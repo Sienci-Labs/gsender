@@ -346,9 +346,6 @@
     "webpack-node-externals": "~1.7.2",
     "write-file-webpack-plugin": "~4.5.0"
   },
-  "pre-push": [
-    "eslint:debug"
-  ],
   "collective": {
     "type": "opencollective",
     "url": "https://opencollective.com/cncjs"
