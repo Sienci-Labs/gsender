@@ -17,7 +17,7 @@ import store from 'app/store';
 import * as widgetManager from './WidgetManager';
 import DefaultWidgets from './DefaultWidgets';
 import PrimaryWidgets from './PrimaryWidgets';
-import SecondaryWidgets from './SecondaryWidgets';
+
 import FeederPaused from './modals/FeederPaused';
 import FeederWait from './modals/FeederWait';
 import ServerDisconnected from './modals/ServerDisconnected';
@@ -58,7 +58,6 @@ class Workspace extends PureComponent {
         isDraggingWidget: false,
         isUploading: false,
         showPrimaryContainer: store.get('workspace.container.primary.show'),
-        showSecondaryContainer: store.get('workspace.container.secondary.show'),
         inactiveCount: _.size(widgetManager.getInactiveWidgets())
     };
 
@@ -213,26 +212,17 @@ class Workspace extends PureComponent {
         pubsub.publish('resize'); // Also see "widgets/Visualizer"
     };
 
-    toggleSecondaryContainer = () => {
-        const { showSecondaryContainer } = this.state;
-        this.setState({ showSecondaryContainer: !showSecondaryContainer });
-
-        // Publish a 'resize' event
-        pubsub.publish('resize'); // Also see "widgets/Visualizer"
-    };
-
     resizeDefaultContainer = () => {
         const sidebar = document.querySelector('#sidebar');
         const primaryContainer = ReactDOM.findDOMNode(this.primaryContainer);
-        const secondaryContainer = ReactDOM.findDOMNode(this.secondaryContainer);
         const primaryToggler = ReactDOM.findDOMNode(this.primaryToggler);
         const secondaryToggler = ReactDOM.findDOMNode(this.secondaryToggler);
         const defaultContainer = ReactDOM.findDOMNode(this.defaultContainer);
-        const { showPrimaryContainer, showSecondaryContainer } = this.state;
+        const { showPrimaryContainer } = this.state;
 
         { // Mobile-Friendly View
             const { location } = this.props;
-            const disableHorizontalScroll = !(showPrimaryContainer && showSecondaryContainer);
+            const disableHorizontalScroll = !(showPrimaryContainer);
 
             if (location.pathname === '/workspace' && disableHorizontalScroll) {
                 // Disable horizontal scroll
@@ -249,13 +239,7 @@ class Workspace extends PureComponent {
         } else {
             defaultContainer.style.left = primaryToggler.offsetWidth + sidebar.offsetWidth + 'px';
         }
-
-        if (showSecondaryContainer) {
-            defaultContainer.style.right = secondaryContainer.offsetWidth + 'px';
-        } else {
-            defaultContainer.style.right = secondaryToggler.offsetWidth + 'px';
-        }
-
+        defaultContainer.style.right = secondaryToggler.offsetWidth + 'px';
         // Publish a 'resize' event
         pubsub.publish('resize'); // Also see "widgets/Visualizer"
     };
@@ -422,11 +406,9 @@ class Workspace extends PureComponent {
             isDraggingFile,
             isDraggingWidget,
             showPrimaryContainer,
-            showSecondaryContainer,
             inactiveCount
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
-        const hideSecondaryContainer = !showSecondaryContainer;
 
         return (
             <div style={style} className={classNames(className, styles.workspace)}>
@@ -606,104 +588,6 @@ class Workspace extends PureComponent {
                                 )}
                             >
                                 <DefaultWidgets />
-                            </div>
-                            {hideSecondaryContainer && (
-                                <div
-                                    ref={node => {
-                                        this.secondaryToggler = node;
-                                    }}
-                                    className={styles.secondaryToggler}
-                                >
-                                    <ButtonGroup
-                                        btnSize="sm"
-                                        btnStyle="flat"
-                                    >
-                                        <Button
-                                            style={{ minWidth: 30 }}
-                                            compact
-                                            onClick={this.toggleSecondaryContainer}
-                                        >
-                                            <i className="fa fa-chevron-left" />
-                                        </Button>
-                                    </ButtonGroup>
-                                </div>
-                            )}
-                            <div
-                                ref={node => {
-                                    this.secondaryContainer = node;
-                                }}
-                                className={classNames(
-                                    styles.secondaryContainer,
-                                    { [styles.hidden]: hideSecondaryContainer }
-                                )}
-                            >
-                                <ButtonToolbar style={{ margin: '5px 0' }}>
-                                    <div className="pull-left">
-                                        <ButtonGroup
-                                            style={{ marginLeft: 0, marginRight: 10 }}
-                                            btnSize="sm"
-                                            btnStyle="flat"
-                                        >
-                                            <Button
-                                                style={{ minWidth: 30 }}
-                                                compact
-                                                title={i18n._('Collapse All')}
-                                                onClick={event => {
-                                                    this.secondaryWidgets.collapseAll();
-                                                }}
-                                            >
-                                                <i className="fa fa-chevron-up" style={{ fontSize: 14 }} />
-                                            </Button>
-                                            <Button
-                                                style={{ minWidth: 30 }}
-                                                compact
-                                                title={i18n._('Expand All')}
-                                                onClick={event => {
-                                                    this.secondaryWidgets.expandAll();
-                                                }}
-                                            >
-                                                <i className="fa fa-chevron-down" style={{ fontSize: 14 }} />
-                                            </Button>
-                                        </ButtonGroup>
-                                        <ButtonGroup
-                                            style={{ marginLeft: 0, marginRight: 10 }}
-                                            btnSize="sm"
-                                            btnStyle="flat"
-                                        >
-                                            <Button
-                                                style={{ width: 230 }}
-                                                onClick={this.updateWidgetsForSecondaryContainer}
-                                            >
-                                                <i className="fa fa-list-alt" />
-                                                {i18n._('Manage Widgets ({{inactiveCount}})', {
-                                                    inactiveCount: inactiveCount
-                                                })}
-                                            </Button>
-                                        </ButtonGroup>
-                                        <ButtonGroup
-                                            style={{ marginLeft: 0, marginRight: 0 }}
-                                            btnSize="sm"
-                                            btnStyle="flat"
-                                        >
-                                            <Button
-                                                style={{ minWidth: 30 }}
-                                                compact
-                                                onClick={this.toggleSecondaryContainer}
-                                            >
-                                                <i className="fa fa-chevron-right" />
-                                            </Button>
-                                        </ButtonGroup>
-                                    </div>
-                                </ButtonToolbar>
-                                <SecondaryWidgets
-                                    ref={node => {
-                                        this.secondaryWidgets = node;
-                                    }}
-                                    onForkWidget={this.widgetEventHandler.onForkWidget}
-                                    onRemoveWidget={this.widgetEventHandler.onRemoveWidget}
-                                    onDragStart={this.widgetEventHandler.onDragStart}
-                                    onDragEnd={this.widgetEventHandler.onDragEnd}
-                                />
                             </div>
                         </div>
                     </div>
