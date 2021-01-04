@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react';
 import { Redirect, withRouter } from 'react-router-dom';
 import { trackPage } from '../lib/analytics';
 import Header from './Header';
-import Sidebar from './Sidebar';
 import Workspace from './Workspace';
 import Settings from './Settings';
 import styles from './App.styl';
@@ -45,9 +44,7 @@ class App extends PureComponent {
         return (
             <div>
                 <Header {...this.props} />
-                <aside className={styles.sidebar} id="sidebar">
-                    <Sidebar {...this.props} />
-                </aside>
+
                 <div className={styles.main}>
                     <div className={styles.content}>
                         <Workspace
