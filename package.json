@@ -74,7 +74,7 @@
     "appId": "org.cncjs",
     "asar": false,
     "asarUnpack": [],
-    "productName": "CNCjs",
+    "productName": "SienciJS",
     "directories": {
       "buildResources": "electron-build",
       "output": "output",
