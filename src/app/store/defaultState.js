@@ -16,13 +16,7 @@ const defaultState = {
             primary: {
                 show: true,
                 widgets: [
-                    'connection', 'console', 'grbl', 'marlin', 'smoothie', 'tinyg', 'webcam'
-                ]
-            },
-            secondary: {
-                show: true,
-                widgets: [
-                    'axes', 'gcode', 'macro', 'probe', 'spindle', 'laser'
+                    'connection', 'console', 'grbl', 'marlin', 'smoothie', 'tinyg', 'webcam', 'axes', 'gcode', 'macro', 'probe', 'spindle', 'laser'
                 ]
             }
         },

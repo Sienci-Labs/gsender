@@ -22,7 +22,7 @@ if (isElectron()) {
     const path = window.require('path'); // Require the path module within Electron
     const app = electron.remote.app;
     userData = {
-        path: path.join(app.getPath('userData'), 'cnc.json')
+        path: path.join(app.getPath('userData'), 'sienci.json')
     };
 }
 
