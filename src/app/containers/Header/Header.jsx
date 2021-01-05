@@ -17,6 +17,7 @@ import * as user from 'app/lib/user';
 import store from 'app/store';
 import QuickAccessToolbar from './QuickAccessToolbar';
 import styles from './index.styl';
+import NavbarConnection from '../../widgets/NavbarConnection';
 
 const releases = 'https://github.com/cncjs/cncjs/releases';
 
@@ -453,6 +454,7 @@ class Header extends PureComponent {
                             </MenuItem>
                         </NavDropdown>
                     </Nav>
+                    <NavbarConnection />::
                     {location.pathname === '/workspace' &&
                     <QuickAccessToolbar state={this.state} actions={this.actions} />
                     }
