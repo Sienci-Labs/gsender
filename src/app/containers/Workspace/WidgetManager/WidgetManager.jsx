@@ -79,6 +79,13 @@ class WidgetManager extends PureComponent {
             disabled: false
         },
         {
+            id: 'location',
+            caption: i18n._('Location Widget'),
+            details: i18n._('This widget displays machine and work coordinates for all axes'),
+            visible: true,
+            disabled: false
+        },
+        {
             id: 'gcode',
             caption: i18n._('G-code Widget'),
             details: i18n._('This widget shows the current status of G-code commands.'),
