@@ -8,3 +8,4 @@ package-lock.json
 /output
 /releases
 .idea
+/.vscode
