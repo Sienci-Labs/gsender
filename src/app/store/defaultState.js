@@ -16,7 +16,7 @@ const defaultState = {
             primary: {
                 show: true,
                 widgets: [
-                    'connection', 'console', 'grbl', 'marlin', 'smoothie', 'tinyg', 'webcam', 'axes', 'gcode', 'macro', 'probe', 'spindle', 'laser'
+                    'location', 'connection', 'console', 'grbl', 'marlin', 'smoothie', 'tinyg', 'webcam', 'axes', 'gcode', 'macro', 'probe', 'spindle', 'laser'
                 ]
             }
         },
@@ -102,6 +102,30 @@ const defaultState = {
                 power: 0,
                 duration: 0,
                 maxS: 1000
+            }
+        },
+        location: {
+            minimized: false,
+            axes: ['x', 'y', 'z'],
+            jog: {
+                keypad: false,
+                imperial: {
+                    step: IMPERIAL_STEPS.indexOf(1), // Defaults to 1 inch
+                    distances: []
+                },
+                metric: {
+                    step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
+                    distances: []
+                }
+            },
+            mdi: {
+                disabled: false
+            },
+            shuttle: {
+                feedrateMin: 500,
+                feedrateMax: 2000,
+                hertz: 10,
+                overshoot: 1
             }
         },
         macro: {
