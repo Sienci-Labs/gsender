@@ -1,0 +1,28 @@
+import PropTypes from 'prop-types';
+import React from 'react';
+import DisplayPanel from './DisplayPanel';
+
+const Location = (props) => {
+    const { state, actions } = props;
+
+    return (
+        <div>
+            <DisplayPanel
+                canClick={state.canClick}
+                units={state.units}
+                axes={state.axes}
+                machinePosition={state.machinePosition}
+                workPosition={state.workPosition}
+                jog={state.jog}
+                actions={actions}
+            />
+        </div>
+    );
+};
+
+Location.propTypes = {
+    state: PropTypes.object,
+    actions: PropTypes.object
+};
+
+export default Location;
