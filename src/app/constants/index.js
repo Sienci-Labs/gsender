@@ -109,3 +109,21 @@ export const TINYG_MACHINE_STATE_JOG = 10; // Machine is in a jogging cycle
 export const TINYG_MACHINE_STATE_INTERLOCK = 11; // Machine is in safety interlock hold
 export const TINYG_MACHINE_STATE_SHUTDOWN = 12; // Machine is in shutdown state. Will not process commands
 export const TINYG_MACHINE_STATE_PANIC = 13; // Machine is in panic state. Needs to be physically reset
+
+
+//Speeds for toggle buttons
+export const XY_FAST_TOGGLE_SPEED_METRIC = METRIC_STEPS[17];
+export const XY_NORMAL_TOGGLE_SPEED_METRIC = METRIC_STEPS[15];
+export const XY_PRECISE_TOGGLE_SPEED_METRIC = METRIC_STEPS[7];
+
+export const XY_FAST_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[16];
+export const XY_NORMAL_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[9];
+export const XY_PRECISE_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[9];
+
+export const Z_FAST_TOGGLE_SPEED_METRIC = METRIC_STEPS[10];
+export const Z_NORMAL_TOGGLE_SPEED_METRIC = METRIC_STEPS[13];
+export const Z_PRECISE_TOGGLE_SPEED_METRIC = METRIC_STEPS[8];
+
+export const Z_FAST_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[11];
+export const Z_NORMAL_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[10];//NO 0.04 FOUND ABOVE
+export const Z_PRECISE_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[2];//NO 0.04 FOUND ABOVE
