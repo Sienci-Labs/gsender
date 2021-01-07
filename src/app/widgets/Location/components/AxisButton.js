@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-const PRIMARY_COLOR = '#3E85C7'; //Primary Color (Light Blue)
+import { PRIMARY_COLOR } from '../constants';
 
 //Main styles
 const Container = styled.div`

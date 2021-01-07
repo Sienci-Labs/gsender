@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-const PRIMARY_COLOR = '#3E85C7'; // Light Blue
-const SECONDARY_COLOR = '#6F7376'; // Grey (for disabled look)
+import { PRIMARY_COLOR, SECONDARY_COLOR } from '../constants';
 
 const Button = styled.button`
     border: 3px solid ${PRIMARY_COLOR};

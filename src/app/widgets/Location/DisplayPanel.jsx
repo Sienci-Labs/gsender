@@ -31,6 +31,8 @@ import BullseyeIcon from './icons/Bullseye';
 import ChartIcon from './icons/Chart';
 import HomeIcon from './icons/Home';
 
+import { PRIMARY_COLOR, SECONDARY_COLOR } from './constants';
+
 class DisplayPanel extends PureComponent {
     static propTypes = {
         canClick: PropTypes.bool,
@@ -1018,9 +1020,6 @@ class DisplayPanel extends PureComponent {
         const hasAxisY = includes(axes, AXIS_Y);
         const hasAxisZ = includes(axes, AXIS_Z);
         const currentAxis = this.state.currentAxis;
-
-        const PRIMARY_COLOR = '#3E85C7';
-        const SECONDARY_COLOR = '#6F7376';
 
         return (
             <Panel className={styles.displayPanel}>
