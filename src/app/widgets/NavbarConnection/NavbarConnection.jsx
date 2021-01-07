@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import find from 'lodash/find';
-import map from 'lodash/map';
+import { find } from 'lodash';
 import { Dropdown } from 'react-bootstrap';
+import PortListing from './PortListing';
 import styles from './Index.styl';
+
 
 class NavbarConnection extends PureComponent {
     static propTypes = {
@@ -36,39 +37,29 @@ class NavbarConnection extends PureComponent {
         return 'fa-plug';
     };
 
-    renderPortOption = (option) => {
-        const { label, inuse } = option;
-
-        return (
-        //const { state, actions } = this.props;
-            <Dropdown.Item>
-                {label}
-                {inuse}
-            </Dropdown.Item>
-        );
-    };
-
     render() {
-        const { state } = this.props;
-        const { ports, connecting, connected } = state;
+        const { state, actions } = this.props;
+        const { ports, connecting, connected, baudrate, controllerType } = state;
 
         return (
             <div className={styles.NavbarConnection}>
                 <div className={styles.NavbarConnectionIcon}>
                     <i className={`fa ${this.renderConnectionStatusIcon(connected, connecting)}`} />
                 </div>
-                <Dropdown>
-                    <Dropdown.Toggle>
+                <Dropdown id="connection-selection-menu" className={styles.NavbarConnectionDropdownToggle}>
+                    <Dropdown.Toggle id="connection-selection-list">
                         { this.getConnectionStatusText(connected, connecting) }
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         {
-                            map(ports, o => this.renderPortOption({
-                                label: o.port,
-                                value: o.port,
-                                manufacturer: o.port,
-                                inuse: o.inuse
-                            }))
+                            ports.map(
+                                port => (<PortListing
+                                    {...port}
+                                    baudrate={baudrate}
+                                    controllerType={controllerType}
+                                    onClick={() => actions.onClickPortListing(port.value)}
+                                />)
+                            )
                         }
                     </Dropdown.Menu>
                 </Dropdown>

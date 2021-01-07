@@ -60,6 +60,13 @@ class NavbarConnectionWidget extends PureComponent {
                 port: option.value
             }));
         },
+        onClickPortListing: (port) => {
+            this.setState(state => ({
+                alertMessage: '',
+                port: port
+            }));
+            this.actions.handleOpenPort();
+        },
         onChangeBaudrateOption: (option) => {
             this.setState(state => ({
                 alertMessage: '',
@@ -259,7 +266,7 @@ class NavbarConnectionWidget extends PureComponent {
                     rtscts: this.config.get('connection.serial.rtscts')
                 }
             },
-            autoReconnect: this.config.get('autoReconnect'),
+            autoReconnect: false,
             hasReconnected: false,
             alertMessage: ''
         };

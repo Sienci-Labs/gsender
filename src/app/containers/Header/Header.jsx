@@ -1,5 +1,4 @@
 import React, { PureComponent } from 'react';
-import { Navbar } from 'react-bootstrap';
 import { withRouter } from 'react-router-dom';
 import without from 'lodash/without';
 import Push from 'push.js';
@@ -9,6 +8,7 @@ import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import NavbarConnection from 'app/widgets/NavbarConnection';
+import styles from './index.styl';
 
 //const releases = 'https://github.com/cncjs/cncjs/releases';
 
@@ -231,19 +231,10 @@ class Header extends PureComponent {
 
     render() {
         return (
-            <Navbar
-                fixedTop
-                style={{
-                    border: 'none',
-                    margin: 0,
-                    background: '#000000',
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                }}
-            >
-                <NavbarConnection state={this.state} actions={this.actions} widgetId="connectionNavbar" />
-            </Navbar>
+            <div className={styles.navBar}>
+                <NavbarConnection state={this.state} actions={this.actions} widgetId="connection" />
+                <div>Menus go here</div>
+            </div>
         );
     }
 }
