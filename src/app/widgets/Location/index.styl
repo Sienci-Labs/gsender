@@ -1,0 +1,24 @@
+@import "display-panel";
+@import "rotate";
+@import "keypad";
+@import "LocationPanel";
+
+.widget-content {
+    position: relative;
+    padding: 10px;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+.row-space {
+    margin-bottom: 5px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+.col-space {
+    margin-right: 5px;
+}
