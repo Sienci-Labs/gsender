@@ -18,9 +18,13 @@
   background: #4B5563;
   height: 2.5rem;
   width: 2.5rem;
-  font-size: 1.8rem;
+
   border-radius: 9999px;
   margin-right: 0.5rem;
+
+  i {
+    font-size: 1.4rem !important;
+  }
 }
 
 .NavbarDropdown {
@@ -59,4 +63,39 @@
   font-size: 0.8rem;
   text-align right
   color: #9CA3AF;
+}
+
+.icon-connecting {
+  animation: spin 1s linear infinite;
+  background: yellow
+}
+
+.icon-disconnected {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.icon-connected {
+  background: green;
+}
+
+.icon-error {
+  background: red;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

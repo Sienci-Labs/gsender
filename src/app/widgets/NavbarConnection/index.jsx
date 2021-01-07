@@ -60,12 +60,13 @@ class NavbarConnectionWidget extends PureComponent {
                 port: option.value
             }));
         },
-        onClickPortListing: (port) => {
+        onClickPortListing: (selectedPort) => {
             this.setState(state => ({
                 alertMessage: '',
-                port: port
+                port: selectedPort
             }));
-            this.actions.handleOpenPort();
+            const { port, baudrate } = this.state;
+            this.openPort(port, { baudrate: baudrate });
         },
         onChangeBaudrateOption: (option) => {
             this.setState(state => ({
@@ -328,7 +329,7 @@ class NavbarConnectionWidget extends PureComponent {
         }, (err) => {
             if (err) {
                 this.setState(state => ({
-                    alertMessage: i18n._('Error opening serial port \'{{- port}}\'', { port: port }),
+                    alertMessage: i18n._('Error opening port \'{{- port}}\'', { port: port }),
                     connecting: false,
                     connected: false
                 }));

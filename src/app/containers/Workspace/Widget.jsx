@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import AxesWidget from 'app/widgets/Axes';
-import ConnectionWidget from 'app/widgets/Connection';
 import ConsoleWidget from 'app/widgets/Console';
 import GCodeWidget from 'app/widgets/GCode';
 import GrblWidget from 'app/widgets/Grbl';
@@ -15,12 +14,13 @@ import CustomWidget from 'app/widgets/Custom';
 import TinyGWidget from 'app/widgets/TinyG';
 import VisualizerWidget from 'app/widgets/Visualizer';
 import WebcamWidget from 'app/widgets/Webcam';
+import ConnectionWidget from '../../widgets/Connection';
 
 const getWidgetByName = (name) => {
     return {
         'axes': AxesWidget,
-        'connection': ConnectionWidget,
         'console': ConsoleWidget,
+        'connection': ConnectionWidget,
         'gcode': GCodeWidget,
         'grbl': GrblWidget,
         'laser': LaserWidget,
