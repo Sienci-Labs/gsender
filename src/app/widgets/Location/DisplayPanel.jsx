@@ -989,37 +989,46 @@ class DisplayPanel extends PureComponent {
     };
 
     renderAxis = (axis) => {
-        const { canClick, machinePosition, workPosition } = this.props;
+        const { canClick, machinePosition, workPosition, actions } = this.props;
         const mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';
         const axisLabel = axis.toUpperCase();
         const showPositionInput = canClick && this.state.positionInput[axis];
-        const currentAxis = this.state.currentAxis;
 
-        //Function to set the current axis
+        //Function to zero out given axis
         const handleAxisButtonClick = () => {
-            this.setState({ currentAxis: axis });
+            const wcs = actions.getWorkCoordinateSystem();
+
+            const p = {
+                'G54': 1,
+                'G55': 2,
+                'G56': 3,
+                'G57': 4,
+                'G58': 5,
+                'G59': 6
+            }[wcs] || 0;
+
+            controller.command('gcode', `G10 L20 P${p} ${axisLabel}0`);
         };
 
         return (
             <tr>
                 <td className={styles.coordinate}>
-                    <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} active={axis === currentAxis} />
+                    <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick} />
                 </td>
                 <td className={styles.machinePosition}>
-                    <PositionLabel value={mpos} />
-                    {!showPositionInput && <PositionLabel value={wpos} small /> }
+                    <PositionLabel value={wpos} />
+                    {!showPositionInput && <PositionLabel value={mpos} small /> }
                 </td>
             </tr>
         );
     };
 
     render() {
-        const { axes, actions, machinePosition, canClick } = this.props;
+        const { axes, actions, canClick } = this.props;
         const hasAxisX = includes(axes, AXIS_X);
         const hasAxisY = includes(axes, AXIS_Y);
         const hasAxisZ = includes(axes, AXIS_Z);
-        const currentAxis = this.state.currentAxis;
 
         return (
             <Panel className={styles.displayPanel}>
@@ -1035,7 +1044,7 @@ class DisplayPanel extends PureComponent {
                     <div className={styles.controlButtons}>
                         <ControlButton
                             icon={() => <BullseyeIcon fill={canClick ? PRIMARY_COLOR : SECONDARY_COLOR} />}
-                            label="Zero All"
+                            label={i18n._('Zero All')}
                             onClick={() => {
                                 const wcs = actions.getWorkCoordinateSystem();
 
@@ -1053,31 +1062,28 @@ class DisplayPanel extends PureComponent {
                             disabled={!canClick}
                         />
                         <ControlButton
-                            label="Go to Zero"
-                            icon={() => <ChartIcon fill={(canClick && currentAxis) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
+                            label={i18n._('Go to Zero')}
+                            icon={() => <ChartIcon fill={(canClick) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
                             onClick={() => {
-                                const val = machinePosition[currentAxis];
-
-                                actions.jog({ [currentAxis]: -val });
+                                controller.command('gcode', 'G0 X0 Y0 Z0'); //Move to Work Position Zero
                             }}
-                            disabled={!canClick || !currentAxis}
+                            disabled={!canClick}
                         />
                         <ControlButton
-                            label="Home"
-                            icon={() => <HomeIcon fill={(canClick && currentAxis) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
+                            label={i18n._('Home')}
+                            icon={() => <HomeIcon fill={(canClick) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
                             onClick={() => {
-                                actions.setWorkOffsets(currentAxis, machinePosition[currentAxis]);
+                                controller.command('homing');
                             }}
-                            disabled={!canClick || !currentAxis}
+                            disabled={!canClick}
                         />
                         <ControlButton
-                            label="Go Home"
-                            icon={() => <ChartIcon fill={(canClick && currentAxis) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
+                            label={i18n._('Go Home')}
+                            icon={() => <ChartIcon fill={(canClick) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
                             onClick={() => {
-                                const axis = currentAxis.toUpperCase();
-                                controller.command('gcode', `G28.1 ${axis}0`);
+                                controller.command('gcode', 'G28 G91'); //Go to Home Position
                             }}
-                            disabled={(!canClick || !currentAxis)}
+                            disabled={!canClick}
                         />
                     </div>
                 </div>
