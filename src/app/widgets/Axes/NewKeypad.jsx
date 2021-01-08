@@ -1,4 +1,3 @@
-import cx from 'classnames';
 import ensureArray from 'ensure-array';
 import frac from 'frac';
 import _includes from 'lodash/includes';
@@ -12,7 +11,6 @@ import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import Fraction from './components/Fraction';
 import * as Constants from '../../constants';
-import styles from './index.styl';
 import './styles.css';
 // import PRECISE_MOVEMENT from './constants';
 // import Dropdown from 'app/components/Dropdown';
@@ -20,15 +18,13 @@ import './styles.css';
 // import { useState } from 'react'
 
 class NewKeypad extends PureComponent {
-    constructor() {
-        super(0, 0);
+    constructor(props) {
+        super(props);
         this.state = {
-            xyDistance: 0,
-            incomingSpeed: 0,
-            Distance: 0
+            xyDistance: 1,
+            zdistance: 1
 
         };
-        this.handleButtons = this.handleButtons.bind(this);
     }
 
 
@@ -50,7 +46,9 @@ class NewKeypad extends PureComponent {
     }
 
     handleXYMove = (event) => {
+        const { actions } = this.props;
         let xyDistance = event.target.value;
+        actions.selectStep(xyDistance);
         console.log('XYdistance is set to ' + xyDistance);
         this.setState(prevState => {
             return {
@@ -60,11 +58,13 @@ class NewKeypad extends PureComponent {
     }
 
     handleZMove = (event) => {
+        const { actions } = this.props;
         let zDistance = event.target.value;
+        actions.selectStep(zDistance);
         console.log('Zdistance is set to ' + zDistance);
         this.setState(prevState => {
             return {
-                distance: zDistance
+                zdistance: zDistance
             };
         });
     }
@@ -161,240 +161,219 @@ class NewKeypad extends PureComponent {
     }
 
     render() {
-        const { canClick, axes, jog, actions } = this.props;
+        const { canClick, axes, actions } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
         const canClickZ = canClick && _includes(axes, 'z');
-        const highlightX = canClickX && (jog.keypad || jog.axis === 'x');
-        // const highlightY = canClickY && (jog.keypad || jog.axis === 'y');
-        // const highlightZ = canClickZ && (jog.keypad || jog.axis === 'z');
 
-        const buttonStyles = {
-            fontSize: 14,
-            color: '#4a54f1',
-            textAlign: 'center',
-            backgroundcolor: 'Blue'
-        };
         return (
-            <div>
-                <div>
-                    <div>
-                        <div>
-                            <div>
-                                <div className="flexParent">
-                                    <div className="upperLeftTriangle">
-                                        <Button
-                                            onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ X: -distance, Y: distance });
-                                            }}
-                                            disabled={!canClickXY}
-                                            title={i18n._('Move X- Y+')}
-                                        >
-                                        </Button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="upArrow">
-                                        <Button
-                                            onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ Y: distance });
-                                            }}
-                                            disabled={!canClickY}
-                                            title={i18n._('Move Y+')}
-                                        >Y+
-                                        </Button>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="upperRightTriangle">
-                                        <Button
-                                            onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                console.log('NEWDISTANCE ' + distance);
-                                                actions.jog({ X: distance, Y: distance });
-                                            }}
-                                            disabled={!canClickXY}
-                                            title={i18n._('Move X+ Y+')}
-                                        >
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <div>
-                                    <Button
-                                        className="upArrow"
-                                        onClick={() => {
-                                            const distance = actions.getJogDistance();
-                                            actions.jog({ Z: distance });
-                                        }}
-                                        disabled={!canClickZ}
-                                        title={i18n._('Move Z+')}
-                                    >Z+
-                                    </Button>
-                                </div>
-                            </div>
+            <div className="controlsContainer">
+                <div className="mainControls">
+                    <div className="topThreeMainControls">
+                        <div className="upperLeftTriangle">
+                            <Button
+                                onClick={() => {
+                                    const distance = this.state.xyDistance;
+                                    actions.jog({ x: -distance, y: distance });
+                                }}
+                                disabled={!canClickXY}
+                                title={i18n._('Move X- Y+')}
+                            >
+                            </Button>
+                        </div>
+                        <div className="upArrow">
+                            <Button
+                                onClick={() => {
+                                    const distance = this.state.xyDistance;
+                                    actions.jog({ Y: distance });
+                                    actions.getJogDistance();
+                                }}
+                                disabled={!canClickY}
+                                title={i18n._('Move Y+')}
+                            >Y+
+                            </Button>
+                        </div>
+                        <div className="upperRightTriangle">
+                            <Button
+                                onClick={() => {
+                                    const distance = this.state.xyDistance;
+                                    actions.jog({ X: distance, Y: distance });
+                                }}
+                                disabled={!canClickXY}
+                                title={i18n._('Move X+ Y+')}
+                            >
+                            </Button>
                         </div>
                     </div>
-                    <div>
-                        <div>
-                            <div>
-                                <div className="leftArrow">
-                                    <Button
-                                        btnStyle="flat"
-                                        compact
-                                        className={cx(
-                                            styles.btnKeypad,
-                                            { [styles.highlight]: highlightX }
-                                        )}
-                                        onClick={() => {
-                                            const distance = actions.getJogDistance();
-                                            actions.jog({ X: -distance });
-                                        }}
-                                        disabled={!canClickX}
-                                        title={i18n._('Move X-')}
-                                    >X-
-                                    </Button>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="lowerRightTriangle">
-                                </div>
-                            </div>
-                            <div>
-                                <div className="rightArrow">
-                                    <Button
-                                        onClick={() => {
-                                            const distance = actions.getJogDistance();
-                                            actions.jog({ X: distance });
-                                        }}
-                                        disabled={!canClickX}
-                                        title={i18n._('Move X+')}
-                                    >
-                                    X+
-                                    </Button>
-                                </div>
-                            </div>
-                            <div>
-                                <div className={styles.colSpace}>
-                                    <Button
-                                        className="downArrow"
-                                        onClick={() => {
-                                            const distance = actions.getJogDistance();
-                                            actions.jog({ Z: -distance });
-                                        }}
-                                        disabled={!canClickZ}
-                                        title={i18n._('Move Z-')}
-                                    >Z-
-                                    </Button>
-                                </div>
-                            </div>
+                    <div className="middleControls">
+                        <div className="leftArrow">
+                            <Button
+                                onClick={() => {
+                                    const distance = this.state.xyDistance;
+                                    actions.jog({ X: -distance });
+                                }}
+                                disabled={!canClickX}
+                                title={i18n._('Move X-')}
+                            >X-
+                            </Button>
+                        </div>
+                        <div className="rightArrow">
+                            <Button
+                                onClick={() => {
+                                    const distance = this.state.xyDistance;
+                                    actions.jog({ X: distance });
+                                }}
+                                disabled={!canClickX}
+                                title={i18n._('Move X+')}
+                            >
+                                X+
+                            </Button>
                         </div>
                     </div>
-                    <div>
-                        <div>
-                            <div>
-                                <div className="lowerLeftTriangle">
-                                    <Button
-                                        onClick={() => {
-                                            const distance = actions.getJogDistance();
-                                            actions.jog({ X: -distance, Y: -distance });
-                                        }}
-                                        disabled={!canClickXY}
-                                        title={i18n._('Move X- Y-')}
-                                    >
-                                    </Button>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="downArrow">
-                                    <Button
-                                        onClick={() => {
-                                            const distance = actions.getJogDistance();
-                                            actions.jog({ Y: -distance });
-                                        }}
-                                        disabled={!canClickY}
-                                        title={i18n._('Move Y-')}
-                                    >Y-
-                                    </Button>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="lowerRightTriangle">
-                                    <Button
-                                        className="leftArrow"
-                                        onClick={() => {
-                                            const distance = actions.getJogDistance();
-                                            actions.jog({ X: distance, Y: -distance });
-                                        }}
-                                        disabled={!canClickXY}
-                                        title={i18n._('Move X+ Y-')}
-                                    >
-                                    </Button>
-                                </div>
-                            </div>
+                    <div className="bottomControls">
+                        <div className="lowerLeftTriangle">
+                            <Button
+                                onClick={() => {
+                                    const distance = this.state.xyDistance;
+                                    actions.jog({ X: -distance, Y: -distance });
+                                }}
+                                disabled={!canClickXY}
+                                title={i18n._('Move X- Y-')}
+                            >
+                            </Button>
+                        </div>
+                        <div className="downArrow">
+                            <Button
+                                onClick={() => {
+                                    const distance = this.state.xyDistance;
+                                    actions.jog({ Y: -distance });
+                                }}
+                                disabled={!canClickY}
+                                title={i18n._('Move Y-')}
+                            >Y-
+                            </Button>
+                        </div>
+                        <div className="lowerRightTriangle">
+                            <Button
+                                className="leftArrow"
+                                onClick={() => {
+                                    const distance = this.state.xyDistance;
+                                    actions.jog({ X: distance, Y: -distance });
+                                }}
+                                disabled={!canClickXY}
+                                title={i18n._('Move X+ Y-')}
+                            >
+                            </Button>
                         </div>
                     </div>
-                </div>
-                <div className="speedButtonGroup">
-                    <div>
+                    <div className="zControls">
                         <Button
-                            style={ buttonStyles }
+                            className="upArrowZ"
+                            onClick={() => {
+                                const distance = this.state.zdistance;
+                                actions.jog({ Z: distance });
+                            }}
+                            disabled={!canClickZ}
+                            title={i18n._('Move Z+')}
+                        >Z+
+                        </Button>
+                        <Button
+                            className="downArrowZ"
+                            onClick={() => {
+                                const distance = this.state.zdistance;
+                                actions.jog({ Z: distance });
+                            }}
+                            disabled={!canClickZ}
+                            title={i18n._('Move Z-')}
+                        >Z-
+                        </Button>
+                    </div>
+                    <div className="speedButtonGroup">
+                        <Button
                             disabled={!canClickXY}
-                            onClick={ () => {
+                            onClick={() => {
                                 console.log(Constants.XY_PRECISE_TOGGLE_SPEED_METRIC);
                                 this.handleButtons(Constants.XY_PRECISE_TOGGLE_SPEED_METRIC);
                             }}
-                            className="speedButtons"
+                            className="preciseSpeedButton"
                         >
-                                Precise
+                            Precise
                         </Button>
                         <Button
-                            style={ buttonStyles }
                             disabled={!canClickXY}
                             onClick={() => {
                                 console.log(Constants.XY_NORMAL_TOGGLE_SPEED_METRIC);
                                 this.handleButtons(Constants.XY_NORMAL_TOGGLE_SPEED_METRIC);
                             }}
-                            className="speedButtons"
+                            className="normalSpeedButton"
                         >
-                                Normal
+                            Normal
                         </Button>
                         <Button
-                            style={ buttonStyles }
                             disabled={!canClickXY}
                             onClick={() => {
                                 console.log(Constants.Z_FAST_TOGGLE_SPEED_METRIC);
                                 this.handleButtons(Constants.Z_FAST_TOGGLE_SPEED_METRIC);
                             }}
-                            className="speedButtons"
+                            className="fastSpeedButton"
                         >
-                                Fast
+                            Fast
                         </Button>
                     </div>
                 </div>
-                <div className="rollingNumbers">
-                    <label className={styles.toggleText} htmlFor="firstToggleNumber">XY Move</label>
-                    <input
-                        disabled={!canClickXY}
-                        onChange={this.handleXYMove}
-                        type="number" name="xyMove" id="firstToggleNumber" min="0" max="1" step="0.01"
-                    />
-                    <label htmlFor="secondToggleNumber">Z Move</label>
-                    <input
-                        disabled={!canClickXY}
-                        onChange={this.handleZMove}
-                        className="" type="number" name="change" id="secondToggleNumber" min="0" max="1" step="0.01"
-                    />
-                    <label htmlFor="thirdToggleNumber">Speed</label>
-                    <input
-                        disabled={!canClickXY}
-                        onChange={this.handleSpeed}
-                        className="" type="number" name="change" id="thirdToggleNumber" min="0" max="1" step="0.01"
-                    />
+                <div>
+                    <div className="rollingNumbers">
+                        <div className="rollingXYMove">
+                            <label className="htmlLabels" htmlFor="firstToggleNumber">XY Move</label>
+                            <input
+                                disabled={!canClickXY}
+                                onChange={this.handleXYMove}
+                                type="number"
+                                className="rollingXYInput"
+                                name="xyMove"
+                                min="0"
+                                max="10"
+                                step="1"
+                            />
+                        </div>
+                        <div className="rollingZMove">
+                            <label
+                                className="htmlLabels"
+                                htmlFor="secondToggleNumber"
+                            >
+                                Z Move
+                            </label>
+                            <input
+                                disabled={!canClickXY}
+                                onChange={this.handleZMove}
+                                className="rollingZInput"
+                                type="number"
+                                name="zMove"
+                                min="0"
+                                max="10"
+                                step="1"
+                            />
+                        </div>
+                        <div className="rollingSpeed">
+                            <label
+                                className="htmlLabels"
+                                htmlFor="thirdToggleNumber"
+                            >
+                                Speed
+                            </label>
+                            <input
+                                disabled={!canClickXY}
+                                onChange={this.handleSpeed}
+                                className="rollingSpeedInput"
+                                type="number"
+                                name="speedMove"
+                                min="0"
+                                max="10"
+                                step="1"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         );

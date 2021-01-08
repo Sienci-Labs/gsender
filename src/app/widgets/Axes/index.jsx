@@ -123,6 +123,7 @@ class AxesWidget extends PureComponent {
                     ...IMPERIAL_STEPS
                 ];
                 const distance = Number(imperialJogSteps[step]) || 0;
+                console.log('distancetraveleing ' + distance);
                 return distance;
             }
 
@@ -183,6 +184,7 @@ class AxesWidget extends PureComponent {
             controller.command('gcode', 'G91'); // relative
             controller.command('gcode', 'G0 ' + s);
             controller.command('gcode', 'G90'); // absolute
+            console.log('Params ' + s);
         },
         move: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
@@ -214,6 +216,7 @@ class AxesWidget extends PureComponent {
         },
         selectStep: (value = '') => {
             const step = Number(value);
+            console.log('Steppin ' + step);
             this.setState(state => ({
                 jog: {
                     ...state.jog,
