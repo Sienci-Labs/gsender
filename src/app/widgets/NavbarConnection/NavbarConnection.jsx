@@ -5,7 +5,6 @@ import { Dropdown } from 'react-bootstrap';
 import PortListing from './PortListing';
 import styles from './Index.styl';
 
-
 class NavbarConnection extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
@@ -21,7 +20,7 @@ class NavbarConnection extends PureComponent {
 
     getConnectionStatusText = (connected, connecting, alertMessage) => {
         if (connected) {
-            return '';
+            return 'Connected';
         } else if (alertMessage) {
             return alertMessage;
         } else if (connecting) {
@@ -48,7 +47,7 @@ class NavbarConnection extends PureComponent {
         if (alertMessage) {
             return 'icon-error';
         }
-        if (connecting && !alertMessage) {
+        if (connecting) {
             return 'icon-connecting';
         }
         return 'icon-disconnected';
@@ -58,7 +57,7 @@ class NavbarConnection extends PureComponent {
         const { state, actions } = this.props;
         const { ports, connecting, connected, baudrate, controllerType, alertMessage } = state;
 
-        const iconState = this.getIconState(connecting, connected, alertMessage);
+        const iconState = this.getIconState(connected, connecting, alertMessage);
 
         return (
             <div className={styles.NavbarConnection}>
@@ -71,7 +70,13 @@ class NavbarConnection extends PureComponent {
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
                         {
-                            ports.map(
+                            !connected && (ports.length === 0) &&
+                                <div>
+                                    No Devices Found
+                                </div>
+                        }
+                        {
+                            !connected && ports.map(
                                 port => (<PortListing
                                     {...port}
                                     baudrate={baudrate}
@@ -79,6 +84,19 @@ class NavbarConnection extends PureComponent {
                                     onClick={() => actions.onClickPortListing(port.value)}
                                 />)
                             )
+                        }
+                        {
+                            !connected &&
+                            <button type="button" className={styles.refreshButton} onClick={actions.handleRefreshPorts}>
+                                <i className="fa fa-refresh" />
+                                Refresh Ports
+                            </button>
+                        }
+                        {
+                            connected &&
+                            <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
+                                Disconnect
+                            </button>
                         }
                     </Dropdown.Menu>
                 </Dropdown>
