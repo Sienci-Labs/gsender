@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { find } from 'lodash';
-import { Dropdown } from 'react-bootstrap';
 import PortListing from './PortListing';
 import styles from './Index.styl';
 
@@ -26,7 +25,7 @@ class NavbarConnection extends PureComponent {
         } else if (connecting) {
             return 'Connecting...';
         }
-        return 'Connect to Machine';
+        return 'Connect to Machine ▼';
     };
 
     renderConnectionStatusIcon = (connected, connecting, alertMessage) => {
@@ -55,7 +54,8 @@ class NavbarConnection extends PureComponent {
 
     render() {
         const { state, actions } = this.props;
-        const { ports, connecting, connected, baudrate, controllerType, alertMessage } = state;
+        const { ports, connecting, loading, connected, baudrate, controllerType, alertMessage, port } = state;
+        const canRefresh = !loading && !connected;
 
         const iconState = this.getIconState(connected, connecting, alertMessage);
 
@@ -64,42 +64,51 @@ class NavbarConnection extends PureComponent {
                 <div className={`${styles.NavbarConnectionIcon} ${styles[iconState]}`}>
                     <i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />
                 </div>
-                <Dropdown id="connection-selection-menu" className={styles.NavbarConnectionDropdownToggle}>
-                    <Dropdown.Toggle id="connection-selection-list">
+                <div>
+                    <div className="dropdown-label" id="connection-selection-list">
                         { this.getConnectionStatusText(connected, connecting, alertMessage) }
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                        {
-                            !connected && (ports.length === 0) &&
-                                <div>
-                                    No Devices Found
-                                </div>
-                        }
-                        {
-                            !connected && ports.map(
-                                port => (<PortListing
+                    </div>
+                </div>
+                {
+                    connected &&
+                        <div className={styles.ConnectionInfo}>
+                            <div className={styles.portLabel}>{ port }</div>
+                            <div>{ controllerType }</div>
+                        </div>
+                }
+                <div className={styles.NavbarConnectionDropdownList}>
+                    {
+                        !connected && (ports.length === 0) &&
+                        <div className={styles.noDevicesWarning}>
+                            No Devices Found
+                        </div>
+                    }
+                    {
+                        !connected && !connecting && ports.map(
+                            port => (
+                                <PortListing
                                     {...port}
                                     baudrate={baudrate}
                                     controllerType={controllerType}
                                     onClick={() => actions.onClickPortListing(port.value)}
                                 />)
-                            )
-                        }
-                        {
-                            !connected &&
-                            <button type="button" className={styles.refreshButton} onClick={actions.handleRefreshPorts}>
-                                <i className="fa fa-refresh" />
-                                Refresh Ports
-                            </button>
-                        }
-                        {
-                            connected &&
-                            <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
-                                Disconnect
-                            </button>
-                        }
-                    </Dropdown.Menu>
-                </Dropdown>
+                        )
+                    }
+                    {
+                        !connected && canRefresh &&
+                        <button type="button" className={styles.refreshButton} onClick={actions.handleRefreshPorts}>
+                            <i className="fa fa-refresh" />
+                            Refresh Ports
+                        </button>
+                    }
+                    {
+                        connected &&
+                        <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
+                            <i className="fa fa-unlink" />
+                            Disconnect
+                        </button>
+                    }
+                </div>
             </div>
         );
     }

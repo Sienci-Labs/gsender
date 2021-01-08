@@ -9,6 +9,7 @@
   justify-content space-between;
   align-items center;
   padding: 0.25rem 1rem;
+  min-width: 250px;
 }
 
 .NavbarConnectionIcon {
@@ -27,7 +28,7 @@
   }
 }
 
-.NavbarDropdown {
+.PortListing {
   color: white;
   display: flex;
   flex-direction: row;
@@ -44,9 +45,18 @@
 }
 
 
-.NavbarConnectionDropdownToggle {
-  background: none;
-  text: white;
+.NavbarConnectionDropdownList {
+  display: none;
+  width: 100%
+  min-width: 250px;
+  position: absolute;
+  z-index: 10;
+  top: 40px;
+  left: -1px;
+}
+
+.NavbarConnection:hover .NavbarConnectionDropdownList{
+  display: block;
 }
 
 .NavbarPortListingInfo {
@@ -87,7 +97,7 @@
   border: none;
   margin: 0;
   padding: 5px;
-  background: black;
+  background: #3E85C7;
   box-sizing: border-box;
   border-top: solid 1px gray;
 
@@ -101,7 +111,7 @@
   border: none;
   margin: 0;
   padding: 5px;
-  background: black;
+  background: #D97706;
   box-sizing: border-box;
   border-top: solid 1px gray;
   i {
@@ -126,3 +136,22 @@
     transform: rotate(360deg);
   }
 }
+
+
+  .ConnectionInfo {
+    font-size: 1rem;
+    color: #6B7280;
+    line-height: 1.2;
+    text-align: right;
+  }
+
+.portLabel {
+  color: white;
+}
+
+.noDevicesWarning {
+  background: #374151;
+  font-weight: bold;
+  text-align center;
+  padding: 1rem 0;
+ }
