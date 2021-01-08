@@ -163,9 +163,9 @@ class NewKeypad extends PureComponent {
     render() {
         const { canClick, axes, jog, actions } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
-        const canClickY = canClick && _includes(axes, 'y');
-        const canClickXY = canClickX && canClickY;
-        const canClickZ = canClick && _includes(axes, 'z');
+        // const canClickY = canClick && _includes(axes, 'y');
+        // const canClickXY = canClickX && canClickY;
+        // const canClickZ = canClick && _includes(axes, 'z');
         const highlightX = canClickX && (jog.keypad || jog.axis === 'x');
         // const highlightY = canClickY && (jog.keypad || jog.axis === 'y');
         // const highlightZ = canClickZ && (jog.keypad || jog.axis === 'z');
@@ -182,14 +182,14 @@ class NewKeypad extends PureComponent {
                     <div>
                         <div>
                             <div>
-                                <div className="flexParent">
+                                <div>
                                     <div className="upperLeftTriangle">
                                         <Button
                                             onClick={() => {
                                                 const distance = actions.getJogDistance();
                                                 actions.jog({ X: -distance, Y: distance });
                                             }}
-                                            disabled={!canClickXY}
+                                            // disabled={!canClickXY}
                                             title={i18n._('Move X- Y+')}
                                         >
                                         </Button>
@@ -202,7 +202,7 @@ class NewKeypad extends PureComponent {
                                                 const distance = actions.getJogDistance();
                                                 actions.jog({ Y: distance });
                                             }}
-                                            disabled={!canClickY}
+                                            // disabled={!canClickY}
                                             title={i18n._('Move Y+')}
                                         >Y+
                                         </Button>
@@ -216,7 +216,7 @@ class NewKeypad extends PureComponent {
                                                 console.log('NEWDISTANCE ' + distance);
                                                 actions.jog({ X: distance, Y: distance });
                                             }}
-                                            disabled={!canClickXY}
+                                            // disabled={!canClickXY}
                                             title={i18n._('Move X+ Y+')}
                                         >
                                         </Button>
@@ -231,7 +231,7 @@ class NewKeypad extends PureComponent {
                                             const distance = actions.getJogDistance();
                                             actions.jog({ Z: distance });
                                         }}
-                                        disabled={!canClickZ}
+                                        // disabled={!canClickZ}
                                         title={i18n._('Move Z+')}
                                     >Z+
                                     </Button>
@@ -254,7 +254,7 @@ class NewKeypad extends PureComponent {
                                             const distance = actions.getJogDistance();
                                             actions.jog({ X: -distance });
                                         }}
-                                        disabled={!canClickX}
+                                        // disabled={!canClickX}
                                         title={i18n._('Move X-')}
                                     >X-
                                     </Button>
@@ -271,7 +271,7 @@ class NewKeypad extends PureComponent {
                                             const distance = actions.getJogDistance();
                                             actions.jog({ X: distance });
                                         }}
-                                        disabled={!canClickX}
+                                        // disabled={!canClickX}
                                         title={i18n._('Move X+')}
                                     >
                                     X+
@@ -286,7 +286,7 @@ class NewKeypad extends PureComponent {
                                             const distance = actions.getJogDistance();
                                             actions.jog({ Z: -distance });
                                         }}
-                                        disabled={!canClickZ}
+                                        // disabled={!canClickZ}
                                         title={i18n._('Move Z-')}
                                     >Z-
                                     </Button>
@@ -303,7 +303,7 @@ class NewKeypad extends PureComponent {
                                             const distance = actions.getJogDistance();
                                             actions.jog({ X: -distance, Y: -distance });
                                         }}
-                                        disabled={!canClickXY}
+                                        // disabled={!canClickXY}
                                         title={i18n._('Move X- Y-')}
                                     >
                                     </Button>
@@ -316,7 +316,7 @@ class NewKeypad extends PureComponent {
                                             const distance = actions.getJogDistance();
                                             actions.jog({ Y: -distance });
                                         }}
-                                        disabled={!canClickY}
+                                        // disabled={!canClickY}
                                         title={i18n._('Move Y-')}
                                     >Y-
                                     </Button>
@@ -330,7 +330,7 @@ class NewKeypad extends PureComponent {
                                             const distance = actions.getJogDistance();
                                             actions.jog({ X: distance, Y: -distance });
                                         }}
-                                        disabled={!canClickXY}
+                                        // disabled={!canClickXY}
                                         title={i18n._('Move X+ Y-')}
                                     >
                                     </Button>
@@ -343,7 +343,7 @@ class NewKeypad extends PureComponent {
                     <div>
                         <Button
                             style={ buttonStyles }
-                            disabled={!canClickXY}
+                            // disabled={!canClickXY}
                             onClick={ () => {
                                 console.log(Constants.XY_PRECISE_TOGGLE_SPEED_METRIC);
                                 this.handleButtons(Constants.XY_PRECISE_TOGGLE_SPEED_METRIC);
@@ -354,7 +354,7 @@ class NewKeypad extends PureComponent {
                         </Button>
                         <Button
                             style={ buttonStyles }
-                            disabled={!canClickXY}
+                            // disabled={!canClickXY}
                             onClick={() => {
                                 console.log(Constants.XY_NORMAL_TOGGLE_SPEED_METRIC);
                                 this.handleButtons(Constants.XY_NORMAL_TOGGLE_SPEED_METRIC);
@@ -365,7 +365,7 @@ class NewKeypad extends PureComponent {
                         </Button>
                         <Button
                             style={ buttonStyles }
-                            disabled={!canClickXY}
+                            // disabled={!canClickXY}
                             onClick={() => {
                                 console.log(Constants.Z_FAST_TOGGLE_SPEED_METRIC);
                                 this.handleButtons(Constants.Z_FAST_TOGGLE_SPEED_METRIC);
@@ -379,19 +379,19 @@ class NewKeypad extends PureComponent {
                 <div className="rollingNumbers">
                     <label className={styles.toggleText} htmlFor="firstToggleNumber">XY Move</label>
                     <input
-                        disabled={!canClickXY}
+                        // disabled={!canClickXY}
                         onChange={this.handleXYMove}
                         type="number" name="xyMove" id="firstToggleNumber" min="0" max="1" step="0.01"
                     />
                     <label htmlFor="secondToggleNumber">Z Move</label>
                     <input
-                        disabled={!canClickXY}
+                        // disabled={!canClickXY}
                         onChange={this.handleZMove}
                         className="" type="number" name="change" id="secondToggleNumber" min="0" max="1" step="0.01"
                     />
                     <label htmlFor="thirdToggleNumber">Speed</label>
                     <input
-                        disabled={!canClickXY}
+                        // disabled={!canClickXY}
                         onChange={this.handleSpeed}
                         className="" type="number" name="change" id="thirdToggleNumber" min="0" max="1" step="0.01"
                     />
