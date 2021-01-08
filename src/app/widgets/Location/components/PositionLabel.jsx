@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import { PRIMARY_COLOR } from '../constants';
+import { PRIMARY_COLOR, SECONDARY_COLOR } from '../constants';
 
 const PositionLabel = ({ value, small }) => {
     value = String(value);
     return (
-        <div style={{ fontSize: small ? 14 : 28, padding: 5, textAlign: 'center', color: small ? null : PRIMARY_COLOR, fontWeight: small ? '400' : 'bold' }}>
+        <div style={{ fontSize: small ? 14 : 28, padding: '0px 5px', textAlign: 'center', color: small ? SECONDARY_COLOR : PRIMARY_COLOR, fontWeight: small ? '400' : 'bold' }}>
             <span>{value.split('.')[0]}</span>
             <span>.</span>
             <span>{value.split('.')[1]}</span>
