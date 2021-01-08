@@ -15,13 +15,11 @@ import CustomWidget from 'app/widgets/Custom';
 import TinyGWidget from 'app/widgets/TinyG';
 import VisualizerWidget from 'app/widgets/Visualizer';
 import WebcamWidget from 'app/widgets/Webcam';
-import ConnectionWidget from '../../widgets/Connection';
 
 const getWidgetByName = (name) => {
     return {
         'axes': AxesWidget,
         'console': ConsoleWidget,
-        'connection': ConnectionWidget,
         'gcode': GCodeWidget,
         'grbl': GrblWidget,
         'laser': LaserWidget,

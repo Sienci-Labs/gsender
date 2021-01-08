@@ -9,6 +9,8 @@ import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import NavbarConnection from 'app/widgets/NavbarConnection';
 import styles from './index.styl';
+import NavLogo from '../../components/NavLogo';
+import NavSidebar from '../NavSidebar';
 
 //const releases = 'https://github.com/cncjs/cncjs/releases';
 
@@ -232,8 +234,11 @@ class Header extends PureComponent {
     render() {
         return (
             <div className={styles.navBar}>
-                <NavbarConnection state={this.state} actions={this.actions} widgetId="connection" />
-                <div>Menus go here</div>
+                <div className={styles.primary}>
+                    <NavLogo />
+                    <NavbarConnection state={this.state} actions={this.actions} widgetId="connection" />
+                </div>
+                <NavSidebar />
             </div>
         );
     }
