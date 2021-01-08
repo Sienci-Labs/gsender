@@ -1,0 +1,157 @@
+.NavbarConnection {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  border: solid 1px #374151;
+  background: #111827;
+  color: white;
+  border-radius: 0.25rem;
+  justify-content space-between;
+  align-items center;
+  padding: 0.25rem 1rem;
+  min-width: 250px;
+}
+
+.NavbarConnectionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #4B5563;
+  height: 2.5rem;
+  width: 2.5rem;
+
+  border-radius: 9999px;
+  margin-right: 0.5rem;
+
+  i {
+    font-size: 1.4rem !important;
+  }
+}
+
+.PortListing {
+  color: white;
+  display: flex;
+  flex-direction: row;
+  justify-content space-between;
+  align-items: center;
+  background: #374151;
+  font-family Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+  padding: 1rem 0.5rem
+  width: 100%;
+  margin: 0;
+  border: 0;
+  --tw-bg-opacity: 0.8;
+  font-size: 1.2rem;
+}
+
+
+.NavbarConnectionDropdownList {
+  display: none;
+  width: 100%
+  min-width: 250px;
+  position: absolute;
+  z-index: 10;
+  top: 40px;
+  left: -1px;
+}
+
+.NavbarConnection:hover .NavbarConnectionDropdownList{
+  display: block;
+}
+
+.NavbarPortListingInfo {
+  display: flex;
+  flex-direction column;
+}
+
+.NavbarPortListingPortLabel {
+
+}
+
+.NavbarPortListingPortManufacturer {
+  font-family "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.8rem;
+  text-align right
+  color: #9CA3AF;
+}
+
+.icon-connecting {
+  animation: spin 1s linear infinite;
+  background: #D97706;
+}
+
+.icon-disconnected {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.icon-connected {
+  background: #059669;
+}
+
+.icon-error {
+  background: #EF4444;
+}
+
+.refreshButton {
+  width: 100%;
+  border: none;
+  margin: 0;
+  padding: 5px;
+  background: #3E85C7;
+  box-sizing: border-box;
+  border-top: solid 1px gray;
+
+  i {
+    margin-right: 5px;
+  }
+}
+
+.disconnectButton {
+  width: 100%;
+  border: none;
+  margin: 0;
+  padding: 5px;
+  background: #D97706;
+  box-sizing: border-box;
+  border-top: solid 1px gray;
+  i {
+    margin-right: 5px;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+  .ConnectionInfo {
+    font-size: 1rem;
+    color: #6B7280;
+    line-height: 1.2;
+    text-align: right;
+  }
+
+.portLabel {
+  color: white;
+}
+
+.noDevicesWarning {
+  background: #374151;
+  font-weight: bold;
+  text-align center;
+  padding: 1rem 0;
+ }

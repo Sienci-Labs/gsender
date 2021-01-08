@@ -58,7 +58,7 @@ class Login extends PureComponent {
                         query: 'token=' + token
                     };
                     controller.connect(host, options, () => {
-                        // @see "src/web/index.jsx"
+                        // @see "src/web/NavbarConnection.jsx"
                         this.setState({
                             alertMessage: '',
                             authenticating: false,
