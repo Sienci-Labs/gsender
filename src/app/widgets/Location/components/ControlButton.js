@@ -25,6 +25,7 @@ const Button = styled.button`
         color: ${SECONDARY_COLOR};
         background-color: #D9DCE1;
         border: 3px solid ${SECONDARY_COLOR};
+        cursor: no-drop;
     }
 
     svg {
