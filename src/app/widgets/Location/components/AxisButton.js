@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { PRIMARY_COLOR } from '../constants';
+import { PRIMARY_COLOR, SECONDARY_COLOR } from '../constants';
 
 //Main styles
 const Container = styled.div`
@@ -14,7 +14,7 @@ const Container = styled.div`
     min-width: 4rem;
     transition: 200ms ease-in-out;
 
-    &.active, &:hover {
+    &.active:hover {
         color: white;
         background-color: ${PRIMARY_COLOR};
         transition: 200ms ease-in-out;
@@ -25,19 +25,30 @@ const Container = styled.div`
         }
     }
 
+    &.disabled {
+        color: ${SECONDARY_COLOR};
+        border: 2px solid ${SECONDARY_COLOR};
+        cursor: no-drop;
+
+        h3 {
+            color: ${SECONDARY_COLOR};
+            transition: 200ms ease-in-out;
+        }
+    }
+
     p, h3 {
         margin: 1px;
     }
 `;
 
-const AxisButton = ({ label, axis, onClick, active }) => {
+const AxisButton = ({ label, axis, onClick, disabled }) => {
     return (
         <Container
             role="button"
             onClick={onClick}
             onKeyDown={onClick}
             tabIndex={0}
-            className={active ? 'active' : null}
+            className={disabled ? 'disabled' : 'active'}
         >
             <p>{label}</p>
 
@@ -50,7 +61,7 @@ AxisButton.propTypes = {
     label: PropTypes.string,
     axis: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
-    active: PropTypes.bool,
+    disabled: PropTypes.bool,
 };
 
 AxisButton.defaultProps = {
