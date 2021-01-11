@@ -182,9 +182,6 @@ class AxesWidget extends PureComponent {
         jog: (params = {}) => {
             const { units } = this.state;
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-            if (units === IMPERIAL_UNITS) {
-                console.log(units);
-            }
             controller.command('gcode', 'G91'); // relative
             controller.command('gcode', 'G0 ' + s);
             controller.command('gcode', 'G90'); // absolute

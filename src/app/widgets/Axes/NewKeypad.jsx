@@ -36,13 +36,40 @@ class NewKeypad extends PureComponent {
         actions: PropTypes.object
     };
 
-    handlePreciseButton = (incomingSpeed) => {
-        console.log('speed is set to ' + incomingSpeed);
-        this.setState(prevState => {
-            return {
-                setSpeed: incomingSpeed
-            };
-        });
+    handlePreciseSpeedButton = (cncUnits) => {
+        console.log('speed is set to ' + cncUnits);
+        if (this.state.units === Constants.IMPERIAL_UNITS) {
+            this.setState({
+                setSpeed: Constants.PRECISE_TOGGLE_SPEED_IMPERIAL
+            });
+        } return {
+            setSpeed: Constants.PRECISE_TOGGLE_SPEED_METRIC
+        };
+    }
+    handleNormalSpeedButton = (cncUnits) => {
+        console.log('speed is set to ' + cncUnits);
+        if (this.state.units === Constants.IMPERIAL_UNITS) {
+            this.setState(prevState => {
+                return {
+                    setSpeed: Constants.NORMAL_TOGGLE_SPEED_IMPERIAL
+                };
+            });
+        } return {
+            setSpeed: Constants.NORMAL_TOGGLE_SPEED_METRIC
+        };
+    }
+
+    handleFastSpeedButton = (cncUnits) => {
+        console.log('speed is set to ' + cncUnits);
+        if (this.state.units === Constants.IMPERIAL_UNITS) {
+            this.setState(prevState => {
+                return {
+                    setSpeed: Constants.FAST_TOGGLE_SPEED_IMPERIAL
+                };
+            });
+        } return {
+            setSpeed: Constants.FAST_TOGGLE_SPEED_METRIC
+        };
     }
 
     handleXYMove = (event) => {
@@ -302,8 +329,7 @@ class NewKeypad extends PureComponent {
                         <Button
                             disabled={!canClickXY}
                             onClick={() => {
-                                console.log(Constants.XY_PRECISE_TOGGLE_SPEED_METRIC);
-                                this.handlePreciseButton(units);
+                                this.handlePreciseSpeedButton(units);
                             }}
                             className="preciseSpeedButton"
                         >
@@ -312,8 +338,7 @@ class NewKeypad extends PureComponent {
                         <Button
                             disabled={!canClickXY}
                             onClick={() => {
-                                console.log(Constants.XY_NORMAL_TOGGLE_SPEED_METRIC);
-                                this.handleButtons(Constants.XY_NORMAL_TOGGLE_SPEED_METRIC);
+                                this.handleNormalSpeedButton(units);
                             }}
                             className="normalSpeedButton"
                         >
@@ -322,8 +347,7 @@ class NewKeypad extends PureComponent {
                         <Button
                             disabled={!canClickXY}
                             onClick={() => {
-                                console.log(Constants.Z_FAST_TOGGLE_SPEED_METRIC);
-                                this.handleButtons(Constants.Z_FAST_TOGGLE_SPEED_METRIC);
+                                this.handleFastSpeedButton(units);
                             }}
                             className="fastSpeedButton"
                         >
