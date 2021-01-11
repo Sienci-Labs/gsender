@@ -5,7 +5,7 @@ import styles from './Index.styl';
 const PortListing = ({ port, inuse, baudrate, controllerType, onClick }) => {
     return (
         <button className={styles.PortListing} onClick={onClick}>
-            <i className={`fa ${inuse ? 'fa-lock' : 'fa-usb'}`} />
+            <i className={`fa fab ${inuse ? 'fa-lock' : 'fa-lock-open'}`} />
             <div className={styles.NavbarPortListingInfo}>
                 <div className={styles.NavbarPortListingPortLabel}>{ port }</div>
                 <div className={styles.NavbarPortListingPortManufacturer}>{controllerType} at { baudrate } baud</div>
