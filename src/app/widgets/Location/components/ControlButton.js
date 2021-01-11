@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { PRIMARY_COLOR, SECONDARY_COLOR } from '../constants';
+import { PRIMARY_COLOR, SECONDARY_COLOR, BORDER_COLOR } from '../constants';
 
 const Button = styled.button`
-    border: 3px solid ${PRIMARY_COLOR};
+    border: 1px solid ${BORDER_COLOR};
     color: ${PRIMARY_COLOR};
-    background-color: #fff;
-    border-radius: 5px;
+    background-color: #D1D5DB;
+    border-radius: 0.25rem;
     width: 100%;
     max-width: 10rem;
     padding: 5px;
@@ -16,15 +16,15 @@ const Button = styled.button`
     transition: 200ms ease-in-out;
 
     &:hover:not([disabled]) {
-        color: #000;
-        border: 3px solid ${PRIMARY_COLOR};
+        border: 1px solid ${PRIMARY_COLOR};
         transition: 200ms ease-in-out;
+        background-color: #E5E7EB;
     }
 
     &:disabled {
         color: ${SECONDARY_COLOR};
         background-color: #D9DCE1;
-        border: 3px solid ${SECONDARY_COLOR};
+        border: 1px solid ${SECONDARY_COLOR};
         cursor: no-drop;
     }
 

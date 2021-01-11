@@ -13,4 +13,5 @@ export const {
 export const DEFAULT_AXES = ['x', 'y', 'z'];
 
 export const PRIMARY_COLOR = '#3E85C7'; // Light Blue
+export const BORDER_COLOR = '#9CA3AF';
 export const SECONDARY_COLOR = '#6F7376'; // Grey (for disabled look)
