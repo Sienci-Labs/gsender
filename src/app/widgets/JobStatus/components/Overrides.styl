@@ -1,0 +1,44 @@
+.wrapper {
+    font-size: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.progress-area {
+    width: 100%;
+}
+
+.times {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.settings-area {
+    button {
+        background-color: #747685;
+        border: 1px solid #747685;
+        color: white;
+
+        &:disabled {
+            background-color: rgba(116,118,133,0.5);
+            border: 1px solid rgba(116,118,133,0.1);
+            color: rgba(116,118,133,0.5);
+        }
+    }
+
+    input {
+        color: #7A93D6;
+        width: 100%;
+        max-width: 50px;
+        font-weight: 800;
+    }
+}
+
+.lines-processed {
+    position: absolute;
+    margin: 0px 5px;
+}
