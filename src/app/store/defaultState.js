@@ -16,7 +16,7 @@ const defaultState = {
             primary: {
                 show: true,
                 widgets: [
-                    'location', 'connection', 'console', 'grbl', 'marlin', 'smoothie', 'tinyg', 'webcam', 'axes', 'gcode', 'macro', 'probe', 'spindle', 'laser'
+                    'location', 'console', 'grbl', 'axes', 'gcode'
                 ]
             }
         },

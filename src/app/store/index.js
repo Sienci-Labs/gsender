@@ -36,7 +36,7 @@ const getConfig = () => {
             content = fs.readFileSync(userData.path, 'utf8') || '{}';
         }
     } else {
-        content = localStorage.getItem('cnc') || '{}';
+        content = localStorage.getItem('sienci') || '{}';
     }
 
     return content;
@@ -61,7 +61,7 @@ const persist = (data) => {
             const fs = window.require('fs'); // Use window.require to require fs module in Electron
             fs.writeFileSync(userData.path, value);
         } else {
-            localStorage.setItem('cnc', value);
+            localStorage.setItem('sienci', value);
         }
     } catch (e) {
         log.error(e);
