@@ -180,6 +180,7 @@ class AxesWidget extends PureComponent {
             controller.command('gcode', gcode);
         },
         jog: (params = {}) => {
+            const { units } = this.state;
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             controller.command('gcode', 'G91'); // relative
             controller.command('gcode', 'G0 ' + s);

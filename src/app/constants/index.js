@@ -110,20 +110,12 @@ export const TINYG_MACHINE_STATE_INTERLOCK = 11; // Machine is in safety interlo
 export const TINYG_MACHINE_STATE_SHUTDOWN = 12; // Machine is in shutdown state. Will not process commands
 export const TINYG_MACHINE_STATE_PANIC = 13; // Machine is in panic state. Needs to be physically reset
 
+//Default Movements for toggle buttons Axis Widget Fast, Normal, Presice
+export const METRIC_DISTANCE_XY = [20, 5, 0.5];
+export const IMPERIAL_DISTANCE_XY = [1, 0.2, 2];
+export const METRIC_DISTANCE_Z = [10, 2, 0.1];
+export const IMPERIAL_DISTANCE_Z = [0.5, 0.04, 0.004];
 
-//Speeds for toggle buttons
-export const XY_FAST_TOGGLE_SPEED_METRIC = METRIC_STEPS[17];
-export const XY_NORMAL_TOGGLE_SPEED_METRIC = METRIC_STEPS[15];
-export const XY_PRECISE_TOGGLE_SPEED_METRIC = METRIC_STEPS[7];
-
-export const XY_FAST_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[16];
-export const XY_NORMAL_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[9];
-export const XY_PRECISE_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[9];
-
-export const Z_FAST_TOGGLE_SPEED_METRIC = METRIC_STEPS[17];
-export const Z_NORMAL_TOGGLE_SPEED_METRIC = METRIC_STEPS[13];
-export const Z_PRECISE_TOGGLE_SPEED_METRIC = METRIC_STEPS[8];
-
-export const Z_FAST_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[11];
-export const Z_NORMAL_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[10];//NO 0.04 FOUND ABOVE
-export const Z_PRECISE_TOGGLE_SPEED_IMPERIAL = IMPERIAL_STEPS[2];//NO 0.04 FOUND ABOVE
+//Default Speeds for toggle button Axis Widget Fast, Normal, Presice
+export const METRIC_SPEEDS = [5000, 3000, 3000];
+export const IMPERIAL_SPEEDS = [200, 120, 120];

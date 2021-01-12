@@ -4,15 +4,14 @@ import _includes from 'lodash/includes';
 import _uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import { Button } from 'app/components/Buttons';
 import { MenuItem } from 'app/components/Dropdown';
+import { Button } from 'app/components/Buttons';
 import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import Fraction from './components/Fraction';
 import * as Constants from '../../constants';
 import './styles.css';
-// import PRECISE_MOVEMENT from './constants';
 // import Dropdown from 'app/components/Dropdown';
 // import Repeatable from 'react-repeatable';
 // import { useState } from 'react'
@@ -21,9 +20,10 @@ class NewKeypad extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            xyDistance: 1,
-            zdistance: 1
-
+            xyDistance: 0,
+            zdistance: 0,
+            setSpeed: 0,
+            units: props.units
         };
     }
 
@@ -36,20 +36,74 @@ class NewKeypad extends PureComponent {
         actions: PropTypes.object
     };
 
-    handleButtons = (incomingSpeed) => {
-        console.log('speed is set to ' + incomingSpeed);
-        this.setState(prevState => {
-            return {
-                speed: incomingSpeed
-            };
-        });
+    componentWillMount() {
+        if (this.state.units === Constants.METRIC_UNITS) {
+            this.setState({
+                setSpeed: Constants.METRIC_SPEEDS[1],
+                xyDistance: Constants.METRIC_DISTANCE_XY[1],
+                zdistance: Constants.METRIC_DISTANCE_Z[1]
+            });
+        } else {
+            this.setState({
+                setSpeed: Constants.IMPERIAL_SPEEDS[1],
+                xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
+                zDistance: Constants.IMPERIAL_DISTANCE_Z[1]
+            });
+        }
+    }
+
+    handlePreciseSpeedButton = () => {
+        if (this.state.units === Constants.METRIC_UNITS) {
+            this.setState({
+                setSpeed: Constants.METRIC_SPEEDS[2],
+                xyDistance: Constants.METRIC_DISTANCE_XY[2],
+                zDistance: Constants.METRIC_DISTANCE_Z[2]
+            });
+        } else {
+            this.setState({
+                setSpeed: Constants.IMPERIAL_SPEEDS[2],
+                xyDistance: Constants.IMPERIAL_DISTANCE_XY[2],
+                zDistance: Constants.IMPERIAL_DISTANCE_Z[2]
+            });
+        }
+    }
+
+    handleNormalSpeedButton = () => {
+        if (this.state.units === Constants.METRIC_UNITS) {
+            this.setState({
+                setSpeed: Constants.METRIC_SPEEDS[1],
+                xyDistance: Constants.METRIC_DISTANCE_XY[1],
+                zDistance: Constants.METRIC_DISTANCE_Z[1]
+            });
+        } else {
+            this.setState({
+                setSpeed: Constants.IMPERIAL_SPEEDS[1],
+                xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
+                zDistance: Constants.IMPERIAL_DISTANCE_Z[1]
+            });
+        }
+    }
+
+    handleFastSpeedButton = () => {
+        if (this.state.units === Constants.METRIC_UNITS) {
+            this.setState({
+                setSpeed: Constants.METRIC_SPEEDS[0],
+                xyDistance: Constants.METRIC_DISTANCE_XY[0],
+                zDistance: Constants.METRIC_DISTANCE_Z[0]
+            });
+        } else {
+            this.setState({
+                setSpeed: Constants.IMPERIAL_SPEEDS[0],
+                xyDistance: Constants.IMPERIAL_DISTANCE_XY[0],
+                zDistance: Constants.IMPERIAL_DISTANCE_Z[0]
+            });
+        }
     }
 
     handleXYMove = (event) => {
         const { actions } = this.props;
         let xyDistance = event.target.value;
         actions.selectStep(xyDistance);
-        console.log('XYdistance is set to ' + xyDistance);
         this.setState(prevState => {
             return {
                 xyDistance: xyDistance
@@ -61,7 +115,6 @@ class NewKeypad extends PureComponent {
         const { actions } = this.props;
         let zDistance = event.target.value;
         actions.selectStep(zDistance);
-        console.log('Zdistance is set to ' + zDistance);
         this.setState(prevState => {
             return {
                 zdistance: zDistance
@@ -71,12 +124,15 @@ class NewKeypad extends PureComponent {
 
     handleSpeed = (event) => {
         let headSpeed = event.target.value;
-        console.log('CNCHEADSPEED  is set to ' + headSpeed);
-        this.setState(prevState => {
-            return {
-                speed: headSpeed
-            };
-        });
+        if (this.state.units === Constants.METRIC_UNITS) {
+            this.setState(prevState => {
+                return {
+                    setSpeed: headSpeed
+                };
+            });
+        } return {
+            setSpeed: headSpeed
+        };
     }
 
     handleSelect = (eventKey) => {
@@ -165,176 +221,208 @@ class NewKeypad extends PureComponent {
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
-        const canClickZ = canClick && _includes(axes, 'z');
+        let disable = true;
+
+        if (canClick === true) {
+            disable = !disable;
+        }
+        const { units } = this.state;
 
         return (
             <div className="controlsContainer">
-                <div className="mainControls">
-                    <div className="topThreeMainControls">
-                        <div className="upperLeftTriangle">
-                            <Button
+                <div className="uppercontrols">
+                    <div className="mainControls">
+                        <div className="topThreeMainControls">
+                            <div
+                                className={disable ? 'upperLeftTrianglehide' : 'upperLeftTriangle'}
                                 onClick={() => {
                                     const distance = this.state.xyDistance;
-                                    actions.jog({ x: -distance, y: distance });
+                                    const toggledSpeed = this.state.setSpeed;
+                                    actions.jog({ x: -distance, y: distance }, { F: toggledSpeed });
                                 }}
-                                disabled={!canClickXY}
-                                title={i18n._('Move X- Y+')}
+                                role="button"
+                                tabIndex={0}
                             >
-                            </Button>
-                        </div>
-                        <div className="upArrow">
-                            <Button
+                            </div>
+                            <div
+                                className={disable ? 'upArrowHide' : 'upArrow'}
                                 onClick={() => {
                                     const distance = this.state.xyDistance;
-                                    actions.jog({ Y: distance });
-                                    actions.getJogDistance();
+                                    const toggledSpeed = this.state.setSpeed;
+                                    actions.jog({ Y: distance }, { F: toggledSpeed });
                                 }}
-                                disabled={!canClickY}
+                                role="button"
+                                tabIndex={0}
                                 title={i18n._('Move Y+')}
-                            >Y+
-                            </Button>
+                            >
+                                <span className="buttonText">Y+</span>
+                            </div>
+                            <div>
+                                <div
+                                    className={disable ? 'upperRightTriangleHide' : 'upperRightTriangle'}
+                                    onClick={() => {
+                                        const distance = this.state.xyDistance;
+                                        const toggledSpeed = this.state.setSpeed;
+                                        actions.jog({ X: distance, Y: distance }, { F: toggledSpeed });
+                                    }}
+                                    role="button"
+                                    tabIndex={0}
+                                    title={i18n._('Move X+ Y+')}
+                                >
+                                </div>
+                            </div>
                         </div>
-                        <div className="upperRightTriangle">
-                            <Button
+                        <div className="middleControls">
+                            <div>
+                                <div
+                                    className={disable ? 'leftArrowHide' : 'leftArrow'}
+                                    onClick={() => {
+                                        const distance = this.state.xyDistance;
+                                        const toggledSpeed = this.state.setSpeed;
+                                        actions.jog({ X: -distance }, { F: toggledSpeed });
+                                    }}
+                                    tabIndex={0}
+                                    title={i18n._('Move X-')}
+                                    role="button"
+                                ><span className="buttonText">X-</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div
+                                    className={disable ? 'rightArrowHide' : 'rightArrow'}
+                                    onClick={() => {
+                                        const distance = this.state.xyDistance;
+                                        const toggledSpeed = this.state.setSpeed;
+                                        actions.jog({ X: distance }, { F: toggledSpeed });
+                                    }}
+                                    tabIndex={0}
+                                    title={i18n._('Move X+')}
+                                    role="button"
+                                >
+                                    <span className="buttonText">X+</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bottomControls">
+                            <div>
+                                <div
+                                    className={disable ? 'lowerLeftTriangleHide' : 'lowerLeftTriangle'}
+                                    onClick={() => {
+                                        const distance = this.state.xyDistance;
+                                        const toggledSpeed = this.state.setSpeed;
+                                        actions.jog({ X: -distance, Y: -distance }, { F: toggledSpeed });
+                                    }}
+                                    tabIndex={0}
+                                    s title={i18n._('Move X- Y-')}
+                                    role="button"
+                                >
+                                </div>
+                            </div>
+                            <div>
+                                <div
+                                    className={disable ? 'downArrowHide' : 'downArrow'}
+                                    onClick={() => {
+                                        const distance = this.state.xyDistance;
+                                        const toggledSpeed = this.state.setSpeed;
+                                        actions.jog({ Y: -distance }, { F: toggledSpeed });
+                                    }}
+                                    tabIndex={0}
+                                    title={i18n._('Move Y-')}
+                                    role="button"
+                                ><span className="buttonText">Y-</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div
+                                    className={disable ? 'lowerRightTriangleHide' : 'lowerRightTriangle'}
+                                    onClick={() => {
+                                        const distance = this.state.xyDistance;
+                                        const toggledSpeed = this.state.setSpeed;
+                                        actions.jog({ X: distance, Y: -distance }, { F: toggledSpeed });
+                                    }}
+                                    tabIndex={0}
+                                    title={i18n._('Move X+ Y-')}
+                                    role="button"
+                                >
+                                </div>
+                            </div>
+                        </div>
+                        <div className="zControls">
+                            <div
+                                className={disable ? 'upArrowZHide' : 'upArrowZ'}
                                 onClick={() => {
-                                    const distance = this.state.xyDistance;
-                                    actions.jog({ X: distance, Y: distance });
+                                    const distance = this.state.zdistance;
+                                    const toggledSpeed = this.state.setSpeed;
+                                    actions.jog({ Z: distance }, { F: toggledSpeed });
                                 }}
+                                tabIndex={0}
+                                title={i18n._('Move Z+')}
+                                role="button"
+                            ><span className="buttonTextZ">Z+</span>
+                            </div>
+                            <div
+                                className={disable ? 'downArrowZHide' : 'downArrowZ'}
+                                onClick={() => {
+                                    const distance = this.state.zdistance;
+                                    const toggledSpeed = this.state.setSpeed;
+                                    actions.jog({ Z: distance }, { F: toggledSpeed });
+                                }}
+                                title={i18n._('Move Z-')}
+                                role="button"
+                                tabIndex={0}
+                            ><span className="buttonTextZ">Z-</span>
+                            </div>
+                        </div>
+                        <div className="speedButtonGroup">
+                            <Button
                                 disabled={!canClickXY}
-                                title={i18n._('Move X+ Y+')}
+                                onClick={() => {
+                                    this.handlePreciseSpeedButton(units);
+                                }}
+                                className="preciseSpeedButton"
                             >
+                                Precise
                             </Button>
-                        </div>
-                    </div>
-                    <div className="middleControls">
-                        <div className="leftArrow">
                             <Button
-                                onClick={() => {
-                                    const distance = this.state.xyDistance;
-                                    actions.jog({ X: -distance });
-                                }}
-                                disabled={!canClickX}
-                                title={i18n._('Move X-')}
-                            >X-
-                            </Button>
-                        </div>
-                        <div className="rightArrow">
-                            <Button
-                                onClick={() => {
-                                    const distance = this.state.xyDistance;
-                                    actions.jog({ X: distance });
-                                }}
-                                disabled={!canClickX}
-                                title={i18n._('Move X+')}
-                            >
-                                X+
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="bottomControls">
-                        <div className="lowerLeftTriangle">
-                            <Button
-                                onClick={() => {
-                                    const distance = this.state.xyDistance;
-                                    actions.jog({ X: -distance, Y: -distance });
-                                }}
                                 disabled={!canClickXY}
-                                title={i18n._('Move X- Y-')}
+                                onClick={() => {
+                                    this.handleNormalSpeedButton(units);
+                                }}
+                                className="normalSpeedButton"
                             >
+                                Normal
                             </Button>
-                        </div>
-                        <div className="downArrow">
                             <Button
-                                onClick={() => {
-                                    const distance = this.state.xyDistance;
-                                    actions.jog({ Y: -distance });
-                                }}
-                                disabled={!canClickY}
-                                title={i18n._('Move Y-')}
-                            >Y-
-                            </Button>
-                        </div>
-                        <div className="lowerRightTriangle">
-                            <Button
-                                className="leftArrow"
-                                onClick={() => {
-                                    const distance = this.state.xyDistance;
-                                    actions.jog({ X: distance, Y: -distance });
-                                }}
                                 disabled={!canClickXY}
-                                title={i18n._('Move X+ Y-')}
+                                onClick={() => {
+                                    this.handleFastSpeedButton(units);
+                                }}
+                                className="fastSpeedButton"
                             >
+                                Fast
                             </Button>
                         </div>
-                    </div>
-                    <div className="zControls">
-                        <Button
-                            className="upArrowZ"
-                            onClick={() => {
-                                const distance = this.state.zdistance;
-                                actions.jog({ Z: distance });
-                            }}
-                            disabled={!canClickZ}
-                            title={i18n._('Move Z+')}
-                        >Z+
-                        </Button>
-                        <Button
-                            className="downArrowZ"
-                            onClick={() => {
-                                const distance = this.state.zdistance;
-                                actions.jog({ Z: distance });
-                            }}
-                            disabled={!canClickZ}
-                            title={i18n._('Move Z-')}
-                        >Z-
-                        </Button>
-                    </div>
-                    <div className="speedButtonGroup">
-                        <Button
-                            disabled={!canClickXY}
-                            onClick={() => {
-                                console.log(Constants.XY_PRECISE_TOGGLE_SPEED_METRIC);
-                                this.handleButtons(Constants.XY_PRECISE_TOGGLE_SPEED_METRIC);
-                            }}
-                            className="preciseSpeedButton"
-                        >
-                            Precise
-                        </Button>
-                        <Button
-                            disabled={!canClickXY}
-                            onClick={() => {
-                                console.log(Constants.XY_NORMAL_TOGGLE_SPEED_METRIC);
-                                this.handleButtons(Constants.XY_NORMAL_TOGGLE_SPEED_METRIC);
-                            }}
-                            className="normalSpeedButton"
-                        >
-                            Normal
-                        </Button>
-                        <Button
-                            disabled={!canClickXY}
-                            onClick={() => {
-                                console.log(Constants.Z_FAST_TOGGLE_SPEED_METRIC);
-                                this.handleButtons(Constants.Z_FAST_TOGGLE_SPEED_METRIC);
-                            }}
-                            className="fastSpeedButton"
-                        >
-                            Fast
-                        </Button>
                     </div>
                 </div>
                 <div>
                     <div className="rollingNumbers">
                         <div className="rollingXYMove">
-                            <label className="htmlLabels" htmlFor="firstToggleNumber">XY Move</label>
+                            <label
+                                className="htmlLabels"
+                                htmlFor="firstToggleNumber"
+                            >XY Move
+                            </label>
                             <input
                                 disabled={!canClickXY}
                                 onChange={this.handleXYMove}
                                 type="number"
                                 className="rollingXYInput"
                                 name="xyMove"
-                                min="0"
+                                min="1"
                                 max="10"
                                 step="1"
+                                defaultValue={this.state.xyDistance}
+                                value={this.state.xyDistance}
                             />
                         </div>
                         <div className="rollingZMove">
@@ -350,9 +438,11 @@ class NewKeypad extends PureComponent {
                                 className="rollingZInput"
                                 type="number"
                                 name="zMove"
-                                min="0"
+                                min="1"
                                 max="10"
                                 step="1"
+                                defaultValue={this.state.zdistance}
+                                value={this.state.zDistance}
                             />
                         </div>
                         <div className="rollingSpeed">
@@ -366,11 +456,12 @@ class NewKeypad extends PureComponent {
                                 disabled={!canClickXY}
                                 onChange={this.handleSpeed}
                                 className="rollingSpeedInput"
-                                type="number"
                                 name="speedMove"
                                 min="0"
                                 max="10"
                                 step="1"
+                                defaultValue={this.state.setSpeed}
+                                value={this.state.setSpeed}
                             />
                         </div>
                     </div>
