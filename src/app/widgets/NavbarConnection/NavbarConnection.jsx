@@ -90,12 +90,12 @@ class NavbarConnection extends PureComponent {
                                     {...port}
                                     baudrate={baudrate}
                                     controllerType={controllerType}
-                                    onClick={() => actions.onClickPortListing(port.value)}
+                                    onClick={() => actions.onClickPortListing(port)}
                                 />)
                         )
                     }
                     {
-                        !connected && canRefresh &&
+                        !connected && !connecting && canRefresh &&
                         <button type="button" className={styles.refreshButton} onClick={actions.handleRefreshPorts}>
                             <i className="fa fa-refresh" />
                             Refresh Ports
