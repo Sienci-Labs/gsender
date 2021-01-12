@@ -5,6 +5,10 @@ import IdleInfo from './components/IdleInfo';
 import Overrides from './components/Overrides';
 import styles from './index.styl';
 
+/**
+ * Job Status component wrapper
+ * @param {Object} state Default state given from parent component (main index.js for this widget)
+ */
 class JobStatus extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
