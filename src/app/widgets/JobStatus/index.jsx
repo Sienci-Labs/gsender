@@ -19,8 +19,6 @@ import {
 } from '../../constants';
 import styles from './index.styl';
 
-import { MAX_SPINDLE_SPEED } from './constants';
-
 class JobStatusWidget extends PureComponent {
     static propTypes = {
         widgetId: PropTypes.string.isRequired,
@@ -54,21 +52,6 @@ class JobStatusWidget extends PureComponent {
             const { minimized } = this.state;
             this.setState({ minimized: !minimized });
         },
-        handleSpindleSpeedChange: (event) => {
-            const spindleSpeed = this.state.spindleSpeed + Number(event.target.value) || 0;
-
-            if (spindleSpeed < 0) {
-                this.setState({ spindleSpeed: 0 });
-                return;
-            }
-
-            if (spindleSpeed > MAX_SPINDLE_SPEED) {
-                this.setState({ spindleSpeed: MAX_SPINDLE_SPEED });
-                return;
-            }
-
-            this.setState({ spindleSpeed: spindleSpeed });
-        }
     };
 
     controllerEvents = {
