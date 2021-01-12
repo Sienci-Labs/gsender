@@ -5,6 +5,7 @@ import ConnectionWidget from 'app/widgets/Connection';
 import ConsoleWidget from 'app/widgets/Console';
 import GCodeWidget from 'app/widgets/GCode';
 import GrblWidget from 'app/widgets/Grbl';
+import JobStatusWidget from 'app/widgets/JobStatus';
 import LaserWidget from 'app/widgets/Laser';
 import MacroWidget from 'app/widgets/Macro';
 import MarlinWidget from 'app/widgets/Marlin';
@@ -23,6 +24,7 @@ const getWidgetByName = (name) => {
         'console': ConsoleWidget,
         'gcode': GCodeWidget,
         'grbl': GrblWidget,
+        'job_status': JobStatusWidget,
         'laser': LaserWidget,
         'macro': MacroWidget,
         'marlin': MarlinWidget,
