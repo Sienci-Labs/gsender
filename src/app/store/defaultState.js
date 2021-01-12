@@ -16,7 +16,7 @@ const defaultState = {
             primary: {
                 show: true,
                 widgets: [
-                    'connection', 'console', 'grbl', 'marlin', 'smoothie', 'tinyg', 'webcam', 'axes', 'gcode', 'macro', 'probe', 'spindle', 'laser'
+                    'connection', 'console', 'grbl', 'job_status', 'marlin', 'smoothie', 'tinyg', 'webcam', 'axes', 'gcode', 'macro', 'probe', 'spindle', 'laser'
                 ]
             }
         },
@@ -76,6 +76,9 @@ const defaultState = {
         },
         gcode: {
             minimized: false
+        },
+        job_status: {
+            minimized: false,
         },
         grbl: {
             minimized: false,
