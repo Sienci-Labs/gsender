@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import DisplayPanel from './DisplayPanel';
-import NewKeypad from './NewKeypad';
+import Keypad from './Keypad';
 import MDI from './MDI';
 
 const Axes = (props) => {
@@ -18,7 +18,7 @@ const Axes = (props) => {
                 jog={state.jog}
                 actions={actions}
             />
-            <NewKeypad
+            <Keypad
                 canClick={state.canClick}
                 units={state.units}
                 axes={state.axes}
