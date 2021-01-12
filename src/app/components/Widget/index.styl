@@ -1,9 +1,11 @@
 @import './theme';
 
+PRIMARY_COLOR = #759fd1
+
 .widget {
     background-color: #e5e7eb;
     margin-bottom: 10px;
-    border: solid 1px #c9cdd3;
+
 
     &.widget-borderless {
         border: none;
@@ -51,8 +53,7 @@
 
     .widget-header {
         clearfix();
-        background-color: #f6f7f8;
-        border: 1px solid #ccc;
+        background-color: #d1d5db;
         position: relative;
     }
     .widget-header-fixed {
@@ -69,14 +70,15 @@
     }
 
     .widget-title {
-        font-size: 14px;
-        font-weight: 400;
+        font-size: 1.2rem;
+        font-weight: bold;
         line-height: 32px;
         display: inline-block;
         vertical-align: middle;
         margin-top: 0;
         margin-bottom: 0;
         padding: 0 10px;
+        color: PRIMARY_COLOR;
 
         // Truncate string with ellipsis
         text-overflow: ellipsis;
@@ -88,7 +90,7 @@
 
     .widget-content,
     .widget-footer {
-        border: 1px solid #CCC;
+        border: solid 1px #c9cdd3;
         border-top: none;
     }
 

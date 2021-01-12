@@ -825,19 +825,6 @@ class LocationWidget extends PureComponent {
                         {i18n._('Location')}
                     </Widget.Title>
                     <Widget.Controls className={this.props.sortable.filterClassName}>
-                        <Widget.Button
-                            disabled={isFullscreen}
-                            title={minimized ? i18n._('Expand') : i18n._('Collapse')}
-                            onClick={actions.toggleMinimized}
-                        >
-                            <i
-                                className={cx(
-                                    'fa',
-                                    { 'fa-chevron-up': !minimized },
-                                    { 'fa-chevron-down': minimized }
-                                )}
-                            />
-                        </Widget.Button>
                     </Widget.Controls>
                 </Widget.Header>
                 <Widget.Content
