@@ -347,61 +347,61 @@ class Keypad extends PureComponent {
                                 </div>
                             </div>
                         </div>
-                        <div className="zControls">
-                            <div
-                                className={disable ? 'upArrowZHide' : 'upArrowZ'}
-                                onClick={() => {
-                                    const distance = this.state.zdistance;
-                                    const toggledSpeed = this.state.setSpeed;
-                                    actions.jog({ Z: distance }, { F: toggledSpeed });
-                                }}
-                                tabIndex={0}
-                                title={i18n._('Move Z+')}
-                                role="button"
-                            ><span className="buttonTextZ">Z+</span>
-                            </div>
-                            <div
-                                className={disable ? 'downArrowZHide' : 'downArrowZ'}
-                                onClick={() => {
-                                    const distance = this.state.zdistance;
-                                    const toggledSpeed = this.state.setSpeed;
-                                    actions.jog({ Z: distance }, { F: toggledSpeed });
-                                }}
-                                title={i18n._('Move Z-')}
-                                role="button"
-                                tabIndex={0}
-                            ><span className="buttonTextZ">Z-</span>
-                            </div>
+                    </div>
+                    <div className="zControls">
+                        <div
+                            className={disable ? 'upArrowZHide' : 'upArrowZ'}
+                            onClick={() => {
+                                const distance = this.state.zdistance;
+                                const toggledSpeed = this.state.setSpeed;
+                                actions.jog({ Z: distance }, { F: toggledSpeed });
+                            }}
+                            tabIndex={0}
+                            title={i18n._('Move Z+')}
+                            role="button"
+                        ><span className="buttonTextZ">Z+</span>
                         </div>
-                        <div className="speedButtonGroup">
-                            <Button
-                                disabled={!canClickXY}
-                                onClick={() => {
-                                    this.handlePreciseSpeedButton(units);
-                                }}
-                                className="preciseSpeedButton"
-                            >
-                                Precise
-                            </Button>
-                            <Button
-                                disabled={!canClickXY}
-                                onClick={() => {
-                                    this.handleNormalSpeedButton(units);
-                                }}
-                                className="normalSpeedButton"
-                            >
-                                Normal
-                            </Button>
-                            <Button
-                                disabled={!canClickXY}
-                                onClick={() => {
-                                    this.handleFastSpeedButton(units);
-                                }}
-                                className="fastSpeedButton"
-                            >
-                                Fast
-                            </Button>
+                        <div
+                            className={disable ? 'downArrowZHide' : 'downArrowZ'}
+                            onClick={() => {
+                                const distance = this.state.zdistance;
+                                const toggledSpeed = this.state.setSpeed;
+                                actions.jog({ Z: distance }, { F: toggledSpeed });
+                            }}
+                            title={i18n._('Move Z-')}
+                            role="button"
+                            tabIndex={0}
+                        ><span className="buttonTextZ">Z-</span>
                         </div>
+                    </div>
+                    <div className="speedButtonGroup">
+                        <Button
+                            disabled={!canClickXY}
+                            onClick={() => {
+                                this.handlePreciseSpeedButton(units);
+                            }}
+                            className="preciseSpeedButton"
+                        >
+                            Precise
+                        </Button>
+                        <Button
+                            disabled={!canClickXY}
+                            onClick={() => {
+                                this.handleNormalSpeedButton(units);
+                            }}
+                            className="normalSpeedButton"
+                        >
+                            Normal
+                        </Button>
+                        <Button
+                            disabled={!canClickXY}
+                            onClick={() => {
+                                this.handleFastSpeedButton(units);
+                            }}
+                            className="fastSpeedButton"
+                        >
+                            Fast
+                        </Button>
                     </div>
                 </div>
                 <div>

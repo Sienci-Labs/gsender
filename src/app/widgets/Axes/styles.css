@@ -192,7 +192,7 @@
 }
 
 .mainControls {
- 
+ width: 40%;
 }
 
 .middleControls {
@@ -223,16 +223,14 @@
 }
 
 .zControls {
-  margin-left: 95%;
-  width: 41%;
-  margin-top: -66%;
+  width: 20%;
 }
 
 .speedButtonGroup {
   display: flex;
-  margin-left: 130%;
   flex-direction: column;
-  margin-top: -62%;
+  width: 30%;
+
 }
 
 .preciseSpeedButton {
@@ -266,8 +264,11 @@
 }
 
 .uppercontrols{
-  height: 125px;
   display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 
