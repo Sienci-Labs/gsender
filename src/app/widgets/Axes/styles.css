@@ -5,19 +5,19 @@
 .upperLeftTriangle {
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
   background-color: #3e85c7;
-  width: 25px;
-  height: 25px;
-  margin-left: 14px;
-  margin-top: 5px;
+  width: 17px;
+  height: 17px;
+  margin-left: 17px;
+  margin-top: -17px;
 }
 
 .upperLeftTrianglehide {
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
   background-color: #3e85c7;
-  width: 25px;
-  height: 25px;
-  margin-left: 14px;
-  margin-top: 5px;
+  width: 17px;
+  height: 17px;
+  margin-left: 17px;
+  margin-top: -17px;
   opacity: 0.7;
   cursor: not-allowed;
 }
@@ -25,36 +25,39 @@
 .upperRightTriangle {
   clip-path: polygon(0 100%, 0 0, 100% 100%);
   background-color: #3e85c7;
-  width: 25px;
-  height: 25px;
-  margin-left: 127px;
-  margin-top: -37px;
+  width: 17px;
+  height: 17px;
+  margin-left: 133px;
+  margin-top: -42px;
 }
+
 .upperRightTriangleHide {
   clip-path: polygon(0 100%, 0 0, 100% 100%);
   background-color: #3e85c7;
-  width: 25px;
-  height: 25px;
-  margin-left: 127px;
-  margin-top: -37px;
+  width: 17px;
+  height: 17px;
+  margin-left: 133px;
+  margin-top: -42px;
   opacity: 0.7;
   cursor: not-allowed;
 }
+
 .lowerLeftTriangle {
   clip-path: polygon(0 0, 100% 0, 100% 100%);
   background-color: #3e85c7;
-  width: 25px;
-  margin-top: 11px;
+  width: 17px;
+  margin-top: 23px;
   margin-left: 14px;
-  height: 25px;
+  height: 17px;
 }
+
 .lowerLeftTriangleHide {
   clip-path: polygon(0 0, 100% 0, 100% 100%);
   background-color: #3e85c7;
-  width: 25px;
-  margin-top: 11px;
+  width: 17px;
+  margin-top: 23px;
   margin-left: 14px;
-  height: 25px;
+  height: 17px;
   opacity: 0.7;
   cursor: not-allowed;
 }
@@ -62,19 +65,19 @@
 .lowerRightTriangle {
   clip-path: polygon(0 100%, 100% 0, 0 0);
   background-color: #3e85c7;
-  width: 25px;
-  height: 25px;
-  margin-left: 182%;
-  margin-top: 13px;
+  width: 17px;
+  height: 17px;
+  margin-left: 383%;
+  margin-top: 24px;
 }
 
 .lowerRightTriangleHide {
   clip-path: polygon(0 100%, 100% 0, 0 0);
   background-color: #3e85c7;
-  width: 25px;
-  height: 25px;
-  margin-left: 182%;
-  margin-top: 13px;
+  width: 17px;
+  height: 17px;
+  margin-left: 383%;
+  margin-top: 24px;
   opacity: 0.7;
   cursor: not-allowed;
 }
@@ -85,16 +88,16 @@
   width: 40px;
   height: 45px;
   margin-left: 65px;
-  margin-top: -33px;
+  margin-top: -21px;
 }
 
-.upArrowHide{
+.upArrowHide {
   clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 100%, 50% 75%, 0 100%);
   background-color: #3e85c7;
   width: 40px;
   height: 45px;
   margin-left: 65px;
-  margin-top: -33px;
+  margin-top: -21px;
   opacity: 0.7;
   cursor: not-allowed;
 }
@@ -114,6 +117,7 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
 .leftArrow {
   clip-path: polygon(100% 0%, 75% 50%, 100% 100%, 25% 100%, 0% 50%, 25% 0%);
   background-color: #3e85c7;
@@ -121,11 +125,12 @@
   height: 37px;
   margin-left: 5px;
 }
-.leftArrowHide{
+
+.leftArrowHide {
   clip-path: polygon(100% 0%, 75% 50%, 100% 100%, 25% 100%, 0% 50%, 25% 0%);
   background-color: #3e85c7;
   width: 35px;
-  height:37px;
+  height: 37px;
   opacity: 0.7;
   margin-left: 5px;
   cursor: not-allowed;
@@ -138,6 +143,7 @@
   height: 37px;
   margin-left: 87px;
 }
+
 .rightArrowHide {
   clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 25% 50%, 0% 0%);
   background-color: #3e85c7;
@@ -153,20 +159,20 @@
   background-color: #3e85c7;
   width: 36px;
   height: 45px;
-  margin-left: 75%;
+  margin-left: 100%;
   margin-top: 4px;
 }
+
 .downArrowHide {
   clip-path: polygon(0 75%, 50% 100%, 100% 75%, 100% 0, 50% 25%, 0 0);
   background-color: #3e85c7;
   width: 36px;
   height: 45px;
-  margin-left: 75%;
+  margin-left: 100%;
   margin-top: 4px;
   opacity: 0.7;
   cursor: not-allowed;
 }
-
 
 .downArrowZ {
   height: 38px;
@@ -175,6 +181,7 @@
   clip-path: polygon(0 75%, 50% 100%, 100% 75%, 100% 0, 50% 25%, 0 0);
   background-color: #3e85c7;
 }
+
 .downArrowZHide {
   height: 38px;
   width: 65%;
@@ -192,12 +199,11 @@
 }
 
 .mainControls {
- width: 40%;
+  width: 55%;
 }
 
 .middleControls {
   display: flex;
-  margin-top: -9px;
 }
 
 .bottomControls {
@@ -205,15 +211,16 @@
 }
 
 .buttonText {
- display: inline-block;
- margin-left: 12px;
- margin-top: 10px;
+  display: inline-block;
+  margin-left: 12px;
+  margin-top: 10px;
 }
+
 .buttonTextZ {
   display: inline-block;
   margin-left: 16px;
   margin-top: 10px;
- }
+}
 
 .topThreeMainControls {
   margin-right: 25px;
@@ -224,19 +231,27 @@
 
 .zControls {
   width: 20%;
+  margin-top: -10%;
 }
 
 .speedButtonGroup {
   display: flex;
   flex-direction: column;
   width: 30%;
-
 }
 
 .preciseSpeedButton {
   color: #3e85c7;
   margin-bottom: 10px;
   margin-left: 9px;
+  margin-top: 0%;
+  
+}
+.speedButtonGroup:hover {
+  color: #3e85c7;
+}
+.speedButtonGroup:disabled {
+  color: #3e85c7;
 }
 
 .normalSpeedButton {
@@ -263,7 +278,7 @@
   margin-top: 2%;
 }
 
-.uppercontrols{
+.uppercontrols {
   display: flex;
   width: 100%;
   flex-direction: row;
@@ -271,4 +286,7 @@
   align-items: center;
 }
 
-
+#keyboard {
+  margin-left: 74%;
+  font-size: 23px;
+}

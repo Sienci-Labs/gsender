@@ -1,5 +1,6 @@
 import ensureArray from 'ensure-array';
 import frac from 'frac';
+import Widget from 'app/components/Widget';
 import _includes from 'lodash/includes';
 import _uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
@@ -26,7 +27,6 @@ class Keypad extends PureComponent {
             units: props.units
         };
     }
-
 
     static propTypes = {
         canClick: PropTypes.bool,
@@ -375,6 +375,14 @@ class Keypad extends PureComponent {
                         </div>
                     </div>
                     <div className="speedButtonGroup">
+                        <Widget.Button
+                            title={i18n._('Keypad jogging')}
+                            onClick={actions.toggleKeypadJogging}
+                            // inverted={state.jog.keypad}
+                            disabled={!canClickXY}
+                        >
+                            <i className="fa fa-keyboard-o" id="keyboard" />
+                        </Widget.Button>
                         <Button
                             disabled={!canClickXY}
                             onClick={() => {

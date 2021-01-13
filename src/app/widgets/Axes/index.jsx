@@ -17,7 +17,6 @@ import { in2mm, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import Axes from './Axes';
-import KeypadOverlay from './KeypadOverlay';
 import Settings from './Settings';
 import ShuttleControl from './ShuttleControl';
 import {
@@ -824,18 +823,6 @@ class AxesWidget extends PureComponent {
                         {i18n._('Axes')}
                     </Widget.Title>
                     <Widget.Controls className={this.props.sortable.filterClassName}>
-                        <KeypadOverlay
-                            show={state.canClick && state.jog.keypad}
-                        >
-                            <Widget.Button
-                                title={i18n._('Keypad jogging')}
-                                onClick={actions.toggleKeypadJogging}
-                                inverted={state.jog.keypad}
-                                disabled={!state.canClick}
-                            >
-                                <i className="fa fa-keyboard-o" />
-                            </Widget.Button>
-                        </KeypadOverlay>
                         <Widget.Button
                             title={i18n._('Manual Data Input')}
                             onClick={actions.toggleMDIMode}
