@@ -27,6 +27,7 @@ const defaultState = {
     widgets: {
         axes: {
             minimized: false,
+            hasNStop: false,
             axes: ['x', 'y', 'z'],
             jog: {
                 keypad: false,

@@ -1,6 +1,5 @@
 import ensureArray from 'ensure-array';
 import frac from 'frac';
-import Widget from 'app/components/Widget';
 import _includes from 'lodash/includes';
 import _uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
@@ -13,22 +12,21 @@ import i18n from 'app/lib/i18n';
 import Fraction from './components/Fraction';
 import * as Constants from '../../constants';
 import './styles.css';
-import defaultState from '../../store/defaultState';
+// import Dropdown from 'app/components/Dropdown';
+// import Repeatable from 'react-repeatable';
+// import { useState } from 'react'
 
-
-class Keypad extends PureComponent {
+class NewKeypad extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
             xyDistance: 0,
             zdistance: 0,
             setSpeed: 0,
-            units: props.units,
-            stepAmountXY: [],
-            stepIncrement: 10,
-            hasNStop: true
+            units: props.units
         };
     }
+
 
     static propTypes = {
         canClick: PropTypes.bool,
@@ -43,18 +41,13 @@ class Keypad extends PureComponent {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[1],
                 xyDistance: Constants.METRIC_DISTANCE_XY[1],
-                zdistance: Constants.METRIC_DISTANCE_Z[1],
-                stepAmountXY: Constants.METRIC_STEPS
+                zdistance: Constants.METRIC_DISTANCE_Z[1]
             });
         } else {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[1],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
-                zDistance: Constants.IMPERIAL_DISTANCE_Z[1],
-                stepAmountXY: Constants.IMPERIAL_STEPS
-            });
-            this.state.stepAmountXY.map((number) => {
-                return this.setState({ stepIncrement: number });
+                zDistance: Constants.IMPERIAL_DISTANCE_Z[1]
             });
         }
     }
@@ -64,13 +57,13 @@ class Keypad extends PureComponent {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[2],
                 xyDistance: Constants.METRIC_DISTANCE_XY[2],
-                zdistance: Constants.METRIC_DISTANCE_Z[2]
+                zDistance: Constants.METRIC_DISTANCE_Z[2]
             });
         } else {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[2],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[2],
-                zdistance: Constants.IMPERIAL_DISTANCE_Z[2]
+                zDistance: Constants.IMPERIAL_DISTANCE_Z[2]
             });
         }
     }
@@ -80,13 +73,13 @@ class Keypad extends PureComponent {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[1],
                 xyDistance: Constants.METRIC_DISTANCE_XY[1],
-                zdistance: Constants.METRIC_DISTANCE_Z[1]
+                zDistance: Constants.METRIC_DISTANCE_Z[1]
             });
         } else {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[1],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
-                zdistance: Constants.IMPERIAL_DISTANCE_Z[1]
+                zDistance: Constants.IMPERIAL_DISTANCE_Z[1]
             });
         }
     }
@@ -96,13 +89,13 @@ class Keypad extends PureComponent {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[0],
                 xyDistance: Constants.METRIC_DISTANCE_XY[0],
-                zdistance: Constants.METRIC_DISTANCE_Z[0]
+                zDistance: Constants.METRIC_DISTANCE_Z[0]
             });
         } else {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[0],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[0],
-                zdistance: Constants.IMPERIAL_DISTANCE_Z[0]
+                zDistance: Constants.IMPERIAL_DISTANCE_Z[0]
             });
         }
     }
@@ -111,16 +104,35 @@ class Keypad extends PureComponent {
         const { actions } = this.props;
         let xyDistance = event.target.value;
         actions.selectStep(xyDistance);
-        this.setState({ xyDistance: xyDistance });
+        this.setState(prevState => {
+            return {
+                xyDistance: xyDistance
+            };
+        });
     }
 
-    handleZToggle = (event) => {
-        let distanceZ = event.target.value;
-        this.setState({ zdistance: distanceZ });
+    handleZMove = (event) => {
+        const { actions } = this.props;
+        let zDistance = event.target.value;
+        actions.selectStep(zDistance);
+        this.setState(prevState => {
+            return {
+                zdistance: zDistance
+            };
+        });
     }
+
     handleSpeed = (event) => {
         let headSpeed = event.target.value;
-        this.setState({ setSpeed: headSpeed });
+        if (this.state.units === Constants.METRIC_UNITS) {
+            this.setState(prevState => {
+                return {
+                    setSpeed: headSpeed
+                };
+            });
+        } return {
+            setSpeed: headSpeed
+        };
     }
 
     handleSelect = (eventKey) => {
@@ -210,7 +222,7 @@ class Keypad extends PureComponent {
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
         let disable = true;
-        const userHasNStops = defaultState.widgets.axes.hasNStop;
+
         if (canClick === true) {
             disable = !disable;
         }
@@ -222,7 +234,7 @@ class Keypad extends PureComponent {
                     <div className="mainControls">
                         <div className="topThreeMainControls">
                             <div
-                                className={userHasNStops ? 'upperLeftTriangle' : 'upperLeftTriangleHide'}
+                                className={disable ? 'upperLeftTrianglehide' : 'upperLeftTriangle'}
                                 onClick={() => {
                                     const distance = this.state.xyDistance;
                                     const toggledSpeed = this.state.setSpeed;
@@ -247,7 +259,7 @@ class Keypad extends PureComponent {
                             </div>
                             <div>
                                 <div
-                                    className={userHasNStops ? 'upperRightTriangle' : 'upperRightTriangleHide'}
+                                    className={disable ? 'upperRightTriangleHide' : 'upperRightTriangle'}
                                     onClick={() => {
                                         const distance = this.state.xyDistance;
                                         const toggledSpeed = this.state.setSpeed;
@@ -294,7 +306,7 @@ class Keypad extends PureComponent {
                         <div className="bottomControls">
                             <div>
                                 <div
-                                    className={userHasNStops ? 'lowerLeftTriangle' : 'lowerLeftTriangleHide'}
+                                    className={disable ? 'lowerLeftTriangleHide' : 'lowerLeftTriangle'}
                                     onClick={() => {
                                         const distance = this.state.xyDistance;
                                         const toggledSpeed = this.state.setSpeed;
@@ -322,7 +334,7 @@ class Keypad extends PureComponent {
                             </div>
                             <div>
                                 <div
-                                    className={userHasNStops ? 'lowerRightTriangle' : 'lowerRightTriangleHide'}
+                                    className={disable ? 'lowerRightTriangleHide' : 'lowerRightTriangle'}
                                     onClick={() => {
                                         const distance = this.state.xyDistance;
                                         const toggledSpeed = this.state.setSpeed;
@@ -335,128 +347,123 @@ class Keypad extends PureComponent {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="zControls">
-                        <div
-                            className={disable ? 'upArrowZHide' : 'upArrowZ'}
-                            onClick={() => {
-                                const distance = this.state.zdistance;
-                                const toggledSpeed = this.state.setSpeed;
-                                actions.jog({ Z: distance }, { F: toggledSpeed });
-                            }}
-                            tabIndex={0}
-                            title={i18n._('Move Z+')}
-                            role="button"
-                        ><span className="buttonTextZ">Z+</span>
+                        <div className="zControls">
+                            <div
+                                className={disable ? 'upArrowZHide' : 'upArrowZ'}
+                                onClick={() => {
+                                    const distance = this.state.zdistance;
+                                    const toggledSpeed = this.state.setSpeed;
+                                    actions.jog({ Z: distance }, { F: toggledSpeed });
+                                }}
+                                tabIndex={0}
+                                title={i18n._('Move Z+')}
+                                role="button"
+                            ><span className="buttonTextZ">Z+</span>
+                            </div>
+                            <div
+                                className={disable ? 'downArrowZHide' : 'downArrowZ'}
+                                onClick={() => {
+                                    const distance = this.state.zdistance;
+                                    const toggledSpeed = this.state.setSpeed;
+                                    actions.jog({ Z: distance }, { F: toggledSpeed });
+                                }}
+                                title={i18n._('Move Z-')}
+                                role="button"
+                                tabIndex={0}
+                            ><span className="buttonTextZ">Z-</span>
+                            </div>
                         </div>
-                        <div
-                            className={disable ? 'downArrowZHide' : 'downArrowZ'}
-                            onClick={() => {
-                                const distance = this.state.zdistance;
-                                const toggledSpeed = this.state.setSpeed;
-                                actions.jog({ Z: distance }, { F: toggledSpeed });
-                            }}
-                            title={i18n._('Move Z-')}
-                            role="button"
-                            tabIndex={0}
-                        ><span className="buttonTextZ">Z-</span>
+                        <div className="speedButtonGroup">
+                            <Button
+                                disabled={!canClickXY}
+                                onClick={() => {
+                                    this.handlePreciseSpeedButton(units);
+                                }}
+                                className="preciseSpeedButton"
+                            >
+                                Precise
+                            </Button>
+                            <Button
+                                disabled={!canClickXY}
+                                onClick={() => {
+                                    this.handleNormalSpeedButton(units);
+                                }}
+                                className="normalSpeedButton"
+                            >
+                                Normal
+                            </Button>
+                            <Button
+                                disabled={!canClickXY}
+                                onClick={() => {
+                                    this.handleFastSpeedButton(units);
+                                }}
+                                className="fastSpeedButton"
+                            >
+                                Fast
+                            </Button>
                         </div>
-                    </div>
-                    <div className="speedButtonGroup">
-                        <Widget.Button
-                            title={i18n._('Keypad jogging')}
-                            onClick={actions.toggleKeypadJogging}
-                            // inverted={state.jog.keypad}
-                            disabled={!canClickXY}
-                        >
-                            <i className="fa fa-keyboard-o" id={disable ? 'keyboardDisabled' : 'keyboard'} />
-                        </Widget.Button>
-                        <Button
-                            disabled={!canClickXY}
-                            onClick={() => {
-                                this.handlePreciseSpeedButton(units);
-                            }}
-                            className="preciseSpeedButton"
-                        >
-                            Precise
-                        </Button>
-                        <Button
-                            disabled={!canClickXY}
-                            onClick={() => {
-                                this.handleNormalSpeedButton(units);
-                            }}
-                            className="normalSpeedButton"
-                        >
-                            Normal
-                        </Button>
-                        <Button
-                            disabled={!canClickXY}
-                            onClick={() => {
-                                this.handleFastSpeedButton(units);
-                            }}
-                            className="fastSpeedButton"
-                        >
-                            Fast
-                        </Button>
                     </div>
                 </div>
-                <div className="rollingNumbers">
-                    <div className="rollingXYMove">
-                        <label
-                            className="htmlLabels"
-                            htmlFor="firstToggleNumber"
-                        >XY Move
-                        </label>
-                        <input
-                            disabled={!canClickXY}
-                            onChange={this.handleXYMove}
-                            type="number"
-                            className="rollingXYInput"
-                            name="xyMove"
-                            min="0"
-                            step={`"${this.state.stepAmountXY}"`}
-                            defaultValue={this.state.xyDistance}
-                            value={this.state.xyDistance}
-                        />
-                    </div>
-                    <div className="rollingZMove">
-                        <label
-                            className="htmlLabels"
-                            htmlFor="secondToggleNumber"
-                        >
-                            Z Move
-                        </label>
-                        <input
-                            disabled={!canClickXY}
-                            onChange={this.handleZToggle}
-                            className="rollingZInput"
-                            type="number"
-                            name="zMove"
-                            min="1"
-                            max="10"
-                            step="1"
-                            defaultValue={this.state.zdistance}
-                            value={this.state.zdistance}
-                        />
-                    </div>
-                    <div className="rollingSpeed">
-                        <label
-                            className="htmlLabels"
-                            htmlFor="thirdToggleNumber"
-                        >
-                            Speed
-                        </label>
-                        <input
-                            disabled={!canClickXY}
-                            onChange={this.handleSpeed}
-                            className="rollingSpeedInput"
-                            name="speedMove"
-                            min="0"
-                            max="10"
-                            step="1"
-                            defaultValue={this.state.setSpeed}
-                            value={this.state.setSpeed}
-                        />
+                <div>
+                    <div className="rollingNumbers">
+                        <div className="rollingXYMove">
+                            <label
+                                className="htmlLabels"
+                                htmlFor="firstToggleNumber"
+                            >XY Move
+                            </label>
+                            <input
+                                disabled={!canClickXY}
+                                onChange={this.handleXYMove}
+                                type="number"
+                                className="rollingXYInput"
+                                name="xyMove"
+                                min="1"
+                                max="10"
+                                step="1"
+                                defaultValue={this.state.xyDistance}
+                                value={this.state.xyDistance}
+                            />
+                        </div>
+                        <div className="rollingZMove">
+                            <label
+                                className="htmlLabels"
+                                htmlFor="secondToggleNumber"
+                            >
+                                Z Move
+                            </label>
+                            <input
+                                disabled={!canClickXY}
+                                onChange={this.handleZMove}
+                                className="rollingZInput"
+                                type="number"
+                                name="zMove"
+                                min="1"
+                                max="10"
+                                step="1"
+                                defaultValue={this.state.zdistance}
+                                value={this.state.zDistance}
+                            />
+                        </div>
+                        <div className="rollingSpeed">
+                            <label
+                                className="htmlLabels"
+                                htmlFor="thirdToggleNumber"
+                            >
+                                Speed
+                            </label>
+                            <input
+                                disabled={!canClickXY}
+                                onChange={this.handleSpeed}
+                                className="rollingSpeedInput"
+                                name="speedMove"
+                                min="0"
+                                max="10"
+                                step="1"
+                                defaultValue={this.state.setSpeed}
+                                value={this.state.setSpeed}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -464,4 +471,4 @@ class Keypad extends PureComponent {
     }
 }
 
-export default Keypad;
+export default NewKeypad;
