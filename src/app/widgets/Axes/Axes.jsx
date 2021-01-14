@@ -5,7 +5,14 @@ import Keypad from './Keypad';
 import MDI from './MDI';
 
 const Axes = (props) => {
-    const { state, actions } = props;
+    const {
+        state,
+        actions,
+        xyDistance,
+        zdistance,
+        setSpeed,
+        userHasNStops
+    } = props;
 
     return (
         <div>
@@ -24,6 +31,10 @@ const Axes = (props) => {
                 axes={state.axes}
                 jog={state.jog}
                 actions={actions}
+                xyDistance={xyDistance}
+                zdistance={zdistance}
+                setSpeed={setSpeed}
+                userHasNStops={userHasNStops}
             />
             <MDI
                 canClick={state.canClick}

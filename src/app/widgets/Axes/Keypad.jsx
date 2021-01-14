@@ -13,23 +13,14 @@ import i18n from 'app/lib/i18n';
 import Fraction from './components/Fraction';
 import * as Constants from '../../constants';
 import './styles.css';
-import defaultState from '../../store/defaultState';
-
 
 class Keypad extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            xyDistance: 0,
-            zdistance: 0,
-            setSpeed: 0,
-            units: props.units,
-            testIncrement: 10,
-            stepAmountXY: [],
-            stepIncrementXYMetric: Constants.METRIC_STEPS,
-            stepIncrementXYImperial: Constants.IMPERIAL_STEPS,
-            hasNStop: true
+            units: props.units
         };
+        console.log(JSON.stringify(props));
     }
 
     static propTypes = {
@@ -37,7 +28,11 @@ class Keypad extends PureComponent {
         units: PropTypes.oneOf([Constants.IMPERIAL_UNITS, Constants.METRIC_UNITS]),
         axes: PropTypes.array,
         jog: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
+        xyDistance: PropTypes.number,
+        zdistance: PropTypes.number,
+        setSpeed: PropTypes.number,
+        userHasNStops: PropTypes.bool
     };
 
     componentWillMount() {
@@ -114,6 +109,21 @@ class Keypad extends PureComponent {
         let xyDistance = event.target.value;
         actions.selectStep(xyDistance);
         this.setState({ xyDistance: xyDistance });
+
+
+        for (let i = 0; i < this.state.stepIncrementXYMetric.length; i++) {
+            this.setState({
+                testIncrement: this.state.stepIncrementXYMetric[i]
+            });
+        } console.log(this.state.testIncrement + ' test number');
+        return this.state.testIncrement;
+
+        // this.state.stepIncrementXYMetric.map((number) => {
+        //     console.log(number + ' inputted number');
+        //     this.setState({
+        //         testIncrement: number
+        //     });
+        //     return number;
     }
 
     handleZToggle = (event) => {
@@ -126,16 +136,16 @@ class Keypad extends PureComponent {
     }
 
     setXyStep = () => {
-        let select = document.getElementsByClassName('rollingXYInput');
-        let options = this.state.stepIncrementXYMetric;
-        for (let i = 0; i < options.length; i++) {
-            let opt = options[i];
-            let el = document.createElement('option');
-            el.text = opt;
-            el.value = opt;
-            select.add(el);
+        this.state.stepIncrementXYMetric.map((number) => {
+            console.log(number + ' inputted number');
+            this.setState({
+                testIncrement: number
+            });
+            return number;
         }
+        );
     }
+
 
     handleSelect = (eventKey) => {
         const commands = ensureArray(eventKey);
@@ -227,13 +237,12 @@ class Keypad extends PureComponent {
         if (canClick === true) {
             disable = !disable;
         }
-        const userHasNStops = defaultState.widgets.axes.hasNStop;
         let upperLeftClass;
         let upperRightClass;
         let lowerRightClass;
         let lowerLeftClass;
 
-        if (!userHasNStops) {
+        if (!this.props.userHasNStops) {
             upperLeftClass = 'upperLeftTriangleHide';
             upperRightClass = 'upperRightTriangleHide';
             lowerRightClass = 'lowerRightTriangleHide';
@@ -251,6 +260,8 @@ class Keypad extends PureComponent {
         }
 
         const { units } = this.state;
+
+        // console.log(JSON.stringify(this.state) + 'STATESTATE');
 
         return (
             <div className="controlsContainer">
@@ -452,8 +463,7 @@ class Keypad extends PureComponent {
                             type="number"
                             className="rollingXYInput"
                             name="xyMove"
-                            min="0"
-                            step={this.setXyStep}
+                            step={this.state.testIncrement}
                             defaultValue={this.state.xyDistance}
                             value={this.state.xyDistance}
                         />

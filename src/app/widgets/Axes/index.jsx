@@ -19,6 +19,7 @@ import WidgetConfig from 'app/widgets/WidgetConfig';
 import Axes from './Axes';
 import Settings from './Settings';
 import ShuttleControl from './ShuttleControl';
+import defaultState from '../../store/defaultState';
 import {
     // Units
     IMPERIAL_UNITS,
@@ -638,6 +639,10 @@ class AxesWidget extends PureComponent {
 
     getInitialState() {
         return {
+            xyDistance: 0,
+            zdistance: 0,
+            setSpeed: 0,
+            userHasNStops: defaultState.widgets.axes.hasNStop,
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             canClick: true, // Defaults to true
@@ -925,7 +930,15 @@ class AxesWidget extends PureComponent {
                             onCancel={actions.closeModal}
                         />
                     )}
-                    <Axes config={config} state={state} actions={actions} />
+                    <Axes
+                        config={config}
+                        state={state}
+                        actions={actions}
+                        xyDistance={this.state.xyDistance}
+                        zdistance={this.state.zdistance}
+                        setSpeed={this.state.setSpeed}
+                        userHasNStops={this.state.userHasNStops}
+                    />
                 </Widget.Content>
             </Widget>
         );
