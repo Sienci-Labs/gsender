@@ -38,10 +38,7 @@ const defaultState = {
                 metric: {
                     step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
                     distances: []
-                },
-                xyStep: 5,
-                zStep: 2,
-                speed: 3000
+                }
             },
             mdi: {
                 disabled: false

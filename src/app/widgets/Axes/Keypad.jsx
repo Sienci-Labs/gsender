@@ -18,9 +18,9 @@ class Keypad extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            units: props.units
+            units: props.units,
+            jogging: this.props.jogDistance
         };
-        console.log(JSON.stringify(props));
     }
 
     static propTypes = {
@@ -36,6 +36,9 @@ class Keypad extends PureComponent {
     };
 
     componentWillMount() {
+        const { actions } = this.props;
+        actions.setToggleAmounts();
+        console.log(this.state.jogDistance);
         if (this.state.units === Constants.METRIC_UNITS) {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[1],
@@ -107,23 +110,11 @@ class Keypad extends PureComponent {
     handleXYMove = (event) => {
         const { actions } = this.props;
         let xyDistance = event.target.value;
-        actions.selectStep(xyDistance);
         this.setState({ xyDistance: xyDistance });
-
-
-        for (let i = 0; i < this.state.stepIncrementXYMetric.length; i++) {
-            this.setState({
-                testIncrement: this.state.stepIncrementXYMetric[i]
-            });
-        } console.log(this.state.testIncrement + ' test number');
-        return this.state.testIncrement;
-
-        // this.state.stepIncrementXYMetric.map((number) => {
-        //     console.log(number + ' inputted number');
-        //     this.setState({
-        //         testIncrement: number
-        //     });
-        //     return number;
+        let toggleness = actions.setToggleAmounts(xyDistance);
+        this.setState({
+            jogging: toggleness
+        });
     }
 
     handleZToggle = (event) => {
@@ -137,7 +128,6 @@ class Keypad extends PureComponent {
 
     setXyStep = () => {
         this.state.stepIncrementXYMetric.map((number) => {
-            console.log(number + ' inputted number');
             this.setState({
                 testIncrement: number
             });
@@ -260,9 +250,7 @@ class Keypad extends PureComponent {
         }
 
         const { units } = this.state;
-
-        // console.log(JSON.stringify(this.state) + 'STATESTATE');
-
+        console.log(JSON.stringify(this.props));
         return (
             <div className="controlsContainer">
                 <div className="uppercontrols">
@@ -463,7 +451,8 @@ class Keypad extends PureComponent {
                             type="number"
                             className="rollingXYInput"
                             name="xyMove"
-                            step={this.state.testIncrement}
+                            max="50"
+                            step={this.state.jogging}
                             defaultValue={this.state.xyDistance}
                             value={this.state.xyDistance}
                         />

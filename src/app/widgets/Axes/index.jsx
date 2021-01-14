@@ -73,7 +73,6 @@ class AxesWidget extends PureComponent {
 
     state = this.getInitialState();
 
-
     actions = {
         toggleFullscreen: () => {
             const { minimized, isFullscreen } = this.state;
@@ -203,6 +202,11 @@ class AxesWidget extends PureComponent {
                     keypad: !state.jog.keypad
                 }
             }));
+        },
+        setToggleAmounts: (amount) => {
+            console.log(amount);
+            this.setState({ jogDistance: amount });
+            return this.state.jogDistance;
         },
         selectAxis: (axis = '') => {
             this.setState(state => ({
@@ -642,6 +646,7 @@ class AxesWidget extends PureComponent {
             xyDistance: 0,
             zdistance: 0,
             setSpeed: 0,
+            jogDistance: 5,
             userHasNStops: defaultState.widgets.axes.hasNStop,
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
@@ -797,6 +802,9 @@ class AxesWidget extends PureComponent {
         const { units, machinePosition, workPosition } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const config = this.config;
+        let toggleDistance = this.state.jog.metric.step;
+        console.log(toggleDistance + 'RENDERTOGGLE');
+
         const state = {
             ...this.state,
             // Determine if the motion button is clickable
@@ -813,7 +821,7 @@ class AxesWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-
+        // console.log(JSON.stringify(this.state));
         return (
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header>
@@ -938,6 +946,7 @@ class AxesWidget extends PureComponent {
                         zdistance={this.state.zdistance}
                         setSpeed={this.state.setSpeed}
                         userHasNStops={this.state.userHasNStops}
+                        jogDistance={this.state.jogDistance}
                     />
                 </Widget.Content>
             </Widget>

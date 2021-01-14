@@ -11,7 +11,8 @@ const Axes = (props) => {
         xyDistance,
         zdistance,
         setSpeed,
-        userHasNStops
+        userHasNStops,
+        jogDistance
     } = props;
 
     return (
@@ -35,6 +36,7 @@ const Axes = (props) => {
                 zdistance={zdistance}
                 setSpeed={setSpeed}
                 userHasNStops={userHasNStops}
+                jogDistance={jogDistance}
             />
             <MDI
                 canClick={state.canClick}
