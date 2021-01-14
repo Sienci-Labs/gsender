@@ -19,8 +19,8 @@ import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
-import PrimaryToolbar from './PrimaryToolbar';
-import SecondaryToolbar from './SecondaryToolbar';
+// import PrimaryToolbar from './PrimaryToolbar';
+// import SecondaryToolbar from './SecondaryToolbar';
 import WorkflowControl from './WorkflowControl';
 import Visualizer from './Visualizer';
 import Dashboard from './Dashboard';
@@ -133,29 +133,29 @@ const displayWebGLErrorMessage = () => {
     ));
 };
 
-const GCodeName = ({ name, style, ...props }) => {
-    if (!name) {
-        return null;
-    }
+// const GCodeName = ({ name, style, ...props }) => {
+//     if (!name) {
+//         return null;
+//     }
 
-    return (
-        <div
-            style={{
-                display: 'inline-block',
-                position: 'absolute',
-                bottom: 8,
-                left: 8,
-                fontSize: '1.5rem',
-                color: '#000',
-                opacity: 0.5,
-                ...style,
-            }}
-            {...props}
-        >
-            {name}
-        </div>
-    );
-};
+//     return (
+//         <div
+//             style={{
+//                 display: 'inline-block',
+//                 position: 'absolute',
+//                 bottom: 8,
+//                 left: 8,
+//                 fontSize: '1.5rem',
+//                 color: '#000',
+//                 opacity: 0.5,
+//                 ...style,
+//             }}
+//             {...props}
+//         >
+//             {name}
+//         </div>
+//     );
+// };
 
 class VisualizerWidget extends PureComponent {
     static propTypes = {
@@ -1021,12 +1021,12 @@ class VisualizerWidget extends PureComponent {
 
         return (
             <Widget borderless>
-                <Widget.Header className={styles.widgetHeader} fixed>
+                {/* <Widget.Header className={styles.widgetHeader} fixed>
                     <PrimaryToolbar
                         state={state}
                         actions={actions}
                     />
-                </Widget.Header>
+                </Widget.Header> */}
                 <Widget.Content
                     ref={node => {
                         this.widgetContent = node;
@@ -1066,11 +1066,11 @@ class VisualizerWidget extends PureComponent {
                             state={state}
                         />
                     )}
-                    {(showVisualizer && state.gcode.displayName) && (
+                    {/* {(showVisualizer && state.gcode.displayName) && (
                         <GCodeName
                             name={state.gcode.name}
                         />
-                    )}
+                    )} */}
                     {showNotifications && (
                         <Notifications
                             show={showNotifications}
@@ -1080,14 +1080,14 @@ class VisualizerWidget extends PureComponent {
                         />
                     )}
                 </Widget.Content>
-                <Widget.Footer className={styles.widgetFooter}>
+                {/* <Widget.Footer className={styles.widgetFooter}>
                     <SecondaryToolbar
                         is3DView={capable.view3D}
                         cameraMode={state.cameraMode}
                         cameraPosition={state.cameraPosition}
                         camera={actions.camera}
                     />
-                </Widget.Footer>
+                </Widget.Footer> */}
             </Widget>
         );
     }
