@@ -11,12 +11,12 @@ const defaultState = {
     workspace: {
         container: {
             default: {
-                widgets: ['visualizer']
+                widgets: ['visualizer', 'job_status']
             },
             primary: {
                 show: true,
                 widgets: [
-                    'connection', 'console', 'grbl', 'job_status', 'marlin', 'smoothie', 'tinyg', 'webcam', 'axes', 'gcode', 'macro', 'probe', 'spindle', 'laser'
+                    'connection', 'console', 'grbl', 'marlin', 'smoothie', 'tinyg', 'webcam', 'axes', 'gcode', 'macro', 'probe', 'spindle', 'laser'
                 ]
             }
         },
