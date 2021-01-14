@@ -47,7 +47,7 @@ const SettingsArea = ({ state }) => {
                 <tbody>
                     <tr>
                         <td>Feed:</td>
-                        <td style={{ color: '#2B5D8B' }}>{feedrate}</td>
+                        <td style={{ color: '#2B5D8B', width: '55px', textAlign: 'right' }}>{feedrate}</td>
                         <td><button type="button" value={-10} onClick={handleFeedRateChange} aria-label="Decrease Feed Rate by 10%">- -</button></td>
                         <td><button type="button" value={-1} onClick={handleFeedRateChange} aria-label="Decrease Feed Rate by 1%">-</button></td>
                         <td><button type="button" value={1} onClick={handleFeedRateChange} aria-label="Increase Feed Rate by 1%">+</button></td>
@@ -58,7 +58,7 @@ const SettingsArea = ({ state }) => {
                     </tr>
                     <tr>
                         <td>Spindle:</td>
-                        <td style={{ color: '#2B5D8B' }}>{spindle}</td>
+                        <td style={{ color: '#2B5D8B', width: '55px', textAlign: 'right' }}>{spindle}</td>
                         <td><button type="button" value={-10} onClick={handleSpindleSpeedChange} aria-label="Decrease Spindle Speed by 10%">- -</button></td>
                         <td><button type="button" value={-1} onClick={handleSpindleSpeedChange} aria-label="Decrease Spindle Speed by 1%">-</button></td>
                         <td><button type="button" value={1} onClick={handleSpindleSpeedChange} aria-label="Increase Spindle Speed by 10%">+</button></td>
