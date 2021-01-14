@@ -5,7 +5,7 @@ import pubsub from 'pubsub-js';
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
 import { withRouter } from 'react-router-dom';
-import { Button, ButtonGroup, ButtonToolbar } from 'app/components/Buttons';
+import { Button, ButtonGroup } from 'app/components/Buttons';
 import api from 'app/api';
 import {
     WORKFLOW_STATE_IDLE
@@ -406,7 +406,6 @@ class Workspace extends PureComponent {
             isDraggingFile,
             isDraggingWidget,
             showPrimaryContainer,
-            inactiveCount
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
 
@@ -491,62 +490,6 @@ class Workspace extends PureComponent {
                                     { [styles.hidden]: hidePrimaryContainer }
                                 )}
                             >
-                                <ButtonToolbar style={{ margin: '5px 0' }}>
-                                    <ButtonGroup
-                                        style={{ marginLeft: 0, marginRight: 10 }}
-                                        btnSize="sm"
-                                        btnStyle="flat"
-                                    >
-                                        <Button
-                                            style={{ minWidth: 30 }}
-                                            compact
-                                            onClick={this.togglePrimaryContainer}
-                                        >
-                                            <i className="fa fa-chevron-left" />
-                                        </Button>
-                                    </ButtonGroup>
-                                    <ButtonGroup
-                                        style={{ marginLeft: 0, marginRight: 10 }}
-                                        btnSize="sm"
-                                        btnStyle="flat"
-                                    >
-                                        <Button
-                                            style={{ width: 230 }}
-                                            onClick={this.updateWidgetsForPrimaryContainer}
-                                        >
-                                            <i className="fa fa-list-alt" />
-                                            {i18n._('Manage Widgets ({{inactiveCount}})', {
-                                                inactiveCount: inactiveCount
-                                            })}
-                                        </Button>
-                                    </ButtonGroup>
-                                    <ButtonGroup
-                                        style={{ marginLeft: 0, marginRight: 0 }}
-                                        btnSize="sm"
-                                        btnStyle="flat"
-                                    >
-                                        <Button
-                                            style={{ minWidth: 30 }}
-                                            compact
-                                            title={i18n._('Collapse All')}
-                                            onClick={event => {
-                                                this.primaryWidgets.collapseAll();
-                                            }}
-                                        >
-                                            <i className="fa fa-chevron-up" style={{ fontSize: 14 }} />
-                                        </Button>
-                                        <Button
-                                            style={{ minWidth: 30 }}
-                                            compact
-                                            title={i18n._('Expand All')}
-                                            onClick={event => {
-                                                this.primaryWidgets.expandAll();
-                                            }}
-                                        >
-                                            <i className="fa fa-chevron-down" style={{ fontSize: 14 }} />
-                                        </Button>
-                                    </ButtonGroup>
-                                </ButtonToolbar>
                                 <PrimaryWidgets
                                     ref={node => {
                                         this.primaryWidgets = node;
