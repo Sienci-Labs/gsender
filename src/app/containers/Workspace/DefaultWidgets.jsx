@@ -10,7 +10,7 @@ class DefaultWidgets extends PureComponent {
         const { className } = this.props;
         const defaultWidgets = ensureArray(store.get('workspace.container.default.widgets'));
         const widgets = defaultWidgets.map(widgetId => (
-            <div data-widget-id={widgetId} key={widgetId}>
+            <div data-widget-id={widgetId} key={widgetId} className={styles['default-widget-wrapper']}>
                 <Widget
                     widgetId={widgetId}
                 />
@@ -18,7 +18,7 @@ class DefaultWidgets extends PureComponent {
         ));
 
         return (
-            <div className={classNames(className, styles.widgets)}>
+            <div className={classNames(className, styles['default-widgets'])}>
                 {widgets}
             </div>
         );
