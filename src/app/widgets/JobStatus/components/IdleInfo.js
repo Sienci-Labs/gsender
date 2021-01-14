@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import i18n from 'app/lib/i18n';
+import moment from 'moment';
 
 import styles from './IdleInfo.styl';
 
@@ -9,50 +9,53 @@ import styles from './IdleInfo.styl';
  * @param {Object} state Default state given from parent component
  */
 const IdleInfo = ({ state }) => {
-    const { bbox: { min, max, delta }, units } = state;
+    const { bbox: { delta }, units, total, remainingTime, fileName } = state;
 
-    return (
-        <div className={styles['idle-info']}>
-            <table>
-                <thead>
-                    <tr>
-                        <th>{i18n._('Axis')}</th>
-                        <th>{i18n._('Min')}</th>
-                        <th>{i18n._('Max')}</th>
-                        <th>{i18n._('Dimension')}</th>
-                    </tr>
-                </thead>
+    /**
+     * Format given time value to display minutes and seconds
+     * @param {Number} givenTime given time value
+     */
+    const outputFormattedTime = (givenTime) => {
+        if (state.startTime === 0 || !givenTime || givenTime < 0) {
+            return '';
+        }
 
-                <tbody>
-                    <tr>
-                        <td className={styles['axis-letter']}>X</td>
-                        <td>{`${min.x} ${units}`}</td>
-                        <td>{`${max.x} ${units}`}</td>
-                        <td>{`${delta.x} ${units}`}</td>
-                    </tr>
+        //Given time is a unix timestamp to be compared to unix timestamp 0
+        const elapsedMinute = moment(moment(givenTime)).diff(moment.unix(0), 'minutes');
+        const elapsedSecond = String((moment(moment(givenTime)).diff(moment.unix(0), 'seconds')));
 
-                    <tr>
-                        <td className={styles['axis-letter']}>Y</td>
-                        <td>{`${min.y} ${units}`}</td>
-                        <td>{`${max.y} ${units}`}</td>
-                        <td>{`${delta.y} ${units}`}</td>
-                    </tr>
+        //Grab last two characters in the elapsedSecond variable, which represent the seconds that have passed
+        const strElapsedSecond = `${(elapsedSecond[elapsedSecond.length - 2] !== undefined ? elapsedSecond[elapsedSecond.length - 2] : '')}${String(elapsedSecond[elapsedSecond.length - 1])}`;
+        const formattedSeconds = Number(strElapsedSecond) < 59 ? Number(strElapsedSecond) : `${Number(strElapsedSecond) - 60}`;
 
-                    <tr>
-                        <td className={styles['axis-letter']}>Z</td>
-                        <td>{`${min.z} ${units}`}</td>
-                        <td>{`${max.z} ${units}`}</td>
-                        <td>{`${delta.z} ${units}`}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    );
+        return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
+    };
+
+    return fileName
+        ? (
+            <div className={styles['idle-info']}>
+                <div>
+                    <span className={styles['file-name']}>{fileName}</span> ({total} lines)
+                </div>
+
+                <div>
+                    {`${delta.x}${units} (X) by ${delta.y}${units} (Y) by ${delta.z}${units} (Z)`}
+                </div>
+
+                <div>
+                    ~ {outputFormattedTime(remainingTime)} runtime
+                </div>
+            </div>
+        )
+        : (
+            <div className={styles['idle-info']}>
+                <div>No File Uploaded...</div>
+            </div>
+        );
 };
 
 IdleInfo.propTypes = {
     state: PropTypes.object,
-    actions: PropTypes.object,
 };
 
 export default IdleInfo;
