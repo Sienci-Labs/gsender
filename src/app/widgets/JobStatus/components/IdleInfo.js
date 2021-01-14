@@ -49,7 +49,7 @@ const IdleInfo = ({ state }) => {
         )
         : (
             <div className={styles['idle-info']}>
-                <div>~</div>
+                <div>No File Loaded...</div>
             </div>
         );
 };
