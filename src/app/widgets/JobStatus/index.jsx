@@ -3,10 +3,9 @@ import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
-import i18n from 'app/lib/i18n';
+// import i18n from 'app/lib/i18n';
 import { mapPositionToUnits } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
 import JobStatus from './JobStatus';
@@ -15,16 +14,14 @@ import {
     // Units
     IMPERIAL_UNITS,
     METRIC_UNITS,
-    WORKFLOW_STATE_IDLE
+    WORKFLOW_STATE_IDLE,
+    WORKFLOW_STATE_PAUSED
 } from '../../constants';
 import styles from './index.styl';
 
 class JobStatusWidget extends PureComponent {
     static propTypes = {
         widgetId: PropTypes.string.isRequired,
-        onFork: PropTypes.func.isRequired,
-        onRemove: PropTypes.func.isRequired,
-        sortable: PropTypes.object
     };
 
     // Public methods
@@ -85,7 +82,7 @@ class JobStatusWidget extends PureComponent {
             });
         },
         'sender:status': (data) => {
-            const { total, sent, received, startTime, finishTime, elapsedTime, remainingTime } = data;
+            const { total, sent, received, startTime, finishTime, elapsedTime, remainingTime, name } = data;
 
             this.setState({
                 total,
@@ -93,6 +90,7 @@ class JobStatusWidget extends PureComponent {
                 received,
                 startTime,
                 finishTime,
+                fileName: name,
                 elapsedTime,
                 remainingTime,
                 workflow: {
@@ -115,13 +113,60 @@ class JobStatusWidget extends PureComponent {
                     unitsState = { units: units };
                 }
 
-                this.setState(prevState => ({
-                    controller: {
-                        ...prevState.controller,
-                        type: type,
-                        state: { ...state, ...unitsState }
+                const { activeState } = state.status;
+
+                //Set the paused time once the machine is paused
+                if (activeState === 'Hold') {
+                    this.setState(prevState => ({
+                        controller: {
+                            ...prevState.controller,
+                            type: type,
+                            state: { ...state, ...unitsState }
+                        },
+                        pausedTime: Date.now()
+                    }));
+
+                // Set the paused time back to 0 when machine is idle
+                } else if (activeState === 'Idle') {
+                    this.setState(prevState => ({
+                        controller: {
+                            ...prevState.controller,
+                            type: type,
+                            state: { ...state, ...unitsState }
+                        },
+                        pausedTime: 0,
+                    }));
+
+                // Calculate the time difference from the paused time to current time
+                // then subtract it from the elapsed time given by the machine
+                } else {
+                    const { pausedTime, elapsedTime, controller: { state: prevState } } = this.state;
+
+                    // If the previous state of the machine was on hold, perform the calculation
+                    if (prevState.status.activeState !== 'Run') {
+                        const now = Date.now();
+
+                        const diff = pausedTime === 0 ? pausedTime : now - pausedTime;
+
+                        this.setState(prevState => ({
+                            controller: {
+                                ...prevState.controller,
+                                type: type,
+                                state: { ...state, ...unitsState }
+                            },
+                            elapsedTime: elapsedTime - diff,
+                            pausedTime: 0,
+                        }));
+                    } else {
+                        this.setState(prevState => ({
+                            controller: {
+                                ...prevState.controller,
+                                type: type,
+                                state: { ...state, ...unitsState },
+                            },
+                        }));
                     }
-                }));
+                }
             }
         }
     };
@@ -177,6 +222,8 @@ class JobStatusWidget extends PureComponent {
             finishTime: 0,
             elapsedTime: 0,
             remainingTime: 0,
+
+            pausedTime: 0, //
 
             // Bounding box
             bbox: {
@@ -261,14 +308,22 @@ class JobStatusWidget extends PureComponent {
         return false;
     }
 
+    jobIsPaused() {
+        const { workflow } = this.state;
+
+        if (workflow.state === WORKFLOW_STATE_PAUSED) {
+            return true;
+        }
+
+        return false;
+    }
+
     render() {
-        const { widgetId } = this.props;
-        const { minimized, isFullscreen } = this.state;
         const { units, bbox } = this.state;
-        const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const state = {
             ...this.state,
             isRunningJob: this.isRunningJob(),
+            jobIsPaused: this.jobIsPaused(),
             bbox: mapValues(bbox, (position) => {
                 return mapValues(position, (pos, axis) => {
                     return mapPositionToUnits(pos, units);
@@ -280,76 +335,10 @@ class JobStatusWidget extends PureComponent {
         };
 
         return (
-            <Widget fullscreen={isFullscreen}>
-                <Widget.Header>
-                    <Widget.Title>
-                        <Widget.Sortable className={this.props.sortable.handleClassName}>
-                            <i className="fa fa-bars" />
-                            <Space width="8" />
-                        </Widget.Sortable>
-                        {isForkedWidget &&
-                        <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
-                        }
-                        {i18n._('Job Status')}
-                    </Widget.Title>
-                    <Widget.Controls className={this.props.sortable.filterClassName}>
-                        <Widget.Button
-                            disabled={isFullscreen}
-                            title={minimized ? i18n._('Expand') : i18n._('Collapse')}
-                            onClick={actions.toggleMinimized}
-                        >
-                            <i
-                                className={classNames(
-                                    'fa',
-                                    { 'fa-chevron-up': !minimized },
-                                    { 'fa-chevron-down': minimized }
-                                )}
-                            />
-                        </Widget.Button>
-                        <Widget.DropdownButton
-                            title={i18n._('More')}
-                            toggle={<i className="fa fa-ellipsis-v" />}
-                            onSelect={(eventKey) => {
-                                if (eventKey === 'fullscreen') {
-                                    actions.toggleFullscreen();
-                                } else if (eventKey === 'fork') {
-                                    this.props.onFork();
-                                } else if (eventKey === 'remove') {
-                                    this.props.onRemove();
-                                }
-                            }}
-                        >
-                            <Widget.DropdownMenuItem eventKey="fullscreen">
-                                <i
-                                    className={classNames(
-                                        'fa',
-                                        'fa-fw',
-                                        { 'fa-expand': !isFullscreen },
-                                        { 'fa-compress': isFullscreen }
-                                    )}
-                                />
-                                <Space width="4" />
-                                {!isFullscreen ? i18n._('Enter Full Screen') : i18n._('Exit Full Screen')}
-                            </Widget.DropdownMenuItem>
-                            <Widget.DropdownMenuItem eventKey="fork">
-                                <i className="fa fa-fw fa-code-fork" />
-                                <Space width="4" />
-                                {i18n._('Fork Widget')}
-                            </Widget.DropdownMenuItem>
-                            <Widget.DropdownMenuItem eventKey="remove">
-                                <i className="fa fa-fw fa-times" />
-                                <Space width="4" />
-                                {i18n._('Remove Widget')}
-                            </Widget.DropdownMenuItem>
-                        </Widget.DropdownButton>
-                    </Widget.Controls>
-                </Widget.Header>
-                <Widget.Content
-                    className={classNames(
-                        styles['widget-content'],
-                        { [styles.hidden]: minimized }
-                    )}
-                >
+            <Widget
+                className={classNames(styles['job-status-widget'])}
+            >
+                <Widget.Content className={classNames(styles['job-status-widget-content'])}>
                     <JobStatus
                         state={state}
                         actions={actions}
