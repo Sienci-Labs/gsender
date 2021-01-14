@@ -61,13 +61,13 @@ class NavbarConnectionWidget extends PureComponent {
             }));
         },
         onClickPortListing: (selectedPort) => {
-            console.log(selectedPort);
             this.setState(state => ({
                 alertMessage: '',
                 port: selectedPort.port
-            }));
-            const { port, baudrate } = this.state;
-            this.openPort(port, { baudrate: baudrate });
+            }), () => {
+                const { port, baudrate } = this.state;
+                this.openPort(port, { baudrate: baudrate });
+            });
         },
         onChangeBaudrateOption: (option) => {
             this.setState(state => ({
