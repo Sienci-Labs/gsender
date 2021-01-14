@@ -360,16 +360,10 @@
     "Program": "Program",
     "Coolant": "Chlazení",
     "Status Report (?)": "",
-    "Check G-code Mode ($C)": "Ověřit mode G-codu ($C)",
     "Homing ($H)": "Homing ($H)",
     "Kill Alarm Lock ($X)": "Uvolnit zámek Alarmu ($X)",
-    "Sleep ($SLP)": "Režim spánku ($SLP)",
-    "Help ($)": "Nápověda ($)",
-    "Settings ($$)": "Nastavení ($$)",
     "View G-code Parameters ($#)": "Náhled parametrů G-codu ($#)",
     "View G-code Parser State ($G)": "Náhled stavu G-code Parseru ($G)",
-    "View Build Info ($I)": "Zobrazit info sestavení ($I)",
-    "View Startup Blocks ($N)": "Náhled startovních bloků ($N)",
     "Laser": "",
     "Laser Intensity Control": "",
     "Laser Test": "",
@@ -522,6 +516,7 @@
     "Ready to start": "",
     "Connect to an IP camera": "",
     "The URL must be for a Motion JPEG (mjpeg) HTTP or RTSP stream.": "",
+    "Error opening port '{{- port}}'": "",
     "Location Widget": "",
     "This widget displays machine and work coordinates for all axes.": "",
     "This widget displays machine and work coordinates for all axes": "",
@@ -529,6 +524,5 @@
     "Go to Zero": "",
     "Home": "",
     "Go Home": "",
-    "Location": "",
-    "Error opening port '{{- port}}'": ""
+    "Location": ""
 }

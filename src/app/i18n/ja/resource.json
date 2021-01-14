@@ -360,16 +360,10 @@
     "Program": "プログラム",
     "Coolant": "冷却液",
     "Status Report (?)": "ステータスレポート (?)",
-    "Check G-code Mode ($C)": "Gコードモードを確認 ($C)",
     "Homing ($H)": "ホーミング ($H)",
     "Kill Alarm Lock ($X)": "アラームロックを停止 ($X)",
-    "Sleep ($SLP)": "スリープ ($SLP)",
-    "Help ($)": "ヘルプ ($)",
-    "Settings ($$)": "設定 ($$)",
     "View G-code Parameters ($#)": "Gコードパラメータを表示 ($#)",
     "View G-code Parser State ($G)": "Gコード解釈状態 ($G)",
-    "View Build Info ($I)": "ビルド情報を表示する ($I)",
-    "View Startup Blocks ($N)": "スタートアップブロックの表示 ($N)",
     "Laser": "レーザー",
     "Laser Intensity Control": "レーザー強度制御",
     "Laser Test": "レーザーテスト",
@@ -522,6 +516,7 @@
     "Ready to start": "スタートの準備ができました",
     "Connect to an IP camera": "IPカメラと接続",
     "The URL must be for a Motion JPEG (mjpeg) HTTP or RTSP stream.": "このURLはモーションJPEG (mjpeg) HTTP もしくは RTSP ストリームである必要があります。",
+    "Error opening port '{{- port}}'": "",
     "Location Widget": "",
     "This widget displays machine and work coordinates for all axes.": "",
     "This widget displays machine and work coordinates for all axes": "",
@@ -529,6 +524,5 @@
     "Go to Zero": "",
     "Home": "",
     "Go Home": "",
-    "Location": "",
-    "Error opening port '{{- port}}'": ""
+    "Location": ""
 }

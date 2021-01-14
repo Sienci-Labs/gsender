@@ -360,16 +360,10 @@
     "Program": "Programm",
     "Coolant": "Kühlmittel",
     "Status Report (?)": "Status Bericht (?)",
-    "Check G-code Mode ($C)": "Prüfe G-Code Modus ($C)",
     "Homing ($H)": "Referenzfahrt ($H)",
     "Kill Alarm Lock ($X)": "Alarm-Stop löschen ($X)",
-    "Sleep ($SLP)": "Ruhezustand ($SLP)",
-    "Help ($)": "Hilfe ($)",
-    "Settings ($$)": "Einstellungen ($$)",
     "View G-code Parameters ($#)": "G-Code Parameter anzeigen ($#)",
     "View G-code Parser State ($G)": "Zustand G-Code-Parser anzeigen ($G)",
-    "View Build Info ($I)": "Build-Information anzeigen ($I)",
-    "View Startup Blocks ($N)": "Startup-Blöcke anzeigen ($N)",
     "Laser": "Laser",
     "Laser Intensity Control": "Laser Intensitäts Steuerung",
     "Laser Test": "Laser Test",
@@ -522,6 +516,7 @@
     "Ready to start": "",
     "Connect to an IP camera": "",
     "The URL must be for a Motion JPEG (mjpeg) HTTP or RTSP stream.": "",
+    "Error opening port '{{- port}}'": "",
     "Location Widget": "",
     "This widget displays machine and work coordinates for all axes.": "",
     "This widget displays machine and work coordinates for all axes": "",
@@ -529,6 +524,5 @@
     "Go to Zero": "",
     "Home": "",
     "Go Home": "",
-    "Location": "",
-    "Error opening port '{{- port}}'": ""
+    "Location": ""
 }

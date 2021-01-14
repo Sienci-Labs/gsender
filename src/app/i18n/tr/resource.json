@@ -360,16 +360,10 @@
     "Program": "Program",
     "Coolant": "Soğutucu",
     "Status Report (?)": "Durum Raporu (?)",
-    "Check G-code Mode ($C)": "G-kodu Modunu Kontrol Et ($C)",
     "Homing ($H)": "Başlangıç ($H)",
     "Kill Alarm Lock ($X)": "Alarm Kilidini Öldür ($X)",
-    "Sleep ($SLP)": "Uyku ($SLP)",
-    "Help ($)": "Yardım ($)",
-    "Settings ($$)": "Ayarlar ($$)",
     "View G-code Parameters ($#)": "G-kodu Parametrelerini Görüntüle ($#)",
     "View G-code Parser State ($G)": "G-kod ayrıştırıcı durumu ($G)",
-    "View Build Info ($I)": "Yapı Bilgisi Görüntüle ($I)",
-    "View Startup Blocks ($N)": "Başlangıç Bloklarını Görüntüle ($N)",
     "Laser": "Lazer",
     "Laser Intensity Control": "Lazer yoğunluk kontrolü",
     "Laser Test": "Lazer test",
@@ -522,6 +516,7 @@
     "Ready to start": "",
     "Connect to an IP camera": "",
     "The URL must be for a Motion JPEG (mjpeg) HTTP or RTSP stream.": "",
+    "Error opening port '{{- port}}'": "",
     "Location Widget": "",
     "This widget displays machine and work coordinates for all axes.": "",
     "This widget displays machine and work coordinates for all axes": "",
@@ -529,6 +524,5 @@
     "Go to Zero": "",
     "Home": "",
     "Go Home": "",
-    "Location": "",
-    "Error opening port '{{- port}}'": ""
+    "Location": ""
 }

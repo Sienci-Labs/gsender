@@ -1,0 +1,35 @@
+PRIMARY_COLOR = #3e85c7
+SECONDARY_COLOR = #6B7280
+PRIMARY_LIGHT = #78aad8;
+
+.tab {
+  color: SECONDARY_COLOR;
+  flex-direction: row;
+  font-size: 1.2rem;
+  background: none;
+  border: none;
+  padding: 0 1rem;
+  border-bottom: solid 4px #D1D5DB;
+  transition: ease-in-out 250ms
+  &:hover {
+    color :#4B5563;
+  }
+  &:focus{
+    outline: none;
+  }
+}
+
+.tab-active {
+  color: PRIMARY_COLOR;
+  border-bottom solid 4px PRIMARY_COLOR;
+  &:hover {
+    color: PRIMARY_LIGHT;
+    border-bottom-color: PRIMARY_LIGHT;
+  }
+}
+
+.tabRow {
+  display: flex;
+
+}
+

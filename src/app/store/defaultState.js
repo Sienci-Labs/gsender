@@ -16,7 +16,7 @@ const defaultState = {
             primary: {
                 show: true,
                 widgets: [
-                    'location', 'console', 'grbl', 'axes', 'gcode'
+                    'location', 'console', 'grbl', 'axes', 'gcode', 'secondary'
                 ]
             }
         },
@@ -63,7 +63,7 @@ const defaultState = {
                     rtscts: false
                 }
             },
-            autoReconnect: true
+            autoReconnect: false
         },
         console: {
             minimized: false
@@ -245,6 +245,10 @@ const defaultState = {
             },
             crosshair: false,
             muted: false
+        },
+        secondary: {
+            disabled: false,
+            minimized: false,
         }
     }
 };

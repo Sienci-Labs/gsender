@@ -15,6 +15,7 @@ import CustomWidget from 'app/widgets/Custom';
 import TinyGWidget from 'app/widgets/TinyG';
 import VisualizerWidget from 'app/widgets/Visualizer';
 import WebcamWidget from 'app/widgets/Webcam';
+import SecondaryFunctionality from 'app/widgets/SecondaryFunctionality';
 
 const getWidgetByName = (name) => {
     return {
@@ -32,7 +33,8 @@ const getWidgetByName = (name) => {
         'custom': CustomWidget,
         'tinyg': TinyGWidget,
         'visualizer': VisualizerWidget,
-        'webcam': WebcamWidget
+        'webcam': WebcamWidget,
+        'secondary': SecondaryFunctionality
     }[name] || null;
 };
 

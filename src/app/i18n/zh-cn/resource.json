@@ -360,16 +360,10 @@
     "Program": "程序",
     "Coolant": "冷却",
     "Status Report (?)": "状态报告(?)",
-    "Check G-code Mode ($C)": "检查 G-code 模式 ($C)",
     "Homing ($H)": "原点复位 ($H)",
     "Kill Alarm Lock ($X)": "解除报警锁定 ($X)",
-    "Sleep ($SLP)": "睡眠 ($SLP)",
-    "Help ($)": "帮助（$）",
-    "Settings ($$)": "设置（$$）",
     "View G-code Parameters ($#)": "查看 G-code 参数（$#）",
     "View G-code Parser State ($G)": "查看 G-code 解析器状态（$G）",
-    "View Build Info ($I)": "查看版本信息（$I）",
-    "View Startup Blocks ($N)": "查看启动区块（$N）",
     "Laser": "激光",
     "Laser Intensity Control": "激光强度控制",
     "Laser Test": "激光测试",
@@ -522,6 +516,7 @@
     "Ready to start": "",
     "Connect to an IP camera": "",
     "The URL must be for a Motion JPEG (mjpeg) HTTP or RTSP stream.": "",
+    "Error opening port '{{- port}}'": "",
     "Location Widget": "",
     "This widget displays machine and work coordinates for all axes.": "",
     "This widget displays machine and work coordinates for all axes": "",
@@ -529,6 +524,5 @@
     "Go to Zero": "",
     "Home": "",
     "Go Home": "",
-    "Location": "",
-    "Error opening port '{{- port}}'": ""
+    "Location": ""
 }
