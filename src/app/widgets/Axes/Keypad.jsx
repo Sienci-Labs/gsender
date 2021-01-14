@@ -125,19 +125,16 @@ class Keypad extends PureComponent {
         this.setState({ setSpeed: headSpeed });
     }
 
-    setXyStep = (loopIndex) => {
-        console.log(loopIndex + 'loopIndex');
-        if (this.state.units === Constants.METRIC_UNITS) {
-            let i;
-            for (i = 0; i < this.state.stepIncrementXYMetric.length; i++) {
-                console.log(i + 'IVALUE');
-                console.log(this.state.stepIncrementXYMetric[i] + 'RETURNED');
-                return this.state.stepIncrementXYMetric[i];
-            }
-        } else {
-            console.log(this.state.stepIncrementXYImperial + 'StepincIMPOERIAL');
-            return this.state.stepIncrementXYImperial;
-        } return loopIndex;
+    setXyStep = () => {
+        let select = document.getElementsByClassName('rollingXYInput');
+        let options = this.state.stepIncrementXYMetric;
+        for (let i = 0; i < options.length; i++) {
+            let opt = options[i];
+            let el = document.createElement('option');
+            el.text = opt;
+            el.value = opt;
+            select.add(el);
+        }
     }
 
     handleSelect = (eventKey) => {
@@ -231,7 +228,6 @@ class Keypad extends PureComponent {
             disable = !disable;
         }
         const userHasNStops = defaultState.widgets.axes.hasNStop;
-        console.log(disable + 'DISABLE');
         let upperLeftClass;
         let upperRightClass;
         let lowerRightClass;
