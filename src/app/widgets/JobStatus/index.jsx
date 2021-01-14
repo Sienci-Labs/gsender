@@ -121,8 +121,9 @@ class JobStatusWidget extends PureComponent {
                         controller: {
                             ...prevState.controller,
                             type: type,
-                            state: { ...state, ...unitsState }
+                            state: { ...state }
                         },
+                        ...unitsState,
                         pausedTime: Date.now()
                     }));
 
@@ -132,8 +133,9 @@ class JobStatusWidget extends PureComponent {
                         controller: {
                             ...prevState.controller,
                             type: type,
-                            state: { ...state, ...unitsState }
+                            state: { ...state }
                         },
+                        ...unitsState,
                         pausedTime: 0,
                     }));
 
@@ -152,8 +154,9 @@ class JobStatusWidget extends PureComponent {
                             controller: {
                                 ...prevState.controller,
                                 type: type,
-                                state: { ...state, ...unitsState }
+                                state: { ...state }
                             },
+                            ...unitsState,
                             elapsedTime: elapsedTime - diff,
                             pausedTime: 0,
                         }));
@@ -162,8 +165,9 @@ class JobStatusWidget extends PureComponent {
                             controller: {
                                 ...prevState.controller,
                                 type: type,
-                                state: { ...state, ...unitsState },
+                                state: { ...state },
                             },
+                            ...unitsState,
                         }));
                     }
                 }
@@ -337,6 +341,7 @@ class JobStatusWidget extends PureComponent {
         return (
             <Widget
                 className={classNames(styles['job-status-widget'])}
+                borderless
             >
                 <Widget.Content className={classNames(styles['job-status-widget-content'])}>
                     <JobStatus
