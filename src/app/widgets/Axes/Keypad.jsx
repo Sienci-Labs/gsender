@@ -407,9 +407,12 @@ class Keypad extends PureComponent {
                             title={i18n._('Keypad jogging')}
                             onClick={actions.toggleKeypadJogging}
                             // inverted={state.jog.keypad}
-                            disabled={!canClickXY}
                         >
-                            <i className="fa fa-keyboard-o" id={disable ? 'keyboardDisabled' : 'keyboard'} />
+                            <i
+                                className="fa fa-keyboard-o"
+                                id={disable ? 'keyboardDisabled' : 'keyboard'
+                                }
+                            />
                         </Widget.Button>
                         <Button
                             disabled={!canClickXY}
