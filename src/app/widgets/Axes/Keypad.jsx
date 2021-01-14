@@ -24,8 +24,10 @@ class Keypad extends PureComponent {
             zdistance: 0,
             setSpeed: 0,
             units: props.units,
+            testIncrement: 10,
             stepAmountXY: [],
-            stepIncrement: 10,
+            stepIncrementXYMetric: Constants.METRIC_STEPS,
+            stepIncrementXYImperial: Constants.IMPERIAL_STEPS,
             hasNStop: true
         };
     }
@@ -123,6 +125,21 @@ class Keypad extends PureComponent {
         this.setState({ setSpeed: headSpeed });
     }
 
+    setXyStep = (loopIndex) => {
+        console.log(loopIndex + 'loopIndex');
+        if (this.state.units === Constants.METRIC_UNITS) {
+            let i;
+            for (i = 0; i < this.state.stepIncrementXYMetric.length; i++) {
+                console.log(i + 'IVALUE');
+                console.log(this.state.stepIncrementXYMetric[i] + 'RETURNED');
+                return this.state.stepIncrementXYMetric[i];
+            }
+        } else {
+            console.log(this.state.stepIncrementXYImperial + 'StepincIMPOERIAL');
+            return this.state.stepIncrementXYImperial;
+        } return loopIndex;
+    }
+
     handleSelect = (eventKey) => {
         const commands = ensureArray(eventKey);
         commands.forEach(command => controller.command('gcode', command));
@@ -210,10 +227,33 @@ class Keypad extends PureComponent {
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
         let disable = true;
-        const userHasNStops = defaultState.widgets.axes.hasNStop;
         if (canClick === true) {
             disable = !disable;
         }
+        const userHasNStops = defaultState.widgets.axes.hasNStop;
+        console.log(disable + 'DISABLE');
+        let upperLeftClass;
+        let upperRightClass;
+        let lowerRightClass;
+        let lowerLeftClass;
+
+        if (!userHasNStops) {
+            upperLeftClass = 'upperLeftTriangleHide';
+            upperRightClass = 'upperRightTriangleHide';
+            lowerRightClass = 'lowerRightTriangleHide';
+            lowerLeftClass = 'lowerLeftTriangleHide';
+        } else if (disable === true) {
+            upperLeftClass = 'upperLeftTriangleDisabled';
+            upperRightClass = 'upperRightTriangleDisabled';
+            lowerRightClass = 'lowerRightTriangleDisabled';
+            lowerLeftClass = 'lowerLeftTriangleDisabled';
+        } else {
+            upperLeftClass = 'upperLeftTriangle';
+            upperRightClass = 'upperRightTriangle';
+            lowerRightClass = 'lowerRightTriangle';
+            lowerLeftClass = 'lowerLeftTriangle';
+        }
+
         const { units } = this.state;
 
         return (
@@ -222,7 +262,7 @@ class Keypad extends PureComponent {
                     <div className="mainControls">
                         <div className="topThreeMainControls">
                             <div
-                                className={userHasNStops ? 'upperLeftTriangle' : 'upperLeftTriangleHide'}
+                                className={upperLeftClass}
                                 onClick={() => {
                                     const distance = this.state.xyDistance;
                                     const toggledSpeed = this.state.setSpeed;
@@ -247,7 +287,7 @@ class Keypad extends PureComponent {
                             </div>
                             <div>
                                 <div
-                                    className={userHasNStops ? 'upperRightTriangle' : 'upperRightTriangleHide'}
+                                    className={upperRightClass}
                                     onClick={() => {
                                         const distance = this.state.xyDistance;
                                         const toggledSpeed = this.state.setSpeed;
@@ -294,7 +334,7 @@ class Keypad extends PureComponent {
                         <div className="bottomControls">
                             <div>
                                 <div
-                                    className={userHasNStops ? 'lowerLeftTriangle' : 'lowerLeftTriangleHide'}
+                                    className={lowerLeftClass}
                                     onClick={() => {
                                         const distance = this.state.xyDistance;
                                         const toggledSpeed = this.state.setSpeed;
@@ -322,7 +362,7 @@ class Keypad extends PureComponent {
                             </div>
                             <div>
                                 <div
-                                    className={userHasNStops ? 'lowerRightTriangle' : 'lowerRightTriangleHide'}
+                                    className={lowerRightClass}
                                     onClick={() => {
                                         const distance = this.state.xyDistance;
                                         const toggledSpeed = this.state.setSpeed;
@@ -414,7 +454,7 @@ class Keypad extends PureComponent {
                             className="rollingXYInput"
                             name="xyMove"
                             min="0"
-                            step={`"${this.state.stepAmountXY}"`}
+                            step={this.setXyStep}
                             defaultValue={this.state.xyDistance}
                             value={this.state.xyDistance}
                         />
