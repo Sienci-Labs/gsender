@@ -13,6 +13,7 @@ import {
     MODAL_NONE,
 } from './constants';
 
+
 class SecondaryFunctionality extends PureComponent {
     static propTypes = {
         widgetId: PropTypes.string.isRequired,
@@ -185,8 +186,17 @@ class SecondaryFunctionality extends PureComponent {
                 <TabbedWidget.Content>
                     {
                         tabs.map((tab, index) => {
+                            const active = index === selectedTab;
                             return (
-                                <tab.component onFork={onFork} onRemove={onRemove} sortable={sortable} widgetId={tab.widgetId}/>
+                                <TabbedWidget.ChildComponent active={active}>
+                                    <tab.component
+                                        onFork={onFork}
+                                        onRemove={onRemove}
+                                        sortable={sortable}
+                                        widgetId={tab.widgetId}
+                                        embedded
+                                    />
+                                </TabbedWidget.ChildComponent>
                             );
                         })
                     }

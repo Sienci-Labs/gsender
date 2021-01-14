@@ -22,7 +22,8 @@ class ConsoleWidget extends PureComponent {
         widgetId: PropTypes.string.isRequired,
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
-        sortable: PropTypes.object
+        sortable: PropTypes.object,
+        embedded: PropTypes.bool
     };
 
     senderId = uuid.v4();
@@ -191,7 +192,7 @@ class ConsoleWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId } = this.props;
+        const { widgetId, embedded } = this.props;
         const { minimized, isFullscreen } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const state = {
@@ -203,7 +204,7 @@ class ConsoleWidget extends PureComponent {
 
         return (
             <Widget fullscreen={isFullscreen}>
-                <Widget.Header>
+                <Widget.Header embedded={embedded}>
                     <Widget.Title>
                         <Widget.Sortable className={this.props.sortable.handleClassName}>
                             <i className="fa fa-bars" />

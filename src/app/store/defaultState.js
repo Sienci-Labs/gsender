@@ -16,7 +16,7 @@ const defaultState = {
             primary: {
                 show: true,
                 widgets: [
-                    'location', 'console', 'grbl', 'axes', 'gcode', 'secondary'
+                    'location', 'axes', 'secondary'
                 ]
             }
         },

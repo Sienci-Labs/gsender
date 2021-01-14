@@ -1,11 +1,11 @@
 import classNames from 'classnames';
 import React from 'react';
-import widgetStyles from '../Widget/index.styl';
+//import styles from './index.styl';
 
-const Content = ({ className, ...props }) => (
+const Content = ({ className, active, ...props }) => (
     <div
         {...props}
-        className={classNames(className, widgetStyles.widgetContent)}
+        className={classNames(className)}
     />
 );
 
