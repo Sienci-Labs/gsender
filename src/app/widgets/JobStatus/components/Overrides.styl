@@ -1,12 +1,19 @@
 .wrapper {
     font-size: 16px;
+    font-weight: 200;
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    justify-content: space-between;
+    justify-content: space-evenly;
+    align-items: center;
 }
 
 .progress-area {
+    width: 100%;
+    max-width: 500px;
+}
+
+.progress-area-table {
     width: 100%;
 }
 
@@ -18,10 +25,27 @@
 }
 
 .settings-area {
+
+    primary = #D1D5DB;
+    secondary = #333;
+
+    label {
+        margin-bottom: 0;
+        background-color: primary;
+        padding: 3px 5px;
+        color: #3E85C8;
+        border: 1px solid #9CA3AF;
+        min-width: 30px;
+        width: 100%;
+        text-align: center;
+    }
+
     button {
-        background-color: #747685;
-        border: 1px solid #747685;
-        color: white;
+        background-color: primary;
+        border: 1px solid #9CA3AF;
+        color: secondary;
+        min-width: 55px;
+        min-height: 35px;
 
         &:disabled {
             background-color: rgba(116,118,133,0.5);
@@ -40,5 +64,17 @@
 
 .lines-processed {
     position: absolute;
-    margin: 0px 5px;
+    left: 25%;
+    right: 50%;
+    margin: 5px;
+}
+
+.seperator {
+    background-color: #D3D3D3;
+    width: 1px;
+    height: 100px;
+
+    @media(max-width: 1420px){
+        display: none;
+    }
 }
