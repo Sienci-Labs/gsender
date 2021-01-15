@@ -19,8 +19,7 @@ class Keypad extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            units: props.units,
-            jogging: this.props.jogDistance
+            units: props.units
         };
     }
 
@@ -37,20 +36,19 @@ class Keypad extends PureComponent {
         jogDistance: PropTypes.number
     };
 
+    //Used to populate forms with default values
     componentWillMount() {
         if (this.state.units === Constants.METRIC_UNITS) {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[1],
                 xyDistance: Constants.METRIC_DISTANCE_XY[1],
                 zdistance: Constants.METRIC_DISTANCE_Z[1],
-                stepAmountXY: Constants.METRIC_STEPS
             });
         } else {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[1],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
                 zDistance: Constants.IMPERIAL_DISTANCE_Z[1],
-                stepAmountXY: Constants.IMPERIAL_STEPS
             });
         }
     }
@@ -104,13 +102,8 @@ class Keypad extends PureComponent {
     }
 
     handleXYMove = (event) => {
-        const { actions } = this.props;
         let xyDistance = event.target.value;
         this.setState({ xyDistance: xyDistance });
-        let toggleness = actions.setToggleAmounts(xyDistance);
-        this.setState({
-            jogging: toggleness
-        });
     }
 
     handleZToggle = (event) => {
@@ -443,6 +436,7 @@ class Keypad extends PureComponent {
                             className="rollingXYInput"
                             name="xyMove"
                             max="50"
+                            min="0"
                             step={this.state.jogging}
                             value={this.state.xyDistance}
                         />

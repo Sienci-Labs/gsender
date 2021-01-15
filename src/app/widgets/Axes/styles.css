@@ -199,7 +199,7 @@
   background-color: #3e85c7;
   width: 39px;
   height: 45px;
-  margin-left: 89%;
+  margin-left: 87%;
   margin-top: 4px;
 }
 
@@ -208,7 +208,7 @@
   background-color: #3e85c7;
   width: 39px;
   height: 45px;
-  margin-left: 89%;
+  margin-left: 87%;
   margin-top: 4px;
   opacity: 0.7;
   cursor: not-allowed;
@@ -311,7 +311,7 @@
 
 .rollingNumbers {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-evenly;
   padding: 0.5em;
 }
 
