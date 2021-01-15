@@ -19,7 +19,8 @@ class Keypad extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            units: props.units
+            units: props.units,
+            lastXYSteps: [],
         };
     }
 
@@ -33,7 +34,8 @@ class Keypad extends PureComponent {
         zdistance: PropTypes.number,
         setSpeed: PropTypes.number,
         userHasNStops: PropTypes.bool,
-        jogDistance: PropTypes.number
+        jogDistance: PropTypes.number,
+        metricMaxDistance: PropTypes.number
     };
 
     //Used to populate forms with default values
@@ -116,16 +118,6 @@ class Keypad extends PureComponent {
         this.setState({ setSpeed: headSpeed });
     }
 
-    setXyStep = () => {
-        this.state.stepIncrementXYMetric.map((number) => {
-            this.setState({
-                testIncrement: number
-            });
-            return number;
-        });
-    }
-
-
     handleSelect = (eventKey) => {
         const commands = ensureArray(eventKey);
         commands.forEach(command => controller.command('gcode', command));
@@ -207,17 +199,33 @@ class Keypad extends PureComponent {
         });
     }
 
-    getStepDistance(step) {
-        if (step >= 1000) {
-            return 1000;
-        } else if (step >= 100) {
-            return 100;
-        } else if (step >= 10) {
-            return 10;
-        } else if (step > 1) {
-            return 1;
+    getStepDistanceXY(step) {
+        if (this.state.units === Constants.METRIC_UNITS) {
+            if (step >= 100) {
+                this.setState({ lastXYStep: 100 });
+                return 100;
+            } else if (step >= 10) {
+                this.setState({ lastXYStep: 100 });
+                return 10;
+            } else if (step > 1) {
+                this.setState({ lastXYStep: 1 });
+                return 1;
+            }
+            this.setState({ lastXYStep: 0.1 });
+            return 0.1;
+        } else {
+        //Todo: Steps for Imperial--These are metric repeated
+            if (step >= 1000) {
+                return 1000;
+            } else if (step >= 100) {
+                return 100;
+            } else if (step >= 10) {
+                return 10;
+            } else if (step > 1) {
+                return 1;
+            }
+            return 0.1;
         }
-        return 0.1;
     }
 
     render() {
@@ -386,7 +394,7 @@ class Keypad extends PureComponent {
                             onClick={() => {
                                 const distance = this.state.zdistance;
                                 const toggledSpeed = this.state.setSpeed;
-                                actions.jog({ Z: distance }, { F: toggledSpeed });
+                                actions.jog({ Z: -distance }, { F: toggledSpeed });
                             }}
                             title={i18n._('Move Z-')}
                             role="button"
@@ -409,11 +417,11 @@ class Keypad extends PureComponent {
                         <Button
                             disabled={!canClickXY}
                             onClick={() => {
-                                this.handlePreciseSpeedButton(units);
+                                this.handleFastSpeedButton(units);
                             }}
-                            className="preciseSpeedButton"
+                            className="rapidSpeedButton"
                         >
-                            Precise
+                            Rapid
                         </Button>
                         <Button
                             disabled={!canClickXY}
@@ -427,11 +435,11 @@ class Keypad extends PureComponent {
                         <Button
                             disabled={!canClickXY}
                             onClick={() => {
-                                this.handleFastSpeedButton(units);
+                                this.handlePreciseSpeedButton(units);
                             }}
-                            className="fastSpeedButton"
+                            className="preciseSpeedButton"
                         >
-                            Fast
+                            Precise
                         </Button>
                     </div>
                 </div>
@@ -448,9 +456,9 @@ class Keypad extends PureComponent {
                             type="number"
                             className="rollingXYInput"
                             name="xyMove"
-                            max="50"
+                            max={this.props.metricMaxDistance}
                             min="0"
-                            step={this.getStepDistance(xyDistance)}
+                            step={this.getStepDistanceXY(xyDistance)}
                             value={this.state.xyDistance}
                         />
                     </div>

@@ -41,7 +41,9 @@ const defaultState = {
                 },
                 xyStep: 5,
                 zStep: 2,
-                speed: 3000
+                speed: 3000,
+                metricMaxMm: 770,
+                imperialMaxInches: 30 //Max distance head can travel on longmill //Max distance head can travel on longmill
             },
             mdi: {
                 disabled: false

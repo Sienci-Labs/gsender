@@ -12,7 +12,8 @@ const Axes = (props) => {
         zdistance,
         setSpeed,
         userHasNStops,
-        jogDistance
+        jogDistance,
+        metricMaxDistance
     } = props;
 
     return (
@@ -37,6 +38,7 @@ const Axes = (props) => {
                 setSpeed={setSpeed}
                 userHasNStops={userHasNStops}
                 jogDistance={jogDistance}
+                metricMaxDistance={metricMaxDistance}
             />
             <MDI
                 canClick={state.canClick}
@@ -53,7 +55,8 @@ Axes.propTypes = {
     zdistance: PropTypes.number,
     setSpeed: PropTypes.number,
     userHasNStops: PropTypes.bool,
-    jogDistance: PropTypes.number
+    jogDistance: PropTypes.number,
+    metricMaxDistance: PropTypes.number
 };
 
 export default Axes;

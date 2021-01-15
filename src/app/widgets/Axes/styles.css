@@ -9,6 +9,7 @@
   height: 17px;
   margin-left: 17px;
   margin-top: -17px;
+  border: none;
 }
 
 .upperLeftTrianglehide {
@@ -20,6 +21,7 @@
   margin-top: -17px;
   opacity: 0;
   cursor: not-allowed;
+  border: none;
 }
 .upperLeftTriangleDisabled{
   clip-path: polygon(100% 0, 100% 100%, 0 100%);
@@ -30,7 +32,10 @@
   margin-top: -17px;
   opacity: 0.7;
   cursor: not-allowed;
+  border: none;
 }
+.upperLeftTriangle:focus {outline:none;}
+.upperLeftTriangleDisabled:focus {outline:none;}
 
 .upperRightTriangle {
   clip-path: polygon(0 100%, 0 0, 100% 100%);
@@ -61,6 +66,8 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+.upperRightTriangle:focus {outline:none;}
+.upperRightTriangleDisabled:focus {outline:none;}
 
 .lowerLeftTriangle {
   clip-path: polygon(0 0, 100% 0, 100% 100%);
@@ -91,6 +98,8 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+.lowerLeftTriangle:focus {outline:none;}
+.lowerLeftTriangleDisabled:focus {outline:none;}
 
 .lowerRightTriangle {
   clip-path: polygon(0 100%, 100% 0, 0 0);
@@ -121,6 +130,8 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+.lowerRightTriangle:focus {outline:none;}
+.lowerRightTriangleDisabled:focus {outline:none;}
 
 .upArrow {
   clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 100%, 50% 75%, 0 100%);
@@ -141,6 +152,9 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+.upArrow:focus {outline:none;}
+.upArrowHide:focus {outline:none;}
+
 
 .upArrowZ {
   clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 100%, 50% 75%, 0 100%);
@@ -157,6 +171,9 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+.upArrowZ:focus {outline:none;}
+.upArrowZHide:focus {outline:none;}
 
 .leftArrow {
   clip-path: polygon(100% 0%, 75% 50%, 100% 100%, 25% 100%, 0% 50%, 25% 0%);
@@ -176,6 +193,9 @@
   cursor: not-allowed;
 }
 
+.leftArrow:focus {outline:none;}
+.leftArrowHide:focus {outline:none;}
+
 .rightArrow {
   clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 25% 50%, 0% 0%);
   background-color: #3e85c7;
@@ -193,6 +213,9 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+.rightArrow:focus {outline:none;}
+.rightArrowHide:focus {outline:none;}
 
 .downArrow {
   clip-path: polygon(0 75%, 50% 100%, 100% 75%, 100% 0, 50% 25%, 0 0);
@@ -214,6 +237,9 @@
   cursor: not-allowed;
 }
 
+.downArrow:focus {outline:none;}
+.downArrowHide:focus {outline:none;}
+
 .downArrowZ {
   height: 38px;
   width: 65%;
@@ -231,6 +257,9 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+.downArrowZ:focus {outline:none;}
+.downArrowZHide:focus {outline:none;}
 
 .controlsContainer {
   display: flex;
@@ -286,6 +315,8 @@
   margin-left: 9px;
   margin-top: 0%;
 }
+.preciseSpeedButton:focus {color: #3e85c7;}
+.preciseSpeedButton:hover {color: #3e85c7;}
 .speedButtonGroup:hover {
   color: #3e85c7;
 }
@@ -298,12 +329,16 @@
   margin-left: inherit;
   margin-bottom: 10px;
 }
+.normalSpeedButton:focus {color: #3e85c7;}
+.normalSpeedButton:hover {color: #3e85c7;}
 
-.fastSpeedButton {
+.rapidSpeedButton {
   color: #3e85c7;
-  margin-left: 2px;
+  margin-left: 9px;
   margin-bottom: 10px;
 }
+.rapidSpeedButton:focus {color: #3e85c7;}
+.rapidSpeedButton:hover {color: #3e85c7;}
 
 .htmlLabels {
   display: block;

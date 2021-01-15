@@ -642,6 +642,7 @@ class AxesWidget extends PureComponent {
 
     getInitialState() {
         return {
+            metricMaxDistance: defaultState.widgets.axes.jog.metricMaxMm,
             xyDistance: defaultState.widgets.axes.jog.xyStep,
             zdistance: defaultState.widgets.axes.jog.zStep,
             setSpeed: defaultState.widgets.axes.jog.speed,
@@ -944,6 +945,7 @@ class AxesWidget extends PureComponent {
                         setSpeed={this.state.setSpeed}
                         userHasNStops={this.state.userHasNStops}
                         jogDistance={this.state.jogDistance}
+                        metricMaxDistance={this.state.metricMaxDistance}
                     />
                 </Widget.Content>
             </Widget>
