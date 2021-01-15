@@ -11,7 +11,7 @@ const defaultState = {
     workspace: {
         container: {
             default: {
-                widgets: ['visualizer']
+                widgets: ['visualizer', 'job_status']
             },
             primary: {
                 show: true,
@@ -76,6 +76,9 @@ const defaultState = {
         },
         gcode: {
             minimized: false
+        },
+        job_status: {
+            minimized: false,
         },
         grbl: {
             minimized: false,

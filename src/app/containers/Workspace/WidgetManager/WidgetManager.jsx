@@ -58,6 +58,13 @@ class WidgetManager extends PureComponent {
             disabled: false
         },
         {
+            id: 'job_status',
+            caption: i18n._('Job Status Widget'),
+            details: i18n._('This widget displays the job progression and feed and spindle overrides.'),
+            visible: true,
+            disabled: false
+        },
+        {
             id: 'marlin',
             caption: i18n._('Marlin Widget'),
             details: i18n._('This widget shows the Marlin state and provides Marlin specific features.'),

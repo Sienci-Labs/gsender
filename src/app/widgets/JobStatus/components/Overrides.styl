@@ -1,0 +1,80 @@
+.wrapper {
+    font-size: 16px;
+    font-weight: 200;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.progress-area {
+    width: 100%;
+    max-width: 500px;
+}
+
+.progress-area-table {
+    width: 100%;
+}
+
+.times {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.settings-area {
+
+    primary = #D1D5DB;
+    secondary = #333;
+
+    label {
+        margin-bottom: 0;
+        background-color: primary;
+        padding: 3px 5px;
+        color: #3E85C8;
+        border: 1px solid #9CA3AF;
+        min-width: 30px;
+        width: 100%;
+        text-align: center;
+    }
+
+    button {
+        background-color: primary;
+        border: 1px solid #9CA3AF;
+        color: secondary;
+        min-width: 55px;
+        min-height: 35px;
+
+        &:disabled {
+            background-color: rgba(116,118,133,0.5);
+            border: 1px solid rgba(116,118,133,0.1);
+            color: rgba(116,118,133,0.5);
+        }
+    }
+
+    input {
+        color: #7A93D6;
+        width: 100%;
+        max-width: 50px;
+        font-weight: 800;
+    }
+}
+
+.lines-processed {
+    position: absolute;
+    left: 25%;
+    right: 50%;
+    margin: 5px;
+}
+
+.seperator {
+    background-color: #D3D3D3;
+    width: 1px;
+    height: 100px;
+
+    @media(max-width: 1440px){
+        display: none;
+    }
+}

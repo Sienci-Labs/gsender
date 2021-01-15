@@ -4,6 +4,7 @@ import AxesWidget from 'app/widgets/Axes';
 import ConsoleWidget from 'app/widgets/Console';
 import GCodeWidget from 'app/widgets/GCode';
 import GrblWidget from 'app/widgets/Grbl';
+import JobStatusWidget from 'app/widgets/JobStatus';
 import LaserWidget from 'app/widgets/Laser';
 import LocationWidget from 'app/widgets/Location';
 import MacroWidget from 'app/widgets/Macro';
@@ -23,6 +24,7 @@ const getWidgetByName = (name) => {
         'console': ConsoleWidget,
         'gcode': GCodeWidget,
         'grbl': GrblWidget,
+        'job_status': JobStatusWidget,
         'laser': LaserWidget,
         'location': LocationWidget,
         'macro': MacroWidget,
