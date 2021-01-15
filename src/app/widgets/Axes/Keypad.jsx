@@ -207,6 +207,19 @@ class Keypad extends PureComponent {
         });
     }
 
+    getStepDistance(step) {
+        if (step >= 1000) {
+            return 1000;
+        } else if (step >= 100) {
+            return 100;
+        } else if (step >= 10) {
+            return 10;
+        } else if (step > 1) {
+            return 1;
+        }
+        return 0.1;
+    }
+
     render() {
         const { canClick, axes, actions } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
@@ -238,7 +251,7 @@ class Keypad extends PureComponent {
             lowerLeftClass = 'lowerLeftTriangle';
         }
 
-        const { units } = this.state;
+        const { units, xyDistance } = this.state;
         return (
             <div className="controlsContainer">
                 <div className="uppercontrols">
@@ -322,7 +335,7 @@ class Keypad extends PureComponent {
                                         actions.jog({ X: -distance, Y: -distance }, { F: toggledSpeed });
                                     }}
                                     tabIndex={0}
-                                    s title={i18n._('Move X- Y-')}
+                                    title={i18n._('Move X- Y-')}
                                     role="button"
                                 />
                             </div>
@@ -437,7 +450,7 @@ class Keypad extends PureComponent {
                             name="xyMove"
                             max="50"
                             min="0"
-                            step={this.state.jogging}
+                            step={this.getStepDistance(xyDistance)}
                             value={this.state.xyDistance}
                         />
                     </div>
