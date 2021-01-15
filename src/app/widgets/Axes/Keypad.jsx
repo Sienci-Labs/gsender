@@ -13,6 +13,7 @@ import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import Fraction from './components/Fraction';
 import * as Constants from '../../constants';
+import XyToggle from './XyToggle';
 import './styles.css';
 
 class Keypad extends PureComponent {
@@ -87,7 +88,7 @@ class Keypad extends PureComponent {
         }
     }
 
-    handleFastSpeedButton = () => {
+    handleRapidSpeedButton = () => {
         if (this.state.units === Constants.METRIC_UNITS) {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[0],
@@ -199,35 +200,6 @@ class Keypad extends PureComponent {
         });
     }
 
-    getStepDistanceXY(step) {
-        if (this.state.units === Constants.METRIC_UNITS) {
-            if (step >= 100) {
-                this.setState({ lastXYStep: 100 });
-                return 100;
-            } else if (step >= 10) {
-                this.setState({ lastXYStep: 100 });
-                return 10;
-            } else if (step > 1) {
-                this.setState({ lastXYStep: 1 });
-                return 1;
-            }
-            this.setState({ lastXYStep: 0.1 });
-            return 0.1;
-        } else {
-        //Todo: Steps for Imperial--These are metric repeated
-            if (step >= 1000) {
-                return 1000;
-            } else if (step >= 100) {
-                return 100;
-            } else if (step >= 10) {
-                return 10;
-            } else if (step > 1) {
-                return 1;
-            }
-            return 0.1;
-        }
-    }
-
     render() {
         const { canClick, axes, actions } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
@@ -259,7 +231,7 @@ class Keypad extends PureComponent {
             lowerLeftClass = 'lowerLeftTriangle';
         }
 
-        const { units, xyDistance } = this.state;
+        const { units } = this.state;
         return (
             <div className="controlsContainer">
                 <div className="uppercontrols">
@@ -406,7 +378,7 @@ class Keypad extends PureComponent {
                         <Widget.Button
                             title={i18n._('Keypad jogging')}
                             onClick={actions.toggleKeypadJogging}
-                            // inverted={state.jog.keypad}
+                        // inverted={state.jog.keypad}
                         >
                             <i
                                 className="fa fa-keyboard-o"
@@ -417,7 +389,7 @@ class Keypad extends PureComponent {
                         <Button
                             disabled={!canClickXY}
                             onClick={() => {
-                                this.handleFastSpeedButton(units);
+                                this.handleRapidSpeedButton(units);
                             }}
                             className="rapidSpeedButton"
                         >
@@ -444,24 +416,14 @@ class Keypad extends PureComponent {
                     </div>
                 </div>
                 <div className="rollingNumbers">
-                    <div className="rollingXYMove">
-                        <label
-                            className="htmlLabels"
-                            htmlFor="firstToggleNumber"
-                        >XY Move
-                        </label>
-                        <input
-                            disabled={!canClickXY}
-                            onChange={this.handleXYMove}
-                            type="number"
-                            className="rollingXYInput"
-                            name="xyMove"
-                            max={this.props.metricMaxDistance}
-                            min="0"
-                            step={this.getStepDistanceXY(xyDistance)}
-                            value={this.state.xyDistance}
-                        />
-                    </div>
+                    <XyToggle
+                        disabled={!canClickXY}
+                        xyDistance={this.state.xyDistance}
+                        metricMaxDistance={this.props.metricMaxDistance}
+                        className="rollingXYMove"
+                        handleXYMove={this.handleXYMove}
+                        units={this.state.units}
+                    />
                     <div className="rollingZMove">
                         <label
                             className="htmlLabels"
