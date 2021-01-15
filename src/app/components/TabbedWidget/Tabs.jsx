@@ -19,6 +19,7 @@ const Tabs = ({ className, tabs, activeTabIndex, onClick, ...props }) => (
                 <Tab
                     active={index === activeTabIndex}
                     onClick={() => onClick(index)}
+                    key={`tab-${tab.widgetId}`}
                 >
                     {tab.label}
                 </Tab>

@@ -88,6 +88,7 @@ class NavbarConnection extends PureComponent {
                             port => (
                                 <PortListing
                                     {...port}
+                                    key={port.port}
                                     baudrate={baudrate}
                                     controllerType={controllerType}
                                     onClick={() => actions.onClickPortListing(port)}

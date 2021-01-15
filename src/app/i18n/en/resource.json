@@ -511,5 +511,11 @@
     "Go to Zero": "Go to Zero",
     "Home": "Home",
     "Go Home": "Go Home",
-    "Location": "Location"
+    "Location": "Location",
+    "Job Status Widget": "Job Status Widget",
+    "This widget displays the job progression and feed and spindle overrides.": "This widget displays the job progression and feed and spindle overrides.",
+    "of": "of",
+    "lines": "lines",
+    "since start": "since start",
+    "remaining": "remaining"
 }

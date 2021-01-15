@@ -188,7 +188,7 @@ class SecondaryFunctionality extends PureComponent {
                         tabs.map((tab, index) => {
                             const active = index === selectedTab;
                             return (
-                                <TabbedWidget.ChildComponent active={active}>
+                                <TabbedWidget.ChildComponent key={`${tab.widgetId}`} active={active}>
                                     <tab.component
                                         onFork={onFork}
                                         onRemove={onRemove}
