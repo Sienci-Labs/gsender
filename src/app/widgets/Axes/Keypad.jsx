@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import ensureArray from 'ensure-array';
 import frac from 'frac';
 import Widget from 'app/components/Widget';
@@ -32,13 +33,11 @@ class Keypad extends PureComponent {
         xyDistance: PropTypes.number,
         zdistance: PropTypes.number,
         setSpeed: PropTypes.number,
-        userHasNStops: PropTypes.bool
+        userHasNStops: PropTypes.bool,
+        jogDistance: PropTypes.number
     };
 
     componentWillMount() {
-        const { actions } = this.props;
-        actions.setToggleAmounts();
-        console.log(this.state.jogDistance);
         if (this.state.units === Constants.METRIC_UNITS) {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[1],
@@ -52,9 +51,6 @@ class Keypad extends PureComponent {
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
                 zDistance: Constants.IMPERIAL_DISTANCE_Z[1],
                 stepAmountXY: Constants.IMPERIAL_STEPS
-            });
-            this.state.stepAmountXY.map((number) => {
-                return this.setState({ stepIncrement: number });
             });
         }
     }
@@ -121,6 +117,7 @@ class Keypad extends PureComponent {
         let distanceZ = event.target.value;
         this.setState({ zdistance: distanceZ });
     }
+
     handleSpeed = (event) => {
         let headSpeed = event.target.value;
         this.setState({ setSpeed: headSpeed });
@@ -132,8 +129,7 @@ class Keypad extends PureComponent {
                 testIncrement: number
             });
             return number;
-        }
-        );
+        });
     }
 
 
@@ -250,7 +246,6 @@ class Keypad extends PureComponent {
         }
 
         const { units } = this.state;
-        console.log(JSON.stringify(this.props));
         return (
             <div className="controlsContainer">
                 <div className="uppercontrols">
@@ -265,8 +260,7 @@ class Keypad extends PureComponent {
                                 }}
                                 role="button"
                                 tabIndex={0}
-                            >
-                            </div>
+                            />
                             <div
                                 className={disable ? 'upArrowHide' : 'upArrow'}
                                 onClick={() => {
@@ -291,8 +285,7 @@ class Keypad extends PureComponent {
                                     role="button"
                                     tabIndex={0}
                                     title={i18n._('Move X+ Y+')}
-                                >
-                                </div>
+                                />
                             </div>
                         </div>
                         <div className="middleControls">
@@ -338,8 +331,7 @@ class Keypad extends PureComponent {
                                     tabIndex={0}
                                     s title={i18n._('Move X- Y-')}
                                     role="button"
-                                >
-                                </div>
+                                />
                             </div>
                             <div>
                                 <div
@@ -366,8 +358,7 @@ class Keypad extends PureComponent {
                                     tabIndex={0}
                                     title={i18n._('Move X+ Y-')}
                                     role="button"
-                                >
-                                </div>
+                                />
                             </div>
                         </div>
                     </div>
@@ -453,7 +444,6 @@ class Keypad extends PureComponent {
                             name="xyMove"
                             max="50"
                             step={this.state.jogging}
-                            defaultValue={this.state.xyDistance}
                             value={this.state.xyDistance}
                         />
                     </div>
@@ -473,7 +463,6 @@ class Keypad extends PureComponent {
                             min="1"
                             max="10"
                             step="1"
-                            defaultValue={this.state.zdistance}
                             value={this.state.zdistance}
                         />
                     </div>
@@ -492,7 +481,6 @@ class Keypad extends PureComponent {
                             min="0"
                             max="10"
                             step="1"
-                            defaultValue={this.state.setSpeed}
                             value={this.state.setSpeed}
                         />
                     </div>

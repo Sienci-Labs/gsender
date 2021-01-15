@@ -204,7 +204,6 @@ class AxesWidget extends PureComponent {
             }));
         },
         setToggleAmounts: (amount) => {
-            console.log(amount);
             this.setState({ jogDistance: amount });
             return this.state.jogDistance;
         },
@@ -643,9 +642,9 @@ class AxesWidget extends PureComponent {
 
     getInitialState() {
         return {
-            xyDistance: 0,
-            zdistance: 0,
-            setSpeed: 0,
+            xyDistance: defaultState.widgets.axes.jog.xyStep,
+            zdistance: defaultState.widgets.axes.jog.zStep,
+            setSpeed: defaultState.widgets.axes.jog.speed,
             jogDistance: 5,
             userHasNStops: defaultState.widgets.axes.hasNStop,
             minimized: this.config.get('minimized', false),
@@ -802,8 +801,6 @@ class AxesWidget extends PureComponent {
         const { units, machinePosition, workPosition } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const config = this.config;
-        let toggleDistance = this.state.jog.metric.step;
-        console.log(toggleDistance + 'RENDERTOGGLE');
 
         const state = {
             ...this.state,
@@ -821,7 +818,7 @@ class AxesWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-        // console.log(JSON.stringify(this.state));
+
         return (
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header>
@@ -831,7 +828,7 @@ class AxesWidget extends PureComponent {
                             <Space width="8" />
                         </Widget.Sortable>
                         {isForkedWidget &&
-                        <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
+                            <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
                         }
                         {i18n._('Axes')}
                     </Widget.Title>

@@ -48,7 +48,12 @@ const Axes = (props) => {
 
 Axes.propTypes = {
     state: PropTypes.object,
-    actions: PropTypes.object
+    actions: PropTypes.object,
+    xyDistance: PropTypes.number,
+    zdistance: PropTypes.number,
+    setSpeed: PropTypes.number,
+    userHasNStops: PropTypes.bool,
+    jogDistance: PropTypes.number
 };
 
 export default Axes;
