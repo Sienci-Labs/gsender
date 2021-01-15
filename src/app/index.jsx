@@ -154,7 +154,7 @@ series([
 
     { // Change backgrond color after loading complete
         const body = document.querySelector('body');
-        body.style.backgroundColor = '#222'; // sidebar background color
+        body.style.backgroundColor = '#000000'; // sidebar background color
     }
 
     if (settings.error.corruptedWorkspaceSettings) {

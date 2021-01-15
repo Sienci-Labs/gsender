@@ -225,7 +225,7 @@ class WorkflowControl extends PureComponent {
                             onClick={actions.handleClose}
                             disabled={!canClose}
                         >
-                            <i className="fa fa-close" />
+                            <i className="fa fa-times-circle" />
                         </button>
                     </div>
                     <Dropdown
