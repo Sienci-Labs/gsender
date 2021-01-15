@@ -686,7 +686,7 @@ class AxesWidget extends PureComponent {
                 keypad: this.config.get('jog.keypad'),
                 imperial: {
                     step: this.config.get('jog.imperial.step'),
-                    distances: ensureArray(this.config.get('widgets.imperial.distances', []))
+                    distances: ensureArray(this.config.get('jog.imperial.distances', []))
                 },
                 metric: {
                     step: this.config.get('jog.metric.step'),
