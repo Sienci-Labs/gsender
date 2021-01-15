@@ -6,11 +6,11 @@ import * as Constants from '../../constants';
 
 import './styles.css';
 
-class XyToggle extends PureComponent {
+class ZToggle extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            xyStepValue: props.xyDistance,
+            zStepValue: props.zDistance,
             canClickXY: props.canClickXY
         };
     }
@@ -19,27 +19,27 @@ class XyToggle extends PureComponent {
         props: PropTypes.bool,
         canClick: PropTypes.bool,
         axes: PropTypes.array,
-        xyDistance: PropTypes.number,
+        zDistance: PropTypes.number,
         metricMaxDistance: PropTypes.number,
         units: PropTypes.number,
-        handleXYMove: PropTypes.func,
-        xyStepValue: PropTypes.number,
+        handleZToggle: PropTypes.func,
+        zStepValue: PropTypes.number,
         canClickXY: PropTypes.bool
     }
 
-    getStepDistanceXY(step) {
+    getStepDistanceZ(step) {
         if (this.props.units === Constants.METRIC_UNITS) {
-            if (step >= 100 || step.valueOf(100)) {
-                this.setState({ lastXYStep: 100 });
+            if (step >= 100) {
+                this.setState({ lastZStep: 100 });
                 return 100;
             } else if (step >= 10) {
-                this.setState({ lastXYStep: 100 });
+                this.setState({ lastZStep: 100 });
                 return 10;
             } else if (step > 1) {
-                this.setState({ lastXYStep: 1 });
+                this.setState({ lastZStep: 1 });
                 return 1;
             }
-            this.setState({ lastXYStep: 0.1 });
+            this.setState({ lastZStep: 0.1 });
             return 0.1;
         } else {
             //Todo: Steps for Imperial--These are metric repeated
@@ -59,21 +59,22 @@ class XyToggle extends PureComponent {
     render() {
         return (
             <div disabled={this.state.canClickXY}>
-                <div className="rollingXYMove">
+                <div className="rollingZMove">
                     <label
                         className="htmlLabels"
-                        htmlFor="firstToggleNumber"
-                    >XY Move
+                        htmlFor="secondToggleNumber"
+                    >
+                        Z Move
                     </label>
                     <input
-                        onChange={this.props.handleXYMove}
+                        onChange={this.props.handleZToggle}
+                        className="rollingZInput"
                         type="number"
-                        className="rollingXYInput"
-                        name="xyMove"
-                        max={this.props.metricMaxDistance}
-                        min="0"
-                        step={this.getStepDistanceXY(this.props.xyDistance)}
-                        value={this.props.xyDistance}
+                        name="zMove"
+                        min="1"
+                        max="10"
+                        step={this.getStepDistanceZ(this.props.zDistance)}
+                        value={this.props.zDistance}
                     />
                 </div>
             </div>
@@ -81,4 +82,4 @@ class XyToggle extends PureComponent {
     }
 }
 
-export default XyToggle;
+export default ZToggle;
