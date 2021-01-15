@@ -378,3 +378,10 @@ input{
 }
 
 
+/* 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  width: 400px; 
+  padding: 11px; 
+  margin: 0;
+} */

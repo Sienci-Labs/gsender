@@ -72,7 +72,7 @@ class ZToggle extends PureComponent {
                         type="number"
                         name="zMove"
                         min="1"
-                        max="10"
+                        max="40"
                         step={this.getStepDistanceZ(this.props.zDistance)}
                         value={this.props.zDistance}
                     />

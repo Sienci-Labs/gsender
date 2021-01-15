@@ -433,6 +433,7 @@ class Keypad extends PureComponent {
                         handleZMove={this.handleZToggle}
                         units={this.state.units}
                         canClickXY={canClickXY}
+                        handleZToggle={this.handleZToggle}
 
                     />
                     <div className="rollingSpeed">
