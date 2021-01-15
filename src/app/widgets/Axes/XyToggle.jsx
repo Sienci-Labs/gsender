@@ -2,7 +2,10 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import NumericInput from 'react-numeric-input';
+import incrimentStyles from './incrimentStyles';
 import * as Constants from '../../constants';
+
 
 import './styles.css';
 
@@ -56,26 +59,33 @@ class XyToggle extends PureComponent {
         }
     }
 
+    myFormat = (num) => {
+        let amounts = [1, 2, 3, 4, 5];
+        for (num = 0; num < amounts.length; num++) {
+            return amounts[num];
+        } return amounts[num];
+    }
+
     render() {
+        let style = incrimentStyles;
         return (
-            <div disabled={this.state.canClickXY}>
-                <div className="rollingXYMove">
-                    <label
-                        className="htmlLabels"
-                        htmlFor="firstToggleNumber"
-                    >XY Move
-                    </label>
-                    <input
-                        onChange={this.props.handleXYMove}
-                        type="number"
-                        className="rollingXYInput"
-                        name="xyMove"
-                        max={this.props.metricMaxDistance}
-                        min="0"
-                        step={this.getStepDistanceXY(this.props.xyDistance)}
-                        value={this.props.xyDistance}
-                    />
-                </div>
+            <div className="rollingXYMove">
+                <label
+                    className="htmlLabels"
+                    htmlFor="firstToggleNumber"
+                >XY Move
+                </label>
+                <NumericInput
+                    onChange={this.props.handleXYMove}
+                    type="number"
+                    style={style}
+                    name="xyMove"
+                    max={this.props.metricMaxDistance}
+                    min="0"
+                    format={this.myFormat}
+                    value={this.props.xyDistance}
+
+                />
             </div>
         );
     }

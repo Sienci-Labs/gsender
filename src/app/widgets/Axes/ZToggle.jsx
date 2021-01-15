@@ -2,6 +2,8 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import NumericInput from 'react-numeric-input';
+import incrimentStyles from './incrimentStyles';
 import * as Constants from '../../constants';
 
 import './styles.css';
@@ -57,6 +59,7 @@ class ZToggle extends PureComponent {
     }
 
     render() {
+        let style = incrimentStyles;
         return (
             <div disabled={this.state.canClickXY}>
                 <div className="rollingZMove">
@@ -66,9 +69,10 @@ class ZToggle extends PureComponent {
                     >
                         Z Move
                     </label>
-                    <input
+                    <NumericInput
                         onChange={this.props.handleZToggle}
                         className="rollingZInput"
+                        style={style}
                         type="number"
                         name="zMove"
                         min="1"

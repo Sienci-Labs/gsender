@@ -5,12 +5,14 @@ import Widget from 'app/components/Widget';
 import _includes from 'lodash/includes';
 import _uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
+import NumericInput from 'react-numeric-input';
 import React, { PureComponent } from 'react';
 import { MenuItem } from 'app/components/Dropdown';
 import { Button } from 'app/components/Buttons';
 import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
+import incrimentStyles from './incrimentStyles';
 import Fraction from './components/Fraction';
 import * as Constants from '../../constants';
 import XyToggle from './XyToggle';
@@ -233,6 +235,7 @@ class Keypad extends PureComponent {
         }
 
         const { units } = this.state;
+        let styles = incrimentStyles;
         return (
             <div className="controlsContainer">
                 <div className="uppercontrols">
@@ -443,11 +446,12 @@ class Keypad extends PureComponent {
                         >
                             Speed
                         </label>
-                        <input
+                        <NumericInput
                             disabled={!canClickXY}
                             onChange={this.handleSpeed}
                             className="rollingSpeedInput"
                             name="speedMove"
+                            style={styles}
                             min="0"
                             max="10"
                             step="1"

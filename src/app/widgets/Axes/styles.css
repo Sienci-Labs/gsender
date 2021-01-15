@@ -349,6 +349,9 @@
   justify-content: space-evenly;
   padding: 0.5em;
 }
+.rollingXYMove{
+width: 60%;
+}
 
 
 .uppercontrols {
