@@ -205,6 +205,9 @@ class Keypad extends PureComponent {
         let hundreds = ['200', '100'];
         let tens = ['20', '10'];
         let ones = ['2', '1'];
+        if (this.state.lastXYSteps.length > 3) {
+            this.state.lastXYSteps.splice(0, 1);
+        }
 
         function arrayEquals(a, b) {
             return Array.isArray(a) &&
