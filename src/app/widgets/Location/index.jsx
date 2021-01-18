@@ -17,7 +17,6 @@ import { in2mm, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import Location from './Location';
-// import KeypadOverlay from './KeypadOverlay';
 import Settings from './Settings';
 import ShuttleControl from './ShuttleControl';
 import {
@@ -43,7 +42,8 @@ import {
     TINYG_MACHINE_STATE_END,
     TINYG_MACHINE_STATE_RUN,
     // Workflow
-    WORKFLOW_STATE_RUNNING
+    WORKFLOW_STATE_RUNNING,
+    WORKFLOW_STATE_IDLE
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -72,6 +72,30 @@ class LocationWidget extends PureComponent {
     config = new WidgetConfig(this.props.widgetId);
 
     state = this.getInitialState();
+
+    getWorkCoordinateSystem = () => {
+        const controllerType = this.state.controller.type;
+        const controllerState = this.state.controller.state;
+        const defaultWCS = 'G54';
+
+        if (controllerType === GRBL) {
+            return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
+        }
+
+        if (controllerType === MARLIN) {
+            return get(controllerState, 'modal.wcs') || defaultWCS;
+        }
+
+        if (controllerType === SMOOTHIE) {
+            return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
+        }
+
+        if (controllerType === TINYG) {
+            return get(controllerState, 'sr.modal.wcs') || defaultWCS;
+        }
+
+        return defaultWCS;
+    }
 
     actions = {
         toggleFullscreen: () => {
@@ -139,29 +163,7 @@ class LocationWidget extends PureComponent {
 
             return 0;
         },
-        getWorkCoordinateSystem: () => {
-            const controllerType = this.state.controller.type;
-            const controllerState = this.state.controller.state;
-            const defaultWCS = 'G54';
-
-            if (controllerType === GRBL) {
-                return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
-            }
-
-            if (controllerType === MARLIN) {
-                return get(controllerState, 'modal.wcs') || defaultWCS;
-            }
-
-            if (controllerType === SMOOTHIE) {
-                return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
-            }
-
-            if (controllerType === TINYG) {
-                return get(controllerState, 'sr.modal.wcs') || defaultWCS;
-            }
-
-            return defaultWCS;
-        },
+        getWorkCoordinateSystem: this.getWorkCoordinateSystem,
         setWorkOffsets: (axis, value) => {
             const wcs = this.actions.getWorkCoordinateSystem();
             const p = {
@@ -320,6 +322,22 @@ class LocationWidget extends PureComponent {
             });
         }
     };
+
+    canSendCommand() {
+        const { port, controller, workflow } = this.state;
+
+        if (!port) {
+            return false;
+        }
+        if (!controller.type || !controller.state) {
+            return false;
+        }
+        if (workflow.state !== WORKFLOW_STATE_IDLE) {
+            return false;
+        }
+
+        return true;
+    }
 
     shuttleControlEvents = {
         SELECT_AXIS: (event, { axis }) => {
@@ -792,8 +810,10 @@ class LocationWidget extends PureComponent {
         const { widgetId } = this.props;
         const { minimized, isFullscreen } = this.state;
         const { units, machinePosition, workPosition } = this.state;
+        const canSendCommand = this.canSendCommand();
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const config = this.config;
+        const wcs = this.getWorkCoordinateSystem();
         const state = {
             ...this.state,
             // Determine if the motion button is clickable
@@ -811,6 +831,39 @@ class LocationWidget extends PureComponent {
             ...this.actions
         };
 
+        const gcodes = [
+            {
+                id: 0,
+                name: 'G54',
+                wcs: 'P1',
+            },
+            {
+                id: 1,
+                name: 'G55',
+                wcs: 'P2',
+            },
+            {
+                id: 2,
+                name: 'G56',
+                wcs: 'P3',
+            },
+            {
+                id: 3,
+                name: 'G57',
+                wcs: 'P4',
+            },
+            {
+                id: 4,
+                name: 'G58',
+                wcs: 'P5',
+            },
+            {
+                id: 5,
+                name: 'G59',
+                wcs: 'P6',
+            },
+        ];
+
         return (
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header>
@@ -825,6 +878,33 @@ class LocationWidget extends PureComponent {
                         {i18n._('Location')}
                     </Widget.Title>
                     <Widget.Controls className={this.props.sortable.filterClassName}>
+
+                        <Widget.DropdownButton
+                            title={i18n._('Work Coordinate System')}
+                            disabled={!canSendCommand}
+                            toggle={(
+                                <div style={{ margin: '0 5px', color: 'black' }}>
+                                    <label>Workspace: </label>
+
+                                    <div className={styles['position-label']}>
+                                        {wcs}{' '}
+                                        <i className="fas fa-chevron-down fa-xs" />
+                                    </div>
+                                </div>
+                            )}
+                            onSelect={(positionName) => {
+                                controller.command('gcode', positionName);
+                            }}
+                        >
+                            {
+                                gcodes.map(({ id, name, wcs }) => (
+                                    <Widget.DropdownMenuItem key={id} eventKey={name}>
+                                        {`${name} (${wcs})`}
+                                    </Widget.DropdownMenuItem>
+                                ))
+                            }
+                        </Widget.DropdownButton>
+
                     </Widget.Controls>
                 </Widget.Header>
                 <Widget.Content
