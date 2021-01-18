@@ -5,18 +5,14 @@ import Widget from 'app/components/Widget';
 import _includes from 'lodash/includes';
 import _uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
-import NumericInput from 'react-numeric-input';
 import React, { PureComponent } from 'react';
 import { MenuItem } from 'app/components/Dropdown';
 import { Button } from 'app/components/Buttons';
 import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import incrimentStyles from './incrimentStyles';
 import Fraction from './components/Fraction';
 import * as Constants from '../../constants';
-import XyToggle from './XyToggle';
-import ZToggle from './ZToggle';
 import './styles.css';
 
 class Keypad extends PureComponent {
@@ -35,7 +31,7 @@ class Keypad extends PureComponent {
         jog: PropTypes.object,
         actions: PropTypes.object,
         xyDistance: PropTypes.number,
-        zDistance: PropTypes.number,
+        zdistance: PropTypes.number,
         setSpeed: PropTypes.number,
         userHasNStops: PropTypes.bool,
         jogDistance: PropTypes.number,
@@ -48,7 +44,7 @@ class Keypad extends PureComponent {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[1],
                 xyDistance: Constants.METRIC_DISTANCE_XY[1],
-                zDistance: Constants.METRIC_DISTANCE_Z[1],
+                zdistance: Constants.METRIC_DISTANCE_Z[1],
             });
         } else {
             this.setState({
@@ -64,13 +60,13 @@ class Keypad extends PureComponent {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[2],
                 xyDistance: Constants.METRIC_DISTANCE_XY[2],
-                zDistance: Constants.METRIC_DISTANCE_Z[2]
+                zdistance: Constants.METRIC_DISTANCE_Z[2]
             });
         } else {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[2],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[2],
-                zDistance: Constants.IMPERIAL_DISTANCE_Z[2]
+                zdistance: Constants.IMPERIAL_DISTANCE_Z[2]
             });
         }
     }
@@ -80,29 +76,29 @@ class Keypad extends PureComponent {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[1],
                 xyDistance: Constants.METRIC_DISTANCE_XY[1],
-                zDistance: Constants.METRIC_DISTANCE_Z[1]
+                zdistance: Constants.METRIC_DISTANCE_Z[1]
             });
         } else {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[1],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
-                zDistance: Constants.IMPERIAL_DISTANCE_Z[1]
+                zdistance: Constants.IMPERIAL_DISTANCE_Z[1]
             });
         }
     }
 
-    handleRapidSpeedButton = () => {
+    handleFastSpeedButton = () => {
         if (this.state.units === Constants.METRIC_UNITS) {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[0],
                 xyDistance: Constants.METRIC_DISTANCE_XY[0],
-                zDistance: Constants.METRIC_DISTANCE_Z[0]
+                zdistance: Constants.METRIC_DISTANCE_Z[0]
             });
         } else {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[0],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[0],
-                zDistance: Constants.IMPERIAL_DISTANCE_Z[0]
+                zdistance: Constants.IMPERIAL_DISTANCE_Z[0]
             });
         }
     }
@@ -114,7 +110,7 @@ class Keypad extends PureComponent {
 
     handleZToggle = (event) => {
         let distanceZ = event.target.value;
-        this.setState({ zDistance: distanceZ });
+        this.setState({ zdistance: distanceZ });
     }
 
     handleSpeed = (event) => {
@@ -203,6 +199,45 @@ class Keypad extends PureComponent {
         });
     }
 
+    getStepDistanceXY(step) {
+        this.state.lastXYSteps.push(step);
+        let lastTwo = this.state.lastXYSteps.slice(-2);
+        let hundreds = ['200', '100'];
+        let tens = ['20', '10'];
+        let ones = ['2', '1'];
+
+        function arrayEquals(a, b) {
+            return Array.isArray(a) &&
+                Array.isArray(b) &&
+                a.length === b.length &&
+                a.every((val, index) => val === b[index]);
+        }
+
+        if (this.state.units === Constants.METRIC_UNITS) {
+            if (step >= 100) {
+                let answer = arrayEquals(lastTwo, hundreds);
+                if (answer === true) {
+                    return 10;
+                } else {
+                    return 100;
+                }
+            } else if (step >= 10) {
+                let answer = arrayEquals(lastTwo, tens);
+                if (answer === true) {
+                    return 1;
+                } else {
+                    return 10;
+                }
+            } else if (step >= 0) {
+                let answer = arrayEquals(lastTwo, ones);
+                if (answer === true) {
+                    return 1;
+                }
+            }
+        } return 1;
+    }
+
+
     render() {
         const { canClick, axes, actions } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
@@ -234,8 +269,7 @@ class Keypad extends PureComponent {
             lowerLeftClass = 'lowerLeftTriangle';
         }
 
-        const { units } = this.state;
-        let styles = incrimentStyles;
+        const { units, xyDistance } = this.state;
         return (
             <div className="controlsContainer">
                 <div className="uppercontrols">
@@ -356,7 +390,7 @@ class Keypad extends PureComponent {
                         <div
                             className={disable ? 'upArrowZHide' : 'upArrowZ'}
                             onClick={() => {
-                                const distance = this.state.zDistance;
+                                const distance = this.state.zdistance;
                                 const toggledSpeed = this.state.setSpeed;
                                 actions.jog({ Z: distance }, { F: toggledSpeed });
                             }}
@@ -368,7 +402,7 @@ class Keypad extends PureComponent {
                         <div
                             className={disable ? 'downArrowZHide' : 'downArrowZ'}
                             onClick={() => {
-                                const distance = this.state.zDistance;
+                                const distance = this.state.zdistance;
                                 const toggledSpeed = this.state.setSpeed;
                                 actions.jog({ Z: -distance }, { F: toggledSpeed });
                             }}
@@ -393,7 +427,7 @@ class Keypad extends PureComponent {
                         <Button
                             disabled={!canClickXY}
                             onClick={() => {
-                                this.handleRapidSpeedButton(units);
+                                this.handleFastSpeedButton(units);
                             }}
                             className="rapidSpeedButton"
                         >
@@ -420,25 +454,44 @@ class Keypad extends PureComponent {
                     </div>
                 </div>
                 <div className="rollingNumbers">
-                    <XyToggle
-                        xyDistance={this.state.xyDistance}
-                        metricMaxDistance={this.props.metricMaxDistance}
-                        className="rollingXYMove"
-                        handleXYMove={this.handleXYMove}
-                        units={this.state.units}
-                        canClickXY={canClickXY}
-
-                    />
-                    <ZToggle
-                        zDistance={this.state.zDistance}
-                        metricMaxDistance={this.props.metricMaxDistance}
-                        className="rollingzMove"
-                        handleZMove={this.handleZToggle}
-                        units={this.state.units}
-                        canClickXY={canClickXY}
-                        handleZToggle={this.handleZToggle}
-
-                    />
+                    <div className="rollingXYMove">
+                        <label
+                            className="htmlLabels"
+                            htmlFor="firstToggleNumber"
+                        >XY Move
+                        </label>
+                        <input
+                            id="inputSteps"
+                            disabled={!canClickXY}
+                            onChange={this.handleXYMove}
+                            type="number"
+                            className="rollingXYInput"
+                            name="xyMove"
+                            max={this.props.metricMaxDistance}
+                            min="-300"
+                            step={this.getStepDistanceXY(xyDistance)}
+                            value={this.state.xyDistance}
+                        />
+                    </div>
+                    <div className="rollingZMove">
+                        <label
+                            className="htmlLabels"
+                            htmlFor="secondToggleNumber"
+                        >
+                            Z Move
+                        </label>
+                        <input
+                            disabled={!canClickXY}
+                            onChange={this.handleZToggle}
+                            className="rollingZInput"
+                            type="number"
+                            name="zMove"
+                            min="1"
+                            max="10"
+                            step="1"
+                            value={this.state.zdistance}
+                        />
+                    </div>
                     <div className="rollingSpeed">
                         <label
                             className="htmlLabels"
@@ -446,15 +499,15 @@ class Keypad extends PureComponent {
                         >
                             Speed
                         </label>
-                        <NumericInput
+                        <input
                             disabled={!canClickXY}
                             onChange={this.handleSpeed}
                             className="rollingSpeedInput"
+                            type="number"
                             name="speedMove"
-                            style={styles}
                             min="0"
-                            max="10"
-                            step="1"
+                            max="10000"
+                            step="500"
                             value={this.state.setSpeed}
                         />
                     </div>
