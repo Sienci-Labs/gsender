@@ -45,7 +45,8 @@ const defaultState = {
                 imperialMaxInches: 30, //Max distance head can travel on longmill //Max distance head can travel on longmill
                 zMaxMovementMetric: 111,
                 zMaxMovementImperial: 4.4,
-                maxSpindleSpeed: 10000
+                maxSpindleSpeed: 10000,
+                maxheadSpeed: 3000
             },
             mdi: {
                 disabled: false

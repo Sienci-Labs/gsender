@@ -484,6 +484,7 @@
   border-radius: 5px;
   width: 52px;
   margin-left: 113px;
+  margin-bottom: 13px;
   height: 26px;
   background-color: white;
 }
@@ -500,6 +501,7 @@
   font-size: 23px;
   opacity: 0.7;
   border-radius: 5px;
+  margin-bottom: 13px;
   cursor: not-allowed;
   background-color: rgb(222 218 232);
   width: 52px;

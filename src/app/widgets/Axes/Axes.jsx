@@ -16,7 +16,8 @@ const Axes = (props) => {
         imperialXYMaxDistance,
         zMaxMovementMetric,
         zMaxMovementImperial,
-        maxSpindleSpeed
+        maxSpindleSpeed,
+        maxheadSpeed
     } = props;
 
     return (
@@ -37,6 +38,7 @@ const Axes = (props) => {
                 zMaxMovementMetric={zMaxMovementMetric}
                 zMaxMovementImperial={zMaxMovementImperial}
                 maxSpindleSpeed={maxSpindleSpeed}
+                MaximumheadSpeed={maxheadSpeed}
             />
             <MDI
                 canClick={state.canClick}
@@ -58,7 +60,8 @@ Axes.propTypes = {
     imperialXYMaxDistance: PropTypes.number,
     zMaxMovementMetric: PropTypes.number,
     zMaxMovementImperial: PropTypes.number,
-    maxSpindleSpeed: PropTypes.number
+    maxSpindleSpeed: PropTypes.number,
+    maxheadSpeed: PropTypes.number
 };
 
 export default Axes;

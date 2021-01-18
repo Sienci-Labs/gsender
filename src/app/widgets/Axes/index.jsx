@@ -178,6 +178,18 @@ class AxesWidget extends PureComponent {
             const gcode = `G10 L20 P${p} ${axis}${value}`;
             controller.command('gcode', gcode);
         },
+        setZParentState: (prevState, parameter) => {
+            this.setState({ zKeyDistance: parameter });
+            this.setState({ zKeyDistance: prevState });
+        },
+        setXYParentState: (prevState, parameter) => {
+            this.setState({ zKeyDistance: parameter });
+            this.setState({ xyKeyDistance: prevState });
+        },
+        setSpeedState: (prevState, parameter) => {
+            this.setState({ maxheadSpeed: parameter });
+            this.setState({ maxheadSpeed: prevState });
+        },
         jog: (params = {}, params2 = {}) => {
             const SValue = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             const FValue = map(params2, (value2, letter2) => (' ' + letter2.toUpperCase() + value2)).join(' ');
@@ -339,7 +351,6 @@ class AxesWidget extends PureComponent {
         },
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
             const { canClick, jog } = this.state;
-
             if (!canClick) {
                 return;
             }
@@ -357,9 +368,9 @@ class AxesWidget extends PureComponent {
             axis = axis || jog.axis;
             const distance = this.actions.getJogDistance();
             const jogAxis = {
-                x: () => this.actions.jog({ X: direction * distance * factor }),
-                y: () => this.actions.jog({ Y: direction * distance * factor }),
-                z: () => this.actions.jog({ Z: direction * distance * factor }),
+                x: () => this.actions.jog({ X: direction * this.state.xyKeyDistance * factor, S: this.state.maxheadSpeed }),
+                y: () => this.actions.jog({ Y: direction * this.state.xyKeyDistance * factor, S: this.state.maxheadSpeed }),
+                z: () => this.actions.jog({ Z: direction * this.state.zKeyDistance * factor, S: this.state.maxheadSpeed }),
                 a: () => this.actions.jog({ A: direction * distance * factor }),
                 b: () => this.actions.jog({ B: direction * distance * factor }),
                 c: () => this.actions.jog({ C: direction * distance * factor })
@@ -642,6 +653,9 @@ class AxesWidget extends PureComponent {
 
     getInitialState() {
         return {
+            maxheadSpeed: defaultState.widgets.axes.jog.maxheadSpeed,
+            xyKeyDistance: 5,
+            zKeyDistance: 2,
             maxSpindleSpeed: defaultState.widgets.axes.jog.maxSpindleSpeed,
             maxZMovementMM: defaultState.widgets.axes.jog.zMaxMovementMetric,
             maxZMovementINCH: defaultState.widgets.axes.jog.zMaxMovementImperial,
@@ -954,6 +968,7 @@ class AxesWidget extends PureComponent {
                         zMaxMovementMetric={this.state.maxZMovementMM}
                         zMaxMovementImperial={this.state.maxZMovementINCH}
                         maxSpindleSpeed={this.state.maxSpindleSpeed}
+                        maxheadSpeed={this.state.maxheadSpeed}
                     />
                 </Widget.Content>
             </Widget>
