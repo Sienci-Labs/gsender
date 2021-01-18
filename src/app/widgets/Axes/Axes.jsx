@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import DisplayPanel from './DisplayPanel';
 import Keypad from './Keypad';
 import MDI from './MDI';
 
@@ -13,20 +12,15 @@ const Axes = (props) => {
         setSpeed,
         userHasNStops,
         jogDistance,
-        metricMaxDistance
+        metricXYMaxDistance,
+        imperialXYMaxDistance,
+        zMaxMovementMetric,
+        zMaxMovementImperial,
+        maxSpindleSpeed
     } = props;
 
     return (
         <div>
-            <DisplayPanel
-                canClick={state.canClick}
-                units={state.units}
-                axes={state.axes}
-                machinePosition={state.machinePosition}
-                workPosition={state.workPosition}
-                jog={state.jog}
-                actions={actions}
-            />
             <Keypad
                 canClick={state.canClick}
                 units={state.units}
@@ -38,7 +32,11 @@ const Axes = (props) => {
                 setSpeed={setSpeed}
                 userHasNStops={userHasNStops}
                 jogDistance={jogDistance}
-                metricMaxDistance={metricMaxDistance}
+                metricMaxDistance={metricXYMaxDistance}
+                imperialMaxDistance={imperialXYMaxDistance}
+                zMaxMovementMetric={zMaxMovementMetric}
+                zMaxMovementImperial={zMaxMovementImperial}
+                maxSpindleSpeed={maxSpindleSpeed}
             />
             <MDI
                 canClick={state.canClick}
@@ -56,7 +54,11 @@ Axes.propTypes = {
     setSpeed: PropTypes.number,
     userHasNStops: PropTypes.bool,
     jogDistance: PropTypes.number,
-    metricMaxDistance: PropTypes.number
+    metricXYMaxDistance: PropTypes.number,
+    imperialXYMaxDistance: PropTypes.number,
+    zMaxMovementMetric: PropTypes.number,
+    zMaxMovementImperial: PropTypes.number,
+    maxSpindleSpeed: PropTypes.number
 };
 
 export default Axes;

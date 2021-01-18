@@ -43,7 +43,7 @@ import {
     TINYG_MACHINE_STATE_END,
     TINYG_MACHINE_STATE_RUN,
     // Workflow
-    WORKFLOW_STATE_RUNNING
+    WORKFLOW_STATE_RUNNING,
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -642,7 +642,11 @@ class AxesWidget extends PureComponent {
 
     getInitialState() {
         return {
+            maxSpindleSpeed: defaultState.widgets.axes.jog.maxSpindleSpeed,
+            maxZMovementMM: defaultState.widgets.axes.jog.zMaxMovementMetric,
+            maxZMovementINCH: defaultState.widgets.axes.jog.zMaxMovementImperial,
             metricMaxDistance: defaultState.widgets.axes.jog.metricMaxMm,
+            imperialMaxDistance: defaultState.widgets.axes.jog.imperialMaxInches,
             xyDistance: defaultState.widgets.axes.jog.xyStep,
             zdistance: defaultState.widgets.axes.jog.zStep,
             setSpeed: defaultState.widgets.axes.jog.speed,
@@ -945,7 +949,11 @@ class AxesWidget extends PureComponent {
                         setSpeed={this.state.setSpeed}
                         userHasNStops={this.state.userHasNStops}
                         jogDistance={this.state.jogDistance}
-                        metricMaxDistance={this.state.metricMaxDistance}
+                        metricXYMaxDistance={this.state.metricMaxDistance}
+                        imperialXYMaxDistance={this.state.metricMaxDistance}
+                        zMaxMovementMetric={this.state.maxZMovementMM}
+                        zMaxMovementImperial={this.state.maxZMovementINCH}
+                        maxSpindleSpeed={this.state.maxSpindleSpeed}
                     />
                 </Widget.Content>
             </Widget>

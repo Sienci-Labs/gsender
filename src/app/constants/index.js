@@ -116,6 +116,9 @@ export const IMPERIAL_DISTANCE_XY = [1, 0.2, 2];
 export const METRIC_DISTANCE_Z = [10, 2, 0.1];
 export const IMPERIAL_DISTANCE_Z = [0.5, 0.04, 0.004];
 
+export const METRIC_MAX_TRAVEL = 770;//The max the head can travel mm
+export const IMPERIAL_MAX_TRAVEL = 30;//The max the head can travel inches
+
 //Default Speeds for toggle button Axis Widget Fast, Normal, Presice
 export const METRIC_SPEEDS = [5000, 3000, 3000];
 export const IMPERIAL_SPEEDS = [200, 120, 120];

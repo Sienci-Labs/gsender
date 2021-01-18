@@ -20,7 +20,7 @@ class Keypad extends PureComponent {
         super(props);
         this.state = {
             units: props.units,
-            lastXYSteps: [],
+            lastXYSteps: []
         };
     }
 
@@ -35,7 +35,11 @@ class Keypad extends PureComponent {
         setSpeed: PropTypes.number,
         userHasNStops: PropTypes.bool,
         jogDistance: PropTypes.number,
-        metricMaxDistance: PropTypes.number
+        metricMaxDistance: PropTypes.number,
+        imperialMaxDistance: PropTypes.number,
+        zMaxMovementMetric: PropTypes.number,
+        zMaxMovementImperial: PropTypes.number,
+        maxSpeedSpindle: PropTypes.number
     };
 
     //Used to populate forms with default values
@@ -45,12 +49,18 @@ class Keypad extends PureComponent {
                 setSpeed: Constants.METRIC_SPEEDS[1],
                 xyDistance: Constants.METRIC_DISTANCE_XY[1],
                 zdistance: Constants.METRIC_DISTANCE_Z[1],
+                maxDistanceHeadCanTravel: this.props.metricMaxDistance,
+                zMaxMovement: this.props.zMaxMovementMetric,
+                maxSpeedSpindle: this.props.maxSpindleSpeed
             });
         } else {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[1],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
                 zDistance: Constants.IMPERIAL_DISTANCE_Z[1],
+                maxDistanceHeadCanTravel: this.props.imperialMaxDistance,
+                zMaxMovementImperial: this.props.zMaxMovementImperial,
+                maxSpeedSpindle: this.props.maxSpindleSpeed
             });
         }
     }
@@ -105,17 +115,38 @@ class Keypad extends PureComponent {
 
     handleXYMove = (event) => {
         let xyDistance = event.target.value;
-        this.setState({ xyDistance: xyDistance });
+        let max = this.state.maxDistanceHeadCanTravel;
+        if (xyDistance <= max) {
+            this.setState({ xyDistance: xyDistance });
+        } else {
+            this.setState({ xyDistance: max });
+        }
+        if (xyDistance < 0) {
+            this.setState({ xyDistance: 1 });
+        }
     }
 
     handleZToggle = (event) => {
         let distanceZ = event.target.value;
-        this.setState({ zdistance: distanceZ });
+        let max = this.state.zMaxMovement;
+        if (distanceZ <= max) {
+            this.setState({ zdistance: distanceZ });
+        } else {
+            this.setState({ zdistance: max });
+        }
+        if (distanceZ < 0) {
+            this.setState({ zdistance: 1 });
+        }
     }
 
     handleSpeed = (event) => {
         let headSpeed = event.target.value;
-        this.setState({ setSpeed: headSpeed });
+        let max = this.state.maxSpeedSpindle;
+        if (headSpeed <= max) {
+            this.setState({ setSpeed: headSpeed });
+        } else {
+            this.setState({ setSpeed: max });
+        }
     }
 
     handleSelect = (eventKey) => {
@@ -327,7 +358,7 @@ class Keypad extends PureComponent {
                                     tabIndex={0}
                                     title={i18n._('Move X-')}
                                     role="button"
-                                ><span className="buttonText">X-</span>
+                                ><span className="buttonTextX-">X-</span>
                                 </div>
                             </div>
                             <div>
@@ -342,7 +373,7 @@ class Keypad extends PureComponent {
                                     title={i18n._('Move X+')}
                                     role="button"
                                 >
-                                    <span className="buttonText">X+</span>
+                                    <span className="buttonTextXPlus">X+</span>
                                 </div>
                             </div>
                         </div>
@@ -371,7 +402,7 @@ class Keypad extends PureComponent {
                                     tabIndex={0}
                                     title={i18n._('Move Y-')}
                                     role="button"
-                                ><span className="buttonText">Y-</span>
+                                ><span className="buttonTextY">Y-</span>
                                 </div>
                             </div>
                             <div>
@@ -412,7 +443,7 @@ class Keypad extends PureComponent {
                             title={i18n._('Move Z-')}
                             role="button"
                             tabIndex={0}
-                        ><span className="buttonTextZ">Z-</span>
+                        ><span className="buttonTextZ-">Z-</span>
                         </div>
                     </div>
                     <div className="speedButtonGroup">
@@ -461,7 +492,7 @@ class Keypad extends PureComponent {
                         <label
                             className="htmlLabels"
                             htmlFor="firstToggleNumber"
-                        >XY Move
+                        >XY Move {this.state.units}
                         </label>
                         <input
                             id="inputSteps"
@@ -471,7 +502,7 @@ class Keypad extends PureComponent {
                             className="rollingXYInput"
                             name="xyMove"
                             max={this.props.metricMaxDistance}
-                            min="-300"
+                            min="0"
                             step={this.getStepDistanceXY(xyDistance)}
                             value={this.state.xyDistance}
                         />
@@ -481,7 +512,7 @@ class Keypad extends PureComponent {
                             className="htmlLabels"
                             htmlFor="secondToggleNumber"
                         >
-                            Z Move
+                            Z Move  {this.state.units}
                         </label>
                         <input
                             disabled={!canClickXY}
@@ -500,7 +531,7 @@ class Keypad extends PureComponent {
                             className="htmlLabels"
                             htmlFor="thirdToggleNumber"
                         >
-                            Speed
+                            Speed {this.state.units}/min
                         </label>
                         <input
                             disabled={!canClickXY}
