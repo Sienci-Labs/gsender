@@ -489,18 +489,28 @@
   width: 59px;
   margin-left: 108px;
   margin-bottom: 13px;
+  outline: none;
 }
 .fa-enabled {
   background-color: white;
 }
+.fa-enabled:focus {
+  outline: none;
+}
+.fa-enabled:active {
+  outline: none;
+}
 .fa fa-keyboard-o{
   line-height: 119%;
+  outline: none;
 }
 
 
 #keyboardDisabled {
   font-size: 25px;
+  outline: none;
   opacity: 1;
+  border: none;
   border-radius: 5px;
   width: 59px;
   margin-left: 108px;
