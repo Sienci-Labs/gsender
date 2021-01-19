@@ -64,7 +64,7 @@ Axes.propTypes = {
     zMaxMovementMetric: PropTypes.number,
     zMaxMovementImperial: PropTypes.number,
     maxSpindleSpeed: PropTypes.number,
-    maxheadSpeed: PropTypes.string,
+    maxheadSpeed: PropTypes.number,
     clicked: PropTypes.bool,
     units: PropTypes.string
 };

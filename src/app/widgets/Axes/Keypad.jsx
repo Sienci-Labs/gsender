@@ -46,7 +46,6 @@ class Keypad extends PureComponent {
 
     //Used to populate forms with default values
     componentWillMount() {
-        console.log(this.props.units + 'PROPSUNITS');
         if (this.props.units === Constants.METRIC_UNITS) {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[1],
@@ -150,8 +149,6 @@ class Keypad extends PureComponent {
         const { actions } = this.props;
         let headSpeed = event.target.value;
         let max = this.state.maxheadSpeed;
-        console.log(max + 'MAXXX');
-        console.log(headSpeed + 'headSpeed');
         if (headSpeed <= max) {
             this.setState({ setSpeed: headSpeed });
         } else {
@@ -242,7 +239,6 @@ class Keypad extends PureComponent {
     }
 
     handleToggleClicks() {
-        console.log('CLICKED');
         this.props.clicked = !this.props.clicked;
     }
 
@@ -290,7 +286,6 @@ class Keypad extends PureComponent {
 
     render() {
         const { canClick, axes, actions, units } = this.props;
-        console.log(this.props.units + 'PROPSUNITSRENDER');
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -321,7 +316,6 @@ class Keypad extends PureComponent {
         }
 
         const { xyDistance } = this.state;
-        console.log(this.state.zdistance);
         return (
             <div className="controlsContainer">
                 <div className="uppercontrols">

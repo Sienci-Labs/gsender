@@ -189,7 +189,6 @@ class AxesWidget extends PureComponent {
         setSpeedState: (prevState, parameter) => {
             this.setState({ maxheadSpeed: parameter });
             this.setState({ maxheadSpeed: prevState });
-            console.log(this.state.maxheadSpeed + 'SETHEADSPEED');
         },
         jog: (params = {}, params2 = {}) => {
             const SValue = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');

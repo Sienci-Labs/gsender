@@ -95,7 +95,6 @@ class ConnectionWidget extends PureComponent {
             this.refreshPorts();
         },
         handleOpenPort: (event) => {
-            console.log(JSON.stringify(this.state));
             const { port, baudrate } = this.state;
             this.openPort(port, { baudrate: baudrate });
         },
