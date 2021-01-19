@@ -39,7 +39,8 @@ class Keypad extends PureComponent {
         imperialMaxDistance: PropTypes.number,
         zMaxMovementMetric: PropTypes.number,
         zMaxMovementImperial: PropTypes.number,
-        MaximumheadSpeed: PropTypes.number
+        MaximumheadSpeed: PropTypes.number,
+        clicked: PropTypes.bool
     };
 
     //Used to populate forms with default values
@@ -456,10 +457,9 @@ class Keypad extends PureComponent {
                         <Widget.Button
                             title={i18n._('Keypad jogging')}
                             onClick={actions.toggleKeypadJogging}
-                        // inverted={state.jog.keypad}
                         >
                             <i
-                                className="fa fa-keyboard-o"
+                                className={!this.props.clicked ? 'fa fa-keyboard-o' : 'fa fa-keyboard-o fa-border'}
                                 id={disable ? 'keyboardDisabled' : 'keyboard'
                                 }
                             />

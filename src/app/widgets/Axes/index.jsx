@@ -209,6 +209,7 @@ class AxesWidget extends PureComponent {
         },
         toggleKeypadJogging: () => {
             this.setState(state => ({
+                clicked: !this.state.clicked,
                 jog: {
                     ...state.jog,
                     keypad: !state.jog.keypad
@@ -368,9 +369,9 @@ class AxesWidget extends PureComponent {
             axis = axis || jog.axis;
             const distance = this.actions.getJogDistance();
             const jogAxis = {
-                x: () => this.actions.jog({ X: direction * this.state.xyKeyDistance * factor, S: this.state.maxheadSpeed }),
-                y: () => this.actions.jog({ Y: direction * this.state.xyKeyDistance * factor, S: this.state.maxheadSpeed }),
-                z: () => this.actions.jog({ Z: direction * this.state.zKeyDistance * factor, S: this.state.maxheadSpeed }),
+                x: () => this.actions.jog({ X: direction * this.state.xyKeyDistance * factor, F: this.state.maxheadSpeed }),
+                y: () => this.actions.jog({ Y: direction * this.state.xyKeyDistance * factor, F: this.state.maxheadSpeed }),
+                z: () => this.actions.jog({ Z: direction * this.state.zKeyDistance * factor, F: this.state.maxheadSpeed }),
                 a: () => this.actions.jog({ A: direction * distance * factor }),
                 b: () => this.actions.jog({ B: direction * distance * factor }),
                 c: () => this.actions.jog({ C: direction * distance * factor })
@@ -653,6 +654,7 @@ class AxesWidget extends PureComponent {
 
     getInitialState() {
         return {
+            clicked: false,
             maxheadSpeed: defaultState.widgets.axes.jog.maxheadSpeed,
             xyKeyDistance: 5,
             zKeyDistance: 2,
@@ -969,6 +971,7 @@ class AxesWidget extends PureComponent {
                         zMaxMovementImperial={this.state.maxZMovementINCH}
                         maxSpindleSpeed={this.state.maxSpindleSpeed}
                         maxheadSpeed={this.state.maxheadSpeed}
+                        clicked={this.state.clicked}
                     />
                 </Widget.Content>
             </Widget>

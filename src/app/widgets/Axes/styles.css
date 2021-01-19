@@ -480,34 +480,35 @@
 }
 
 #keyboard {
-  font-size: 23px;
-  opacity: 0.7;
+  font-size: 27px;
+  opacity: 1;
   border-radius: 5px;
-  width: 52px;
-  margin-left: 113px;
+  width: 59px;
+  margin-left: 114px;
   margin-bottom: 13px;
-  height: 26px;
   background-color: white;
 }
-
-#keybaord:focus  {
-  border: 2px solid black;
+.fa-border {
+  border: solid 2px black;
+  border-radius: .1em;
 }
-#keybaord:active  {
-  border: 2px solid black;
+.fa fa-keyboard-o{
+  line-height: 119%;
 }
 
 
 #keyboardDisabled {
-  font-size: 23px;
-  opacity: 0.7;
-  border-radius: 5px;
+  font-size: 27px;
+  border: none;
+  border-radius: 6px;
+  width: 59px;
+  margin-left: 113px;
   margin-bottom: 13px;
+  height: 31px;
+  background-color: white;
+  opacity: 0.7;
   cursor: not-allowed;
   background-color: rgb(222 218 232);
-  width: 52px;
-  margin-left: 113px;
-  height: 26px;
 }
 
 input.rollingXYInput[type="number"] {
