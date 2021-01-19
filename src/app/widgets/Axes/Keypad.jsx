@@ -19,8 +19,9 @@ class Keypad extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            units: this.props.units,
-            lastXYSteps: []
+            units: props.units,
+            lastXYSteps: [],
+            setSpeed: 10000
         };
     }
 
@@ -45,7 +46,8 @@ class Keypad extends PureComponent {
 
     //Used to populate forms with default values
     componentWillMount() {
-        if (this.state.units === Constants.METRIC_UNITS) {
+        console.log(this.props.units + 'PROPSUNITS');
+        if (this.props.units === Constants.METRIC_UNITS) {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[1],
                 xyDistance: Constants.METRIC_DISTANCE_XY[1],
@@ -54,7 +56,7 @@ class Keypad extends PureComponent {
                 zMaxMovement: this.props.zMaxMovementMetric,
                 MaximumheadSpeed: this.props.MaximumheadSpeed
             });
-        } else if (this.state.units === Constants.IMPERIAL_UNITS) {
+        } else if (this.props.units === Constants.IMPERIAL_UNITS) {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[1],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
@@ -238,6 +240,7 @@ class Keypad extends PureComponent {
     }
 
     handleToggleClicks() {
+        console.log('CLICKED');
         this.props.clicked = !this.props.clicked;
     }
 
@@ -285,6 +288,7 @@ class Keypad extends PureComponent {
 
     render() {
         const { canClick, axes, actions, units } = this.props;
+        console.log(this.props.units + 'PROPSUNITSRENDER');
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -292,7 +296,6 @@ class Keypad extends PureComponent {
         if (canClick === true) {
             disable = !disable;
         }
-
         let upperLeftClass;
         let upperRightClass;
         let lowerRightClass;
@@ -316,6 +319,7 @@ class Keypad extends PureComponent {
         }
 
         const { xyDistance } = this.state;
+        console.log(this.state.zdistance);
         return (
             <div className="controlsContainer">
                 <div className="uppercontrols">
@@ -461,12 +465,15 @@ class Keypad extends PureComponent {
                     <div className="speedButtonGroup">
                         <Widget.Button
                             title={i18n._('Keypad jogging')}
-                            onClick={actions.toggleKeypadJogging}
+                            className="buttonWidget"
                         >
                             <i
+                                onClick={actions.toggleKeypadJogging}
                                 className={!this.props.clicked ? 'fa fa-keyboard-o' : 'fa fa-keyboard-o fa-enabled'}
                                 id={disable ? 'keyboardDisabled' : 'keyboard'
                                 }
+                                role="button"
+                                tabIndex={0}
                             />
                         </Widget.Button>
                         <Button

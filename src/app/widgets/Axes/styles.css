@@ -478,13 +478,16 @@
   justify-content: space-between;
   align-items: center;
 }
+.buttonWidget{
+  width:0px;
+}
 
 #keyboard {
   font-size: 25px;
   opacity: 1;
   border-radius: 5px;
   width: 59px;
-  margin-left: 114px;
+  margin-left: 108px;
   margin-bottom: 13px;
 }
 .fa-enabled {
@@ -497,13 +500,11 @@
 
 #keyboardDisabled {
   font-size: 25px;
-  border: none;
-  border-radius: 6px;
+  opacity: 1;
+  border-radius: 5px;
   width: 59px;
-  margin-left: 113px;
+  margin-left: 108px;
   margin-bottom: 13px;
-  height: 31px;
-  background-color: white;
   opacity: 0.7;
   cursor: not-allowed;
   background-color: rgb(222 218 232);
