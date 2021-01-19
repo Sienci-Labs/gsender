@@ -1,11 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styles from './index.styl';
 
 
 const NavSidebarLink = ({ label, url = '#', icon, onClick }) => {
     return (
         <button
             onClick={onClick}
+            className={styles.linkButton}
         >
             <i className={`fa fas ${icon}`} /> {label}
         </button>
