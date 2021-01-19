@@ -480,17 +480,15 @@
 }
 
 #keyboard {
-  font-size: 27px;
+  font-size: 25px;
   opacity: 1;
   border-radius: 5px;
   width: 59px;
   margin-left: 114px;
   margin-bottom: 13px;
-  background-color: white;
 }
-.fa-border {
-  border: solid 2px black;
-  border-radius: .1em;
+.fa-enabled {
+  background-color: white;
 }
 .fa fa-keyboard-o{
   line-height: 119%;
@@ -498,7 +496,7 @@
 
 
 #keyboardDisabled {
-  font-size: 27px;
+  font-size: 25px;
   border: none;
   border-radius: 6px;
   width: 59px;

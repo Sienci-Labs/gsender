@@ -193,7 +193,11 @@ class AxesWidget extends PureComponent {
         jog: (params = {}, params2 = {}) => {
             const SValue = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             const FValue = map(params2, (value2, letter2) => (' ' + letter2.toUpperCase() + value2)).join(' ');
-            controller.command('gcode', 'G21  G91 G1 ' + SValue + FValue);
+            if (this.state.units === 'mm') {
+                controller.command('gcode', 'G21  G91 G1 ' + SValue + FValue);
+            } else if (this.state.units === 'in') {
+                controller.command('gcode', 'G20  G91 G1 ' + SValue + FValue);
+            }
         },
         move: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
@@ -206,6 +210,9 @@ class AxesWidget extends PureComponent {
                     disabled: !state.mdi.disabled
                 }
             }));
+        },
+        handleToggleClicks: () => {
+            this.setState({ clicked: !this.state.clicked });
         },
         toggleKeypadJogging: () => {
             this.setState(state => ({
@@ -654,7 +661,7 @@ class AxesWidget extends PureComponent {
 
     getInitialState() {
         return {
-            clicked: false,
+            clicked: true,
             maxheadSpeed: defaultState.widgets.axes.jog.maxheadSpeed,
             xyKeyDistance: 5,
             zKeyDistance: 2,
@@ -670,9 +677,9 @@ class AxesWidget extends PureComponent {
             userHasNStops: defaultState.widgets.axes.hasNStop,
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
-            canClick: true, // Defaults to true
+            canClick: true,
             port: controller.port,
-            units: METRIC_UNITS,
+            units: IMPERIAL_UNITS,
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -966,12 +973,13 @@ class AxesWidget extends PureComponent {
                         userHasNStops={this.state.userHasNStops}
                         jogDistance={this.state.jogDistance}
                         metricXYMaxDistance={this.state.metricMaxDistance}
-                        imperialXYMaxDistance={this.state.metricMaxDistance}
+                        imperialXYMaxDistance={this.state.imperialMaxDistance}
                         zMaxMovementMetric={this.state.maxZMovementMM}
                         zMaxMovementImperial={this.state.maxZMovementINCH}
                         maxSpindleSpeed={this.state.maxSpindleSpeed}
                         maxheadSpeed={this.state.maxheadSpeed}
                         clicked={this.state.clicked}
+                        units={this.state.units}
                     />
                 </Widget.Content>
             </Widget>

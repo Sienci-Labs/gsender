@@ -18,14 +18,14 @@ const Axes = (props) => {
         zMaxMovementImperial,
         maxSpindleSpeed,
         maxheadSpeed,
-        clicked
+        clicked,
+        units
     } = props;
 
     return (
         <div>
             <Keypad
                 canClick={state.canClick}
-                units={state.units}
                 axes={state.axes}
                 jog={state.jog}
                 actions={actions}
@@ -41,6 +41,7 @@ const Axes = (props) => {
                 maxSpindleSpeed={maxSpindleSpeed}
                 MaximumheadSpeed={maxheadSpeed}
                 clicked={clicked}
+                units={units}
             />
             <MDI
                 canClick={state.canClick}
@@ -64,7 +65,8 @@ Axes.propTypes = {
     zMaxMovementImperial: PropTypes.number,
     maxSpindleSpeed: PropTypes.number,
     maxheadSpeed: PropTypes.number,
-    clicked: PropTypes.bool
+    clicked: PropTypes.bool,
+    units: PropTypes.string
 };
 
 export default Axes;

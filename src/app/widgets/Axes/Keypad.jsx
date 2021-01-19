@@ -19,7 +19,7 @@ class Keypad extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            units: props.units,
+            units: this.props.units,
             lastXYSteps: []
         };
     }
@@ -54,13 +54,13 @@ class Keypad extends PureComponent {
                 zMaxMovement: this.props.zMaxMovementMetric,
                 MaximumheadSpeed: this.props.MaximumheadSpeed
             });
-        } else {
+        } else if (this.state.units === Constants.IMPERIAL_UNITS) {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[1],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
-                zDistance: Constants.IMPERIAL_DISTANCE_Z[1],
+                zdistance: Constants.IMPERIAL_DISTANCE_Z[1],
                 maxDistanceHeadCanTravel: this.props.imperialMaxDistance,
-                zMaxMovementImperial: this.props.zMaxMovementImperial,
+                zMaxMovement: this.props.zMaxMovementImperial,
                 MaximumheadSpeed: this.props.MaximumheadSpeed
             });
         }
@@ -73,7 +73,7 @@ class Keypad extends PureComponent {
                 xyDistance: Constants.METRIC_DISTANCE_XY[2],
                 zdistance: Constants.METRIC_DISTANCE_Z[2]
             });
-        } else {
+        } else if (this.state.units === Constants.IMPERIAL_UNITS) {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[2],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[2],
@@ -89,7 +89,7 @@ class Keypad extends PureComponent {
                 xyDistance: Constants.METRIC_DISTANCE_XY[1],
                 zdistance: Constants.METRIC_DISTANCE_Z[1]
             });
-        } else {
+        } else if (this.state.units === Constants.IMPERIAL_UNITS) {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[1],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
@@ -98,14 +98,14 @@ class Keypad extends PureComponent {
         }
     }
 
-    handleFastSpeedButton = () => {
+    handleRapidSpeedButton = () => {
         if (this.state.units === Constants.METRIC_UNITS) {
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[0],
                 xyDistance: Constants.METRIC_DISTANCE_XY[0],
                 zdistance: Constants.METRIC_DISTANCE_Z[0]
             });
-        } else {
+        } else if (this.state.units === Constants.IMPERIAL_UNITS) {
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[0],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[0],
@@ -237,6 +237,10 @@ class Keypad extends PureComponent {
         });
     }
 
+    handleToggleClicks() {
+        this.props.clicked = !this.props.clicked;
+    }
+
     getStepDistanceXY(step) {
         this.state.lastXYSteps.push(step);
         let lastTwo = this.state.lastXYSteps.slice(-2);
@@ -280,7 +284,7 @@ class Keypad extends PureComponent {
 
 
     render() {
-        const { canClick, axes, actions } = this.props;
+        const { canClick, axes, actions, units } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -288,6 +292,7 @@ class Keypad extends PureComponent {
         if (canClick === true) {
             disable = !disable;
         }
+
         let upperLeftClass;
         let upperRightClass;
         let lowerRightClass;
@@ -310,7 +315,7 @@ class Keypad extends PureComponent {
             lowerLeftClass = 'lowerLeftTriangle';
         }
 
-        const { units, xyDistance } = this.state;
+        const { xyDistance } = this.state;
         return (
             <div className="controlsContainer">
                 <div className="uppercontrols">
@@ -459,7 +464,7 @@ class Keypad extends PureComponent {
                             onClick={actions.toggleKeypadJogging}
                         >
                             <i
-                                className={!this.props.clicked ? 'fa fa-keyboard-o' : 'fa fa-keyboard-o fa-border'}
+                                className={this.props.clicked ? 'fa fa-keyboard-o fa-enabled' : 'fa fa-keyboard-o'}
                                 id={disable ? 'keyboardDisabled' : 'keyboard'
                                 }
                             />
@@ -467,7 +472,7 @@ class Keypad extends PureComponent {
                         <Button
                             disabled={!canClickXY}
                             onClick={() => {
-                                this.handleFastSpeedButton(units);
+                                this.handleRapidSpeedButton(units);
                             }}
                             className="rapidSpeedButton"
                         >
@@ -498,7 +503,7 @@ class Keypad extends PureComponent {
                         <label
                             className="htmlLabels"
                             htmlFor="firstToggleNumber"
-                        >XY Move {this.state.units}
+                        >XY Move {`(${this.state.units})`}
                         </label>
                         <input
                             id="inputSteps"
@@ -518,7 +523,7 @@ class Keypad extends PureComponent {
                             className="htmlLabels"
                             htmlFor="secondToggleNumber"
                         >
-                            Z Move  {this.state.units}
+                            Z Move {`(${this.state.units})`}
                         </label>
                         <input
                             disabled={!canClickXY}
@@ -527,7 +532,7 @@ class Keypad extends PureComponent {
                             type="number"
                             name="zMove"
                             min="1"
-                            max="10"
+                            max={this.state.zMaxMovement}
                             step="1"
                             value={this.state.zdistance}
                         />
@@ -537,7 +542,7 @@ class Keypad extends PureComponent {
                             className="htmlLabels"
                             htmlFor="thirdToggleNumber"
                         >
-                            Speed {this.state.units}/min
+                            Speed {`(${this.state.units}/min)`}
                         </label>
                         <input
                             disabled={!canClickXY}
