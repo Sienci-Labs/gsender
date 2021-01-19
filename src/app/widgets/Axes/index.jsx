@@ -661,7 +661,7 @@ class AxesWidget extends PureComponent {
 
     getInitialState() {
         return {
-            clicked: true,
+            clicked: false,
             maxheadSpeed: defaultState.widgets.axes.jog.maxheadSpeed,
             xyKeyDistance: 5,
             zKeyDistance: 2,

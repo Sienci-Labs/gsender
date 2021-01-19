@@ -464,7 +464,7 @@ class Keypad extends PureComponent {
                             onClick={actions.toggleKeypadJogging}
                         >
                             <i
-                                className={this.props.clicked ? 'fa fa-keyboard-o fa-enabled' : 'fa fa-keyboard-o'}
+                                className={!this.props.clicked ? 'fa fa-keyboard-o' : 'fa fa-keyboard-o fa-enabled'}
                                 id={disable ? 'keyboardDisabled' : 'keyboard'
                                 }
                             />
