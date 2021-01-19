@@ -40,7 +40,7 @@ class Keypad extends PureComponent {
         imperialMaxDistance: PropTypes.number,
         zMaxMovementMetric: PropTypes.number,
         zMaxMovementImperial: PropTypes.number,
-        MaximumheadSpeed: PropTypes.number,
+        maxheadSpeed: PropTypes.number,
         clicked: PropTypes.bool
     };
 
@@ -54,7 +54,7 @@ class Keypad extends PureComponent {
                 zdistance: Constants.METRIC_DISTANCE_Z[1],
                 maxDistanceHeadCanTravel: this.props.metricMaxDistance,
                 zMaxMovement: this.props.zMaxMovementMetric,
-                MaximumheadSpeed: this.props.MaximumheadSpeed
+                maxheadSpeed: this.props.maxheadSpeed
             });
         } else if (this.props.units === Constants.IMPERIAL_UNITS) {
             this.setState({
@@ -63,7 +63,7 @@ class Keypad extends PureComponent {
                 zdistance: Constants.IMPERIAL_DISTANCE_Z[1],
                 maxDistanceHeadCanTravel: this.props.imperialMaxDistance,
                 zMaxMovement: this.props.zMaxMovementImperial,
-                MaximumheadSpeed: this.props.MaximumheadSpeed
+                maxheadSpeed: this.props.maxheadSpeed
             });
         }
     }
@@ -149,13 +149,15 @@ class Keypad extends PureComponent {
     handleSpeed = (event) => {
         const { actions } = this.props;
         let headSpeed = event.target.value;
-        let max = this.state.maxSpeedSpindle;
+        let max = this.state.maxheadSpeed;
+        console.log(max + 'MAXXX');
+        console.log(headSpeed + 'headSpeed');
         if (headSpeed <= max) {
             this.setState({ setSpeed: headSpeed });
         } else {
             this.setState({ setSpeed: max });
         }
-        actions.setSpeedState(headSpeed, this.state.MaximumheadSpeed);
+        actions.setSpeedState(headSpeed, this.state.maxheadSpeed);
     }
 
     handleSelect = (eventKey) => {

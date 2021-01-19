@@ -39,7 +39,7 @@ const Axes = (props) => {
                 zMaxMovementMetric={zMaxMovementMetric}
                 zMaxMovementImperial={zMaxMovementImperial}
                 maxSpindleSpeed={maxSpindleSpeed}
-                MaximumheadSpeed={maxheadSpeed}
+                maxheadSpeed={maxheadSpeed}
                 clicked={clicked}
                 units={units}
             />
@@ -64,7 +64,7 @@ Axes.propTypes = {
     zMaxMovementMetric: PropTypes.number,
     zMaxMovementImperial: PropTypes.number,
     maxSpindleSpeed: PropTypes.number,
-    maxheadSpeed: PropTypes.number,
+    maxheadSpeed: PropTypes.string,
     clicked: PropTypes.bool,
     units: PropTypes.string
 };

@@ -47,7 +47,7 @@ const defaultState = {
                 zMaxMovementMetric: 111,
                 zMaxMovementImperial: 4.4,
                 maxSpindleSpeed: 10000,
-                maxheadSpeed: 3000
+                maxheadSpeed: 10000
             },
             mdi: {
                 disabled: false
