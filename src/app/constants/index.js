@@ -112,7 +112,7 @@ export const TINYG_MACHINE_STATE_PANIC = 13; // Machine is in panic state. Needs
 
 //Default Movements for toggle buttons Axis Widget Fast, Normal, Presice
 export const METRIC_DISTANCE_XY = [20, 5, 0.5];
-export const IMPERIAL_DISTANCE_XY = [1, 0.2, 2];
+export const IMPERIAL_DISTANCE_XY = [1, 0.2, 0.02];
 export const METRIC_DISTANCE_Z = [10, 2, 0.1];
 export const IMPERIAL_DISTANCE_Z = [0.5, 0.04, 0.004];
 

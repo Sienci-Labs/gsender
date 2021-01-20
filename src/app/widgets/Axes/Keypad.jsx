@@ -19,9 +19,8 @@ class Keypad extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            units: props.units,
-            lastXYSteps: [],
-            setSpeed: 10000
+            units: this.props.units,
+            lastXYSteps: []
         };
     }
 
@@ -40,77 +39,103 @@ class Keypad extends PureComponent {
         imperialMaxDistance: PropTypes.number,
         zMaxMovementMetric: PropTypes.number,
         zMaxMovementImperial: PropTypes.number,
-        maxheadSpeed: PropTypes.number,
-        clicked: PropTypes.bool
+        MaximumheadSpeed: PropTypes.number,
+        clicked: PropTypes.bool,
+        xyStepImperial: PropTypes.number,
+        zStepImperial: PropTypes.number
     };
 
     //Used to populate forms with default values
     componentWillMount() {
-        if (this.props.units === Constants.METRIC_UNITS) {
+        const { actions } = this.props;
+        if (this.state.units === Constants.METRIC_UNITS) {
+            actions.setSpeedState(this.state.setSpeed, Constants.METRIC_SPEEDS[1]);
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[1],
                 xyDistance: Constants.METRIC_DISTANCE_XY[1],
                 zdistance: Constants.METRIC_DISTANCE_Z[1],
                 maxDistanceHeadCanTravel: this.props.metricMaxDistance,
                 zMaxMovement: this.props.zMaxMovementMetric,
-                maxheadSpeed: this.props.maxheadSpeed
+                MaximumheadSpeed: this.props.MaximumheadSpeed
             });
-        } else if (this.props.units === Constants.IMPERIAL_UNITS) {
+        } else if (this.state.units === Constants.IMPERIAL_UNITS) {
+            actions.setSpeedState(this.state.setSpeed, Constants.IMPERIAL_SPEEDS[1]);
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[1],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
                 zdistance: Constants.IMPERIAL_DISTANCE_Z[1],
                 maxDistanceHeadCanTravel: this.props.imperialMaxDistance,
                 zMaxMovement: this.props.zMaxMovementImperial,
-                maxheadSpeed: this.props.maxheadSpeed
+                MaximumheadSpeed: this.props.MaximumheadSpeed
             });
         }
     }
 
     handlePreciseSpeedButton = () => {
+        const { actions } = this.props;
         if (this.state.units === Constants.METRIC_UNITS) {
+            actions.setSpeedState(this.state.setSpeed, Constants.METRIC_SPEEDS[2]);
+            actions.setXYState(Constants.METRIC_DISTANCE_XY[2], Constants.METRIC_DISTANCE_XY[2]);
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[2],
                 xyDistance: Constants.METRIC_DISTANCE_XY[2],
-                zdistance: Constants.METRIC_DISTANCE_Z[2]
+                zdistance: Constants.METRIC_DISTANCE_Z[2],
+                xyKeyDistance: Constants.METRIC_DISTANCE_XY[2]
             });
         } else if (this.state.units === Constants.IMPERIAL_UNITS) {
+            actions.setSpeedState(this.state.setSpeed, Constants.IMPERIAL_SPEEDS[2]);
+            actions.setXYState(this.state.xyDistance, Constants.IMPERIAL_DISTANCE_XY[2]);
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[2],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[2],
-                zdistance: Constants.IMPERIAL_DISTANCE_Z[2]
+                zdistance: Constants.IMPERIAL_DISTANCE_Z[2],
+                xyKeyDistance: Constants.IMPERIAL_DISTANCE_XY[2]
             });
         }
     }
 
     handleNormalSpeedButton = () => {
+        const { actions } = this.props;
         if (this.state.units === Constants.METRIC_UNITS) {
+            actions.setSpeedState(this.state.setSpeed, Constants.METRIC_SPEEDS[1]);
+            actions.setXYState(Constants.METRIC_DISTANCE_XY[1], Constants.METRIC_DISTANCE_XY[1]);
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[1],
                 xyDistance: Constants.METRIC_DISTANCE_XY[1],
-                zdistance: Constants.METRIC_DISTANCE_Z[1]
+                zdistance: Constants.METRIC_DISTANCE_Z[1],
+                xyKeyDistance: Constants.METRIC_DISTANCE_XY[1]
             });
         } else if (this.state.units === Constants.IMPERIAL_UNITS) {
+            actions.setSpeedState(this.state.setSpeed, Constants.IMPERIAL_SPEEDS[1]);
+            actions.setXYState(Constants.METRIC_DISTANCE_XY[1], Constants.IMPERIAL_DISTANCE_XY[1]);
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[1],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[1],
-                zdistance: Constants.IMPERIAL_DISTANCE_Z[1]
+                zdistance: Constants.IMPERIAL_DISTANCE_Z[1],
+                xyKeyDistance: Constants.IMPERIAL_DISTANCE_XY[1]
             });
         }
     }
 
     handleRapidSpeedButton = () => {
+        const { actions } = this.props;
         if (this.state.units === Constants.METRIC_UNITS) {
+            actions.setSpeedState(this.state.setSpeed, Constants.METRIC_SPEEDS[0]);
+            actions.setXYState(Constants.METRIC_DISTANCE_XY[0], Constants.METRIC_DISTANCE_XY[0]);
             this.setState({
                 setSpeed: Constants.METRIC_SPEEDS[0],
                 xyDistance: Constants.METRIC_DISTANCE_XY[0],
-                zdistance: Constants.METRIC_DISTANCE_Z[0]
+                zdistance: Constants.METRIC_DISTANCE_Z[0],
+                xyKeyDistance: Constants.METRIC_DISTANCE_XY[0]
             });
         } else if (this.state.units === Constants.IMPERIAL_UNITS) {
+            actions.setSpeedState(this.state.setSpeed, Constants.IMPERIAL_SPEEDS[0]);
+            actions.setXYState(this.state.xyDistance, Constants.IMPERIAL_DISTANCE_XY[0]);
             this.setState({
                 setSpeed: Constants.IMPERIAL_SPEEDS[0],
                 xyDistance: Constants.IMPERIAL_DISTANCE_XY[0],
-                zdistance: Constants.IMPERIAL_DISTANCE_Z[0]
+                zdistance: Constants.IMPERIAL_DISTANCE_Z[0],
+                xyKeyDistance: Constants.IMPERIAL_DISTANCE_XY[0]
             });
         }
     }
@@ -147,14 +172,17 @@ class Keypad extends PureComponent {
 
     handleSpeed = (event) => {
         const { actions } = this.props;
-        let headSpeed = event.target.value;
-        let max = this.state.maxheadSpeed;
-        if (headSpeed <= max) {
-            this.setState({ setSpeed: headSpeed });
-        } else {
-            this.setState({ setSpeed: max });
+        let toggleSpeed = event.target.value;
+        if (this.state.units === Constants.METRIC_UNITS) {
+            this.setState({
+                setSpeed: toggleSpeed,
+            });
+        } else if (this.state.units === Constants.IMPERIAL_UNITS) {
+            this.setState({
+                setSpeed: toggleSpeed,
+            });
         }
-        actions.setSpeedState(headSpeed, this.state.maxheadSpeed);
+        actions.setSpeedState(this.state.setSpeed, toggleSpeed);
     }
 
     handleSelect = (eventKey) => {
@@ -293,6 +321,7 @@ class Keypad extends PureComponent {
         if (canClick === true) {
             disable = !disable;
         }
+
         let upperLeftClass;
         let upperRightClass;
         let lowerRightClass;
@@ -461,15 +490,12 @@ class Keypad extends PureComponent {
                     <div className="speedButtonGroup">
                         <Widget.Button
                             title={i18n._('Keypad jogging')}
-                            className="buttonWidget"
+                            onClick={actions.toggleKeypadJogging}
                         >
                             <i
-                                onClick={actions.toggleKeypadJogging}
                                 className={!this.props.clicked ? 'fa fa-keyboard-o' : 'fa fa-keyboard-o fa-enabled'}
                                 id={disable ? 'keyboardDisabled' : 'keyboard'
                                 }
-                                role="button"
-                                tabIndex={0}
                             />
                         </Widget.Button>
                         <Button

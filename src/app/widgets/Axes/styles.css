@@ -379,13 +379,13 @@
 
 .buttonTextZ {
   display: inline-block;
-  margin-left: 39%;
+  margin-left: 30%;
   margin-top: 10px;
 }
 
 .buttonTextZ- {
   display: inline-block;
-  margin-left: 39%;
+  margin-left: 32%;
   margin-top: 12px;
 }
 
@@ -467,8 +467,6 @@
 .rollingNumbers {
   display: flex;
   justify-content: space-evenly;
-  padding: 0.5em;
-  
 }
 
 .uppercontrols {
@@ -486,8 +484,8 @@
   font-size: 25px;
   opacity: 1;
   border-radius: 5px;
-  width: 59px;
-  margin-left: 108px;
+  width: 49px;
+  margin-left: 78px;
   margin-bottom: 13px;
   outline: none;
 }
@@ -509,11 +507,10 @@
 #keyboardDisabled {
   font-size: 25px;
   outline: none;
-  opacity: 1;
   border: none;
   border-radius: 5px;
-  width: 59px;
-  margin-left: 108px;
+  width: 49px;
+  margin-left: 78px;
   margin-bottom: 13px;
   opacity: 0.7;
   cursor: not-allowed;

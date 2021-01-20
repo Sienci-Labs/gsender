@@ -11,7 +11,7 @@ import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
-import { preventDefault } from 'app/lib/dom-events';
+// import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
 import { in2mm, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
@@ -186,17 +186,21 @@ class AxesWidget extends PureComponent {
             this.setState({ zKeyDistance: parameter });
             this.setState({ xyKeyDistance: prevState });
         },
-        setSpeedState: (prevState, parameter) => {
-            this.setState({ maxheadSpeed: parameter });
-            this.setState({ maxheadSpeed: prevState });
+        setSpeedState: (previous, parameter) => {
+            let integer = parseInt(parameter, 10);
+            this.setState({ setSpeed: integer });
+        },
+        setXYState: (previous, parameter) => {
+            this.setState({ xyKeyDistance: parameter });
         },
         jog: (params = {}, params2 = {}) => {
+            const units = defaultState.widgets.axes.jog.defaultUnits;
             const SValue = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             const FValue = map(params2, (value2, letter2) => (' ' + letter2.toUpperCase() + value2)).join(' ');
-            if (this.state.units === 'mm') {
-                controller.command('gcode', 'G21  G91 G1 ' + SValue + FValue);
-            } else if (this.state.units === 'in') {
+            if (units === IMPERIAL_UNITS) {
                 controller.command('gcode', 'G20  G91 G1 ' + SValue + FValue);
+            } else if (units === METRIC_UNITS) {
+                controller.command('gcode', 'G21  G91 G1 ' + SValue + FValue);
             }
         },
         move: (params = {}) => {
@@ -214,7 +218,8 @@ class AxesWidget extends PureComponent {
         handleToggleClicks: () => {
             this.setState({ clicked: !this.state.clicked });
         },
-        toggleKeypadJogging: () => {
+        toggleKeypadJogging: (e) => {
+            e.preventDefault();
             this.setState(state => ({
                 clicked: !this.state.clicked,
                 jog: {
@@ -311,6 +316,46 @@ class AxesWidget extends PureComponent {
                 };
             });
         },
+        getStepDistanceXY: (step) => {
+            this.state.lastXYSteps.push(step);
+            let lastTwo = this.state.lastXYSteps.slice(-2);
+            let hundreds = ['200', '100'];
+            let tens = ['20', '10'];
+            let ones = ['2', '1'];
+            if (this.state.lastXYSteps.length > 3) {
+                this.state.lastXYSteps.splice(0, 1);
+            }
+
+            function arrayEquals(a, b) {
+                return Array.isArray(a) &&
+                    Array.isArray(b) &&
+                    a.length === b.length &&
+                    a.every((val, index) => val === b[index]);
+            }
+
+            if (this.state.units === METRIC_UNITS) {
+                if (step >= 100) {
+                    let answer = arrayEquals(lastTwo, hundreds);
+                    if (answer === true) {
+                        return 10;
+                    } else {
+                        return 100;
+                    }
+                } else if (step >= 10) {
+                    let answer = arrayEquals(lastTwo, tens);
+                    if (answer === true) {
+                        return 1;
+                    } else {
+                        return 10;
+                    }
+                } else if (step >= 0) {
+                    let answer = arrayEquals(lastTwo, ones);
+                    if (answer === true) {
+                        return 1;
+                    }
+                }
+            } return 1;
+        },
         stepNext: () => {
             this.setState(state => {
                 const imperialJogSteps = [
@@ -358,6 +403,7 @@ class AxesWidget extends PureComponent {
             }
         },
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
+            event.preventDefault();
             const { canClick, jog } = this.state;
             if (!canClick) {
                 return;
@@ -371,20 +417,39 @@ class AxesWidget extends PureComponent {
             // The keyboard events of arrow keys for X-axis/Y-axis and pageup/pagedown for Z-axis
             // are not prevented by default. If a jog command will be executed, it needs to
             // stop the default behavior of a keyboard combination in a browser.
-            preventDefault(event);
+            // preventDefault(event);
 
+            let toggleSpeed = this.state.setSpeed;
+            let xyKeyDistance = this.state.xyKeyDistance;
             axis = axis || jog.axis;
             const distance = this.actions.getJogDistance();
-            const jogAxis = {
-                x: () => this.actions.jog({ X: direction * this.state.xyKeyDistance * factor, F: this.state.maxheadSpeed }),
-                y: () => this.actions.jog({ Y: direction * this.state.xyKeyDistance * factor, F: this.state.maxheadSpeed }),
-                z: () => this.actions.jog({ Z: direction * this.state.zKeyDistance * factor, F: this.state.maxheadSpeed }),
-                a: () => this.actions.jog({ A: direction * distance * factor }),
-                b: () => this.actions.jog({ B: direction * distance * factor }),
-                c: () => this.actions.jog({ C: direction * distance * factor })
-            }[axis];
+            let { zKeyDistance } = this.state;
 
-            jogAxis && jogAxis();
+            if (this.state.units === METRIC_UNITS) {
+                const jogAxis = {
+                    x: () => this.actions.jog({ X: direction * xyKeyDistance * factor, F: toggleSpeed }),
+                    y: () => this.actions.jog({ Y: direction * xyKeyDistance * factor, F: toggleSpeed }),
+                    z: () => this.actions.jog({ Z: direction * zKeyDistance * factor, F: toggleSpeed }),
+                    a: () => this.actions.jog({ A: direction * distance * factor }),
+                    b: () => this.actions.jog({ B: direction * distance * factor }),
+                    c: () => this.actions.jog({ C: direction * distance * factor })
+                }[axis];
+
+
+                jogAxis && jogAxis();
+            } else if (this.state.units === IMPERIAL_UNITS) {
+                const jogAxis = {
+                    x: () => this.actions.jog({ X: direction * xyKeyDistance * factor, F: toggleSpeed }),
+                    y: () => this.actions.jog({ Y: direction * xyKeyDistance * factor, F: toggleSpeed }),
+                    z: () => this.actions.jog({ Z: direction * xyKeyDistance * factor, F: toggleSpeed }),
+                    a: () => this.actions.jog({ A: direction * distance * factor }),
+                    b: () => this.actions.jog({ B: direction * distance * factor }),
+                    c: () => this.actions.jog({ C: direction * distance * factor })
+                }[axis];
+
+
+                jogAxis && jogAxis();
+            }
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
@@ -661,10 +726,13 @@ class AxesWidget extends PureComponent {
 
     getInitialState() {
         return {
+            lastXYSteps: [],
             clicked: false,
             maxheadSpeed: defaultState.widgets.axes.jog.maxheadSpeed,
             xyKeyDistance: 5,
             zKeyDistance: 2,
+            xyKeyDistanceImperial: 0.2,
+            zKeyDistanceImperial: 0.04,
             maxSpindleSpeed: defaultState.widgets.axes.jog.maxSpindleSpeed,
             maxZMovementMM: defaultState.widgets.axes.jog.zMaxMovementMetric,
             maxZMovementINCH: defaultState.widgets.axes.jog.zMaxMovementImperial,
@@ -679,7 +747,7 @@ class AxesWidget extends PureComponent {
             isFullscreen: false,
             canClick: true,
             port: controller.port,
-            units: IMPERIAL_UNITS,
+            units: defaultState.widgets.axes.jog.defaultUnits,
             controller: {
                 type: controller.type,
                 settings: controller.settings,
