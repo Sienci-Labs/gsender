@@ -5,6 +5,7 @@ import ToolSettings from './Tools/Tools';
 import MachineProfiles from './MachineProfiles';
 import ProbeSettings from './ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
+import store from '../../store';
 import styles from './index.styl';
 
 
@@ -32,33 +33,7 @@ class PreferencesPage extends PureComponent {
                     component: ProbeSettings
                 }
             ],
-            tools: [
-                {
-                    metricDiameter: 3.175,
-                    imperialDiameter: 0.125,
-                    type: 'end mill'
-                },
-                {
-                    metricDiameter: 6.35,
-                    imperialDiameter: 0.25,
-                    type: 'end mill'
-                },
-                {
-                    metricDiameter: 9.525,
-                    imperialDiameter: 0.375,
-                    type: 'end mill'
-                },
-                {
-                    metricDiameter: 12.7,
-                    imperialDiameter: 0.5,
-                    type: 'end mill'
-                },
-                {
-                    metricDiameter: 15.875,
-                    imperialDiameter: 0.625,
-                    type: 'end mill'
-                }
-            ],
+            tools: store.get('workspace[tools]', []),
             tool: {
                 metricDiameter: 0,
                 imperialDiameter: 0,
@@ -78,7 +53,7 @@ class PreferencesPage extends PureComponent {
         },
         tool: {
             setImperialDiameter: (e) => {
-                const diameter = e.target.value;
+                const diameter = Number(e.target.value);
                 const metricDiameter = this.convertToMetric(diameter);
                 const tool = this.state.tool;
                 this.setState({
@@ -90,7 +65,7 @@ class PreferencesPage extends PureComponent {
                 });
             },
             setMetricDiameter: (e) => {
-                const diameter = e.target.value;
+                const diameter = Number(e.target.value);
                 const imperialDiameter = this.convertToImperial(diameter);
                 const tool = this.state.tool;
                 this.setState({
@@ -114,14 +89,26 @@ class PreferencesPage extends PureComponent {
             addTool: () => {
                 const tools = [...this.state.tools];
                 const tool = this.state.tool;
-                console.log(tool);
-                console.log(tools);
                 tools.push(tool);
                 this.setState({
                     tools: tools
                 });
+            },
+            deleteTool: (index) => {
+                const tools = [...this.state.tools];
+                tools.splice(index, 1);
+                this.setState({
+                    tools: [...tools]
+                });
             }
         }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        const { tools, tool } = this.state;
+
+        store.replace('workspace[tools]', tools);
+        store.set('workspace[tool]', tool);
     }
 
     convertToMetric(diameter) {

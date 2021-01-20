@@ -7,6 +7,7 @@ import AddTool from './AddTool';
 
 const ToolSettings = ({ active, state, actions }) => {
     const { tools } = state;
+    const toolActions = actions.tool;
     return (
         <div className={classNames(
             styles.hidden,
@@ -23,7 +24,11 @@ const ToolSettings = ({ active, state, actions }) => {
                     <div className={styles.tools}>
                         {
                             tools.map((tool, index) => (
-                                <Tool key={`tool-${index}`} {...tool} />
+                                <Tool
+                                    key={`tool-${index}`}
+                                    {...tool}
+                                    onDelete={() => toolActions.deleteTool(index)}
+                                />
                             ))
                         }
                     </div>

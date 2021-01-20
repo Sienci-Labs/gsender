@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from '../index.styl';
 
-const Tool = ({ metricDiameter, imperialDiameter, type }) => {
+const Tool = ({ metricDiameter, imperialDiameter, type, onDelete }) => {
     return (
         <div className={styles.tool}>
             <div className={styles.toolDimensions}>
@@ -9,7 +9,12 @@ const Tool = ({ metricDiameter, imperialDiameter, type }) => {
                 <div><b>{imperialDiameter}</b>in</div>
             </div>
             <div>{type}</div>
-            <button type="button" className={styles.delete} alt="Delete Tool">
+            <button
+                type="button"
+                className={styles.delete}
+                alt="Delete Tool"
+                onClick={onDelete}
+            >
                 <i className="fa fa-minus" />
             </button>
 
