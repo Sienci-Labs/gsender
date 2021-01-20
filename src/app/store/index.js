@@ -114,6 +114,15 @@ const normalizeState = (state) => {
         set(state, 'widgets.axes.axes', defaultAxes);
     }
 
+    // Get user tool sizes
+    const userTools = ensureArray(get(cnc.state, 'workspace.tools'));
+    const defaultTools = ensureArray(get(defaultState, 'workspace.tools'));
+    if (userTools.length > 0) {
+        set(state, 'workspace.tools', userTools);
+    } else {
+        set(state, 'workspace.tools', defaultTools);
+    }
+
     return state;
 };
 
