@@ -51,7 +51,7 @@
   }
 }
 
-.activeMenu {
+.activeMenu button {
   background: #374151 !important;
 }
 
@@ -72,4 +72,70 @@
 
 .settingsContainer {
 
+}
+
+.tool-main {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+
+  h4 {
+    color: #3e85c7;
+    font-size: 1.4rem;
+  }
+}
+
+.tool-listings {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+}
+
+.add-tool-form {
+  display: flex;
+  flex-direction column;
+  width: 50%;
+}
+
+.tools {
+  width: 100%;
+  border-radius: 0.5rem;
+  background: white;
+
+  .delete {
+    color: red;
+    justify-content center
+    align-items center;
+    border: none;
+    outline: none;
+    background: none;
+  }
+}
+
+.tool {
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  font-size: 1rem;
+  align-items center;
+  justify-content space-between
+}
+
+.tool-dimensions {
+  width: 30%;
+}
+
+.tool + .tool {
+  border-top: solid 1px #cccccc;
+}
+
+.add-tool button {
+  width: 100%;
+  background: #3e85c7;
+  color: #FFFFFF;
+  outline: none;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
 }

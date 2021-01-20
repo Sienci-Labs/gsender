@@ -22,7 +22,34 @@ const defaultState = {
         },
         machineProfile: {
             id: null
-        }
+        },
+        tools: [
+            {
+                metric: 6.35,
+                imperial: 0.25,
+                type: 'end mill'
+            },
+            {
+                metric: 3.175,
+                imperial: 0.125,
+                type: 'end mill'
+            },
+            {
+                metric: 9.525,
+                imperial: 0.375,
+                type: 'end mill'
+            },
+            {
+                metric: 12.7,
+                imperial: 0.5,
+                type: 'end mill'
+            },
+            {
+                metric: 15.875,
+                imperial: 0.625,
+                type: 'end mill'
+            }
+        ],
     },
     widgets: {
         axes: {
