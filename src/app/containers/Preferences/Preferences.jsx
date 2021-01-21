@@ -3,7 +3,7 @@ import React, { PureComponent } from 'react';
 import GeneralSettings from './GeneralSettings';
 import ToolSettings from './Tools/Tools';
 import MachineProfiles from './MachineProfiles';
-import ProbeSettings from './ProbeSettings';
+import ProbeSettings from './Probe/ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import store from '../../store';
 import styles from './index.styl';
@@ -38,6 +38,16 @@ class PreferencesPage extends PureComponent {
                 metricDiameter: 0,
                 imperialDiameter: 0,
                 type: 'end mill'
+            },
+            probe: {
+                id: 'Custom Probe Profile',
+                xyThickness: 0,
+                zThickness: 0,
+                functions: {
+                    x: true,
+                    y: true,
+                    z: true
+                }
             },
             probeConfig: new WidgetConfig('probe')
         };

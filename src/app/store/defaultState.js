@@ -23,6 +23,18 @@ const defaultState = {
         machineProfile: {
             id: null
         },
+        probeProfiles: [
+            {
+                id: 'Sienci Touchplate',
+                xyThickness: 10,
+                zThickness: 15,
+                functions: {
+                    x: true,
+                    y: true,
+                    z: true
+                }
+            }
+        ],
         tools: [
             {
                 metricDiameter: 6.35,
