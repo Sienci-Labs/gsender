@@ -72,7 +72,7 @@ const AddProbe = ({ state, actions }) => {
                         onChange={() => probeActions.handleToggleChange('z')}
                     />
                 </div>
-                <button className={styles.addTool} type="button">
+                <button className={styles.addTool} type="button" onClick={probeActions.addProbeProfile}>
                     Add Probe Profile
                 </button>
             </div>

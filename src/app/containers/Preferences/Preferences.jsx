@@ -34,6 +34,7 @@ class PreferencesPage extends PureComponent {
                 }
             ],
             tools: store.get('workspace[tools]', []),
+            probeProfiles: store.get('workspace[probeProfiles]', []),
             tool: {
                 metricDiameter: 0,
                 imperialDiameter: 0,
@@ -155,15 +156,22 @@ class PreferencesPage extends PureComponent {
                     }
                 });
             },
-            addProbeProfile: () => {}
+            addProbeProfile: () => {
+                const { probe, probeProfiles } = this.state;
+                probeProfiles.push(probe);
+                this.setState({
+                    probeProfiles: probeProfiles
+                });
+            }
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool } = this.state;
+        const { tools, tool, probeProfiles } = this.state;
 
         store.replace('workspace[tools]', tools);
         store.set('workspace[tool]', tool);
+        store.replace('workspace[probeProfiles]', probeProfiles);
     }
 
     convertToMetric(diameter) {
