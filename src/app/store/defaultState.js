@@ -1,7 +1,7 @@
 import {
     IMPERIAL_STEPS,
-    IMPERIAL_UNITS,
-    METRIC_STEPS
+    METRIC_STEPS,
+    METRIC_UNITS
 } from '../constants';
 
 const defaultState = {
@@ -45,12 +45,12 @@ const defaultState = {
                 zStepImperial: 0.04,
                 xyStepImperial: 0.2,
                 metricMaxMm: 770,
-                imperialMaxInches: 30, //Max distance head can travel on longmill //Max distance head can travel on longmill
+                imperialMaxInches: 30, //Max distance head can travel on longmill
                 zMaxMovementMetric: 111,
                 zMaxMovementImperial: 4.4,
                 maxSpindleSpeed: 10000,
                 maxheadSpeed: 10000,
-                defaultUnits: IMPERIAL_UNITS,
+                defaultUnits: METRIC_UNITS,
                 speed: 589
             },
             mdi: {

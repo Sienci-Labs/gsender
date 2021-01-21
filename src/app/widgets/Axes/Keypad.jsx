@@ -41,8 +41,7 @@ class Keypad extends PureComponent {
         zMaxMovementImperial: PropTypes.number,
         MaximumheadSpeed: PropTypes.number,
         clicked: PropTypes.bool,
-        xyStepImperial: PropTypes.number,
-        zStepImperial: PropTypes.number
+        maxSpindleSpeed: PropTypes.number
     };
 
     //Used to populate forms with default values
@@ -143,7 +142,7 @@ class Keypad extends PureComponent {
     handleXYMove = (event) => {
         const { actions } = this.props;
         let xyDistance = event.target.value;
-        let max = this.state.maxDistanceHeadCanTravel;
+        const max = this.state.maxDistanceHeadCanTravel;
         if (xyDistance <= max) {
             this.setState({ xyDistance: xyDistance });
         } else {
@@ -158,7 +157,7 @@ class Keypad extends PureComponent {
     handleZToggle = (event) => {
         const { actions } = this.props;
         let distanceZ = event.target.value;
-        let max = this.state.zMaxMovement;
+        const max = this.state.zMaxMovement;
         if (distanceZ <= max) {
             this.setState({ zdistance: distanceZ });
         } else {
@@ -173,6 +172,10 @@ class Keypad extends PureComponent {
     handleSpeed = (event) => {
         const { actions } = this.props;
         let toggleSpeed = event.target.value;
+        const max = this.props.maxSpindleSpeed;
+        if (toggleSpeed > max) {
+            toggleSpeed = max;
+        }
         if (this.state.units === Constants.METRIC_UNITS) {
             this.setState({
                 setSpeed: toggleSpeed,

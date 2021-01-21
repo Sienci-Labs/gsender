@@ -476,8 +476,13 @@
   justify-content: space-between;
   align-items: center;
 }
-.buttonWidget{
-  width:0px;
+
+.buttonWidget {
+  width: 0px;
+}
+
+.components-Widget-index__widget-button--NRooU {
+  pointer-events: none;
 }
 
 #keyboard {
@@ -488,21 +493,29 @@
   margin-left: 78px;
   margin-bottom: 13px;
   outline: none;
-}
-.fa-enabled {
-  background-color: white;
-}
-.fa-enabled:focus {
-  outline: none;
-}
-.fa-enabled:active {
-  outline: none;
-}
-.fa fa-keyboard-o{
-  line-height: 119%;
-  outline: none;
+  pointer-events: auto;
 }
 
+.fa-enabled {
+  background-color: white;
+  pointer-events: auto;
+}
+
+.fa-enabled:focus {
+  outline: none;
+  pointer-events: auto;
+}
+
+.fa-enabled:active {
+  outline: none;
+  pointer-events: auto;
+}
+
+.fa fa-keyboard-o {
+  line-height: 119%;
+  outline: none;
+  pointer-events: auto;
+}
 
 #keyboardDisabled {
   font-size: 25px;
@@ -545,7 +558,6 @@ input.rollingXYInput[type="number"]::-webkit-inner-spin-button {
   cursor: pointer;
 }
 
-
 input.rollingZInput[type="number"] {
   color: #3e85c7;
   height: 37px;
@@ -573,7 +585,6 @@ input.rollingZInput[type="number"]::-webkit-inner-spin-button {
   width: 23px;
   cursor: pointer;
 }
-
 
 input.rollingSpeedInput[type="number"] {
   color: #3e85c7;
