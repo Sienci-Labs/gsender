@@ -41,12 +41,12 @@ class PreferencesPage extends PureComponent {
             },
             probe: {
                 id: 'Custom Probe Profile',
-                xyThickness: 0,
-                zThickness: 0,
+                xyThickness: 10,
+                zThickness: 10,
                 functions: {
                     x: true,
                     y: true,
-                    z: true
+                    z: false
                 }
             },
             probeConfig: new WidgetConfig('probe')
@@ -111,6 +111,51 @@ class PreferencesPage extends PureComponent {
                     tools: [...tools]
                 });
             }
+        },
+        probe: {
+            handleToggleChange: (key) => {
+                const { probe } = this.state;
+                const { functions } = probe;
+                functions[key] = !functions[key];
+                this.setState({
+                    probe: {
+                        functions: {
+                            ...functions,
+                        }
+                    }
+                });
+            },
+            changeId: (e) => {
+                const { probe } = this.state;
+                const id = e.target.value;
+                this.setState({
+                    probe: {
+                        ...probe,
+                        id: id
+                    }
+                });
+            },
+            changeXYThickness: (e) => {
+                const value = Number(e.target.value);
+                const { probe } = this.state;
+                this.setState({
+                    probe: {
+                        ...probe,
+                        xyThickness: value
+                    }
+                });
+            },
+            changeZThickness: (e) => {
+                const value = Number(e.target.value);
+                const { probe } = this.state;
+                this.setState({
+                    probe: {
+                        ...probe,
+                        zThickness: value
+                    }
+                });
+            },
+            addProbeProfile: () => {}
         }
     }
 

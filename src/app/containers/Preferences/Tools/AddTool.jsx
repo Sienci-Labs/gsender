@@ -6,7 +6,7 @@ const AddTool = ({ actions, state }) => {
     const toolActions = actions.tool;
 
     return (
-        <div className={styles.addTool}>
+        <div>
             <form>
                 <div className="form-group">
                     <label htmlFor="metricDiameter">Metric Diameter (mm)</label>
