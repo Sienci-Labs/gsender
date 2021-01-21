@@ -1,38 +1,35 @@
-import classNames from 'classnames';
-import ensureArray from 'ensure-array';
-import get from 'lodash/get';
+// import ensureArray from 'ensure-array';
+// import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import styles from './index.styl';
+import './styles.css';
+
 
 class Spindle extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
+        clicked: PropTypes.bool
     };
 
     render() {
         const { state, actions } = this.props;
         const { canClick, spindleSpeed } = state;
-        const spindle = get(state, 'controller.modal.spindle');
-        const coolant = ensureArray(get(state, 'controller.modal.coolant'));
-        const mistCoolant = coolant.indexOf('M7') >= 0;
-        const floodCoolant = coolant.indexOf('M8') >= 0;
-
+        // const spindle = get(state, 'controller.modal.spindle');
         return (
             <div>
                 <div className="form-group">
                     <div className="row no-gutters">
-                        <div className="col-xs-6" style={{ paddingRight: 5 }}>
+                        <div className="col-xs-14" style={{ marginLeft: 10, marginBottom: 10 }}>
                             <label className="control-label">{i18n._('Spindle')}</label>
                             <div className="btn-group btn-group-justified" role="group">
-                                <div className="btn-group btn-group-sm" role="group">
+                                <div className="btn-group btn-group-lr" role="group">
                                     <button
                                         type="button"
-                                        className="btn btn-default"
+                                        className="coolantButtons"
                                         style={{ padding: '5px 0' }}
                                         onClick={() => {
                                             if (spindleSpeed > 0) {
@@ -45,11 +42,7 @@ class Spindle extends PureComponent {
                                         disabled={!canClick}
                                     >
                                         <i
-                                            className={classNames(
-                                                'fa',
-                                                'fa-rotate-right',
-                                                { 'fa-spin': spindle === 'M3' }
-                                            )}
+                                            className="fas fa-forward"
                                         />
                                         <Space width="4" />
                                         M3
@@ -58,7 +51,7 @@ class Spindle extends PureComponent {
                                 <div className="btn-group btn-group-sm" role="group">
                                     <button
                                         type="button"
-                                        className="btn btn-default"
+                                        className="coolantButtons"
                                         style={{ padding: '5px 0' }}
                                         onClick={() => {
                                             if (spindleSpeed > 0) {
@@ -71,11 +64,7 @@ class Spindle extends PureComponent {
                                         disabled={!canClick}
                                     >
                                         <i
-                                            className={classNames(
-                                                'fa',
-                                                'fa-rotate-left',
-                                                { 'fa-spin-reverse': spindle === 'M4' }
-                                            )}
+                                            className="fas fa-forward fa-flip-horizontal"
                                         />
                                         <Space width="4" />
                                         M4
@@ -84,7 +73,7 @@ class Spindle extends PureComponent {
                                 <div className="btn-group btn-group-sm" role="group">
                                     <button
                                         type="button"
-                                        className="btn btn-default"
+                                        className="coolantButtons"
                                         style={{ padding: '5px 0' }}
                                         onClick={() => controller.command('gcode', 'M5')}
                                         title={i18n._('Spindle Off (M5)', { ns: 'gcode' })}
@@ -97,13 +86,15 @@ class Spindle extends PureComponent {
                                 </div>
                             </div>
                         </div>
-                        <div className="col-xs-6" style={{ paddingLeft: 5 }}>
+                    </div>
+                    <div className="row no-gutters">
+                        <div className="col-xs-14" style={{ marginLeft: 10, marginBottom: 10 }}>
                             <label className="control-label">{i18n._('Coolant')}</label>
                             <div className="btn-group btn-group-justified" role="group">
                                 <div className="btn-group btn-group-sm" role="group">
                                     <button
                                         type="button"
-                                        className="btn btn-default"
+                                        className="coolantButtons"
                                         style={{ padding: '5px 0' }}
                                         onClick={() => {
                                             controller.command('gcode', 'M7');
@@ -111,13 +102,7 @@ class Spindle extends PureComponent {
                                         title={i18n._('Mist Coolant On (M7)', { ns: 'gcode' })}
                                         disabled={!canClick}
                                     >
-                                        <i
-                                            className={classNames(
-                                                styles.icon,
-                                                styles.iconFan,
-                                                { 'fa-spin': mistCoolant }
-                                            )}
-                                        />
+                                        <i className="fas fa-shower" />
                                         <Space width="4" />
                                         M7
                                     </button>
@@ -125,7 +110,7 @@ class Spindle extends PureComponent {
                                 <div className="btn-group btn-group-sm" role="group">
                                     <button
                                         type="button"
-                                        className="btn btn-default"
+                                        className="coolantButtons"
                                         style={{ padding: '5px 0' }}
                                         onClick={() => {
                                             controller.command('gcode', 'M8');
@@ -133,13 +118,7 @@ class Spindle extends PureComponent {
                                         title={i18n._('Flood Coolant On (M8)', { ns: 'gcode' })}
                                         disabled={!canClick}
                                     >
-                                        <i
-                                            className={classNames(
-                                                styles.icon,
-                                                styles.iconFan,
-                                                { 'fa-spin': floodCoolant }
-                                            )}
-                                        />
+                                        <i className="fas fa-water" />
                                         <Space width="4" />
                                         M8
                                     </button>
@@ -147,15 +126,15 @@ class Spindle extends PureComponent {
                                 <div className="btn-group btn-group-sm" role="group">
                                     <button
                                         type="button"
-                                        className="btn btn-default"
+                                        className="coolantButtons"
                                         style={{ padding: '5px 0' }}
-                                        onClick={() => {
-                                            controller.command('gcode', 'M9');
-                                        }}
+                                        onClick={controller.command('gcode', 'M9')}
                                         title={i18n._('Coolant Off (M9)', { ns: 'gcode' })}
                                         disabled={!canClick}
                                     >
-                                        <i className="fa fa-power-off" />
+                                        <ic
+                                            className="fa fa-power-off fa-flip-horizontal"
+                                        />
                                         <Space width="4" />
                                         M9
                                     </button>
@@ -166,7 +145,7 @@ class Spindle extends PureComponent {
                 </div>
                 <div className="form-group">
                     <div className="row no-gutters">
-                        <div className="col-xs-6" style={{ paddingRight: 5 }}>
+                        <div className="col-xs-10" style={{ marginLeft: 37 }}>
                             <label className="control-label">{i18n._('Spindle Speed')}</label>
                             <div className="input-group input-group-sm">
                                 <input
@@ -177,6 +156,7 @@ class Spindle extends PureComponent {
                                     min={0}
                                     step={1}
                                     onChange={actions.handleSpindleSpeedChange}
+                                    disabled={!canClick}
                                 />
                                 <span className="input-group-addon">{i18n._('RPM')}</span>
                             </div>
