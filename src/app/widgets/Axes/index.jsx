@@ -219,7 +219,7 @@ class AxesWidget extends PureComponent {
             this.setState({ clicked: !this.state.clicked });
         },
         toggleKeypadJogging: (e) => {
-            e.preventDefault();
+            console.log('Clicked');
             this.setState(state => ({
                 clicked: !this.state.clicked,
                 jog: {

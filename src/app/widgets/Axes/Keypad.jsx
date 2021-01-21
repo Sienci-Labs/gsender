@@ -493,7 +493,14 @@ class Keypad extends PureComponent {
                     <div className="speedButtonGroup">
                         <Widget.Button
                             title={i18n._('Keypad jogging')}
-                            onClick={actions.toggleKeypadJogging}
+                            onClick={() => {
+                                this.setState({
+                                    clicked: !this.state.clicked
+                                }, () => {
+                                    actions.toggleKeypadJogging();
+                                });
+                            }
+                            }
                         >
                             <i
                                 className={!this.props.clicked ? 'fa fa-keyboard-o' : 'fa fa-keyboard-o fa-enabled'}
