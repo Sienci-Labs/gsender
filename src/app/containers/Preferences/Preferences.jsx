@@ -45,8 +45,8 @@ class PreferencesPage extends PureComponent {
                 xyThickness: 10,
                 zThickness: 10,
                 functions: {
-                    x: true,
-                    y: true,
+                    x: false,
+                    y: false,
                     z: false
                 }
             },
@@ -115,11 +115,12 @@ class PreferencesPage extends PureComponent {
         },
         probe: {
             handleToggleChange: (key) => {
-                const { probe } = this.state;
-                const { functions } = probe;
+                const probe = { ...this.state.probe };
+                const functions = { ...probe.functions };
                 functions[key] = !functions[key];
                 this.setState({
                     probe: {
+                        ...probe,
                         functions: {
                             ...functions,
                         }
@@ -127,7 +128,7 @@ class PreferencesPage extends PureComponent {
                 });
             },
             changeId: (e) => {
-                const { probe } = this.state;
+                const probe = { ...this.state.probe };
                 const id = e.target.value;
                 this.setState({
                     probe: {
@@ -138,7 +139,7 @@ class PreferencesPage extends PureComponent {
             },
             changeXYThickness: (e) => {
                 const value = Number(e.target.value);
-                const { probe } = this.state;
+                const probe = { ...this.state.probe };
                 this.setState({
                     probe: {
                         ...probe,
@@ -148,7 +149,7 @@ class PreferencesPage extends PureComponent {
             },
             changeZThickness: (e) => {
                 const value = Number(e.target.value);
-                const { probe } = this.state;
+                const probe = { ...this.state.probe };
                 this.setState({
                     probe: {
                         ...probe,
@@ -157,10 +158,18 @@ class PreferencesPage extends PureComponent {
                 });
             },
             addProbeProfile: () => {
-                const { probe, probeProfiles } = this.state;
-                probeProfiles.push(probe);
+                const probes = [...this.state.probeProfiles];
+                const probe = this.state.probe;
+                probes.push(probe);
                 this.setState({
-                    probeProfiles: probeProfiles
+                    probeProfiles: probes
+                });
+            },
+            deleteProbe: (index) => {
+                const probes = [...this.state.probeProfiles];
+                probes.splice(index, 1);
+                this.setState({
+                    probeProfiles: [...probes]
                 });
             }
         }

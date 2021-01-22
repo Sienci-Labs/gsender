@@ -2,9 +2,12 @@ import React from 'react';
 import classNames from 'classnames';
 import styles from '../index.styl';
 import AddProbe from './AddProbe';
+import Probe from './Probe';
 
 
 const ProbeSettings = ({ active, state, actions }) => {
+    const { probeProfiles } = state;
+    const probeActions = actions.probe;
     return (
         <div className={classNames(
             styles.hidden,
@@ -17,8 +20,18 @@ const ProbeSettings = ({ active, state, actions }) => {
             </h3>
             <div className={styles.toolMain}>
                 <div className={styles.toolListings}>
-                    <h4>Probe Settings</h4>
-                    <h5>About (PROBE_NAME)</h5>
+                    <h4>Available Touchplates</h4>
+                    <div className={styles.tools}>
+                        {
+                            probeProfiles.map((probe, index) => (
+                                <Probe
+                                    key={`tool-${index}`}
+                                    {...probe}
+                                    handleDelete={() => probeActions.deleteProbe(index)}
+                                />
+                            ))
+                        }
+                    </div>
                 </div>
                 <div className={styles.addToolForm}>
                     <h4>Add Touch Plate Profile</h4>

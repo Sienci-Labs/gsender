@@ -120,6 +120,7 @@
   font-size: 1rem;
   align-items center;
   justify-content space-between
+  width: 100%;
 }
 
 .tool-dimensions {
@@ -138,6 +139,10 @@
   border: none;
   padding: 0.5rem;
   border-radius: 0.25rem;
+
+  &:disabled {
+    background: #6B7280;
+  }
 }
 
 .input-spread {
@@ -146,4 +151,11 @@
   justify-content space-between;
   margin-bottom: 10px;
   align-items center;
+}
+
+.probe-info {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  justify-content space-between;
 }

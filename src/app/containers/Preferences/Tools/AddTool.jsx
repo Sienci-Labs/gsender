@@ -38,7 +38,7 @@ const AddTool = ({ actions, state }) => {
                     </select>
                 </div>
 
-                <button className={styles.addTool} type="button" onClick={toolActions.addTool}>
+                <button className={styles.addTool} type="button" onClick={toolActions.addTool} disabled={tool.imperialDiameter === 0 || tool.metricDiameter === 0}>
                     Add Tool
                 </button>
             </form>
