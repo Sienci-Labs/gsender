@@ -31,7 +31,7 @@ const IdleInfo = ({ state }) => {
         return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
     };
 
-    return fileName ? (
+    return port && fileName ? (
         <div className={styles['idle-info']}>
             <div>
                 <span className={styles['file-name']}>{fileName}</span> ({total} lines)
