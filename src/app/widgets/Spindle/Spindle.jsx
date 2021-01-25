@@ -42,10 +42,10 @@ class Spindle extends PureComponent {
                                         disabled={!canClick}
                                     >
                                         <i
-                                            className="fas fa-forward"
+                                            className="fas fa-redo"
                                         />
                                         <Space width="4" />
-                                        M3
+                                       Forward M3
                                     </button>
                                 </div>
                                 <div className="btn-group btn-group-sm" role="group">
@@ -64,10 +64,10 @@ class Spindle extends PureComponent {
                                         disabled={!canClick}
                                     >
                                         <i
-                                            className="fas fa-forward fa-flip-horizontal"
+                                            className="fas fa-redo fa-flip-horizontal"
                                         />
                                         <Space width="4" />
-                                        M4
+                                       Reverse M4
                                     </button>
                                 </div>
                                 <div className="btn-group btn-group-sm" role="group">
@@ -79,10 +79,30 @@ class Spindle extends PureComponent {
                                         title={i18n._('Spindle Off (M5)', { ns: 'gcode' })}
                                         disabled={!canClick}
                                     >
-                                        <i className="fa fa-power-off" />
+                                        <i className="fa fa-ban" />
                                         <Space width="4" />
                                         M5
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="form-group">
+                        <div className="row no-gutters">
+                            <div className="speedSpindle">
+                                <label className="control-label">{i18n._('Speed')}</label>
+                                <div className="input-group input-group-sm">
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        value={spindleSpeed}
+                                        placeholder="0"
+                                        min={0}
+                                        step={1}
+                                        onChange={actions.handleSpindleSpeedChange}
+                                        disabled={!canClick}
+                                    />
+                                    <span className="input-group-addon">{i18n._('RPM')}</span>
                                 </div>
                             </div>
                         </div>
@@ -133,32 +153,12 @@ class Spindle extends PureComponent {
                                         disabled={!canClick}
                                     >
                                         <ic
-                                            className="fa fa-power-off fa-flip-horizontal"
+                                            className="fa fa-ban"
                                         />
                                         <Space width="4" />
                                         M9
                                     </button>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="form-group">
-                    <div className="row no-gutters">
-                        <div className="col-xs-10" style={{ marginLeft: 37 }}>
-                            <label className="control-label">{i18n._('Spindle Speed')}</label>
-                            <div className="input-group input-group-sm">
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    value={spindleSpeed}
-                                    placeholder="0"
-                                    min={0}
-                                    step={1}
-                                    onChange={actions.handleSpindleSpeedChange}
-                                    disabled={!canClick}
-                                />
-                                <span className="input-group-addon">{i18n._('RPM')}</span>
                             </div>
                         </div>
                     </div>

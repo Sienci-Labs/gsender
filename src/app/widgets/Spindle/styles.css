@@ -6,6 +6,10 @@
   font-size: 14px;
 }
 
+.speedSpindle {
+  width: 96%
+}
+
 .coolantButtons:disabled {
   background-color: #D9DCE1;
   border: 1px solid #6F7376;
