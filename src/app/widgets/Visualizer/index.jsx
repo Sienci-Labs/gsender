@@ -22,12 +22,14 @@ import WidgetConfig from '../WidgetConfig';
 // import PrimaryToolbar from './PrimaryToolbar';
 // import SecondaryToolbar from './SecondaryToolbar';
 import WorkflowControl from './WorkflowControl';
+import CameraControlArea from './CameraControlArea';
 import Visualizer from './Visualizer';
-import Dashboard from './Dashboard';
+// import Dashboard from './Dashboard';
 import Notifications from './Notifications';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
+import TopAccessControl from './TopAccessControl';
 import {
     // Units
     IMPERIAL_UNITS,
@@ -133,30 +135,6 @@ const displayWebGLErrorMessage = () => {
     ));
 };
 
-// const GCodeName = ({ name, style, ...props }) => {
-//     if (!name) {
-//         return null;
-//     }
-
-//     return (
-//         <div
-//             style={{
-//                 display: 'inline-block',
-//                 position: 'absolute',
-//                 bottom: 8,
-//                 left: 8,
-//                 fontSize: '1.5rem',
-//                 color: '#000',
-//                 opacity: 0.5,
-//                 ...style,
-//             }}
-//             {...props}
-//         >
-//             {name}
-//         </div>
-//     );
-// };
-
 class VisualizerWidget extends PureComponent {
     static propTypes = {
         widgetId: PropTypes.string.isRequired
@@ -236,6 +214,8 @@ class VisualizerWidget extends PureComponent {
             const { name } = { ...meta };
             const context = {};
 
+            const { port } = this.state;
+
             this.setState((state) => ({
                 gcode: {
                     ...state.gcode,
@@ -244,6 +224,14 @@ class VisualizerWidget extends PureComponent {
                     ready: false
                 }
             }));
+
+            //If we aren't connected to a device, only load the gcode
+            //to the visualizer and make no call to the controller
+            if (!port) {
+                console.log('Visualize without device connection');
+                this.actions.loadGCode(name, gcode);
+                return;
+            }
 
             controller.command('gcode:load', name, gcode, context, (err, data) => {
                 if (err) {
@@ -268,27 +256,30 @@ class VisualizerWidget extends PureComponent {
                 view3D: !!this.visualizer
             };
 
-            const updater = (state) => ({
-                gcode: {
-                    ...state.gcode,
-                    loading: false,
-                    rendering: capable.view3D,
-                    ready: !capable.view3D,
-                    content: gcode,
-                    bbox: {
-                        min: {
-                            x: 0,
-                            y: 0,
-                            z: 0
+            const updater = (state) => {
+                return ({
+                    gcode: {
+                        ...state.gcode,
+                        loading: false,
+                        rendering: capable.view3D,
+                        ready: !capable.view3D,
+                        content: gcode,
+                        bbox: {
+                            min: {
+                                x: 0,
+                                y: 0,
+                                z: 0
+                            },
+                            max: {
+                                x: 0,
+                                y: 0,
+                                z: 0
+                            }
                         },
-                        max: {
-                            x: 0,
-                            y: 0,
-                            z: 0
-                        }
+                        name: name,
                     }
-                }
-            });
+                });
+            };
             const callback = () => {
                 // Clear gcode bounding box
                 controller.context = {
@@ -320,14 +311,18 @@ class VisualizerWidget extends PureComponent {
 
                         pubsub.publish('gcode:bbox', bbox);
 
+                        const { port } = this.state;
+
                         this.setState((state) => ({
                             gcode: {
                                 ...state.gcode,
                                 loading: false,
                                 rendering: false,
                                 ready: true,
-                                bbox: bbox
-                            }
+                                bbox: bbox,
+                                loadedBeforeConnection: !port,
+                            },
+                            filename: name
                         }));
                     });
                 }, 0);
@@ -595,7 +590,29 @@ class VisualizerWidget extends PureComponent {
     controllerEvents = {
         'serialport:open': (options) => {
             const { port } = options;
-            this.setState((state) => ({ port: port }));
+            const { gcode } = this.state;
+
+            if (gcode.loadedBeforeConnection) {
+                controller.command('gcode:load', this.state.filename, gcode.content, {}, (err, data) => {
+                    if (err) {
+                        this.setState((state) => ({
+                            gcode: {
+                                ...state.gcode,
+                                loading: false,
+                                rendering: false,
+                                ready: false
+                            }
+                        }));
+
+                        log.error(err);
+                        return;
+                    }
+
+                    log.debug(data); // TODO
+                });
+            }
+
+            this.setState({ port: port });
         },
         'serialport:close': (options) => {
             this.actions.unloadGCode();
@@ -920,7 +937,8 @@ class VisualizerWidget extends PureComponent {
                 size: 0,
                 total: 0,
                 sent: 0,
-                received: 0
+                received: 0,
+                loadedBeforeConnection: false,
             },
             disabled: this.config.get('disabled', false),
             projection: this.config.get('projection', 'orthographic'),
@@ -940,7 +958,23 @@ class VisualizerWidget extends PureComponent {
             },
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
             cameraPosition: 'top', // 'top', '3d', 'front', 'left', 'right'
-            isAgitated: false // Defaults to false
+            isAgitated: false, // Defaults to false
+            currentTheme: {
+                backgroundColor: '#111827', //Navy Blue
+                gridColor: '#00FFFF', // Turqoise / Light Blue
+                xAxisColor: '#cd5c5c', //Indian Red
+                yAxisColor: '#53d277', //Light Green
+                zAxisColor: '#007BFF', //Light Green
+                limitColor: '#cd5c5c', //Indian Red
+                cuttingCoordinateLines: '#fff', //White
+                joggingCoordinateLines: '#53d277', // Light Green
+                G0Color: '#53d277', // Light Green
+                G1Color: '#007BFF', // Light Blue
+                G2Color: '#007BFF', // Light Blue
+                G3Color: '#007BFF', // Light Blue
+            },
+            currentTab: 0,
+            filename: '',
         };
     }
 
@@ -1003,6 +1037,8 @@ class VisualizerWidget extends PureComponent {
         return true;
     }
 
+    setCurrentTab = (id = 0) => this.setState({ currentTab: id });
+
     render() {
         const state = {
             ...this.state,
@@ -1015,25 +1051,26 @@ class VisualizerWidget extends PureComponent {
         const capable = {
             view3D: WebGL.isWebGLAvailable() && !state.disabled
         };
-        const showDashboard = !capable.view3D && !showLoader;
+        // const showDashboard = !capable.view3D && !showLoader;
         const showVisualizer = capable.view3D && !showLoader;
         const showNotifications = showVisualizer && !!state.notification.type;
 
+        const { setCurrentTab } = this;
+        const { currentTab } = this.state;
+
         return (
-            <Widget borderless>
-                {/* <Widget.Header className={styles.widgetHeader} fixed>
-                    <PrimaryToolbar
-                        state={state}
-                        actions={actions}
-                    />
-                </Widget.Header> */}
+            <Widget style={{ paddingBottom: '1px' }}>
+                <Widget.Header className={styles['visualizer-header']}>
+                    <TopAccessControl activeTab={currentTab} setCurrentTab={setCurrentTab} />
+                </Widget.Header>
                 <Widget.Content
                     ref={node => {
                         this.widgetContent = node;
                     }}
                     className={classNames(
                         styles.widgetContent,
-                        { [styles.view3D]: capable.view3D }
+                        { [styles.view3D]: capable.view3D },
+                        styles['visualizer-component']
                     )}
                 >
                     {state.gcode.loading &&
@@ -1048,29 +1085,29 @@ class VisualizerWidget extends PureComponent {
                             actions={actions}
                         />
                     )}
-                    <WorkflowControl
-                        state={state}
-                        actions={actions}
-                    />
-                    <Dashboard
-                        show={showDashboard}
-                        state={state}
-                    />
+
                     {WebGL.isWebGLAvailable() && (
-                        <Visualizer
-                            show={showVisualizer}
-                            cameraPosition={state.cameraPosition}
-                            ref={node => {
-                                this.visualizer = node;
-                            }}
-                            state={state}
-                        />
+                        <div>
+                            <CameraControlArea
+                                state={state}
+                                actions={actions}
+                            />
+                            <Visualizer
+                                show={showVisualizer}
+                                cameraPosition={state.cameraPosition}
+                                ref={node => {
+                                    this.visualizer = node;
+                                }}
+                                state={state}
+                                actions={actions}
+                            />
+
+                            <WorkflowControl
+                                state={state}
+                                actions={actions}
+                            />
+                        </div>
                     )}
-                    {/* {(showVisualizer && state.gcode.displayName) && (
-                        <GCodeName
-                            name={state.gcode.name}
-                        />
-                    )} */}
                     {showNotifications && (
                         <Notifications
                             show={showNotifications}
@@ -1080,14 +1117,6 @@ class VisualizerWidget extends PureComponent {
                         />
                     )}
                 </Widget.Content>
-                {/* <Widget.Footer className={styles.widgetFooter}>
-                    <SecondaryToolbar
-                        is3DView={capable.view3D}
-                        cameraMode={state.cameraMode}
-                        cameraPosition={state.cameraPosition}
-                        camera={actions.camera}
-                    />
-                </Widget.Footer> */}
             </Widget>
         );
     }
