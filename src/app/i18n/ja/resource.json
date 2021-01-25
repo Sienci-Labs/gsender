@@ -403,7 +403,6 @@
     "Probe Z Axis": "Z軸",
     "Probe X Axis": "X軸",
     "Probe Y Axis": "Y軸",
-    "Spindle Speed": "スピンドルの速度",
     "RPM": "RPM",
     "Queue Flush (%)": "キューを流す (%)",
     "Kill Job (^d)": "ジョブ削除 (^d)",
@@ -517,5 +516,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Speed": ""
 }

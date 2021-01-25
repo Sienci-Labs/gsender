@@ -7,7 +7,23 @@
 }
 
 .speedSpindle {
-  width: 96%
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 12px;
+  margin-left: 36%;
+  width: 110%;
+}
+
+.smalledText {
+  font-size: smaller;
+  display: inline-block;
+}
+
+.labelSpindle {
+  font-size: larger;
+  margin-right: 10px;
 }
 
 .coolantButtons:disabled {
@@ -94,4 +110,8 @@ input.form-control[type="number"]::-webkit-inner-spin-button {
 
 .form-group {
   margin-left: 2%;
+}
+
+.form-groupSpindle {
+  margin-left: 0;
 }

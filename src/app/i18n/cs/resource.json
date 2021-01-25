@@ -403,7 +403,6 @@
     "Probe Z Axis": "Sondu osu Z",
     "Probe X Axis": "Sondu osu X",
     "Probe Y Axis": "Sondu osu Y",
-    "Spindle Speed": "Otáčky nástroje",
     "RPM": "",
     "Queue Flush (%)": "",
     "Kill Job (^d)": "",
@@ -517,5 +516,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Speed": ""
 }

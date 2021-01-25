@@ -403,7 +403,6 @@
     "Probe Z Axis": "Tapintó Z-tengely",
     "Probe X Axis": "Tapintó X-tengely",
     "Probe Y Axis": "Tapintó Y-tengely",
-    "Spindle Speed": "Főorsó sebessége ",
     "RPM": "RPM",
     "Queue Flush (%)": "Queue Flush (%)",
     "Kill Job (^d)": "Munka Kilővés (^d)",
@@ -517,5 +516,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Speed": ""
 }

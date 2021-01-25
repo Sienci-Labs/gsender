@@ -403,7 +403,6 @@
     "Probe Z Axis": "Probe Z Axis",
     "Probe X Axis": "Probe X Axis",
     "Probe Y Axis": "Probe Y Axis",
-    "Spindle Speed": "Spindle Speed",
     "RPM": "RPM",
     "Queue Flush (%)": "Queue Flush (%)",
     "Kill Job (^d)": "Kill Job (^d)",
@@ -517,5 +516,6 @@
     "of": "of",
     "lines": "lines",
     "since start": "since start",
-    "remaining": "remaining"
+    "remaining": "remaining",
+    "Speed": "Speed"
 }

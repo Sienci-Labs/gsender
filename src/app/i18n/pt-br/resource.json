@@ -403,7 +403,6 @@
     "Probe Z Axis": "Sensor Eixo Z",
     "Probe X Axis": "Sensor Eixo X",
     "Probe Y Axis": "Sensor Eixo Y",
-    "Spindle Speed": "Velocidade do Spindle",
     "RPM": "RPM",
     "Queue Flush (%)": "Fluxo da fila (%)",
     "Kill Job (^d)": "Matar Trabalho (^d)",
@@ -517,5 +516,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Speed": ""
 }

@@ -44,8 +44,8 @@ class Spindle extends PureComponent {
                                         <i
                                             className="fas fa-redo"
                                         />
-                                        <Space width="4" />
-                                       Forward M3
+                                        <Space width="6" />
+                                       CW <div className="smalledText">M3</div>
                                     </button>
                                 </div>
                                 <div className="btn-group btn-group-sm" role="group">
@@ -67,7 +67,7 @@ class Spindle extends PureComponent {
                                             className="fas fa-redo fa-flip-horizontal"
                                         />
                                         <Space width="4" />
-                                       Reverse M4
+                                       CCW <div className="smalledText">M4</div>
                                     </button>
                                 </div>
                                 <div className="btn-group btn-group-sm" role="group">
@@ -80,29 +80,31 @@ class Spindle extends PureComponent {
                                         disabled={!canClick}
                                     >
                                         <i className="fa fa-ban" />
-                                        <Space width="4" />
-                                        M5
+                                        <Space width="6" />
+                                       Stop <div className="smalledText">M5</div>
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div className="form-group">
-                        <div className="row no-gutters">
-                            <div className="speedSpindle">
-                                <label className="control-label">{i18n._('Speed')}</label>
-                                <div className="input-group input-group-sm">
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        value={spindleSpeed}
-                                        placeholder="0"
-                                        min={0}
-                                        step={1}
-                                        onChange={actions.handleSpindleSpeedChange}
-                                        disabled={!canClick}
-                                    />
-                                    <span className="input-group-addon">{i18n._('RPM')}</span>
+                            <div className="col-xs-6">
+                                <div className="form-groupSpindle">
+                                    <div className="row no-gutters">
+                                        <div className="speedSpindle">
+                                            <label className="labelSpindle">{i18n._('Speed')}</label>
+                                            <div className="input-group input-group-sm">
+                                                <input
+                                                    type="number"
+                                                    className="form-control"
+                                                    value={spindleSpeed}
+                                                    placeholder="0"
+                                                    min={0}
+                                                    step={1}
+                                                    onChange={actions.handleSpindleSpeedChange}
+                                                    disabled={!canClick}
+                                                />
+                                                <span className="input-group-addon">{i18n._('RPM')}</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -124,7 +126,7 @@ class Spindle extends PureComponent {
                                     >
                                         <i className="fas fa-shower" />
                                         <Space width="4" />
-                                        M7
+                                       Mist <div className="smalledText">M7</div>
                                     </button>
                                 </div>
                                 <div className="btn-group btn-group-sm" role="group">
@@ -139,8 +141,8 @@ class Spindle extends PureComponent {
                                         disabled={!canClick}
                                     >
                                         <i className="fas fa-water" />
-                                        <Space width="4" />
-                                        M8
+                                        <Space width="6" />
+                                       Flood <div className="smalledText">M8</div>
                                     </button>
                                 </div>
                                 <div className="btn-group btn-group-sm" role="group">
@@ -155,15 +157,15 @@ class Spindle extends PureComponent {
                                         <ic
                                             className="fa fa-ban"
                                         />
-                                        <Space width="4" />
-                                        M9
+                                        <Space width="6" />
+                                        Stop <div className="smalledText">M9</div>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </div >
         );
     }
 }

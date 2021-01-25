@@ -403,7 +403,6 @@
     "Probe Z Axis": "Z轴探针",
     "Probe X Axis": "X轴探针",
     "Probe Y Axis": "Y轴探针",
-    "Spindle Speed": "主轴转速",
     "RPM": "转/分钟",
     "Queue Flush (%)": "清除工作队列 (%)",
     "Kill Job (^d)": "终止工作 (^d)",
@@ -517,5 +516,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Speed": ""
 }

@@ -403,7 +403,6 @@
     "Probe Z Axis": "Sonde Z-Axe",
     "Probe X Axis": "Sonde X-Axe",
     "Probe Y Axis": "Sonde Y-Axe",
-    "Spindle Speed": "Vitesse de broche",
     "RPM": "",
     "Queue Flush (%)": "",
     "Kill Job (^d)": "",
@@ -517,5 +516,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Speed": ""
 }

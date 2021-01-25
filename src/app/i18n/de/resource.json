@@ -403,7 +403,6 @@
     "Probe Z Axis": "Antaster Z-Achse",
     "Probe X Axis": "Antaster X-Achse",
     "Probe Y Axis": "Antaster Y-Achse",
-    "Spindle Speed": "Spindeldrehzahl",
     "RPM": "UPM",
     "Queue Flush (%)": "",
     "Kill Job (^d)": "Job (^d) abbrechen",
@@ -517,5 +516,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Speed": ""
 }

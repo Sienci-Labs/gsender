@@ -403,7 +403,6 @@
     "Probe Z Axis": "Sonda Eje-Y",
     "Probe X Axis": "Sonda Eje-X",
     "Probe Y Axis": "Sonda Eje-Y",
-    "Spindle Speed": "Velocidad del Spindle",
     "RPM": "RPM",
     "Queue Flush (%)": "",
     "Kill Job (^d)": "Detener proceso (^d)",
@@ -517,5 +516,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Speed": ""
 }

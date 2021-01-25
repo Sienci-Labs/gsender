@@ -403,7 +403,6 @@
     "Probe Z Axis": "Sonda Z-asse",
     "Probe X Axis": "Sonda X-asse",
     "Probe Y Axis": "Sonda Y-asse",
-    "Spindle Speed": "Velocità rotazione elettromandrino",
     "RPM": "",
     "Queue Flush (%)": "",
     "Kill Job (^d)": "Blocca il lavoro (^d)",
@@ -517,5 +516,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Speed": ""
 }
