@@ -463,7 +463,6 @@ class ProbeWidget extends PureComponent {
 
     render() {
         const { widgetId, active, embedded } = this.props;
-        console.log(active);
         const { minimized, isFullscreen } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const state = {
