@@ -988,7 +988,6 @@ class Visualizer extends Component {
         this.unload();
 
         const { currentTheme } = this.props.state;
-        const { actions } = this.props;
 
         this.visualizer = new GCodeVisualizer(currentTheme);
 
@@ -1025,9 +1024,32 @@ class Visualizer extends Component {
         // Update the scene
         this.updateScene();
 
-        (typeof callback === 'function') && callback({ bbox: bbox });
+        switch (this.props.cameraPosition) {
+        case 'top':
+            this.toTopView();
+            break;
 
-        actions.camera.to3DView();
+        case '3d':
+            this.to3DView();
+            break;
+
+        case 'front':
+            this.toFrontView();
+            break;
+
+        case 'left':
+            this.toLeftSideView();
+            break;
+
+        case 'right':
+            this.toRightSideView();
+            break;
+
+        default:
+            this.toFrontView();
+        }
+
+        (typeof callback === 'function') && callback({ bbox: bbox });
     }
 
     unload() {
