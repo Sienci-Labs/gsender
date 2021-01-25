@@ -31,7 +31,7 @@ const IdleInfo = ({ state }) => {
         return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
     };
 
-    return (
+    return fileName ? (
         <div className={styles['idle-info']}>
             <div>
                 <span className={styles['file-name']}>{fileName}</span> ({total} lines)
@@ -45,12 +45,11 @@ const IdleInfo = ({ state }) => {
                 ~ {outputFormattedTime(remainingTime)} runtime
             </div>
         </div>
+    ) : (
+        <div className={styles['idle-info']}>
+            <div>{port ? 'No File Loaded...' : 'Not Connected to a Machine...'}</div>
+        </div>
     );
-// (
-//     <div className={styles['idle-info']}>
-//         <div>No File Loaded...</div>
-//     </div>
-// );
 };
 
 IdleInfo.propTypes = {
