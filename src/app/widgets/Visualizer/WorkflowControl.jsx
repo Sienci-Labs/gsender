@@ -25,9 +25,6 @@ import {
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
-import {
-    MODAL_WATCH_DIRECTORY
-} from './constants';
 import styles from './workflow-control.styl';
 
 class WorkflowControl extends PureComponent {
@@ -70,6 +67,7 @@ class WorkflowControl extends PureComponent {
                 name: file.name,
                 size: file.size
             };
+
             actions.uploadFile(result, meta);
         };
 
@@ -129,16 +127,24 @@ class WorkflowControl extends PureComponent {
         return true;
     }
 
+    handleOnStop = () => {
+        const { actions: { handlePause, handleStop } } = this.props;
+
+        handlePause();
+        handleStop();
+    }
+
     render() {
+        const { handleOnStop } = this;
         const { state, actions } = this.props;
         const { port, gcode, workflow } = state;
         const canClick = !!port;
         const isReady = canClick && gcode.ready;
         const canRun = this.canRun();
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflow.state);
-        const canStop = isReady && includes([WORKFLOW_STATE_PAUSED], workflow.state);
-        const canClose = isReady && includes([WORKFLOW_STATE_IDLE], workflow.state);
-        const canUpload = isReady ? canClose : (canClick && !gcode.loading);
+        const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflow.state);
+        // const canClose = isReady && includes([WORKFLOW_STATE_IDLE], workflow.state);
+        // const canUpload = isReady ? canClose : (canClick && !gcode.loading);
 
         return (
             <div className={styles.workflowControl}>
@@ -154,10 +160,10 @@ class WorkflowControl extends PureComponent {
                     onChange={this.handleChangeFile}
                 />
                 <div className="btn-toolbar">
-                    <div className="btn-group btn-group-sm">
+                    {/* <div className="btn-group btn-group-sm">
                         <button
                             type="button"
-                            className="btn btn-primary"
+                            className={`btn btn-primary ${styles['workflow-button-upload']}`}
                             title={i18n._('Upload G-code')}
                             onClick={this.handleClickUpload}
                             disabled={!canUpload}
@@ -167,9 +173,11 @@ class WorkflowControl extends PureComponent {
                         <Dropdown
                             id="upload-dropdown"
                             disabled={!canUpload}
+                            style={{ height: '51px' }}
                         >
                             <Dropdown.Toggle
                                 bsStyle="primary"
+                                style={{ height: '86%' }}
                                 noCaret
                             >
                                 <i className="fa fa-caret-down" />
@@ -189,45 +197,73 @@ class WorkflowControl extends PureComponent {
                                 </MenuItem>
                             </Dropdown.Menu>
                         </Dropdown>
-                    </div>
-                    <div className="btn-group btn-group-sm">
+                    </div> */}
+
+                    <div className="btn-group btn-group-sm" style={{ backgroundColor: 'transparent' }}>
                         <button
                             type="button"
-                            className="btn btn-default"
-                            title={workflow.state === WORKFLOW_STATE_PAUSED ? i18n._('Resume') : i18n._('Run')}
-                            onClick={actions.handleRun}
-                            disabled={!canRun}
+                            className={`${styles['workflow-button-upload']}`}
+                            title={i18n._('Upload G-code')}
+                            onClick={this.handleClickUpload}
+                            // disabled={!canUpload}
+                            style={{ writingMode: 'vertical-lr' }}
                         >
-                            <i className="fa fa-play" />
+                            {i18n._('Upload G-code')} <i className="fa fa-upload" style={{ writingMode: 'vertical-lr' }} />
                         </button>
-                        <button
-                            type="button"
-                            className="btn btn-default"
-                            title={i18n._('Pause')}
-                            onClick={actions.handlePause}
-                            disabled={!canPause}
-                        >
-                            <i className="fa fa-pause" />
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-default"
-                            title={i18n._('Stop')}
-                            onClick={actions.handleStop}
-                            disabled={!canStop}
-                        >
-                            <i className="fa fa-stop" />
-                        </button>
-                        <button
+
+                        {
+                            canRun && (
+                                <button
+                                    type="button"
+                                    className={styles['workflow-button-play']}
+                                    title={workflow.state === WORKFLOW_STATE_PAUSED ? i18n._('Resume') : i18n._('Run')}
+                                    onClick={actions.handleRun}
+                                    disabled={!canRun}
+                                >
+                                    {i18n._(`${workflow.state === 'paused' ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'vertical-lr' }} />
+                                </button>
+                            )
+                        }
+
+                        {
+                            canPause && (
+                                <button
+                                    type="button"
+                                    className={styles['workflow-button-pause']}
+                                    title={i18n._('Pause')}
+                                    onClick={actions.handlePause}
+                                    disabled={!canPause}
+                                >
+                                    {i18n._('Pause Job')} <i className="fa fa-pause" style={{ writingMode: 'vertical-lr' }} />
+                                </button>
+                            )
+                        }
+
+                        {
+                            canStop && (
+                                <button
+                                    type="button"
+                                    className={styles['workflow-button-stop']}
+                                    title={i18n._('Stop')}
+                                    onClick={handleOnStop}
+                                    disabled={!canStop}
+                                >
+                                    {i18n._('Stop Job')} <i className="fa fa-stop" style={{ writingMode: 'vertical-lr' }} />
+                                </button>
+                            )
+                        }
+
+                        {/* <button
                             type="button"
                             className="btn btn-default"
                             title={i18n._('Close')}
                             onClick={actions.handleClose}
                             disabled={!canClose}
                         >
-                            <i className="fa fa-close" />
-                        </button>
+                            Close File <i className="fa fa-close" />
+                        </button> */}
                     </div>
+
                     <Dropdown
                         className="hidden"
                         bsSize="sm"

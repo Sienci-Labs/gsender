@@ -1,8 +1,8 @@
 .workflow-control {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    right: 10px;
+    bottom: 25px;
+    left: 20px;
+    right: 20px;
 
     :global {
         .btn-group {
@@ -24,4 +24,63 @@
     &.icon-perimeter-tracing-circle {
         background: url("./images/perimeter-tracing-circle.svg") no-repeat 0 0;
     }
+}
+
+.workflow-btn {
+    font-size: 1.5rem;
+    width: 190px;
+    height: 75px;
+    border: 0;
+    font-weight: bold;
+    color: white;
+
+    i {
+        font-size: 1.25rem;
+    }
+}
+
+.workflow-button {
+
+    btn-mixin(color){
+        @extend .workflow-btn;
+
+        background-color: rgba(color, 0.6);
+        border: 2px solid darken(color, 30%);
+
+        transition: 200ms ease-in-out;
+
+        &:disabled {
+            disabled-color = rgba(color, 0.5);
+            
+            background-color: disabled-color;
+            color: rgba(black, 0.2);
+            border: 2px solid darken(color, 30%);
+        }
+
+        &:not(:disabled):hover {
+            background-color: darken(color, 35%);
+            color: black;
+            transition: 200ms ease-in-out;
+        }
+    }
+
+    &-upload {
+        color = #007BFF;
+        btn-mixin(color)
+    }
+
+    &-play {
+        color = #53D277;
+        btn-mixin(color)
+    }
+
+    &-pause {
+        color = #FAFB58;
+        btn-mixin(color)
+    }
+
+    &-stop {
+        color = #FF9897;
+        btn-mixin(#FF9897)
+    }    
 }
