@@ -228,7 +228,6 @@ class VisualizerWidget extends PureComponent {
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no call to the controller
             if (!port) {
-                console.log('Visualize without device connection');
                 this.actions.loadGCode(name, gcode);
                 return;
             }
@@ -592,6 +591,7 @@ class VisualizerWidget extends PureComponent {
             const { port } = options;
             const { gcode } = this.state;
 
+            //If we uploaded a file before connecting to a machine, load the gcode to the controller
             if (gcode.loadedBeforeConnection) {
                 controller.command('gcode:load', this.state.filename, gcode.content, {}, (err, data) => {
                     if (err) {
