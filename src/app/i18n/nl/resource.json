@@ -399,10 +399,6 @@
     "Retraction Distance": "Retractie Afstand",
     "Apply tool length offset": "Pas gereedschap lengte offset toe",
     "Run Probe": "Start Uit peilen",
-    "Probe Axis": "Peiler As",
-    "Probe Z Axis": "Z-As Peiler",
-    "Probe X Axis": "X-As Peiler",
-    "Probe Y Axis": "Y-As Peiler",
     "Spindle Speed": "Spindel Snelheid ",
     "RPM": "Toeren Per Minuut",
     "Queue Flush (%)": "Queue Flush (%)",
@@ -517,5 +513,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Touchplate Profile": ""
 }

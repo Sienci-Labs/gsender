@@ -399,10 +399,6 @@
     "Retraction Distance": "Vzdálenost vrácení",
     "Apply tool length offset": "",
     "Run Probe": "Spustit sondu",
-    "Probe Axis": "Sondu osy",
-    "Probe Z Axis": "Sondu osu Z",
-    "Probe X Axis": "Sondu osu X",
-    "Probe Y Axis": "Sondu osu Y",
     "Spindle Speed": "Otáčky nástroje",
     "RPM": "",
     "Queue Flush (%)": "",
@@ -517,5 +513,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Touchplate Profile": ""
 }

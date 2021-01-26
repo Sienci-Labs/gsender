@@ -399,10 +399,6 @@
     "Retraction Distance": "回缩距离",
     "Apply tool length offset": "",
     "Run Probe": "执行探测",
-    "Probe Axis": "轴",
-    "Probe Z Axis": "Z轴探针",
-    "Probe X Axis": "X轴探针",
-    "Probe Y Axis": "Y轴探针",
     "Spindle Speed": "主轴转速",
     "RPM": "转/分钟",
     "Queue Flush (%)": "清除工作队列 (%)",
@@ -517,5 +513,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Touchplate Profile": ""
 }

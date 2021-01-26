@@ -399,10 +399,6 @@
     "Retraction Distance": "Retraction Distance",
     "Apply tool length offset": "Apply tool length offset",
     "Run Probe": "Run Probe",
-    "Probe Axis": "Probe Axis",
-    "Probe Z Axis": "Probe Z Axis",
-    "Probe X Axis": "Probe X Axis",
-    "Probe Y Axis": "Probe Y Axis",
     "Spindle Speed": "Spindle Speed",
     "RPM": "RPM",
     "Queue Flush (%)": "Queue Flush (%)",
@@ -517,5 +513,6 @@
     "of": "of",
     "lines": "lines",
     "since start": "since start",
-    "remaining": "remaining"
+    "remaining": "remaining",
+    "Touchplate Profile": "Touchplate Profile"
 }

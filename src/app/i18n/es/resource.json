@@ -399,10 +399,6 @@
     "Retraction Distance": "Distancia de retracción",
     "Apply tool length offset": "Aplicar desplazamiento de la longitud de la herramienta",
     "Run Probe": "Inicio la sonda",
-    "Probe Axis": "Eje de la sonda ",
-    "Probe Z Axis": "Sonda Eje-Y",
-    "Probe X Axis": "Sonda Eje-X",
-    "Probe Y Axis": "Sonda Eje-Y",
     "Spindle Speed": "Velocidad del Spindle",
     "RPM": "RPM",
     "Queue Flush (%)": "",
@@ -517,5 +513,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Touchplate Profile": ""
 }

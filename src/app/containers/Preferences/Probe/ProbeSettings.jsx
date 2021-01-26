@@ -6,7 +6,7 @@ import Probe from './Probe';
 
 
 const ProbeSettings = ({ active, state, actions }) => {
-    const { probeProfiles } = state;
+    const { probeProfiles, probeSettings } = state;
     const probeActions = actions.probe;
     return (
         <div className={classNames(
@@ -15,11 +15,32 @@ const ProbeSettings = ({ active, state, actions }) => {
             { [styles.visible]: active }
         )}
         >
-            <h3>
-                Probe
-            </h3>
+
             <div className={styles.toolMain}>
                 <div className={styles.toolListings}>
+                    <h4>Probing settings</h4>
+                    <label htmlFor="retraction">Retraction Distance</label>
+                    <div className="input-group">
+                        <input
+                            type="number"
+                            className="form-control input-sm"
+                            id="retraction"
+                            value={probeSettings.retractionDistance}
+                            onChange={probeActions.changeRetractionDistance}
+                        />
+                        <div className="input-group-addon">mm</div>
+                    </div>
+                    <label htmlFor="normalFeedrate">Probe Feedrate</label>
+                    <div className="input-group">
+                        <input
+                            type="number"
+                            className="form-control input-sm"
+                            id="normalFeedrate"
+                            value={probeSettings.normalFeedrate}
+                            onChange={probeActions.changeNormalFeedrate}
+                        />
+                        <div className="input-group-addon">mm/min</div>
+                    </div>
                     <h4>Available Touchplates</h4>
                     <div className={styles.tools}>
                         {

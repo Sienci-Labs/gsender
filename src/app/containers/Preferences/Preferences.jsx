@@ -10,7 +10,9 @@ import styles from './index.styl';
 
 
 class PreferencesPage extends PureComponent {
+    probeConfig = new WidgetConfig('probe');
     state = this.getInitialState();
+
 
     getInitialState() {
         return {
@@ -50,7 +52,11 @@ class PreferencesPage extends PureComponent {
                     z: false
                 }
             },
-            probeConfig: new WidgetConfig('probe')
+            probeSettings: {
+                retractionDistance: Number(this.probeConfig.get('retractionDistance') || 0).toFixed(3) * 1,
+                normalFeedrate: Number(this.probeConfig.get('probeFeedrate') || 0).toFixed(3) * 1,
+                probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
+            },
         };
     }
 
@@ -127,6 +133,26 @@ class PreferencesPage extends PureComponent {
                     }
                 });
             },
+            changeRetractionDistance: (e) => {
+                const probeSettings = { ...this.state.probeSettings };
+                const value = Number(e.target.value).toFixed(3) * 1;
+                this.setState({
+                    probeSettings: {
+                        ...probeSettings,
+                        retractionDistance: value
+                    }
+                });
+            },
+            changeNormalFeedrate: (e) => {
+                const probeSettings = { ...this.state.probeSettings };
+                const value = Number(e.target.value).toFixed(3) * 1;
+                this.setState({
+                    probeSettings: {
+                        ...probeSettings,
+                        normalFeedrate: value
+                    }
+                });
+            },
             changeId: (e) => {
                 const probe = { ...this.state.probe };
                 const id = e.target.value;
@@ -176,11 +202,13 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probeProfiles } = this.state;
+        const { tools, tool, probeProfiles, probeSettings } = this.state;
 
         store.replace('workspace[tools]', tools);
         store.set('workspace[tool]', tool);
         store.replace('workspace[probeProfiles]', probeProfiles);
+        this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
+        this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
     }
 
     convertToMetric(diameter) {

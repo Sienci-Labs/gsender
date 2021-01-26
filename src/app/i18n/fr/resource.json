@@ -399,10 +399,6 @@
     "Retraction Distance": "Distance de retrait",
     "Apply tool length offset": "",
     "Run Probe": "Lancer le palpage",
-    "Probe Axis": "Axes de le palpage",
-    "Probe Z Axis": "Sonde Z-Axe",
-    "Probe X Axis": "Sonde X-Axe",
-    "Probe Y Axis": "Sonde Y-Axe",
     "Spindle Speed": "Vitesse de broche",
     "RPM": "",
     "Queue Flush (%)": "",
@@ -517,5 +513,6 @@
     "of": "",
     "lines": "",
     "since start": "",
-    "remaining": ""
+    "remaining": "",
+    "Touchplate Profile": ""
 }

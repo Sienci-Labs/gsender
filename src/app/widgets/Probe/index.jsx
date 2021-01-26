@@ -36,6 +36,7 @@ import {
     MODAL_NONE,
     MODAL_PREVIEW
 } from './constants';
+import store from '../../store';
 import styles from './index.styl';
 
 const gcode = (cmd, params) => {
@@ -129,6 +130,79 @@ class ProbeWidget extends PureComponent {
         handleRetractionDistanceChange: (event) => {
             const retractionDistance = event.target.value;
             this.setState({ retractionDistance });
+        },
+        handleTouchplateSelection: (e) => {
+            const index = Number(e.target.value);
+            this.setState({
+                selectedTouchplate: index
+            }, () => {
+                this.actions.generatePossibleProbeCommands();
+            });
+        },
+        handleProbeCommandChange: (e) => {
+            const index = Number(e.target.value);
+            console.log(index);
+            this.setState({
+                selectedProbeCommand: index
+            });
+        },
+        handleSafeProbeToggle: () => {
+            const value = !this.state.useSafeProbeOption;
+            this.setState({
+                useSafeProbeOption: value
+            });
+        },
+        generatePossibleProbeCommands: () => {
+            const commands = [];
+            let command;
+            const selectedProfile = this.state.availableTouchplates[this.state.selectedTouchplate];
+            const { functions } = selectedProfile;
+
+            //Z
+            if (functions.z) {
+                command = {
+                    id: 'Z Touch',
+                    safe: false,
+                    tool: false,
+                    value: 'Z-notool'
+                };
+                commands.push(command);
+            }
+            if (functions.x && functions.y) {
+                command = {
+                    id: 'X Touch',
+                    safe: true,
+                    tool: true,
+                    value: 'X-tool'
+                };
+                commands.push(command);
+                command = {
+                    id: 'Y Touch',
+                    safe: true,
+                    tool: true,
+                    value: 'Y-tool'
+                };
+                commands.push(command);
+                command = {
+                    id: 'XY Touch',
+                    safe: true,
+                    tool: true,
+                    value: 'XY-tool'
+                };
+                commands.push(command);
+                if (functions.z) {
+                    command = {
+                        id: 'XYZ Touch',
+                        safe: true,
+                        tool: true,
+                        value: 'ZXY-tool'
+                    };
+                    commands.push(command);
+                }
+            }
+            this.setState({
+                availableProbeCommands: commands
+            });
         },
         populateProbeCommands: () => {
             const {
@@ -308,6 +382,10 @@ class ProbeWidget extends PureComponent {
         this.removeControllerEvents();
     }
 
+    componentWillMount() {
+        this.actions.generatePossibleProbeCommands();
+    }
+
     componentDidUpdate(prevProps, prevState) {
         const {
             minimized
@@ -369,7 +447,14 @@ class ProbeWidget extends PureComponent {
             probeDepth: Number(this.config.get('probeDepth') || 0).toFixed(3) * 1,
             probeFeedrate: Number(this.config.get('probeFeedrate') || 0).toFixed(3) * 1,
             touchPlateHeight: Number(this.config.get('touchPlateHeight') || 0).toFixed(3) * 1,
-            retractionDistance: Number(this.config.get('retractionDistance') || 0).toFixed(3) * 1
+            retractionDistance: Number(this.config.get('retractionDistance') || 0).toFixed(3) * 1,
+            availableTouchplates: store.get('workspace[probeProfiles]', []),
+            availableTools: store.get('workspace[tools]', []),
+            selectedTouchplate: 0,
+            selectedtool: 0,
+            useSafeProbeOption: false,
+            availableProbeCommands: [],
+            selectedProbeCommand: 0,
         };
     }
 
@@ -463,7 +548,6 @@ class ProbeWidget extends PureComponent {
 
     render() {
         const { widgetId, active, embedded } = this.props;
-        console.log(active);
         const { minimized, isFullscreen } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const state = {
