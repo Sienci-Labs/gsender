@@ -11,6 +11,7 @@ export default class TopAccessControl extends Component {
     static propTypes = {
         activeTab: PropTypes.number,
         setCurrentTab: PropTypes.func,
+        port: PropTypes.string,
     }
 
     command = {
@@ -35,7 +36,7 @@ export default class TopAccessControl extends Component {
     };
 
     render() {
-        const { activeTab, setCurrentTab } = this.props;
+        const { activeTab, setCurrentTab, port } = this.props;
 
         const tabs = [
             { id: 0, title: 'Visualizer', active: activeTab === 0, handleClick: () => setCurrentTab(0) },
@@ -43,9 +44,9 @@ export default class TopAccessControl extends Component {
         ];
 
         const controlButtons = [
-            { id: 0, title: 'Home', icon: <i className="fas fa-home" />, onClick: this.command.homing, disabled: false },
-            { id: 1, title: 'Release', icon: <i className="fas fa-arrow-alt-circle-up" />, onClick: this.command.unlock, disabled: false },
-            { id: 2, title: 'Reset', icon: <i className="fas fa-undo" />, onClick: this.command.reset, disabled: false },
+            { id: 0, title: 'Home', icon: <i className="fas fa-home" />, onClick: this.command.homing, disabled: !port },
+            { id: 1, title: 'Release', icon: <i className="fas fa-arrow-alt-circle-up" />, onClick: this.command.unlock, disabled: !port },
+            { id: 2, title: 'Reset', icon: <i className="fas fa-undo" />, onClick: this.command.reset, disabled: !port },
         ];
 
         return (
