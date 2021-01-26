@@ -166,6 +166,7 @@ class Visualizer extends Component {
             this.createScene(el);
             this.resizeRenderer();
         }
+        this.to3DView(); //Set default view to 3D (cameraPosition set to '3d' does not seem to set this)
     }
 
     componentDidUpdate(prevProps) {
