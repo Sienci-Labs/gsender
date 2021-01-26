@@ -1056,12 +1056,12 @@ class VisualizerWidget extends PureComponent {
         const showNotifications = showVisualizer && !!state.notification.type;
 
         const { setCurrentTab } = this;
-        const { currentTab } = this.state;
+        const { currentTab, port } = this.state;
 
         return (
             <Widget style={{ paddingBottom: '1px' }}>
                 <Widget.Header className={styles['visualizer-header']}>
-                    <TopAccessControl activeTab={currentTab} setCurrentTab={setCurrentTab} />
+                    <TopAccessControl activeTab={currentTab} setCurrentTab={setCurrentTab} port={port} />
                 </Widget.Header>
                 <Widget.Content
                     ref={node => {
