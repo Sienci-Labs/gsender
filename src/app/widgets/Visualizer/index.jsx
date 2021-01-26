@@ -957,7 +957,7 @@ class VisualizerWidget extends PureComponent {
                 }
             },
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
-            cameraPosition: 'top', // 'top', '3d', 'front', 'left', 'right'
+            cameraPosition: '3d', // 'top', '3d', 'front', 'left', 'right'
             isAgitated: false, // Defaults to false
             currentTheme: {
                 backgroundColor: '#111827', //Navy Blue
