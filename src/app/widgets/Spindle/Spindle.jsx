@@ -45,7 +45,7 @@ class Spindle extends PureComponent {
                                             className="fas fa-redo"
                                         />
                                         <Space width="6" />
-                                       CW <div className="smalledText">M3</div>
+                                       CW <div className="smalledText">(M3)</div>
                                     </button>
                                 </div>
                                 <div className="btn-group btn-group-sm" role="group">
@@ -67,7 +67,7 @@ class Spindle extends PureComponent {
                                             className="fas fa-redo fa-flip-horizontal"
                                         />
                                         <Space width="4" />
-                                       CCW <div className="smalledText">M4</div>
+                                       CCW <div className="smalledText">(M4)</div>
                                     </button>
                                 </div>
                                 <div className="btn-group btn-group-sm" role="group">
@@ -81,7 +81,7 @@ class Spindle extends PureComponent {
                                     >
                                         <i className="fa fa-ban" />
                                         <Space width="6" />
-                                       Stop <div className="smalledText">M5</div>
+                                       Stop <div className="smalledText">(M5)</div>
                                     </button>
                                 </div>
                             </div>
@@ -126,7 +126,7 @@ class Spindle extends PureComponent {
                                     >
                                         <i className="fas fa-shower" />
                                         <Space width="4" />
-                                       Mist <div className="smalledText">M7</div>
+                                       Mist <div className="smalledText">(M7)</div>
                                     </button>
                                 </div>
                                 <div className="btn-group btn-group-sm" role="group">
@@ -158,7 +158,7 @@ class Spindle extends PureComponent {
                                             className="fa fa-ban"
                                         />
                                         <Space width="6" />
-                                        Stop <div className="smalledText">M9</div>
+                                        Stop <div className="smalledText">(M9)</div>
                                     </button>
                                 </div>
                             </div>
