@@ -1,22 +1,24 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import styles from './index.styl';
 
-const NavSidebarLink = ({ label, url, icon }) => {
+
+const NavSidebarLink = ({ label, url = '#', icon, onClick }) => {
     return (
-        <Link
-            to={url}
-            title={label}
+        <button
+            onClick={onClick}
+            className={styles.linkButton}
         >
             <i className={`fa fas ${icon}`} /> {label}
-        </Link>
+        </button>
     );
 };
 
 NavSidebarLink.propTypes = {
     label: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired,
-    icon: PropTypes.string.isRequired
+    url: PropTypes.string,
+    icon: PropTypes.string.isRequired,
+    onClick: PropTypes.func
 };
 
 export default NavSidebarLink;

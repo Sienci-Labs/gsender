@@ -1,0 +1,161 @@
+.preferencesContainer {
+  width: 1000px;
+  height: 700px;
+  display: flex;
+  flex-grow: 1;
+  border: solid 1px #aab0ba;
+}
+
+.preferencesContent {
+  display: flex;
+  flex-direction row;
+  flex-grow 1;
+}
+
+.preferencesMenu {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  background: #1F2937;
+
+  h3 {
+    color: #3e85c7;
+    padding-left: 10px;
+  }
+
+  button + button {
+    border-top: solid 1px #6B7280;
+  }
+
+  button {
+    border: none;
+    width: 100%;
+    margin: 0;
+    background: none;
+    color: white;
+    text-align: left;
+    padding: 10px 0 10px 10px;
+
+    &:focus {
+      outline: none;
+    }
+
+    &:hover{
+      background: #374151;
+    }
+
+    &:last-child {
+      border-bottom: solid 1px  #6B7280;
+    }
+  }
+}
+
+.activeMenu button {
+  background: #374151 !important;
+}
+
+
+.preferencesOptions {
+  width: 70%;
+  background: #d1d5db;
+  padding: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+.settingsContainer {
+
+}
+
+.tool-main {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+
+  h4 {
+    color: #3e85c7;
+    font-size: 1.4rem;
+  }
+}
+
+.tool-listings {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+}
+
+.add-tool-form {
+  display: flex;
+  flex-direction column;
+  width: 50%;
+}
+
+.tools {
+  width: 100%;
+  border-radius: 0.5rem;
+  background: white;
+
+  .delete {
+    color: red;
+    justify-content center
+    align-items center;
+    border: none;
+    outline: none;
+    background: none;
+  }
+}
+
+.tool {
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  font-size: 1rem;
+  align-items center;
+  justify-content space-between
+  width: 100%;
+}
+
+.tool-dimensions {
+  width: 30%;
+}
+
+.tool + .tool {
+  border-top: solid 1px #cccccc;
+}
+
+.add-tool {
+  width: 100%;
+  background: #3e85c7;
+  color: #FFFFFF;
+  outline: none;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+
+  &:disabled {
+    background: #6B7280;
+  }
+}
+
+.input-spread {
+  display: flex;
+  flex-direction row;
+  justify-content space-between;
+  margin-bottom: 10px;
+  align-items center;
+}
+
+.probe-info {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  justify-content space-between;
+}
