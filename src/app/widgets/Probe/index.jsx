@@ -452,6 +452,8 @@ class ProbeWidget extends PureComponent {
         const workspace = this.mapWCSToPValue(wcs);
         let probeDistance = this.PROBE_DISTANCE[axis];
         probeDistance = (isSafe) ? -probeDistance : probeDistance;
+        probeDistance = (axis === 'Z') ? (-1 * Math.abs(probeDistance)) : probeDistance;
+        retractDistance = (axis === 'Z') ? retractDistance : retractDistance * -1;
         let code;
         code = [
             this.gcode(`; ${axis}-Probe`),
@@ -489,7 +491,7 @@ class ProbeWidget extends PureComponent {
         } else {
             const tool = this.state.availableTools[this.state.selectedtool];
             const toolRadius = (tool.metricDiameter / 2);
-            const toolCompensatedThickness = (toolRadius + thickness);
+            const toolCompensatedThickness = ((-1 * toolRadius) - thickness);
             code = code.concat([
                 this.gcode('G91'),
                 // Absolute, set Zero for this axis
