@@ -124,12 +124,12 @@ const normalizeState = (state) => {
     }
 
     // Get probe definitions
-    const userProbes = ensureArray(get(cnc.state, 'workspace.probeProfiles'));
-    const defaultProbes = ensureArray(get(defaultState, 'workspace.probeProfiles'));
-    if (userProbes.length > 0) {
-        set(state, 'workspace.probeProfiles', userProbes);
+    const userProbes = get(cnc.state, 'workspace.probeProfile');
+    const defaultProbes = get(defaultState, 'workspace.probeProfile');
+    if (userProbes) {
+        set(state, 'workspace.probeProfile', userProbes);
     } else {
-        set(state, 'workspace.probeProfiles', defaultProbes);
+        set(state, 'workspace.probeProfile', defaultProbes);
     }
 
     return state;

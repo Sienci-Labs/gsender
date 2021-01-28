@@ -23,18 +23,17 @@ const defaultState = {
         machineProfile: {
             id: null
         },
-        probeProfiles: [
-            {
-                id: 'Sienci Touchplate',
-                xyThickness: 10,
-                zThickness: 15,
-                functions: {
-                    x: true,
-                    y: true,
-                    z: true
-                }
+        probeProfile: {
+            xyThickness: 10,
+            zThickness: 15,
+            plateWidth: 50,
+            plateLength: 50,
+            functions: {
+                x: true,
+                y: true,
+                z: true
             }
-        ],
+        },
         tools: [
             {
                 metricDiameter: 6.35,
@@ -204,7 +203,8 @@ const defaultState = {
             probeCommand: 'G38.2',
             useTLO: false,
             probeDepth: 10,
-            probeFeedrate: 20,
+            probeFeedrate: 35,
+            probeFastFeedrate: 75,
             touchPlateHeight: 10,
             retractionDistance: 4
         },

@@ -386,18 +386,6 @@
     "Extruder Power": "",
     "Heated Bed Power": "",
     "Probe": "Palpeur",
-    "mm/min": "mm/min",
-    "in/min": "in/min",
-    "Probe Command": "Commande de palpage",
-    "G38.2 probe toward workpiece, stop on contact, signal error if failure": "G38.2 palper vers la pièce, stopper au contact, signaler une erreur si échec",
-    "G38.3 probe toward workpiece, stop on contact": "G38.3 palper vers la pièce, stopper au contact",
-    "G38.4 probe away from workpiece, stop on loss of contact, signal error if failure": "G38.4 palper en s'éloignant de la pièce, stopper à la perte de contact, signaler une erreur si échec",
-    "G38.5 probe away from workpiece, stop on loss of contact": "G38.5 palper en s'éloignant de la pièce, stopper à la perte de contact",
-    "Probe Depth": "Résolution de palpage",
-    "Probe Feedrate": "Vitesse de palpage",
-    "Touch Plate Thickness": "Largeur du palpeur",
-    "Retraction Distance": "Distance de retrait",
-    "Apply tool length offset": "",
     "Run Probe": "Lancer le palpage",
     "Spindle Speed": "Vitesse de broche",
     "RPM": "",
@@ -514,5 +502,7 @@
     "lines": "",
     "since start": "",
     "remaining": "",
-    "Touchplate Profile": ""
+    "Touchplate Profile": "",
+    "Probe Commands": "",
+    "Tool Profile": ""
 }

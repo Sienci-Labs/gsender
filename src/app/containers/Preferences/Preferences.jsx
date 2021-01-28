@@ -36,25 +36,16 @@ class PreferencesPage extends PureComponent {
                 }
             ],
             tools: store.get('workspace[tools]', []),
-            probeProfiles: store.get('workspace[probeProfiles]', []),
             tool: {
                 metricDiameter: 0,
                 imperialDiameter: 0,
                 type: 'end mill'
             },
-            probe: {
-                id: 'Custom Probe Profile',
-                xyThickness: 10,
-                zThickness: 10,
-                functions: {
-                    x: false,
-                    y: false,
-                    z: false
-                }
-            },
+            probe: store.get('workspace[probeProfile]'),
             probeSettings: {
                 retractionDistance: Number(this.probeConfig.get('retractionDistance') || 0).toFixed(3) * 1,
                 normalFeedrate: Number(this.probeConfig.get('probeFeedrate') || 0).toFixed(3) * 1,
+                fastFeedrate: Number(this.probeConfig.get('probeFastFeedrate') || 0).toFixed(3) * 1,
                 probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
             },
         };
@@ -153,16 +144,6 @@ class PreferencesPage extends PureComponent {
                     }
                 });
             },
-            changeId: (e) => {
-                const probe = { ...this.state.probe };
-                const id = e.target.value;
-                this.setState({
-                    probe: {
-                        ...probe,
-                        id: id
-                    }
-                });
-            },
             changeXYThickness: (e) => {
                 const value = Number(e.target.value);
                 const probe = { ...this.state.probe };
@@ -183,32 +164,48 @@ class PreferencesPage extends PureComponent {
                     }
                 });
             },
-            addProbeProfile: () => {
-                const probes = [...this.state.probeProfiles];
-                const probe = this.state.probe;
-                probes.push(probe);
+            changePlateWidth: (e) => {
+                const value = Number(e.target.value);
+                const probe = { ...this.state.probe };
                 this.setState({
-                    probeProfiles: probes
+                    probe: {
+                        ...probe,
+                        plateWidth: value
+                    }
                 });
             },
-            deleteProbe: (index) => {
-                const probes = [...this.state.probeProfiles];
-                probes.splice(index, 1);
+            changePlateLength: (e) => {
+                const value = Number(e.target.value);
+                const probe = { ...this.state.probe };
                 this.setState({
-                    probeProfiles: [...probes]
+                    probe: {
+                        ...probe,
+                        plateLength: value
+                    }
                 });
-            }
+            },
+            changeFastFeedrate: (e) => {
+                const probeSettings = { ...this.state.probeSettings };
+                const value = Number(e.target.value).toFixed(3) * 1;
+                this.setState({
+                    probeSettings: {
+                        ...probeSettings,
+                        fastFeedrate: value
+                    }
+                });
+            },
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probeProfiles, probeSettings } = this.state;
+        const { tools, tool, probe, probeSettings } = this.state;
 
         store.replace('workspace[tools]', tools);
         store.set('workspace[tool]', tool);
-        store.replace('workspace[probeProfiles]', probeProfiles);
+        store.replace('workspace[probeProfile]', probe);
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
+        this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
     }
 
     convertToMetric(diameter) {

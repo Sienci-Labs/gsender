@@ -386,18 +386,6 @@
     "Extruder Power": "",
     "Heated Bed Power": "",
     "Probe": "Tapintó",
-    "mm/min": "mm/min",
-    "in/min": "in/min",
-    "Probe Command": "Tapintó parancs",
-    "G38.2 probe toward workpiece, stop on contact, signal error if failure": "G38.2 tapintó megáll a munadarabál ha valami hiba van.",
-    "G38.3 probe toward workpiece, stop on contact": "G38.3 tapintó munkadarab felé megáll amikor hozzáér.",
-    "G38.4 probe away from workpiece, stop on loss of contact, signal error if failure": "G38.4 tapintó eltávolodott a munkadarabtól, kapcsolat elvesztése",
-    "G38.5 probe away from workpiece, stop on loss of contact": "G38.5 tapintó eltávolodott a munkadarabtól, megállít ha kapcsolat megszünik",
-    "Probe Depth": "Tapintás mélység",
-    "Probe Feedrate": "Tapintás Előtolás",
-    "Touch Plate Thickness": "Tapintási lemez vastagság",
-    "Retraction Distance": "Visszahuzási távolság",
-    "Apply tool length offset": "",
     "Run Probe": "Futtatás tapintó",
     "Spindle Speed": "Főorsó sebessége ",
     "RPM": "RPM",
@@ -514,5 +502,7 @@
     "lines": "",
     "since start": "",
     "remaining": "",
-    "Touchplate Profile": ""
+    "Touchplate Profile": "",
+    "Probe Commands": "",
+    "Tool Profile": ""
 }

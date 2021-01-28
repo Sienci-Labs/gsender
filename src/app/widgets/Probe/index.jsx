@@ -1,9 +1,9 @@
 import get from 'lodash/get';
 import includes from 'lodash/includes';
-import map from 'lodash/map';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import map from 'lodash/map';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
@@ -39,10 +39,6 @@ import {
 import store from '../../store';
 import styles from './index.styl';
 
-const gcode = (cmd, params) => {
-    const s = map(params, (value, letter) => String(letter + value)).join(' ');
-    return (s.length > 0) ? (cmd + ' ' + s) : cmd;
-};
 
 class ProbeWidget extends PureComponent {
     static propTypes = {
@@ -65,6 +61,14 @@ class ProbeWidget extends PureComponent {
     config = new WidgetConfig(this.props.widgetId);
 
     state = this.getInitialState();
+
+    PROBE_DISTANCE = {
+        X: 25,
+        Y: 25,
+        Z: 15
+    };
+
+    DWELL_TIME = 0.3;
 
     actions = {
         toggleFullscreen: () => {
@@ -123,10 +127,6 @@ class ProbeWidget extends PureComponent {
             const probeFeedrate = event.target.value;
             this.setState({ probeFeedrate });
         },
-        handleTouchPlateHeightChange: (event) => {
-            const touchPlateHeight = event.target.value;
-            this.setState({ touchPlateHeight });
-        },
         handleRetractionDistanceChange: (event) => {
             const retractionDistance = event.target.value;
             this.setState({ retractionDistance });
@@ -141,8 +141,8 @@ class ProbeWidget extends PureComponent {
         },
         handleProbeCommandChange: (e) => {
             const index = Number(e.target.value);
-            console.log(index);
             this.setState({
+                useSafeProbeOption: false,
                 selectedProbeCommand: index
             });
         },
@@ -155,7 +155,7 @@ class ProbeWidget extends PureComponent {
         generatePossibleProbeCommands: () => {
             const commands = [];
             let command;
-            const selectedProfile = this.state.availableTouchplates[this.state.selectedTouchplate];
+            const selectedProfile = this.state.touchplate;
             const { functions } = selectedProfile;
 
             //Z
@@ -164,7 +164,11 @@ class ProbeWidget extends PureComponent {
                     id: 'Z Touch',
                     safe: false,
                     tool: false,
-                    value: 'Z-notool'
+                    axes: {
+                        x: false,
+                        y: false,
+                        z: true,
+                    }
                 };
                 commands.push(command);
             }
@@ -173,21 +177,33 @@ class ProbeWidget extends PureComponent {
                     id: 'X Touch',
                     safe: true,
                     tool: true,
-                    value: 'X-tool'
+                    axes: {
+                        x: true,
+                        y: false,
+                        z: false
+                    }
                 };
                 commands.push(command);
                 command = {
                     id: 'Y Touch',
                     safe: true,
                     tool: true,
-                    value: 'Y-tool'
+                    axes: {
+                        x: false,
+                        y: true,
+                        z: false
+                    }
                 };
                 commands.push(command);
                 command = {
                     id: 'XY Touch',
                     safe: true,
                     tool: true,
-                    value: 'XY-tool'
+                    axes: {
+                        x: true,
+                        y: true,
+                        z: false
+                    }
                 };
                 commands.push(command);
                 if (functions.z) {
@@ -195,7 +211,11 @@ class ProbeWidget extends PureComponent {
                         id: 'XYZ Touch',
                         safe: true,
                         tool: true,
-                        value: 'ZXY-tool'
+                        axes: {
+                            x: true,
+                            y: true,
+                            z: true
+                        }
                     };
                     commands.push(command);
                 }
@@ -204,91 +224,8 @@ class ProbeWidget extends PureComponent {
                 availableProbeCommands: commands
             });
         },
-        populateProbeCommands: () => {
-            const {
-                probeAxis,
-                probeCommand,
-                useTLO,
-                probeDepth,
-                probeFeedrate,
-                touchPlateHeight,
-                retractionDistance
-            } = this.state;
-            const wcs = this.getWorkCoordinateSystem();
-            const mapWCSToP = (wcs) => ({
-                'G54': 1,
-                'G55': 2,
-                'G56': 3,
-                'G57': 4,
-                'G58': 5,
-                'G59': 6
-            }[wcs] || 0);
-            const towardWorkpiece = includes(['G38.2', 'G38.3'], probeCommand);
-            const posname = `pos${probeAxis.toLowerCase()}`;
-            const tloProbeCommands = [
-                gcode('; Cancel tool length offset'),
-                // Cancel tool length offset
-                gcode('G49'),
-
-                // Probe (use relative distance mode)
-                gcode(`; ${probeAxis}-Probe`),
-                gcode('G91'),
-                gcode(probeCommand, {
-                    [probeAxis]: towardWorkpiece ? -probeDepth : probeDepth,
-                    F: probeFeedrate
-                }),
-                // Use absolute distance mode
-                gcode('G90'),
-
-                // Dwell
-                gcode('; A dwell time of one second'),
-                gcode('G4 P1'),
-
-                // Apply touch plate height with tool length offset
-                gcode('; Set tool length offset'),
-                gcode('G43.1', {
-                    [probeAxis]: towardWorkpiece ? `[${posname}-${touchPlateHeight}]` : `[${posname}+${touchPlateHeight}]`
-                }),
-
-                // Retract from the touch plate (use relative distance mode)
-                gcode('; Retract from the touch plate'),
-                gcode('G91'),
-                gcode('G0', {
-                    [probeAxis]: retractionDistance
-                }),
-                // Use asolute distance mode
-                gcode('G90')
-            ];
-            const wcsProbeCommands = [
-                // Probe (use relative distance mode)
-                gcode(`; ${probeAxis}-Probe`),
-                gcode('G91'),
-                gcode(probeCommand, {
-                    [probeAxis]: towardWorkpiece ? -probeDepth : probeDepth,
-                    F: probeFeedrate
-                }),
-                // Use absolute distance mode
-                gcode('G90'),
-
-                // Set the WCS 0 offset
-                gcode(`; Set the active WCS ${probeAxis}0`),
-                gcode('G10', {
-                    L: 20,
-                    P: mapWCSToP(wcs),
-                    [probeAxis]: touchPlateHeight
-                }),
-
-                // Retract from the touch plate (use relative distance mode)
-                gcode('; Retract from the touch plate'),
-                gcode('G91'),
-                gcode('G0', {
-                    [probeAxis]: retractionDistance
-                }),
-                // Use absolute distance mode
-                gcode('G90')
-            ];
-
-            return useTLO ? tloProbeCommands : wcsProbeCommands;
+        generateProbeCommands: () => {
+            return this.generateProbeCommands();
         },
         runProbeCommands: (commands) => {
             controller.command('gcode', commands);
@@ -448,9 +385,8 @@ class ProbeWidget extends PureComponent {
             probeFeedrate: Number(this.config.get('probeFeedrate') || 0).toFixed(3) * 1,
             touchPlateHeight: Number(this.config.get('touchPlateHeight') || 0).toFixed(3) * 1,
             retractionDistance: Number(this.config.get('retractionDistance') || 0).toFixed(3) * 1,
-            availableTouchplates: store.get('workspace[probeProfiles]', []),
+            touchplate: store.get('workspace[probeProfile]', {}),
             availableTools: store.get('workspace[tools]', []),
-            selectedTouchplate: 0,
             selectedtool: 0,
             useSafeProbeOption: false,
             availableProbeCommands: [],
@@ -463,6 +399,278 @@ class ProbeWidget extends PureComponent {
             const callback = this.controllerEvents[eventName];
             controller.addListener(eventName, callback);
         });
+    }
+
+    gcode(cmd, params) {
+        const s = map(params, (value, letter) => String(letter + value)).join(' ');
+        return (s.length > 0) ? (cmd + ' ' + s) : cmd;
+    }
+
+    mapWCSToPValue(wcs) {
+        return ({
+            'G54': 1,
+            'G55': 2,
+            'G56': 3,
+            'G57': 4,
+            'G58': 5,
+            'G59': 6
+        }[wcs] || 0);
+    }
+
+    determineProbeOptions(probeCommand) {
+        const { axes, tool } = probeCommand;
+        return {
+            axes: axes,
+            calcToolDiameter: !tool
+        };
+    }
+
+    generateInitialProbeSettings(axes, wcs) {
+        const axesToZero = {};
+        Object.keys(axes).forEach((axis) => {
+            if (axes[axis]) {
+                axesToZero[axis.toUpperCase()] = 0;
+            }
+        });
+        return [
+            this.gcode('; Initial Probe setup'),
+            this.gcode('; Set initial zero for specified axes'),
+            this.gcode('G10', {
+                L: 20,
+                P: this.mapWCSToPValue(wcs),
+                ...axesToZero
+            }),
+            this.gcode('G91', {
+                G: 21
+            }),
+            this.gcode('G49')
+        ];
+    }
+
+    generateSingleAxisCommands(axis, thickness, params) {
+        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate } = params;
+        const workspace = this.mapWCSToPValue(wcs);
+        let probeDistance = this.PROBE_DISTANCE[axis];
+        probeDistance = (isSafe) ? -probeDistance : probeDistance;
+        let code;
+        code = [
+            this.gcode(`; ${axis}-Probe`),
+            // Fast probe for initial touch
+            this.gcode(probeCommand, {
+                [axis]: probeDistance,
+                F: quickFeedrate
+            }),
+            // Retract after initial touch
+            this.gcode('G91'),
+            this.gcode('G0', {
+                [axis]: retractDistance
+            }),
+            // Slow probe for second more accurate touch
+            this.gcode(probeCommand, {
+                [axis]: probeDistance,
+                F: normalFeedrate
+            }),
+            // Wait a tick
+            this.gcode('G4', {
+                P: this.DWELL_TIME
+            }),
+        ];
+
+        // We handle X and Y differently than Z for calculating offset
+        if (axis === 'Z') {
+            code = code.concat([
+                // Absolute, set Zero for this axis
+                this.gcode('G10', {
+                    L: 20,
+                    P: workspace,
+                    [axis]: thickness
+                }),
+            ]);
+        } else {
+            const tool = this.state.availableTools[this.state.selectedtool];
+            const toolRadius = (tool.metricDiameter / 2);
+            const toolCompensatedThickness = (toolRadius + thickness);
+            code = code.concat([
+                this.gcode('G91'),
+                // Absolute, set Zero for this axis
+                this.gcode('G10', {
+                    L: 20,
+                    P: workspace,
+                    [axis]: toolCompensatedThickness
+                }),
+            ]);
+        }
+
+        // Final retraction
+        code = code.concat([
+            this.gcode('G91'),
+            this.gcode('G0', {
+                [axis]: retractDistance
+            }),
+            this.gcode('G90')
+        ]);
+        return code;
+    }
+
+    generateMultiAxisCommands(axes, xyThickness, zThickness, params) {
+        let code = [];
+        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate } = params;
+        const workspace = this.mapWCSToPValue(wcs);
+        const XYRetract = -retractDistance;
+        let XYProbeDistance = this.PROBE_DISTANCE.X;
+        let ZProbeDistance = this.PROBE_DISTANCE.Z * -1;
+        XYProbeDistance = (isSafe) ? -XYProbeDistance : XYProbeDistance;
+        const gcode = this.gcode;
+
+        // Calculate tool offset using radius and block thickness to origin
+        const tool = this.state.availableTools[this.state.selectedtool];
+        const toolRadius = (tool.metricDiameter / 2);
+        const toolCompensatedThickness = ((-1 * toolRadius) - xyThickness);
+
+        // Add Z Probe code if we're doing 3 axis probing
+        if (axes.z) {
+            code = code.concat([
+                gcode('; Z-Probe no-safe'),
+                gcode(probeCommand, {
+                    Z: ZProbeDistance,
+                    F: quickFeedrate
+                }),
+                gcode('G91'),
+                gcode('G0', {
+                    Z: retractDistance
+                }),
+                gcode(probeCommand, {
+                    Z: ZProbeDistance,
+                    F: normalFeedrate
+                }),
+                gcode('G10', {
+                    L: 20,
+                    P: workspace,
+                    Z: zThickness
+                }),
+                gcode('G91'),
+                gcode('G0', {
+                    Z: retractDistance
+                }),
+            ]);
+        }
+
+        // We always probe X and Y based if we're running this function
+        code = code.concat([
+            // X First - move to left of plate
+            gcode('G0', {
+                X: -20
+            }),
+            // Move down to impact plate from side
+            gcode('G0', {
+                Z: -15
+            }),
+            gcode(probeCommand, {
+                X: XYProbeDistance,
+                F: quickFeedrate
+            }),
+            gcode('G91'),
+            gcode('G0', {
+                X: XYRetract
+            }),
+            gcode(probeCommand, {
+                X: XYProbeDistance,
+                F: normalFeedrate
+            }),
+            gcode('G4', {
+                P: this.DWELL_TIME
+            }),
+            gcode('G91'),
+            gcode('G10', {
+                L: 20,
+                P: workspace,
+                X: toolCompensatedThickness
+            }),
+            // Move for Y Touch - toward front + to right
+            gcode('G0', {
+                X: -(2 * retractDistance)
+            }),
+            gcode('G0', {
+                Y: -20
+            }),
+            gcode('G0', {
+                X: 20
+            }),
+            gcode(probeCommand, {
+                Y: XYProbeDistance,
+                F: quickFeedrate
+            }),
+            gcode('G91'),
+            gcode('G0', {
+                Y: XYRetract
+            }),
+            gcode(probeCommand, {
+                Y: XYProbeDistance,
+                F: normalFeedrate
+            }),
+            gcode('G4', {
+                P: this.DWELL_TIME
+            }),
+            gcode('G91'),
+            gcode('G10', {
+                L: 20,
+                P: workspace,
+                Y: toolCompensatedThickness
+            }),
+            gcode('G0', {
+                Y: XYRetract
+            }),
+        ]);
+        // Make sure we're in the correct mode at end of probe
+        code = code.concat([
+            this.gcode('G90')
+        ]);
+        return code;
+    }
+
+    generateProbeCommands() {
+        const state = { ...this.state };
+        const {
+            useSafeProbeOption,
+            retractionDistance,
+            probeCommand,
+            probeFeedrate,
+            touchplate
+        } = state;
+        const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
+        const wcs = this.getWorkCoordinateSystem();
+        const code = [];
+
+        const gCodeParams = {
+            wcs: wcs,
+            isSafe: useSafeProbeOption,
+            probeCommand: probeCommand,
+            retractDistance: retractionDistance,
+            normalFeedrate: probeFeedrate,
+            quickFeedrate: probeFeedrate + 25,
+        };
+
+        const axesCount = Object.keys(axes).filter(axis => axes[axis]).length;
+        // Probe setup code
+        this.generateInitialProbeSettings(axes, wcs).map(line => code.push(line));
+
+        if (axesCount === 1) {
+            if (axes.z) {
+                (this.generateSingleAxisCommands('Z', touchplate.zThickness, gCodeParams)).map(line => code.push(line));
+            }
+            if (axes.y) {
+                (this.generateSingleAxisCommands('Y', touchplate.xyThickness, gCodeParams)).map(line => code.push(line));
+            }
+            if (axes.x) {
+                (this.generateSingleAxisCommands('X', touchplate.xyThickness, gCodeParams)).map(line => code.push(line));
+            }
+        }
+
+        if (axesCount > 1) {
+            (this.generateMultiAxisCommands(axes, touchplate.xyThickness, touchplate.zThickness, gCodeParams)).map(line => code.push(line));
+        }
+
+        return code;
     }
 
     removeControllerEvents() {
@@ -557,7 +765,6 @@ class ProbeWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-
         return (
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header embedded={embedded}>

@@ -386,18 +386,6 @@
     "Extruder Power": "Extruder Power",
     "Heated Bed Power": "Heated Bed Power",
     "Probe": "Probe",
-    "mm/min": "mm/min",
-    "in/min": "in/min",
-    "Probe Command": "Probe Command",
-    "G38.2 probe toward workpiece, stop on contact, signal error if failure": "G38.2 probe toward workpiece, stop on contact, signal error if failure",
-    "G38.3 probe toward workpiece, stop on contact": "G38.3 probe toward workpiece, stop on contact",
-    "G38.4 probe away from workpiece, stop on loss of contact, signal error if failure": "G38.4 probe away from workpiece, stop on loss of contact, signal error if failure",
-    "G38.5 probe away from workpiece, stop on loss of contact": "G38.5 probe away from workpiece, stop on loss of contact",
-    "Probe Depth": "Probe Depth",
-    "Probe Feedrate": "Probe Feedrate",
-    "Touch Plate Thickness": "Touch Plate Thickness",
-    "Retraction Distance": "Retraction Distance",
-    "Apply tool length offset": "Apply tool length offset",
     "Run Probe": "Run Probe",
     "Spindle Speed": "Spindle Speed",
     "RPM": "RPM",
@@ -514,5 +502,7 @@
     "lines": "lines",
     "since start": "since start",
     "remaining": "remaining",
-    "Touchplate Profile": "Touchplate Profile"
+    "Touchplate Profile": "Touchplate Profile",
+    "Probe Commands": "Probe Commands",
+    "Tool Profile": "Tool Profile"
 }

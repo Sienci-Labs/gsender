@@ -2,11 +2,10 @@ import React from 'react';
 import classNames from 'classnames';
 import styles from '../index.styl';
 import AddProbe from './AddProbe';
-import Probe from './Probe';
 
 
 const ProbeSettings = ({ active, state, actions }) => {
-    const { probeProfiles, probeSettings } = state;
+    const { probeSettings } = state;
     const probeActions = actions.probe;
     return (
         <div className={classNames(
@@ -30,7 +29,7 @@ const ProbeSettings = ({ active, state, actions }) => {
                         />
                         <div className="input-group-addon">mm</div>
                     </div>
-                    <label htmlFor="normalFeedrate">Probe Feedrate</label>
+                    <label htmlFor="normalFeedrate">Normal Probe Feedrate</label>
                     <div className="input-group">
                         <input
                             type="number"
@@ -41,21 +40,20 @@ const ProbeSettings = ({ active, state, actions }) => {
                         />
                         <div className="input-group-addon">mm/min</div>
                     </div>
-                    <h4>Available Touchplates</h4>
-                    <div className={styles.tools}>
-                        {
-                            probeProfiles.map((probe, index) => (
-                                <Probe
-                                    key={`tool-${index}`}
-                                    {...probe}
-                                    handleDelete={() => probeActions.deleteProbe(index)}
-                                />
-                            ))
-                        }
+                    <label htmlFor="normalFeedrate">Fast Probe Feedrate</label>
+                    <div className="input-group">
+                        <input
+                            type="number"
+                            className="form-control input-sm"
+                            id="normalFeedrate"
+                            value={probeSettings.fastFeedrate}
+                            onChange={probeActions.changeFastFeedrate}
+                        />
+                        <div className="input-group-addon">mm/min</div>
                     </div>
                 </div>
                 <div className={styles.addToolForm}>
-                    <h4>Add Touch Plate Profile</h4>
+                    <h4>Edit Touch Plate Profile</h4>
                     <AddProbe actions={actions} state={state} />
                 </div>
             </div>

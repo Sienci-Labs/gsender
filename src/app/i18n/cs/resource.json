@@ -386,18 +386,6 @@
     "Extruder Power": "",
     "Heated Bed Power": "",
     "Probe": "Sonda",
-    "mm/min": "mm/min",
-    "in/min": "in/min",
-    "Probe Command": "Příkazy sondy",
-    "G38.2 probe toward workpiece, stop on contact, signal error if failure": "G38.2 sonda najíždí k materiálu, zastaví při kontaktu, zahlásí chybu při selhání",
-    "G38.3 probe toward workpiece, stop on contact": "G38.3 sonda najíždí k materiálu, zastaví při kontaktu",
-    "G38.4 probe away from workpiece, stop on loss of contact, signal error if failure": "G38.4 sonda odjíždí od materiálu, zastaví při kontaktu, zahlásí chybu při selhání",
-    "G38.5 probe away from workpiece, stop on loss of contact": "G38.5 sonda odjíždí od materiálu, zastaví při kontaktu",
-    "Probe Depth": "Hloubka sondy",
-    "Probe Feedrate": "Feedrate sondy",
-    "Touch Plate Thickness": "Tloušťka dotykové desky",
-    "Retraction Distance": "Vzdálenost vrácení",
-    "Apply tool length offset": "",
     "Run Probe": "Spustit sondu",
     "Spindle Speed": "Otáčky nástroje",
     "RPM": "",
@@ -514,5 +502,7 @@
     "lines": "",
     "since start": "",
     "remaining": "",
-    "Touchplate Profile": ""
+    "Touchplate Profile": "",
+    "Probe Commands": "",
+    "Tool Profile": ""
 }

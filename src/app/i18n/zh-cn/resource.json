@@ -386,18 +386,6 @@
     "Extruder Power": "挤出机电源",
     "Heated Bed Power": "热床电源",
     "Probe": "探针",
-    "mm/min": "毫米/分钟",
-    "in/min": "英尺/分钟",
-    "Probe Command": "探针指令",
-    "G38.2 probe toward workpiece, stop on contact, signal error if failure": "G38.2 探针向工作区移动，在接触时停止，若失败会发出错误信号",
-    "G38.3 probe toward workpiece, stop on contact": "G38.3 探针向工作区移动，在接触时停止",
-    "G38.4 probe away from workpiece, stop on loss of contact, signal error if failure": "G38.4 探针远离工作区，在未接触时停止，若失败会发出错误信号",
-    "G38.5 probe away from workpiece, stop on loss of contact": "G38.5 探针远离工作区，在未接触时停止",
-    "Probe Depth": "探针深度",
-    "Probe Feedrate": "探针馈送率",
-    "Touch Plate Thickness": "对刀仪厚度",
-    "Retraction Distance": "回缩距离",
-    "Apply tool length offset": "",
     "Run Probe": "执行探测",
     "Spindle Speed": "主轴转速",
     "RPM": "转/分钟",
@@ -514,5 +502,7 @@
     "lines": "",
     "since start": "",
     "remaining": "",
-    "Touchplate Profile": ""
+    "Touchplate Profile": "",
+    "Probe Commands": "",
+    "Tool Profile": ""
 }

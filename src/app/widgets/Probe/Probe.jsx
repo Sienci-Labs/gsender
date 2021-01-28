@@ -20,38 +20,21 @@ class Probe extends PureComponent {
         const { state, actions } = this.props;
         const {
             canClick,
-            availableTouchplates,
-            selectedTouchplate,
             units,
             availableTools,
             availableProbeCommands,
             selectedProbeCommand,
-            useSafeProbeOption
+            useSafeProbeOption,
+            touchplate
         } = state;
         const displayUnits = (units === METRIC_UNITS) ? i18n._('mm') : i18n._('in');
 
-        const touchplateProfile = availableTouchplates[selectedTouchplate];
-        const { functions } = touchplateProfile;
+        const { functions } = touchplate;
         const probeCommand = availableProbeCommands[selectedProbeCommand];
-        console.log(probeCommand);
 
         return (
             <div className={styles.probeFlex}>
                 <div className={styles.probeOptionsCol}>
-                    <div className="form-group">
-                        <label className="control-label">{i18n._('Touchplate Profile')}</label>
-                        <select onChange={actions.handleTouchplateSelection} className="form-control">
-                            {
-                                availableTouchplates.map((touchplate, index) => (
-                                    <option
-                                        value={index}
-                                        key={`option-${index}`}
-                                    >
-                                        {touchplate.id}
-                                    </option>))
-                            }
-                        </select>
-                    </div>
                     <div className="form-group">
                         <label className="control-label">{i18n._('Probe Commands')}</label>
                         <select className="form-control" onChange={actions.handleProbeCommandChange}>
@@ -71,7 +54,7 @@ class Probe extends PureComponent {
                         <div className="form-group">
                             <div className={styles.rowSpread}>
                                 <label htmlFor="exampleInputEmail2">Use Safe Probe:</label>
-                                <ToggleSwitch checked={useSafeProbeOption} />
+                                <ToggleSwitch checked={useSafeProbeOption} onChange={actions.handleSafeProbeToggle}/>
                             </div>
                             <span id="helpBlock" className="help-block">Safe probe probes from the top and right to avoid breaking bits.</span>
                         </div>
@@ -111,19 +94,18 @@ class Probe extends PureComponent {
                     </div>
                 </div>
                 <div className={styles.probeSettingsCol}>
-                    <h5>{touchplateProfile.id}</h5>
                     {
                         (functions.x && functions.y) &&
                             <div>
                                 <h6>XY Thickness:</h6>
-                                <div className="small">{touchplateProfile.xyThickness}{displayUnits}</div>
+                                <div className="small">{touchplate.xyThickness}{displayUnits}</div>
                             </div>
                     }
                     {
                         functions.z &&
                             <div>
                                 <h6>Z Thickness:</h6>
-                                <div className="small">{touchplateProfile.zThickness}{displayUnits}</div>
+                                <div className="small">{touchplate.zThickness}{displayUnits}</div>
                             </div>
                     }
                 </div>

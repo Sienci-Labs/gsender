@@ -10,18 +10,6 @@ const AddProbe = ({ state, actions }) => {
     return (
         <div>
             <div className="form-group">
-                <label htmlFor="xyThickness">Touch Plate Identifier</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    id="id"
-                    placeholder={probe.id}
-                    value={probe.id}
-                    onChange={(e) => probeActions.changeId(e)}
-                />
-                <span id="helpBlock" className="help-block">What you want to call this profile</span>
-            </div>
-            <div className="form-group">
                 <label htmlFor="zThickness">Probe Functions</label>
                 <span id="helpBlock" className="help-block">Supported probe axes for this specific touchplate.</span>
                 <div className={styles.inputSpread}>
@@ -85,9 +73,32 @@ const AddProbe = ({ state, actions }) => {
                     </div>
                 )
             }
-            <button className={styles.addTool} type="button" onClick={probeActions.addProbeProfile} disabled={!functions.x && !functions.y && !functions.z}>
-                Add Probe Profile
-            </button>
+            <h4>Touch Plate Dimensions</h4>
+            <div className="form-group">
+                <label htmlFor="plateWidth">Touch Plate Width</label>
+                <div className="input-group">
+                    <input
+                        type="number"
+                        className="form-control"
+                        id="plateWidth"
+                        value={probe.plateWidth}
+                        onChange={probeActions.changePlateWidth}
+                    />
+                    <div className="input-group-addon">mm</div>
+                </div>
+                <label htmlFor="plateLength">Touch Plate Length</label>
+                <div className="input-group">
+                    <input
+                        type="number"
+                        className="form-control"
+                        id="plateLength"
+                        value={probe.plateLength}
+                        onChange={probeActions.changePlateLength}
+                    />
+                    <div className="input-group-addon">mm</div>
+                </div>
+                <span id="helpBlock" className="help-block">Width and length measurements of the touchplate, used for calculating tool diameters on the fly.</span>
+            </div>
         </div>
     );
 };
