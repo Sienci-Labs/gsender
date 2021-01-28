@@ -2,6 +2,8 @@ import React from 'react';
 import classNames from 'classnames';
 import styles from './index.styl';
 
+import Options from './MachineProfiles/Options';
+
 
 const MachineProfiles = ({ active, state, actions }) => {
     return (
@@ -14,6 +16,8 @@ const MachineProfiles = ({ active, state, actions }) => {
             <h3>
                 Machine Profiles
             </h3>
+
+            <Options />
         </div>
     );
 };
