@@ -22,12 +22,11 @@ export default class ControlArea extends Component {
     }
 
     render() {
-        // const { cameraPosition, controller, workflow } = this.props.state;
-        const { cameraPosition } = this.props.state;
+        const { cameraPosition, controller, port } = this.props.state;
         const { name, total } = this.props.state.gcode;
         const { camera } = this.props.actions;
 
-        // const { state } = controller;
+        const { state = {} } = controller;
 
         //Array of objects containing the images, functions and tooltip settings for the CameraItem components being rendered from to be outputted
         const cameraItems = [
@@ -38,13 +37,25 @@ export default class ControlArea extends Component {
             { id: 4, img: threeDIcon, cameraSide: camera.to3DView, tooltip: { text: '3D View', placement: 'bottom' }, active: cameraPosition === '3d' },
         ];
 
+        console.log(styles);
+
         return (
             <div className={styles['control-area']}>
                 <div className={styles['camera-control']}>
-                    { cameraItems.map(item => <CameraItem key={item.id} image={item.img} changeCamera={item.cameraSide} tooltip={item.tooltip} active={item.active} />) }
+                    {
+                        cameraItems.map(item => (
+                            <CameraItem
+                                key={item.id}
+                                image={item.img}
+                                changeCamera={item.cameraSide}
+                                tooltip={item.tooltip}
+                                active={item.active}
+                            />
+                        ))
+                    }
                 </div>
 
-                {/* {workflow.state === 'idle' && <div className={styles['machine-status-message']}>{state.status.activeState}</div>} */}
+                {port && <div className={styles[`machine-${state.status.activeState}`]}>{state.status.activeState}</div>}
 
                 <div className={styles['machine-status']}>
                     { name && <p><strong>{name}</strong></p> }
