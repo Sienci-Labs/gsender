@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import controller from 'app/lib/controller';
+import { Tooltip } from 'app/components/Tooltip';
+
 import leftSideIcon from './images/camera-left-side-view-light.png';
 import rightSideIcon from './images/camera-right-side-view-light.png';
 import topSideIcon from './images/camera-top-view-light.png';
@@ -21,8 +24,12 @@ export default class ControlArea extends Component {
         actions: PropTypes.object,
     }
 
+    unlock = () => {
+        controller.command('unlock');
+    }
+
     render() {
-        const { cameraPosition, controller, port } = this.props.state;
+        const { cameraPosition, controller, port, filename } = this.props.state;
         const { name, total } = this.props.state.gcode;
         const { camera } = this.props.actions;
 
@@ -37,7 +44,6 @@ export default class ControlArea extends Component {
             { id: 4, img: threeDIcon, cameraSide: camera.to3DView, tooltip: { text: '3D View', placement: 'bottom' }, active: cameraPosition === '3d' },
         ];
 
-        console.log(styles);
 
         return (
             <div className={styles['control-area']}>
@@ -55,7 +61,24 @@ export default class ControlArea extends Component {
                     }
                 </div>
 
-                {port && <div className={styles[`machine-${state.status.activeState}`]}>{state.status.activeState}</div>}
+                {
+                    (port && filename) && (
+                        state.status.activeState === 'Alarm' ? (
+                            <Tooltip placement="bottom" content="Click to Unlock Machine" hideOnClick>
+                                <div
+                                    role="button"
+                                    tabIndex={-1}
+                                    className={styles[`machine-${state.status.activeState}`]}
+                                    onClick={this.unlock}
+                                    onKeyDown={this.unlock}
+                                >
+                                    {state.status.activeState}({state.status.alarmCode}){' '}
+                                    <i className="fas fa-unlock" />
+                                </div>
+                            </Tooltip>
+                        ) : <div className={styles[`machine-${state.status.activeState}`]}>{state.status.activeState}</div>
+                    )
+                }
 
                 <div className={styles['machine-status']}>
                     { name && <p><strong>{name}</strong></p> }
