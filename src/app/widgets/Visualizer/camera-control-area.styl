@@ -43,8 +43,48 @@
 .machine-status-message {
     font-size: 2rem;
     align-self: center;
-    background-color: rgba(0,0,0,0.4);
-    padding: 25px 100px;
+    padding: 25px;
     border-radius: 5px;
-    color: rgba(0,0,0,0.4);    
+    width: 100%;
+    max-width: 255px;
+    text-align: center;
+}
+
+.machine {
+    status-mixin(bgColor, textColor){
+        @extend .machine-status-message;
+        
+        background-color: rgba(bgColor, 0.6);
+        color: rgba(textColor, 0.8);
+    }
+
+    &-Idle {
+        bgColor = rgb(255,255,255);
+        color = rgb(255, 255, 255);
+        status-mixin(bgColor, color)
+    }
+
+    &-Alarm {
+        bgColor = rgb(255, 0, 0);
+        color = rgb(255, 255, 255);
+        status-mixin(bgColor, color)
+        cursor: pointer;
+
+        &:hover {
+            background-color: lighten(bgColor, 5%);
+            color: black;
+        }
+    }
+
+    &-Run {
+        bgColor = rgb(0, 255, 0);
+        color = rgb(255, 255, 255);
+        status-mixin(bgColor, color)
+    }
+
+    &-Hold {
+        bgColor = rgb(217, 119, 6);
+        color = rgb(255, 255, 255, 0.8);
+        status-mixin(bgColor, color)
+    }
 }

@@ -30,7 +30,8 @@ class GrblRunner extends events.EventEmitter {
                 y: '0.000',
                 z: '0.000'
             },
-            ov: []
+            ov: [],
+            alarmCode: null,
         },
         parserstate: {
             modal: {
@@ -120,6 +121,16 @@ class GrblRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblLineParserResultAlarm) {
+            const nextState = {
+                ...this.state,
+                status: {
+                    ...this.state.status,
+                    alarmCode: Number(payload.message)
+                }
+            };
+            if (!_.isEqual(this.state.status, nextState.status)) {
+                this.state = nextState; // enforce change
+            }
             this.emit('alarm', payload);
             return;
         }

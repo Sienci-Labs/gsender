@@ -67,7 +67,15 @@ export default class TopAccessControl extends Component {
 
                 <div className={styles['v-control-area']}>
                     {
-                        controlButtons.map(({ id, title, icon, onClick, disabled }) => <ControlButton key={id} label={title} icon={icon} onClick={onClick} disabled={disabled} />)
+                        controlButtons.map(({ id, title, icon, onClick, disabled }) => (
+                            <ControlButton
+                                key={id}
+                                label={title}
+                                icon={icon}
+                                onClick={onClick}
+                                disabled={disabled}
+                            />
+                        ))
                     }
                 </div>
             </div>
