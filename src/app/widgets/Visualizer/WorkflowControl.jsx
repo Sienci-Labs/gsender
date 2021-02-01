@@ -160,46 +160,7 @@ class WorkflowControl extends PureComponent {
                     onChange={this.handleChangeFile}
                 />
                 <div className="btn-toolbar">
-                    {/* <div className="btn-group btn-group-sm">
-                        <button
-                            type="button"
-                            className={`btn btn-primary ${styles['workflow-button-upload']}`}
-                            title={i18n._('Upload G-code')}
-                            onClick={this.handleClickUpload}
-                            disabled={!canUpload}
-                        >
-                            {i18n._('Upload G-code')}
-                        </button>
-                        <Dropdown
-                            id="upload-dropdown"
-                            disabled={!canUpload}
-                            style={{ height: '51px' }}
-                        >
-                            <Dropdown.Toggle
-                                bsStyle="primary"
-                                style={{ height: '86%' }}
-                                noCaret
-                            >
-                                <i className="fa fa-caret-down" />
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                                <MenuItem header>
-                                    {i18n._('Watch Directory')}
-                                </MenuItem>
-                                <MenuItem
-                                    onSelect={() => {
-                                        actions.openModal(MODAL_WATCH_DIRECTORY);
-                                    }}
-                                >
-                                    <i className="fa fa-search" />
-                                    <Space width="4" />
-                                    {i18n._('Browse...')}
-                                </MenuItem>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </div> */}
-
-                    <div className="btn-group btn-group-sm" style={{ backgroundColor: 'transparent' }}>
+                    <div className="btn-group btn-group-sm" style={{ backgroundColor: 'transparent', width: '100%' }}>
                         <button
                             type="button"
                             className={`${styles['workflow-button-upload']}`}
@@ -252,16 +213,6 @@ class WorkflowControl extends PureComponent {
                                 </button>
                             )
                         }
-
-                        {/* <button
-                            type="button"
-                            className="btn btn-default"
-                            title={i18n._('Close')}
-                            onClick={actions.handleClose}
-                            disabled={!canClose}
-                        >
-                            Close File <i className="fa fa-close" />
-                        </button> */}
                     </div>
 
                     <Dropdown
