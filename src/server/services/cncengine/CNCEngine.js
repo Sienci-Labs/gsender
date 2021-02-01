@@ -200,6 +200,13 @@ class CNCEngine {
                     .then(ports => {
                         ports = ports.concat(ensureArray(config.get('ports', [])));
 
+                        // Filter ports by productId to avoid non-arduino devices from appearing
+                        const validProductIDs = ['6015', '6001', '606D', '003D', '0043', '2341', '7523', 'EA60', '2303'];
+                        const validVendorIDs = ['1D50', '0403', '2341', '0042', '1A86', '10C4', '067B'];
+                        ports = ports.filter(port => validProductIDs.includes(port.productId));
+                        ports = ports.filter(port => validVendorIDs.includes(port.vendorId));
+                        log.debug(ports);
+
                         const controllers = store.get('controllers', {});
                         const portsInUse = Object.keys(controllers)
                             .filter(port => {

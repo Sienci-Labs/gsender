@@ -60,7 +60,7 @@ class NavbarConnection extends PureComponent {
         const iconState = this.getIconState(connected, connecting, alertMessage);
 
         return (
-            <div className={styles.NavbarConnection}>
+            <div className={styles.NavbarConnection} onMouseEnter={actions.handleRefreshPorts}>
                 <div className={`${styles.NavbarConnectionIcon} ${styles[iconState]}`}>
                     <i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />
                 </div>
@@ -77,6 +77,9 @@ class NavbarConnection extends PureComponent {
                         </div>
                 }
                 <div className={styles.NavbarConnectionDropdownList}>
+                    {
+                        !connected && <h5>Available Devices</h5>
+                    }
                     {
                         !connected && (ports.length === 0) &&
                         <div className={styles.noDevicesWarning}>

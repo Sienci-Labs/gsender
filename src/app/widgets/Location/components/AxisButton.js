@@ -35,6 +35,13 @@ const Container = styled.div`
             transition: 200ms ease-in-out;
         }
     }
+  
+  &:focus {
+    outline: none;
+  }
+  &:active{
+    outline: none;
+  }
 
     p, h3 {
         margin: 1px;
