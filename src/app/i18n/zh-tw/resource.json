@@ -387,7 +387,6 @@
     "Heated Bed Power": "",
     "Probe": "探測",
     "Run Probe": "執行探測",
-    "Spindle Speed": "主軸轉速",
     "RPM": "每分鐘轉速",
     "Queue Flush (%)": "清除工作佇列",
     "Kill Job (^d)": "終止工作 (^d)",
@@ -505,5 +504,6 @@
     "Probe Commands": "",
     "Tool Profile": "",
     "Pause Job": "",
-    "Stop Job": ""
+    "Stop Job": "",
+    "Speed": ""
 }

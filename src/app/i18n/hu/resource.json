@@ -387,7 +387,6 @@
     "Heated Bed Power": "",
     "Probe": "Tapintó",
     "Run Probe": "Futtatás tapintó",
-    "Spindle Speed": "Főorsó sebessége ",
     "RPM": "RPM",
     "Queue Flush (%)": "Queue Flush (%)",
     "Kill Job (^d)": "Munka Kilővés (^d)",
@@ -505,5 +504,6 @@
     "Probe Commands": "",
     "Tool Profile": "",
     "Pause Job": "",
-    "Stop Job": ""
+    "Stop Job": "",
+    "Speed": ""
 }

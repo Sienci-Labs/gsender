@@ -387,7 +387,6 @@
     "Heated Bed Power": "Potência da Cama Aquecida",
     "Probe": "Referenciamento e Nivelamento",
     "Run Probe": "Rodar o referenciamento",
-    "Spindle Speed": "Velocidade do Spindle",
     "RPM": "RPM",
     "Queue Flush (%)": "Fluxo da fila (%)",
     "Kill Job (^d)": "Matar Trabalho (^d)",
@@ -505,5 +504,6 @@
     "Probe Commands": "",
     "Tool Profile": "",
     "Pause Job": "",
-    "Stop Job": ""
+    "Stop Job": "",
+    "Speed": ""
 }

@@ -387,7 +387,6 @@
     "Heated Bed Power": "",
     "Probe": "Sonda",
     "Run Probe": "Spustit sondu",
-    "Spindle Speed": "Otáčky nástroje",
     "RPM": "",
     "Queue Flush (%)": "",
     "Kill Job (^d)": "",
@@ -505,5 +504,6 @@
     "Probe Commands": "",
     "Tool Profile": "",
     "Pause Job": "",
-    "Stop Job": ""
+    "Stop Job": "",
+    "Speed": ""
 }

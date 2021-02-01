@@ -387,7 +387,6 @@
     "Heated Bed Power": "Heated Bed Power",
     "Probe": "Probe",
     "Run Probe": "Run Probe",
-    "Spindle Speed": "Spindle Speed",
     "RPM": "RPM",
     "Queue Flush (%)": "Queue Flush (%)",
     "Kill Job (^d)": "Kill Job (^d)",
@@ -505,5 +504,6 @@
     "Probe Commands": "Probe Commands",
     "Tool Profile": "Tool Profile",
     "Pause Job": "Pause Job",
-    "Stop Job": "Stop Job"
+    "Stop Job": "Stop Job",
+    "Speed": "Speed"
 }

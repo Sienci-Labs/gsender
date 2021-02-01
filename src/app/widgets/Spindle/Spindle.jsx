@@ -150,7 +150,7 @@ class Spindle extends PureComponent {
                                         type="button"
                                         className="coolantButtons"
                                         style={{ padding: '5px 0' }}
-                                        onClick={controller.command('gcode', 'M9')}
+                                        onClick={() => controller.command('gcode', 'M9')}
                                         title={i18n._('Coolant Off (M9)', { ns: 'gcode' })}
                                         disabled={!canClick}
                                     >

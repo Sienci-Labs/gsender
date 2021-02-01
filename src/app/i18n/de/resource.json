@@ -387,7 +387,6 @@
     "Heated Bed Power": "",
     "Probe": "Antaster",
     "Run Probe": "Starte Antastung",
-    "Spindle Speed": "Spindeldrehzahl",
     "RPM": "UPM",
     "Queue Flush (%)": "",
     "Kill Job (^d)": "Job (^d) abbrechen",
@@ -505,5 +504,6 @@
     "Probe Commands": "",
     "Tool Profile": "",
     "Pause Job": "",
-    "Stop Job": ""
+    "Stop Job": "",
+    "Speed": ""
 }

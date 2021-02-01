@@ -387,7 +387,6 @@
     "Heated Bed Power": "",
     "Probe": "Проба",
     "Run Probe": "Выполнить пробу",
-    "Spindle Speed": "Скорость вращения шпинделя",
     "RPM": "",
     "Queue Flush (%)": "",
     "Kill Job (^d)": "",
@@ -505,5 +504,6 @@
     "Probe Commands": "",
     "Tool Profile": "",
     "Pause Job": "",
-    "Stop Job": ""
+    "Stop Job": "",
+    "Speed": ""
 }

@@ -387,7 +387,6 @@
     "Heated Bed Power": "",
     "Probe": "Palpeur",
     "Run Probe": "Lancer le palpage",
-    "Spindle Speed": "Vitesse de broche",
     "RPM": "",
     "Queue Flush (%)": "",
     "Kill Job (^d)": "",
@@ -505,5 +504,6 @@
     "Probe Commands": "",
     "Tool Profile": "",
     "Pause Job": "",
-    "Stop Job": ""
+    "Stop Job": "",
+    "Speed": ""
 }

@@ -387,7 +387,6 @@
     "Heated Bed Power": "",
     "Probe": "Sonda",
     "Run Probe": "Avvia sonda",
-    "Spindle Speed": "Velocità rotazione elettromandrino",
     "RPM": "",
     "Queue Flush (%)": "",
     "Kill Job (^d)": "Blocca il lavoro (^d)",
@@ -505,5 +504,6 @@
     "Probe Commands": "",
     "Tool Profile": "",
     "Pause Job": "",
-    "Stop Job": ""
+    "Stop Job": "",
+    "Speed": ""
 }

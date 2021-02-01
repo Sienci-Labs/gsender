@@ -387,7 +387,6 @@
     "Heated Bed Power": "ヒーテッドベッド電源",
     "Probe": "プローブ",
     "Run Probe": "プローブの実行",
-    "Spindle Speed": "スピンドルの速度",
     "RPM": "RPM",
     "Queue Flush (%)": "キューを流す (%)",
     "Kill Job (^d)": "ジョブ削除 (^d)",
@@ -505,5 +504,6 @@
     "Probe Commands": "",
     "Tool Profile": "",
     "Pause Job": "",
-    "Stop Job": ""
+    "Stop Job": "",
+    "Speed": ""
 }
