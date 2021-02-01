@@ -67,6 +67,9 @@ const defaultState = {
             minimized: false,
             axes: ['x', 'y', 'z'],
             jog: {
+                xyStep: 5,
+                zStep: 0.5,
+                feedrate: 5000,
                 keypad: false,
                 imperial: {
                     step: IMPERIAL_STEPS.indexOf(1), // Defaults to 1 inch
@@ -85,7 +88,7 @@ const defaultState = {
                 feedrateMax: 2000,
                 hertz: 10,
                 overshoot: 1
-            }
+            },
         },
         connection: {
             minimized: false,

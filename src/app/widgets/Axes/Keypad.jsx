@@ -5,10 +5,9 @@ import _includes from 'lodash/includes';
 import _uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import Repeatable from 'react-repeatable';
 import styled from 'styled-components';
 import { Button } from 'app/components/Buttons';
-import Dropdown, { MenuItem } from 'app/components/Dropdown';
+import { MenuItem } from 'app/components/Dropdown';
 import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
@@ -129,7 +128,6 @@ class Keypad extends PureComponent {
 
     render() {
         const { canClick, units, axes, jog, actions } = this.props;
-        const canChangeUnits = canClick;
         const canChangeStep = canClick;
         const imperialJogDistances = ensureArray(jog.imperial.distances);
         const metricJogDistances = ensureArray(jog.metric.distances);
@@ -149,6 +147,8 @@ class Keypad extends PureComponent {
             (units === IMPERIAL_UNITS && (jog.imperial.step > 0)) ||
             (units === METRIC_UNITS && (jog.metric.step > 0))
         );
+        console.log(canStepBackward);
+        console.log(canStepForward);
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -401,165 +401,9 @@ class Keypad extends PureComponent {
                         </div>
                     </div>
                     <div className="col-xs-4">
-                        <div className={styles.rowSpace}>
-                            <Dropdown
-                                pullRight
-                                style={{
-                                    width: '100%'
-                                }}
-                                disabled={!canChangeUnits}
-                            >
-                                <Dropdown.Toggle
-                                    btnStyle="flat"
-                                    style={{
-                                        textAlign: 'right',
-                                        width: '100%'
-                                    }}
-                                >
-                                    {units === IMPERIAL_UNITS && i18n._('G20 (inch)')}
-                                    {units === METRIC_UNITS && i18n._('G21 (mm)')}
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                    <MenuItem header>
-                                        {i18n._('Units')}
-                                    </MenuItem>
-                                    <MenuItem
-                                        active={units === IMPERIAL_UNITS}
-                                        onSelect={() => {
-                                            controller.command('gcode', 'G20');
-                                        }}
-                                    >
-                                        {i18n._('G20 (inch)')}
-                                    </MenuItem>
-                                    <MenuItem
-                                        active={units === METRIC_UNITS}
-                                        onSelect={() => {
-                                            controller.command('gcode', 'G21');
-                                        }}
-                                    >
-                                        {i18n._('G21 (mm)')}
-                                    </MenuItem>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </div>
-                        <div className={styles.rowSpace}>
-                            {units === IMPERIAL_UNITS && (
-                                <Dropdown
-                                    pullRight
-                                    style={{
-                                        width: '100%'
-                                    }}
-                                    disabled={!canChangeStep}
-                                    onSelect={(eventKey) => {
-                                        const step = eventKey;
-                                        actions.selectStep(step);
-                                    }}
-                                >
-                                    <Dropdown.Toggle
-                                        btnStyle="flat"
-                                        style={{
-                                            textAlign: 'right',
-                                            width: '100%'
-                                        }}
-                                    >
-                                        {imperialJogSteps[jog.imperial.step]}
-                                        <Space width="4" />
-                                        <sub>{i18n._('in')}</sub>
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu
-                                        style={{
-                                            maxHeight: 150,
-                                            overflowY: 'auto'
-                                        }}
-                                    >
-                                        <MenuItem header>
-                                            {i18n._('Imperial')}
-                                        </MenuItem>
-                                        {this.renderImperialMenuItems()}
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            )}
-                            {units === METRIC_UNITS && (
-                                <Dropdown
-                                    pullRight
-                                    style={{
-                                        width: '100%'
-                                    }}
-                                    disabled={!canChangeStep}
-                                    onSelect={(eventKey) => {
-                                        const step = eventKey;
-                                        actions.selectStep(step);
-                                    }}
-                                >
-                                    <Dropdown.Toggle
-                                        btnStyle="flat"
-                                        style={{
-                                            textAlign: 'right',
-                                            width: '100%'
-                                        }}
-                                    >
-                                        {metricJogSteps[jog.metric.step]}
-                                        <Space width="4" />
-                                        <sub>{i18n._('mm')}</sub>
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu
-                                        style={{
-                                            maxHeight: 150,
-                                            overflowY: 'auto'
-                                        }}
-                                    >
-                                        <MenuItem header>
-                                            {i18n._('Metric')}
-                                        </MenuItem>
-                                        {this.renderMetricMenuItems()}
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            )}
-                        </div>
-                        <div className={styles.rowSpace}>
-                            <div className="row no-gutters">
-                                <div className="col-xs-6">
-                                    <Repeatable
-                                        disabled={!canStepBackward}
-                                        style={{ marginRight: 2.5 }}
-                                        repeatDelay={500}
-                                        repeatInterval={Math.floor(1000 / 15)}
-                                        onHold={actions.stepBackward}
-                                        onRelease={actions.stepBackward}
-                                    >
-                                        <Button
-                                            disabled={!canStepBackward}
-                                            style={{ width: '100%' }}
-                                            compact
-                                            btnStyle="flat"
-                                            className="pull-left"
-                                        >
-                                            <i className="fa fa-minus" />
-                                        </Button>
-                                    </Repeatable>
-                                </div>
-                                <div className="col-xs-6">
-                                    <Repeatable
-                                        disabled={!canStepForward}
-                                        style={{ marginLeft: 2.5 }}
-                                        repeatDelay={500}
-                                        repeatInterval={Math.floor(1000 / 15)}
-                                        onHold={actions.stepForward}
-                                        onRelease={actions.stepForward}
-                                    >
-                                        <Button
-                                            disabled={!canStepForward}
-                                            style={{ width: '100%' }}
-                                            compact
-                                            btnStyle="flat"
-                                            className="pull-right"
-                                        >
-                                            <i className="fa fa-plus" />
-                                        </Button>
-                                    </Repeatable>
-                                </div>
-                            </div>
-                        </div>
+                        <button className={styles.movementRateButton}>Rapid</button>
+                        <button className={styles.movementRateButton}>Normal</button>
+                        <button className={styles.movementRateButton}>Precise</button>
                     </div>
                 </div>
             </div>

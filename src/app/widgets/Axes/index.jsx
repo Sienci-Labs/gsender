@@ -17,7 +17,6 @@ import { in2mm, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import Axes from './Axes';
-import Settings from './Settings';
 import ShuttleControl from './ShuttleControl';
 import {
     // Units
@@ -46,7 +45,6 @@ import {
 } from '../../constants';
 import {
     MODAL_NONE,
-    MODAL_SETTINGS,
     DEFAULT_AXES
 } from './constants';
 import styles from './index.styl';
@@ -407,6 +405,17 @@ class AxesWidget extends PureComponent {
                 hertz: hertz,
                 overshoot: overshoot
             });
+        },
+        changeMovementRates: (xyStep, zStep, feedrate) => {
+            const { jog } = this.state;
+            this.setState({
+                jog: {
+                    ...jog,
+                    xyStep: xyStep,
+                    zStep: zStep,
+                    feedrate: feedrate
+                }
+            });
         }
     };
 
@@ -673,6 +682,9 @@ class AxesWidget extends PureComponent {
                 c: '0.000'
             },
             jog: {
+                xyStep: this.config.get('jog.xyStep'),
+                zStep: this.config.get('jog.zStep'),
+                feedrate: this.config.get('jog.feedrate'),
                 axis: '', // Defaults to empty
                 keypad: this.config.get('jog.keypad'),
                 imperial: {
@@ -820,7 +832,7 @@ class AxesWidget extends PureComponent {
                         {isForkedWidget &&
                         <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
                         }
-                        {i18n._('Axes')}
+                        {i18n._('Jog Control')}
                     </Widget.Title>
                     <Widget.Controls className={this.props.sortable.filterClassName}>
                     </Widget.Controls>
@@ -831,34 +843,6 @@ class AxesWidget extends PureComponent {
                         { [styles.hidden]: minimized }
                     )}
                 >
-                    {state.modal.name === MODAL_SETTINGS && (
-                        <Settings
-                            config={config}
-                            onSave={() => {
-                                const axes = config.get('axes', DEFAULT_AXES);
-                                const imperialJogDistances = ensureArray(config.get('jog.imperial.distances', []));
-                                const metricJogDistances = ensureArray(config.get('jog.metric.distances', []));
-
-                                this.setState(state => ({
-                                    axes: axes,
-                                    jog: {
-                                        ...state.jog,
-                                        imperial: {
-                                            ...state.jog.imperial,
-                                            distances: imperialJogDistances
-                                        },
-                                        metric: {
-                                            ...state.jog.metric,
-                                            distances: metricJogDistances
-                                        }
-                                    }
-                                }));
-
-                                actions.closeModal();
-                            }}
-                            onCancel={actions.closeModal}
-                        />
-                    )}
                     <Axes config={config} state={state} actions={actions} />
                 </Widget.Content>
             </Widget>
