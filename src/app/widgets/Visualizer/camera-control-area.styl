@@ -25,7 +25,7 @@
 
 .camera-control {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 4rem 4rem 4rem;
     grid-gap: 5px;
     align-self: flex-start;
     border-radius: 10px;
@@ -35,9 +35,10 @@
     width: 100%;
     max-width: 160px;
     p {
-        font-size: 1.5rem;
         text-align: right;
         color: white;
+        word-break: break-all;
+        font-size: clamp(0.8rem, 1vw, 1.6rem);
     }
 }
 
