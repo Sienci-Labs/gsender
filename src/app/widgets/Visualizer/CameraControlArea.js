@@ -29,11 +29,41 @@ export default class ControlArea extends Component {
     }
 
     render() {
-        const { cameraPosition, controller, port, filename } = this.props.state;
+        const { cameraPosition, controller, port } = this.props.state;
         const { name, total } = this.props.state.gcode;
         const { camera } = this.props.actions;
 
         const { state = {} } = controller;
+
+        /**
+         * Function to output the machine state based on multiple conditions
+         */
+        const machineStateRender = () => {
+            if (port) {
+                if (state.status.activeState === 'Alarm') {
+                    return (
+                        <Tooltip placement="bottom" content="Click to Unlock Machine" hideOnClick>
+                            <div
+                                role="button"
+                                tabIndex={-1}
+                                className={styles[`machine-${state.status.activeState}`]}
+                                onClick={this.unlock}
+                                onKeyDown={this.unlock}
+                            >
+                                {state.status.activeState}({state.status.alarmCode}){' '}
+                                <i className="fas fa-unlock" />
+                            </div>
+                        </Tooltip>
+                    );
+                } else {
+                    return state.status.activeState //Show disconnected until machine connection process is finished, otherwise an empty div is shown
+                        ? <div className={styles[`machine-${state.status.activeState}`]}>{state.status.activeState}</div>
+                        : <div className={styles['machine-Disconnected']}>Disconnected</div>;
+                }
+            } else {
+                return <div className={styles['machine-Disconnected']}>Disconnected</div>;
+            }
+        };
 
         //Array of objects containing the images, functions and tooltip settings for the CameraItem components being rendered from to be outputted
         const cameraItems = [
@@ -61,26 +91,9 @@ export default class ControlArea extends Component {
                     }
                 </div>
 
-                {
-                    (port && filename) && (
-                        state.status.activeState === 'Alarm' ? (
-                            <Tooltip placement="bottom" content="Click to Unlock Machine" hideOnClick>
-                                <div
-                                    role="button"
-                                    tabIndex={-1}
-                                    className={styles[`machine-${state.status.activeState}`]}
-                                    onClick={this.unlock}
-                                    onKeyDown={this.unlock}
-                                >
-                                    {state.status.activeState}({state.status.alarmCode}){' '}
-                                    <i className="fas fa-unlock" />
-                                </div>
-                            </Tooltip>
-                        ) : <div className={styles[`machine-${state.status.activeState}`]}>{state.status.activeState}</div>
-                    )
-                }
+                {machineStateRender()}
 
-                <div className={styles['machine-status']}>
+                <div className={styles['machine-info']}>
                     { name && <p><strong>{name}</strong></p> }
                     { total !== 0 && <p>{`${total} lines`}</p> }
                 </div>
