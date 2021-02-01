@@ -8,7 +8,7 @@ const PortListing = ({ port, inuse, baudrate, controllerType, onClick }) => {
             <i className={`fa fab ${inuse ? 'fa-lock' : 'fa-lock-open'}`} />
             <div className={styles.NavbarPortListingInfo}>
                 <div className={styles.NavbarPortListingPortLabel}>{ port }</div>
-                <div className={styles.NavbarPortListingPortManufacturer}>{controllerType} at { baudrate } baud</div>
+                <div className={styles.NavbarPortListingPortManufacturer}>use {controllerType} at { baudrate } baud</div>
             </div>
         </button>
     );
