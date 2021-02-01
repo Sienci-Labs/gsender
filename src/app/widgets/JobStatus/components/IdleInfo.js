@@ -9,7 +9,7 @@ import styles from './IdleInfo.styl';
  * @param {Object} state Default state given from parent component
  */
 const IdleInfo = ({ state }) => {
-    const { bbox: { delta }, units, total, remainingTime, fileName } = state;
+    const { bbox: { delta }, units, total, remainingTime, fileName, port } = state;
 
     /**
      * Format given time value to display minutes and seconds
@@ -31,27 +31,25 @@ const IdleInfo = ({ state }) => {
         return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
     };
 
-    return fileName
-        ? (
-            <div className={styles['idle-info']}>
-                <div>
-                    <span className={styles['file-name']}>{fileName}</span> ({total} lines)
-                </div>
-
-                <div>
-                    {`${delta.x}${units} (X) by ${delta.y}${units} (Y) by ${delta.z}${units} (Z)`}
-                </div>
-
-                <div>
-                    ~ {outputFormattedTime(remainingTime)} runtime
-                </div>
+    return port && fileName ? (
+        <div className={styles['idle-info']}>
+            <div>
+                <span className={styles['file-name']}>{fileName}</span> ({total} lines)
             </div>
-        )
-        : (
-            <div className={styles['idle-info']}>
-                <div>No File Loaded...</div>
+
+            <div>
+                {`${delta.x}${units} (X) by ${delta.y}${units} (Y) by ${delta.z}${units} (Z)`}
             </div>
-        );
+
+            <div>
+                ~ {outputFormattedTime(remainingTime)} runtime
+            </div>
+        </div>
+    ) : (
+        <div className={styles['idle-info']}>
+            <div>{port ? 'No File Loaded...' : 'Not Connected to a Machine...'}</div>
+        </div>
+    );
 };
 
 IdleInfo.propTypes = {

@@ -503,5 +503,7 @@
     "since start": "",
     "remaining": "",
     "Probe Commands": "",
-    "Tool Profile": ""
+    "Tool Profile": "",
+    "Pause Job": "",
+    "Stop Job": ""
 }

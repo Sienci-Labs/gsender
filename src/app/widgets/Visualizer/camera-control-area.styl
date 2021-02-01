@@ -1,0 +1,50 @@
+.control-area {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    left: 20px;
+}
+
+.camera-img {
+    width: 50px;
+    padding: 5px;
+    border-radius: 10px;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.camera-control-active {
+    background-color: darken(#53d277, 30%);
+}
+
+.camera-control {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 5px;
+    // background-color: rgba(255,255,255,0.3);
+    // padding: 1rem;
+    border-radius: 10px;
+}
+
+.machine-status {
+    p {
+        font-size: 1.5rem;
+        text-align: right;
+        color: white;
+    }
+}
+
+.machine-status-message {
+    font-size: 2rem;
+    align-self: center;
+    background-color: rgba(0,0,0,0.4);
+    padding: 25px 100px;
+    border-radius: 5px;
+    color: rgba(0,0,0,0.4);    
+}

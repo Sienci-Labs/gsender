@@ -46,7 +46,7 @@ const PERSPECTIVE_FAR = 2000;
 const ORTHOGRAPHIC_FOV = 35;
 const ORTHOGRAPHIC_NEAR = 0.001;
 const ORTHOGRAPHIC_FAR = 2000;
-const CAMERA_DISTANCE = 200; // Move the camera out a bit from the origin (0, 0, 0)
+const CAMERA_DISTANCE = 300; // Move the camera out a bit from the origin (0, 0, 0)
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 
@@ -173,6 +173,10 @@ class Visualizer extends Component {
         let needUpdateScene = false;
         const prevState = prevProps.state;
         const state = this.props.state;
+
+        // Update the visualizer size whenever the machine is running,
+        // to fill the empty area between it and the job status widget when necessary
+        this.resizeRenderer();
 
         // Enable or disable 3D view
         if ((prevProps.show !== this.props.show) && (this.props.show === true)) {
@@ -393,12 +397,23 @@ class Visualizer extends Component {
     }
 
     getVisibleHeight() {
+        const idleHeight = 175; // When the workflow status is idle, the job status widget's height is 100px
+        const runningHeight = 260; // When the workflow status is running or paused, the job status widget's height is 150px
+
+        const { workflow } = this.props.state;
+
+        let jobStatusWidgetHeight;
+
+        if (workflow.state === 'running' || workflow.state === 'paused') {
+            jobStatusWidgetHeight = runningHeight;
+        } else {
+            jobStatusWidgetHeight = idleHeight;
+        }
+
         const clientHeight = document.documentElement.clientHeight;
         const navbarHeight = 50;
-        const widgetHeaderHeight = 38;
-        const widgetFooterHeight = 38;
         const visibleHeight = (
-            clientHeight - navbarHeight - widgetHeaderHeight - widgetFooterHeight - 1
+            clientHeight - navbarHeight - jobStatusWidgetHeight - 1
         );
 
         return visibleHeight;
@@ -451,10 +466,13 @@ class Visualizer extends Component {
     }
 
     createLimits(xmin, xmax, ymin, ymax, zmin, zmax) {
+        const { currentTheme } = this.props.state;
+        const { limitColor } = currentTheme;
+
         const dx = Math.abs(xmax - xmin) || Number.MIN_VALUE;
         const dy = Math.abs(ymax - ymin) || Number.MIN_VALUE;
         const dz = Math.abs(zmax - zmin) || Number.MIN_VALUE;
-        const color = colornames('indianred');
+        const color = limitColor;
         const opacity = 0.5;
         const transparent = true;
         const dashed = true;
@@ -485,14 +503,19 @@ class Visualizer extends Component {
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const group = new THREE.Group();
 
+        const { currentTheme } = this.props.state;
+        const { gridColor, xAxisColor, yAxisColor, zAxisColor } = currentTheme;
+
         { // Coordinate Grid
             const gridLine = new GridLine(
                 gridCount * gridSpacing,
                 gridSpacing,
                 gridCount * gridSpacing,
                 gridSpacing,
-                colornames('blue'), // center line
-                colornames('gray 44') // grid
+                gridColor, // center line
+                gridColor // grid
+                // colornames('blue'), // center line
+                // colornames('gray 44') // grid
             );
             _each(gridLine.children, (o) => {
                 o.material.opacity = 0.15;
@@ -516,7 +539,7 @@ class Visualizer extends Component {
                 z: 0,
                 size: 20,
                 text: 'X',
-                color: colornames('red')
+                color: xAxisColor
             });
             const axisYLabel = new TextSprite({
                 x: 0,
@@ -524,7 +547,7 @@ class Visualizer extends Component {
                 z: 0,
                 size: 20,
                 text: 'Y',
-                color: colornames('green')
+                color: yAxisColor
             });
             const axisZLabel = new TextSprite({
                 x: 0,
@@ -532,7 +555,7 @@ class Visualizer extends Component {
                 z: axisLength + 10,
                 size: 20,
                 text: 'Z',
-                color: colornames('blue')
+                color: zAxisColor
             });
 
             group.add(axisXLabel);
@@ -550,6 +573,9 @@ class Visualizer extends Component {
         const textOffset = (units === IMPERIAL_UNITS) ? (25.4 / 5) : (10 / 5);
         const group = new THREE.Group();
 
+        const { currentTheme } = this.props.state;
+        const { xAxisColor, yAxisColor } = currentTheme;
+
         for (let i = -gridCount; i <= gridCount; ++i) {
             if (i !== 0) {
                 const textLabel = new TextSprite({
@@ -560,7 +586,7 @@ class Visualizer extends Component {
                     text: (units === IMPERIAL_UNITS) ? i : i * 10,
                     textAlign: 'center',
                     textBaseline: 'bottom',
-                    color: colornames('red'),
+                    color: xAxisColor,
                     opacity: 0.5
                 });
                 group.add(textLabel);
@@ -576,7 +602,7 @@ class Visualizer extends Component {
                     text: (units === IMPERIAL_UNITS) ? i : i * 10,
                     textAlign: 'right',
                     textBaseline: 'middle',
-                    color: colornames('green'),
+                    color: yAxisColor,
                     opacity: 0.5
                 });
                 group.add(textLabel);
@@ -596,9 +622,11 @@ class Visualizer extends Component {
         }
 
         const { state } = this.props;
-        const { units, objects } = state;
+        const { units, objects, currentTheme } = state;
         const width = this.getVisibleWidth();
         const height = this.getVisibleHeight();
+
+        const { backgroundColor, cuttingCoordinateLines } = currentTheme;
 
         // WebGLRenderer
         this.renderer = new THREE.WebGLRenderer({
@@ -608,7 +636,7 @@ class Visualizer extends Component {
         });
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.setClearColor(new THREE.Color(colornames('white')), 1);
+        this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
         this.renderer.setSize(width, height);
         this.renderer.clear();
 
@@ -730,7 +758,7 @@ class Visualizer extends Component {
 
         { // Cutting Pointer
             this.cuttingPointer = new CuttingPointer({
-                color: colornames('indianred'),
+                color: cuttingCoordinateLines,
                 diameter: 2
             });
             this.cuttingPointer.name = 'CuttingPointer';
@@ -959,7 +987,9 @@ class Visualizer extends Component {
         // Remove previous G-code object
         this.unload();
 
-        this.visualizer = new GCodeVisualizer();
+        const { currentTheme } = this.props.state;
+
+        this.visualizer = new GCodeVisualizer(currentTheme);
 
         const obj = this.visualizer.render(gcode);
         obj.name = 'Visualizer';
@@ -993,6 +1023,31 @@ class Visualizer extends Component {
 
         // Update the scene
         this.updateScene();
+
+        switch (this.props.cameraPosition) {
+        case 'top':
+            this.toTopView();
+            break;
+
+        case '3d':
+            this.to3DView();
+            break;
+
+        case 'front':
+            this.toFrontView();
+            break;
+
+        case 'left':
+            this.toLeftSideView();
+            break;
+
+        case 'right':
+            this.toRightSideView();
+            break;
+
+        default:
+            this.toFrontView();
+        }
 
         (typeof callback === 'function') && callback({ bbox: bbox });
     }

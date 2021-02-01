@@ -341,7 +341,7 @@ class JobStatusWidget extends PureComponent {
         return (
             <Widget
                 className={classNames(styles['job-status-widget'])}
-                borderless
+                // borderless
             >
                 <Widget.Content className={classNames(styles['job-status-widget-content'])}>
                     <JobStatus

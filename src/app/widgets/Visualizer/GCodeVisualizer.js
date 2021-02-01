@@ -1,20 +1,21 @@
-import colornames from 'colornames';
+// import colornames from 'colornames';
 import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
 import log from 'app/lib/log';
 
-const defaultColor = new THREE.Color(colornames('lightgrey'));
-const motionColor = {
-    'G0': new THREE.Color(colornames('green')),
-    'G1': new THREE.Color(colornames('blue')),
-    'G2': new THREE.Color(colornames('deepskyblue')),
-    'G3': new THREE.Color(colornames('deepskyblue'))
-};
+// const defaultColor = new THREE.Color(colornames('lightgrey'));
+// const motionColor = {
+//     'G0': new THREE.Color(colornames('green')),
+//     'G1': new THREE.Color(colornames('blue')),
+//     'G2': new THREE.Color(colornames('deepskyblue')),
+//     'G3': new THREE.Color(colornames('deepskyblue'))
+// };
 
 class GCodeVisualizer {
-    constructor() {
+    constructor(theme) {
         this.group = new THREE.Object3D();
         this.geometry = new THREE.Geometry();
+        this.theme = theme;
 
         // Example
         // [
@@ -30,6 +31,17 @@ class GCodeVisualizer {
     }
 
     render(gcode) {
+        const { cuttingCoordinateLines, G0Color, G1Color, G2Color, G3Color } = this.theme;
+
+        const defaultColor = new THREE.Color(cuttingCoordinateLines);
+
+        const motionColor = {
+            'G0': new THREE.Color(G0Color),
+            'G1': new THREE.Color(G1Color),
+            'G2': new THREE.Color(G2Color),
+            'G3': new THREE.Color(G3Color)
+        };
+
         const toolpath = new Toolpath({
             // @param {object} modal The modal object.
             // @param {object} v1 A 3D vector of the start point.
@@ -127,6 +139,10 @@ class GCodeVisualizer {
         if (this.frames.length === 0) {
             return;
         }
+
+        const { cuttingCoordinateLines } = this.theme;
+
+        const defaultColor = new THREE.Color(cuttingCoordinateLines);
 
         frameIndex = Math.min(frameIndex, this.frames.length - 1);
         frameIndex = Math.max(frameIndex, 0);
