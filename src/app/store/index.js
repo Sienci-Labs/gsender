@@ -114,6 +114,24 @@ const normalizeState = (state) => {
         set(state, 'widgets.axes.axes', defaultAxes);
     }
 
+    // Get user tool definitions
+    const userTools = ensureArray(get(cnc.state, 'workspace.tools'));
+    const defaultTools = ensureArray(get(defaultState, 'workspace.tools'));
+    if (userTools.length > 0) {
+        set(state, 'workspace.tools', userTools);
+    } else {
+        set(state, 'workspace.tools', defaultTools);
+    }
+
+    // Get probe definitions
+    const userProbes = get(cnc.state, 'workspace.probeProfile');
+    const defaultProbes = get(defaultState, 'workspace.probeProfile');
+    if (userProbes) {
+        set(state, 'workspace.probeProfile', userProbes);
+    } else {
+        set(state, 'workspace.probeProfile', defaultProbes);
+    }
+
     return state;
 };
 

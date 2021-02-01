@@ -22,7 +22,45 @@ const defaultState = {
         },
         machineProfile: {
             id: null
-        }
+        },
+        probeProfile: {
+            xyThickness: 10,
+            zThickness: 15,
+            plateWidth: 50,
+            plateLength: 50,
+            functions: {
+                x: true,
+                y: true,
+                z: true
+            }
+        },
+        tools: [
+            {
+                metricDiameter: 6.35,
+                imperialDiameter: 0.25,
+                type: 'end mill'
+            },
+            {
+                metricDiameter: 3.175,
+                imperialDiameter: 0.125,
+                type: 'end mill'
+            },
+            {
+                metricDiameter: 9.525,
+                imperialDiameter: 0.375,
+                type: 'end mill'
+            },
+            {
+                metricDiameter: 12.7,
+                imperialDiameter: 0.5,
+                type: 'end mill'
+            },
+            {
+                metricDiameter: 15.875,
+                imperialDiameter: 0.625,
+                type: 'end mill'
+            }
+        ],
     },
     widgets: {
         axes: {
@@ -165,7 +203,8 @@ const defaultState = {
             probeCommand: 'G38.2',
             useTLO: false,
             probeDepth: 10,
-            probeFeedrate: 20,
+            probeFeedrate: 35,
+            probeFastFeedrate: 75,
             touchPlateHeight: 10,
             retractionDistance: 4
         },

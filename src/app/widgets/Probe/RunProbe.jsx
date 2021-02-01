@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Modal from 'app/components/Modal';
-import ToggleSwitch from 'app/components/ToggleSwitch';
 import i18n from 'app/lib/i18n';
 
 class RunProbe extends PureComponent {
@@ -11,9 +10,8 @@ class RunProbe extends PureComponent {
     };
 
     render() {
-        const { state, actions } = this.props;
-        const { useTLO } = state;
-        const probeCommands = actions.populateProbeCommands();
+        const { actions } = this.props;
+        const probeCommands = actions.generateProbeCommands();
         const content = probeCommands.join('\n');
 
         return (
@@ -22,14 +20,6 @@ class RunProbe extends PureComponent {
                     <Modal.Title>{i18n._('Probe')}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div style={{ marginBottom: 10 }}>
-                        <ToggleSwitch
-                            checked={useTLO}
-                            size="sm"
-                            onChange={actions.toggleUseTLO}
-                        />
-                        {i18n._('Apply tool length offset')}
-                    </div>
                     <pre style={{ minHeight: 240 }}>
                         <code>{content}</code>
                     </pre>
