@@ -166,6 +166,7 @@ class Visualizer extends Component {
             this.createScene(el);
             this.resizeRenderer();
         }
+        this.to3DView(); //Set default view to 3D (cameraPosition set to '3d' does not seem to set this)
     }
 
     componentDidUpdate(prevProps) {
@@ -1083,15 +1084,14 @@ class Visualizer extends Component {
         // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
         // A number representing a given button:
         // 0: main button pressed, usually the left button or the un-initialized state
-        const MAIN_BUTTON = 0;
-        const ROTATE = 0;
-        const PAN = 2;
+        const MAIN_BUTTON = 0, ROTATE = 0;
+        const SECOND_BUTTON = 2, PAN = 2;
 
         if (mode === CAMERA_MODE_ROTATE) {
             this.controls && this.controls.setMouseButtonState(MAIN_BUTTON, ROTATE);
         }
         if (mode === CAMERA_MODE_PAN) {
-            this.controls && this.controls.setMouseButtonState(MAIN_BUTTON, PAN);
+            this.controls && this.controls.setMouseButtonState(SECOND_BUTTON, PAN);
         }
     }
 

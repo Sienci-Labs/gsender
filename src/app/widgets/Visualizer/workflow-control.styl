@@ -44,7 +44,7 @@
     btn-mixin(color){
         @extend .workflow-btn;
 
-        background-color: rgba(color, 0.6);
+        background-color: rgba(color, 0.9);
         border: 2px solid darken(color, 30%);
 
         transition: 200ms ease-in-out;
@@ -58,7 +58,7 @@
         }
 
         &:not(:disabled):hover {
-            background-color: darken(color, 35%);
+            background-color: lighten(color, 25%);
             color: black;
             transition: 200ms ease-in-out;
         }
@@ -70,17 +70,17 @@
     }
 
     &-play {
-        color = #53D277;
+        color = #059669;
         btn-mixin(color)
     }
 
     &-pause {
-        color = #FAFB58;
+        color = #D97706;
         btn-mixin(color)
     }
 
     &-stop {
-        color = #FF9897;
-        btn-mixin(#FF9897)
+        color = #EF4444;
+        btn-mixin(color)
     }    
 }
