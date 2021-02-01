@@ -25,7 +25,7 @@ import WorkflowControl from './WorkflowControl';
 import CameraControlArea from './CameraControlArea';
 import Visualizer from './Visualizer';
 // import Dashboard from './Dashboard';
-import Notifications from './Notifications';
+// import Notifications from './Notifications';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
@@ -1053,7 +1053,7 @@ class VisualizerWidget extends PureComponent {
         };
         // const showDashboard = !capable.view3D && !showLoader;
         const showVisualizer = capable.view3D && !showLoader;
-        const showNotifications = showVisualizer && !!state.notification.type;
+        // const showNotifications = showVisualizer && !!state.notification.type;
 
         const { setCurrentTab } = this;
         const { currentTab, port } = this.state;
@@ -1108,14 +1108,14 @@ class VisualizerWidget extends PureComponent {
                             />
                         </div>
                     )}
-                    {showNotifications && (
+                    {/* {showNotifications && (
                         <Notifications
                             show={showNotifications}
                             type={state.notification.type}
                             data={state.notification.data}
                             onDismiss={actions.dismissNotification}
                         />
-                    )}
+                    )} */}
                 </Widget.Content>
             </Widget>
         );
