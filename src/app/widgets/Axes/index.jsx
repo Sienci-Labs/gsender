@@ -109,6 +109,21 @@ class AxesWidget extends PureComponent {
                 }
             });
         },
+        getXYJogDistance: () => {
+            const { jog } = this.state;
+            const { xyStep } = jog;
+            return xyStep;
+        },
+        getZJogDistance: () => {
+            const { jog } = this.state;
+            const { zStep } = jog;
+            return zStep;
+        },
+        getFeedrate: () => {
+            const { jog } = this.state;
+            const { feedrate } = jog;
+            return feedrate;
+        },
         getJogDistance: () => {
             const { units } = this.state;
 
@@ -314,7 +329,54 @@ class AxesWidget extends PureComponent {
                     }
                 };
             });
-        }
+        },
+        handleXYStepChange: (value) => {
+            const { jog } = this.state;
+            if (Number.isNaN(value)) {
+                value = this.props.value;
+            }
+            this.setState({
+                jog: {
+                    ...jog,
+                    xyStep: value
+                }
+            });
+        },
+        handleZStepChange: (value) => {
+            const { jog } = this.state;
+            if (Number.isNaN(value)) {
+                value = this.props.value;
+            }
+            this.setState({
+                jog: {
+                    ...jog,
+                    zStep: value
+                }
+            });
+        },
+        handleFeedrateChange: (value) => {
+            const { jog } = this.state;
+            if (Number.isNaN(value)) {
+                value = this.props.value;
+            }
+            this.setState({
+                jog: {
+                    ...jog,
+                    feedrate: value
+                }
+            });
+        },
+        changeMovementRates: (xyStep, zStep, feedrate) => {
+            const { jog } = this.state;
+            this.setState({
+                jog: {
+                    ...jog,
+                    xyStep: xyStep,
+                    zStep: zStep,
+                    feedrate: feedrate
+                }
+            });
+        },
     };
 
     shuttleControlEvents = {
@@ -406,17 +468,6 @@ class AxesWidget extends PureComponent {
                 overshoot: overshoot
             });
         },
-        changeMovementRates: (xyStep, zStep, feedrate) => {
-            const { jog } = this.state;
-            this.setState({
-                jog: {
-                    ...jog,
-                    xyStep: xyStep,
-                    zStep: zStep,
-                    feedrate: feedrate
-                }
-            });
-        }
     };
 
     controllerEvents = {

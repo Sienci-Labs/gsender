@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Keypad from './Keypad';
-import MDI from './MDI';
+import SpeedControls from './SpeedControls';
+import styles from './index.styl';
 
 const Axes = (props) => {
     const { state, actions } = props;
 
     return (
-        <div>
+        <div className={styles.jogWidget}>
             <Keypad
                 canClick={state.canClick}
                 units={state.units}
@@ -15,10 +16,7 @@ const Axes = (props) => {
                 jog={state.jog}
                 actions={actions}
             />
-            <MDI
-                canClick={state.canClick}
-                mdi={state.mdi}
-            />
+            <SpeedControls state={state} actions={actions} />
         </div>
     );
 };

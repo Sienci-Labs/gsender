@@ -1,0 +1,45 @@
+.input-wrapper {
+  display flex;
+  flex-direction: row;
+  width: 90%;
+
+
+.jog-widget {
+  button + button {
+    margin-left: 0;
+  }
+}
+
+  input {
+    text-align center;
+    width: 75%;
+    margin: 0;
+    padding: 0;
+    &:focus {
+      outline: none;
+    }
+
+  }
+}
+
+.control-wrapper {
+  display flex;
+  flex-direction column;
+  flex-wrap wrap;
+  span {
+    font-weight: bold;
+  }
+  button + button {
+    margin-left: 0;
+  }
+}
+
+.step-button  {
+  font-size: 1.2rem;
+  padding: 0;
+  margin: none;
+  color: #3e85c7;
+  background: none;
+  border: solid 1px #cccccc;
+  border-left: 0;
+}
