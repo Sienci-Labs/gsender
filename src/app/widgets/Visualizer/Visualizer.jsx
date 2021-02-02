@@ -166,7 +166,6 @@ class Visualizer extends Component {
             this.createScene(el);
             this.resizeRenderer();
         }
-        this.to3DView(); //Set default view to 3D (cameraPosition set to '3d' does not seem to set this)
     }
 
     componentDidUpdate(prevProps) {
@@ -648,6 +647,11 @@ class Visualizer extends Component {
         this.scene = new THREE.Scene();
 
         this.camera = this.createCombinedCamera(width, height);
+
+        //Set default camera position to 3D
+        this.camera.up.set(0, 0, 1);
+        this.camera.position.set(CAMERA_DISTANCE, -CAMERA_DISTANCE, CAMERA_DISTANCE);
+
         this.controls = this.createTrackballControls(this.camera, this.renderer.domElement);
 
         this.setCameraMode(state.cameraMode);
