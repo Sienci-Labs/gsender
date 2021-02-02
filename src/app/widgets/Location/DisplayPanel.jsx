@@ -1,10 +1,11 @@
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
-
+import _isEqual from 'lodash/isEqual';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
+import store from 'app/store';
 
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
@@ -52,6 +53,7 @@ class DisplayPanel extends PureComponent {
             [AXIS_B]: false,
             [AXIS_C]: false
         },
+        machineProfile: store.get('workspace.machineProfile')
     };
 
     handleSelect = (eventKey) => {
@@ -113,11 +115,29 @@ class DisplayPanel extends PureComponent {
         );
     };
 
+    /**
+     * Function to listen for store changes and re-render accordingly
+     */
+    updateMachineProfileFromStore = () => {
+        const machineProfile = store.get('workspace.machineProfile');
+
+        if (!machineProfile || _isEqual(machineProfile, this.state.machineProfile)) {
+            return;
+        }
+
+        this.setState({ machineProfile });
+    };
+
+    componentDidMount() {
+        store.on('change', this.updateMachineProfileFromStore);
+    }
+
     render() {
         const { axes, actions, canClick } = this.props;
         const hasAxisX = includes(axes, AXIS_X);
         const hasAxisY = includes(axes, AXIS_Y);
         const hasAxisZ = includes(axes, AXIS_Z);
+        const machineProfile = this.state.machineProfile;
 
         return (
             <Panel className={styles.displayPanel}>
@@ -160,19 +180,19 @@ class DisplayPanel extends PureComponent {
                         />
                         <ControlButton
                             label={i18n._('Home')}
-                            icon={() => <HomeIcon fill={(canClick) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
+                            icon={() => <HomeIcon fill={(canClick && machineProfile.endstops) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
                             onClick={() => {
                                 controller.command('homing');
                             }}
-                            disabled={!canClick}
+                            disabled={!canClick || !machineProfile.endstops}
                         />
                         <ControlButton
                             label={i18n._('Go Home')}
-                            icon={() => <ChartIcon fill={(canClick) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
+                            icon={() => <ChartIcon fill={(canClick && machineProfile.endstops) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
                             onClick={() => {
                                 controller.command('gcode', 'G28 G91'); //Go to Home Position
                             }}
-                            disabled={!canClick}
+                            disabled={!canClick || !machineProfile.endstops}
                         />
                     </div>
                 </div>
