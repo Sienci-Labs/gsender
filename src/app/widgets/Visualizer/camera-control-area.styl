@@ -1,8 +1,7 @@
 .control-area {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
     position: absolute;
     top: 60px;
     right: 20px;
@@ -25,29 +24,35 @@
 
 .camera-control {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    align-self: flex-start;
+    grid-template-columns: 33% 33% 34%;
     grid-gap: 5px;
-    // background-color: rgba(255,255,255,0.3);
-    // padding: 1rem;
+    max-width: 160px;
     border-radius: 10px;
 }
 
-.machine-status {
+.machine-info {
     p {
-        font-size: 1.5rem;
         text-align: right;
         color: white;
+        word-break: break-all;
+        font-size: clamp(0.8rem, 1vw, 1.6rem);
     }
 }
 
 .machine-status-message {
-    font-size: 2rem;
-    align-self: center;
-    padding: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: flex-start;
+    justify-self: center;
+    font-size: clamp(1rem, 1.15vw, 2rem);
+    height: 10vh
+    max-height: 70px
     border-radius: 5px;
+    margin-top: 15px;
     width: 100%;
     max-width: 255px;
-    text-align: center;
 }
 
 .machine {
@@ -58,9 +63,15 @@
         color: rgba(textColor, 0.8);
     }
 
+    &-Disconnected {
+        bgColor = grey;
+        color = white;
+        status-mixin(bgColor, color)
+    }
+
     &-Idle {
-        bgColor = rgb(255,255,255);
-        color = rgb(255, 255, 255);
+        bgColor = white;
+        color = black;
         status-mixin(bgColor, color)
     }
 
