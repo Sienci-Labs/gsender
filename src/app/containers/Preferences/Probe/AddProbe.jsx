@@ -16,7 +16,6 @@ const AddProbe = ({ state, actions }) => {
                     <label htmlFor="xProbe">X Probe</label>
                     <ToggleSwitch
                         checked={functions.x}
-                        variantColor="green"
                         onChange={() => probeActions.handleToggleChange('x')}
                     />
                 </div>
@@ -24,7 +23,6 @@ const AddProbe = ({ state, actions }) => {
                     <label htmlFor="yProbe">Y Probe</label>
                     <ToggleSwitch
                         checked={functions.y}
-                        variantColor="green"
                         onChange={() => probeActions.handleToggleChange('y')}
                     />
                 </div>
@@ -32,7 +30,6 @@ const AddProbe = ({ state, actions }) => {
                     <label htmlFor="zProbe">Z Probe</label>
                     <ToggleSwitch
                         checked={functions.z}
-                        variantColor="green"
                         onChange={() => probeActions.handleToggleChange('z')}
                     />
                 </div>
