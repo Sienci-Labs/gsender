@@ -29,9 +29,6 @@ class Console extends PureComponent {
                 ref={node => {
                     if (node) {
                         this.terminal = node;
-                        console.log('yes node');
-                    } else {
-                        console.log('No node');
                     }
                 }}
                 cols={state.terminal.cols}

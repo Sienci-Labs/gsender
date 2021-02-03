@@ -30,7 +30,7 @@ class Probe extends PureComponent {
         const displayUnits = (units === METRIC_UNITS) ? i18n._('mm') : i18n._('in');
 
         const { functions } = touchplate;
-        const probeCommand = availableProbeCommands[selectedProbeCommand];
+        const probeCommand = availableProbeCommands[selectedProbeCommand] || false;
 
         return (
             <div className={styles.probeFlex}>
@@ -60,7 +60,7 @@ class Probe extends PureComponent {
                         </div>
                     }
                     {
-                        probeCommand.tool &&
+                        probeCommand && probeCommand.tool &&
                         <div className="form-group">
                             <label className="control-label">{i18n._('Tool Profile')}</label>
                             <select className="form-control">

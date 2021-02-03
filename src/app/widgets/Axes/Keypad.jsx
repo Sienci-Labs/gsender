@@ -121,28 +121,7 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, units, axes, jog, actions } = this.props;
-        const canChangeStep = canClick;
-        const imperialJogDistances = ensureArray(jog.imperial.distances);
-        const metricJogDistances = ensureArray(jog.metric.distances);
-        const imperialJogSteps = [
-            ...imperialJogDistances,
-            ...IMPERIAL_STEPS
-        ];
-        const metricJogSteps = [
-            ...metricJogDistances,
-            ...METRIC_STEPS
-        ];
-        const canStepForward = canChangeStep && (
-            (units === IMPERIAL_UNITS && (jog.imperial.step < imperialJogSteps.length - 1)) ||
-            (units === METRIC_UNITS && (jog.metric.step < metricJogSteps.length - 1))
-        );
-        const canStepBackward = canChangeStep && (
-            (units === IMPERIAL_UNITS && (jog.imperial.step > 0)) ||
-            (units === METRIC_UNITS && (jog.metric.step > 0))
-        );
-        console.log(canStepBackward);
-        console.log(canStepForward);
+        const { canClick, axes, jog, actions } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
