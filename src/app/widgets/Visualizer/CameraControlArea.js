@@ -40,7 +40,7 @@ export default class ControlArea extends Component {
          */
         const machineStateRender = () => {
             if (port) {
-                if (state.status.activeState === 'Alarm') {
+                if (state.status?.activeState === 'Alarm') {
                     return (
                         <Tooltip placement="bottom" content="Click to Unlock Machine" hideOnClick>
                             <div
@@ -56,7 +56,7 @@ export default class ControlArea extends Component {
                         </Tooltip>
                     );
                 } else {
-                    return state.status.activeState //Show disconnected until machine connection process is finished, otherwise an empty div is shown
+                    return state.status?.activeState //Show disconnected until machine connection process is finished, otherwise an empty div is shown
                         ? <div className={styles[`machine-${state.status.activeState}`]}>{state.status.activeState}</div>
                         : <div className={styles['machine-Disconnected']}>Disconnected</div>;
                 }
