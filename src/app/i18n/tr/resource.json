@@ -310,7 +310,6 @@
     "Distance Overshoot: {{overshoot}}x": "Mesafeyi ileriye at: {{overshoot}}x",
     "Refresh": "Yenile",
     "Error opening serial port '{{- port}}'": "Seri bağlantı noktası açılırken hata oluştu '{{- port}}'",
-    "No serial connection": "Seri bağlantı yok",
     "Connected to {{-port}} with a baud rate of {{baudrate}}": "Şuna Bağlan {{-port}} bir band hızı ile {{baudrate}}",
     "Console": "Konsol",
     "URL not configured": "URL yapılandırılmadı",
@@ -505,5 +504,6 @@
     "Pause Job": "",
     "Stop Job": "",
     "Speed": "",
-    "Jog Control": ""
+    "Jog Control": "",
+    "Not connected to a device": ""
 }

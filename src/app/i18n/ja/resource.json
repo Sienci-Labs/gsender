@@ -310,7 +310,6 @@
     "Distance Overshoot: {{overshoot}}x": "オーバーシュート距離: {{overshoot}}x",
     "Refresh": "表示更新",
     "Error opening serial port '{{- port}}'": "シリアルポート '{{- port}}' を開くのに失敗しました",
-    "No serial connection": "シリアル接続がありません。",
     "Connected to {{-port}} with a baud rate of {{baudrate}}": "{{-port}} にボーレート {{baudrate}} で接続中",
     "Console": "コンソール",
     "URL not configured": "URLが設定されていません",
@@ -505,5 +504,6 @@
     "Pause Job": "",
     "Stop Job": "",
     "Speed": "",
-    "Jog Control": ""
+    "Jog Control": "",
+    "Not connected to a device": ""
 }

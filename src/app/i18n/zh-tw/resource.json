@@ -310,7 +310,6 @@
     "Distance Overshoot: {{overshoot}}x": "超調量距離：{{overshoot}}x",
     "Refresh": "重新整理",
     "Error opening serial port '{{- port}}'": "",
-    "No serial connection": "",
     "Connected to {{-port}} with a baud rate of {{baudrate}}": "",
     "Console": "控制台",
     "URL not configured": "",
@@ -505,5 +504,6 @@
     "Pause Job": "",
     "Stop Job": "",
     "Speed": "",
-    "Jog Control": ""
+    "Jog Control": "",
+    "Not connected to a device": ""
 }

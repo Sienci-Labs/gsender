@@ -75,6 +75,13 @@ class NavbarConnection extends PureComponent {
                             <div>{ controllerType }</div>
                         </div>
                 }
+                {
+                    connected &&
+                    <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
+                        <i className="fa fa-unlink" />
+                        Disconnect
+                    </button>
+                }
                 <div className={styles.NavbarConnectionDropdownList}>
                     {
                         !connected && <h5>Available Devices</h5>
@@ -96,13 +103,6 @@ class NavbarConnection extends PureComponent {
                                     onClick={() => actions.onClickPortListing(port)}
                                 />)
                         )
-                    }
-                    {
-                        connected &&
-                        <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
-                            <i className="fa fa-unlink" />
-                            Disconnect
-                        </button>
                     }
                 </div>
             </div>
