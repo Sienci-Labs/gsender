@@ -206,8 +206,8 @@ const defaultState = {
             probeCommand: 'G38.2',
             useTLO: false,
             probeDepth: 10,
-            probeFeedrate: 35,
-            probeFastFeedrate: 75,
+            probeFeedrate: 75,
+            probeFastFeedrate: 150,
             touchPlateHeight: 10,
             retractionDistance: 4
         },
