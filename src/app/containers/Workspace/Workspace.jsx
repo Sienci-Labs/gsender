@@ -213,10 +213,10 @@ class Workspace extends PureComponent {
     };
 
     resizeDefaultContainer = () => {
-        const sidebar = document.querySelector('#sidebar');
+        // const sidebar = document.querySelector('#sidebar');
         const primaryContainer = ReactDOM.findDOMNode(this.primaryContainer);
         const primaryToggler = ReactDOM.findDOMNode(this.primaryToggler);
-        const secondaryToggler = ReactDOM.findDOMNode(this.secondaryToggler);
+        // const secondaryToggler = ReactDOM.findDOMNode(this.secondaryToggler);
         const defaultContainer = ReactDOM.findDOMNode(this.defaultContainer);
         const { showPrimaryContainer } = this.state;
 
@@ -235,11 +235,13 @@ class Workspace extends PureComponent {
         }
 
         if (showPrimaryContainer) {
-            defaultContainer.style.left = primaryContainer.offsetWidth + sidebar.offsetWidth + 'px';
+            // defaultContainer.style.left = primaryContainer.offsetWidth + sidebar.offsetWidth + 'px';
+            defaultContainer.style.left = primaryContainer.offsetWidth + 'px';
         } else {
-            defaultContainer.style.left = primaryToggler.offsetWidth + sidebar.offsetWidth + 'px';
+            // defaultContainer.style.left = primaryToggler.offsetWidth + sidebar.offsetWidth + 'px';
+            defaultContainer.style.left = primaryToggler.offsetWidth + 'px';
         }
-        defaultContainer.style.right = secondaryToggler.offsetWidth + 'px';
+        // defaultContainer.style.right = secondaryToggler.offsetWidth + 'px';
         // Publish a 'resize' event
         pubsub.publish('resize'); // Also see "widgets/Visualizer"
     };
