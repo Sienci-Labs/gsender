@@ -25,11 +25,7 @@ export default class Options extends Component {
      * Function to handle preset machine profile select
      * @param {Object} options {value} The ID of the profile which is the selected option's value
      */
-    handleSelect = ({ value }) => {
-        if (!value) {
-            return;
-        }
-
+    handleSelect = ({ value = 0 }) => {
         const { machineProfiles } = this.state;
 
         const foundProfile = machineProfiles.find(profile => profile.id === value);
@@ -162,54 +158,56 @@ export default class Options extends Component {
                     <label htmlFor="">Cutting Area</label>
 
                     <table className={styles['cutting-area']}>
-                        <tr>
-                            <td className={styles.label}>Width</td>
-                            <td className={styles.value}>
-                                <div className="input-group" style={{ width: '156px' }}>
-                                    <input
-                                        type="text"
-                                        name="width"
-                                        className="form-control"
-                                        style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
-                                        value={width}
-                                        onChange={this.handleChange}
-                                    />
-                                    <span className="input-group-addon">{units}</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className={styles.label}>Depth</td>
-                            <td className={styles.value}>
-                                <div className="input-group" style={{ width: '156px' }}>
-                                    <input
-                                        type="text"
-                                        name="depth"
-                                        className="form-control"
-                                        style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
-                                        value={depth}
-                                        onChange={this.handleChange}
-                                    />
-                                    <span className="input-group-addon">{units}</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className={styles.label}>Height</td>
-                            <td className={styles.value}>
-                                <div className="input-group" style={{ width: '156px' }}>
-                                    <input
-                                        type="text"
-                                        name="height"
-                                        className="form-control"
-                                        style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
-                                        value={height}
-                                        onChange={this.handleChange}
-                                    />
-                                    <span className="input-group-addon">{units}</span>
-                                </div>
-                            </td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td className={styles.label}>Width</td>
+                                <td className={styles.value}>
+                                    <div className="input-group" style={{ width: '156px' }}>
+                                        <input
+                                            type="text"
+                                            name="width"
+                                            className="form-control"
+                                            style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
+                                            value={width}
+                                            onChange={this.handleChange}
+                                        />
+                                        <span className="input-group-addon">{units}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className={styles.label}>Depth</td>
+                                <td className={styles.value}>
+                                    <div className="input-group" style={{ width: '156px' }}>
+                                        <input
+                                            type="text"
+                                            name="depth"
+                                            className="form-control"
+                                            style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
+                                            value={depth}
+                                            onChange={this.handleChange}
+                                        />
+                                        <span className="input-group-addon">{units}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className={styles.label}>Height</td>
+                                <td className={styles.value}>
+                                    <div className="input-group" style={{ width: '156px' }}>
+                                        <input
+                                            type="text"
+                                            name="height"
+                                            className="form-control"
+                                            style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
+                                            value={height}
+                                            onChange={this.handleChange}
+                                        />
+                                        <span className="input-group-addon">{units}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
 
