@@ -116,65 +116,87 @@ class JobStatusWidget extends PureComponent {
                     unitsState = { units: units };
                 }
 
-                const { activeState } = state.status;
-
-                //Set the paused time once the machine is paused
-                if (activeState === 'Hold') {
-                    this.setState(prevState => ({
-                        controller: {
-                            ...prevState.controller,
-                            type: type,
-                            state: { ...state }
-                        },
-                        ...unitsState,
-                        pausedTime: Date.now()
-                    }));
-
-                // Set the paused time back to 0 when machine is idle
-                } else if (activeState === 'Idle') {
-                    this.setState(prevState => ({
-                        controller: {
-                            ...prevState.controller,
-                            type: type,
-                            state: { ...state }
-                        },
-                        ...unitsState,
-                        pausedTime: 0,
-                    }));
-
-                // Calculate the time difference from the paused time to current time
-                // then subtract it from the elapsed time given by the machine
-                } else {
-                    const { pausedTime, elapsedTime, controller: { state: prevState } } = this.state;
-
-                    // If the previous state of the machine was on hold, perform the calculation
-                    if (prevState.status.activeState !== 'Run') {
-                        const now = Date.now();
-
-                        const diff = pausedTime === 0 ? pausedTime : now - pausedTime;
-
-                        this.setState(prevState => ({
-                            controller: {
-                                ...prevState.controller,
-                                type: type,
-                                state: { ...state }
-                            },
-                            ...unitsState,
-                            elapsedTime: elapsedTime - diff,
-                            pausedTime: 0,
-                        }));
-                    } else {
-                        this.setState(prevState => ({
-                            controller: {
-                                ...prevState.controller,
-                                type: type,
-                                state: { ...state },
-                            },
-                            ...unitsState,
-                        }));
+                this.setState(prevState => ({
+                    controller: {
+                        ...prevState.controller,
+                        type: type,
+                        state: { ...state, ...unitsState }
                     }
-                }
+                }));
             }
+            // // Grbl
+            // if (type === GRBL) {
+            //     const { parserstate } = { ...state };
+            //     const { modal = {} } = { ...parserstate };
+            //     const units = {
+            //         'G20': IMPERIAL_UNITS,
+            //         'G21': METRIC_UNITS
+            //     }[modal.units] || this.state.units;
+
+            //     let unitsState = {};
+            //     if (this.state.units !== units) {
+            //         unitsState = { units: units };
+            //     }
+
+            //     const { activeState } = state.status;
+
+            //     //Set the paused time once the machine is paused
+            //     if (activeState === 'Hold') {
+            //         this.setState(prevState => ({
+            //             controller: {
+            //                 ...prevState.controller,
+            //                 type: type,
+            //                 state: { ...state }
+            //             },
+            //             ...unitsState,
+            //             pausedTime: Date.now()
+            //         }));
+
+            //     // Set the paused time back to 0 when machine is idle
+            //     } else if (activeState === 'Idle') {
+            //         this.setState(prevState => ({
+            //             controller: {
+            //                 ...prevState.controller,
+            //                 type: type,
+            //                 state: { ...state }
+            //             },
+            //             ...unitsState,
+            //             pausedTime: 0,
+            //         }));
+
+            //     // Calculate the time difference from the paused time to current time
+            //     // then subtract it from the elapsed time given by the machine
+            //     } else {
+            //         const { pausedTime, elapsedTime, controller: { state: prevState } } = this.state;
+
+            //         // If the previous state of the machine was on hold, perform the calculation
+            //         if (prevState.status.activeState !== 'Run') {
+            //             const now = Date.now();
+
+            //             const diff = pausedTime === 0 ? pausedTime : now - pausedTime;
+
+            //             this.setState(prevState => ({
+            //                 controller: {
+            //                     ...prevState.controller,
+            //                     type: type,
+            //                     state: { ...state }
+            //                 },
+            //                 ...unitsState,
+            //                 elapsedTime: elapsedTime - diff,
+            //                 pausedTime: 0,
+            //             }));
+            //         } else {
+            //             this.setState(prevState => ({
+            //                 controller: {
+            //                     ...prevState.controller,
+            //                     type: type,
+            //                     state: { ...state },
+            //                 },
+            //                 ...unitsState,
+            //             }));
+            //         }
+            //     }
+            // }
         }
     };
 
