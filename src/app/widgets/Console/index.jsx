@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import React, { PureComponent } from 'react';
 import uuid from 'uuid';
-import settings from 'app/config/settings';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
@@ -79,8 +78,7 @@ class ConsoleWidget extends PureComponent {
             this.setState({ port: port });
 
             if (this.terminal) {
-                const { productName, version } = settings;
-                this.terminal.writeln(color.white.bold(`${productName} ${version} [${controller.type}]`));
+                this.terminal.writeln(color.white.bold(`Sienci Sender - [${controller.type}]`));
                 this.terminal.writeln(color.white(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: color.yellowBright(port), baudrate: color.blueBright(baudrate) })));
             }
         },
