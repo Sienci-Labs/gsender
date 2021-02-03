@@ -23,7 +23,8 @@ class ConsoleWidget extends PureComponent {
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object,
-        embedded: PropTypes.bool
+        embedded: PropTypes.bool,
+        active: PropTypes.bool
     };
 
     senderId = uuid.v4();
@@ -192,7 +193,7 @@ class ConsoleWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId, embedded } = this.props;
+        const { widgetId, embedded, active } = this.props;
         const { minimized, isFullscreen } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const state = {
@@ -201,6 +202,9 @@ class ConsoleWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
+
+        console.log(active);
+        active && this.resizeTerminal();
 
         return (
             <Widget fullscreen={isFullscreen}>

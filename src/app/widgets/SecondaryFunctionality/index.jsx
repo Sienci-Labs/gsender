@@ -195,6 +195,7 @@ class SecondaryFunctionality extends PureComponent {
                                         sortable={sortable}
                                         widgetId={tab.widgetId}
                                         embedded
+                                        active={active}
                                     />
                                 </TabbedWidget.ChildComponent>
                             );
