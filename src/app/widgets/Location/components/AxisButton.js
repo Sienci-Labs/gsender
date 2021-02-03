@@ -72,7 +72,7 @@ AxisButton.propTypes = {
 };
 
 AxisButton.defaultProps = {
-    label: 'Set'
+    label: 'Zero'
 };
 
 export default AxisButton;
