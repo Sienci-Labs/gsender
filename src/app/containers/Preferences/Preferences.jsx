@@ -19,18 +19,22 @@ class PreferencesPage extends PureComponent {
             selectedMenu: 0,
             menu: [
                 {
+                    id: 0,
                     label: 'General',
                     component: GeneralSettings
                 },
                 {
+                    id: 1,
                     label: 'Tools',
                     component: ToolSettings
                 },
                 {
+                    id: 2,
                     label: 'Machine Profiles',
                     component: MachineProfiles
                 },
                 {
+                    id: 3,
                     label: 'Probe',
                     component: ProbeSettings
                 }
@@ -241,10 +245,10 @@ class PreferencesPage extends PureComponent {
                                 ))
                             }
                         </div>
-                        <div className={ styles.preferencesOptions }>
+                        <div className={styles.preferencesOptions}>
                             {
                                 menu.map((menuItem, index) => (
-                                    <div>
+                                    <div key={menuItem.id}>
                                         { <menuItem.component
                                             actions={actions}
                                             state={state}
