@@ -310,7 +310,6 @@
     "Distance Overshoot: {{overshoot}}x": "Abstandsüberschreitung: {{overshoot}}x",
     "Refresh": "Aktualisieren",
     "Error opening serial port '{{- port}}'": "Fehler beim Öffnen des seriellen Ports '{{- port}}'",
-    "No serial connection": "Keine serielle Verbindung",
     "Connected to {{-port}} with a baud rate of {{baudrate}}": "Verbunden mit dem seriellen Port {{-port}} mit einer Baud-Rate von {{baudrate}}",
     "Console": "Konsole",
     "URL not configured": "URL nicht konfiguriert",
@@ -505,5 +504,6 @@
     "Pause Job": "",
     "Stop Job": "",
     "Speed": "",
-    "Jog Control": ""
+    "Jog Control": "",
+    "Not connected to a device": ""
 }

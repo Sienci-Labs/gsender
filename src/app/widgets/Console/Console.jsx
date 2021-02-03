@@ -19,7 +19,7 @@ class Console extends PureComponent {
         if (!port) {
             return (
                 <div className={styles.noSerialConnection}>
-                    {i18n._('No serial connection')}
+                    {i18n._('Not connected to a device')}
                 </div>
             );
         }

@@ -54,8 +54,7 @@ class NavbarConnection extends PureComponent {
 
     render() {
         const { state, actions } = this.props;
-        const { ports, connecting, loading, connected, baudrate, controllerType, alertMessage, port } = state;
-        const canRefresh = !loading && !connected;
+        const { ports, connecting, connected, baudrate, controllerType, alertMessage, port } = state;
 
         const iconState = this.getIconState(connected, connecting, alertMessage);
 
@@ -75,6 +74,13 @@ class NavbarConnection extends PureComponent {
                             <div className={styles.portLabel}>{ port }</div>
                             <div>{ controllerType }</div>
                         </div>
+                }
+                {
+                    connected &&
+                    <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
+                        <i className="fa fa-unlink" />
+                        Disconnect
+                    </button>
                 }
                 <div className={styles.NavbarConnectionDropdownList}>
                     {
@@ -97,20 +103,6 @@ class NavbarConnection extends PureComponent {
                                     onClick={() => actions.onClickPortListing(port)}
                                 />)
                         )
-                    }
-                    {
-                        !connected && !connecting && canRefresh &&
-                        <button type="button" className={styles.refreshButton} onClick={actions.handleRefreshPorts}>
-                            <i className="fa fa-refresh" />
-                            Refresh Ports
-                        </button>
-                    }
-                    {
-                        connected &&
-                        <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
-                            <i className="fa fa-unlink" />
-                            Disconnect
-                        </button>
                     }
                 </div>
             </div>
