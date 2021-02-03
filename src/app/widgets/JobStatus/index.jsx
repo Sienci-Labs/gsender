@@ -54,7 +54,10 @@ class JobStatusWidget extends PureComponent {
     controllerEvents = {
         'serialport:open': (options) => {
             const { port } = options;
-            this.setState({ port: port });
+            this.setState({
+                port: port,
+                connected: true,
+            });
         },
         'serialport:close': (options) => {
             const initialState = this.getInitialState();
@@ -205,6 +208,7 @@ class JobStatusWidget extends PureComponent {
             spindleSpeed: this.config.get('speed', 1000),
             probeFeedrate: Number(this.config.get('probeFeedrate') || 0).toFixed(3) * 1,
             isFullscreen: false,
+            connected: false,
             workflow: {
                 state: controller.workflow.state
             },

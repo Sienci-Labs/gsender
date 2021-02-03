@@ -15,7 +15,7 @@ const PortListing = ({ port, inuse, baudrate, controllerType, onClick }) => {
 };
 
 PortListing.propTypes = {
-    port: PropTypes.number,
+    port: PropTypes.string,
     inuse: PropTypes.bool,
     baudrate: PropTypes.number,
     controllerType: PropTypes.string,

@@ -9,7 +9,7 @@ import styles from './IdleInfo.styl';
  * @param {Object} state Default state given from parent component
  */
 const IdleInfo = ({ state }) => {
-    const { bbox: { delta }, units, total, remainingTime, fileName, port } = state;
+    const { bbox: { delta }, units, total, remainingTime, fileName, connected } = state;
 
     /**
      * Format given time value to display minutes and seconds
@@ -31,7 +31,7 @@ const IdleInfo = ({ state }) => {
         return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
     };
 
-    return port && fileName ? (
+    return connected && fileName ? (
         <div className={styles['idle-info']}>
             <div>
                 <span className={styles['file-name']}>{fileName}</span> ({total} lines)
@@ -47,7 +47,7 @@ const IdleInfo = ({ state }) => {
         </div>
     ) : (
         <div className={styles['idle-info']}>
-            <div>{port ? 'No File Loaded...' : 'Not Connected to a Machine...'}</div>
+            <div>{connected ? 'No File Loaded...' : 'Not Connected to a Machine...'}</div>
         </div>
     );
 };

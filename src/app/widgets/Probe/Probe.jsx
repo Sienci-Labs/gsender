@@ -50,7 +50,7 @@ class Probe extends PureComponent {
                         </select>
                     </div>
                     {
-                        probeCommand.safe &&
+                        false && probeCommand.safe &&
                         <div className="form-group">
                             <div className={styles.rowSpread}>
                                 <label htmlFor="exampleInputEmail2">Use Safe Probe:</label>
