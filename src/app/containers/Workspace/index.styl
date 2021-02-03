@@ -1,6 +1,10 @@
 @import "../variables";
 
 .workspace {
+    height: 92vh;
+    overflow-y: overlay;
+
+
     .dropzone-overlay {
         position: fixed;
         top: $navbar-height;
@@ -34,10 +38,12 @@
         display: table;
         width: 100%;
         height: 'calc(100vh - %s)' % ($navbar-height);
+        background-color: #d1d5db;
     }
     .workspace-table-row {
         display: table-row;
     }
+
 
     .primary-container,
     .secondary-container,
@@ -46,6 +52,7 @@
     .default-container {
         display: table-cell;
         position: relative;
+        height: 60vh;
     }
     .primary-container {
         // border-right: 1px solid #ccc;
@@ -94,4 +101,8 @@
             bottom: 0;
         }
     }
+}
+
+.workspace::-webkit-scrollbar {
+  display: none;
 }
