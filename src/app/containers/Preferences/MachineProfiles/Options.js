@@ -4,11 +4,12 @@ import pubsub from 'pubsub-js';
 import _isEqual from 'lodash/isEqual';
 import ensureArray from 'ensure-array';
 
-import { Input } from 'app/components/FormControl';
+import ToggleSwitch from 'app/components/ToggleSwitch';
 import store from 'app/store';
 
 import styles from './options.styl';
 import defaultProfiles from './defaultMachineProfiles';
+
 
 /**
  * Machine Profile Options Component
@@ -81,17 +82,15 @@ export default class Options extends Component {
     }
 
     /**
-     * Function to handle checkbox changes
+     * Function to handle trigger changes to attributes within the current machine profile
      * @param {Object} e Changed element
      */
-    handleCheck = (e) => {
-        const { name, checked } = e.target;
-
+    handleToggle = (id) => {
         const { machineProfile } = this.state;
 
         store.replace('workspace.machineProfile', {
             ...machineProfile,
-            [name]: checked,
+            [id]: !machineProfile[id],
         });
     }
 
@@ -213,41 +212,33 @@ export default class Options extends Component {
 
                 <div className={styles['options-inputgroup']}>
                     <label htmlFor="">Endstops</label>
-                    <Input
-                        type="checkbox"
-                        name="endstops"
+                    <ToggleSwitch
                         checked={endstops}
-                        onChange={this.handleCheck}
+                        onChange={() => this.handleToggle('endstops')}
                     />
                 </div>
 
                 <div className={styles['options-inputgroup']}>
                     <label htmlFor="">Spindle</label>
-                    <Input
-                        type="checkbox"
-                        name="spindle"
+                    <ToggleSwitch
                         checked={spindle}
-                        onChange={this.handleCheck}
+                        onChange={() => this.handleToggle('spindle')}
                     />
                 </div>
 
                 <div className={styles['options-inputgroup']}>
                     <label htmlFor="">Coolant</label>
-                    <Input
-                        type="checkbox"
-                        name="coolant"
+                    <ToggleSwitch
                         checked={coolant}
-                        onChange={this.handleCheck}
+                        onChange={() => this.handleToggle('coolant')}
                     />
                 </div>
 
                 <div className={styles['options-inputgroup']}>
                     <label htmlFor="">Laser</label>
-                    <Input
-                        type="checkbox"
-                        name="laser"
+                    <ToggleSwitch
                         checked={laser}
-                        onChange={this.handleCheck}
+                        onChange={() => this.handleToggle('laser')}
                     />
                 </div>
             </div>
