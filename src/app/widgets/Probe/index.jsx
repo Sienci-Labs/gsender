@@ -767,6 +767,10 @@ class ProbeWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
+        console.log(controller.state);
+        const { status } = controller.state || {};
+        const { probeActive } = status || false;
+
         return (
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header embedded={embedded}>
@@ -845,6 +849,7 @@ class ProbeWidget extends PureComponent {
                     <Probe
                         state={state}
                         actions={actions}
+                        probeActive={probeActive}
                     />
                 </Widget.Content>
             </Widget>

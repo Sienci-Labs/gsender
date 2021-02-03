@@ -9,11 +9,13 @@ import {
     METRIC_UNITS
 } from '../../constants';
 import styles from './index.styl';
+import ProbeCircuitStatus from './ProbeCircuitStatus';
 
 class Probe extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
+        probeActive: PropTypes.bool
     };
 
     render() {
@@ -25,12 +27,10 @@ class Probe extends PureComponent {
             availableProbeCommands,
             selectedProbeCommand,
             useSafeProbeOption,
-            touchplate
         } = state;
         const displayUnits = (units === METRIC_UNITS) ? i18n._('mm') : i18n._('in');
-
-        const { functions } = touchplate;
         const probeCommand = availableProbeCommands[selectedProbeCommand] || false;
+        const { probeActive } = this.props;
 
         return (
             <div className={styles.probeFlex}>
@@ -50,7 +50,7 @@ class Probe extends PureComponent {
                         </select>
                     </div>
                     {
-                        false && probeCommand.safe &&
+                        probeCommand && probeCommand.safe &&
                         <div className="form-group">
                             <div className={styles.rowSpread}>
                                 <label htmlFor="exampleInputEmail2">Use Safe Probe:</label>
@@ -94,20 +94,7 @@ class Probe extends PureComponent {
                     </div>
                 </div>
                 <div className={styles.probeSettingsCol}>
-                    {
-                        (functions.x && functions.y) &&
-                            <div>
-                                <h6>XY Thickness:</h6>
-                                <div className="small">{touchplate.xyThickness}{displayUnits}</div>
-                            </div>
-                    }
-                    {
-                        functions.z &&
-                            <div>
-                                <h6>Z Thickness:</h6>
-                                <div className="small">{touchplate.zThickness}{displayUnits}</div>
-                            </div>
-                    }
+                    <ProbeCircuitStatus connected={canClick} probeActive={probeActive} />
                 </div>
             </div>
         );

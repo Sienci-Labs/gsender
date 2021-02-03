@@ -16,6 +16,7 @@ import {
     GRBL_ACTIVE_STATE_ALARM
 } from './constants';
 
+
 class GrblRunner extends events.EventEmitter {
     state = {
         status: {
@@ -32,6 +33,7 @@ class GrblRunner extends events.EventEmitter {
             },
             ov: [],
             alarmCode: null,
+            probeActive: false
         },
         parserstate: {
             modal: {
@@ -47,7 +49,7 @@ class GrblRunner extends events.EventEmitter {
             },
             tool: '',
             feedrate: '',
-            spindle: ''
+            spindle: '',
         }
     };
 
@@ -71,6 +73,7 @@ class GrblRunner extends events.EventEmitter {
 
         const result = this.parser.parse(data) || {};
         const { type, payload } = result;
+        const { raw } = payload;
 
         if (type === GrblLineParserResultStatus) {
             // Grbl v1.1
@@ -93,10 +96,13 @@ class GrblRunner extends events.EventEmitter {
                 });
             }
 
+            const probeActive = raw.includes('Pn:P');
+
             const nextState = {
                 ...this.state,
                 status: {
                     ...this.state.status,
+                    probeActive: probeActive,
                     ...payload
                 }
             };

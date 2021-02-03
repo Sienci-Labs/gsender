@@ -15,6 +15,7 @@ class GrblLineParserResultParserState {
     // * Grbl v1.1
     //   [GC:G0 G54 G17 G21 G90 G94 M0 M5 M9 T0 S0.0 F500.0]
     static parse(line) {
+        console.log(line);
         const r = line.match(/^\[(?:GC:)?((?:[a-zA-Z][0-9]+(?:\.[0-9]*)?\s*)+)\]$/);
         if (!r) {
             return null;
