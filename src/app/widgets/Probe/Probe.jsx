@@ -82,13 +82,13 @@ class Probe extends PureComponent {
                         <div className="col-xs-12">
                             <button
                                 type="button"
-                                className="btn btn-sm btn-default"
+                                className={styles.btnPrimary}
                                 onClick={() => {
                                     actions.openModal(MODAL_PREVIEW);
                                 }}
                                 disabled={!canClick}
                             >
-                                {i18n._('Probe')}
+                                {i18n._('Generate Probe Commands')}
                             </button>
                         </div>
                     </div>

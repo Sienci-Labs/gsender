@@ -13,7 +13,7 @@ const ProbeCircuitStatus = ({ probeActive, connected }) => {
                     <div className={cx(styles.probeIndicator, { [styles.circuitOpen]: !probeActive }, { [styles.circuitClosed]: probeActive })} />
                     <span>
                         {
-                            connected && probeActive ? 'Circuit closed' : 'Circuit open'
+                            connected && probeActive ? 'Touch detected' : 'No Touch'
                         }
                     </span>
                 </div>

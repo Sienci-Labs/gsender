@@ -505,5 +505,8 @@
     "Stop Job": "Stop Job",
     "Speed": "Speed",
     "Jog Control": "Jog Control",
-    "Not connected to a device": "Not connected to a device"
+    "Not connected to a device": "Not connected to a device",
+    "Generate Probe Commands": "Generate Probe Commands",
+    "Confirm Probe Connectivity": "Confirm Probe Connectivity",
+    "Confirm Router Position": "Confirm Router Position"
 }

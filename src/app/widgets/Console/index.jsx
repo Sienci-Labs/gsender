@@ -201,7 +201,6 @@ class ConsoleWidget extends PureComponent {
             ...this.actions
         };
 
-        console.log(active);
         active && this.resizeTerminal();
 
         return (

@@ -229,6 +229,11 @@ class ProbeWidget extends PureComponent {
         },
         runProbeCommands: (commands) => {
             controller.command('gcode', commands);
+        },
+        returnProbeConnectivity: () => {
+            const { status } = controller.state || {};
+            const { probeActive } = status || false;
+            return probeActive;
         }
     };
 
@@ -306,7 +311,7 @@ class ProbeWidget extends PureComponent {
                 touchPlateHeight: mapValueToUnits(this.config.get('touchPlateHeight'), units),
                 retractionDistance: mapValueToUnits(this.config.get('retractionDistance'), units)
             });
-        }
+        },
     };
 
     unitsDidChange = false;
@@ -767,7 +772,6 @@ class ProbeWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-        console.log(controller.state);
         const { status } = controller.state || {};
         const { probeActive } = status || false;
 
