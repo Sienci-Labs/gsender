@@ -19,13 +19,9 @@ import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
-// import PrimaryToolbar from './PrimaryToolbar';
-// import SecondaryToolbar from './SecondaryToolbar';
 import WorkflowControl from './WorkflowControl';
 import CameraControlArea from './CameraControlArea';
 import Visualizer from './Visualizer';
-// import Dashboard from './Dashboard';
-// import Notifications from './Notifications';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
@@ -226,9 +222,20 @@ class VisualizerWidget extends PureComponent {
             }));
 
             //If we aren't connected to a device, only load the gcode
-            //to the visualizer and make no call to the controller
+            //to the visualizer and make no calls to the controller
             if (!port) {
                 this.actions.loadGCode(name, gcode);
+
+                const lines = gcode.split('\n')
+                    .filter(line => (line.trim().length > 0));
+
+                const total = lines.length + 1; //Added one as that is the dwell line added after every gcode parse
+
+                this.setState({ total });
+
+                pubsub.publish('gcode:total', total);
+                pubsub.publish('gcode:fileName', name);
+
                 return;
             }
 
@@ -665,6 +672,7 @@ class VisualizerWidget extends PureComponent {
             }
 
             this.setState(state => ({
+                total,
                 gcode: {
                     ...state.gcode,
                     name,
@@ -829,7 +837,7 @@ class VisualizerWidget extends PureComponent {
                     })
                 }));
             }
-        }
+        },
     };
 
     pubsubTokens = [];
@@ -975,6 +983,7 @@ class VisualizerWidget extends PureComponent {
             },
             currentTab: 0,
             filename: '',
+            total: 0,
         };
     }
 
