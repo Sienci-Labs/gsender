@@ -42,10 +42,14 @@ export default class ControlArea extends Component {
 
         //Object to customize the message of the active machine state
         const message = {
-            Alarm: 'Alarm',
-            Run: 'Running',
             Idle: 'Idle',
+            Run: 'Running',
             Hold: 'Hold',
+            Jog: 'Jogging',
+            Check: 'Check',
+            Home: 'Homing',
+            Sleep: 'Sleep',
+            Alarm: 'Alarm',
             Disconnected: 'Disconnected',
         };
 
