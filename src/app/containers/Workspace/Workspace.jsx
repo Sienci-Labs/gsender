@@ -5,7 +5,6 @@ import pubsub from 'pubsub-js';
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
 import { withRouter } from 'react-router-dom';
-import { Button, ButtonGroup } from 'app/components/Buttons';
 import api from 'app/api';
 import {
     WORKFLOW_STATE_IDLE
@@ -509,27 +508,6 @@ class Workspace extends PureComponent {
                                     />
                                 </div>
                             </div>
-                            {hidePrimaryContainer && (
-                                <div
-                                    ref={node => {
-                                        this.primaryToggler = node;
-                                    }}
-                                    className={styles.primaryToggler}
-                                >
-                                    <ButtonGroup
-                                        btnSize="sm"
-                                        btnStyle="flat"
-                                    >
-                                        <Button
-                                            style={{ minWidth: 30 }}
-                                            compact
-                                            onClick={this.togglePrimaryContainer}
-                                        >
-                                            <i className="fa fa-chevron-right" />
-                                        </Button>
-                                    </ButtonGroup>
-                                </div>
-                            )}
                             <div
                                 ref={node => {
                                     this.defaultContainer = node;
