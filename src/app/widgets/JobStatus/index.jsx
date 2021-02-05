@@ -245,6 +245,7 @@ class JobStatusWidget extends PureComponent {
             },
 
             fileName: '',
+            fileSize: 0,
 
             // G-code Status (from server)
             total: 0,
@@ -305,11 +306,12 @@ class JobStatusWidget extends PureComponent {
                     }
                 });
             }),
-            pubsub.subscribe('gcode:total', (msg, total) => {
-                this.setState({ total });
-            }),
-            pubsub.subscribe('gcode:fileName', (msg, fileName) => {
-                this.setState({ fileName });
+            pubsub.subscribe('gcode:fileInfo', (msg, file) => {
+                this.setState({
+                    fileName: file.name,
+                    fileSize: file.size,
+                    total: file.total
+                });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);

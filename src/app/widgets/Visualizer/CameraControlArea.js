@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import controller from 'app/lib/controller';
-import { Tooltip } from 'app/components/Tooltip';
+// import { Tooltip } from 'app/components/Tooltip';
 
 import leftSideIcon from './images/camera-left-side-view-light.png';
 import rightSideIcon from './images/camera-right-side-view-light.png';
@@ -65,17 +65,20 @@ export default class ControlArea extends Component {
                                 {state.status.activeState} ({state.status.alarmCode}){' '}
                             </div>
 
-                            <Tooltip placement="bottom" content="Click to Unlock Machine" hideOnClick>
-                                <i
-                                    onMouseEnter={() => this.setState({ currentAlarmIcon: 'fa-unlock' })}
-                                    onMouseLeave={() => this.setState({ currentAlarmIcon: 'fa-lock' })}
-                                    className={classnames('fas', currentAlarmIcon, styles['machine-status-unlock'])}
-                                    role="button"
-                                    tabIndex={-1}
-                                    onClick={this.unlock}
-                                    onKeyDown={this.unlock}
-                                />
-                            </Tooltip>
+                            <i
+                                onMouseEnter={() => this.setState({ currentAlarmIcon: 'fa-unlock' })}
+                                onMouseLeave={() => this.setState({ currentAlarmIcon: 'fa-lock' })}
+                                className={classnames('fas', currentAlarmIcon, styles['machine-status-unlock'])}
+                                role="button"
+                                tabIndex={-1}
+                                onClick={this.unlock}
+                                onKeyDown={this.unlock}
+                            />
+
+                            <div style={{ color: 'white', textAlign: 'center', fontSize: 'clamp(1rem, 1vw, 1.5rem)' }}>
+                                <i className="fas fa-long-arrow-alt-up" style={{ fontSize: 'clamp(1.5rem, 2vw, 2.5rem)' }} />
+                                <div>Click to Unlock Machine</div>
+                            </div>
                         </div>
                     );
                 } else {

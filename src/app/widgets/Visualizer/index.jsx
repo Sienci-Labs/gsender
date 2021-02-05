@@ -207,7 +207,7 @@ class VisualizerWidget extends PureComponent {
             });
         },
         uploadFile: (gcode, meta) => {
-            const { name } = { ...meta };
+            const { name, size } = { ...meta };
             const context = {};
 
             const { port } = this.state;
@@ -224,21 +224,34 @@ class VisualizerWidget extends PureComponent {
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
             if (!port) {
-                this.actions.loadGCode(name, gcode);
+                this.actions.loadGCode(name, gcode, size);
 
                 const lines = gcode.split('\n')
                     .filter(line => (line.trim().length > 0));
+
+                // // const tools = lines.filter(line => line[0] === 'T'); //Find all T commands
+
+                // const maxSpindleSpeed = lines.find(
+                //     line => [line[0], line[1], line[2]].join('') === 'G50'
+                // );
+
+                // console.log(maxSpindleSpeed);
+
+                // //max spindle rate - min spindle rate is range
+
+                // console.log(lines);
+                // console.log(tools);
 
                 const total = lines.length + 1; //Added one as that is the dwell line added after every gcode parse
 
                 this.setState({ total });
 
-                pubsub.publish('gcode:total', total);
-                pubsub.publish('gcode:fileName', name);
+                pubsub.publish('gcode:fileInfo', { name, size, total });
 
                 return;
             }
 
+            pubsub.publish('gcode:fileInfo', { size });
             controller.command('gcode:load', name, gcode, context, (err, data) => {
                 if (err) {
                     this.setState((state) => ({
@@ -254,10 +267,10 @@ class VisualizerWidget extends PureComponent {
                     return;
                 }
 
-                log.debug(data); // TODO
+                log.debug(data);
             });
         },
-        loadGCode: (name, gcode) => {
+        loadGCode: (name, gcode, size) => {
             const capable = {
                 view3D: !!this.visualizer
             };
@@ -328,7 +341,8 @@ class VisualizerWidget extends PureComponent {
                                 bbox: bbox,
                                 loadedBeforeConnection: !port,
                             },
-                            filename: name
+                            filename: name,
+                            fileSize: size
                         }));
                     });
                 }, 0);
@@ -983,6 +997,7 @@ class VisualizerWidget extends PureComponent {
             },
             currentTab: 0,
             filename: '',
+            fileSize: 0, //in bytes
             total: 0,
         };
     }
