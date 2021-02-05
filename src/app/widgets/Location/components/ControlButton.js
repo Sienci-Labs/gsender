@@ -13,6 +13,10 @@ const Button = styled.button`
     max-width: 10rem;
     padding: 5px;
     margin: 0;
+    --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+
+
     transition: 200ms ease-in-out;
 
     &:hover:not([disabled]) {
@@ -38,8 +42,8 @@ const ControlButton = ({ label, icon: Icon, onClick, disabled }) => {
     return (
         <Button
             type="button"
-            onClick={onClick}
-            style={{ fontSize: '14px' }}
+            onClick={onClick}//STYLE HERE FOR LOCATION BUTTONS IN BUILD VERSION
+            style={{ fontSize: '14px', marginBottom: '0px', marginRight: '10px', marginTop: '10px' }}
             disabled={disabled}
         >
             {Icon && <Icon /> } {label}

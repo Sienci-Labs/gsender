@@ -48,6 +48,7 @@ class Workspace extends PureComponent {
     };
 
     state = {
+        disabled: true,
         mounted: false,
         port: '',
         modal: {
@@ -112,6 +113,7 @@ class Workspace extends PureComponent {
 
     controllerEvents = {
         'connect': () => {
+            this.setState({ disabled: false });
             if (controller.connected) {
                 this.action.closeModal();
             } else {
@@ -126,6 +128,7 @@ class Workspace extends PureComponent {
             }
         },
         'disconnect': () => {
+            this.setState({ disabled: true });
             if (controller.connected) {
                 this.action.closeModal();
             } else {
@@ -133,10 +136,12 @@ class Workspace extends PureComponent {
             }
         },
         'serialport:open': (options) => {
+            this.setState({ disabled: false });
             const { port } = options;
             this.setState({ port: port });
         },
         'serialport:close': (options) => {
+            this.setState({ disabled: true });
             this.setState({ port: '' });
         },
         'feeder:status': (status) => {
@@ -402,6 +407,7 @@ class Workspace extends PureComponent {
 
     render() {
         const { style, className } = this.props;
+        let disabled = this.state.disabled;
         const {
             port,
             modal,
@@ -410,7 +416,6 @@ class Workspace extends PureComponent {
             showPrimaryContainer,
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
-
         return (
             <div style={style} className={classNames(className, styles.workspace)}>
                 {modal.name === MODAL_FEEDER_PAUSED && (
@@ -426,7 +431,7 @@ class Workspace extends PureComponent {
                     />
                 )}
                 {modal.name === MODAL_SERVER_DISCONNECTED &&
-                <ServerDisconnected />
+                    <ServerDisconnected />
                 }
                 <div
                     className={classNames(
@@ -492,15 +497,17 @@ class Workspace extends PureComponent {
                                     { [styles.hidden]: hidePrimaryContainer }
                                 )}
                             >
-                                <PrimaryWidgets
-                                    ref={node => {
-                                        this.primaryWidgets = node;
-                                    }}
-                                    onForkWidget={this.widgetEventHandler.onForkWidget}
-                                    onRemoveWidget={this.widgetEventHandler.onRemoveWidget}
-                                    onDragStart={this.widgetEventHandler.onDragStart}
-                                    onDragEnd={this.widgetEventHandler.onDragEnd}
-                                />
+                                <div className={disabled ? `${styles.disabled}` : 'styles.enabled'}>
+                                    <PrimaryWidgets
+                                        ref={node => {
+                                            this.primaryWidgets = node;
+                                        }}
+                                        onForkWidget={this.widgetEventHandler.onForkWidget}
+                                        onRemoveWidget={this.widgetEventHandler.onRemoveWidget}
+                                        onDragStart={this.widgetEventHandler.onDragStart}
+                                        onDragEnd={this.widgetEventHandler.onDragEnd}
+                                    />
+                                </div>
                             </div>
                             {hidePrimaryContainer && (
                                 <div

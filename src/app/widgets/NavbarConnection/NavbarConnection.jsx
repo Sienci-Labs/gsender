@@ -39,7 +39,7 @@ class NavbarConnection extends PureComponent {
         return 'fa-plug';
     };
 
-    getIconState (connected, connecting, alertMessage) {
+    getIconState(connected, connecting, alertMessage) {
         if (connected) {
             return 'icon-connected';
         }
@@ -65,32 +65,35 @@ class NavbarConnection extends PureComponent {
                 </div>
                 <div>
                     <div className="dropdown-label" id="connection-selection-list">
-                        { this.getConnectionStatusText(connected, connecting, alertMessage) }
+                        {this.getConnectionStatusText(connected, connecting, alertMessage)}
                     </div>
                 </div>
                 {
-                    connected &&
+                    connected && (
                         <div className={styles.ConnectionInfo}>
-                            <div className={styles.portLabel}>{ port }</div>
-                            <div>{ controllerType }</div>
+                            <div className={styles.portLabel}>{port}</div>
+                            <div>{controllerType}</div>
                         </div>
+                    )
                 }
                 {
-                    connected &&
-                    <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
-                        <i className="fa fa-unlink" />
+                    connected && (
+                        <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
+                            <i className="fa fa-unlink" />
                         Disconnect
-                    </button>
+                        </button>
+                    )
                 }
                 <div className={styles.NavbarConnectionDropdownList}>
                     {
                         !connected && <h5>Available Devices</h5>
                     }
                     {
-                        !connected && (ports.length === 0) &&
-                        <div className={styles.noDevicesWarning}>
-                            No Devices Found
-                        </div>
+                        !connected && (ports.length === 0) && (
+                            <div className={styles.noDevicesWarning}>
+                                No Devices Found
+                            </div>
+                        )
                     }
                     {
                         !connected && !connecting && ports.map(
@@ -101,7 +104,8 @@ class NavbarConnection extends PureComponent {
                                     baudrate={baudrate}
                                     controllerType={controllerType}
                                     onClick={() => actions.onClickPortListing(port)}
-                                />)
+                                />
+                            )
                         )
                     }
                 </div>

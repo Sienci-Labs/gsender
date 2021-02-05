@@ -1,6 +1,11 @@
-@import "display-panel";
-@import "rotate";
-@import "keypad";
+@import 'display-panel';
+@import 'rotate';
+@import 'keypad';
+
+.disabled {
+    opacity: .5;
+    cursor: no-drop;
+}
 
 .widget-content {
     position: relative;
@@ -18,6 +23,7 @@
         margin-bottom: 0;
     }
 }
+
 .col-space {
     margin-right: 5px;
 }
@@ -30,32 +36,44 @@
 
 .movementRateButton {
     border: solid 1px #9CA3AF;
-    background: rgba(209, 213, 219, 0.6);
-    padding: 0.25rem;
+    background-color: #D1D5DB;
+    padding: 5px;
+    font-size: 14px;
     display: flex;
     flex-grow: 1;
     width: 90%;
-    border-radius: 0.25rem;
-    justify-content center;
+    border-radius: .25rem;
+    justify-content: center;
     color: #3e85c7;
-    --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
     margin-bottom: 20px;
+    transition: 200ms ease-in-out;
+
+    &:hover {
+        border: 1px solid #3E85C7;
+        -webkit-transition: 200ms ease-in-out;
+        transition: 200ms ease-in-out;
+        background-color: #E5E7EB;
+    }
+
+    &:disabled {
+        cursor: no-drop;
+    }
 }
 
 .flex-col {
-    display flex
-    flex-direction column;
-    align-items center;
-    justify-items  center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
     flex-grow: 1;
     height: 100%;
     width: 100%;
+
     button + button {
         margin-left: 0;
     }
-
-
 }
 
 .speed-controls {
@@ -63,10 +81,10 @@
     width: 100%;
     flex-grow: 1;
     flex-direction: row;
-    justify-content space-between;
+    justify-content: space-between;
     padding: 1rem;
     box-sizing: border-box;
-    align-items center;
+    align-items: center;
 }
 
 .btn-Keypad {
@@ -77,34 +95,39 @@
     width: 100%;
     height: 4rem;
     display: flex;
-    flex-grow 1;
-    align-items center
-    justify-content center;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
     font-size: 1.2rem;
-    --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+
     &:disabled {
         background: #9CA3AF;
+        cursor: no-drop;
     }
 }
 
 .control-group {
     width: 30%;
     display: flex;
-    flex-direction column;
+    flex-direction: column;
 }
 
 .btn-up {
     clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 100%, 50% 75%, 0 100%);
 }
+
 .btn-right {
-    clip-path: polygon(75% 0%, 100% 50%, 75% 100%, 0% 100%, 25% 50%, 0% 0%);
+    clip-path: polygon(75% 0, 100% 50%, 75% 100%, 0 100%, 25% 50%, 0 0);
 }
+
 .btn-down {
     clip-path: polygon(0 75%, 50% 100%, 100% 75%, 100% 0, 50% 25%, 0 0);
 }
+
 .btn-left {
-    clip-path: polygon(100% 0%, 75% 50%, 100% 100%, 25% 100%, 0% 50%, 25% 0%);
+    clip-path: polygon(100% 0, 75% 50%, 100% 100%, 25% 100%, 0 50%, 25% 0);
 }
 
 .hidden {
