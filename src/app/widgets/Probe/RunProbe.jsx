@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import cx from 'classnames';
 import Modal from 'app/components/Modal';
 import i18n from 'app/lib/i18n';
 import Image from 'app/components/Image';
@@ -19,7 +20,7 @@ class RunProbe extends PureComponent {
     steps = [
         {
             title: 'Confirm Touchplate Connection',
-            description: 'Touch the touchplate to the bit to confirm that everything is connected correctly and a circuit can be formed.'
+            description: 'Touch the touchplate to the bit to confirm that everything is connected correctly and a circuit can be formed.  You have 15 seconds to complete this circuit.'
         },
         {
             title: 'Confirm Router Position',
@@ -146,13 +147,14 @@ class RunProbe extends PureComponent {
                                 </div>
                             }
                             {
-                                (currentStep === 1) &&
-                                    <Image
-                                        src={XYZProbe}
-                                    />
+                                <Image
+                                    src={XYZProbe}
+                                    className={cx({ [styles.imgHidden]: (currentStep === 0) })}
+                                />
+
                             }
                             {
-                                (currentStep === 1) && true
+                                (currentStep === 2) && true
                             }
                         </div>
                     </div>
