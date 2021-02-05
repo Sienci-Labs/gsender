@@ -31,6 +31,7 @@ import ChartIcon from './icons/Chart';
 import HomeIcon from './icons/Home';
 
 import { PRIMARY_COLOR, SECONDARY_COLOR } from './constants';
+import Release from './icons/Release';
 
 class DisplayPanel extends PureComponent {
     static propTypes = {
@@ -196,7 +197,7 @@ class DisplayPanel extends PureComponent {
                         />
                         <ControlButton
                             label={i18n._('Release')}
-                            icon={() => <HomeIcon fill={(canClick) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
+                            icon={() => <Release fill={(canClick) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
                             onClick={() => {
                                 controller.command('unlock');
                             }}
