@@ -245,6 +245,7 @@ class ProbeWidget extends PureComponent {
         'serialport:close': (options) => {
             const initialState = this.getInitialState();
             this.setState({ ...initialState });
+            this.actions.generatePossibleProbeCommands();
         },
         'workflow:state': (workflowState) => {
             this.setState(state => ({
