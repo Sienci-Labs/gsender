@@ -64,6 +64,7 @@
 
     .primary-container {
         // border-right: 1px solid #ccc;
+        float: right;
     }
 
     .secondary-container {
@@ -74,7 +75,6 @@
         vertical-align: top;
         background-color: #d1d5db;
         width: 33%;
-        max-width: 360px;
         min-width: 360px;
         padding: 0 10px;
 
@@ -106,8 +106,8 @@
 
         &.fixed {
             position: fixed;
-            left: 33%;
-            right: 0;
+            left: 0 !important;
+            width: 66%;
             top: ($navbar-height + 1);
             bottom: 0;
         }
