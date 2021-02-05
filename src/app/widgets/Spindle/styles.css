@@ -4,6 +4,10 @@
   background-color: #D1D5DB;
   border-radius: 0.25rem;
   font-size: 14px;
+  color: #3e85c7;
+  --tw-shadow: 0 11px 10px 1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  transition: 200ms ease-in-out;
 }
 
 .speedSpindle {

@@ -48,7 +48,7 @@ class NavSidebar extends PureComponent {
                 <NavSidebarLink url="" icon="fa-border-style" label="Surface" />
                 <NavSidebarLink url="" icon="fa-wrench" label="Calibrate" />
                 <NavSidebarLink url="" icon="fa-hat-wizard" label="Wizard" />
-                <NavSidebarLink url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa-cog" label="Preferences" />
+                <NavSidebarLink url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa-cog" label="Settings" />
 
                 {
                     state.modal.name === MODAL_PREFERENCES && <Preferences state={state} modalClose={actions.closeModal} />

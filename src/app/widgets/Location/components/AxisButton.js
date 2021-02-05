@@ -43,6 +43,12 @@ const Container = styled.div`
     outline: none;
   }
 
+  h3 {
+    font-weight: 600;
+    font-size: 31px;
+    margin-top: -5px;
+  }
+
     p, h3 {
         margin: 1px;
     }

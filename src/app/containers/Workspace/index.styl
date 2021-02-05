@@ -1,9 +1,19 @@
-@import "../variables";
+@import '../variables';
+
+.disabled {
+    opacity: .5;
+    cursor: no-drop;
+    color: #999;
+    pointer-events: none;
+}
 
 .workspace {
     height: 92vh;
     overflow-y: overlay;
 
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
     .dropzone-overlay {
         position: fixed;
@@ -30,6 +40,7 @@
             font-size: 32px;
         }
     }
+
     .dropzone {
         height: 100%;
     }
@@ -37,31 +48,29 @@
     .workspace-table {
         display: table;
         width: 100%;
-        height: 'calc(100vh - %s)' % ($navbar-height);
+        height: 'calc(100vh - %s)' % $navbar-height;
         background-color: #d1d5db;
     }
+
     .workspace-table-row {
         display: table-row;
     }
 
-
-    .primary-container,
-    .secondary-container,
-    .primary-toggler,
-    .secondary-toggler,
-    .default-container {
+    .primary-container, .secondary-container, .primary-toggler, .secondary-toggler, .default-container {
         display: table-cell;
         position: relative;
         height: 60vh;
     }
+
     .primary-container {
         // border-right: 1px solid #ccc;
     }
+
     .secondary-container {
         border-left: 1px solid #ccc;
     }
-    .primary-container,
-    .secondary-container {
+
+    .primary-container, .secondary-container {
         vertical-align: top;
         background-color: #d1d5db;
         width: 33%;
@@ -73,22 +82,24 @@
             display: none;
         }
     }
-    .primary-toggler,
-    .secondary-toggler {
+
+    .primary-toggler, .secondary-toggler {
         background-color: #f6f7f8;
         padding-top: 5px;
         text-align: center;
         width: $toggler-width;
-
         // http://stackoverflow.com/questions/32272158/how-to-use-a-stylus-variable-in-calc
-        height: 'calc(100vh - %s)' % ($navbar-height);
+        height: 'calc(100vh - %s)' % $navbar-height;
     }
+
     .primary-toggler {
         border-right: 1px solid #ccc;
     }
+
     .secondary-toggler {
         border-left: 1px solid #ccc;
     }
+
     .default-container {
         min-width: 360px;
         background-color: #d1d5db;
@@ -101,8 +112,4 @@
             bottom: 0;
         }
     }
-}
-
-.workspace::-webkit-scrollbar {
-  display: none;
 }

@@ -9,7 +9,7 @@ const SpeedControl = ({ state, actions }) => {
     return (
         <div className={styles.speedControls}>
             <div className={styles.controlGroup}>
-                <span>XY Step ({units})</span>
+                <span>XY move ({units})</span>
                 <NumberInput
                     value={xyStep}
                     min={0}
@@ -18,7 +18,7 @@ const SpeedControl = ({ state, actions }) => {
                 />
             </div>
             <div className={styles.controlGroup}>
-                <span>Z Step ({units})</span>
+                <span>Z move ({units})</span>
                 <NumberInput
                     value={zStep}
                     min={0}
@@ -27,7 +27,7 @@ const SpeedControl = ({ state, actions }) => {
                 />
             </div>
             <div className={styles.controlGroup}>
-                <span>Feedrate ({units}/min)</span>
+                <span>Speed ({units}/min)</span>
                 <NumberInput
                     value={feedrate}
                     min={100}

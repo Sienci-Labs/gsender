@@ -10,12 +10,11 @@
         }
     }
 
-    .machine-position,
-    .work-position {
+    .machine-position, .work-position {
         position: relative;
         white-space: nowrap;
         padding: 0;
-        width: 7vw;
+        width: 13vw;
     }
 
     .action {
@@ -33,12 +32,15 @@
 
             &:disabled:hover {
                 background-color: inherit;
+
                 > * {
                     color: #666;
                 }
             }
+
             &:hover {
                 background-color: #e6e6e6;
+
                 > * {
                     color: #333;
                 }

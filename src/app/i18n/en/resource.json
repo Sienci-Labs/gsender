@@ -488,10 +488,6 @@
     "Location Widget": "Location Widget",
     "This widget displays machine and work coordinates for all axes.": "This widget displays machine and work coordinates for all axes.",
     "This widget displays machine and work coordinates for all axes": "This widget displays machine and work coordinates for all axes",
-    "Zero All": "Zero All",
-    "Go to Zero": "Go to Zero",
-    "Home": "Home",
-    "Go Home": "Go Home",
     "Location": "Location",
     "Job Status Widget": "Job Status Widget",
     "This widget displays the job progression and feed and spindle overrides.": "This widget displays the job progression and feed and spindle overrides.",
@@ -505,5 +501,9 @@
     "Stop Job": "Stop Job",
     "Speed": "Speed",
     "Jog Control": "Jog Control",
-    "Not connected to a device": "Not connected to a device"
+    "Not connected to a device": "Not connected to a device",
+    "Zero All": "Zero All",
+    "Go to Zero": "Go to Zero",
+    "Home": "Home",
+    "Go Home": "Go Home"
 }

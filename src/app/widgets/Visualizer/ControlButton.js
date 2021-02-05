@@ -13,6 +13,7 @@ const Button = styled.button`
     padding: 5px;
     margin: 0;
     transition: 200ms ease-in-out;
+    margin-right:15px;
 
     &:hover:not([disabled]) {
         border: 1px solid ${PRIMARY_COLOR};

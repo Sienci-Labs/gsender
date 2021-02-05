@@ -163,12 +163,12 @@ class WorkflowControl extends PureComponent {
                         <button
                             type="button"
                             className={`${styles['workflow-button-upload']}`}
-                            title={i18n._('Upload G-code')}
+                            title={i18n._('Load File')}
                             onClick={this.handleClickUpload}
                             // disabled={!canUpload}
                             style={{ writingMode: 'vertical-lr' }}
                         >
-                            {i18n._('Upload G-code')} <i className="fa fa-upload" style={{ writingMode: 'vertical-lr' }} />
+                            {i18n._('Load File')} <i className="fa fa-file" style={{ writingMode: 'vertical-lr' }} />
                         </button>
 
                         {

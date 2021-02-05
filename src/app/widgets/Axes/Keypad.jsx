@@ -1,3 +1,4 @@
+/* eslint-disable react/self-closing-comp */
 import cx from 'classnames';
 import ensureArray from 'ensure-array';
 import frac from 'frac';
@@ -140,6 +141,7 @@ class Keypad extends PureComponent {
                                     <div className={styles.colSpace}>
                                         <button
                                             className={cx(styles.btnKeypad, styles.hidden)}
+                                            type="button"
                                             onClick={() => {
                                                 const distance = actions.getXYJogDistance();
                                                 const feedrate = actions.getFeedrate();
@@ -155,6 +157,7 @@ class Keypad extends PureComponent {
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
                                         <button
+                                            type="button"
                                             className={cx(
                                                 styles.btnKeypad,
                                                 styles.btnUp,
@@ -176,6 +179,7 @@ class Keypad extends PureComponent {
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
                                         <button
+                                            type="button"
                                             className={cx(styles.btnKeypad, styles.hidden)}
                                             onClick={() => {
                                                 const distance = actions.getXYJogDistance();
@@ -192,6 +196,7 @@ class Keypad extends PureComponent {
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
                                         <button
+                                            type="button"
                                             className={cx(
                                                 styles.btnKeypad,
                                                 styles.btnUp,
@@ -217,6 +222,7 @@ class Keypad extends PureComponent {
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
                                         <button
+                                            type="button"
                                             className={cx(
                                                 styles.btnKeypad,
                                                 styles.btnLeft,
@@ -240,6 +246,7 @@ class Keypad extends PureComponent {
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
                                         <button
+                                            type="button"
                                             className={cx(
                                                 styles.btnKeypad,
                                                 styles.btnRight
@@ -266,6 +273,7 @@ class Keypad extends PureComponent {
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
                                         <button
+                                            type="button"
                                             className={cx(styles.btnKeypad, styles.hidden)}
                                             onClick={() => {
                                                 const distance = actions.getXYJogDistance();
@@ -282,6 +290,7 @@ class Keypad extends PureComponent {
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
                                         <button
+                                            type="button"
                                             className={cx(
                                                 styles.btnKeypad,
                                                 styles.btnDown,
@@ -303,6 +312,7 @@ class Keypad extends PureComponent {
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
                                         <button
+                                            type="button"
                                             className={cx(styles.btnKeypad, styles.hidden)}
                                             onClick={() => {
                                                 const distance = actions.getJogDistance();
@@ -318,6 +328,7 @@ class Keypad extends PureComponent {
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
                                         <button
+                                            type="button"
                                             className={cx(
                                                 styles.btnKeypad,
                                                 styles.btnDown,
@@ -340,13 +351,13 @@ class Keypad extends PureComponent {
                         </div>
                     </div>
                     <div className={cx('col-xs-4', styles.flexCol)}>
-                        <button className={styles.movementRateButton} onClick={() => actions.changeMovementRates(20, 10, 5000)}>
+                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(20, 10, 5000)}>
                             Rapid
                         </button>
-                        <button className={styles.movementRateButton} onClick={() => actions.changeMovementRates(5, 2, 3000)}>
+                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(5, 2, 3000)}>
                             Normal
                         </button>
-                        <button className={styles.movementRateButton} onClick={() => actions.changeMovementRates(0.5, 0.1, 1000)}>
+                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(0.5, 0.1, 1000)}>
                             Precise
                         </button>
                     </div>

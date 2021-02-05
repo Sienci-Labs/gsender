@@ -4,7 +4,7 @@ import classnames from 'classnames';
 
 import controller from 'app/lib/controller';
 
-import ControlButton from './ControlButton';
+// import ControlButton from './ControlButton';
 import styles from './top-access-control.styl';
 
 export default class TopAccessControl extends Component {
@@ -36,18 +36,18 @@ export default class TopAccessControl extends Component {
     };
 
     render() {
-        const { activeTab, setCurrentTab, port } = this.props;
+        const { activeTab, setCurrentTab } = this.props;
 
         const tabs = [
             { id: 0, title: 'Visualizer', active: activeTab === 0, handleClick: () => setCurrentTab(0) },
             { id: 1, title: 'G-Code', active: activeTab === 1, handleClick: () => setCurrentTab(1) },
         ];
 
-        const controlButtons = [
-            { id: 0, title: 'Home', icon: <i className="fas fa-home" />, onClick: this.command.homing, disabled: !port },
-            { id: 1, title: 'Release', icon: <i className="fas fa-arrow-alt-circle-up" />, onClick: this.command.unlock, disabled: !port },
-            { id: 2, title: 'Reset', icon: <i className="fas fa-undo" />, onClick: this.command.reset, disabled: !port },
-        ];
+        // const controlButtons = [
+        //     { id: 0, title: 'Home', icon: <i className="fas fa-home" />, onClick: this.command.homing, disabled: !port },
+        //     { id: 1, title: 'Release', icon: <i className="fas fa-arrow-alt-circle-up" />, onClick: this.command.unlock, disabled: !port },
+        //     { id: 2, title: 'Reset', icon: <i className="fas fa-undo" />, onClick: this.command.reset, disabled: !port },
+        // ];
 
         return (
             <div className={styles['top-access-control']}>
@@ -66,7 +66,7 @@ export default class TopAccessControl extends Component {
                 </div>
 
                 <div className={styles['v-control-area']}>
-                    {
+                    {/* {
                         controlButtons.map(({ id, title, icon, onClick, disabled }) => (
                             <ControlButton
                                 key={id}
@@ -76,7 +76,7 @@ export default class TopAccessControl extends Component {
                                 disabled={disabled}
                             />
                         ))
-                    }
+                    } */}
                 </div>
             </div>
         );
