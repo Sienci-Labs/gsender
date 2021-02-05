@@ -194,6 +194,14 @@ class DisplayPanel extends PureComponent {
                             }}
                             disabled={!canClick || !machineProfile.endstops}
                         />
+                        <ControlButton
+                            label={i18n._('Release')}
+                            icon={() => <HomeIcon fill={(canClick) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
+                            onClick={() => {
+                                controller.command('unlock');
+                            }}
+                            disabled={!canClick}
+                        />
                     </div>
                 </div>
             </Panel>

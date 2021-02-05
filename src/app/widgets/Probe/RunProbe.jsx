@@ -89,7 +89,7 @@ class RunProbe extends PureComponent {
 
         return (
             <Modal disableOverlay onClose={actions.closeModal}>
-                <Modal.Header classnames={styles.modalHeader}>
+                <Modal.Header className={styles.modalHeader}>
                     <Modal.Title>{i18n._(`Probe - ${probeCommand.id}`)}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

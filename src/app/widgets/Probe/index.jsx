@@ -767,7 +767,8 @@ class ProbeWidget extends PureComponent {
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const state = {
             ...this.state,
-            canClick: this.canClick()
+            canClick: this.canClick(),
+            connected: controller.port
         };
         const actions = {
             ...this.actions

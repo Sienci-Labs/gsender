@@ -22,6 +22,7 @@ class Probe extends PureComponent {
         const { state, actions } = this.props;
         const {
             canClick,
+            connected,
             units,
             availableTools,
             availableProbeCommands,
@@ -94,7 +95,7 @@ class Probe extends PureComponent {
                     </div>
                 </div>
                 <div className={styles.probeSettingsCol}>
-                    <ProbeCircuitStatus connected={canClick} probeActive={probeActive} />
+                    <ProbeCircuitStatus connected={connected} probeActive={probeActive} />
                 </div>
             </div>
         );

@@ -44,7 +44,6 @@ export default class TopAccessControl extends Component {
         ];
 
         const controlButtons = [
-            { id: 0, title: 'Home', icon: <i className="fas fa-home" />, onClick: this.command.homing, disabled: !port },
             { id: 1, title: 'Release', icon: <i className="fas fa-arrow-alt-circle-up" />, onClick: this.command.unlock, disabled: !port },
             { id: 2, title: 'Reset', icon: <i className="fas fa-undo" />, onClick: this.command.reset, disabled: !port },
         ];
