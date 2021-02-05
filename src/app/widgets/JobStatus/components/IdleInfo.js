@@ -61,8 +61,8 @@ const IdleInfo = ({ state }) => {
             </div>
 
             <div className={styles['additional-info']}>
-                <div>Feed Range: 0</div>
-                <div>Spindle Range: 0</div>
+                <div>Feed Range: 500 to 1000 mm/min</div>
+                <div>Spindle Range: 1000 to 2000 RPM</div>
                 <div>Tools Used: None</div>
             </div>
         </div>
