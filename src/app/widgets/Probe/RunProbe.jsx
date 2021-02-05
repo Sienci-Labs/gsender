@@ -62,10 +62,10 @@ class RunProbe extends PureComponent {
             } else {
                 const { timer } = this.state;
                 this.setState({
-                    timer: timer + 1
+                    timer: timer + 0.5
                 });
             }
-        }, 1000);
+        }, 500);
         setTimeout(() => {
             clearInterval(interval);
         }, 15000);
