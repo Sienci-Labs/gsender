@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
+import classnames from 'classnames';
 import controller from 'app/lib/controller';
 import { Tooltip } from 'app/components/Tooltip';
 
@@ -24,16 +24,34 @@ export default class ControlArea extends Component {
         actions: PropTypes.object,
     }
 
+    state = {
+        currentAlarmIcon: 'fa-lock'
+    }
+
     unlock = () => {
         controller.command('unlock');
     }
 
     render() {
-        const { cameraPosition, controller, port } = this.props.state;
-        const { name, total } = this.props.state.gcode;
+        const { cameraPosition, controller, port, total } = this.props.state;
+        const { name } = this.props.state.gcode;
         const { camera } = this.props.actions;
+        const { currentAlarmIcon } = this.state;
 
         const { state = {} } = controller;
+
+        //Object to customize the message of the active machine state
+        const message = {
+            Idle: 'Idle',
+            Run: 'Running',
+            Hold: 'Hold',
+            Jog: 'Jogging',
+            Check: 'Check',
+            Home: 'Homing',
+            Sleep: 'Sleep',
+            Alarm: 'Alarm',
+            Disconnected: 'Disconnected',
+        };
 
         /**
          * Function to output the machine state based on multiple conditions
@@ -42,22 +60,31 @@ export default class ControlArea extends Component {
             if (port) {
                 if (state.status?.activeState === 'Alarm') {
                     return (
-                        <Tooltip placement="bottom" content="Click to Unlock Machine" hideOnClick>
-                            <div
-                                role="button"
-                                tabIndex={-1}
-                                className={styles[`machine-${state.status.activeState}`]}
-                                onClick={this.unlock}
-                                onKeyDown={this.unlock}
-                            >
-                                {state.status.activeState}({state.status.alarmCode}){' '}
-                                <i className="fas fa-unlock" />
+                        <div className={styles['machine-status-wrapper']}>
+                            <div className={styles['machine-Alarm']}>
+                                {state.status.activeState} ({state.status.alarmCode}){' '}
                             </div>
-                        </Tooltip>
+
+                            <Tooltip placement="bottom" content="Click to Unlock Machine" hideOnClick>
+                                <i
+                                    onMouseEnter={() => this.setState({ currentAlarmIcon: 'fa-unlock' })}
+                                    onMouseLeave={() => this.setState({ currentAlarmIcon: 'fa-lock' })}
+                                    className={classnames('fas', currentAlarmIcon, styles['machine-status-unlock'])}
+                                    role="button"
+                                    tabIndex={-1}
+                                    onClick={this.unlock}
+                                    onKeyDown={this.unlock}
+                                />
+                            </Tooltip>
+                        </div>
                     );
                 } else {
                     return state.status?.activeState //Show disconnected until machine connection process is finished, otherwise an empty div is shown
-                        ? <div className={styles[`machine-${state.status.activeState}`]}>{state.status.activeState}</div>
+                        ? (
+                            <div className={styles[`machine-${state.status.activeState}`]}>
+                                { message[state.status.activeState] }
+                            </div>
+                        )
                         : <div className={styles['machine-Disconnected']}>Disconnected</div>;
                 }
             } else {

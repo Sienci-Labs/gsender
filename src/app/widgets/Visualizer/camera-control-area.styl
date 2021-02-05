@@ -55,6 +55,26 @@
     max-width: 255px;
 }
 
+.machine-status-wrapper {
+    display: grid;
+    row-gap: 1rem;
+}
+
+.machine-status-unlock {
+    primary = rgb(0, 255, 0);
+
+    outline: none;
+    cursor: pointer;
+    justify-self: center;
+    font-size: clamp(2rem, 2.5vw, 3.5rem);
+    color: rgba(primary, 0.6);
+    transition: color 350ms ease-in-out
+
+    &:hover {
+        color: rgb(primary);
+    }
+}
+
 .machine {
     status-mixin(bgColor, textColor){
         @extend .machine-status-message;
@@ -79,12 +99,6 @@
         bgColor = rgb(255, 0, 0);
         color = rgb(255, 255, 255);
         status-mixin(bgColor, color)
-        cursor: pointer;
-
-        &:hover {
-            background-color: lighten(bgColor, 5%);
-            color: black;
-        }
     }
 
     &-Run {

@@ -4,11 +4,12 @@ import pubsub from 'pubsub-js';
 import _isEqual from 'lodash/isEqual';
 import ensureArray from 'ensure-array';
 
-import { Input } from 'app/components/FormControl';
+import ToggleSwitch from 'app/components/ToggleSwitch';
 import store from 'app/store';
 
 import styles from './options.styl';
 import defaultProfiles from './defaultMachineProfiles';
+
 
 /**
  * Machine Profile Options Component
@@ -81,17 +82,15 @@ export default class Options extends Component {
     }
 
     /**
-     * Function to handle checkbox changes
+     * Function to handle trigger changes to attributes within the current machine profile
      * @param {Object} e Changed element
      */
-    handleCheck = (e) => {
-        const { name, checked } = e.target;
-
+    handleToggle = (id) => {
         const { machineProfile } = this.state;
 
         store.replace('workspace.machineProfile', {
             ...machineProfile,
-            [name]: checked,
+            [id]: !machineProfile[id],
         });
     }
 
@@ -141,114 +140,114 @@ export default class Options extends Component {
         const { id, endstops, laser, spindle, coolant, width, depth, height, units } = machineProfile;
 
         return (
-            <div>
-                <div className={styles['options-inputgroup']}>
-                    <label htmlFor="">Presets</label>
+            <div style={{ marginTop: '3rem' }}>
+                <div className={styles['options-section']}>
+                    <div style={{ width: '50%' }}>
+                        <label style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>Presets</label>
 
-                    <Select
-                        className={styles['options-select']}
-                        value={id}
-                        options={machineProfiles.map(({ id, name, company, type }) => ({ key: id, value: id, label: `${company} ${name} ${' - ' && type}` }))}
-                        onChange={this.handleSelect}
-                        clearable={false}
-                    />
+                        <Select
+                            className={styles['options-select']}
+                            value={id}
+                            options={machineProfiles.map(({ id, name, company, type }) => ({ key: id, value: id, label: `${company} ${name} ${' - ' && type}` }))}
+                            onChange={this.handleSelect}
+                            clearable={false}
+                        />
+                    </div>
+
+                    <div style={{ width: '50%' }}>
+                        <label style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>Cutting Area</label>
+
+                        <table className={styles['cutting-area']}>
+                            <tbody>
+                                <tr>
+                                    <td className={styles.label}>Width</td>
+                                    <td className={styles.value}>
+                                        <div className="input-group" style={{ width: '156px' }}>
+                                            <input
+                                                type="text"
+                                                name="width"
+                                                className="form-control"
+                                                style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
+                                                value={width}
+                                                onChange={this.handleChange}
+                                            />
+                                            <span className="input-group-addon">{units}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className={styles.label}>Depth</td>
+                                    <td className={styles.value}>
+                                        <div className="input-group" style={{ width: '156px' }}>
+                                            <input
+                                                type="text"
+                                                name="depth"
+                                                className="form-control"
+                                                style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
+                                                value={depth}
+                                                onChange={this.handleChange}
+                                            />
+                                            <span className="input-group-addon">{units}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className={styles.label}>Height</td>
+                                    <td className={styles.value}>
+                                        <div className="input-group" style={{ width: '156px' }}>
+                                            <input
+                                                type="text"
+                                                name="height"
+                                                className="form-control"
+                                                style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
+                                                value={height}
+                                                onChange={this.handleChange}
+                                            />
+                                            <span className="input-group-addon">{units}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div className={styles['options-inputgroup']}>
-                    <label htmlFor="">Cutting Area</label>
+                <div style={{ marginTop: '3rem' }}>
+                    <div className={styles['options-section']}>
+                        <div className={styles['options-inputgroup']}>
+                            <label htmlFor="">Endstops</label>
+                            <ToggleSwitch
+                                checked={endstops}
+                                onChange={() => this.handleToggle('endstops')}
+                            />
+                        </div>
 
-                    <table className={styles['cutting-area']}>
-                        <tbody>
-                            <tr>
-                                <td className={styles.label}>Width</td>
-                                <td className={styles.value}>
-                                    <div className="input-group" style={{ width: '156px' }}>
-                                        <input
-                                            type="text"
-                                            name="width"
-                                            className="form-control"
-                                            style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
-                                            value={width}
-                                            onChange={this.handleChange}
-                                        />
-                                        <span className="input-group-addon">{units}</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className={styles.label}>Depth</td>
-                                <td className={styles.value}>
-                                    <div className="input-group" style={{ width: '156px' }}>
-                                        <input
-                                            type="text"
-                                            name="depth"
-                                            className="form-control"
-                                            style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
-                                            value={depth}
-                                            onChange={this.handleChange}
-                                        />
-                                        <span className="input-group-addon">{units}</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td className={styles.label}>Height</td>
-                                <td className={styles.value}>
-                                    <div className="input-group" style={{ width: '156px' }}>
-                                        <input
-                                            type="text"
-                                            name="height"
-                                            className="form-control"
-                                            style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
-                                            value={height}
-                                            onChange={this.handleChange}
-                                        />
-                                        <span className="input-group-addon">{units}</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                        <div className={styles['options-inputgroup']}>
+                            <label htmlFor="">Spindle</label>
+                            <ToggleSwitch
+                                checked={spindle}
+                                onChange={() => this.handleToggle('spindle')}
+                            />
+                        </div>
+                    </div>
 
-                <div className={styles['options-inputgroup']}>
-                    <label htmlFor="">Endstops</label>
-                    <Input
-                        type="checkbox"
-                        name="endstops"
-                        checked={endstops}
-                        onChange={this.handleCheck}
-                    />
-                </div>
+                    <div className={styles['options-section']}>
+                        <div className={styles['options-inputgroup']}>
+                            <label htmlFor="">Coolant</label>
+                            <ToggleSwitch
+                                checked={coolant}
+                                onChange={() => this.handleToggle('coolant')}
+                            />
+                        </div>
 
-                <div className={styles['options-inputgroup']}>
-                    <label htmlFor="">Spindle</label>
-                    <Input
-                        type="checkbox"
-                        name="spindle"
-                        checked={spindle}
-                        onChange={this.handleCheck}
-                    />
-                </div>
-
-                <div className={styles['options-inputgroup']}>
-                    <label htmlFor="">Coolant</label>
-                    <Input
-                        type="checkbox"
-                        name="coolant"
-                        checked={coolant}
-                        onChange={this.handleCheck}
-                    />
-                </div>
-
-                <div className={styles['options-inputgroup']}>
-                    <label htmlFor="">Laser</label>
-                    <Input
-                        type="checkbox"
-                        name="laser"
-                        checked={laser}
-                        onChange={this.handleCheck}
-                    />
+                        <div className={styles['options-inputgroup']}>
+                            <label htmlFor="">Laser</label>
+                            <ToggleSwitch
+                                checked={laser}
+                                onChange={() => this.handleToggle('laser')}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         );
