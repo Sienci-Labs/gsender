@@ -9,7 +9,7 @@ import styles from './IdleInfo.styl';
  * @param {Object} state Default state given from parent component
  */
 const IdleInfo = ({ state }) => {
-    const { bbox: { delta }, units, total, remainingTime, fileName, connected } = state;
+    const { bbox: { delta }, units, total, remainingTime, fileName, connected, fileSize } = state;
 
     /**
      * Format given time value to display minutes and seconds
@@ -31,18 +31,39 @@ const IdleInfo = ({ state }) => {
         return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
     };
 
+    const fileSizeFormat = () => {
+        const ONE_KB = 1000;
+        const ONE_MB = 1000000;
+
+        if (fileSize >= ONE_KB && fileSize < ONE_MB) {
+            return `${(fileSize / ONE_KB).toFixed(1)} kB`;
+        } else if (fileSize >= ONE_MB) {
+            return `${(fileSize / ONE_MB).toFixed(0)} MB`;
+        }
+
+        return `${fileSize} bytes`;
+    };
+
     return fileName ? (
-        <div className={styles['idle-info']}>
-            <div>
-                <span className={styles['file-name']}>{fileName}</span> ({total} lines)
+        <div>
+            <div className={styles['idle-info']}>
+                <div>
+                    <span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)
+                </div>
+
+                <div>
+                    {`${delta.x}${units} (X) by ${delta.y}${units} (Y) by ${delta.z}${units} (Z)`}
+                </div>
+
+                <div>
+                    ~ {outputFormattedTime(remainingTime)} runtime
+                </div>
             </div>
 
-            <div>
-                {`${delta.x}${units} (X) by ${delta.y}${units} (Y) by ${delta.z}${units} (Z)`}
-            </div>
-
-            <div>
-                ~ {outputFormattedTime(remainingTime)} runtime
+            <div className={styles['additional-info']}>
+                <div>Feed Range: 0</div>
+                <div>Spindle Range: 0</div>
+                <div>Tools Used: None</div>
             </div>
         </div>
     ) : (
