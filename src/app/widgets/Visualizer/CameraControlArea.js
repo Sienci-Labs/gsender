@@ -33,8 +33,8 @@ export default class ControlArea extends Component {
     }
 
     render() {
-        const { cameraPosition, controller, port } = this.props.state;
-        const { name, total } = this.props.state.gcode;
+        const { cameraPosition, controller, port, total } = this.props.state;
+        const { name } = this.props.state.gcode;
         const { camera } = this.props.actions;
         const { currentAlarmIcon } = this.state;
 
@@ -42,10 +42,14 @@ export default class ControlArea extends Component {
 
         //Object to customize the message of the active machine state
         const message = {
-            Alarm: 'Alarm',
-            Run: 'Running',
             Idle: 'Idle',
+            Run: 'Running',
             Hold: 'Hold',
+            Jog: 'Jogging',
+            Check: 'Check',
+            Home: 'Homing',
+            Sleep: 'Sleep',
+            Alarm: 'Alarm',
             Disconnected: 'Disconnected',
         };
 
