@@ -240,10 +240,10 @@ class Workspace extends PureComponent {
 
         if (showPrimaryContainer) {
             // defaultContainer.style.left = primaryContainer.offsetWidth + sidebar.offsetWidth + 'px';
-            defaultContainer.style.left = primaryContainer.offsetWidth + 'px';
+            defaultContainer.style.right = primaryContainer.offsetWidth + 'px';
         } else {
             // defaultContainer.style.left = primaryToggler.offsetWidth + sidebar.offsetWidth + 'px';
-            defaultContainer.style.left = primaryToggler.offsetWidth + 'px';
+            defaultContainer.style.right = primaryToggler.offsetWidth + 'px';
         }
         // defaultContainer.style.right = secondaryToggler.offsetWidth + 'px';
         // Publish a 'resize' event
