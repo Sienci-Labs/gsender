@@ -432,7 +432,6 @@
     "Type": "類型",
     "Size": "大小",
     "Load G-code": "載入 G-code",
-    "Upload G-code": "上傳 G-code",
     "Resume": "",
     "Pause": "暫停",
     "Webcam": "網路攝影機",
@@ -505,5 +504,6 @@
     "Zero All": "",
     "Go to Zero": "",
     "Home": "",
-    "Go Home": ""
+    "Go Home": "",
+    "Load File": ""
 }

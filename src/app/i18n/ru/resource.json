@@ -432,7 +432,6 @@
     "Type": "Тип",
     "Size": "Размер",
     "Load G-code": "",
-    "Upload G-code": "Загрузить G-код",
     "Resume": "",
     "Pause": "Пауза",
     "Webcam": "Камера",
@@ -505,5 +504,6 @@
     "Zero All": "",
     "Go to Zero": "",
     "Home": "",
-    "Go Home": ""
+    "Go Home": "",
+    "Load File": ""
 }

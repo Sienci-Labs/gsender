@@ -432,7 +432,6 @@
     "Type": "Tip",
     "Size": "Boyut",
     "Load G-code": "G kodunu yükle",
-    "Upload G-code": "G kodunu yükle",
     "Resume": "Devam et",
     "Pause": "Beklet",
     "Webcam": "Web Kamera",
@@ -505,5 +504,6 @@
     "Zero All": "",
     "Go to Zero": "",
     "Home": "",
-    "Go Home": ""
+    "Go Home": "",
+    "Load File": ""
 }

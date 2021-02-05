@@ -432,7 +432,6 @@
     "Type": "Típus",
     "Size": "Méret",
     "Load G-code": "G-code Betöltés",
-    "Upload G-code": "G-code Feltöltés",
     "Resume": "",
     "Pause": "Pause",
     "Webcam": "Webkamera",
@@ -505,5 +504,6 @@
     "Zero All": "",
     "Go to Zero": "",
     "Home": "",
-    "Go Home": ""
+    "Go Home": "",
+    "Load File": ""
 }

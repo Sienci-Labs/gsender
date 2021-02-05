@@ -432,7 +432,6 @@
     "Type": "Typ",
     "Size": "Velikost",
     "Load G-code": "",
-    "Upload G-code": "Nahrát G-code",
     "Resume": "",
     "Pause": "Pause",
     "Webcam": "Webkamera",
@@ -505,5 +504,6 @@
     "Zero All": "",
     "Go to Zero": "",
     "Home": "",
-    "Go Home": ""
+    "Go Home": "",
+    "Load File": ""
 }

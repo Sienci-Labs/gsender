@@ -432,7 +432,6 @@
     "Type": "Tipo",
     "Size": "Tamaño",
     "Load G-code": "Cargar G-code",
-    "Upload G-code": "Subir G-code",
     "Resume": "",
     "Pause": "Pausar",
     "Webcam": "Camara web",
@@ -505,5 +504,6 @@
     "Zero All": "",
     "Go to Zero": "",
     "Home": "",
-    "Go Home": ""
+    "Go Home": "",
+    "Load File": ""
 }

@@ -432,7 +432,6 @@
     "Type": "类型",
     "Size": "大小",
     "Load G-code": "加载G-code",
-    "Upload G-code": "上传 G-code 文档",
     "Resume": "重新开始",
     "Pause": "暂停",
     "Webcam": "网络摄像机",
@@ -505,5 +504,6 @@
     "Zero All": "",
     "Go to Zero": "",
     "Home": "",
-    "Go Home": ""
+    "Go Home": "",
+    "Load File": ""
 }

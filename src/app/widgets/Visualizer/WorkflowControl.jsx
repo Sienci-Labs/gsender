@@ -168,7 +168,7 @@ class WorkflowControl extends PureComponent {
                             // disabled={!canUpload}
                             style={{ writingMode: 'vertical-lr' }}
                         >
-                            {i18n._('Load File')} <i className="fa fa-file" style={{ writingMode: 'vertical-lr' }} />
+                            {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
                         </button>
 
                         {
@@ -180,7 +180,7 @@ class WorkflowControl extends PureComponent {
                                     onClick={actions.handleRun}
                                     disabled={!canRun}
                                 >
-                                    {i18n._(`${workflow.state === 'paused' ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'vertical-lr' }} />
+                                    {i18n._(`${workflow.state === 'paused' ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
                             )
                         }
