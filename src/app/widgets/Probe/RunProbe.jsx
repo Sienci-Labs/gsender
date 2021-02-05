@@ -71,6 +71,12 @@ class RunProbe extends PureComponent {
         }, 15000);
     }
 
+    resetTimer() {
+        this.setState({
+            timer: 0
+        });
+    }
+
     verifyProbePosition() {
         this.setState({
             currentStep: 2
@@ -106,7 +112,10 @@ class RunProbe extends PureComponent {
                                     type="button"
                                     className="btn btn-default"
                                     disabled={(currentStep !== 0) && !testRunning}
-                                    onClick={() => this.runConnectivityTest(actions.returnProbeConnectivity)}
+                                    onClick={() => {
+                                        this.resetTimer();
+                                        this.runConnectivityTest(actions.returnProbeConnectivity);
+                                    }}
                                 >
                                     {i18n._('Confirm Probe Connectivity')}
                                 </button>
