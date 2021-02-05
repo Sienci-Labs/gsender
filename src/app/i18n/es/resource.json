@@ -432,7 +432,6 @@
     "Type": "Tipo",
     "Size": "Tamaño",
     "Load G-code": "Cargar G-code",
-    "Upload G-code": "Subir G-code",
     "Resume": "",
     "Pause": "Pausar",
     "Webcam": "Camara web",
@@ -509,5 +508,6 @@
     "Generate Probe Commands": "",
     "Confirm Probe Connectivity": "",
     "Confirm Router Position": "",
-    "Release": ""
+    "Release": "",
+    "Load File": ""
 }

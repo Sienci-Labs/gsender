@@ -432,7 +432,6 @@
     "Type": "Тип",
     "Size": "Размер",
     "Load G-code": "",
-    "Upload G-code": "Загрузить G-код",
     "Resume": "",
     "Pause": "Пауза",
     "Webcam": "Камера",
@@ -509,5 +508,6 @@
     "Generate Probe Commands": "",
     "Confirm Probe Connectivity": "",
     "Confirm Router Position": "",
-    "Release": ""
+    "Release": "",
+    "Load File": ""
 }

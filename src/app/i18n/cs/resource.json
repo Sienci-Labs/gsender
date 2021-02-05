@@ -432,7 +432,6 @@
     "Type": "Typ",
     "Size": "Velikost",
     "Load G-code": "",
-    "Upload G-code": "Nahrát G-code",
     "Resume": "",
     "Pause": "Pause",
     "Webcam": "Webkamera",
@@ -509,5 +508,6 @@
     "Generate Probe Commands": "",
     "Confirm Probe Connectivity": "",
     "Confirm Router Position": "",
-    "Release": ""
+    "Release": "",
+    "Load File": ""
 }

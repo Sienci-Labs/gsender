@@ -1,13 +1,11 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import cx from 'classnames';
 import Modal from 'app/components/Modal';
 import i18n from 'app/lib/i18n';
-import Image from 'app/components/Image';
 import ProbeTimer from './ProbeTimer';
 import styles from './index.styl';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
-import XYZProbe from './assets/xyz_probe.png';
+import ProbeImage from './ProbeImage';
 
 class RunProbe extends PureComponent {
     static propTypes = {
@@ -156,10 +154,7 @@ class RunProbe extends PureComponent {
                                 </div>
                             }
                             {
-                                <Image
-                                    src={XYZProbe}
-                                    className={cx({ [styles.imgHidden]: (currentStep === 0) })}
-                                />
+                                <ProbeImage probeCommand={probeCommand} visible={(currentStep !== 0)} />
 
                             }
                             {

@@ -432,7 +432,6 @@
     "Type": "Tip",
     "Size": "Boyut",
     "Load G-code": "G kodunu yükle",
-    "Upload G-code": "G kodunu yükle",
     "Resume": "Devam et",
     "Pause": "Beklet",
     "Webcam": "Web Kamera",
@@ -509,5 +508,6 @@
     "Generate Probe Commands": "",
     "Confirm Probe Connectivity": "",
     "Confirm Router Position": "",
-    "Release": ""
+    "Release": "",
+    "Load File": ""
 }

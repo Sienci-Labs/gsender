@@ -432,7 +432,6 @@
     "Type": "類型",
     "Size": "大小",
     "Load G-code": "載入 G-code",
-    "Upload G-code": "上傳 G-code",
     "Resume": "",
     "Pause": "暫停",
     "Webcam": "網路攝影機",
@@ -509,5 +508,6 @@
     "Generate Probe Commands": "",
     "Confirm Probe Connectivity": "",
     "Confirm Router Position": "",
-    "Release": ""
+    "Release": "",
+    "Load File": ""
 }

@@ -432,7 +432,6 @@
     "Type": "Type",
     "Size": "Size",
     "Load G-code": "Load G-code",
-    "Upload G-code": "Upload G-code",
     "Resume": "Resume",
     "Pause": "Pause",
     "Webcam": "Webcam",
@@ -509,5 +508,6 @@
     "Generate Probe Commands": "Generate Probe Commands",
     "Confirm Probe Connectivity": "Confirm Probe Connectivity",
     "Confirm Router Position": "Confirm Router Position",
-    "Release": "Release"
+    "Release": "Release",
+    "Load File": "Load File"
 }

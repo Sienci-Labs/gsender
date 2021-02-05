@@ -432,7 +432,6 @@
     "Type": "種類",
     "Size": "サイズ",
     "Load G-code": "G-codeの読み込み",
-    "Upload G-code": "G-codeのアップロード",
     "Resume": "復帰",
     "Pause": "一時停止",
     "Webcam": "ウェブカメラ",
@@ -509,5 +508,6 @@
     "Generate Probe Commands": "",
     "Confirm Probe Connectivity": "",
     "Confirm Router Position": "",
-    "Release": ""
+    "Release": "",
+    "Load File": ""
 }
