@@ -45,7 +45,7 @@ const IdleInfo = ({ state }) => {
     };
 
     return fileName ? (
-        <div>
+        <div style={{ margin: '0 3rem' }}>
             <div className={styles['idle-info']}>
                 <div>
                     <span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)
@@ -67,7 +67,7 @@ const IdleInfo = ({ state }) => {
             </div>
         </div>
     ) : (
-        <div className={styles['idle-info']}>
+        <div className={styles['disconnected-info']}>
             <div>{connected ? 'No File Loaded...' : 'Not Connected to a Machine...'}</div>
         </div>
     );
