@@ -1,9 +1,8 @@
 {
-  "name": "cncjs",
+  "name": "SienciSender",
   "version": "1.9.22",
   "description": "A web-based interface for CNC milling controller running Grbl, Marlin, Smoothieware, or TinyG",
-  "homepage": "https://github.com/cncjs/cncjs",
-  "author": "Cheton Wu <cheton@gmail.com>",
+  "author": "Sienci Labs",
   "main": "./dist/cncjs/server-cli.js",
   "bin": {
     "cncjs": "./bin/cncjs",
@@ -71,10 +70,10 @@
     "postinstall": "opencollective postinstall"
   },
   "build": {
-    "appId": "org.cncjs",
+    "appId": "org.sienci",
     "asar": false,
     "asarUnpack": [],
-    "productName": "SienciJS",
+    "productName": "Sienci Sender",
     "directories": {
       "buildResources": "electron-build",
       "output": "output",

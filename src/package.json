@@ -1,10 +1,9 @@
 {
-  "name": "cncjs-app",
+  "name": "SienciSender",
   "version": "1.9.22",
-  "productName": "CNCjs",
+  "productName": "Sienci Sender",
   "description": "CNC Milling Controller",
-  "homepage": "https://github.com/cncjs/cncjs",
-  "author": "Cheton Wu <cheton@gmail.com>",
+  "author": "Sienci Labs",
   "license": "MIT",
   "repository": {
     "type": "git",
