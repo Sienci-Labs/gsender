@@ -397,7 +397,7 @@ class Visualizer extends Component {
     }
 
     getVisibleHeight() {
-        const idleHeight = 205; // When the workflow status is idle, the job status widget's height is 100px
+        const idleHeight = 260; // When the workflow status is idle, the job status widget's height is 100px
         const runningHeight = 260; // When the workflow status is running or paused, the job status widget's height is 150px
 
         const { workflow } = this.props.state;
