@@ -19,6 +19,7 @@ import {
     METRIC_STEPS
 } from '../../constants';
 import styles from './index.styl';
+import JogControl from './components/JogControl';
 
 const KeypadText = styled.span`
     position: relative;
@@ -130,6 +131,11 @@ class Keypad extends PureComponent {
         const highlightX = canClickX && (jog.keypad || jog.axis === 'x');
         const highlightY = canClickY && (jog.keypad || jog.axis === 'y');
         const highlightZ = canClickZ && (jog.keypad || jog.axis === 'z');
+
+        // Feedrates and distances
+        const xyDistance = actions.getXYJogDistance();
+        //const zDistance = actions.getZJogDistance();
+        const feedrate = actions.getFeedrate();
 
         return (
             <div className={styles.keypad}>
@@ -289,24 +295,16 @@ class Keypad extends PureComponent {
                                 </div>
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnDown,
-                                                { [styles.highlight]: highlightY }
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ Y: -distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickY}
-                                            title={i18n._('Move Y-')}
+                                        <JogControl
+                                            className={styles.btnDown}
+                                            jog={() => actions.jog({ Y: -xyDistance, F: feedrate })}
+                                            continuousJog={() => actions.startContinuousJog({ Y: -1 }, feedrate)}
+                                            stopContinuousJog={() => actions.stopContinuousJog()}
+                                            disabled={!canClickXY}
                                         >
                                             <KeypadText>Y</KeypadText>
                                             <KeypadDirectionText>-</KeypadDirectionText>
-                                        </button>
+                                        </JogControl>
                                     </div>
                                 </div>
                                 <div className="col-xs-3">

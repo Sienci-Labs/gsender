@@ -154,7 +154,7 @@ class Spindle extends PureComponent {
                                         title={i18n._('Coolant Off (M9)', { ns: 'gcode' })}
                                         disabled={!canClick}
                                     >
-                                        <ic
+                                        <i
                                             className="fa fa-ban"
                                         />
                                         <Space width="6" />

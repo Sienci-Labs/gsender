@@ -1132,14 +1132,6 @@ class VisualizerWidget extends PureComponent {
                             />
                         </div>
                     )}
-                    {/* {showNotifications && (
-                        <Notifications
-                            show={showNotifications}
-                            type={state.notification.type}
-                            data={state.notification.data}
-                            onDismiss={actions.dismissNotification}
-                        />
-                    )} */}
                 </Widget.Content>
             </Widget>
         );

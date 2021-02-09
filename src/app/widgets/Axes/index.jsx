@@ -196,6 +196,12 @@ class AxesWidget extends PureComponent {
             controller.command('gcode', 'G0 ' + s);
             controller.command('gcode', 'G90'); // absolute
         },
+        startContinuousJog: (params = {}, feedrate = 1000) => {
+            controller.command('jog:continuous', params, feedrate);
+        },
+        stopContinuousJog: () => {
+            controller.command('jog:stop');
+        },
         move: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             controller.command('gcode', 'G0 ' + s);
