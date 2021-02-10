@@ -1258,7 +1258,6 @@ class Visualizer extends Component {
         if (!WebGL.isWebGLAvailable()) {
             return null;
         }
-
         return (
             <div
                 style={{

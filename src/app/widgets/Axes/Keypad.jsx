@@ -2,8 +2,8 @@
 import cx from 'classnames';
 import ensureArray from 'ensure-array';
 import frac from 'frac';
-import _includes from 'lodash/includes';
 import _uniqueId from 'lodash/uniqueId';
+import _includes from 'lodash/includes';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
@@ -19,6 +19,7 @@ import {
     METRIC_STEPS
 } from '../../constants';
 import styles from './index.styl';
+import JogControl from './components/JogControl';
 
 const KeypadText = styled.span`
     position: relative;
@@ -122,14 +123,19 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, axes, jog, actions } = this.props;
+        const { canClick, actions, axes } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
         const canClickZ = canClick && _includes(axes, 'z');
-        const highlightX = canClickX && (jog.keypad || jog.axis === 'x');
-        const highlightY = canClickY && (jog.keypad || jog.axis === 'y');
-        const highlightZ = canClickZ && (jog.keypad || jog.axis === 'z');
+
+        const xyControlsDisabled = !canClickXY;
+        const zControlsDisabled = !canClickZ;
+
+        // Feedrates and distances
+        const xyDistance = actions.getXYJogDistance();
+        const zDistance = actions.getZJogDistance();
+        const feedrate = actions.getFeedrate();
 
         return (
             <div className={styles.keypad}>
@@ -147,7 +153,7 @@ class Keypad extends PureComponent {
                                                 const feedrate = actions.getFeedrate();
                                                 actions.jog({ X: -distance, Y: distance, F: feedrate });
                                             }}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                             title={i18n._('Move X- Y+')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-up', styles['rotate--45deg'])} style={{ fontSize: 16 }} />
@@ -156,24 +162,16 @@ class Keypad extends PureComponent {
                                 </div>
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnUp,
-                                                { [styles.highlight]: highlightY }
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ Y: distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickY}
-                                            title={i18n._('Move Y+')}
+                                        <JogControl
+                                            className={styles.btnUp}
+                                            jog={() => actions.jog({ Y: xyDistance, F: feedrate })}
+                                            continuousJog={() => actions.startContinuousJog({ Y: 1 }, feedrate)}
+                                            stopContinuousJog={() => actions.stopContinuousJog()}
+                                            disabled={xyControlsDisabled}
                                         >
                                             <KeypadText>Y</KeypadText>
                                             <KeypadDirectionText>+</KeypadDirectionText>
-                                        </button>
+                                        </JogControl>
                                     </div>
                                 </div>
                                 <div className="col-xs-3">
@@ -186,7 +184,7 @@ class Keypad extends PureComponent {
                                                 const feedrate = actions.getFeedrate();
                                                 actions.jog({ X: distance, Y: distance, F: feedrate });
                                             }}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                             title={i18n._('Move X+ Y+')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-up', styles['rotate-45deg'])} style={{ fontSize: 16 }} />
@@ -195,24 +193,16 @@ class Keypad extends PureComponent {
                                 </div>
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnUp,
-                                                { [styles.highlight]: highlightZ }
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getZJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ Z: distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickZ}
-                                            title={i18n._('Move Z+')}
+                                        <JogControl
+                                            className={styles.btnUp}
+                                            jog={() => actions.jog({ Z: zDistance, F: feedrate })}
+                                            continuousJog={() => actions.startContinuousJog({ Z: 1 }, feedrate)}
+                                            stopContinuousJog={() => actions.stopContinuousJog()}
+                                            disabled={zControlsDisabled}
                                         >
                                             <KeypadText>Z</KeypadText>
                                             <KeypadDirectionText>+</KeypadDirectionText>
-                                        </button>
+                                        </JogControl>
                                     </div>
                                 </div>
                             </div>
@@ -221,47 +211,32 @@ class Keypad extends PureComponent {
                             <div className="row no-gutters">
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnLeft,
-                                                { [styles.highlight]: highlightX }
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ X: -distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickX}
-                                            title={i18n._('Move X-')}
+                                        <JogControl
+                                            className={styles.btnLeft}
+                                            jog={() => actions.jog({ X: -xyDistance, F: feedrate })}
+                                            continuousJog={() => actions.startContinuousJog({ X: -1 }, feedrate)}
+                                            stopContinuousJog={() => actions.stopContinuousJog()}
+                                            disabled={xyControlsDisabled}
                                         >
                                             <KeypadText>X</KeypadText>
                                             <KeypadDirectionText>-</KeypadDirectionText>
-                                        </button>
+                                        </JogControl>
                                     </div>
                                 </div>
                                 <div className="col-xs-3">
                                 </div>
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnRight
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ X: distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickX}
-                                            title={i18n._('Move X+')}
+                                        <JogControl
+                                            className={styles.btnRight}
+                                            jog={() => actions.jog({ X: xyDistance, F: feedrate })}
+                                            continuousJog={() => actions.startContinuousJog({ X: 1 }, feedrate)}
+                                            stopContinuousJog={() => actions.stopContinuousJog()}
+                                            disabled={xyControlsDisabled}
                                         >
                                             <KeypadText>X</KeypadText>
                                             <KeypadDirectionText>+</KeypadDirectionText>
-                                        </button>
+                                        </JogControl>
                                     </div>
                                 </div>
                                 <div className="col-xs-3">
@@ -280,7 +255,7 @@ class Keypad extends PureComponent {
                                                 const feedrate = actions.getFeedrate();
                                                 actions.jog({ X: -distance, Y: -distance, F: feedrate });
                                             }}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                             title={i18n._('Move X- Y-')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-down', styles['rotate-45deg'])} style={{ fontSize: 16 }} />
@@ -289,24 +264,16 @@ class Keypad extends PureComponent {
                                 </div>
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnDown,
-                                                { [styles.highlight]: highlightY }
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ Y: -distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickY}
-                                            title={i18n._('Move Y-')}
+                                        <JogControl
+                                            className={styles.btnDown}
+                                            jog={() => actions.jog({ Y: -xyDistance, F: feedrate })}
+                                            continuousJog={() => actions.startContinuousJog({ Y: -1 }, feedrate)}
+                                            stopContinuousJog={() => actions.stopContinuousJog()}
+                                            disabled={xyControlsDisabled}
                                         >
                                             <KeypadText>Y</KeypadText>
                                             <KeypadDirectionText>-</KeypadDirectionText>
-                                        </button>
+                                        </JogControl>
                                     </div>
                                 </div>
                                 <div className="col-xs-3">
@@ -318,7 +285,7 @@ class Keypad extends PureComponent {
                                                 const distance = actions.getJogDistance();
                                                 actions.jog({ X: distance, Y: -distance });
                                             }}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                             title={i18n._('Move X+ Y-')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-down', styles['rotate--45deg'])} style={{ fontSize: 16 }} />
@@ -327,37 +294,29 @@ class Keypad extends PureComponent {
                                 </div>
                                 <div className="col-xs-3">
                                     <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnDown,
-                                                { [styles.highlight]: highlightZ }
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getZJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ Z: -distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickZ}
-                                            title={i18n._('Move Z-')}
+                                        <JogControl
+                                            className={styles.btnDown}
+                                            jog={() => actions.jog({ Z: -zDistance, F: feedrate })}
+                                            continuousJog={() => actions.startContinuousJog({ Z: -1 }, feedrate)}
+                                            stopContinuousJog={() => actions.stopContinuousJog()}
+                                            disabled={zControlsDisabled}
                                         >
                                             <KeypadText>Z</KeypadText>
                                             <KeypadDirectionText>-</KeypadDirectionText>
-                                        </button>
+                                        </JogControl>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className={cx('col-xs-4', styles.flexCol)}>
-                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(20, 10, 5000)}>
+                        <button disabled={!canClick} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(20, 10, 5000)}>
                             Rapid
                         </button>
-                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(5, 2, 3000)}>
+                        <button disabled={!canClick} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(5, 2, 3000)}>
                             Normal
                         </button>
-                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(0.5, 0.1, 1000)}>
+                        <button disabled={!canClick} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(0.5, 0.1, 1000)}>
                             Precise
                         </button>
                     </div>

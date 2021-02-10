@@ -26,20 +26,12 @@ import {
     METRIC_STEPS,
     // Grbl
     GRBL,
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_RUN,
     // Marlin
     MARLIN,
     // Smoothie
     SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_IDLE,
-    SMOOTHIE_ACTIVE_STATE_RUN,
     // TinyG
     TINYG,
-    TINYG_MACHINE_STATE_READY,
-    TINYG_MACHINE_STATE_STOP,
-    TINYG_MACHINE_STATE_END,
-    TINYG_MACHINE_STATE_RUN,
     // Workflow
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
@@ -195,6 +187,17 @@ class AxesWidget extends PureComponent {
             controller.command('gcode', 'G91'); // relative
             controller.command('gcode', 'G0 ' + s);
             controller.command('gcode', 'G90'); // absolute
+        },
+        startContinuousJog: (params = {}, feedrate = 1000) => {
+            this.setState({
+                isContinuousJogging: true
+            }, controller.command('jog:continuous', params, feedrate));
+        },
+        stopContinuousJog: () => {
+            this.setState({
+                isContinuousJogging: false
+            });
+            controller.command('jog:stop');
         },
         move: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
@@ -703,6 +706,7 @@ class AxesWidget extends PureComponent {
             canClick: true, // Defaults to true
             port: controller.port,
             units: METRIC_UNITS,
+            isContinuousJogging: false,
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -797,53 +801,17 @@ class AxesWidget extends PureComponent {
     }
 
     canClick() {
-        const { port, workflow } = this.state;
+        const { port, workflow, isContinuousJogging } = this.state;
         const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
 
         if (!port) {
             return false;
         }
-        if (workflow.state === WORKFLOW_STATE_RUNNING) {
+        if (workflow.state === WORKFLOW_STATE_RUNNING && !isContinuousJogging) {
             return false;
         }
         if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
             return false;
-        }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE,
-                GRBL_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Ignore
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_IDLE,
-                SMOOTHIE_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_READY,
-                TINYG_MACHINE_STATE_STOP,
-                TINYG_MACHINE_STATE_END,
-                TINYG_MACHINE_STATE_RUN
-            ];
-            if (!includes(states, machineState)) {
-                return false;
-            }
         }
 
         return true;

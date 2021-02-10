@@ -101,6 +101,10 @@ class ConsoleWidget extends PureComponent {
             }
 
             data = String(data).trim();
+            // Handle non-ascii characters more gracefully
+            data = data.replace(/[^\x20-\x7E]/g, (m) => {
+                return '\\x' + m.charCodeAt(0).toString(16);
+            });
 
             if (source) {
                 this.terminal.writeln(color.blackBright(source) + color.white(this.terminal.prompt + data));
