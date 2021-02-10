@@ -1302,12 +1302,12 @@ class GrblController {
 
                 this.jogInterval = setInterval(() => {
                     if (this.jogging) {
-                        if (!this.feeder.isPending()) {
+                        if (!this.feeder.isPending() && this.feeder.size() < 2) {
                             this.feeder.feed(jogCommand);
                             this.feeder.next();
                         }
                     }
-                }, 100);
+                }, 250);
             },
             'jog:stop': () => {
                 this.jogging = false;
