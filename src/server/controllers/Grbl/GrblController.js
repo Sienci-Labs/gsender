@@ -129,10 +129,6 @@ class GrblController {
     // Workflow
     workflow = null;
 
-    // Continuous Jogging indicators
-    jogging = false
-    jogInterval = null;
-
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -464,6 +460,7 @@ class GrblController {
             this.emit('serialport:read', res.raw);
 
             // Feeder
+            this.feeder.ack();
             this.feeder.next();
         });
 
@@ -509,6 +506,7 @@ class GrblController {
             }
 
             // Feeder
+            this.feeder.ack();
             this.feeder.next();
         });
 
@@ -1284,7 +1282,6 @@ class GrblController {
             'jog:continuous': () => {
                 const [axes, feedrate = 1000] = args;
                 const JOG_COMMAND_INTERVAL = 100;
-                this.jogging = true;
 
                 // Borrowed from UGS
                 // /ugs-core/src/com/willwinder/universalgcodesender/utils/ContinuousJogWorker.java Line 107
@@ -1296,25 +1293,13 @@ class GrblController {
 
                 axes.F = feedrate;
 
-                const jogCommand = 'G0 ' + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+                const jogCommand = '$J=G91 ' + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
 
-                this.command('gcode', 'G91');
-
-                this.jogInterval = setInterval(() => {
-                    if (this.jogging) {
-                        if (!this.feeder.isPending() && this.feeder.size() < 2) {
-                            this.feeder.feed(jogCommand);
-                            this.feeder.next();
-                        }
-                    }
-                }, 250);
+                this.feeder.repeatCommand(jogCommand);
             },
             'jog:stop': () => {
-                this.jogging = false;
-                this.jogInterval && clearInterval(this.jogInterval);
-                this.jogInterval = null;
-                this.feeder.hold();
                 this.feeder.reset();
+                this.command('gcode', '\x85');
                 this.command('gcode', 'G90');
             },
             'macro:run': () => {

@@ -2,8 +2,8 @@
 import cx from 'classnames';
 import ensureArray from 'ensure-array';
 import frac from 'frac';
-import _includes from 'lodash/includes';
 import _uniqueId from 'lodash/uniqueId';
+import _includes from 'lodash/includes';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
@@ -123,11 +123,14 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, axes, actions } = this.props;
+        const { canClick, actions, axes } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
         const canClickZ = canClick && _includes(axes, 'z');
+
+        const xyControlsDisabled = !canClickXY;
+        const zControlsDisabled = !canClickZ;
 
         // Feedrates and distances
         const xyDistance = actions.getXYJogDistance();
@@ -150,7 +153,7 @@ class Keypad extends PureComponent {
                                                 const feedrate = actions.getFeedrate();
                                                 actions.jog({ X: -distance, Y: distance, F: feedrate });
                                             }}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                             title={i18n._('Move X- Y+')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-up', styles['rotate--45deg'])} style={{ fontSize: 16 }} />
@@ -164,7 +167,7 @@ class Keypad extends PureComponent {
                                             jog={() => actions.jog({ Y: xyDistance, F: feedrate })}
                                             continuousJog={() => actions.startContinuousJog({ Y: 1 }, feedrate)}
                                             stopContinuousJog={() => actions.stopContinuousJog()}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                         >
                                             <KeypadText>Y</KeypadText>
                                             <KeypadDirectionText>+</KeypadDirectionText>
@@ -181,7 +184,7 @@ class Keypad extends PureComponent {
                                                 const feedrate = actions.getFeedrate();
                                                 actions.jog({ X: distance, Y: distance, F: feedrate });
                                             }}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                             title={i18n._('Move X+ Y+')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-up', styles['rotate-45deg'])} style={{ fontSize: 16 }} />
@@ -195,7 +198,7 @@ class Keypad extends PureComponent {
                                             jog={() => actions.jog({ Z: zDistance, F: feedrate })}
                                             continuousJog={() => actions.startContinuousJog({ Z: 1 }, feedrate)}
                                             stopContinuousJog={() => actions.stopContinuousJog()}
-                                            disabled={!canClickZ}
+                                            disabled={zControlsDisabled}
                                         >
                                             <KeypadText>Z</KeypadText>
                                             <KeypadDirectionText>+</KeypadDirectionText>
@@ -213,7 +216,7 @@ class Keypad extends PureComponent {
                                             jog={() => actions.jog({ X: -xyDistance, F: feedrate })}
                                             continuousJog={() => actions.startContinuousJog({ X: -1 }, feedrate)}
                                             stopContinuousJog={() => actions.stopContinuousJog()}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                         >
                                             <KeypadText>X</KeypadText>
                                             <KeypadDirectionText>-</KeypadDirectionText>
@@ -229,7 +232,7 @@ class Keypad extends PureComponent {
                                             jog={() => actions.jog({ X: xyDistance, F: feedrate })}
                                             continuousJog={() => actions.startContinuousJog({ X: 1 }, feedrate)}
                                             stopContinuousJog={() => actions.stopContinuousJog()}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                         >
                                             <KeypadText>X</KeypadText>
                                             <KeypadDirectionText>+</KeypadDirectionText>
@@ -252,7 +255,7 @@ class Keypad extends PureComponent {
                                                 const feedrate = actions.getFeedrate();
                                                 actions.jog({ X: -distance, Y: -distance, F: feedrate });
                                             }}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                             title={i18n._('Move X- Y-')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-down', styles['rotate-45deg'])} style={{ fontSize: 16 }} />
@@ -266,7 +269,7 @@ class Keypad extends PureComponent {
                                             jog={() => actions.jog({ Y: -xyDistance, F: feedrate })}
                                             continuousJog={() => actions.startContinuousJog({ Y: -1 }, feedrate)}
                                             stopContinuousJog={() => actions.stopContinuousJog()}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                         >
                                             <KeypadText>Y</KeypadText>
                                             <KeypadDirectionText>-</KeypadDirectionText>
@@ -282,7 +285,7 @@ class Keypad extends PureComponent {
                                                 const distance = actions.getJogDistance();
                                                 actions.jog({ X: distance, Y: -distance });
                                             }}
-                                            disabled={!canClickXY}
+                                            disabled={xyControlsDisabled}
                                             title={i18n._('Move X+ Y-')}
                                         >
                                             <i className={cx('fa', 'fa-arrow-circle-down', styles['rotate--45deg'])} style={{ fontSize: 16 }} />
@@ -296,7 +299,7 @@ class Keypad extends PureComponent {
                                             jog={() => actions.jog({ Z: -zDistance, F: feedrate })}
                                             continuousJog={() => actions.startContinuousJog({ Z: -1 }, feedrate)}
                                             stopContinuousJog={() => actions.stopContinuousJog()}
-                                            disabled={!canClickZ}
+                                            disabled={zControlsDisabled}
                                         >
                                             <KeypadText>Z</KeypadText>
                                             <KeypadDirectionText>-</KeypadDirectionText>
@@ -307,13 +310,13 @@ class Keypad extends PureComponent {
                         </div>
                     </div>
                     <div className={cx('col-xs-4', styles.flexCol)}>
-                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(20, 10, 5000)}>
+                        <button disabled={!canClick} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(20, 10, 5000)}>
                             Rapid
                         </button>
-                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(5, 2, 3000)}>
+                        <button disabled={!canClick} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(5, 2, 3000)}>
                             Normal
                         </button>
-                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(0.5, 0.1, 1000)}>
+                        <button disabled={!canClick} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(0.5, 0.1, 1000)}>
                             Precise
                         </button>
                     </div>

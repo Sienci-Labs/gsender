@@ -6,7 +6,9 @@ class Feeder extends events.EventEmitter {
         holdReason: null,
         queue: [],
         pending: false,
-        changed: false
+        changed: false,
+        outstanding: 0,
+        interval: null
     };
 
     dataFilter = null;
@@ -73,6 +75,8 @@ class Feeder extends events.EventEmitter {
     clear() {
         this.state.queue = [];
         this.state.pending = false;
+        this.state.outstanding = 0;
+        this.state.interval && clearInterval(this.state.interval);
         this.emit('change');
     }
 
@@ -81,6 +85,8 @@ class Feeder extends events.EventEmitter {
         this.state.holdReason = null;
         this.state.queue = [];
         this.state.pending = false;
+        this.state.outstanding = 0;
+        this.state.interval && clearInterval(this.state.interval);
         this.emit('change');
     }
 
@@ -100,6 +106,7 @@ class Feeder extends events.EventEmitter {
             }
 
             this.state.pending = true;
+            this.state.outstanding++;
             this.emit('data', command, context);
             this.emit('change');
             break;
@@ -122,6 +129,27 @@ class Feeder extends events.EventEmitter {
         const changed = this.state.changed;
         this.state.changed = false;
         return changed;
+    }
+
+    ack() {
+        if (this.state.outstanding > 0) {
+            this.state.outstanding--;
+        }
+    }
+
+    hasOutstanding() {
+        return this.state.outstanding > 0;
+    }
+
+    repeatCommand(command, timer = 250) {
+        this.state.interval = setInterval(() => {
+            if (!this.hasOutstanding()) {
+                this.feed(command);
+                if (!this.isPending()) {
+                    this.next();
+                }
+            }
+        }, timer);
     }
 }
 

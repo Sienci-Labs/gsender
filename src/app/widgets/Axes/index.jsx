@@ -197,9 +197,14 @@ class AxesWidget extends PureComponent {
             controller.command('gcode', 'G90'); // absolute
         },
         startContinuousJog: (params = {}, feedrate = 1000) => {
-            controller.command('jog:continuous', params, feedrate);
+            this.setState({
+                isContinuousJogging: true
+            }, controller.command('jog:continuous', params, feedrate));
         },
         stopContinuousJog: () => {
+            this.setState({
+                isContinuousJogging: false
+            });
             controller.command('jog:stop');
         },
         move: (params = {}) => {
@@ -709,6 +714,7 @@ class AxesWidget extends PureComponent {
             canClick: true, // Defaults to true
             port: controller.port,
             units: METRIC_UNITS,
+            isContinuousJogging: false,
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -803,14 +809,14 @@ class AxesWidget extends PureComponent {
     }
 
     canClick() {
-        const { port, workflow } = this.state;
+        const { port, workflow, isContinuousJogging } = this.state;
         const controllerType = this.state.controller.type;
         const controllerState = this.state.controller.state;
 
         if (!port) {
             return false;
         }
-        if (workflow.state === WORKFLOW_STATE_RUNNING) {
+        if (workflow.state === WORKFLOW_STATE_RUNNING && !isContinuousJogging) {
             return false;
         }
         if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
@@ -822,7 +828,7 @@ class AxesWidget extends PureComponent {
                 GRBL_ACTIVE_STATE_IDLE,
                 GRBL_ACTIVE_STATE_RUN
             ];
-            if (!includes(states, activeState)) {
+            if (!includes(states, activeState) && !isContinuousJogging) {
                 return false;
             }
         }
