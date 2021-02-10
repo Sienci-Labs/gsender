@@ -141,7 +141,7 @@ class Feeder extends events.EventEmitter {
         return this.state.outstanding > 0;
     }
 
-    repeatCommand(command, timer = 250) {
+    repeatCommand(command, timer = 200) {
         this.state.interval = setInterval(() => {
             if (!this.hasOutstanding()) {
                 this.feed(command);

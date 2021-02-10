@@ -26,20 +26,12 @@ import {
     METRIC_STEPS,
     // Grbl
     GRBL,
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_RUN,
     // Marlin
     MARLIN,
     // Smoothie
     SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_IDLE,
-    SMOOTHIE_ACTIVE_STATE_RUN,
     // TinyG
     TINYG,
-    TINYG_MACHINE_STATE_READY,
-    TINYG_MACHINE_STATE_STOP,
-    TINYG_MACHINE_STATE_END,
-    TINYG_MACHINE_STATE_RUN,
     // Workflow
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
@@ -811,7 +803,6 @@ class AxesWidget extends PureComponent {
     canClick() {
         const { port, workflow, isContinuousJogging } = this.state;
         const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
 
         if (!port) {
             return false;
@@ -821,41 +812,6 @@ class AxesWidget extends PureComponent {
         }
         if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
             return false;
-        }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE,
-                GRBL_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState) && !isContinuousJogging) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Ignore
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_IDLE,
-                SMOOTHIE_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_READY,
-                TINYG_MACHINE_STATE_STOP,
-                TINYG_MACHINE_STATE_END,
-                TINYG_MACHINE_STATE_RUN
-            ];
-            if (!includes(states, machineState)) {
-                return false;
-            }
         }
 
         return true;
