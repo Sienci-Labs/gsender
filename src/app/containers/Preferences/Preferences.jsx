@@ -8,18 +8,22 @@ import ProbeSettings from './Probe/ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import store from '../../store';
 import styles from './index.styl';
-import { IMPERIAL_UNITS, METRIC_UNITS } from '../../constants';
+import { IMPERIAL_UNITS, METRIC_UNITS, GRBL } from '../../constants';
 
 
 class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
     state = this.getInitialState();
 
-
     getInitialState() {
         return {
             selectedMenu: 0,
             units: store.get('workspace.units', METRIC_UNITS),
+            controller: {
+                type: controller.type,
+                settings: controller.settings,
+                state: controller.state
+            },
             menu: [
                 {
                     id: 0,
@@ -66,14 +70,10 @@ class PreferencesPage extends PureComponent {
         },
         general: {
             setUnits: (units) => {
-                if (units === METRIC_UNITS) {
-                    controller.command('gcode', 'G21');
-                } else if (units === IMPERIAL_UNITS) {
-                    controller.command('gcode', 'G20');
-                }
                 this.setState({
                     units: units
                 });
+                controller.command('unitChange', units);
             }
         },
         tool: {
@@ -214,6 +214,43 @@ class PreferencesPage extends PureComponent {
         }
     }
 
+    controllerEvents = {
+        'unitChange': (units) => {
+            this.setState({
+                units: units
+            });
+        },
+        'controller:settings': (type, controllerSettings) => {
+            this.setState(state => ({
+                controller: {
+                    ...state.controller,
+                    type: type,
+                    settings: controllerSettings
+                }
+            }));
+        },
+        'controller:state': (type, controllerState) => {
+            // Grbl
+            if (type === GRBL) {
+                const { parserstate } = { ...controllerState };
+                const { modal = {} } = { ...parserstate };
+                const units = {
+                    'G20': IMPERIAL_UNITS,
+                    'G21': METRIC_UNITS
+                }[modal.units] || this.state.units;
+
+                this.setState(state => ({
+                    units: units,
+                    controller: {
+                        ...state.controller,
+                        type: type,
+                        state: controllerState
+                    },
+                }));
+            }
+        }
+    };
+
     componentDidUpdate(prevProps, prevState) {
         const { tools, tool, probe, probeSettings, units } = this.state;
         store.set('workspace.units', units);
@@ -231,6 +268,28 @@ class PreferencesPage extends PureComponent {
 
     convertToImperial(diameter) {
         return (diameter / 25.4).toFixed(3);
+    }
+
+    componentDidMount() {
+        this.addControllerEvents();
+    }
+
+    componentWillUnmount() {
+        this.removeControllerEvents();
+    }
+
+    addControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.addListener(eventName, callback);
+        });
+    }
+
+    removeControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.removeListener(eventName, callback);
+        });
     }
 
     render() {

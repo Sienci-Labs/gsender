@@ -123,7 +123,7 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, actions, axes } = this.props;
+        const { canClick, actions, axes, units } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -310,13 +310,39 @@ class Keypad extends PureComponent {
                         </div>
                     </div>
                     <div className={cx('col-xs-4', styles.flexCol)}>
-                        <button disabled={!canClick} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(20, 10, 5000)}>
+                        <button
+                            disabled={!canClick} type="button"
+                            className={styles.movementRateButton}
+                            onClick={() => {
+                                const xyStep = (units === 'mm') ? 20 : 1;
+                                const zStep = (units === 'mm') ? 10 : 0.5;
+                                actions.changeMovementRates(xyStep, zStep, 5000);
+                            }}
+                        >
                             Rapid
                         </button>
-                        <button disabled={!canClick} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(5, 2, 3000)}>
+                        <button
+                            disabled={!canClick}
+                            type="button"
+                            className={styles.movementRateButton}
+                            onClick={() => {
+                                const xyStep = (units === 'mm') ? 5 : 0.2;
+                                const zStep = (units === 'mm') ? 2 : 0.04;
+                                actions.changeMovementRates(xyStep, zStep, 3000);
+                            }}
+                        >
                             Normal
                         </button>
-                        <button disabled={!canClick} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(0.5, 0.1, 1000)}>
+                        <button
+                            disabled={!canClick}
+                            type="button"
+                            className={styles.movementRateButton}
+                            onClick={() => {
+                                const xyStep = (units === 'mm') ? 0.5 : 0.02;
+                                const zStep = (units === 'mm') ? 0.1 : 0.004;
+                                actions.changeMovementRates(xyStep, zStep, 3000);
+                            }}
+                        >
                             Precise
                         </button>
                     </div>

@@ -431,6 +431,11 @@ class LocationWidget extends PureComponent {
     };
 
     controllerEvents = {
+        'unitChange': (units) => {
+            this.setState({
+                units: units
+            });
+        },
         'config:change': () => {
             this.fetchMDICommands();
         },
@@ -477,17 +482,12 @@ class LocationWidget extends PureComponent {
         'controller:state': (type, controllerState) => {
             // Grbl
             if (type === GRBL) {
-                const { status, parserstate } = { ...controllerState };
+                const { status } = { ...controllerState };
                 const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
+
                 const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
-                    units: units,
                     controller: {
                         ...state.controller,
                         type: type,

@@ -16,6 +16,7 @@ import i18n from 'app/lib/i18n';
 import { in2mm, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
+import store from '../../store';
 import Axes from './Axes';
 import ShuttleControl from './ShuttleControl';
 import {
@@ -191,7 +192,7 @@ class AxesWidget extends PureComponent {
         startContinuousJog: (params = {}, feedrate = 1000) => {
             this.setState({
                 isContinuousJogging: true
-            }, controller.command('jog:continuous', params, feedrate));
+            }, controller.command('jog:start', params, feedrate));
         },
         stopContinuousJog: () => {
             this.setState({
@@ -474,6 +475,11 @@ class AxesWidget extends PureComponent {
     };
 
     controllerEvents = {
+        'unitChange': (units) => {
+            this.setState({
+                units: units
+            });
+        },
         'config:change': () => {
             this.fetchMDICommands();
         },
@@ -520,17 +526,11 @@ class AxesWidget extends PureComponent {
         'controller:state': (type, controllerState) => {
             // Grbl
             if (type === GRBL) {
-                const { status, parserstate } = { ...controllerState };
+                const { status } = { ...controllerState };
                 const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
                 const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
-                    units: units,
                     controller: {
                         ...state.controller,
                         type: type,
@@ -705,7 +705,7 @@ class AxesWidget extends PureComponent {
             isFullscreen: false,
             canClick: true, // Defaults to true
             port: controller.port,
-            units: METRIC_UNITS,
+            units: store.get('workspace.units', METRIC_UNITS),
             isContinuousJogging: false,
             controller: {
                 type: controller.type,
