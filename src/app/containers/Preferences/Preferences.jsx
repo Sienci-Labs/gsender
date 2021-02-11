@@ -1,5 +1,6 @@
 import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
+import pubsub from 'pubsub-js';
 import controller from 'app/lib/controller';
 import GeneralSettings from './GeneralSettings';
 import ToolSettings from './Tools/Tools';
@@ -8,7 +9,7 @@ import ProbeSettings from './Probe/ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import store from '../../store';
 import styles from './index.styl';
-import { IMPERIAL_UNITS, METRIC_UNITS, GRBL } from '../../constants';
+import { METRIC_UNITS } from '../../constants';
 
 
 class PreferencesPage extends PureComponent {
@@ -73,7 +74,7 @@ class PreferencesPage extends PureComponent {
                 this.setState({
                     units: units
                 });
-                controller.command('unitChange', units);
+                pubsub.publish('units:change', units);
             }
         },
         tool: {
@@ -214,43 +215,6 @@ class PreferencesPage extends PureComponent {
         }
     }
 
-    controllerEvents = {
-        'unitChange': (units) => {
-            this.setState({
-                units: units
-            });
-        },
-        'controller:settings': (type, controllerSettings) => {
-            this.setState(state => ({
-                controller: {
-                    ...state.controller,
-                    type: type,
-                    settings: controllerSettings
-                }
-            }));
-        },
-        'controller:state': (type, controllerState) => {
-            // Grbl
-            if (type === GRBL) {
-                const { parserstate } = { ...controllerState };
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                }));
-            }
-        }
-    };
-
     componentDidUpdate(prevProps, prevState) {
         const { tools, tool, probe, probeSettings, units } = this.state;
         store.set('workspace.units', units);
@@ -268,28 +232,6 @@ class PreferencesPage extends PureComponent {
 
     convertToImperial(diameter) {
         return (diameter / 25.4).toFixed(3);
-    }
-
-    componentDidMount() {
-        this.addControllerEvents();
-    }
-
-    componentWillUnmount() {
-        this.removeControllerEvents();
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     render() {

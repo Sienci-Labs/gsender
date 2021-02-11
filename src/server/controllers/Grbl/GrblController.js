@@ -1281,14 +1281,18 @@ class GrblController {
             },
             'gcode:safe': () => {
                 const [commands, prefUnits] = args;
-                const deviceUnits = this.state.modal.units;
+                const deviceUnits = this.state.parserstate.modal.units;
 
                 if (!deviceUnits) {
                     log.error('Unable to determine device unit modal');
                     return;
                 }
-                this.command('gcode', prefUnits);
+                // Force command in preferred units
+                if (prefUnits !== deviceUnits) {
+                    this.command('gcode', prefUnits);
+                }
                 this.command('gcode', commands);
+                // return modal to previous state if they were different previously
                 if (prefUnits !== deviceUnits) {
                     this.command('gcode', deviceUnits);
                 }
@@ -1315,11 +1319,6 @@ class GrblController {
                 this.feeder.reset();
                 this.command('gcode', '\x85');
                 this.command('gcode', 'G90');
-            },
-            'unitChange': () => {
-                const [units] = args;
-                console.log(units);
-                this.emit('unitChange', units);
             },
             'macro:run': () => {
                 let [id, context = {}, callback = noop] = args;

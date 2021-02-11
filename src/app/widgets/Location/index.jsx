@@ -431,11 +431,6 @@ class LocationWidget extends PureComponent {
     };
 
     controllerEvents = {
-        'unitChange': (units) => {
-            this.setState({
-                units: units
-            });
-        },
         'config:change': () => {
             this.fetchMDICommands();
         },

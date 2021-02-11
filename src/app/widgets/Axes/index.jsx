@@ -16,6 +16,7 @@ import i18n from 'app/lib/i18n';
 import { in2mm, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
+import pubsub from 'pubsub-js';
 import store from '../../store';
 import Axes from './Axes';
 import ShuttleControl from './ShuttleControl';
@@ -42,6 +43,7 @@ import {
 } from './constants';
 import styles from './index.styl';
 
+
 class AxesWidget extends PureComponent {
     static propTypes = {
         widgetId: PropTypes.string.isRequired,
@@ -62,6 +64,8 @@ class AxesWidget extends PureComponent {
     config = new WidgetConfig(this.props.widgetId);
 
     state = this.getInitialState();
+
+    pubsubTokens = [];
 
     actions = {
         toggleFullscreen: () => {
@@ -184,12 +188,18 @@ class AxesWidget extends PureComponent {
             controller.command('gcode', gcode);
         },
         jog: (params = {}) => {
+            const { units } = this.state;
+            const modal = (units === 'mm') ? 'G21' : 'G20';
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-            controller.command('gcode', 'G91'); // relative
-            controller.command('gcode', 'G0 ' + s);
-            controller.command('gcode', 'G90'); // absolute
+            const commands = [
+                'G91',
+                'G0 ' + s,
+                'G90'
+            ];
+            controller.command('gcode:safe', commands, modal);
         },
         startContinuousJog: (params = {}, feedrate = 1000) => {
+            //const modal = (units === 'mm') ? 'G21' : 'G20';
             this.setState({
                 isContinuousJogging: true
             }, controller.command('jog:start', params, feedrate));
@@ -475,11 +485,6 @@ class AxesWidget extends PureComponent {
     };
 
     controllerEvents = {
-        'unitChange': (units) => {
-            this.setState({
-                units: units
-            });
-        },
         'config:change': () => {
             this.fetchMDICommands();
         },
@@ -671,11 +676,13 @@ class AxesWidget extends PureComponent {
         this.fetchMDICommands();
         this.addControllerEvents();
         this.addShuttleControlEvents();
+        this.subscribe();
     }
 
     componentWillUnmount() {
         this.removeControllerEvents();
         this.removeShuttleControlEvents();
+        this.unsubscribe();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -770,6 +777,28 @@ class AxesWidget extends PureComponent {
             const callback = this.controllerEvents[eventName];
             controller.removeListener(eventName, callback);
         });
+    }
+
+    changeUnits(units) {
+        this.setState({
+            units: units
+        });
+    }
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('units:change', (event, units) => {
+                this.changeUnits(units);
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
     }
 
     addShuttleControlEvents() {
