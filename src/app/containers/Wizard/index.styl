@@ -1,0 +1,421 @@
+.wizardContainer {
+  width: 1000px;
+  height: 100%;
+  display: flex;
+  flex-grow: 1;
+  border: solid 1px #aab0ba;
+}
+
+.containerFluid {
+  padding-right: 15px;
+  margin-top: 25px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.modalScroll {
+  overflow-y: auto;
+  height: 617px;
+}
+
+.singleToggle {
+  margin-left: 10vw;
+}
+
+.numberValues {
+  margin-left: 1vw;
+}
+
+.descriptionRow {
+  display: -webkit-flex;
+  font-size: medium;
+  width: 100%;
+  margin-top: 8%;
+  padding-left: 15px;
+  padding-right: 15px;
+  border-bottom: 2px solid #a2abd6;
+}
+
+.keyRow {
+  width: 50px;
+  font-family: Georgia, serif;
+  font-size: 21px;
+}
+
+.itemText {
+  font-weight: bold;
+  width: 35%;
+  font-size: large;
+  text-align: center;
+}
+
+.wizardContent {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+}
+
+.wizardMenu {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  background: #1F2937;
+
+  h3 {
+    color: #3e85c7;
+    padding-left: 10px;
+  }
+
+  button + button {
+    border-top: solid 1px #6B7280;
+  }
+
+  button {
+    border: none;
+    width: 100%;
+    margin: 0;
+    background: none;
+    color: white;
+    text-align: left;
+    padding: 10px 0 10px 10px;
+
+    &:focus {
+      outline: none;
+    }
+
+    &:hover {
+      background: #374151;
+    }
+
+    &:last-child {
+      border-bottom: solid 1px #6B7280;
+    }
+  }
+}
+
+.activeMenu button {
+  background: #374151 !important;
+}
+
+.wizardOptions {
+  width: 85%;
+  background: #d1d5db;
+  padding: 10px;
+  overflow-y: auto;
+  height: 617px;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+.tool-main {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+
+  h4 {
+    color: #3e85c7;
+    font-size: 1.4rem;
+  }
+}
+
+.tool-listings {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+}
+
+.add-tool-form {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.tools {
+  width: 100%;
+  border-radius: .5rem;
+  background: white;
+
+  .delete {
+    color: red;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    outline: none;
+    background: none;
+  }
+}
+
+.tool {
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  font-size: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.tool-dimensions {
+  width: 30%;
+}
+
+.tool + .tool {
+  border-top: solid 1px #cccccc;
+}
+
+.add-tool {
+  width: 100%;
+  background: #3e85c7;
+  color: #FFFFFF;
+  outline: none;
+  border: none;
+  padding: .5rem;
+  border-radius: .25rem;
+
+  &:disabled {
+    background: #6B7280;
+  }
+}
+
+.input-spread {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.probe-info {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.modal-main {
+  position: fixed;
+  background: #D9DCE1;
+  width: 50%;
+  height: 85%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.wizardModalFooter {
+  margin-top: 166%;
+  width: 100%;
+  min-height: 56px;
+  margin-top: 0;
+  text-align: right;
+  background-color: #eee;
+  padding: 0;
+  position: fixed;
+  bottom: 0;
+}
+
+/* HEADER
+================================== */
+.modalButton {
+  border: 1px solid #9CA3AF;
+  color: #3E85C7;
+  background-color: #D1D5DB;
+  border-radius: .25rem;
+  width: 100%;
+  max-width: 10rem;
+  padding: 5px;
+  margin: 0;
+  -webkit-transition: 200ms ease-in-out;
+  transition: 200ms ease-in-out;
+}
+
+.modalButton:hover {
+  color: #3E85C7;
+  border: 1px solid #3E85C7;
+  -webkit-transition: 200ms ease-in-out;
+  transition: 200ms ease-in-out;
+  background-color: #E5E7EB;
+}
+
+/* Tables
+================================== */
+.tablerowKeyValues {
+  background-color: white;
+  height: 30px;
+  display: -webkit-flex;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-bottom: 10px;
+}
+
+.text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 20px;
+  height: 28px;
+  margin-left: -5%;
+}
+
+.headerRow {
+  font-weight: bold;
+  -webkit-flex-grow: 1;
+  padding-top: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 20px;
+}
+
+.text {
+  width: 10px;
+}
+
+.keyRow {
+  width: 35px;
+}
+
+.num {
+  width: 5px;
+}
+
+.material-switch>input[type='checkbox'] {
+  display: none;
+}
+
+.material-switch>label {
+  cursor: pointer;
+  height: 0;
+  position: relative;
+  width: 40px;
+}
+
+.material-switch>label::before {
+  background: rgb(0, 0, 0);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, .5);
+  border-radius: 8px;
+  content: '';
+  height: 16px;
+  margin-top: -8px;
+  position: absolute;
+  opacity: .3;
+  transition: all .4s ease-in-out;
+  width: 40px;
+}
+
+.material-switch>label::after {
+  background: rgb(255, 255, 255);
+  border-radius: 16px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, .3);
+  content: '';
+  height: 24px;
+  left: -4px;
+  margin-top: -8px;
+  position: absolute;
+  top: -4px;
+  transition: all .3s ease-in-out;
+  width: 24px;
+}
+
+.material-switch>input[type='checkbox']:checked+label::before {
+  background: inherit;
+  opacity: .5;
+}
+
+.material-switch>input[type='checkbox']:checked+label::after {
+  background: inherit;
+  left: 20px;
+}
+
+.switchLabel {
+  display: inline-block;
+}
+
+.custom-switch {
+  width: 60px;
+  padding: 5px;
+}
+
+.numberInputDiv {
+  width: 192px;
+}
+
+.modalButtonValue {
+  height: 10px;
+}
+
+.table-row {
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: row;
+  -webkit-flex-direction: row;
+  flex-grow: 0;
+  -webkit-flex-grow: 0;
+  flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-top: 6px;
+  border-collapse: collapse;
+  height: 60px;
+  padding-top: -1px;
+}
+
+.tablerowKeyValues {
+  height: 2px;
+  display: -webkit-flex;
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin-bottom: 10px;
+}
+
+.text {
+  flex-grow: 1;
+  -webkit-flex-grow: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 20px;
+  height: 28px;
+}
+
+.text {
+  width: 10px;
+}
+
+.itemText {
+  font-weight: bold;
+  width: 25%;
+  font-size: medium;
+  text-align: center;
+}
+
+.keyRow {
+  width: 50px;
+  font-family: Georgia, serif;
+  font-size: 21px;
+}
+
+
+.threeToggles {
+  margin-left: 10vw;
+}
+
+.singleToggle {
+  margin-left: 10vw;
+}
+
+.numberValues {
+  margin-left: 1vw;
+}

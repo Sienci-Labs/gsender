@@ -4,8 +4,10 @@ import styles from './index.styl';
 import {
     MODAL_NONE,
     MODAL_PREFERENCES,
+    MODAL_WIZARD,
 } from './constants';
 import Preferences from '../Preferences/Preferences';
+import WizardModal from '../Wizard/WizardModal';
 
 class NavSidebar extends PureComponent {
     state = this.getInitialState();
@@ -47,9 +49,13 @@ class NavSidebar extends PureComponent {
                 <NavSidebarLink url="" icon="fa-ruler" label="Flatten" />
                 <NavSidebarLink url="" icon="fa-border-style" label="Surface" />
                 <NavSidebarLink url="" icon="fa-wrench" label="Calibrate" />
-                <NavSidebarLink url="" icon="fa-hat-wizard" label="Wizard" />
+                <div className={!this.props.wizardDisabled ? 'enable' : `${styles.disable}`}>
+                    <NavSidebarLink url="" onClick={() => actions.openModal(MODAL_WIZARD)} icon="fa-hat-wizard" label="Wizard" />
+                </div>
                 <NavSidebarLink url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa-cog" label="" />
-
+                {
+                    state.modal.name === MODAL_WIZARD && <WizardModal state={state} modalClose={actions.closeModal} />
+                }
                 {
                     state.modal.name === MODAL_PREFERENCES && <Preferences state={state} modalClose={actions.closeModal} />
                 }
