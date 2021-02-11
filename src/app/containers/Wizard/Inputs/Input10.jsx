@@ -30,67 +30,36 @@ class MaskInputTen extends PureComponent {
     }
 
     getCurrentSettings = () => {
-        let loadedSettings = this.props.currentSettings.$10;
+        let loadedSetting = this.props.currentSettings.$10;
         let $10Options = [
-            [false, false, false],
-            [true, false, false],
-            [false, true, false],
-            [true, true, false],
-            [false, false, true],
-            [true, false, true],
-            [false, true, true],
-            [true, true, true],
+            [false, false], //$10=0
+            [true, false],
+            [false, true],
+            [true, true],
+
         ];
 
-        if (loadedSettings === '0') {
-            loadedSettings = $10Options[0];
+        if (loadedSetting === '0') {
+            loadedSetting = $10Options[0];
             this.setState({ zero: false });
             this.setState({ one: false });
-            this.setState({ two: false });
         }
-        if (loadedSettings === '1') {
-            loadedSettings = $10Options[1];
+        if (loadedSetting === '1') {
+            loadedSetting = $10Options[1];
             this.setState({ zero: true });
             this.setState({ one: false });
-            this.setState({ two: false });
         }
-        if (loadedSettings === '2') {
-            loadedSettings = $10Options[2];
+        if (loadedSetting === '2') {
+            loadedSetting = $10Options[2];
             this.setState({ zero: false });
             this.setState({ one: true });
-            this.setState({ two: false });
         }
-        if (loadedSettings === '3') {
-            loadedSettings = $10Options[3];
+        if (loadedSetting === '3') {
+            loadedSetting = $10Options[3];
             this.setState({ zero: true });
             this.setState({ one: true });
-            this.setState({ two: false });
         }
-        if (loadedSettings === '4') {
-            loadedSettings = $10Options[4];
-            this.setState({ zero: false });
-            this.setState({ one: false });
-            this.setState({ two: true });
-        }
-        if (loadedSettings === '5') {
-            loadedSettings = $10Options[5];
-            this.setState({ zero: true });
-            this.setState({ one: false });
-            this.setState({ two: true });
-        }
-        if (loadedSettings === '6') {
-            loadedSettings = $10Options[6];
-            this.setState({ zero: false });
-            this.setState({ one: true });
-            this.setState({ two: true });
-        }
-        if (loadedSettings === '7') {
-            loadedSettings = $10Options[7];
-            this.setState({ zero: true });
-            this.setState({ one: true });
-            this.setState({ two: true });
-        }
-        this.setState({ defaultSettings: loadedSettings });
+        this.setState({ defaultSettings: loadedSetting });
     }
 
     handleSwitch = (event) => {
@@ -107,11 +76,6 @@ class MaskInputTen extends PureComponent {
         } else if (currentValue[1] === false) {
             currentValue[1] = 0;
         }
-        if (currentValue[2] === true) {
-            currentValue[2] = 1;
-        } else if (currentValue[2] === false) {
-            currentValue[2] = 0;
-        }
 
         if (value === true) {
             value = 1;
@@ -126,9 +90,6 @@ class MaskInputTen extends PureComponent {
         if (name === '10-1') {
             currentValue[1] = value;
         }
-        if (name === '10-2') {
-            currentValue[2] = value;
-        }
 
         this.props.grabNew$10InputSettings(name, currentValue);
     }
@@ -137,10 +98,9 @@ class MaskInputTen extends PureComponent {
     render() {
         let settingsZero = this.state.defaultSettings[0];
         let settingsOne = this.state.defaultSettings[1];
-        let settingsTwo = this.state.defaultSettings[2];
         return (
             <div className={styles.maskTwo}>
-                <div className={styles.maskThreeTitles}>WPos: </div>
+                <div className={styles.toggleTitles}>WPosition </div>
                 <div className={styles.threeToggles}>
                     <div className={styles.onoffswitch}>
                         <input
@@ -153,9 +113,9 @@ class MaskInputTen extends PureComponent {
                             defaultChecked={settingsZero}
                         />
                         <label className={styles.onoffswitchlabel} htmlFor="10-0" />
-                    </div>
+                    </div><div className={styles.mPos}>MPosition </div>
                 </div>
-                <div className={styles.maskThreeTitles}>MPos: </div>
+                <div className={styles.toggleTitles}>Buffer </div>
                 <div className={styles.threeToggles}>
                     <div className={styles.onoffswitch}>
                         <input
@@ -168,21 +128,6 @@ class MaskInputTen extends PureComponent {
                             defaultChecked={settingsOne}
                         />
                         <label className={styles.onoffswitchlabel} htmlFor="10-1" />
-                    </div>
-                </div>
-                <div className={styles.maskThreeTitles}>Buf: </div>
-                <div className={styles.threeToggles}>
-                    <div className={styles.onoffswitch}>
-                        <input
-                            type="checkbox"
-                            name="10-2"
-                            className={styles.onoffswitchcheckbox}
-                            id="10-2"
-                            tabIndex="0"
-                            onClick={this.handleSwitch}
-                            defaultChecked={settingsTwo}
-                        />
-                        <label className={styles.onoffswitchlabel} htmlFor="10-2" />
                     </div>
                 </div>
             </div>

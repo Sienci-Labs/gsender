@@ -51,7 +51,7 @@ class WizardModal extends PureComponent {
             }));
         },
 
-        grabNew$2InputSettings: (name, allTheeValues) => {
+        grabNew$2InputSettings: (name, allTheValues) => {
             let finalValue = '';
             let zero = [0, 0, 0];
             let one = [1, 0, 0];
@@ -62,28 +62,28 @@ class WizardModal extends PureComponent {
             let six = [0, 1, 1];
             let seven = [1, 1, 1];
 
-            if (new String(zero).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(zero).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 0;
             }
-            if (new String(one).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(one).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 1;
             }
-            if (new String(two).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(two).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 2;
             }
-            if (new String(three).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(three).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 3;
             }
-            if (new String(four).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(four).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 4;
             }
-            if (new String(five).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(five).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 5;
             }
-            if (new String(six).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(six).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 6;
             }
-            if (new String(seven).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(seven).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 7;
             }
 
@@ -94,7 +94,7 @@ class WizardModal extends PureComponent {
                 }
             }));
         },
-        grabNew$3InputSettings: (name, allTheeValues) => {
+        grabNew$3InputSettings: (name, allTheValues) => {
             let finalValue = '';
             let zero = [0, 0, 0];
             let one = [1, 0, 0];
@@ -105,28 +105,28 @@ class WizardModal extends PureComponent {
             let six = [0, 1, 1];
             let seven = [1, 1, 1];
 
-            if (new String(zero).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(zero).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 0;
             }
-            if (new String(one).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(one).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 1;
             }
-            if (new String(two).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(two).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 2;
             }
-            if (new String(three).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(three).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 3;
             }
-            if (new String(four).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(four).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 4;
             }
-            if (new String(five).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(five).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 5;
             }
-            if (new String(six).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(six).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 6;
             }
-            if (new String(seven).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(seven).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 7;
             }
             this.setState(prevState => ({
@@ -136,40 +136,24 @@ class WizardModal extends PureComponent {
                 }
             }));
         },
-        grabNew$10InputSettings: (name, allTheeValues) => {
+        grabNew$10InputSettings: (name, bothToggleValues) => {
             let finalValue = '';
-            let zero = [0, 0, 0];
-            let one = [1, 0, 0];//
-            let two = [0, 1, 0];//
-            let three = [1, 1, 0];
-            let four = [0, 0, 1];
-            let five = [1, 0, 1];//
-            let six = [0, 1, 1];
-            let seven = [1, 1, 1];
+            let zero = [0, 0];
+            let one = [1, 0];
+            let two = [0, 1];
+            let three = [1, 1];
 
-            if (new String(zero).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(zero).valueOf() === new String(bothToggleValues).valueOf()) {
                 finalValue = 0;
             }
-            if (new String(one).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(one).valueOf() === new String(bothToggleValues).valueOf()) {
                 finalValue = 1;
             }
-            if (new String(two).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(two).valueOf() === new String(bothToggleValues).valueOf()) {
                 finalValue = 2;
             }
-            if (new String(three).valueOf() === new String(allTheeValues).valueOf()) {
-                finalValue = 'Invalid Setting';
-            }
-            if (new String(four).valueOf() === new String(allTheeValues).valueOf()) {
-                finalValue = 4;
-            }
-            if (new String(five).valueOf() === new String(allTheeValues).valueOf()) {
-                finalValue = 5;
-            }
-            if (new String(six).valueOf() === new String(allTheeValues).valueOf()) {
-                finalValue = 6;
-            }
-            if (new String(seven).valueOf() === new String(allTheeValues).valueOf()) {
-                finalValue = 'Invalid Setting';
+            if (new String(three).valueOf() === new String(bothToggleValues).valueOf()) {
+                finalValue = 3;
             }
 
             this.setState(prevState => ({
@@ -179,7 +163,7 @@ class WizardModal extends PureComponent {
                 }
             }));
         },
-        grabNew$23InputSettings: (name, allTheeValues) => {
+        grabNew$23InputSettings: (name, allTheValues) => {
             let finalValue = '';
             let zero = [0, 0, 0];
             let one = [1, 0, 0];
@@ -191,28 +175,28 @@ class WizardModal extends PureComponent {
             let seven = [1, 1, 1];
 
 
-            if (new String(zero).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(zero).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 0;
             }
-            if (new String(one).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(one).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 1;
             }
-            if (new String(two).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(two).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 2;
             }
-            if (new String(three).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(three).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 3;
             }
-            if (new String(four).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(four).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 4;
             }
-            if (new String(five).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(five).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 5;
             }
-            if (new String(six).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(six).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 6;
             }
-            if (new String(seven).valueOf() === new String(allTheeValues).valueOf()) {
+            if (new String(seven).valueOf() === new String(allTheValues).valueOf()) {
                 finalValue = 7;
             }
 
