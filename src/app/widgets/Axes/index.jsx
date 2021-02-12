@@ -6,6 +6,7 @@ import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import pubsub from 'pubsub-js';
 import api from 'app/api';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
@@ -56,6 +57,27 @@ class AxesWidget extends PureComponent {
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    pubsubTokens = [];
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('jogSpeeds', (msg, speeds) => {
+                this.setState({ jog: {
+                    ...this.state.jog,
+                    ...speeds,
+                } });
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
 
     // Public methods
     collapse = () => {
@@ -341,6 +363,8 @@ class AxesWidget extends PureComponent {
                     xyStep: value
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep: value, zStep: jog.zStep, feedrate: jog.feedrate });
         },
         handleZStepChange: (value) => {
             const { jog } = this.state;
@@ -353,6 +377,8 @@ class AxesWidget extends PureComponent {
                     zStep: value
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep: jog.xyStep, zStep: value, feedrate: jog.feedrate });
         },
         handleFeedrateChange: (value) => {
             const { jog } = this.state;
@@ -365,6 +391,8 @@ class AxesWidget extends PureComponent {
                     feedrate: value
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep: jog.xyStep, zStep: jog.zStep, feedrate: value });
         },
         changeMovementRates: (xyStep, zStep, feedrate) => {
             const { jog } = this.state;
@@ -376,6 +404,8 @@ class AxesWidget extends PureComponent {
                     feedrate: feedrate
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep, zStep, feedrate });
         },
     };
 
@@ -665,12 +695,14 @@ class AxesWidget extends PureComponent {
     };
 
     componentDidMount() {
+        this.subscribe();
         this.fetchMDICommands();
         this.addControllerEvents();
         this.addShuttleControlEvents();
     }
 
     componentWillUnmount() {
+        this.unsubscribe();
         this.removeControllerEvents();
         this.removeShuttleControlEvents();
     }
