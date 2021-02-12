@@ -536,6 +536,8 @@ class Combokeys extends events.EventEmitter {
         didBindEvents: false
     };
 
+    commandKeys = store.get('commandKeys', []);
+
     list = [];
 
     constructor(options = {}) {
@@ -550,7 +552,7 @@ class Combokeys extends events.EventEmitter {
         if (this.state.didBindEvents) {
             return;
         }
-        commandKeys.forEach((o) => {
+        this.commandKeys.forEach((o) => {
             const { keys, cmd, payload = {} } = o;
             const callback = (event) => {
                 log.debug(`combokeys: keys=${keys} cmd=${cmd} payload=${JSON.stringify(payload)}`);
@@ -574,6 +576,13 @@ class Combokeys extends events.EventEmitter {
             Mousetrap.unbind(keys, callback);
         });
         this.state.didBindEvents = false;
+    }
+
+    reload() {
+        this.commandKeys = store.get('commandKeys', []);
+
+        this.unbind();
+        this.bind();
     }
 
     reset() {
