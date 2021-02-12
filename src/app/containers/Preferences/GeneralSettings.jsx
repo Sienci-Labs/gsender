@@ -26,10 +26,10 @@ const GeneralSettings = ({ active, state, actions }) => {
                     <h4>Preferred Units</h4>
                     <div className={styles.rowSpace}>
                         <Dropdown
-                            pullRight
                             style={{
                                 width: '100%'
                             }}
+                            btnSize="lg"
                         >
                             <Dropdown.Toggle
                                 btnStyle="flat"
@@ -41,7 +41,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 {units === IMPERIAL_UNITS && i18n._('Inches (G20)')}
                                 {units === METRIC_UNITS && i18n._('Millimeters (G21)')}
                             </Dropdown.Toggle>
-                            <Dropdown.Menu>
+                            <Dropdown.Menu size="lg">
                                 <MenuItem header>
                                     {i18n._('Units')}
                                 </MenuItem>
@@ -50,8 +50,9 @@ const GeneralSettings = ({ active, state, actions }) => {
                                     onSelect={() => {
                                         actions.general.setUnits(IMPERIAL_UNITS);
                                     }}
+                                    size="lg"
                                 >
-                                    {i18n._('G20 (inch)')}
+                                    {i18n._('Inches (G20)')}
                                 </MenuItem>
                                 <MenuItem
                                     active={units === METRIC_UNITS}
@@ -59,11 +60,11 @@ const GeneralSettings = ({ active, state, actions }) => {
                                         actions.general.setUnits(METRIC_UNITS);
                                     }}
                                 >
-                                    {i18n._('G21 (mm)')}
+                                    {i18n._('Millimeters (G21)')}
                                 </MenuItem>
                             </Dropdown.Menu>
                         </Dropdown>
-                        <small>Which units will be displayed throughout the interface.</small>
+                        <small>Units to be displayed throughout the interface.</small>
                     </div>
                 </div>
                 <div className={styles.addToolForm}>
