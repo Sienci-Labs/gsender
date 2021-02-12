@@ -1,3 +1,33 @@
+.firmwareSettingsButtons {
+  position: absolute;
+  bottom: 1vh;
+  margin-bottom: 10p;
+  left: 4%;
+  -moz-box-shadow: 0 2px 3px 0 rgba(0, 0, 0, .16);
+}
+
+.wizardButtons {
+  border: 1px solid #6F7376;
+  color: #3E85C7;
+  background-color: #d1d5db;
+  border-radius: .25rem;
+  width: 96%;
+  max-width: 14rem;
+  font-size: 14px;
+  padding: 9px;
+  margin: 6px;
+  transition: 200ms;
+
+  &:hover {
+    border: 1px solid #3e85c7;
+    transition: 200ms ease-in-out;
+    background-color: #E5E7EB;
+    border-radius: .25rem;
+    --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  }
+}
+
 .wizardContainer {
   width: 1000px;
   height: 100%;
@@ -115,92 +145,6 @@
   display: block;
 }
 
-.tool-main {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-
-  h4 {
-    color: #3e85c7;
-    font-size: 1.4rem;
-  }
-}
-
-.tool-listings {
-  display: flex;
-  flex-direction: column;
-  width: 40%;
-}
-
-.add-tool-form {
-  display: flex;
-  flex-direction: column;
-  width: 50%;
-}
-
-.tools {
-  width: 100%;
-  border-radius: .5rem;
-  background: white;
-
-  .delete {
-    color: red;
-    justify-content: center;
-    align-items: center;
-    border: none;
-    outline: none;
-    background: none;
-  }
-}
-
-.tool {
-  padding: 10px;
-  display: flex;
-  flex-direction: row;
-  font-size: 1rem;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.tool-dimensions {
-  width: 30%;
-}
-
-.tool + .tool {
-  border-top: solid 1px #cccccc;
-}
-
-.add-tool {
-  width: 100%;
-  background: #3e85c7;
-  color: #FFFFFF;
-  outline: none;
-  border: none;
-  padding: .5rem;
-  border-radius: .25rem;
-
-  &:disabled {
-    background: #6B7280;
-  }
-}
-
-.input-spread {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  align-items: center;
-}
-
-.probe-info {
-  width: 60%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
 .modal-main {
   position: fixed;
   background: #D9DCE1;
@@ -221,29 +165,6 @@
   padding: 0;
   position: fixed;
   bottom: 0;
-}
-
-/* HEADER
-================================== */
-.modalButton {
-  border: 1px solid #9CA3AF;
-  color: #3E85C7;
-  background-color: #D1D5DB;
-  border-radius: .25rem;
-  width: 100%;
-  max-width: 10rem;
-  padding: 5px;
-  margin: 0;
-  -webkit-transition: 200ms ease-in-out;
-  transition: 200ms ease-in-out;
-}
-
-.modalButton:hover {
-  color: #3E85C7;
-  border: 1px solid #3E85C7;
-  -webkit-transition: 200ms ease-in-out;
-  transition: 200ms ease-in-out;
-  background-color: #E5E7EB;
 }
 
 /* Tables
@@ -406,7 +327,6 @@
   font-family: Georgia, serif;
   font-size: 21px;
 }
-
 
 .threeToggles {
   margin-left: 10vw;

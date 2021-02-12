@@ -1,3 +1,3 @@
-import WizardPage from './WizardPage';
+import Firmware from './Firmware';
 
-export default WizardPage;
+export default Firmware;
