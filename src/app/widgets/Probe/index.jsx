@@ -9,6 +9,7 @@ import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import { in2mm, mapValueToUnits } from 'app/lib/units';
+import pubsub from 'pubsub-js';
 import WidgetConfig from '../WidgetConfig';
 import Probe from './Probe';
 import RunProbe from './RunProbe';
@@ -48,6 +49,8 @@ class ProbeWidget extends PureComponent {
         sortable: PropTypes.object,
         embedded: PropTypes.bool
     };
+
+    pubsubTokens = []
 
     // Public methods
     collapse = () => {
@@ -228,7 +231,7 @@ class ProbeWidget extends PureComponent {
             return this.generateProbeCommands();
         },
         runProbeCommands: (commands) => {
-            controller.command('gcode', commands);
+            controller.command('gcode:safe', commands, 'G21');
         },
         returnProbeConnectivity: () => {
             const { status } = controller.state || {};
@@ -302,7 +305,6 @@ class ProbeWidget extends PureComponent {
             }
 
             this.setState({
-                units: units,
                 controller: {
                     type: type,
                     state: state
@@ -319,10 +321,12 @@ class ProbeWidget extends PureComponent {
 
     componentDidMount() {
         this.addControllerEvents();
+        this.subscribe();
     }
 
     componentWillUnmount() {
         this.removeControllerEvents();
+        this.unsubscribe();
     }
 
     componentWillMount() {
@@ -372,7 +376,7 @@ class ProbeWidget extends PureComponent {
             isFullscreen: false,
             canClick: true, // Defaults to true
             port: controller.port,
-            units: METRIC_UNITS,
+            units: store.get('workspace.units'),
             controller: {
                 type: controller.type,
                 state: controller.state
@@ -760,6 +764,28 @@ class ProbeWidget extends PureComponent {
         }
 
         return true;
+    }
+
+    changeUnits(units) {
+        this.setState({
+            units: units
+        });
+    }
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('units:change', (event, units) => {
+                this.changeUnits(units);
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
     }
 
     render() {
