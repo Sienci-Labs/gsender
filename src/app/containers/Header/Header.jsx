@@ -175,6 +175,7 @@ class Header extends PureComponent {
         }
 
         return {
+            wizardDisabled: true,
             pushPermission: pushPermission,
             commands: [],
             runningTasks: [],
@@ -231,14 +232,29 @@ class Header extends PureComponent {
         });
     }
 
+    toggleWizardDisabled = () => {
+        this.setState({ wizardDisabled: false });
+    }
+
+    toggleWizardEnabled = () => {
+        this.setState({ wizardDisabled: true });
+    }
+
     render() {
         return (
             <div className={styles.navBar}>
                 <div className={styles.primary}>
                     <NavLogo />
-                    <NavbarConnection state={this.state} actions={this.actions} widgetId="connection" />
+                    <NavbarConnection
+                        state={this.state}
+                        actions={this.actions}
+                        widgetId="connection"
+                        isWizardDisabled={this.state.wizardDisabled}
+                        disableWizardFunction={this.toggleWizardDisabled}
+                        enableWizardFunction={this.toggleWizardEnabled}
+                    />
                 </div>
-                <NavSidebar />
+                <NavSidebar wizardDisabled={this.state.wizardDisabled} />
             </div>
         );
     }
