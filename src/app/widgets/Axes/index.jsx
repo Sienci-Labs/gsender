@@ -13,7 +13,7 @@ import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
-import { in2mm, mapPositionToUnits } from 'app/lib/units';
+import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
@@ -744,8 +744,8 @@ class AxesWidget extends PureComponent {
                 c: '0.000'
             },
             jog: {
-                xyStep: this.config.get('jog.xyStep'),
-                zStep: this.config.get('jog.zStep'),
+                xyStep: this.getInitialXYStep(),
+                zStep: this.getInitialZStep(),
                 feedrate: this.config.get('jog.feedrate'),
                 axis: '', // Defaults to empty
                 keypad: this.config.get('jog.keypad'),
@@ -779,9 +779,43 @@ class AxesWidget extends PureComponent {
         });
     }
 
+    getInitialXYStep() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+
+        if (units === IMPERIAL_UNITS) {
+            return 0.2;
+        }
+        return 5;
+    }
+
+    getInitialZStep() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+
+        if (units === IMPERIAL_UNITS) {
+            return 0.04;
+        }
+        return 2;
+    }
+
     changeUnits(units) {
+        const oldUnits = this.state.units;
+        const { jog } = this.state;
+        let { zStep, xyStep } = jog;
+        if (oldUnits === METRIC_UNITS && units === IMPERIAL_UNITS) {
+            zStep = mm2in(zStep).toFixed(3);
+            xyStep = mm2in(xyStep).toFixed(3);
+        } else if (oldUnits === IMPERIAL_UNITS && units === METRIC_UNITS) {
+            zStep = in2mm(zStep).toFixed(1);
+            xyStep = in2mm(xyStep).toFixed(1);
+        }
+
         this.setState({
-            units: units
+            units: units,
+            jog: {
+                ...jog,
+                zStep: zStep,
+                xyStep: xyStep
+            }
         });
     }
 
