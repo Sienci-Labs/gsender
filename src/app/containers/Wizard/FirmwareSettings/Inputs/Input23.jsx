@@ -5,12 +5,13 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styles from './index.styl';
 
-class MaskInputTwentyThree extends PureComponent {
+class InputTwentyThree extends PureComponent {
     static propTypes = {
         switchSettings: PropTypes.object,
         title: PropTypes.string,
         currentSettings: PropTypes.object,
-        grabNew$23InputSettings: PropTypes.func
+        grabNew$23InputSettings: PropTypes.func,
+        disableSettingsButton: PropTypes.func
     }
 
     state = this.getInitialState();
@@ -127,7 +128,7 @@ class MaskInputTwentyThree extends PureComponent {
         if (name === '23-2') {
             currentValue[2] = value;
         }
-
+        this.props.disableSettingsButton();
         this.props.grabNew$23InputSettings(name, currentValue);
     }
 
@@ -188,4 +189,4 @@ class MaskInputTwentyThree extends PureComponent {
     }
 }
 
-export default MaskInputTwentyThree;
+export default InputTwentyThree;

@@ -4,6 +4,9 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import map from 'lodash/map';
+import { Alert } from 'react-bootstrap';
+import WarningModal from './WarningModal';
 import controller from '../../../lib/controller';
 import WidgetConfig from '../../../widgets/WidgetConfig';
 import styles from '../index.styl';
@@ -83,6 +86,9 @@ class FirmwareSettings extends PureComponent {
 
     getInitialState() {
         return {
+            disable: true,
+            alert: false,
+            warning: false,
             usersUpdatedSettings: this.props.usersUpdatedSettings,
             usersNewSettings: {},
             isReady: (controller.loadedControllers.length === 1) || (controller.type === GRBL),
@@ -118,9 +124,9 @@ class FirmwareSettings extends PureComponent {
     //Erases and restores the $$ Grbl settings back to defaults
     //which is defined by the default settings file used when compiling Grbl
     restoreSettings = () => {
+        this.setState({ warning: true });
         controller.command('gcode', '$RST=$');
         controller.command('gcode', '$$');
-        this.props.modalClose();
     }
 
     getCurrentSettings = () => {
@@ -128,22 +134,34 @@ class FirmwareSettings extends PureComponent {
         this.setState({ settings: LoadedSettings });
     }
 
+    gcode(cmd, params) {
+        const s = map(params, (value, letter) => String(letter + value)).join('=');
+        return (s.length > 0) ? (cmd + '' + s) : cmd;
+    }
+
+    disableSettingsButton = () => {
+        this.setState({ disable: false });
+    }
+
     applyNewSettings = () => {
         let numbersValues = this.state.valuesToApplyToGrbl;
         let values = Object.values(numbersValues);
         let keys = Object.keys(numbersValues);
+        let finalStrings = [];
         const valuesToSubmit = [];
         for (let i = 0; i < keys.length; i++) {
             valuesToSubmit.push([keys[i], values[i]]);
         }
+        let gCoded = this.gcode(valuesToSubmit);
 
-        //loops through array values, concatinates them with = and submits them to controller
-        for (let j = 0; j < valuesToSubmit.length; j++) {
-            let finalStrings = valuesToSubmit[j].join('=');
-            controller.command('gcode', finalStrings);
+        //loops through array values, concatinates them with =
+        for (let j = 0; j < gCoded.length; j++) {
+            finalStrings[j] = gCoded[j].join('=');
         }
-        controller.command('gcode', '$$');//Needed so nexttime wizard is opened changes are reflected
-        this.props.modalClose();
+        controller.command('gcode', finalStrings);
+        controller.command('gcode', '$$');//Needed so next time wizard is opened changes are reflected
+        this.setState({ alert: true });
+        setTimeout(() => this.handleNoUpdates(), 3000);
     }
 
     grabNewNumberInputSettings = (name, value) => {
@@ -251,6 +269,16 @@ class FirmwareSettings extends PureComponent {
         }));
     }
 
+    handleWarningModal = () => {
+        this.setState({ warning: false });
+        this.setState({ alert: true });
+    }
+
+    handleNoUpdates = () => {
+        this.setState({ warning: false });
+        this.setState({ alert: false });
+    }
+
     grabNew$10InputSettings = (name, bothToggleValues) => {
         let finalValue = '';
         let zero = [0, 0];
@@ -334,25 +362,37 @@ class FirmwareSettings extends PureComponent {
                 { [styles.visible]: this.props.active }
             )}
             >
-                <div className={styles.firmwareSettingsButtons}>
-                    <button
-                        onClick={this.applyNewSettings}
-                        type="button"
-                        className={styles.wizardButtons}
-                    >
-                        Apply New Settings
-                    </button>
-                    <button
-                        onClick={this.restoreSettings}
-                        type="button"
-                        className={styles.wizardButtons}
-                    >
-                        Restore Factory Settings
-                    </button>
-                </div>
-                <h3>
-                    Firmware Settings
-                </h3>
+                <header className={styles.header}>
+                    <h3 className={styles.firmware}>
+                        Firmware Settings
+                    </h3>
+                    <div className={styles.firmwareSettingsButtons}>
+                        <button
+                            onClick={this.applyNewSettings}
+                            type="button"
+                            className={this.state.disable ? `${styles.wizardButtonsDisabled}` : `${styles.wizardButtons}`}
+                        >
+                            Apply New Settings
+                        </button>
+                        <button
+                            onClick={this.restoreSettings}
+                            type="button"
+                            className={styles.wizardButtons}
+                        >
+                            Restore Factory Settings
+                        </button>
+                    </div>
+                </header>
+                { this.state.warning && (
+                    <WarningModal
+                        handleWarningModal={this.handleWarningModal}
+                        handleNoUpdates={this.handleNoUpdates}
+                    />
+                )}
+                {
+                    this.state.alert &&
+                    <Alert className={styles.alert}>Settings updated!</Alert>
+                }
                 <div> {loadedSettings.map((grbl) => (
                     <div key={grbl.setting} className={styles.containerFluid}>
                         <div className={styles.tableRow}>
@@ -374,12 +414,11 @@ class FirmwareSettings extends PureComponent {
                                 grabNew$10InputSettings={this.grabNew$10InputSettings}
                                 grabNew$23InputSettings={this.grabNew$23InputSettings}
                                 units={grbl.units}
+                                disableSettingsButton={this.disableSettingsButton}
                             />
 
                         </div>
-                        <div className={styles.descriptionRow}>
-                            <div>{grbl.description}</div>
-                        </div>
+                        <div className={styles.descriptionRow}>{grbl.description}</div>
                     </div>
                 ))
                 }

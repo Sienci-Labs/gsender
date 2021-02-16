@@ -7,13 +7,14 @@ import PropTypes from 'prop-types';
 import styles from './index.styl';
 
 
-class MaskInputTwo extends PureComponent {
+class InputTwo extends PureComponent {
     static propTypes = {
         switchSettings: PropTypes.object,
         title: PropTypes.string,
         currentSettings: PropTypes.object,
         getUsersNewSettings: PropTypes.func,
-        grabNew$2InputSettings: PropTypes.func
+        grabNew$2InputSettings: PropTypes.func,
+        disableSettingsButton: PropTypes.func
     }
 
     state = this.getInitialState();
@@ -133,6 +134,7 @@ class MaskInputTwo extends PureComponent {
         }
 
         this.props.grabNew$2InputSettings(name, currentValue);
+        this.props.disableSettingsButton();
     }
 
 
@@ -192,4 +194,4 @@ class MaskInputTwo extends PureComponent {
     }
 }
 
-export default MaskInputTwo;
+export default InputTwo;

@@ -1,7 +1,7 @@
 import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import FirmwareFlashing from './FirmwareFlashing/FirmwareFlashing';
+// import FirmwareFlashing from './FirmwareFlashing/FirmwareFlashing';
 import FirmwareSettings from './FirmwareSettings/FirmwareSettings';
 import styles from './index.styl';
 
@@ -19,15 +19,15 @@ class WizardModal extends PureComponent {
             selectedMenu: 0,
             menu: [
                 {
-                    id: 0,
+                    id: 1,
                     label: 'Firmware Settings',
                     component: FirmwareSettings
                 },
-                {
-                    id: 1,
-                    label: 'Firmware Flashing',
-                    component: FirmwareFlashing
-                }
+                // {
+                //     id: 2,
+                //     label: 'Firmware Flashing',
+                //     component: FirmwareFlashing
+                // },
             ]
         };
     }

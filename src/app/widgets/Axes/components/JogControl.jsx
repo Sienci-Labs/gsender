@@ -29,10 +29,10 @@ class JogControl extends PureComponent {
         clearTimeout((this.timeoutFunction));
         this.timeoutFunction = null;
         if (timer < this.timeout) {
-            console.log('Run click');
+            // console.log('Run click');
             jog();
         } else {
-            console.log('Hold Ended');
+            // console.log('Hold Ended');
             this.continuousInterval && clearInterval(this.continuousInterval);
             this.continuousInterval = null;
             stopContinuousJog();
