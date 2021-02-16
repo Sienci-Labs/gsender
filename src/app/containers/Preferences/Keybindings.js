@@ -66,7 +66,7 @@ export default class Keybindings extends Component {
                 <h3 style={{ marginBottom: '3rem' }}>Keybindings</h3>
 
                 { currentPage === 'Table' && <div className={styles['table-wrapper']}><Table data={keybindingsList} onEdit={handleEdit} /></div> }
-                { currentPage === 'Edit' && <EditArea switchPages={switchPages} shortcut={currentShortcut} shorcuts={keybindingsList} edit={editKeybinding} /> }
+                { currentPage === 'Edit' && <EditArea switchPages={switchPages} shortcut={currentShortcut} shortcuts={keybindingsList} edit={editKeybinding} /> }
 
                 {message && <div className={styles['keybindings-message']}>{message}</div>}
             </div>
