@@ -12,7 +12,6 @@ import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
-import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
 import { in2mm, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
@@ -76,6 +75,12 @@ class LocationWidget extends PureComponent {
             }),
             pubsub.subscribe('keybindingsUpdated', () => {
                 this.updateShuttleControlEvents();
+            }),
+            pubsub.subscribe('addKeybindingsListener', () => {
+                this.addShuttleControlEvents();
+            }),
+            pubsub.subscribe('removeKeybindingsListener', () => {
+                this.removeShuttleControlEvents();
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -454,40 +459,6 @@ class LocationWidget extends PureComponent {
             } else {
                 this.actions.selectAxis(axis);
             }
-        },
-        JOG: (event, { axis = null, direction = 1 }) => {
-            const { canClick, jog } = this.state;
-
-            if (!canClick) {
-                return;
-            }
-
-            if (axis !== null && !jog.keypad) {
-                // keypad jogging is disabled
-                return;
-            }
-
-            const { speeds } = this.state.jog;
-
-            // The keyboard events of arrow keys for X-axis/Y-axis and pageup/pagedown for Z-axis
-            // are not prevented by default. If a jog command will be executed, it needs to
-            // stop the default behavior of a keyboard combination in a browser.
-            preventDefault(event);
-
-            axis = axis || jog.axis;
-            // const distance = this.actions.getJogDistance();
-
-            const X = direction * speeds.xyStep;
-            const Y = direction * speeds.xyStep;
-            const Z = direction * speeds.zStep;
-
-            const jogAxis = {
-                x: () => this.actions.jog({ X }),
-                y: () => this.actions.jog({ Y }),
-                z: () => this.actions.jog({ Z }),
-            }[axis];
-
-            jogAxis && jogAxis();
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
@@ -871,8 +842,10 @@ class LocationWidget extends PureComponent {
             combokeys.removeListener(eventName, callback);
         });
 
-        this.shuttleControl.removeAllListeners('flush');
-        this.shuttleControl = null;
+        if (this.shuttleControl) {
+            this.shuttleControl.removeAllListeners('flush');
+            this.shuttleControl = null;
+        }
     }
 
     canClick() {
