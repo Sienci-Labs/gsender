@@ -175,7 +175,11 @@ class DisplayPanel extends PureComponent {
                             label={i18n._('Go to Zero')}
                             icon={() => <ChartIcon fill={(canClick) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
                             onClick={() => {
-                                controller.command('gcode', 'G0 X0 Y0 Z0'); //Move to Work Position Zero
+                                controller.command('gcode', 'G91');
+                                controller.command('gcode:safe', 'G0 Z10', 'G21'); // Retract Z when moving across workspace
+                                controller.command('gcode', 'G90');
+                                controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
+                                controller.command('gcode', 'G0 Z0'); // Move Z up
                             }}
                             disabled={!canClick}
                         />
