@@ -561,6 +561,22 @@ class Combokeys extends events.EventEmitter {
                 }
                 this.emit(cmd, event, payload);
             };
+
+            //Add keyup listeners for jogging events
+            if (cmd === 'JOG') {
+                const STOP_CMD = 'STOP_JOG';
+
+                const callback = (event) => {
+                    log.debug(`combokeys: keys=${keys} cmd=${STOP_CMD} payload=${JSON.stringify(payload)}`);
+                    if (!!o.preventDefault) {
+                        preventDefault(event);
+                    }
+                    this.emit(STOP_CMD, event, payload);
+                };
+
+                Mousetrap.bind(keys, callback, 'keyup');
+            }
+
             Mousetrap.bind(keys, callback);
             this.list.push({ keys: keys, callback: callback });
         });
