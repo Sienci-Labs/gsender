@@ -59,8 +59,15 @@ class AxesWidget extends PureComponent {
                     ...this.state.jog,
                     ...speeds,
                 } });
+            }),
+            pubsub.subscribe('addKeybindingsListener', () => {
+                this.addShuttleControlEvents();
+            }),
+            pubsub.subscribe('removeKeybindingsListener', () => {
+                this.removeShuttleControlEvents();
             })
         ];
+
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
 
@@ -427,34 +434,26 @@ class AxesWidget extends PureComponent {
             }
         },
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
-            const { canClick, jog } = this.state;
+            preventDefault(event);
+            const { isContinuousJogging } = this.state;
 
-            if (!canClick) {
+            if (!axis || isContinuousJogging) {
                 return;
             }
 
-            if (axis !== null && !jog.keypad) {
-                // keypad jogging is disabled
-                return;
-            }
+            const givenAxis = axis.toUpperCase();
+            const feedrate = this.actions.getFeedrate();
 
-            // The keyboard events of arrow keys for X-axis/Y-axis and pageup/pagedown for Z-axis
-            // are not prevented by default. If a jog command will be executed, it needs to
-            // stop the default behavior of a keyboard combination in a browser.
+            this.actions.startContinuousJog({ [givenAxis]: direction }, feedrate);
+        },
+        STOP_JOG: (event) => {
             preventDefault(event);
 
-            axis = axis || jog.axis;
-            const distance = this.actions.getJogDistance();
-            const jogAxis = {
-                x: () => this.actions.jog({ X: direction * distance * factor }),
-                y: () => this.actions.jog({ Y: direction * distance * factor }),
-                z: () => this.actions.jog({ Z: direction * distance * factor }),
-                a: () => this.actions.jog({ A: direction * distance * factor }),
-                b: () => this.actions.jog({ B: direction * distance * factor }),
-                c: () => this.actions.jog({ C: direction * distance * factor })
-            }[axis];
+            const { isContinuousJogging } = this.state;
 
-            jogAxis && jogAxis();
+            if (isContinuousJogging) {
+                this.actions.stopContinuousJog();
+            }
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
@@ -707,7 +706,7 @@ class AxesWidget extends PureComponent {
     componentWillUnmount() {
         this.unsubscribe();
         this.removeControllerEvents();
-        this.removeShuttleControlEvents();
+        // this.removeShuttleControlEvents();
     }
 
     componentDidUpdate(prevProps, prevState) {
