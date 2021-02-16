@@ -8,10 +8,9 @@
 
 .idle-info {
     width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    row-gap: 2rem;
 }
 
 .additional-info {
@@ -28,5 +27,5 @@
 }
 
 .file-name {
-        font-weight: bold;
+    font-weight: bold;
 }

@@ -1,6 +1,7 @@
 import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
 import _ from 'lodash';
+import map from 'lodash/map';
 import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
@@ -34,6 +35,7 @@ import {
     GRBL_ERRORS,
     GRBL_SETTINGS
 } from './constants';
+
 
 // % commands
 const WAIT = '%wait';
@@ -458,6 +460,7 @@ class GrblController {
             this.emit('serialport:read', res.raw);
 
             // Feeder
+            this.feeder.ack();
             this.feeder.next();
         });
 
@@ -503,6 +506,7 @@ class GrblController {
             }
 
             // Feeder
+            this.feeder.ack();
             this.feeder.next();
         });
 
@@ -1274,6 +1278,29 @@ class GrblController {
                 if (!this.feeder.isPending()) {
                     this.feeder.next();
                 }
+            },
+            'jog:continuous': () => {
+                const [axes, feedrate = 1000] = args;
+                const JOG_COMMAND_INTERVAL = 100;
+
+                // Borrowed from UGS
+                // /ugs-core/src/com/willwinder/universalgcodesender/utils/ContinuousJogWorker.java Line 107
+                const jogFeedrate = (feedrate / 60.0) * (JOG_COMMAND_INTERVAL / 1000.0) * 1.2;
+
+                Object.keys(axes).forEach((axis) => {
+                    axes[axis] *= jogFeedrate;
+                });
+
+                axes.F = feedrate;
+
+                const jogCommand = '$J=G91 ' + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+
+                this.feeder.repeatCommand(jogCommand, 150);
+            },
+            'jog:stop': () => {
+                this.feeder.reset();
+                this.command('gcode', '\x85');
+                this.command('gcode', 'G90');
             },
             'macro:run': () => {
                 let [id, context = {}, callback = noop] = args;

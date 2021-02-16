@@ -216,7 +216,7 @@ class JobStatusWidget extends PureComponent {
         const {
             minimized,
             spindleSpeed,
-            probeFeedrate
+            probeFeedrate,
         } = this.state;
 
         this.config.set('minimized', minimized);
@@ -229,6 +229,10 @@ class JobStatusWidget extends PureComponent {
             minimized: this.config.get('minimized', false),
             spindleSpeed: this.config.get('speed', 1000),
             probeFeedrate: Number(this.config.get('probeFeedrate') || 0).toFixed(3) * 1,
+            feedrateMin: this.config.get('feedrateMin', 500),
+            feedrateMax: this.config.get('feedrateMax', 2000),
+            spindleSpeedMin: this.config.get('spindleSpeedMin', 0),
+            spindleSpeedMax: this.config.get('spindleSpeedMax', 1000),
             isFullscreen: false,
             connected: false,
             workflow: {
@@ -310,7 +314,9 @@ class JobStatusWidget extends PureComponent {
                 this.setState({
                     fileName: file.name,
                     fileSize: file.size,
-                    total: file.total
+                    total: file.total,
+                    toolsAmount: file.toolSet.size,
+                    toolsUsed: file.toolSet,
                 });
             })
         ];

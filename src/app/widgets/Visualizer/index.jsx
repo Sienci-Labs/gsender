@@ -229,24 +229,28 @@ class VisualizerWidget extends PureComponent {
                 const lines = gcode.split('\n')
                     .filter(line => (line.trim().length > 0));
 
-                // // const tools = lines.filter(line => line[0] === 'T'); //Find all T commands
+                const tCommandRegex = /^[T]+[0-9]+/g;
+                const toolSet = new Set();
 
-                // const maxSpindleSpeed = lines.find(
-                //     line => [line[0], line[1], line[2]].join('') === 'G50'
-                // );
+                //Iterate over the lines and use regex against them
+                for (const line of lines) {
+                    if (tCommandRegex.test(line)) {
+                        const lineItems = line.split(' ');
 
-                // console.log(maxSpindleSpeed);
+                        //Find the line item with the T command and add it to the set
+                        for (const item of lineItems) {
+                            if (item[0] === 'T') {
+                                toolSet.add(item.trim());
+                            }
+                        }
+                    }
+                }
 
-                // //max spindle rate - min spindle rate is range
-
-                // console.log(lines);
-                // console.log(tools);
-
-                const total = lines.length + 1; //Added one as that is the dwell line added after every gcode parse
+                const total = lines.length + 1; //Dwell line added after every gcode parse
 
                 this.setState({ total });
 
-                pubsub.publish('gcode:fileInfo', { name, size, total });
+                pubsub.publish('gcode:fileInfo', { name, size, total, toolSet });
 
                 return;
             }
@@ -1132,14 +1136,6 @@ class VisualizerWidget extends PureComponent {
                             />
                         </div>
                     )}
-                    {/* {showNotifications && (
-                        <Notifications
-                            show={showNotifications}
-                            type={state.notification.type}
-                            data={state.notification.data}
-                            onDismiss={actions.dismissNotification}
-                        />
-                    )} */}
                 </Widget.Content>
             </Widget>
         );

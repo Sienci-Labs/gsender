@@ -128,6 +128,10 @@ const defaultState = {
         },
         job_status: {
             minimized: false,
+            feedrateMin: 500,
+            feedrateMax: 2000,
+            spindleSpeedMin: 0,
+            spindleSpeedMax: 1000
         },
         grbl: {
             minimized: false,
