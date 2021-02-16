@@ -50,6 +50,19 @@ export default class Keybindings extends Component {
         this.setState({ currentPage: 'Table', message: 'Shortcut Edited Successfully', keybindingsList: editedKeybindingsList });
     }
 
+    // Trigger pubsub for use in Location widget where keybindings are injected
+    // When modifing keybindings, we remove the key listener in location widget to prevent
+    // it from being fired during the edit
+    componentDidMount() {
+        pubsub.publish('removeKeybindingsListener');
+    }
+
+    // When we are not editing the keybindings anymore, make sure to re-inject the keybindings
+    // within the location widget again
+    componentWillUnmount() {
+        pubsub.publish('addKeybindingsListener');
+    }
+
     render() {
         const { handleEdit, switchPages, editKeybinding } = this;
         const { active } = this.props;
