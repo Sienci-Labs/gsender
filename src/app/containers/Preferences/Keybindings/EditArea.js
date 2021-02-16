@@ -18,7 +18,7 @@ const triggerKeys = ['Meta', 'Alt', 'Shift', 'Control'];
 export default class EditArea extends Component {
     static propTypes = {
         shortcut: PropTypes.object,
-        shorcuts: PropTypes.array,
+        shortcuts: PropTypes.array,
         switchPages: PropTypes.func,
         edit: PropTypes.func,
     }
@@ -37,30 +37,32 @@ export default class EditArea extends Component {
     state = this.initialState;
 
     /**
-     * Function to listen to keydowns and generate new keybinding command combo
+     * Function to build shortcut key combination
      * @param {KeyboardEvent} e The keyboard object containing all keyboard related attributes and methods
      */
-    outputKeys = (e) => {
-        e.preventDefault();
-        const key = e.key;
-        const keyLocation = e.location;
+    buildCombo = (e) => {
+        //Key map for mousetrap package
+        const keyMap = {
+            Backspace: 'backspace',
+            Tab: 'tab',
+            Enter: 'enter',
+            CapsLock: 'capslock',
+            Escape: 'escape',
+            ' ': 'space',
+            PageUp: 'pageup',
+            PageDown: 'pagedown',
+            ArrowLeft: 'left',
+            ArrowRight: 'right',
+            ArrowUp: 'up',
+            ArrowDown: 'down',
+            Delete: 'delete',
+        }[e.key];
 
-        const NUMPAD_LOCATION = e.DOM_KEY_LOCATION_NUMPAD;
+        const key = keyMap || e.key.toLowerCase();
 
         //Ignore trigger keys
-        if (triggerKeys.includes(key)) {
-            return;
-        }
-
-        //Space is not allowed as a keybinding
-        if (key === ' ') {
-            return;
-        }
-
-        //Backspace key will reset state
-        if (e.key === 'Backspace') {
-            this.setState(this.initialState);
-            return;
+        if (triggerKeys.includes(e.key)) {
+            return '';
         }
 
         this.setState({
@@ -91,21 +93,35 @@ export default class EditArea extends Component {
             keyCombo += `${keys.ctrlKey.label}+`;
         }
 
-        //If the key that was pressed is located on the numpad, we can add shift to the combo if it was triggered,
-        //otherwise if the location is somewhere else we need to check if the shift key was the only one triggered,
-        //in that case we would not add it to the combo as we want the pressed key's primary value, not secondary
-        if (keyLocation === NUMPAD_LOCATION && keys.shiftKey.triggered) {
-            keyCombo += `${keys.shiftKey.label}+`;
-        } else if (keys.shiftKey.triggered && keyCombo) {
+        // Do not add shift to the combo if one of the numbers on the main area of the keyboard are clicked
+        // This will prevent the keycombo from being set as shift + ! for example, which mousetrap won't understand
+        // (ex. shift + 1 = !)
+        if (keys.shiftKey.triggered && !e.code.includes('Digit')) {
             keyCombo += `${keys.shiftKey.label}+`;
         }
 
         keyCombo += key;
 
-        const foundShortcut = this.props.shorcuts.find(shortcut => shortcut.keys === keyCombo);
+        return [key, keyCombo];
+    }
+
+    /**
+     * Function to listen to keydowns and generate new keybinding command combo
+     * @param {KeyboardEvent} e The keyboard object containing all keyboard related attributes and methods
+     */
+    outputKeys = (e) => {
+        e.preventDefault();
+
+        const [singleKey, keyCombo] = this.buildCombo(e);
+
+        if (!keyCombo) {
+            return;
+        }
+
+        const foundShortcut = this.props.shortcuts.find(shortcut => shortcut.keys === keyCombo);
 
         const keyState = {
-            singleKey: key,
+            singleKey,
             keyCombo,
             metaTriggered: e.metaKey,
             altTriggered: e.altKey,
@@ -167,6 +183,26 @@ export default class EditArea extends Component {
         return (<div className={styles['info-window-area']}><i className="fas fa-info-circle" /> <p>&nbsp;</p></div>);
     }
 
+    displayShortcut = () => {
+        const { shortcut } = this.props;
+
+        const shortcutArray = shortcut.keys.split('+');
+
+        let cleanedShortcut = null;
+
+        //If there is an empty value as the last element in the shorcut array,
+        //that means a plus key is supposed to be there, but it was filtered out
+        //due to keys.split
+        if (shortcutArray[shortcutArray.length - 1] === '') {
+            cleanedShortcut = shortcutArray.filter(item => item !== '');
+            cleanedShortcut.push('+');
+        }
+
+        const output = cleanedShortcut ? formatShortcut(cleanedShortcut) : formatShortcut(shortcutArray);
+
+        return output;
+    }
+
     render() {
         const {
             pressed,
@@ -185,7 +221,7 @@ export default class EditArea extends Component {
             ? formatShortcut([singleKey])
             : <span className={styles['glowing-text']}>Press Some Keys...</span>;
 
-        const shortcutkeys = formatShortcut(shortcut.keys.split('+'));
+        const shortcutkeys = this.displayShortcut();
 
         return (
             <div className={styles.wrapper}>
