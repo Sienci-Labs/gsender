@@ -581,7 +581,9 @@ class Combokeys extends events.EventEmitter {
     reload() {
         this.commandKeys = store.get('commandKeys', []);
 
-        this.unbind();
+        this.reset();
+        this.list = [];
+
         this.bind();
     }
 
