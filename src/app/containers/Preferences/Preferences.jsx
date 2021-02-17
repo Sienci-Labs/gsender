@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import GeneralSettings from './GeneralSettings';
 import ToolSettings from './Tools/Tools';
 import MachineProfiles from './MachineProfiles';
+import Keybindings from './Keybindings';
 import ProbeSettings from './Probe/ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import store from '../../store';
@@ -37,6 +38,11 @@ class PreferencesPage extends PureComponent {
                     id: 3,
                     label: 'Probe',
                     component: ProbeSettings
+                },
+                {
+                    id: 4,
+                    label: 'Keybindings',
+                    component: Keybindings
                 }
             ],
             tools: store.get('workspace[tools]', []),

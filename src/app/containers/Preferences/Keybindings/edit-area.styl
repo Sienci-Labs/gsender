@@ -1,0 +1,101 @@
+.wrapper {
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+}
+
+.edit-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 auto 2rem auto;
+}
+
+.new-shortcut {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+@keyframes glowEffect {
+    from  {
+        primary = #1f2937;
+        color: primary;
+        border-bottom: 2px solid primary;
+    }
+
+    to {
+        secondary = #3e85c7;
+        color: secondary;
+        border-bottom: 2px solid secondary;
+    }
+}
+
+.glowing-text {
+    animation: glowEffect 1s ease-in-out infinite alternate;
+}
+
+.trigger-keys {
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+
+    margin: 2rem auto;
+    font-weight: bold;
+
+    label {
+        font-size: 1.75rem;
+        text-decoration: underline;
+        text-decoration-color: rgba(0,0,0,0);
+    }
+
+    .active {
+        color: #3e85c7;
+        text-decoration-color: rgba(#3e85c7, 1);
+    }
+
+    .disabled {
+        color: #9ca3af;
+    }
+}
+
+info-window() {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    align-items: center;
+    border: 2px solid black;
+    padding: 1rem;
+
+    p {
+        color: black;
+        font-size: 1.25rem;
+        margin: 0;
+    }
+
+    i {
+        font-size: 1.5rem;
+    }
+}
+
+.info-window-area {
+    info-window()
+}
+
+.info-window-area-error {
+    info-window()
+    color: red;
+    border: 2px solid red;
+}
+
+.info-window-area-success {
+    info-window()
+    color: #3e85c7;
+    border: 2px solid #3e85c7;
+}
+
+.button-group-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

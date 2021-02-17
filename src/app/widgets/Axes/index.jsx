@@ -6,6 +6,7 @@ import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import pubsub from 'pubsub-js';
 import api from 'app/api';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
@@ -48,6 +49,34 @@ class AxesWidget extends PureComponent {
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    pubsubTokens = [];
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('jogSpeeds', (msg, speeds) => {
+                this.setState({ jog: {
+                    ...this.state.jog,
+                    ...speeds,
+                } });
+            }),
+            pubsub.subscribe('addKeybindingsListener', () => {
+                this.addShuttleControlEvents();
+            }),
+            pubsub.subscribe('removeKeybindingsListener', () => {
+                this.removeShuttleControlEvents();
+            })
+        ];
+
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
 
     // Public methods
     collapse = () => {
@@ -344,6 +373,8 @@ class AxesWidget extends PureComponent {
                     xyStep: value
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep: value, zStep: jog.zStep, feedrate: jog.feedrate });
         },
         handleZStepChange: (value) => {
             const { jog } = this.state;
@@ -356,6 +387,8 @@ class AxesWidget extends PureComponent {
                     zStep: value
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep: jog.xyStep, zStep: value, feedrate: jog.feedrate });
         },
         handleFeedrateChange: (value) => {
             const { jog } = this.state;
@@ -368,6 +401,8 @@ class AxesWidget extends PureComponent {
                     feedrate: value
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep: jog.xyStep, zStep: jog.zStep, feedrate: value });
         },
         changeMovementRates: (xyStep, zStep, feedrate) => {
             const { jog } = this.state;
@@ -379,6 +414,8 @@ class AxesWidget extends PureComponent {
                     feedrate: feedrate
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep, zStep, feedrate });
         },
     };
 
@@ -397,34 +434,26 @@ class AxesWidget extends PureComponent {
             }
         },
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
-            const { canClick, jog } = this.state;
+            preventDefault(event);
+            const { isContinuousJogging } = this.state;
 
-            if (!canClick) {
+            if (!axis || isContinuousJogging) {
                 return;
             }
 
-            if (axis !== null && !jog.keypad) {
-                // keypad jogging is disabled
-                return;
-            }
+            const givenAxis = axis.toUpperCase();
+            const feedrate = this.actions.getFeedrate();
 
-            // The keyboard events of arrow keys for X-axis/Y-axis and pageup/pagedown for Z-axis
-            // are not prevented by default. If a jog command will be executed, it needs to
-            // stop the default behavior of a keyboard combination in a browser.
+            this.actions.startContinuousJog({ [givenAxis]: direction }, feedrate);
+        },
+        STOP_JOG: (event) => {
             preventDefault(event);
 
-            axis = axis || jog.axis;
-            const distance = this.actions.getJogDistance();
-            const jogAxis = {
-                x: () => this.actions.jog({ X: direction * distance * factor }),
-                y: () => this.actions.jog({ Y: direction * distance * factor }),
-                z: () => this.actions.jog({ Z: direction * distance * factor }),
-                a: () => this.actions.jog({ A: direction * distance * factor }),
-                b: () => this.actions.jog({ B: direction * distance * factor }),
-                c: () => this.actions.jog({ C: direction * distance * factor })
-            }[axis];
+            const { isContinuousJogging } = this.state;
 
-            jogAxis && jogAxis();
+            if (isContinuousJogging) {
+                this.actions.stopContinuousJog();
+            }
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
@@ -668,14 +697,16 @@ class AxesWidget extends PureComponent {
     };
 
     componentDidMount() {
+        this.subscribe();
         this.fetchMDICommands();
         this.addControllerEvents();
         this.addShuttleControlEvents();
     }
 
     componentWillUnmount() {
+        this.unsubscribe();
         this.removeControllerEvents();
-        this.removeShuttleControlEvents();
+        // this.removeShuttleControlEvents();
     }
 
     componentDidUpdate(prevProps, prevState) {
