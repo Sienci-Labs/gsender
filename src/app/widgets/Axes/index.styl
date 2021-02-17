@@ -130,16 +130,16 @@
 }
 
 .btn-up-left{
-    clip-path: polygon(0 0, 0 100%, 100% 0);
+    clip-path: polygon(0 0, 0 75%, 75% 0);
 }
 .btn-up-right{
-    clip-path: polygon(100% 0, 0 0, 100% 100%);
+    clip-path: polygon(100% 75%, 25% 0, 100% 0);
 }
 .btn-down-left{
-    clip-path: polygon(0 100%, 100% 100%, 0 0);
+    clip-path: polygon(0 100%, 0 25%, 75% 100%);
 }
 .btn-down-right{
-    clip-path: polygon(100% 100%, 100% 0, 0 100%);
+    clip-path: polygon(25% 100%, 100% 25%, 100% 100%);
 }
 
 .hidden {
@@ -175,10 +175,7 @@
 }
 
 .preset-controls{
-    display: flex;
     width: 25%;
-    flex-direction column;
-    align-items center;
 
     button + button {
         margin-left: 0;
