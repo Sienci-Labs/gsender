@@ -531,6 +531,7 @@ class AxesWidget extends PureComponent {
         'controller:state': (type, controllerState) => {
             // Grbl
             if (type === GRBL) {
+                const { units } = this.state;
                 const { status } = { ...controllerState };
                 const { mpos, wpos } = status;
                 const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
@@ -546,14 +547,34 @@ class AxesWidget extends PureComponent {
                         ...state.machinePosition,
                         ...mpos
                     }, (val) => {
-                        return ($13 > 0) ? in2mm(val) : val;
+                        if ($13 > 0) {
+                            if (units === METRIC_UNITS) {
+                                return in2mm(val);
+                            } else {
+                                return val;
+                            }
+                        } else if (units === IMPERIAL_UNITS) {
+                            return mm2in(val);
+                        } else {
+                            return val;
+                        }
                     }),
                     // Work position are reported in mm ($13=0) or inches ($13=1)
                     workPosition: mapValues({
                         ...state.workPosition,
                         ...wpos
                     }, val => {
-                        return ($13 > 0) ? in2mm(val) : val;
+                        if ($13 > 0) {
+                            if (units === METRIC_UNITS) {
+                                return in2mm(val).toFixed(1);
+                            } else {
+                                return val;
+                            }
+                        } else if (units === IMPERIAL_UNITS) {
+                            return mm2in(val).toFixed(3);
+                        } else {
+                            return val;
+                        }
                     })
                 }));
             }

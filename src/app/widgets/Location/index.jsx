@@ -5,6 +5,7 @@ import includes from 'lodash/includes';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
+import store from 'app/store';
 import React, { PureComponent } from 'react';
 import api from 'app/api';
 import Space from 'app/components/Space';
@@ -16,6 +17,7 @@ import i18n from 'app/lib/i18n';
 import { in2mm, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
+import pubsub from 'pubsub-js';
 import Location from './Location';
 import Settings from './Settings';
 import ShuttleControl from './ShuttleControl';
@@ -52,6 +54,7 @@ import {
 } from './constants';
 import styles from './index.styl';
 
+
 class LocationWidget extends PureComponent {
     static propTypes = {
         widgetId: PropTypes.string.isRequired,
@@ -72,6 +75,8 @@ class LocationWidget extends PureComponent {
     config = new WidgetConfig(this.props.widgetId);
 
     state = this.getInitialState();
+
+    pubsubTokens = [];
 
     getWorkCoordinateSystem = () => {
         const controllerType = this.state.controller.type;
@@ -504,100 +509,6 @@ class LocationWidget extends PureComponent {
                     })
                 }));
             }
-
-            // Marlin
-            if (type === MARLIN) {
-                const { pos, modal = {} } = { ...controllerState };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position is always reported in mm
-                    machinePosition: {
-                        ...state.machinePosition,
-                        ...pos
-                    },
-                    // Work position is always reported in mm
-                    workPosition: {
-                        ...state.workPosition,
-                        ...pos
-                    }
-                }));
-            }
-
-            // Smoothie
-            if (type === SMOOTHIE) {
-                const { status, parserstate } = { ...controllerState };
-                const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in current units
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in current units
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    })
-                }));
-            }
-
-            // TinyG
-            if (type === TINYG) {
-                const { sr } = { ...controllerState };
-                const { mpos, wpos, modal = {} } = { ...sr };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // https://github.com/synthetos/g2/wiki/Status-Reports
-                    // Canonical machine position are always reported in millimeters with no offsets.
-                    machinePosition: {
-                        ...state.machinePosition,
-                        ...mpos
-                    },
-                    // Work position are reported in current units, and also apply any offsets.
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    })
-                }));
-            }
         }
     };
 
@@ -623,11 +534,13 @@ class LocationWidget extends PureComponent {
         this.fetchMDICommands();
         this.addControllerEvents();
         this.addShuttleControlEvents();
+        this.subscribe();
     }
 
     componentWillUnmount() {
         this.removeControllerEvents();
         this.removeShuttleControlEvents();
+        this.unsubscribe();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -657,7 +570,7 @@ class LocationWidget extends PureComponent {
             isFullscreen: false,
             canClick: true, // Defaults to true
             port: controller.port,
-            units: METRIC_UNITS,
+            units: store.get('workspace.units', METRIC_UNITS),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -799,6 +712,28 @@ class LocationWidget extends PureComponent {
         }
 
         return true;
+    }
+
+    changeUnits(units) {
+        this.setState({
+            units: units
+        });
+    }
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('units:change', (event, units) => {
+                this.changeUnits(units);
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
     }
 
     render() {
