@@ -93,7 +93,6 @@
     background: #3e85c7;
     color: white;
     width: 100%;
-    height: 4rem;
     display: flex;
     flex-grow: 1;
     align-items: center;
@@ -130,6 +129,58 @@
     clip-path: polygon(100% 0, 75% 50%, 100% 100%, 25% 100%, 0 50%, 25% 0);
 }
 
+.btn-up-left{
+    clip-path: polygon(0 0, 0 100%, 100% 0);
+}
+.btn-up-right{
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
+}
+.btn-down-left{
+    clip-path: polygon(0 100%, 100% 100%, 0 0);
+}
+.btn-down-right{
+    clip-path: polygon(100% 100%, 100% 0, 0 100%);
+}
+
 .hidden {
     display: none;
+}
+
+.keys-body{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around
+}
+
+.xy-keys{
+    width: 35%;
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.xy-keys > div::before, .xy-keys > button::before {
+    content: '';
+    width: 0;
+    padding-bottom: 100%;
+    display: block;
+}
+
+.zKeys{
+    width: 15%;
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.preset-controls{
+    display: flex;
+    width: 25%;
+    flex-direction column;
+    align-items center;
+
+    button + button {
+        margin-left: 0;
+    }
 }
