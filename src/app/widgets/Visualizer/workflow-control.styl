@@ -53,21 +53,21 @@
 
         &:disabled {
             disabled-color = rgba(color, 0.5);
-            
+
             background-color: disabled-color;
             color: rgba(black, 0.2);
             border: 2px solid darken(color, 30%);
         }
 
         &:not(:disabled):hover {
-            background-color: lighten(color, 5%);
-            color: black;
+            background-color: darken(color, 30%);
+            border: 2px solid darken(color, 10%);
             transition: 200ms ease-in-out;
         }
     }
 
     &-upload {
-        color = #007BFF;
+        color = #3e85c7;
         btn-mixin(color)
     }
 
@@ -82,7 +82,7 @@
     }
 
     &-stop {
-        color = #EF4444;
+        color = #dc2626;
         btn-mixin(color)
-    }    
+    }
 }

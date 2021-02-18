@@ -987,17 +987,17 @@ class VisualizerWidget extends PureComponent {
             isAgitated: false, // Defaults to false
             currentTheme: {
                 backgroundColor: '#111827', //Navy Blue
-                gridColor: '#00FFFF', // Turqoise / Light Blue
-                xAxisColor: '#cd5c5c', //Indian Red
-                yAxisColor: '#53d277', //Light Green
-                zAxisColor: '#007BFF', //Light Green
-                limitColor: '#cd5c5c', //Indian Red
+                gridColor: '#77a9d7', // Turqoise / Light Blue
+                xAxisColor: '#df3b3b', //Indian Red
+                yAxisColor: '#06b881', //Light Green
+                zAxisColor: '#295d8d', //Light Green
+                limitColor: '#5191cc', //Indian Red
                 cuttingCoordinateLines: '#fff', //White
-                joggingCoordinateLines: '#53d277', // Light Green
-                G0Color: '#53d277', // Light Green
-                G1Color: '#007BFF', // Light Blue
-                G2Color: '#007BFF', // Light Blue
-                G3Color: '#007BFF', // Light Blue
+                joggingCoordinateLines: '#0ef6ae', // Light Green
+                G0Color: '#0ef6ae', // Light Green
+                G1Color: '#3e85c7', // Light Blue
+                G2Color: '#3e85c7', // Light Blue
+                G3Color: '#3e85c7', // Light Blue
             },
             currentTab: 0,
             filename: '',

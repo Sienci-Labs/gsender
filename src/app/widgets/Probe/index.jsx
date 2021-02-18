@@ -505,8 +505,21 @@ class ProbeWidget extends PureComponent {
         code = code.concat([
             this.gcode('G91'),
             this.gcode('G0', {
-                [axis]: retractDistance
-            }),
+                [axis]: (retractDistance * 2)
+            })
+        ]);
+
+        // Go up on Z if X or Y
+        if (axis !== 'Z') {
+            const { touchPlateHeight } = this.state;
+            code = code.concat([
+                this.gcode('G0', {
+                    Z: -1 * ((retractDistance * 2) + touchPlateHeight)
+                })
+            ]);
+        }
+
+        code = code.concat([
             this.gcode('G90')
         ]);
         return code;
