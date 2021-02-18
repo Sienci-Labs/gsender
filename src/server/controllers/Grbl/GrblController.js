@@ -1279,7 +1279,25 @@ class GrblController {
                     this.feeder.next();
                 }
             },
-            'jog:continuous': () => {
+            'gcode:safe': () => {
+                const [commands, prefUnits] = args;
+                const deviceUnits = this.state.parserstate.modal.units;
+
+                if (!deviceUnits) {
+                    log.error('Unable to determine device unit modal');
+                    return;
+                }
+                // Force command in preferred units
+                if (prefUnits !== deviceUnits) {
+                    this.command('gcode', prefUnits);
+                }
+                this.command('gcode', commands);
+                // return modal to previous state if they were different previously
+                if (prefUnits !== deviceUnits) {
+                    this.command('gcode', deviceUnits);
+                }
+            },
+            'jog:start': () => {
                 const [axes, feedrate = 1000] = args;
                 const JOG_COMMAND_INTERVAL = 100;
 

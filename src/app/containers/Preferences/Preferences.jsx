@@ -1,5 +1,7 @@
 import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
+import pubsub from 'pubsub-js';
+import controller from 'app/lib/controller';
 import GeneralSettings from './GeneralSettings';
 import ToolSettings from './Tools/Tools';
 import MachineProfiles from './MachineProfiles';
@@ -8,16 +10,22 @@ import ProbeSettings from './Probe/ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import store from '../../store';
 import styles from './index.styl';
+import { METRIC_UNITS } from '../../constants';
 
 
 class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
     state = this.getInitialState();
 
-
     getInitialState() {
         return {
             selectedMenu: 0,
+            units: store.get('workspace.units', METRIC_UNITS),
+            controller: {
+                type: controller.type,
+                settings: controller.settings,
+                state: controller.state
+            },
             menu: [
                 {
                     id: 0,
@@ -68,6 +76,12 @@ class PreferencesPage extends PureComponent {
             });
         },
         general: {
+            setUnits: (units) => {
+                this.setState({
+                    units: units
+                });
+                pubsub.publish('units:change', units);
+            }
         },
         tool: {
             setImperialDiameter: (e) => {
@@ -208,8 +222,8 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings } = this.state;
-
+        const { tools, tool, probe, probeSettings, units } = this.state;
+        store.set('workspace.units', units);
         store.replace('workspace[tools]', tools);
         store.set('workspace[tool]', tool);
         store.replace('workspace[probeProfile]', probe);

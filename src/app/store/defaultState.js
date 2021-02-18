@@ -1,6 +1,7 @@
 import {
     IMPERIAL_STEPS,
-    METRIC_STEPS
+    METRIC_STEPS,
+    METRIC_UNITS
 } from '../constants';
 
 const AXIS_X = 'x';
@@ -17,6 +18,7 @@ const defaultState = {
         token: ''
     },
     workspace: {
+        units: METRIC_UNITS,
         container: {
             default: {
                 widgets: ['visualizer', 'job_status']

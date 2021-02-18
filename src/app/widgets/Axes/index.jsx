@@ -6,7 +6,6 @@ import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import pubsub from 'pubsub-js';
 import api from 'app/api';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
@@ -14,9 +13,11 @@ import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
-import { in2mm, mapPositionToUnits } from 'app/lib/units';
+import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
+import pubsub from 'pubsub-js';
+import store from '../../store';
 import Axes from './Axes';
 import ShuttleControl from './ShuttleControl';
 import {
@@ -212,15 +213,20 @@ class AxesWidget extends PureComponent {
             controller.command('gcode', gcode);
         },
         jog: (params = {}) => {
+            const { units } = this.state;
+            const modal = (units === 'mm') ? 'G21' : 'G20';
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-            controller.command('gcode', 'G91'); // relative
-            controller.command('gcode', 'G0 ' + s);
-            controller.command('gcode', 'G90'); // absolute
+            const commands = [
+                'G91',
+                'G0 ' + s,
+                'G90'
+            ];
+            controller.command('gcode:safe', commands, modal);
         },
         startContinuousJog: (params = {}, feedrate = 1000) => {
             this.setState({
                 isContinuousJogging: true
-            }, controller.command('jog:continuous', params, feedrate));
+            }, controller.command('jog:start', params, feedrate));
         },
         stopContinuousJog: () => {
             this.setState({
@@ -549,17 +555,12 @@ class AxesWidget extends PureComponent {
         'controller:state': (type, controllerState) => {
             // Grbl
             if (type === GRBL) {
-                const { status, parserstate } = { ...controllerState };
+                const { units } = this.state;
+                const { status } = { ...controllerState };
                 const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
                 const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
-                    units: units,
                     controller: {
                         ...state.controller,
                         type: type,
@@ -570,14 +571,34 @@ class AxesWidget extends PureComponent {
                         ...state.machinePosition,
                         ...mpos
                     }, (val) => {
-                        return ($13 > 0) ? in2mm(val) : val;
+                        if ($13 > 0) {
+                            if (units === METRIC_UNITS) {
+                                return in2mm(val);
+                            } else {
+                                return val;
+                            }
+                        } else if (units === IMPERIAL_UNITS) {
+                            return mm2in(val);
+                        } else {
+                            return val;
+                        }
                     }),
                     // Work position are reported in mm ($13=0) or inches ($13=1)
                     workPosition: mapValues({
                         ...state.workPosition,
                         ...wpos
                     }, val => {
-                        return ($13 > 0) ? in2mm(val) : val;
+                        if ($13 > 0) {
+                            if (units === METRIC_UNITS) {
+                                return in2mm(val).toFixed(1);
+                            } else {
+                                return val;
+                            }
+                        } else if (units === IMPERIAL_UNITS) {
+                            return mm2in(val).toFixed(3);
+                        } else {
+                            return val;
+                        }
                     })
                 }));
             }
@@ -697,10 +718,10 @@ class AxesWidget extends PureComponent {
     };
 
     componentDidMount() {
-        this.subscribe();
         this.fetchMDICommands();
         this.addControllerEvents();
         this.addShuttleControlEvents();
+        this.subscribe();
     }
 
     componentWillUnmount() {
@@ -736,7 +757,7 @@ class AxesWidget extends PureComponent {
             isFullscreen: false,
             canClick: true, // Defaults to true
             port: controller.port,
-            units: METRIC_UNITS,
+            units: store.get('workspace.units', METRIC_UNITS),
             isContinuousJogging: false,
             controller: {
                 type: controller.type,
@@ -768,8 +789,8 @@ class AxesWidget extends PureComponent {
                 c: '0.000'
             },
             jog: {
-                xyStep: this.config.get('jog.xyStep'),
-                zStep: this.config.get('jog.zStep'),
+                xyStep: this.getInitialXYStep(),
+                zStep: this.getInitialZStep(),
                 feedrate: this.config.get('jog.feedrate'),
                 axis: '', // Defaults to empty
                 keypad: this.config.get('jog.keypad'),
@@ -801,6 +822,62 @@ class AxesWidget extends PureComponent {
             const callback = this.controllerEvents[eventName];
             controller.removeListener(eventName, callback);
         });
+    }
+
+    getInitialXYStep() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+
+        if (units === IMPERIAL_UNITS) {
+            return 0.2;
+        }
+        return 5;
+    }
+
+    getInitialZStep() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+
+        if (units === IMPERIAL_UNITS) {
+            return 0.04;
+        }
+        return 2;
+    }
+
+    changeUnits(units) {
+        const oldUnits = this.state.units;
+        const { jog } = this.state;
+        let { zStep, xyStep } = jog;
+        if (oldUnits === METRIC_UNITS && units === IMPERIAL_UNITS) {
+            zStep = mm2in(zStep).toFixed(3);
+            xyStep = mm2in(xyStep).toFixed(3);
+        } else if (oldUnits === IMPERIAL_UNITS && units === METRIC_UNITS) {
+            zStep = in2mm(zStep).toFixed(1);
+            xyStep = in2mm(xyStep).toFixed(1);
+        }
+
+        this.setState({
+            units: units,
+            jog: {
+                ...jog,
+                zStep: zStep,
+                xyStep: xyStep
+            }
+        });
+    }
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('units:change', (event, units) => {
+                this.changeUnits(units);
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
     }
 
     addShuttleControlEvents() {

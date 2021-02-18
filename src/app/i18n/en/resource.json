@@ -508,5 +508,7 @@
     "Confirm Probe Connectivity": "Confirm Probe Connectivity",
     "Confirm Router Position": "Confirm Router Position",
     "Release": "Release",
-    "Load File": "Load File"
+    "Load File": "Load File",
+    "Inches (G20)": "Inches (G20)",
+    "Millimeters (G21)": "Millimeters (G21)"
 }
