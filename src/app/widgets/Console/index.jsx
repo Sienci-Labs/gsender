@@ -14,7 +14,7 @@ import styles from './index.styl';
 
 // The buffer starts with 254 bytes free. The terminating <LF> or <CR> counts as a byte.
 const TERMINAL_COLS = 254;
-const TERMINAL_ROWS = 12;
+const TERMINAL_ROWS = 10;
 
 class ConsoleWidget extends PureComponent {
     static propTypes = {

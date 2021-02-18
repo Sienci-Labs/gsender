@@ -167,6 +167,16 @@ class Keypad extends PureComponent {
                         >
                         </JogControl>
                         <JogControl
+                            className={styles.btnUp}
+                            jog={() => actions.jog({ Z: zDistance, F: feedrate })}
+                            continuousJog={() => actions.startContinuousJog({ Z: 1 }, feedrate)}
+                            stopContinuousJog={() => actions.stopContinuousJog()}
+                            disabled={zControlsDisabled}
+                        >
+                            <KeypadText>Z</KeypadText>
+                            <KeypadDirectionText>+</KeypadDirectionText>
+                        </JogControl>
+                        <JogControl
                             className={styles.btnLeft}
                             jog={() => actions.jog({ X: -xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ X: -1 }, feedrate)}
@@ -187,6 +197,7 @@ class Keypad extends PureComponent {
                             <KeypadText>X</KeypadText>
                             <KeypadDirectionText>+</KeypadDirectionText>
                         </JogControl>
+                        <div />
                         <JogControl
                             className={styles.btnDownLeft}
                             jog={() => actions.jog({ X: -xyDistance, Y: -xyDistance, F: feedrate })}
@@ -213,19 +224,6 @@ class Keypad extends PureComponent {
                             disabled={xyControlsDisabled}
                         >
                         </JogControl>
-                    </div>
-                    <div className={styles.zKeys}>
-                        <JogControl
-                            className={styles.btnUp}
-                            jog={() => actions.jog({ Z: zDistance, F: feedrate })}
-                            continuousJog={() => actions.startContinuousJog({ Z: 1 }, feedrate)}
-                            stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={zControlsDisabled}
-                        >
-                            <KeypadText>Z</KeypadText>
-                            <KeypadDirectionText>+</KeypadDirectionText>
-                        </JogControl>
-                        <div />
                         <JogControl
                             className={styles.btnDown}
                             jog={() => actions.jog({ Z: -zDistance, F: feedrate })}
