@@ -8,7 +8,6 @@ import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import { in2mm, mapValueToUnits } from 'app/lib/units';
 import pubsub from 'pubsub-js';
 import WidgetConfig from '../WidgetConfig';
 import Probe from './Probe';
@@ -309,10 +308,6 @@ class ProbeWidget extends PureComponent {
                     type: type,
                     state: state
                 },
-                probeDepth: mapValueToUnits(this.config.get('probeDepth'), units),
-                probeFeedrate: mapValueToUnits(this.config.get('probeFeedrate'), units),
-                touchPlateHeight: mapValueToUnits(this.config.get('touchPlateHeight'), units),
-                retractionDistance: mapValueToUnits(this.config.get('retractionDistance'), units)
             });
         },
     };
@@ -346,7 +341,7 @@ class ProbeWidget extends PureComponent {
             return;
         }
 
-        const { units, probeCommand, useTLO } = this.state;
+        const { probeCommand, useTLO } = this.state;
         this.config.set('probeCommand', probeCommand);
         this.config.set('useTLO', useTLO);
 
@@ -357,13 +352,6 @@ class ProbeWidget extends PureComponent {
             retractionDistance
         } = this.state;
 
-        // To save in mm
-        if (units === IMPERIAL_UNITS) {
-            probeDepth = in2mm(probeDepth);
-            probeFeedrate = in2mm(probeFeedrate);
-            touchPlateHeight = in2mm(touchPlateHeight);
-            retractionDistance = in2mm(retractionDistance);
-        }
         this.config.set('probeDepth', Number(probeDepth));
         this.config.set('probeFeedrate', Number(probeFeedrate));
         this.config.set('touchPlateHeight', Number(touchPlateHeight));

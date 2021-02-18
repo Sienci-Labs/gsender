@@ -43,7 +43,7 @@ export const mapPositionToImperialUnits = (pos) => {
 // Maps position to metric units
 export const mapPositionToMetricUnits = (pos) => {
     pos = Number(pos) || 0;
-    return pos.toFixed(1);
+    return pos.toFixed(2);
 };
 
 // Maps position to the specified units
