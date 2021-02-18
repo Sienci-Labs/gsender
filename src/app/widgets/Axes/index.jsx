@@ -66,6 +66,9 @@ class AxesWidget extends PureComponent {
             }),
             pubsub.subscribe('removeKeybindingsListener', () => {
                 this.removeShuttleControlEvents();
+            }),
+            pubsub.subscribe('units:change', (event, units) => {
+                this.changeUnits(units);
             })
         ];
 
@@ -862,22 +865,6 @@ class AxesWidget extends PureComponent {
                 xyStep: xyStep
             }
         });
-    }
-
-    subscribe() {
-        const tokens = [
-            pubsub.subscribe('units:change', (event, units) => {
-                this.changeUnits(units);
-            })
-        ];
-        this.pubsubTokens = this.pubsubTokens.concat(tokens);
-    }
-
-    unsubscribe() {
-        this.pubsubTokens.forEach((token) => {
-            pubsub.unsubscribe(token);
-        });
-        this.pubsubTokens = [];
     }
 
     addShuttleControlEvents() {
