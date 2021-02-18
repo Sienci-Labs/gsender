@@ -742,8 +742,9 @@ class Visualizer extends Component {
                 if (geometry.hasColors) {
                     material = new THREE.MeshLambertMaterial({
                         map: texture,
-                        opacity: 0.9,
-                        transparent: false
+                        opacity: 0.01,
+                        transparent: false,
+                        color: '#caf0f8'
                     });
                 }
 
