@@ -61,6 +61,7 @@ class JogControl extends PureComponent {
                 disabled={props.disabled}
                 onMouseDown={(e) => this.onMouseDown(e)}
                 onMouseUp={(e) => this.onMouseUp(e)}
+                onMouseLeave={(e) => this.onMouseUp(e)}
             >
                 {props.children}
             </button>
