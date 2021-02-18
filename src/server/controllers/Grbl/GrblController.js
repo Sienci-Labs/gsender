@@ -1313,7 +1313,7 @@ class GrblController {
 
                 const jogCommand = '$J=G91 ' + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
 
-                this.feeder.repeatCommand(jogCommand, 150);
+                this.feeder.repeatCommand(jogCommand, 170);
             },
             'jog:stop': () => {
                 this.feeder.reset();
