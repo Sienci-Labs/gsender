@@ -6,13 +6,14 @@ import PropTypes from 'prop-types';
 // import Space from 'app/components/Space';
 import styles from './index.styl';
 
-class MaskInputTen extends PureComponent {
+class InputTen extends PureComponent {
     static propTypes = {
         switchSettings: PropTypes.object,
         title: PropTypes.string,
         currentSettings: PropTypes.object,
         getUsersNewSettings: PropTypes.func,
-        grabNew$10InputSettings: PropTypes.func
+        grabNew$10InputSettings: PropTypes.func,
+        disableSettingsButton: PropTypes.func
     }
 
     state = this.getInitialState();
@@ -90,7 +91,7 @@ class MaskInputTen extends PureComponent {
         if (name === '10-1') {
             currentValue[1] = value;
         }
-
+        this.props.disableSettingsButton();
         this.props.grabNew$10InputSettings(name, currentValue);
     }
 
@@ -135,4 +136,4 @@ class MaskInputTen extends PureComponent {
     }
 }
 
-export default MaskInputTen;
+export default InputTen;

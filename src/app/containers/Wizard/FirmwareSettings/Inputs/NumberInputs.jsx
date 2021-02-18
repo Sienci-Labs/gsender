@@ -17,7 +17,8 @@ class NumberInputs extends PureComponent {
         currentSettings: PropTypes.object,
         getUsersNewSettings: PropTypes.func,
         grabNewNumberInputSettings: PropTypes.func,
-        units: PropTypes.string
+        units: PropTypes.string,
+        disableSettingsButton: PropTypes.func
     }
 
     state = this.getInitialState();
@@ -42,6 +43,7 @@ class NumberInputs extends PureComponent {
     handleNumberInputs = (event) => {
         let value = event.target.value;
         let name = event.target.name;
+        this.props.disableSettingsButton();
         this.props.grabNewNumberInputSettings(name, value);
     }
 

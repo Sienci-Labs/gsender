@@ -1,3 +1,3 @@
-import Firmware from './Firmware';
+import FirmwareSettings from './FirmwareSettings/FirmwareSettings';
 
-export default Firmware;
+export default FirmwareSettings;

@@ -27,7 +27,8 @@ class InputController extends PureComponent {
         grabNew$3InputSettings: PropTypes.func,
         grabNew$10InputSettings: PropTypes.func,
         grabNew$23InputSettings: PropTypes.func,
-        units: PropTypes.string
+        units: PropTypes.string,
+        disableSettingsButton: PropTypes.func
     }
 
     render() {
@@ -48,6 +49,7 @@ class InputController extends PureComponent {
                     getUsersNewSettings={this.props.getUsersNewSettings}
                     grabNewNumberInputSettings={this.props.grabNewNumberInputSettings}
                     units={this.props.units}
+                    disableSettingsButton={this.props.disableSettingsButton}
                 />
             );
         } else if (this.props.type === 'switch') {
@@ -59,6 +61,7 @@ class InputController extends PureComponent {
                     title={title}
                     getUsersNewSettings={this.props.getUsersNewSettings}
                     grabNewSwitchInputSettings={this.props.grabNewSwitchInputSettings}
+                    disableSettingsButton={this.props.disableSettingsButton}
                 />
             );
         } else if (this.props.type === 'mask2') {
@@ -70,6 +73,7 @@ class InputController extends PureComponent {
                     title={title}
                     getUsersNewSettings={this.props.getUsersNewSettings}
                     grabNew$2InputSettings={this.props.grabNew$2InputSettings}
+                    disableSettingsButton={this.props.disableSettingsButton}
                     />
             );
         } else if (this.props.type === 'mask3') {
@@ -81,6 +85,7 @@ class InputController extends PureComponent {
                     title={title}
                     getUsersNewSettings={this.props.getUsersNewSettings}
                     grabNew$3InputSettings={this.props.grabNew$3InputSettings}
+                    disableSettingsButton={this.props.disableSettingsButton}
                     />
             );
         } else if (this.props.type === 'mask10') {
@@ -92,6 +97,7 @@ class InputController extends PureComponent {
                     title={title}
                     getUsersNewSettings={this.props.getUsersNewSettings}
                     grabNew$10InputSettings={this.props.grabNew$10InputSettings}
+                    disableSettingsButton={this.props.disableSettingsButton}
                     />
             );
         } else if (this.props.type === 'mask23') {
@@ -103,6 +109,7 @@ class InputController extends PureComponent {
                     title={title}
                     getUsersNewSettings={this.props.getUsersNewSettings}
                     grabNew$23InputSettings={this.props.grabNew$23InputSettings}
+                    disableSettingsButton={this.props.disableSettingsButton}
                     />
             );
         }

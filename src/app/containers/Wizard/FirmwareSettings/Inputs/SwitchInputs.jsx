@@ -12,7 +12,8 @@ class SwitchInput extends PureComponent {
         title: PropTypes.string,
         currentSettings: PropTypes.object,
         getUsersNewSettings: PropTypes.func,
-        grabNewSwitchInputSettings: PropTypes.func
+        grabNewSwitchInputSettings: PropTypes.func,
+        disableSettingsButton: PropTypes.func
     }
 
     state = this.getInitialState();
@@ -43,7 +44,7 @@ class SwitchInput extends PureComponent {
         if (value === false) {
             value = 0;
         }
-
+        this.props.disableSettingsButton();
         this.props.grabNewSwitchInputSettings(name, value);
     }
 

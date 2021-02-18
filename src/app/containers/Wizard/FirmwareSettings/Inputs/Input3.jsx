@@ -6,12 +6,13 @@ import PropTypes from 'prop-types';
 // import Space from 'app/components/Space';
 import styles from './index.styl';
 
-class MaskInputThree extends PureComponent {
+class InputThree extends PureComponent {
     static propTypes = {
         switchSettings: PropTypes.object,
         title: PropTypes.string,
         currentSettings: PropTypes.object,
-        grabNew$3InputSettings: PropTypes.func
+        grabNew$3InputSettings: PropTypes.func,
+        disableSettingsButton: PropTypes.func
     }
 
     state = this.getInitialState();
@@ -128,7 +129,7 @@ class MaskInputThree extends PureComponent {
         if (name === '3-2') {
             currentValue[2] = value;
         }
-
+        this.props.disableSettingsButton();
         this.props.grabNew$3InputSettings(name, currentValue);
     }
 
@@ -189,4 +190,4 @@ class MaskInputThree extends PureComponent {
     }
 }
 
-export default MaskInputThree;
+export default InputThree;
