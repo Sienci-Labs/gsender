@@ -2,6 +2,11 @@
 import { app, BrowserWindow, shell } from 'electron';
 //import AutoUpdater from './AutoUpdater';
 
+const browserWindowOptions = {
+    minWidth: 1280,
+    minHeight: 720,
+};
+
 class WindowManager {
     windows = [];
 
@@ -49,6 +54,7 @@ class WindowManager {
     openWindow(url, options) {
         const window = new BrowserWindow({
             ...options,
+            ...browserWindowOptions,
             show: false
         });
         const webContents = window.webContents;

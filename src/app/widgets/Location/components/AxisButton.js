@@ -6,52 +6,57 @@ import { PRIMARY_COLOR, SECONDARY_COLOR } from '../constants';
 
 //Main styles
 const Container = styled.div`
-    text-align: center;
-    border: 2px solid ${PRIMARY_COLOR};
-    border-radius: 5px;
-    width: 100%;
-    max-width: 5rem;
-    min-width: 4rem;
-    transition: 200ms ease-in-out;
-
-    &.active:hover {
-        color: white;
-        background-color: ${PRIMARY_COLOR};
+        text-align: center;
+        border: 2px solid ${PRIMARY_COLOR};
+        border-radius: 5px;
+        width: 100%;
+        max-width: 5rem;
+        min-width: 4rem;
         transition: 200ms ease-in-out;
 
-        h3 {
+        &.active:hover {
             color: white;
+            background-color: ${PRIMARY_COLOR};
             transition: 200ms ease-in-out;
+
+            h3 {
+                color: white;
+                transition: 200ms ease-in-out;
+            }
         }
-    }
 
-    &.disabled {
-        color: ${SECONDARY_COLOR};
-        border: 2px solid ${SECONDARY_COLOR};
-        cursor: no-drop;
-
-        h3 {
+        &.disabled {
             color: ${SECONDARY_COLOR};
-            transition: 200ms ease-in-out;
-        }
-    }
-  
-  &:focus {
-    outline: none;
-  }
-  &:active{
-    outline: none;
-  }
+            border: 2px solid ${SECONDARY_COLOR};
+            cursor: no-drop;
 
-  h3 {
-    font-weight: 600;
-    font-size: 31px;
-    margin-top: -5px;
-  }
+            h3 {
+                color: ${SECONDARY_COLOR};
+                transition: 200ms ease-in-out;
+            }
+        }
+    
+    &:focus {
+        outline: none;
+    }
+    &:active{
+        outline: none;
+    }
+
+    h3 {
+        font-weight: 600;
+        font-size: clamp(12px, 1vw, 32px);
+        margin-top: -5px;
+    }
+
+    p {
+        font-size: clamp(9px,0.5vw,14px);
+    }
 
     p, h3 {
         margin: 1px;
     }
+
 `;
 
 const AxisButton = ({ label, axis, onClick, disabled }) => {

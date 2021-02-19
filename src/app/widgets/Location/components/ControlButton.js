@@ -10,7 +10,7 @@ const Button = styled.button`
     background-color: ${props => (props.isMovement ? PRIMARY_COLOR : '#D1D5DB')};
     border-radius: 0.25rem;
     width: 100%;
-    max-width: 10rem;
+    max-width: 8rem;
     padding: 5px;
     margin: 0;
     --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
