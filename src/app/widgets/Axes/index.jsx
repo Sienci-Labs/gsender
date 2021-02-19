@@ -853,8 +853,8 @@ class AxesWidget extends PureComponent {
             zStep = mm2in(zStep).toFixed(3);
             xyStep = mm2in(xyStep).toFixed(3);
         } else if (oldUnits === IMPERIAL_UNITS && units === METRIC_UNITS) {
-            zStep = in2mm(zStep).toFixed(1);
-            xyStep = in2mm(xyStep).toFixed(1);
+            zStep = in2mm(zStep).toFixed(2);
+            xyStep = in2mm(xyStep).toFixed(2);
         }
 
         this.setState({

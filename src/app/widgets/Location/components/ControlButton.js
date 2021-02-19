@@ -38,13 +38,14 @@ const Button = styled.button`
     }
 `;
 
-const ControlButton = ({ label, icon: Icon, onClick, disabled }) => {
+const ControlButton = ({ label, icon: Icon, onClick, disabled, className }) => {
     return (
         <Button
             type="button"
             onClick={onClick}//STYLE HERE FOR LOCATION BUTTONS IN BUILD VERSION
             style={{ fontSize: '14px', marginBottom: '0px', marginRight: '10px', marginTop: '10px' }}
             disabled={disabled}
+            className={className}
         >
             {Icon && <Icon /> } {label}
         </Button>

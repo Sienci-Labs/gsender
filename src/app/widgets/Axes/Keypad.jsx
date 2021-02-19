@@ -266,7 +266,7 @@ class Keypad extends PureComponent {
                             onClick={() => {
                                 const xyStep = (units === 'mm') ? 0.5 : 0.02;
                                 const zStep = (units === 'mm') ? 0.1 : 0.004;
-                                actions.changeMovementRates(xyStep, zStep, 3000);
+                                actions.changeMovementRates(xyStep, zStep, 1000);
                             }}
                         >
                             Precise

@@ -190,6 +190,7 @@ class DisplayPanel extends PureComponent {
                                 controller.command('homing');
                             }}
                             disabled={!canClick || !machineProfile.endstops}
+                            className={(!machineProfile.endstops) ? 'hidden' : ''}
                         />
                         <ControlButton
                             label={i18n._('Go Home')}
@@ -198,6 +199,7 @@ class DisplayPanel extends PureComponent {
                                 controller.command('gcode', 'G28 G91'); //Go to Home Position
                             }}
                             disabled={!canClick || !machineProfile.endstops}
+                            className={(!machineProfile.endstops) ? 'hidden' : ''}
                         />
                         <ControlButton
                             label={i18n._('Release')}
