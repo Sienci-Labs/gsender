@@ -35,6 +35,10 @@ const Button = styled.button`
         cursor: no-drop;
     }
 
+    &:first-child {
+        margin-top: 0 !important;
+    }
+
     svg {
         width: 17px;
         height: 17px;
