@@ -1299,11 +1299,11 @@ class GrblController {
             },
             'jog:start': () => {
                 const [axes, feedrate = 1000] = args;
-                const JOG_COMMAND_INTERVAL = 100;
+                const JOG_COMMAND_INTERVAL = 80;
 
                 // Borrowed from UGS
                 // /ugs-core/src/com/willwinder/universalgcodesender/utils/ContinuousJogWorker.java Line 107
-                const jogFeedrate = (feedrate / 60.0) * (JOG_COMMAND_INTERVAL / 1000.0) * 1.2;
+                const jogFeedrate = ((feedrate / 60.0) * (JOG_COMMAND_INTERVAL / 1000.0) * 1.2).toFixed(1);
 
                 Object.keys(axes).forEach((axis) => {
                     axes[axis] *= jogFeedrate;
@@ -1313,12 +1313,13 @@ class GrblController {
 
                 const jogCommand = '$J=G91 ' + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
 
-                this.feeder.repeatCommand(jogCommand, 170);
+                this.feeder.repeatCommand(jogCommand, 230);
             },
             'jog:stop': () => {
                 this.feeder.reset();
                 this.command('gcode', '\x85');
                 this.command('gcode', 'G90');
+                this.feeder.reset();
             },
             'macro:run': () => {
                 let [id, context = {}, callback = noop] = args;

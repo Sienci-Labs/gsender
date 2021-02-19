@@ -51,17 +51,16 @@ class NavSidebar extends PureComponent {
 
         return (
             <div className={styles.Sidebar}>
-                <NavSidebarLink url="" icon="fa-ruler" label="Flatten" />
-                <NavSidebarLink url="" icon="fa-border-style" label="Surface" />
-                <NavSidebarLink url="" icon="fa-wrench" label="Calibrate" />
-                <div className={!this.props.wizardDisabled ? 'enable' : `${styles.disable}`}>
-                    <NavSidebarLink
-                        url=""
-                        onClick={() => actions.openModal(MODAL_FIRMWARE)}
-                        icon="fa-hat-wizard"
-                        label="Wizard"
-                    />
-                </div>
+                <NavSidebarLink url="" className={styles.disable} icon="fa-ruler" label="Flatten" />
+                <NavSidebarLink url="" className={styles.disable} icon="fa-border-style" label="Surface" />
+                <NavSidebarLink url="" className={styles.disable} icon="fa-wrench" label="Calibrate" />
+                <NavSidebarLink
+                    url=""
+                    onClick={() => actions.openModal(MODAL_FIRMWARE)}
+                    icon="fa-hat-wizard"
+                    label="Wizard"
+                    className={!this.props.wizardDisabled ? 'enable' : `${styles.disable}`}
+                />
                 <NavSidebarLink
                     url="" onClick={() => actions.openModal(MODAL_PREFERENCES)}
                     icon="fa-cog" label=""

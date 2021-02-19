@@ -7,7 +7,7 @@ const PositionLabel = ({ value, small }) => {
     value = String(value);
     return (
         <div style={{ fontFamily: 'Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Bitstream Vera Sans Mono",  Monaco, "Courier New", Courier, monospace',
-            fontSize: small ? 14 : 'clamp(20px, 1vw, 28px)',
+            fontSize: small ? '14px' : '2rem',
             padding: '0px 5px',
             textAlign: 'center',
             color: small ? SECONDARY_COLOR : PRIMARY_COLOR,
