@@ -221,41 +221,40 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
+            const lines = gcode.split('\n')
+                .filter(line => (line.trim().length > 0));
+
+            const tCommandRegex = /^[T]+[0-9]+/g;
+            const toolSet = new Set();
+
+            //Iterate over the lines and use regex against them
+            for (const line of lines) {
+                if (tCommandRegex.test(line)) {
+                    const lineItems = line.split(' ');
+
+                    //Find the line item with the T command and add it to the set
+                    for (const item of lineItems) {
+                        if (item[0] === 'T') {
+                            toolSet.add(item.trim());
+                        }
+                    }
+                }
+            }
+
+            const total = lines.length + 1; //Dwell line added after every gcode parse
+
+            this.setState({ total });
+
+            pubsub.publish('gcode:fileInfo', { name, size, total, toolSet });
+
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
             if (!port) {
                 this.actions.loadGCode(name, gcode, size);
 
-                const lines = gcode.split('\n')
-                    .filter(line => (line.trim().length > 0));
-
-                const tCommandRegex = /^[T]+[0-9]+/g;
-                const toolSet = new Set();
-
-                //Iterate over the lines and use regex against them
-                for (const line of lines) {
-                    if (tCommandRegex.test(line)) {
-                        const lineItems = line.split(' ');
-
-                        //Find the line item with the T command and add it to the set
-                        for (const item of lineItems) {
-                            if (item[0] === 'T') {
-                                toolSet.add(item.trim());
-                            }
-                        }
-                    }
-                }
-
-                const total = lines.length + 1; //Dwell line added after every gcode parse
-
-                this.setState({ total });
-
-                pubsub.publish('gcode:fileInfo', { name, size, total, toolSet });
-
                 return;
             }
 
-            pubsub.publish('gcode:fileInfo', { size });
             controller.command('gcode:load', name, gcode, context, (err, data) => {
                 if (err) {
                     this.setState((state) => ({
