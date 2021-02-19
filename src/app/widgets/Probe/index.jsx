@@ -649,7 +649,6 @@ class ProbeWidget extends PureComponent {
         code = code.concat([
             this.gcode('G90')
         ]);
-        console.log(code);
         return code;
     }
 
