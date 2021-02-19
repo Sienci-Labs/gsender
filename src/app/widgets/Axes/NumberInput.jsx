@@ -28,6 +28,8 @@ class NumberInput extends PureComponent {
             step = 100;
         } else if (value < 10000) {
             step = 1000;
+        } else {
+            step = 10000;
         }
 
         if (!increment && step !== 0.1 && value - step === 0) {

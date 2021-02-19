@@ -514,7 +514,7 @@ class ProbeWidget extends PureComponent {
             const { touchPlateHeight } = this.state;
             code = code.concat([
                 this.gcode('G0', {
-                    Z: -1 * ((retractDistance * 2) + touchPlateHeight)
+                    Z: -1 * ((retractDistance * 4) - touchPlateHeight)
                 })
             ]);
         }
