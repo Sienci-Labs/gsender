@@ -2,7 +2,9 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-const Home = ({ fill }) => {
+const Home = ({ fill, isMovement = false, disabled = false }) => {
+    fill = (isMovement ? '#FFFFFF' : fill);
+    fill = (disabled ? '#9ca3af' : fill);
     return (
         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 1000 1000" enableBackground="new 0 0 1000 1000" xmlSpace="preserve">
             <metadata> Svg Vector Icons : http://www.onlinewebfonts.com/icon </metadata>
@@ -13,6 +15,7 @@ const Home = ({ fill }) => {
 
 Home.propTypes = {
     fill: PropTypes.string,
+    isMovement: PropTypes.bool
 };
 
 export default Home;
