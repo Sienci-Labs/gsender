@@ -634,10 +634,22 @@ class ProbeWidget extends PureComponent {
                 Y: XYRetract
             }),
         ]);
+
+        // Go up on Z if X or Y
+        code = code.concat([
+            this.gcode('G0', {
+                Z: ((retractDistance * 3) + zThickness)
+            }),
+            this.gcode('G0', {
+                Y: -1 * ((XYRetract * 3) - xyThickness)
+            })
+        ]);
+
         // Make sure we're in the correct mode at end of probe
         code = code.concat([
             this.gcode('G90')
         ]);
+        console.log(code);
         return code;
     }
 
