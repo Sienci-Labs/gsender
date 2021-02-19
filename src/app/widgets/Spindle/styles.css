@@ -8,6 +8,9 @@
   --tw-shadow: 0 11px 10px 1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   transition: 200ms ease-in-out;
+  font-size: clamp(12px, 1vw, 22px);
+  height: clamp(24px, 2vw, 38px);
+  padding: 0;
 }
 
 .speedSpindle {
@@ -15,10 +18,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 12px;
+  margin-top: clamp(3px, 1vw, 20px);
+  margin-bottom: clamp(3px, 0.5vw, 20px);
   margin-left: 36%;
   width: 110%;
-  margin-bottom: 20px;
 }
 
 .smalledText {
@@ -27,8 +30,9 @@
 }
 
 .labelSpindle {
-  font-size: larger;
-  margin-right: 10px;
+  font-size: clamp(12px, 1vw, 22px);
+  margin-bottom: clamp(0px, 0.5vh, 10px);
+  margin-right: 5px;
 }
 
 .coolantButtons:disabled {
@@ -38,7 +42,7 @@
   border-radius: 0.25rem;
   width: 100%;
   max-width: 10rem;
-  padding: 5px;
+  /* padding: 5px; */
   margin: 0;
   -webkit-transition: 200ms ease-in-out;
   transition: 200ms ease-in-out;
@@ -52,7 +56,7 @@
   border-radius: 0.25rem;
   width: 100%;
   max-width: 10rem;
-  padding: 5px;
+  /* padding: 5px; */
   margin: 0;
   cursor: not-allowed;
 }
@@ -64,7 +68,7 @@
   border-radius: 0.25rem;
   width: 100%;
   max-width: 10rem;
-  padding: 5px;
+  /* padding: 5px; */
   margin: 0;
   -webkit-transition: 200ms ease-in-out;
   transition: 200ms ease-in-out;
@@ -78,6 +82,7 @@
 }
 
 input.form-control[type="number"] {
+  min-width: 8rem;
   color: #3e85c7;
   height: 37px;
   border-radius: 4px;
@@ -110,7 +115,8 @@ input.form-control[type="number"]::-webkit-inner-spin-button {
 }
 
 .control-label {
-  font-size: larger;
+  font-size: clamp(12px 1vw, 22px);
+  margin-bottom: clamp(0px, 0.25vw, 10px);
 }
 
 .form-group {
