@@ -47,7 +47,7 @@
     color: #3e85c7;
     --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-    margin-bottom: 20px;
+    margin-bottom: clamp(12px, 1vw, 2rem);
     transition: 200ms ease-in-out;
 
     &:hover {
@@ -82,12 +82,13 @@
     flex-grow: 1;
     flex-direction: row;
     justify-content: space-between;
-    padding: 1rem;
+    padding: clamp(5px, 0.55vw, 1rem);
     box-sizing: border-box;
     align-items: center;
 }
 
 .btn-Keypad {
+    height: clamp(30px, 3vw, 60px);
     border: none;
     outline: none;
     background: #3e85c7;
@@ -155,6 +156,7 @@
 
 .xy-keys{
     width: 50%;
+    height: max-content;
     display: grid;
     grid-gap: 10px;
     grid-template-columns: repeat(4, minmax(0, 1fr));
