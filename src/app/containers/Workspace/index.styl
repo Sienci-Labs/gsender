@@ -81,6 +81,9 @@
         &.hidden {
             display: none;
         }
+        @media (min-width: 1921px) {
+            width: 634px;
+        }
     }
 
     .primary-toggler, .secondary-toggler {
@@ -110,6 +113,10 @@
             width: 66%;
             top: ($navbar-height + 1);
             bottom: 0;
+
+            @media (min-width: 1921px) {
+                width: calc(100vw - 630px) !important;
+            }
         }
     }
 }
