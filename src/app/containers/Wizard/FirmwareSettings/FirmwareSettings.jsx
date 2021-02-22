@@ -86,6 +86,7 @@ class FirmwareSettings extends PureComponent {
 
     getInitialState() {
         return {
+            loading: true,
             disable: true,
             alert: false,
             warning: false,

@@ -19,6 +19,7 @@ const defaultState = {
     },
     workspace: {
         units: METRIC_UNITS,
+        reverseWidgets: false,
         container: {
             default: {
                 widgets: ['visualizer', 'job_status']

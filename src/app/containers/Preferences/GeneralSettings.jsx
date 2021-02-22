@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import Dropdown, { MenuItem } from 'app/components/Dropdown';
+import ToggleSwitch from 'app/components/ToggleSwitch';
 import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 import {
@@ -10,7 +11,7 @@ import {
 
 
 const GeneralSettings = ({ active, state, actions }) => {
-    const { units } = state;
+    const { units, reverseWidgets } = state;
     return (
         <div className={classNames(
             styles.hidden,
@@ -68,6 +69,12 @@ const GeneralSettings = ({ active, state, actions }) => {
                     </div>
                 </div>
                 <div className={styles.addToolForm}>
+                    <h4>Reverse Workspace</h4>
+                    <ToggleSwitch
+                        checked={reverseWidgets}
+                        onChange={() => actions.general.setReverseWidgets()}
+                    />
+                    <small>Functionality appears on the left if toggled on.</small>
                 </div>
             </div>
 

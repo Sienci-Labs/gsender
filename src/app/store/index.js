@@ -140,6 +140,14 @@ const normalizeState = (state) => {
         set(state, 'workspace.units', METRIC_UNITS);
     }
 
+    const reverseWidgets = get(cnc.state, 'workspace.reverseWidgets');
+    if (reverseWidgets) {
+        set(state, 'workspace.reverseWidgets', reverseWidgets);
+    } else {
+        set(state, 'workspace.reverseWidgets', false);
+    }
+
+
     return state;
 };
 

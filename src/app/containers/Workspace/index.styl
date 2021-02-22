@@ -10,6 +10,8 @@
 .workspace {
     height: 92vh;
     overflow-y: overlay;
+    display: flex;
+    flex-direction: row;
 
     &::-webkit-scrollbar {
         display: none;
@@ -46,7 +48,8 @@
     }
 
     .workspace-table {
-        display: table;
+        display: flex;
+        flex-direction: row;
         width: 100%;
         height: 'calc(100vh - %s)' % $navbar-height;
         background-color: #d1d5db;
@@ -57,14 +60,13 @@
     }
 
     .primary-container, .secondary-container, .primary-toggler, .secondary-toggler, .default-container {
-        display: table-cell;
+        display: flex;
+        flex-direction: column;
         position: relative;
-        height: 60vh;
     }
 
     .primary-container {
         // border-right: 1px solid #ccc;
-        float: right;
     }
 
     .secondary-container {
@@ -95,6 +97,9 @@
         height: 'calc(100vh - %s)' % $navbar-height;
     }
 
+.reverse-workspace {
+    flex-direction: row-reverse;
+}
     .primary-toggler {
         border-right: 1px solid #ccc;
     }
@@ -106,17 +111,12 @@
     .default-container {
         min-width: 360px;
         background-color: #d1d5db;
-
-        &.fixed {
-            position: fixed;
-            left: 0 !important;
-            width: 66%;
-            top: ($navbar-height + 1);
-            bottom: 0;
-
-            @media (min-width: 1921px) {
-                width: calc(100vw - 630px) !important;
-            }
+        width: 66%;
+        top: ($navbar-height + 1);
+        bottom: 0;
+        @media (min-width: 1921px) {
+            width: calc(100vw - 630px) !important;
         }
     }
 }
+

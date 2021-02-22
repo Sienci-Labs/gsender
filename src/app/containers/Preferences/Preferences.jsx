@@ -21,6 +21,7 @@ class PreferencesPage extends PureComponent {
         return {
             selectedMenu: 0,
             units: store.get('workspace.units', METRIC_UNITS),
+            reverseWidgets: store.get('workspace.reverseWidgets', false),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -81,6 +82,13 @@ class PreferencesPage extends PureComponent {
                     units: units
                 });
                 pubsub.publish('units:change', units);
+            },
+            setReverseWidgets: () => {
+                const reverseWidgetState = !this.state.reverseWidgets;
+                this.setState({
+                    reverseWidgets: reverseWidgetState
+                });
+                pubsub.publish('widgets:reverse', reverseWidgetState);
             }
         },
         tool: {
@@ -224,7 +232,8 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units } = this.state;
+        const { tools, tool, probe, probeSettings, units, reverseWidgets } = this.state;
+        store.set('workspace.reverseWidgets', reverseWidgets);
         store.set('workspace.units', units);
         store.replace('workspace[tools]', tools);
         store.set('workspace[tool]', tool);
