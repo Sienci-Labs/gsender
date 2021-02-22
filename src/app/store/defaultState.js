@@ -31,7 +31,7 @@ const defaultState = {
             }
         },
         machineProfile: {
-            id: null
+            id: 5
         },
         probeProfile: {
             xyThickness: 10,
