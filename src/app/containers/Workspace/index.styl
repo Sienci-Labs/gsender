@@ -44,7 +44,7 @@
     }
 
     .dropzone {
-        height: 100%;
+        height: 'calc(100vh - %s)' % $navbar-height;
     }
 
     .workspace-table {
@@ -112,7 +112,6 @@
         min-width: 360px;
         background-color: #d1d5db;
         width: 66%;
-        top: ($navbar-height + 1);
         bottom: 0;
         @media (min-width: 1921px) {
             width: calc(100vw - 630px) !important;
