@@ -6,7 +6,7 @@ import WidgetConfig from '../WidgetConfig';
 import ProbeWidget from '../Probe';
 import MacroWidget from '../Macro';
 import ConsoleWidget from '../Console';
-import LaserWidget from '../Laser';
+// import LaserWidget from '../Laser';
 import SpindleWidget from '../Spindle';
 
 import {
@@ -150,11 +150,11 @@ class SecondaryFunctionality extends PureComponent {
                     widgetId: 'spindle',
                     component: SpindleWidget
                 },
-                {
-                    label: 'Laser',
-                    widgetId: 'laser',
-                    component: LaserWidget
-                },
+                // {
+                //     label: 'Laser',
+                //     widgetId: 'laser',
+                //     component: LaserWidget
+                // },
             ]
         };
     }
