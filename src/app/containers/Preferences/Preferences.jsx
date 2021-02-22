@@ -125,6 +125,7 @@ class PreferencesPage extends PureComponent {
                 this.setState({
                     tools: tools
                 });
+                pubsub.publish('tools:updated');
             },
             deleteTool: (index) => {
                 const tools = [...this.state.tools];
@@ -132,6 +133,7 @@ class PreferencesPage extends PureComponent {
                 this.setState({
                     tools: [...tools]
                 });
+                pubsub.publish('tools:updated');
             }
         },
         probe: {

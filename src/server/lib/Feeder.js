@@ -86,7 +86,8 @@ class Feeder extends events.EventEmitter {
         this.state.queue = [];
         this.state.pending = false;
         this.state.outstanding = 0;
-        this.state.interval && clearInterval(this.state.interval);
+        clearInterval(this.state.interval);
+        this.state.interval = null;
         this.emit('change');
     }
 
@@ -142,14 +143,20 @@ class Feeder extends events.EventEmitter {
     }
 
     repeatCommand(command, timer = 200) {
-        this.state.interval = setInterval(() => {
-            if (!this.hasOutstanding()) {
-                this.feed(command);
-                if (!this.isPending()) {
-                    this.next();
+        if (!this.state.interval) {
+            this.state.interval = setInterval(() => {
+                if (!this.hasOutstanding()) {
+                    this.feed(command);
+                    if (!this.isPending()) {
+                        this.next();
+                    }
                 }
-            }
-        }, timer);
+            }, timer);
+        } else {
+            console.log('Second interval found');
+            clearInterval(this.state.interval);
+            this.state.interval = null;
+        }
     }
 }
 
