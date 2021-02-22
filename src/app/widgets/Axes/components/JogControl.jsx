@@ -13,7 +13,8 @@ class JogControl extends PureComponent {
     };
 
     state = {
-        down: 0
+        startTime: 0,
+        didClick: false
     }
 
     timeout = 250;
@@ -22,32 +23,56 @@ class JogControl extends PureComponent {
     timeoutFunction = null;
 
     onMouseUp(e) {
-        const { down } = this.state;
+        const { startTime, didClick } = this.state;
         const { jog, stopContinuousJog } = this.props;
 
-        const timer = new Date() - down;
-        clearTimeout((this.timeoutFunction));
+        const timer = new Date() - startTime;
+        clearTimeout(this.timeoutFunction);
         this.timeoutFunction = null;
-        if (timer < this.timeout) {
+        if (timer < this.timeout && didClick) {
             jog();
-        } else if (down !== 0) {
+            this.setState({
+                didClick: false,
+                timer: new Date()
+            });
+        } else {
             this.continuousInterval && clearInterval(this.continuousInterval);
             this.continuousInterval = null;
             stopContinuousJog();
             this.setState({
-                down: 0
+                startTime: new Date(),
+                didClick: false
             });
         }
     }
 
     onMouseDown(e) {
-        const down = new Date();
+        const startTime = new Date();
         this.setState({
-            down: down
+            startTime: startTime,
+            didClick: true
         });
         this.timeoutFunction = setTimeout(() => {
             this.props.continuousJog();
         }, this.timeout);
+    }
+
+    onMouseLeave(e) {
+        const { didClick, startTime } = this.state;
+        const timer = new Date() - startTime;
+        if (didClick && timer >= this.timeout) {
+            this.props.stopContinuousJog();
+            this.setState({
+                didClick: false,
+                startTime: new Date()
+            });
+        }
+    }
+
+    onMouseEnter(e) {
+        this.setState({
+            startTime: new Date()
+        });
     }
 
     render() {
@@ -59,7 +84,8 @@ class JogControl extends PureComponent {
                 disabled={props.disabled}
                 onMouseDown={(e) => this.onMouseDown(e)}
                 onMouseUp={(e) => this.onMouseUp(e)}
-                onMouseLeave={(e) => this.onMouseUp(e)}
+                onMouseLeave={(e) => this.onMouseLeave(e)}
+                onMouseEnter={(e) => this.onMouseEnter(e)}
             >
                 {props.children}
             </button>
