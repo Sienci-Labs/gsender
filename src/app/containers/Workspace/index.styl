@@ -8,7 +8,7 @@
 }
 
 .workspace {
-    height: 92vh;
+    height: 100vh;
     overflow-y: overlay;
     display: flex;
     flex-direction: row;
@@ -19,10 +19,6 @@
 
     .dropzone-overlay {
         position: fixed;
-        top: $navbar-height;
-        bottom: 0;
-        left: $sidebar-width;
-        right: 0;
         z-index: 100;
         background-color: rgba(255, 255, 255, .5);
         border: 4px dashed #286090;
@@ -44,7 +40,7 @@
     }
 
     .dropzone {
-        height: 80vh;
+        height: 100vh;
     }
 
     .workspace-table {
@@ -52,12 +48,14 @@
         flex-direction: column;
         flex-grow: 1;
         width: 100%;
+        min-height: 100vh;
         background-color: #d1d5db;
     }
 
     .workspace-table-row {
         display: flex;
         flex-direction: row;
+        flex-grow: 1;
     }
 
     .primary-container, .secondary-container, .primary-toggler, .secondary-toggler, .default-container {
