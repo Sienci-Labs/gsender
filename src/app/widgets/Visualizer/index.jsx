@@ -25,7 +25,6 @@ import Visualizer from './Visualizer';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
-import TopAccessControl from './TopAccessControl';
 import {
     // Units
     IMPERIAL_UNITS,
@@ -1082,13 +1081,12 @@ class VisualizerWidget extends PureComponent {
         const showVisualizer = capable.view3D && !showLoader;
         // const showNotifications = showVisualizer && !!state.notification.type;
 
-        const { setCurrentTab } = this;
-        const { currentTab, port } = this.state;
-
         return (
             <Widget style={{ paddingBottom: '1px' }}>
                 <Widget.Header className={styles['visualizer-header']}>
-                    <TopAccessControl activeTab={currentTab} setCurrentTab={setCurrentTab} port={port} />
+                    <Widget.Title>
+                        Visualizer
+                    </Widget.Title>
                 </Widget.Header>
                 <Widget.Content
                     ref={node => {
@@ -1114,7 +1112,7 @@ class VisualizerWidget extends PureComponent {
                     )}
 
                     {WebGL.isWebGLAvailable() && (
-                        <div>
+                        <div className={styles.visualizerWrapper}>
                             <CameraControlArea
                                 state={state}
                                 actions={actions}

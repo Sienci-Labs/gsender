@@ -2,6 +2,7 @@ import _ from 'lodash';
 import classNames from 'classnames';
 import Dropzone from 'react-dropzone';
 import pubsub from 'pubsub-js';
+import Header from 'app/containers/Header';
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import api from 'app/api';
@@ -499,26 +500,28 @@ class Workspace extends PureComponent {
                     }}
                 >
                     <div className={classNames(styles.workspaceTable, { [styles.reverseWorkspace]: reverseWidgets })}>
-                        <div
-                            ref={node => {
-                                this.defaultContainer = node;
-                            }}
-                            className={classNames(
-                                styles.defaultContainer,
-                            )}
-                        >
-                            <DefaultWidgets />
-                        </div>
-                        <div
-                            ref={node => {
-                                this.primaryContainer = node;
-                            }}
-                            className={classNames(
-                                styles.primaryContainer,
-                                { [styles.hidden]: hidePrimaryContainer }
-                            )}
-                        >
-                            <div className={disabled ? `${styles.disabled}` : 'styles.enabled'}>
+                        <Header />
+                        <div className={styles.workspaceTableRow}>
+                            <div
+                                ref={node => {
+                                    this.defaultContainer = node;
+                                }}
+                                className={classNames(
+                                    styles.defaultContainer,
+                                )}
+                            >
+                                <DefaultWidgets />
+                            </div>
+                            <div
+                                ref={node => {
+                                    this.primaryContainer = node;
+                                }}
+                                className={classNames(
+                                    styles.primaryContainer,
+                                    { [styles.hidden]: hidePrimaryContainer },
+                                    { [styles.disabled]: disabled }
+                                )}
+                            >
                                 <PrimaryWidgets
                                     ref={node => {
                                         this.primaryWidgets = node;

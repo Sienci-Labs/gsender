@@ -31,6 +31,7 @@ import {
     CAMERA_MODE_PAN,
     CAMERA_MODE_ROTATE
 } from './constants';
+import styles from './index.styl';
 
 const IMPERIAL_GRID_COUNT = 32; // 32 in
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
@@ -1265,6 +1266,7 @@ class Visualizer extends Component {
                     visibility: this.props.show ? 'visible' : 'hidden'
                 }}
                 ref={this.setRef}
+                className={styles.visualizerContainer}
             />
         );
     }

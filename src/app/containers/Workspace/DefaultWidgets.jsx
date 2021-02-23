@@ -1,8 +1,8 @@
 import classNames from 'classnames';
 import React, { PureComponent } from 'react';
 import styles from './widgets.styl';
-import VisualizerWidget from '../../widgets/Visualizer';
 import JobStatusWidget from '../../widgets/JobStatus';
+import VisualizerWidget from '../../widgets/Visualizer';
 
 class DefaultWidgets extends PureComponent {
     render() {
@@ -10,7 +10,7 @@ class DefaultWidgets extends PureComponent {
 
         return (
             <div className={classNames(className, styles['default-widgets'])}>
-                <div data-widget-id="visualizer" className={styles['default-widget-wrapper']}>
+                <div data-widget-id="visualizerWrapper" className={styles['default-widget-wrapper']}>
                     <VisualizerWidget
                         widgetId="visualizer"
                     />

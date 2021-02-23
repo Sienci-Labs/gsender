@@ -44,19 +44,20 @@
     }
 
     .dropzone {
-        height: 'calc(100vh - %s)' % $navbar-height;
+        height: 80vh;
     }
 
     .workspace-table {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
+        flex-grow: 1;
         width: 100%;
-        height: 'calc(100vh - %s)' % $navbar-height;
         background-color: #d1d5db;
     }
 
     .workspace-table-row {
-        display: table-row;
+        display: flex;
+        flex-direction: row;
     }
 
     .primary-container, .secondary-container, .primary-toggler, .secondary-toggler, .default-container {
@@ -88,15 +89,6 @@
         }
     }
 
-    .primary-toggler, .secondary-toggler {
-        background-color: #f6f7f8;
-        padding-top: 5px;
-        text-align: center;
-        width: $toggler-width;
-        // http://stackoverflow.com/questions/32272158/how-to-use-a-stylus-variable-in-calc
-        height: 'calc(100vh - %s)' % $navbar-height;
-    }
-
 .reverse-workspace {
     flex-direction: row-reverse;
 }
@@ -111,11 +103,11 @@
     .default-container {
         display: flex;
         flex-direction: column;
+        flex-grow: 1;
         justify-content space-between;
         min-width: 360px;
         background-color: #d1d5db;
         width: 66%;
-        bottom: 0;
         @media (min-width: 1921px) {
             width: calc(100vw - 630px) !important;
         }

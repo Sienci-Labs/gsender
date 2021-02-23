@@ -1,4 +1,8 @@
 .widgets {
+    display: flex;
+    flex-direction: column;
+    justify-content space-between;
+    flex-grow: 1;
     min-height: 240px; // Keep a minimum space for dropping widgets
     // margin-top: 1vh;
     :global {
@@ -19,20 +23,13 @@
     display: flex;
     flex-grow: 1;
     flex-direction column;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .default-widget-wrapper {
-    margin: 2px 10px 0 10px;
     display: flex;
+    margin: 0 20px;
     flex-grow: 1;
     flex-direction column;
-
-    &:first-child {
-        position: relative;
-    }
-
-    &:last-child {
-        display: flex;
-        align-items: center;
-    }
 }
