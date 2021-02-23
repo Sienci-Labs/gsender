@@ -11,7 +11,7 @@ import {
 
 
 const GeneralSettings = ({ active, state, actions }) => {
-    const { units, reverseWidgets } = state;
+    const { units, reverseWidgets, autoReconnect } = state;
     return (
         <div className={classNames(
             styles.hidden,
@@ -75,6 +75,13 @@ const GeneralSettings = ({ active, state, actions }) => {
                         onChange={() => actions.general.setReverseWidgets()}
                     />
                     <small>Functionality appears on the left if toggled on.</small>
+
+                    <h4>Auto-Reconnect</h4>
+                    <ToggleSwitch
+                        checked={autoReconnect}
+                        onChange={() => actions.general.setAutoReconnect()}
+                    />
+                    <small>Attempt to reconnect to the same device you last connected to on program start.</small>
                 </div>
             </div>
 

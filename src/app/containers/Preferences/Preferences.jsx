@@ -22,6 +22,7 @@ class PreferencesPage extends PureComponent {
             selectedMenu: 0,
             units: store.get('workspace.units', METRIC_UNITS),
             reverseWidgets: store.get('workspace.reverseWidgets', false),
+            autoReconnect: store.get('widgets.connection.autoReconnect', false),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -89,6 +90,13 @@ class PreferencesPage extends PureComponent {
                     reverseWidgets: reverseWidgetState
                 });
                 pubsub.publish('widgets:reverse', reverseWidgetState);
+            },
+            setAutoReconnect: () => {
+                const autoReconnect = !this.state.autoReconnect;
+                this.setState({
+                    autoReconnect: autoReconnect
+                });
+                pubsub.publish('autoReconnect:update', autoReconnect);
             }
         },
         tool: {
@@ -232,8 +240,9 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units, reverseWidgets } = this.state;
+        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect } = this.state;
         store.set('workspace.reverseWidgets', reverseWidgets);
+        store.set('widgets.connection.autoReconnect', autoReconnect);
         store.set('workspace.units', units);
         store.replace('workspace[tools]', tools);
         store.set('workspace[tool]', tool);

@@ -499,9 +499,9 @@ class Workspace extends PureComponent {
                         this.onDrop(acceptedFiles);
                     }}
                 >
-                    <div className={classNames(styles.workspaceTable, { [styles.reverseWorkspace]: reverseWidgets })}>
+                    <div className={classNames(styles.workspaceTable)}>
                         <Header />
-                        <div className={styles.workspaceTableRow}>
+                        <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
                             <div
                                 ref={node => {
                                     this.defaultContainer = node;
