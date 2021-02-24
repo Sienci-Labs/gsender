@@ -400,7 +400,7 @@ class Visualizer extends Component {
     // TODO: fix resizing on visualizer
     getVisibleHeight() {
         const container = document.getElementById('visualizer_container');
-        const clientHeight = container.clientHeight + 1;
+        const clientHeight = container.clientHeight;
         return clientHeight;
     }
 

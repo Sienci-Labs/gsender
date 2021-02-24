@@ -16,7 +16,6 @@ const IdleInfo = ({ state }) => {
         total,
         remainingTime,
         fileName,
-        connected,
         fileSize,
         toolsAmount,
         toolsUsed,
@@ -87,8 +86,15 @@ const IdleInfo = ({ state }) => {
             </div>
         </div>
     ) : (
-        <div className={styles['disconnected-info']}>
-            <div>{connected ? 'No File Loaded...' : 'Not Connected to a Machine...'}</div>
+        <div className={styles['idle-info']}>
+            <div><span className={styles['file-name']}>No File Loaded</span></div>
+            <div className={styles.idleInfoRow}>
+                <FileStat label="Dimensions">-</FileStat>
+                <FileStat label="Feed Range">-</FileStat>
+                <FileStat label="Spindle Range">-</FileStat>
+                <FileStat label="Tools Used">-</FileStat>
+                <FileStat label="Runtime">-</FileStat>
+            </div>
         </div>
     );
 };

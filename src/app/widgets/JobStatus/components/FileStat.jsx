@@ -5,8 +5,8 @@ const FileStat = ({ label, children }) => {
     return (
         <div className={styles.fileStat}>
             <div className={styles.fileStatContainer}>
-                <div className={styles.fileStatContent}>{children}</div>
                 <div className={styles.fileStatLabel}>{label}</div>
+                <div className={styles.fileStatContent}>{children}</div>
             </div>
 
         </div>
