@@ -1095,8 +1095,9 @@ class VisualizerWidget extends PureComponent {
                     className={classNames(
                         styles.widgetContent,
                         { [styles.view3D]: capable.view3D },
-                        styles['visualizer-component']
+                        styles['visualizer-component'],
                     )}
+                    id="visualizer_container"
                 >
                     {state.gcode.loading &&
                     <Loading />

@@ -399,34 +399,9 @@ class Visualizer extends Component {
 
     // TODO: fix resizing on visualizer
     getVisibleHeight() {
-        /*const el = ReactDOM.findDOMNode(this.node);
-        const visibleHeight = Math.max(
-            Number(el && el.clientHeight) || 0,
-            360
-        );
-        return visibleHeight;*/
-
-        const idleHeight = 260; // When the workflow status is idle, the job status widget's height is 100px
-        const runningHeight = 260; // When the workflow status is running or paused, the job status widget's height is 150px
-
-        const { workflow } = this.props.state;
-
-        let jobStatusWidgetHeight;
-
-        if (workflow.state === 'running' || workflow.state === 'paused') {
-            jobStatusWidgetHeight = runningHeight;
-        } else {
-            jobStatusWidgetHeight = idleHeight;
-        }
-
-        const clientHeight = document.documentElement.clientHeight;
-        console.log(clientHeight);
-        //const navbarHeight = 50;
-        const visibleHeight = (
-            clientHeight - jobStatusWidgetHeight - 1
-        );
-        console.log(visibleHeight);
-        return visibleHeight;
+        const container = document.getElementById('visualizer_container');
+        const clientHeight = container.clientHeight + 1;
+        return clientHeight;
     }
 
     addResizeEventListener() {
