@@ -4,13 +4,20 @@
     flex-wrap: wrap;
     justify-content: space-evenly;
     gap: 1rem;
+    background: #e5e7eb;
 }
 
 .idle-info {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    row-gap: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+.idle-info-row {
+    display: flex;
+    flex-direction: row;
+    justify-content space-around;
+    width: 100%;
+    background: #e5e7eb;
 }
 
 .additional-info {
@@ -28,4 +35,34 @@
 
 .file-name {
     font-weight: bold;
+}
+
+.file-stat {
+    display: flex;
+    flex-direction column;
+    border-left: solid 3px #d1d5db;
+    width: 20%;
+    padding-left: 1em;
+    justify-content center;
+    align-items center;
+    flex-grow: 1;
+    box-sizing border-box;
+}
+
+.file-stat-container {
+    margin-bottom: 1em;
+}
+
+.file-stat-content {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 1em;
+    text-align center;
+}
+
+.file-stat-label {
+    font-size: 1.2em;
+    margin-top: 0.5em;
+    color: #6b7280;
+    text-align center;
 }
