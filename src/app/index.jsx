@@ -114,7 +114,6 @@ series([
     })()
 ]).then(async () => {
     log.info(`${settings.productName} ${settings.version}`);
-
     // Cross-origin communication
     window.addEventListener('message', (event) => {
         // TODO: event.origin
