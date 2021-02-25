@@ -1093,7 +1093,6 @@ class VisualizerWidget extends PureComponent {
                         this.widgetContent = node;
                     }}
                     className={classNames(
-                        styles.widgetContent,
                         { [styles.view3D]: capable.view3D },
                         styles['visualizer-component'],
                     )}
