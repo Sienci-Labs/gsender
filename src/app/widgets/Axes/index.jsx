@@ -220,9 +220,7 @@ class AxesWidget extends PureComponent {
             const modal = (units === 'mm') ? 'G21' : 'G20';
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             const commands = [
-                'G91',
-                'G0 ' + s,
-                'G90'
+                '$J=G91 ' + s,
             ];
             controller.command('gcode:safe', commands, modal);
         },

@@ -157,6 +157,7 @@ class WorkflowControl extends PureComponent {
                     style={{ display: 'none' }}
                     multiple={false}
                     onChange={this.handleChangeFile}
+                    accept=".gcode,.gc,.nc,.tap,.cnc"
                 />
                 <div className="btn-toolbar">
                     <div className="btn-group btn-group-sm" style={{ backgroundColor: 'transparent', width: '100%' }}>
