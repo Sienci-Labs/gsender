@@ -27,17 +27,15 @@
 }
 
 .workflow-btn {
-    font-size: clamp(0.8rem, 1.15vw, 1.75rem);
-    width: 190px;
-    height: 75px;
-    border: 0;
+    padding: 1.5rem 2rem;
+    margin-right: 1rem;
     font-weight: bold;
     color: white;
-    width: 12vw;
-    calc(var(--vh, 1vh) * 10);
+    border-radius: 0.25rem;
+    border: solid 1px rgba(209, 213, 219, 1);
 
     i {
-        font-size: clamp(0.7rem, 1.15vw, 1.25rem);
+        margin-left: 1rem;
     }
 }
 
@@ -46,23 +44,21 @@
     btn-mixin(color){
         @extend .workflow-btn;
 
-        background-color: rgba(color, 0.9);
-        border: 2px solid darken(color, 30%);
-
-        transition: 200ms ease-in-out;
+        background-color: rgba(color, 0.8);
+        --tw-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+        transition: 150ms ease-in-out;
 
         &:disabled {
             disabled-color = rgba(color, 0.5);
 
             background-color: disabled-color;
             color: rgba(black, 0.2);
-            border: 2px solid darken(color, 30%);
         }
 
         &:not(:disabled):hover {
             background-color: darken(color, 30%);
-            border: 2px solid darken(color, 10%);
-            transition: 200ms ease-in-out;
+            transition: 150ms ease-in-out;
         }
     }
 
