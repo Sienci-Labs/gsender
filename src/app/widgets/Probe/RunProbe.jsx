@@ -82,7 +82,7 @@ class RunProbe extends PureComponent {
                             </div>
                             <button
                                 type="button"
-                                className="btn btn-primary"
+                                className={styles.btnStart}
                                 disabled={!connectionMade}
                                 onClick={() => {
                                     actions.closeModal();
