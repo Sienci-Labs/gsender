@@ -19,13 +19,19 @@
 
 .default-widgets {
     margin: 0 10px;
+    padding: 0 20px;
     display: flex;
+    flex-direction: column;
     flex-grow: 1;
-    flex-direction column;
-    align-items: stretch;
-    width: 100%;
-    box-sizing border-box;
-    justify-content: space-between;
+    flex-shrink: 1;
+    justify-content space-between;
+    min-width: 360px;
+    background-color: #d1d5db;
+    width: 66%;
+    @media (min-width: 1921px) {
+        width: calc(100vw - 630px) !important;
+    }
+
 }
 
 .default-widget-wrapper {
@@ -44,10 +50,9 @@
 }
 
 .visualizer-container {
-    max-height: 80%;
-    overflow: hidden;
+    flex-shrink: 1;
 }
 
 .job-status-container {
-    height: 15%;
+    flex-shrink: 1;
 }

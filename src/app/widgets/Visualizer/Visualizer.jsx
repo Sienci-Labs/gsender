@@ -389,6 +389,8 @@ class Visualizer extends Component {
 
     getVisibleWidth() {
         const el = ReactDOM.findDOMNode(this.node);
+        console.log(el.parentNode.clientWidth);
+        console.log(el.clientWidth);
         const visibleWidth = Math.max(
             Number(el && el.parentNode && el.parentNode.clientWidth) || 0,
             360
@@ -400,6 +402,7 @@ class Visualizer extends Component {
     // TODO: fix resizing on visualizer
     getVisibleHeight() {
         const container = document.getElementById('visualizer_container');
+        console.log(container);
         const clientHeight = container.clientHeight;
         return clientHeight;
     }
@@ -419,7 +422,6 @@ class Visualizer extends Component {
 
         const width = this.getVisibleWidth();
         const height = this.getVisibleHeight();
-
         if (width === 0 || height === 0) {
             log.warn(`The width (${width}) and height (${height}) cannot be a zero value`);
         }

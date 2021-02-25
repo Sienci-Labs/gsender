@@ -224,6 +224,15 @@ class Workspace extends PureComponent {
         // const secondaryToggler = ReactDOM.findDOMNode(this.secondaryToggler);
         const { showPrimaryContainer } = this.state;
 
+        // Calculate VH based on current window height
+        let vh = window.innerHeight * 0.01;
+        let vw = window.innerWidth * 0.01;
+        //Update styling with new VH value for CSS calculations
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        document.documentElement.style.setProperty('--vw', `${vw}px`);
+        console.log(vh);
+        console.log(vw);
+
         { // Mobile-Friendly View
             const { location } = this.props;
             const disableHorizontalScroll = !(showPrimaryContainer);
@@ -502,16 +511,11 @@ class Workspace extends PureComponent {
                     <div className={classNames(styles.workspaceTable)}>
                         <Header />
                         <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
-                            <div
+                            <DefaultWidgets
                                 ref={node => {
                                     this.defaultContainer = node;
                                 }}
-                                className={classNames(
-                                    styles.defaultContainer,
-                                )}
-                            >
-                                <DefaultWidgets />
-                            </div>
+                            />
                             <div
                                 ref={node => {
                                     this.primaryContainer = node;
