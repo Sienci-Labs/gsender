@@ -8,66 +8,80 @@ import {
     METRIC_UNITS,
 } from '../../constants';
 
+import JogSpeeds from './General/JogSpeeds';
+import MachineProfileOptions from './MachineProfiles/Options';
+
+import Fieldset from './FieldSet';
 
 const GeneralSettings = ({ active, state, actions }) => {
     const { units } = state;
     return (
         <div className={classNames(
             styles.hidden,
-            styles.settingsContainer,
+            styles['settings-wrapper'],
             { [styles.visible]: active }
         )}
         >
-            <h3>
+            <h3 className={styles.settingsTitle}>
                 General Settings
             </h3>
             <div className={styles.toolMain}>
-                <div className={styles.toolListings}>
-                    <h4>Preferred Units</h4>
-                    <div className={styles.rowSpace}>
-                        <Dropdown
-                            style={{
-                                width: '100%'
-                            }}
-                            btnSize="lg"
-                        >
-                            <Dropdown.Toggle
-                                btnStyle="flat"
+                <div className={styles.generalArea}>
+                    <div style={{ width: '50% ' }}>
+                        <Fieldset legend="Preferred Units">
+                            <Dropdown
                                 style={{
-                                    textAlign: 'right',
                                     width: '100%'
                                 }}
+                                btnSize="lg"
                             >
-                                {units === IMPERIAL_UNITS && i18n._('Inches (G20)')}
-                                {units === METRIC_UNITS && i18n._('Millimeters (G21)')}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu size="lg">
-                                <MenuItem header>
-                                    {i18n._('Units')}
-                                </MenuItem>
-                                <MenuItem
-                                    active={units === IMPERIAL_UNITS}
-                                    onSelect={() => {
-                                        actions.general.setUnits(IMPERIAL_UNITS);
-                                    }}
-                                    size="lg"
-                                >
-                                    {i18n._('Inches (G20)')}
-                                </MenuItem>
-                                <MenuItem
-                                    active={units === METRIC_UNITS}
-                                    onSelect={() => {
-                                        actions.general.setUnits(METRIC_UNITS);
+                                <Dropdown.Toggle
+                                    btnStyle="flat"
+                                    style={{
+                                        textAlign: 'right',
+                                        width: '100%'
                                     }}
                                 >
-                                    {i18n._('Millimeters (G21)')}
-                                </MenuItem>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        <small>Units to be displayed throughout the interface.</small>
+                                    {units === IMPERIAL_UNITS && i18n._('Inches (G20)')}
+                                    {units === METRIC_UNITS && i18n._('Millimeters (G21)')}
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu size="lg">
+                                    <MenuItem header>
+                                        {i18n._('Units')}
+                                    </MenuItem>
+                                    <MenuItem
+                                        active={units === IMPERIAL_UNITS}
+                                        onSelect={() => {
+                                            actions.general.setUnits(IMPERIAL_UNITS);
+                                        }}
+                                        size="lg"
+                                    >
+                                        {i18n._('Inches (G20)')}
+                                    </MenuItem>
+                                    <MenuItem
+                                        active={units === METRIC_UNITS}
+                                        onSelect={() => {
+                                            actions.general.setUnits(METRIC_UNITS);
+                                        }}
+                                    >
+                                        {i18n._('Millimeters (G21)')}
+                                    </MenuItem>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <small>Units to be displayed throughout the interface</small>
+                        </Fieldset>
+
+                        <Fieldset legend="Machine Profile">
+                            <MachineProfileOptions />
+                        </Fieldset>
                     </div>
-                </div>
-                <div className={styles.addToolForm}>
+
+                    <div style={{ width: '50% ' }}>
+                        <Fieldset legend="Jog Speed Presets">
+                            {/* <h4 className={styles['settings-subtitle']}>Jog Speeds Presets</h4> */}
+                            <JogSpeeds />
+                        </Fieldset>
+                    </div>
                 </div>
             </div>
 
