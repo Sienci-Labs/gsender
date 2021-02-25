@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Modal from 'app/components/Modal';
 import i18n from 'app/lib/i18n';
-import ProbeTimer from './ProbeTimer';
 import styles from './index.styl';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
@@ -15,26 +14,11 @@ class RunProbe extends PureComponent {
 
     state = this.getInitialState();
 
-    steps = [
-        {
-            title: 'Confirm Touchplate Connection',
-            description: 'Touch the touchplate to the bit to confirm that everything is connected correctly and a circuit can be formed.  You have 15 seconds to complete this circuit.'
-        },
-        {
-            title: 'Confirm Router Position',
-            description: 'Router should be positioned above the lower left corner of the touchplate if you\'re probing Z, XY, or XYZ.  It should be positioned horizontal to the X or Y axis if you\'re probing those.'
-        },
-        {
-            title: 'Run Probe',
-            description: 'You\'re now ready to run the selected probe operation!'
-        }
-    ];
+    testInterval = null;
 
     getInitialState() {
         return {
-            currentStep: 0,
-            timer: 0,
-            probeActive: false,
+            connectionMade: false,
             testRunning: false
         };
     }
@@ -45,18 +29,17 @@ class RunProbe extends PureComponent {
         });
     }
 
-    runConnectivityTest(probeStatus) {
+    startConnectivityTest(probeStatus) {
         this.setState({
             testRunning: true
         });
-        const interval = setInterval(() => {
+        this.testInterval = setInterval(() => {
             if (probeStatus()) {
                 this.setState({
-                    timer: 0,
-                    probeActive: true,
-                    currentStep: 1
+                    connectionMade: true,
                 });
-                clearInterval(interval);
+                clearInterval(this.testInterval);
+                this.testInterval = null;
             } else {
                 const { timer } = this.state;
                 this.setState({
@@ -64,26 +47,11 @@ class RunProbe extends PureComponent {
                 });
             }
         }, 500);
-        setTimeout(() => {
-            clearInterval(interval);
-            this.setState({
-                timer: 0,
-                testRunning: false
-            });
-        }, 15000);
     }
 
-    resetTimer() {
-        this.setState({
-            timer: 0,
-            testRunning: false
-        });
-    }
-
-    verifyProbePosition() {
-        this.setState({
-            currentStep: 2
-        });
+    componentDidMount() {
+        const { actions } = this.props;
+        this.startConnectivityTest(actions.returnProbeConnectivity);
     }
 
     render() {
@@ -93,7 +61,7 @@ class RunProbe extends PureComponent {
         const probeCommands = actions.generateProbeCommands();
         const probeCommand = state.availableProbeCommands[state.selectedProbeCommand];
         const probeActive = actions.returnProbeConnectivity();
-        const { timer, testRunning, currentStep } = this.state;
+        const { connectionMade } = this.state;
 
         return (
             <Modal disableOverlay onClose={actions.closeModal}>
@@ -104,66 +72,32 @@ class RunProbe extends PureComponent {
                     <div className={styles.runProbeBody}>
 
                         <div className={styles.left}>
-                            <div>
-                                <h5>{ this.steps[currentStep].title } </h5>
-                                <span>{ this.steps[currentStep].description }</span>
+                            <div className={styles.greyText}>
+                                <p>Ensure tool is positioned as shown.</p>
+                                <p>
+                                    To confirm a reliable circuit, touch your plate to the tool and look for the signal to robustly detected
+                                     (indicated by a green light) before returning the probe to its probing position.
+                                </p>
+                                <p>Probing cannot be run without confirming the circuit.</p>
                             </div>
-                            {
-                                (currentStep === 0) &&
-                                <button
-                                    type="button"
-                                    className="btn btn-default"
-                                    disabled={(currentStep !== 0) && !testRunning}
-                                    onClick={() => {
-                                        this.resetTimer();
-                                        this.runConnectivityTest(actions.returnProbeConnectivity);
-                                    }}
-                                >
-                                    {i18n._('Confirm Probe Connectivity')}
-                                </button>
-                            }
-                            {
-                                (currentStep === 1) &&
-                                <button
-                                    type="button"
-                                    className="btn btn-default"
-                                    disabled={currentStep !== 1}
-                                    onClick={() => this.verifyProbePosition()}
-                                >
-                                    {i18n._('Confirm Router Position')}
-                                </button>
-                            }
-                            {
-                                (currentStep === 2) &&
-                                <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    disabled={currentStep !== 2}
-                                    onClick={() => {
-                                        actions.closeModal();
-                                        actions.runProbeCommands(probeCommands);
-                                        this.resetProbeState();
-                                    }}
-                                >
-                                    {i18n._('Run Probe')}
-                                </button>
-                            }
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                disabled={!connectionMade}
+                                onClick={() => {
+                                    actions.closeModal();
+                                    actions.runProbeCommands(probeCommands);
+                                    this.resetProbeState();
+                                }}
+                            >
+                                {
+                                    !connectionMade ? 'Waiting on probe circuit confirmation...' : ' Start Probe'
+                                }
+                            </button>
                         </div>
                         <div className={styles.right}>
-                            {
-                                (currentStep === 0) &&
-                                <div>
-                                    <ProbeCircuitStatus connected={canClick} probeActive={probeActive}/>
-                                    <ProbeTimer timer={timer} testRunning={testRunning} />
-                                </div>
-                            }
-                            {
-                                <ProbeImage probeCommand={probeCommand} visible={(currentStep !== 0)} />
-
-                            }
-                            {
-                                (currentStep === 2) && true
-                            }
+                            <ProbeImage probeCommand={probeCommand} />
+                            <ProbeCircuitStatus connected={canClick} probeActive={probeActive} />
                         </div>
                     </div>
                 </Modal.Body>

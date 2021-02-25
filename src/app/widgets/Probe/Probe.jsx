@@ -10,7 +10,6 @@ import {
 } from '../../constants';
 import styles from './index.styl';
 import ProbeImage from './ProbeImage';
-import MiniCircuitStatus from './MiniCircuitStatus';
 
 class Probe extends PureComponent {
     static propTypes = {
@@ -31,7 +30,6 @@ class Probe extends PureComponent {
         } = state;
         const displayUnits = (units === METRIC_UNITS) ? i18n._('mm') : i18n._('in');
         const probeCommand = availableProbeCommands[selectedProbeCommand] || false;
-        const probeActive = actions.returnProbeConnectivity();
 
         return (
             <div className={styles.probeFlex}>
@@ -39,7 +37,6 @@ class Probe extends PureComponent {
                     <div className="form-group">
                         <label className="control-label">
                             {i18n._('Probe')}
-                            <MiniCircuitStatus probeActive={probeActive} />
                         </label>
                         <select className="form-control" onChange={actions.handleProbeCommandChange}>
                             {

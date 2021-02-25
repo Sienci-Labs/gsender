@@ -230,8 +230,6 @@ class Workspace extends PureComponent {
         //Update styling with new VH value for CSS calculations
         document.documentElement.style.setProperty('--vh', `${vh}px`);
         document.documentElement.style.setProperty('--vw', `${vw}px`);
-        console.log(vh);
-        console.log(vw);
 
         { // Mobile-Friendly View
             const { location } = this.props;
