@@ -13,7 +13,7 @@
 }
 
 .preferencesMenu {
-  width: 30%;
+  width: 20%;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -29,13 +29,14 @@
   }
 
   button {
+    font-size: 1.25rem;
     border: none;
     width: 100%;
     margin: 0;
     background: none;
     color: white;
     text-align: left;
-    padding: 10px 0 10px 10px;
+    padding: 20px 0 20px 10px;
 
     &:focus {
       outline: none;
@@ -55,9 +56,13 @@
   background: #374151 !important;
 }
 
+.general-area {
+  display: flex;
+  gap: 3rem; 
+}
 
 .preferencesOptions {
-  width: 70%;
+  width: 80%;
   background: #d1d5db;
   padding: 10px;
 }
@@ -70,20 +75,11 @@
   display: block;
 }
 
-.settingsContainer {
-
-}
-
 .tool-main {
   display: flex;
   flex-direction: col;
   justify-content: space-between;
   width: 100%;
-
-  h4 {
-    color: #3e85c7;
-    font-size: 1.4rem;
-  }
 }
 
 .tool-listings {
@@ -145,6 +141,30 @@
   }
 }
 
+.jog-speed-active {
+  font-size: 18px;
+  width: 100%;
+  background: #3e85c7;
+  color: #FFFFFF;
+  outline: none;
+  border: none;
+  padding: 10px;
+  border-radius: 0.25rem;
+  margin: 0;
+}
+
+.jog-speed-inactive {
+  font-size: 18px;
+  width: 100%;
+  background: #6B7280;
+  color: #FFFFFF;
+  outline: none;
+  border: none;
+  padding: 10px;
+  border-radius: 0.25rem;
+  margin: 0;
+}
+
 .input-spread {
   display: flex;
   flex-direction row;
@@ -169,6 +189,108 @@
 }
 
 .table-wrapper {
-  height: 450px;
+  height: 600px;
   overflow-y: scroll;
+}
+
+.settings-title { 
+  font-size: 2rem;
+  margin: 10px 0 2rem 0;
+}
+
+.settings-subtitle {
+    // color: #3e85c7;
+    font-size: 1.25rem;
+    margin: 0 0 10px 0;
+    text-decoration: underline
+}
+
+.settings-wrapper {
+  width: 95%;
+  margin: auto;
+}
+
+.machine-options-inputgroup {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 2rem;
+    justify-content: space-between;
+    width: 100%;
+
+    label {
+        font-size: 1.4rem;
+    }
+}
+
+.machine-options-section {
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.machine-options-select {
+    width: 100%;
+    font-size: 14px;
+}
+
+.machine-features-section {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.cutting-area {
+    font-size: 1.4rem;
+    width: 100%;
+
+    tr {
+        height: 30px;
+    }
+
+    .label, .value {
+        width: 150px;
+    }
+
+    .value {
+        text-align: right;
+    }
+}
+
+.probe-settings-group {
+  margin: 1rem 0;
+}
+
+.jog-speed-wrapper {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.fieldset {
+  border: 2px solid black;
+  padding: 10px;
+  margin: 1rem 0;
+}
+
+.fieldset-legend {
+  font-size: 1.5rem;
+  color: #3e85c7;
+  margin: 0;
+  width: unset;
+  border-bottom: 0;
+}
+
+.general-area-item {
+  margin-bottom: 2rem;
 }
