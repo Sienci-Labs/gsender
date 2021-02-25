@@ -1,16 +1,19 @@
 .wrapper {
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 200;
     display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: space-evenly;
-    align-items: center;
+    flex-direction: row;
+    justify-content center;
+    align-items center;
+    width: 100%;
+    background: #e5e7eb;
+    border: solid 1px #c9cdd3;
 }
 
 .progress-area {
-    width: 100%;
-    max-width: 500px;
+        width:50%;
+        padding: 0 2em;
+        position: relative;
 }
 
 .progress-area-table {
@@ -28,7 +31,8 @@
 
     primary = #D1D5DB;
     secondary = #333;
-
+    width: 50%;
+    padding: 0 2em;
     label {
         margin-bottom: 0;
         background-color: primary;
@@ -64,9 +68,10 @@
 
 .lines-processed {
     position: absolute;
-    left: 25%;
-    right: 50%;
-    margin: 5px;
+    top: 25%;
+    left: 50%; /* position the left edge of the element at the middle of the parent */
+    transform: translate(-50%, -50%);
+
 }
 
 .seperator {
