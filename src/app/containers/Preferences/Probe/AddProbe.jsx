@@ -70,32 +70,6 @@ const AddProbe = ({ state, actions }) => {
                     </div>
                 )
             }
-            <h4>Touch Plate Dimensions</h4>
-            <div className="form-group">
-                <label htmlFor="plateWidth">Touch Plate Width</label>
-                <div className="input-group">
-                    <input
-                        type="number"
-                        className="form-control"
-                        id="plateWidth"
-                        value={probe.plateWidth}
-                        onChange={probeActions.changePlateWidth}
-                    />
-                    <div className="input-group-addon">mm</div>
-                </div>
-                <label htmlFor="plateLength">Touch Plate Length</label>
-                <div className="input-group">
-                    <input
-                        type="number"
-                        className="form-control"
-                        id="plateLength"
-                        value={probe.plateLength}
-                        onChange={probeActions.changePlateLength}
-                    />
-                    <div className="input-group-addon">mm</div>
-                </div>
-                <span id="helpBlock" className="help-block">Width and length measurements of the touchplate, used for calculating tool diameters on the fly.</span>
-            </div>
         </div>
     );
 };
