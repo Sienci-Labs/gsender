@@ -55,6 +55,7 @@ class WindowManager {
         const window = new BrowserWindow({
             ...options,
             ...browserWindowOptions,
+            titleBarStyle: 'hidden',
             show: false
         });
         const webContents = window.webContents;

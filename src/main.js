@@ -3,7 +3,6 @@ import { app, Menu } from 'electron';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
-import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
@@ -87,7 +86,8 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `${pkg.name} ${pkg.version}`
+                title: `${pkg.name} ${pkg.version}`,
+                titleBarStyle: 'hidden'
             };
             const window = windowManager.openWindow(url, options);
 

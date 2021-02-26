@@ -35,7 +35,7 @@ import {
     // TinyG
     TINYG,
     // Workflow
-    WORKFLOW_STATE_RUNNING
+    WORKFLOW_STATE_RUNNING, GRBL_ACTIVE_STATE_JOG
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -234,6 +234,9 @@ class AxesWidget extends PureComponent {
                 isContinuousJogging: false
             });
             controller.command('jog:stop');
+        },
+        cancelJog: () => {
+            controller.command('jog:cancel');
         },
         move: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
@@ -529,7 +532,6 @@ class AxesWidget extends PureComponent {
         },
         'workflow:state': (workflowState) => {
             const canJog = (workflowState !== WORKFLOW_STATE_RUNNING);
-
             // Disable keypad jogging and shuttle wheel when the workflow state is 'running'.
             // This prevents accidental movement while sending G-code commands.
             this.setState(state => ({
@@ -910,6 +912,12 @@ class AxesWidget extends PureComponent {
         return true;
     }
 
+    isJogging() {
+        const { controller } = this.state;
+        const activeState = controller.state?.status?.activeState || '';
+        return (activeState === GRBL_ACTIVE_STATE_JOG);
+    }
+
     render() {
         const { widgetId } = this.props;
         const { minimized, isFullscreen } = this.state;
@@ -920,6 +928,7 @@ class AxesWidget extends PureComponent {
             ...this.state,
             // Determine if the motion button is clickable
             canClick: this.canClick(),
+            isJogging: this.isJogging(),
             // Output machine position with the display units
             machinePosition: mapValues(machinePosition, (pos, axis) => {
                 return String(mapPositionToUnits(pos, units));

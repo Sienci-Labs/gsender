@@ -75,8 +75,8 @@ class RunProbe extends PureComponent {
                             <div className={styles.greyText}>
                                 <p>Ensure tool is positioned as shown.</p>
                                 <p>
-                                    To confirm a reliable circuit, touch your plate to the tool and look for the signal to robustly detected
-                                     (indicated by a green light) before returning the probe to its probing position.
+                                    To confirm a reliable circuit, touch your plate to the tool and look for the signal to be robustly detected
+                                     (indicated by a green light) before returning the probe to the probing position.
                                 </p>
                                 <p>Probing cannot be run without confirming the circuit.</p>
                             </div>

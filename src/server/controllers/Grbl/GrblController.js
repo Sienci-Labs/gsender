@@ -1317,9 +1317,11 @@ class GrblController {
             },
             'jog:stop': () => {
                 this.feeder.reset();
-                this.command('gcode', '\x85');
-                this.command('gcode', 'G90');
+                this.command('jog:cancel');
                 this.feeder.reset();
+            },
+            'jog:cancel': () => {
+                this.command('gcode', '\x85');
             },
             'macro:run': () => {
                 let [id, context = {}, callback = noop] = args;

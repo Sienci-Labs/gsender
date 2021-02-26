@@ -19,6 +19,7 @@ import {
 } from '../../constants';
 import styles from './index.styl';
 import JogControl from './components/JogControl';
+import JogCancel from './components/JogCancel';
 
 const KeypadText = styled.span`
     position: relative;
@@ -122,7 +123,7 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, actions, axes, units } = this.props;
+        const { canClick, actions, axes, units, isJogging } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -186,7 +187,7 @@ class Keypad extends PureComponent {
                             <KeypadText>X</KeypadText>
                             <KeypadDirectionText>-</KeypadDirectionText>
                         </JogControl>
-                        <div />
+                        <JogCancel disabled={!isJogging} onClick={() => actions.cancelJog()} />
                         <JogControl
                             className={styles.btnRight}
                             jog={() => actions.jog({ X: xyDistance, F: feedrate })}
