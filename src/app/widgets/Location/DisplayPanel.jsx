@@ -4,7 +4,6 @@ import _isEqual from 'lodash/isEqual';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
-import i18n from 'app/lib/i18n';
 import store from 'app/store';
 
 import Panel from './components/Panel';
@@ -22,16 +21,8 @@ import {
     METRIC_UNITS
 } from '../../constants';
 import styles from './index.styl';
-
 import AxisButton from './components/AxisButton';
-import ControlButton from './components/ControlButton';
-
-import BullseyeIcon from './icons/Bullseye';
-import ChartIcon from './icons/Chart';
-import HomeIcon from './icons/Home';
-
-import { PRIMARY_COLOR, SECONDARY_COLOR } from './constants';
-import Release from './icons/Release';
+import FunctionButton from '../../components/FunctionButton/FunctionButton';
 
 class DisplayPanel extends PureComponent {
     static propTypes = {
@@ -152,9 +143,7 @@ class DisplayPanel extends PureComponent {
                     </table>
 
                     <div className={styles.controlButtons}>
-                        <ControlButton
-                            icon={() => <BullseyeIcon fill={canClick ? PRIMARY_COLOR : SECONDARY_COLOR} />}
-                            label={i18n._('Zero All')}
+                        <FunctionButton
                             onClick={() => {
                                 const wcs = actions.getWorkCoordinateSystem();
 
@@ -170,10 +159,11 @@ class DisplayPanel extends PureComponent {
                                 controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
                             }}
                             disabled={!canClick}
-                        />
-                        <ControlButton
-                            label={i18n._('Go to Zero')}
-                            icon={() => <ChartIcon isMovement disabled={!canClick} fill={PRIMARY_COLOR} />}
+                        >
+                            <i className="fas fa-bullseye" />
+                            Zero All
+                        </FunctionButton>
+                        <FunctionButton
                             onClick={() => {
                                 controller.command('gcode', 'G91');
                                 controller.command('gcode:safe', 'G0 Z10', 'G21'); // Retract Z when moving across workspace
@@ -182,38 +172,33 @@ class DisplayPanel extends PureComponent {
                                 controller.command('gcode', 'G0 Z0'); // Move Z up
                             }}
                             disabled={!canClick}
-                            isMovement
-                        />
-                        <ControlButton
-                            label={i18n._('Home')}
-                            icon={() => <HomeIcon isMovement disabled={!canClick} fill={PRIMARY_COLOR}/>}
+                            primary
+                        >
+                            <i className="fas fa-chart-line" />
+                            Go to Zero
+                        </FunctionButton>
+                        <FunctionButton
+                            primary
                             onClick={() => {
                                 controller.command('homing');
                             }}
                             disabled={!canClick || !machineProfile.endstops}
-                            className={!machineProfile.endstops ? 'hidden' : ''}
-                            isMovement
-                            isHidden={!machineProfile.endstops}
-                        />
-                        <ControlButton
-                            label={i18n._('Go Home')}
-                            icon={() => <ChartIcon isMovement disabled={!canClick} fill={PRIMARY_COLOR} />}
+                            hidden={!machineProfile.endstops}
+                        >
+                            <i className="fas fa-home" />
+                            Home
+                        </FunctionButton>
+                        <FunctionButton
+                            primary
                             onClick={() => {
                                 controller.command('gcode', 'G28 G91'); //Go to Home Position
                             }}
-                            disabled={!canClick || !machineProfile.endstops}
-                            isHidden={!machineProfile.endstops}
-                            className={(!machineProfile.endstops) ? 'hidden' : ''}
-                            isMovement
-                        />
-                        <ControlButton
-                            label={i18n._('Release')}
-                            icon={() => <Release fill={(canClick) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
-                            onClick={() => {
-                                controller.command('unlock');
-                            }}
                             disabled={!canClick}
-                        />
+                            hidden={!machineProfile.endstops}
+                        >
+                            <i className="fas fa-chart-line" />
+                            Go Home
+                        </FunctionButton>
                     </div>
                 </div>
             </Panel>

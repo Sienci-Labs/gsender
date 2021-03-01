@@ -20,6 +20,7 @@ import {
 import styles from './index.styl';
 import JogControl from './components/JogControl';
 import JogCancel from './components/JogCancel';
+import FunctionButton from '../../components/FunctionButton/FunctionButton';
 
 const KeypadText = styled.span`
     position: relative;
@@ -237,9 +238,8 @@ class Keypad extends PureComponent {
                         </JogControl>
                     </div>
                     <div className={styles.presetControls}>
-                        <button
+                        <FunctionButton
                             disabled={!canClick} type="button"
-                            className={styles.movementRateButton}
                             onClick={() => {
                                 const xyStep = (units === 'mm') ? 20 : 1;
                                 const zStep = (units === 'mm') ? 10 : 0.5;
@@ -247,11 +247,9 @@ class Keypad extends PureComponent {
                             }}
                         >
                             Rapid
-                        </button>
-                        <button
+                        </FunctionButton>
+                        <FunctionButton
                             disabled={!canClick}
-                            type="button"
-                            className={styles.movementRateButton}
                             onClick={() => {
                                 const xyStep = (units === 'mm') ? 5 : 0.2;
                                 const zStep = (units === 'mm') ? 2 : 0.04;
@@ -259,11 +257,9 @@ class Keypad extends PureComponent {
                             }}
                         >
                             Normal
-                        </button>
-                        <button
+                        </FunctionButton>
+                        <FunctionButton
                             disabled={!canClick}
-                            type="button"
-                            className={styles.movementRateButton}
                             onClick={() => {
                                 const xyStep = (units === 'mm') ? 0.5 : 0.02;
                                 const zStep = (units === 'mm') ? 0.1 : 0.004;
@@ -271,7 +267,7 @@ class Keypad extends PureComponent {
                             }}
                         >
                             Precise
-                        </button>
+                        </FunctionButton>
                     </div>
                 </div>
             </div>
