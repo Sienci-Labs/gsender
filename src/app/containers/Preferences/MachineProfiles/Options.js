@@ -10,6 +10,8 @@ import store from 'app/store';
 import styles from '../index.styl';
 import defaultProfiles from './defaultMachineProfiles';
 
+import Input from '../Input';
+
 
 /**
  * Machine Profile Options Component
@@ -137,7 +139,8 @@ export default class Options extends Component {
 
     render() {
         const { machineProfile, machineProfiles } = this.state;
-        const { id, endstops, laser, spindle, coolant, width, depth, height, units } = machineProfile;
+        // const { id, endstops, laser, spindle, coolant, width, depth, height, units } = machineProfile;
+        const { id, endstops, spindle, coolant, width, depth, height, units } = machineProfile;
 
         return (
             <div>
@@ -157,58 +160,29 @@ export default class Options extends Component {
                     <div className={styles['general-area-item']}>
                         <h4 className={styles['settings-subtitle']}>Cutting Area</h4>
 
-                        <table className={styles['cutting-area']}>
-                            <tbody>
-                                <tr>
-                                    <td className={styles.label}>Width</td>
-                                    <td className={styles.value}>
-                                        <div className="input-group" style={{ width: '200px' }}>
-                                            <input
-                                                type="text"
-                                                name="width"
-                                                className="form-control"
-                                                style={{ zIndex: '0', fontSize: '20px', textAlign: 'center', color: '#3e85c7' }}
-                                                value={width}
-                                                onChange={this.handleChange}
-                                            />
-                                            <span className="input-group-addon">{units}</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className={styles.label}>Depth</td>
-                                    <td className={styles.value}>
-                                        <div className="input-group" style={{ width: '200px' }}>
-                                            <input
-                                                type="text"
-                                                name="depth"
-                                                className="form-control"
-                                                style={{ zIndex: '0', fontSize: '20px', textAlign: 'center', color: '#3e85c7' }}
-                                                value={depth}
-                                                onChange={this.handleChange}
-                                            />
-                                            <span className="input-group-addon">{units}</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className={styles.label}>Height</td>
-                                    <td className={styles.value}>
-                                        <div className="input-group" style={{ width: '200px' }}>
-                                            <input
-                                                type="text"
-                                                name="height"
-                                                className="form-control"
-                                                style={{ zIndex: '0', fontSize: '20px', textAlign: 'center', color: '#3e85c7' }}
-                                                value={height}
-                                                onChange={this.handleChange}
-                                            />
-                                            <span className="input-group-addon">{units}</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <Input
+                            label="Width"
+                            units={units}
+                            value={width}
+                            onChange={this.handleChange}
+                            additionalProps={{ name: 'width', type: 'number' }}
+                        />
+
+                        <Input
+                            label="Depth"
+                            units={units}
+                            value={depth}
+                            onChange={this.handleChange}
+                            additionalProps={{ name: 'depth', type: 'number' }}
+                        />
+
+                        <Input
+                            label="Height"
+                            units={units}
+                            value={height}
+                            onChange={this.handleChange}
+                            additionalProps={{ name: 'height', type: 'number' }}
+                        />
                     </div>
                 </div>
 
@@ -233,7 +207,7 @@ export default class Options extends Component {
                     </div>
 
                     <div className={styles['machine-features-section']}>
-                        <div className={styles['machine-options-inputgroup']} style={{ margin: 0 }}>
+                        <div className={styles['machine-options-inputgroup']} style={{ display: 'grid', gridTemplateColumns: '1fr 3fr' }}>
                             <label htmlFor="">Coolant</label>
                             <ToggleSwitch
                                 checked={coolant}
@@ -241,13 +215,13 @@ export default class Options extends Component {
                             />
                         </div>
 
-                        <div className={styles['machine-options-inputgroup']} style={{ margin: 0 }}>
+                        {/* <div className={styles['machine-options-inputgroup']} style={{ margin: 0 }}>
                             <label htmlFor="">Laser</label>
                             <ToggleSwitch
                                 checked={laser}
                                 onChange={() => this.handleToggle('laser')}
                             />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
