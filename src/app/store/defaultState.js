@@ -95,9 +95,24 @@ const defaultState = {
             axes: ['x', 'y', 'z'],
             jog: {
                 xyStep: 5,
-                zStep: 0.5,
-                feedrate: 5000,
+                zStep: 2,
+                feedrate: 3000,
                 keypad: false,
+                rapid: {
+                    xyStep: 20,
+                    zStep: 10,
+                    feedrate: 5000,
+                },
+                normal: {
+                    xyStep: 5,
+                    zStep: 2,
+                    feedrate: 3000,
+                },
+                precise: {
+                    xyStep: 0.5,
+                    zStep: 0.1,
+                    feedrate: 1000,
+                },
                 imperial: {
                     step: IMPERIAL_STEPS.indexOf(1), // Defaults to 1 inch
                     distances: []
