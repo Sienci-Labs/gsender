@@ -2,6 +2,8 @@ import React from 'react';
 import ToggleSwitch from '../../../components/ToggleSwitch';
 import styles from '../index.styl';
 
+import Input from '../Input';
+
 const AddProbe = ({ state, actions }) => {
     const { probe } = state;
     const { functions } = probe;
@@ -9,65 +11,49 @@ const AddProbe = ({ state, actions }) => {
 
     return (
         <div>
-            <div className="form-group">
-                <label htmlFor="zThickness">Probe Functions</label>
-                <span id="helpBlock" className="help-block">Supported probe axes for this specific touchplate.</span>
-                <div className={styles.inputSpread}>
-                    <label htmlFor="xProbe">X Probe</label>
-                    <ToggleSwitch
-                        checked={functions.x}
-                        onChange={() => probeActions.handleToggleChange('x')}
-                    />
-                </div>
-                <div className={styles.inputSpread}>
-                    <label htmlFor="yProbe">Y Probe</label>
-                    <ToggleSwitch
-                        checked={functions.y}
-                        onChange={() => probeActions.handleToggleChange('y')}
-                    />
-                </div>
-                <div className={styles.inputSpread}>
-                    <label htmlFor="zProbe">Z Probe</label>
-                    <ToggleSwitch
-                        checked={functions.z}
-                        onChange={() => probeActions.handleToggleChange('z')}
-                    />
+            <div style={{ marginBottom: '1rem' }}>
+                <span id="helpBlock" className="help-block">Supported probe axes for this specific touchplate</span>
+
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'space-between' }}>
+                    <div className={styles.inputSpread}>
+                        <label htmlFor="xProbe">XY Probe</label>
+                        <ToggleSwitch
+                            checked={functions.x && functions.y}
+                            onChange={() => {
+                                probeActions.handleToggleChange('x');
+                                probeActions.handleToggleChange('y');
+                            }}
+                        />
+                    </div>
+                    {/* <div className={styles.inputSpread}>
+                        <label htmlFor="zProbe">Z Probe</label>
+                        <ToggleSwitch
+                            checked={functions.z}
+                            onChange={() => probeActions.handleToggleChange('z')}
+                        />
+                    </div> */}
                 </div>
             </div>
             {
-                (functions.x || functions.y) && (
-                    <div className="form-group">
-                        <label htmlFor="xyThickness">XY Thickness</label>
-                        <div className="input-group">
-                            <input
-                                type="number"
-                                className="form-control"
-                                id="xyThickness"
-                                value={probe.xyThickness}
-                                onChange={probeActions.changeXYThickness}
-                            />
-                            <div className="input-group-addon">mm</div>
-                        </div>
-                        <span id="helpBlock" className="help-block">Distance between the side of the touchplate and the material it is resting on.</span>
-                    </div>
+                (functions.x && functions.y) && (
+                    <Input
+                        label="XY Thickness"
+                        units="mm"
+                        value={probe.xyThickness}
+                        onChange={probeActions.changeXYThickness}
+                        additionalProps={{ type: 'number', id: 'xyThickness' }}
+                    />
                 )
             }
             {
                 functions.z && (
-                    <div className="form-group">
-                        <label htmlFor="zThickness">Z Thickness</label>
-                        <div className="input-group">
-                            <input
-                                type="number"
-                                className="form-control"
-                                id="zThickness"
-                                value={probe.zThickness}
-                                onChange={probeActions.changeZThickness}
-                            />
-                            <div className="input-group-addon">mm</div>
-                        </div>
-                        <span id="helpBlock" className="help-block">Distance between the top of the touchplate and the material it is resting on. </span>
-                    </div>
+                    <Input
+                        label="Z Thickness"
+                        units="mm"
+                        value={probe.zThickness}
+                        onChange={probeActions.changeZThickness}
+                        additionalProps={{ type: 'number', id: 'zThickness' }}
+                    />
                 )
             }
         </div>

@@ -3,9 +3,15 @@ import classNames from 'classnames';
 import styles from '../index.styl';
 import AddProbe from './AddProbe';
 
+import Tools from '../Tools/Tools';
+
+import Fieldset from '../FieldSet';
+import Input from '../Input';
+
 
 const ProbeSettings = ({ active, state, actions }) => {
     const { probeSettings, probe } = state;
+    const { functions } = probe;
     const probeActions = actions.probe;
     return (
         <div className={classNames(
@@ -15,84 +21,63 @@ const ProbeSettings = ({ active, state, actions }) => {
         )}
         >
             <h3 className={styles['settings-title']}>Probe</h3>
-            <div className={styles.toolMain}>
-                <div className={styles.toolListings}>
-                    <h4 className={styles['settings-subtitle']}>Probing Settings</h4>
+            <div className={styles.generalArea}>
+                <div style={{ width: '50%' }}>
+                    <Fieldset legend="Probing Settings">
 
-                    <div className={styles['probe-settings-group']}>
-                        <label htmlFor="retraction">Retraction Distance</label>
-                        <div className="input-group">
-                            <input
-                                type="number"
-                                className="form-control input-sm"
-                                id="retraction"
-                                value={probeSettings.retractionDistance}
-                                onChange={probeActions.changeRetractionDistance}
-                            />
-                            <div className="input-group-addon">mm</div>
-                        </div>
-                    </div>
+                        <Input
+                            label="Fast Find"
+                            value={probeSettings.fastFeedrate}
+                            onChange={probeActions.changeFastFeedrate}
+                            additionalProps={{ type: 'number', id: 'fastFeedrate' }}
+                        />
 
-                    <div className={styles['probe-settings-group']}>
-                        <label htmlFor="normalFeedrate">Normal Probe Feedrate</label>
-                        <div className="input-group">
-                            <input
-                                type="number"
-                                className="form-control input-sm"
-                                id="normalFeedrate"
-                                value={probeSettings.normalFeedrate}
-                                onChange={probeActions.changeNormalFeedrate}
-                            />
-                            <div className="input-group-addon">mm/min</div>
-                        </div>
-                    </div>
+                        <Input
+                            label="Slow Find"
+                            value={probeSettings.normalFeedrate}
+                            onChange={probeActions.changeNormalFeedrate}
+                            additionalProps={{ type: 'number', id: 'normalFeedrate' }}
+                        />
 
-                    <div className={styles['probe-settings-group']}>
-                        <label htmlFor="normalFeedrate">Fast Probe Feedrate</label>
-                        <div className="input-group">
-                            <input
-                                type="number"
-                                className="form-control input-sm"
-                                id="normalFeedrate"
-                                value={probeSettings.fastFeedrate}
-                                onChange={probeActions.changeFastFeedrate}
-                            />
-                            <div className="input-group-addon">mm/min</div>
-                        </div>
-                    </div>
+                        <Input
+                            label="Retraction"
+                            value={probeSettings.retractionDistance}
+                            onChange={probeActions.changeRetractionDistance}
+                            additionalProps={{ type: 'number', id: 'retraction' }}
+                        />
+                    </Fieldset>
 
-                    <div style={{ marginTop: '2rem' }}>
-                        <h4 className={styles['settings-subtitle']}>Touch Plate Dimensions</h4>
-                        <div className="form-group">
-                            <label htmlFor="plateWidth">Touch Plate Width</label>
-                            <div className="input-group">
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    id="plateWidth"
-                                    value={probe.plateWidth}
-                                    onChange={probeActions.changePlateWidth}
-                                />
-                                <div className="input-group-addon">mm</div>
-                            </div>
-                            <label htmlFor="plateLength">Touch Plate Length</label>
-                            <div className="input-group">
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    id="plateLength"
-                                    value={probe.plateLength}
-                                    onChange={probeActions.changePlateLength}
-                                />
-                                <div className="input-group-addon">mm</div>
-                            </div>
-                            <span id="helpBlock" className="help-block">Width and length measurements of the touchplate, used for calculating tool diameters on the fly.</span>
-                        </div>
-                    </div>
+                    <Fieldset legend="Touch Plate" className={styles['mb-0']}>
+                        <AddProbe actions={actions} state={state} />
+
+                        {
+                            (functions.x && functions.y) && (
+                                <div>
+                                    <Input
+                                        label="Length"
+                                        value={probe.plateLength}
+                                        units="mm"
+                                        onChange={probeActions.changePlateLength}
+                                        additionalProps={{ type: 'number', id: 'plateLength' }}
+                                    />
+
+                                    <Input
+                                        label="Width"
+                                        value={probe.plateWidth}
+                                        units="mm"
+                                        onChange={probeActions.changePlateWidth}
+                                        additionalProps={{ type: 'number', id: 'plateWidth' }}
+                                    />
+                                </div>
+                            )
+                        }
+
+                    </Fieldset>
+
                 </div>
-                <div className={styles.addToolForm}>
-                    <h4 className={styles['settings-subtitle']}>Edit Touch Plate Profile</h4>
-                    <AddProbe actions={actions} state={state} />
+
+                <div style={{ width: '50%' }}>
+                    <Tools state={state} actions={actions} />
                 </div>
             </div>
         </div>
