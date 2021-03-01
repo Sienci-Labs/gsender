@@ -69,7 +69,8 @@ class AxesWidget extends PureComponent {
             }),
             pubsub.subscribe('units:change', (event, units) => {
                 this.changeUnits(units);
-            })
+            }),
+            pubsub.subscribe('jogPresets')
         ];
 
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -424,6 +425,9 @@ class AxesWidget extends PureComponent {
 
             pubsub.publish('jogSpeeds', { xyStep, zStep, feedrate });
         },
+        setJogFromPreset: (presetID) => {
+              
+        }
     };
 
     shuttleControlEvents = {
@@ -793,6 +797,9 @@ class AxesWidget extends PureComponent {
                 xyStep: this.getInitialXYStep(),
                 zStep: this.getInitialZStep(),
                 feedrate: this.config.get('jog.feedrate'),
+                rapid: this.config.get('jog.rapid'),
+                normal: this.config.get('jog.normal'),
+                precise: this.config.get('jog.precise'),
                 axis: '', // Defaults to empty
                 keypad: this.config.get('jog.keypad'),
                 imperial: {
