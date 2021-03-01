@@ -1,7 +1,8 @@
 import React from 'react';
 import classNames from 'classnames';
-import Dropdown, { MenuItem } from 'app/components/Dropdown';
+// import Dropdown, { MenuItem } from 'app/components/Dropdown';
 import ToggleSwitch from 'app/components/ToggleSwitch';
+import { RadioGroup, RadioButton } from 'app/components/Radio';
 import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 import {
@@ -24,13 +25,25 @@ const GeneralSettings = ({ active, state, actions }) => {
         )}
         >
             <h3 className={styles.settingsTitle}>
-                General Settings
+                General
             </h3>
             <div className={styles.toolMain}>
+
                 <div className={styles.generalArea}>
                     <div style={{ width: '50% ' }}>
                         <Fieldset legend="Preferred Units">
-                            <Dropdown
+                            <RadioGroup
+                                name="units"
+                                value={units}
+                                depth={2}
+                                onChange={(value, event) => actions.general.setUnits(value)}
+                            >
+                                <div>
+                                    <RadioButton label={i18n._('Inches (G20)')} value={IMPERIAL_UNITS} />
+                                    <RadioButton label={i18n._('Millimeters (G21)')} value={METRIC_UNITS} />
+                                </div>
+                            </RadioGroup>
+                            {/* <Dropdown
                                 style={{
                                     width: '100%'
                                 }}
@@ -68,29 +81,28 @@ const GeneralSettings = ({ active, state, actions }) => {
                                         {i18n._('Millimeters (G21)')}
                                     </MenuItem>
                                 </Dropdown.Menu>
-                            </Dropdown>
-                            <small>Units to be displayed throughout the interface</small>
+                            </Dropdown> */}
+                            <small className={styles['item-info']}>Units to be displayed throughout the interface</small>
                         </Fieldset>
 
-                        <Fieldset legend="Machine Profile">
+                        <Fieldset legend="Machine Profile" className={styles['mb-0']}>
                             <MachineProfileOptions />
                         </Fieldset>
                     </div>
 
                     <div style={{ width: '50% ' }}>
                         <Fieldset legend="Jog Speed Presets">
-                            {/* <h4 className={styles['settings-subtitle']}>Jog Speeds Presets</h4> */}
                             <JogSpeeds />
                         </Fieldset>
+
+                        <Fieldset legend="Reverse Workspace">
+                            <ToggleSwitch
+                                checked={reverseWidgets}
+                                onChange={() => actions.general.setReverseWidgets()}
+                            />
+                            <small className={styles['item-info']}>Functionality appears on the left if toggled on.</small>
+                        </Fieldset>
                     </div>
-                </div>
-                <div className={styles.addToolForm}>
-                    <h4>Reverse Workspace</h4>
-                    <ToggleSwitch
-                        checked={reverseWidgets}
-                        onChange={() => actions.general.setReverseWidgets()}
-                    />
-                    <small>Functionality appears on the left if toggled on.</small>
                 </div>
             </div>
 
