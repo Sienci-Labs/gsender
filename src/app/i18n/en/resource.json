@@ -454,10 +454,6 @@
     "Location Widget": "Location Widget",
     "This widget displays machine and work coordinates for all axes.": "This widget displays machine and work coordinates for all axes.",
     "This widget displays machine and work coordinates for all axes": "This widget displays machine and work coordinates for all axes",
-    "Zero All": "Zero All",
-    "Go to Zero": "Go to Zero",
-    "Home": "Home",
-    "Go Home": "Go Home",
     "Location": "Location",
     "Job Status Widget": "Job Status Widget",
     "This widget displays the job progression and feed and spindle overrides.": "This widget displays the job progression and feed and spindle overrides.",
@@ -472,7 +468,6 @@
     "Jog Control": "Jog Control",
     "Not connected to a device": "Not connected to a device",
     "Generate Probe Commands": "Generate Probe Commands",
-    "Release": "Release",
     "Load File": "Load File",
     "Inches (G20)": "Inches (G20)",
     "Millimeters (G21)": "Millimeters (G21)"

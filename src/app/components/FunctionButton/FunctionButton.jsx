@@ -2,10 +2,10 @@ import React from 'react';
 import cx from 'classnames';
 import styles from './index.styl';
 
-const FunctionButton = ({ className, children, ...props }) => {
+const FunctionButton = ({ className, primary = false, children, ...props }) => {
     return (
         <button
-            className={cx(styles.functionButton, { [styles.functionButtonPrimary]: props.primary })}
+            className={cx(styles.functionButton, { [styles.functionButtonPrimary]: primary })}
             {...props}
         >
             {children}
