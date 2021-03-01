@@ -3,8 +3,8 @@ import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
 import controller from 'app/lib/controller';
 import GeneralSettings from './GeneralSettings';
-import ToolSettings from './Tools/Tools';
-import MachineProfiles from './MachineProfiles';
+// import ToolSettings from './Tools/Tools';
+// import MachineProfiles from './MachineProfiles';
 import Keybindings from './Keybindings';
 import ProbeSettings from './Probe/ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
@@ -15,6 +15,7 @@ import { METRIC_UNITS } from '../../constants';
 
 class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
+
     state = this.getInitialState();
 
     getInitialState() {
@@ -33,23 +34,18 @@ class PreferencesPage extends PureComponent {
                     label: 'General',
                     component: GeneralSettings
                 },
+                // {
+                //     id: 1,
+                //     label: 'Tools',
+                //     component: ToolSettings
+                // },
                 {
                     id: 1,
-                    label: 'Tools',
-                    component: ToolSettings
-                },
-                {
-                    id: 2,
-                    label: 'Machine Profiles',
-                    component: MachineProfiles
-                },
-                {
-                    id: 3,
                     label: 'Probe',
                     component: ProbeSettings
                 },
                 {
-                    id: 4,
+                    id: 2,
                     label: 'Keybindings',
                     component: Keybindings
                 }
