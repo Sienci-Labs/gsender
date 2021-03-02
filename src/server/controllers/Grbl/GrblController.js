@@ -1302,21 +1302,37 @@ class GrblController {
                 const [axes, feedrate = 1000, units = METRIC_UNITS] = args;
                 //const JOG_COMMAND_INTERVAL = 80;
                 const unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-                let { $20 } = this.settings || 0;
+                let { $20, $130, $131, $132 } = this.settings.settings;
+                console.log(axes);
 
                 // Borrowed from UGS
                 // /ugs-core/src/com/willwinder/universalgcodesender/utils/ContinuousJogWorker.java Line 107
                 //const jogFeedrate = ((feedrate / 60.0) * (JOG_COMMAND_INTERVAL / 1000.0) * 1.2).toFixed(1);
                 let jogFeedrate;
-                if ($20 === 1) {
-                    console.log('SOFT LIMIT MATH');
+                if ($20 === '1') {
+                    $130 = Number($130);
+                    $131 = Number($131);
+                    $132 = Number($132);
+                    let { mpos } = this.state.status;
+                    Object.keys(mpos).forEach((axis) => {
+                        mpos[axis] = Number(mpos[axis]);
+                    });
+                    if (axes.Z) {
+                        axes.Z *= (($132 - mpos.z) * 0.98).toFixed(1);
+                    }
+                    if (axes.X) {
+                        axes.X *= (($130 - mpos.x) * 0.98).toFixed(1);
+                    }
+                    if (axes.Y) {
+                        axes.Y *= (($131 - mpos.y) * 0.98).toFixed(1);
+                    }
+                    console.log(axes);
                 } else {
                     jogFeedrate = 1000;
+                    Object.keys(axes).forEach((axis) => {
+                        axes[axis] *= jogFeedrate;
+                    });
                 }
-
-                Object.keys(axes).forEach((axis) => {
-                    axes[axis] *= jogFeedrate;
-                });
 
                 axes.F = feedrate;
 
