@@ -220,14 +220,15 @@ class AxesWidget extends PureComponent {
             const modal = (units === 'mm') ? 'G21' : 'G20';
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             const commands = [
-                '$J=G91 ' + s,
+                `$J=${modal}G91 ` + s,
             ];
-            controller.command('gcode:safe', commands, modal);
+            controller.command('gcode', commands, modal);
         },
         startContinuousJog: (params = {}, feedrate = 1000) => {
+            const { units } = this.state;
             this.setState({
                 isContinuousJogging: true
-            }, controller.command('jog:start', params, feedrate));
+            }, controller.command('jog:start', params, feedrate, units));
         },
         stopContinuousJog: () => {
             this.setState({

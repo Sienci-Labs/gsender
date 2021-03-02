@@ -35,6 +35,7 @@ import {
     GRBL_ERRORS,
     GRBL_SETTINGS
 } from './constants';
+import { METRIC_UNITS } from '../../../app/constants';
 
 
 // % commands
@@ -1298,12 +1299,20 @@ class GrblController {
                 }
             },
             'jog:start': () => {
-                const [axes, feedrate = 1000] = args;
-                const JOG_COMMAND_INTERVAL = 80;
+                const [axes, feedrate = 1000, units = METRIC_UNITS] = args;
+                //const JOG_COMMAND_INTERVAL = 80;
+                const unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+                let { $20 } = this.settings || 0;
 
                 // Borrowed from UGS
                 // /ugs-core/src/com/willwinder/universalgcodesender/utils/ContinuousJogWorker.java Line 107
-                const jogFeedrate = ((feedrate / 60.0) * (JOG_COMMAND_INTERVAL / 1000.0) * 1.2).toFixed(1);
+                //const jogFeedrate = ((feedrate / 60.0) * (JOG_COMMAND_INTERVAL / 1000.0) * 1.2).toFixed(1);
+                let jogFeedrate;
+                if ($20 === 1) {
+                    console.log('SOFT LIMIT MATH');
+                } else {
+                    jogFeedrate = 1000;
+                }
 
                 Object.keys(axes).forEach((axis) => {
                     axes[axis] *= jogFeedrate;
@@ -1311,9 +1320,8 @@ class GrblController {
 
                 axes.F = feedrate;
 
-                const jogCommand = '$J=G91 ' + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-
-                this.feeder.repeatCommand(jogCommand, 230);
+                const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+                this.command('gcode', jogCommand);
             },
             'jog:stop': () => {
                 this.feeder.reset();
