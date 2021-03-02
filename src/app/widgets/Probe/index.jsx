@@ -8,7 +8,7 @@ import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import { in2mm, mapValueToUnits } from 'app/lib/units';
+import pubsub from 'pubsub-js';
 import WidgetConfig from '../WidgetConfig';
 import Probe from './Probe';
 import RunProbe from './RunProbe';
@@ -48,6 +48,8 @@ class ProbeWidget extends PureComponent {
         sortable: PropTypes.object,
         embedded: PropTypes.bool
     };
+
+    pubsubTokens = []
 
     // Public methods
     collapse = () => {
@@ -228,7 +230,7 @@ class ProbeWidget extends PureComponent {
             return this.generateProbeCommands();
         },
         runProbeCommands: (commands) => {
-            controller.command('gcode', commands);
+            controller.command('gcode:safe', commands, 'G21');
         },
         returnProbeConnectivity: () => {
             const { status } = controller.state || {};
@@ -302,15 +304,10 @@ class ProbeWidget extends PureComponent {
             }
 
             this.setState({
-                units: units,
                 controller: {
                     type: type,
                     state: state
                 },
-                probeDepth: mapValueToUnits(this.config.get('probeDepth'), units),
-                probeFeedrate: mapValueToUnits(this.config.get('probeFeedrate'), units),
-                touchPlateHeight: mapValueToUnits(this.config.get('touchPlateHeight'), units),
-                retractionDistance: mapValueToUnits(this.config.get('retractionDistance'), units)
             });
         },
     };
@@ -319,10 +316,12 @@ class ProbeWidget extends PureComponent {
 
     componentDidMount() {
         this.addControllerEvents();
+        this.subscribe();
     }
 
     componentWillUnmount() {
         this.removeControllerEvents();
+        this.unsubscribe();
     }
 
     componentWillMount() {
@@ -342,7 +341,7 @@ class ProbeWidget extends PureComponent {
             return;
         }
 
-        const { units, probeCommand, useTLO } = this.state;
+        const { probeCommand, useTLO } = this.state;
         this.config.set('probeCommand', probeCommand);
         this.config.set('useTLO', useTLO);
 
@@ -353,13 +352,6 @@ class ProbeWidget extends PureComponent {
             retractionDistance
         } = this.state;
 
-        // To save in mm
-        if (units === IMPERIAL_UNITS) {
-            probeDepth = in2mm(probeDepth);
-            probeFeedrate = in2mm(probeFeedrate);
-            touchPlateHeight = in2mm(touchPlateHeight);
-            retractionDistance = in2mm(retractionDistance);
-        }
         this.config.set('probeDepth', Number(probeDepth));
         this.config.set('probeFeedrate', Number(probeFeedrate));
         this.config.set('touchPlateHeight', Number(touchPlateHeight));
@@ -372,7 +364,7 @@ class ProbeWidget extends PureComponent {
             isFullscreen: false,
             canClick: true, // Defaults to true
             port: controller.port,
-            units: METRIC_UNITS,
+            units: store.get('workspace.units'),
             controller: {
                 type: controller.type,
                 state: controller.state
@@ -513,8 +505,21 @@ class ProbeWidget extends PureComponent {
         code = code.concat([
             this.gcode('G91'),
             this.gcode('G0', {
-                [axis]: retractDistance
-            }),
+                [axis]: (retractDistance * 2)
+            })
+        ]);
+
+        // Go up on Z if X or Y
+        if (axis !== 'Z') {
+            const { touchPlateHeight } = this.state;
+            code = code.concat([
+                this.gcode('G0', {
+                    Z: -1 * ((retractDistance * 4) - touchPlateHeight)
+                })
+            ]);
+        }
+
+        code = code.concat([
             this.gcode('G90')
         ]);
         return code;
@@ -629,6 +634,17 @@ class ProbeWidget extends PureComponent {
                 Y: XYRetract
             }),
         ]);
+
+        // Go up on Z if X or Y
+        code = code.concat([
+            this.gcode('G0', {
+                Z: ((retractDistance * 3) + zThickness)
+            }),
+            this.gcode('G0', {
+                Y: -1 * ((XYRetract * 3) - xyThickness)
+            })
+        ]);
+
         // Make sure we're in the correct mode at end of probe
         code = code.concat([
             this.gcode('G90')
@@ -760,6 +776,28 @@ class ProbeWidget extends PureComponent {
         }
 
         return true;
+    }
+
+    changeUnits(units) {
+        this.setState({
+            units: units
+        });
+    }
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('units:change', (event, units) => {
+                this.changeUnits(units);
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
     }
 
     render() {

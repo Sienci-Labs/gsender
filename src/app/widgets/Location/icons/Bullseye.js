@@ -2,7 +2,8 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-const Bullseye = ({ fill }) => {
+const Bullseye = ({ fill, isMovement }) => {
+    fill = (isMovement ? '#FFFFFF' : fill);
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -45,6 +46,7 @@ const Bullseye = ({ fill }) => {
 
 Bullseye.propTypes = {
     fill: PropTypes.string,
+    isMovement: PropTypes.bool
 };
 
 Bullseye.defaultProps = {

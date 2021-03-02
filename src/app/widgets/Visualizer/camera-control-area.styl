@@ -19,7 +19,7 @@
 }
 
 .camera-control-active {
-    background-color: darken(#53d277, 30%);
+    background-color: lighten(#059669, 10%);
 }
 
 .camera-control {
@@ -78,7 +78,7 @@
 .machine {
     status-mixin(bgColor, textColor){
         @extend .machine-status-message;
-        
+
         background-color: rgba(bgColor, 0.6);
         color: rgba(textColor, 0.8);
     }
@@ -102,7 +102,7 @@
     }
 
     &-Run {
-        bgColor = rgb(0, 255, 0);
+        bgColor = rgb(5,150,105);
         color = rgb(255, 255, 255);
         status-mixin(bgColor, color)
     }

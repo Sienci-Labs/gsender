@@ -1,13 +1,20 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import NavSidebarLink from './NavSideBarLink';
 import styles from './index.styl';
 import {
     MODAL_NONE,
     MODAL_PREFERENCES,
+    MODAL_FIRMWARE
 } from './constants';
 import Preferences from '../Preferences/Preferences';
+import WizardModal from '../Wizard/WizardModal';
 
 class NavSidebar extends PureComponent {
+    static propTypes = {
+        wizardDisabled: PropTypes.bool
+    };
+
     state = this.getInitialState();
 
     actions = {
@@ -44,12 +51,23 @@ class NavSidebar extends PureComponent {
 
         return (
             <div className={styles.Sidebar}>
-                <NavSidebarLink url="" icon="fa-ruler" label="Flatten" />
-                <NavSidebarLink url="" icon="fa-border-style" label="Surface" />
-                <NavSidebarLink url="" icon="fa-wrench" label="Calibrate" />
-                <NavSidebarLink url="" icon="fa-hat-wizard" label="Wizard" />
-                <NavSidebarLink url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa-cog" label="" />
-
+                <NavSidebarLink url="" className={styles.disable} icon="fa-ruler" label="Flatten" />
+                <NavSidebarLink url="" className={styles.disable} icon="fa-border-style" label="Surface" />
+                <NavSidebarLink url="" className={styles.disable} icon="fa-wrench" label="Calibrate" />
+                <NavSidebarLink
+                    url=""
+                    onClick={() => actions.openModal(MODAL_FIRMWARE)}
+                    icon="fa-hat-wizard"
+                    label="Wizard"
+                    className={!this.props.wizardDisabled ? 'enable' : `${styles.disable}`}
+                />
+                <NavSidebarLink
+                    url="" onClick={() => actions.openModal(MODAL_PREFERENCES)}
+                    icon="fa-cog" label=""
+                />
+                {
+                    state.modal.name === MODAL_FIRMWARE && <WizardModal state={state} modalClose={actions.closeModal} />
+                }
                 {
                     state.modal.name === MODAL_PREFERENCES && <Preferences state={state} modalClose={actions.closeModal} />
                 }

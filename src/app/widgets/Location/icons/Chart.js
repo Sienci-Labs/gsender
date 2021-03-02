@@ -2,7 +2,9 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
-const Chart = ({ fill }) => {
+const Chart = ({ fill, isMovement, disabled }) => {
+    fill = (isMovement ? '#FFFFFF' : fill);
+    fill = (disabled ? '#9ca3af' : fill);
     return (
         <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 512.001 512.001" enableBackground="new 0 0 512 512" xmlSpace="preserve">
             <g>
@@ -43,6 +45,7 @@ const Chart = ({ fill }) => {
 
 Chart.propTypes = {
     fill: PropTypes.string,
+    isMovement: PropTypes.bool
 };
 
 Chart.defaultProps = {

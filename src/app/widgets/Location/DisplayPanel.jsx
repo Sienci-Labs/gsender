@@ -173,27 +173,38 @@ class DisplayPanel extends PureComponent {
                         />
                         <ControlButton
                             label={i18n._('Go to Zero')}
-                            icon={() => <ChartIcon fill={(canClick) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
+                            icon={() => <ChartIcon isMovement disabled={!canClick} fill={PRIMARY_COLOR} />}
                             onClick={() => {
-                                controller.command('gcode', 'G0 X0 Y0 Z0'); //Move to Work Position Zero
+                                controller.command('gcode', 'G91');
+                                controller.command('gcode:safe', 'G0 Z10', 'G21'); // Retract Z when moving across workspace
+                                controller.command('gcode', 'G90');
+                                controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
+                                controller.command('gcode', 'G0 Z0'); // Move Z up
                             }}
                             disabled={!canClick}
+                            isMovement
                         />
                         <ControlButton
                             label={i18n._('Home')}
-                            icon={() => <HomeIcon fill={(canClick && machineProfile.endstops) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
+                            icon={() => <HomeIcon isMovement disabled={!canClick} fill={PRIMARY_COLOR}/>}
                             onClick={() => {
                                 controller.command('homing');
                             }}
                             disabled={!canClick || !machineProfile.endstops}
+                            className={!machineProfile.endstops ? 'hidden' : ''}
+                            isMovement
+                            isHidden={!machineProfile.endstops}
                         />
                         <ControlButton
                             label={i18n._('Go Home')}
-                            icon={() => <ChartIcon fill={(canClick && machineProfile.endstops) ? PRIMARY_COLOR : SECONDARY_COLOR} />}
+                            icon={() => <ChartIcon isMovement disabled={!canClick} fill={PRIMARY_COLOR} />}
                             onClick={() => {
                                 controller.command('gcode', 'G28 G91'); //Go to Home Position
                             }}
                             disabled={!canClick || !machineProfile.endstops}
+                            isHidden={!machineProfile.endstops}
+                            className={(!machineProfile.endstops) ? 'hidden' : ''}
+                            isMovement
                         />
                         <ControlButton
                             label={i18n._('Release')}

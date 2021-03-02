@@ -14,7 +14,7 @@ import styles from './index.styl';
 
 // The buffer starts with 254 bytes free. The terminating <LF> or <CR> counts as a byte.
 const TERMINAL_COLS = 254;
-const TERMINAL_ROWS = 12;
+const TERMINAL_ROWS = 10;
 
 class ConsoleWidget extends PureComponent {
     static propTypes = {
@@ -101,6 +101,10 @@ class ConsoleWidget extends PureComponent {
             }
 
             data = String(data).trim();
+            // Handle non-ascii characters more gracefully
+            data = data.replace(/[^\x20-\x7E]/g, (m) => {
+                return '\\x' + m.charCodeAt(0).toString(16);
+            });
 
             if (source) {
                 this.terminal.writeln(color.blackBright(source) + color.white(this.terminal.prompt + data));

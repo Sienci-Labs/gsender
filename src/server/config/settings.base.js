@@ -2,7 +2,7 @@ import path from 'path';
 import pkg from '../../package.json';
 import { languages } from '../../../build.config';
 
-const RC_FILE = '.cncrc';
+const RC_FILE = '.sender_rc';
 const SESSION_PATH = '.cncjs-sessions';
 
 // Secret

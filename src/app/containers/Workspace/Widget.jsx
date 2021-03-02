@@ -8,12 +8,9 @@ import JobStatusWidget from 'app/widgets/JobStatus';
 import LaserWidget from 'app/widgets/Laser';
 import LocationWidget from 'app/widgets/Location';
 import MacroWidget from 'app/widgets/Macro';
-import MarlinWidget from 'app/widgets/Marlin';
 import ProbeWidget from 'app/widgets/Probe';
-import SmoothieWidget from 'app/widgets/Smoothie';
 import SpindleWidget from 'app/widgets/Spindle';
 import CustomWidget from 'app/widgets/Custom';
-import TinyGWidget from 'app/widgets/TinyG';
 import VisualizerWidget from 'app/widgets/Visualizer';
 import WebcamWidget from 'app/widgets/Webcam';
 import SecondaryFunctionality from 'app/widgets/SecondaryFunctionality';
@@ -28,12 +25,9 @@ const getWidgetByName = (name) => {
         'laser': LaserWidget,
         'location': LocationWidget,
         'macro': MacroWidget,
-        'marlin': MarlinWidget,
         'probe': ProbeWidget,
-        'smoothie': SmoothieWidget,
         'spindle': SpindleWidget,
         'custom': CustomWidget,
-        'tinyg': TinyGWidget,
         'visualizer': VisualizerWidget,
         'webcam': WebcamWidget,
         'secondary': SecondaryFunctionality

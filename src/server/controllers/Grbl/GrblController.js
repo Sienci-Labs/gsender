@@ -1,6 +1,7 @@
 import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
 import _ from 'lodash';
+import map from 'lodash/map';
 import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
@@ -34,6 +35,7 @@ import {
     GRBL_ERRORS,
     GRBL_SETTINGS
 } from './constants';
+
 
 // % commands
 const WAIT = '%wait';
@@ -458,6 +460,7 @@ class GrblController {
             this.emit('serialport:read', res.raw);
 
             // Feeder
+            this.feeder.ack();
             this.feeder.next();
         });
 
@@ -503,6 +506,7 @@ class GrblController {
             }
 
             // Feeder
+            this.feeder.ack();
             this.feeder.next();
         });
 
@@ -1274,6 +1278,48 @@ class GrblController {
                 if (!this.feeder.isPending()) {
                     this.feeder.next();
                 }
+            },
+            'gcode:safe': () => {
+                const [commands, prefUnits] = args;
+                const deviceUnits = this.state.parserstate.modal.units;
+
+                if (!deviceUnits) {
+                    log.error('Unable to determine device unit modal');
+                    return;
+                }
+                // Force command in preferred units
+                if (prefUnits !== deviceUnits) {
+                    this.command('gcode', prefUnits);
+                }
+                this.command('gcode', commands);
+                // return modal to previous state if they were different previously
+                if (prefUnits !== deviceUnits) {
+                    this.command('gcode', deviceUnits);
+                }
+            },
+            'jog:start': () => {
+                const [axes, feedrate = 1000] = args;
+                const JOG_COMMAND_INTERVAL = 80;
+
+                // Borrowed from UGS
+                // /ugs-core/src/com/willwinder/universalgcodesender/utils/ContinuousJogWorker.java Line 107
+                const jogFeedrate = ((feedrate / 60.0) * (JOG_COMMAND_INTERVAL / 1000.0) * 1.2).toFixed(1);
+
+                Object.keys(axes).forEach((axis) => {
+                    axes[axis] *= jogFeedrate;
+                });
+
+                axes.F = feedrate;
+
+                const jogCommand = '$J=G91 ' + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
+
+                this.feeder.repeatCommand(jogCommand, 230);
+            },
+            'jog:stop': () => {
+                this.feeder.reset();
+                this.command('gcode', '\x85');
+                this.command('gcode', 'G90');
+                this.feeder.reset();
             },
             'macro:run': () => {
                 let [id, context = {}, callback = noop] = args;

@@ -221,37 +221,40 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
+            const lines = gcode.split('\n')
+                .filter(line => (line.trim().length > 0));
+
+            const tCommandRegex = /^[T]+[0-9]+/g;
+            const toolSet = new Set();
+
+            //Iterate over the lines and use regex against them
+            for (const line of lines) {
+                if (tCommandRegex.test(line)) {
+                    const lineItems = line.split(' ');
+
+                    //Find the line item with the T command and add it to the set
+                    for (const item of lineItems) {
+                        if (item[0] === 'T') {
+                            toolSet.add(item.trim());
+                        }
+                    }
+                }
+            }
+
+            const total = lines.length + 1; //Dwell line added after every gcode parse
+
+            this.setState({ total });
+
+            pubsub.publish('gcode:fileInfo', { name, size, total, toolSet });
+
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
             if (!port) {
                 this.actions.loadGCode(name, gcode, size);
 
-                const lines = gcode.split('\n')
-                    .filter(line => (line.trim().length > 0));
-
-                // // const tools = lines.filter(line => line[0] === 'T'); //Find all T commands
-
-                // const maxSpindleSpeed = lines.find(
-                //     line => [line[0], line[1], line[2]].join('') === 'G50'
-                // );
-
-                // console.log(maxSpindleSpeed);
-
-                // //max spindle rate - min spindle rate is range
-
-                // console.log(lines);
-                // console.log(tools);
-
-                const total = lines.length + 1; //Added one as that is the dwell line added after every gcode parse
-
-                this.setState({ total });
-
-                pubsub.publish('gcode:fileInfo', { name, size, total });
-
                 return;
             }
 
-            pubsub.publish('gcode:fileInfo', { size });
             controller.command('gcode:load', name, gcode, context, (err, data) => {
                 if (err) {
                     this.setState((state) => ({
@@ -983,17 +986,17 @@ class VisualizerWidget extends PureComponent {
             isAgitated: false, // Defaults to false
             currentTheme: {
                 backgroundColor: '#111827', //Navy Blue
-                gridColor: '#00FFFF', // Turqoise / Light Blue
-                xAxisColor: '#cd5c5c', //Indian Red
-                yAxisColor: '#53d277', //Light Green
-                zAxisColor: '#007BFF', //Light Green
-                limitColor: '#cd5c5c', //Indian Red
+                gridColor: '#77a9d7', // Turqoise / Light Blue
+                xAxisColor: '#df3b3b', //Indian Red
+                yAxisColor: '#06b881', //Light Green
+                zAxisColor: '#295d8d', //Light Green
+                limitColor: '#5191cc', //Indian Red
                 cuttingCoordinateLines: '#fff', //White
-                joggingCoordinateLines: '#53d277', // Light Green
-                G0Color: '#53d277', // Light Green
-                G1Color: '#007BFF', // Light Blue
-                G2Color: '#007BFF', // Light Blue
-                G3Color: '#007BFF', // Light Blue
+                joggingCoordinateLines: '#0ef6ae', // Light Green
+                G0Color: '#0ef6ae', // Light Green
+                G1Color: '#3e85c7', // Light Blue
+                G2Color: '#3e85c7', // Light Blue
+                G3Color: '#3e85c7', // Light Blue
             },
             currentTab: 0,
             filename: '',
@@ -1132,14 +1135,6 @@ class VisualizerWidget extends PureComponent {
                             />
                         </div>
                     )}
-                    {/* {showNotifications && (
-                        <Notifications
-                            show={showNotifications}
-                            type={state.notification.type}
-                            data={state.notification.data}
-                            onDismiss={actions.dismissNotification}
-                        />
-                    )} */}
                 </Widget.Content>
             </Widget>
         );
