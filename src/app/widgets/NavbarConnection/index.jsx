@@ -377,6 +377,11 @@ class NavbarConnectionWidget extends PureComponent {
                     autoReconnect: value
                 });
             }),
+            pubsub.subscribe('baudrate:update', (msg, value) => {
+                this.setState({
+                    baudrate: value
+                });
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }

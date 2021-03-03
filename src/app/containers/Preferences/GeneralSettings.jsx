@@ -61,7 +61,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                                     checked={autoReconnect}
                                     onChange={() => actions.general.setAutoReconnect()}
                                 />
-                                <small className={styles['item-info']}>Connect Automatically</small>
+                                <small className={styles['item-info']}>Re-connect automatically</small>
                                 <br />
                                 <Baudrates baudrate={state.baudrate} onChange={(option) => actions.general.setBaudrate(option)}/>
                             </div>

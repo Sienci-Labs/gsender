@@ -1,6 +1,7 @@
 import React from 'react';
 import Select from 'react-select';
 import map from 'lodash/map';
+import styles from '../index.styl';
 
 const defaultBaudrates = [
     250000,
@@ -25,21 +26,25 @@ const Baudrates = ({ onChange, baudrate }) => {
     };
 
     return (
-        <Select
-            backspaceRemoves={false}
-            className="sm"
-            clearable={false}
-            menuContainerStyle={{ zIndex: 5 }}
-            name="baudrate"
-            onChange={onChange}
-            options={map(defaultBaudrates, (value) => ({
-                value: value,
-                label: Number(value).toString()
-            }))}
-            searchable={false}
-            value={baudrate}
-            valueRenderer={renderBaudrate}
-        />
+        <div>
+            <h4 className={styles.settingsSubtitle}>Baudrate</h4>
+            <Select
+                backspaceRemoves={false}
+                className="sm"
+                clearable={false}
+                menuContainerStyle={{ zIndex: 5 }}
+                name="baudrate"
+                onChange={onChange}
+                options={map(defaultBaudrates, (value) => ({
+                    value: value,
+                    label: Number(value).toString()
+                }))}
+                searchable={false}
+                value={baudrate}
+                valueRenderer={renderBaudrate}
+            />
+        </div>
+
     );
 };
 

@@ -97,7 +97,7 @@ class PreferencesPage extends PureComponent {
                 this.setState({
                     baudrate: option.value
                 });
-                pubsub.publish('baudrate:update');
+                pubsub.publish('baudrate:update', option.value);
             }
         },
         tool: {
