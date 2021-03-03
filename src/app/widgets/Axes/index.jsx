@@ -70,7 +70,6 @@ class AxesWidget extends PureComponent {
             pubsub.subscribe('units:change', (event, units) => {
                 this.changeUnits(units);
             }),
-            pubsub.subscribe('jogPresets')
         ];
 
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -425,8 +424,16 @@ class AxesWidget extends PureComponent {
 
             pubsub.publish('jogSpeeds', { xyStep, zStep, feedrate });
         },
-        setJogFromPreset: (presetID) => {
-              
+        setJogFromPreset: (presetKey) => {
+            const { jog, units } = this.state;
+            const jogObj = jog[presetKey][units];
+
+            this.setState({
+                jog: {
+                    ...jog,
+                    ...jogObj
+                }
+            });
         }
     };
 
@@ -722,7 +729,28 @@ class AxesWidget extends PureComponent {
         }
     };
 
+    updateJogPresets = () => {
+        const { jog } = this.state;
+        const data = store.get('widgets.axes.jog');
+
+        if (!data) {
+            return;
+        }
+        const { rapid, normal, precise } = data;
+
+        this.setState({
+            jog: {
+                ...jog,
+                rapid,
+                normal,
+                precise
+            }
+        });
+    }
+
     componentDidMount() {
+        store.on('change', this.updateJogPresets);
+
         this.fetchMDICommands();
         this.addControllerEvents();
         this.addShuttleControlEvents();
@@ -730,6 +758,7 @@ class AxesWidget extends PureComponent {
     }
 
     componentWillUnmount() {
+        store.removeListener('change', this.updateJogPresets);
         this.unsubscribe();
         this.removeControllerEvents();
         // this.removeShuttleControlEvents();
@@ -757,6 +786,8 @@ class AxesWidget extends PureComponent {
     }
 
     getInitialState() {
+        const { rapid, normal, precise } = store.get('widgets.axes.jog');
+
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
@@ -797,9 +828,9 @@ class AxesWidget extends PureComponent {
                 xyStep: this.getInitialXYStep(),
                 zStep: this.getInitialZStep(),
                 feedrate: this.config.get('jog.feedrate'),
-                rapid: this.config.get('jog.rapid'),
-                normal: this.config.get('jog.normal'),
-                precise: this.config.get('jog.precise'),
+                rapid,
+                normal,
+                precise,
                 axis: '', // Defaults to empty
                 keypad: this.config.get('jog.keypad'),
                 imperial: {
