@@ -207,7 +207,7 @@ export default class Options extends Component {
                     </div>
 
                     <div className={styles['machine-features-section']}>
-                        <div className={styles['machine-options-inputgroup']} style={{ display: 'grid', gridTemplateColumns: '1fr 3fr' }}>
+                        <div className={styles['machine-options-inputgroup']} style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', margin: '0' }}>
                             <label htmlFor="">Coolant</label>
                             <ToggleSwitch
                                 checked={coolant}
