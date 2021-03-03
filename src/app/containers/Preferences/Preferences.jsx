@@ -22,6 +22,7 @@ class PreferencesPage extends PureComponent {
             units: store.get('workspace.units', METRIC_UNITS),
             reverseWidgets: store.get('workspace.reverseWidgets', false),
             autoReconnect: store.get('widgets.connection.autoReconnect', false),
+            baudrate: store.get('widgets.connection.baudrate', 115200),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -91,6 +92,12 @@ class PreferencesPage extends PureComponent {
                     autoReconnect: autoReconnect
                 });
                 pubsub.publish('autoReconnect:update', autoReconnect);
+            },
+            setBaudrate: (option) => {
+                this.setState({
+                    baudrate: option.value
+                });
+                pubsub.publish('baudrate:update');
             }
         },
         tool: {

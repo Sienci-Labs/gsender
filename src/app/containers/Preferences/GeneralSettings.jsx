@@ -14,6 +14,7 @@ import JogSpeeds from './General/JogSpeeds';
 import MachineProfileOptions from './MachineProfiles/Options';
 
 import Fieldset from './FieldSet';
+import Baudrates from './General/Baudrates';
 
 const GeneralSettings = ({ active, state, actions }) => {
     const { units, reverseWidgets, autoReconnect } = state;
@@ -50,24 +51,27 @@ const GeneralSettings = ({ active, state, actions }) => {
                             <MachineProfileOptions />
                         </Fieldset>
                     </div>
-
                     <div style={{ width: '50% ' }}>
                         <Fieldset legend="Jog Speed Presets">
                             <JogSpeeds />
                         </Fieldset>
-
+                        <Fieldset legend="Connection">
+                            <div>
+                                <ToggleSwitch
+                                    checked={autoReconnect}
+                                    onChange={() => actions.general.setAutoReconnect()}
+                                />
+                                <small className={styles['item-info']}>Connect Automatically</small>
+                                <br />
+                                <Baudrates baudrate={state.baudrate} onChange={(option) => actions.general.setBaudrate(option)}/>
+                            </div>
+                        </Fieldset>
                         <Fieldset legend="Workspace">
                             <ToggleSwitch
                                 checked={reverseWidgets}
                                 onChange={() => actions.general.setReverseWidgets()}
                             />
                             <small className={styles['item-info']}>Reverse workspace layout</small>
-                            <br />
-                            <ToggleSwitch
-                                checked={autoReconnect}
-                                onChange={() => actions.general.setAutoReconnect()}
-                            />
-                            <small className={styles['item-info']}>Connect Automatically</small>
                         </Fieldset>
                     </div>
                 </div>
