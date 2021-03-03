@@ -20,7 +20,7 @@ import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
 import WorkflowControl from './WorkflowControl';
-import CameraControlArea from './CameraControlArea';
+import MachineStatusArea from './MachineStatusArea';
 import Visualizer from './Visualizer';
 import Loading from './Loading';
 import Rendering from './Rendering';
@@ -1112,7 +1112,7 @@ class VisualizerWidget extends PureComponent {
 
                     {WebGL.isWebGLAvailable() && (
                         <div>
-                            <CameraControlArea
+                            <MachineStatusArea
                                 state={state}
                                 actions={actions}
                             />

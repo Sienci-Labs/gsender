@@ -3,9 +3,14 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: 2rem;
     position: absolute;
-    top: 60px;
+    top: 52px;
     right: 20px;
-    left: 20px;
+    left: 23px;
+}
+
+.cameraControl {
+    width: 50%;
+    height: 50%;
 }
 
 .camera-img {
@@ -36,7 +41,7 @@
         text-align: right;
         color: white;
         word-break: break-all;
-        font-size: clamp(0.8rem, 1vw, 1.6rem);
+        font-size: clamp(.8rem, 1vw, 1.6rem);
     }
 }
 
@@ -47,8 +52,8 @@
     align-self: flex-start;
     justify-self: center;
     font-size: clamp(1rem, 1.15vw, 2rem);
-    height: 10vh
-    max-height: 70px
+    height: 10vh;
+    max-height: 70px;
     border-radius: 5px;
     margin-top: 15px;
     width: 100%;
@@ -62,13 +67,12 @@
 
 .machine-status-unlock {
     primary = rgb(0, 255, 0);
-
     outline: none;
     cursor: pointer;
     justify-self: center;
     font-size: clamp(2rem, 2.5vw, 3.5rem);
-    color: rgba(primary, 0.6);
-    transition: color 350ms ease-in-out
+    color: rgba(primary, .6);
+    transition: color 350ms ease-in-out;
 
     &:hover {
         color: rgb(primary);
@@ -76,40 +80,39 @@
 }
 
 .machine {
-    status-mixin(bgColor, textColor){
+    status-mixin(bgColor, textColor) {
         @extend .machine-status-message;
-        
-        background-color: rgba(bgColor, 0.6);
-        color: rgba(textColor, 0.8);
+        background-color: rgba(bgColor, .6);
+        color: rgba(textColor, .8);
     }
 
     &-Disconnected {
         bgColor = grey;
         color = white;
-        status-mixin(bgColor, color)
+        status-mixin(bgColor, color);
     }
 
     &-Idle {
         bgColor = white;
         color = black;
-        status-mixin(bgColor, color)
+        status-mixin(bgColor, color);
     }
 
     &-Alarm {
         bgColor = rgb(255, 0, 0);
         color = rgb(255, 255, 255);
-        status-mixin(bgColor, color)
+        status-mixin(bgColor, color);
     }
 
     &-Run {
         bgColor = rgb(0, 255, 0);
         color = rgb(255, 255, 255);
-        status-mixin(bgColor, color)
+        status-mixin(bgColor, color);
     }
 
     &-Hold {
         bgColor = rgb(217, 119, 6);
-        color = rgb(255, 255, 255, 0.8);
-        status-mixin(bgColor, color)
+        color = rgb(255, 255, 255, .8);
+        status-mixin(bgColor, color);
     }
 }

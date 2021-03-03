@@ -8,6 +8,7 @@ import { Dropdown, MenuItem } from 'react-bootstrap';
 import Space from 'app/components/Space';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
+import CameraDisplay from './CameraDisplay/CameraDisplay';
 import {
     // Grbl
     GRBL,
@@ -134,6 +135,8 @@ class WorkflowControl extends PureComponent {
     }
 
     render() {
+        const { cameraPosition } = this.props.state;
+        const { camera } = this.props.actions;
         const { handleOnStop } = this;
         const { state, actions } = this.props;
         const { port, gcode, workflow } = state;
@@ -236,6 +239,10 @@ class WorkflowControl extends PureComponent {
                             </MenuItem>
                         </Dropdown.Menu>
                     </Dropdown>
+                    <CameraDisplay
+                        camera={camera}
+                        cameraPosition={cameraPosition}
+                    />
                 </div>
             </div>
         );

@@ -39,8 +39,8 @@ export default class Options extends Component {
                     ymin: 0,
                     zmin: 0,
                     xmax: foundProfile.width,
-                    ymax: foundProfile.height,
-                    zmax: foundProfile.depth,
+                    ymax: foundProfile.depth,
+                    zmax: foundProfile.height,
                 }
             });
         }
@@ -62,8 +62,8 @@ export default class Options extends Component {
         //Object to map work area dimmensions to limits
         const limitMap = {
             width: 'xmax',
-            height: 'ymax',
-            depth: 'zmax'
+            height: 'zmax',
+            depth: 'ymax'
         }[name];
 
         // Limit the given value

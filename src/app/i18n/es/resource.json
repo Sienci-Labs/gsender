@@ -489,8 +489,6 @@
     "This widget displays machine and work coordinates for all axes": "",
     "Zero All": "",
     "Go to Zero": "",
-    "Home": "",
-    "Go Home": "",
     "Location": "",
     "Job Status Widget": "",
     "This widget displays the job progression and feed and spindle overrides.": "",
@@ -507,6 +505,12 @@
     "Generate Probe Commands": "",
     "Confirm Probe Connectivity": "",
     "Confirm Router Position": "",
-    "Release": "",
-    "Load File": ""
+    "Load File": "",
+    "Top": "",
+    "Front": "",
+    "3D": "",
+    "Back Right": "",
+    "Front Left": "",
+    "Front Right": "",
+    "Back Left": ""
 }

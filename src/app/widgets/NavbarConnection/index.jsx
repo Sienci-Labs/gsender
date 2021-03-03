@@ -15,6 +15,8 @@ import NavbarConnection from './NavbarConnection';
 class NavbarConnectionWidget extends PureComponent {
     static propTypes = {
         widgetId: PropTypes.string.isRequired,
+        disableWizardFunction: PropTypes.func,
+        enableWizardFunction: PropTypes.func
     };
 
     // Public methods
@@ -154,6 +156,9 @@ class NavbarConnectionWidget extends PureComponent {
             }));
         },
         'serialport:open': (options) => {
+            setTimeout(() => {
+                this.props.disableWizardFunction();
+            }, 1500); // delay 1500ms so wizard can load settings
             const { controllerType, port, baudrate, inuse } = options;
             const ports = this.state.ports.map((o) => {
                 if (o.port !== port) {
@@ -175,6 +180,7 @@ class NavbarConnectionWidget extends PureComponent {
             log.debug(`Established a connection to the serial port "${port}"`);
         },
         'serialport:close': (options) => {
+            this.props.enableWizardFunction();
             const { port } = options;
 
             log.debug(`The serial port "${port}" is disconected`);
@@ -253,6 +259,7 @@ class NavbarConnectionWidget extends PureComponent {
         ];
 
         return {
+            wizardDisabled: true,
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             loading: false,

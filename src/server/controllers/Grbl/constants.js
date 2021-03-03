@@ -303,204 +303,304 @@ export const GRBL_SETTINGS = [
         setting: '$0',
         message: 'Step pulse time',
         units: 'microseconds',
-        description: 'Sets time length per step. Minimum 3usec.'
+        description: 'Sets time length per step. Minimum 3usec.',
+        inputType: 'number',
+        min: 3,
+        max: 12,
+        step: 1
     },
     {
         setting: '$1',
         message: 'Step idle delay',
         units: 'milliseconds',
-        description: 'Sets a short hold delay when stopping to let dynamics settle before disabling steppers. Value 255 keeps motors enabled with no delay.'
+        description: 'Sets a short hold delay when stopping to let dynamics settle before disabling steppers. Value 255 keeps motors enabled with no delay.',
+        inputType: 'number',
+        min: 25,
+        max: 255,
+        step: 5
     },
     {
         setting: '$2',
         message: 'Step pulse invert',
         units: 'mask',
-        description: 'Inverts the step signal. Set axis bit to invert (00000ZYX).'
+        description: 'Inverts the step signal. Set axis bit to invert (00000ZYX).',
+        inputType: 'mask2'
     },
     {
         setting: '$3',
         message: 'Step direction invert',
         units: 'mask',
-        description: 'Inverts the direction signal. Set axis bit to invert (00000ZYX).'
+        description: 'Inverts the direction signal. Set axis bit to invert (00000ZYX).',
+        inputType: 'mask3'
     },
     {
         setting: '$4',
         message: 'Invert step enable pin',
         units: 'boolean',
-        description: 'Inverts the stepper driver enable pin signal.'
+        description: 'Inverts the stepper driver enable pin signal.',
+        inputType: 'switch'
     },
     {
         setting: '$5',
         message: 'Invert limit pins',
         units: 'boolean',
-        description: 'Inverts the all of the limit input pins.'
+        description: 'Inverts the all of the limit input pins.',
+        inputType: 'switch'
     },
     {
         setting: '$6',
         message: 'Invert probe pin',
         units: 'boolean',
-        description: 'Inverts the probe input pin signal.'
+        description: 'Inverts the probe input pin signal.',
+        inputType: 'switch'
     },
     {
         setting: '$10',
         message: 'Status report options',
         units: 'mask',
-        description: 'Alters data included in status reports.'
+        description: 'Alters data included in status reports.',
+        inputType: 'mask10'
     },
     {
         setting: '$11',
         message: 'Junction deviation',
         units: 'millimeters',
-        description: 'Sets how fast Grbl travels through consecutive motions. Lower value slows it down.'
+        description: 'Sets how fast Grbl travels through consecutive motions. Lower value slows it down.',
+        inputType: 'number',
+        min: 0.001,
+        max: 0.020,
+        step: 0.001
     },
     {
         setting: '$12',
         message: 'Arc tolerance',
         units: 'millimeters',
-        description: 'Sets the G2 and G3 arc tracing accuracy based on radial error. Beware: A very small value may effect performance.'
+        description: 'Sets the G2 and G3 arc tracing accuracy based on radial error. Beware: A very small value may effect performance.',
+        inputType: 'number',
+        min: 0.001,
+        max: 0.003,
+        step: 0.001
     },
     {
         setting: '$13',
         message: 'Report in inches',
         units: 'boolean',
-        description: 'Enables inch units when returning any position and rate value that is not a settings value.'
+        description: 'Enables inch units when returning any position and rate value that is not a settings value.',
+        inputType: 'switch'
     },
     {
         setting: '$20',
         message: 'Soft limits enable',
         units: 'boolean',
-        description: 'Enables soft limits checks within machine travel and sets alarm when exceeded. Requires homing.'
+        description: 'Enables soft limits checks within machine travel and sets alarm when exceeded. Requires homing.',
+        inputType: 'switch'
     },
     {
         setting: '$21',
         message: 'Hard limits enable',
         units: 'boolean',
-        description: 'Enables hard limits. Immediately halts motion and throws an alarm when switch is triggered.'
+        description: 'Enables hard limits. Immediately halts motion and throws an alarm when switch is triggered.',
+        inputType: 'switch'
     },
     {
         setting: '$22',
         message: 'Homing cycle enable',
         units: 'boolean',
-        description: 'Enables homing cycle. Requires limit switches on all axes.'
+        description: 'Enables homing cycle. Requires limit switches on all axes.',
+        inputType: 'switch'
     },
     {
         setting: '$23',
         message: 'Homing direction invert',
         units: 'mask',
-        description: 'Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction.'
+        description: 'Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction.',
+        inputType: 'mask23'
     },
     {
         setting: '$24',
         message: 'Homing locate feed rate',
         units: 'mm/min',
-        description: 'Feed rate to slowly engage limit switch to determine its location accurately.'
+        description: 'Feed rate to slowly engage limit switch to determine its location accurately.',
+        inputType: 'number',
+        min: 1,
+        max: 30,
+        step: 1
     },
     {
         setting: '$25',
         message: 'Homing search seek rate',
         units: 'mm/min',
-        description: 'Seek rate to quickly find the limit switch before the slower locating phase.'
+        description: 'Seek rate to quickly find the limit switch before the slower locating phase.',
+        inputType: 'number',
+        min: 100,
+        max: 1000,
+        step: 100
     },
     {
         setting: '$26',
         message: 'Homing switch debounce delay',
         units: 'milliseconds',
-        description: 'Sets a short delay between phases of homing cycle to let a switch debounce.'
+        description: 'Sets a short delay between phases of homing cycle to let a switch debounce.',
+        inputType: 'number',
+        min: 5,
+        max: 255,
+        step: 5
     },
     {
         setting: '$27',
         message: 'Homing switch pull-off distance',
         units: 'millimeters',
-        description: 'Retract distance after triggering switch to disengage it. Homing will fail if switch isn\'t cleared.'
+        description: 'Retract distance after triggering switch to disengage it. Homing will fail if switch isn\'t cleared.',
+        inputType: 'number',
+        min: 0,
+        max: 5,
+        step: 0.5
     },
     {
         setting: '$30',
         message: 'Maximum spindle speed',
         units: 'RPM',
-        description: 'Maximum spindle speed. Sets PWM to 100% duty cycle.'
+        description: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
+        inputType: 'number',
+        min: 100,
+        max: 10000,
+        step: 100
     },
     {
         setting: '$31',
         message: 'Minimum spindle speed',
         units: 'RPM',
-        description: 'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.'
+        description: 'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
+        inputType: 'number',
+        min: 1,
+        max: 100,
+        step: 1
     },
     {
         setting: '$32',
         message: 'Laser-mode enable',
         units: 'boolean',
-        description: 'Enables laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed.'
+        description: 'Enables laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed.',
+        inputType: 'switch'
     },
     {
         setting: '$100',
         message: 'X-axis travel resolution',
         units: 'step/mm',
-        description: 'X-axis travel resolution in steps per millimeter.'
+        description: 'X-axis travel resolution in steps per millimeter.',
+        inputType: 'number',
+        min: 10,
+        max: 500,
+        step: 10
     },
     {
         setting: '$101',
         message: 'Y-axis travel resolution',
         units: 'step/mm',
-        description: 'Y-axis travel resolution in steps per millimeter.'
+        description: 'Y-axis travel resolution in steps per millimeter.',
+        inputType: 'number',
+        min: 10,
+        max: 500,
+        step: 10
     },
     {
         setting: '$102',
         message: 'Z-axis travel resolution',
         units: 'step/mm',
-        description: 'Z-axis travel resolution in steps per millimeter.'
+        description: 'Z-axis travel resolution in steps per millimeter.',
+        inputType: 'number',
+        min: 10,
+        max: 500,
+        step: 10
     },
     {
         setting: '$110',
         message: 'X-axis maximum rate',
         units: 'mm/min',
-        description: 'X-axis maximum rate. Used as G0 rapid rate.'
+        description: 'X-axis maximum rate. Used as G0 rapid rate.',
+        inputType: 'number',
+        min: 100,
+        max: 1500,
+        step: 100
     },
     {
         setting: '$111',
         message: 'Y-axis maximum rate',
         units: 'mm/min',
-        description: 'Y-axis maximum rate. Used as G0 rapid rate.'
+        description: 'Y-axis maximum rate. Used as G0 rapid rate.',
+        inputType: 'number',
+        min: 100,
+        max: 1500,
+        step: 100
     },
     {
         setting: '$112',
         message: 'Z-axis maximum rate',
         units: 'mm/min',
-        description: 'Z-axis maximum rate. Used as G0 rapid rate.'
+        description: 'Z-axis maximum rate. Used as G0 rapid rate.',
+        inputType: 'number',
+        min: 10,
+        max: 1000,
+        step: 10
     },
     {
         setting: '$120',
         message: 'X-axis acceleration',
         units: 'mm/sec^2',
-        description: 'X-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.'
+        description: 'X-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
+        inputType: 'number',
+        min: 1,
+        max: 15,
+        step: 1
     },
     {
         setting: '$121',
         message: 'Y-axis acceleration',
         units: 'mm/sec^2',
-        description: 'Y-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.'
+        description: 'Y-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
+        inputType: 'number',
+        min: 1,
+        max: 15,
+        step: 1
     },
     {
         setting: '$122',
         message: 'Z-axis acceleration',
         units: 'mm/sec^2',
-        description: 'Z-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.'
+        description: 'Z-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
+        inputType: 'number',
+        min: 1,
+        max: 15,
+        step: 1
     },
     {
         setting: '$130',
         message: 'X-axis maximum travel',
         units: 'millimeters',
-        description: 'Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.'
+        description: 'Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
+        inputType: 'number',
+        min: 1,
+        max: 1500,
+        step: 10
     },
     {
         setting: '$131',
         message: 'Y-axis maximum travel',
         units: 'millimeters',
-        description: 'Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.'
+        description: 'Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
+        inputType: 'number',
+        min: 1,
+        max: 1500,
+        step: 10
     },
     {
         setting: '$132',
         message: 'Z-axis maximum travel',
         units: 'millimeters',
-        description: 'Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.'
+        description: 'Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
+        inputType: 'number',
+        min: 1,
+        max: 1500,
+        step: 10
     }
 ];
