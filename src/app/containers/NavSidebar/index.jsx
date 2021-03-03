@@ -50,17 +50,16 @@ class NavSidebar extends PureComponent {
         const state = { ...this.state };
         return (
             <div className={styles.Sidebar}>
-                <NavSidebarLink url="" icon="fa-ruler" label="Flatten" />
-                <NavSidebarLink url="" icon="fa-border-style" label="Surface" />
-                <NavSidebarLink url="" icon="fa-wrench" label="Calibrate" />
-                <div className={!this.props.wizardDisabled ? 'enable' : `${styles.disable}`}>
-                    <NavSidebarLink
-                        url=""
-                        onClick={() => actions.openModal(MODAL_FIRMWARE)}
-                        icon="fa-hat-wizard"
-                        label="Wizard"
-                    />
-                </div>
+                <NavSidebarLink url="" icon="fa-ruler" label="Flatten" disabled/>
+                <NavSidebarLink url="" icon="fa-border-style" label="Surface" disabled/>
+                <NavSidebarLink url="" icon="fa-wrench" label="Calibrate" disabled/>
+                <NavSidebarLink
+                    url=""
+                    onClick={() => actions.openModal(MODAL_FIRMWARE)}
+                    icon="fa-hat-wizard"
+                    label="Wizard"
+                    disabled={this.props.wizardDisabled}
+                />
                 <NavSidebarLink url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa-cog" label="" />
                 {
                     state.modal.name === MODAL_FIRMWARE && <WizardModal state={state} modalClose={actions.closeModal} />
