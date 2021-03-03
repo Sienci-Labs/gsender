@@ -1,7 +1,7 @@
 {
-  "name": "SienciSender",
+  "name": "gSender",
   "version": "1.9.22",
-  "description": "A web-based interface for CNC milling controller running Grbl, Marlin, Smoothieware, or TinyG",
+  "description": "Electon sender for GRBL based CNC machines",
   "author": "Sienci Labs",
   "main": "./dist/cncjs/server-cli.js",
   "bin": {
@@ -73,7 +73,7 @@
     "appId": "org.sienci",
     "asar": false,
     "asarUnpack": [],
-    "productName": "Sienci Sender",
+    "productName": "gSender",
     "directories": {
       "buildResources": "electron-build",
       "output": "output",
