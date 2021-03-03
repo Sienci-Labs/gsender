@@ -1303,7 +1303,6 @@ class GrblController {
                 //const JOG_COMMAND_INTERVAL = 80;
                 const unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132 } = this.settings.settings;
-                console.log(axes);
 
                 // Borrowed from UGS
                 // /ugs-core/src/com/willwinder/universalgcodesender/utils/ContinuousJogWorker.java Line 107
@@ -1326,7 +1325,6 @@ class GrblController {
                     if (axes.Y) {
                         axes.Y *= (($131 - mpos.y) * 0.98).toFixed(1);
                     }
-                    console.log(axes);
                 } else {
                     jogFeedrate = 1000;
                     Object.keys(axes).forEach((axis) => {
