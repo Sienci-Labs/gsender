@@ -1,14 +1,254 @@
 .location-wrapper {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: inherit;
+
+    .displaypanelTable {
+    }
 
     .control-buttons {
+        align-items: center;
+        align-content: center;
+        align-self: center;
+    }
+
+    .endStopsActive {
+        display: block;
+        align-self: center;
+    }
+
+    .endStopsDisabled {
+        display: none;
+    }
+
+    .endStopActiveControls {
+        flex-direction: row;
+        width: 50%;
+        flex-grow: 1;
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-evenly;
-        align-items: center;
-        // gap: 1rem;
-        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        align-content: space-between;
+        padding: 0;
+    }
+
+    .buttoncontainer {
+        border: 5px solid black;
+        display: flex;
+    }
+
+    .centerhomebutton {
+        border: solid 1px #9ca3af;
+        color: #3E85C7;
+        background-color: #D1D5DB;
+        border-radius: .25rem;
+        width: 100%;
+        max-width: 10rem;
+        font-size: 14px;
+        padding: 5px;
+        margin: 0;
+        transition: 200ms ease-in-out;
+        --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
+        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+
+        &:hover {
+            border: 1px solid #3e85c7;
+            transition: 200ms ease-in-out;
+            background-color: #E5E7EB;
+            border-radius: .25rem;
+            --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+        }
+
+        &:disabled {
+            color: #6F7376;
+            background-color: #D9DCE1;
+            border: 1px solid #6F7376;
+            cursor: no-drop;
+            font-size: 14px;
+            --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+        }
+    }
+
+    .backleft {
+        background-color: #3e85c7;
+        clip-path: polygon(100% 30%, 30% 30%, 30% 100%, 0 100%, 0 0, 100% 0);
+        width: 40%;
+        height: 40%;
+        justify-content: flex-start;
+        display: flex;
+        border: none;
+        outline: none;
+        vertical-align: top;
+        text-align: left;
+
+        &disabled {
+            background-color: #3e85c7;
+            clip-path: polygon(100% 30%, 30% 30%, 30% 100%, 0 100%, 0 0, 100% 0);
+            width: 40%;
+            height: 40%;
+            justify-content: flex-start;
+            display: flex;
+            border: none;
+            outline: none;
+            vertical-align: top;
+            text-align: left;
+            opacity: .6;
+            cursor: no-drop;
+            pointer-events: none;
+        }
+    }
+
+    .bltext {
+        align-self: flex-start;
+        color: white;
+        margin-top: 2rem;
+        margin-left: -1px;
+        position: absolute;
+        display: flex;
+        font-size: 1rem;
+    }
+
+    .blhomeicon {
+        color: white;
+        font-size: 18px;
+        margin-left: -3px;
+    }
+
+    .backRight {
+        background-color: #3e85c7;
+        clip-path: polygon(0 30%, 0 0, 100% 0, 100% 100%, 70% 100%, 70% 30%);
+        margin-left: auto;
+        border: none;
+        display: flex;
+        outline: none;
+        justify-content: flex-end;
+        width: 40%;
+        height: 40%;
+
+        &disabled {
+            background-color: #3e85c7;
+            clip-path: polygon(0 30%, 0 0, 100% 0, 100% 100%, 70% 100%, 70% 30%);
+            margin-left: auto;
+            border: none;
+            display: flex;
+            outline: none;
+            justify-content: flex-end;
+            width: 40%;
+            height: 40%;
+            opacity: .6;
+            cursor: no-drop;
+            pointer-events: none;
+        }
+    }
+
+    .brtext {
+        display: flex;
+        color: white;
+        margin-right: -2px;
+        font-size: 1rem;
+        margin-top: 2rem;
+        justify-content: flex-end;
+    }
+
+    .brhomeicon {
+        color: #fff;
+        font-size: 18px;
+        margin-right: -16px;
+    }
+
+    .frontleft {
+        clip-path: polygon(30% 70%, 100% 70%, 100% 100%, 0 100%, 0 0, 30% 0);
+        background-color: #3e85c7;
+        width: 40%;
+        display: flex;
+        height: 40%;
+        justify-content: flex-start;
+        align-items: normal;
+        margin-top: auto;
+        margin-left: 0;
+        border: none;
+        outline: none;
+
+        &disabled {
+            clip-path: polygon(30% 70%, 100% 70%, 100% 100%, 0 100%, 0 0, 30% 0);
+            background-color: #3e85c7;
+            width: 40%;
+            display: flex;
+            height: 40%;
+            justify-content: flex-start;
+            align-items: normal;
+            margin-top: auto;
+            margin-left: 0;
+            border: none;
+            outline: none;
+            opacity: .6;
+            cursor: no-drop;
+            pointer-events: none;
+        }
+    }
+
+    .fltext {
+        display: flex;
+        justify-content: flex-start;
+        margin-left: -1px;
+        margin-top: 3rem;
+        color: #fff;
+        font-size: 1rem;
+    }
+
+    .flhomeicon {
+        color: #fff;
+        font-size: 18px;
+        margin-left: -16px;
+        margin-top: 62px;
+    }
+
+    .frontright {
+        clip-path: polygon(0 70%, 70% 70%, 70% 0, 100% 0, 100% 100%, 0 100%);
+        background-color: #3e85c7;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        border: none;
+        outline: none;
+        margin-left: auto;
+        margin-top: auto;
+        width: 40%;
+        height: 40%;
+
+        &disabled {
+            clip-path: polygon(0 70%, 70% 70%, 70% 0, 100% 0, 100% 100%, 0 100%);
+            background-color: #3e85c7;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            border: none;
+            outline: none;
+            margin-left: auto;
+            margin-top: auto;
+            width: 40%;
+            height: 40%;
+            opacity: .6;
+            cursor: no-drop;
+            pointer-events: none;
+        }
+    }
+
+    .frtext {
+        display: flex;
+        justify-content: flex-end;
+        color: #fff;
+        margin-bottom: 2rem;
+        margin-right: -1rem;
+        font-size: 1rem;
+    }
+
+    .frhomeicon {
+        color: #fff;
+        font-size: 18px;
+        margin-right: -5px;
     }
 }

@@ -1,5 +1,10 @@
+/* eslint-disable dot-notation */
+/* eslint-disable eqeqeq */
+
 import ensureArray from 'ensure-array';
+import cx from 'classnames';
 import includes from 'lodash/includes';
+import Space from 'app/components/Space';
 import _isEqual from 'lodash/isEqual';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -35,7 +40,53 @@ class DisplayPanel extends PureComponent {
         actions: PropTypes.object
     };
 
+    controllerEvents = {
+        'controller:state': (data, controllerState) => {
+            let controllersAlarmState = this.state.controllersAlarmState;
+            let hardStopAlarm = controllerState.status.alarmcode;
+            this.setState(prevState => ({
+                controllersAlarmState: hardStopAlarm
+            }));
+            if (controllersAlarmState == '1') {
+                controller.command('gcode:stop', { force: true });
+            }
+        },
+        'controller:settings': (type, controllerSettings) => {
+            this.setState(state => ({
+                ...state.controller,
+                homePosition: controllerSettings.settings.$23
+            }));
+        },
+        'sender:status': (data, controllerState) => {
+            let controllersAlarmState = this.state.controllersAlarmState;
+            if (controllersAlarmState == '1') {
+                controller.command('gcode:stop', { force: true });
+            }
+        }
+    }
+
+
+    componentWillUnmount() {
+        this.removeControllerEvents();
+    }
+
+    addControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.addListener(eventName, callback);
+        });
+    }
+
+    removeControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.removeListener(eventName, callback);
+        });
+    }
+
     state = {
+        homingHasBeenRun: false,
+        controllerAlarmState: null,
         positionInput: {
             [AXIS_E]: false,
             [AXIS_X]: false,
@@ -101,7 +152,7 @@ class DisplayPanel extends PureComponent {
                 </td>
                 <td className={styles.machinePosition}>
                     <PositionLabel value={wpos} />
-                    {!showPositionInput && <PositionLabel value={mpos} small /> }
+                    {!showPositionInput && <PositionLabel value={mpos} small />}
                 </td>
             </tr>
         );
@@ -122,31 +173,148 @@ class DisplayPanel extends PureComponent {
 
     componentDidMount() {
         store.on('change', this.updateMachineProfileFromStore);
+        this.addControllerEvents();
+    }
+
+    actions = {
+        jogtoFRCorner: () => {
+            const xLimit = this.state.machineProfile.limits.xmax;
+            const yLimit = this.state.machineProfile.limits.ymax;
+            const zLimit = this.state.machineProfile.limits.zmax;
+            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
+            controller.command('gcode', `G53 G0 X${xLimit} Y${yLimit} F5000`);
+        },
+        jogtoFLCorner: () => {
+            const xLimit = this.state.machineProfile.limits.xmax;
+            const yLimit = this.state.machineProfile.limits.ymax;
+            const zLimit = this.state.machineProfile.limits.zmax;
+            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
+            controller.command('gcode', `G53 G0 X${-xLimit} Y${yLimit} F5000`);
+        },
+        jogtoBRCorner: () => {
+            const xLimit = this.state.machineProfile.limits.xmax;
+            const yLimit = this.state.machineProfile.limits.ymax;
+            const zLimit = this.state.machineProfile.limits.zmax;
+            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
+            controller.command('gcode', `G53 G0 X${xLimit} Y${-yLimit} F5000`);
+        },
+        jogtoBLCorner: () => {
+            const xLimit = this.state.machineProfile.limits.xmax;
+            const yLimit = this.state.machineProfile.limits.ymax;
+            const zLimit = this.state.machineProfile.limits.zmax;
+            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
+            controller.command('gcode', `G53 G0 X${-xLimit} Y${-yLimit} F5000`);
+        },
+        startHoming: () => {
+            const { actions } = this.props;
+            let invertedHomePosition = this.state.homePosition;
+            const xLimit = this.state.machineProfile.limits.xmax;
+            const yLimit = this.state.machineProfile.limits.ymax;
+            const zLimit = this.state.machineProfile.limits.zmax;
+
+            if (invertedHomePosition === '0') { //Nothing Inverted
+                controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
+                controller.command('gcode', `G53 G0 X${-xLimit} Y${-yLimit} F5000`);
+                this.setState(prevState => ({
+                    homingHasBeenRun: true
+                }));
+                this.setState(prevState => ({
+                    houseIconPos: 'BL'
+                }));
+            } else if (invertedHomePosition === '1') { //X Inverted
+                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
+                controller.command('gcode', `G53 G0 X${xLimit} Y${-yLimit} F5000`);
+                this.setState(prevState => ({
+                    homingHasBeenRun: true
+                }));
+                this.setState(prevState => ({
+                    houseIconPos: 'FL'
+                }));
+            } else if (invertedHomePosition === '3') { //X AND Y inverted
+                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
+                controller.command('gcode', `G53 G0 X${xLimit} Y${yLimit} F5000`);
+                this.setState(prevState => ({
+                    homingHasBeenRun: true
+                }));
+                this.setState(prevState => ({
+                    houseIconPos: 'FR'
+                }));
+            } else if (invertedHomePosition === '4') { //Z inverted
+                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
+                controller.command('gcode', `G53 G0 X${-xLimit} Y${-yLimit} F5000`);
+                this.setState(prevState => ({
+                    homingHasBeenRun: true
+                }));
+                this.setState(prevState => ({
+                    houseIconPos: 'BL'
+                }));
+            } else if (invertedHomePosition === '5') { //X and Z inverted
+                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
+                controller.command('gcode', `G53 G0 X${xLimit} Y${-yLimit} F5000`);
+                this.setState(prevState => ({
+                    homingHasBeenRun: true
+                }));
+                this.setState(prevState => ({
+                    houseIconPos: 'BR'
+                }));
+            } else if (invertedHomePosition === '6') { //Y and Z inverted
+                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
+                controller.command('gcode', `G53 G0 X${-xLimit} Y${yLimit} F5000`);
+                this.setState(prevState => ({
+                    homingHasBeenRun: true
+                }));
+                this.setState(prevState => ({
+                    houseIconPos: 'FL'
+                }));
+            } else if (invertedHomePosition === '7') { //X, Y and Z inverted
+                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
+                controller.command('gcode', `G53 G0 X${xLimit} Y${yLimit} F5000`);
+
+                this.setState(prevState => ({
+                    homingHasBeenRun: true
+                }));
+                this.setState(prevState => ({
+                    houseIconPos: 'FR'
+                }));
+            }
+            const wcs = actions.getWorkCoordinateSystem();
+            const p = {
+                'G54': 1,
+                'G55': 2,
+                'G56': 3,
+                'G57': 4,
+                'G58': 5,
+                'G59': 6
+            }[wcs] || 0;
+
+            controller.command('gcode', `G10 L20 P${p} X0 Y0`);
+        }
     }
 
     render() {
         const { axes, actions, canClick } = this.props;
+        let { homingHasBeenRun } = this.state;
+        let houseIconPos = this.state.houseIconPos;
         const hasAxisX = includes(axes, AXIS_X);
         const hasAxisY = includes(axes, AXIS_Y);
         const hasAxisZ = includes(axes, AXIS_Z);
         const machineProfile = this.state.machineProfile;
+        let { endstops } = machineProfile;
 
         return (
             <Panel className={styles.displayPanel}>
                 <div className={styles.locationWrapper}>
-                    <table>
+                    <table className={styles.displaypanelTable}>
                         <tbody>
                             {hasAxisX && this.renderAxis(AXIS_X)}
                             {hasAxisY && this.renderAxis(AXIS_Y)}
                             {hasAxisZ && this.renderAxis(AXIS_Z)}
                         </tbody>
                     </table>
-
-                    <div className={styles.controlButtons}>
+                    <div className={endstops === true ? `${styles.endStopsActive}` : `${styles.controlButtons}`}>
                         <FunctionButton
                             onClick={() => {
                                 const wcs = actions.getWorkCoordinateSystem();
-
                                 const p = {
                                     'G54': 1,
                                     'G55': 2,
@@ -174,31 +342,67 @@ class DisplayPanel extends PureComponent {
                             disabled={!canClick}
                             primary
                         >
-                            <i className="fas fa-chart-line" />
-                            Go to Zero
+
                         </FunctionButton>
-                        <FunctionButton
-                            primary
-                            onClick={() => {
-                                controller.command('homing');
-                            }}
-                            disabled={!canClick || !machineProfile.endstops}
-                            hidden={!machineProfile.endstops}
-                        >
-                            <i className="fas fa-home" />
-                            Home
-                        </FunctionButton>
-                        <FunctionButton
-                            primary
-                            onClick={() => {
-                                controller.command('gcode', 'G28 G91'); //Go to Home Position
-                            }}
+                    </div>
+                    <div className={endstops === true ? `${styles.endStopActiveControls}` : `${styles.endStopsDisabled}`}>
+                        <button
+                            type="button"
+                            title={i18n._('Back Left')}
                             disabled={!canClick}
-                            hidden={!machineProfile.endstops}
+                            className={homingHasBeenRun === true ? `${styles.backleft}` : `${styles.backleftdisabled}`}
+                            onClick={() => {
+                                this.actions.jogtoBLCorner();
+                            }}
                         >
-                            <i className="fas fa-chart-line" />
-                            Go Home
-                        </FunctionButton>
+                            <i className={houseIconPos === 'BL' ? (cx('fa', 'fa-home', styles['blhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-320deg'])} style={{ fontSize: 18 }} />
+                            <h3 className={styles.bltext}>BL</h3>
+                        </button>
+                        <button
+                            type="button"
+                            title={i18n._('Back Right')}
+                            disabled={!canClick}
+                            className={homingHasBeenRun === true ? `${styles.backRight}` : `${styles.backRightdisabled}`}
+                            onClick={() => {
+                                this.actions.jogtoBRCorner();
+                            }}
+                        >
+                            <i className={houseIconPos === 'BR' ? (cx('fa', 'fa-home', styles['brhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-45deg'])} style={{ fontSize: 18 }} />
+                            <h3 className={styles.brtext}>BR</h3>
+                        </button>
+                        <button
+                            type="button"
+                            disabled={!canClick}
+                            className={styles.centerhomebutton}
+                            onClick={
+                                this.actions.startHoming}
+                        > <Space width="1" />
+                            <div className="fa fa-home" /> Start Homing
+                        </button>
+                        <button
+                            type="button"
+                            title={i18n._('Front Left')}
+                            disabled={!canClick}
+                            className={homingHasBeenRun === true ? `${styles.frontleft}` : `${styles.frontleftdisabled}`}
+                            onClick={() => {
+                                this.actions.jogtoFLCorner();
+                            }}
+                        >
+                            <h3 className={styles.fltext}>FL</h3>
+                            <i className={houseIconPos === 'FL' ? (cx('fa', 'fa-home', styles['flhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate--135deg'])} style={{ fontSize: 18 }} />
+                        </button>
+                        <button
+                            type="button"
+                            title={i18n._('Front Right')}
+                            disabled={!canClick}
+                            className={homingHasBeenRun === true ? `${styles.frontright}` : `${styles.frontrightdisabled}`}
+                            onClick={() => {
+                                this.actions.jogtoFRCorner();
+                            }}
+                        >
+                            <h3 className={styles.frtext}>FR</h3>
+                            <i className={houseIconPos === 'FR' ? (cx('fa', 'fa-home', styles['frhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate--225deg'])} style={{ fontSize: 18 }} />
+                        </button>
                     </div>
                 </div>
             </Panel>

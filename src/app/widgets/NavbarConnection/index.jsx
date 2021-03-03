@@ -160,7 +160,9 @@ class NavbarConnectionWidget extends PureComponent {
             }));
         },
         'serialport:open': (options) => {
-            this.props.disableWizardFunction();
+            setTimeout(() => {
+                this.props.disableWizardFunction();
+            }, 1500); // delay 1500ms so wizard can load settings
             const { controllerType, port, baudrate, inuse } = options;
             const ports = this.state.ports.map((o) => {
                 if (o.port !== port) {

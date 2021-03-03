@@ -1,6 +1,3 @@
-/* eslint-disable brace-style */
-/* eslint-disable indent */
-/* eslint-disable react/jsx-closing-bracket-location */
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import i18n from 'app/lib/i18n';
@@ -44,6 +41,12 @@ class NumberInputs extends PureComponent {
         let value = event.target.value;
         let name = event.target.name;
         this.props.disableSettingsButton();
+        this.setState(prevState => ({
+            defaultSettings: {
+                ...prevState.defaultSettings,
+                [name]: value
+            }
+        }));
         this.props.grabNewNumberInputSettings(name, value);
     }
 
@@ -53,13 +56,14 @@ class NumberInputs extends PureComponent {
         let max = this.props.max;
         let step = this.props.step;
         let units = this.props.units;
+        let placeHolder = this.state.defaultSettings[title];
         return (
             <div className={styles.numberInputs}>
                 <input
                     name={title}
                     type="number"
                     className={styles.formControlModal}
-                    placeholder={this.state.defaultSettings[title]}
+                    value={placeHolder || ''}
                     onChange={this.handleNumberInputs}
                     min={min}
                     max={max}
