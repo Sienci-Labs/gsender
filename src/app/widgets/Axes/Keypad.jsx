@@ -122,7 +122,8 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, actions, axes, units } = this.props;
+        // const { canClick, actions, axes, units } = this.props;
+        const { canClick, actions, axes } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -240,9 +241,7 @@ class Keypad extends PureComponent {
                             disabled={!canClick} type="button"
                             className={styles.movementRateButton}
                             onClick={() => {
-                                const xyStep = (units === 'mm') ? 20 : 1;
-                                const zStep = (units === 'mm') ? 10 : 0.5;
-                                actions.changeMovementRates(xyStep, zStep, 5000);
+                                actions.setJogFromPreset('rapid');
                             }}
                         >
                             Rapid
@@ -252,9 +251,7 @@ class Keypad extends PureComponent {
                             type="button"
                             className={styles.movementRateButton}
                             onClick={() => {
-                                const xyStep = (units === 'mm') ? 5 : 0.2;
-                                const zStep = (units === 'mm') ? 2 : 0.04;
-                                actions.changeMovementRates(xyStep, zStep, 3000);
+                                actions.setJogFromPreset('normal');
                             }}
                         >
                             Normal
@@ -264,9 +261,7 @@ class Keypad extends PureComponent {
                             type="button"
                             className={styles.movementRateButton}
                             onClick={() => {
-                                const xyStep = (units === 'mm') ? 0.5 : 0.02;
-                                const zStep = (units === 'mm') ? 0.1 : 0.004;
-                                actions.changeMovementRates(xyStep, zStep, 1000);
+                                actions.setJogFromPreset('precise');
                             }}
                         >
                             Precise
