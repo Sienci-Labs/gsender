@@ -342,13 +342,14 @@ class DisplayPanel extends PureComponent {
                             disabled={!canClick}
                             primary
                         >
-
+                            <i className="fas fa-chart-line" />
+                            Go to Zero
                         </FunctionButton>
                     </div>
                     <div className={endstops === true ? `${styles.endStopActiveControls}` : `${styles.endStopsDisabled}`}>
                         <button
                             type="button"
-                            title={i18n._('Back Left')}
+                            title="Back Left"
                             disabled={!canClick}
                             className={homingHasBeenRun === true ? `${styles.backleft}` : `${styles.backleftdisabled}`}
                             onClick={() => {
@@ -360,7 +361,7 @@ class DisplayPanel extends PureComponent {
                         </button>
                         <button
                             type="button"
-                            title={i18n._('Back Right')}
+                            title="Back Right"
                             disabled={!canClick}
                             className={homingHasBeenRun === true ? `${styles.backRight}` : `${styles.backRightdisabled}`}
                             onClick={() => {
@@ -381,7 +382,7 @@ class DisplayPanel extends PureComponent {
                         </button>
                         <button
                             type="button"
-                            title={i18n._('Front Left')}
+                            title="Front Left"
                             disabled={!canClick}
                             className={homingHasBeenRun === true ? `${styles.frontleft}` : `${styles.frontleftdisabled}`}
                             onClick={() => {
@@ -393,7 +394,7 @@ class DisplayPanel extends PureComponent {
                         </button>
                         <button
                             type="button"
-                            title={i18n._('Front Right')}
+                            title="Front Right"
                             disabled={!canClick}
                             className={homingHasBeenRun === true ? `${styles.frontright}` : `${styles.frontrightdisabled}`}
                             onClick={() => {

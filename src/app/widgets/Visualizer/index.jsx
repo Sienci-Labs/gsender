@@ -25,7 +25,6 @@ import Visualizer from './Visualizer';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
-import TopAccessControl from './TopAccessControl';
 import {
     // Units
     IMPERIAL_UNITS,
