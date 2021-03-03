@@ -99,19 +99,40 @@ const defaultState = {
                 feedrate: 3000,
                 keypad: false,
                 rapid: {
-                    xyStep: 20,
-                    zStep: 10,
-                    feedrate: 5000,
+                    mm: {
+                        xyStep: 20,
+                        zStep: 10,
+                        feedrate: 5000,
+                    },
+                    in: {
+                        xyStep: 1,
+                        zStep: 0.5,
+                        feedrate: 5000,
+                    }
                 },
                 normal: {
-                    xyStep: 5,
-                    zStep: 2,
-                    feedrate: 3000,
+                    mm: {
+                        xyStep: 5,
+                        zStep: 2,
+                        feedrate: 3000,
+                    },
+                    in: {
+                        xyStep: 0.2,
+                        zStep: 0.04,
+                        feedrate: 3000,
+                    },
                 },
                 precise: {
-                    xyStep: 0.5,
-                    zStep: 0.1,
-                    feedrate: 1000,
+                    mm: {
+                        xyStep: 0.5,
+                        zStep: 0.1,
+                        feedrate: 1000,
+                    },
+                    in: {
+                        xyStep: 0.02,
+                        zStep: 0.004,
+                        feedrate: 1000,
+                    },
                 },
                 imperial: {
                     step: IMPERIAL_STEPS.indexOf(1), // Defaults to 1 inch
