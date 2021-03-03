@@ -4,9 +4,9 @@ import classNames from 'classnames';
 
 import styles from './index.styl';
 
-const Input = ({ value, label, units, onChange, additionalProps }) => {
+const Input = ({ value, label, units, onChange, additionalProps, className }) => {
     return (
-        <div className={classNames(styles.input, 'form-group')}>
+        <div className={classNames(styles.input, 'form-group', className)}>
             <label htmlFor="">{`${label}`}</label>
             <div className="input-group">
                 <input
@@ -31,6 +31,7 @@ Input.propTypes = {
         PropTypes.number,
     ]),
     additionalProps: PropTypes.object,
+    className: PropTypes.string,
 };
 
 Input.defaultProps = {
