@@ -16,7 +16,7 @@ import MachineProfileOptions from './MachineProfiles/Options';
 import Fieldset from './FieldSet';
 
 const GeneralSettings = ({ active, state, actions }) => {
-    const { units, reverseWidgets } = state;
+    const { units, reverseWidgets, autoReconnect } = state;
     return (
         <div className={classNames(
             styles.hidden,
@@ -56,12 +56,18 @@ const GeneralSettings = ({ active, state, actions }) => {
                             <JogSpeeds />
                         </Fieldset>
 
-                        <Fieldset legend="Reverse Workspace">
+                        <Fieldset legend="Workspace">
                             <ToggleSwitch
                                 checked={reverseWidgets}
                                 onChange={() => actions.general.setReverseWidgets()}
                             />
-                            <small className={styles['item-info']}>Functionality appears on the left if toggled on.</small>
+                            <small className={styles['item-info']}>Reverse workspace layout</small>
+                            <br />
+                            <ToggleSwitch
+                                checked={autoReconnect}
+                                onChange={() => actions.general.setAutoReconnect()}
+                            />
+                            <small className={styles['item-info']}>Connect Automatically</small>
                         </Fieldset>
                     </div>
                 </div>
