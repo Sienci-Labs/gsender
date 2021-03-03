@@ -89,6 +89,8 @@
 
 .btn-Keypad {
     height: clamp(30px, 3vw, 60px);
+    margin: 0 !important;
+    padding: 0 !important;
     border: none;
     outline: none;
     background: #3e85c7;
@@ -131,17 +133,16 @@
 }
 
 .btn-up-left{
-    clip-path: url("#tl");
+    clip-path: url(#bl);
 }
 .btn-up-right{
-    clip-path: url("#tr");
+    clip-path: url(#br);
 }
 .btn-down-left{
-    background-size: cover;
-    clip-path: url("#bl");
+    clip-path: url(#fl);
 }
 .btn-down-right{
-    clip-path: url("#br");
+    clip-path: url(#fr);
 }
 
 .hidden {
@@ -206,4 +207,10 @@
         cursor: no-drop;
         color: #9ca3af
     }
+}
+
+.hideSVG {
+    position: absolute;
+    width: 0;
+    height: 0;
 }
