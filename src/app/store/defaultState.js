@@ -29,7 +29,26 @@ const defaultState = {
             }
         },
         machineProfile: {
-            id: null
+            id: 5,
+            company: 'Sienci Labs',
+            name: 'LongMill',
+            type: '30x30',
+            width: 792,
+            units: 'mm',
+            depth: 845,
+            height: 114.3,
+            endstops: false,
+            spindle: false,
+            coolant: false,
+            laser: false,
+            limits: {
+                xmin: 0,
+                ymin: 0,
+                zmin: 0,
+                xmax: 792,
+                ymax: 114.3,
+                zmax: 845,
+            }
         },
         probeProfile: {
             xyThickness: 10,
@@ -76,9 +95,45 @@ const defaultState = {
             axes: ['x', 'y', 'z'],
             jog: {
                 xyStep: 5,
-                zStep: 0.5,
-                feedrate: 5000,
+                zStep: 2,
+                feedrate: 3000,
                 keypad: false,
+                rapid: {
+                    mm: {
+                        xyStep: 20,
+                        zStep: 10,
+                        feedrate: 5000,
+                    },
+                    in: {
+                        xyStep: 1,
+                        zStep: 0.5,
+                        feedrate: 5000,
+                    }
+                },
+                normal: {
+                    mm: {
+                        xyStep: 5,
+                        zStep: 2,
+                        feedrate: 3000,
+                    },
+                    in: {
+                        xyStep: 0.2,
+                        zStep: 0.04,
+                        feedrate: 3000,
+                    },
+                },
+                precise: {
+                    mm: {
+                        xyStep: 0.5,
+                        zStep: 0.1,
+                        feedrate: 1000,
+                    },
+                    in: {
+                        xyStep: 0.02,
+                        zStep: 0.004,
+                        feedrate: 1000,
+                    },
+                },
                 imperial: {
                     step: IMPERIAL_STEPS.indexOf(1), // Defaults to 1 inch
                     distances: []

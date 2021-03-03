@@ -1,12 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import store from 'app/store';
 import TabbedWidget from 'app/components/TabbedWidget';
 import controller from 'app/lib/controller';
 import WidgetConfig from '../WidgetConfig';
 import ProbeWidget from '../Probe';
 import MacroWidget from '../Macro';
 import ConsoleWidget from '../Console';
-import LaserWidget from '../Laser';
+// import LaserWidget from '../Laser';
 import SpindleWidget from '../Spindle';
 
 import {
@@ -93,12 +94,38 @@ class SecondaryFunctionality extends PureComponent {
 
     component = null;
 
+    /**
+     * Function to listen for store changes and add or remove the spindle tab from state
+     */
+    handleMachineProfileChange = () => {
+        const machineProfile = store.get('workspace.machineProfile');
+
+        if (!machineProfile) {
+            return;
+        }
+
+        if (machineProfile.spindle) {
+            const hasSpindleWidget = this.state.tabs.find(tab => tab.widgetId === 'spindle');
+            if (!hasSpindleWidget) {
+                this.setState((prev) => ({ ...prev, tabs: [...prev.tabs, { label: 'Spindle', widgetId: 'spindle', component: SpindleWidget }] }));
+            }
+        } else {
+            const filteredTabs = this.state.tabs.filter(tab => tab.widgetId !== 'spindle');
+
+            this.setState((prev) => ({ ...prev, selectedTab: prev.selectedTab === 3 ? 0 : prev.selectedTab, tabs: filteredTabs }));
+        }
+    }
+
     componentDidMount() {
         this.addControllerEvents();
+        store.on('change', this.handleMachineProfileChange);
+
+        this.handleMachineProfileChange();
     }
 
     componentWillUnmount() {
         this.removeControllerEvents();
+        store.removeListener('change', this.handleMachineProfileChange);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -133,28 +160,28 @@ class SecondaryFunctionality extends PureComponent {
                 {
                     label: 'Probe',
                     widgetId: 'probe',
-                    component: ProbeWidget
+                    component: ProbeWidget,
                 },
                 {
                     label: 'Macros',
                     widgetId: 'macro',
-                    component: MacroWidget
+                    component: MacroWidget,
                 },
                 {
                     label: 'Console',
                     widgetId: 'console',
-                    component: ConsoleWidget
+                    component: ConsoleWidget,
                 },
-                {
-                    label: 'Spindle',
-                    widgetId: 'spindle',
-                    component: SpindleWidget
-                },
-                {
-                    label: 'Laser',
-                    widgetId: 'laser',
-                    component: LaserWidget
-                },
+                // {
+                //     label: 'Spindle',
+                //     widgetId: 'spindle',
+                //     component: SpindleWidget,
+                // },
+                // {
+                //     label: 'Laser',
+                //     widgetId: 'laser',
+                //     component: LaserWidget
+                // },
             ]
         };
     }

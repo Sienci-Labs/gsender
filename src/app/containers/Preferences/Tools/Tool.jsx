@@ -15,7 +15,7 @@ const Tool = ({ metricDiameter, imperialDiameter, type, onDelete }) => {
                 alt="Delete Tool"
                 onClick={onDelete}
             >
-                <i className="fa fa-minus" />
+                <i className="far fa-trash-alt" />
             </button>
 
         </div>

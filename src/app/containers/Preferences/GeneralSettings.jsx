@@ -1,7 +1,8 @@
 import React from 'react';
 import classNames from 'classnames';
-import Dropdown, { MenuItem } from 'app/components/Dropdown';
+// import Dropdown, { MenuItem } from 'app/components/Dropdown';
 import ToggleSwitch from 'app/components/ToggleSwitch';
+import { RadioGroup, RadioButton } from 'app/components/Radio';
 import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 import {
@@ -9,79 +10,60 @@ import {
     METRIC_UNITS,
 } from '../../constants';
 
+import JogSpeeds from './General/JogSpeeds';
+import MachineProfileOptions from './MachineProfiles/Options';
+
+import Fieldset from './FieldSet';
 
 const GeneralSettings = ({ active, state, actions }) => {
-    const { units, reverseWidgets, autoReconnect } = state;
+    const { units, reverseWidgets } = state;
     return (
         <div className={classNames(
             styles.hidden,
-            styles.settingsContainer,
+            styles['settings-wrapper'],
             { [styles.visible]: active }
         )}
         >
-            <h3>
-                General Settings
+            <h3 className={styles.settingsTitle}>
+                General
             </h3>
             <div className={styles.toolMain}>
-                <div className={styles.toolListings}>
-                    <h4>Preferred Units</h4>
-                    <div className={styles.rowSpace}>
-                        <Dropdown
-                            style={{
-                                width: '100%'
-                            }}
-                            btnSize="lg"
-                        >
-                            <Dropdown.Toggle
-                                btnStyle="flat"
-                                style={{
-                                    textAlign: 'right',
-                                    width: '100%'
-                                }}
-                            >
-                                {units === IMPERIAL_UNITS && i18n._('Inches (G20)')}
-                                {units === METRIC_UNITS && i18n._('Millimeters (G21)')}
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu size="lg">
-                                <MenuItem header>
-                                    {i18n._('Units')}
-                                </MenuItem>
-                                <MenuItem
-                                    active={units === IMPERIAL_UNITS}
-                                    onSelect={() => {
-                                        actions.general.setUnits(IMPERIAL_UNITS);
-                                    }}
-                                    size="lg"
-                                >
-                                    {i18n._('Inches (G20)')}
-                                </MenuItem>
-                                <MenuItem
-                                    active={units === METRIC_UNITS}
-                                    onSelect={() => {
-                                        actions.general.setUnits(METRIC_UNITS);
-                                    }}
-                                >
-                                    {i18n._('Millimeters (G21)')}
-                                </MenuItem>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                        <small>Units to be displayed throughout the interface.</small>
-                    </div>
-                </div>
-                <div className={styles.addToolForm}>
-                    <h4>Reverse Workspace</h4>
-                    <ToggleSwitch
-                        checked={reverseWidgets}
-                        onChange={() => actions.general.setReverseWidgets()}
-                    />
-                    <small>Functionality appears on the left if toggled on.</small>
 
-                    <h4>Auto-Reconnect</h4>
-                    <ToggleSwitch
-                        checked={autoReconnect}
-                        onChange={() => actions.general.setAutoReconnect()}
-                    />
-                    <small>Attempt to reconnect to the same device you last connected to on program start.</small>
+                <div className={styles.generalArea}>
+                    <div style={{ width: '50% ' }}>
+                        <Fieldset legend="Preferred Units">
+                            <RadioGroup
+                                name="units"
+                                value={units}
+                                depth={2}
+                                onChange={(value, event) => actions.general.setUnits(value)}
+                            >
+                                <div>
+                                    <RadioButton label={i18n._('Inches (G20)')} value={IMPERIAL_UNITS} />
+                                    <RadioButton label={i18n._('Millimeters (G21)')} value={METRIC_UNITS} />
+                                </div>
+                            </RadioGroup>
+                            <small className={styles['item-info']}>Units to be displayed throughout the interface</small>
+                        </Fieldset>
+
+                        <Fieldset legend="Machine Profile" className={styles['mb-0']}>
+                            <MachineProfileOptions />
+                        </Fieldset>
+                    </div>
+
+                    <div style={{ width: '50% ' }}>
+                        <Fieldset legend="Jog Speed Presets">
+                            <JogSpeeds />
+                        </Fieldset>
+
+                        <Fieldset legend="Reverse Workspace">
+                            <ToggleSwitch
+                                checked={reverseWidgets}
+                                onChange={() => actions.general.setReverseWidgets()}
+                            />
+                            <small className={styles['item-info']}>Functionality appears on the left if toggled on.</small>
+                        </Fieldset>
+                    </div>
                 </div>
             </div>
 

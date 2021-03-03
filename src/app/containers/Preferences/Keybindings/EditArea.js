@@ -227,11 +227,11 @@ export default class EditArea extends Component {
             <div className={styles.wrapper}>
 
                 <div className={styles['edit-info']}>
-                    <h5 style={{ textAlign: 'center', textDecoration: 'underline' }}><strong>Action</strong></h5>
-                    <h5 style={{ textAlign: 'center', textDecoration: 'underline' }}><strong>Current Shortcut</strong></h5>
+                    <h4 className={styles['edit-subtitle']}>Action</h4>
+                    <h4 className={styles['edit-subtitle']}>Current Shortcut</h4>
 
-                    <h5 style={{ textAlign: 'center' }}>{shortcut.title}</h5>
-                    <h5 style={{ textAlign: 'center' }}>{shortcutkeys}</h5>
+                    <h4 style={{ textAlign: 'center' }}>{shortcut.title}</h4>
+                    <h4 style={{ textAlign: 'center' }}>{shortcutkeys}</h4>
                 </div>
 
                 <div className={styles['new-shortcut']}>
