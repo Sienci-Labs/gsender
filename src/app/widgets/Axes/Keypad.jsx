@@ -1,9 +1,8 @@
 /* eslint-disable react/self-closing-comp */
-import cx from 'classnames';
 import ensureArray from 'ensure-array';
 import frac from 'frac';
-import _includes from 'lodash/includes';
 import _uniqueId from 'lodash/uniqueId';
+import _includes from 'lodash/includes';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
@@ -19,6 +18,7 @@ import {
     METRIC_STEPS
 } from '../../constants';
 import styles from './index.styl';
+import JogControl from './components/JogControl';
 
 const KeypadText = styled.span`
     position: relative;
@@ -122,242 +122,153 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, axes, jog, actions } = this.props;
+        const { canClick, actions, axes, units } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
         const canClickZ = canClick && _includes(axes, 'z');
-        const highlightX = canClickX && (jog.keypad || jog.axis === 'x');
-        const highlightY = canClickY && (jog.keypad || jog.axis === 'y');
-        const highlightZ = canClickZ && (jog.keypad || jog.axis === 'z');
+
+        const xyControlsDisabled = !canClickXY;
+        const zControlsDisabled = !canClickZ;
+
+        // Feedrates and distances
+        const xyDistance = actions.getXYJogDistance();
+        const zDistance = actions.getZJogDistance();
+        const feedrate = actions.getFeedrate();
 
         return (
             <div className={styles.keypad}>
-                <div className="row no-gutters">
-                    <div className="col-xs-8">
-                        <div className={styles.rowSpace}>
-                            <div className="row no-gutters">
-                                <div className="col-xs-3">
-                                    <div className={styles.colSpace}>
-                                        <button
-                                            className={cx(styles.btnKeypad, styles.hidden)}
-                                            type="button"
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ X: -distance, Y: distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickXY}
-                                            title={i18n._('Move X- Y+')}
-                                        >
-                                            <i className={cx('fa', 'fa-arrow-circle-up', styles['rotate--45deg'])} style={{ fontSize: 16 }} />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="col-xs-3">
-                                    <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnUp,
-                                                { [styles.highlight]: highlightY }
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ Y: distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickY}
-                                            title={i18n._('Move Y+')}
-                                        >
-                                            <KeypadText>Y</KeypadText>
-                                            <KeypadDirectionText>+</KeypadDirectionText>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="col-xs-3">
-                                    <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(styles.btnKeypad, styles.hidden)}
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ X: distance, Y: distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickXY}
-                                            title={i18n._('Move X+ Y+')}
-                                        >
-                                            <i className={cx('fa', 'fa-arrow-circle-up', styles['rotate-45deg'])} style={{ fontSize: 16 }} />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="col-xs-3">
-                                    <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnUp,
-                                                { [styles.highlight]: highlightZ }
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getZJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ Z: distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickZ}
-                                            title={i18n._('Move Z+')}
-                                        >
-                                            <KeypadText>Z</KeypadText>
-                                            <KeypadDirectionText>+</KeypadDirectionText>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className={styles.rowSpace}>
-                            <div className="row no-gutters">
-                                <div className="col-xs-3">
-                                    <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnLeft,
-                                                { [styles.highlight]: highlightX }
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ X: -distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickX}
-                                            title={i18n._('Move X-')}
-                                        >
-                                            <KeypadText>X</KeypadText>
-                                            <KeypadDirectionText>-</KeypadDirectionText>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="col-xs-3">
-                                </div>
-                                <div className="col-xs-3">
-                                    <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnRight
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ X: distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickX}
-                                            title={i18n._('Move X+')}
-                                        >
-                                            <KeypadText>X</KeypadText>
-                                            <KeypadDirectionText>+</KeypadDirectionText>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="col-xs-3">
-                                </div>
-                            </div>
-                        </div>
-                        <div className={styles.rowSpace}>
-                            <div className="row no-gutters">
-                                <div className="col-xs-3">
-                                    <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(styles.btnKeypad, styles.hidden)}
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ X: -distance, Y: -distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickXY}
-                                            title={i18n._('Move X- Y-')}
-                                        >
-                                            <i className={cx('fa', 'fa-arrow-circle-down', styles['rotate-45deg'])} style={{ fontSize: 16 }} />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="col-xs-3">
-                                    <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnDown,
-                                                { [styles.highlight]: highlightY }
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getXYJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ Y: -distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickY}
-                                            title={i18n._('Move Y-')}
-                                        >
-                                            <KeypadText>Y</KeypadText>
-                                            <KeypadDirectionText>-</KeypadDirectionText>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="col-xs-3">
-                                    <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(styles.btnKeypad, styles.hidden)}
-                                            onClick={() => {
-                                                const distance = actions.getJogDistance();
-                                                actions.jog({ X: distance, Y: -distance });
-                                            }}
-                                            disabled={!canClickXY}
-                                            title={i18n._('Move X+ Y-')}
-                                        >
-                                            <i className={cx('fa', 'fa-arrow-circle-down', styles['rotate--45deg'])} style={{ fontSize: 16 }} />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="col-xs-3">
-                                    <div className={styles.colSpace}>
-                                        <button
-                                            type="button"
-                                            className={cx(
-                                                styles.btnKeypad,
-                                                styles.btnDown,
-                                                { [styles.highlight]: highlightZ }
-                                            )}
-                                            onClick={() => {
-                                                const distance = actions.getZJogDistance();
-                                                const feedrate = actions.getFeedrate();
-                                                actions.jog({ Z: -distance, F: feedrate });
-                                            }}
-                                            disabled={!canClickZ}
-                                            title={i18n._('Move Z-')}
-                                        >
-                                            <KeypadText>Z</KeypadText>
-                                            <KeypadDirectionText>-</KeypadDirectionText>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div className={styles.keysBody}>
+                    <div className={styles.xyKeys}>
+                        <JogControl
+                            className={styles.btnUpLeft}
+                            jog={() => actions.jog({ X: -xyDistance, Y: xyDistance, F: feedrate })}
+                            continuousJog={() => actions.startContinuousJog({ X: -1, Y: 1 }, feedrate)}
+                            stopContinuousJog={() => actions.stopContinuousJog()}
+                            disabled={xyControlsDisabled}
+                        >
+                        </JogControl>
+                        <JogControl
+                            className={styles.btnUp}
+                            jog={() => actions.jog({ Y: xyDistance, F: feedrate })}
+                            continuousJog={() => actions.startContinuousJog({ Y: 1 }, feedrate)}
+                            stopContinuousJog={() => actions.stopContinuousJog()}
+                            disabled={xyControlsDisabled}
+                        >
+                            <KeypadText>Y</KeypadText>
+                            <KeypadDirectionText>+</KeypadDirectionText>
+                        </JogControl>
+                        <JogControl
+                            className={styles.btnUpRight}
+                            jog={() => actions.jog({ X: xyDistance, Y: xyDistance, F: feedrate })}
+                            continuousJog={() => actions.startContinuousJog({ X: 1, Y: 1 }, feedrate)}
+                            stopContinuousJog={() => actions.stopContinuousJog()}
+                            disabled={xyControlsDisabled}
+                        >
+                        </JogControl>
+                        <JogControl
+                            className={styles.btnUp}
+                            jog={() => actions.jog({ Z: zDistance, F: feedrate })}
+                            continuousJog={() => actions.startContinuousJog({ Z: 1 }, feedrate)}
+                            stopContinuousJog={() => actions.stopContinuousJog()}
+                            disabled={zControlsDisabled}
+                        >
+                            <KeypadText>Z</KeypadText>
+                            <KeypadDirectionText>+</KeypadDirectionText>
+                        </JogControl>
+                        <JogControl
+                            className={styles.btnLeft}
+                            jog={() => actions.jog({ X: -xyDistance, F: feedrate })}
+                            continuousJog={() => actions.startContinuousJog({ X: -1 }, feedrate)}
+                            stopContinuousJog={() => actions.stopContinuousJog()}
+                            disabled={xyControlsDisabled}
+                        >
+                            <KeypadText>X</KeypadText>
+                            <KeypadDirectionText>-</KeypadDirectionText>
+                        </JogControl>
+                        <div />
+                        <JogControl
+                            className={styles.btnRight}
+                            jog={() => actions.jog({ X: xyDistance, F: feedrate })}
+                            continuousJog={() => actions.startContinuousJog({ X: 1 }, feedrate)}
+                            stopContinuousJog={() => actions.stopContinuousJog()}
+                            disabled={xyControlsDisabled}
+                        >
+                            <KeypadText>X</KeypadText>
+                            <KeypadDirectionText>+</KeypadDirectionText>
+                        </JogControl>
+                        <div />
+                        <JogControl
+                            className={styles.btnDownLeft}
+                            jog={() => actions.jog({ X: -xyDistance, Y: -xyDistance, F: feedrate })}
+                            continuousJog={() => actions.startContinuousJog({ X: -1, Y: -1 }, feedrate)}
+                            stopContinuousJog={() => actions.stopContinuousJog()}
+                            disabled={xyControlsDisabled}
+                        >
+                        </JogControl>
+                        <JogControl
+                            className={styles.btnDown}
+                            jog={() => actions.jog({ Y: -xyDistance, F: feedrate })}
+                            continuousJog={() => actions.startContinuousJog({ Y: -1 }, feedrate)}
+                            stopContinuousJog={() => actions.stopContinuousJog()}
+                            disabled={xyControlsDisabled}
+                        >
+                            <KeypadText>Y</KeypadText>
+                            <KeypadDirectionText>-</KeypadDirectionText>
+                        </JogControl>
+                        <JogControl
+                            className={styles.btnDownRight}
+                            jog={() => actions.jog({ X: xyDistance, Y: -xyDistance, F: feedrate })}
+                            continuousJog={() => actions.startContinuousJog({ X: 1, Y: -1 }, feedrate)}
+                            stopContinuousJog={() => actions.stopContinuousJog()}
+                            disabled={xyControlsDisabled}
+                        >
+                        </JogControl>
+                        <JogControl
+                            className={styles.btnDown}
+                            jog={() => actions.jog({ Z: -zDistance, F: feedrate })}
+                            continuousJog={() => actions.startContinuousJog({ Z: -1 }, feedrate)}
+                            stopContinuousJog={() => actions.stopContinuousJog()}
+                            disabled={zControlsDisabled}
+                        >
+                            <KeypadText>Z</KeypadText>
+                            <KeypadDirectionText>-</KeypadDirectionText>
+                        </JogControl>
                     </div>
-                    <div className={cx('col-xs-4', styles.flexCol)}>
-                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(20, 10, 5000)}>
+                    <div className={styles.presetControls}>
+                        <button
+                            disabled={!canClick} type="button"
+                            className={styles.movementRateButton}
+                            onClick={() => {
+                                const xyStep = (units === 'mm') ? 20 : 1;
+                                const zStep = (units === 'mm') ? 10 : 0.5;
+                                actions.changeMovementRates(xyStep, zStep, 5000);
+                            }}
+                        >
                             Rapid
                         </button>
-                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(5, 2, 3000)}>
+                        <button
+                            disabled={!canClick}
+                            type="button"
+                            className={styles.movementRateButton}
+                            onClick={() => {
+                                const xyStep = (units === 'mm') ? 5 : 0.2;
+                                const zStep = (units === 'mm') ? 2 : 0.04;
+                                actions.changeMovementRates(xyStep, zStep, 3000);
+                            }}
+                        >
                             Normal
                         </button>
-                        <button disabled={!canClickZ} type="button" className={styles.movementRateButton} onClick={() => actions.changeMovementRates(0.5, 0.1, 1000)}>
+                        <button
+                            disabled={!canClick}
+                            type="button"
+                            className={styles.movementRateButton}
+                            onClick={() => {
+                                const xyStep = (units === 'mm') ? 0.5 : 0.02;
+                                const zStep = (units === 'mm') ? 0.1 : 0.004;
+                                actions.changeMovementRates(xyStep, zStep, 1000);
+                            }}
+                        >
                             Precise
                         </button>
                     </div>

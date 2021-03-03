@@ -13,9 +13,11 @@ import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
-import { in2mm, mapPositionToUnits } from 'app/lib/units';
+import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
+import pubsub from 'pubsub-js';
+import store from '../../store';
 import Axes from './Axes';
 import ShuttleControl from './ShuttleControl';
 import {
@@ -26,20 +28,12 @@ import {
     METRIC_STEPS,
     // Grbl
     GRBL,
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_RUN,
     // Marlin
     MARLIN,
     // Smoothie
     SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_IDLE,
-    SMOOTHIE_ACTIVE_STATE_RUN,
     // TinyG
     TINYG,
-    TINYG_MACHINE_STATE_READY,
-    TINYG_MACHINE_STATE_STOP,
-    TINYG_MACHINE_STATE_END,
-    TINYG_MACHINE_STATE_RUN,
     // Workflow
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
@@ -56,6 +50,37 @@ class AxesWidget extends PureComponent {
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    pubsubTokens = [];
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('jogSpeeds', (msg, speeds) => {
+                this.setState({ jog: {
+                    ...this.state.jog,
+                    ...speeds,
+                } });
+            }),
+            pubsub.subscribe('addKeybindingsListener', () => {
+                this.addShuttleControlEvents();
+            }),
+            pubsub.subscribe('removeKeybindingsListener', () => {
+                this.removeShuttleControlEvents();
+            }),
+            pubsub.subscribe('units:change', (event, units) => {
+                this.changeUnits(units);
+            })
+        ];
+
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
 
     // Public methods
     collapse = () => {
@@ -191,10 +216,26 @@ class AxesWidget extends PureComponent {
             controller.command('gcode', gcode);
         },
         jog: (params = {}) => {
+            const { units } = this.state;
+            const modal = (units === 'mm') ? 'G21' : 'G20';
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-            controller.command('gcode', 'G91'); // relative
-            controller.command('gcode', 'G0 ' + s);
-            controller.command('gcode', 'G90'); // absolute
+            const commands = [
+                'G91',
+                'G0 ' + s,
+                'G90'
+            ];
+            controller.command('gcode:safe', commands, modal);
+        },
+        startContinuousJog: (params = {}, feedrate = 1000) => {
+            this.setState({
+                isContinuousJogging: true
+            }, controller.command('jog:start', params, feedrate));
+        },
+        stopContinuousJog: () => {
+            this.setState({
+                isContinuousJogging: false
+            });
+            controller.command('jog:stop');
         },
         move: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
@@ -341,6 +382,8 @@ class AxesWidget extends PureComponent {
                     xyStep: value
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep: value, zStep: jog.zStep, feedrate: jog.feedrate });
         },
         handleZStepChange: (value) => {
             const { jog } = this.state;
@@ -353,6 +396,8 @@ class AxesWidget extends PureComponent {
                     zStep: value
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep: jog.xyStep, zStep: value, feedrate: jog.feedrate });
         },
         handleFeedrateChange: (value) => {
             const { jog } = this.state;
@@ -365,6 +410,8 @@ class AxesWidget extends PureComponent {
                     feedrate: value
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep: jog.xyStep, zStep: jog.zStep, feedrate: value });
         },
         changeMovementRates: (xyStep, zStep, feedrate) => {
             const { jog } = this.state;
@@ -376,6 +423,8 @@ class AxesWidget extends PureComponent {
                     feedrate: feedrate
                 }
             });
+
+            pubsub.publish('jogSpeeds', { xyStep, zStep, feedrate });
         },
     };
 
@@ -394,34 +443,26 @@ class AxesWidget extends PureComponent {
             }
         },
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
-            const { canClick, jog } = this.state;
+            preventDefault(event);
+            const { isContinuousJogging } = this.state;
 
-            if (!canClick) {
+            if (!axis || isContinuousJogging) {
                 return;
             }
 
-            if (axis !== null && !jog.keypad) {
-                // keypad jogging is disabled
-                return;
-            }
+            const givenAxis = axis.toUpperCase();
+            const feedrate = this.actions.getFeedrate();
 
-            // The keyboard events of arrow keys for X-axis/Y-axis and pageup/pagedown for Z-axis
-            // are not prevented by default. If a jog command will be executed, it needs to
-            // stop the default behavior of a keyboard combination in a browser.
+            this.actions.startContinuousJog({ [givenAxis]: direction }, feedrate);
+        },
+        STOP_JOG: (event) => {
             preventDefault(event);
 
-            axis = axis || jog.axis;
-            const distance = this.actions.getJogDistance();
-            const jogAxis = {
-                x: () => this.actions.jog({ X: direction * distance * factor }),
-                y: () => this.actions.jog({ Y: direction * distance * factor }),
-                z: () => this.actions.jog({ Z: direction * distance * factor }),
-                a: () => this.actions.jog({ A: direction * distance * factor }),
-                b: () => this.actions.jog({ B: direction * distance * factor }),
-                c: () => this.actions.jog({ C: direction * distance * factor })
-            }[axis];
+            const { isContinuousJogging } = this.state;
 
-            jogAxis && jogAxis();
+            if (isContinuousJogging) {
+                this.actions.stopContinuousJog();
+            }
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
@@ -517,17 +558,12 @@ class AxesWidget extends PureComponent {
         'controller:state': (type, controllerState) => {
             // Grbl
             if (type === GRBL) {
-                const { status, parserstate } = { ...controllerState };
+                const { units } = this.state;
+                const { status } = { ...controllerState };
                 const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
                 const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
-                    units: units,
                     controller: {
                         ...state.controller,
                         type: type,
@@ -538,14 +574,34 @@ class AxesWidget extends PureComponent {
                         ...state.machinePosition,
                         ...mpos
                     }, (val) => {
-                        return ($13 > 0) ? in2mm(val) : val;
+                        if ($13 > 0) {
+                            if (units === METRIC_UNITS) {
+                                return in2mm(val);
+                            } else {
+                                return val;
+                            }
+                        } else if (units === IMPERIAL_UNITS) {
+                            return mm2in(val);
+                        } else {
+                            return val;
+                        }
                     }),
                     // Work position are reported in mm ($13=0) or inches ($13=1)
                     workPosition: mapValues({
                         ...state.workPosition,
                         ...wpos
                     }, val => {
-                        return ($13 > 0) ? in2mm(val) : val;
+                        if ($13 > 0) {
+                            if (units === METRIC_UNITS) {
+                                return in2mm(val).toFixed(1);
+                            } else {
+                                return val;
+                            }
+                        } else if (units === IMPERIAL_UNITS) {
+                            return mm2in(val).toFixed(3);
+                        } else {
+                            return val;
+                        }
                     })
                 }));
             }
@@ -668,11 +724,13 @@ class AxesWidget extends PureComponent {
         this.fetchMDICommands();
         this.addControllerEvents();
         this.addShuttleControlEvents();
+        this.subscribe();
     }
 
     componentWillUnmount() {
+        this.unsubscribe();
         this.removeControllerEvents();
-        this.removeShuttleControlEvents();
+        // this.removeShuttleControlEvents();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -702,7 +760,8 @@ class AxesWidget extends PureComponent {
             isFullscreen: false,
             canClick: true, // Defaults to true
             port: controller.port,
-            units: METRIC_UNITS,
+            units: store.get('workspace.units', METRIC_UNITS),
+            isContinuousJogging: false,
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -733,8 +792,8 @@ class AxesWidget extends PureComponent {
                 c: '0.000'
             },
             jog: {
-                xyStep: this.config.get('jog.xyStep'),
-                zStep: this.config.get('jog.zStep'),
+                xyStep: this.getInitialXYStep(),
+                zStep: this.getInitialZStep(),
                 feedrate: this.config.get('jog.feedrate'),
                 axis: '', // Defaults to empty
                 keypad: this.config.get('jog.keypad'),
@@ -768,6 +827,46 @@ class AxesWidget extends PureComponent {
         });
     }
 
+    getInitialXYStep() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+
+        if (units === IMPERIAL_UNITS) {
+            return 0.2;
+        }
+        return 5;
+    }
+
+    getInitialZStep() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+
+        if (units === IMPERIAL_UNITS) {
+            return 0.04;
+        }
+        return 2;
+    }
+
+    changeUnits(units) {
+        const oldUnits = this.state.units;
+        const { jog } = this.state;
+        let { zStep, xyStep } = jog;
+        if (oldUnits === METRIC_UNITS && units === IMPERIAL_UNITS) {
+            zStep = mm2in(zStep).toFixed(3);
+            xyStep = mm2in(xyStep).toFixed(3);
+        } else if (oldUnits === IMPERIAL_UNITS && units === METRIC_UNITS) {
+            zStep = in2mm(zStep).toFixed(2);
+            xyStep = in2mm(xyStep).toFixed(2);
+        }
+
+        this.setState({
+            units: units,
+            jog: {
+                ...jog,
+                zStep: zStep,
+                xyStep: xyStep
+            }
+        });
+    }
+
     addShuttleControlEvents() {
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
             const callback = this.shuttleControlEvents[eventName];
@@ -797,53 +896,17 @@ class AxesWidget extends PureComponent {
     }
 
     canClick() {
-        const { port, workflow } = this.state;
+        const { port, workflow, isContinuousJogging } = this.state;
         const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
 
         if (!port) {
             return false;
         }
-        if (workflow.state === WORKFLOW_STATE_RUNNING) {
+        if (workflow.state === WORKFLOW_STATE_RUNNING && !isContinuousJogging) {
             return false;
         }
         if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
             return false;
-        }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE,
-                GRBL_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Ignore
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_IDLE,
-                SMOOTHIE_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_READY,
-                TINYG_MACHINE_STATE_STOP,
-                TINYG_MACHINE_STATE_END,
-                TINYG_MACHINE_STATE_RUN
-            ];
-            if (!includes(states, machineState)) {
-                return false;
-            }
         }
 
         return true;

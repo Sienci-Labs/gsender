@@ -47,7 +47,7 @@
     color: #3e85c7;
     --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-    margin-bottom: 20px;
+    margin-bottom: clamp(12px, 1vw, 2rem);
     transition: 200ms ease-in-out;
 
     &:hover {
@@ -82,18 +82,18 @@
     flex-grow: 1;
     flex-direction: row;
     justify-content: space-between;
-    padding: 1rem;
+    padding: clamp(5px, 0.55vw, 1rem);
     box-sizing: border-box;
     align-items: center;
 }
 
 .btn-Keypad {
+    height: clamp(30px, 3vw, 60px);
     border: none;
     outline: none;
     background: #3e85c7;
     color: white;
     width: 100%;
-    height: 4rem;
     display: flex;
     flex-grow: 1;
     align-items: center;
@@ -130,6 +130,61 @@
     clip-path: polygon(100% 0, 75% 50%, 100% 100%, 25% 100%, 0 50%, 25% 0);
 }
 
+.btn-up-left{
+    clip-path: polygon(0 0, 0 75%, 75% 0);
+}
+.btn-up-right{
+    clip-path: polygon(100% 75%, 25% 0, 100% 0);
+}
+.btn-down-left{
+    clip-path: polygon(0 100%, 0 25%, 75% 100%);
+}
+.btn-down-right{
+    clip-path: polygon(25% 100%, 100% 25%, 100% 100%);
+}
+
 .hidden {
     display: none;
+}
+
+.keys-body{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around
+}
+
+.xy-keys{
+    width: 50%;
+    height: max-content;
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.xy-keys > div::before, .xy-keys > button::before {
+    content: '';
+    width: 0;
+    padding-bottom: 100%;
+    display: block;
+}
+
+.zKeys{
+    width: 13.4%;
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.preset-controls{
+    width: 25%;
+    margin-left: 5%;
+
+    button {
+        margin-bottom: 20px;
+    }
+
+    button + button {
+        margin-left: 0;
+    }
 }

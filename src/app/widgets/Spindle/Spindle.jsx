@@ -30,7 +30,7 @@ class Spindle extends PureComponent {
                                     <button
                                         type="button"
                                         className="coolantButtons"
-                                        style={{ padding: '5px 0' }}
+                                        // style={{ padding: '5px 0' }}
                                         onClick={() => {
                                             if (spindleSpeed > 0) {
                                                 controller.command('gcode', 'M3 S' + spindleSpeed);
@@ -52,7 +52,7 @@ class Spindle extends PureComponent {
                                     <button
                                         type="button"
                                         className="coolantButtons"
-                                        style={{ padding: '5px 0' }}
+                                        // style={{ padding: '5px 0' }}
                                         onClick={() => {
                                             if (spindleSpeed > 0) {
                                                 controller.command('gcode', 'M4 S' + spindleSpeed);
@@ -74,7 +74,7 @@ class Spindle extends PureComponent {
                                     <button
                                         type="button"
                                         className="coolantButtons"
-                                        style={{ padding: '5px 0' }}
+                                        // style={{ padding: '5px 0' }}
                                         onClick={() => controller.command('gcode', 'M5')}
                                         title={i18n._('Spindle Off (M5)', { ns: 'gcode' })}
                                         disabled={!canClick}
@@ -100,8 +100,18 @@ class Spindle extends PureComponent {
                                                     step={1}
                                                     onChange={actions.handleSpindleSpeedChange}
                                                     disabled={!canClick}
+                                                    style={{ fontSize: 'clamp(12px, 1vw, 22px)', height: 'clamp(24px, 2vw, 38px)' }}
                                                 />
-                                                <span className="input-group-addon">{i18n._('RPM')}</span>
+                                                <span
+                                                    className="input-group-addon"
+                                                    style={{
+                                                        fontSize: 'clamp(12px, 1vw, 22px)',
+                                                        height: 'clamp(24px, 2vw, 38px)',
+                                                        padding: '0 10px'
+                                                    }}
+                                                >
+                                                    {i18n._('RPM')}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -117,7 +127,7 @@ class Spindle extends PureComponent {
                                     <button
                                         type="button"
                                         className="coolantButtons"
-                                        style={{ padding: '5px 0' }}
+                                        // style={{ padding: '5px 0' }}
                                         onClick={() => {
                                             controller.command('gcode', 'M7');
                                         }}
@@ -133,7 +143,7 @@ class Spindle extends PureComponent {
                                     <button
                                         type="button"
                                         className="coolantButtons"
-                                        style={{ padding: '5px 0' }}
+                                        // style={{ padding: '5px 0' }}
                                         onClick={() => {
                                             controller.command('gcode', 'M8');
                                         }}
@@ -149,12 +159,12 @@ class Spindle extends PureComponent {
                                     <button
                                         type="button"
                                         className="coolantButtons"
-                                        style={{ padding: '5px 0' }}
+                                        // style={{ padding: '5px 0' }}
                                         onClick={() => controller.command('gcode', 'M9')}
                                         title={i18n._('Coolant Off (M9)', { ns: 'gcode' })}
                                         disabled={!canClick}
                                     >
-                                        <ic
+                                        <i
                                             className="fa fa-ban"
                                         />
                                         <Space width="6" />

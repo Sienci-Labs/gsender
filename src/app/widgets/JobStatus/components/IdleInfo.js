@@ -9,7 +9,34 @@ import styles from './IdleInfo.styl';
  * @param {Object} state Default state given from parent component
  */
 const IdleInfo = ({ state }) => {
-    const { bbox: { delta }, units, total, remainingTime, fileName, connected, fileSize } = state;
+    const {
+        bbox: { delta },
+        units,
+        total,
+        remainingTime,
+        fileName,
+        connected,
+        fileSize,
+        toolsAmount,
+        toolsUsed,
+        feedrateMin,
+        feedrateMax,
+        spindleSpeedMin,
+        spindleSpeedMax
+    } = state;
+
+    /**
+     * Return formatted list of tools in use
+     */
+    const formattedToolsUsed = () => {
+        let line = '';
+
+        for (const item of toolsUsed) {
+            line += `${item}, `;
+        }
+
+        return line.slice(0, -2); //Remove space and apostrophe at the end
+    };
 
     /**
      * Format given time value to display minutes and seconds
@@ -31,14 +58,17 @@ const IdleInfo = ({ state }) => {
         return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
     };
 
+    /**
+     * Determine the file size format between bytes, kilobytes (KB) and megabytes (MB)
+     */
     const fileSizeFormat = () => {
         const ONE_KB = 1000;
         const ONE_MB = 1000000;
 
         if (fileSize >= ONE_KB && fileSize < ONE_MB) {
-            return `${(fileSize / ONE_KB).toFixed(1)} kB`;
+            return `${(fileSize / ONE_KB).toFixed(0)} KB`;
         } else if (fileSize >= ONE_MB) {
-            return `${(fileSize / ONE_MB).toFixed(0)} MB`;
+            return `${(fileSize / ONE_MB).toFixed(1)} MB`;
         }
 
         return `${fileSize} bytes`;
@@ -47,24 +77,20 @@ const IdleInfo = ({ state }) => {
     return fileName ? (
         <div style={{ margin: '0 3rem' }}>
             <div className={styles['idle-info']}>
-                <div>
-                    <span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)
-                </div>
+                <div><span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)</div>
+                <div>{`${delta.x}${units} (X) by ${delta.y}${units} (Y) by ${delta.z}${units} (Z)`}</div>
+                <div>~ {outputFormattedTime(remainingTime)} runtime</div>
 
-                <div>
-                    {`${delta.x}${units} (X) by ${delta.y}${units} (Y) by ${delta.z}${units} (Z)`}
-                </div>
-
-                <div>
-                    ~ {outputFormattedTime(remainingTime)} runtime
-                </div>
+                <div>Feed Range: {feedrateMin} to {feedrateMax} mm/min</div>
+                <div>Spindle Range: {spindleSpeedMin} to {spindleSpeedMax} RPM</div>
+                <div>Tools Used: {toolsAmount > 0 ? `${toolsAmount} (${formattedToolsUsed()})` : 'None'}</div>
             </div>
 
-            <div className={styles['additional-info']}>
-                <div>Feed Range: 500 to 1000 mm/min</div>
-                <div>Spindle Range: 1000 to 2000 RPM</div>
-                <div>Tools Used: None</div>
-            </div>
+            {/* <div className={styles['additional-info']}>
+                <div>Feed Range: {feedrateMin} to {feedrateMax} mm/min</div>
+                <div>Spindle Range: {spindleSpeedMin} to {spindleSpeedMax} RPM</div>
+                <div>Tools Used: {toolsAmount > 0 ? `${toolsAmount} (${formattedToolsUsed()})` : 'None'}</div>
+            </div> */}
         </div>
     ) : (
         <div className={styles['disconnected-info']}>

@@ -66,12 +66,17 @@ class RunProbe extends PureComponent {
         }, 500);
         setTimeout(() => {
             clearInterval(interval);
+            this.setState({
+                timer: 0,
+                testRunning: false
+            });
         }, 15000);
     }
 
     resetTimer() {
         this.setState({
-            timer: 0
+            timer: 0,
+            testRunning: false
         });
     }
 
@@ -86,7 +91,6 @@ class RunProbe extends PureComponent {
         const { state } = this.props;
         const { canClick } = state;
         const probeCommands = actions.generateProbeCommands();
-        //const content = probeCommands.join('\n');
         const probeCommand = state.availableProbeCommands[state.selectedProbeCommand];
         const probeActive = actions.returnProbeConnectivity();
         const { timer, testRunning, currentStep } = this.state;

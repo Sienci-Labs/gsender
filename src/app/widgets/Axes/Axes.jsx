@@ -6,7 +6,6 @@ import styles from './index.styl';
 
 const Axes = (props) => {
     const { state, actions } = props;
-
     return (
         <div className={styles.jogWidget}>
             <Keypad
@@ -15,6 +14,7 @@ const Axes = (props) => {
                 axes={state.axes}
                 jog={state.jog}
                 actions={actions}
+                isContinuousJogging={state.isContinuousJogging}
             />
             <SpeedControls state={state} actions={actions} />
         </div>

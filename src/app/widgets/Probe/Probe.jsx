@@ -55,7 +55,7 @@ class Probe extends PureComponent {
                     </div>
                     {
                         probeCommand && probeCommand.safe &&
-                        <div className="form-group">
+                        <div className="form-group hidden">
                             <div className={styles.rowSpread}>
                                 <label htmlFor="exampleInputEmail2">Use Safe Probe:</label>
                                 <ToggleSwitch checked={useSafeProbeOption} onChange={actions.handleSafeProbeToggle}/>

@@ -25,12 +25,12 @@ import * as user from './lib/user';
 import store from './store';
 import defaultState from './store/defaultState';
 import App from './containers/App';
-import Login from './containers/Login';
+// import Login from './containers/Login';
 import Anchor from './components/Anchor';
 import { Button } from './components/Buttons';
 import ModalTemplate from './components/ModalTemplate';
 import Modal from './components/Modal';
-import ProtectedRoute from './components/ProtectedRoute';
+// import ProtectedRoute from './components/ProtectedRoute';
 import Space from './components/Space';
 import './styles/vendor.styl';
 import './styles/app.styl';
@@ -49,8 +49,9 @@ const renderPage = () => {
         >
             <Router>
                 <div>
-                    <Route path="/login" component={Login} />
-                    <ProtectedRoute path="/" component={App} />
+                    {/* <Route path="/login" component={Login} /> */}
+                    {/* <ProtectedRoute path="/" component={App} /> */}
+                    <Route path="/" component={App} />
                 </div>
             </Router>
         </GridSystemProvider>,

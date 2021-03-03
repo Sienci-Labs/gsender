@@ -1,7 +1,16 @@
 import {
     IMPERIAL_STEPS,
-    METRIC_STEPS
+    METRIC_STEPS,
+    METRIC_UNITS
 } from '../constants';
+
+const AXIS_X = 'x';
+const AXIS_Y = 'y';
+const AXIS_Z = 'z';
+const FORWARD = 1;
+const BACKWARD = -1;
+// const OVERSHOOT_FACTOR = 10; // 10x
+// const UNDERSHOOT_FACTOR = 0.1; // 0.1x
 
 const defaultState = {
     session: {
@@ -9,6 +18,7 @@ const defaultState = {
         token: ''
     },
     workspace: {
+        units: METRIC_UNITS,
         container: {
             default: {
                 widgets: ['visualizer', 'job_status']
@@ -120,6 +130,10 @@ const defaultState = {
         },
         job_status: {
             minimized: false,
+            feedrateMin: 500,
+            feedrateMax: 2000,
+            spindleSpeedMin: 0,
+            spindleSpeedMax: 1000
         },
         grbl: {
             minimized: false,
@@ -152,7 +166,7 @@ const defaultState = {
             minimized: false,
             axes: ['x', 'y', 'z'],
             jog: {
-                keypad: false,
+                keypad: true,
                 imperial: {
                     step: IMPERIAL_STEPS.indexOf(1), // Defaults to 1 inch
                     distances: []
@@ -160,6 +174,11 @@ const defaultState = {
                 metric: {
                     step: METRIC_STEPS.indexOf(1), // Defaults to 1 mm
                     distances: []
+                },
+                speeds: {
+                    xyStep: 5,
+                    zStep: 0.5,
+                    feedrate: 5000,
                 }
             },
             mdi: {
@@ -295,7 +314,197 @@ const defaultState = {
             disabled: false,
             minimized: false,
         }
-    }
+    },
+    /**
+     * Command Keys Available (default):
+     *  Start Job                   ~
+     *  Pause Job                   !
+     *  Stop Job                    @
+     *  Zero All                    $
+     *  Go to Zero                  %
+     *  Feed Hold                   ^
+     *  Cycle Start                 &
+     *  Homing                      ctrl + alt + command + h
+     *  Unlock                      ctrl + alt + command + u
+     *  Reset                       ctrl + alt + command + r
+     *  Change Jog Speeds           shift + (+ or -)
+     *  Jog X                       shift + (left or right) * arrows *
+     *  Jog Y                       shift + (up or down)    * arrows *
+     *  Jog Z                       shift + (pageup or pagedown)
+     */
+    commandKeys: [
+        { // Start Job
+            id: 0,
+            title: 'Start Job',
+            keys: '~',
+            cmd: 'START_JOB',
+            preventDefault: true
+        },
+        { // Pause Job
+            id: 1,
+            title: 'Pause Job',
+            keys: '!',
+            cmd: 'PAUSE_JOB',
+            preventDefault: true
+        },
+        { // Stop Job
+            id: 2,
+            title: 'Stop Job',
+            keys: '@',
+            cmd: 'STOP_JOB',
+            preventDefault: true
+        },
+        { // Zero All
+            id: 3,
+            title: 'Zero All',
+            keys: '$',
+            cmd: 'ZERO_ALL',
+            preventDefault: true
+        },
+        { // Go to Zero
+            id: 4,
+            title: 'Go to Zero',
+            keys: '%',
+            cmd: 'GO_TO_ZERO',
+            preventDefault: true
+        },
+        { // Feed Hold
+            id: 5,
+            title: 'Feed Hold',
+            keys: '^',
+            cmd: 'CONTROLLER_COMMAND',
+            payload: {
+                command: 'feedhold'
+            },
+            preventDefault: true
+        },
+        { // Cycle Start
+            id: 6,
+            title: 'Cycle Start',
+            keys: '&',
+            cmd: 'CONTROLLER_COMMAND',
+            payload: {
+                command: 'cyclestart'
+            },
+            preventDefault: true
+        },
+        { // Homing
+            id: 7,
+            title: 'Homing',
+            keys: ['ctrl', 'alt', 'command', 'h'].join('+'),
+            cmd: 'CONTROLLER_COMMAND',
+            payload: {
+                command: 'homing'
+            },
+            preventDefault: true
+        },
+        { // Unlock
+            id: 8,
+            title: 'Unlock',
+            keys: ['ctrl', 'alt', 'command', 'u'].join('+'),
+            cmd: 'CONTROLLER_COMMAND',
+            payload: {
+                command: 'unlock'
+            },
+            preventDefault: true
+        },
+        { // Reset
+            id: 9,
+            title: 'Reset',
+            keys: ['ctrl', 'alt', 'command', 'r'].join('+'),
+            cmd: 'CONTROLLER_COMMAND',
+            payload: {
+                command: 'reset'
+            },
+            preventDefault: true
+        },
+        { // Change Jog Speed
+            id: 10,
+            title: 'Increase Jog Speed',
+            keys: 'shift++',
+            cmd: 'JOG_SPEED',
+            payload: {
+                speed: 'increase'
+            },
+            preventDefault: false
+        },
+        { // Change Jog Speed
+            id: 11,
+            title: 'Decrease Jog Speed',
+            keys: 'shift+-',
+            cmd: 'JOG_SPEED',
+            payload: {
+                speed: 'decrease'
+            },
+            preventDefault: false
+        },
+        { // Jog X+
+            id: 12,
+            title: 'Jog: X+',
+            keys: 'shift+right',
+            cmd: 'JOG',
+            payload: {
+                axis: AXIS_X,
+                direction: FORWARD,
+            },
+            preventDefault: false
+        },
+        { // Jog X-
+            id: 13,
+            title: 'Jog: X-',
+            keys: 'shift+left',
+            cmd: 'JOG',
+            payload: {
+                axis: AXIS_X,
+                direction: BACKWARD,
+            },
+            preventDefault: false
+        },
+        { // Jog Y+
+            id: 14,
+            title: 'Jog: Y+',
+            keys: 'shift+up',
+            cmd: 'JOG',
+            payload: {
+                axis: AXIS_Y,
+                direction: FORWARD,
+            },
+            preventDefault: false
+        },
+        { // Jog Y-
+            id: 15,
+            title: 'Jog: Y-',
+            keys: 'shift+down',
+            cmd: 'JOG',
+            payload: {
+                axis: AXIS_Y,
+                direction: BACKWARD,
+            },
+            preventDefault: false
+        },
+        { // Jog Z+
+            id: 16,
+            title: 'Jog: Z+',
+            keys: 'shift+pageup',
+            cmd: 'JOG',
+            payload: {
+                axis: AXIS_Z,
+                direction: FORWARD,
+            },
+            preventDefault: false
+        },
+        { // Jog Z-
+            id: 17,
+            title: 'Jog: Z-',
+            keys: 'shift+pagedown',
+            cmd: 'JOG',
+            payload: {
+                axis: AXIS_Z,
+                direction: BACKWARD,
+            },
+            preventDefault: false
+        },
+    ]
 };
 
 export default defaultState;

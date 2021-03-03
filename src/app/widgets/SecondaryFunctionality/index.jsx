@@ -146,15 +146,15 @@ class SecondaryFunctionality extends PureComponent {
                     component: ConsoleWidget
                 },
                 {
+                    label: 'Spindle',
+                    widgetId: 'spindle',
+                    component: SpindleWidget
+                },
+                {
                     label: 'Laser',
                     widgetId: 'laser',
                     component: LaserWidget
                 },
-                {
-                    label: 'Spindle',
-                    widgetId: 'spindle',
-                    component: SpindleWidget
-                }
             ]
         };
     }

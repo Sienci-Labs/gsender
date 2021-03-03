@@ -5,13 +5,14 @@ import includes from 'lodash/includes';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
+import store from 'app/store';
 import React, { PureComponent } from 'react';
+import pubsub from 'pubsub-js';
 import api from 'app/api';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
-import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
 import { in2mm, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
@@ -43,7 +44,8 @@ import {
     TINYG_MACHINE_STATE_RUN,
     // Workflow
     WORKFLOW_STATE_RUNNING,
-    WORKFLOW_STATE_IDLE
+    WORKFLOW_STATE_IDLE,
+    WORKFLOW_STATE_PAUSED
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -59,6 +61,41 @@ class LocationWidget extends PureComponent {
         onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object
     };
+
+    pubsubTokens = [];
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('jogSpeeds', (msg, speeds) => {
+                this.setState({ jog: {
+                    ...this.state.jog,
+                    speeds: {
+                        ...speeds
+                    },
+                } });
+            }),
+            pubsub.subscribe('keybindingsUpdated', () => {
+                this.updateShuttleControlEvents();
+            }),
+            pubsub.subscribe('addKeybindingsListener', () => {
+                this.addShuttleControlEvents();
+            }),
+            pubsub.subscribe('removeKeybindingsListener', () => {
+                this.removeShuttleControlEvents();
+            }),
+            pubsub.subscribe('units:change', (event, units) => {
+                this.changeUnits(units);
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
 
     // Public methods
     collapse = () => {
@@ -340,6 +377,80 @@ class LocationWidget extends PureComponent {
     }
 
     shuttleControlEvents = {
+        START_JOB: () => {
+            const { port, workflow } = this.state;
+            if (!port) {
+                return;
+            }
+
+            const canStart = (workflow.state !== WORKFLOW_STATE_RUNNING);
+
+            if (canStart) {
+                if (workflow.state === WORKFLOW_STATE_IDLE) {
+                    controller.command('gcode:start');
+                    return;
+                }
+
+                if (workflow.state === WORKFLOW_STATE_PAUSED) {
+                    controller.command('gcode:resume');
+                    return;
+                }
+            }
+        },
+        PAUSE_JOB: () => {
+            const { port, workflow } = this.state;
+            if (!port) {
+                return;
+            }
+
+            if (workflow.state === WORKFLOW_STATE_RUNNING) {
+                controller.command('gcode:pause');
+            }
+        },
+        STOP_JOB: () => {
+            const { port } = this.state;
+            if (!port) {
+                return;
+            }
+
+            controller.command('gcode:stop', { force: true });
+        },
+        ZERO_ALL: () => {
+            const wcs = this.getWorkCoordinateSystem;
+
+            const p = {
+                'G54': 1,
+                'G55': 2,
+                'G56': 3,
+                'G57': 4,
+                'G58': 5,
+                'G59': 6
+            }[wcs] || 0;
+
+            controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
+        },
+        GO_TO_ZERO: () => {
+            controller.command('gcode', 'G0 X0 Y0 Z0'); //Move to Work Position Zero
+        },
+        JOG_SPEED: (event, { speed }) => {
+            const RAPID = { xyStep: 20, zStep: 10, feedrate: 5000 };
+            const NORMAL = { xyStep: 5, zStep: 2, feedrate: 3000 };
+            const PRECISE = { xyStep: 0.5, zStep: 0.1, feedrate: 1000 };
+
+            const { jog } = this.state;
+            const { feedrate } = jog.speeds;
+            if (speed === 'increase' && feedrate !== 5000) {
+                feedrate === 1000
+                    ? pubsub.publish('jogSpeeds', NORMAL)
+                    : pubsub.publish('jogSpeeds', RAPID);
+            }
+
+            if (speed === 'decrease' && feedrate !== 1000) {
+                feedrate === 5000
+                    ? pubsub.publish('jogSpeeds', NORMAL)
+                    : pubsub.publish('jogSpeeds', PRECISE);
+            }
+        },
         SELECT_AXIS: (event, { axis }) => {
             const { canClick, jog } = this.state;
 
@@ -352,36 +463,6 @@ class LocationWidget extends PureComponent {
             } else {
                 this.actions.selectAxis(axis);
             }
-        },
-        JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
-            const { canClick, jog } = this.state;
-
-            if (!canClick) {
-                return;
-            }
-
-            if (axis !== null && !jog.keypad) {
-                // keypad jogging is disabled
-                return;
-            }
-
-            // The keyboard events of arrow keys for X-axis/Y-axis and pageup/pagedown for Z-axis
-            // are not prevented by default. If a jog command will be executed, it needs to
-            // stop the default behavior of a keyboard combination in a browser.
-            preventDefault(event);
-
-            axis = axis || jog.axis;
-            const distance = this.actions.getJogDistance();
-            const jogAxis = {
-                x: () => this.actions.jog({ X: direction * distance * factor }),
-                y: () => this.actions.jog({ Y: direction * distance * factor }),
-                z: () => this.actions.jog({ Z: direction * distance * factor }),
-                a: () => this.actions.jog({ A: direction * distance * factor }),
-                b: () => this.actions.jog({ B: direction * distance * factor }),
-                c: () => this.actions.jog({ C: direction * distance * factor })
-            }[axis];
-
-            jogAxis && jogAxis();
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
@@ -449,7 +530,7 @@ class LocationWidget extends PureComponent {
             }));
         },
         'workflow:state': (workflowState) => {
-            const canJog = (workflowState !== WORKFLOW_STATE_RUNNING);
+            const canJog = (workflowState === WORKFLOW_STATE_IDLE);
 
             // Disable keypad jogging and shuttle wheel when the workflow state is 'running'.
             // This prevents accidental movement while sending G-code commands.
@@ -457,7 +538,7 @@ class LocationWidget extends PureComponent {
                 jog: {
                     ...state.jog,
                     axis: canJog ? state.jog.axis : '',
-                    keypad: canJog ? state.jog.keypad : false
+                    keypad: canJog
                 },
                 workflow: {
                     ...state.workflow,
@@ -477,17 +558,12 @@ class LocationWidget extends PureComponent {
         'controller:state': (type, controllerState) => {
             // Grbl
             if (type === GRBL) {
-                const { status, parserstate } = { ...controllerState };
+                const { status } = { ...controllerState };
                 const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
+
                 const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
-                    units: units,
                     controller: {
                         ...state.controller,
                         type: type,
@@ -506,100 +582,6 @@ class LocationWidget extends PureComponent {
                         ...wpos
                     }, val => {
                         return ($13 > 0) ? in2mm(val) : val;
-                    })
-                }));
-            }
-
-            // Marlin
-            if (type === MARLIN) {
-                const { pos, modal = {} } = { ...controllerState };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position is always reported in mm
-                    machinePosition: {
-                        ...state.machinePosition,
-                        ...pos
-                    },
-                    // Work position is always reported in mm
-                    workPosition: {
-                        ...state.workPosition,
-                        ...pos
-                    }
-                }));
-            }
-
-            // Smoothie
-            if (type === SMOOTHIE) {
-                const { status, parserstate } = { ...controllerState };
-                const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in current units
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in current units
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    })
-                }));
-            }
-
-            // TinyG
-            if (type === TINYG) {
-                const { sr } = { ...controllerState };
-                const { mpos, wpos, modal = {} } = { ...sr };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // https://github.com/synthetos/g2/wiki/Status-Reports
-                    // Canonical machine position are always reported in millimeters with no offsets.
-                    machinePosition: {
-                        ...state.machinePosition,
-                        ...mpos
-                    },
-                    // Work position are reported in current units, and also apply any offsets.
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
                     })
                 }));
             }
@@ -625,14 +607,18 @@ class LocationWidget extends PureComponent {
     };
 
     componentDidMount() {
+        this.subscribe();
         this.fetchMDICommands();
         this.addControllerEvents();
         this.addShuttleControlEvents();
+
+        this.actions.toggleKeypadJogging();
     }
 
     componentWillUnmount() {
         this.removeControllerEvents();
         this.removeShuttleControlEvents();
+        this.unsubscribe();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -662,7 +648,7 @@ class LocationWidget extends PureComponent {
             isFullscreen: false,
             canClick: true, // Defaults to true
             port: controller.port,
-            units: METRIC_UNITS,
+            units: store.get('workspace.units', METRIC_UNITS),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -702,6 +688,11 @@ class LocationWidget extends PureComponent {
                 metric: {
                     step: this.config.get('jog.metric.step'),
                     distances: ensureArray(this.config.get('jog.metric.distances', []))
+                },
+                speeds: {
+                    xyStep: this.config.get('jog.speeds.xyStep'),
+                    zStep: this.config.get('jog.speeds.zStep'),
+                    feedrate: this.config.get('jog.speeds.feedrate'),
                 }
             },
             mdi: {
@@ -725,7 +716,14 @@ class LocationWidget extends PureComponent {
         });
     }
 
+    updateShuttleControlEvents = () => {
+        this.removeShuttleControlEvents();
+        this.addShuttleControlEvents();
+    }
+
     addShuttleControlEvents() {
+        combokeys.reload();
+
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
             const callback = this.shuttleControlEvents[eventName];
             combokeys.on(eventName, callback);
@@ -749,8 +747,10 @@ class LocationWidget extends PureComponent {
             combokeys.removeListener(eventName, callback);
         });
 
-        this.shuttleControl.removeAllListeners('flush');
-        this.shuttleControl = null;
+        if (this.shuttleControl) {
+            this.shuttleControl.removeAllListeners('flush');
+            this.shuttleControl = null;
+        }
     }
 
     canClick() {
@@ -804,6 +804,12 @@ class LocationWidget extends PureComponent {
         }
 
         return true;
+    }
+
+    changeUnits(units) {
+        this.setState({
+            units: units
+        });
     }
 
     render() {
