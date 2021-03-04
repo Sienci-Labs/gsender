@@ -5,6 +5,10 @@ import Dropdown, { MenuItem } from 'app/components/Dropdown';
 
 import styles from './index.styl';
 
+/**
+ * Toggle Component used to trigger the dropdown
+ * @prop {Object} props Various props passed by the parent Dropdown component
+ */
 const Toggle = (props) => {
     return (
         <div {...props} className={styles['macro-item-options']}>
@@ -13,6 +17,13 @@ const Toggle = (props) => {
     );
 };
 
+/**
+ * Macro Item Component
+ * @prop {Object} macro Macro object
+ * @prop {Array} onRun Function to run the macro
+ * @prop {Function} onEdit Function to edit the macro
+ * @prop {Function} onDelete Function to delete the macro
+ */
 export default class MacroItem extends Component {
     static propTypes = {
         macro: PropTypes.object,
@@ -25,10 +36,16 @@ export default class MacroItem extends Component {
         display: 'name',
     }
 
+    /**
+     * Function to handle mouse enter on the wrapper div
+     */
     handleMouseEnter = () => {
         this.setState({ display: 'icon' });
     }
 
+    /**
+     * Function to handle mouse leave on the wrapper div
+     */
     handleMouseLeave = () => {
         this.setState({ display: 'name' });
     }
@@ -80,7 +97,6 @@ export default class MacroItem extends Component {
                         </MenuItem>
                     </Dropdown.Menu>
                 </Dropdown>
-
             </div>
         );
     }
