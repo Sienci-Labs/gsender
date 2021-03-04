@@ -10,6 +10,7 @@ import {
 } from '../../constants';
 import styles from './index.styl';
 import ProbeImage from './ProbeImage';
+import FunctionButton from '../../components/FunctionButton/FunctionButton';
 
 class Probe extends PureComponent {
     static propTypes = {
@@ -81,16 +82,14 @@ class Probe extends PureComponent {
                     </div>
                     <div className="row no-gutters">
                         <div className="col-xs-12">
-                            <button
-                                type="button"
-                                className={styles.btnPrimary}
+                            <FunctionButton
                                 onClick={() => {
                                     actions.openModal(MODAL_PREVIEW);
                                 }}
                                 disabled={!canClick}
                             >
-                                {i18n._('Generate Probe Commands')}
-                            </button>
+                                Generate Probe Command
+                            </FunctionButton>
                         </div>
                     </div>
                 </div>

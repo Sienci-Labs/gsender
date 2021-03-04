@@ -5,6 +5,7 @@ import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
+import FunctionButton from '../../components/FunctionButton/FunctionButton';
 
 class RunProbe extends PureComponent {
     static propTypes = {
@@ -80,9 +81,8 @@ class RunProbe extends PureComponent {
                                 </p>
                                 <p>Probing cannot be run without confirming the circuit.</p>
                             </div>
-                            <button
-                                type="button"
-                                className={styles.btnStart}
+                            <FunctionButton
+                                primary
                                 disabled={!connectionMade}
                                 onClick={() => {
                                     actions.closeModal();
@@ -93,7 +93,7 @@ class RunProbe extends PureComponent {
                                 {
                                     !connectionMade ? 'Waiting on probe circuit confirmation...' : ' Start Probe'
                                 }
-                            </button>
+                            </FunctionButton>
                         </div>
                         <div className={styles.right}>
                             <ProbeImage probeCommand={probeCommand} />
