@@ -16,6 +16,8 @@ import insertAtCaret from './insertAtCaret';
 import variables from './variables';
 import styles from './index.styl';
 
+import { modalStyle, modalHeaderStyle, modalTitleStyle, modalBodyStyle, modalFooterStyle } from './modalStyle';
+
 class EditMacro extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
@@ -44,13 +46,13 @@ class EditMacro extends PureComponent {
         const { id, name, content } = { ...state.modal.params };
 
         return (
-            <Modal disableOverlay size="md" onClose={actions.closeModal}>
-                <Modal.Header>
-                    <Modal.Title>
+            <Modal size="md" onClose={actions.closeModal} style={modalStyle}>
+                <Modal.Header style={modalHeaderStyle}>
+                    <Modal.Title style={modalTitleStyle}>
                         {i18n._('Edit Macro')}
                     </Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body style={modalBodyStyle}>
                     <Form
                         ref={c => {
                             this.form = c;
@@ -66,11 +68,13 @@ class EditMacro extends PureComponent {
                                     this.fields.name = c;
                                 }}
                                 type="text"
+                                maxLength="12"
                                 className="form-control"
                                 name="name"
                                 value={name}
                                 validations={[validations.required]}
                             />
+                            <small style={{ color: 'grey', marginLeft: '2px' }}>Max 12 characters</small>
                         </div>
                         <div className="form-group">
                             <div>
@@ -140,7 +144,7 @@ class EditMacro extends PureComponent {
                         </div>
                     </Form>
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer style={modalFooterStyle}>
                     <Button
                         btnStyle="danger"
                         className="pull-left"
@@ -189,7 +193,7 @@ class EditMacro extends PureComponent {
                         {i18n._('Cancel')}
                     </Button>
                     <Button
-                        btnStyle="primary"
+                        style={{ backgroundColor: '#3e85c7', color: 'white', backgroundImage: 'none' }}
                         onClick={() => {
                             this.form.validate(err => {
                                 if (err) {
