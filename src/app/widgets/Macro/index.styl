@@ -81,3 +81,74 @@
 .table-bordered {
     border: 1px solid #ddd;
 }
+
+.macro-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(grey, 0.5);
+    height: 40px;
+    font-size: 13px;
+    width: 100%;
+    // max-width: 180px;
+    border-radius: 5px;
+}
+
+.macro-item-control {
+    width: 85%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    outline: none;
+}
+
+.macro-item-options {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-left: 1px solid rgba(grey, 0.5);
+    cursor: pointer;
+    outline: none;
+}
+
+.macro-control-area {
+    display: flex;
+    gap: 1rem;
+}
+
+.add-macro-button {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    border-radius: 50%;
+    background-color: #3e85c7;
+    border: 0;
+    color: white;
+    font-size: 12px;
+}
+
+.macro-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 5px;
+    height: 125px;
+    overflow-y: scroll;
+    padding: 5px;
+}
+
+.macro-menu-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    font-size: 14px;
+    column-gap: 10px;
+    align-items: center;
+}
+
+.empty-result {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
