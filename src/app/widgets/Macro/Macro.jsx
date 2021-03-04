@@ -92,48 +92,14 @@ class Macro extends PureComponent {
                                 </tr>
                             )}
                             {ensureArray(macros).map((macro, index) => (
-                                <tr key={macro.id}>
-                                    <td>
-                                        <Button
-                                            compact
-                                            btnSize="xs"
-                                            btnStyle="flat"
-                                            disabled={!canRunMacro}
-                                            onClick={this.handleRunMacro(macro)}
-                                            title={i18n._('Run Macro')}
-                                        >
-                                            <i className="fa fa-play" />
-                                        </Button>
-                                        <Space width="8" />
-                                        {macro.name}
-                                    </td>
-                                    <td style={{ width: '1%' }}>
-                                        <div className="nowrap">
-                                            <Button
-                                                compact
-                                                btnSize="xs"
-                                                btnStyle="flat"
-                                                disabled={!canLoadMacro}
-                                                onClick={this.handleLoadMacro(macro)}
-                                                title={i18n._('Load Macro')}
-                                            >
-                                                <i className="fa fa-chevron-up" />
-                                            </Button>
-                                            <Button
-                                                compact
-                                                btnSize="xs"
-                                                btnStyle="flat"
-                                                onClick={this.handleEditMacro(macro)}
-                                            >
-                                                <i className="fa fa-edit" />
-                                            </Button>
-                                        </div>
-                                    </td>
-                                </tr>
+                    <MacroItem
+                        key={macro.id}
+                        macro={macro}
+                        onRun={this.handleRunMacro}
+                        onEdit={this.handleEditMacro}
+                        onDelete={this.handleDeleteMacro}
+                    />
                             ))}
-                        </tbody>
-                    </table>
-                </div>
             </div>
         );
     }
