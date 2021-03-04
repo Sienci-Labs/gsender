@@ -405,7 +405,6 @@
     "Error opening port '{{- port}}'": "",
     "Probe": "",
     "Tool Profile": "",
-    "Generate Probe Commands": "",
     "Speed": "",
     "RPM": "",
     "Top": "",
