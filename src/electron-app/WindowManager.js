@@ -1,6 +1,8 @@
 /* eslint import/no-unresolved: 0 */
 import { app, BrowserWindow, shell } from 'electron';
 //import AutoUpdater from './AutoUpdater';
+// const customTitlebar = require('custom-electron-titlebar');
+// import customTitlebar from 'custom-electron-titlebar';
 
 const browserWindowOptions = {
     minWidth: 1280,
@@ -52,6 +54,7 @@ class WindowManager {
     }
 
     openWindow(url, options) {
+        // console.log(customTitlebar)
         const window = new BrowserWindow({
             ...options,
             ...browserWindowOptions,

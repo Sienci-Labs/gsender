@@ -1,5 +1,5 @@
 /* eslint-disable dot-notation */
-/* eslint-disable eqeqeq */
+/* eslint-disable jsx-a11y/heading-has-content */
 
 import ensureArray from 'ensure-array';
 import cx from 'classnames';
@@ -47,7 +47,7 @@ class DisplayPanel extends PureComponent {
             this.setState(prevState => ({
                 controllersAlarmState: hardStopAlarm
             }));
-            if (controllersAlarmState == '1') {
+            if (controllersAlarmState === '1') {
                 controller.command('gcode:stop', { force: true });
             }
         },
@@ -59,7 +59,7 @@ class DisplayPanel extends PureComponent {
         },
         'sender:status': (data, controllerState) => {
             let controllersAlarmState = this.state.controllersAlarmState;
-            if (controllersAlarmState == '1') {
+            if (controllersAlarmState === '1') {
                 controller.command('gcode:stop', { force: true });
             }
         }
@@ -331,46 +331,24 @@ class DisplayPanel extends PureComponent {
                             <i className="fas fa-bullseye" />
                             Zero All
                         </FunctionButton>
-                        <FunctionButton
-                            onClick={() => {
-                                controller.command('gcode', 'G91');
-                                controller.command('gcode:safe', 'G0 Z10', 'G21'); // Retract Z when moving across workspace
-                                controller.command('gcode', 'G90');
-                                controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
-                                controller.command('gcode', 'G0 Z0'); // Move Z up
-                            }}
-                            disabled={!canClick}
-                            primary
-                        >
-                            <i className="fas fa-chart-line" />
+                        <div className={styles.buttonwrap}>
+                            <FunctionButton
+                                onClick={() => {
+                                    controller.command('gcode', 'G91');
+                                    controller.command('gcode:safe', 'G0 Z10', 'G21'); // Retract Z when moving across workspace
+                                    controller.command('gcode', 'G90');
+                                    controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
+                                    controller.command('gcode', 'G0 Z0'); // Move Z up
+                                }}
+                                disabled={!canClick}
+                                primary
+                            >
+                                <i className="fas fa-chart-line" />
                             Go to Zero
-                        </FunctionButton>
+                            </FunctionButton>
+                        </div>
                     </div>
                     <div className={endstops === true ? `${styles.endStopActiveControls}` : `${styles.endStopsDisabled}`}>
-                        <button
-                            type="button"
-                            title="Back Left"
-                            disabled={!canClick}
-                            className={homingHasBeenRun === true ? `${styles.backleft}` : `${styles.backleftdisabled}`}
-                            onClick={() => {
-                                this.actions.jogtoBLCorner();
-                            }}
-                        >
-                            <i className={houseIconPos === 'BL' ? (cx('fa', 'fa-home', styles['blhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-320deg'])} style={{ fontSize: 18 }} />
-                            <h3 className={styles.bltext}>BL</h3>
-                        </button>
-                        <button
-                            type="button"
-                            title="Back Right"
-                            disabled={!canClick}
-                            className={homingHasBeenRun === true ? `${styles.backRight}` : `${styles.backRightdisabled}`}
-                            onClick={() => {
-                                this.actions.jogtoBRCorner();
-                            }}
-                        >
-                            <i className={houseIconPos === 'BR' ? (cx('fa', 'fa-home', styles['brhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-45deg'])} style={{ fontSize: 18 }} />
-                            <h3 className={styles.brtext}>BR</h3>
-                        </button>
                         <button
                             type="button"
                             disabled={!canClick}
@@ -378,30 +356,59 @@ class DisplayPanel extends PureComponent {
                             onClick={
                                 this.actions.startHoming}
                         > <Space width="1" />
-                            <div className="fa fa-home" /> Start Homing
+                            <div className="fa fa-home" /> Home Machine
                         </button>
                         <button
                             type="button"
-                            title="Front Left"
+                            title="Move to Back Left"
+                            disabled={!canClick}
+                            className={homingHasBeenRun === true ? `${styles.backleft}` : `${styles.backleftdisabled}`}
+                            onClick={() => {
+                                this.actions.jogtoBLCorner();
+                            }}
+                        >
+                            <i className={houseIconPos === 'BL' ? (cx('fa', 'fa-home', styles['blhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-320deg'])} style={{ fontSize: 18 }} />
+                            <h3 className={styles.bltext} />
+                        </button>
+                        <button
+                            type="button"
+                            title="Move to Back Right"
+                            disabled={!canClick}
+                            className={homingHasBeenRun === true ? `${styles.backRight}` : `${styles.backRightdisabled}`}
+                            onClick={() => {
+                                this.actions.jogtoBRCorner();
+                            }}
+                        >
+                            <i className={houseIconPos === 'BR' ? (cx('fa', 'fa-home', styles['brhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-45deg'])} style={{ fontSize: 18 }} />
+                            <h3 className={styles.brtext} />
+                        </button>
+                        <label
+                            className={styles.quicktravel}
+                        >
+                            Quick Travel
+                        </label>
+                        <button
+                            type="button"
+                            title="Move to Front Left"
                             disabled={!canClick}
                             className={homingHasBeenRun === true ? `${styles.frontleft}` : `${styles.frontleftdisabled}`}
                             onClick={() => {
                                 this.actions.jogtoFLCorner();
                             }}
                         >
-                            <h3 className={styles.fltext}>FL</h3>
+                            <h3 className={styles.fltext} />
                             <i className={houseIconPos === 'FL' ? (cx('fa', 'fa-home', styles['flhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate--135deg'])} style={{ fontSize: 18 }} />
                         </button>
                         <button
                             type="button"
-                            title="Front Right"
+                            title="Move to Front Right"
                             disabled={!canClick}
                             className={homingHasBeenRun === true ? `${styles.frontright}` : `${styles.frontrightdisabled}`}
                             onClick={() => {
                                 this.actions.jogtoFRCorner();
                             }}
                         >
-                            <h3 className={styles.frtext}>FR</h3>
+                            <h3 className={styles.frtext} />
                             <i className={houseIconPos === 'FR' ? (cx('fa', 'fa-home', styles['frhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate--225deg'])} style={{ fontSize: 18 }} />
                         </button>
                     </div>
