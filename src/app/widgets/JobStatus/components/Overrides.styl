@@ -82,3 +82,36 @@
         display: none;
     }
 }
+
+.overrides {
+    display: grid;
+    grid-gap: 0.25rem;
+    gap: 0.25rem;
+    align-items: center;
+    justify-items: stretch;
+    margin: 0 auto;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-rows: repeat(1, minmax(0, 1fr));
+    margin-top: 0.5rem;
+}
+
+.override-value {
+    color: #295d8d;
+    text-align: right;
+}
+
+.feed-control-button {
+    --tw-border-opacity: 1;
+    --tw-bg-opacity: 0.6;
+    color: rgba(17, 24, 39, 1);
+    text-align center;
+    padding: 0.25rem;
+    margin: 0;
+    font-weight bold;
+    border: solid 1px rgba(156, 163, 175, 1);
+    background-color: rgba(209, 213, 219, 0.6);
+
+    &:hover:enabled {
+        background-color: rgba(209, 213, 219, 0.5);
+    }
+}

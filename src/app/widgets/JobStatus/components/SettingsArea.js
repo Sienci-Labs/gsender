@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import controller from 'app/lib/controller';
 
 import styles from './Overrides.styl';
+import FeedControlButton from './FeedControlButton';
 
 /**
  * Settingd Area component to display override controls for user
@@ -43,16 +44,36 @@ const SettingsArea = ({ state }) => {
 
     return (
         <div className={styles['settings-area']}>
-            <table>
+            <div className={styles.overrides}>
+                <span>Feed:</span>
+                <span className={styles.overrideValue}>{feedrate}</span>
+                <FeedControlButton value={-10} onClick={handleFeedRateChange}>- -</FeedControlButton>
+                <FeedControlButton value={-1} onClick={handleFeedRateChange}>-</FeedControlButton>
+                <FeedControlButton value={1} onClick={handleFeedRateChange}>+</FeedControlButton>
+                <FeedControlButton value={10} onClick={handleFeedRateChange}>+ +</FeedControlButton>
+                <FeedControlButton value={0} onClick={handleFeedRateChange}><i className="fas fa-redo fa-flip-horizontal" /></FeedControlButton>
+                <span>{`${ovF}%`}</span>
+            </div>
+            <div className={styles.overrides}>
+                <span>Spindle:</span>
+                <span className={styles.overrideValue}>{spindle}</span>
+                <FeedControlButton value={-10} onClick={handleSpindleSpeedChange}>- -</FeedControlButton>
+                <FeedControlButton value={-1} onClick={handleSpindleSpeedChange}>-</FeedControlButton>
+                <FeedControlButton value={1} onClick={handleSpindleSpeedChange}>+</FeedControlButton>
+                <FeedControlButton value={10} onClick={handleSpindleSpeedChange}>+ +</FeedControlButton>
+                <FeedControlButton value={0} onClick={handleSpindleSpeedChange}><i className="fas fa-redo fa-flip-horizontal" /></FeedControlButton>
+                <span>{`${ovS}%`}</span>
+            </div>
+            {/*<table width="100%">
                 <tbody>
                     <tr>
                         <td>Feed:</td>
                         <td style={{ color: '#2B5D8B', width: '55px', textAlign: 'right' }}>{feedrate}</td>
-                        <td><button type="button" value={-10} onClick={handleFeedRateChange} aria-label="Decrease Feed Rate by 10%">- -</button></td>
-                        <td><button type="button" value={-1} onClick={handleFeedRateChange} aria-label="Decrease Feed Rate by 1%">-</button></td>
-                        <td><button type="button" value={1} onClick={handleFeedRateChange} aria-label="Increase Feed Rate by 1%">+</button></td>
-                        <td><button type="button" value={10} onClick={handleFeedRateChange} aria-label="Increase Feed Rate by 10%">++</button></td>
-                        <td><button type="button" value={0} onClick={handleFeedRateChange} aria-label="Reset Feed Rate to 100%"><i className="fa fa-undo" /></button></td>
+                        <td><button type="button" value={-10} onClick={handleSpindleSpeedChange} aria-label="Decrease Feed Rate by 10%">- -</button></td>
+                        <td><button type="button" value={-1} onClick={handleSpindleSpeedChange} aria-label="Decrease Feed Rate by 1%">-</button></td>
+                        <td><button type="button" value={1} onClick={handleSpindleSpeedChange} aria-label="Increase Feed Rate by 1%">+</button></td>
+                        <td><button type="button" value={10} onClick={handleSpindleSpeedChange} aria-label="Increase Feed Rate by 10%">++</button></td>
+                        <td><button type="button" value={0} onClick={handleSpindleSpeedChange} aria-label="Reset Feed Rate to 100%"><i className="fa fa-undo" /></button></td>
                         <td><label>{`${ovF}%`}</label>
                         </td>
                     </tr>
@@ -68,7 +89,7 @@ const SettingsArea = ({ state }) => {
                         </td>
                     </tr>
                 </tbody>
-            </table>
+            </table>*/}
         </div>
     );
 };
