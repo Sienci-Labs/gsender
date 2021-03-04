@@ -81,7 +81,7 @@ const main = () => {
             // * `height` Number - The height of the rectangle.
             const bounds = {
                 width: 1280, // Defaults to 1280
-                height: 1024, // Defaults to 1024
+                height: 920, // Defaults to 1024
                 ...store.get('bounds')
             };
             const options = {
