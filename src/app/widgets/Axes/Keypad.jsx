@@ -4,6 +4,7 @@ import frac from 'frac';
 import _uniqueId from 'lodash/uniqueId';
 import _includes from 'lodash/includes';
 import PropTypes from 'prop-types';
+import cx from 'classnames';
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import { MenuItem } from 'app/components/Dropdown';
@@ -175,7 +176,7 @@ class Keypad extends PureComponent {
                         >
                         </JogControl>
                         <JogControl
-                            className={styles.btnUp}
+                            className={cx(styles.btnUp, styles.zTopTransform)}
                             jog={() => actions.jog({ Z: zDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ Z: 1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
@@ -233,7 +234,7 @@ class Keypad extends PureComponent {
                         >
                         </JogControl>
                         <JogControl
-                            className={styles.btnDown}
+                            className={cx(styles.btnDown, styles.zBottomTransform)}
                             jog={() => actions.jog({ Z: -zDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ Z: -1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
