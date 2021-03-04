@@ -396,7 +396,7 @@ class Workspace extends PureComponent {
     }
 
     addResizeEventListener() {
-        this.onResizeThrottled = _.throttle(this.resizeDefaultContainer, 50);
+        this.onResizeThrottled = _.throttle(this.resizeDefaultContainer, 25);
         window.addEventListener('resize', this.onResizeThrottled);
     }
 
