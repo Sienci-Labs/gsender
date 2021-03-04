@@ -22,7 +22,7 @@ const ProbeSettings = ({ active, state, actions }) => {
         >
             <h3 className={styles['settings-title']}>Probe</h3>
             <div className={styles.generalArea}>
-                <div style={{ width: '50%' }}>
+                <div style={{ width: '48%' }}>
                     <Fieldset legend="Probing Settings">
 
                         <Input
@@ -76,7 +76,7 @@ const ProbeSettings = ({ active, state, actions }) => {
 
                 </div>
 
-                <div style={{ width: '50%' }}>
+                <div style={{ width: '48%' }}>
                     <Tools state={state} actions={actions} />
                 </div>
             </div>

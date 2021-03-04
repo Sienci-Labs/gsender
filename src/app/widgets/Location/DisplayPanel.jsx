@@ -4,7 +4,6 @@
 import ensureArray from 'ensure-array';
 import cx from 'classnames';
 import includes from 'lodash/includes';
-import Space from 'app/components/Space';
 import _isEqual from 'lodash/isEqual';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -349,15 +348,12 @@ class DisplayPanel extends PureComponent {
                         </div>
                     </div>
                     <div className={endstops === true ? `${styles.endStopActiveControls}` : `${styles.endStopsDisabled}`}>
-                        <button
-                            type="button"
+                        <FunctionButton
                             disabled={!canClick}
-                            className={styles.centerhomebutton}
-                            onClick={
-                                this.actions.startHoming}
-                        > <Space width="1" />
-                            <div className="fa fa-home" /> Home Machine
-                        </button>
+                            onClick={this.actions.startHoming}
+                        >
+                            <i className="fas fa-home" /> Home Machine
+                        </FunctionButton>
                         <button
                             type="button"
                             title="Move to Back Left"

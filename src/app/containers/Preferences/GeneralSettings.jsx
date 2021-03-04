@@ -31,7 +31,7 @@ const GeneralSettings = ({ active, state, actions }) => {
             <div className={styles.toolMain}>
 
                 <div className={styles.generalArea}>
-                    <div style={{ width: '50% ' }}>
+                    <div style={{ width: '48%' }}>
                         <Fieldset legend="Preferred Units">
                             <RadioGroup
                                 name="units"
@@ -51,7 +51,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                             <MachineProfileOptions />
                         </Fieldset>
                     </div>
-                    <div style={{ width: '50% ' }}>
+                    <div style={{ width: '48%' }}>
                         <Fieldset legend="Jog Speed Presets">
                             <JogSpeeds />
                         </Fieldset>
