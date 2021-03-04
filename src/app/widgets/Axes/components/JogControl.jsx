@@ -78,7 +78,6 @@ class JogControl extends PureComponent {
     render() {
         const props = { ...this.props };
 
-
         return (
             <button
                 className={cx(styles.btnKeypad, props.className)}
