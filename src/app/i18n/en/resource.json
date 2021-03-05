@@ -398,8 +398,6 @@
     "No": "No",
     "Yes": "Yes",
     "Macro": "Macro",
-    "Are you sure you want to load this macro?": "Are you sure you want to load this macro?",
-    "No macros": "No macros",
     "Run": "Run",
     "Error opening serial port '{{- port}}'": "Error opening serial port '{{- port}}'",
     "Error opening port '{{- port}}'": "Error opening port '{{- port}}'",
@@ -472,5 +470,7 @@
     "Rotate Right": "Rotate Right",
     "Flip Horizontally": "Flip Horizontally",
     "Flip Vertically": "Flip Vertically",
-    "Crosshair": "Crosshair"
+    "Crosshair": "Crosshair",
+    "Add New Macro": "Add New Macro",
+    "No macros...": "No macros..."
 }
