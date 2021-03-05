@@ -13,6 +13,8 @@ import insertAtCaret from './insertAtCaret';
 import variables from './variables';
 import styles from './index.styl';
 
+import { modalStyle, modalHeaderStyle, modalTitleStyle, modalBodyStyle, modalFooterStyle } from './modalStyle';
+
 class AddMacro extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
@@ -41,13 +43,13 @@ class AddMacro extends PureComponent {
         const { content = '' } = { ...state.modal.params };
 
         return (
-            <Modal disableOverlay size="md" onClose={actions.closeModal}>
-                <Modal.Header>
-                    <Modal.Title>
+            <Modal size="md" onClose={actions.closeModal} style={modalStyle}>
+                <Modal.Header style={modalHeaderStyle}>
+                    <Modal.Title style={modalTitleStyle}>
                         {i18n._('New Macro')}
                     </Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body style={modalBodyStyle}>
                     <Form
                         ref={c => {
                             this.form = c;
@@ -62,12 +64,14 @@ class AddMacro extends PureComponent {
                                 ref={c => {
                                     this.fields.name = c;
                                 }}
+                                maxLength="12"
                                 type="text"
                                 className="form-control"
                                 name="name"
                                 value=""
                                 validations={[validations.required]}
                             />
+                            <small style={{ color: 'grey', marginLeft: '2px' }}>Max 12 characters</small>
                         </div>
                         <div className="form-group">
                             <div>
@@ -137,14 +141,14 @@ class AddMacro extends PureComponent {
                         </div>
                     </Form>
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer style={modalFooterStyle}>
                     <Button
                         onClick={actions.closeModal}
                     >
                         {i18n._('Cancel')}
                     </Button>
                     <Button
-                        btnStyle="primary"
+                        style={{ backgroundColor: '#3e85c7', color: 'white', backgroundImage: 'none' }}
                         onClick={() => {
                             this.form.validate(err => {
                                 if (err) {
@@ -158,7 +162,7 @@ class AddMacro extends PureComponent {
                             });
                         }}
                     >
-                        {i18n._('OK')}
+                        {i18n._('Add New Macro')}
                     </Button>
                 </Modal.Footer>
             </Modal>
