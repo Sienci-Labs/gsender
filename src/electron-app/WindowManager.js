@@ -54,7 +54,6 @@ class WindowManager {
     }
 
     openWindow(url, options) {
-        // console.log(customTitlebar)
         const window = new BrowserWindow({
             ...options,
             ...browserWindowOptions,
