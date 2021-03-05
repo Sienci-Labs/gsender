@@ -2,7 +2,6 @@
 /* eslint-disable jsx-a11y/heading-has-content */
 
 import ensureArray from 'ensure-array';
-import cx from 'classnames';
 import includes from 'lodash/includes';
 import _isEqual from 'lodash/isEqual';
 import PropTypes from 'prop-types';
@@ -27,6 +26,7 @@ import {
 import styles from './index.styl';
 import AxisButton from './components/AxisButton';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
+import QuickPositionButton from './components/QuickPositionButton';
 
 class DisplayPanel extends PureComponent {
     static propTypes = {
@@ -310,7 +310,7 @@ class DisplayPanel extends PureComponent {
                             {hasAxisZ && this.renderAxis(AXIS_Z)}
                         </tbody>
                     </table>
-                    <div className={endstops === true ? `${styles.endStopsActive}` : `${styles.controlButtons}`}>
+                    <div className={styles.controlButtons}>
                         <FunctionButton
                             onClick={() => {
                                 const wcs = actions.getWorkCoordinateSystem();
@@ -347,62 +347,49 @@ class DisplayPanel extends PureComponent {
                             </FunctionButton>
                         </div>
                     </div>
-                    <div className={endstops === true ? `${styles.endStopActiveControls}` : `${styles.endStopsDisabled}`}>
+                    <div className={endstops ? styles.endStopActiveControls : styles.hidden}>
                         <FunctionButton
                             disabled={!canClick}
                             onClick={this.actions.startHoming}
+                            className={styles.runHomeButton}
                         >
                             <i className="fas fa-home" /> Home Machine
                         </FunctionButton>
-                        <button
-                            type="button"
-                            title="Move to Back Left"
-                            disabled={!canClick}
-                            className={homingHasBeenRun === true ? `${styles.backleft}` : `${styles.backleftdisabled}`}
+                        <QuickPositionButton
+                            disabled={!canClick || !homingHasBeenRun}
+                            className={styles.QPBL}
                             onClick={() => {
                                 this.actions.jogtoBLCorner();
                             }}
-                        >
-                            <i className={houseIconPos === 'BL' ? (cx('fa', 'fa-home', styles['blhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-320deg'])} style={{ fontSize: 16 }} />
-                        </button>
-                        <button
-                            type="button"
-                            title="Move to Back Right"
-                            disabled={!canClick}
-                            className={homingHasBeenRun === true ? `${styles.backRight}` : `${styles.backRightdisabled}`}
+                            icon={(houseIconPos === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                        />
+                        <QuickPositionButton
+                            disabled={!canClick || !homingHasBeenRun}
+                            className={styles.QPBR}
+                            rotate={45}
                             onClick={() => {
                                 this.actions.jogtoBRCorner();
                             }}
-                        >
-                            <i className={houseIconPos === 'BR' ? (cx('fa', 'fa-home', styles['brhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-45deg'])} style={{ fontSize: 16 }} />
-                        </button>
-                        <label
-                            className={styles.quicktravel}
-                        >
-                            Quick Travel
-                        </label>
-                        <button
-                            type="button"
-                            title="Move to Front Left"
-                            disabled={!canClick}
-                            className={homingHasBeenRun === true ? `${styles.frontleft}` : `${styles.frontleftdisabled}`}
+                            icon={(houseIconPos === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                        />
+                        <QuickPositionButton
+                            disabled={!canClick || !homingHasBeenRun}
+                            className={styles.QPFL}
                             onClick={() => {
                                 this.actions.jogtoFLCorner();
                             }}
-                        >
-                            <i className={houseIconPos === 'FL' ? (cx('fa', 'fa-home', styles['flhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate--135deg'])} style={{ fontSize: 16 }} />
-                        </button>
-                        <button
-                            type="button"
-                            title="Move to Front Right"
-                            disabled={!canClick}
-                            className={homingHasBeenRun === true ? `${styles.frontright}` : `${styles.frontrightdisabled}`}
+                            icon={(houseIconPos === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                        />
+                        <QuickPositionButton
+                            disabled={!canClick || !homingHasBeenRun}
+                            className={styles.QPFR}
                             onClick={() => {
                                 this.actions.jogtoFRCorner();
                             }}
-                        >
-                            <i className={houseIconPos === 'FR' ? (cx('fa', 'fa-home', styles['frhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate--225deg'])} style={{ fontSize: 16 }} />
-                        </button>
+                            icon={(houseIconPos === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                        />
+
+
                     </div>
                 </div>
             </Panel>

@@ -88,7 +88,7 @@ class Probe extends PureComponent {
                                 }}
                                 disabled={!canClick}
                             >
-                                Generate Probe Command
+                                Probe
                             </FunctionButton>
                         </div>
                     </div>

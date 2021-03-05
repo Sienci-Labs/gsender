@@ -44,9 +44,9 @@ const Container = styled.div`
     }
 
     h3 {
-      font-weight: 600;
+      font-weight: bold;
       line-height: 1.8rem;
-      font-size: 1.1rem;
+      font-size: 1.6rem;
     }
 
     p {
@@ -55,6 +55,7 @@ const Container = styled.div`
     }
 
     p, h3 {
+      margin: 1px;
     }
 
 `;

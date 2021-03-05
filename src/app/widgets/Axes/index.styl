@@ -79,13 +79,11 @@
 }
 
 .speed-controls {
-    display: flex;
     width: 100%;
-    flex-grow: 1;
-    flex-direction: row;
-    justify-content: space-around;
-    box-sizing: border-box;
-    align-items: center;
+    height: 4rem;
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(3,minmax(0,1fr));
 }
 
 .btn-Keypad {
@@ -176,6 +174,9 @@
     flex-direction: row;
     width: 100%;
     justify-content: space-around
+    height: 100%;
+    align-self center;
+    align-items center;
 }
 
 .xy-keys{
@@ -203,6 +204,8 @@
 .preset-controls{
     width: 25%;
     margin-left: 5%;
+    align-self center;
+
 
     button {
         margin-bottom: 20px;

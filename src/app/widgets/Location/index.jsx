@@ -887,9 +887,10 @@ class LocationWidget extends PureComponent {
 
                         <Widget.DropdownButton
                             title={i18n._('Work Coordinate System')}
+                            className={styles.workspaceDropdown}
                             disabled={!canSendCommand}
                             toggle={(
-                                <div style={{ margin: '0 5px', color: 'black' }}>
+                                <div style={{ fontSize: '1.1rem', lineHeight: '1.5rem', margin: '0 5px', color: 'black' }}>
                                     <label>Workspace: </label>
 
                                     <div className={styles['position-label']}>
