@@ -6,6 +6,7 @@ const ChildComponent = ({ className, active, ...props }) => (
     <div
         {...props}
         className={classNames(className,
+            styles.tabChild,
             { [styles.notActive]: !active }
         )}
     />

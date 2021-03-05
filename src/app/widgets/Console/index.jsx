@@ -226,6 +226,7 @@ class ConsoleWidget extends PureComponent {
                 <Widget.Content
                     className={cx(
                         styles.widgetContent,
+                        styles.heightOverride,
                         { [styles.hidden]: minimized },
                         { [styles.fullscreen]: isFullscreen }
                     )}

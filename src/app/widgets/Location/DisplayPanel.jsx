@@ -347,7 +347,7 @@ class DisplayPanel extends PureComponent {
                             </FunctionButton>
                         </div>
                     </div>
-                    <div className={endstops ? styles.endStopActiveControls : styles.hidden}>
+                    <div className={endstops ? styles.endStopActiveControls : styles.hideHoming}>
                         <FunctionButton
                             disabled={!canClick}
                             onClick={this.actions.startHoming}

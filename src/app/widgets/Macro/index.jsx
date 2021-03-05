@@ -414,6 +414,7 @@ class MacroWidget extends PureComponent {
                 <Widget.Content
                     className={classNames(
                         styles['widget-content'],
+                        styles.heightOverride,
                         { [styles.hidden]: minimized }
                     )}
                 >
