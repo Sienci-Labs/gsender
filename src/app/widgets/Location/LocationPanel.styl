@@ -76,6 +76,7 @@
         font-weight: normal;
 
         &:hover {
+            transform: scale(1.1);
             border: 1px solid #3e85c7;
             transition: 200ms ease-in-out;
             background-color: #E5E7EB;
@@ -101,14 +102,20 @@
         width: 30%;
         height: 30%;
         justify-content: flex-start;
+        flex-direction: column;
         margin-top: 4px;
         display: flex;
         border: none;
         outline: none;
         vertical-align: top;
         text-align: left;
+        margin-right: auto;
         --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
         box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+        max-height: 40px;
+        max-width: 40px;
+        min-width: 35px;
+        min-height: 35px;
 
         &disabled {
             background-color: #3e85c7;
@@ -118,36 +125,35 @@
             justify-content: flex-start;
             margin-top: 4px;
             display: flex;
+            flex-direction: column;
             border: none;
             outline: none;
             vertical-align: top;
             text-align: left;
+            margin-right: auto;
+            max-height: 40px;
+            max-width: 40px;
+            min-width: 35px;
+            min-height: 35px;
             opacity: .6;
             cursor: no-drop;
             pointer-events: none;
         }
 
         &:hover {
+            transform: scale(1.1);
             background-color: #5191cc;
             --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
             box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
         }
     }
 
-    .bltext {
-        align-self: flex-start;
-        color: white;
-        margin-top: 2rem;
-        margin-left: -1px;
-        position: absolute;
-        display: flex;
-        font-size: 1rem;
-    }
-
     .blhomeicon {
         color: white;
-        font-size: 18px;
-        margin-left: -3px;
+        display: flex;
+        align-self: flex-start;
+        margin-right: auto;
+        margin-left: -6px;
     }
 
     .backRight {
@@ -158,9 +164,16 @@
         display: flex;
         margin-top: 4px;
         outline: none;
-        justify-content: flex-end;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-end;
         width: 30%;
         height: 30%;
+        margin-left: auto;
+        max-height: 40px;
+        max-width: 40px;
+        min-width: 35px;
+        min-height: 35px;
 
         &disabled {
             background-color: #3e85c7;
@@ -170,86 +183,83 @@
             display: flex;
             margin-top: 4px;
             outline: none;
-            justify-content: flex-end;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-end;
             width: 30%;
             height: 30%;
+            margin-left: auto;
+            max-height: 40px;
+            max-width: 40px;
+            min-width: 35px;
+            min-height: 35px;
             opacity: .6;
             cursor: no-drop;
             pointer-events: none;
         }
 
         &:hover {
+            transform: scale(1.1);
             background-color: #5191cc;
             --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
             box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
         }
     }
 
-    .brtext {
-        display: flex;
-        color: white;
-        margin-right: -2px;
-        font-size: 1rem;
-        margin-top: 2rem;
-        justify-content: flex-end;
-    }
-
     .brhomeicon {
         color: #fff;
         font-size: 18px;
-        margin-right: -16px;
+        margin-right: -5px;
     }
 
     .frontleft {
         clip-path: polygon(0 0, 40% 0, 40% 60%, 100% 60%, 100% 100%, 0 100%);
         background-color: #3e85c7;
         display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
         width: 30%;
         height: 30%;
-        justify-content: flex-start;
-        align-items: normal;
-        margin-top: auto;
-        margin-left: 0;
         border: none;
         outline: none;
+        margin-right: auto;
+        max-height: 40px;
+        max-width: 40px;
+        min-width: 35px;
+        min-height: 35px;
 
         &disabled {
             clip-path: polygon(0 0, 40% 0, 40% 60%, 100% 60%, 100% 100%, 0 100%);
             background-color: #3e85c7;
             display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
             width: 30%;
             height: 30%;
-            justify-content: flex-start;
-            align-items: normal;
-            margin-top: auto;
-            margin-left: 0;
             border: none;
             outline: none;
+            opacity: .6;
+            margin-right: auto;
+            max-height: 40px;
+            max-width: 40px;
+            min-width: 35px;
+            min-height: 35px;
             opacity: .6;
             cursor: no-drop;
             pointer-events: none;
         }
 
         &:hover {
+            transform: scale(1.1);
             background-color: #5191cc;
             --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
             box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
         }
     }
 
-    .fltext {
-        display: flex;
-        justify-content: flex-start;
-        margin-left: -1px;
-        margin-top: 2rem;
-        color: #fff;
-        font-size: 1rem;
-    }
-
     .flhomeicon {
         color: #fff;
-        font-size: 18px;
-        margin-left: -16px;
+        margin-left: -6px;
         margin-top: 62px;
     }
 
@@ -258,6 +268,9 @@
         background-color: #3e85c7;
         display: flex;
         align-items: flex-end;
+        flex-direction: column;
+        align-items: flex-end;
+        align-content: flex-end;
         justify-content: flex-end;
         border: none;
         outline: none;
@@ -265,12 +278,20 @@
         margin-top: auto;
         width: 30%;
         height: 30%;
+        margin-left: auto;
+        max-height: 40px;
+        max-width: 40px;
+        min-width: 35px;
+        min-height: 35px;
 
         &disabled {
             clip-path: polygon(60% 60%, 60% 0, 100% 0, 100% 100%, 0 99%, 0 60%);
             background-color: #3e85c7;
             display: flex;
             align-items: flex-end;
+            flex-direction: column;
+            align-items: flex-end;
+            align-content: flex-end;
             justify-content: flex-end;
             border: none;
             outline: none;
@@ -278,25 +299,22 @@
             margin-top: auto;
             width: 30%;
             height: 30%;
+            margin-left: auto;
+            max-height: 40px;
+            max-width: 40px;
+            min-width: 35px;
+            min-height: 35px;
             opacity: .6;
             cursor: no-drop;
             pointer-events: none;
         }
 
         &:hover {
+            transform: scale(1.1);
             background-color: #5191cc;
             --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
             box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
         }
-    }
-
-    .frtext {
-        display: flex;
-        justify-content: flex-end;
-        color: #fff;
-        margin-bottom: 2rem;
-        margin-right: -1rem;
-        font-size: 1rem;
     }
 
     .frhomeicon {

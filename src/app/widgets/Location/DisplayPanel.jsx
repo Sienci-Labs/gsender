@@ -363,8 +363,7 @@ class DisplayPanel extends PureComponent {
                                 this.actions.jogtoBLCorner();
                             }}
                         >
-                            <i className={houseIconPos === 'BL' ? (cx('fa', 'fa-home', styles['blhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-320deg'])} style={{ fontSize: 18 }} />
-                            <h3 className={styles.bltext} />
+                            <i className={houseIconPos === 'BL' ? (cx('fa', 'fa-home', styles['blhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-320deg'])} style={{ fontSize: 16 }} />
                         </button>
                         <button
                             type="button"
@@ -375,8 +374,7 @@ class DisplayPanel extends PureComponent {
                                 this.actions.jogtoBRCorner();
                             }}
                         >
-                            <i className={houseIconPos === 'BR' ? (cx('fa', 'fa-home', styles['brhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-45deg'])} style={{ fontSize: 18 }} />
-                            <h3 className={styles.brtext} />
+                            <i className={houseIconPos === 'BR' ? (cx('fa', 'fa-home', styles['brhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate-45deg'])} style={{ fontSize: 16 }} />
                         </button>
                         <label
                             className={styles.quicktravel}
@@ -392,8 +390,7 @@ class DisplayPanel extends PureComponent {
                                 this.actions.jogtoFLCorner();
                             }}
                         >
-                            <h3 className={styles.fltext} />
-                            <i className={houseIconPos === 'FL' ? (cx('fa', 'fa-home', styles['flhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate--135deg'])} style={{ fontSize: 18 }} />
+                            <i className={houseIconPos === 'FL' ? (cx('fa', 'fa-home', styles['flhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate--135deg'])} style={{ fontSize: 16 }} />
                         </button>
                         <button
                             type="button"
@@ -404,8 +401,7 @@ class DisplayPanel extends PureComponent {
                                 this.actions.jogtoFRCorner();
                             }}
                         >
-                            <h3 className={styles.frtext} />
-                            <i className={houseIconPos === 'FR' ? (cx('fa', 'fa-home', styles['frhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate--225deg'])} style={{ fontSize: 18 }} />
+                            <i className={houseIconPos === 'FR' ? (cx('fa', 'fa-home', styles['frhomeicon'])) : cx('fa', 'fa-arrow-circle-up', styles['rotate--225deg'])} style={{ fontSize: 16 }} />
                         </button>
                     </div>
                 </div>
