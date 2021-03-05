@@ -388,8 +388,6 @@ class DisplayPanel extends PureComponent {
                             }}
                             icon={(houseIconPos === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
                         />
-
-
                     </div>
                 </div>
             </Panel>

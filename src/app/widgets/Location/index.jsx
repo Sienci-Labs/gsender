@@ -893,9 +893,9 @@ class LocationWidget extends PureComponent {
                                 <div style={{ fontSize: '1.1rem', lineHeight: '1.5rem', margin: '0 5px', color: 'black' }}>
                                     <label>Workspace: </label>
 
-                                    <div className={styles['position-label']}>
+                                    <div className={styles['position-label'] }>
                                         {wcs}{' '}
-                                        <i className="fas fa-chevron-down fa-xs" style={{ fontSize: '0.8rem' }} />
+                                        <i className={cx('fas fa-chevron-down', styles.smallIcon)} />
                                     </div>
                                 </div>
                             )}
