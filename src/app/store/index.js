@@ -40,6 +40,10 @@ const getConfig = () => {
         content = localStorage.getItem('sienci') || '{}';
     }
 
+    if (content === '{}') {
+        content = this.normalizeState().toString();
+    }
+
     return content;
 };
 
@@ -154,7 +158,7 @@ try {
     cnc.version = get(data, 'version', settings.version);
     cnc.state = get(data, 'state', {});
 } catch (e) {
-    set(settings, 'error.corruptedWorkspaceSettings', true);
+    // set(settings, 'error.corruptedWorkspaceSettings', true);
     log.error(e);
 }
 
