@@ -163,60 +163,59 @@ class WorkflowControl extends PureComponent {
                     accept=".gcode,.gc,.nc,.tap,.cnc"
                 />
                 <div className="btn-toolbar">
-                    <div className="btn-group btn-group-sm" style={{ backgroundColor: 'transparent', width: '100%' }}>
-                        <button
-                            type="button"
-                            className={`${styles['workflow-button-upload']}`}
-                            title={i18n._('Load File')}
-                            onClick={this.handleClickUpload}
-                            // disabled={!canUpload}
-                            style={{ writingMode: 'vertical-lr' }}
-                        >
-                            {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
-                        </button>
 
-                        {
-                            canRun && (
-                                <button
-                                    type="button"
-                                    className={styles['workflow-button-play']}
-                                    title={workflow.state === WORKFLOW_STATE_PAUSED ? i18n._('Resume') : i18n._('Run')}
-                                    onClick={actions.handleRun}
-                                    disabled={!canRun}
-                                >
-                                    {i18n._(`${workflow.state === 'paused' ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
-                                </button>
-                            )
-                        }
+                    <button
+                        type="button"
+                        className={`${styles['workflow-button-upload']}`}
+                        title={i18n._('Load File')}
+                        onClick={this.handleClickUpload}
+                        // disabled={!canUpload}
+                        style={{ writingMode: 'vertical-lr' }}
+                    >
+                        {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
+                    </button>
 
-                        {
-                            canPause && (
-                                <button
-                                    type="button"
-                                    className={styles['workflow-button-pause']}
-                                    title={i18n._('Pause')}
-                                    onClick={actions.handlePause}
-                                    disabled={!canPause}
-                                >
-                                    {i18n._('Pause Job')} <i className="fa fa-pause" style={{ writingMode: 'vertical-lr' }} />
-                                </button>
-                            )
-                        }
+                    {
+                        canRun && (
+                            <button
+                                type="button"
+                                className={styles['workflow-button-play']}
+                                title={workflow.state === WORKFLOW_STATE_PAUSED ? i18n._('Resume') : i18n._('Run')}
+                                onClick={actions.handleRun}
+                                disabled={!canRun}
+                            >
+                                {i18n._(`${workflow.state === 'paused' ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
+                            </button>
+                        )
+                    }
 
-                        {
-                            canStop && (
-                                <button
-                                    type="button"
-                                    className={styles['workflow-button-stop']}
-                                    title={i18n._('Stop')}
-                                    onClick={handleOnStop}
-                                    disabled={!canStop}
-                                >
-                                    {i18n._('Stop Job')} <i className="fa fa-stop" style={{ writingMode: 'vertical-lr' }} />
-                                </button>
-                            )
-                        }
-                    </div>
+                    {
+                        canPause && (
+                            <button
+                                type="button"
+                                className={styles['workflow-button-pause']}
+                                title={i18n._('Pause')}
+                                onClick={actions.handlePause}
+                                disabled={!canPause}
+                            >
+                                {i18n._('Pause Job')} <i className="fa fa-pause" style={{ writingMode: 'vertical-lr' }} />
+                            </button>
+                        )
+                    }
+
+                    {
+                        canStop && (
+                            <button
+                                type="button"
+                                className={styles['workflow-button-stop']}
+                                title={i18n._('Stop')}
+                                onClick={handleOnStop}
+                                disabled={!canStop}
+                            >
+                                {i18n._('Stop Job')} <i className="fa fa-stop" style={{ writingMode: 'vertical-lr' }} />
+                            </button>
+                        )
+                    }
 
                     <Dropdown
                         className="hidden"
