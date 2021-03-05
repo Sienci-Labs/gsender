@@ -29,9 +29,11 @@
 }
 
 .jog-widget {
-    button + button {
-        margin: none;
-    }
+    height: 100%;
+}
+
+.keypad {
+    height: calc(100% - 4rem);
 }
 
 .movementRateButton {
@@ -87,7 +89,6 @@
 }
 
 .btn-Keypad {
-    height: clamp(30px, 3vw, 60px);
     margin: 0 !important;
     padding: 0 !important;
     border: none;
@@ -99,7 +100,8 @@
     flex-grow: 1;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
+    font-size: 1.3rem;
+    align-self: center;
 
 
     &:disabled {
@@ -148,12 +150,14 @@
     width: 60%;
     height: 60%;
     margin-left: 40% !important;
+    margin-bottom: 40% !important;
 }
 .btn-down-right{
     clip-path: url(#fr);
     width: 60%;
     height: 60%;
     margin-right 40% !important;
+    margin-bottom: 40% !important;
 }
 
 .z-top-transform {

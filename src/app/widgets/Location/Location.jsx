@@ -6,17 +6,15 @@ const Location = (props) => {
     const { state, actions } = props;
 
     return (
-        <div>
-            <DisplayPanel
-                canClick={state.canClick}
-                units={state.units}
-                axes={state.axes}
-                machinePosition={state.machinePosition}
-                workPosition={state.workPosition}
-                jog={state.jog}
-                actions={actions}
-            />
-        </div>
+        <DisplayPanel
+            canClick={state.canClick}
+            units={state.units}
+            axes={state.axes}
+            machinePosition={state.machinePosition}
+            workPosition={state.workPosition}
+            jog={state.jog}
+            actions={actions}
+        />
     );
 };
 

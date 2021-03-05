@@ -402,7 +402,7 @@ class Visualizer extends Component {
     getVisibleHeight() {
         const container = document.getElementById('visualizer_container');
 
-        const clientHeight = container.clientHeight;
+        const clientHeight = container.clientHeight - 30;
         return clientHeight;
     }
 

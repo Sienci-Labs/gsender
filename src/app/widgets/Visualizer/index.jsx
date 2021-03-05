@@ -1082,7 +1082,7 @@ class VisualizerWidget extends PureComponent {
         // const showNotifications = showVisualizer && !!state.notification.type;
 
         return (
-            <Widget style={{ paddingBottom: '1px' }} className={styles.flexGrow}>
+            <Widget>
                 <Widget.Header className={styles['visualizer-header']}>
                     <Widget.Title>
                         Visualizer

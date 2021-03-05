@@ -37,6 +37,7 @@ import './styles/app.styl';
 
 const renderPage = () => {
     const container = document.createElement('div');
+    container.style.width = '100%';
     document.body.appendChild(container);
 
     ReactDOM.render(

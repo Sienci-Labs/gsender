@@ -3,7 +3,6 @@ import { Redirect, withRouter } from 'react-router-dom';
 import pubsub from 'pubsub-js';
 import { trackPage } from '../lib/analytics';
 import Workspace from './Workspace';
-import Settings from './Settings';
 import styles from './App.styl';
 
 class App extends PureComponent {
@@ -47,20 +46,13 @@ class App extends PureComponent {
         trackPage(location.pathname);
 
         return (
-            <div>
-                <div className={styles.main}>
-                    <div className={styles.content}>
-                        <Workspace
-                            {...this.props}
-                            style={{
-                                display: (location.pathname !== '/workspace') ? 'none' : 'block'
-                            }}
-                        />
-                        {location.pathname.indexOf('/settings') === 0 &&
-                            <Settings {...this.props} />
-                        }
-                    </div>
-                </div>
+            <div className={styles.main}>
+                <Workspace
+                    {...this.props}
+                    style={{
+                        display: (location.pathname !== '/workspace') ? 'none' : 'block'
+                    }}
+                />
             </div>
         );
     }
