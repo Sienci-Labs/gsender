@@ -170,6 +170,7 @@ class PreferencesPage extends PureComponent {
                         }
                     }
                 });
+                pubsub.publish('probe:updated');
             },
             changeRetractionDistance: (e) => {
                 const probeSettings = { ...this.state.probeSettings };
