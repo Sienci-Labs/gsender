@@ -1,17 +1,19 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import styles from '../index.styl';
 
 import { PRIMARY_COLOR, SECONDARY_COLOR } from '../constants';
 
 const PositionLabel = ({ value, small }) => {
     value = String(value);
     return (
-        <div style={{ fontFamily: 'Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Bitstream Vera Sans Mono",  Monaco, "Courier New", Courier, monospace',
-            fontSize: small ? '14px' : '2rem',
-            padding: '0px 5px',
-            textAlign: 'center',
-            color: small ? SECONDARY_COLOR : PRIMARY_COLOR,
-            fontWeight: small ? '400' : 'bold' }}
+        <div
+            style={{ fontSize: small ? '14px' : '2rem',
+                padding: '0px 5px',
+                textAlign: 'center',
+                color: small ? SECONDARY_COLOR : PRIMARY_COLOR,
+                fontWeight: small ? '400' : 'bold' }}
+            className={styles.axesPositionLabel}
         >
             <span>{value.split('.')[0]}</span>
             <span>.</span>

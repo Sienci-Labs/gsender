@@ -1,16 +1,19 @@
 .wrapper {
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 200;
     display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: space-evenly;
-    align-items: center;
+    flex-direction: row;
+    justify-content center;
+    align-items center;
+    width: 100%;
+    background: #e5e7eb;
+    border: solid 1px #9CA3AF;
 }
 
 .progress-area {
-    width: 100%;
-    max-width: 500px;
+        width:50%;
+        padding: 0 2em;
+        position: relative;
 }
 
 .progress-area-table {
@@ -28,11 +31,12 @@
 
     primary = #D1D5DB;
     secondary = #333;
-
+    width: 50%;
+    padding: 0 2em;
     label {
         margin-bottom: 0;
         background-color: primary;
-        padding: 3px 5px;
+        padding: 3px 3px;
         color: #3E85C8;
         border: 1px solid #9CA3AF;
         min-width: 30px;
@@ -44,7 +48,6 @@
         background-color: primary;
         border: 1px solid #9CA3AF;
         color: secondary;
-        min-width: 55px;
         min-height: 35px;
 
         &:disabled {
@@ -64,9 +67,10 @@
 
 .lines-processed {
     position: absolute;
-    left: 25%;
-    right: 50%;
-    margin: 5px;
+    top: 25%;
+    left: 50%; /* position the left edge of the element at the middle of the parent */
+    transform: translate(-50%, -50%);
+
 }
 
 .seperator {
@@ -76,5 +80,37 @@
 
     @media(max-width: 1440px){
         display: none;
+    }
+}
+
+.overrides {
+    display: grid;
+    grid-gap: 0.25rem;
+    gap: 0.25rem;
+    align-items: center;
+    justify-items: stretch;
+    margin: 0.5rem auto;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-rows: repeat(1, minmax(0, 1fr));
+}
+
+.override-value {
+    color: #295d8d;
+    text-align: right;
+}
+
+.feed-control-button {
+    --tw-border-opacity: 1;
+    --tw-bg-opacity: 0.6;
+    color: rgba(17, 24, 39, 1);
+    text-align center;
+    padding: 0.25rem;
+    margin: 0;
+    font-weight bold;
+    border: solid 1px rgba(156, 163, 175, 1);
+    background-color: rgba(209, 213, 219, 0.6);
+
+    &:hover:enabled {
+        background-color: rgba(209, 213, 219, 0.5);
     }
 }

@@ -1,7 +1,7 @@
 {
-  "name": "SienciSender",
+  "name": "gSender",
   "version": "1.9.22",
-  "productName": "Sienci Sender",
+  "productName": "gSender",
   "description": "CNC Milling Controller",
   "author": "Sienci Labs",
   "license": "MIT",

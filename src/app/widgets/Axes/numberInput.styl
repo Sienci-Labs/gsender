@@ -1,23 +1,18 @@
 .input-wrapper {
   display flex;
   flex-direction: row;
-  width: 90%;
-
-
-.jog-widget {
-  button + button {
-    margin-left: 0;
-  }
-}
+  width: 100%;
+  align-items stretch;
+  flex-grow: 1;
+  border: 1px solid #d8d8d8;
 
   input {
     text-align center;
-    font-size: 16px;
     width: 75%;
     margin: 0;
     padding: 0;
-    font-size: clamp(12px, 1vw, 22px);
-    height: clamp(24px, 2vw, 38px);
+    font-size: 0.9rem;
+    border: none;
     &:focus {
       outline: none;
     }
@@ -38,14 +33,16 @@
 }
 
 .step-button  {
-    height: clamp(12px, 1vw, 20px);
-    border-radius: 4px;
-    border: 1px solid #d8d8d8;
+  border: none;
     position: relative;
     text-align: center;
     font-size: 10px;
     outline: none;
-    background-size: contain;
-    background-repeat: no-repeat;
-    caret-color: transparent;
+    display: flex;
+  flex-grow: 1;
+  margin: 0;
+  padding: 0.25rem;
+  border-radius: 0;
+  flex-direction column;
+  height: 100%;
 }

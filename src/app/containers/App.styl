@@ -5,16 +5,8 @@ body {
 }
 
 .main {
-    position: absolute;
-    top: $navbar-height;
-    left: 0;
-    right: 0;
-    bottom: 0;
     background-color: #d1d5db;
-    min-width: $content-min-width;
+    width: calc(var(--vw, 1vw) * 100);
+    height: calc(var(--vh, 1vh) * 100);
 }
 
-.content {
-    position: relative;
-    background-color: $content-background-color;
-}

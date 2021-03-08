@@ -29,9 +29,11 @@
 }
 
 .jog-widget {
-    button + button {
-        margin: none;
-    }
+    height: 100%;
+}
+
+.keypad {
+    height: calc(100% - 4rem);
 }
 
 .movementRateButton {
@@ -77,18 +79,16 @@
 }
 
 .speed-controls {
-    display: flex;
     width: 100%;
-    flex-grow: 1;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: clamp(5px, 0.55vw, 1rem);
-    box-sizing: border-box;
-    align-items: center;
+    height: 4rem;
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(3,minmax(0,1fr));
 }
 
 .btn-Keypad {
-    height: clamp(30px, 3vw, 60px);
+    margin: 0 !important;
+    padding: 0 !important;
     border: none;
     outline: none;
     background: #3e85c7;
@@ -98,21 +98,20 @@
     flex-grow: 1;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
-    --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    font-size: 1.3rem;
+    align-self: center;
+
 
     &:disabled {
         background: #9CA3AF;
         cursor: no-drop;
     }
+
+    &:hover:enabled {
+        background: #5191cc;
+    }
 }
 
-.control-group {
-    width: 30%;
-    display: flex;
-    flex-direction: column;
-}
 
 .btn-up {
     clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 100%, 50% 75%, 0 100%);
@@ -131,16 +130,39 @@
 }
 
 .btn-up-left{
-    clip-path: polygon(0 0, 0 75%, 75% 0);
+    clip-path: url(#bl);
+    width: 60%;
+    height: 60%;
+    margin-top: 40% !important;
+    margin-left: 40% !important;
 }
 .btn-up-right{
-    clip-path: polygon(100% 75%, 25% 0, 100% 0);
+    clip-path: url(#br);
+    width: 60%;
+    height: 60%;
+    margin-top: 40% !important;
+    margin-right: 40% !important;
 }
 .btn-down-left{
-    clip-path: polygon(0 100%, 0 25%, 75% 100%);
+    clip-path: url(#fl);
+    width: 60%;
+    height: 60%;
+    margin-left: 40% !important;
+    margin-bottom: 40% !important;
 }
 .btn-down-right{
-    clip-path: polygon(25% 100%, 100% 25%, 100% 100%);
+    clip-path: url(#fr);
+    width: 60%;
+    height: 60%;
+    margin-right 40% !important;
+    margin-bottom: 40% !important;
+}
+
+.z-top-transform {
+    transform: translate(40%, 50%);
+}
+.z-bottom-transform {
+    transform: translate(40%, -50%);
 }
 
 .hidden {
@@ -152,13 +174,16 @@
     flex-direction: row;
     width: 100%;
     justify-content: space-around
+    height: 100%;
+    align-self center;
+    align-items center;
 }
 
 .xy-keys{
     width: 50%;
     height: max-content;
     display: grid;
-    grid-gap: 10px;
+    grid-gap: 5px;
     grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
@@ -179,12 +204,33 @@
 .preset-controls{
     width: 25%;
     margin-left: 5%;
-
-    button {
-        margin-bottom: 20px;
-    }
+    align-self center;
 
     button + button {
         margin-left: 0;
     }
+}
+
+.jog-cancel-button {
+    color: #dc2626;
+    border: none;
+    outline: none;
+    font-size: 2rem;
+    display: flex;
+    align-items center;
+    justify-content center;
+    background: none;
+    border-radius: 9999px;
+    background: #cccccc;
+
+    &:disabled {
+        cursor: no-drop;
+        color: #9ca3af
+    }
+}
+
+.hideSVG {
+    position: absolute;
+    width: 0;
+    height: 0;
 }

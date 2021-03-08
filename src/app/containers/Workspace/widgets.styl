@@ -1,5 +1,9 @@
 .widgets {
-    min-height: 240px; // Keep a minimum space for dropping widgets
+    height: 100%;
+    display: grid;
+    grid-template-rows: 32fr 38fr 30fr;
+    grid-gap: 10px;
+    width: 100%;
     // margin-top: 1vh;
     :global {
         // Class name for the chosen item
@@ -15,18 +19,46 @@
 }
 
 .default-widgets {
-    margin: 0 10px;
+    margin-right: 10px;
+    padding: 0 0;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 1;
+    justify-content space-between;
+    min-width: 360px;
+    background-color: #d1d5db;
+    width: 66%;
+    @media (min-width: 1921px) {
+        width: calc(100vw - 630px) !important;
+    }
+
+}
+
+.margin-left {
+    margin-right: 0 !important;
+    margin-left: 10px !important;
 }
 
 .default-widget-wrapper {
-    margin: 10px;
-    
-    &:first-child {
-        position: relative;
-    }
+    display: flex;
+    margin: 0 20px;
+    flex-grow: 1;
+    flex-direction column;
+    justify-content: space-between;
+}
 
-    &:last-child {
-        display: flex;
-        align-items: center;
-    }
+.flex-grow {
+    display: flex;
+    flex-grow: 1;
+    flex-direction column;
+    align-items stretch;
+}
+
+.visualizer-container {
+    flex-shrink: 1;
+}
+
+.job-status-container {
+    flex-shrink: 1;
 }

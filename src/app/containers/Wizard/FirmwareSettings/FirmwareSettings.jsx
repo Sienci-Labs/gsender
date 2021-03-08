@@ -8,7 +8,6 @@ import map from 'lodash/map';
 import { Alert } from 'react-bootstrap';
 import WarningModal from './WarningModal';
 import controller from '../../../lib/controller';
-import WidgetConfig from '../../../widgets/WidgetConfig';
 import styles from '../index.styl';
 import * as GRBL_SETTINGS from '../../../../server/controllers/Grbl/constants';
 import {
@@ -35,8 +34,6 @@ class FirmwareSettings extends PureComponent {
         actions: PropTypes.object,
         modalClose: PropTypes.func
     };
-
-    config = new WidgetConfig('1');
 
     state = this.getInitialState();
 
@@ -86,6 +83,7 @@ class FirmwareSettings extends PureComponent {
 
     getInitialState() {
         return {
+            loading: true,
             disable: true,
             alert: false,
             warning: false,
@@ -106,7 +104,6 @@ class FirmwareSettings extends PureComponent {
         Object.keys(this.controllerEvents).forEach(eventName => {
             const callback = this.controllerEvents[eventName];
             controller.addListener(eventName, callback);
-            this.getCurrentSettings();
         });
     }
 
@@ -125,13 +122,11 @@ class FirmwareSettings extends PureComponent {
     //which is defined by the default settings file used when compiling Grbl
     restoreSettings = () => {
         this.setState({ warning: true });
-        controller.command('gcode', '$RST=$');
-        controller.command('gcode', '$$');
     }
 
     getCurrentSettings = () => {
-        let LoadedSettings = this.state.settings.settings;
-        this.setState({ settings: LoadedSettings });
+        let loadedSettings = this.state.settings.settings;
+        this.setState({ settings: loadedSettings });
     }
 
     gcode(cmd, params) {
@@ -161,7 +156,7 @@ class FirmwareSettings extends PureComponent {
         controller.command('gcode', finalStrings);
         controller.command('gcode', '$$');//Needed so next time wizard is opened changes are reflected
         this.setState({ alert: true });
-        setTimeout(() => this.handleNoUpdates(), 3000);
+        setTimeout(() => this.handleNoUpdates(), 1000);
     }
 
     grabNewNumberInputSettings = (name, value) => {

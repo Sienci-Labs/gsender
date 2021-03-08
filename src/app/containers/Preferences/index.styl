@@ -4,6 +4,10 @@
   display: flex;
   flex-grow: 1;
   border: solid 1px #aab0ba;
+
+  label {
+    margin: 0;
+  }
 }
 
 .preferencesContent {
@@ -13,7 +17,7 @@
 }
 
 .preferencesMenu {
-  width: 30%;
+  width: 20%;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -24,18 +28,15 @@
     padding-left: 10px;
   }
 
-  button + button {
-    border-top: solid 1px #6B7280;
-  }
-
   button {
+    font-size: 1rem;
     border: none;
     width: 100%;
     margin: 0;
     background: none;
     color: white;
     text-align: left;
-    padding: 10px 0 10px 10px;
+    padding: 20px 0 20px 10px;
 
     &:focus {
       outline: none;
@@ -44,10 +45,6 @@
     &:hover{
       background: #374151;
     }
-
-    &:last-child {
-      border-bottom: solid 1px  #6B7280;
-    }
   }
 }
 
@@ -55,9 +52,15 @@
   background: #374151 !important;
 }
 
+.general-area {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  justify-content space-between;
+}
 
 .preferencesOptions {
-  width: 70%;
+  width: 80%;
   background: #d1d5db;
   padding: 10px;
 }
@@ -70,20 +73,11 @@
   display: block;
 }
 
-.settingsContainer {
-
-}
-
 .tool-main {
   display: flex;
   flex-direction: col;
   justify-content: space-between;
   width: 100%;
-
-  h4 {
-    color: #3e85c7;
-    font-size: 1.4rem;
-  }
 }
 
 .tool-listings {
@@ -100,10 +94,14 @@
 
 .tools {
   width: 100%;
-  border-radius: 0.5rem;
+  border-radius: 2px;
   background: white;
+  margin-bottom: 1.4rem;
+  overflow-y: scroll;
+  height: 344px;
 
   .delete {
+    font-size: 1.1rem;
     color: red;
     justify-content center
     align-items center;
@@ -117,7 +115,7 @@
   padding: 10px;
   display: flex;
   flex-direction: row;
-  font-size: 1rem;
+  font-size: 0.9rem;
   align-items center;
   justify-content space-between
   width: 100%;
@@ -139,10 +137,35 @@
   border: none;
   padding: 0.5rem;
   border-radius: 0.25rem;
+  margin-top: 1rem;
 
   &:disabled {
     background: #6B7280;
   }
+}
+
+.jog-speed-active {
+  font-size: 0.7rem;
+  width: 100%;
+  background: #3e85c7;
+  color: #FFFFFF;
+  outline: none;
+  border: none;
+  padding: 7px;
+  border-radius: 0.25rem;
+  margin: 0;
+}
+
+.jog-speed-inactive {
+  font-size: 0.7rem;
+  width: 100%;
+  background: #6B7280;
+  color: #FFFFFF;
+  outline: none;
+  border: none;
+  padding: 7px;
+  border-radius: 0.25rem;
+  margin: 0;
 }
 
 .input-spread {
@@ -151,6 +174,7 @@
   justify-content space-between;
   margin-bottom: 10px;
   align-items center;
+  gap: 1rem
 }
 
 .probe-info {
@@ -163,12 +187,145 @@
 .keybindings-message {
   color: white;
   background-color: #3e85c7;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   padding: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 1.4rem;
 }
 
 .table-wrapper {
-  height: 450px;
+  height: 600px;
   overflow-y: scroll;
+}
+
+.settings-title {
+  font-size: 1.6rem;
+  margin: 10px 0 1.6rem 0;
+}
+
+.settings-subtitle {
+    color: #3e85c7;
+    font-size: 1rem;
+    margin: 10px 0 10px 0;
+}
+
+.settings-wrapper {
+  width: 95%;
+  margin: auto;
+}
+
+.machine-options-inputgroup {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 1.4rem;
+    justify-content: space-between;
+    width: 100%;
+
+    label {
+        font-size: 0.9rem;
+    }
+}
+
+.machine-options-section {
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.machine-options-select {
+    width: 100%;
+    font-size: 15px;
+}
+
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.machine-features-section {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.probe-settings-group {
+  margin: 1rem 0;
+}
+
+.jog-speed-wrapper {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+
+  button {
+    max-width: 30%;
+  }
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.justify-content-space-between {
+  justify-content: space-between;
+}
+
+.justify-content-space-around {
+  justify-content: space-around;
+}
+
+.justify-content-space-evenly {
+  justify-content: space-evenly;
+}
+
+.flex-row {
+  flex-direction: row;
+  justify-content space-between;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.fieldset {
+  border: 2px solid rgba(0,0,0,0.15);
+  padding: 10px;
+  margin-bottom: 1.4rem;
+
+  br {
+    line-height 150%;
+  }
+}
+
+.fieldset-legend {
+  font-size: 1.2rem;
+  color: #3e85c7;
+  margin: 0;
+  width: unset;
+  border-bottom: 0;
+}
+
+.general-area-item {
+  margin-bottom: 1.4rem;
+}
+
+.item-info {
+  color: rgba(0,0,0,0.45);
+}
+
+.input {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 2fr;
+  margin: 0 0 1.5rem 0 !important;
+
+  label {
+    font-size: 1rem;
+    align-self: center;
+  }
 }

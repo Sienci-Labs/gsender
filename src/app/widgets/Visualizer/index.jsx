@@ -20,12 +20,11 @@ import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
 import WorkflowControl from './WorkflowControl';
-import CameraControlArea from './CameraControlArea';
+import MachineStatusArea from './MachineStatusArea';
 import Visualizer from './Visualizer';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
-import TopAccessControl from './TopAccessControl';
 import {
     // Units
     IMPERIAL_UNITS,
@@ -1082,23 +1081,22 @@ class VisualizerWidget extends PureComponent {
         const showVisualizer = capable.view3D && !showLoader;
         // const showNotifications = showVisualizer && !!state.notification.type;
 
-        const { setCurrentTab } = this;
-        const { currentTab, port } = this.state;
-
         return (
-            <Widget style={{ paddingBottom: '1px' }}>
+            <Widget className={styles.vizWidgetOverride}>
                 <Widget.Header className={styles['visualizer-header']}>
-                    <TopAccessControl activeTab={currentTab} setCurrentTab={setCurrentTab} port={port} />
+                    <Widget.Title>
+                        Visualizer
+                    </Widget.Title>
                 </Widget.Header>
                 <Widget.Content
                     ref={node => {
                         this.widgetContent = node;
                     }}
                     className={classNames(
-                        styles.widgetContent,
                         { [styles.view3D]: capable.view3D },
-                        styles['visualizer-component']
+                        styles['visualizer-component'],
                     )}
+                    id="visualizer_container"
                 >
                     {state.gcode.loading &&
                     <Loading />
@@ -1114,8 +1112,8 @@ class VisualizerWidget extends PureComponent {
                     )}
 
                     {WebGL.isWebGLAvailable() && (
-                        <div>
-                            <CameraControlArea
+                        <div className={styles.visualizerWrapper}>
+                            <MachineStatusArea
                                 state={state}
                                 actions={actions}
                             />

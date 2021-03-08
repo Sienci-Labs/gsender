@@ -3,8 +3,6 @@ import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
 import controller from 'app/lib/controller';
 import GeneralSettings from './GeneralSettings';
-import ToolSettings from './Tools/Tools';
-import MachineProfiles from './MachineProfiles';
 import Keybindings from './Keybindings';
 import ProbeSettings from './Probe/ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
@@ -15,12 +13,16 @@ import { METRIC_UNITS } from '../../constants';
 
 class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
+
     state = this.getInitialState();
 
     getInitialState() {
         return {
             selectedMenu: 0,
             units: store.get('workspace.units', METRIC_UNITS),
+            reverseWidgets: store.get('workspace.reverseWidgets', false),
+            autoReconnect: store.get('widgets.connection.autoReconnect', false),
+            baudrate: store.get('widgets.connection.baudrate', 115200),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -32,23 +34,18 @@ class PreferencesPage extends PureComponent {
                     label: 'General',
                     component: GeneralSettings
                 },
+                // {
+                //     id: 1,
+                //     label: 'Tools',
+                //     component: ToolSettings
+                // },
                 {
                     id: 1,
-                    label: 'Tools',
-                    component: ToolSettings
-                },
-                {
-                    id: 2,
-                    label: 'Machine Profiles',
-                    component: MachineProfiles
-                },
-                {
-                    id: 3,
                     label: 'Probe',
                     component: ProbeSettings
                 },
                 {
-                    id: 4,
+                    id: 2,
                     label: 'Keybindings',
                     component: Keybindings
                 }
@@ -81,6 +78,26 @@ class PreferencesPage extends PureComponent {
                     units: units
                 });
                 pubsub.publish('units:change', units);
+            },
+            setReverseWidgets: () => {
+                const reverseWidgetState = !this.state.reverseWidgets;
+                this.setState({
+                    reverseWidgets: reverseWidgetState
+                });
+                pubsub.publish('widgets:reverse', reverseWidgetState);
+            },
+            setAutoReconnect: () => {
+                const autoReconnect = !this.state.autoReconnect;
+                this.setState({
+                    autoReconnect: autoReconnect
+                });
+                pubsub.publish('autoReconnect:update', autoReconnect);
+            },
+            setBaudrate: (option) => {
+                this.setState({
+                    baudrate: option.value
+                });
+                pubsub.publish('baudrate:update', option.value);
             }
         },
         tool: {
@@ -125,6 +142,7 @@ class PreferencesPage extends PureComponent {
                 this.setState({
                     tools: tools
                 });
+                pubsub.publish('tools:updated');
             },
             deleteTool: (index) => {
                 const tools = [...this.state.tools];
@@ -132,13 +150,17 @@ class PreferencesPage extends PureComponent {
                 this.setState({
                     tools: [...tools]
                 });
+                pubsub.publish('tools:updated');
             }
         },
         probe: {
-            handleToggleChange: (key) => {
+            handleToggleChange: (...keys) => {
                 const probe = { ...this.state.probe };
                 const functions = { ...probe.functions };
-                functions[key] = !functions[key];
+
+                keys.forEach((key) => {
+                    functions[key] = !functions[key];
+                });
                 this.setState({
                     probe: {
                         ...probe,
@@ -222,7 +244,9 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units } = this.state;
+        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect } = this.state;
+        store.set('workspace.reverseWidgets', reverseWidgets);
+        store.set('widgets.connection.autoReconnect', autoReconnect);
         store.set('workspace.units', units);
         store.replace('workspace[tools]', tools);
         store.set('workspace[tool]', tool);

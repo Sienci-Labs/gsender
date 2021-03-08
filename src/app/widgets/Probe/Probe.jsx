@@ -10,7 +10,7 @@ import {
 } from '../../constants';
 import styles from './index.styl';
 import ProbeImage from './ProbeImage';
-import MiniCircuitStatus from './MiniCircuitStatus';
+import FunctionButton from '../../components/FunctionButton/FunctionButton';
 
 class Probe extends PureComponent {
     static propTypes = {
@@ -31,7 +31,6 @@ class Probe extends PureComponent {
         } = state;
         const displayUnits = (units === METRIC_UNITS) ? i18n._('mm') : i18n._('in');
         const probeCommand = availableProbeCommands[selectedProbeCommand] || false;
-        const probeActive = actions.returnProbeConnectivity();
 
         return (
             <div className={styles.probeFlex}>
@@ -39,7 +38,6 @@ class Probe extends PureComponent {
                     <div className="form-group">
                         <label className="control-label">
                             {i18n._('Probe')}
-                            <MiniCircuitStatus probeActive={probeActive} />
                         </label>
                         <select className="form-control" onChange={actions.handleProbeCommandChange}>
                             {
@@ -84,16 +82,14 @@ class Probe extends PureComponent {
                     </div>
                     <div className="row no-gutters">
                         <div className="col-xs-12">
-                            <button
-                                type="button"
-                                className={styles.btnPrimary}
+                            <FunctionButton
                                 onClick={() => {
                                     actions.openModal(MODAL_PREVIEW);
                                 }}
                                 disabled={!canClick}
                             >
-                                {i18n._('Generate Probe Commands')}
-                            </button>
+                                Probe
+                            </FunctionButton>
                         </div>
                     </div>
                 </div>

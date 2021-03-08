@@ -3,7 +3,7 @@ import { app, Menu } from 'electron';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
-import menuTemplate from './electron-app/menu-template';
+//import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
@@ -63,7 +63,7 @@ const main = () => {
     app.on('ready', async () => {
         try {
             const res = await launchServer();
-            const { address, port } = { ...res };
+            const { address, port, mountPoints } = { ...res };
             if (!(address && port)) {
                 console.error('Unable to start the server at ' + chalk.cyan(`http://${address}:${port}`));
                 return;
@@ -82,12 +82,13 @@ const main = () => {
             // * `height` Number - The height of the rectangle.
             const bounds = {
                 width: 1280, // Defaults to 1280
-                height: 768, // Defaults to 768
+                height: 920, // Defaults to 1024
                 ...store.get('bounds')
             };
             const options = {
                 ...bounds,
-                title: `${pkg.name} ${pkg.version}`
+                title: `${pkg.name} ${pkg.version}`,
+                titleBarStyle: 'hidden'
             };
             const window = windowManager.openWindow(url, options);
 

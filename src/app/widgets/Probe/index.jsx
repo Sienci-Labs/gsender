@@ -786,8 +786,13 @@ class ProbeWidget extends PureComponent {
 
     subscribe() {
         const tokens = [
-            pubsub.subscribe('units:change', (event, units) => {
+            pubsub.subscribe('units:change', (msg, units) => {
                 this.changeUnits(units);
+            }),
+            pubsub.subscribe('tools:updated', (msg) => {
+                this.setState({
+                    availableTools: store.get('workspace[tools]', [])
+                });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -883,6 +888,7 @@ class ProbeWidget extends PureComponent {
                 <Widget.Content
                     className={classNames(
                         styles['widget-content'],
+                        styles.heightOverride,
                         { [styles.hidden]: minimized }
                     )}
                     active={active}

@@ -1,22 +1,20 @@
 // ==========================================================================
 // Base styles: opinionated defaults
 // ==========================================================================
+@import './variables';
 
 body {
     margin: 0;
-    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-    font-size: 13px;
+    font-family: 'Open Sans', Arial, sans-serif;
     color: #222222;
     text-align: left;
     background-color: #ffffff;
-    min-width: 960px;
-
-    @media (max-width: 767px) {
-        min-width: 0;
-    }
-
     > * {
         user-select: none;
+    }
+
+    &::-webkit-scrollbar {
+        display: none;
     }
 }
 
@@ -87,4 +85,8 @@ button {
     &:focus {
         outline: none;
     }
+}
+
+i {
+    font-size: 1.3rem !important;
 }

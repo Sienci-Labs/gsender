@@ -97,20 +97,18 @@ class NumberInput extends PureComponent {
         const { value } = this.props;
         return (
             <div className={styles.inputWrapper}>
+                <button type="button" className={styles.stepButton} onClick={(e) => this.decrementValue(e)}>
+                    <i className="fa fa-minus fa-fw" style={{ verticalAlign: 'super', fontSize: 'clamp(10px, 1vw, 14px)' }} />
+                </button>
                 <input
                     value={value}
                     type="text"
                     inputMode="decimal"
                     onChange={(e) => this.setValue(e)}
                 />
-                <div className={styles.controlWrapper}>
-                    <button type="button" className={styles.stepButton} onClick={(e) => this.incrementValue(e)}>
-                        <i className="fa fa-caret-up fa-fw" style={{ verticalAlign: 'super', fontSize: 'clamp(10px, 1vw, 14px)' }} />
-                    </button>
-                    <button type="button" className={styles.stepButton} onClick={(e) => this.decrementValue(e)}>
-                        <i className="fa fa-caret-down fa-fw" style={{ verticalAlign: 'super', fontSize: 'clamp(10px, 1vw, 14px)' }} />
-                    </button>
-                </div>
+                <button type="button" className={styles.stepButton} onClick={(e) => this.incrementValue(e)}>
+                    <i className="fa fa-plus fa-fw" style={{ verticalAlign: 'super', fontSize: 'clamp(10px, 1vw, 14px)' }} />
+                </button>
             </div>
 
         );

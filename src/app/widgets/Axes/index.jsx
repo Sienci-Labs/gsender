@@ -35,7 +35,8 @@ import {
     // TinyG
     TINYG,
     // Workflow
-    WORKFLOW_STATE_RUNNING
+    WORKFLOW_STATE_RUNNING,
+    GRBL_ACTIVE_STATE_JOG
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -220,22 +221,24 @@ class AxesWidget extends PureComponent {
             const modal = (units === 'mm') ? 'G21' : 'G20';
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             const commands = [
-                'G91',
-                'G0 ' + s,
-                'G90'
+                `$J=${modal}G91 ` + s,
             ];
-            controller.command('gcode:safe', commands, modal);
+            controller.command('gcode', commands, modal);
         },
         startContinuousJog: (params = {}, feedrate = 1000) => {
+            const { units } = this.state;
             this.setState({
                 isContinuousJogging: true
-            }, controller.command('jog:start', params, feedrate));
+            }, controller.command('jog:start', params, feedrate, units));
         },
         stopContinuousJog: () => {
             this.setState({
                 isContinuousJogging: false
             });
             controller.command('jog:stop');
+        },
+        cancelJog: () => {
+            controller.command('jog:cancel');
         },
         move: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
@@ -426,6 +429,17 @@ class AxesWidget extends PureComponent {
 
             pubsub.publish('jogSpeeds', { xyStep, zStep, feedrate });
         },
+        setJogFromPreset: (presetKey) => {
+            const { jog, units } = this.state;
+            const jogObj = jog[presetKey][units];
+
+            this.setState({
+                jog: {
+                    ...jog,
+                    ...jogObj
+                }
+            });
+        }
     };
 
     shuttleControlEvents = {
@@ -720,7 +734,28 @@ class AxesWidget extends PureComponent {
         }
     };
 
+    updateJogPresets = () => {
+        const { jog } = this.state;
+        const data = store.get('widgets.axes.jog');
+
+        if (!data) {
+            return;
+        }
+        const { rapid, normal, precise } = data;
+
+        this.setState({
+            jog: {
+                ...jog,
+                rapid,
+                normal,
+                precise
+            }
+        });
+    }
+
     componentDidMount() {
+        store.on('change', this.updateJogPresets);
+
         this.fetchMDICommands();
         this.addControllerEvents();
         this.addShuttleControlEvents();
@@ -728,6 +763,7 @@ class AxesWidget extends PureComponent {
     }
 
     componentWillUnmount() {
+        store.removeListener('change', this.updateJogPresets);
         this.unsubscribe();
         this.removeControllerEvents();
         // this.removeShuttleControlEvents();
@@ -755,6 +791,8 @@ class AxesWidget extends PureComponent {
     }
 
     getInitialState() {
+        const { rapid, normal, precise } = store.get('widgets.axes.jog');
+
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
@@ -795,6 +833,9 @@ class AxesWidget extends PureComponent {
                 xyStep: this.getInitialXYStep(),
                 zStep: this.getInitialZStep(),
                 feedrate: this.config.get('jog.feedrate'),
+                rapid,
+                normal,
+                precise,
                 axis: '', // Defaults to empty
                 keypad: this.config.get('jog.keypad'),
                 imperial: {
@@ -912,6 +953,12 @@ class AxesWidget extends PureComponent {
         return true;
     }
 
+    isJogging() {
+        const { controller } = this.state;
+        const activeState = controller.state?.status?.activeState || '';
+        return (activeState === GRBL_ACTIVE_STATE_JOG);
+    }
+
     render() {
         const { widgetId } = this.props;
         const { minimized, isFullscreen } = this.state;
@@ -922,6 +969,7 @@ class AxesWidget extends PureComponent {
             ...this.state,
             // Determine if the motion button is clickable
             canClick: this.canClick(),
+            isJogging: this.isJogging(),
             // Output machine position with the display units
             machinePosition: mapValues(machinePosition, (pos, axis) => {
                 return String(mapPositionToUnits(pos, units));

@@ -1,9 +1,8 @@
-import classNames from 'classnames';
+
 import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 // import i18n from 'app/lib/i18n';
 import { mapPositionToUnits } from 'app/lib/units';
@@ -17,7 +16,6 @@ import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED
 } from '../../constants';
-import styles from './index.styl';
 
 class JobStatusWidget extends PureComponent {
     static propTypes = {
@@ -381,17 +379,10 @@ class JobStatusWidget extends PureComponent {
         };
 
         return (
-            <Widget
-                className={classNames(styles['job-status-widget'])}
-                // borderless
-            >
-                <Widget.Content className={classNames(styles['job-status-widget-content'])}>
-                    <JobStatus
-                        state={state}
-                        actions={actions}
-                    />
-                </Widget.Content>
-            </Widget>
+            <JobStatus
+                state={state}
+                actions={actions}
+            />
         );
     }
 }

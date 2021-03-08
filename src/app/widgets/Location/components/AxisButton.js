@@ -44,17 +44,18 @@ const Container = styled.div`
     }
 
     h3 {
-        font-weight: 600;
-        font-size: clamp(12px, 1vw, 32px);
-        margin-top: -5px;
+      font-weight: bold;
+      line-height: 1.8rem;
+      font-size: 1.6rem;
     }
 
     p {
-        font-size: clamp(9px,0.5vw,14px);
+        margin: 0;
+      
     }
 
     p, h3 {
-        margin: 1px;
+      margin: 1px;
     }
 
 `;

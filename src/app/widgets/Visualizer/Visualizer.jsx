@@ -31,6 +31,7 @@ import {
     CAMERA_MODE_PAN,
     CAMERA_MODE_ROTATE
 } from './constants';
+import styles from './index.styl';
 
 const IMPERIAL_GRID_COUNT = 32; // 32 in
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
@@ -388,6 +389,7 @@ class Visualizer extends Component {
 
     getVisibleWidth() {
         const el = ReactDOM.findDOMNode(this.node);
+
         const visibleWidth = Math.max(
             Number(el && el.parentNode && el.parentNode.clientWidth) || 0,
             360
@@ -396,27 +398,12 @@ class Visualizer extends Component {
         return visibleWidth;
     }
 
+    // TODO: fix resizing on visualizer
     getVisibleHeight() {
-        const idleHeight = 260; // When the workflow status is idle, the job status widget's height is 100px
-        const runningHeight = 260; // When the workflow status is running or paused, the job status widget's height is 150px
+        const container = document.getElementById('visualizer_container');
 
-        const { workflow } = this.props.state;
-
-        let jobStatusWidgetHeight;
-
-        if (workflow.state === 'running' || workflow.state === 'paused') {
-            jobStatusWidgetHeight = runningHeight;
-        } else {
-            jobStatusWidgetHeight = idleHeight;
-        }
-
-        const clientHeight = document.documentElement.clientHeight;
-        const navbarHeight = 50;
-        const visibleHeight = (
-            clientHeight - navbarHeight - jobStatusWidgetHeight - 1
-        );
-
-        return visibleHeight;
+        const clientHeight = container.clientHeight - 30;
+        return clientHeight;
     }
 
     addResizeEventListener() {
@@ -434,7 +421,6 @@ class Visualizer extends Component {
 
         const width = this.getVisibleWidth();
         const height = this.getVisibleHeight();
-
         if (width === 0 || height === 0) {
             log.warn(`The width (${width}) and height (${height}) cannot be a zero value`);
         }
@@ -742,7 +728,7 @@ class Visualizer extends Component {
                 if (geometry.hasColors) {
                     material = new THREE.MeshLambertMaterial({
                         map: texture,
-                        opacity: 0.01,
+                        opacity: 0.6,
                         transparent: false,
                         color: '#caf0f8'
                     });
@@ -1265,6 +1251,7 @@ class Visualizer extends Component {
                     visibility: this.props.show ? 'visible' : 'hidden'
                 }}
                 ref={this.setRef}
+                className={styles.visualizerContainer}
             />
         );
     }

@@ -1,25 +1,57 @@
 import classNames from 'classnames';
-import ensureArray from 'ensure-array';
 import React, { PureComponent } from 'react';
 import store from 'app/store';
-import Widget from './Widget';
+import pubsub from 'pubsub-js';
 import styles from './widgets.styl';
+import JobStatusWidget from '../../widgets/JobStatus';
+import VisualizerWidget from '../../widgets/Visualizer';
+
 
 class DefaultWidgets extends PureComponent {
+    state = {
+        isReverse: store.get('workspace.reverseWidgets', false)
+    }
+
+    pubsubTokens = []
+
+    subscribe () {
+        const tokens = [
+            pubsub.subscribe('widgets:reverse', (msg) => {
+                this.setState({
+                    isReverse: store.get('workspace.reverseWidgets', false)
+                });
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
+
+    componentDidMount() {
+        this.subscribe();
+    }
+
+    componentWillUnmount() {
+        this.unsubscribe();
+    }
+
     render() {
+        const { isReverse } = this.state;
         const { className } = this.props;
-        const defaultWidgets = ensureArray(store.get('workspace.container.default.widgets'));
-        const widgets = defaultWidgets.map(widgetId => (
-            <div data-widget-id={widgetId} key={widgetId} className={styles['default-widget-wrapper']}>
-                <Widget
-                    widgetId={widgetId}
-                />
-            </div>
-        ));
 
         return (
-            <div className={classNames(className, styles['default-widgets'])}>
-                {widgets}
+            <div className={classNames(className, styles['default-widgets'], { [styles.marginLeft]: isReverse })}>
+                <VisualizerWidget
+                    widgetId="visualizer"
+                />
+                <JobStatusWidget
+                    widgetId="job_status"
+                />
             </div>
         );
     }

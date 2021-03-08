@@ -5,6 +5,7 @@ import uniq from 'lodash/uniq';
 import includes from 'lodash/includes';
 import map from 'lodash/map';
 import PropTypes from 'prop-types';
+import pubsub from 'pubsub-js';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
@@ -12,12 +13,15 @@ import log from 'app/lib/log';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
 
+
 class NavbarConnectionWidget extends PureComponent {
     static propTypes = {
         widgetId: PropTypes.string.isRequired,
         disableWizardFunction: PropTypes.func,
         enableWizardFunction: PropTypes.func
     };
+
+    pubsubTokens = [];
 
     // Public methods
     collapse = () => {
@@ -156,7 +160,9 @@ class NavbarConnectionWidget extends PureComponent {
             }));
         },
         'serialport:open': (options) => {
-            this.props.disableWizardFunction();
+            setTimeout(() => {
+                this.props.disableWizardFunction();
+            }, 1500); // delay 1500ms so wizard can load settings
             const { controllerType, port, baudrate, inuse } = options;
             const ports = this.state.ports.map((o) => {
                 if (o.port !== port) {
@@ -207,10 +213,12 @@ class NavbarConnectionWidget extends PureComponent {
     componentDidMount() {
         this.addControllerEvents();
         this.refreshPorts();
+        this.subscribe();
     }
 
     componentWillUnmount() {
         this.removeControllerEvents();
+        this.unsubscribe();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -273,7 +281,7 @@ class NavbarConnectionWidget extends PureComponent {
                     rtscts: this.config.get('connection.serial.rtscts')
                 }
             },
-            autoReconnect: false,
+            autoReconnect: this.config.get('autoReconnect'),
             hasReconnected: false,
             alertMessage: ''
         };
@@ -360,6 +368,29 @@ class NavbarConnectionWidget extends PureComponent {
             // Refresh ports
             controller.listPorts();
         });
+    }
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('autoReconnect:update', (msg, value) => {
+                this.setState({
+                    autoReconnect: value
+                });
+            }),
+            pubsub.subscribe('baudrate:update', (msg, value) => {
+                this.setState({
+                    baudrate: value
+                });
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
     }
 
     render() {

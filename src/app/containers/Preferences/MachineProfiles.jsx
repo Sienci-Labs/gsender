@@ -9,11 +9,11 @@ const MachineProfiles = ({ active, state, actions }) => {
     return (
         <div className={classNames(
             styles.hidden,
-            styles.settingsContainer,
+            styles['settings-wrapper'],
             { [styles.visible]: active }
         )}
         >
-            <h3>
+            <h3 className={styles['settings-title']}>
                 Machine Profiles
             </h3>
 

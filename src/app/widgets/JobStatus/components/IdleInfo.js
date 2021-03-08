@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import styles from './IdleInfo.styl';
+import FileStat from './FileStat';
 
 /**
  * Idle Information component displaying job information when status is set to idle
@@ -15,7 +16,6 @@ const IdleInfo = ({ state }) => {
         total,
         remainingTime,
         fileName,
-        connected,
         fileSize,
         toolsAmount,
         toolsUsed,
@@ -44,7 +44,7 @@ const IdleInfo = ({ state }) => {
      */
     const outputFormattedTime = (givenTime) => {
         if (state.startTime === 0 || !givenTime || givenTime < 0) {
-            return '';
+            return 'N/A';
         }
 
         //Given time is a unix timestamp to be compared to unix timestamp 0
@@ -75,26 +75,26 @@ const IdleInfo = ({ state }) => {
     };
 
     return fileName ? (
-        <div style={{ margin: '0 3rem' }}>
-            <div className={styles['idle-info']}>
-                <div><span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)</div>
-                <div>{`${delta.x}${units} (X) by ${delta.y}${units} (Y) by ${delta.z}${units} (Z)`}</div>
-                <div>~ {outputFormattedTime(remainingTime)} runtime</div>
-
-                <div>Feed Range: {feedrateMin} to {feedrateMax} mm/min</div>
-                <div>Spindle Range: {spindleSpeedMin} to {spindleSpeedMax} RPM</div>
-                <div>Tools Used: {toolsAmount > 0 ? `${toolsAmount} (${formattedToolsUsed()})` : 'None'}</div>
+        <div className={styles['idle-info']}>
+            <div><span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)</div>
+            <div className={styles.idleInfoRow}>
+                <FileStat label="Dimensions">{`${delta.x} ${units} (X)`}<br />{`${delta.y} ${units} (Y)`}<br />{`${delta.z} ${units} (Z)`}</FileStat>
+                <FileStat label="Feed Range">{feedrateMin} to {feedrateMax} mm/min</FileStat>
+                <FileStat label="Spindle Range">{spindleSpeedMin} to {spindleSpeedMax} RPM</FileStat>
+                <FileStat label="Tools Used">{toolsAmount > 0 ? `${toolsAmount} (${formattedToolsUsed()})` : 'None'}</FileStat>
+                <FileStat label="Runtime">{outputFormattedTime(remainingTime)}</FileStat>
             </div>
-
-            {/* <div className={styles['additional-info']}>
-                <div>Feed Range: {feedrateMin} to {feedrateMax} mm/min</div>
-                <div>Spindle Range: {spindleSpeedMin} to {spindleSpeedMax} RPM</div>
-                <div>Tools Used: {toolsAmount > 0 ? `${toolsAmount} (${formattedToolsUsed()})` : 'None'}</div>
-            </div> */}
         </div>
     ) : (
-        <div className={styles['disconnected-info']}>
-            <div>{connected ? 'No File Loaded...' : 'Not Connected to a Machine...'}</div>
+        <div className={styles['idle-info']}>
+            <div><span className={styles['file-name']}>No File Loaded</span></div>
+            <div className={styles.idleInfoRow}>
+                <FileStat label="Dimensions">-</FileStat>
+                <FileStat label="Feed Range">-</FileStat>
+                <FileStat label="Spindle Range">-</FileStat>
+                <FileStat label="Tools Used">-</FileStat>
+                <FileStat label="Runtime">-</FileStat>
+            </div>
         </div>
     );
 };

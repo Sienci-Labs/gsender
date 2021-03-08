@@ -14,7 +14,7 @@ import styles from './index.styl';
 
 // The buffer starts with 254 bytes free. The terminating <LF> or <CR> counts as a byte.
 const TERMINAL_COLS = 254;
-const TERMINAL_ROWS = 10;
+const TERMINAL_ROWS = 12;
 
 class ConsoleWidget extends PureComponent {
     static propTypes = {
@@ -78,7 +78,7 @@ class ConsoleWidget extends PureComponent {
             this.setState({ port: port });
 
             if (this.terminal) {
-                this.terminal.writeln(color.white.bold(`Sienci Sender - [${controller.type}]`));
+                this.terminal.writeln(color.white.bold(`gSender - [${controller.type}]`));
                 this.terminal.writeln(color.white(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: color.yellowBright(port), baudrate: color.blueBright(baudrate) })));
             }
         },
@@ -226,6 +226,7 @@ class ConsoleWidget extends PureComponent {
                 <Widget.Content
                     className={cx(
                         styles.widgetContent,
+                        styles.heightOverride,
                         { [styles.hidden]: minimized },
                         { [styles.fullscreen]: isFullscreen }
                     )}

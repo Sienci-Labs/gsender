@@ -8,8 +8,6 @@ import AvrgirlArduino from './avrgirl-arduino';
 // import gear from './images/gear4.svg';
 
 const FirmwareFlashing = ({ active }) => {
-    // console.log(state);
-
     let getInitialState = () => {
         return {
             fileName: '',

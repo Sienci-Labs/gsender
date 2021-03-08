@@ -2,6 +2,7 @@
 @import "rotate";
 @import "keypad";
 @import "LocationPanel";
+@import "../../styles/variables";
 
 .widget-content {
     position: relative;
@@ -10,6 +11,10 @@
     &.hidden {
         display: none;
     }
+}
+
+.hideHoming {
+    display: none;
 }
 
 .row-space {
@@ -28,6 +33,7 @@
     border: 1px solid #9CA3AF;
     padding: 4px;
     margin-left: 5px;
+    font-size: 0.8rem;
 
     &:hover {
         background-color: rgba(0, 0, 0, .05);
@@ -37,4 +43,144 @@
 .movement {
     background: #3e85c7;
     color: #FFFFFF;
+}
+
+
+.axes-position-label {
+    font-family: $font-family-monospace;
+}
+
+.control-buttons {
+    button {
+        margin-bottom: 10px;
+    }
+}
+
+.display-panel {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content space-between;
+
+}
+.location-wrapper {
+    height: 100%;
+    display: flex;
+    align-items center;
+}
+.machine-position {
+    width: 13ch;
+    align-items center;
+}
+
+.end-stop-active-controls {
+    width: 30%;
+    height: calc(100% - 20px);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+    right: 15px;
+    top: 0;
+    position: absolute;
+}
+
+.quickPositionButton {
+    background: #3e85c7;
+    color: #FFFFFF;
+    border: none;
+    i {
+        text-align left;
+    }
+    &:active {
+        outline: none;
+    }
+    &:hover:enabled {
+        background: #5191cc
+    }
+
+    &:disabled {
+        background: rgb(204, 204, 204);
+        color: #9ca3af;
+    }
+}
+
+.runHomeButton {
+    grid-row: 1;
+    grid-column: 1/4;
+    line-height: 1px;
+    height: fit-content;
+    padding: 8px
+}
+
+.QPBR {
+    clip-path: polygon(0% 0%, 0% 45%, 55% 46%, 55% 100%, 100% 100%, 100% 0%);
+    grid-row: 2;
+    grid-column: 2/3;
+    padding: 0;
+    margin-left: 70%;
+    width: 130%;
+    height: 130%;
+    i {
+        transform: rotate(45deg);
+        font-size: 1.7rem;
+        top: -1.45rem;
+        position: relative;
+        right: 0.25rem;
+    }
+}
+.QPBL {
+    clip-path: polygon(0 0,100% 0,100% 45%,45% 45%,45% 100%,0 100%);
+    grid-row: 2;
+    grid-column: 1/2;
+    padding: 0;
+    width: 130%;
+    height: 130%;
+
+    i {
+        transform: rotate(315deg);
+        font-size: 1.7rem;
+        top: -1.45rem;
+        position: relative;
+        left: 0.25rem;
+    }
+}
+.QPFR {
+    clip-path: polygon(100% 100%, 100% 0%, 55% 0%, 55% 55%, 0% 55%, 0% 100%);
+    grid-row: 3;
+    grid-column: 2/3;
+    margin: 70%;
+    width: 130%;
+    height: 130%;
+    i {
+        transform: rotate(135deg);
+        font-size: 1.7rem;
+        bottom: -1.45rem;
+        position: relative;
+        right: 0.25rem;
+    }
+}
+.QPFL {
+    clip-path: polygon(0% 100%, 100% 100%, 100% 55%, 45% 55%, 45% 0%, 0% 0%);
+    grid-row: 3;
+    grid-column: 1/2;
+    margin-top: 70%;
+    width: 130%;
+    height: 130%;
+    i {
+        transform: rotate(225deg);
+        font-size: 1.7rem;
+        bottom: -1.45rem;
+        position: relative;
+        left: 0.25rem;
+    }
+}
+
+
+.workspaceDropdown {
+    font-size: 1.1rem;
+    line-height: 1.5rem;
+}
+
+.smallIcon {
+    font-size: 0.9rem !important;
 }

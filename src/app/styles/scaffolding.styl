@@ -23,6 +23,24 @@
 
 html {
   font-size: $font-size-base;
+
+  @media screen and (min-width:$screen-sm) {
+    font-size: 11px;
+  }
+
+  @media screen and (max-width: $screen-sm) {
+    font-size: 11px;
+  }
+
+  @media screen and (min-width:$screen-md) {
+    font-size: 12px;
+  }
+
+  @media screen and (min-width: $screen-lg) {
+    font-size: 15px;
+  }
+
+
   -webkit-tap-highlight-color: $gray-base;
 }
 

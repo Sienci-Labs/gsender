@@ -7,8 +7,10 @@ import ensureArray from 'ensure-array';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import store from 'app/store';
 
-import styles from './options.styl';
+import styles from '../index.styl';
 import defaultProfiles from './defaultMachineProfiles';
+
+import Input from '../Input';
 
 
 /**
@@ -39,8 +41,8 @@ export default class Options extends Component {
                     ymin: 0,
                     zmin: 0,
                     xmax: foundProfile.width,
-                    ymax: foundProfile.height,
-                    zmax: foundProfile.depth,
+                    ymax: foundProfile.depth,
+                    zmax: foundProfile.height,
                 }
             });
         }
@@ -62,8 +64,8 @@ export default class Options extends Component {
         //Object to map work area dimmensions to limits
         const limitMap = {
             width: 'xmax',
-            height: 'ymax',
-            depth: 'zmax'
+            height: 'zmax',
+            depth: 'ymax'
         }[name];
 
         // Limit the given value
@@ -137,16 +139,17 @@ export default class Options extends Component {
 
     render() {
         const { machineProfile, machineProfiles } = this.state;
-        const { id, endstops, laser, spindle, coolant, width, depth, height, units } = machineProfile;
+        // const { id, endstops, laser, spindle, coolant, width, depth, height, units } = machineProfile;
+        const { id, endstops, spindle, coolant, width, depth, height, units } = machineProfile;
 
         return (
-            <div style={{ marginTop: '3rem' }}>
-                <div className={styles['options-section']}>
-                    <div style={{ width: '50%' }}>
-                        <label style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>Presets</label>
+            <div>
+                <div className={styles['machine-options-section']}>
+                    <div className={styles['general-area-item']}>
+                        <h4 className={styles['settings-subtitle']}>Presets</h4>
 
                         <Select
-                            className={styles['options-select']}
+                            className={styles['machine-options-select']}
                             value={id}
                             options={machineProfiles.map(({ id, name, company, type }) => ({ key: id, value: id, label: `${company} ${name} ${' - ' && type}` }))}
                             onChange={this.handleSelect}
@@ -154,67 +157,39 @@ export default class Options extends Component {
                         />
                     </div>
 
-                    <div style={{ width: '50%' }}>
-                        <label style={{ fontSize: '1.5rem', marginBottom: '2rem' }}>Cutting Area</label>
+                    <div className={styles['general-area-item']}>
+                        <h4 className={styles['settings-subtitle']}>Cutting Area</h4>
 
-                        <table className={styles['cutting-area']}>
-                            <tbody>
-                                <tr>
-                                    <td className={styles.label}>Width</td>
-                                    <td className={styles.value}>
-                                        <div className="input-group" style={{ width: '156px' }}>
-                                            <input
-                                                type="text"
-                                                name="width"
-                                                className="form-control"
-                                                style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
-                                                value={width}
-                                                onChange={this.handleChange}
-                                            />
-                                            <span className="input-group-addon">{units}</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className={styles.label}>Depth</td>
-                                    <td className={styles.value}>
-                                        <div className="input-group" style={{ width: '156px' }}>
-                                            <input
-                                                type="text"
-                                                name="depth"
-                                                className="form-control"
-                                                style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
-                                                value={depth}
-                                                onChange={this.handleChange}
-                                            />
-                                            <span className="input-group-addon">{units}</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className={styles.label}>Height</td>
-                                    <td className={styles.value}>
-                                        <div className="input-group" style={{ width: '156px' }}>
-                                            <input
-                                                type="text"
-                                                name="height"
-                                                className="form-control"
-                                                style={{ zIndex: '0', fontSize: '1.5rem', textAlign: 'center' }}
-                                                value={height}
-                                                onChange={this.handleChange}
-                                            />
-                                            <span className="input-group-addon">{units}</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <Input
+                            label="Width"
+                            units={units}
+                            value={width}
+                            onChange={this.handleChange}
+                            additionalProps={{ name: 'width', type: 'number' }}
+                        />
+
+                        <Input
+                            label="Depth"
+                            units={units}
+                            value={depth}
+                            onChange={this.handleChange}
+                            additionalProps={{ name: 'depth', type: 'number' }}
+                        />
+
+                        <Input
+                            label="Height"
+                            units={units}
+                            value={height}
+                            onChange={this.handleChange}
+                            additionalProps={{ name: 'height', type: 'number' }}
+                        />
                     </div>
                 </div>
 
-                <div style={{ marginTop: '3rem' }}>
-                    <div className={styles['options-section']}>
-                        <div className={styles['options-inputgroup']}>
+                <div className={styles['general-area-item']}>
+                    <h4 className={styles['settings-subtitle']}>Machine Features</h4>
+                    <div className={styles['machine-features-section']}>
+                        <div className={styles['machine-options-inputgroup']}>
                             <label htmlFor="">Endstops</label>
                             <ToggleSwitch
                                 checked={endstops}
@@ -222,7 +197,7 @@ export default class Options extends Component {
                             />
                         </div>
 
-                        <div className={styles['options-inputgroup']}>
+                        <div className={styles['machine-options-inputgroup']}>
                             <label htmlFor="">Spindle</label>
                             <ToggleSwitch
                                 checked={spindle}
@@ -231,8 +206,8 @@ export default class Options extends Component {
                         </div>
                     </div>
 
-                    <div className={styles['options-section']}>
-                        <div className={styles['options-inputgroup']}>
+                    <div className={styles['machine-features-section']}>
+                        <div className={styles['machine-options-inputgroup']} style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', margin: '0' }}>
                             <label htmlFor="">Coolant</label>
                             <ToggleSwitch
                                 checked={coolant}
@@ -240,13 +215,13 @@ export default class Options extends Component {
                             />
                         </div>
 
-                        <div className={styles['options-inputgroup']}>
+                        {/* <div className={styles['machine-options-inputgroup']} style={{ margin: 0 }}>
                             <label htmlFor="">Laser</label>
                             <ToggleSwitch
                                 checked={laser}
                                 onChange={() => this.handleToggle('laser')}
                             />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

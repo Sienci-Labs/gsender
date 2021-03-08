@@ -7,23 +7,34 @@
 // Fontface
 // -------------------------
 
-// Interstate-ExtraLight
+/* open-sans-regular - latin */
 @font-face {
-    font-family: Interstate-ExtraLight;
-    font-style: normal;
-    font-weight: normal;
-    src: url(../fonts/Interstate-ExtraLight-webfont.eot);
-    src: url(../fonts/Interstate-ExtraLight-webfont.eot?#iefix) format("embedded-opentype"), url(../fonts/Interstate-ExtraLight-webfont.woff) format("woff"), url(../fonts/Interstate-ExtraLight-webfont.ttf) format("truetype"), url(../fonts/Interstate-ExtraLight-webfont.svg#InterstateExtraLight) format("svg");
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/open_sans/open-sans-v18-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local(''),
+          url('../fonts/open_sans/open-sans-v18-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+          url('../fonts/open_sans/open-sans-v18-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+          url('../fonts/open_sans/open-sans-v18-latin-regular.woff') format('woff'), /* Modern Browsers */
+          url('../fonts/open_sans/open-sans-v18-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+          url('../fonts/open_sans/open-sans-v18-latin-regular.svg#OpenSans') format('svg'); /* Legacy iOS */
 }
 
-// Interstate-Light
+/* open-sans-700 - latin */
 @font-face {
-    font-family: Interstate-Light;
-    font-style: normal;
-    font-weight: normal;
-    src: url(../fonts/Interstate-Light-webfont.eot);
-    src: url(../fonts/Interstate-Light-webfont.eot?#iefix) format("embedded-opentype"), url(../fonts/Interstate-Light-webfont.woff) format("woff"), url(../fonts/Interstate-Light-webfont.ttf) format("truetype"), url(../fonts/Interstate-Light-webfont.svg#InterstateLight) format("svg");
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/open_sans/open-sans-v18-latin-700.eot'); /* IE9 Compat Modes */
+  src: local(''),
+          url('../fonts/open_sans/open-sans-v18-latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+          url('../fonts/open_sans/open-sans-v18-latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+          url('../fonts/open_sans/open-sans-v18-latin-700.woff') format('woff'), /* Modern Browsers */
+          url('../fonts/open_sans/open-sans-v18-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+          url('../fonts/open_sans/open-sans-v18-latin-700.svg#OpenSans') format('svg'); /* Legacy iOS */
 }
+
 
 // Headings
 // -------------------------
@@ -53,7 +64,7 @@ h2, .h2,
 h3, .h3 {
   margin-top: $line-height-base-computed;
   margin-bottom: ($line-height-base-computed / 2);
-  
+
   small,
   .small {
     font-size: 72%;
@@ -63,7 +74,7 @@ h3, .h3 {
 h4, .h4,
 h5, .h5,
 h6, .h6 {
-  
+
   margin-top: ($line-height-base-computed / 2);
   margin-bottom: ($line-height-base-computed / 2);
 
@@ -261,7 +272,7 @@ dd {
   dt {
     color: $dl-horizontal-title-color;
   }
-  
+
   @media (min-width: $dl-horizontal-breakpoint) {
     dt {
       float: left;

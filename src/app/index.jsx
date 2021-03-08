@@ -37,6 +37,7 @@ import './styles/app.styl';
 
 const renderPage = () => {
     const container = document.createElement('div');
+    container.style.width = '100%';
     document.body.appendChild(container);
 
     ReactDOM.render(
@@ -114,7 +115,6 @@ series([
     })()
 ]).then(async () => {
     log.info(`${settings.productName} ${settings.version}`);
-
     // Cross-origin communication
     window.addEventListener('message', (event) => {
         // TODO: event.origin

@@ -2,8 +2,8 @@ import _ from 'lodash';
 import classNames from 'classnames';
 import Dropzone from 'react-dropzone';
 import pubsub from 'pubsub-js';
+import Header from 'app/containers/Header';
 import React, { PureComponent } from 'react';
-import ReactDOM from 'react-dom';
 import { withRouter } from 'react-router-dom';
 import api from 'app/api';
 import {
@@ -58,8 +58,11 @@ class Workspace extends PureComponent {
         isDraggingWidget: false,
         isUploading: false,
         showPrimaryContainer: store.get('workspace.container.primary.show'),
-        inactiveCount: _.size(widgetManager.getInactiveWidgets())
+        inactiveCount: _.size(widgetManager.getInactiveWidgets()),
+        reverseWidgets: store.get('workspace.reverseWidgets')
     };
+
+    pubsubTokens = [];
 
     action = {
         openModal: (name = MODAL_NONE, params = {}) => {
@@ -218,11 +221,15 @@ class Workspace extends PureComponent {
 
     resizeDefaultContainer = () => {
         // const sidebar = document.querySelector('#sidebar');
-        const primaryContainer = ReactDOM.findDOMNode(this.primaryContainer);
-        const primaryToggler = ReactDOM.findDOMNode(this.primaryToggler);
         // const secondaryToggler = ReactDOM.findDOMNode(this.secondaryToggler);
-        const defaultContainer = ReactDOM.findDOMNode(this.defaultContainer);
         const { showPrimaryContainer } = this.state;
+
+        // Calculate VH based on current window height
+        let vh = window.innerHeight * 0.01;
+        let vw = window.innerWidth * 0.01;
+        //Update styling with new VH value for CSS calculations
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        document.documentElement.style.setProperty('--vw', `${vw}px`);
 
         { // Mobile-Friendly View
             const { location } = this.props;
@@ -238,13 +245,6 @@ class Workspace extends PureComponent {
             }
         }
 
-        if (showPrimaryContainer) {
-            // defaultContainer.style.left = primaryContainer.offsetWidth + sidebar.offsetWidth + 'px';
-            defaultContainer.style.left = primaryContainer.offsetWidth + 'px';
-        } else {
-            // defaultContainer.style.left = primaryToggler.offsetWidth + sidebar.offsetWidth + 'px';
-            defaultContainer.style.left = primaryToggler.offsetWidth + 'px';
-        }
         // defaultContainer.style.right = secondaryToggler.offsetWidth + 'px';
         // Publish a 'resize' event
         pubsub.publish('resize'); // Also see "widgets/Visualizer"
@@ -361,6 +361,7 @@ class Workspace extends PureComponent {
     componentDidMount() {
         this.addControllerEvents();
         this.addResizeEventListener();
+        this.subscribe();
 
         setTimeout(() => {
             // A workaround solution to trigger componentDidUpdate on initial render
@@ -369,13 +370,13 @@ class Workspace extends PureComponent {
     }
 
     componentWillUnmount() {
+        this.unsubscribe();
         this.removeControllerEvents();
         this.removeResizeEventListener();
     }
 
     componentDidUpdate() {
         store.set('workspace.container.primary.show', this.state.showPrimaryContainer);
-        store.set('workspace.container.secondary.show', this.state.showSecondaryContainer);
 
         this.resizeDefaultContainer();
     }
@@ -395,7 +396,7 @@ class Workspace extends PureComponent {
     }
 
     addResizeEventListener() {
-        this.onResizeThrottled = _.throttle(this.resizeDefaultContainer, 50);
+        this.onResizeThrottled = _.throttle(this.resizeDefaultContainer, 25);
         window.addEventListener('resize', this.onResizeThrottled);
     }
 
@@ -403,6 +404,25 @@ class Workspace extends PureComponent {
         window.removeEventListener('resize', this.onResizeThrottled);
         this.onResizeThrottled = null;
     }
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('widgets:reverse', (msg, value) => {
+                this.setState({
+                    reverseWidgets: value
+                });
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
+
 
     render() {
         const { style, className } = this.props;
@@ -413,6 +433,7 @@ class Workspace extends PureComponent {
             isDraggingFile,
             isDraggingWidget,
             showPrimaryContainer,
+            reverseWidgets
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
         return (
@@ -485,41 +506,36 @@ class Workspace extends PureComponent {
                         this.onDrop(acceptedFiles);
                     }}
                 >
-                    <div className={styles.workspaceTable}>
-                        <div className={styles.workspaceTableRow}>
+                    <div className={classNames(styles.workspaceTable)}>
+                        <Header />
+                        <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
+                            <DefaultWidgets
+                                ref={node => {
+                                    this.defaultContainer = node;
+                                }}
+                            />
                             <div
                                 ref={node => {
                                     this.primaryContainer = node;
                                 }}
                                 className={classNames(
                                     styles.primaryContainer,
-                                    { [styles.hidden]: hidePrimaryContainer }
+                                    { [styles.hidden]: hidePrimaryContainer },
+                                    { [styles.disabled]: disabled }
                                 )}
                             >
-                                <div className={disabled ? `${styles.disabled}` : 'styles.enabled'}>
-                                    <PrimaryWidgets
-                                        ref={node => {
-                                            this.primaryWidgets = node;
-                                        }}
-                                        onForkWidget={this.widgetEventHandler.onForkWidget}
-                                        onRemoveWidget={this.widgetEventHandler.onRemoveWidget}
-                                        onDragStart={this.widgetEventHandler.onDragStart}
-                                        onDragEnd={this.widgetEventHandler.onDragEnd}
-                                    />
-                                </div>
-                            </div>
-                            <div
-                                ref={node => {
-                                    this.defaultContainer = node;
-                                }}
-                                className={classNames(
-                                    styles.defaultContainer,
-                                    styles.fixed
-                                )}
-                            >
-                                <DefaultWidgets />
+                                <PrimaryWidgets
+                                    ref={node => {
+                                        this.primaryWidgets = node;
+                                    }}
+                                    onForkWidget={this.widgetEventHandler.onForkWidget}
+                                    onRemoveWidget={this.widgetEventHandler.onRemoveWidget}
+                                    onDragStart={this.widgetEventHandler.onDragStart}
+                                    onDragEnd={this.widgetEventHandler.onDragEnd}
+                                />
                             </div>
                         </div>
+
                     </div>
                 </Dropzone>
             </div>

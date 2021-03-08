@@ -1,10 +1,12 @@
 /* eslint import/no-unresolved: 0 */
 import { app, BrowserWindow, shell } from 'electron';
 //import AutoUpdater from './AutoUpdater';
+// const customTitlebar = require('custom-electron-titlebar');
+// import customTitlebar from 'custom-electron-titlebar';
 
 const browserWindowOptions = {
     minWidth: 1280,
-    minHeight: 720,
+    minHeight: 1024,
 };
 
 class WindowManager {
@@ -55,6 +57,7 @@ class WindowManager {
         const window = new BrowserWindow({
             ...options,
             ...browserWindowOptions,
+            titleBarStyle: 'hidden',
             show: false
         });
         const webContents = window.webContents;

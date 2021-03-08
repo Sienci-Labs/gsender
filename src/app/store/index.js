@@ -23,7 +23,7 @@ if (isElectron()) {
     const path = window.require('path'); // Require the path module within Electron
     const app = electron.remote.app;
     userData = {
-        path: path.join(app.getPath('userData'), 'sienci.json')
+        path: path.join(app.getPath('userData'), 'cnc.json')
     };
 }
 
@@ -38,6 +38,10 @@ const getConfig = () => {
         }
     } else {
         content = localStorage.getItem('sienci') || '{}';
+    }
+
+    if (content === '{}') {
+        content = this.normalizeState().toString();
     }
 
     return content;
@@ -72,12 +76,6 @@ const persist = (data) => {
 const normalizeState = (state) => {
     //
     // Normalize workspace widgets
-    //
-
-    // Keep default widgets unchanged
-    const defaultList = get(defaultState, 'workspace.container.default.widgets');
-    set(state, 'workspace.container.default.widgets', defaultList);
-
     // Update primary widgets
     let primaryList = get(cnc.state, 'workspace.container.primary.widgets');
     if (primaryList) {
@@ -95,11 +93,9 @@ const normalizeState = (state) => {
     }
 
     primaryList = uniq(ensureArray(primaryList)); // Use the same order in primaryList
-    primaryList = difference(primaryList, defaultList); // Exclude defaultList
 
     secondaryList = uniq(ensureArray(secondaryList)); // Use the same order in secondaryList
     secondaryList = difference(secondaryList, primaryList); // Exclude primaryList
-    secondaryList = difference(secondaryList, defaultList); // Exclude defaultList
 
     set(state, 'workspace.container.primary.widgets', primaryList);
     set(state, 'workspace.container.secondary.widgets', secondaryList);
@@ -140,6 +136,14 @@ const normalizeState = (state) => {
         set(state, 'workspace.units', METRIC_UNITS);
     }
 
+    const reverseWidgets = get(cnc.state, 'workspace.reverseWidgets');
+    if (reverseWidgets) {
+        set(state, 'workspace.reverseWidgets', reverseWidgets);
+    } else {
+        set(state, 'workspace.reverseWidgets', false);
+    }
+
+
     return state;
 };
 
@@ -154,7 +158,7 @@ try {
     cnc.version = get(data, 'version', settings.version);
     cnc.state = get(data, 'state', {});
 } catch (e) {
-    set(settings, 'error.corruptedWorkspaceSettings', true);
+    // set(settings, 'error.corruptedWorkspaceSettings', true);
     log.error(e);
 }
 

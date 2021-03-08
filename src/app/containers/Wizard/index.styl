@@ -1,3 +1,17 @@
+.loadercontainer{
+  display: flex;
+  align-content: center;
+  align-items: center;
+  }
+
+.loader {
+ margin: auto;
+  padding: 10px;
+  &text{
+    font-size: large;
+    }
+}
+
 .header {
   position: absolute;
   top: 2%;
@@ -5,7 +19,7 @@
   margin-top: 37px;
   justify-content: space-around;
   display: flex;
-  height: 9%;
+  height: 8%;
   right: 0;
   z-index: 100;
   border-bottom: 4px solid #1f2937;
@@ -24,7 +38,6 @@
 
 .wizardButtons {
   border-radius: .25rem;
-  max-width: 17rem;
   font-size: 17px;
   transition: all .2s ease-in-out;
   background-color: #e5e7eb;
@@ -86,15 +99,14 @@
 }
 
 .alert {
-    text-align: center;
-    position: absolute;
-    width: 67%;
-    top: 124px;
-    font-size: x-large;
-    height: 8%;
-    z-index: 1000;
+  text-align: center;
+  position: absolute;
+  width: 71%;
+  top: 124px;
+  font-size: x-large;
+  height: 8%;
+  z-index: 1000;
 }
-
 
 .descriptionRow {
   display: -webkit-flex;
@@ -108,7 +120,7 @@
 
 .keyRow {
   width: 50px;
-  font-family: Georgia, serif;
+  font-family: $font-family-arial;
   font-size: 2em;
 }
 

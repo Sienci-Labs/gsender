@@ -6,7 +6,6 @@ import styles from './index.styl';
 const ProbeCircuitStatus = ({ probeActive, connected }) => {
     return (
         <div className={styles.probeStatus}>
-            <h5>Probe Status</h5>
             {
                 connected &&
                 <div className={styles.probeStatus}>
