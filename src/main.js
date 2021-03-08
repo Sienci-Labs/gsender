@@ -3,7 +3,7 @@ import { app, Menu } from 'electron';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
-//import menuTemplate from './electron-app/menu-template';
+import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
@@ -69,8 +69,8 @@ const main = () => {
                 return;
             }
 
-            //const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
-            //Menu.setApplicationMenu(menu);
+            const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
+            Menu.setApplicationMenu(menu);
 
             windowManager = new WindowManager();
 
@@ -82,7 +82,7 @@ const main = () => {
             // * `height` Number - The height of the rectangle.
             const bounds = {
                 width: 1280, // Defaults to 1280
-                height: 920, // Defaults to 1024
+                height: 768, // Defaults to 768
                 ...store.get('bounds')
             };
             const options = {
