@@ -21,6 +21,7 @@ import { in2mm } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
 import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
+import ValidationModal from './ValidationModal';
 import Visualizer from './Visualizer';
 import Loading from './Loading';
 import Rendering from './Rendering';
@@ -220,11 +221,18 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
+            const comments = ['#', ';', '(']; // We assume an opening parenthesis indicates a header line
+
+            //Clean up lines and remove ones that are comments and headers
             const lines = gcode.split('\n')
-                .filter(line => (line.trim().length > 0));
+                .filter(line => (line.trim().length > 0))
+                .filter(line => !comments.some(comment => line.includes(comment)));
 
             const tCommandRegex = /^[T]+[0-9]+/g;
+            const invalidGCodeRegex = /[^NGMXYZIJKF%\-?\.?\d+\.?\s]/gi;
+
             const toolSet = new Set();
+            const invalidGcode = new Set();
 
             //Iterate over the lines and use regex against them
             for (const line of lines) {
@@ -238,6 +246,15 @@ class VisualizerWidget extends PureComponent {
                         }
                     }
                 }
+
+                if (invalidGCodeRegex.test(line)) {
+                    invalidGcode.add(line);
+                }
+            }
+            console.log(invalidGcode);
+
+            if (invalidGcode.size > 0) {
+                this.setState({ invalidGcode: { showModal: true, list: invalidGcode } });
             }
 
             const total = lines.length + 1; //Dwell line added after every gcode parse
@@ -1001,6 +1018,10 @@ class VisualizerWidget extends PureComponent {
             filename: '',
             fileSize: 0, //in bytes
             total: 0,
+            invalidGcode: {
+                showModal: false,
+                list: [],
+            },
         };
     }
 
@@ -1131,6 +1152,15 @@ class VisualizerWidget extends PureComponent {
                                 state={state}
                                 actions={actions}
                             />
+
+                            {
+                                state.invalidGcode.showModal && (
+                                    <ValidationModal
+                                        invalidGcode={state.invalidGcode}
+                                        onClose={() => this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }))}
+                                    />
+                                )
+                            }
                         </div>
                     )}
                 </Widget.Content>
