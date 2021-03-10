@@ -1,12 +1,13 @@
 import '@babel/polyfill';
-import { app, Menu } from 'electron';
+import { app, Menu, ipcMain } from 'electron';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
-//import menuTemplate from './electron-app/menu-template';
+import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
+import { autoUpdater } from 'electron-updater';
 
 // The selection menu
 const selectionMenu = Menu.buildFromTemplate([
@@ -54,6 +55,10 @@ const main = () => {
         }
     });
 
+    ipcMain.on('app_version', (event) => {
+        event.sender.send('app_version', { version: app.getVersion() });
+    });
+
     const store = new Store();
 
     // Create the user data directory if it does not exist
@@ -69,8 +74,8 @@ const main = () => {
                 return;
             }
 
-            //const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
-            //Menu.setApplicationMenu(menu);
+            const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
+            Menu.setApplicationMenu(menu);
 
             windowManager = new WindowManager();
 
@@ -82,7 +87,7 @@ const main = () => {
             // * `height` Number - The height of the rectangle.
             const bounds = {
                 width: 1280, // Defaults to 1280
-                height: 920, // Defaults to 1024
+                height: 768, // Defaults to 768
                 ...store.get('bounds')
             };
             const options = {
@@ -97,6 +102,12 @@ const main = () => {
                 store.set('bounds', window.getBounds());
             });
 
+            //Check for available updates
+
+            window.on('ready-to-show', () => {
+                autoUpdater.checkForUpdatesAndNotify();
+            });
+
             // https://github.com/electron/electron/issues/4068#issuecomment-274159726
             window.webContents.on('context-menu', (event, props) => {
                 const { selectionText, isEditable } = props;
@@ -108,6 +119,18 @@ const main = () => {
                     // Shows a selection menu if there was selected text
                     selectionMenu.popup(window);
                 }
+
+                // What to do in cases where update is available
+                autoUpdater.on('update-available', () => {
+                    window.webContents.send('update_available');
+                });
+                autoUpdater.on('update-downloaded', () => {
+                    window.webContents.send('update_downloaded');
+                });
+
+                ipcMain.on('restart_app', () => {
+                    autoUpdater.quitAndInstall();
+                });
             });
         } catch (err) {
             console.error('Error:', err);

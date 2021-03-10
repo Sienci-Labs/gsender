@@ -793,7 +793,17 @@ class ProbeWidget extends PureComponent {
                 this.setState({
                     availableTools: store.get('workspace[tools]', [])
                 });
+            }),
+            pubsub.subscribe('probe:updated', (msg) => {
+                const touchplate = store.get('workspace[probeProfile]', {});
+                console.log(touchplate);
+                this.setState({
+                    touchplate: touchplate
+                }, () => {
+                    this.actions.generatePossibleProbeCommands();
+                });
             })
+
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }

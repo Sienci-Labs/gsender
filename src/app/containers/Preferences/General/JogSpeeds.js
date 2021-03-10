@@ -50,7 +50,6 @@ export default class JogSpeeds extends Component {
         const id = e.target.id;
         const value = Number(e.target.value);
         const { currentPreset, units } = this.state;
-        // const { jogSpeeds } = this.state;
 
         if (value <= 0) {
             return;
@@ -86,14 +85,8 @@ export default class JogSpeeds extends Component {
         };
         this.setState(prev => ({ currentPreset: {
             ...prev.currentPreset,
-            in: {
-                ...prev.currentPreset?.in,
-                [id]: imperialValue
-            },
-            mm: {
-                ...prev.currentPreset?.in,
-                [id]: metricValue
-            },
+            in: newObj.in,
+            mm: newObj.mm,
         } }));
         store.replace('widgets.axes', updated);
     }

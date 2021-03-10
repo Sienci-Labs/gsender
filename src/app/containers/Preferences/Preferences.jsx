@@ -139,6 +139,7 @@ class PreferencesPage extends PureComponent {
                 const tools = [...this.state.tools];
                 const tool = this.state.tool;
                 tools.push(tool);
+                tools.sort(this.toolSortCompare);
                 this.setState({
                     tools: tools
                 });
@@ -169,6 +170,7 @@ class PreferencesPage extends PureComponent {
                         }
                     }
                 });
+                pubsub.publish('probe:updated');
             },
             changeRetractionDistance: (e) => {
                 const probeSettings = { ...this.state.probeSettings };
@@ -254,6 +256,16 @@ class PreferencesPage extends PureComponent {
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
+    }
+
+    toolSortCompare(a, b) {
+        if (a.metricDiameter < b.metricDiameter) {
+            return -1;
+        }
+        if (a.metricDiameter > b.metricDiameter) {
+            return 1;
+        }
+        return 0;
     }
 
     convertToMetric(diameter) {

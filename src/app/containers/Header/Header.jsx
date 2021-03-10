@@ -7,10 +7,12 @@ import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
+import pubsub from 'pubsub-js';
 import NavbarConnection from 'app/widgets/NavbarConnection';
 import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
+
 
 //const releases = 'https://github.com/cncjs/cncjs/releases';
 
@@ -240,11 +242,16 @@ class Header extends PureComponent {
         this.setState({ wizardDisabled: true });
     }
 
+    toggleUpdateToast() {
+        pubsub.publish('showUpdateToast');
+        console.log('show');
+    }
+
     render() {
         return (
             <div className={styles.navBar}>
                 <div className={styles.primary}>
-                    <NavLogo />
+                    <NavLogo updateAvailable={true} onClick={() => this.toggleUpdateToast()} />
                     <NavbarConnection
                         state={this.state}
                         actions={this.actions}

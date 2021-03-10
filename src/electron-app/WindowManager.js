@@ -6,7 +6,7 @@ import { app, BrowserWindow, shell } from 'electron';
 
 const browserWindowOptions = {
     minWidth: 1280,
-    minHeight: 1024,
+    minHeight: 768,
 };
 
 class WindowManager {
