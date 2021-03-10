@@ -61,6 +61,9 @@ class UpdateAvailableAlert extends PureComponent {
                     <div>
                         Update downloaded and available to install.  Restart now?
                     </div>
+                    <button className={styles.restartButton}>
+                        Restart and Install
+                    </button>
                 </div>
                 <div className={styles.closeModal}>
                     <button onClick={actions.hideModal}>

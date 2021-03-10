@@ -127,6 +127,10 @@ const main = () => {
                 autoUpdater.on('update-downloaded', () => {
                     window.webContents.send('update_downloaded');
                 });
+
+                ipcMain.on('restart_app', () => {
+                    autoUpdater.quitAndInstall();
+                });
             });
         } catch (err) {
             console.error('Error:', err);
