@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.9.22",
+  "version": "0.6.1",
   "description": "Electron sender for GRBL based CNC machines",
   "author": "Sienci Labs",
   "main": "./dist/cncjs/server-cli.js",
@@ -15,7 +15,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:cncjs/cncjs.git"
+    "url": "https://github.com/Sienci-Labs/sender.git"
   },
   "license": "MIT",
   "engines": {
@@ -186,6 +186,7 @@
     "electron-store": "~3.2.0",
     "electron-titlebar": "0.0.3",
     "electron-titlebar-windows": "^3.0.0",
+    "electron-updater": "^4.3.8",
     "ensure-array": "~1.0.0",
     "errorhandler": "~1.5.0",
     "es5-shim": "~4.5.13",

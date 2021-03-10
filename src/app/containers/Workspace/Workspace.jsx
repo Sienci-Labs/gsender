@@ -27,6 +27,7 @@ import {
     MODAL_FEEDER_WAIT,
     MODAL_SERVER_DISCONNECTED
 } from './constants';
+import UpdateAvailableAlert from './UpdateAvailableAlert/UpdateAvailableAlert';
 
 const WAIT = '%wait';
 
@@ -507,6 +508,7 @@ class Workspace extends PureComponent {
                     }}
                 >
                     <div className={classNames(styles.workspaceTable)}>
+                        <UpdateAvailableAlert />
                         <Header />
                         <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
                             <DefaultWidgets
