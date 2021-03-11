@@ -9,7 +9,7 @@ import WidgetConfig from '../../widgets/WidgetConfig';
 import store from '../../store';
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
-
+import { convertToImperial, convertToMetric } from './calculate';
 
 class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
@@ -195,40 +195,76 @@ class PreferencesPage extends PureComponent {
             changeXYThickness: (e) => {
                 const value = Number(e.target.value);
                 const probe = { ...this.state.probe };
+
+                const { units } = this.state;
+
+                const metricValue = units === 'mm' ? value : convertToMetric(value);
+                const imperialValue = units === 'in' ? value : convertToImperial(value);
+
                 this.setState({
                     probe: {
                         ...probe,
-                        xyThickness: value
+                        xyThickness: {
+                            mm: metricValue,
+                            in: imperialValue
+                        }
                     }
                 });
             },
             changeZThickness: (e) => {
                 const value = Number(e.target.value);
                 const probe = { ...this.state.probe };
+
+                const { units } = this.state;
+
+                const metricValue = units === 'mm' ? value : convertToMetric(value);
+                const imperialValue = units === 'in' ? value : convertToImperial(value);
+
                 this.setState({
                     probe: {
                         ...probe,
-                        zThickness: value
+                        zThickness: {
+                            mm: metricValue,
+                            in: imperialValue
+                        }
                     }
                 });
             },
             changePlateWidth: (e) => {
                 const value = Number(e.target.value);
                 const probe = { ...this.state.probe };
+
+                const { units } = this.state;
+
+                const metricValue = units === 'mm' ? value : convertToMetric(value);
+                const imperialValue = units === 'in' ? value : convertToImperial(value);
+
                 this.setState({
                     probe: {
                         ...probe,
-                        plateWidth: value
+                        plateWidth: {
+                            mm: metricValue,
+                            in: imperialValue
+                        }
                     }
                 });
             },
             changePlateLength: (e) => {
                 const value = Number(e.target.value);
                 const probe = { ...this.state.probe };
+
+                const { units } = this.state;
+
+                const metricValue = units === 'mm' ? value : convertToMetric(value);
+                const imperialValue = units === 'in' ? value : convertToImperial(value);
+
                 this.setState({
                     probe: {
                         ...probe,
-                        plateLength: value
+                        plateLength: {
+                            mm: metricValue,
+                            in: imperialValue
+                        }
                     }
                 });
             },
