@@ -104,11 +104,7 @@ const main = () => {
             });
 
             //Check for available updates
-
-            window.on('ready-to-show', () => {
-                console.log('ready');
-                autoUpdater.checkForUpdatesAndNotify();
-            });
+            await autoUpdater.checkForUpdatesAndNotify();
 
             // https://github.com/electron/electron/issues/4068#issuecomment-274159726
             window.webContents.on('context-menu', (event, props) => {
@@ -121,19 +117,28 @@ const main = () => {
                     // Shows a selection menu if there was selected text
                     selectionMenu.popup(window);
                 }
-
-                // What to do in cases where update is available
-                autoUpdater.on('update-available', () => {
-                    window.webContents.send('update_available');
-                });
-                autoUpdater.on('update-downloaded', () => {
-                    window.webContents.send('update_downloaded');
-                });
-
-                ipcMain.on('restart_app', () => {
-                    autoUpdater.quitAndInstall();
-                });
             });
+
+            // What to do in cases where update is available
+            autoUpdater.on('checking-for-updates', () => {
+                window.webContents.send('message', 'CHECKING UPDATES');
+            });
+            autoUpdater.on('update-not-available', (ev, info) => {
+                window.webContents.send('message', 'Update not available.');
+            });
+            autoUpdater.on('update-available', () => {
+                window.webContents.send('message', 'Update Available');
+            });
+            autoUpdater.on('update-downloaded', () => {
+                window.webContents.send('update_downloaded');
+            });
+            autoUpdater.on('error', (ev, e) => {
+                window.webContents.send('message', `Error: ${e}`);
+            });
+            ipcMain.on('restart_app', () => {
+                autoUpdater.quitAndInstall();
+            });
+
         } catch (err) {
             console.error('Error:', err);
         }

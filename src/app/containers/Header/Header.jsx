@@ -247,6 +247,12 @@ class Header extends PureComponent {
     }
 
     registerIPCListeners () {
+        window.ipcRenderer.on('message', (event, msg) => {
+            console.log(msg);
+        });
+        window.ipcRenderer.on('window:ready', () => {
+            console.log('WINDOW READY');
+        });
         window.ipcRenderer.on('update_downloaded', () => {
             this.setState({
                 updateAvailable: true
