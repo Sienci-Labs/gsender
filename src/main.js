@@ -1,5 +1,6 @@
 import '@babel/polyfill';
 import { app, Menu, ipcMain } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
@@ -7,7 +8,7 @@ import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
-import { autoUpdater } from 'electron-updater';
+
 
 // The selection menu
 const selectionMenu = Menu.buildFromTemplate([
@@ -105,6 +106,7 @@ const main = () => {
             //Check for available updates
 
             window.on('ready-to-show', () => {
+                console.log('ready');
                 autoUpdater.checkForUpdatesAndNotify();
             });
 

@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "0.6.1",
+  "version": "0.6.0",
   "description": "Electron sender for GRBL based CNC machines",
   "author": "Sienci Labs",
   "main": "./dist/cncjs/server-cli.js",
@@ -79,7 +79,9 @@
       "output": "output",
       "app": "dist/cncjs"
     },
-    "publish": [],
+    "publish": {
+      "provider": "github"
+    },
     "mac": {
       "category": "public.app-category.productivity",
       "target": [

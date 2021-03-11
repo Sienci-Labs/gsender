@@ -3,6 +3,7 @@ import { app, BrowserWindow, shell } from 'electron';
 //import AutoUpdater from './AutoUpdater';
 // const customTitlebar = require('custom-electron-titlebar');
 // import customTitlebar from 'custom-electron-titlebar';
+import path from 'path';
 
 const browserWindowOptions = {
     minWidth: 1280,
@@ -58,7 +59,11 @@ class WindowManager {
             ...options,
             ...browserWindowOptions,
             titleBarStyle: 'hidden',
-            show: false
+            show: false,
+            webPreferences: {
+                nodeIntegration: true,
+                preload: path.join(__dirname, 'preload.js')
+            }
         });
         const webContents = window.webContents;
 

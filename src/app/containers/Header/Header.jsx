@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import without from 'lodash/without';
 import Push from 'push.js';
+import isElectron from 'is-electron';
 import api from 'app/api';
 import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
@@ -12,8 +13,6 @@ import NavbarConnection from 'app/widgets/NavbarConnection';
 import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
-
-
 //const releases = 'https://github.com/cncjs/cncjs/releases';
 
 
@@ -81,7 +80,7 @@ class Header extends PureComponent {
             } catch (res) {
                 // Ignore error
             }
-        }
+        },
     };
 
     actionHandlers = {
@@ -182,7 +181,8 @@ class Header extends PureComponent {
             commands: [],
             runningTasks: [],
             currentVersion: settings.version,
-            latestVersion: settings.version
+            latestVersion: settings.version,
+            updateAvailable: false
         };
     }
 
@@ -192,9 +192,9 @@ class Header extends PureComponent {
         this.addActionHandlers();
         this.addControllerEvents();
 
-        // Initial actions
-        this.actions.checkForUpdates();
-        this.actions.fetchCommands();
+        if (isElectron()) {
+            this.registerIPCListeners();
+        }
     }
 
     componentWillUnmount() {
@@ -244,14 +244,25 @@ class Header extends PureComponent {
 
     toggleUpdateToast() {
         pubsub.publish('showUpdateToast');
-        console.log('show');
+    }
+
+    registerIPCListeners () {
+        window.ipcRenderer.on('update_downloaded', () => {
+            this.setState({
+                updateAvailable: true
+            });
+        });
+        window.ipcRenderer.on('update_available', () => {
+            console.log('Found available update');
+        });
     }
 
     render() {
+        const { updateAvailable } = this.state;
         return (
             <div className={styles.navBar}>
                 <div className={styles.primary}>
-                    <NavLogo updateAvailable={true} onClick={() => this.toggleUpdateToast()} />
+                    <NavLogo updateAvailable={updateAvailable} onClick={() => this.toggleUpdateToast()} />
                     <NavbarConnection
                         state={this.state}
                         actions={this.actions}
