@@ -51,10 +51,22 @@ const defaultState = {
             }
         },
         probeProfile: {
-            xyThickness: 10,
-            zThickness: 15,
-            plateWidth: 50,
-            plateLength: 50,
+            xyThickness: {
+                mm: 10,
+                in: 0.393
+            },
+            zThickness: {
+                mm: 15,
+                in: 0.590
+            },
+            plateWidth: {
+                mm: 50,
+                in: 1.968
+            },
+            plateLength: {
+                mm: 50,
+                in: 1.968
+            },
             functions: {
                 x: true,
                 y: true,
