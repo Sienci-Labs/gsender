@@ -93,7 +93,7 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `${pkg.name} ${pkg.version}`,
+                title: `gSender ${pkg.version}`,
                 titleBarStyle: 'hidden'
             };
             const window = windowManager.openWindow(url, options);

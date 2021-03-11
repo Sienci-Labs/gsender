@@ -66,7 +66,9 @@ class WindowManager {
             }
         });
         const webContents = window.webContents;
-
+        window.webContents.on('did-finish-load', () => {
+            window.setTitle(options.title);
+        });
         window.on('closed', (event) => {
             const index = this.windows.indexOf(event.sender);
             console.assert(index >= 0);
