@@ -248,7 +248,7 @@ class AxesWidget extends PureComponent {
                 if (state === GRBL_ACTIVE_STATE_IDLE) {
                     return;
                 }
-                controller.command('feedhold');
+                controller.command('reset');
             }
         },
         move: (params = {}) => {

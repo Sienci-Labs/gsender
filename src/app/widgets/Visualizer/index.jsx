@@ -5,6 +5,7 @@ import includes from 'lodash/includes';
 import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
+import store from 'app/store';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Anchor from 'app/components/Anchor';
@@ -56,7 +57,7 @@ import {
     NOTIFICATION_M30_PROGRAM_END,
     NOTIFICATION_M6_TOOL_CHANGE,
     NOTIFICATION_M109_SET_EXTRUDER_TEMPERATURE,
-    NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE
+    NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE, LIGHT_THEME, LIGHT_THEME_VALUES, DARK_THEME, DARK_THEME_VALUES
 } from './constants';
 import styles from './index.styl';
 
@@ -912,6 +913,7 @@ class VisualizerWidget extends PureComponent {
         return {
             port: controller.port,
             units: METRIC_UNITS,
+            theme: this.config.get('theme'),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -983,20 +985,7 @@ class VisualizerWidget extends PureComponent {
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
             cameraPosition: '3d', // 'top', '3d', 'front', 'left', 'right'
             isAgitated: false, // Defaults to false
-            currentTheme: {
-                backgroundColor: '#111827', //Navy Blue
-                gridColor: '#77a9d7', // Turqoise / Light Blue
-                xAxisColor: '#df3b3b', //Indian Red
-                yAxisColor: '#06b881', //Light Green
-                zAxisColor: '#295d8d', //Light Green
-                limitColor: '#5191cc', //Indian Red
-                cuttingCoordinateLines: '#fff', //White
-                joggingCoordinateLines: '#0ef6ae', // Light Green
-                G0Color: '#0ef6ae', // Light Green
-                G1Color: '#3e85c7', // Light Blue
-                G2Color: '#3e85c7', // Light Blue
-                G3Color: '#3e85c7', // Light Blue
-            },
+            currentTheme: this.getVisualizerTheme(),
             currentTab: 0,
             filename: '',
             fileSize: 0, //in bytes
@@ -1016,6 +1005,17 @@ class VisualizerWidget extends PureComponent {
             const callback = this.controllerEvents[eventName];
             controller.removeListener(eventName, callback);
         });
+    }
+
+    getVisualizerTheme() {
+        const { theme } = store.get('widgets.visualizer');
+        if (theme === LIGHT_THEME) {
+            return LIGHT_THEME_VALUES;
+        }
+        if (theme === DARK_THEME) {
+            return DARK_THEME_VALUES;
+        }
+        return DARK_THEME_VALUES;
     }
 
     isAgitated() {

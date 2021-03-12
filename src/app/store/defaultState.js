@@ -333,7 +333,8 @@ const defaultState = {
             // 3D View
             disabled: false,
             projection: 'orthographic', // 'perspective' or 'orthographic'
-            cameraMode: 'pan', // 'pan' or 'rotate'
+            cameraMode: 'pan', // 'pan' or 'rotate',
+            theme: 'light',
             gcode: {
                 displayName: true
             },
