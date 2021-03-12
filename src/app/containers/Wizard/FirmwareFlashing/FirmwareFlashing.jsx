@@ -5,11 +5,17 @@ import controller from 'app/lib/controller';
 import ArduinoUno from '../FirmwareFlashing/images/ArduinoUno.svg';
 import styles from './index.styl';
 import Fieldset from '../../../containers/Preferences/FieldSet';
-import FlashingFirmware from '../../../../server/lib/FirmwareFlashing/firmwareflashing';
+//import FlashingFirmware from '../../../../server/lib/FirmwareFlashing/firmwareflashing';
 
 class FirmwareFlashing extends PureComponent {
     state = this.getInitialState();
 
+    actions = {
+        startFlash: () => {
+            // Get port from user
+            controller.command('flash:start');
+        }
+    }
 
     controllerEvents = {
         'FLASHGRBL': (data, controllerState) => {
@@ -104,7 +110,7 @@ class FirmwareFlashing extends PureComponent {
 
 
     handleFlashing=() => {
-        FlashingFirmware();
+        //FlashingFirmware();
     }
 
     render = () => {

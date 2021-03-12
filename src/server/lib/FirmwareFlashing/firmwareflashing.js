@@ -1,13 +1,13 @@
 // import controller from 'app/lib/controller';
 import AvrgirlArduino from 'avrgirl-arduino';
 import logger from '../logger';
-import UNOFLASH from './filetoflashuno.hex';
+//import UNOFLASH from './filetoflashuno.hex';
 
 const log = logger('FLASHING FIRMWARE: ');
 
 const FlashingFirmware = () => {
     const reader = new FileReader();
-    reader.readAsArrayBuffer(UNOFLASH);
+    reader.readAsArrayBuffer('');
 
     reader.onload = event => {
         const filecontents = event.target.result;

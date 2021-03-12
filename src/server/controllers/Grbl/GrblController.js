@@ -234,7 +234,7 @@ class GrblController {
                     // unsupported command error. If we nuke the whole
                     // line, then we'll likely lose other commands that
                     // share the line, like a T~.  This makes tool
-                    // changes complicated.
+                    // changes complicated.ad
                     line = line.replace('M6', '(M6)');
                 }
 
@@ -1033,6 +1033,12 @@ class GrblController {
 
     command(cmd, ...args) {
         const handler = {
+            'flash:start': () => {
+                let [port] = args;
+                log.debug(port);
+                // import library
+                // run flash command "flashingFirmware"
+            },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;
                 if (typeof context === 'function') {
