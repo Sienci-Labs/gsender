@@ -1,12 +1,16 @@
 /* eslint import/no-unresolved: 0 */
 import { app, BrowserWindow, shell } from 'electron';
 //import AutoUpdater from './AutoUpdater';
-// const customTitlebar = require('custom-electron-titlebar');
-// import customTitlebar from 'custom-electron-titlebar';
+
 
 const browserWindowOptions = {
     minWidth: 1280,
-    minHeight: 768,
+    minHeight: 1024,
+};
+
+const loadingWindowOptions = {
+    maxWidth: 600,
+    maxHeight: 400
 };
 
 class WindowManager {
@@ -60,6 +64,21 @@ class WindowManager {
             titleBarStyle: 'hidden',
             show: false
         });
+
+        const loadingWindow = new BrowserWindow({
+            ...options,
+            ...loadingWindowOptions,
+            titleBarStyle: 'hidden',
+            frame: false,
+            center: true,
+            show: false,
+            webPreferences: {
+                nodeIntegration: true
+            }
+        });
+
+        // loadingWindow.loadURL(`file://${__dirname}/app/index.html`);
+        loadingWindow.loadFile('src/index.html');
         const webContents = window.webContents;
 
         window.on('closed', (event) => {
@@ -76,7 +95,13 @@ class WindowManager {
         });
 
         webContents.once('dom-ready', () => {
-            window.show();
+            loadingWindow.setSize(1200, 1800);
+            loadingWindow.center();
+            loadingWindow.show();
+            setTimeout(() => {
+                loadingWindow.close();
+                window.show();
+            }, 7000);
         });
 
         // Call `ses.setProxy` to ignore proxy settings
@@ -86,7 +111,9 @@ class WindowManager {
             window.loadURL(url);
         });
 
-        this.windows.push(window);
+        setTimeout(function() {
+            this.windows.push(window);
+        }, 5000);
 
         // Disable AutoUpdater until an update server is available
         //new AutoUpdater(window);

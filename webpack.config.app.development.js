@@ -124,6 +124,17 @@ module.exports = {
             {
                 test: /\.(ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: 'file-loader'
+            },
+            {
+                test: /\.hex$/,
+                loader: 'file-loader'
+            },
+            {
+                test: /\.hex$/,
+                loader: 'file-loader',
+                include: [
+                    path.resolve(__dirname, 'src/server/lib/FirmwareFlashing')
+                ]
             }
         ]
     },

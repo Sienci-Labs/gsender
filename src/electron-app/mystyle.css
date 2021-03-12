@@ -1,0 +1,69 @@
+@import url(https://fonts.googleapis.com/css?family=Devonshire);
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: url("./splash.png") fixed no-repeat;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.headertext{
+  padding:5%;
+}
+.wrapper{
+display: flex;
+justify-content: flex-start;
+}
+
+.logo{
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+.welcometext {
+  display: inline-block;
+  font-family: 'Dancing Script';
+  margin-top: 50%;
+  width: 50%;
+  padding: 10px;
+  font-size: 100px;
+  color: white;
+  text-transform: none;
+  animation: fadeIn ease 0.2s;
+  -webkit-animation: fadeIn ease 0.2s;
+  width:100%;
+}
+
+.footer{
+  font-size: 5px;
+  color: white;
+}
+
+@keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-moz-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-o-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-ms-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}

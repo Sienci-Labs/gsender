@@ -1,132 +1,145 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unneeded-ternary */
-import React from 'react';
-import classNames from 'classnames';
-import styles from '../index.styl';
-import AvrgirlArduino from './avrgirl-arduino';
-// import ArduinoUno from './images/ArduinoUno.svg';
-// import gear from './images/gear4.svg';
+/* eslint-disable new-cap */
+/* eslint-disable import/no-useless-path-segments */
+import React, { PureComponent } from 'react';
+import controller from 'app/lib/controller';
+import ArduinoUno from '../FirmwareFlashing/images/ArduinoUno.svg';
+import styles from './index.styl';
+import Fieldset from '../../../containers/Preferences/FieldSet';
+import FlashingFirmware from '../../../../server/lib/FirmwareFlashing/firmwareflashing';
 
-const FirmwareFlashing = ({ active }) => {
-    let getInitialState = () => {
+class FirmwareFlashing extends PureComponent {
+    state = this.getInitialState();
+
+
+    controllerEvents = {
+        'FLASHGRBL': (data, controllerState) => {
+            console.log(data);
+            console.log(controllerState);
+        }
+    }
+
+    componentDidMount() {
+        this.addControllerEvents();
+    }
+
+    componentWillUnmount() {
+        this.removeControllerEvents();
+    }
+
+    getInitialState() {
         return {
-            fileName: '',
-            upLoading: false
+            port: controller.port,
+            alertMessage: ''
         };
-    };
+    }
 
-    let state = getInitialState();
+    addControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            console.log(eventName);
+            console.log(callback);
+            controller.addListener(eventName, callback);
+            console.log(controller);
+        });
+    }
 
-    const boardChoices = [
-        'uno',
-    ];
+    removeControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.removeListener(eventName, callback);
+        });
+    }
 
-    const fileInput = 'null';
-    // const [uploading, updateUploading] = useState(false);
+    //THIS FUNCTION IS USED TO TEST .HEX FILES ON CLIENT SIDE. REMOVE WHEN IT WORKS SERVER SIDE
+    // readFileAsync = (file) => {
+    //     return new Promise((resolve, reject) => {
+    //         let reader = new FileReader();
+    //         reader.onload = () => {
+    //             resolve(reader.result);
+    //         };
+    //         reader.onerror = reject;
+    //         reader.readAsArrayBuffer(file);
+    //     });
+    // }
 
-    const handleSubmit = e => {
-        e.preventDefault();
-        // updateUploading(true);
-        // setState({ upLoading: true });
+    // //THIS FUNCTION IS USED TO TEST .HEX FILES ON CLIENT SIDE. REMOVE WHEN IT WORKS SERVER SIDE
+    // handleChangeFile = (file) => {
+    //     const reader = new FileReader();
+    //     reader.readAsArrayBuffer(file);
 
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(fileInput.current.files[0]);
+    //     reader.onload = event => {
+    //         const filecontents = event.target.result;
 
-        reader.onload = event => {
-            const filecontents = event.target.result;
+    //         let avrgirl = new AvrgirlArduino({
+    //             board: 'uno',
+    //             debug: true
+    //         });
 
-            const avrgirl = new AvrgirlArduino({
-                board: boardChoices[0],
-                debug: true
-            });
+    //         avrgirl.flash(filecontents, error => {
+    //             if (error) {
+    //                 console.error(error);
+    //             } else {
+    //                 console.info('flash successful');
+    //             }
+    //         });
+    //     };
+    // }
 
-            avrgirl.flash(filecontents, error => {
-                if (error) {
-                    console.error(error);
-                } else {
-                    console.info('flash successful');
-                }
-                // updateUploading(false);
-            });
-        };
-    };
+    readFileAsync = (file) => {
+        return new Promise((resolve, reject) => {
+            let reader = new FileReader();
+            reader.onload = () => {
+                resolve(reader.result);
+            };
+            reader.onerror = reject;
+            reader.readAsArrayBuffer(file);
+        });
+    }
 
-    const BoardOptions = boardChoices.map((board, i) => <option value={board} key={i}>{board}</option>);
+    //Need to call 'flashGrbl' event here and send it the file that was chosen
+    handleChangeFile = (file) => {
+        console.log(file);
+        controller.socket.emit('flashGrbl', file);
+    }
 
-    return (
-        <div className={classNames(
-            styles.hidden,
-            styles.header,
-            { [styles.visible]: active }
-        )}
-        >
-            <h3>
-                Firmware Flashing
-            </h3>
-            <div className="main">
-                <div className="wrapper">
-                    <div className="bot">
-                        <p>Choose a program to upload to your arduino board</p>
 
-                        <form id="uploadForm" onSubmit={handleSubmit}>
-                            <label>
-                                Board:
-                                <select
-                                    id="boardType"
-                                    value={boardChoices[0]}
-                                // onChange={event => updateBoard(event.target.value)}
-                                >
-                                    {BoardOptions}
-                                </select>
-                            </label>
+    handleFlashing=() => {
+        FlashingFirmware();
+    }
 
-                            <label>
-                                Program:
-                                <div className="fileButtonWrapper">
-                                    <button
-                                        id="fileButton"
-                                        type="button"
-                                        aria-controls="fileInput"
-                                        onClick={() => fileInput.current.click()}
-                                    >
-                                        Choose file
-                                    </button>
-                                    <input
-                                        id="fileInput"
-                                        tabIndex="-1"
-                                        type="file"
-                                    // ref={fileInput}
-                                    // onChange={() => updateFileName(fileInput.current.files[0].name)
-                                    // }
-                                    />
-                                    <span id="fileName">
-                                        {state.fileName ? state.fileName : 'no file chosen'}
-                                    </span>
-                                </div>
-                            </label>
-
-                            <button type="submit" id="uploadBtn">
-                                Upload!
+    render = () => {
+        console.log(JSON.stringify(this.state));
+        return (
+            <div className={styles.firmwarewrapper}>
+                <Fieldset legend="Firmware Flashing">
+                    <h3 className={styles.iteminfo}>You can use this wizard to flash Firmware onto compatible controllers only.</h3>
+                    <h3 className={styles.iteminfo}>Use with care, or when instructed by Support</h3>
+                    <div>
+                        <div className={styles.wizardform}>
+                            {/* <form id="uploadForm" onSubmit={this.handleSubmit}>
+                                <input
+                                    id="fileInput"
+                                    tabIndex="-1"
+                                    type="file"
+                                    ref={this.fileInput}
+                                    onChange={e => this.handleChangeFile(e.target.files[0])}
+                                />
+                            </form> */}
+                            <button
+                                type="button"
+                                onClick={this.handleFlashing}
+                            >Begin
                             </button>
-                        </form>
+                        </div>
+                        <img src={ArduinoUno} className={styles.board} alt="arduino uno" />
                     </div>
-
-                    <div className="board">
-                        {/* <img src={ArduinoUno} alt="arduino board" /> */}
-                    </div>
-                    <div id="pipe" />
-                    <div id="progress" />
-                    <div id="gear">
-                        {/* <img
-                            src={gear}
-                            alt="gear icon"
-                            // className={uploading ? 'spinning' : null}
-                        /> */}
-                    </div>
-                </div>
+                </Fieldset>
+                <Fieldset>
+                    <p>For more info please visit: <a href="www.sienci.com">Sienci.com</a></p>
+                </Fieldset>
             </div>
-        </div>
-    );
-};
+        );
+    }
+}
 
 export default FirmwareFlashing;

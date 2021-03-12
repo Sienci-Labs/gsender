@@ -1,8 +1,8 @@
 import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-// import FirmwareFlashing from './FirmwareFlashing/FirmwareFlashing';
-import FirmwareSettings from './FirmwareSettings/FirmwareSettings';
+import FirmwareFlashing from './FirmwareFlashing/FirmwareFlashing';
+// import FirmwareSettings from './FirmwareSettings/FirmwareSettings';
 import styles from './index.styl';
 
 
@@ -16,18 +16,18 @@ class WizardModal extends PureComponent {
 
     getInitialState() {
         return {
-            selectedMenu: 0,
+            selectedMenu: 2,
             menu: [
-                {
-                    id: 1,
-                    label: 'Firmware Settings',
-                    component: FirmwareSettings
-                },
                 // {
-                //     id: 2,
-                //     label: 'Firmware Flashing',
-                //     component: FirmwareFlashing
+                //     id: 1,
+                //     label: 'Firmware Settings',
+                //     component: FirmwareSettings
                 // },
+                {
+                    id: 2,
+                    label: 'Firmware Flashing',
+                    component: FirmwareFlashing
+                },
             ]
         };
     }
