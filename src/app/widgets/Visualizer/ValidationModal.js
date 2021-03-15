@@ -5,7 +5,7 @@ import { Button } from 'app/components/Buttons';
 
 import { modalStyle, modalHeaderStyle, modalTitleStyle, modalBodyStyle, modalFooterStyle } from './modalStyle';
 
-const ValidationModal = ({ onClose, invalidGcode }) => {
+const ValidationModal = ({ onClose, onCancel, invalidGcode }) => {
     const { list } = invalidGcode;
 
     return (
@@ -13,6 +13,7 @@ const ValidationModal = ({ onClose, invalidGcode }) => {
             size="xs"
             onClose={onClose}
             style={modalStyle}
+            disableOverlay
         >
             <Modal.Header style={modalHeaderStyle}>
                 <Modal.Title style={modalTitleStyle}>
@@ -30,6 +31,12 @@ const ValidationModal = ({ onClose, invalidGcode }) => {
             </Modal.Body>
             <Modal.Footer style={modalFooterStyle}>
                 <Button
+                    // style={{ backgroundColor: '#3e85c7', color: 'white', backgroundImage: 'none' }}
+                    onClick={onCancel}
+                >
+                    Cancel (Unload File)
+                </Button>
+                <Button
                     style={{ backgroundColor: '#3e85c7', color: 'white', backgroundImage: 'none' }}
                     onClick={onClose}
                 >
@@ -42,6 +49,7 @@ const ValidationModal = ({ onClose, invalidGcode }) => {
 
 ValidationModal.propTypes = {
     onClose: PropTypes.func,
+    onCancel: PropTypes.func,
     invalidGcode: PropTypes.object,
 };
 
