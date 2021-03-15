@@ -63,6 +63,7 @@ class PreferencesPage extends PureComponent {
                 fastFeedrate: Number(this.probeConfig.get('probeFastFeedrate') || 0).toFixed(3) * 1,
                 probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
             },
+            showWarning: store.get('widgets.visualizer.showWarning')
         };
     }
 
@@ -98,6 +99,11 @@ class PreferencesPage extends PureComponent {
                     baudrate: option.value
                 });
                 pubsub.publish('baudrate:update', option.value);
+            },
+            setShowWarning: (shouldShow) => {
+                store.set('widgets.visualizer.showWarning', shouldShow);
+                this.setState({ showWarning: shouldShow });
+                pubsub.publish('gcode:showWarning', shouldShow);
             }
         },
         tool: {
