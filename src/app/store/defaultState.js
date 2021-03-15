@@ -338,7 +338,8 @@ const defaultState = {
                 cuttingTool: {
                     visible: true
                 }
-            }
+            },
+            showWarning: true,
         },
         webcam: {
             disabled: true,
