@@ -866,6 +866,7 @@ class VisualizerWidget extends PureComponent {
 
     componentDidMount() {
         this.addControllerEvents();
+        this.subscribe();
 
         if (!WebGL.isWebGLAvailable() && !this.state.disabled) {
             displayWebGLErrorMessage();
@@ -880,6 +881,7 @@ class VisualizerWidget extends PureComponent {
 
     componentWillUnmount() {
         this.removeControllerEvents();
+        this.unsubscribe();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -1007,6 +1009,7 @@ class VisualizerWidget extends PureComponent {
         });
     }
 
+
     getVisualizerTheme() {
         const { theme } = store.get('widgets.visualizer');
         if (theme === LIGHT_THEME) {
@@ -1064,6 +1067,26 @@ class VisualizerWidget extends PureComponent {
     }
 
     setCurrentTab = (id = 0) => this.setState({ currentTab: id });
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('theme:change', (msg, theme) => {
+                this.setState({
+                    theme: theme
+                }, this.setState({
+                    currentTheme: this.getVisualizerTheme()
+                }), pubsub.publish('visualizer:redraw'));
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
 
     render() {
         const state = {

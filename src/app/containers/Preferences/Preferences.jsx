@@ -6,13 +6,16 @@ import GeneralSettings from './GeneralSettings';
 import Keybindings from './Keybindings';
 import ProbeSettings from './Probe/ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
+import VisualizerSettings from './Visualizer/Visualizer';
 import store from '../../store';
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 
+
 class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
+    visualizerConfig = new WidgetConfig('visualizer');
 
     state = this.getInitialState();
 
@@ -34,11 +37,6 @@ class PreferencesPage extends PureComponent {
                     label: 'General',
                     component: GeneralSettings
                 },
-                // {
-                //     id: 1,
-                //     label: 'Tools',
-                //     component: ToolSettings
-                // },
                 {
                     id: 1,
                     label: 'Probe',
@@ -48,6 +46,11 @@ class PreferencesPage extends PureComponent {
                     id: 2,
                     label: 'Keybindings',
                     component: Keybindings
+                },
+                {
+                    id: 3,
+                    label: 'Visualizer',
+                    component: VisualizerSettings
                 }
             ],
             tools: store.get('workspace[tools]', []),
@@ -63,6 +66,9 @@ class PreferencesPage extends PureComponent {
                 fastFeedrate: Number(this.probeConfig.get('probeFastFeedrate') || 0).toFixed(3) * 1,
                 probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
             },
+            visualizer: {
+                theme: this.visualizerConfig.get('theme')
+            }
         };
     }
 
@@ -278,13 +284,24 @@ class PreferencesPage extends PureComponent {
                     }
                 });
             },
+        },
+        visualizer: {
+            handleThemeChange: (theme) => {
+                this.setState({
+                    visualizer: {
+                        theme: theme.value
+                    }
+                });
+                pubsub.publish('theme:change', theme.value);
+            }
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect } = this.state;
+        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer } = this.state;
         store.set('workspace.reverseWidgets', reverseWidgets);
         store.set('widgets.connection.autoReconnect', autoReconnect);
+        store.set('widgets.visualizer.theme', visualizer.theme);
         store.set('workspace.units', units);
         store.replace('workspace[tools]', tools);
         store.set('workspace[tool]', tool);

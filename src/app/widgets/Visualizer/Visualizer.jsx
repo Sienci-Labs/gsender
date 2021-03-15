@@ -1,7 +1,7 @@
 import _get from 'lodash/get';
 import _each from 'lodash/each';
 import _isEqual from 'lodash/isEqual';
-import _tail from 'lodash/tail';
+//import _tail from 'lodash/tail';
 import _throttle from 'lodash/throttle';
 import colornames from 'colornames';
 import pubsub from 'pubsub-js';
@@ -337,10 +337,51 @@ class Visualizer extends Component {
         this.clearScene();
     }
 
+    updateGridChildColor(name, color) {
+        const group = this.group.getObjectByName(name);
+        const gridLines = group.getObjectByName('GridLine');
+        gridLines.children.forEach((child) => {
+            child.material.color = color;
+        });
+    }
+
+    rerenderGCode(colors) {
+        const group = this.group.getObjectByName('Visualizer');
+        console.log(group);
+        if (group) {
+            this.group.remove(group);
+            //this.render(colors);
+        }
+    }
+
+    removeSceneGroup() {
+        this.group.remove(...this.group.children);
+    }
+
+    recolorScene() {
+        const { currentTheme } = this.props.state;
+        const { backgroundColor, gridColor } = currentTheme;
+        console.log(currentTheme);
+        console.log(this.group);
+        console.log(currentTheme);
+        // Handle Background color
+        this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
+        // handle imperial gridlines
+        this.updateGridChildColor('ImperialCoordinateSystem', new THREE.Color(gridColor));
+        // handle metric gridlines
+        this.updateGridChildColor('MetricCoordinateSystem', new THREE.Color(gridColor));
+        // handle mesh gridlines
+        this.updateMeshChildColor('Visualizer', currentTheme);
+    }
+
     subscribe() {
         const tokens = [
             pubsub.subscribe('resize', (msg) => {
                 this.resizeRenderer();
+            }),
+            pubsub.subscribe('visualizer:redraw', () => {
+                this.recolorScene();
+                this.updateScene({ forceUpdate: true });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -785,7 +826,7 @@ class Visualizer extends Component {
 
     clearScene() {
         // to iterrate over all children (except the first) in a scene
-        const objsToRemove = _tail(this.scene.children);
+        const objsToRemove = this.scene.children;
         _each(objsToRemove, (obj) => {
             this.scene.remove(obj);
         });

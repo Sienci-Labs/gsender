@@ -340,16 +340,18 @@ const defaultState = {
             },
             objects: {
                 limits: {
-                    visible: true
+                    visible: true,
                 },
                 coordinateSystem: {
-                    visible: true
+                    visible: true,
                 },
                 gridLineNumbers: {
-                    visible: true
+                    visible: true,
+                    visibleLite: true
                 },
                 cuttingTool: {
-                    visible: true
+                    visible: true,
+                    visibleLite: true
                 }
             }
         },

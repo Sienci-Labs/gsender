@@ -52,7 +52,7 @@ export const LIGHT_THEME_VALUES = {
     yAxisColor: '#06b881', //Light Green
     zAxisColor: '#295d8d', //Light Green
     limitColor: '#5191cc', //Indian Red
-    cuttingCoordinateLines: '#fff', //White
+    cuttingCoordinateLines: '#000000',
     joggingCoordinateLines: '#0ef6ae', // Light Green
     G0Color: '#0ef6ae', // Light Green
     G1Color: '#111827', // Light Blue
