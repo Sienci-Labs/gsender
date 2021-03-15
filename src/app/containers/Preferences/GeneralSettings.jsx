@@ -73,6 +73,14 @@ const GeneralSettings = ({ active, state, actions }) => {
                             />
                             <small className={styles['item-info']}>Reverse workspace layout</small>
                         </Fieldset>
+
+                        <Fieldset legend="File Validation Warning">
+                            <ToggleSwitch
+                                checked={state.showWarning}
+                                onChange={() => actions.general.setShowWarning(!state.showWarning)}
+                            />
+                            <small className={styles['item-info']}>Show warning when file contains invalid G-Code</small>
+                        </Fieldset>
                     </div>
                 </div>
             </div>
