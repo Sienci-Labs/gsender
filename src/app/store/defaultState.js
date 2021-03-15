@@ -474,7 +474,7 @@ const defaultState = {
         { // Change Jog Speed
             id: 10,
             title: 'Increase Jog Speed',
-            keys: 'shift++',
+            keys: '=',
             cmd: 'JOG_SPEED',
             payload: {
                 speed: 'increase'
@@ -484,7 +484,7 @@ const defaultState = {
         { // Change Jog Speed
             id: 11,
             title: 'Decrease Jog Speed',
-            keys: 'shift+-',
+            keys: '-',
             cmd: 'JOG_SPEED',
             payload: {
                 speed: 'decrease'
