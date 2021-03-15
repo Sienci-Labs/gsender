@@ -574,6 +574,16 @@ class Combokeys extends events.EventEmitter {
                     this.emit(STOP_CMD, event, payload);
                 };
 
+                //Listen for keyups on individual keys, for example,
+                //if jogging is shift+arrowup and the user lets go of one key and not the other,
+                //this should trigger STOP_JOG
+                if (keys.includes('+')) {
+                    const keysArr = keys.split('+');
+                    for (const key of keysArr) {
+                        Mousetrap.bind(key, callback, 'keyup');
+                    }
+                }
+
                 Mousetrap.bind(keys, callback, 'keyup');
             }
 
