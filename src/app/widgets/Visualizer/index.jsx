@@ -254,7 +254,7 @@ class VisualizerWidget extends PureComponent {
             console.log(invalidGcode);
 
             if (invalidGcode.size > 0) {
-                this.setState({ invalidGcode: { showModal: true, list: invalidGcode } });
+                this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: true, list: invalidGcode } }));
             }
 
             const total = lines.length + 1; //Dwell line added after every gcode parse
@@ -875,12 +875,29 @@ class VisualizerWidget extends PureComponent {
 
     pubsubTokens = [];
 
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('gcode:showWarning', (msg, shouldShow) => {
+                this.setState(prev => ({ invalidGcode: { shouldShow, showModal: false, list: [], } }));
+            }),
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
+
     // refs
     widgetContent = null;
 
     visualizer = null;
 
     componentDidMount() {
+        this.subscribe();
         this.addControllerEvents();
 
         if (!WebGL.isWebGLAvailable() && !this.state.disabled) {
@@ -895,6 +912,7 @@ class VisualizerWidget extends PureComponent {
     }
 
     componentWillUnmount() {
+        this.unsubscribe();
         this.removeControllerEvents();
     }
 
@@ -1019,6 +1037,7 @@ class VisualizerWidget extends PureComponent {
             fileSize: 0, //in bytes
             total: 0,
             invalidGcode: {
+                shouldShow: this.config.get('showWarning'),
                 showModal: false,
                 list: [],
             },
@@ -1154,10 +1173,15 @@ class VisualizerWidget extends PureComponent {
                             />
 
                             {
-                                state.invalidGcode.showModal && (
+                                state.invalidGcode.shouldShow && state.invalidGcode.showModal && (
                                     <ValidationModal
                                         invalidGcode={state.invalidGcode}
                                         onClose={() => this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }))}
+                                        onCancel={() => {
+                                            this.setState(this.getInitialState());
+                                            this.actions.unloadGCode();
+                                            pubsub.publish('gcode:fileInfo');
+                                        }}
                                     />
                                 )
                             }
