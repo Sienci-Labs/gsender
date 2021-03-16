@@ -15,6 +15,7 @@ const themes = [
 
 const VisualizerSettings = ({ active, state, actions }) => {
     const { theme, objects, disabled, disabledLite } = state.visualizer;
+    const visualizerActions = actions.visualizer;
     const themeRenderer = (option) => {
         const style = {
             color: '#333',
@@ -45,14 +46,14 @@ const VisualizerSettings = ({ active, state, actions }) => {
                             <b>Regular</b>
                             <b>Light-mode</b>
                             <span>Visualize G-Code</span>
-                            <ToggleSwitch checked={!disabled} />
-                            <ToggleSwitch checked={!disabledLite} />
+                            <ToggleSwitch checked={!disabled} onChange={() => visualizerActions.handleVisEnabledToggle()} />
+                            <ToggleSwitch checked={!disabledLite} onChange={() => visualizerActions.handleVisEnabledToggle(true)} />
                             <span>Drill Animation</span>
-                            <ToggleSwitch checked={objects.cuttingTool.visible} />
-                            <ToggleSwitch checked={objects.cuttingTool.visibleLite} />
+                            <ToggleSwitch checked={objects.cuttingTool.visible} onChange={() => visualizerActions.handleAnimationToggle()} />
+                            <ToggleSwitch checked={objects.cuttingTool.visibleLite} onChange={() => visualizerActions.handleAnimationToggle(true)} />
                             <span>Cutpath Animation</span>
-                            <ToggleSwitch checked={objects.cutPath.visible} />
-                            <ToggleSwitch checked={objects.cutPath.visibleLite} />
+                            <ToggleSwitch checked={objects.cutPath.visible} onChange={() => visualizerActions.handleCutPathToggle()} />
+                            <ToggleSwitch checked={objects.cutPath.visibleLite} onChange={() => visualizerActions.handleCutPathToggle(true)} />
                         </div>
                         <small>Specify which visualizer features are enabled or disable in both regular mode and light-mode, in order to save computer resources</small>
                     </Fieldset>

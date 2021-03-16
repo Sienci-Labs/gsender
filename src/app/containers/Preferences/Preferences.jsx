@@ -297,10 +297,98 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('theme:change', theme.value);
             },
-            handleVizOptionToggle: (key) => {
-                const value = store.get(key);
-                store.set(key, !value);
+            handleVisEnabledToggle: (liteMode = false) => {
+                const { visualizer } = this.state;
+                if (liteMode) {
+                    const value = visualizer.disabledLite;
+                    console.log(value);
+                    this.setState({
+                        visualizer: {
+                            ...visualizer,
+                            disabledLite: !value
+                        }
+                    });
+                } else {
+                    const value = visualizer.disabled;
+                    this.setState({
+                        visualizer: {
+                            ...visualizer,
+                            disabled: !value
+                        }
+                    });
+                }
+                pubsub.publish('visualizer:settings');
             },
+            handleCutPathToggle: (liteMode = false) => {
+                const { visualizer } = this.state;
+                const { objects } = visualizer;
+                const { cutPath } = objects;
+                if (liteMode) {
+                    const value = cutPath.visibleLite;
+                    this.setState({
+                        visualizer: {
+                            ...visualizer,
+                            objects: {
+                                ...objects,
+                                cutPath: {
+                                    ...cutPath,
+                                    visibleLite: !value
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    const value = cutPath.visible;
+                    this.setState({
+                        visualizer: {
+                            ...visualizer,
+                            objects: {
+                                ...objects,
+                                cutPath: {
+                                    ...cutPath,
+                                    visible: !value
+                                }
+                            }
+                        }
+                    });
+                }
+                pubsub.publish('visualizer:settings');
+            },
+            handleAnimationToggle: (liteMode = false) => {
+                const { visualizer } = this.state;
+                const { objects } = visualizer;
+                const { cuttingTool } = objects;
+                if (liteMode) {
+                    const value = cuttingTool.visibleLite;
+                    this.setState({
+                        visualizer: {
+                            ...visualizer,
+                            objects: {
+                                ...objects,
+                                cuttingTool: {
+                                    ...cuttingTool,
+                                    visibleLite: !value
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    const value = cuttingTool.visible;
+                    this.setState({
+                        visualizer: {
+                            ...visualizer,
+                            objects: {
+                                ...objects,
+                                cuttingTool: {
+                                    ...cuttingTool,
+                                    visible: !value
+                                }
+                            }
+                        }
+                    });
+                }
+                pubsub.publish('visualizer:settings');
+            }
         }
     }
 
@@ -309,8 +397,11 @@ class PreferencesPage extends PureComponent {
         store.set('workspace.reverseWidgets', reverseWidgets);
         store.set('widgets.connection.autoReconnect', autoReconnect);
         store.set('widgets.visualizer.theme', visualizer.theme);
+        store.set('widgets.visualizer.disabled', visualizer.disabled);
+        store.set('widgets.visualizer.disabledLite', visualizer.disabledLite);
         store.set('workspace.units', units);
         store.replace('workspace[tools]', tools);
+        store.replace('widgets.visualizer.objects', visualizer.objects);
         store.set('workspace[tool]', tool);
         store.replace('workspace[probeProfile]', probe);
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);

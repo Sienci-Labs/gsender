@@ -969,6 +969,7 @@ class VisualizerWidget extends PureComponent {
                 loadedBeforeConnection: false,
             },
             disabled: this.config.get('disabled', false),
+            disabledLite: this.config.get('disabledLite'),
             projection: this.config.get('projection', 'orthographic'),
             objects: {
                 limits: {
@@ -981,7 +982,11 @@ class VisualizerWidget extends PureComponent {
                     visible: this.config.get('objects.gridLineNumbers.visible', true)
                 },
                 cuttingTool: {
-                    visible: this.config.get('objects.cuttingTool.visible', true)
+                    visible: this.config.get('objects.cuttingTool.visible', true),
+                    visibleLite: this.config.get('objects.cuttingTool.visibleLite', true)
+                },
+                cutPath: {
+
                 }
             },
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
