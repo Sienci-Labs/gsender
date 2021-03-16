@@ -329,26 +329,37 @@ const defaultState = {
         },
         visualizer: {
             minimized: false,
-
             // 3D View
+            liteMode: false,
             disabled: false,
+            disabledLite: false,
             projection: 'orthographic', // 'perspective' or 'orthographic'
-            cameraMode: 'pan', // 'pan' or 'rotate'
+            cameraMode: 'pan', // 'pan' or 'rotate',
+            theme: 'light',
             gcode: {
                 displayName: true
             },
             objects: {
                 limits: {
-                    visible: true
+                    visible: true,
                 },
                 coordinateSystem: {
-                    visible: true
+                    visible: true,
                 },
                 gridLineNumbers: {
-                    visible: true
+                    visible: true,
                 },
                 cuttingTool: {
-                    visible: true
+                    visible: true,
+                    visibleLite: true
+                },
+                cuttingToolAnimation: {
+                    visible: true,
+                    visibleLite: true
+                },
+                cutPath: {
+                    visible: true,
+                    visibleLite: true
                 }
             }
         },
