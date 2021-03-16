@@ -190,29 +190,29 @@ export default class Options extends Component {
                     <h4 className={styles['settings-subtitle']}>Machine Features</h4>
                     <div className={styles['machine-features-section']}>
                         <div className={styles['machine-options-inputgroup']}>
-                            <label htmlFor="">Endstops</label>
                             <ToggleSwitch
                                 checked={endstops}
                                 onChange={() => this.handleToggle('endstops')}
                             />
+                            <label htmlFor="">Endstops</label>
                         </div>
 
                         <div className={styles['machine-options-inputgroup']}>
-                            <label htmlFor="">Spindle</label>
                             <ToggleSwitch
                                 checked={spindle}
                                 onChange={() => this.handleToggle('spindle')}
                             />
+                            <label htmlFor="">Spindle</label>
                         </div>
                     </div>
 
                     <div className={styles['machine-features-section']}>
-                        <div className={styles['machine-options-inputgroup']} style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', margin: '0' }}>
-                            <label htmlFor="">Coolant</label>
+                        <div className={styles['machine-options-inputgroup']} style={{ display: 'grid', gridTemplateColumns: '0fr 3fr', margin: '0' }}>
                             <ToggleSwitch
                                 checked={coolant}
                                 onChange={() => this.handleToggle('coolant')}
                             />
+                            <label htmlFor="">Coolant</label>
                         </div>
 
                         {/* <div className={styles['machine-options-inputgroup']} style={{ margin: 0 }}>

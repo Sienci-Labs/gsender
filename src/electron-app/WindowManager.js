@@ -77,8 +77,7 @@ class WindowManager {
             }
         });
 
-        // loadingWindow.loadURL(`file://${__dirname}/app/index.html`);
-        loadingWindow.loadFile('src/index.html');
+        loadingWindow.loadFile('index.html');
         const webContents = window.webContents;
 
         window.on('closed', (event) => {

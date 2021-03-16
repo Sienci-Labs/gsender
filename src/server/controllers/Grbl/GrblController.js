@@ -36,12 +36,14 @@ import {
     GRBL_SETTINGS
 } from './constants';
 import { METRIC_UNITS } from '../../../app/constants';
+import FlashingFirmware from '../../lib/FirmwareFlashing/firmwareflashing';
 
 
 // % commands
 const WAIT = '%wait';
 
 const log = logger('controller:Grbl');
+// const firmhelper = logger('Firmware: ');
 const noop = _.noop;
 
 class GrblController {
@@ -1034,10 +1036,8 @@ class GrblController {
     command(cmd, ...args) {
         const handler = {
             'flash:start': () => {
-                let [port] = args;
-                log.debug(port);
-                // import library
-                // run flash command "flashingFirmware"
+                // let [port] = args;
+                FlashingFirmware();
             },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;

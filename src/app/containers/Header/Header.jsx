@@ -177,7 +177,7 @@ class Header extends PureComponent {
         }
 
         return {
-            wizardDisabled: true,
+            wizardDisabled: false,
             pushPermission: pushPermission,
             commands: [],
             runningTasks: [],
@@ -235,16 +235,15 @@ class Header extends PureComponent {
     }
 
     toggleWizardDisabled = () => {
-        this.setState({ wizardDisabled: false });
+        // this.setState({ wizardDisabled: false });
     }
 
     toggleWizardEnabled = () => {
-        this.setState({ wizardDisabled: true });
+        // this.setState({ wizardDisabled: true });
     }
 
     toggleUpdateToast() {
         pubsub.publish('showUpdateToast');
-        console.log('show');
     }
 
     render() {

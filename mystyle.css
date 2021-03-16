@@ -5,37 +5,31 @@
 }
 
 body {
-  background: url("./splash.png") fixed no-repeat;
+  background: url("./background.jpg") fixed no-repeat;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
 }
 
 .headertext{
-  padding:5%;
+  padding: 5%;
+  font-size: 9rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10%;
+  font-family: 'Dancing Script';
 }
-.wrapper{
-display: flex;
-justify-content: flex-start;
+.body{
+  display: flex;
+  animation: fadeIn ease 0.2s;
+  -webkit-animation: fadeIn ease 1s;
 }
 
 .logo{
+  background: url("./logo.jpg") fixed no-repeat;
   margin: auto;
   width: 50%;
   padding: 10px;
-}
-.welcometext {
-  display: inline-block;
-  font-family: 'Dancing Script';
-  margin-top: 50%;
-  width: 50%;
-  padding: 10px;
-  font-size: 100px;
-  color: white;
-  text-transform: none;
-  animation: fadeIn ease 0.2s;
-  -webkit-animation: fadeIn ease 0.2s;
-  width:100%;
 }
 
 .footer{

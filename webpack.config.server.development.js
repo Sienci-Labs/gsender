@@ -40,6 +40,17 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.hex$/,
+                loader: 'file-loader'
+            },
+            {
+                test: /\.hex$/,
+                loader: 'file-loader',
+                include: [
+                    path.resolve(__dirname, 'src/server/lib/FirmwareFlashing')
+                ]
+            },
+            {
                 test: /\.jsx?$/,
                 loader: 'eslint-loader',
                 enforce: 'pre',
