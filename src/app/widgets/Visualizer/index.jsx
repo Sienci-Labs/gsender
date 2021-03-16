@@ -1100,7 +1100,7 @@ class VisualizerWidget extends PureComponent {
                     disabled: this.config.get('disabled'),
                     disabledLite: this.config.get('disabledLite'),
                     objects: this.config.get('objects')
-                }, console.log(this.state));
+                });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -1118,7 +1118,6 @@ class VisualizerWidget extends PureComponent {
             ...this.state,
             isAgitated: this.isAgitated()
         };
-        console.log(state);
         const actions = {
             ...this.actions
         };
@@ -1135,7 +1134,6 @@ class VisualizerWidget extends PureComponent {
         // const showNotifications = showVisualizer && !!state.notification.type;
 
         const { liteMode } = this.state;
-        console.log(liteMode);
 
         return (
             <Widget className={styles.vizWidgetOverride}>

@@ -251,7 +251,6 @@ class Header extends PureComponent {
             console.log(msg);
         });
         window.ipcRenderer.on('window:ready', () => {
-            console.log('WINDOW READY');
         });
         window.ipcRenderer.on('update_downloaded', () => {
             this.setState({

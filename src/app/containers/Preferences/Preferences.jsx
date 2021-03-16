@@ -290,8 +290,10 @@ class PreferencesPage extends PureComponent {
         },
         visualizer: {
             handleThemeChange: (theme) => {
+                const { visualizer } = this.state;
                 this.setState({
                     visualizer: {
+                        ...visualizer,
                         theme: theme.value
                     }
                 });

@@ -30,9 +30,6 @@ class UpdateAvailableAlert extends PureComponent {
                     shown: true
                 });
             }),
-            pubsub.subscribe('ipc:test', (msg) => {
-                console.log('HEARD');
-            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
