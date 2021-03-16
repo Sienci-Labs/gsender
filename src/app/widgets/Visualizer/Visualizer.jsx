@@ -128,19 +128,22 @@ class Visualizer extends Component {
     };
 
     renderAnimationLoop = () => {
-        if (this.isAgitated) {
-            // Call the render() function up to 60 times per second (i.e. 60fps)
-            requestAnimationFrame(this.renderAnimationLoop);
+        const showAnimation = this.showAnimation();
+        if (showAnimation) {
+            if (this.isAgitated) {
+                // Call the render() function up to 60 times per second (i.e. 60fps)
+                requestAnimationFrame(this.renderAnimationLoop);
 
-            const rpm = 600;
-            this.rotateCuttingTool(rpm);
-        } else {
-            const rpm = 0;
-            this.rotateCuttingTool(rpm);
+                const rpm = 600;
+                this.rotateCuttingTool(rpm);
+            } else {
+                const rpm = 0;
+                this.rotateCuttingTool(rpm);
+            }
+
+            // Update the scene
+            this.updateScene();
         }
-
-        // Update the scene
-        this.updateScene();
     };
 
     constructor(props) {
@@ -264,9 +267,10 @@ class Visualizer extends Component {
         }
 
         // Whether to show cutting tool or cutting pointer
-        if (this.cuttingTool && this.cuttingPointer && (this.cuttingTool.visible !== state.objects.cuttingTool.visible)) {
-            this.cuttingTool.visible = state.objects.cuttingTool.visible;
-            this.cuttingPointer.visible = !state.objects.cuttingTool.visible;
+        if (this.cuttingTool && this.cuttingPointer && (state.liteMode) ? (this.cuttingTool.visibleLite !== state.objects.cuttingTool.visibleLite) : (this.cuttingTool.visible !== state.objects.cuttingTool.visible)) {
+            const { liteMode } = state;
+            this.cuttingTool.visible = liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible;
+            this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
             needUpdateScene = true;
         }
 
@@ -347,7 +351,6 @@ class Visualizer extends Component {
 
     rerenderGCode(colors) {
         const group = this.group.getObjectByName('Visualizer');
-        console.log(group);
         if (group) {
             this.group.remove(group);
             //this.render(colors);
@@ -358,12 +361,20 @@ class Visualizer extends Component {
         this.group.remove(...this.group.children);
     }
 
+    showAnimation = () => {
+        const state = { ...this.props.state };
+        const { liteMode, objects } = state;
+        if (liteMode && objects.cuttingToolAnimation.visibleLite) {
+            return true;
+        } else if (!liteMode && objects.cuttingToolAnimation.visible) {
+            return true;
+        }
+        return false;
+    }
+
     recolorScene() {
         const { currentTheme } = this.props.state;
         const { backgroundColor, gridColor } = currentTheme;
-        console.log(currentTheme);
-        console.log(this.group);
-        console.log(currentTheme);
         // Handle Background color
         this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
         // handle imperial gridlines
@@ -780,7 +791,7 @@ class Visualizer extends Component {
 
                 this.cuttingTool = object;
                 this.cuttingTool.name = 'CuttingTool';
-                this.cuttingTool.visible = objects.cuttingTool.visible;
+                this.cuttingTool.visible = state.liteMode ? objects.cuttingTool.visibleLite : objects.cuttingTool.visible;
 
                 this.group.add(this.cuttingTool);
 
@@ -795,7 +806,7 @@ class Visualizer extends Component {
                 diameter: 2
             });
             this.cuttingPointer.name = 'CuttingPointer';
-            this.cuttingPointer.visible = !objects.cuttingTool.visible;
+            this.cuttingPointer.visible = (state.liteMode) ? !objects.cuttingTool.visibleLite : !objects.cuttingTool.visible;
             this.group.add(this.cuttingPointer);
         }
 

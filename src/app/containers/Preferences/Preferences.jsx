@@ -301,7 +301,6 @@ class PreferencesPage extends PureComponent {
                 const { visualizer } = this.state;
                 if (liteMode) {
                     const value = visualizer.disabledLite;
-                    console.log(value);
                     this.setState({
                         visualizer: {
                             ...visualizer,
@@ -355,6 +354,41 @@ class PreferencesPage extends PureComponent {
                 pubsub.publish('visualizer:settings');
             },
             handleAnimationToggle: (liteMode = false) => {
+                const { visualizer } = this.state;
+                const { objects } = visualizer;
+                const { cuttingToolAnimation } = objects;
+                if (liteMode) {
+                    const value = cuttingToolAnimation.visibleLite;
+                    this.setState({
+                        visualizer: {
+                            ...visualizer,
+                            objects: {
+                                ...objects,
+                                cuttingToolAnimation: {
+                                    ...cuttingToolAnimation,
+                                    visibleLite: !value
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    const value = cuttingToolAnimation.visible;
+                    this.setState({
+                        visualizer: {
+                            ...visualizer,
+                            objects: {
+                                ...objects,
+                                cuttingToolAnimation: {
+                                    ...cuttingToolAnimation,
+                                    visible: !value
+                                }
+                            }
+                        }
+                    });
+                }
+                pubsub.publish('visualizer:settings');
+            },
+            handleBitToggle: (liteMode = false) => {
                 const { visualizer } = this.state;
                 const { objects } = visualizer;
                 const { cuttingTool } = objects;

@@ -44,13 +44,16 @@ const VisualizerSettings = ({ active, state, actions }) => {
                         <div className={styles.vizGrid}>
                             <b>Option</b>
                             <b>Regular</b>
-                            <b>Light-mode</b>
+                            <b>Lite Mode</b>
                             <span>Visualize G-Code</span>
                             <ToggleSwitch checked={!disabled} onChange={() => visualizerActions.handleVisEnabledToggle()} />
                             <ToggleSwitch checked={!disabledLite} onChange={() => visualizerActions.handleVisEnabledToggle(true)} />
-                            <span>Drill Animation</span>
-                            <ToggleSwitch checked={objects.cuttingTool.visible} onChange={() => visualizerActions.handleAnimationToggle()} />
-                            <ToggleSwitch checked={objects.cuttingTool.visibleLite} onChange={() => visualizerActions.handleAnimationToggle(true)} />
+                            <span>Show Bit</span>
+                            <ToggleSwitch checked={objects.cuttingTool.visible} onChange={() => visualizerActions.handleBitToggle()} />
+                            <ToggleSwitch checked={objects.cuttingTool.visibleLite} onChange={() => visualizerActions.handleBitToggle(true)} />
+                            <span>Show Bit Animation</span>
+                            <ToggleSwitch checked={objects.cuttingToolAnimation.visible} onChange={() => visualizerActions.handleAnimationToggle()} />
+                            <ToggleSwitch checked={objects.cuttingToolAnimation.visibleLite} onChange={() => visualizerActions.handleAnimationToggle(true)} />
                             <span>Cutpath Animation</span>
                             <ToggleSwitch checked={objects.cutPath.visible} onChange={() => visualizerActions.handleCutPathToggle()} />
                             <ToggleSwitch checked={objects.cutPath.visibleLite} onChange={() => visualizerActions.handleCutPathToggle(true)} />

@@ -330,6 +330,7 @@ const defaultState = {
         visualizer: {
             minimized: false,
             // 3D View
+            liteMode: false,
             disabled: false,
             disabledLite: false,
             projection: 'orthographic', // 'perspective' or 'orthographic'
@@ -347,9 +348,12 @@ const defaultState = {
                 },
                 gridLineNumbers: {
                     visible: true,
-                    visibleLite: true
                 },
                 cuttingTool: {
+                    visible: true,
+                    visibleLite: true
+                },
+                cuttingToolAnimation: {
                     visible: true,
                     visibleLite: true
                 },
