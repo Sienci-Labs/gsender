@@ -1036,8 +1036,12 @@ class GrblController {
     command(cmd, ...args) {
         const handler = {
             'flash:start': () => {
-                // let [port] = args;
-                FlashingFirmware();
+                let [port = 'COM3'] = args;
+                // Flashing command is in a callback to make sure it happens after the port is closed
+                this.close(() => {
+                    log.debug('Firmware callback called');
+                    FlashingFirmware(port);
+                });
             },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;
