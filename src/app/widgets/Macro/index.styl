@@ -161,3 +161,26 @@
 .height-override {
     height: 100% !important;
 }
+
+@keyframes glowEffect {
+    from  {
+        primary = #059669;
+        background: primary;
+        border-bottom: 2px solid primary;
+    }
+
+    to {
+        secondary = #0ef6ae;
+        background: secondary;
+        border-bottom: 2px solid secondary;
+    }
+}
+
+.glowing-background {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    animation: glowEffect 0.8s ease-in-out infinite alternate;
+}
