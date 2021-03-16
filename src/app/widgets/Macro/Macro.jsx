@@ -26,7 +26,7 @@ class Macro extends PureComponent {
         return canClick && includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state);
     }
 
-    handleRunMacro = (macro) => (event) => {
+    handleRunMacro = (macro) => {
         if (!this.canRunMacro()) {
             return;
         }
