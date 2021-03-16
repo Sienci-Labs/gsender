@@ -371,7 +371,7 @@ class Visualizer extends Component {
         // handle metric gridlines
         this.updateGridChildColor('MetricCoordinateSystem', new THREE.Color(gridColor));
         // handle mesh gridlines
-        this.updateMeshChildColor('Visualizer', currentTheme);
+        this.rerenderGCode(currentTheme);
     }
 
     subscribe() {

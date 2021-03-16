@@ -14,7 +14,7 @@ const themes = [
 ];
 
 const VisualizerSettings = ({ active, state, actions }) => {
-    const { theme } = state.visualizer;
+    const { theme, objects, disabled, disabledLite } = state.visualizer;
     const themeRenderer = (option) => {
         const style = {
             color: '#333',
@@ -44,15 +44,15 @@ const VisualizerSettings = ({ active, state, actions }) => {
                             <b>Option</b>
                             <b>Regular</b>
                             <b>Light-mode</b>
-                            <span>Drill Animation</span>
-                            <ToggleSwitch />
-                            <ToggleSwitch />
-                            <span>Cutpath Animation</span>
-                            <ToggleSwitch />
-                            <ToggleSwitch />
                             <span>Visualize G-Code</span>
-                            <ToggleSwitch />
-                            <ToggleSwitch />
+                            <ToggleSwitch checked={!disabled} />
+                            <ToggleSwitch checked={!disabledLite} />
+                            <span>Drill Animation</span>
+                            <ToggleSwitch checked={objects.cuttingTool.visible} />
+                            <ToggleSwitch checked={objects.cuttingTool.visibleLite} />
+                            <span>Cutpath Animation</span>
+                            <ToggleSwitch checked={objects.cutPath.visible} />
+                            <ToggleSwitch checked={objects.cutPath.visibleLite} />
                         </div>
                         <small>Specify which visualizer features are enabled or disable in both regular mode and light-mode, in order to save computer resources</small>
                     </Fieldset>

@@ -67,7 +67,10 @@ class PreferencesPage extends PureComponent {
                 probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
             },
             visualizer: {
-                theme: this.visualizerConfig.get('theme')
+                theme: this.visualizerConfig.get('theme'),
+                objects: this.visualizerConfig.get('objects'),
+                disabled: this.visualizerConfig.get('disabled'),
+                disabledLite: this.visualizerConfig.get('disabledLite')
             }
         };
     }
@@ -293,7 +296,11 @@ class PreferencesPage extends PureComponent {
                     }
                 });
                 pubsub.publish('theme:change', theme.value);
-            }
+            },
+            handleVizOptionToggle: (key) => {
+                const value = store.get(key);
+                store.set(key, !value);
+            },
         }
     }
 

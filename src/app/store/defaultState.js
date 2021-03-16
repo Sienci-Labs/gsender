@@ -329,9 +329,9 @@ const defaultState = {
         },
         visualizer: {
             minimized: false,
-
             // 3D View
             disabled: false,
+            disabledLite: false,
             projection: 'orthographic', // 'perspective' or 'orthographic'
             cameraMode: 'pan', // 'pan' or 'rotate',
             theme: 'light',
@@ -350,6 +350,10 @@ const defaultState = {
                     visibleLite: true
                 },
                 cuttingTool: {
+                    visible: true,
+                    visibleLite: true
+                },
+                cutPath: {
                     visible: true,
                     visibleLite: true
                 }
