@@ -266,7 +266,8 @@ class Keypad extends PureComponent {
                             disabled={!canClick}
                             onClick={() => {
                                 Toaster.pop({
-                                    msg: Date.now()
+                                    msg: Date.now(),
+                                    type: 'success'
                                 });
                                 actions.setJogFromPreset('precise');
                             }}
