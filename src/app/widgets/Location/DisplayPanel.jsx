@@ -352,7 +352,7 @@ class DisplayPanel extends PureComponent {
 
                     {
                         !endstops
-                            ? <div><img src={logo} alt="Logo" style={{ width: '100%', maxWidth: '135px', background: 'rgba(0,0,0,0.04)', borderRadius: '50%', padding: '1rem' }} /></div>
+                            ? <div className={styles.logoWrapper}><img src={logo} alt="Logo" style={{ width: '100%', maxWidth: '135px', background: 'rgba(0,0,0,0.04)', borderRadius: '50%', padding: '1rem' }} /></div>
                             : (
                                 <div className={endstops ? styles.endStopActiveControls : styles.hideHoming}>
                                     <FunctionButton
