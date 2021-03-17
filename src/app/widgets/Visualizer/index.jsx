@@ -921,7 +921,7 @@ class VisualizerWidget extends PureComponent {
     getInitialState() {
         return {
             port: controller.port,
-            units: METRIC_UNITS,
+            units: store.get('workspace.units', METRIC_UNITS),
             theme: this.config.get('theme'),
             controller: {
                 type: controller.type,
@@ -1100,6 +1100,11 @@ class VisualizerWidget extends PureComponent {
                     disabled: this.config.get('disabled'),
                     disabledLite: this.config.get('disabledLite'),
                     objects: this.config.get('objects')
+                });
+            }),
+            pubsub.subscribe('units:change', (msg, units) => {
+                this.setState({
+                    units: units
                 });
             })
         ];
