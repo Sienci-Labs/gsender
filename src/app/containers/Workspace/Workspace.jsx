@@ -29,6 +29,7 @@ import {
     MODAL_SERVER_DISCONNECTED
 } from './constants';
 import UpdateAvailableAlert from './UpdateAvailableAlert/UpdateAvailableAlert';
+import Toaster from '../../lib/toaster/Toaster';
 
 
 const WAIT = '%wait';
@@ -516,6 +517,7 @@ class Workspace extends PureComponent {
                 >
                     <div className={classNames(styles.workspaceTable)}>
                         <UpdateAvailableAlert restartHandler={this.action.sendRestartCommand} />
+                        <Toaster />
                         <Header />
                         <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
                             <DefaultWidgets

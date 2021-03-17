@@ -19,7 +19,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=6"
+    "node": ">=10"
   },
   "preferGlobal": true,
   "scripts": {
@@ -187,9 +187,7 @@
     "debug": "~4.1.1",
     "deep-keys": "~0.5.0",
     "detect-browser": "~4.4.0",
-    "electron-store": "~3.2.0",
-    "electron-titlebar": "0.0.3",
-    "electron-titlebar-windows": "^3.0.0",
+    "electron-store": "~6.0.1",
     "electron-updater": "^4.3.8",
     "ensure-array": "~1.0.0",
     "errorhandler": "~1.5.0",
@@ -311,9 +309,9 @@
     "css-loader": "~2.1.1",
     "css-split-webpack-plugin": "~0.2.6",
     "dotenv": "~7.0.0",
-    "electron": "~4.2.12",
-    "electron-builder": "~22.4.0",
-    "electron-rebuild": "~1.10.0",
+    "electron": "~8.5.1",
+    "electron-builder": "~22.9.1",
+    "electron-rebuild": "~2.3.4",
     "eslint": "~5.16.0",
     "eslint-config-trendmicro": "~1.4.1",
     "eslint-import-resolver-webpack": "~0.11.1",

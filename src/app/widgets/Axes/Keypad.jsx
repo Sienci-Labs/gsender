@@ -22,6 +22,7 @@ import styles from './index.styl';
 import JogControl from './components/JogControl';
 import JogCancel from './components/JogCancel';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
+import { Toaster } from '../../lib/toaster/ToasterLib';
 
 const KeypadText = styled.span`
     position: relative;
@@ -264,6 +265,9 @@ class Keypad extends PureComponent {
                         <FunctionButton
                             disabled={!canClick}
                             onClick={() => {
+                                Toaster.pop({
+                                    msg: Date.now()
+                                });
                                 actions.setJogFromPreset('precise');
                             }}
                         >
