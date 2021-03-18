@@ -58,7 +58,7 @@ export default class ControlArea extends Component {
                             <i
                                 onMouseEnter={() => this.setState({ currentAlarmIcon: 'fa-unlock' })}
                                 onMouseLeave={() => this.setState({ currentAlarmIcon: 'fa-lock' })}
-                                className={classnames('fas', currentAlarmIcon, styles['machine-status-unlock'])}
+                                className={classnames('fas', currentAlarmIcon, styles['machine-status-unlock'], styles.bigText)}
                                 role="button"
                                 tabIndex={-1}
                                 onClick={this.unlock}
@@ -67,7 +67,7 @@ export default class ControlArea extends Component {
 
                             <div style={{ color: 'white', textAlign: 'center', fontSize: 'clamp(1rem, 1vw, 1.5rem)' }}>
                                 <i className="fas fa-long-arrow-alt-up" style={{ fontSize: 'clamp(1.5rem, 2vw, 2.5rem)' }} />
-                                <div>Click to Unlock Machine</div>
+                                <div className={styles.unlockMachine}>Click to Unlock Machine</div>
                             </div>
                         </div>
                     );
