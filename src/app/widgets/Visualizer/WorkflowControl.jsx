@@ -177,7 +177,7 @@ class WorkflowControl extends PureComponent {
                             type="button"
                             className={styles['workflow-button-play']}
                             title={workflow.state === WORKFLOW_STATE_PAUSED ? i18n._('Resume') : i18n._('Run')}
-                            onClick={actions.handleRun}
+                            onClick={actions.onRunClick}
                             disabled={!canRun}
                         >
                             {i18n._(`${workflow.state === 'paused' ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
