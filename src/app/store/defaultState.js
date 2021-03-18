@@ -340,6 +340,7 @@ const defaultState = {
                 }
             },
             showWarning: true,
+            showLineWarnings: true,
         },
         webcam: {
             disabled: true,
