@@ -74,12 +74,22 @@ const GeneralSettings = ({ active, state, actions }) => {
                             <small className={styles['item-info']}>Reverse workspace layout</small>
                         </Fieldset>
 
-                        <Fieldset legend="File Validation Warning">
-                            <ToggleSwitch
-                                checked={state.showWarning}
-                                onChange={() => actions.general.setShowWarning(!state.showWarning)}
-                            />
-                            <small className={styles['item-info']}>Show warning when file contains invalid G-Code</small>
+                        <Fieldset legend="File Validation Warnings">
+                            <div style={{ marginBottom: '10px' }}>
+                                <ToggleSwitch
+                                    checked={state.showWarning}
+                                    onChange={() => actions.general.setShowWarning(!state.showWarning)}
+                                />
+                                <small className={styles['item-info']}>Show warning when file contains invalid G-Code</small>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 5fr' }}>
+                                <ToggleSwitch
+                                    checked={state.showLineWarnings}
+                                    onChange={() => actions.general.setShowLineWarnings(!state.showLineWarnings)}
+                                />
+                                <small className={styles['item-info']}>Show warning when invalid line is detected during job run</small>
+                            </div>
                         </Fieldset>
                     </div>
                 </div>
