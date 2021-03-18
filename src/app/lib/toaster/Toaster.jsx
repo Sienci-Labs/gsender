@@ -84,7 +84,20 @@ class Toaster extends PureComponent {
             <div className={styles.toasterContainer}>
                 <TransitionGroup>
                     {
-                        activeToasts.map((toast) => <CSSTransition key={toast.id} timeout={200} classNames={styles.toastAppear}><Toast {...toast} /></CSSTransition>)
+                        activeToasts.map((toast) => (
+                            <CSSTransition
+                                key={toast.id}
+                                timeout={100}
+                                classNames={{
+                                    enterActive: styles.toastAppearEnterActive,
+                                    enterDone: styles.toastAppearEnterDone,
+                                    exitActive: styles.toastAppearExitActive,
+                                    exitDone: styles.toastAppearExitDone
+                                }}
+                            >
+                                <Toast {...toast} />
+                            </CSSTransition>
+                        ))
                     }
                 </TransitionGroup>
             </div>
