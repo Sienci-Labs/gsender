@@ -92,9 +92,20 @@
   }
 }
 
+.toast-appear-enter {
+  opacity: 0;
+}
 
-@keyframes roundtime {
-  to {
-    transform: scaleX(0);
-  }
+.toast-appear-enter {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
+.toast-appear-exit {
+  opacity: 1;
+}
+
+.toast-appear-exit-active {
+  opacity: 0;
+  transition: opacity 200ms ease-in;
 }

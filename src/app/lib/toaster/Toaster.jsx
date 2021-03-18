@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import uuid from 'uuid';
 import styles from './toaster.styl';
 import Toast from './Toast';
 import { TOASTER_DEFAULT, TOASTER_UNTIL_CLOSE } from './ToasterLib';
+
 
 class Toaster extends PureComponent {
     pubsubTokens = [];
@@ -80,9 +82,11 @@ class Toaster extends PureComponent {
         const { activeToasts } = this.state;
         return (
             <div className={styles.toasterContainer}>
-                {
-                    activeToasts.map((toast) => <Toast key={toast.id} {...toast} />)
-                }
+                <TransitionGroup>
+                    {
+                        activeToasts.map((toast) => <CSSTransition key={toast.id} timeout={200} classNames={styles.toastAppear}><Toast {...toast} /></CSSTransition>)
+                    }
+                </TransitionGroup>
             </div>
         );
     }

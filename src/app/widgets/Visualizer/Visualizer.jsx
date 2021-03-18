@@ -907,7 +907,7 @@ class Visualizer extends Component {
 
         controls.rotateSpeed = 1.0;
         controls.zoomSpeed = 1.2;
-        controls.panSpeed = 0.8;
+        controls.panSpeed = 0.4;
         controls.noZoom = false;
         controls.noPan = false;
 

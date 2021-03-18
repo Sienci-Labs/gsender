@@ -167,6 +167,7 @@
     "@trendmicro/react-toggle-switch": "~0.5.7",
     "@trendmicro/react-tooltip": "~0.6.0",
     "@trendmicro/react-validation": "~0.1.0",
+    "@types/react-transition-group": "^4.4.1",
     "avrgirl-arduino": "^5.0.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.18.3",
