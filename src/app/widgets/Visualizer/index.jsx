@@ -1,4 +1,4 @@
-import chainedFunction from 'chained-function';
+// import chainedFunction from 'chained-function';
 import classNames from 'classnames';
 import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
@@ -15,6 +15,7 @@ import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
+import store from 'app/store';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
@@ -22,6 +23,7 @@ import WidgetConfig from '../WidgetConfig';
 import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
 import ValidationModal from './ValidationModal';
+import WarningModal from './WarningModal';
 import Visualizer from './Visualizer';
 import Loading from './Loading';
 import Rendering from './Rendering';
@@ -229,7 +231,7 @@ class VisualizerWidget extends PureComponent {
                 .filter(line => !comments.some(comment => line.includes(comment)));
 
             const tCommandRegex = /^[T]+[0-9]+/g;
-            const invalidGCodeRegex = /[^NGMXYZIJKF%\-?\.?\d+\.?\s]/gi;
+            const invalidGCodeRegex = /([^NGMXYZIJKF%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
 
             const toolSet = new Set();
             const invalidGcode = new Set();
@@ -251,10 +253,9 @@ class VisualizerWidget extends PureComponent {
                     invalidGcode.add(line);
                 }
             }
-            console.log(invalidGcode);
 
             if (invalidGcode.size > 0) {
-                this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: true, list: invalidGcode } }));
+                this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
             }
 
             const total = lines.length + 1; //Dwell line added after every gcode parse
@@ -408,9 +409,17 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
         },
+        onRunClick: () => {
+            const { invalidGcode } = this.state;
+
+            invalidGcode.list.size > 0
+                ? this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: true } }))
+                : this.actions.handleRun();
+        },
         handleRun: () => {
             const { workflow } = this.state;
             console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state));
+            this.setState((prev) => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
 
             if (workflow.state === WORKFLOW_STATE_IDLE) {
                 controller.command('gcode:start');
@@ -418,42 +427,6 @@ class VisualizerWidget extends PureComponent {
             }
 
             if (workflow.state === WORKFLOW_STATE_PAUSED) {
-                const { notification } = this.state;
-
-                // M6 Tool Change
-                if (notification.type === NOTIFICATION_M6_TOOL_CHANGE) {
-                    portal(({ onClose }) => (
-                        <Modal disableOverlay size="xs" onClose={onClose}>
-                            <Modal.Header>
-                                <Modal.Title>
-                                    {i18n._('Tool Change')}
-                                </Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                {i18n._('Are you sure you want to resume program execution?')}
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button onClick={onClose}>
-                                    {i18n._('No')}
-                                </Button>
-                                <Button
-                                    btnStyle="primary"
-                                    onClick={chainedFunction(
-                                        () => {
-                                            controller.command('gcode:resume');
-                                        },
-                                        onClose
-                                    )}
-                                >
-                                    {i18n._('Yes')}
-                                </Button>
-                            </Modal.Footer>
-                        </Modal>
-                    ));
-
-                    return;
-                }
-
                 controller.command('gcode:resume');
             }
         },
@@ -623,6 +596,31 @@ class VisualizerWidget extends PureComponent {
             toRightSideView: () => {
                 this.setState({ cameraPosition: 'right' });
             }
+        },
+        lineWarning: {
+            onContinue: () => {
+                this.setState(prev => ({ invalidLine: { ...prev.invalidLine, show: false, line: '', } }));
+                this.actions.handleRun();
+            },
+            onIgnoreWarning: () => {
+                this.setState(prev => ({
+                    invalidLine: {
+                        ...prev.invalidLine,
+                        show: false,
+                        line: ''
+                    }
+                }));
+
+                store.set('widgets.visualizer.showLineWarnings', false);
+                controller.command('settings:updated', { showLineWarnings: false });
+                this.actions.handleRun();
+            },
+            onCancel: () => this.actions.reset(),
+        },
+        reset: () => {
+            this.setState(this.getInitialState());
+            this.actions.unloadGCode();
+            pubsub.publish('gcode:fileInfo');
         }
     };
 
@@ -630,6 +628,17 @@ class VisualizerWidget extends PureComponent {
         'serialport:open': (options) => {
             const { port } = options;
             const { gcode } = this.state;
+
+            const machineProfile = store.get('workspace.machineProfile');
+            const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
+
+            if (machineProfile) {
+                controller.command('machineprofile:load', machineProfile);
+            }
+
+            if (showLineWarnings) {
+                controller.command('settings:updated', { showLineWarnings });
+            }
 
             //If we uploaded a file before connecting to a machine, load the gcode to the controller
             if (gcode.loadedBeforeConnection) {
@@ -720,13 +729,27 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
         },
-        'workflow:state': (workflowState) => {
-            this.setState(state => ({
-                workflow: {
-                    ...state.workflow,
-                    state: workflowState
-                }
-            }));
+        'workflow:state': (workflowState, data) => {
+            if (data) {
+                this.setState(state => ({
+                    workflow: {
+                        ...state.workflow,
+                        state: workflowState
+                    },
+                    invalidLine: {
+                        ...state.invalidLine,
+                        show: true,
+                        line: data.line,
+                    }
+                }));
+            } else {
+                this.setState(state => ({
+                    workflow: {
+                        ...state.workflow,
+                        state: workflowState
+                    }
+                }));
+            }
         },
         'controller:settings': (type, controllerSettings) => {
             this.setState(state => ({
@@ -877,8 +900,11 @@ class VisualizerWidget extends PureComponent {
 
     subscribe() {
         const tokens = [
-            pubsub.subscribe('gcode:showWarning', (msg, shouldShow) => {
-                this.setState(prev => ({ invalidGcode: { shouldShow, showModal: false, list: [], } }));
+            pubsub.subscribe('gcode:showWarning', (_, shouldShow) => {
+                this.setState({ invalidGcode: { shouldShow, showModal: false, list: [], } });
+            }),
+            pubsub.subscribe('gcode:showLineWarnings', (_, shouldShow) => {
+                this.setState({ invalidLine: { shouldShow, show: false, line: '', } });
             }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -1039,8 +1065,13 @@ class VisualizerWidget extends PureComponent {
             invalidGcode: {
                 shouldShow: this.config.get('showWarning'),
                 showModal: false,
-                list: [],
+                list: new Set([]),
             },
+            invalidLine: {
+                shouldShow: this.config.get('showLineWarnings'),
+                show: false,
+                line: '',
+            }
         };
     }
 
@@ -1176,12 +1207,18 @@ class VisualizerWidget extends PureComponent {
                                 state.invalidGcode.shouldShow && state.invalidGcode.showModal && (
                                     <ValidationModal
                                         invalidGcode={state.invalidGcode}
-                                        onClose={() => this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }))}
-                                        onCancel={() => {
-                                            this.setState(this.getInitialState());
-                                            this.actions.unloadGCode();
-                                            pubsub.publish('gcode:fileInfo');
-                                        }}
+                                        onProceed={this.actions.handleRun}
+                                        onCancel={this.actions.reset}
+                                    />
+                                )
+                            }
+                            {
+                                state.invalidLine.shouldShow && state.invalidLine.show && (
+                                    <WarningModal
+                                        onContinue={actions.lineWarning.onContinue}
+                                        onIgnoreWarning={actions.lineWarning.onIgnoreWarning}
+                                        onCancel={actions.lineWarning.onCancel}
+                                        invalidLine={state.invalidLine.line}
                                     />
                                 )
                             }
