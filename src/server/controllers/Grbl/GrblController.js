@@ -211,32 +211,32 @@ class GrblController {
                 // line="G0 X[posx - 8] Y[ymax]"
                 // > "G0 X2 Y50"
                 line = translateExpression(line, context);
-                const data = parser.parseLine(line, { flatten: true });
-                const words = ensureArray(data.words);
+                // const data = parser.parseLine(line, { flatten: true });
+                // const words = ensureArray(data.words);
 
-                { // Program Mode: M0, M1
-                    const programMode = _.intersection(words, ['M0', 'M1'])[0];
-                    if (programMode === 'M0') {
-                        log.debug('M0 Program Pause');
-                        this.feeder.hold({ data: 'M0' }); // Hold reason
-                    } else if (programMode === 'M1') {
-                        log.debug('M1 Program Pause');
-                        this.feeder.hold({ data: 'M1' }); // Hold reason
-                    }
-                }
+                // { // Program Mode: M0, M1
+                //     const programMode = _.intersection(words, ['M0', 'M1'])[0];
+                //     if (programMode === 'M0') {
+                //         log.debug('M0 Program Pause');
+                //         this.feeder.hold({ data: 'M0' }); // Hold reason
+                //     } else if (programMode === 'M1') {
+                //         log.debug('M1 Program Pause');
+                //         this.feeder.hold({ data: 'M1' }); // Hold reason
+                //     }
+                // }
 
-                // M6 Tool Change
-                if (_.includes(words, 'M6')) {
-                    log.debug('M6 Tool Change');
-                    this.feeder.hold({ data: 'M6' }); // Hold reason
+                // // M6 Tool Change
+                // if (_.includes(words, 'M6')) {
+                //     log.debug('M6 Tool Change');
+                //     this.feeder.hold({ data: 'M6' }); // Hold reason
 
-                    // Surround M6 with parentheses to ignore
-                    // unsupported command error. If we nuke the whole
-                    // line, then we'll likely lose other commands that
-                    // share the line, like a T~.  This makes tool
-                    // changes complicated.
-                    line = line.replace('M6', '(M6)');
-                }
+                //     // Surround M6 with parentheses to ignore
+                //     // unsupported command error. If we nuke the whole
+                //     // line, then we'll likely lose other commands that
+                //     // share the line, like a T~.  This makes tool
+                //     // changes complicated.
+                //     line = line.replace('M6', '(M6)');
+                // }
 
                 return line;
             }
