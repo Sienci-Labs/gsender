@@ -51,9 +51,6 @@
 }
 
 .control-buttons {
-    display: flex;
-    flex-grow 1;
-    flex-direction column;
     padding: 0 2rem
     button {
         margin-bottom: 10px;
@@ -194,6 +191,15 @@
     flex-grow 1;
     justify-content center;
     align-items center;
+}
+
+.button-wrap {
+    display: grid;
+    width: 100%;
+    grid-gap 10px;
+    grid-template-columns repeat( 2, 1fr );
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .button-wrap {

@@ -32,13 +32,14 @@ const ProgressArea = ({ state }) => {
         return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
     };
 
-    const { total, received, elapsedTime, remainingTime } = state;
+    const { total, received, elapsedTime, remainingTime, fileName } = state;
 
     // eslint-disable-next-line no-restricted-globals
     const percentageValue = isNaN(((received / total) * 100).toFixed(0)) ? 0 : ((received / total) * 100).toFixed(0);
 
     return (
         <div className={styles.progressArea}>
+            <span className={styles.progressName}>{ fileName }</span>
             <table className={styles['progress-area-table']}>
                 <tbody>
                     <tr>

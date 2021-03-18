@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import store from 'app/store';
-
+import cx from 'classnames';
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
 
@@ -330,7 +330,7 @@ class DisplayPanel extends PureComponent {
                             <i className="fas fa-bullseye" />
                             Zero All
                         </FunctionButton>
-                        <div className={styles.buttonWrap}>
+                        <div className={cx({ [styles.buttonWrap]: !endstops }, { [styles.columnZeros]: endstops })}>
                             <FunctionButton
                                 onClick={() => {
                                     controller.command('gcode', 'G91');
@@ -354,7 +354,7 @@ class DisplayPanel extends PureComponent {
                                 primary
                             >
                                 <i className="fas fa-chart-line" />
-                                Go to X Zero
+                                Go to X<span style={{ fontFamily: 'ui-monospace' }}>0</span>
                             </FunctionButton>
                             <FunctionButton
                                 onClick={() => {
