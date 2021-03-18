@@ -29,9 +29,19 @@ const GeneralSettings = ({ active, state, actions }) => {
                 General
             </h3>
             <div className={styles.toolMain}>
-
                 <div className={styles.generalArea}>
                     <div style={{ width: '48%' }}>
+                        <Fieldset legend="Connection">
+                            <div>
+                                <Baudrates baudrate={state.baudrate} onChange={(option) => actions.general.setBaudrate(option)} />
+                                <br />
+                                <ToggleSwitch
+                                    checked={autoReconnect}
+                                    onChange={() => actions.general.setAutoReconnect()}
+                                />
+                                <small className={styles['item-info']}>Re-connect automatically</small>
+                            </div>
+                        </Fieldset>
                         <Fieldset legend="Preferred Units">
                             <RadioGroup
                                 name="units"
@@ -40,31 +50,11 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 onChange={(value, event) => actions.general.setUnits(value)}
                             >
                                 <div>
-                                    <RadioButton label={i18n._('Inches (G20)')} value={IMPERIAL_UNITS} />
-                                    <RadioButton label={i18n._('Millimeters (G21)')} value={METRIC_UNITS} />
+                                    <RadioButton className={styles.prefferedradio} label={i18n._('Inches (G20)')} value={IMPERIAL_UNITS} />
+                                    <RadioButton className={styles.prefferedradio} label={i18n._('Millimeters (G21)')} value={METRIC_UNITS} />
                                 </div>
                             </RadioGroup>
                             <small className={styles['item-info']}>Units to be displayed throughout the interface</small>
-                        </Fieldset>
-
-                        <Fieldset legend="Machine Profile" className={styles['mb-0']}>
-                            <MachineProfileOptions />
-                        </Fieldset>
-                    </div>
-                    <div style={{ width: '48%' }}>
-                        <Fieldset legend="Jog Speed Presets">
-                            <JogSpeeds />
-                        </Fieldset>
-                        <Fieldset legend="Connection">
-                            <div>
-                                <ToggleSwitch
-                                    checked={autoReconnect}
-                                    onChange={() => actions.general.setAutoReconnect()}
-                                />
-                                <small className={styles['item-info']}>Re-connect automatically</small>
-                                <br />
-                                <Baudrates baudrate={state.baudrate} onChange={(option) => actions.general.setBaudrate(option)}/>
-                            </div>
                         </Fieldset>
                         <Fieldset legend="Workspace">
                             <ToggleSwitch
@@ -72,6 +62,14 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 onChange={() => actions.general.setReverseWidgets()}
                             />
                             <small className={styles['item-info']}>Reverse workspace layout</small>
+                        </Fieldset>
+                        <Fieldset legend="Jog Speed Presets">
+                            <JogSpeeds />
+                        </Fieldset>
+                    </div>
+                    <div style={{ width: '48%' }}>
+                        <Fieldset legend="Machine Profile" className={styles['mb-0']}>
+                            <MachineProfileOptions />
                         </Fieldset>
                     </div>
                 </div>

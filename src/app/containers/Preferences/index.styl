@@ -7,13 +7,14 @@
 
   label {
     margin: 0;
+    font-size: 1.2rem;
   }
 }
 
 .preferencesContent {
   display: flex;
-  flex-direction row;
-  flex-grow 1;
+  flex-direction: row;
+  flex-grow: 1;
 }
 
 .preferencesMenu {
@@ -22,6 +23,7 @@
   flex-direction: column;
   flex-grow: 1;
   background: #1F2937;
+  font-size: 1.3rem;
 
   h3 {
     color: #3e85c7;
@@ -42,7 +44,7 @@
       outline: none;
     }
 
-    &:hover{
+    &:hover {
       background: #374151;
     }
   }
@@ -56,13 +58,12 @@
   display: flex;
   gap: 2rem;
   width: 100%;
-  justify-content space-between;
+  justify-content: space-between;
 }
 
 .preferencesOptions {
   width: 80%;
   background: #d1d5db;
-  padding: 10px;
 }
 
 .hidden {
@@ -88,7 +89,7 @@
 
 .add-tool-form {
   display: flex;
-  flex-direction column;
+  flex-direction: column;
   width: 50%;
 }
 
@@ -103,8 +104,8 @@
   .delete {
     font-size: 1.1rem;
     color: red;
-    justify-content center
-    align-items center;
+    justify-content: center;
+    align-items: center;
     border: none;
     outline: none;
     background: none;
@@ -115,9 +116,9 @@
   padding: 10px;
   display: flex;
   flex-direction: row;
-  font-size: 0.9rem;
-  align-items center;
-  justify-content space-between
+  font-size: 1.25rem;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
 }
 
@@ -135,8 +136,8 @@
   color: #FFFFFF;
   outline: none;
   border: none;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
+  padding: .5rem;
+  border-radius: .25rem;
   margin-top: 1rem;
 
   &:disabled {
@@ -145,43 +146,43 @@
 }
 
 .jog-speed-active {
-  font-size: 0.7rem;
+  font-size: 1.1rem;
   width: 100%;
   background: #3e85c7;
   color: #FFFFFF;
   outline: none;
   border: none;
   padding: 7px;
-  border-radius: 0.25rem;
+  border-radius: .25rem;
   margin: 0;
 }
 
 .jog-speed-inactive {
-  font-size: 0.7rem;
+  font-size: 1.1rem;
   width: 100%;
   background: #6B7280;
   color: #FFFFFF;
   outline: none;
   border: none;
   padding: 7px;
-  border-radius: 0.25rem;
+  border-radius: .25rem;
   margin: 0;
 }
 
 .input-spread {
   display: flex;
-  flex-direction row;
-  justify-content space-between;
+  flex-direction: row;
+  justify-content: space-between;
   margin-bottom: 10px;
-  align-items center;
-  gap: 1rem
+  align-items: center;
+  gap: 1rem;
 }
 
 .probe-info {
   width: 60%;
   display: flex;
   flex-direction: column;
-  justify-content space-between;
+  justify-content: space-between;
 }
 
 .keybindings-message {
@@ -198,14 +199,14 @@
 }
 
 .settings-title {
-  font-size: 1.6rem;
-  margin: 10px 0 1.6rem 0;
+  font-size: 1.9rem;
+  margin: 3rem 0 1rem;
 }
 
 .settings-subtitle {
-    color: #3e85c7;
-    font-size: 1rem;
-    margin: 10px 0 10px 0;
+  color: #3e85c7;
+  font-size: 1.25rem;
+  margin: 10px 0;
 }
 
 .settings-wrapper {
@@ -214,28 +215,25 @@
 }
 
 .machine-options-inputgroup {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-    margin-bottom: 1.4rem;
-    justify-content: space-between;
-    width: 100%;
-
-    label {
-        font-size: 0.9rem;
-    }
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.4rem;
+  width: 100%;
+  label {
+   font-size: 1.2rem;
+  }
 }
 
 .machine-options-section {
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
 }
 
 .machine-options-select {
-    width: 100%;
-    font-size: 15px;
+  width: 100%;
+  font-size: 1.4rem;
 }
 
 .mb-0 {
@@ -256,7 +254,8 @@
 .jog-speed-wrapper {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1.4rem;
+  margin-bottom: 1.0rem;
+  font-size: 1.2rem;
 
   button {
     max-width: 30%;
@@ -285,7 +284,7 @@
 
 .flex-row {
   flex-direction: row;
-  justify-content space-between;
+  justify-content: space-between;
 }
 
 .flex-column {
@@ -293,17 +292,17 @@
 }
 
 .fieldset {
-  border: 2px solid rgba(0,0,0,0.15);
+  border: 2px solid rgba(0, 0, 0, .15);
   padding: 10px;
   margin-bottom: 1.4rem;
 
   br {
-    line-height 150%;
+    line-height: 150%;
   }
 }
 
 .fieldset-legend {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: #3e85c7;
   margin: 0;
   width: unset;
@@ -315,19 +314,24 @@
 }
 
 .item-info {
-  color: rgba(0,0,0,0.45);
+  font-size: 1.05rem;
+  color: rgba(0, 0, 0, .45);
 }
 
 .input {
   display: grid;
   gap: 1rem;
-  grid-template-columns: 1fr 2fr;
-  margin: 0 0 1.5rem 0 !important;
+  grid-template-columns: 0fr 2fr;
+  margin: 0 10px 1.5rem !important;
 
   label {
-    font-size: 1rem;
+    font-size: 1.2rem;
     align-self: center;
   }
+}
+
+.prefferedradio {
+  font-size: 1.2rem;
 }
 
 .viz-grid {

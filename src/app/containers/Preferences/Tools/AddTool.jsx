@@ -1,6 +1,6 @@
 import React from 'react';
-import classnames from 'classnames';
-import { RadioGroup, RadioButton } from 'app/components/Radio';
+// import classnames from 'classnames';
+// import { RadioGroup, RadioButton } from 'app/components/Radio';
 
 // import Fieldset from '../FieldSet';
 import Input from '../Input';
@@ -30,7 +30,7 @@ const AddTool = ({ actions, state }) => {
                 onChange={toolActions.setImperialDiameter}
             />
 
-            <div className={classnames(styles.flex, styles['justify-content-space-between'])}>
+            {/* <div className={classnames(styles.flex, styles['justify-content-space-between'])}>
                 <label htmlFor="bitType">Tool Type</label>
 
                 <RadioGroup
@@ -42,7 +42,7 @@ const AddTool = ({ actions, state }) => {
                         <RadioButton label="V Bit" value="v bit" />
                     </div>
                 </RadioGroup>
-            </div>
+            </div> */}
 
             <button
                 className={styles.addTool}
