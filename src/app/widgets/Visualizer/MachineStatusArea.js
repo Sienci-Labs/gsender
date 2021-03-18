@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 import controller from 'app/lib/controller';
 
 import styles from './machine-status-area.styl';
+import UnlockAlarmButton from './UnlockAlarmButton';
 
 /**
  * Control Area component displaying machine status
@@ -26,8 +26,6 @@ export default class ControlArea extends Component {
 
     render() {
         const { controller, port } = this.props.state;
-        const { currentAlarmIcon } = this.state;
-
         const { state = {} } = controller;
 
         //Object to customize the message of the active machine state
@@ -54,21 +52,7 @@ export default class ControlArea extends Component {
                             <div className={styles['machine-Alarm']}>
                                 {state.status.activeState} ({state.status.alarmCode}){' '}
                             </div>
-
-                            <i
-                                onMouseEnter={() => this.setState({ currentAlarmIcon: 'fa-unlock' })}
-                                onMouseLeave={() => this.setState({ currentAlarmIcon: 'fa-lock' })}
-                                className={classnames('fas', currentAlarmIcon, styles['machine-status-unlock'], styles.bigText)}
-                                role="button"
-                                tabIndex={-1}
-                                onClick={this.unlock}
-                                onKeyDown={this.unlock}
-                            />
-
-                            <div style={{ color: 'white', textAlign: 'center', fontSize: 'clamp(1rem, 1vw, 1.5rem)' }}>
-                                <i className="fas fa-long-arrow-alt-up" style={{ fontSize: 'clamp(1.5rem, 2vw, 2.5rem)' }} />
-                                <div className={styles.unlockMachine}>Click to Unlock Machine</div>
-                            </div>
+                            <UnlockAlarmButton onClick={this.unlock} />
                         </div>
                     );
                 } else {
