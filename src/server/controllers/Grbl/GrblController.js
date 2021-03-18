@@ -300,25 +300,44 @@ class GrblController {
                 const data = parser.parseLine(line, { flatten: true });
                 const words = ensureArray(data.words);
 
-                { // Program Mode: M0, M1
-                    const programMode = _.intersection(words, ['M0', 'M1'])[0];
-                    if (programMode === 'M0') {
-                        log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
-                        this.workflow.pause({ data: 'M0' });
-                    } else if (programMode === 'M1') {
-                        log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
-                        this.workflow.pause({ data: 'M1' });
+                // { // Program Mode: M0, M1
+                //     const programMode = _.intersection(words, ['M0', 'M1'])[0];
+                //     if (programMode === 'M0') {
+                //         log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
+                //         this.workflow.pause({ data: 'M0' });
+                //     } else if (programMode === 'M1') {
+                //         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
+                //         this.workflow.pause({ data: 'M1' });
+                //     }
+                // }
+
+                const machineProfile = store.get('machineProfile');
+                const preferences = store.get('preferences');
+                if (line) {
+                    const regex = /([^NGMXYZIJKF%\-?\.?\d+\.?\s])/gi;
+                    if (regex.test(line)) {
+                        if (preferences && preferences.showLineWarnings) {
+                            console.log('INVALID LINE FOUND');
+                            // this.workflow.pause({ data: line });
+                            this.emit('workflow:state', this.workflow.state, { validLine: false, line });
+                        } else {
+                            line = '(' + line + ')'; //Surround with paranthesis to ignore line
+                        }
                     }
                 }
 
-                // M6 Tool Change
-                if (_.includes(words, 'M6')) {
-                    log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
-                    this.workflow.pause({ data: 'M6' });
-
-                    // Surround M6 with parentheses to ignore unsupported command error
-                    line = line.replace('M6', '(M6)');
+                if (_.includes(words, 'G28') && !machineProfile.endstops) {
+                    line = line.replace('G28', '(G28)');
                 }
+
+                // M6 Tool Change
+                // if (_.includes(words, 'M6')) {
+                //     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
+                //     this.workflow.pause({ data: 'M6' });
+
+                //     // Surround M6 with parentheses to ignore unsupported command error
+                //     line = line.replace('M6', '(M6)');
+                // }
 
                 return line;
             }
@@ -367,6 +386,7 @@ class GrblController {
 
             if (args.length > 0) {
                 const reason = { ...args[0] };
+                // console.log(reason);
                 this.sender.hold(reason); // Hold reason
             } else {
                 this.sender.hold();
@@ -469,28 +489,45 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
 
-            if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
-                const ignoreErrors = config.get('state.controller.exception.ignoreErrors');
-                const pauseError = !ignoreErrors;
+            if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
+                // const ignoreErrors = config.get('state.controller.exception.ignoreErrors');
+                // const pauseError = !ignoreErrors;
                 const { lines, received } = this.sender.state;
                 const line = lines[received] || '';
 
-                this.emit('serialport:read', `> ${line.trim()} (line=${received + 1})`);
-                if (error) {
-                    // Grbl v1.1
-                    this.emit('serialport:read', `error:${code} (${error.message})`);
+                const preferences = store.get('preferences') || { showLineWarnings: true };
 
-                    if (pauseError) {
+                this.emit('serialport:read', `error:${code} (${error.message})`);
+                if (error) {
+                    if (preferences.showLineWarnings) {
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
+                        this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
                     }
                 } else {
-                    // Grbl v0.9
                     this.emit('serialport:read', res.raw);
 
-                    if (pauseError) {
-                        this.workflow.pause({ err: res.raw });
+                    if (preferences.showLineWarnings) {
+                        this.workflow.pause({ err: `error:${code} (${error.message})` });
+                        this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
                     }
                 }
+
+                // this.emit('serialport:read', `> ${line.trim()} (line=${received + 1})`);
+                // if (error) {
+                //     // Grbl v1.1
+                //     this.emit('serialport:read', `error:${code} (${error.message})`);
+
+                //     if (pauseError) {
+                //         this.workflow.pause({ err: `error:${code} (${error.message})` });
+                //     }
+                // } else {
+                //     // Grbl v0.9
+                //     this.emit('serialport:read', res.raw);
+
+                //     if (pauseError) {
+                //         this.workflow.pause({ err: res.raw });
+                //     }
+                // }
 
                 this.sender.ack();
                 this.sender.next();
@@ -1396,6 +1433,23 @@ class GrblController {
 
                     this.command('gcode:load', file, data, context, callback);
                 });
+            },
+            'machineprofile:load': () => {
+                const [machineProfile] = args;
+
+                store.set('machineProfile', machineProfile);
+            },
+            'settings:updated': () => {
+                const [newSettings = {}] = args;
+
+                const currentSettings = store.get('preferences') || {};
+
+                const updated = {
+                    ...currentSettings,
+                    ...newSettings,
+                };
+
+                store.set('preferences', updated);
             }
         }[cmd];
 
