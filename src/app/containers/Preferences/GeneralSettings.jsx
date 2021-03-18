@@ -30,9 +30,9 @@ const GeneralSettings = ({ active, state, actions }) => {
             </h3>
             <div className={styles.toolMain}>
                 <div className={styles.generalArea}>
-                    <div style={{ width: '48%' }}>
+                    <div className={styles.halfContainer}>
                         <Fieldset legend="Connection">
-                            <div>
+                            <div className={styles.addMargin}>
                                 <Baudrates baudrate={state.baudrate} onChange={(option) => actions.general.setBaudrate(option)} />
                                 <br />
                                 <ToggleSwitch
@@ -43,25 +43,29 @@ const GeneralSettings = ({ active, state, actions }) => {
                             </div>
                         </Fieldset>
                         <Fieldset legend="Preferred Units">
-                            <RadioGroup
-                                name="units"
-                                value={units}
-                                depth={2}
-                                onChange={(value, event) => actions.general.setUnits(value)}
-                            >
-                                <div>
-                                    <RadioButton className={styles.prefferedradio} label={i18n._('Inches (G20)')} value={IMPERIAL_UNITS} />
-                                    <RadioButton className={styles.prefferedradio} label={i18n._('Millimeters (G21)')} value={METRIC_UNITS} />
-                                </div>
-                            </RadioGroup>
-                            <small className={styles['item-info']}>Units to be displayed throughout the interface</small>
+                            <div className={styles.addMargin}>
+                                <RadioGroup
+                                    name="units"
+                                    value={units}
+                                    depth={2}
+                                    onChange={(value, event) => actions.general.setUnits(value)}
+                                >
+                                    <div>
+                                        <RadioButton className={styles.prefferedradio} label={i18n._('Inches (G20)')} value={IMPERIAL_UNITS} />
+                                        <RadioButton className={styles.prefferedradio} label={i18n._('Millimeters (G21)')} value={METRIC_UNITS} />
+                                    </div>
+                                </RadioGroup>
+                                <small className={styles['item-info']}>Units to be displayed throughout the interface</small>
+                            </div>
                         </Fieldset>
                         <Fieldset legend="Workspace">
-                            <ToggleSwitch
-                                checked={reverseWidgets}
-                                onChange={() => actions.general.setReverseWidgets()}
-                            />
-                            <small className={styles['item-info']}>Reverse workspace layout</small>
+                            <div className={styles.addMargin}>
+                                <ToggleSwitch
+                                    checked={reverseWidgets}
+                                    onChange={() => actions.general.setReverseWidgets()}
+                                />
+                                <small className={styles['item-info']}>Reverse workspace layout</small>
+                            </div>
                         </Fieldset>
                         <Fieldset legend="Jog Speed Presets">
                             <JogSpeeds />

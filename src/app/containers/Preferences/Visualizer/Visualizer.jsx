@@ -41,44 +41,48 @@ const VisualizerSettings = ({ active, state, actions }) => {
             <div className={styles.toolMain}>
                 <div style={{ width: '48%' }}>
                     <Fieldset legend="Visualizer Options">
-                        <div className={styles.vizGrid}>
-                            <b>Option</b>
-                            <b>Regular</b>
-                            <b>Lite Mode</b>
-                            <span>Visualize G-Code</span>
-                            <ToggleSwitch checked={!disabled} onChange={() => visualizerActions.handleVisEnabledToggle()} />
-                            <ToggleSwitch checked={!disabledLite} onChange={() => visualizerActions.handleVisEnabledToggle(true)} />
-                            <span>Show Bit</span>
-                            <ToggleSwitch checked={objects.cuttingTool.visible} onChange={() => visualizerActions.handleBitToggle()} />
-                            <ToggleSwitch checked={objects.cuttingTool.visibleLite} onChange={() => visualizerActions.handleBitToggle(true)} />
-                            <span>Show Bit Animation</span>
-                            <ToggleSwitch checked={objects.cuttingToolAnimation.visible} onChange={() => visualizerActions.handleAnimationToggle()} />
-                            <ToggleSwitch checked={objects.cuttingToolAnimation.visibleLite} onChange={() => visualizerActions.handleAnimationToggle(true)} />
-                            <span>Cutpath Animation</span>
-                            <ToggleSwitch checked={objects.cutPath.visible} onChange={() => visualizerActions.handleCutPathToggle()} />
-                            <ToggleSwitch checked={objects.cutPath.visibleLite} onChange={() => visualizerActions.handleCutPathToggle(true)} />
+                        <div className={styles.addMargin}>
+                            <div className={classNames(styles.vizGrid)}>
+                                <b>Option</b>
+                                <b>Regular</b>
+                                <b>Lite Mode</b>
+                                <span>Visualize G-Code</span>
+                                <ToggleSwitch checked={!disabled} onChange={() => visualizerActions.handleVisEnabledToggle()} />
+                                <ToggleSwitch checked={!disabledLite} onChange={() => visualizerActions.handleVisEnabledToggle(true)} />
+                                <span>Show Bit</span>
+                                <ToggleSwitch checked={objects.cuttingTool.visible} onChange={() => visualizerActions.handleBitToggle()} />
+                                <ToggleSwitch checked={objects.cuttingTool.visibleLite} onChange={() => visualizerActions.handleBitToggle(true)} />
+                                <span>Show Bit Animation</span>
+                                <ToggleSwitch checked={objects.cuttingToolAnimation.visible} onChange={() => visualizerActions.handleAnimationToggle()} />
+                                <ToggleSwitch checked={objects.cuttingToolAnimation.visibleLite} onChange={() => visualizerActions.handleAnimationToggle(true)} />
+                                <span>Cutpath Animation</span>
+                                <ToggleSwitch checked={objects.cutPath.visible} onChange={() => visualizerActions.handleCutPathToggle()} />
+                                <ToggleSwitch checked={objects.cutPath.visibleLite} onChange={() => visualizerActions.handleCutPathToggle(true)} />
+                            </div>
+                            <small>Specify which visualizer features are enabled or disable in both regular mode and light-mode, in order to save computer resources</small>
                         </div>
-                        <small>Specify which visualizer features are enabled or disable in both regular mode and light-mode, in order to save computer resources</small>
                     </Fieldset>
                 </div>
                 <div style={{ width: '48%' }}>
                     <Fieldset legend="Theme">
-                        <Select
-                            backspaceRemoves={false}
-                            className="sm"
-                            clearable={false}
-                            menuContainerStyle={{ zIndex: 5 }}
-                            name="theme"
-                            onChange={actions.visualizer.handleThemeChange}
-                            options={map(themes, (value) => ({
-                                value: value,
-                                label: value
-                            }))}
-                            searchable={false}
-                            value={theme}
-                            valueRenderer={themeRenderer}
-                        />
-                        <small>Colours used when visualizing a G-Code file.</small>
+                        <div className={styles.addMargin}>
+                            <Select
+                                backspaceRemoves={false}
+                                className="sm"
+                                clearable={false}
+                                menuContainerStyle={{ zIndex: 5 }}
+                                name="theme"
+                                onChange={actions.visualizer.handleThemeChange}
+                                options={map(themes, (value) => ({
+                                    value: value,
+                                    label: value
+                                }))}
+                                searchable={false}
+                                value={theme}
+                                valueRenderer={themeRenderer}
+                            />
+                            <small>Colours used when visualizing a G-Code file.</small>
+                        </div>
                     </Fieldset>
                 </div>
             </div>

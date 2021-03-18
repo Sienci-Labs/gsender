@@ -19,10 +19,9 @@ const Baudrates = ({ onChange, baudrate }) => {
             color: '#333',
             textOverflow: 'ellipsis',
             overflow: 'hidden',
-            fontSize: '1.4rem'
         };
         return (
-            <div style={style} title={option.label}>{option.label}</div>
+            <div className={styles.inputText} style={style} title={option.label}>{option.label}</div>
         );
     };
 

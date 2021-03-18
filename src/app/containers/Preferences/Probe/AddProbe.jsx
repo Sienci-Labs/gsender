@@ -31,16 +31,14 @@ const AddProbe = ({ state, actions }) => {
                         />
                     )
                 }
-                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'space-between' }}>
-                    <div className={styles.inputSpread}>
-                        <label htmlFor="xProbe">XY Probe</label>
-                        <ToggleSwitch
-                            checked={functions.y}
-                            onChange={() => {
-                                probeActions.handleToggleChange('x', 'y');
-                            }}
-                        />
-                    </div>
+                <div className={styles.inputSpread}>
+                    <label htmlFor="xProbe">XY Probe</label>
+                    <ToggleSwitch
+                        checked={functions.y}
+                        onChange={() => {
+                            probeActions.handleToggleChange('x', 'y');
+                        }}
+                    />
                 </div>
             </div>
 

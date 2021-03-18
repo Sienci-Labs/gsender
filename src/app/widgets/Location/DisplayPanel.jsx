@@ -12,8 +12,6 @@ import store from 'app/store';
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
 
-import logo from '../../images/logo-badge-256x256.png';
-
 import {
     AXIS_E,
     AXIS_X,
@@ -332,7 +330,7 @@ class DisplayPanel extends PureComponent {
                             <i className="fas fa-bullseye" />
                             Zero All
                         </FunctionButton>
-                        <div className={styles.buttonwrap}>
+                        <div className={styles.buttonWrap}>
                             <FunctionButton
                                 onClick={() => {
                                     controller.command('gcode', 'G91');
@@ -345,58 +343,88 @@ class DisplayPanel extends PureComponent {
                                 primary
                             >
                                 <i className="fas fa-chart-line" />
-                            Go to Zero
+                            Go to XYZ Zero
+                            </FunctionButton>
+                            <FunctionButton
+                                onClick={() => {
+                                    controller.command('gcode', 'G90');
+                                    controller.command('gcode', 'G0 X0'); //Move to Work Position Zero
+                                }}
+                                disabled={!canClick}
+                                primary
+                            >
+                                <i className="fas fa-chart-line" />
+                                Go to X Zero
+                            </FunctionButton>
+                            <FunctionButton
+                                onClick={() => {
+                                    controller.command('gcode', 'G90');
+                                    controller.command('gcode', 'G0 Y0'); //Move to Work Position Zero
+                                }}
+                                disabled={!canClick}
+                                primary
+                            >
+                                <i className="fas fa-chart-line" />
+                                Go to Y Zero
+                            </FunctionButton>
+                            <FunctionButton
+                                onClick={() => {
+                                    controller.command('gcode', 'G90');
+                                    controller.command('gcode', 'G0 Z0'); //Move to Work Position Zero
+                                }}
+                                disabled={!canClick}
+                                primary
+                            >
+                                <i className="fas fa-chart-line" />
+                                Go to Z Zero
                             </FunctionButton>
                         </div>
                     </div>
 
                     {
-                        !endstops
-                            ? <div className={styles.logoWrapper}><img src={logo} alt="Logo" style={{ width: '100%', maxWidth: '135px', background: 'rgba(0,0,0,0.04)', borderRadius: '50%', padding: '1rem' }} /></div>
-                            : (
-                                <div className={endstops ? styles.endStopActiveControls : styles.hideHoming}>
-                                    <FunctionButton
-                                        disabled={!canClick}
-                                        onClick={this.actions.startHoming}
-                                        className={styles.runHomeButton}
-                                    >
-                                        <i className="fas fa-home" /> Home Machine
-                                    </FunctionButton>
-                                    <QuickPositionButton
-                                        disabled={!canClick || !homingHasBeenRun}
-                                        className={styles.QPBL}
-                                        onClick={() => {
-                                            this.actions.jogtoBLCorner();
-                                        }}
-                                        icon={(houseIconPos === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                    />
-                                    <QuickPositionButton
-                                        disabled={!canClick || !homingHasBeenRun}
-                                        className={styles.QPBR}
-                                        rotate={45}
-                                        onClick={() => {
-                                            this.actions.jogtoBRCorner();
-                                        }}
-                                        icon={(houseIconPos === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                    />
-                                    <QuickPositionButton
-                                        disabled={!canClick || !homingHasBeenRun}
-                                        className={styles.QPFL}
-                                        onClick={() => {
-                                            this.actions.jogtoFLCorner();
-                                        }}
-                                        icon={(houseIconPos === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                    />
-                                    <QuickPositionButton
-                                        disabled={!canClick || !homingHasBeenRun}
-                                        className={styles.QPFR}
-                                        onClick={() => {
-                                            this.actions.jogtoFRCorner();
-                                        }}
-                                        icon={(houseIconPos === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                    />
-                                </div>
-                            )
+                        endstops &&
+                        <div className={endstops ? styles.endStopActiveControls : styles.hideHoming}>
+                            <FunctionButton
+                                disabled={!canClick}
+                                onClick={this.actions.startHoming}
+                                className={styles.runHomeButton}
+                            >
+                                <i className="fas fa-home" /> Home Machine
+                            </FunctionButton>
+                            <QuickPositionButton
+                                disabled={!canClick || !homingHasBeenRun}
+                                className={styles.QPBL}
+                                onClick={() => {
+                                    this.actions.jogtoBLCorner();
+                                }}
+                                icon={(houseIconPos === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                            />
+                            <QuickPositionButton
+                                disabled={!canClick || !homingHasBeenRun}
+                                className={styles.QPBR}
+                                rotate={45}
+                                onClick={() => {
+                                    this.actions.jogtoBRCorner();
+                                }}
+                                icon={(houseIconPos === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                            />
+                            <QuickPositionButton
+                                disabled={!canClick || !homingHasBeenRun}
+                                className={styles.QPFL}
+                                onClick={() => {
+                                    this.actions.jogtoFLCorner();
+                                }}
+                                icon={(houseIconPos === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                            />
+                            <QuickPositionButton
+                                disabled={!canClick || !homingHasBeenRun}
+                                className={styles.QPFR}
+                                onClick={() => {
+                                    this.actions.jogtoFRCorner();
+                                }}
+                                icon={(houseIconPos === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                            />
+                        </div>
                     }
                 </div>
             </Panel>
