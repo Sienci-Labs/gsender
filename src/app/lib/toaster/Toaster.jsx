@@ -3,6 +3,7 @@ import pubsub from 'pubsub-js';
 import uuid from 'uuid';
 import styles from './toaster.styl';
 import Toast from './Toast';
+import { TOASTER_DEFAULT, TOASTER_UNTIL_CLOSE } from './ToasterLib';
 
 class Toaster extends PureComponent {
     pubsubTokens = [];
@@ -14,7 +15,7 @@ class Toaster extends PureComponent {
         };
     }
 
-    createNewToast(options = {}) {
+    createNewToast({ duration = TOASTER_DEFAULT, ...options }) {
         const state = { ...this.state };
         const activeToasts = [...state.activeToasts];
         const toastId = uuid();
@@ -23,9 +24,17 @@ class Toaster extends PureComponent {
         };
         activeToasts.push({
             id: toastId,
+            createdAt: Date.now(),
+            duration: duration,
             closeHandler: closeHandler,
             ...options
         });
+        // Handle self-expiring
+        if (duration !== TOASTER_UNTIL_CLOSE) {
+            setTimeout(() => {
+                this.removeToast(toastId);
+            }, duration);
+        }
         this.setState({
             activeToasts: activeToasts
         });

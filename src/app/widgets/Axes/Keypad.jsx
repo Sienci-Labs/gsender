@@ -267,7 +267,8 @@ class Keypad extends PureComponent {
                             onClick={() => {
                                 Toaster.pop({
                                     msg: Date.now(),
-                                    type: 'success'
+                                    type: 'success',
+                                    duration: 5000
                                 });
                                 actions.setJogFromPreset('precise');
                             }}

@@ -23,6 +23,8 @@
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   margin-top: 10px;
   justify-content space-between;
+  transition: ease-in 200;
+  position: relative;
 }
 
 .toast-icon {
@@ -52,8 +54,24 @@
 
 .toast-content {
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   padding: 2rem;
+}
+
+.toast-progress {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.toast-progress-bar {
+  background: #283048;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to left, #859398, #283048);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to left, #859398, #283048); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  height: 3px;
+  transition: width 50
 }
 
 .toast-close {
@@ -71,5 +89,12 @@
     i {
       font-size: 2rem !important;
     }
+  }
+}
+
+
+@keyframes roundtime {
+  to {
+    transform: scaleX(0);
   }
 }
