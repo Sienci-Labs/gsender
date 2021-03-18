@@ -107,7 +107,7 @@ class NumberInput extends PureComponent {
         return (
             <div className={styles.inputWrapper}>
                 <button type="button" className={styles.stepButton} onClick={(e) => this.decrementValue(e)}>
-                    <i className="fa fa-minus fa-fw" style={{ verticalAlign: 'super', fontSize: 'clamp(10px, 1vw, 14px)' }} />
+                    <i className="fa fa-minus fa-fw" style={{ verticalAlign: 'super', margin: 'auto 0.5rem', fontSize: 'clamp(10px, 1vw, 14px)' }} />
                 </button>
                 <input
                     value={value}
@@ -116,7 +116,7 @@ class NumberInput extends PureComponent {
                     onChange={(e) => this.setValue(e)}
                 />
                 <button type="button" className={styles.stepButton} onClick={(e) => this.incrementValue(e)}>
-                    <i className="fa fa-plus fa-fw" style={{ verticalAlign: 'super', fontSize: 'clamp(10px, 1vw, 14px)' }} />
+                    <i className="fa fa-plus fa-fw" style={{ verticalAlign: 'super', margin: 'auto 0.5rem', fontSize: 'clamp(10px, 1vw, 14px)' }} />
                 </button>
             </div>
 
