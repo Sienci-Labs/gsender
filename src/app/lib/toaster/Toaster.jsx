@@ -87,7 +87,7 @@ class Toaster extends PureComponent {
                         activeToasts.map((toast) => (
                             <CSSTransition
                                 key={toast.id}
-                                timeout={100}
+                                timeout={150}
                                 classNames={{
                                     enterActive: styles.toastAppearEnterActive,
                                     enterDone: styles.toastAppearEnterDone,
