@@ -63,7 +63,8 @@ class PreferencesPage extends PureComponent {
                 fastFeedrate: Number(this.probeConfig.get('probeFastFeedrate') || 0).toFixed(3) * 1,
                 probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
             },
-            showWarning: store.get('widgets.visualizer.showWarning')
+            showWarning: store.get('widgets.visualizer.showWarning'),
+            showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
         };
     }
 
@@ -104,7 +105,12 @@ class PreferencesPage extends PureComponent {
                 store.set('widgets.visualizer.showWarning', shouldShow);
                 this.setState({ showWarning: shouldShow });
                 pubsub.publish('gcode:showWarning', shouldShow);
-            }
+            },
+            setShowLineWarnings: (shouldShow) => {
+                store.set('widgets.visualizer.showLineWarnings', shouldShow);
+                this.setState({ showLineWarnings: shouldShow });
+                pubsub.publish('gcode:showLineWarnings', shouldShow);
+            },
         },
         tool: {
             setImperialDiameter: (e) => {
@@ -249,6 +255,10 @@ class PreferencesPage extends PureComponent {
         }
     }
 
+    componentDidMount() {
+        controller.command('settings:updated', this.state);
+    }
+
     componentDidUpdate(prevProps, prevState) {
         const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect } = this.state;
         store.set('workspace.reverseWidgets', reverseWidgets);
@@ -260,6 +270,8 @@ class PreferencesPage extends PureComponent {
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
+
+        controller.command('settings:updated', this.state);
     }
 
     convertToMetric(diameter) {
