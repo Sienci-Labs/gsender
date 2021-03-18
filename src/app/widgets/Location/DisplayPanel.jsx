@@ -340,10 +340,11 @@ class DisplayPanel extends PureComponent {
                                     controller.command('gcode', 'G0 Z0'); // Move Z up
                                 }}
                                 disabled={!canClick}
+                                className={styles.fontMonospace}
                                 primary
                             >
                                 <i className="fas fa-chart-line" />
-                            Go to XYZ Zero
+                            G0 XYZ0
                             </FunctionButton>
                             <FunctionButton
                                 onClick={() => {
@@ -352,9 +353,10 @@ class DisplayPanel extends PureComponent {
                                 }}
                                 disabled={!canClick}
                                 primary
+                                className={styles.fontMonospace}
                             >
                                 <i className="fas fa-chart-line" />
-                                Go to X<span style={{ fontFamily: 'ui-monospace' }}>0</span>
+                                G0 X0
                             </FunctionButton>
                             <FunctionButton
                                 onClick={() => {
@@ -363,9 +365,10 @@ class DisplayPanel extends PureComponent {
                                 }}
                                 disabled={!canClick}
                                 primary
+                                className={styles.fontMonospace}
                             >
                                 <i className="fas fa-chart-line" />
-                                Go to Y Zero
+                                G0 Y0
                             </FunctionButton>
                             <FunctionButton
                                 onClick={() => {
@@ -373,10 +376,11 @@ class DisplayPanel extends PureComponent {
                                     controller.command('gcode', 'G0 Z0'); //Move to Work Position Zero
                                 }}
                                 disabled={!canClick}
+                                className={styles.fontMonospace}
                                 primary
                             >
                                 <i className="fas fa-chart-line" />
-                                Go to Z Zero
+                                G0 Z0
                             </FunctionButton>
                         </div>
                     </div>
