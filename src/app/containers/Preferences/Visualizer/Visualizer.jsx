@@ -45,7 +45,7 @@ const VisualizerSettings = ({ active, state, actions }) => {
                             <div className={classNames(styles.vizGrid)}>
                                 <b>Option</b>
                                 <b>Regular</b>
-                                <b>Lite Mode</b>
+                                <b>Lightweight Mode</b>
                                 <span>Visualize G-Code</span>
                                 <ToggleSwitch checked={!disabled} onChange={() => visualizerActions.handleVisEnabledToggle()} />
                                 <ToggleSwitch checked={!disabledLite} onChange={() => visualizerActions.handleVisEnabledToggle(true)} />
