@@ -37,7 +37,8 @@ class FirmwareFlashing extends PureComponent {
                 type: 'TOASTER_INFO',
             });
         },
-        'error': (boardinfo) => {
+        'error': (error) => {
+            console.log(error);
             this.setState({ currentlyFlashing: false });
             this.setState({ showToaster: true });
             this.setState({ finishedMessage: 'Error flashing board...' });
