@@ -1,4 +1,3 @@
-import chainedFunction from 'chained-function';
 import classNames from 'classnames';
 import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
@@ -20,9 +19,12 @@ import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
+import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
 import WidgetConfig from '../WidgetConfig';
 import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
+import ValidationModal from './ValidationModal';
+import WarningModal from './WarningModal';
 import Visualizer from './Visualizer';
 import Loading from './Loading';
 import Rendering from './Rendering';
@@ -58,7 +60,11 @@ import {
     NOTIFICATION_M30_PROGRAM_END,
     NOTIFICATION_M6_TOOL_CHANGE,
     NOTIFICATION_M109_SET_EXTRUDER_TEMPERATURE,
-    NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE, LIGHT_THEME, LIGHT_THEME_VALUES, DARK_THEME, DARK_THEME_VALUES
+    NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE,
+    LIGHT_THEME,
+    LIGHT_THEME_VALUES,
+    DARK_THEME,
+    DARK_THEME_VALUES
 } from './constants';
 import styles from './index.styl';
 
@@ -222,11 +228,18 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
+            const comments = ['#', ';', '(']; // We assume an opening parenthesis indicates a header line
+
+            //Clean up lines and remove ones that are comments and headers
             const lines = gcode.split('\n')
-                .filter(line => (line.trim().length > 0));
+                .filter(line => (line.trim().length > 0))
+                .filter(line => !comments.some(comment => line.includes(comment)));
 
             const tCommandRegex = /^[T]+[0-9]+/g;
+            const invalidGCodeRegex = /([^NGMXYZIJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
+
             const toolSet = new Set();
+            const invalidGcode = new Set();
 
             //Iterate over the lines and use regex against them
             for (const line of lines) {
@@ -239,6 +252,22 @@ class VisualizerWidget extends PureComponent {
                             toolSet.add(item.trim());
                         }
                     }
+                }
+
+                if (invalidGCodeRegex.test(line)) {
+                    invalidGcode.add(line);
+                }
+            }
+
+            if (invalidGcode.size > 0) {
+                this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
+                if (this.state.invalidGcode.shouldShow) {
+                    Toaster.pop({
+                        msg: `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
+                        type: TOASTER_WARNING,
+                        duration: TOASTER_LONG,
+                        icon: 'fa-exclamation-triangle'
+                    });
                 }
             }
 
@@ -393,9 +422,17 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
         },
+        onRunClick: () => {
+            const { invalidGcode } = this.state;
+
+            invalidGcode.list.size > 0
+                ? this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: true } }))
+                : this.actions.handleRun();
+        },
         handleRun: () => {
             const { workflow } = this.state;
             console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state));
+            this.setState((prev) => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
 
             if (workflow.state === WORKFLOW_STATE_IDLE) {
                 controller.command('gcode:start');
@@ -403,42 +440,6 @@ class VisualizerWidget extends PureComponent {
             }
 
             if (workflow.state === WORKFLOW_STATE_PAUSED) {
-                const { notification } = this.state;
-
-                // M6 Tool Change
-                if (notification.type === NOTIFICATION_M6_TOOL_CHANGE) {
-                    portal(({ onClose }) => (
-                        <Modal disableOverlay size="xs" onClose={onClose}>
-                            <Modal.Header>
-                                <Modal.Title>
-                                    {i18n._('Tool Change')}
-                                </Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                {i18n._('Are you sure you want to resume program execution?')}
-                            </Modal.Body>
-                            <Modal.Footer>
-                                <Button onClick={onClose}>
-                                    {i18n._('No')}
-                                </Button>
-                                <Button
-                                    btnStyle="primary"
-                                    onClick={chainedFunction(
-                                        () => {
-                                            controller.command('gcode:resume');
-                                        },
-                                        onClose
-                                    )}
-                                >
-                                    {i18n._('Yes')}
-                                </Button>
-                            </Modal.Footer>
-                        </Modal>
-                    ));
-
-                    return;
-                }
-
                 controller.command('gcode:resume');
             }
         },
@@ -614,6 +615,31 @@ class VisualizerWidget extends PureComponent {
             this.setState({
                 liteMode: !liteMode
             });
+        },
+        lineWarning: {
+            onContinue: () => {
+                this.setState(prev => ({ invalidLine: { ...prev.invalidLine, show: false, line: '', } }));
+                this.actions.handleRun();
+            },
+            onIgnoreWarning: () => {
+                this.setState(prev => ({
+                    invalidLine: {
+                        ...prev.invalidLine,
+                        show: false,
+                        line: ''
+                    }
+                }));
+
+                store.set('widgets.visualizer.showLineWarnings', false);
+                controller.command('settings:updated', { showLineWarnings: false });
+                this.actions.handleRun();
+            },
+            onCancel: () => this.actions.reset(),
+        },
+        reset: () => {
+            this.setState(this.getInitialState());
+            this.actions.unloadGCode();
+            pubsub.publish('gcode:fileInfo');
         }
     };
 
@@ -621,6 +647,17 @@ class VisualizerWidget extends PureComponent {
         'serialport:open': (options) => {
             const { port } = options;
             const { gcode } = this.state;
+
+            const machineProfile = store.get('workspace.machineProfile');
+            const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
+
+            if (machineProfile) {
+                controller.command('machineprofile:load', machineProfile);
+            }
+
+            if (showLineWarnings) {
+                controller.command('settings:updated', { showLineWarnings });
+            }
 
             //If we uploaded a file before connecting to a machine, load the gcode to the controller
             if (gcode.loadedBeforeConnection) {
@@ -711,13 +748,27 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
         },
-        'workflow:state': (workflowState) => {
-            this.setState(state => ({
-                workflow: {
-                    ...state.workflow,
-                    state: workflowState
-                }
-            }));
+        'workflow:state': (workflowState, data) => {
+            if (data) {
+                this.setState(state => ({
+                    workflow: {
+                        ...state.workflow,
+                        state: workflowState
+                    },
+                    invalidLine: {
+                        ...state.invalidLine,
+                        show: true,
+                        line: data.line,
+                    }
+                }));
+            } else {
+                this.setState(state => ({
+                    workflow: {
+                        ...state.workflow,
+                        state: workflowState
+                    }
+                }));
+            }
         },
         'controller:settings': (type, controllerSettings) => {
             this.setState(state => ({
@@ -866,12 +917,21 @@ class VisualizerWidget extends PureComponent {
 
     pubsubTokens = [];
 
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
+
     // refs
     widgetContent = null;
 
     visualizer = null;
 
     componentDidMount() {
+        this.subscribe();
         this.addControllerEvents();
         this.subscribe();
 
@@ -887,6 +947,7 @@ class VisualizerWidget extends PureComponent {
     }
 
     componentWillUnmount() {
+        this.unsubscribe();
         this.removeControllerEvents();
         this.unsubscribe();
     }
@@ -1010,6 +1071,16 @@ class VisualizerWidget extends PureComponent {
             filename: '',
             fileSize: 0, //in bytes
             total: 0,
+            invalidGcode: {
+                shouldShow: this.config.get('showWarning'),
+                showModal: false,
+                list: new Set([]),
+            },
+            invalidLine: {
+                shouldShow: this.config.get('showLineWarnings'),
+                show: false,
+                line: '',
+            }
         };
     }
 
@@ -1106,16 +1177,15 @@ class VisualizerWidget extends PureComponent {
                 this.setState({
                     units: units
                 });
-            })
+            }),
+            pubsub.subscribe('gcode:showWarning', (_, shouldShow) => {
+                this.setState({ invalidGcode: { shouldShow, showModal: false, list: [], } });
+            }),
+            pubsub.subscribe('gcode:showLineWarnings', (_, shouldShow) => {
+                this.setState({ invalidLine: { shouldShow, show: false, line: '', } });
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
-    }
-
-    unsubscribe() {
-        this.pubsubTokens.forEach((token) => {
-            pubsub.unsubscribe(token);
-        });
-        this.pubsubTokens = [];
     }
 
     render() {
@@ -1194,6 +1264,26 @@ class VisualizerWidget extends PureComponent {
                                 state={state}
                                 actions={actions}
                             />
+
+                            {
+                                state.invalidGcode.shouldShow && state.invalidGcode.showModal && (
+                                    <ValidationModal
+                                        invalidGcode={state.invalidGcode}
+                                        onProceed={this.actions.handleRun}
+                                        onCancel={this.actions.reset}
+                                    />
+                                )
+                            }
+                            {
+                                state.invalidLine.shouldShow && state.invalidLine.show && (
+                                    <WarningModal
+                                        onContinue={actions.lineWarning.onContinue}
+                                        onIgnoreWarning={actions.lineWarning.onIgnoreWarning}
+                                        onCancel={actions.lineWarning.onCancel}
+                                        invalidLine={state.invalidLine.line}
+                                    />
+                                )
+                            }
                         </div>
                     )}
                 </Widget.Content>

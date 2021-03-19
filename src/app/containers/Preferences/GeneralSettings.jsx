@@ -75,6 +75,24 @@ const GeneralSettings = ({ active, state, actions }) => {
                         <Fieldset legend="Machine Profile" className={styles['mb-0']}>
                             <MachineProfileOptions />
                         </Fieldset>
+
+                        <Fieldset legend="File Validation Warnings">
+                            <div style={{ marginBottom: '10px' }}>
+                                <ToggleSwitch
+                                    checked={state.showWarning}
+                                    onChange={() => actions.general.setShowWarning(!state.showWarning)}
+                                />
+                                <small className={styles['item-info']}>Show warning when file contains invalid G-Code</small>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 5fr' }}>
+                                <ToggleSwitch
+                                    checked={state.showLineWarnings}
+                                    onChange={() => actions.general.setShowLineWarnings(!state.showLineWarnings)}
+                                />
+                                <small className={styles['item-info']}>Show warning when invalid line is detected during job run</small>
+                            </div>
+                        </Fieldset>
                     </div>
                 </div>
             </div>

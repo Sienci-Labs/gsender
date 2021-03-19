@@ -359,7 +359,9 @@ const defaultState = {
                     visible: true,
                     visibleLite: true
                 }
-            }
+            },
+            showWarning: true,
+            showLineWarnings: true,
         },
         webcam: {
             disabled: true,

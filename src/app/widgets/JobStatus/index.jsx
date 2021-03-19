@@ -310,6 +310,11 @@ class JobStatusWidget extends PureComponent {
                 });
             }),
             pubsub.subscribe('gcode:fileInfo', (msg, file) => {
+                if (!file) {
+                    this.setState(this.getInitialState());
+                    return;
+                }
+
                 this.setState({
                     fileName: file.name,
                     fileSize: file.size,
