@@ -27,9 +27,7 @@ class FirmwareFlashing extends PureComponent {
 
     controllerEvents = {
         'message': (boardinfo) => {
-            console.log('message called' + JSON.stringify(Toaster));
             this.setState({ currentlyFlashing: false });
-            this.setState({ showToaster: true });
             this.setState({ finishedMessage: 'Flashing completed successfully!' });
             this.props.modalClose();
             Toaster.pop({
@@ -40,7 +38,6 @@ class FirmwareFlashing extends PureComponent {
         'error': (error) => {
             console.log(error);
             this.setState({ currentlyFlashing: false });
-            this.setState({ showToaster: true });
             this.setState({ finishedMessage: 'Error flashing board...' });
             Toaster.pop({
                 msg: (this.state.finishedMessage),
@@ -86,7 +83,6 @@ class FirmwareFlashing extends PureComponent {
             alertMessage: '',
             warning: false,
             boardOptions: '',
-            showToaster: false,
             finishedMessage: ''
         };
     }

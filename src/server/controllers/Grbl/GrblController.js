@@ -1046,8 +1046,9 @@ class GrblController {
                 this.emit('message', data);
             },
             'flashing:failed': (data) => {
-                this.emit('error', data);
+                this.emit('message', data);
                 log.debug('CALLED ERROR');
+                console.log('error grblcontroller');
             },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;
