@@ -360,8 +360,8 @@ const defaultState = {
                     visibleLite: true
                 }
             },
-            showWarning: true,
-            showLineWarnings: true,
+            showWarning: false,
+            showLineWarnings: false,
         },
         webcam: {
             disabled: true,

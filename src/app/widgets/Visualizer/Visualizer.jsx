@@ -47,7 +47,7 @@ const PERSPECTIVE_FAR = 2000;
 const ORTHOGRAPHIC_FOV = 35;
 const ORTHOGRAPHIC_NEAR = 0.001;
 const ORTHOGRAPHIC_FAR = 2000;
-const CAMERA_DISTANCE = 300; // Move the camera out a bit from the origin (0, 0, 0)
+const CAMERA_DISTANCE = 400; // Move the camera out a bit from the origin (0, 0, 0)
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 
@@ -201,11 +201,11 @@ class Visualizer extends Component {
         if (prevState.projection !== state.projection) {
             if (state.projection === 'orthographic') {
                 this.camera.toOrthographic();
-                this.camera.setZoom(1);
+                this.camera.setZoom(1.3);
                 this.camera.setFov(ORTHOGRAPHIC_FOV);
             } else {
                 this.camera.toPerspective();
-                this.camera.setZoom(1);
+                this.camera.setZoom(1.3);
                 this.camera.setFov(PERSPECTIVE_FOV);
             }
             if (this.viewport) {
