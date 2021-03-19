@@ -374,16 +374,35 @@ class Visualizer extends Component {
         return false;
     }
 
+    redrawGrids() {
+        const { objects, units } = this.props.state;
+        const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
+        const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
+
+        this.group.remove(impGroup);
+        this.group.remove(metGroup);
+        {
+            const visible = objects.coordinateSystem.visible;
+            const imperialCoordinateSystem = this.createCoordinateSystem(IMPERIAL_UNITS);
+            imperialCoordinateSystem.name = 'ImperialCoordinateSystem';
+            imperialCoordinateSystem.visible = visible && (units === IMPERIAL_UNITS);
+            this.group.add(imperialCoordinateSystem);
+        }
+
+        { // Metric Coordinate System
+            const visible = objects.coordinateSystem.visible;
+            const metricCoordinateSystem = this.createCoordinateSystem(METRIC_UNITS);
+            metricCoordinateSystem.name = 'MetricCoordinateSystem';
+            metricCoordinateSystem.visible = visible && (units === METRIC_UNITS);
+            this.group.add(metricCoordinateSystem);
+        }
+    }
     recolorScene() {
         const { currentTheme } = this.props.state;
-        const { backgroundColor, gridColor } = currentTheme;
+        const { backgroundColor } = currentTheme;
         // Handle Background color
         this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
-        // handle imperial gridlines
-        this.updateGridChildColor('ImperialCoordinateSystem', new THREE.Color(gridColor));
-        // handle metric gridlines
-        this.updateGridChildColor('MetricCoordinateSystem', new THREE.Color(gridColor));
-        // handle mesh gridlines
+        this.redrawGrids();
         this.rerenderGCode(currentTheme);
     }
 
