@@ -554,8 +554,6 @@ class Visualizer extends Component {
                 gridSpacing,
                 gridColor, // center line
                 gridColor // grid
-                // colornames('blue'), // center line
-                // colornames('gray 44') // grid
             );
             _each(gridLine.children, (o) => {
                 o.material.opacity = 0.15;

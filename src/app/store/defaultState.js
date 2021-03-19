@@ -9,8 +9,6 @@ const AXIS_Y = 'y';
 const AXIS_Z = 'z';
 const FORWARD = 1;
 const BACKWARD = -1;
-// const OVERSHOOT_FACTOR = 10; // 10x
-// const UNDERSHOOT_FACTOR = 0.1; // 0.1x
 
 const defaultState = {
     session: {
@@ -335,7 +333,7 @@ const defaultState = {
             disabledLite: false,
             projection: 'orthographic', // 'perspective' or 'orthographic'
             cameraMode: 'pan', // 'pan' or 'rotate',
-            theme: 'light',
+            theme: 'dark',
             gcode: {
                 displayName: true
             },
@@ -351,11 +349,11 @@ const defaultState = {
                 },
                 cuttingTool: {
                     visible: true,
-                    visibleLite: true
+                    visibleLite: false
                 },
                 cuttingToolAnimation: {
                     visible: true,
-                    visibleLite: true
+                    visibleLite: false
                 },
                 cutPath: {
                     visible: true,

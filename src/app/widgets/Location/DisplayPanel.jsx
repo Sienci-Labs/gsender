@@ -344,7 +344,7 @@ class DisplayPanel extends PureComponent {
                                 primary
                             >
                                 <i className="fas fa-chart-line" />
-                            G0 XYZ0
+                            Go XYZ0
                             </FunctionButton>
                             <FunctionButton
                                 onClick={() => {
@@ -356,7 +356,7 @@ class DisplayPanel extends PureComponent {
                                 className={styles.fontMonospace}
                             >
                                 <i className="fas fa-chart-line" />
-                                G0 X0
+                                Go X0
                             </FunctionButton>
                             <FunctionButton
                                 onClick={() => {
@@ -368,7 +368,7 @@ class DisplayPanel extends PureComponent {
                                 className={styles.fontMonospace}
                             >
                                 <i className="fas fa-chart-line" />
-                                G0 Y0
+                                Go Y0
                             </FunctionButton>
                             <FunctionButton
                                 onClick={() => {
@@ -380,7 +380,7 @@ class DisplayPanel extends PureComponent {
                                 primary
                             >
                                 <i className="fas fa-chart-line" />
-                                G0 Z0
+                                Go Z0
                             </FunctionButton>
                         </div>
                     </div>

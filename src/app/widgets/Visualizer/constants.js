@@ -47,7 +47,7 @@ export const DARK_THEME_VALUES = {
 
 export const LIGHT_THEME_VALUES = {
     backgroundColor: '#e5e7eb', //Navy Blue
-    gridColor: '#111827', // Turqoise / Light Blue
+    gridColor: '#000000', // Turqoise / Light Blue
     xAxisColor: '#df3b3b', //Indian Red
     yAxisColor: '#06b881', //Light Green
     zAxisColor: '#295d8d', //Light Green
