@@ -256,6 +256,7 @@ class Header extends PureComponent {
             this.setState({
                 updateAvailable: true
             });
+            pubsub.publish('showUpdateToast');
         });
         window.ipcRenderer.on('update_available', () => {
             console.log('Found available update');
