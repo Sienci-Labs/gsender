@@ -393,7 +393,7 @@ class DisplayPanel extends PureComponent {
                                 onClick={this.actions.startHoming}
                                 className={styles.runHomeButton}
                             >
-                                <i className="fas fa-home" /> Home Machine
+                                <i className="fas fa-home" /> Home
                             </FunctionButton>
                             <QuickPositionButton
                                 disabled={!canClick || !homingHasBeenRun}
