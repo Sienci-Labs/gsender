@@ -78,9 +78,11 @@ class NumberInput extends PureComponent {
 
         const regex = /[^0-9.]/g;
 
+        let dotOccurance = 0;
+        [...value].forEach(char => char === '.' && dotOccurance++);
         // Ignore non digit and non . values
         // eslint-disable-next-line no-restricted-globals
-        if (regex.test(value)) {
+        if (regex.test(value) || dotOccurance > 1) {
             return;
         }
 
