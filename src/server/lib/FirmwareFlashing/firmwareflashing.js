@@ -1,31 +1,36 @@
+/* eslint-disable no-unused-vars */
 import AvrgirlArduino from 'avrgirl-arduino';
 import logger from '../logger';
-// import * as UNOFLASH from './filetoflashuno.hex';
+import store from '../../store';
 
 const log = logger('FlashLib: ');
-const FlashingFirmware = (port) => {
+const FlashingFirmware = (recievedPortNumber, connectionFunction) => {
+    const controller = store.get('controllers["' + recievedPortNumber + '"]');
+
     try {
         let avrgirl = new AvrgirlArduino({
             board: 'uno',
             debug: true,
-            port: port, //Does not have to be listed for flashing to work
-            manualReset: true
+            port: recievedPortNumber,
         });
 
         avrgirl.list((err, ports) => {
-            log.debug(JSON.stringify(ports));
+            log.debug(JSON.stringify(ports[0].path));
+            let port = ports[0].path;
         });
 
-        // I commented this out for the time  being since I didn't want to fry my board if it failed
         avrgirl.flash('../../filetoflashuno.hex', error => {
             if (error) {
+                controller.command('flashing:failed', error);
                 log.debug(`${error} Error flashing board`);
             } else {
                 log.debug('FLASH SUCCESFULL!!!');
+                controller.command('flashing:success');
             }
         });
-    } catch (e) {
-        log.error(e);
+    } catch (error) {
+        log.debug(`${error} Error flashing board`);
+        controller.command('flashing:failed', error);
     }
 };
 

@@ -2,6 +2,7 @@ import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
 import _ from 'lodash';
 import map from 'lodash/map';
+// import controller from 'cncjs-controller/lib/controller';
 import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
@@ -1037,11 +1038,16 @@ class GrblController {
         const handler = {
             'flash:start': () => {
                 let [port = 'COM3'] = args;
-                // Flashing command is in a callback to make sure it happens after the port is closed
                 this.close(() => {
-                    log.debug('Firmware callback called');
                     FlashingFirmware(port);
                 });
+            },
+            'flashing:success': (data) => {
+                this.emit('message', data);
+            },
+            'flashing:failed': (data) => {
+                this.emit('error', data);
+                log.debug('CALLED ERROR');
             },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;
@@ -1072,7 +1078,7 @@ class GrblController {
             },
             'gcode:unload': () => {
                 this.workflow.stop();
-
+                console.log('GCODE FIRED...');
                 // Sender
                 this.sender.unload();
 
