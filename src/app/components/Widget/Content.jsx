@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styles from './index.styl';
 
 const Content = ({ className, active, ...props }) => (
@@ -9,4 +9,4 @@ const Content = ({ className, active, ...props }) => (
     />
 );
 
-export default Content;
+export default forwardRef((props, ref) => <Content {...props} reference={ref} />);
