@@ -314,10 +314,9 @@ class GrblController {
                 const machineProfile = store.get('machineProfile');
                 const preferences = store.get('preferences');
                 if (line) {
-                    const regex = /([^NGMXYZIJKF%\-?\.?\d+\.?\s])/gi;
+                    const regex = /([^NGMXYZIJKFP%\-?\.?\d+\.?\s])/gi;
                     if (regex.test(line)) {
                         if (preferences && preferences.showLineWarnings) {
-                            console.log('INVALID LINE FOUND');
                             // this.workflow.pause({ data: line });
                             this.emit('workflow:state', this.workflow.state, { validLine: false, line });
                         } else {

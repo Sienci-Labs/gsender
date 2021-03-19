@@ -256,6 +256,10 @@ class VisualizerWidget extends PureComponent {
 
             if (invalidGcode.size > 0) {
                 this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
+                Toaster.pop({
+                    msg: `Found ${invalidGcode.size} lines of non-standard G-Code in this file.  Your job may not run properly.`,
+                    type: TOASTER_WARNING
+                });
             }
 
             const total = lines.length + 1; //Dwell line added after every gcode parse

@@ -409,8 +409,6 @@
     "Front": "Front",
     "3D": "3D",
     "G-code not loaded": "G-code not loaded",
-    "Tool Change": "Tool Change",
-    "Are you sure you want to resume program execution?": "Are you sure you want to resume program execution?",
     "Click the Resume button to resume program execution.": "Click the Resume button to resume program execution.",
     "Click the Stop button to stop program execution.": "Click the Stop button to stop program execution.",
     "Run a tool change macro to change the tool and adjust the Z-axis offset. Afterwards, click the Resume button to resume program execution.": "Run a tool change macro to change the tool and adjust the Z-axis offset. Afterwards, click the Resume button to resume program execution.",
