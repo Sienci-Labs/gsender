@@ -314,7 +314,7 @@ class GrblController {
                 const machineProfile = store.get('machineProfile');
                 const preferences = store.get('preferences');
                 if (line) {
-                    const regex = /([^NGMXYZIJKFP%\-?\.?\d+\.?\s])/gi;
+                    const regex = /([^NGMXYZIJKFPRS%\-?\.?\d+\.?\s])/gi;
                     if (regex.test(line)) {
                         if (preferences && preferences.showLineWarnings) {
                             // this.workflow.pause({ data: line });

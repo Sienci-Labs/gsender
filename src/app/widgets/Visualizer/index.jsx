@@ -1,4 +1,3 @@
-// import chainedFunction from 'chained-function';
 import classNames from 'classnames';
 import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
@@ -20,6 +19,7 @@ import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
+import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
 import WidgetConfig from '../WidgetConfig';
 import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
@@ -236,7 +236,7 @@ class VisualizerWidget extends PureComponent {
                 .filter(line => !comments.some(comment => line.includes(comment)));
 
             const tCommandRegex = /^[T]+[0-9]+/g;
-            const invalidGCodeRegex = /([^NGMXYZIJKF%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
+            const invalidGCodeRegex = /([^NGMXYZIJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
 
             const toolSet = new Set();
             const invalidGcode = new Set();
@@ -261,10 +261,14 @@ class VisualizerWidget extends PureComponent {
 
             if (invalidGcode.size > 0) {
                 this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
-                Toaster.pop({
-                    msg: `Found ${invalidGcode.size} lines of non-standard G-Code in this file.  Your job may not run properly.`,
-                    type: TOASTER_WARNING
-                });
+                if (this.state.invalidGcode.shouldShow) {
+                    Toaster.pop({
+                        msg: `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
+                        type: TOASTER_WARNING,
+                        duration: TOASTER_LONG,
+                        icon: 'fa-exclamation-triangle'
+                    });
+                }
             }
 
             const total = lines.length + 1; //Dwell line added after every gcode parse
@@ -913,17 +917,6 @@ class VisualizerWidget extends PureComponent {
 
     pubsubTokens = [];
 
-    subscribe() {
-        const tokens = [
-            pubsub.subscribe('gcode:showWarning', (_, shouldShow) => {
-                this.setState({ invalidGcode: { shouldShow, showModal: false, list: [], } });
-            }),
-            pubsub.subscribe('gcode:showLineWarnings', (_, shouldShow) => {
-                this.setState({ invalidLine: { shouldShow, show: false, line: '', } });
-            }),
-        ];
-        this.pubsubTokens = this.pubsubTokens.concat(tokens);
-    }
 
     unsubscribe() {
         this.pubsubTokens.forEach((token) => {
@@ -1184,16 +1177,15 @@ class VisualizerWidget extends PureComponent {
                 this.setState({
                     units: units
                 });
-            })
+            }),
+            pubsub.subscribe('gcode:showWarning', (_, shouldShow) => {
+                this.setState({ invalidGcode: { shouldShow, showModal: false, list: [], } });
+            }),
+            pubsub.subscribe('gcode:showLineWarnings', (_, shouldShow) => {
+                this.setState({ invalidLine: { shouldShow, show: false, line: '', } });
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
-    }
-
-    unsubscribe() {
-        this.pubsubTokens.forEach((token) => {
-            pubsub.unsubscribe(token);
-        });
-        this.pubsubTokens = [];
     }
 
     render() {

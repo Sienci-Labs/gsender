@@ -69,7 +69,7 @@ class ConsoleWidget extends PureComponent {
                 __sender__: this.senderId
             };
 
-            const invalidGCodeRegex = /[^NGMXYZIJKF%\-?\.?\d+\.?\s]/gi;
+            const invalidGCodeRegex = /[^NGMXYZIJKFRS%\-?\.?\d+\.?\s]/gi;
 
             if (invalidGCodeRegex.test(data)) {
                 const output = 'This Command is Not Supported';
