@@ -1229,7 +1229,7 @@ class VisualizerWidget extends PureComponent {
                     </Widget.Controls>
                 </Widget.Header>
                 <Widget.Content
-                    ref={node => {
+                    reference={node => {
                         this.widgetContent = node;
                     }}
                     className={classNames(
