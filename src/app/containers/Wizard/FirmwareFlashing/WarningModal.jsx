@@ -2,6 +2,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Button } from 'react-bootstrap';
+import { Toaster } from '../../../lib/toaster/ToasterLib';
 import controller from '../../../lib/controller';
 import styles from '../index.styl';
 
@@ -24,6 +25,10 @@ class WarningModal extends PureComponent {
         this.props.handleCloseWarning();
         this.props.flashingStart();
         this.actions.startFlash(this.props.port);
+        Toaster.pop({
+            msg: ('Flashing started...'),
+            type: 'TOASTER_INFO',
+        });
     }
 
     handleNo = () => {

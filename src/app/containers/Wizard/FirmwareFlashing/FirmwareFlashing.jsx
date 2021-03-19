@@ -49,10 +49,6 @@ class FirmwareFlashing extends PureComponent {
     }
 
     componentDidMount() {
-        Toaster.pop({
-            msg: (this.state.finishedMessage),
-            type: 'TOASTER_INFO',
-        });
         this.addControllerEvents();
     }
 
@@ -114,7 +110,6 @@ class FirmwareFlashing extends PureComponent {
     BoardOptions = this.boardChoices.map((board, i) => <option value={board} key={i}>{board}</option>)
 
     render = () => {
-        console.log('TOASTER!!' + JSON.stringify(Toaster));
         return (
             <div className={styles.firmwarewrapper}>
                 { this.state.warning && (
@@ -144,11 +139,6 @@ class FirmwareFlashing extends PureComponent {
                             <button
                                 type="button"
                                 onClick={() => {
-                                    Toaster.pop({
-                                        msg: Date.now(),
-                                        type: 'success',
-                                        duration: 15000
-                                    });
                                     this.handleFlashing();
                                 }}
                             >Begin
