@@ -350,10 +350,12 @@ class Visualizer extends Component {
     }
 
     rerenderGCode(colors) {
+        const { actions, state } = this.props;
+        const { gcode } = state;
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
             this.group.remove(group);
-            //this.render(colors);
+            actions.loadGCode('Visualizer', gcode.content);
         }
     }
 
