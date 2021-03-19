@@ -74,10 +74,19 @@ class NumberInput extends PureComponent {
     setValue(e) {
         const { max, min } = this.state;
         const { changeHandler } = this.props;
-        let value = Number(e.target.value);
-        if (value > max) {
+        let value = e.target.value;
+
+        const regex = /[^0-9.]/g;
+
+        // Ignore non digit and non . values
+        // eslint-disable-next-line no-restricted-globals
+        if (regex.test(value)) {
+            return;
+        }
+
+        if (Number(value) > max) {
             value = max;
-        } else if (value < min) {
+        } else if (Number(value) < min) {
             value = min;
         }
 

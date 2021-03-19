@@ -1,13 +1,13 @@
 {
   "name": "gSender",
-  "version": "1.9.22",
+  "version": "0.5.2",
   "productName": "gSender",
   "description": "CNC Milling Controller",
   "author": "Sienci Labs",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:cncjs/cncjs.git"
+    "url": "https://github.com/Sienci-Labs/sender.git"
   },
   "main": "main.js",
   "dependencies": {
@@ -24,7 +24,8 @@
     "cookie-parser": "~1.4.4",
     "debug": "~4.1.1",
     "deep-keys": "~0.5.0",
-    "electron-store": "~3.2.0",
+    "electron-store": "~6.0.1",
+    "electron-updater": "^4.3.8",
     "ensure-array": "~1.0.0",
     "errorhandler": "~1.5.0",
     "escodegen": "~1.11.1",
@@ -49,7 +50,7 @@
     "registry-auth-token": "~3.4.0",
     "registry-url": "~5.1.0",
     "rimraf": "~2.6.3",
-    "serialport": "^7.1.5",
+    "serialport": "~9.0.7",
     "serve-favicon": "~2.5.0",
     "serve-static": "~1.13.2",
     "session-file-store": "~1.2.0",

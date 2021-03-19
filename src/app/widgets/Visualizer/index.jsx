@@ -5,8 +5,10 @@ import includes from 'lodash/includes';
 import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
+import store from 'app/store';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import ToggleSwitch from 'app/components/ToggleSwitch';
 import Anchor from 'app/components/Anchor';
 import { Button } from 'app/components/Buttons';
 import ModalTemplate from 'app/components/ModalTemplate';
@@ -15,7 +17,6 @@ import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
-import store from 'app/store';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
@@ -59,7 +60,11 @@ import {
     NOTIFICATION_M30_PROGRAM_END,
     NOTIFICATION_M6_TOOL_CHANGE,
     NOTIFICATION_M109_SET_EXTRUDER_TEMPERATURE,
-    NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE
+    NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE,
+    LIGHT_THEME,
+    LIGHT_THEME_VALUES,
+    DARK_THEME,
+    DARK_THEME_VALUES
 } from './constants';
 import styles from './index.styl';
 
@@ -601,6 +606,12 @@ class VisualizerWidget extends PureComponent {
                 this.setState({ cameraPosition: 'right' });
             }
         },
+        handleLiteModeToggle: () => {
+            const { liteMode } = this.state;
+            this.setState({
+                liteMode: !liteMode
+            });
+        },
         lineWarning: {
             onContinue: () => {
                 this.setState(prev => ({ invalidLine: { ...prev.invalidLine, show: false, line: '', } }));
@@ -929,6 +940,7 @@ class VisualizerWidget extends PureComponent {
     componentDidMount() {
         this.subscribe();
         this.addControllerEvents();
+        this.subscribe();
 
         if (!WebGL.isWebGLAvailable() && !this.state.disabled) {
             displayWebGLErrorMessage();
@@ -944,6 +956,7 @@ class VisualizerWidget extends PureComponent {
     componentWillUnmount() {
         this.unsubscribe();
         this.removeControllerEvents();
+        this.unsubscribe();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -976,7 +989,8 @@ class VisualizerWidget extends PureComponent {
     getInitialState() {
         return {
             port: controller.port,
-            units: METRIC_UNITS,
+            units: store.get('workspace.units', METRIC_UNITS),
+            theme: this.config.get('theme'),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -1030,6 +1044,8 @@ class VisualizerWidget extends PureComponent {
                 loadedBeforeConnection: false,
             },
             disabled: this.config.get('disabled', false),
+            disabledLite: this.config.get('disabledLite'),
+            liteMode: this.config.get('liteMode'),
             projection: this.config.get('projection', 'orthographic'),
             objects: {
                 limits: {
@@ -1042,26 +1058,22 @@ class VisualizerWidget extends PureComponent {
                     visible: this.config.get('objects.gridLineNumbers.visible', true)
                 },
                 cuttingTool: {
-                    visible: this.config.get('objects.cuttingTool.visible', true)
+                    visible: this.config.get('objects.cuttingTool.visible', true),
+                    visibleLite: this.config.get('objects.cuttingTool.visibleLite', true)
+                },
+                cuttingToolAnimation: {
+                    visible: this.config.get('objects.cuttingToolAnimation.visible', true),
+                    visibleLite: this.config.get('objects.cuttingToolAnimation.visibleLite', true)
+                },
+                cutPath: {
+                    visible: this.config.get('objects.cutPath.visible', true),
+                    visibleLite: this.config.get('objects.cutPath.visibleLite', true)
                 }
             },
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
             cameraPosition: '3d', // 'top', '3d', 'front', 'left', 'right'
             isAgitated: false, // Defaults to false
-            currentTheme: {
-                backgroundColor: '#111827', //Navy Blue
-                gridColor: '#77a9d7', // Turqoise / Light Blue
-                xAxisColor: '#df3b3b', //Indian Red
-                yAxisColor: '#06b881', //Light Green
-                zAxisColor: '#295d8d', //Light Green
-                limitColor: '#5191cc', //Indian Red
-                cuttingCoordinateLines: '#fff', //White
-                joggingCoordinateLines: '#0ef6ae', // Light Green
-                G0Color: '#0ef6ae', // Light Green
-                G1Color: '#3e85c7', // Light Blue
-                G2Color: '#3e85c7', // Light Blue
-                G3Color: '#3e85c7', // Light Blue
-            },
+            currentTheme: this.getVisualizerTheme(),
             currentTab: 0,
             filename: '',
             fileSize: 0, //in bytes
@@ -1091,6 +1103,18 @@ class VisualizerWidget extends PureComponent {
             const callback = this.controllerEvents[eventName];
             controller.removeListener(eventName, callback);
         });
+    }
+
+
+    getVisualizerTheme() {
+        const { theme } = store.get('widgets.visualizer');
+        if (theme === LIGHT_THEME) {
+            return LIGHT_THEME_VALUES;
+        }
+        if (theme === DARK_THEME) {
+            return DARK_THEME_VALUES;
+        }
+        return DARK_THEME_VALUES;
     }
 
     isAgitated() {
@@ -1140,6 +1164,38 @@ class VisualizerWidget extends PureComponent {
 
     setCurrentTab = (id = 0) => this.setState({ currentTab: id });
 
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('theme:change', (msg, theme) => {
+                this.setState({
+                    theme: theme
+                }, this.setState({
+                    currentTheme: this.getVisualizerTheme()
+                }), pubsub.publish('visualizer:redraw'));
+            }),
+            pubsub.subscribe('visualizer:settings', () => {
+                this.setState({
+                    disabled: this.config.get('disabled'),
+                    disabledLite: this.config.get('disabledLite'),
+                    objects: this.config.get('objects')
+                });
+            }),
+            pubsub.subscribe('units:change', (msg, units) => {
+                this.setState({
+                    units: units
+                });
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
+
     render() {
         const state = {
             ...this.state,
@@ -1149,12 +1205,18 @@ class VisualizerWidget extends PureComponent {
             ...this.actions
         };
         const showLoader = state.gcode.loading || state.gcode.rendering;
+
+        // Handle visualizer render
+        const isVisualizerDisabled = (state.liteMode) ? state.disabledLite : state.disabled;
+
         const capable = {
-            view3D: WebGL.isWebGLAvailable() && !state.disabled
+            view3D: WebGL.isWebGLAvailable() && !isVisualizerDisabled
         };
         // const showDashboard = !capable.view3D && !showLoader;
         const showVisualizer = capable.view3D && !showLoader;
         // const showNotifications = showVisualizer && !!state.notification.type;
+
+        const { liteMode } = this.state;
 
         return (
             <Widget className={styles.vizWidgetOverride}>
@@ -1162,6 +1224,10 @@ class VisualizerWidget extends PureComponent {
                     <Widget.Title>
                         Visualizer
                     </Widget.Title>
+                    <Widget.Controls>
+                        <span>Lite Visualizer Mode</span>
+                        <ToggleSwitch checked={liteMode} onChange={() => this.actions.handleLiteModeToggle()} />
+                    </Widget.Controls>
                 </Widget.Header>
                 <Widget.Content
                     ref={node => {

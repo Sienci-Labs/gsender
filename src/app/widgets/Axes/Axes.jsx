@@ -15,6 +15,7 @@ const Axes = (props) => {
                 jog={state.jog}
                 actions={actions}
                 isJogging={state.isJogging}
+                activeState={state.activeState}
             />
             <SpeedControls state={state} actions={actions} />
         </div>

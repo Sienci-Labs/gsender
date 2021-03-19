@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.9.22",
+  "version": "0.5.2",
   "description": "Electron sender for GRBL based CNC machines",
   "author": "Sienci Labs",
   "main": "./dist/cncjs/server-cli.js",
@@ -15,11 +15,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:cncjs/cncjs.git"
+    "url": "https://github.com/Sienci-Labs/sender.git"
   },
   "license": "MIT",
   "engines": {
-    "node": ">=6"
+    "node": ">=10"
   },
   "preferGlobal": true,
   "scripts": {
@@ -67,7 +67,8 @@
     "stylint": "stylint src/app",
     "test": "tap test/*.js --no-timeout --node-arg=--require --node-arg=@babel/register --node-arg=--require --node-arg=@babel/polyfill",
     "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls",
-    "postinstall": "opencollective postinstall"
+    "postinstall": "opencollective postinstall",
+    "deploy-release": "electron-builder build --win --publish always"
   },
   "build": {
     "appId": "org.sienci",
@@ -79,7 +80,10 @@
       "output": "output",
       "app": "dist/cncjs"
     },
-    "publish": [],
+    "publish": {
+      "provider": "github",
+      "token": "2da587d1e20255ebbb50f70d86e40c685917e114"
+    },
     "mac": {
       "category": "public.app-category.productivity",
       "target": [
@@ -163,6 +167,7 @@
     "@trendmicro/react-toggle-switch": "~0.5.7",
     "@trendmicro/react-tooltip": "~0.6.0",
     "@trendmicro/react-validation": "~0.1.0",
+    "@types/react-transition-group": "^4.4.1",
     "avrgirl-arduino": "^5.0.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.18.3",
@@ -183,9 +188,8 @@
     "debug": "~4.1.1",
     "deep-keys": "~0.5.0",
     "detect-browser": "~4.4.0",
-    "electron-store": "~3.2.0",
-    "electron-titlebar": "0.0.3",
-    "electron-titlebar-windows": "^3.0.0",
+    "electron-store": "~6.0.1",
+    "electron-updater": "^4.3.8",
     "ensure-array": "~1.0.0",
     "errorhandler": "~1.5.0",
     "es5-shim": "~4.5.13",
@@ -262,7 +266,7 @@
     "registry-url": "~5.1.0",
     "rimraf": "~2.6.3",
     "semver": "~6.0.0",
-    "serialport": "^7.1.5",
+    "serialport": "~9.0.7",
     "serve-favicon": "~2.5.0",
     "serve-static": "~1.13.2",
     "session-file-store": "~1.2.0",
@@ -306,9 +310,9 @@
     "css-loader": "~2.1.1",
     "css-split-webpack-plugin": "~0.2.6",
     "dotenv": "~7.0.0",
-    "electron": "~4.2.12",
-    "electron-builder": "~22.4.0",
-    "electron-rebuild": "~1.10.0",
+    "electron": "~8.5.1",
+    "electron-builder": "~22.9.1",
+    "electron-rebuild": "~2.3.4",
     "eslint": "~5.16.0",
     "eslint-config-trendmicro": "~1.4.1",
     "eslint-import-resolver-webpack": "~0.11.1",

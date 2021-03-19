@@ -3,10 +3,11 @@ import { app, BrowserWindow, shell } from 'electron';
 //import AutoUpdater from './AutoUpdater';
 // const customTitlebar = require('custom-electron-titlebar');
 // import customTitlebar from 'custom-electron-titlebar';
+import path from 'path';
 
 const browserWindowOptions = {
     minWidth: 1280,
-    minHeight: 1024,
+    minHeight: 768,
 };
 
 class WindowManager {
@@ -58,10 +59,16 @@ class WindowManager {
             ...options,
             ...browserWindowOptions,
             titleBarStyle: 'hidden',
-            show: false
+            show: false,
+            webPreferences: {
+                nodeIntegration: true,
+                preload: path.join(__dirname, 'preload.js')
+            }
         });
         const webContents = window.webContents;
-
+        window.webContents.on('did-finish-load', () => {
+            window.setTitle(options.title);
+        });
         window.on('closed', (event) => {
             const index = this.windows.indexOf(event.sender);
             console.assert(index >= 0);

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import classNames from 'classnames';
 import Dropzone from 'react-dropzone';
+import isElectron from 'is-electron';
 import pubsub from 'pubsub-js';
 import Header from 'app/containers/Header';
 import React, { PureComponent } from 'react';
@@ -27,6 +28,9 @@ import {
     MODAL_FEEDER_WAIT,
     MODAL_SERVER_DISCONNECTED
 } from './constants';
+import UpdateAvailableAlert from './UpdateAvailableAlert/UpdateAvailableAlert';
+import Toaster from '../../lib/toaster/Toaster';
+
 
 const WAIT = '%wait';
 
@@ -91,6 +95,11 @@ class Workspace extends PureComponent {
                     }
                 }
             }));
+        },
+        sendRestartCommand: () => {
+            if (isElectron()) {
+                window.ipcRenderer.send('restart_app');
+            }
         }
     };
 
@@ -507,6 +516,8 @@ class Workspace extends PureComponent {
                     }}
                 >
                     <div className={classNames(styles.workspaceTable)}>
+                        <UpdateAvailableAlert restartHandler={this.action.sendRestartCommand} />
+                        <Toaster />
                         <Header />
                         <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
                             <DefaultWidgets

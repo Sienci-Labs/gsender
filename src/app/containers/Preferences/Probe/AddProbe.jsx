@@ -9,6 +9,13 @@ const AddProbe = ({ state, actions }) => {
     const { functions } = probe;
     const probeActions = actions.probe;
 
+    const { units } = state;
+
+    const values = {
+        xyThickness: units === 'mm' ? probe.xyThickness.mm : probe.xyThickness.in,
+        zThickness: units === 'mm' ? probe.zThickness.mm : probe.zThickness.in
+    };
+
     return (
         <div>
             <div style={{ marginBottom: '1rem' }}>
@@ -17,8 +24,8 @@ const AddProbe = ({ state, actions }) => {
                     functions.z && (
                         <Input
                             label="Z Thickness"
-                            units="mm"
-                            value={probe.zThickness}
+                            units={units}
+                            value={values.zThickness}
                             onChange={probeActions.changeZThickness}
                             additionalProps={{ type: 'number', id: 'zThickness' }}
                         />
@@ -41,8 +48,8 @@ const AddProbe = ({ state, actions }) => {
                 (functions.x && functions.y) && (
                     <Input
                         label="XY Thickness"
-                        units="mm"
-                        value={probe.xyThickness}
+                        units={units}
+                        value={values.xyThickness}
                         onChange={probeActions.changeXYThickness}
                         additionalProps={{ type: 'number', id: 'xyThickness' }}
                     />

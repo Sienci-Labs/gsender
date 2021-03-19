@@ -36,7 +36,8 @@ import {
     TINYG,
     // Workflow
     WORKFLOW_STATE_RUNNING,
-    GRBL_ACTIVE_STATE_JOG
+    GRBL_ACTIVE_STATE_JOG,
+    GRBL_ACTIVE_STATE_IDLE
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -238,7 +239,17 @@ class AxesWidget extends PureComponent {
             controller.command('jog:stop');
         },
         cancelJog: () => {
-            controller.command('jog:cancel');
+            const state = this.state.controller.state.status.activeState || null;
+            if (state) {
+                if (state === GRBL_ACTIVE_STATE_JOG) {
+                    controller.command('jog:cancel');
+                    return;
+                }
+                if (state === GRBL_ACTIVE_STATE_IDLE) {
+                    return;
+                }
+                controller.command('reset');
+            }
         },
         move: (params = {}) => {
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
@@ -970,6 +981,7 @@ class AxesWidget extends PureComponent {
             // Determine if the motion button is clickable
             canClick: this.canClick(),
             isJogging: this.isJogging(),
+            activeState: controller.state?.status?.activeState || GRBL_ACTIVE_STATE_IDLE,
             // Output machine position with the display units
             machinePosition: mapValues(machinePosition, (pos, axis) => {
                 return String(mapPositionToUnits(pos, units));
