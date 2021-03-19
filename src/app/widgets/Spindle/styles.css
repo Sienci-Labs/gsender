@@ -9,8 +9,12 @@
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   transition: 200ms ease-in-out;
   font-size: clamp(12px, 1vw, 22px);
-  height: clamp(24px, 2vw, 38px);
+  height: 2.25rem;
   padding: 0;
+  --tw-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+		-webkit-box-shadow: var(--tw-ring-offset-shadow,0 0 transparent),var(--tw-ring-shadow,0 0 transparent),var(--tw-shadow);
+		box-shadow: var(--tw-ring-offset-shadow,0 0 transparent),var(--tw-ring-shadow,0 0 transparent),var(--tw-shadow);
+
 }
 
 .speedSpindle {
@@ -125,4 +129,5 @@ input.form-control[type="number"]::-webkit-inner-spin-button {
 
 .form-groupSpindle {
   margin-left: 0;
+  margin: 1rem 0;
 }

@@ -1148,7 +1148,7 @@ class VisualizerWidget extends PureComponent {
                     </Widget.Title>
                     <Widget.Controls>
                         <span>Lite Visualizer Mode</span>
-                        <ToggleSwitch checked={liteMode} onChange={() => this.actions.handleLiteModeToggle()} />
+                        <ToggleSwitch className={styles.litetoggle} checked={liteMode} onChange={() => this.actions.handleLiteModeToggle()} />
                     </Widget.Controls>
                 </Widget.Header>
                 <Widget.Content
