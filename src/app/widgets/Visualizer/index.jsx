@@ -423,17 +423,18 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         onRunClick: () => {
-            const { invalidGcode } = this.state;
+            //const { invalidGcode } = this.state;
 
-            if (invalidGcode.shouldShow) {
+            /*if (invalidGcode.shouldShow) {
                 if (invalidGcode.list.size > 0) {
-                    this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: true } }));
+                    this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
                 } else {
                     this.actions.handleRun();
                 }
             } else {
                 this.actions.handleRun();
-            }
+            }*/
+            this.actions.handleRun();
         },
         handleRun: () => {
             const { workflow } = this.state;
