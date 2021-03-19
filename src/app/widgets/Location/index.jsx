@@ -45,12 +45,18 @@ import {
     // Workflow
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_IDLE,
-    WORKFLOW_STATE_PAUSED
+    WORKFLOW_STATE_PAUSED,
 } from '../../constants';
 import {
     MODAL_NONE,
     MODAL_SETTINGS,
-    DEFAULT_AXES
+    DEFAULT_AXES,
+    XY_MAX,
+    XY_MIN,
+    Z_MAX,
+    Z_MIN,
+    FEEDRATE_MAX,
+    FEEDRATE_MIN
 } from './constants';
 import styles from './index.styl';
 
@@ -433,23 +439,58 @@ class LocationWidget extends PureComponent {
             controller.command('gcode', 'G0 X0 Y0 Z0'); //Move to Work Position Zero
         },
         JOG_SPEED: (event, { speed }) => {
-            const RAPID = { xyStep: 20, zStep: 10, feedrate: 5000 };
-            const NORMAL = { xyStep: 5, zStep: 2, feedrate: 3000 };
-            const PRECISE = { xyStep: 0.5, zStep: 0.1, feedrate: 1000 };
+            const { speeds } = this.state.jog;
+            const newSpeeds = speeds;
 
-            const { jog } = this.state;
-            const { feedrate } = jog.speeds;
-            if (speed === 'increase' && feedrate !== 5000) {
-                feedrate === 1000
-                    ? pubsub.publish('jogSpeeds', NORMAL)
-                    : pubsub.publish('jogSpeeds', RAPID);
+            const xyStep = Number(newSpeeds.xyStep);
+            const zStep = Number(newSpeeds.zStep);
+            const feedrate = Number(newSpeeds.feedrate);
+
+            let xyFactor;
+            let zFactor;
+            let feedrateFactor;
+
+            const toFixed = (val) => val.toFixed(1);
+
+            if (xyStep < 1) {
+                xyFactor = 0.1;
+            } else if (xyStep < 10) {
+                xyFactor = 1;
+            } else if (xyStep < 100) {
+                xyFactor = 10;
+            } else {
+                xyFactor = 50;
             }
 
-            if (speed === 'decrease' && feedrate !== 1000) {
-                feedrate === 5000
-                    ? pubsub.publish('jogSpeeds', NORMAL)
-                    : pubsub.publish('jogSpeeds', PRECISE);
+            if (zStep < 1) {
+                zFactor = 0.1;
+            } else if (zStep >= 1 && zStep < 10) {
+                zFactor = 1;
+            } else {
+                zFactor = 5;
             }
+
+            if (feedrate < 100) {
+                feedrateFactor = 10;
+            } else if (feedrate >= 100 && feedrate < 1000) {
+                feedrateFactor = 100;
+            } else if (feedrate >= 1000 && feedrate < 10000) {
+                feedrateFactor = 1000;
+            } else {
+                feedrateFactor = 10000;
+            }
+
+            if (speed === 'increase') {
+                newSpeeds.xyStep = xyStep + xyFactor < XY_MAX ? toFixed(xyStep + xyFactor) : XY_MAX;
+                newSpeeds.zStep = zStep + zFactor < Z_MAX ? toFixed(zStep + zFactor) : Z_MAX;
+                newSpeeds.feedrate = feedrate + feedrateFactor < FEEDRATE_MAX ? toFixed(feedrate + feedrateFactor) : FEEDRATE_MAX;
+            } else {
+                newSpeeds.xyStep = xyStep - xyFactor > XY_MIN ? toFixed(xyStep - xyFactor) : XY_MIN;
+                newSpeeds.zStep = zStep - zFactor > Z_MIN ? toFixed(zStep - zFactor) : Z_MIN;
+                newSpeeds.feedrate = feedrate - feedrateFactor > FEEDRATE_MIN ? toFixed(feedrate - feedrateFactor) : FEEDRATE_MIN;
+            }
+
+            pubsub.publish('jogSpeeds', newSpeeds);
         },
         SELECT_AXIS: (event, { axis }) => {
             const { canClick, jog } = this.state;
