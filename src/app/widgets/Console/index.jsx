@@ -191,7 +191,9 @@ class ConsoleWidget extends PureComponent {
     }
 
     resizeTerminal() {
-        this.terminal && this.terminal.resize();
+        setTimeout(() => {
+            this.terminal && this.terminal.resize();
+        }, 0);
     }
 
     render() {
