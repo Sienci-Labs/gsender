@@ -18,7 +18,7 @@ const SpeedControl = ({ state, actions }) => {
     return (
         <div className={styles.speedControls}>
             <div className={styles.controlGroup}>
-                <span>XY move ({units})</span>
+                <span className={styles.controlGroupLabel}>XY move ({units})</span>
                 <NumberInput
                     value={xyStep}
                     min={xyMin}

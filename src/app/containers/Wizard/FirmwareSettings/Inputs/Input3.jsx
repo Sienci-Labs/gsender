@@ -139,53 +139,56 @@ class InputThree extends PureComponent {
         let settingsOne = this.state.defaultSettings[1];
         let settingsTwo = this.state.defaultSettings[2];
         return (
-            <div className={styles.maskTwo}>
-                <div className={styles.maskTwoTitles}>X: </div>
-                <div className={styles.threeToggles}>
-                    <div className={styles.onoffswitch}>
-                        <input
-                            type="checkbox"
-                            name="3-0"
-                            className={styles.onoffswitchcheckbox}
-                            id="3-0"
-                            tabIndex="0"
-                            onClick={this.handleSwitch}
-                            defaultChecked={settingsZero}
-                        />
-                        <label className={styles.onoffswitchlabel} htmlFor="3-0" />
+            <div className={styles.numberWidth}>
+                <div className={styles.maskTwo}>
+                    <div className={styles.maskTwoTitles}>X: </div>
+                    <div className={styles.threeToggles}>
+                        <div className={styles.onoffswitch}>
+                            <input
+                                type="checkbox"
+                                name="3-0"
+                                className={styles.onoffswitchcheckbox}
+                                id="3-0"
+                                tabIndex="0"
+                                onClick={this.handleSwitch}
+                                defaultChecked={settingsZero}
+                            />
+                            <label className={styles.onoffswitchlabel} htmlFor="3-0" />
+                        </div>
                     </div>
-                </div>
-                <div className={styles.maskTwoTitles}>Y: </div>
-                <div className={styles.threeToggles}>
-                    <div className={styles.onoffswitch}>
-                        <input
-                            type="checkbox"
-                            name="3-1"
-                            className={styles.onoffswitchcheckbox}
-                            id="3-1"
-                            tabIndex="0"
-                            onClick={this.handleSwitch}
-                            defaultChecked={settingsOne}
-                        />
-                        <label className={styles.onoffswitchlabel} htmlFor="3-1" />
+                    <div className={styles.maskTwoTitles}>Y: </div>
+                    <div className={styles.threeToggles}>
+                        <div className={styles.onoffswitch}>
+                            <input
+                                type="checkbox"
+                                name="3-1"
+                                className={styles.onoffswitchcheckbox}
+                                id="3-1"
+                                tabIndex="0"
+                                onClick={this.handleSwitch}
+                                defaultChecked={settingsOne}
+                            />
+                            <label className={styles.onoffswitchlabel} htmlFor="3-1" />
+                        </div>
                     </div>
-                </div>
-                <div className={styles.maskTwoTitles}>Z: </div>
-                <div className={styles.threeToggles}>
-                    <div className={styles.onoffswitch}>
-                        <input
-                            type="checkbox"
-                            name="3-2"
-                            className={styles.onoffswitchcheckbox}
-                            id="3-2"
-                            tabIndex="0"
-                            onClick={this.handleSwitch}
-                            defaultChecked={settingsTwo}
-                        />
-                        <label className={styles.onoffswitchlabel} htmlFor="3-2" />
+                    <div className={styles.maskTwoTitles}>Z: </div>
+                    <div className={styles.threeToggles}>
+                        <div className={styles.onoffswitch}>
+                            <input
+                                type="checkbox"
+                                name="3-2"
+                                className={styles.onoffswitchcheckbox}
+                                id="3-2"
+                                tabIndex="0"
+                                onClick={this.handleSwitch}
+                                defaultChecked={settingsTwo}
+                            />
+                            <label className={styles.onoffswitchlabel} htmlFor="3-2" />
+                        </div>
                     </div>
                 </div>
             </div>
+
         );
     }
 }

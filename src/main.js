@@ -1,5 +1,6 @@
 import '@babel/polyfill';
 import { app, Menu, ipcMain } from 'electron';
+import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
@@ -7,7 +8,7 @@ import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
-import { autoUpdater } from 'electron-updater';
+
 
 // The selection menu
 const selectionMenu = Menu.buildFromTemplate([
@@ -92,7 +93,7 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `${pkg.name} ${pkg.version}`,
+                title: `gSender ${pkg.version}`,
                 titleBarStyle: 'hidden'
             };
             const window = windowManager.openWindow(url, options);
@@ -103,10 +104,7 @@ const main = () => {
             });
 
             //Check for available updates
-
-            window.on('ready-to-show', () => {
-                autoUpdater.checkForUpdatesAndNotify();
-            });
+            await autoUpdater.checkForUpdatesAndNotify();
 
             // https://github.com/electron/electron/issues/4068#issuecomment-274159726
             window.webContents.on('context-menu', (event, props) => {
@@ -119,19 +117,28 @@ const main = () => {
                     // Shows a selection menu if there was selected text
                     selectionMenu.popup(window);
                 }
-
-                // What to do in cases where update is available
-                autoUpdater.on('update-available', () => {
-                    window.webContents.send('update_available');
-                });
-                autoUpdater.on('update-downloaded', () => {
-                    window.webContents.send('update_downloaded');
-                });
-
-                ipcMain.on('restart_app', () => {
-                    autoUpdater.quitAndInstall();
-                });
             });
+
+            // What to do in cases where update is available
+            autoUpdater.on('checking-for-updates', () => {
+                window.webContents.send('message', 'CHECKING UPDATES');
+            });
+            autoUpdater.on('update-not-available', (ev, info) => {
+                window.webContents.send('message', 'Update not available.');
+            });
+            autoUpdater.on('update-available', () => {
+                window.webContents.send('message', 'Update Available');
+            });
+            autoUpdater.on('update-downloaded', () => {
+                window.webContents.send('update_downloaded');
+            });
+            autoUpdater.on('error', (ev, e) => {
+                window.webContents.send('message', `Error: ${e}`);
+            });
+            ipcMain.on('restart_app', () => {
+                autoUpdater.quitAndInstall();
+            });
+
         } catch (err) {
             console.error('Error:', err);
         }

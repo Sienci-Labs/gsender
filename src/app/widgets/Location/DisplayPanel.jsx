@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import store from 'app/store';
-
+import cx from 'classnames';
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
 
@@ -330,7 +330,7 @@ class DisplayPanel extends PureComponent {
                             <i className="fas fa-bullseye" />
                             Zero All
                         </FunctionButton>
-                        <div className={styles.buttonwrap}>
+                        <div className={cx({ [styles.buttonWrap]: !endstops }, { [styles.columnZeros]: endstops })}>
                             <FunctionButton
                                 onClick={() => {
                                     controller.command('gcode', 'G91');
@@ -340,55 +340,96 @@ class DisplayPanel extends PureComponent {
                                     controller.command('gcode', 'G0 Z0'); // Move Z up
                                 }}
                                 disabled={!canClick}
+                                className={styles.fontMonospace}
                                 primary
                             >
                                 <i className="fas fa-chart-line" />
-                            Go to Zero
+                            Go XYZ0
+                            </FunctionButton>
+                            <FunctionButton
+                                onClick={() => {
+                                    controller.command('gcode', 'G90');
+                                    controller.command('gcode', 'G0 X0'); //Move to Work Position Zero
+                                }}
+                                disabled={!canClick}
+                                primary
+                                className={styles.fontMonospace}
+                            >
+                                <i className="fas fa-chart-line" />
+                                Go X0
+                            </FunctionButton>
+                            <FunctionButton
+                                onClick={() => {
+                                    controller.command('gcode', 'G90');
+                                    controller.command('gcode', 'G0 Y0'); //Move to Work Position Zero
+                                }}
+                                disabled={!canClick}
+                                primary
+                                className={styles.fontMonospace}
+                            >
+                                <i className="fas fa-chart-line" />
+                                Go Y0
+                            </FunctionButton>
+                            <FunctionButton
+                                onClick={() => {
+                                    controller.command('gcode', 'G90');
+                                    controller.command('gcode', 'G0 Z0'); //Move to Work Position Zero
+                                }}
+                                disabled={!canClick}
+                                className={styles.fontMonospace}
+                                primary
+                            >
+                                <i className="fas fa-chart-line" />
+                                Go Z0
                             </FunctionButton>
                         </div>
                     </div>
-                    <div className={endstops ? styles.endStopActiveControls : styles.hideHoming}>
-                        <FunctionButton
-                            disabled={!canClick}
-                            onClick={this.actions.startHoming}
-                            className={styles.runHomeButton}
-                        >
-                            <i className="fas fa-home" /> Home Machine
-                        </FunctionButton>
-                        <QuickPositionButton
-                            disabled={!canClick || !homingHasBeenRun}
-                            className={styles.QPBL}
-                            onClick={() => {
-                                this.actions.jogtoBLCorner();
-                            }}
-                            icon={(houseIconPos === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
-                        />
-                        <QuickPositionButton
-                            disabled={!canClick || !homingHasBeenRun}
-                            className={styles.QPBR}
-                            rotate={45}
-                            onClick={() => {
-                                this.actions.jogtoBRCorner();
-                            }}
-                            icon={(houseIconPos === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
-                        />
-                        <QuickPositionButton
-                            disabled={!canClick || !homingHasBeenRun}
-                            className={styles.QPFL}
-                            onClick={() => {
-                                this.actions.jogtoFLCorner();
-                            }}
-                            icon={(houseIconPos === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
-                        />
-                        <QuickPositionButton
-                            disabled={!canClick || !homingHasBeenRun}
-                            className={styles.QPFR}
-                            onClick={() => {
-                                this.actions.jogtoFRCorner();
-                            }}
-                            icon={(houseIconPos === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
-                        />
-                    </div>
+
+                    {
+                        endstops &&
+                        <div className={endstops ? styles.endStopActiveControls : styles.hideHoming}>
+                            <FunctionButton
+                                disabled={!canClick}
+                                onClick={this.actions.startHoming}
+                                className={styles.runHomeButton}
+                            >
+                                <i className="fas fa-home" /> Home
+                            </FunctionButton>
+                            <QuickPositionButton
+                                disabled={!canClick || !homingHasBeenRun}
+                                className={styles.QPBL}
+                                onClick={() => {
+                                    this.actions.jogtoBLCorner();
+                                }}
+                                icon={(houseIconPos === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                            />
+                            <QuickPositionButton
+                                disabled={!canClick || !homingHasBeenRun}
+                                className={styles.QPBR}
+                                rotate={45}
+                                onClick={() => {
+                                    this.actions.jogtoBRCorner();
+                                }}
+                                icon={(houseIconPos === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                            />
+                            <QuickPositionButton
+                                disabled={!canClick || !homingHasBeenRun}
+                                className={styles.QPFL}
+                                onClick={() => {
+                                    this.actions.jogtoFLCorner();
+                                }}
+                                icon={(houseIconPos === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                            />
+                            <QuickPositionButton
+                                disabled={!canClick || !homingHasBeenRun}
+                                className={styles.QPFR}
+                                onClick={() => {
+                                    this.actions.jogtoFRCorner();
+                                }}
+                                icon={(houseIconPos === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                            />
+                        </div>
+                    }
                 </div>
             </Panel>
         );

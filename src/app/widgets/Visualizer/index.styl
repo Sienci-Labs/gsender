@@ -1,15 +1,19 @@
-@import "widget";
-@import "primary-toolbar";
+@import 'widget';
+@import 'primary-toolbar';
 
 .visualizer-component {
     border: solid 1px #9CA3AF;
+}
+
+.litetoggle {
+    transform: scale(.8);
 }
 
 .visualizer-wrapper {
     position: relative;
 }
 
-.visualizer-container{
+.visualizer-container {
     height: 100%;
 }
 
@@ -22,12 +26,56 @@
     width: 100%;
     height: 100%;
     flex-grow: 1;
-    flex-direction column;
-    box-sizing border-box;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .vizWidgetOverride {
     height: calc(100% - 8rem) !important;
     margin: 0 !important;
     padding-bottom: 10px;
+}
+
+.alarm-button-wrap {
+    display flex;
+    align-items center
+    justify-content center;
+}
+.alarm-button {
+    max-width: 225px;
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    align-items center;
+    justify-content space-between;
+    padding: 1rem;
+    border-radius: 2rem;
+
+    border: solid 1px #9b1919;
+    background: rgba(220,38,38, 0.9);
+    color: #FFFFFF;
+    font-weight: bold;
+    flex-grow 1;
+    animation: grow 2s infinite
+    i {
+        font-size: 3rem !important;
+
+    }
+
+    &:hover {
+        background: rgba(220,38,38, 0.7);
+    }
+}
+
+
+
+@keyframes grow {
+    0% { transform: scale(1); }
+    30% { transform: scale(1); }
+    40% { transform: scale(1.08); }
+    50% { transform: scale(1); }
+    60% { transform: scale(1); }
+    70% { transform: scale(1.05); }
+    80% { transform: scale(1); }
+    100% { transform: scale(1); }
 }

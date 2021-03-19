@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Dropdown, { MenuItem } from 'app/components/Dropdown';
 
 import styles from './index.styl';
+import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 
 /**
  * Toggle Component used to trigger the dropdown
@@ -40,18 +41,36 @@ export default class MacroItem extends Component {
      * Function to handle mouse enter on the wrapper div
      */
     handleMouseEnter = () => {
-        this.setState({ display: 'icon' });
+        if (this.state.display !== 'running') {
+            this.setState({ display: 'icon' });
+        }
     }
 
     /**
      * Function to handle mouse leave on the wrapper div
      */
     handleMouseLeave = () => {
-        this.setState({ display: 'name' });
+        if (this.state.display !== 'running') {
+            this.setState({ display: 'name' });
+        }
+    }
+
+    onMacroRun = () => {
+        const { macro, onRun } = this.props;
+        onRun(macro);
+        Toaster.pop({
+            msg: `Started running macro '${macro.name}'!`,
+            type: TOASTER_INFO
+        });
+        this.setState({ display: 'running' });
+
+        setTimeout(() => {
+            this.setState({ display: 'name' });
+        }, 4000);
     }
 
     render() {
-        const { macro, onRun, onEdit, onDelete } = this.props;
+        const { macro, onEdit, onDelete } = this.props;
         const { display } = this.state;
 
         return (
@@ -61,13 +80,15 @@ export default class MacroItem extends Component {
                 onMouseLeave={this.handleMouseLeave}
             >
                 <div
-                    onClick={onRun(macro)}
-                    onKeyDown={onRun(macro)}
+                    onClick={this.onMacroRun}
+                    onKeyDown={this.onMacroRun}
                     role="button"
                     tabIndex={-1}
                     className={styles['macro-item-control']}
                 >
                     { display === 'name' && <div>{macro.name}</div>}
+
+                    { display === 'running' && <div className={styles['glowing-background']}>Running...</div>}
 
                     { display === 'icon' && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>

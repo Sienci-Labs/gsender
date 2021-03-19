@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+
 import styles from '../index.styl';
 import AddProbe from './AddProbe';
 
@@ -13,6 +14,16 @@ const ProbeSettings = ({ active, state, actions }) => {
     const { probeSettings, probe } = state;
     const { functions } = probe;
     const probeActions = actions.probe;
+
+    const { units } = state;
+
+    const values = {
+        length: units === 'mm' ? probe.plateLength.mm : probe.plateLength.in,
+        width: units === 'mm' ? probe.plateWidth.mm : probe.plateWidth.in,
+        xyThickness: units === 'mm' ? probe.xyThickness.mm : probe.xyThickness.in,
+        zThickness: units === 'mm' ? probe.zThickness.mm : probe.zThickness.in
+    };
+
     return (
         <div className={classNames(
             styles.hidden,
@@ -55,16 +66,16 @@ const ProbeSettings = ({ active, state, actions }) => {
                                 <div>
                                     <Input
                                         label="Length"
-                                        value={probe.plateLength}
-                                        units="mm"
+                                        value={values.length}
+                                        units={units}
                                         onChange={probeActions.changePlateLength}
                                         additionalProps={{ type: 'number', id: 'plateLength' }}
                                     />
 
                                     <Input
                                         label="Width"
-                                        value={probe.plateWidth}
-                                        units="mm"
+                                        value={values.width}
+                                        units={units}
                                         onChange={probeActions.changePlateWidth}
                                         additionalProps={{ type: 'number', id: 'plateWidth' }}
                                     />

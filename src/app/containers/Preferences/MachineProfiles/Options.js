@@ -3,7 +3,7 @@ import Select from 'react-select';
 import pubsub from 'pubsub-js';
 import _isEqual from 'lodash/isEqual';
 import ensureArray from 'ensure-array';
-
+import controller from 'app/lib/controller';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import store from 'app/store';
 
@@ -34,7 +34,7 @@ export default class Options extends Component {
         const foundProfile = machineProfiles.find(profile => profile.id === value);
 
         if (foundProfile) {
-            store.replace('workspace.machineProfile', {
+            const updatedObj = {
                 ...foundProfile,
                 limits: {
                     xmin: 0,
@@ -44,7 +44,9 @@ export default class Options extends Component {
                     ymax: foundProfile.depth,
                     zmax: foundProfile.height,
                 }
-            });
+            };
+            store.replace('workspace.machineProfile', updatedObj);
+            controller.command('machineprofile:load', updatedObj);
         }
     }
 
@@ -73,14 +75,17 @@ export default class Options extends Component {
             return;
         }
 
-        store.replace('workspace.machineProfile', {
+        const updatedObj = {
             ...machineProfile,
             [name]: value,
             limits: {
                 ...machineProfile.limits,
                 [limitMap]: value
             }
-        });
+        };
+
+        store.replace('workspace.machineProfile', updatedObj);
+        controller.command('machineprofile:load', updatedObj);
     }
 
     /**
@@ -90,10 +95,13 @@ export default class Options extends Component {
     handleToggle = (id) => {
         const { machineProfile } = this.state;
 
-        store.replace('workspace.machineProfile', {
+        const updatedObj = {
             ...machineProfile,
-            [id]: !machineProfile[id],
-        });
+            [id]: !machineProfile[id]
+        };
+
+        store.replace('workspace.machineProfile', updatedObj);
+        controller.command('machineprofile:load', updatedObj);
     }
 
     updateMachineProfileFromStore = () => {
@@ -190,29 +198,29 @@ export default class Options extends Component {
                     <h4 className={styles['settings-subtitle']}>Machine Features</h4>
                     <div className={styles['machine-features-section']}>
                         <div className={styles['machine-options-inputgroup']}>
-                            <label htmlFor="">Endstops</label>
                             <ToggleSwitch
                                 checked={endstops}
                                 onChange={() => this.handleToggle('endstops')}
                             />
+                            <label htmlFor="">Endstops</label>
                         </div>
 
                         <div className={styles['machine-options-inputgroup']}>
-                            <label htmlFor="">Spindle</label>
                             <ToggleSwitch
                                 checked={spindle}
                                 onChange={() => this.handleToggle('spindle')}
                             />
+                            <label htmlFor="">Spindle</label>
                         </div>
                     </div>
 
                     <div className={styles['machine-features-section']}>
-                        <div className={styles['machine-options-inputgroup']} style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', margin: '0' }}>
-                            <label htmlFor="">Coolant</label>
+                        <div className={styles['machine-options-inputgroup']} style={{ display: 'grid', gridTemplateColumns: '1fr 5fr', margin: '0' }}>
                             <ToggleSwitch
                                 checked={coolant}
                                 onChange={() => this.handleToggle('coolant')}
                             />
+                            <label htmlFor="">Coolant</label>
                         </div>
 
                         {/* <div className={styles['machine-options-inputgroup']} style={{ margin: 0 }}>

@@ -28,7 +28,7 @@
 }
 
 .settings-area {
-
+    min-height: 25px;
     primary = #D1D5DB;
     secondary = #333;
     width: 50%;
@@ -67,7 +67,7 @@
 
 .lines-processed {
     position: absolute;
-    top: 25%;
+    top: calc(1rem + 30%);
     left: 50%; /* position the left edge of the element at the middle of the parent */
     transform: translate(-50%, -50%);
 
@@ -113,4 +113,10 @@
     &:hover:enabled {
         background-color: rgba(209, 213, 219, 0.5);
     }
+}
+
+
+.progressName {
+    color: #3e85c7;
+    font-size: 1rem;
 }

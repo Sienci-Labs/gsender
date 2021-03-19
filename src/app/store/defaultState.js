@@ -9,8 +9,6 @@ const AXIS_Y = 'y';
 const AXIS_Z = 'z';
 const FORWARD = 1;
 const BACKWARD = -1;
-// const OVERSHOOT_FACTOR = 10; // 10x
-// const UNDERSHOOT_FACTOR = 0.1; // 0.1x
 
 const defaultState = {
     session: {
@@ -51,10 +49,22 @@ const defaultState = {
             }
         },
         probeProfile: {
-            xyThickness: 10,
-            zThickness: 15,
-            plateWidth: 50,
-            plateLength: 50,
+            xyThickness: {
+                mm: 10,
+                in: 0.393
+            },
+            zThickness: {
+                mm: 15,
+                in: 0.590
+            },
+            plateWidth: {
+                mm: 50,
+                in: 1.968
+            },
+            plateLength: {
+                mm: 50,
+                in: 1.968
+            },
             functions: {
                 x: true,
                 y: true,
@@ -317,28 +327,41 @@ const defaultState = {
         },
         visualizer: {
             minimized: false,
-
             // 3D View
+            liteMode: false,
             disabled: false,
+            disabledLite: false,
             projection: 'orthographic', // 'perspective' or 'orthographic'
-            cameraMode: 'pan', // 'pan' or 'rotate'
+            cameraMode: 'pan', // 'pan' or 'rotate',
+            theme: 'dark',
             gcode: {
                 displayName: true
             },
             objects: {
                 limits: {
-                    visible: true
+                    visible: true,
                 },
                 coordinateSystem: {
-                    visible: true
+                    visible: true,
                 },
                 gridLineNumbers: {
-                    visible: true
+                    visible: true,
                 },
                 cuttingTool: {
-                    visible: true
+                    visible: true,
+                    visibleLite: false
+                },
+                cuttingToolAnimation: {
+                    visible: true,
+                    visibleLite: false
+                },
+                cutPath: {
+                    visible: true,
+                    visibleLite: true
                 }
-            }
+            },
+            showWarning: false,
+            showLineWarnings: false,
         },
         webcam: {
             disabled: true,
@@ -474,7 +497,7 @@ const defaultState = {
         { // Change Jog Speed
             id: 10,
             title: 'Increase Jog Speed',
-            keys: 'shift++',
+            keys: '=',
             cmd: 'JOG_SPEED',
             payload: {
                 speed: 'increase'
@@ -484,7 +507,7 @@ const defaultState = {
         { // Change Jog Speed
             id: 11,
             title: 'Decrease Jog Speed',
-            keys: 'shift+-',
+            keys: '-',
             cmd: 'JOG_SPEED',
             payload: {
                 speed: 'decrease'

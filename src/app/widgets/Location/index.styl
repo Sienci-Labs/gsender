@@ -51,6 +51,11 @@
 }
 
 .control-buttons {
+    padding: 0 2rem
+    display: flex;
+    flex-grow 1;
+    flex-direction column;
+   padding: 0 1rem;
     button {
         margin-bottom: 10px;
     }
@@ -59,29 +64,28 @@
 .display-panel {
     height: 100%;
     width: 100%;
-    display: flex;
-    justify-content space-between;
 
 }
 .location-wrapper {
     height: 100%;
+    width: 100%;
     display: flex;
-    align-items center;
+    justify-content: space-around;
 }
 .machine-position {
-    width: 13ch;
+    width: 15ch;
     align-items center;
 }
 
 .end-stop-active-controls {
     width: 30%;
-    height: calc(100% - 20px);
+    height: 0;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0,1fr));
     right: 15px;
     top: 0;
-    position: absolute;
+    padding-bottom: 40%;
 }
 
 .quickPositionButton {
@@ -110,53 +114,66 @@
     line-height: 1px;
     height: fit-content;
     padding: 8px
+    margin-top: 0;
 }
 
 .QPBR {
     clip-path: polygon(0% 0%, 0% 45%, 55% 46%, 55% 100%, 100% 100%, 100% 0%);
     grid-row: 2;
     grid-column: 2/3;
-    padding: 0;
-    margin-left: 70%;
     width: 130%;
-    height: 130%;
+    margin-left: 70%;
+	height: 0;
+	padding: 0;
+	padding-top: 130%;
+	margin-top: 100%;
+
     i {
-        transform: rotate(45deg);
+        transform: translateY(-420%) rotate(45deg);
+		display: block;
+		text-align: right;
         font-size: 1.7rem;
-        top: -1.45rem;
         position: relative;
-        right: 0.25rem;
     }
 }
 .QPBL {
     clip-path: polygon(0 0,100% 0,100% 45%,45% 45%,45% 100%,0 100%);
     grid-row: 2;
     grid-column: 1/2;
-    padding: 0;
     width: 130%;
-    height: 130%;
+    height: 0;
+	padding: 0;
+	padding-top: 130%;
+	margin-top: 100%;
+
 
     i {
-        transform: rotate(315deg);
+       transform: translateY(-420%) rotate(315deg);
+		display: block;
         font-size: 1.7rem;
-        top: -1.45rem;
         position: relative;
-        left: 0.25rem;
     }
 }
 .QPFR {
     clip-path: polygon(100% 100%, 100% 0%, 55% 0%, 55% 55%, 0% 55%, 0% 100%);
     grid-row: 3;
     grid-column: 2/3;
-    margin: 70%;
     width: 130%;
-    height: 130%;
+
+    margin: 70% 0 0 70%;
+		height: 0;
+		padding: 0;
+		padding-top: 130%;
+		margin-top: 260%;
+
     i {
         transform: rotate(135deg);
         font-size: 1.7rem;
         bottom: -1.45rem;
         position: relative;
-        right: 0.25rem;
+        bottom: 8px;
+		display: block;
+
     }
 }
 .QPFL {
@@ -165,13 +182,22 @@
     grid-column: 1/2;
     margin-top: 70%;
     width: 130%;
-    height: 130%;
+
+
+    height: 0;
+		padding: 0;
+		padding-top: 130%;
+		margin-top: 260%;
+
     i {
         transform: rotate(225deg);
         font-size: 1.7rem;
         bottom: -1.45rem;
         position: relative;
-        left: 0.25rem;
+        bottom: 8px;
+		display: block;
+		text-align: right;
+
     }
 }
 
@@ -183,4 +209,35 @@
 
 .smallIcon {
     font-size: 0.9rem !important;
+}
+
+
+.logo-wrapper {
+    display: flex;
+    flex-grow 1;
+    justify-content center;
+    align-items center;
+}
+
+.button-wrap {
+    display: grid;
+    width: 100%;
+    grid-gap 10px;
+    grid-template-columns repeat( 2, 1fr );
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.button-wrap {
+    display: grid;
+    width: 100%;
+    grid-gap 10px;
+    grid-template-columns repeat( 2, 1fr );
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+
+.font-monospace {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 }

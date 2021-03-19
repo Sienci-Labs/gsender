@@ -6,6 +6,7 @@ import styles from './index.styl';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
+import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 
 class RunProbe extends PureComponent {
     static propTypes = {
@@ -88,6 +89,12 @@ class RunProbe extends PureComponent {
                                     actions.closeModal();
                                     actions.runProbeCommands(probeCommands);
                                     this.resetProbeState();
+                                    Toaster.pop({
+                                        msg: 'Initiated probing cycle',
+                                        type: TOASTER_INFO,
+                                        duration: 5000,
+                                        icon: 'fa-satellite-dish'
+                                    });
                                 }}
                             >
                                 {

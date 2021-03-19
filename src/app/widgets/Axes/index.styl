@@ -33,7 +33,7 @@
 }
 
 .keypad {
-    height: calc(100% - 4rem);
+    height: calc(100% - 3.5rem - 10px);
 }
 
 .movementRateButton {
@@ -79,11 +79,18 @@
 }
 
 .speed-controls {
+    height: 3.5rem;
+    margin-top: 10px;
     width: 100%;
-    height: 4rem;
+    font-size: 1.05rem;
     display: grid;
     grid-gap: 2rem;
-    grid-template-columns: repeat(3,minmax(0,1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.controlGroupLabel {
+    font-size: 1rem;
+    line-height: .8rem;
 }
 
 .btn-Keypad {
@@ -101,7 +108,6 @@
     font-size: 1.3rem;
     align-self: center;
 
-
     &:disabled {
         background: #9CA3AF;
         cursor: no-drop;
@@ -111,7 +117,6 @@
         background: #5191cc;
     }
 }
-
 
 .btn-up {
     clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 100%, 50% 75%, 0 100%);
@@ -129,38 +134,42 @@
     clip-path: polygon(100% 0, 75% 50%, 100% 100%, 25% 100%, 0 50%, 25% 0);
 }
 
-.btn-up-left{
-    clip-path: url(#bl);
+.btn-up-left {
+    clip-path: url('#bl');
     width: 60%;
     height: 60%;
     margin-top: 40% !important;
     margin-left: 40% !important;
 }
-.btn-up-right{
-    clip-path: url(#br);
+
+.btn-up-right {
+    clip-path: url('#br');
     width: 60%;
     height: 60%;
     margin-top: 40% !important;
     margin-right: 40% !important;
 }
-.btn-down-left{
-    clip-path: url(#fl);
+
+.btn-down-left {
+    clip-path: url('#fl');
     width: 60%;
     height: 60%;
     margin-left: 40% !important;
     margin-bottom: 40% !important;
 }
-.btn-down-right{
-    clip-path: url(#fr);
+
+.btn-down-right {
+    clip-path: url('#fr');
     width: 60%;
     height: 60%;
-    margin-right 40% !important;
+    margin-right: 40% !important;
     margin-bottom: 40% !important;
 }
 
 .z-top-transform {
     transform: translate(40%, 50%);
 }
+
 .z-bottom-transform {
     transform: translate(40%, -50%);
 }
@@ -169,18 +178,18 @@
     display: none;
 }
 
-.keys-body{
+.keys-body {
     display: flex;
     flex-direction: row;
     width: 100%;
-    justify-content: space-around
+    justify-content: space-around;
     height: 100%;
-    align-self center;
-    align-items center;
+    align-self: center;
+    align-items: center;
 }
 
-.xy-keys{
-    width: 50%;
+.xy-keys {
+    width: 58%;
     height: max-content;
     display: grid;
     grid-gap: 5px;
@@ -194,17 +203,17 @@
     display: block;
 }
 
-.zKeys{
+.zKeys {
     width: 13.4%;
     display: grid;
     grid-gap: 10px;
     grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-.preset-controls{
-    width: 25%;
+.preset-controls {
+    width: 22%;
     margin-left: 5%;
-    align-self center;
+    align-self: center;
 
     button + button {
         margin-left: 0;
@@ -215,18 +224,26 @@
     color: #dc2626;
     border: none;
     outline: none;
-    font-size: 2rem;
     display: flex;
-    align-items center;
-    justify-content center;
+    align-items: center;
+    justify-content: center;
     background: none;
     border-radius: 9999px;
     background: #cccccc;
 
+    i {
+        font-size: 3rem !important;
+    }
+
     &:disabled {
         cursor: no-drop;
-        color: #9ca3af
+        color: #9ca3af;
     }
+}
+
+.jog-active {
+    background: #dc2626;
+    color: #FFFFFF;
 }
 
 .hideSVG {

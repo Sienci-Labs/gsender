@@ -9,3 +9,4 @@ package-lock.json
 /releases
 .idea
 /.vscode
+electron-builder.yml

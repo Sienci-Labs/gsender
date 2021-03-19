@@ -74,10 +74,21 @@ class NumberInput extends PureComponent {
     setValue(e) {
         const { max, min } = this.state;
         const { changeHandler } = this.props;
-        let value = Number(e.target.value);
-        if (value > max) {
+        let value = e.target.value;
+
+        const regex = /[^0-9.]/g;
+
+        let dotOccurance = 0;
+        [...value].forEach(char => char === '.' && dotOccurance++);
+        // Ignore non digit and non . values
+        // eslint-disable-next-line no-restricted-globals
+        if (regex.test(value) || dotOccurance > 1) {
+            return;
+        }
+
+        if (Number(value) > max) {
             value = max;
-        } else if (value < min) {
+        } else if (Number(value) < min) {
             value = min;
         }
 
@@ -98,7 +109,7 @@ class NumberInput extends PureComponent {
         return (
             <div className={styles.inputWrapper}>
                 <button type="button" className={styles.stepButton} onClick={(e) => this.decrementValue(e)}>
-                    <i className="fa fa-minus fa-fw" style={{ verticalAlign: 'super', fontSize: 'clamp(10px, 1vw, 14px)' }} />
+                    <i className="fa fa-minus fa-fw" style={{ verticalAlign: 'super', margin: 'auto 0.5rem', fontSize: 'clamp(10px, 1vw, 14px)' }} />
                 </button>
                 <input
                     value={value}
@@ -107,7 +118,7 @@ class NumberInput extends PureComponent {
                     onChange={(e) => this.setValue(e)}
                 />
                 <button type="button" className={styles.stepButton} onClick={(e) => this.incrementValue(e)}>
-                    <i className="fa fa-plus fa-fw" style={{ verticalAlign: 'super', fontSize: 'clamp(10px, 1vw, 14px)' }} />
+                    <i className="fa fa-plus fa-fw" style={{ verticalAlign: 'super', margin: 'auto 0.5rem', fontSize: 'clamp(10px, 1vw, 14px)' }} />
                 </button>
             </div>
 

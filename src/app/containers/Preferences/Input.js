@@ -13,8 +13,8 @@ const Input = ({ value, label, units, onChange, additionalProps, className }) =>
                     {...additionalProps}
                     value={value}
                     onChange={onChange}
-                    className="form-control"
-                    style={{ zIndex: '0', fontSize: '20px', textAlign: 'center', color: '#3e85c7' }}
+                    className={classNames('form-control', styles.inputText)}
+                    style={{ zIndex: '0', textAlign: 'center', color: '#3e85c7' }}
                 />
                 {units && <span className="input-group-addon">{units}</span>}
             </div>

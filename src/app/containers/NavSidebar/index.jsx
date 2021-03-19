@@ -60,6 +60,11 @@ class NavSidebar extends PureComponent {
                     label="Wizard"
                     disabled={this.props.wizardDisabled}
                 />
+                <NavSidebarLink
+                    icon="fa-share-square"
+                    label=""
+                    onClick={() => window.open('https://sienci.com/gsender-documentation/', '_blank')}
+                />
                 <NavSidebarLink url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa-cog" label="" />
                 {
                     state.modal.name === MODAL_FIRMWARE && <WizardModal state={state} modalClose={actions.closeModal} />

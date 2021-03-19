@@ -1,7 +1,7 @@
 import _get from 'lodash/get';
 import _each from 'lodash/each';
 import _isEqual from 'lodash/isEqual';
-import _tail from 'lodash/tail';
+//import _tail from 'lodash/tail';
 import _throttle from 'lodash/throttle';
 import colornames from 'colornames';
 import pubsub from 'pubsub-js';
@@ -47,7 +47,7 @@ const PERSPECTIVE_FAR = 2000;
 const ORTHOGRAPHIC_FOV = 35;
 const ORTHOGRAPHIC_NEAR = 0.001;
 const ORTHOGRAPHIC_FAR = 2000;
-const CAMERA_DISTANCE = 300; // Move the camera out a bit from the origin (0, 0, 0)
+const CAMERA_DISTANCE = 400; // Move the camera out a bit from the origin (0, 0, 0)
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 
@@ -120,7 +120,7 @@ class Visualizer extends Component {
         this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
         this.limits.name = 'Limits';
         this.limits.visible = state.objects.limits.visible;
-        this.group.add(this.limits);
+        // this.group.add(this.limits);
 
         this.updateLimitsPosition();
 
@@ -128,19 +128,22 @@ class Visualizer extends Component {
     };
 
     renderAnimationLoop = () => {
-        if (this.isAgitated) {
-            // Call the render() function up to 60 times per second (i.e. 60fps)
-            requestAnimationFrame(this.renderAnimationLoop);
+        const showAnimation = this.showAnimation();
+        if (showAnimation) {
+            if (this.isAgitated) {
+                // Call the render() function up to 60 times per second (i.e. 60fps)
+                requestAnimationFrame(this.renderAnimationLoop);
 
-            const rpm = 600;
-            this.rotateCuttingTool(rpm);
-        } else {
-            const rpm = 0;
-            this.rotateCuttingTool(rpm);
+                const rpm = 600;
+                this.rotateCuttingTool(rpm);
+            } else {
+                const rpm = 0;
+                this.rotateCuttingTool(rpm);
+            }
+
+            // Update the scene
+            this.updateScene();
         }
-
-        // Update the scene
-        this.updateScene();
     };
 
     constructor(props) {
@@ -198,11 +201,11 @@ class Visualizer extends Component {
         if (prevState.projection !== state.projection) {
             if (state.projection === 'orthographic') {
                 this.camera.toOrthographic();
-                this.camera.setZoom(1);
+                this.camera.setZoom(1.3);
                 this.camera.setFov(ORTHOGRAPHIC_FOV);
             } else {
                 this.camera.toPerspective();
-                this.camera.setZoom(1);
+                this.camera.setZoom(1.3);
                 this.camera.setFov(PERSPECTIVE_FOV);
             }
             if (this.viewport) {
@@ -264,9 +267,10 @@ class Visualizer extends Component {
         }
 
         // Whether to show cutting tool or cutting pointer
-        if (this.cuttingTool && this.cuttingPointer && (this.cuttingTool.visible !== state.objects.cuttingTool.visible)) {
-            this.cuttingTool.visible = state.objects.cuttingTool.visible;
-            this.cuttingPointer.visible = !state.objects.cuttingTool.visible;
+        if (this.cuttingTool && this.cuttingPointer && (state.liteMode) ? (this.cuttingTool.visibleLite !== state.objects.cuttingTool.visibleLite) : (this.cuttingTool.visible !== state.objects.cuttingTool.visible)) {
+            const { liteMode } = state;
+            this.cuttingTool.visible = liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible;
+            this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
             needUpdateScene = true;
         }
 
@@ -337,10 +341,79 @@ class Visualizer extends Component {
         this.clearScene();
     }
 
+    updateGridChildColor(name, color) {
+        const group = this.group.getObjectByName(name);
+        const gridLines = group.getObjectByName('GridLine');
+        gridLines.children.forEach((child) => {
+            child.material.color = color;
+        });
+    }
+
+    rerenderGCode(colors) {
+        const { actions, state } = this.props;
+        const { gcode } = state;
+        const group = this.group.getObjectByName('Visualizer');
+        if (group) {
+            this.group.remove(group);
+            actions.loadGCode('Visualizer', gcode.content);
+        }
+    }
+
+    removeSceneGroup() {
+        this.group.remove(...this.group.children);
+    }
+
+    showAnimation = () => {
+        const state = { ...this.props.state };
+        const { liteMode, objects } = state;
+        if (liteMode && objects.cuttingToolAnimation.visibleLite) {
+            return true;
+        } else if (!liteMode && objects.cuttingToolAnimation.visible) {
+            return true;
+        }
+        return false;
+    }
+
+    redrawGrids() {
+        const { objects, units } = this.props.state;
+        const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
+        const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
+
+        this.group.remove(impGroup);
+        this.group.remove(metGroup);
+        {
+            const visible = objects.coordinateSystem.visible;
+            const imperialCoordinateSystem = this.createCoordinateSystem(IMPERIAL_UNITS);
+            imperialCoordinateSystem.name = 'ImperialCoordinateSystem';
+            imperialCoordinateSystem.visible = visible && (units === IMPERIAL_UNITS);
+            this.group.add(imperialCoordinateSystem);
+        }
+
+        { // Metric Coordinate System
+            const visible = objects.coordinateSystem.visible;
+            const metricCoordinateSystem = this.createCoordinateSystem(METRIC_UNITS);
+            metricCoordinateSystem.name = 'MetricCoordinateSystem';
+            metricCoordinateSystem.visible = visible && (units === METRIC_UNITS);
+            this.group.add(metricCoordinateSystem);
+        }
+    }
+    recolorScene() {
+        const { currentTheme } = this.props.state;
+        const { backgroundColor } = currentTheme;
+        // Handle Background color
+        this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
+        this.redrawGrids();
+        this.rerenderGCode(currentTheme);
+    }
+
     subscribe() {
         const tokens = [
             pubsub.subscribe('resize', (msg) => {
                 this.resizeRenderer();
+            }),
+            pubsub.subscribe('visualizer:redraw', () => {
+                this.recolorScene();
+                this.updateScene({ forceUpdate: true });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -500,8 +573,6 @@ class Visualizer extends Component {
                 gridSpacing,
                 gridColor, // center line
                 gridColor // grid
-                // colornames('blue'), // center line
-                // colornames('gray 44') // grid
             );
             _each(gridLine.children, (o) => {
                 o.material.opacity = 0.15;
@@ -739,7 +810,7 @@ class Visualizer extends Component {
 
                 this.cuttingTool = object;
                 this.cuttingTool.name = 'CuttingTool';
-                this.cuttingTool.visible = objects.cuttingTool.visible;
+                this.cuttingTool.visible = state.liteMode ? objects.cuttingTool.visibleLite : objects.cuttingTool.visible;
 
                 this.group.add(this.cuttingTool);
 
@@ -754,7 +825,7 @@ class Visualizer extends Component {
                 diameter: 2
             });
             this.cuttingPointer.name = 'CuttingPointer';
-            this.cuttingPointer.visible = !objects.cuttingTool.visible;
+            this.cuttingPointer.visible = (state.liteMode) ? !objects.cuttingTool.visibleLite : !objects.cuttingTool.visible;
             this.group.add(this.cuttingPointer);
         }
 
@@ -764,7 +835,7 @@ class Visualizer extends Component {
             this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
             this.limits.name = 'Limits';
             this.limits.visible = objects.limits.visible;
-            this.group.add(this.limits);
+            // this.group.add(this.limits);
 
             this.updateLimitsPosition();
         }
@@ -785,7 +856,7 @@ class Visualizer extends Component {
 
     clearScene() {
         // to iterrate over all children (except the first) in a scene
-        const objsToRemove = _tail(this.scene.children);
+        const objsToRemove = this.scene.children;
         _each(objsToRemove, (obj) => {
             this.scene.remove(obj);
         });
@@ -855,7 +926,7 @@ class Visualizer extends Component {
 
         controls.rotateSpeed = 1.0;
         controls.zoomSpeed = 1.2;
-        controls.panSpeed = 0.8;
+        controls.panSpeed = 0.4;
         controls.noZoom = false;
         controls.noPan = false;
 

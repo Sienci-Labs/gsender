@@ -125,7 +125,7 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, actions, axes, isJogging } = this.props;
+        const { canClick, actions, axes, activeState } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -195,7 +195,7 @@ class Keypad extends PureComponent {
                             <KeypadText>X</KeypadText>
                             <KeypadDirectionText>-</KeypadDirectionText>
                         </JogControl>
-                        <JogCancel disabled={!isJogging} onClick={() => actions.cancelJog()} />
+                        <JogCancel disabled={!canClick} activeState={activeState} onClick={() => actions.cancelJog()} />
                         <JogControl
                             className={styles.btnRight}
                             jog={() => actions.jog({ X: xyDistance, F: feedrate })}

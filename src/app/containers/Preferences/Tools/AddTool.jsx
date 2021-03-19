@@ -1,6 +1,6 @@
 import React from 'react';
-import classnames from 'classnames';
-import { RadioGroup, RadioButton } from 'app/components/Radio';
+// import classnames from 'classnames';
+// import { RadioGroup, RadioButton } from 'app/components/Radio';
 
 // import Fieldset from '../FieldSet';
 import Input from '../Input';
@@ -30,19 +30,6 @@ const AddTool = ({ actions, state }) => {
                 onChange={toolActions.setImperialDiameter}
             />
 
-            <div className={classnames(styles.flex, styles['justify-content-space-between'])}>
-                <label htmlFor="bitType">Tool Type</label>
-
-                <RadioGroup
-                    depth={2}
-                    onChange={(value, event) => toolActions.setToolType(value)}
-                >
-                    <div>
-                        <RadioButton label="End Mill" value="end mill" />
-                        <RadioButton label="V Bit" value="v bit" />
-                    </div>
-                </RadioGroup>
-            </div>
 
             <button
                 className={styles.addTool}
@@ -52,38 +39,6 @@ const AddTool = ({ actions, state }) => {
             >
                 Add Tool
             </button>
-            {/* </Fieldset> */}
-
-            {/* <div className="form-group">
-                <label htmlFor="metricDiameter">Metric Diameter (mm)</label>
-                <input
-                    type="number"
-                    step=".01"
-                    className="form-control"
-                    id="metricDiameter"
-                    value={tool.metricDiameter}
-                    onChange={toolActions.setMetricDiameter}
-                />
-            </div>
-            <div className="form-group">
-                <label htmlFor="metricDiameter">Imperial Diameter (in)</label>
-                <input
-                    type="number"
-                    step=".01"
-                    className="form-control"
-                    id="imperialDiameter"
-                    value={tool.imperialDiameter}
-                    onChange={toolActions.setImperialDiameter}
-                />
-            </div> */}
-
-            {/* <div className="form-group">
-                <label htmlFor="bitType">Tool Type</label>
-                <select id="bitType" className="form-control" onChange={toolActions.setToolType}>
-                    <option value="end mill">End Mill</option>
-                    <option value="v bit">V Bit</option>
-                </select>
-            </div> */}
         </div>
     );
 };

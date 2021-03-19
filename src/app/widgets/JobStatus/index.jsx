@@ -1,6 +1,7 @@
 
 import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
+import store from 'app/store';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
@@ -238,7 +239,7 @@ class JobStatusWidget extends PureComponent {
             },
 
             port: controller.port,
-            units: METRIC_UNITS,
+            units: store.get('workspace.units'),
 
             controller: {
                 type: controller.type,
@@ -309,12 +310,22 @@ class JobStatusWidget extends PureComponent {
                 });
             }),
             pubsub.subscribe('gcode:fileInfo', (msg, file) => {
+                if (!file) {
+                    this.setState(this.getInitialState());
+                    return;
+                }
+
                 this.setState({
                     fileName: file.name,
                     fileSize: file.size,
                     total: file.total,
                     toolsAmount: file.toolSet.size,
                     toolsUsed: file.toolSet,
+                });
+            }),
+            pubsub.subscribe('units:change', (msg, units) => {
+                this.setState({
+                    units: units
                 });
             })
         ];

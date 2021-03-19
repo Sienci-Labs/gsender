@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "0.6.1",
+  "version": "0.5.4",
   "description": "Electron sender for GRBL based CNC machines",
   "author": "Sienci Labs",
   "main": "./dist/cncjs/server-cli.js",
@@ -19,7 +19,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=6"
+    "node": ">=10"
   },
   "preferGlobal": true,
   "scripts": {
@@ -67,7 +67,8 @@
     "stylint": "stylint src/app",
     "test": "tap test/*.js --no-timeout --node-arg=--require --node-arg=@babel/register --node-arg=--require --node-arg=@babel/polyfill",
     "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls",
-    "postinstall": "opencollective postinstall"
+    "postinstall": "opencollective postinstall",
+    "deploy-release": "electron-builder build --ia32 --x64 --win --publish always"
   },
   "build": {
     "appId": "org.sienci",
@@ -79,7 +80,9 @@
       "output": "output",
       "app": "dist/cncjs"
     },
-    "publish": [],
+    "publish": {
+      "provider": "github"
+    },
     "mac": {
       "category": "public.app-category.productivity",
       "target": [
@@ -163,6 +166,7 @@
     "@trendmicro/react-toggle-switch": "~0.5.7",
     "@trendmicro/react-tooltip": "~0.6.0",
     "@trendmicro/react-validation": "~0.1.0",
+    "@types/react-transition-group": "^4.4.1",
     "avrgirl-arduino": "^5.0.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.18.3",
@@ -184,8 +188,6 @@
     "deep-keys": "~0.5.0",
     "detect-browser": "~4.4.0",
     "electron-store": "~3.2.0",
-    "electron-titlebar": "0.0.3",
-    "electron-titlebar-windows": "^3.0.0",
     "electron-updater": "^4.3.8",
     "ensure-array": "~1.0.0",
     "errorhandler": "~1.5.0",
