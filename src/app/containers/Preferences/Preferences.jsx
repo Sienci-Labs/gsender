@@ -2,6 +2,7 @@ import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
 import controller from 'app/lib/controller';
+import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import GeneralSettings from './GeneralSettings';
 import Keybindings from './Keybindings';
 import ProbeSettings from './Probe/ProbeSettings';
@@ -12,9 +13,9 @@ import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 
-
 class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
+
     visualizerConfig = new WidgetConfig('visualizer');
 
     state = this.getInitialState();
@@ -461,6 +462,20 @@ class PreferencesPage extends PureComponent {
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
 
         controller.command('settings:updated', this.state);
+
+        if (prevState.selectedMenu !== this.state.selectedMenu) {
+            return;
+        }
+
+        pubsub.publish('toast:removeAll');
+        setTimeout(() => {
+            pubsub.publish('toast:removeAll');
+            Toaster.pop({
+                msg: 'Settings Updated',
+                type: TOASTER_SUCCESS,
+                duration: 3000
+            });
+        }, 1000);
     }
 
     toolSortCompare(a, b) {
