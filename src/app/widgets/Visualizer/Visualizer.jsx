@@ -120,7 +120,7 @@ class Visualizer extends Component {
         this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
         this.limits.name = 'Limits';
         this.limits.visible = state.objects.limits.visible;
-        this.group.add(this.limits);
+        // this.group.add(this.limits);
 
         this.updateLimitsPosition();
 
@@ -816,7 +816,7 @@ class Visualizer extends Component {
             this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
             this.limits.name = 'Limits';
             this.limits.visible = objects.limits.visible;
-            this.group.add(this.limits);
+            // this.group.add(this.limits);
 
             this.updateLimitsPosition();
         }
