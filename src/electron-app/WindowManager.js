@@ -1,7 +1,13 @@
 /* eslint import/no-unresolved: 0 */
 import { app, BrowserWindow, shell } from 'electron';
 //import AutoUpdater from './AutoUpdater';
+<<<<<<< HEAD
 
+=======
+// const customTitlebar = require('custom-electron-titlebar');
+// import customTitlebar from 'custom-electron-titlebar';
+import path from 'path';
+>>>>>>> origin/toaster
 
 const browserWindowOptions = {
     minWidth: 1280,
@@ -62,7 +68,11 @@ class WindowManager {
             ...options,
             ...browserWindowOptions,
             titleBarStyle: 'hidden',
-            show: false
+            show: false,
+            webPreferences: {
+                nodeIntegration: true,
+                preload: path.join(__dirname, 'preload.js')
+            }
         });
 
         const loadingWindow = new BrowserWindow({
@@ -79,7 +89,9 @@ class WindowManager {
 
         loadingWindow.loadFile('index.html');
         const webContents = window.webContents;
-
+        window.webContents.on('did-finish-load', () => {
+            window.setTitle(options.title);
+        });
         window.on('closed', (event) => {
             const index = this.windows.indexOf(event.sender);
             console.assert(index >= 0);

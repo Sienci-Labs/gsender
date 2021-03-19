@@ -796,7 +796,6 @@ class ProbeWidget extends PureComponent {
             }),
             pubsub.subscribe('probe:updated', (msg) => {
                 const touchplate = store.get('workspace[probeProfile]', {});
-                console.log(touchplate);
                 this.setState({
                     touchplate: touchplate
                 }, () => {

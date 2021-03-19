@@ -22,6 +22,7 @@ import styles from './index.styl';
 import JogControl from './components/JogControl';
 import JogCancel from './components/JogCancel';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
+import { Toaster } from '../../lib/toaster/ToasterLib';
 
 const KeypadText = styled.span`
     position: relative;
@@ -125,7 +126,7 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, actions, axes, isJogging } = this.props;
+        const { canClick, actions, axes, activeState } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -195,7 +196,7 @@ class Keypad extends PureComponent {
                             <KeypadText>X</KeypadText>
                             <KeypadDirectionText>-</KeypadDirectionText>
                         </JogControl>
-                        <JogCancel disabled={!isJogging} onClick={() => actions.cancelJog()} />
+                        <JogCancel disabled={!canClick} activeState={activeState} onClick={() => actions.cancelJog()} />
                         <JogControl
                             className={styles.btnRight}
                             jog={() => actions.jog({ X: xyDistance, F: feedrate })}
@@ -264,6 +265,11 @@ class Keypad extends PureComponent {
                         <FunctionButton
                             disabled={!canClick}
                             onClick={() => {
+                                Toaster.pop({
+                                    msg: Date.now(),
+                                    type: 'success',
+                                    duration: 5000
+                                });
                                 actions.setJogFromPreset('precise');
                             }}
                         >

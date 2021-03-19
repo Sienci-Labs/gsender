@@ -29,7 +29,7 @@ class UpdateAvailableAlert extends PureComponent {
                 this.setState({
                     shown: true
                 });
-            })
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -51,6 +51,7 @@ class UpdateAvailableAlert extends PureComponent {
 
     render() {
         const { shown } = this.state;
+        const { restartHandler } = this.props;
         const actions = { ...this.actions };
         return (
             <div className={cx(styles.updateWrapper, { [styles.hideModal]: !shown })}>
@@ -61,7 +62,7 @@ class UpdateAvailableAlert extends PureComponent {
                     <div>
                         Update downloaded and available to install.  Restart now?
                     </div>
-                    <button className={styles.restartButton}>
+                    <button onClick={() => restartHandler()} className={styles.restartButton}>
                         Restart and Install
                     </button>
                 </div>

@@ -51,10 +51,22 @@ const defaultState = {
             }
         },
         probeProfile: {
-            xyThickness: 10,
-            zThickness: 15,
-            plateWidth: 50,
-            plateLength: 50,
+            xyThickness: {
+                mm: 10,
+                in: 0.393
+            },
+            zThickness: {
+                mm: 15,
+                in: 0.590
+            },
+            plateWidth: {
+                mm: 50,
+                in: 1.968
+            },
+            plateLength: {
+                mm: 50,
+                in: 1.968
+            },
             functions: {
                 x: true,
                 y: true,
@@ -317,26 +329,37 @@ const defaultState = {
         },
         visualizer: {
             minimized: false,
-
             // 3D View
+            liteMode: false,
             disabled: false,
+            disabledLite: false,
             projection: 'orthographic', // 'perspective' or 'orthographic'
-            cameraMode: 'pan', // 'pan' or 'rotate'
+            cameraMode: 'pan', // 'pan' or 'rotate',
+            theme: 'light',
             gcode: {
                 displayName: true
             },
             objects: {
                 limits: {
-                    visible: true
+                    visible: true,
                 },
                 coordinateSystem: {
-                    visible: true
+                    visible: true,
                 },
                 gridLineNumbers: {
-                    visible: true
+                    visible: true,
                 },
                 cuttingTool: {
-                    visible: true
+                    visible: true,
+                    visibleLite: true
+                },
+                cuttingToolAnimation: {
+                    visible: true,
+                    visibleLite: true
+                },
+                cutPath: {
+                    visible: true,
+                    visibleLite: true
                 }
             }
         },

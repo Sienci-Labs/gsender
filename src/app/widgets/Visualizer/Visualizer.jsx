@@ -1,7 +1,7 @@
 import _get from 'lodash/get';
 import _each from 'lodash/each';
 import _isEqual from 'lodash/isEqual';
-import _tail from 'lodash/tail';
+//import _tail from 'lodash/tail';
 import _throttle from 'lodash/throttle';
 import colornames from 'colornames';
 import pubsub from 'pubsub-js';
@@ -128,19 +128,22 @@ class Visualizer extends Component {
     };
 
     renderAnimationLoop = () => {
-        if (this.isAgitated) {
-            // Call the render() function up to 60 times per second (i.e. 60fps)
-            requestAnimationFrame(this.renderAnimationLoop);
+        const showAnimation = this.showAnimation();
+        if (showAnimation) {
+            if (this.isAgitated) {
+                // Call the render() function up to 60 times per second (i.e. 60fps)
+                requestAnimationFrame(this.renderAnimationLoop);
 
-            const rpm = 600;
-            this.rotateCuttingTool(rpm);
-        } else {
-            const rpm = 0;
-            this.rotateCuttingTool(rpm);
+                const rpm = 600;
+                this.rotateCuttingTool(rpm);
+            } else {
+                const rpm = 0;
+                this.rotateCuttingTool(rpm);
+            }
+
+            // Update the scene
+            this.updateScene();
         }
-
-        // Update the scene
-        this.updateScene();
     };
 
     constructor(props) {
@@ -264,9 +267,10 @@ class Visualizer extends Component {
         }
 
         // Whether to show cutting tool or cutting pointer
-        if (this.cuttingTool && this.cuttingPointer && (this.cuttingTool.visible !== state.objects.cuttingTool.visible)) {
-            this.cuttingTool.visible = state.objects.cuttingTool.visible;
-            this.cuttingPointer.visible = !state.objects.cuttingTool.visible;
+        if (this.cuttingTool && this.cuttingPointer && (state.liteMode) ? (this.cuttingTool.visibleLite !== state.objects.cuttingTool.visibleLite) : (this.cuttingTool.visible !== state.objects.cuttingTool.visible)) {
+            const { liteMode } = state;
+            this.cuttingTool.visible = liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible;
+            this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
             needUpdateScene = true;
         }
 
@@ -337,10 +341,58 @@ class Visualizer extends Component {
         this.clearScene();
     }
 
+    updateGridChildColor(name, color) {
+        const group = this.group.getObjectByName(name);
+        const gridLines = group.getObjectByName('GridLine');
+        gridLines.children.forEach((child) => {
+            child.material.color = color;
+        });
+    }
+
+    rerenderGCode(colors) {
+        const group = this.group.getObjectByName('Visualizer');
+        if (group) {
+            this.group.remove(group);
+            //this.render(colors);
+        }
+    }
+
+    removeSceneGroup() {
+        this.group.remove(...this.group.children);
+    }
+
+    showAnimation = () => {
+        const state = { ...this.props.state };
+        const { liteMode, objects } = state;
+        if (liteMode && objects.cuttingToolAnimation.visibleLite) {
+            return true;
+        } else if (!liteMode && objects.cuttingToolAnimation.visible) {
+            return true;
+        }
+        return false;
+    }
+
+    recolorScene() {
+        const { currentTheme } = this.props.state;
+        const { backgroundColor, gridColor } = currentTheme;
+        // Handle Background color
+        this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
+        // handle imperial gridlines
+        this.updateGridChildColor('ImperialCoordinateSystem', new THREE.Color(gridColor));
+        // handle metric gridlines
+        this.updateGridChildColor('MetricCoordinateSystem', new THREE.Color(gridColor));
+        // handle mesh gridlines
+        this.rerenderGCode(currentTheme);
+    }
+
     subscribe() {
         const tokens = [
             pubsub.subscribe('resize', (msg) => {
                 this.resizeRenderer();
+            }),
+            pubsub.subscribe('visualizer:redraw', () => {
+                this.recolorScene();
+                this.updateScene({ forceUpdate: true });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -739,7 +791,7 @@ class Visualizer extends Component {
 
                 this.cuttingTool = object;
                 this.cuttingTool.name = 'CuttingTool';
-                this.cuttingTool.visible = objects.cuttingTool.visible;
+                this.cuttingTool.visible = state.liteMode ? objects.cuttingTool.visibleLite : objects.cuttingTool.visible;
 
                 this.group.add(this.cuttingTool);
 
@@ -754,7 +806,7 @@ class Visualizer extends Component {
                 diameter: 2
             });
             this.cuttingPointer.name = 'CuttingPointer';
-            this.cuttingPointer.visible = !objects.cuttingTool.visible;
+            this.cuttingPointer.visible = (state.liteMode) ? !objects.cuttingTool.visibleLite : !objects.cuttingTool.visible;
             this.group.add(this.cuttingPointer);
         }
 
@@ -785,7 +837,7 @@ class Visualizer extends Component {
 
     clearScene() {
         // to iterrate over all children (except the first) in a scene
-        const objsToRemove = _tail(this.scene.children);
+        const objsToRemove = this.scene.children;
         _each(objsToRemove, (obj) => {
             this.scene.remove(obj);
         });
@@ -855,7 +907,7 @@ class Visualizer extends Component {
 
         controls.rotateSpeed = 1.0;
         controls.zoomSpeed = 1.2;
-        controls.panSpeed = 0.8;
+        controls.panSpeed = 0.4;
         controls.noZoom = false;
         controls.noPan = false;
 

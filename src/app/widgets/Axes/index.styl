@@ -215,7 +215,6 @@
     color: #dc2626;
     border: none;
     outline: none;
-    font-size: 2rem;
     display: flex;
     align-items center;
     justify-content center;
@@ -223,10 +222,19 @@
     border-radius: 9999px;
     background: #cccccc;
 
+    i {
+        font-size: 3rem !important;
+    }
+
     &:disabled {
         cursor: no-drop;
         color: #9ca3af
     }
+}
+
+.jog-active {
+    background: #dc2626;
+    color: #FFFFFF;
 }
 
 .hideSVG {
