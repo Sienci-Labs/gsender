@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Dropdown, { MenuItem } from 'app/components/Dropdown';
 
 import styles from './index.styl';
+import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 
 /**
  * Toggle Component used to trigger the dropdown
@@ -57,6 +58,10 @@ export default class MacroItem extends Component {
     onMacroRun = () => {
         const { macro, onRun } = this.props;
         onRun(macro);
+        Toaster.pop({
+            msg: `Started running macro '${macro.name}'!`,
+            type: TOASTER_INFO
+        });
         this.setState({ display: 'running' });
 
         setTimeout(() => {
