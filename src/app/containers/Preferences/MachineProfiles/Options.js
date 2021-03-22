@@ -6,7 +6,7 @@ import ensureArray from 'ensure-array';
 import controller from 'app/lib/controller';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import store from 'app/store';
-
+import { Toaster, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
 import styles from '../index.styl';
 import defaultProfiles from './defaultMachineProfiles';
 
@@ -111,12 +111,32 @@ export default class Options extends Component {
         }
 
         this.setState({ machineProfile });
+
+        pubsub.publish('toast:removeAll');
+        setTimeout(() => {
+            pubsub.publish('toast:removeAll');
+            Toaster.pop({
+                msg: 'Settings Updated',
+                type: TOASTER_SUCCESS,
+                duration: 3000
+            });
+        }, 1000);
     };
 
     updateMachineProfilesFromSubscriber = (machineProfiles) => {
         this.setState({
             machineProfiles: ensureArray(machineProfiles)
         });
+
+        pubsub.publish('toast:removeAll');
+        setTimeout(() => {
+            pubsub.publish('toast:removeAll');
+            Toaster.pop({
+                msg: 'Settings Updated',
+                type: TOASTER_SUCCESS,
+                duration: 3000
+            });
+        }, 1000);
     };
 
     subscribe() {

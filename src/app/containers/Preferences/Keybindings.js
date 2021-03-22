@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 
 import store from 'app/store';
+import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 
 import Table from './Keybindings/MainTable';
 import EditArea from './Keybindings/EditArea';
@@ -23,7 +24,6 @@ export default class Keybindings extends Component {
         keybindingsList: store.get('commandKeys', []),
         currentPage: 'Table',
         currentShortcut: {},
-        message: ''
     }
 
     switchPages = (page) => {
@@ -40,6 +40,7 @@ export default class Keybindings extends Component {
      */
     editKeybinding = (shortcut) => {
         const { keybindingsList } = this.state;
+        const { title } = shortcut;
 
         //Replace old keybinding item with new one
         const editedKeybindingsList = keybindingsList.map(keybinding => (keybinding.id === shortcut.id ? shortcut : keybinding));
@@ -47,7 +48,13 @@ export default class Keybindings extends Component {
         store.set('commandKeys', editedKeybindingsList);
         pubsub.publish('keybindingsUpdated');
 
-        this.setState({ currentPage: 'Table', message: 'Shortcut Edited Successfully', keybindingsList: editedKeybindingsList });
+        this.setState({ currentPage: 'Table', keybindingsList: editedKeybindingsList });
+
+        Toaster.pop({
+            msg: `"${title}" Shortcut Updated`,
+            type: TOASTER_SUCCESS,
+            duration: 4000
+        });
     }
 
     // Trigger pubsub for use in Location widget where keybindings are injected
@@ -66,7 +73,7 @@ export default class Keybindings extends Component {
     render() {
         const { handleEdit, switchPages, editKeybinding } = this;
         const { active } = this.props;
-        const { currentPage, currentShortcut, keybindingsList, message } = this.state;
+        const { currentPage, currentShortcut, keybindingsList } = this.state;
 
         return (
             <div
@@ -78,10 +85,20 @@ export default class Keybindings extends Component {
             >
                 <h3 className={styles['settings-title']}>Keybindings</h3>
 
-                { currentPage === 'Table' && <div className={styles['table-wrapper']}><Table data={keybindingsList} onEdit={handleEdit} /></div> }
-                { currentPage === 'Edit' && <EditArea switchPages={switchPages} shortcut={currentShortcut} shortcuts={keybindingsList} edit={editKeybinding} /> }
+                { currentPage === 'Table' && (
+                    <div className={styles['table-wrapper']}>
+                        <Table data={keybindingsList} onEdit={handleEdit} />
+                    </div>
+                )}
 
-                {message && <div className={styles['keybindings-message']}>{message}</div>}
+                { currentPage === 'Edit' && (
+                    <EditArea
+                        switchPages={switchPages}
+                        shortcut={currentShortcut}
+                        shortcuts={keybindingsList}
+                        edit={editKeybinding}
+                    />
+                )}
             </div>
         );
     }
