@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Select from 'react-select';
 import pubsub from 'pubsub-js';
 import _isEqual from 'lodash/isEqual';
+import _ from 'lodash';
 import ensureArray from 'ensure-array';
 import controller from 'app/lib/controller';
 import ToggleSwitch from 'app/components/ToggleSwitch';
@@ -21,6 +22,14 @@ export default class Options extends Component {
         machineProfiles: defaultProfiles.sort((a, b) => a.company.localeCompare(b.company)),
         machineProfile: store.get('workspace.machineProfile')
     };
+
+    showToast = _.throttle(() => {
+        Toaster.pop({
+            msg: 'Settings Updated',
+            type: TOASTER_SUCCESS,
+            duration: 3000
+        });
+    }, 5000, { trailing: false });
 
     pubsubTokens = [];
 
@@ -112,15 +121,7 @@ export default class Options extends Component {
 
         this.setState({ machineProfile });
 
-        pubsub.publish('toast:removeAll');
-        setTimeout(() => {
-            pubsub.publish('toast:removeAll');
-            Toaster.pop({
-                msg: 'Settings Updated',
-                type: TOASTER_SUCCESS,
-                duration: 3000
-            });
-        }, 1000);
+        this.showToast();
     };
 
     updateMachineProfilesFromSubscriber = (machineProfiles) => {
@@ -128,15 +129,7 @@ export default class Options extends Component {
             machineProfiles: ensureArray(machineProfiles)
         });
 
-        pubsub.publish('toast:removeAll');
-        setTimeout(() => {
-            pubsub.publish('toast:removeAll');
-            Toaster.pop({
-                msg: 'Settings Updated',
-                type: TOASTER_SUCCESS,
-                duration: 3000
-            });
-        }, 1000);
+        this.showToast();
     };
 
     subscribe() {
@@ -167,7 +160,6 @@ export default class Options extends Component {
 
     render() {
         const { machineProfile, machineProfiles } = this.state;
-        // const { id, endstops, laser, spindle, coolant, width, depth, height, units } = machineProfile;
         const { id, endstops, spindle, coolant, width, depth, height, units } = machineProfile;
 
         return (
