@@ -6170,6 +6170,11 @@ filename-regex@^2.0.0:
   resolved "https://registry.yarnpkg.com/filename-regex/-/filename-regex-2.0.1.tgz#c1c4b9bee3e09725ddb106b75c1e301fe2f18b26"
   integrity sha1-wcS5vuPglyXdsQa3XB4wH+LxiyY=
 
+filereader@^0.10.3:
+  version "0.10.3"
+  resolved "https://registry.yarnpkg.com/filereader/-/filereader-0.10.3.tgz#c747d4a2cd8f61e5418a7c07fe1257a43f0acdb1"
+  integrity sha1-x0fUos2PYeVBinwH/hJXpD8KzbE=
+
 filesize@^3.6.1:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/filesize/-/filesize-3.6.1.tgz#090bb3ee01b6f801a8a8be99d31710b3422bb317"

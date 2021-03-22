@@ -478,6 +478,7 @@ class ProbeWidget extends PureComponent {
 
         // We handle X and Y differently than Z for calculating offset
         if (axis === 'Z') {
+            console.log(thickness);
             code = code.concat([
                 // Absolute, set Zero for this axis
                 this.gcode('G10', {
@@ -680,18 +681,18 @@ class ProbeWidget extends PureComponent {
 
         if (axesCount === 1) {
             if (axes.z) {
-                (this.generateSingleAxisCommands('Z', touchplate.zThickness, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('Z', touchplate.zThickness.mm, gCodeParams)).map(line => code.push(line));
             }
             if (axes.y) {
-                (this.generateSingleAxisCommands('Y', touchplate.xyThickness, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('Y', touchplate.xyThickness.mm, gCodeParams)).map(line => code.push(line));
             }
             if (axes.x) {
-                (this.generateSingleAxisCommands('X', touchplate.xyThickness, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('X', touchplate.xyThickness.mm, gCodeParams)).map(line => code.push(line));
             }
         }
 
         if (axesCount > 1) {
-            (this.generateMultiAxisCommands(axes, touchplate.xyThickness, touchplate.zThickness, gCodeParams)).map(line => code.push(line));
+            (this.generateMultiAxisCommands(axes, touchplate.xyThickness.mm, touchplate.zThickness.mm, gCodeParams)).map(line => code.push(line));
         }
 
         return code;
