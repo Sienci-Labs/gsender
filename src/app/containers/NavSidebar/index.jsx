@@ -57,7 +57,7 @@ class NavSidebar extends PureComponent {
                     url=""
                     onClick={() => actions.openModal(MODAL_FIRMWARE)}
                     icon="fa-hat-wizard"
-                    label="Wizard"
+                    label="Firmware"
                     disabled={this.props.wizardDisabled}
                 />
                 <NavSidebarLink
