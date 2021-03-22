@@ -199,6 +199,7 @@
     "express": "~4.16.4",
     "express-jwt": "~5.3.1",
     "express-session": "~1.16.1",
+    "filereader": "^0.10.3",
     "final-form": "~4.12.0",
     "font-awesome": "^4.7.0",
     "frac": "~1.1.2",

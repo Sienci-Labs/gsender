@@ -3,6 +3,7 @@ const path = require('path');
 const boolean = require('boolean');
 const dotenv = require('dotenv');
 const TerserPlugin = require('terser-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const babelConfig = require('./babel.config');
@@ -52,6 +53,11 @@ module.exports = {
             'global.NODE_ENV': JSON.stringify('production'),
             'global.PUBLIC_PATH': JSON.stringify(publicPath),
             'global.BUILD_VERSION': JSON.stringify(buildVersion)
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'index.html',
+            template: path.resolve(__dirname, 'index.html'),
+            chunksSortMode: 'dependency' // Sort chunks by dependency
         })
     ],
     module: {
@@ -61,6 +67,17 @@ module.exports = {
                 loader: 'eslint-loader',
                 enforce: 'pre',
                 exclude: /node_modules/
+            },
+            {
+                test: /\.hex$/,
+                loader: 'file-loader'
+            },
+            {
+                test: /\.hex$/,
+                loader: 'file-loader',
+                include: [
+                    path.resolve(__dirname, 'src/server/lib/FirmwareFlashing')
+                ]
             },
             {
                 test: /\.jsx?$/,

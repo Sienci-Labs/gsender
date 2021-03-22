@@ -13,6 +13,7 @@
   "dependencies": {
     "@babel/polyfill": "~7.4.3",
     "@babel/runtime": "~7.4.3",
+    "avrgirl-arduino": "^5.0.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.18.3",
     "chalk": "~2.4.2",

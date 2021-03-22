@@ -1,132 +1,154 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unneeded-ternary */
-import React from 'react';
-import classNames from 'classnames';
-import styles from '../index.styl';
-import AvrgirlArduino from './avrgirl-arduino';
-// import ArduinoUno from './images/ArduinoUno.svg';
-// import gear from './images/gear4.svg';
+/* eslint-disable react/jsx-closing-bracket-location */
+/* eslint-disable new-cap */
+/* eslint-disable import/no-useless-path-segments */
+import React, { PureComponent } from 'react';
+import controller from 'app/lib/controller';
+import PropTypes from 'prop-types';
+import { Toaster } from '../../../lib/toaster/ToasterLib';
+import ArduinoUno from '../FirmwareFlashing/images/ArduinoUno.svg';
+import styles from './index.styl';
+import Fieldset from '../../../containers/Preferences/FieldSet';
+import Loading from '../../../components/Loader';
+import WarningModal from './WarningModal';
 
-const FirmwareFlashing = ({ active }) => {
-    let getInitialState = () => {
-        return {
-            fileName: '',
-            upLoading: false
-        };
+
+class FirmwareFlashing extends PureComponent {
+    static propTypes = {
+        modalClose: PropTypes.func
     };
 
-    let state = getInitialState();
+    state = this.getInitialState();
 
-    const boardChoices = [
-        'uno',
+    boardChoices = [
+        `Arduino Uno on port: ${this.state.port}`
     ];
 
-    const fileInput = 'null';
-    // const [uploading, updateUploading] = useState(false);
+    board = this.boardChoices[0];
 
-    const handleSubmit = e => {
-        e.preventDefault();
-        // updateUploading(true);
-        // setState({ upLoading: true });
-
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(fileInput.current.files[0]);
-
-        reader.onload = event => {
-            const filecontents = event.target.result;
-
-            const avrgirl = new AvrgirlArduino({
-                board: boardChoices[0],
-                debug: true
+    controllerEvents = {
+        'message': (boardinfo) => {
+            this.setState({ currentlyFlashing: false });
+            this.setState({ finishedMessage: 'Flashing completed successfully!' });
+            this.props.modalClose();
+            Toaster.pop({
+                msg: (this.state.finishedMessage),
+                type: 'TOASTER_INFO',
             });
-
-            avrgirl.flash(filecontents, error => {
-                if (error) {
-                    console.error(error);
-                } else {
-                    console.info('flash successful');
-                }
-                // updateUploading(false);
+        },
+        'error': (error) => {
+            console.log(error);
+            this.setState({ currentlyFlashing: false });
+            this.setState({ finishedMessage: 'Error flashing board...' });
+            Toaster.pop({
+                msg: (this.state.finishedMessage),
+                type: 'TOASTER_WARNING',
             });
+        },
+    }
+
+    componentDidMount() {
+        this.addControllerEvents();
+    }
+
+    componentWillUnmount() {
+        this.removeControllerEvents();
+    }
+
+    addControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.addListener(eventName, callback);
+        });
+    }
+
+    removeControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.removeListener(eventName, callback);
+        });
+    }
+
+
+    actions = {
+        startFlash: (port) => {
+            controller.command('flash:start', port);
+            this.setState({ currentlyFlashing: true });
+        }
+    }
+
+    getInitialState() {
+        return {
+            currentlyFlashing: false,
+            port: controller.port,
+            alertMessage: '',
+            warning: false,
+            boardOptions: '',
+            finishedMessage: ''
         };
-    };
+    }
 
-    const BoardOptions = boardChoices.map((board, i) => <option value={board} key={i}>{board}</option>);
+    handleFlashing=() => {
+        this.setState({ warning: true });
+    }
 
-    return (
-        <div className={classNames(
-            styles.hidden,
-            styles.header,
-            { [styles.visible]: active }
-        )}
-        >
-            <h3>
-                Firmware Flashing
-            </h3>
-            <div className="main">
-                <div className="wrapper">
-                    <div className="bot">
-                        <p>Choose a program to upload to your arduino board</p>
+    updateBoard=(event) => {
+        this.setState({ board: event });
+    }
 
-                        <form id="uploadForm" onSubmit={handleSubmit}>
-                            <label>
-                                Board:
-                                <select
-                                    id="boardType"
-                                    value={boardChoices[0]}
-                                // onChange={event => updateBoard(event.target.value)}
-                                >
-                                    {BoardOptions}
-                                </select>
-                            </label>
+    handleCloseWarning=() => {
+        this.setState({ warning: false });
+    }
 
-                            <label>
-                                Program:
-                                <div className="fileButtonWrapper">
-                                    <button
-                                        id="fileButton"
-                                        type="button"
-                                        aria-controls="fileInput"
-                                        onClick={() => fileInput.current.click()}
-                                    >
-                                        Choose file
-                                    </button>
-                                    <input
-                                        id="fileInput"
-                                        tabIndex="-1"
-                                        type="file"
-                                    // ref={fileInput}
-                                    // onChange={() => updateFileName(fileInput.current.files[0].name)
-                                    // }
-                                    />
-                                    <span id="fileName">
-                                        {state.fileName ? state.fileName : 'no file chosen'}
-                                    </span>
-                                </div>
-                            </label>
+    flashingStart=() => {
+        this.setState({ currentlyFlashing: true });
+    }
 
-                            <button type="submit" id="uploadBtn">
-                                Upload!
+
+    BoardOptions = this.boardChoices.map((board, i) => <option value={board} key={i}>{board}</option>)
+
+    render = () => {
+        return (
+            <div className={styles.firmwarewrapper}>
+                { this.state.warning && (
+                    <WarningModal
+                        handleCloseWarning={this.handleCloseWarning}
+                        boardType={this.boardChoices}
+                        flashingStart={this.flashingStart}
+                        port={this.state.port}
+                    />
+                )}
+                <Fieldset legend="Firmware Flashing">
+                    <h3 className={styles.iteminfo}>You can use this wizard to flash Grbl Firmware onto compatible Arduino Uno boards only.</h3>
+                    <h3 className={styles.iteminfo}>Use with care, or when instructed by Support...</h3>
+                    <div>
+                        <label>
+                                    Board:
+                            <select
+                                className={styles['flashing-options-select']}
+                                id="boardType"
+                                value={this.board}
+                                onChange={event => this.updateBoard(event.target.value)}
+                            >
+                                {this.BoardOptions}
+                            </select>
+                        </label>
+                        <div className={styles.wizardform}>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    this.handleFlashing();
+                                }}
+                            >Begin
                             </button>
-                        </form>
+                        </div>
+                        {this.state.currentlyFlashing ? <Loading size="lg" overlay={true} /> : ''}
+                        <img src={ArduinoUno} className={styles.board} alt="arduino uno" />
                     </div>
-
-                    <div className="board">
-                        {/* <img src={ArduinoUno} alt="arduino board" /> */}
-                    </div>
-                    <div id="pipe" />
-                    <div id="progress" />
-                    <div id="gear">
-                        {/* <img
-                            src={gear}
-                            alt="gear icon"
-                            // className={uploading ? 'spinning' : null}
-                        /> */}
-                    </div>
-                </div>
+                    <p>For more info please visit: <a href="https://sienci.com/dmx-longmill/grbl-firmware/">Sienci.com</a></p>
+                </Fieldset>
             </div>
-        </div>
-    );
-};
+        );
+    }
+}
 
 export default FirmwareFlashing;

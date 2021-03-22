@@ -36,6 +36,7 @@ import {
     GRBL_SETTINGS
 } from './constants';
 import { METRIC_UNITS } from '../../../app/constants';
+import FlashingFirmware from '../../lib/FirmwareFlashing/firmwareflashing';
 
 
 // % commands
@@ -510,23 +511,6 @@ class GrblController {
                         this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
                     }
                 }
-
-                // this.emit('serialport:read', `> ${line.trim()} (line=${received + 1})`);
-                // if (error) {
-                //     // Grbl v1.1
-                //     this.emit('serialport:read', `error:${code} (${error.message})`);
-
-                //     if (pauseError) {
-                //         this.workflow.pause({ err: `error:${code} (${error.message})` });
-                //     }
-                // } else {
-                //     // Grbl v0.9
-                //     this.emit('serialport:read', res.raw);
-
-                //     if (pauseError) {
-                //         this.workflow.pause({ err: res.raw });
-                //     }
-                // }
 
                 this.sender.ack();
                 this.sender.next();
@@ -1069,6 +1053,20 @@ class GrblController {
 
     command(cmd, ...args) {
         const handler = {
+            'flash:start': () => {
+                let [port = 'COM3'] = args;
+                this.close(() => {
+                    FlashingFirmware(port);
+                });
+            },
+            'flashing:success': (data) => {
+                this.emit('message', data);
+            },
+            'flashing:failed': (data) => {
+                this.emit('message', data);
+                log.debug('CALLED ERROR');
+                console.log('error grblcontroller');
+            },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;
                 if (typeof context === 'function') {

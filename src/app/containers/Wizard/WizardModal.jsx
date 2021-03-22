@@ -1,7 +1,7 @@
 import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-// import FirmwareFlashing from './FirmwareFlashing/FirmwareFlashing';
+import FirmwareFlashing from './FirmwareFlashing/FirmwareFlashing';
 import FirmwareSettings from './FirmwareSettings/FirmwareSettings';
 import styles from './index.styl';
 
@@ -23,11 +23,11 @@ class WizardModal extends PureComponent {
                     label: 'Firmware Settings',
                     component: FirmwareSettings
                 },
-                // {
-                //     id: 2,
-                //     label: 'Firmware Flashing',
-                //     component: FirmwareFlashing
-                // },
+                {
+                    id: 2,
+                    label: 'Firmware Flashing',
+                    component: FirmwareFlashing
+                },
             ]
         };
     }
