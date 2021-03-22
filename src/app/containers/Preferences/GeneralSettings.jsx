@@ -1,6 +1,5 @@
 import React from 'react';
 import classNames from 'classnames';
-// import Dropdown, { MenuItem } from 'app/components/Dropdown';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import { RadioGroup, RadioButton } from 'app/components/Radio';
 import i18n from 'app/lib/i18n';

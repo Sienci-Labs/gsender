@@ -1,5 +1,4 @@
 import React from 'react';
-// import classNames from 'classnames';
 import styles from '../index.styl';
 import Tool from './Tool';
 import AddTool from './AddTool';
