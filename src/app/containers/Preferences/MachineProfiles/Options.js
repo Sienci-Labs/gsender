@@ -148,7 +148,7 @@ export default class Options extends Component {
     render() {
         const { machineProfile, machineProfiles } = this.state;
         // const { id, endstops, laser, spindle, coolant, width, depth, height, units } = machineProfile;
-        const { id, endstops, spindle, coolant, width, depth, height, units } = machineProfile;
+        const { id, endstops, spindle, width, depth, height, units } = machineProfile;
 
         return (
             <div>
@@ -214,7 +214,7 @@ export default class Options extends Component {
                         </div>
                     </div>
 
-                    <div className={styles['machine-features-section']}>
+                    {/* <div className={styles['machine-features-section']}>
                         <div className={styles['machine-options-inputgroup']} style={{ display: 'grid', gridTemplateColumns: '1fr 5fr', margin: '0' }}>
                             <ToggleSwitch
                                 checked={coolant}
@@ -223,14 +223,14 @@ export default class Options extends Component {
                             <label htmlFor="">Coolant</label>
                         </div>
 
-                        {/* <div className={styles['machine-options-inputgroup']} style={{ margin: 0 }}>
+                        <div className={styles['machine-options-inputgroup']} style={{ margin: 0 }}>
                             <label htmlFor="">Laser</label>
                             <ToggleSwitch
                                 checked={laser}
                                 onChange={() => this.handleToggle('laser')}
                             />
-                        </div> */}
-                    </div>
+                        </div>
+                    </div> */}
                 </div>
             </div>
         );
