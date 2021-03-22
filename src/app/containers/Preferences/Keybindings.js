@@ -85,8 +85,20 @@ export default class Keybindings extends Component {
             >
                 <h3 className={styles['settings-title']}>Keybindings</h3>
 
-                { currentPage === 'Table' && <div className={styles['table-wrapper']}><Table data={keybindingsList} onEdit={handleEdit} /></div> }
-                { currentPage === 'Edit' && <EditArea switchPages={switchPages} shortcut={currentShortcut} shortcuts={keybindingsList} edit={editKeybinding} /> }
+                { currentPage === 'Table' && (
+                    <div className={styles['table-wrapper']}>
+                        <Table data={keybindingsList} onEdit={handleEdit} />
+                    </div>
+                )}
+
+                { currentPage === 'Edit' && (
+                    <EditArea
+                        switchPages={switchPages}
+                        shortcut={currentShortcut}
+                        shortcuts={keybindingsList}
+                        edit={editKeybinding}
+                    />
+                )}
             </div>
         );
     }
