@@ -27,7 +27,7 @@ class PreferencesPage extends PureComponent {
             type: TOASTER_SUCCESS,
             duration: 3000
         });
-    }, 5000);
+    }, 3000, { trailing: false });
 
     getInitialState() {
         return {
