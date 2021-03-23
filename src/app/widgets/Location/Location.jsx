@@ -14,6 +14,7 @@ const Location = (props) => {
             workPosition={state.workPosition}
             jog={state.jog}
             actions={actions}
+            safeRetractHeight={state.safeRetractHeight}
         />
     );
 };

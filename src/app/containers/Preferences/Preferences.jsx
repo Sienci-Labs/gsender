@@ -91,11 +91,12 @@ class PreferencesPage extends PureComponent {
                 this.setState({
                     safeRetractHeight: value
                 });
+                pubsub.publish('safeHeight:update', value);
             },
             setUnits: (units) => {
                 this.setState({
                     units: units
-                });
+                }, this.convertUnits());
                 pubsub.publish('units:change', units);
             },
             setReverseWidgets: () => {
@@ -496,12 +497,25 @@ class PreferencesPage extends PureComponent {
         return 0;
     }
 
+    convertUnits() {
+        let { units, safeRetractHeight } = this.state;
+        if (units === METRIC_UNITS) {
+            safeRetractHeight = convertToImperial(safeRetractHeight);
+        } else {
+            safeRetractHeight = convertToMetric(safeRetractHeight);
+        }
+        this.setState({
+            safeRetractHeight: safeRetractHeight
+        });
+        pubsub.publish('safeHeight:update', safeRetractHeight);
+    }
+
     convertToMetric(diameter) {
-        return (diameter * 25.4).toFixed(3);
+        return (diameter * 25.4).toFixed(2);
     }
 
     convertToImperial(diameter) {
-        return (diameter / 25.4).toFixed(3);
+        return (diameter / 25.4).toFixed(4);
     }
 
     render() {

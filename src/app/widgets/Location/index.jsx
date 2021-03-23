@@ -91,7 +91,12 @@ class LocationWidget extends PureComponent {
             }),
             pubsub.subscribe('units:change', (event, units) => {
                 this.changeUnits(units);
-            })
+            }),
+            pubsub.subscribe('safeHeight:update', (event, value) => {
+                this.setState({
+                    safeRetractHeight: value
+                });
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -690,6 +695,7 @@ class LocationWidget extends PureComponent {
             canClick: true, // Defaults to true
             port: controller.port,
             units: store.get('workspace.units', METRIC_UNITS),
+            safeRetractHeight: store.get('workspace.safeRetractHeight'),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -849,7 +855,8 @@ class LocationWidget extends PureComponent {
 
     changeUnits(units) {
         this.setState({
-            units: units
+            units: units,
+            safeRetractHeight: store.get('workspace.safeRetractHeight')
         });
     }
 

@@ -291,7 +291,8 @@ class DisplayPanel extends PureComponent {
     }
 
     render() {
-        const { axes, actions, canClick } = this.props;
+        const { axes, actions, canClick, safeRetractHeight, units } = this.props;
+        console.log(safeRetractHeight);
         let { homingHasBeenRun } = this.state;
         let houseIconPos = this.state.houseIconPos;
         const hasAxisX = includes(axes, AXIS_X);
@@ -333,8 +334,12 @@ class DisplayPanel extends PureComponent {
                         <div className={cx({ [styles.buttonWrap]: !endstops }, { [styles.columnZeros]: endstops })}>
                             <FunctionButton
                                 onClick={() => {
-                                    controller.command('gcode', 'G91');
-                                    controller.command('gcode:safe', 'G0 Z10', 'G21'); // Retract Z when moving across workspace
+                                    const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+                                    if (safeRetractHeight !== 0) {
+                                        controller.command('gcode', 'G91');
+                                        controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                    }
+
                                     controller.command('gcode', 'G90');
                                     controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
                                     controller.command('gcode', 'G0 Z0'); // Move Z up
