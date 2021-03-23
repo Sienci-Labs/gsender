@@ -1,13 +1,7 @@
 /* eslint import/no-unresolved: 0 */
 import { app, BrowserWindow, shell } from 'electron';
-//import AutoUpdater from './AutoUpdater';
-<<<<<<< HEAD
 
-=======
-// const customTitlebar = require('custom-electron-titlebar');
-// import customTitlebar from 'custom-electron-titlebar';
 import path from 'path';
->>>>>>> origin/toaster
 
 const browserWindowOptions = {
     minWidth: 1280,
