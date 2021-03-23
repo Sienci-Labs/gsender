@@ -178,7 +178,6 @@ export default class Options extends Component {
     render() {
         const { machineProfile, machineProfiles } = this.state;
         const { state } = this.props;
-        console.log(state);
         const { id, endstops, spindle, width, depth, height, units } = machineProfile;
         const disableEndstops = this.shouldDisableEndstops(state);
 
