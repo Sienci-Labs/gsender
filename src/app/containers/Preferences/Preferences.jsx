@@ -27,6 +27,7 @@ class PreferencesPage extends PureComponent {
             reverseWidgets: store.get('workspace.reverseWidgets', false),
             autoReconnect: store.get('widgets.connection.autoReconnect', false),
             baudrate: store.get('widgets.connection.baudrate', 115200),
+            safeRetractHeight: store.get('workspace.safeRetractHeight', 10),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -85,6 +86,12 @@ class PreferencesPage extends PureComponent {
             });
         },
         general: {
+            setSafeRetractHeight: (e) => {
+                const value = Number(e.target.value);
+                this.setState({
+                    safeRetractHeight: value
+                });
+            },
             setUnits: (units) => {
                 this.setState({
                     units: units
@@ -446,8 +453,9 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer } = this.state;
+        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight } = this.state;
         store.set('workspace.reverseWidgets', reverseWidgets);
+        store.set('workspace.safeRetractHeight', safeRetractHeight);
         store.set('widgets.connection.autoReconnect', autoReconnect);
         store.set('widgets.visualizer.theme', visualizer.theme);
         store.set('widgets.visualizer.disabled', visualizer.disabled);

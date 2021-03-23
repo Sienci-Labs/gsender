@@ -18,7 +18,7 @@ import Baudrates from './General/Baudrates';
 import Input from './Input';
 
 const GeneralSettings = ({ active, state, actions }) => {
-    const { units, reverseWidgets, autoReconnect } = state;
+    const { units, reverseWidgets, autoReconnect, safeRetractHeight } = state;
     return (
         <div className={classNames(
             styles.hidden,
@@ -92,9 +92,9 @@ const GeneralSettings = ({ active, state, actions }) => {
                             <Input
                                 label="Safe Height"
                                 units={units}
-                                value={0}
-                                onChange={null}
-                                additionalProps={{ name: 'width', type: 'number' }}
+                                value={safeRetractHeight}
+                                onChange={(e) => actions.general.setSafeRetractHeight(e)}
+                                additionalProps={{ name: 'safeRetractHeight', type: 'number' }}
                             />
                         </Fieldset>
 

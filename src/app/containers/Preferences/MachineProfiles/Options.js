@@ -167,7 +167,6 @@ export default class Options extends Component {
 
     render() {
         const { machineProfile, machineProfiles } = this.state;
-        // const { id, endstops, laser, spindle, coolant, width, depth, height, units } = machineProfile;
         const { id, endstops, spindle, width, depth, height, units } = machineProfile;
 
         return (

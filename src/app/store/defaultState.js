@@ -18,6 +18,7 @@ const defaultState = {
     workspace: {
         units: METRIC_UNITS,
         reverseWidgets: false,
+        safeRetractHeight: 0,
         container: {
             primary: {
                 show: true,
