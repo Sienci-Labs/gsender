@@ -80,6 +80,10 @@
       "output": "output",
       "app": "dist/cncjs"
     },
+    "nsis": {
+      "allowToChangeInstallationDirectory": true,
+      "oneClick": false
+    },
     "publish": {
       "provider": "github"
     },
