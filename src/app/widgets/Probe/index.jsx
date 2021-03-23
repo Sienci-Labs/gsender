@@ -478,7 +478,6 @@ class ProbeWidget extends PureComponent {
 
         // We handle X and Y differently than Z for calculating offset
         if (axis === 'Z') {
-            console.log(thickness);
             code = code.concat([
                 // Absolute, set Zero for this axis
                 this.gcode('G10', {

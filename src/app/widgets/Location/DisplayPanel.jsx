@@ -205,94 +205,12 @@ class DisplayPanel extends PureComponent {
             controller.command('gcode', `G53 G0 X${-xLimit} Y${-yLimit} F5000`);
         },
         startHoming: () => {
-            const { actions } = this.props;
-            let invertedHomePosition = this.state.homePosition;
-            const xLimit = this.state.machineProfile.limits.xmax;
-            const yLimit = this.state.machineProfile.limits.ymax;
-            const zLimit = this.state.machineProfile.limits.zmax;
-
-            if (invertedHomePosition === '0') { //Nothing Inverted
-                controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
-                controller.command('gcode', `G53 G0 X${-xLimit} Y${-yLimit} F5000`);
-                this.setState(prevState => ({
-                    homingHasBeenRun: true
-                }));
-                this.setState(prevState => ({
-                    houseIconPos: 'BL'
-                }));
-            } else if (invertedHomePosition === '1') { //X Inverted
-                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
-                controller.command('gcode', `G53 G0 X${xLimit} Y${-yLimit} F5000`);
-                this.setState(prevState => ({
-                    homingHasBeenRun: true
-                }));
-                this.setState(prevState => ({
-                    houseIconPos: 'FL'
-                }));
-            } else if (invertedHomePosition === '3') { //X AND Y inverted
-                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
-                controller.command('gcode', `G53 G0 X${xLimit} Y${yLimit} F5000`);
-                this.setState(prevState => ({
-                    homingHasBeenRun: true
-                }));
-                this.setState(prevState => ({
-                    houseIconPos: 'FR'
-                }));
-            } else if (invertedHomePosition === '4') { //Z inverted
-                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
-                controller.command('gcode', `G53 G0 X${-xLimit} Y${-yLimit} F5000`);
-                this.setState(prevState => ({
-                    homingHasBeenRun: true
-                }));
-                this.setState(prevState => ({
-                    houseIconPos: 'BL'
-                }));
-            } else if (invertedHomePosition === '5') { //X and Z inverted
-                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
-                controller.command('gcode', `G53 G0 X${xLimit} Y${-yLimit} F5000`);
-                this.setState(prevState => ({
-                    homingHasBeenRun: true
-                }));
-                this.setState(prevState => ({
-                    houseIconPos: 'BR'
-                }));
-            } else if (invertedHomePosition === '6') { //Y and Z inverted
-                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
-                controller.command('gcode', `G53 G0 X${-xLimit} Y${yLimit} F5000`);
-                this.setState(prevState => ({
-                    homingHasBeenRun: true
-                }));
-                this.setState(prevState => ({
-                    houseIconPos: 'FL'
-                }));
-            } else if (invertedHomePosition === '7') { //X, Y and Z inverted
-                controller.command('gcode', 'G0 Z0 F10000'); // Move z out of the way
-                controller.command('gcode', `G53 G0 X${xLimit} Y${yLimit} F5000`);
-
-                this.setState(prevState => ({
-                    homingHasBeenRun: true
-                }));
-                this.setState(prevState => ({
-                    houseIconPos: 'FR'
-                }));
-            }
-            const wcs = actions.getWorkCoordinateSystem();
-            const p = {
-                'G54': 1,
-                'G55': 2,
-                'G56': 3,
-                'G57': 4,
-                'G58': 5,
-                'G59': 6
-            }[wcs] || 0;
-
-            controller.command('gcode', `G10 L20 P${p} X0 Y0`);
+            controller.command('homing');
         }
     }
 
     render() {
         const { axes, actions, canClick, safeRetractHeight, units } = this.props;
-        console.log(safeRetractHeight);
         let { homingHasBeenRun } = this.state;
         let houseIconPos = this.state.houseIconPos;
         const hasAxisX = includes(axes, AXIS_X);
