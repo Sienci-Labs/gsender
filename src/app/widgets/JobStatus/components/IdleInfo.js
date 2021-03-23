@@ -11,7 +11,7 @@ import FileStat from './FileStat';
  */
 const IdleInfo = ({ state }) => {
     const {
-        bbox: { delta },
+        bbox: { delta, min, max },
         units,
         total,
         remainingTime,
@@ -78,22 +78,46 @@ const IdleInfo = ({ state }) => {
         <div className={styles['idle-info']}>
             <div><span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)</div>
             <div className={styles.idleInfoRow}>
-                <FileStat label="Dimensions">{`${delta.x} ${units} (X)`}<br />{`${delta.y} ${units} (Y)`}<br />{`${delta.z} ${units} (Z)`}</FileStat>
-                <FileStat label="Feed Range">{feedrateMin} to {feedrateMax} mm/min</FileStat>
-                <FileStat label="Spindle Range">{spindleSpeedMin} to {spindleSpeedMax} RPM</FileStat>
-                <FileStat label="Tools Used">{toolsAmount > 0 ? `${toolsAmount} (${formattedToolsUsed()})` : 'None'}</FileStat>
-                <FileStat label="Runtime">{outputFormattedTime(remainingTime)}</FileStat>
+                <FileStat label="Attributes">
+                    {`${outputFormattedTime(remainingTime)}`}<br /> {`${feedrateMin}`} to {`${feedrateMax} mm/min`}
+                </FileStat>
+                <FileStat label="Spindle">
+                    {spindleSpeedMin} to {spindleSpeedMax} RPM
+                    <br />
+                    {toolsAmount > 0 ? `${toolsAmount} (${formattedToolsUsed()})` : 'No Tools'}
+                </FileStat>
+                <FileStat label="Dimensions">
+                    {`${delta.x} ${units} (X)`}
+                    <br />
+                    {`${delta.y} ${units} (Y)`}
+                    <br />
+                    {`${delta.z} ${units} (Z)`}
+                </FileStat>
+                <FileStat label="Minimum">
+                    {`${min.x} ${units} (X)`}
+                    <br />
+                    {`${min.y} ${units} (Y)`}
+                    <br />
+                    {`${min.z} ${units} (Z)`}
+                </FileStat>
+                <FileStat label="Maximum">
+                    {`${max.x} ${units} (X)`}
+                    <br />
+                    {`${max.y} ${units} (Y)`}
+                    <br />
+                    {`${max.z} ${units} (Z)`}
+                </FileStat>
             </div>
         </div>
     ) : (
         <div className={styles['idle-info']}>
             <div><span className={styles['file-name']}>No File Loaded</span></div>
             <div className={styles.idleInfoRow}>
+                <FileStat label="Attributes">-</FileStat>
+                <FileStat label="Spindle">-</FileStat>
                 <FileStat label="Dimensions">-</FileStat>
-                <FileStat label="Feed Range">-</FileStat>
-                <FileStat label="Spindle Range">-</FileStat>
-                <FileStat label="Tools Used">-</FileStat>
-                <FileStat label="Runtime">-</FileStat>
+                <FileStat label="Minimum">-</FileStat>
+                <FileStat label="Maximum">-</FileStat>
             </div>
         </div>
     );
