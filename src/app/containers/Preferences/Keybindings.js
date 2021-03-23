@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
+import _ from 'lodash';
 
 import store from 'app/store';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
@@ -19,6 +20,14 @@ export default class Keybindings extends Component {
     static propTypes = {
         active: PropTypes.bool,
     }
+
+    showToast = _.throttle(() => {
+        Toaster.pop({
+            msg: 'Shortcut Updated',
+            type: TOASTER_SUCCESS,
+            duration: 3000
+        });
+    }, 5000, { trailing: false });
 
     state = {
         keybindingsList: store.get('commandKeys', []),
@@ -40,7 +49,6 @@ export default class Keybindings extends Component {
      */
     editKeybinding = (shortcut) => {
         const { keybindingsList } = this.state;
-        const { title } = shortcut;
 
         //Replace old keybinding item with new one
         const editedKeybindingsList = keybindingsList.map(keybinding => (keybinding.id === shortcut.id ? shortcut : keybinding));
@@ -50,11 +58,7 @@ export default class Keybindings extends Component {
 
         this.setState({ currentPage: 'Table', keybindingsList: editedKeybindingsList });
 
-        Toaster.pop({
-            msg: `"${title}" Shortcut Updated`,
-            type: TOASTER_SUCCESS,
-            duration: 4000
-        });
+        this.showToast();
     }
 
     // Trigger pubsub for use in Location widget where keybindings are injected

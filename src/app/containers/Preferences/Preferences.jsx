@@ -1,6 +1,7 @@
 import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
+import _ from 'lodash';
 import controller from 'app/lib/controller';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import GeneralSettings from './GeneralSettings';
@@ -19,6 +20,14 @@ class PreferencesPage extends PureComponent {
     visualizerConfig = new WidgetConfig('visualizer');
 
     state = this.getInitialState();
+
+    showToast = _.throttle(() => {
+        Toaster.pop({
+            msg: 'Settings Updated',
+            type: TOASTER_SUCCESS,
+            duration: 3000
+        });
+    }, 3000, { trailing: false });
 
     getInitialState() {
         return {
@@ -476,15 +485,7 @@ class PreferencesPage extends PureComponent {
             return;
         }
 
-        pubsub.publish('toast:removeAll');
-        setTimeout(() => {
-            pubsub.publish('toast:removeAll');
-            Toaster.pop({
-                msg: 'Settings Updated',
-                type: TOASTER_SUCCESS,
-                duration: 3000
-            });
-        }, 1000);
+        this.showToast();
     }
 
     toolSortCompare(a, b) {

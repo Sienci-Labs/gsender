@@ -1,8 +1,4 @@
 import React from 'react';
-// import classnames from 'classnames';
-// import { RadioGroup, RadioButton } from 'app/components/Radio';
-
-// import Fieldset from '../FieldSet';
 import Input from '../Input';
 
 import styles from '../index.styl';
@@ -13,7 +9,6 @@ const AddTool = ({ actions, state }) => {
 
     return (
         <div>
-            {/* <Fieldset legend="Add New Tool"> */}
             <Input
                 label="Metric Diameter"
                 units="mm"
