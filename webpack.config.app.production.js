@@ -210,8 +210,6 @@ module.exports = {
             preserve: false
         }),
         new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: path.resolve(__dirname, 'index.html'),
             chunksSortMode: 'dependency' // Sort chunks by dependency
         })
     ],

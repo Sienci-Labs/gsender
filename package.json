@@ -81,7 +81,7 @@
       "app": "dist/cncjs"
     },
     "nsis": {
-      "allowToChangeInstallationDirector": true,
+      "allowToChangeInstallationDirectory": true,
       "oneClick": false
     },
     "publish": {
