@@ -15,6 +15,7 @@ import MachineProfileOptions from './MachineProfiles/Options';
 
 import Fieldset from './FieldSet';
 import Baudrates from './General/Baudrates';
+import Input from './Input';
 
 const GeneralSettings = ({ active, state, actions }) => {
     const { units, reverseWidgets, autoReconnect } = state;
@@ -42,7 +43,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 <small className={styles['item-info']}>Re-connect automatically</small>
                             </div>
                         </Fieldset>
-                        <Fieldset legend="Preferred Units">
+                        <Fieldset legend="Workspace">
                             <div className={styles.addMargin}>
                                 <RadioGroup
                                     name="units"
@@ -57,14 +58,26 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 </RadioGroup>
                                 <small className={styles['item-info']}>Units to be displayed throughout the interface</small>
                             </div>
-                        </Fieldset>
-                        <Fieldset legend="Workspace">
                             <div className={styles.addMargin}>
                                 <ToggleSwitch
                                     checked={reverseWidgets}
                                     onChange={() => actions.general.setReverseWidgets()}
                                 />
                                 <small className={styles['item-info']}>Reverse workspace layout</small>
+                            </div>
+                            <div style={{ marginBottom: '10px' }}>
+                                <ToggleSwitch
+                                    checked={state.showWarning}
+                                    onChange={() => actions.general.setShowWarning(!state.showWarning)}
+                                />
+                                <small className={styles['item-info']}>Warn if file contains invalid G-Code</small>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 5fr' }}>
+                                <ToggleSwitch
+                                    checked={state.showLineWarnings}
+                                    onChange={() => actions.general.setShowLineWarnings(!state.showLineWarnings)}
+                                />
+                                <small className={styles['item-info']}>Warn if invalid line is detected during job run</small>
                             </div>
                         </Fieldset>
                         <Fieldset legend="Jog Speed Presets">
@@ -75,24 +88,16 @@ const GeneralSettings = ({ active, state, actions }) => {
                         <Fieldset legend="Machine Profile" className={styles['mb-0']}>
                             <MachineProfileOptions />
                         </Fieldset>
-
-                        <Fieldset legend="File Validation Warnings">
-                            <div style={{ marginBottom: '10px' }}>
-                                <ToggleSwitch
-                                    checked={state.showWarning}
-                                    onChange={() => actions.general.setShowWarning(!state.showWarning)}
-                                />
-                                <small className={styles['item-info']}>Show warning when file contains invalid G-Code</small>
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 5fr' }}>
-                                <ToggleSwitch
-                                    checked={state.showLineWarnings}
-                                    onChange={() => actions.general.setShowLineWarnings(!state.showLineWarnings)}
-                                />
-                                <small className={styles['item-info']}>Show warning when invalid line is detected during job run</small>
-                            </div>
+                        <Fieldset legend="Movement">
+                            <Input
+                                label="Safe Height"
+                                units={units}
+                                value={0}
+                                onChange={null}
+                                additionalProps={{ name: 'width', type: 'number' }}
+                            />
                         </Fieldset>
+
                     </div>
                 </div>
             </div>
