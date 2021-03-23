@@ -158,9 +158,30 @@ export default class Options extends Component {
         this.unsubscribe();
     }
 
+    shouldDisableEndstops(state) {
+        const { controller } = state;
+        const { settings } = controller;
+        // Handle case where we aren't connected - user unable to enable
+        if (Object.keys(settings).length === 0) {
+            return true;
+        }
+        const controllerSettings = settings.settings;
+        const { $22 } = controllerSettings;
+        // Handle case where endstops enabled - we should be able to enabled
+        if ($22 === '1') {
+            return false;
+        }
+        // default - disable
+        return true;
+    }
+
     render() {
         const { machineProfile, machineProfiles } = this.state;
+        const { state } = this.props;
+        console.log(state);
         const { id, endstops, spindle, width, depth, height, units } = machineProfile;
+        const disableEndstops = this.shouldDisableEndstops(state);
+
 
         return (
             <div>
@@ -212,6 +233,7 @@ export default class Options extends Component {
                         <div className={styles['machine-options-inputgroup']}>
                             <ToggleSwitch
                                 checked={endstops}
+                                disabled={disableEndstops}
                                 onChange={() => this.handleToggle('endstops')}
                             />
                             <label htmlFor="">Endstops</label>

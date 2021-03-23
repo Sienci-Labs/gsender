@@ -85,7 +85,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                     </div>
                     <div style={{ width: '48%' }}>
                         <Fieldset legend="Machine Profile" className={styles['mb-0']}>
-                            <MachineProfileOptions />
+                            <MachineProfileOptions state={state} />
                         </Fieldset>
                         <Fieldset legend="Movement">
                             <Input
