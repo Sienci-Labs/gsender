@@ -20,6 +20,7 @@ import pubsub from 'pubsub-js';
 import store from '../../store';
 import Axes from './Axes';
 import ShuttleControl from './ShuttleControl';
+import JogHelper from './jogHelper';
 import {
     // Units
     IMPERIAL_UNITS,
@@ -54,6 +55,8 @@ class AxesWidget extends PureComponent {
     };
 
     pubsubTokens = [];
+
+    joggingHelper = null;
 
     subscribe() {
         const tokens = [
@@ -476,18 +479,37 @@ class AxesWidget extends PureComponent {
             }
 
             const givenAxis = axis.toUpperCase();
-            const feedrate = this.actions.getFeedrate();
+            const feedrate = Number(this.actions.getFeedrate());
 
-            this.actions.startContinuousJog({ [givenAxis]: direction }, feedrate);
+            const jogCB = (given) => this.actions.jog(given);
+
+            const startContinuousJogCB = (coordinates, feedrate) => this.actions.startContinuousJog(coordinates, feedrate);
+
+            const stopContinuousJogCB = () => this.actions.stopContinuousJog();
+
+            if (!this.joggingHelper) {
+                this.joggingHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
+            }
+
+            this.joggingHelper.onKeyDown({ [givenAxis]: direction }, feedrate);
         },
-        STOP_JOG: (event) => {
+        STOP_JOG: (event, { axis, direction }) => {
             preventDefault(event);
 
-            const { isContinuousJogging } = this.state;
+            const { getXYJogDistance, getZJogDistance } = this.actions;
 
-            if (isContinuousJogging) {
-                this.actions.stopContinuousJog();
-            }
+            const xyStep = getXYJogDistance();
+            const zStep = getZJogDistance();
+
+            const givenAxis = axis.toUpperCase();
+            const axisValue = {
+                X: xyStep,
+                Y: xyStep,
+                Z: zStep
+            }[givenAxis] * direction;
+            const feedrate = Number(this.actions.getFeedrate());
+
+            this.joggingHelper && this.joggingHelper.onKeyUp({ [givenAxis]: axisValue, F: feedrate });
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
