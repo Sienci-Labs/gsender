@@ -15,7 +15,9 @@ const Switch = ({ label, checked, onChange, className, style, disabled }) => {
                 disabled={disabled}
                 checkedIcon={false}
                 uncheckedIcon={false}
-                onColor="#3e85c7"
+                onColor="#295d8d"
+                height={24}
+                width={48}
             />
         </div>
     );

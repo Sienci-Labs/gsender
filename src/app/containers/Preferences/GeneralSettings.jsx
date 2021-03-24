@@ -39,6 +39,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                                     label="Re-connect automatically"
                                     checked={autoReconnect}
                                     onChange={() => actions.general.setAutoReconnect()}
+                                    size="small"
                                 />
                             </div>
                         </Fieldset>
@@ -49,6 +50,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                                     value={units}
                                     depth={2}
                                     onChange={(value, event) => actions.general.setUnits(value)}
+                                    size="small"
                                 >
                                     <div>
                                         <RadioButton className={styles.prefferedradio} label={i18n._('Inches (G20)')} value={IMPERIAL_UNITS} />
@@ -62,6 +64,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                                     label="Reverse workspace layout"
                                     checked={reverseWidgets}
                                     onChange={() => actions.general.setReverseWidgets()}
+                                    size="small"
                                 />
                             </div>
                             <div style={{ marginBottom: '10px' }}>
@@ -69,13 +72,15 @@ const GeneralSettings = ({ active, state, actions }) => {
                                     label="Warn if file contains invalid G-Code"
                                     checked={state.showWarning}
                                     onChange={() => actions.general.setShowWarning(!state.showWarning)}
+                                    size="small"
                                 />
                             </div>
                             <div style={{ marginBottom: '10px' }}>
                                 <ToggleSwitch
-                                    label="Warn if invalid line is detected during job run"
+                                    label="Warn if invalid line detected during job"
                                     checked={state.showLineWarnings}
                                     onChange={() => actions.general.setShowLineWarnings(!state.showLineWarnings)}
+                                    size="small"
                                 />
                             </div>
                         </Fieldset>
