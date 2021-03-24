@@ -288,7 +288,8 @@ class TerminalWrapper extends PureComponent {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
+    // eslint-disable-next-line camelcase
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.cursorBlink !== this.props.cursorBlink) {
             this.term.setOption('cursorBlink', nextProps.cursorBlink);
         }

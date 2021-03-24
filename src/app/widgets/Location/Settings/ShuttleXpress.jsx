@@ -50,7 +50,8 @@ class ShuttleXpress extends PureComponent {
         return { feedrateMin, feedrateMax, hertz, overshoot };
     }
 
-    componentWillReceiveProps(nextProps) {
+    // eslint-disable-next-line camelcase
+    UNSAFE_componentWillReceiveProps(nextProps) {
         const {
             feedrateMin,
             feedrateMax,
