@@ -35,7 +35,8 @@ class Custom extends PureComponent {
         this.unsubscribe();
     }
 
-    componentWillReceiveProps(nextProps) {
+    // eslint-disable-next-line camelcase
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.url !== this.props.url) {
             this.reload();
         }

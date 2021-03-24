@@ -231,19 +231,19 @@ export default class Options extends Component {
                     <div className={styles['machine-features-section']}>
                         <div className={styles['machine-options-inputgroup']}>
                             <ToggleSwitch
+                                label="Endstops"
                                 checked={endstops}
                                 disabled={disableEndstops}
                                 onChange={() => this.handleToggle('endstops')}
                             />
-                            <label htmlFor="">Endstops</label>
                         </div>
 
                         <div className={styles['machine-options-inputgroup']}>
                             <ToggleSwitch
+                                label="Spindle"
                                 checked={spindle}
                                 onChange={() => this.handleToggle('spindle')}
                             />
-                            <label htmlFor="">Spindle</label>
                         </div>
                     </div>
 

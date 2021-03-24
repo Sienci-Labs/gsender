@@ -12,7 +12,8 @@ class ModalWrapper extends PureComponent {
         ...Modal.defaultProps
     };
 
-    componentWillReceiveProps(nextProps) {
+    // eslint-disable-next-line camelcase
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.show !== this.props.show) {
             if (nextProps.show) {
                 this.blockScrolling();

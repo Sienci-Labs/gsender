@@ -70,7 +70,8 @@ class Dashboard extends PureComponent {
         window.removeEventListener('resize', this.resizeVirtualList);
     }
 
-    componentWillReceiveProps(nextProps) {
+    // eslint-disable-next-line camelcase
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.state.gcode.content !== this.props.state.gcode.content) {
             this.lines = get(nextProps, 'state.gcode.content', '')
                 .split('\n')

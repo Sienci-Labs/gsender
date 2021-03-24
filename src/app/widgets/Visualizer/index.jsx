@@ -1223,9 +1223,13 @@ class VisualizerWidget extends PureComponent {
                     <Widget.Title>
                         Visualizer
                     </Widget.Title>
-                    <Widget.Controls>
-                        <span>Lightweight Mode</span>
-                        <ToggleSwitch className={styles.litetoggle} checked={liteMode} onChange={() => this.actions.handleLiteModeToggle()} />
+                    <Widget.Controls style={{ top: '-4px' }}>
+                        <ToggleSwitch
+                            label="Lighweight Mode"
+                            checked={liteMode}
+                            onChange={() => this.actions.handleLiteModeToggle()}
+                            className={styles.litetoggle}
+                        />
                     </Widget.Controls>
                 </Widget.Header>
                 <Widget.Content

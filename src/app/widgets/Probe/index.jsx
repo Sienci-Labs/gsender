@@ -324,7 +324,8 @@ class ProbeWidget extends PureComponent {
         this.unsubscribe();
     }
 
-    componentWillMount() {
+    // eslint-disable-next-line camelcase
+    UNSAFE_componentWillMount() {
         this.actions.generatePossibleProbeCommands();
     }
 

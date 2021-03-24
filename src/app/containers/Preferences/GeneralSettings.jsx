@@ -36,10 +36,10 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 <Baudrates baudrate={state.baudrate} onChange={(option) => actions.general.setBaudrate(option)} />
                                 <br />
                                 <ToggleSwitch
+                                    label="Re-connect automatically"
                                     checked={autoReconnect}
                                     onChange={() => actions.general.setAutoReconnect()}
                                 />
-                                <small className={styles['item-info']}>Re-connect automatically</small>
                             </div>
                         </Fieldset>
                         <Fieldset legend="Workspace">
@@ -59,24 +59,24 @@ const GeneralSettings = ({ active, state, actions }) => {
                             </div>
                             <div className={styles.addMargin}>
                                 <ToggleSwitch
+                                    label="Reverse workspace layout"
                                     checked={reverseWidgets}
                                     onChange={() => actions.general.setReverseWidgets()}
                                 />
-                                <small className={styles['item-info']}>Reverse workspace layout</small>
                             </div>
                             <div style={{ marginBottom: '10px' }}>
                                 <ToggleSwitch
+                                    label="Warn if file contains invalid G-Code"
                                     checked={state.showWarning}
                                     onChange={() => actions.general.setShowWarning(!state.showWarning)}
                                 />
-                                <small className={styles['item-info']}>Warn if file contains invalid G-Code</small>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 5fr' }}>
+                            <div style={{ marginBottom: '10px' }}>
                                 <ToggleSwitch
+                                    label="Warn if invalid line is detected during job run"
                                     checked={state.showLineWarnings}
                                     onChange={() => actions.general.setShowLineWarnings(!state.showLineWarnings)}
                                 />
-                                <small className={styles['item-info']}>Warn if invalid line is detected during job run</small>
                             </div>
                         </Fieldset>
                         <Fieldset legend="Jog Speed Presets">
