@@ -4,11 +4,11 @@ import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
+import path from 'path';
 import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
-
 
 // The selection menu
 const selectionMenu = Menu.buildFromTemplate([
@@ -64,6 +64,17 @@ const main = () => {
 
     app.whenReady().then(async () => {
         try {
+            windowManager = new WindowManager();
+
+            // Create and show splash before server starts
+            const splashScreen = windowManager.createSplashScreen({
+                width: 500,
+                height: 400,
+                frame: false
+            });
+            await splashScreen.loadFile(path.join(__dirname, 'app/assets/splashscreen.png'));
+            splashScreen.show();
+
             const res = await launchServer();
             const { address, port, mountPoints } = { ...res };
             if (!(address && port)) {
@@ -73,8 +84,6 @@ const main = () => {
 
             const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
             Menu.setApplicationMenu(menu);
-
-            windowManager = new WindowManager();
 
             const url = `http://${address}:${port}`;
             // The bounds is a rectangle object with the following properties:
@@ -91,7 +100,7 @@ const main = () => {
                 ...bounds,
                 title: `gSender ${pkg.version}`,
             };
-            const window = windowManager.openWindow(url, options);
+            const window = windowManager.openWindow(url, options, splashScreen);
 
             // Save window size and position
             window.on('close', () => {
@@ -133,7 +142,6 @@ const main = () => {
             ipcMain.on('restart_app', () => {
                 autoUpdater.quitAndInstall();
             });
-
         } catch (err) {
             console.error('Error:', err);
         }
