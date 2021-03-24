@@ -56,17 +56,13 @@ const main = () => {
         }
     });
 
-    ipcMain.on('app_version', (event) => {
-        event.sender.send('app_version', { version: app.getVersion() });
-    });
-
     const store = new Store();
 
     // Create the user data directory if it does not exist
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
 
-    app.on('ready', async () => {
+    app.whenReady().then(async () => {
         try {
             const res = await launchServer();
             const { address, port, mountPoints } = { ...res };
@@ -94,7 +90,6 @@ const main = () => {
             const options = {
                 ...bounds,
                 title: `gSender ${pkg.version}`,
-                titleBarStyle: 'hidden'
             };
             const window = windowManager.openWindow(url, options);
 

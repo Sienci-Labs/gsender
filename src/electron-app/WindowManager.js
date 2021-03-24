@@ -1,17 +1,7 @@
 /* eslint import/no-unresolved: 0 */
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, shell, dialog } from 'electron';
 
 import path from 'path';
-
-const browserWindowOptions = {
-    minWidth: 1280,
-    minHeight: 1024,
-};
-
-const loadingWindowOptions = {
-    maxWidth: 600,
-    maxHeight: 400
-};
 
 class WindowManager {
     windows = [];
@@ -60,32 +50,18 @@ class WindowManager {
     openWindow(url, options) {
         const window = new BrowserWindow({
             ...options,
-            ...browserWindowOptions,
-            titleBarStyle: 'hidden',
-            show: false,
             webPreferences: {
                 nodeIntegration: true,
+                enableRemoteModule: true,
                 preload: path.join(__dirname, 'preload.js')
             }
         });
-
-        const loadingWindow = new BrowserWindow({
-            ...options,
-            ...loadingWindowOptions,
-            titleBarStyle: 'hidden',
-            frame: false,
-            center: true,
-            show: false,
-            webPreferences: {
-                nodeIntegration: true
-            }
-        });
-
-        loadingWindow.loadFile('index.html');
         const webContents = window.webContents;
+
         window.webContents.on('did-finish-load', () => {
             window.setTitle(options.title);
         });
+
         window.on('closed', (event) => {
             const index = this.windows.indexOf(event.sender);
             console.assert(index >= 0);
@@ -99,29 +75,30 @@ class WindowManager {
             shell.openExternal(url);
         });
 
-        webContents.once('dom-ready', () => {
-            loadingWindow.setSize(1200, 1800);
-            loadingWindow.center();
-            loadingWindow.show();
-            setTimeout(() => {
-                loadingWindow.close();
-                window.show();
-            }, 7000);
-        });
-
         // Call `ses.setProxy` to ignore proxy settings
         // http://electron.atom.io/docs/latest/api/session/#sessetproxyconfig-callback
         const ses = webContents.session;
-        ses.setProxy({ proxyRules: 'direct://' }, () => {
+        ses.setProxy({ proxyRules: 'direct://' }).then(() => {
             window.loadURL(url);
         });
 
-        setTimeout(function() {
-            this.windows.push(window);
-        }, 5000);
+        window.loadURL(url).then(() => {
+            dialog.showMessageBox({
+                message: `Loaded ${url}`
+            });
+            console.log(`Loaded ${url}`);
+        }).catch((e) => {
+            dialog.showMessageBox({
+                message: e
+            });
+            console.log(`Error: ${e}`);
+        });
 
-        // Disable AutoUpdater until an update server is available
-        //new AutoUpdater(window);
+        /*webContents.once('dom-ready', () => {
+            window.show();
+        });*/
+
+        this.windows.push(window);
 
         return window;
     }
