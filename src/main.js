@@ -8,7 +8,7 @@ import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
-
+import './sentryInit';
 
 // The selection menu
 const selectionMenu = Menu.buildFromTemplate([
