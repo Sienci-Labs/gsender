@@ -258,7 +258,6 @@ const defaultState = {
             laserTest: {
                 power: 0,
                 duration: 0,
-                maxS: 1000
             }
         },
         visualizer: {

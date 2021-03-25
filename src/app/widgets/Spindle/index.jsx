@@ -182,7 +182,8 @@ class SpindleWidget extends PureComponent {
                 state: controller.workflow.state
             },
             spindleSpeed: this.config.get('speed', 1000),
-            spindleMax: this.config.get('spindleMax', 25000)
+            spindleMax: this.config.get('spindleMax', 25000),
+            laser: this.config.get('laserTest')
         };
     }
 
