@@ -3,12 +3,9 @@ import includes from 'lodash/includes';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
-import i18n from 'app/lib/i18n';
 import WidgetConfig from '../WidgetConfig';
-import Spindle from './Spindle';
 import {
     // Grbl
     GRBL,
@@ -28,8 +25,14 @@ import {
     TINYG_MACHINE_STATE_HOLD,
     // Workflow
     WORKFLOW_STATE_RUNNING,
+    SPINDLE_MODE,
+    LASER_MODE
 } from '../../constants';
 import styles from './index.styl';
+import SpindleControls from './components/SpindleControls';
+import LaserControls from './components/LaserControls';
+import ModalToggle from './components/ModalToggle';
+import ActiveIndicator from './components/ActiveIndicator';
 
 class SpindleWidget extends PureComponent {
     static propTypes = {
@@ -54,20 +57,31 @@ class SpindleWidget extends PureComponent {
     state = this.getInitialState();
 
     actions = {
-        toggleFullscreen: () => {
-            const { minimized, isFullscreen } = this.state;
-            this.setState({
-                minimized: isFullscreen ? minimized : false,
-                isFullscreen: !isFullscreen
-            });
+        handleModeToggle: () => {
+            const { mode } = this.state;
+            if (mode === LASER_MODE) {
+                this.setState({
+                    mode: SPINDLE_MODE
+                });
+                this.enableSpindleMode();
+            } else {
+                this.setState({
+                    mode: LASER_MODE
+                });
+                this.enableLaserMode();
+            }
         },
-        toggleMinimized: () => {
-            const { minimized } = this.state;
-            this.setState({ minimized: !minimized });
+        sendM3: () => {
+            controller.command('gcode', 'M3');
+            this.setActive();
         },
-        handleSpindleSpeedChange: (event) => {
-            const spindleSpeed = Number(event.target.value) || 0;
-            this.setState({ spindleSpeed: spindleSpeed });
+        sendM4: () => {
+            controller.command('gcode', 'M4');
+            this.setActive();
+        },
+        sendM5: () => {
+            controller.command('gcode', 'M5');
+            this.setInactive();
         }
     };
 
@@ -104,56 +118,6 @@ class SpindleWidget extends PureComponent {
                     }
                 });
             }
-
-            // Marlin
-            if (type === MARLIN) {
-                const { modal = {} } = { ...state };
-
-                this.setState({
-                    controller: {
-                        type: type,
-                        state: state,
-                        modal: {
-                            spindle: modal.spindle || '',
-                            coolant: modal.coolant || ''
-                        }
-                    }
-                });
-            }
-
-            // Smoothie
-            if (type === SMOOTHIE) {
-                const { parserstate } = { ...state };
-                const { modal = {} } = { ...parserstate };
-
-                this.setState({
-                    controller: {
-                        type: type,
-                        state: state,
-                        modal: {
-                            spindle: modal.spindle || '',
-                            coolant: modal.coolant || ''
-                        }
-                    }
-                });
-            }
-
-            // TinyG
-            if (type === TINYG) {
-                const { sr } = { ...state };
-                const { modal = {} } = { ...sr };
-
-                this.setState({
-                    controller: {
-                        type: type,
-                        state: state,
-                        modal: {
-                            spindle: modal.spindle || '',
-                            coolant: modal.coolant || ''
-                        }
-                    }
-                });
-            }
         }
     };
 
@@ -168,9 +132,11 @@ class SpindleWidget extends PureComponent {
     componentDidUpdate(prevProps, prevState) {
         const {
             minimized,
-            spindleSpeed
+            spindleSpeed,
+            mode
         } = this.state;
 
+        this.config.set('mode', mode);
         this.config.set('minimized', minimized);
         this.config.set('speed', spindleSpeed);
     }
@@ -181,6 +147,8 @@ class SpindleWidget extends PureComponent {
             isFullscreen: false,
             canClick: true, // Defaults to true
             port: controller.port,
+            mode: this.config.get('mode'),
+            active: false,
             controller: {
                 type: controller.type,
                 state: controller.state,
@@ -192,7 +160,8 @@ class SpindleWidget extends PureComponent {
             workflow: {
                 state: controller.workflow.state
             },
-            spindleSpeed: this.config.get('speed', 1000)
+            spindleSpeed: this.config.get('speed', 1000),
+            spindleMax: this.config.get('spindleMax', 25000)
         };
     }
 
@@ -208,6 +177,36 @@ class SpindleWidget extends PureComponent {
             const callback = this.controllerEvents[eventName];
             controller.removeListener(eventName, callback);
         });
+    }
+
+    setActive() {
+        this.setState({
+            active: true
+        });
+    }
+
+    setInactive() {
+        this.setState({
+            active: false
+        });
+    }
+
+    enableSpindleMode() {
+        const { active } = this.state;
+        if (active) {
+            controller.command('gcode', 'M5');
+            this.setInactive();
+        }
+        controller.command('gcode', '$31=0');
+    }
+
+    enableLaserMode() {
+        const { active } = this.state;
+        if (active) {
+            controller.command('gcode', 'M5');
+            this.setInactive();
+        }
+        controller.command('gcode', '$31=1');
     }
 
     canClick() {
@@ -264,9 +263,8 @@ class SpindleWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId, embedded } = this.props;
+        const { embedded } = this.props;
         const { minimized, isFullscreen } = this.state;
-        const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const state = {
             ...this.state,
             canClick: this.canClick()
@@ -275,81 +273,31 @@ class SpindleWidget extends PureComponent {
             ...this.actions
         };
 
+        const { active } = state;
         return (
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header embedded={embedded}>
-                    <Widget.Title>
-                        <Widget.Sortable className={this.props.sortable.handleClassName}>
-                            <i className="fa fa-bars" />
-                            <Space width="8" />
-                        </Widget.Sortable>
-                        {isForkedWidget &&
-                        <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
-                        }
-                        {i18n._('Spindle')}
-                    </Widget.Title>
-                    <Widget.Controls className={this.props.sortable.filterClassName}>
-                        <Widget.Button
-                            disabled={isFullscreen}
-                            title={minimized ? i18n._('Expand') : i18n._('Collapse')}
-                            onClick={actions.toggleMinimized}
-                        >
-                            <i
-                                className={classNames(
-                                    'fa',
-                                    { 'fa-chevron-up': !minimized },
-                                    { 'fa-chevron-down': minimized }
-                                )}
-                            />
-                        </Widget.Button>
-                        <Widget.DropdownButton
-                            title={i18n._('More')}
-                            toggle={<i className="fa fa-ellipsis-v" />}
-                            onSelect={(eventKey) => {
-                                if (eventKey === 'fullscreen') {
-                                    actions.toggleFullscreen();
-                                } else if (eventKey === 'fork') {
-                                    this.props.onFork();
-                                } else if (eventKey === 'remove') {
-                                    this.props.onRemove();
-                                }
-                            }}
-                        >
-                            <Widget.DropdownMenuItem eventKey="fullscreen">
-                                <i
-                                    className={classNames(
-                                        'fa',
-                                        'fa-fw',
-                                        { 'fa-expand': !isFullscreen },
-                                        { 'fa-compress': isFullscreen }
-                                    )}
-                                />
-                                <Space width="4" />
-                                {!isFullscreen ? i18n._('Enter Full Screen') : i18n._('Exit Full Screen')}
-                            </Widget.DropdownMenuItem>
-                            <Widget.DropdownMenuItem eventKey="fork">
-                                <i className="fa fa-fw fa-code-fork" />
-                                <Space width="4" />
-                                {i18n._('Fork Widget')}
-                            </Widget.DropdownMenuItem>
-                            <Widget.DropdownMenuItem eventKey="remove">
-                                <i className="fa fa-fw fa-times" />
-                                <Space width="4" />
-                                {i18n._('Remove Widget')}
-                            </Widget.DropdownMenuItem>
-                        </Widget.DropdownButton>
-                    </Widget.Controls>
                 </Widget.Header>
                 <Widget.Content
                     className={classNames(
                         styles['widget-content'],
+                        styles.heightOverride,
                         { [styles.hidden]: minimized }
                     )}
                 >
-                    <Spindle
-                        state={state}
-                        actions={actions}
-                    />
+                    <div>
+                        <div className={styles.modalRow}>
+                            <ModalToggle mode={state.mode} onChange={actions.handleModeToggle} />
+                            <ActiveIndicator active={active} />
+                        </div>
+                        <div>
+                            {
+                                (state.mode === SPINDLE_MODE)
+                                    ? <SpindleControls state={state} actions={actions} />
+                                    : <LaserControls state={state} actions={actions} />
+                            }
+                        </div>
+                    </div>
                 </Widget.Content>
             </Widget>
         );

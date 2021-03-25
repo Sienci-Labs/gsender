@@ -3,11 +3,9 @@ import isNumber from 'lodash/isNumber';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import ensurePositiveNumber from 'app/lib/ensure-positive-number';
-import i18n from 'app/lib/i18n';
 import WidgetConfig from '../WidgetConfig';
 import Laser from './Laser';
 import {
@@ -236,9 +234,8 @@ class LaserWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId, embedded } = this.props;
+        const { embedded } = this.props;
         const { minimized, isFullscreen } = this.state;
-        const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const state = {
             ...this.state,
             canClick: this.canClick()
@@ -250,16 +247,6 @@ class LaserWidget extends PureComponent {
         return (
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header embedded={embedded}>
-                    <Widget.Title>
-                        <Widget.Sortable className={this.props.sortable.handleClassName}>
-                            <i className="fa fa-bars" />
-                            <Space width="8" />
-                        </Widget.Sortable>
-                        {isForkedWidget &&
-                        <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
-                        }
-                        {i18n._('Laser')}
-                    </Widget.Title>
                     <Widget.Controls className={this.props.sortable.filterClassName}>
                     </Widget.Controls>
                 </Widget.Header>
