@@ -154,22 +154,22 @@ class SpindleWidget extends PureComponent {
                 }
             }));
         },
+        'controller:settings': (type, controllerSettings) => {
+            const { settings } = controllerSettings;
+            console.log(settings);
+            if (Object.keys(settings).length > 0) {
+                const { $30, $31 } = settings;
+                this.setState({
+                    spindleMax: Number($30),
+                    spindleMin: Number($31)
+                });
+            }
+        },
         'controller:state': (type, state) => {
             // Grbl
             if (type === GRBL) {
                 const { parserstate } = { ...state };
                 const { modal = {} } = { ...parserstate };
-
-                const settings = { ...controller.settings };
-                const eepromSettings = settings.settings || {};
-                if (Object.keys(eepromSettings).length > 0) {
-                    const { $30 = 1000, $31 = 0 } = settings;
-                    this.setState({
-                        spindleMax: Number($30),
-                        spindleMin: Number($31)
-                    });
-                }
-
                 this.setState({
                     controller: {
                         type: type,
@@ -198,11 +198,13 @@ class SpindleWidget extends PureComponent {
             spindleSpeed,
             mode,
             spindleMax,
+            spindleMin,
             laser
         } = this.state;
 
         this.config.set('laserTest', laser);
         this.config.set('spindleMax', spindleMax);
+        this.config.set('spindleMin', spindleMin);
         this.config.set('mode', mode);
         this.config.set('minimized', minimized);
         this.config.set('speed', spindleSpeed);
@@ -229,7 +231,7 @@ class SpindleWidget extends PureComponent {
             },
             spindleSpeed: this.config.get('speed', 1000),
             spindleMin: this.config.get('spindleMin', 0),
-            spindleMax: this.config.get('spindleMax', 25000),
+            spindleMax: this.config.get('spindleMax', 5000),
             laser: this.config.get('laserTest')
         };
     }
@@ -345,8 +347,6 @@ class SpindleWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-
-        console.log(state);
 
         const { active } = state;
         return (

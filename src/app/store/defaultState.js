@@ -252,13 +252,13 @@ const defaultState = {
         },
         spindle: {
             minimized: false,
-            speed: 1000,
             mode: SPINDLE_MODE,
+            speed: 1000,
             spindleMax: 2000,
             spindleMin: 0,
             laserTest: {
-                power: 0,
-                duration: 0,
+                power: 100,
+                duration: 1000,
             }
         },
         visualizer: {
