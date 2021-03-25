@@ -124,12 +124,12 @@ class SpindleWidget extends PureComponent {
             });
         },
         runLaserTest: () => {
-            const { laser } = this.state;
+            const { laser, spindleMax } = this.state;
             const { power, duration } = laser;
             this.setState({
                 active: true
             });
-            controller.command('lasertest:on', power, duration, 1000);
+            controller.command('lasertest:on', power, duration, spindleMax);
             setTimeout(() => {
                 this.setState({
                     active: false
@@ -160,6 +160,16 @@ class SpindleWidget extends PureComponent {
                 const { parserstate } = { ...state };
                 const { modal = {} } = { ...parserstate };
 
+                const settings = { ...controller.settings };
+                const eepromSettings = settings.settings || {};
+                if (Object.keys(eepromSettings).length > 0) {
+                    const { $30 = 1000, $31 = 0 } = settings;
+                    this.setState({
+                        spindleMax: Number($30),
+                        spindleMin: Number($31)
+                    });
+                }
+
                 this.setState({
                     controller: {
                         type: type,
@@ -171,7 +181,7 @@ class SpindleWidget extends PureComponent {
                     }
                 });
             }
-        }
+        },
     };
 
     componentDidMount() {
@@ -218,6 +228,7 @@ class SpindleWidget extends PureComponent {
                 state: controller.workflow.state
             },
             spindleSpeed: this.config.get('speed', 1000),
+            spindleMin: this.config.get('spindleMin', 0),
             spindleMax: this.config.get('spindleMax', 25000),
             laser: this.config.get('laserTest')
         };
@@ -255,7 +266,7 @@ class SpindleWidget extends PureComponent {
             controller.command('gcode', 'M5');
             this.setInactive();
         }
-        controller.command('gcode', '$31=0');
+        controller.command('gcode', '$32=0');
     }
 
     debouncedSpindleOverride = debounce((spindleSpeed) => {
@@ -268,7 +279,7 @@ class SpindleWidget extends PureComponent {
             controller.command('gcode', 'M5');
             this.setInactive();
         }
-        controller.command('gcode', '$31=1');
+        controller.command('gcode', '$32=1');
     }
 
     canClick() {
@@ -334,6 +345,8 @@ class SpindleWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
+
+        console.log(state);
 
         const { active } = state;
         return (

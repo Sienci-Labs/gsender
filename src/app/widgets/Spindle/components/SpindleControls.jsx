@@ -24,6 +24,7 @@ const SpindleControls = ({ actions, state }) => {
                 label="Speed"
                 unitString="RPM"
                 value={state.spindleSpeed}
+                min={state.spindleMin}
                 max={state.spindleMax}
                 step={10}
                 onChange={actions.handleSpindleSpeedChange}

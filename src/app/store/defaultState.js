@@ -254,7 +254,8 @@ const defaultState = {
             minimized: false,
             speed: 1000,
             mode: SPINDLE_MODE,
-            spindleMax: 25000,
+            spindleMax: 2000,
+            spindleMin: 0,
             laserTest: {
                 power: 0,
                 duration: 0,
