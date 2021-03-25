@@ -8,9 +8,10 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import store from 'app/store';
-import cx from 'classnames';
+// import cx from 'classnames';
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
+import GoToButton from './components/GoToButton';
 
 import {
     AXIS_E,
@@ -36,7 +37,8 @@ class DisplayPanel extends PureComponent {
         machinePosition: PropTypes.object,
         workPosition: PropTypes.object,
         jog: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
+        safeRetractHeight: PropTypes.number,
     };
 
     controllerEvents = {
@@ -147,6 +149,13 @@ class DisplayPanel extends PureComponent {
         return (
             <tr>
                 <td className={styles.coordinate}>
+                    <GoToButton
+                        disabled={!canClick}
+                        onClick={() => {
+                            controller.command('gcode', 'G90');
+                            controller.command('gcode', `G0 ${axisLabel}0`); //Move to Work Position Zero
+                        }}
+                    />
                     <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick} />
                 </td>
                 <td className={styles.machinePosition}>
@@ -249,26 +258,27 @@ class DisplayPanel extends PureComponent {
                             <i className="fas fa-bullseye" />
                             Zero All
                         </FunctionButton>
-                        <div className={cx({ [styles.buttonWrap]: !endstops }, { [styles.columnZeros]: endstops })}>
-                            <FunctionButton
-                                onClick={() => {
-                                    const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-                                    if (safeRetractHeight !== 0) {
-                                        controller.command('gcode', 'G91');
-                                        controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
-                                    }
+                        <FunctionButton
+                            onClick={() => {
+                                const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+                                if (safeRetractHeight !== 0) {
+                                    controller.command('gcode', 'G91');
+                                    controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                }
 
-                                    controller.command('gcode', 'G90');
-                                    controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
-                                    controller.command('gcode', 'G0 Z0'); // Move Z up
-                                }}
-                                disabled={!canClick}
-                                className={styles.fontMonospace}
-                                primary
-                            >
-                                <i className="fas fa-chart-line" />
+                                controller.command('gcode', 'G90');
+                                controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
+                                controller.command('gcode', 'G0 Z0'); // Move Z up
+                            }}
+                            disabled={!canClick}
+                            className={styles.fontMonospace}
+                            primary
+                        >
+                            <i className="fas fa-chart-line" />
                             Go XYZ0
-                            </FunctionButton>
+                        </FunctionButton>
+                        {/* <div className={cx({ [styles.buttonWrap]: !endstops }, { [styles.columnZeros]: endstops })}>
+
                             <FunctionButton
                                 onClick={() => {
                                     controller.command('gcode', 'G90');
@@ -305,53 +315,54 @@ class DisplayPanel extends PureComponent {
                                 <i className="fas fa-chart-line" />
                                 Go Z0
                             </FunctionButton>
-                        </div>
+                        </div> */}
                     </div>
 
                     {
-                        endstops &&
-                        <div className={endstops ? styles.endStopActiveControls : styles.hideHoming}>
-                            <FunctionButton
-                                disabled={!canClick}
-                                onClick={this.actions.startHoming}
-                                className={styles.runHomeButton}
-                            >
-                                <i className="fas fa-home" /> Home
-                            </FunctionButton>
-                            <QuickPositionButton
-                                disabled={!canClick || !homingHasBeenRun}
-                                className={styles.QPBL}
-                                onClick={() => {
-                                    this.actions.jogtoBLCorner();
-                                }}
-                                icon={(houseIconPos === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
-                            />
-                            <QuickPositionButton
-                                disabled={!canClick || !homingHasBeenRun}
-                                className={styles.QPBR}
-                                rotate={45}
-                                onClick={() => {
-                                    this.actions.jogtoBRCorner();
-                                }}
-                                icon={(houseIconPos === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
-                            />
-                            <QuickPositionButton
-                                disabled={!canClick || !homingHasBeenRun}
-                                className={styles.QPFL}
-                                onClick={() => {
-                                    this.actions.jogtoFLCorner();
-                                }}
-                                icon={(houseIconPos === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
-                            />
-                            <QuickPositionButton
-                                disabled={!canClick || !homingHasBeenRun}
-                                className={styles.QPFR}
-                                onClick={() => {
-                                    this.actions.jogtoFRCorner();
-                                }}
-                                icon={(houseIconPos === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
-                            />
-                        </div>
+                        endstops && (
+                            <div className={endstops ? styles.endStopActiveControls : styles.hideHoming}>
+                                <FunctionButton
+                                    disabled={!canClick}
+                                    onClick={this.actions.startHoming}
+                                    className={styles.runHomeButton}
+                                >
+                                    <i className="fas fa-home" /> Home
+                                </FunctionButton>
+                                <QuickPositionButton
+                                    disabled={!canClick || !homingHasBeenRun}
+                                    className={styles.QPBL}
+                                    onClick={() => {
+                                        this.actions.jogtoBLCorner();
+                                    }}
+                                    icon={(houseIconPos === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                />
+                                <QuickPositionButton
+                                    disabled={!canClick || !homingHasBeenRun}
+                                    className={styles.QPBR}
+                                    rotate={45}
+                                    onClick={() => {
+                                        this.actions.jogtoBRCorner();
+                                    }}
+                                    icon={(houseIconPos === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                />
+                                <QuickPositionButton
+                                    disabled={!canClick || !homingHasBeenRun}
+                                    className={styles.QPFL}
+                                    onClick={() => {
+                                        this.actions.jogtoFLCorner();
+                                    }}
+                                    icon={(houseIconPos === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                />
+                                <QuickPositionButton
+                                    disabled={!canClick || !homingHasBeenRun}
+                                    className={styles.QPFR}
+                                    onClick={() => {
+                                        this.actions.jogtoFRCorner();
+                                    }}
+                                    icon={(houseIconPos === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                />
+                            </div>
+                        )
                     }
                 </div>
             </Panel>
