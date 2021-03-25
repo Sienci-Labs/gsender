@@ -20,7 +20,14 @@ const SpindleControls = ({ actions, state }) => {
                     Stop (M5)
                 </FunctionButton>
             </div>
-            <Slider label="Speed" unitString="RPM" value={state.spindleSpeed}/>
+            <Slider
+                label="Speed"
+                unitString="RPM"
+                value={state.spindleSpeed}
+                max={state.spindleMax}
+                step={10}
+                onChange={actions.handleSpindleSpeedChange}
+            />
         </div>
     );
 };

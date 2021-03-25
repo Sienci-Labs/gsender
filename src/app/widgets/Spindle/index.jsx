@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import includes from 'lodash/includes';
+import debounce from 'lodash/debounce';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -72,16 +73,34 @@ class SpindleWidget extends PureComponent {
             }
         },
         sendM3: () => {
-            controller.command('gcode', 'M3');
+            const { spindleSpeed, mode } = this.state;
+            if (mode === LASER_MODE || spindleSpeed === 0) {
+                controller.command('gcode', 'M3');
+            } else {
+                controller.command('gcode', `M3 S${spindleSpeed}`);
+            }
+
             this.setActive();
         },
         sendM4: () => {
-            controller.command('gcode', 'M4');
+            const { spindleSpeed, mode } = this.state;
+            if (mode === LASER_MODE || spindleSpeed === 0) {
+                controller.command('gcode', 'M4');
+            } else {
+                controller.command('gcode', `M4 S${spindleSpeed}`);
+            }
             this.setActive();
         },
         sendM5: () => {
             controller.command('gcode', 'M5');
             this.setInactive();
+        },
+        handleSpindleSpeedChange: (e) => {
+            const value = Number(e.target.value);
+            this.setState({
+                spindleSpeed: value
+            });
+            this.debouncedSpindleOverride(value);
         }
     };
 
@@ -133,9 +152,11 @@ class SpindleWidget extends PureComponent {
         const {
             minimized,
             spindleSpeed,
-            mode
+            mode,
+            spindleMax
         } = this.state;
 
+        this.config.set('spindleMax', spindleMax);
         this.config.set('mode', mode);
         this.config.set('minimized', minimized);
         this.config.set('speed', spindleSpeed);
@@ -199,6 +220,10 @@ class SpindleWidget extends PureComponent {
         }
         controller.command('gcode', '$31=0');
     }
+
+    debouncedSpindleOverride = debounce((spindleSpeed) => {
+        controller.command('spindleOverride', spindleSpeed);
+    }, 250);
 
     enableLaserMode() {
         const { active } = this.state;
