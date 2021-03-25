@@ -96,11 +96,45 @@ class SpindleWidget extends PureComponent {
             this.setInactive();
         },
         handleSpindleSpeedChange: (e) => {
-            const value = Number(e.target.value);
+            const value = Number(e.target.value) || 0;
             this.setState({
                 spindleSpeed: value
             });
-            this.debouncedSpindleOverride(value);
+            //this.debouncedSpindleOverride(value);
+        },
+        handleLaserPowerChange: (e) => {
+            const { laser } = this.state;
+            const value = Number(e.target.value);
+            this.setState({
+                laser: {
+                    ...laser,
+                    power: value
+                }
+            });
+        },
+        handleLaserDurationChange: (e) => {
+            const { laser } = this.state;
+            let value = Number(e.target.value) || 0;
+            value = Math.abs(value);
+            this.setState({
+                laser: {
+                    ...laser,
+                    duration: value
+                }
+            });
+        },
+        runLaserTest: () => {
+            const { laser } = this.state;
+            const { power, duration } = laser;
+            this.setState({
+                active: true
+            });
+            controller.command('lasertest:on', power, duration, 1000);
+            setTimeout(() => {
+                this.setState({
+                    active: false
+                });
+            }, laser.duration);
         }
     };
 
@@ -153,9 +187,11 @@ class SpindleWidget extends PureComponent {
             minimized,
             spindleSpeed,
             mode,
-            spindleMax
+            spindleMax,
+            laser
         } = this.state;
 
+        this.config.set('laserTest', laser);
         this.config.set('spindleMax', spindleMax);
         this.config.set('mode', mode);
         this.config.set('minimized', minimized);

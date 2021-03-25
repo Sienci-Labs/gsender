@@ -107,7 +107,7 @@ class SecondaryFunctionality extends PureComponent {
         if (machineProfile.spindle) {
             const hasSpindleWidget = this.state.tabs.find(tab => tab.widgetId === 'spindle');
             if (!hasSpindleWidget) {
-                this.setState((prev) => ({ ...prev, tabs: [...prev.tabs, { label: 'Spindle', widgetId: 'spindle', component: SpindleWidget }] }));
+                this.setState((prev) => ({ ...prev, tabs: [...prev.tabs, { label: 'Spindle/Laser', widgetId: 'spindle', component: SpindleWidget }] }));
             }
         } else {
             const filteredTabs = this.state.tabs.filter(tab => tab.widgetId !== 'spindle');

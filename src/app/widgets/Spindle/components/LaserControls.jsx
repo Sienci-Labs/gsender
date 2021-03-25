@@ -14,7 +14,7 @@ const LaserControls = ({ actions, state }) => {
                     <i className="fas fa-lightbulb" />
                     Laser On
                 </FunctionButton>
-                <FunctionButton onClick={actions.sendM4}>
+                <FunctionButton onClick={actions.runLaserTest}>
                     <i className="fas fa-satellite-dish" />
                     Laser Test
                 </FunctionButton>
@@ -29,20 +29,17 @@ const LaserControls = ({ actions, state }) => {
                 value={laser.power}
                 max={100}
                 step={1}
-                onChange={null}
+                onChange={actions.handleLaserPowerChange}
             />
-            <div className={styles.durationWrapper}>
-                <div className={classNames('form-group')}>
-                    <label>Test Duration:</label>
-                    <div className="input-group">
-                        <input
-                            value={laser.duration}
-                            onChange={null}
-                            className={classNames('form-control')}
-                            style={{ zIndex: '0', textAlign: 'center', color: '#3e85c7' }}
-                        />
-                        <span className="input-group-addon">ms</span>
-                    </div>
+            <div className={classNames('form-group', styles.durationWrapper)}>
+                <label>Test Duration:</label>
+                <div className="input-group">
+                    <input
+                        value={laser.duration}
+                        onChange={actions.handleLaserDurationChange}
+                        className={classNames('form-control', styles.durationInput)}
+                    />
+                    <span className="input-group-addon">ms</span>
                 </div>
             </div>
         </div>

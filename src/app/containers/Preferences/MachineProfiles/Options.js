@@ -240,7 +240,7 @@ export default class Options extends Component {
 
                         <div className={styles['machine-options-inputgroup']}>
                             <ToggleSwitch
-                                label="Spindle"
+                                label="Spindle/Laser"
                                 checked={spindle}
                                 onChange={() => this.handleToggle('spindle')}
                             />
