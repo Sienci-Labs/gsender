@@ -97,20 +97,17 @@ series([
         const token = store.get('session.token');
         user.signin({ token: token })
             .then(({ authenticated, token }) => {
-                if (authenticated) {
-                    log.debug('Create and establish a WebSocket connection');
+                log.debug('Create and establish a WebSocket connection');
 
-                    const host = '';
-                    const options = {
-                        query: 'token=' + token
-                    };
-                    controller.connect(host, options, () => {
-                        // @see "src/web/containers/Login/Login.jsx"
-                        next();
-                    });
-                    return;
-                }
-                next();
+                const host = '';
+                const options = {
+                    query: 'token=' + token
+                };
+                controller.connect(host, options, () => {
+                    // @see "src/web/containers/Login/Login.jsx"
+                    next();
+                });
+                return;
             });
     })()
 ]).then(async () => {
