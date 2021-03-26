@@ -11,6 +11,9 @@ const ActiveIndicator = ({ active = true }) => {
                 }
             </small>
             <div className={cx(styles.activeIndicator, { [styles.activeIndicatorOn]: active })}>
+                {
+                    active && <i className={cx('fas fa-exclamation', styles.activePulse)} />
+                }
             </div>
         </div>
 
