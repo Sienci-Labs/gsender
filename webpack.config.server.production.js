@@ -6,6 +6,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
+const SentryWebpackPlugin = require('@sentry/webpack-plugin');
 const babelConfig = require('./babel.config');
 const pkg = require('./package.json');
 
@@ -58,7 +59,15 @@ module.exports = {
             filename: 'index.html',
             template: path.resolve(__dirname, 'index.html'),
             chunksSortMode: 'dependency' // Sort chunks by dependency
-        })
+        }),
+        new SentryWebpackPlugin({
+            authToken: process.env.SENTRY_IO_AUTH_TOKEN,
+            org: 'sienci-labs',
+            project: 'gsender',
+
+            include: '.',
+            ignore: ['node_modules', 'webpack.config.js'],
+        }),
     ],
     module: {
         rules: [
