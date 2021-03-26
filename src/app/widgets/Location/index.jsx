@@ -940,7 +940,6 @@ class LocationWidget extends PureComponent {
                             toggle={(
                                 <div style={{ fontSize: '1.1rem', lineHeight: '1.5rem', margin: '0 5px', color: 'black' }}>
                                     <label>Workspace: </label>
-
                                     <div className={styles['position-label'] }>
                                         {wcs}{' '}
                                         <i className={cx('fas fa-chevron-down', styles.smallIcon)} />
