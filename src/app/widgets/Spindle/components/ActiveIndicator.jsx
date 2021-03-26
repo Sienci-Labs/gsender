@@ -11,9 +11,6 @@ const ActiveIndicator = ({ active = true }) => {
                 }
             </small>
             <div className={cx(styles.activeIndicator, { [styles.activeIndicatorOn]: active })}>
-                {
-                    active && <div className={styles.activePing} />
-                }
             </div>
         </div>
 

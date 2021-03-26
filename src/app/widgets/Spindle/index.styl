@@ -115,27 +115,23 @@
 }
 
 .active-indicator-on {
-    background: #3e85c7;
-    border: solid 1px #295d8d;
-    animation: pulse-blue 1s infinite;
+    background: #dc2626;
+    border: solid 1px #9b1919;
+    animation: pulse-red 1s infinite;
+}
+@keyframes pulse-red {
+0% {
+    transform: scale(0.95);
+box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7);
 }
 
-
-@keyframes pulse-blue {
-    0% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(52, 172, 224, 0.7);
-    }
-
-    70% {
-        transform: scale(1);
-        box-shadow: 0 0 0 10px rgba(52, 172, 224, 0);
-    }
-
-    100% {
-        transform: scale(0.95);
-        box-shadow: 0 0 0 0 rgba(52, 172, 224, 0);
-    }
+70% {
+    transform: scale(1);
+box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
 }
 
-
+100% {
+    transform: scale(0.95);
+box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+}
+}
