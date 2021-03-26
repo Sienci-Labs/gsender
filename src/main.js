@@ -11,6 +11,9 @@ import launchServer from './server-cli';
 import pkg from './package.json';
 import './sentryInit';
 
+/* Whether to include menu or no */
+const BUILD_DEV = false;
+
 // The selection menu
 const selectionMenu = Menu.buildFromTemplate([
     { role: 'copy' },
@@ -71,10 +74,13 @@ const main = () => {
             const splashScreen = windowManager.createSplashScreen({
                 width: 500,
                 height: 400,
+                show: false,
                 frame: false
             });
             await splashScreen.loadFile(path.join(__dirname, 'app/assets/splashscreen.png'));
-            splashScreen.show();
+            splashScreen.once('ready-to-show', () => {
+                splashScreen.show();
+            });
 
             const res = await launchServer();
             const { address, port, mountPoints } = { ...res };
@@ -83,8 +89,10 @@ const main = () => {
                 return;
             }
 
-            const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
-            Menu.setApplicationMenu(menu);
+            if (BUILD_DEV) {
+                const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
+                Menu.setApplicationMenu(menu);
+            }
 
             const url = `http://${address}:${port}`;
             // The bounds is a rectangle object with the following properties:
