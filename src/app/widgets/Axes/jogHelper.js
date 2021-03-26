@@ -7,8 +7,6 @@ class JogHelper {
 
     startTime = 0;
 
-    didPress = false;
-
     jog = null;
 
     continuousJog = null;
@@ -16,16 +14,15 @@ class JogHelper {
     stopContinuousJog = null;
 
     constructor({ jogCB, startContinuousJogCB, stopContinuousJogCB }) {
-        this.jog = _.throttle(jogCB, this.timeout);
-        this.continuousJog = _.throttle(startContinuousJogCB, this.timeout);
-        this.stopContinuousJog = _.throttle(stopContinuousJogCB, this.timeout);
+        this.jog = _.throttle(jogCB, this.timeout, { trailing: false });
+        this.continuousJog = _.throttle(startContinuousJogCB, this.timeout, { trailing: false });
+        this.stopContinuousJog = _.throttle(stopContinuousJogCB, this.timeout, { trailing: false });
     }
 
     onKeyDown(coordinates, feedrate) {
         const startTime = new Date();
 
         this.startTime = startTime;
-        this.didPress = true;
 
         this.timeoutFunction = setTimeout(() => {
             this.continuousJog(coordinates, feedrate);
@@ -34,18 +31,22 @@ class JogHelper {
 
     onKeyUp(coordinates) {
         const timer = new Date() - this.startTime;
-        clearTimeout(this.timeoutFunction);
-        this.timeoutFunction = null;
+
+        if (!this.timeoutFunction) {
+            this.stopContinuousJog();
+            return;
+        }
 
         if (timer < this.timeout) {
             this.jog(coordinates);
-            this.didPress = false;
             this.startTime = new Date();
         } else {
             this.stopContinuousJog();
             this.startTime = new Date();
-            this.didPress = false;
         }
+
+        clearTimeout(this.timeoutFunction);
+        this.timeoutFunction = null;
     }
 }
 
