@@ -3,6 +3,7 @@ import includes from 'lodash/includes';
 import debounce from 'lodash/debounce';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
+import pubsub from 'pubsub-js';
 import React, { PureComponent } from 'react';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
@@ -65,11 +66,13 @@ class SpindleWidget extends PureComponent {
                     mode: SPINDLE_MODE
                 });
                 this.enableSpindleMode();
+                pubsub.publish('spindle:mode', SPINDLE_MODE);
             } else {
                 this.setState({
                     mode: LASER_MODE
                 });
                 this.enableLaserMode();
+                pubsub.publish('spindle:mode', LASER_MODE);
             }
         },
         sendM3: () => {

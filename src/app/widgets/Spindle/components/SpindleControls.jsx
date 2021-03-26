@@ -4,18 +4,19 @@ import Slider from './Slider';
 import styles from '../index.styl';
 
 const SpindleControls = ({ actions, state }) => {
+    const { canClick } = state;
     return (
         <div className={styles.controlContainer}>
             <div className={styles.controlRow}>
-                <FunctionButton onClick={actions.sendM3}>
+                <FunctionButton onClick={actions.sendM3} disabled={!canClick}>
                     <i className="fas fa-redo-alt" />
                     CW (M3)
                 </FunctionButton>
-                <FunctionButton onClick={actions.sendM4}>
+                <FunctionButton onClick={actions.sendM4} disabled={!canClick}>
                     <i className="fas fa-redo-alt fa-flip-horizontal" />
                     CCW (M4)
                 </FunctionButton>
-                <FunctionButton onClick={actions.sendM5}>
+                <FunctionButton onClick={actions.sendM5} disabled={!canClick}>
                     <i className="fas fa-ban" />
                     Stop (M5)
                 </FunctionButton>
