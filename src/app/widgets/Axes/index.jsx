@@ -473,6 +473,10 @@ class AxesWidget extends PureComponent {
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
             preventDefault(event);
             const { isContinuousJogging } = this.state;
+            const { getXYJogDistance, getZJogDistance } = this.actions;
+
+            const xyStep = getXYJogDistance();
+            const zStep = getZJogDistance();
 
             if (!axis || isContinuousJogging) {
                 return;
@@ -480,6 +484,14 @@ class AxesWidget extends PureComponent {
 
             const givenAxis = axis.toUpperCase();
             const feedrate = Number(this.actions.getFeedrate());
+
+            const axisValue = {
+                X: xyStep,
+                Y: xyStep,
+                Z: zStep
+            }[givenAxis] * direction;
+
+            this.setState({ prevJog: { [givenAxis]: axisValue, F: feedrate } });
 
             const jogCB = (given) => this.actions.jog(given);
 
@@ -493,8 +505,17 @@ class AxesWidget extends PureComponent {
 
             this.joggingHelper.onKeyDown({ [givenAxis]: direction }, feedrate);
         },
-        STOP_JOG: (event, { axis, direction }) => {
+        STOP_JOG: (event, payload) => {
             preventDefault(event);
+
+            const { prevJog } = this.state;
+
+            if (!payload) {
+                this.joggingHelper && this.joggingHelper.onKeyUp(prevJog);
+                return;
+            }
+
+            const { axis, direction } = payload;
 
             const { getXYJogDistance, getZJogDistance } = this.actions;
 
@@ -883,7 +904,8 @@ class AxesWidget extends PureComponent {
             mdi: {
                 disabled: this.config.get('mdi.disabled'),
                 commands: []
-            }
+            },
+            prevJog: null,
         };
     }
 
