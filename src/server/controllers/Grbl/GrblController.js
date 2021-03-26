@@ -36,7 +36,9 @@ import {
     GRBL_SETTINGS
 } from './constants';
 import { METRIC_UNITS } from '../../../app/constants';
-import FlashingFirmware from '../../lib/FirmwareFlashing/firmwareflashing';
+import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
+import FirmwareProfiles from '../../lib/Firmware/Profiles/firmwareprofiles';
+import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 
 
 // % commands
@@ -1060,12 +1062,32 @@ class GrblController {
                 });
             },
             'flashing:success': (data) => {
-                this.emit('message', data);
+                console.log(`${data}FLASHING SUCCESS CALLED`);
+                this.emit('task:finish', data);
             },
-            'flashing:failed': (data) => {
-                this.emit('message', data);
-                log.debug('CALLED ERROR');
-                console.log('error grblcontroller');
+            'flashing:failed': () => {
+                let [error] = args;
+                setTimeout(() => this.emit('task:error', error), 2000);
+                // log.debug(`${error} flashing:failed`);
+            },
+            'firmware:getProfiles': (data) => {
+                let [port = 'COM3'] = args;
+                FirmwareProfiles(port);
+                // log.debug('firmware:getProfiles');
+                // console.log('firmware:getProfiles');
+            },
+            'firmware:recievedProfiles': () => {
+                let [files] = args;
+                this.emit('message', files);
+                // log.debug(`${files} files inside grblcontroller`);
+            },
+            'firmware:applyProfileSettings': () => {
+                let [chosenProfile, port] = args;
+                ApplyFirmwareProfile(chosenProfile, port);
+            },
+            'firmware:dubugging': () => {
+                let [values] = args;
+                this.emit('message', values);
             },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;

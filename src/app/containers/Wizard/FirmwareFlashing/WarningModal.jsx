@@ -10,6 +10,7 @@ import styles from '../index.styl';
 class WarningModal extends PureComponent {
     static propTypes = {
         handleCloseWarning: PropTypes.func,
+        modalClose: PropTypes.func,
         port: PropTypes.string,
         flashingStart: PropTypes.func,
     }

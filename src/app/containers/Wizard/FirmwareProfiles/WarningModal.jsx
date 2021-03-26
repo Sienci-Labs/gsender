@@ -2,26 +2,36 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Button } from 'react-bootstrap';
+import { Toaster } from '../../../lib/toaster/ToasterLib';
 import controller from '../../../lib/controller';
 import styles from '../index.styl';
 
 
 class WarningModal extends PureComponent {
-    static propTypes = {
-        handleWarningModal: PropTypes.func,
-        handleNoUpdates: PropTypes.func
+        static propTypes = {
+            selectedProfile: PropTypes.string,
+            modalClose: PropTypes.func,
+            port: PropTypes.string
+        }
+
+    actions = {
+        startFlash: (port) => {
+            controller.command('flash:start', port);
+            this.setState({ currentlyFlashing: true });
+        }
     }
 
     handleYes = (props) => {
-        this.props.handleWarningModal();
-        controller.command('gcode', '$RST=$');
-        controller.command('gcode', '$$');
+        controller.command('firmware:applyProfileSettings', this.props.selectedProfile, this.props.port);
         this.props.modalClose();
-        setTimeout(() => this.props.handleNoUpdates(), 3000);
+        Toaster.pop({
+            msg: (`Settings Updated to ${this.props.selectedProfile} eeprom`),
+            type: 'TOASTER_INFO',
+        });
     }
 
     handleNo = () => {
-        this.props.handleNoUpdates();
+        this.props.handleCloseWarning();
     };
 
     render() {
@@ -32,7 +42,8 @@ class WarningModal extends PureComponent {
                 </Modal.Header>
 
                 <Modal.Body>
-                    <p>Return all Grbl settings to default?</p>
+                    <p className={styles.warningtext}>Upload settings to your device...</p>
+                    <p>Upload {this.props.selectedProfile} eeprom settings?</p>
                 </Modal.Body>
 
                 <Modal.Footer>

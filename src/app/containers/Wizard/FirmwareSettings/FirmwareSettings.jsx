@@ -5,7 +5,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import map from 'lodash/map';
-import { Alert } from 'react-bootstrap';
+import { Toaster, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
 import WarningModal from './WarningModal';
 import controller from '../../../lib/controller';
 import styles from '../index.styl';
@@ -348,6 +348,7 @@ class FirmwareSettings extends PureComponent {
     }
 
     render() {
+        if (this.state.settings.settings !== undefined) {
         const loadedSettings = GRBL_SETTINGS.GRBL_SETTINGS;
         let currentSettings = this.state.settings.settings;
         return (
@@ -382,11 +383,16 @@ class FirmwareSettings extends PureComponent {
                     <WarningModal
                         handleWarningModal={this.handleWarningModal}
                         handleNoUpdates={this.handleNoUpdates}
+                        modalClose={this.props.modalClose}
                     />
                 )}
                 {
-                    this.state.alert &&
-                    <Alert className={styles.alert}>Settings updated!</Alert>
+                    this.state.alert
+                    ? Toaster.pop({
+                        msg: 'Settings Updated',
+                        type: TOASTER_SUCCESS,
+                        duration: 3000
+                    }) : ''
                 }
                 <div> {loadedSettings.map((grbl) => (
                     <div key={grbl.setting} className={styles.containerFluid}>
@@ -420,6 +426,9 @@ class FirmwareSettings extends PureComponent {
                 </div>
             </div>
         );
+        } else {
+           return <div> </div>;
+        }
     }
 }
 

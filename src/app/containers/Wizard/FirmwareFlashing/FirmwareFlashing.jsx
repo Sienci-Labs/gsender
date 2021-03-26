@@ -4,6 +4,7 @@
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 import { Toaster } from '../../../lib/toaster/ToasterLib';
 import ArduinoUno from '../FirmwareFlashing/images/ArduinoUno.svg';
 import styles from './index.styl';
@@ -26,7 +27,7 @@ class FirmwareFlashing extends PureComponent {
     board = this.boardChoices[0];
 
     controllerEvents = {
-        'message': (boardinfo) => {
+        'task:finish': () => {
             this.setState({ currentlyFlashing: false });
             this.setState({ finishedMessage: 'Flashing completed successfully!' });
             this.props.modalClose();
@@ -36,7 +37,6 @@ class FirmwareFlashing extends PureComponent {
             });
         },
         'error': (error) => {
-            console.log(error);
             this.setState({ currentlyFlashing: false });
             this.setState({ finishedMessage: 'Error flashing board...' });
             Toaster.pop({
@@ -108,44 +108,52 @@ class FirmwareFlashing extends PureComponent {
 
     render = () => {
         return (
-            <div className={styles.firmwarewrapper}>
-                { this.state.warning && (
-                    <WarningModal
-                        handleCloseWarning={this.handleCloseWarning}
-                        boardType={this.boardChoices}
-                        flashingStart={this.flashingStart}
-                        port={this.state.port}
-                    />
-                )}
-                <Fieldset legend="Firmware Flashing">
-                    <h3 className={styles.iteminfo}>You can use this wizard to flash Grbl Firmware onto compatible Arduino Uno boards only.</h3>
-                    <h3 className={styles.iteminfo}>Use with care, or when instructed by Support...</h3>
-                    <div>
-                        <label>
+            <div className={classNames(
+                styles.hidden,
+                styles['settings-wrapper'],
+                { [styles.visible]: this.props.active }
+            )}
+            >
+                <div className={styles.firmwarewrapper}>
+                    { this.state.warning ? (
+                        <WarningModal
+                            handleCloseWarning={this.handleCloseWarning}
+                            modalClose={this.props.modalClose}
+                            boardType={this.boardChoices}
+                            flashingStart={this.flashingStart}
+                            port={this.state.port}
+                        />
+                    ) : ''}
+                    <Fieldset legend="Firmware Flashing">
+                        <h3 className={styles.iteminfo}>You can use this wizard to flash Grbl Firmware onto compatible Arduino Uno boards only.</h3>
+                        <h3 className={styles.iteminfo}>Use with care, or when instructed by Support...</h3>
+                        <div>
+                            <label>
                                     Board:
-                            <select
-                                className={styles['flashing-options-select']}
-                                id="boardType"
-                                value={this.board}
-                                onChange={event => this.updateBoard(event.target.value)}
-                            >
-                                {this.BoardOptions}
-                            </select>
-                        </label>
-                        <div className={styles.wizardform}>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    this.handleFlashing();
-                                }}
-                            >Begin
-                            </button>
+                                <select
+                                    className={styles['flashing-options-select']}
+                                    id="boardType"
+                                    value={this.board}
+                                    onChange={event => this.updateBoard(event.target.value)}
+                                >
+                                    {this.BoardOptions}
+                                </select>
+                            </label>
+                            <div className={styles.wizardform}>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        this.handleFlashing();
+                                    }}
+                                >Begin
+                                </button>
+                            </div>
+                            {this.state.currentlyFlashing ? <Loading size="lg" overlay={true} /> : ''}
+                            <img src={ArduinoUno} className={styles.board} alt="arduino uno" />
                         </div>
-                        {this.state.currentlyFlashing ? <Loading size="lg" overlay={true} /> : ''}
-                        <img src={ArduinoUno} className={styles.board} alt="arduino uno" />
-                    </div>
-                    <p>For more info please visit: <a href="https://sienci.com/dmx-longmill/grbl-firmware/">Sienci.com</a></p>
-                </Fieldset>
+                        <p>For more info please visit: <a href="https://sienci.com/dmx-longmill/grbl-firmware/">Sienci.com</a></p>
+                    </Fieldset>
+                </div>
             </div>
         );
     }

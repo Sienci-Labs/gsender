@@ -76,7 +76,29 @@ module.exports = {
                 test: /\.hex$/,
                 loader: 'file-loader',
                 include: [
-                    path.resolve(__dirname, 'src/server/lib/FirmwareFlashing')
+                    path.resolve(__dirname, 'src/server/lib/Firmware/Flashing')
+                ]
+            },
+            {
+                test: /\.hex$/,
+                loader: 'raw-loader'
+            },
+            {
+                test: /\.hex$/,
+                loader: 'raw-loader',
+                include: [
+                    path.resolve(__dirname, 'src/server/lib/Firmware/Flashing')
+                ]
+            },
+            {
+                test: /\.txt$/,
+                loader: 'file-loader'
+            },
+            {
+                test: /\.txt$/,
+                loader: 'raw-loader',
+                include: [
+                    path.resolve(__dirname, 'src/server/lib/Firmware/Flashing')
                 ]
             },
             {
