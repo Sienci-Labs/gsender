@@ -4,11 +4,15 @@ import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
+import path from 'path';
 import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
+import './sentryInit';
 
+/* Whether to include menu or no */
+const BUILD_DEV = false;
 
 // The selection menu
 const selectionMenu = Menu.buildFromTemplate([
@@ -64,6 +68,20 @@ const main = () => {
 
     app.whenReady().then(async () => {
         try {
+            windowManager = new WindowManager();
+
+            // Create and show splash before server starts
+            const splashScreen = windowManager.createSplashScreen({
+                width: 500,
+                height: 400,
+                show: false,
+                frame: false
+            });
+            await splashScreen.loadFile(path.join(__dirname, 'app/assets/splashscreen.png'));
+            splashScreen.once('ready-to-show', () => {
+                splashScreen.show();
+            });
+
             const res = await launchServer();
             const { address, port, mountPoints } = { ...res };
             if (!(address && port)) {
@@ -71,10 +89,10 @@ const main = () => {
                 return;
             }
 
-            const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
-            Menu.setApplicationMenu(menu);
-
-            windowManager = new WindowManager();
+            if (BUILD_DEV) {
+                const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
+                Menu.setApplicationMenu(menu);
+            }
 
             const url = `http://${address}:${port}`;
             // The bounds is a rectangle object with the following properties:
@@ -91,7 +109,7 @@ const main = () => {
                 ...bounds,
                 title: `gSender ${pkg.version}`,
             };
-            const window = windowManager.openWindow(url, options);
+            const window = windowManager.openWindow(url, options, splashScreen);
 
             // Save window size and position
             window.on('close', () => {

@@ -8,10 +8,8 @@ import {
     IMPERIAL_UNITS,
     METRIC_UNITS,
 } from '../../constants';
-
 import JogSpeeds from './General/JogSpeeds';
 import MachineProfileOptions from './MachineProfiles/Options';
-
 import Fieldset from './FieldSet';
 import Baudrates from './General/Baudrates';
 import Input from './Input';

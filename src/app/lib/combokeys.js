@@ -3,6 +3,8 @@ import Mousetrap from 'mousetrap';
 import log from './log';
 import { preventDefault } from './dom-events';
 
+import { modifierKeys } from './constants';
+
 import store from '../store';
 
 // const AXIS_X = 'x';
@@ -574,13 +576,25 @@ class Combokeys extends events.EventEmitter {
                     this.emit(STOP_CMD, event, payload);
                 };
 
+                const modiferKeyCB = (e) => {
+                    if (!!o.preventDefault) {
+                        preventDefault(e);
+                    }
+
+                    this.emit(STOP_CMD, e, null);
+                };
+
                 //Listen for keyups on individual keys, for example,
                 //if jogging is shift+arrowup and the user lets go of one key and not the other,
                 //this should trigger STOP_JOG
                 if (keys.includes('+')) {
                     const keysArr = keys.split('+');
                     for (const key of keysArr) {
-                        Mousetrap.bind(key, callback, 'keyup');
+                        if (modifierKeys.includes(key?.toLowerCase())) {
+                            Mousetrap.bind(key, modiferKeyCB, 'keyup');
+                        } else {
+                            Mousetrap.bind(key, callback, 'keyup');
+                        }
                     }
                 }
 

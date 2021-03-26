@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "0.5.6",
+  "version": "0.5.5",
   "productName": "gSender",
   "description": "CNC Milling Controller",
   "author": "Sienci Labs",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@babel/polyfill": "~7.4.3",
     "@babel/runtime": "~7.4.3",
+    "@sentry/electron": "^2.4.0",
     "avrgirl-arduino": "^5.0.1",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.18.3",
