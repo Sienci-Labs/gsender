@@ -68,7 +68,7 @@
     "test": "tap test/*.js --no-timeout --node-arg=--require --node-arg=@babel/register --node-arg=--require --node-arg=@babel/polyfill",
     "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls",
     "postinstall": "opencollective postinstall",
-    "deploy-release": "electron-builder build --ia32 --x64 --win --publish always"
+    "deploy-release": "electron-builder build --x64 --win --publish always"
   },
   "build": {
     "appId": "org.sienci",
