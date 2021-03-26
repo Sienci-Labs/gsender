@@ -11,7 +11,7 @@ const NavSidebarLink = ({ label, url = '#', icon, onClick, className, disabled =
             className={cx(styles.linkButton, className)}
             disabled={disabled}
         >
-            <i className={`fa fas ${icon}`} /> {label}
+            <i className={`${icon}`} /> {label}
         </button>
     );
 };
