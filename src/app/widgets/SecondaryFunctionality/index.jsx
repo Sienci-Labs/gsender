@@ -119,8 +119,6 @@ class SecondaryFunctionality extends PureComponent {
     componentDidMount() {
         this.addControllerEvents();
         store.on('change', this.handleMachineProfileChange);
-
-        this.handleMachineProfileChange();
     }
 
     componentWillUnmount() {
@@ -172,6 +170,11 @@ class SecondaryFunctionality extends PureComponent {
                     widgetId: 'console',
                     component: ConsoleWidget,
                 },
+                {
+                    label: 'Spindle/Laser',
+                    widgetId: 'spindle',
+                    component: SpindleWidget,
+                },
             ]
         };
     }
@@ -194,7 +197,6 @@ class SecondaryFunctionality extends PureComponent {
         const { isFullscreen, tabs, selectedTab } = this.state;
         const { onFork, onRemove, sortable } = this.props;
         const actions = { ...this.actions };
-        this.handleMachineProfileChange();
 
         return (
             <TabbedWidget fullscreen={isFullscreen}>
