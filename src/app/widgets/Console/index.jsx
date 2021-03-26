@@ -68,17 +68,7 @@ class ConsoleWidget extends PureComponent {
             const context = {
                 __sender__: this.senderId
             };
-
-            const invalidGCodeRegex = /[^NGMXYZIJKFRS%\-?\.?\d+\.?\s]/gi;
-
-            if (invalidGCodeRegex.test(data)) {
-                const output = 'This Command is Not Supported';
-
-                this.terminal.writeln(color.white.bold(data));
-                this.terminal.writeln(color.red.bold(output));
-            } else {
-                controller.write(data, context);
-            }
+            controller.write(data, context);
         }
     };
 
@@ -201,7 +191,9 @@ class ConsoleWidget extends PureComponent {
     }
 
     resizeTerminal() {
-        this.terminal && this.terminal.resize();
+        setTimeout(() => {
+            this.terminal && this.terminal.resize();
+        }, 0);
     }
 
     render() {

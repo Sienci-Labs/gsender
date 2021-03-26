@@ -116,6 +116,8 @@ class NumberInput extends PureComponent {
                     type="text"
                     inputMode="decimal"
                     onChange={(e) => this.setValue(e)}
+                    onFocus={(e) => e.target.select()}
+                    onClick={(e) => e.target.select()}
                 />
                 <button type="button" className={styles.stepButton} onClick={(e) => this.incrementValue(e)}>
                     <i className="fa fa-plus fa-fw" style={{ verticalAlign: 'super', margin: 'auto 0.5rem', fontSize: 'clamp(10px, 1vw, 14px)' }} />

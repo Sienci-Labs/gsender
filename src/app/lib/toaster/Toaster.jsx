@@ -51,6 +51,10 @@ class Toaster extends PureComponent {
         });
     }
 
+    removeAll() {
+        this.setState({ activeToasts: [] });
+    }
+
     subscribe () {
         const tokens = [
             pubsub.subscribe('toast:new', (msg, options) => {
@@ -58,6 +62,9 @@ class Toaster extends PureComponent {
             }),
             pubsub.subscribe('toast:remove', (msg, id) => {
                 this.removeToast(id);
+            }),
+            pubsub.subscribe('toast:removeAll', (msg, id) => {
+                this.removeAll();
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);

@@ -47,17 +47,17 @@ const VisualizerSettings = ({ active, state, actions }) => {
                                 <b>Regular</b>
                                 <b>Lightweight Mode</b>
                                 <span>Visualize G-Code</span>
-                                <ToggleSwitch checked={!disabled} onChange={() => visualizerActions.handleVisEnabledToggle()} />
-                                <ToggleSwitch checked={!disabledLite} onChange={() => visualizerActions.handleVisEnabledToggle(true)} />
+                                <ToggleSwitch checked={!disabled} onChange={() => visualizerActions.handleVisEnabledToggle()} size="sm" />
+                                <ToggleSwitch checked={!disabledLite} onChange={() => visualizerActions.handleVisEnabledToggle(true)} size="lg" />
                                 <span>Show Bit</span>
-                                <ToggleSwitch checked={objects.cuttingTool.visible} onChange={() => visualizerActions.handleBitToggle()} />
-                                <ToggleSwitch checked={objects.cuttingTool.visibleLite} onChange={() => visualizerActions.handleBitToggle(true)} />
+                                <ToggleSwitch checked={objects.cuttingTool.visible} onChange={() => visualizerActions.handleBitToggle()} size="md" />
+                                <ToggleSwitch checked={objects.cuttingTool.visibleLite} onChange={() => visualizerActions.handleBitToggle(true)} size="md" />
                                 <span>Show Bit Animation</span>
-                                <ToggleSwitch checked={objects.cuttingToolAnimation.visible} onChange={() => visualizerActions.handleAnimationToggle()} />
-                                <ToggleSwitch checked={objects.cuttingToolAnimation.visibleLite} onChange={() => visualizerActions.handleAnimationToggle(true)} />
+                                <ToggleSwitch checked={objects.cuttingToolAnimation.visible} onChange={() => visualizerActions.handleAnimationToggle()} size="md" />
+                                <ToggleSwitch checked={objects.cuttingToolAnimation.visibleLite} onChange={() => visualizerActions.handleAnimationToggle(true)} size="md" />
                                 <span>Cutpath Animation</span>
-                                <ToggleSwitch checked={objects.cutPath.visible} onChange={() => visualizerActions.handleCutPathToggle()} />
-                                <ToggleSwitch checked={objects.cutPath.visibleLite} onChange={() => visualizerActions.handleCutPathToggle(true)} />
+                                <ToggleSwitch checked={objects.cutPath.visible} onChange={() => visualizerActions.handleCutPathToggle()} size="md" />
+                                <ToggleSwitch checked={objects.cutPath.visibleLite} onChange={() => visualizerActions.handleCutPathToggle(true)} size="md" />
                             </div>
                             <small>Specify which visualizer features are enabled or disable in both regular mode and light-mode, in order to save computer resources</small>
                         </div>

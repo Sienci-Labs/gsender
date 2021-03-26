@@ -13,7 +13,7 @@ import {
     GRBL,
     // Units
     IMPERIAL_UNITS,
-    METRIC_UNITS,
+    METRIC_UNITS, SPINDLE_MODE,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED
 } from '../../constants';
@@ -223,6 +223,14 @@ class JobStatusWidget extends PureComponent {
         this.config.set('probeFeedrate', Number(probeFeedrate));
     }
 
+    getSpindleOverrideLabel() {
+        const mode = store.get('widgets.spindle.mode', SPINDLE_MODE);
+        if (mode === SPINDLE_MODE) {
+            return 'Spindle';
+        }
+        return 'Laser';
+    }
+
     getInitialState() {
         return {
             minimized: this.config.get('minimized', false),
@@ -232,6 +240,7 @@ class JobStatusWidget extends PureComponent {
             feedrateMax: this.config.get('feedrateMax', 2000),
             spindleSpeedMin: this.config.get('spindleSpeedMin', 0),
             spindleSpeedMax: this.config.get('spindleSpeedMax', 1000),
+            spindleOverrideLabel: this.getSpindleOverrideLabel(),
             isFullscreen: false,
             connected: false,
             workflow: {
@@ -326,6 +335,11 @@ class JobStatusWidget extends PureComponent {
             pubsub.subscribe('units:change', (msg, units) => {
                 this.setState({
                     units: units
+                });
+            }),
+            pubsub.subscribe('spindle:mode', (msg, mode) => {
+                this.setState({
+                    spindleOverrideLabel: this.getSpindleOverrideLabel()
                 });
             })
         ];

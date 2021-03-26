@@ -546,7 +546,6 @@ class Workspace extends PureComponent {
                                 />
                             </div>
                         </div>
-
                     </div>
                 </Dropzone>
             </div>

@@ -36,6 +36,9 @@ import {
     GRBL_SETTINGS
 } from './constants';
 import { METRIC_UNITS } from '../../../app/constants';
+import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
+import FirmwareProfiles from '../../lib/Firmware/Profiles/firmwareprofiles';
+import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 
 
 // % commands
@@ -510,23 +513,6 @@ class GrblController {
                         this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
                     }
                 }
-
-                // this.emit('serialport:read', `> ${line.trim()} (line=${received + 1})`);
-                // if (error) {
-                //     // Grbl v1.1
-                //     this.emit('serialport:read', `error:${code} (${error.message})`);
-
-                //     if (pauseError) {
-                //         this.workflow.pause({ err: `error:${code} (${error.message})` });
-                //     }
-                // } else {
-                //     // Grbl v0.9
-                //     this.emit('serialport:read', res.raw);
-
-                //     if (pauseError) {
-                //         this.workflow.pause({ err: res.raw });
-                //     }
-                // }
 
                 this.sender.ack();
                 this.sender.next();
@@ -1069,6 +1055,40 @@ class GrblController {
 
     command(cmd, ...args) {
         const handler = {
+            'flash:start': () => {
+                let [port = 'COM3'] = args;
+                this.close(() => {
+                    FlashingFirmware(port);
+                });
+            },
+            'flashing:success': (data) => {
+                console.log(`${data}FLASHING SUCCESS CALLED`);
+                this.emit('task:finish', data);
+            },
+            'flashing:failed': () => {
+                let [error] = args;
+                setTimeout(() => this.emit('task:error', error), 2000);
+                // log.debug(`${error} flashing:failed`);
+            },
+            'firmware:getProfiles': (data) => {
+                let [port = 'COM3'] = args;
+                FirmwareProfiles(port);
+                // log.debug('firmware:getProfiles');
+                // console.log('firmware:getProfiles');
+            },
+            'firmware:recievedProfiles': () => {
+                let [files] = args;
+                this.emit('message', files);
+                // log.debug(`${files} files inside grblcontroller`);
+            },
+            'firmware:applyProfileSettings': () => {
+                let [chosenProfile, port] = args;
+                ApplyFirmwareProfile(chosenProfile, port);
+            },
+            'firmware:dubugging': () => {
+                let [values] = args;
+                this.emit('message', values);
+            },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;
                 if (typeof context === 'function') {

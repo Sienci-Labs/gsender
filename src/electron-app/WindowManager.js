@@ -1,14 +1,7 @@
 /* eslint import/no-unresolved: 0 */
-import { app, BrowserWindow, shell } from 'electron';
-//import AutoUpdater from './AutoUpdater';
-// const customTitlebar = require('custom-electron-titlebar');
-// import customTitlebar from 'custom-electron-titlebar';
-import path from 'path';
+import { app, BrowserWindow, shell, dialog } from 'electron';
 
-const browserWindowOptions = {
-    minWidth: 1280,
-    minHeight: 768,
-};
+import path from 'path';
 
 class WindowManager {
     windows = [];
@@ -54,21 +47,22 @@ class WindowManager {
         });
     }
 
-    openWindow(url, options) {
+    openWindow(url, options, splashScreen) {
         const window = new BrowserWindow({
             ...options,
-            ...browserWindowOptions,
-            titleBarStyle: 'hidden',
             show: false,
             webPreferences: {
                 nodeIntegration: true,
+                enableRemoteModule: true,
                 preload: path.join(__dirname, 'preload.js')
             }
         });
         const webContents = window.webContents;
+
         window.webContents.on('did-finish-load', () => {
             window.setTitle(options.title);
         });
+
         window.on('closed', (event) => {
             const index = this.windows.indexOf(event.sender);
             console.assert(index >= 0);
@@ -83,22 +77,43 @@ class WindowManager {
         });
 
         webContents.once('dom-ready', () => {
+            splashScreen.hide();
             window.show();
+            splashScreen.destroy();
         });
 
         // Call `ses.setProxy` to ignore proxy settings
         // http://electron.atom.io/docs/latest/api/session/#sessetproxyconfig-callback
         const ses = webContents.session;
-        ses.setProxy({ proxyRules: 'direct://' }, () => {
+        ses.setProxy({ proxyRules: 'direct://' }).then(() => {
             window.loadURL(url);
         });
 
+        /*window.loadURL(url).then(() => {
+            dialog.showMessageBox({
+                message: `Loaded ${url}`
+            });
+            console.log(`Loaded ${url}`);
+        }).catch((e) => {
+            dialog.showMessageBox({
+                message: e
+            });
+            console.log(`Error: ${e}`);
+        });*/
+
+
+
         this.windows.push(window);
 
-        // Disable AutoUpdater until an update server is available
-        //new AutoUpdater(window);
-
         return window;
+    }
+
+    createSplashScreen(options) {
+        const splashScreen = new BrowserWindow({
+            ...options
+        });
+
+        return splashScreen;
     }
 
     getWindow(index = 0) {

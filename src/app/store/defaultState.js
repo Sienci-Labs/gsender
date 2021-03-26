@@ -1,7 +1,8 @@
 import {
     IMPERIAL_STEPS,
     METRIC_STEPS,
-    METRIC_UNITS
+    METRIC_UNITS,
+    SPINDLE_MODE
 } from '../constants';
 
 const AXIS_X = 'x';
@@ -18,6 +19,7 @@ const defaultState = {
     workspace: {
         units: METRIC_UNITS,
         reverseWidgets: false,
+        safeRetractHeight: 0,
         container: {
             primary: {
                 show: true,
@@ -182,12 +184,6 @@ const defaultState = {
         console: {
             minimized: false
         },
-        custom: {
-            disabled: true,
-            minimized: false,
-            title: '',
-            url: ''
-        },
         gcode: {
             minimized: false
         },
@@ -210,19 +206,6 @@ const defaultState = {
                 modalGroups: {
                     expanded: true
                 }
-            }
-        },
-        laser: {
-            minimized: false,
-            panel: {
-                laserTest: {
-                    expanded: true
-                }
-            },
-            test: {
-                power: 0,
-                duration: 0,
-                maxS: 1000
             }
         },
         location: {
@@ -257,32 +240,6 @@ const defaultState = {
         macro: {
             minimized: false
         },
-        marlin: {
-            minimized: false,
-            panel: {
-                heaterControl: {
-                    expanded: true
-                },
-                statusReports: {
-                    expanded: false
-                },
-                modalGroups: {
-                    expanded: false
-                }
-            },
-            heater: {
-                // Filament          | PLA                | ABS
-                // ----------------- | ------------------ | --------------------
-                // Uses              | Consumer Products  | Functional Parts
-                // Strength          | Medium             | Medium
-                // Flexibility       | Low                | Medium
-                // Durability        | Medium             | High
-                // Print Temperature | 180-230°C          | 210-250°C
-                // Bed Temperature   | 20-60°C (optional) | 80-110°C (mandatory)
-                extruder: 180,
-                heatedBed: 60
-            }
-        },
         probe: {
             minimized: false,
             probeCommand: 'G38.2',
@@ -293,36 +250,15 @@ const defaultState = {
             touchPlateHeight: 10,
             retractionDistance: 4
         },
-        smoothie: {
-            minimized: false,
-            panel: {
-                statusReports: {
-                    expanded: true
-                },
-                modalGroups: {
-                    expanded: true
-                }
-            }
-        },
         spindle: {
             minimized: false,
-            speed: 1000
-        },
-        tinyg: {
-            minimized: false,
-            panel: {
-                powerManagement: {
-                    expanded: false
-                },
-                queueReports: {
-                    expanded: true
-                },
-                statusReports: {
-                    expanded: true
-                },
-                modalGroups: {
-                    expanded: true
-                }
+            mode: SPINDLE_MODE,
+            speed: 1000,
+            spindleMax: 2000,
+            spindleMin: 0,
+            laserTest: {
+                power: 100,
+                duration: 1000,
             }
         },
         visualizer: {
@@ -362,33 +298,6 @@ const defaultState = {
             },
             showWarning: false,
             showLineWarnings: false,
-        },
-        webcam: {
-            disabled: true,
-            minimized: false,
-
-            // local - Use a built-in camera or a connected webcam
-            // mjpeg - M-JPEG stream over HTTP
-            mediaSource: 'local',
-
-            // The device id
-            deviceId: '',
-
-            // The URL field is required for the M-JPEG stream
-            url: '',
-
-            geometry: {
-                scale: 1.0,
-                rotation: 0, // 0: 0, 1: 90, 2: 180, 3: 270
-                flipHorizontally: false,
-                flipVertically: false
-            },
-            crosshair: false,
-            muted: false
-        },
-        secondary: {
-            disabled: false,
-            minimized: false,
         }
     },
     /**

@@ -50,22 +50,34 @@ class NavSidebar extends PureComponent {
         const state = { ...this.state };
         return (
             <div className={styles.Sidebar}>
-                <NavSidebarLink url="" icon="fa-ruler" label="Flatten" disabled/>
-                <NavSidebarLink url="" icon="fa-border-style" label="Surface" disabled/>
-                <NavSidebarLink url="" icon="fa-wrench" label="Calibrate" disabled/>
+                <NavSidebarLink
+                    url="" icon="fab fa-codepen" label="Surfacing"
+                    disabled
+                />
+                <NavSidebarLink
+                    url="" icon="fa fa-mountain" label="Heightmap"
+                    disabled
+                />
+                <NavSidebarLink
+                    url="" icon="fa fa-ruler" label="Calibrate"
+                    disabled
+                />
                 <NavSidebarLink
                     url=""
                     onClick={() => actions.openModal(MODAL_FIRMWARE)}
-                    icon="fa-hat-wizard"
-                    label="Wizard"
+                    icon="fa fa-microchip"
+                    label="Firmware"
                     disabled={this.props.wizardDisabled}
                 />
                 <NavSidebarLink
-                    icon="fa-share-square"
+                    icon="fa fa-share-square"
                     label=""
                     onClick={() => window.open('https://sienci.com/gsender-documentation/', '_blank')}
                 />
-                <NavSidebarLink url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa-cog" label="" />
+                <NavSidebarLink
+                    url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa fa-cog"
+                    label=""
+                />
                 {
                     state.modal.name === MODAL_FIRMWARE && <WizardModal state={state} modalClose={actions.closeModal} />
                 }

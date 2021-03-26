@@ -36,7 +36,8 @@ class RepeatButton extends PureComponent {
         }
     };
 
-    componentWillMount() {
+    // eslint-disable-next-line camelcase
+    UNSAFE_componentWillMount() {
         this.timeout = null;
         this.interval = null;
     }

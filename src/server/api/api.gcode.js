@@ -37,7 +37,6 @@ export const upload = (req, res) => {
             });
             return;
         }
-
         res.send({ ...state });
     });
 };

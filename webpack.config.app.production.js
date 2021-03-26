@@ -61,81 +61,124 @@ module.exports = {
         publicPath: publicPath
     },
     module: {
-        rules: [
-            USE_ESLINT_LOADER && {
-                test: /\.jsx?$/,
-                loader: 'eslint-loader',
-                enforce: 'pre',
-                exclude: /node_modules/
-            },
-            {
-                test: /\.jsx?$/,
-                loader: 'babel-loader',
-                options: babelConfig,
-                exclude: /node_modules/
-            },
-            {
-                test: /\.styl$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            modules: true,
-                            localIdentName: '[path][name]__[local]--[hash:base64:5]',
-                            camelCase: true,
-                            importLoaders: 1,
-                        }
-                    },
-                    'stylus-loader'
-                ],
-                exclude: [
-                    path.resolve(__dirname, 'src/app/styles')
-                ]
-            },
-            {
-                test: /\.styl$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            modules: false,
-                            camelCase: true,
-                        }
-                    },
-                    'stylus-loader'
-                ],
-                include: [
-                    path.resolve(__dirname, 'src/app/styles')
-                ]
-            },
-            {
-                test: /\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ]
-            },
-            {
-                test: /\.(png|jpg|svg)$/,
-                loader: 'url-loader',
-                options: {
-                    limit: 8192
-                }
-            },
-            {
-                test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: 'url-loader',
-                options: {
-                    limit: 10000,
-                    mimetype: 'application/font-woff'
-                }
-            },
-            {
-                test: /\.(ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: 'file-loader'
+        rules: [{
+            test: /\.hex$/,
+            loader: 'file-loader'
+        },
+        {
+            test: /\.hex$/,
+            loader: 'file-loader',
+            include: [
+                path.resolve(__dirname, 'src/server/lib/FirmwareFlashing')
+            ]
+        },
+        USE_ESLINT_LOADER && {
+            test: /\.jsx?$/,
+            loader: 'eslint-loader',
+            enforce: 'pre',
+            exclude: /node_modules/
+        },
+        {
+            test: /\.jsx?$/,
+            loader: 'babel-loader',
+            options: babelConfig,
+            exclude: /node_modules/
+        },
+        {
+            test: /\.styl$/,
+            use: [
+                MiniCssExtractPlugin.loader,
+                {
+                    loader: 'css-loader',
+                    options: {
+                        modules: true,
+                        localIdentName: '[path][name]__[local]--[hash:base64:5]',
+                        camelCase: true,
+                        importLoaders: 1,
+                    }
+                },
+                'stylus-loader'
+            ],
+            exclude: [
+                path.resolve(__dirname, 'src/app/styles')
+            ]
+        },
+        {
+            test: /\.styl$/,
+            use: [
+                MiniCssExtractPlugin.loader,
+                {
+                    loader: 'css-loader',
+                    options: {
+                        modules: false,
+                        camelCase: true,
+                    }
+                },
+                'stylus-loader'
+            ],
+            include: [
+                path.resolve(__dirname, 'src/app/styles')
+            ]
+        },
+        {
+            test: /\.css$/,
+            use: [
+                'style-loader',
+                'css-loader'
+            ]
+        },
+        {
+            test: /\.(png|jpg|svg)$/,
+            loader: 'url-loader',
+            options: {
+                limit: 8192
             }
+        },
+        {
+            test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+            loader: 'url-loader',
+            options: {
+                limit: 10000,
+                mimetype: 'application/font-woff'
+            }
+        },
+        {
+            test: /\.(ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+            loader: 'file-loader'
+        },
+        {
+            test: /\.hex$/,
+            loader: 'file-loader'
+        },
+        {
+            test: /\.hex$/,
+            loader: 'file-loader',
+            include: [
+                path.resolve(__dirname, 'src/server/lib/Firmware/Flashing')
+            ]
+        },
+        {
+            test: /\.hex$/,
+            loader: 'raw-loader'
+        },
+        {
+            test: /\.hex$/,
+            loader: 'raw-loader',
+            include: [
+                path.resolve(__dirname, 'src/server/lib/Firmware/Flashing')
+            ]
+        },
+        {
+            test: /\.txt$/,
+            loader: 'file-loader'
+        },
+        {
+            test: /\.txt$/,
+            loader: 'raw-loader',
+            include: [
+                path.resolve(__dirname, 'src/server/lib/Firmware/Flashing')
+            ]
+        },
         ].filter(Boolean)
     },
     node: {
@@ -189,8 +232,6 @@ module.exports = {
             preserve: false
         }),
         new HtmlWebpackPlugin({
-            filename: 'index.hbs',
-            template: path.resolve(__dirname, 'index.hbs'),
             chunksSortMode: 'dependency' // Sort chunks by dependency
         })
     ],

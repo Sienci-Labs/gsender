@@ -324,7 +324,8 @@ class ProbeWidget extends PureComponent {
         this.unsubscribe();
     }
 
-    componentWillMount() {
+    // eslint-disable-next-line camelcase
+    UNSAFE_componentWillMount() {
         this.actions.generatePossibleProbeCommands();
     }
 
@@ -680,18 +681,18 @@ class ProbeWidget extends PureComponent {
 
         if (axesCount === 1) {
             if (axes.z) {
-                (this.generateSingleAxisCommands('Z', touchplate.zThickness, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('Z', touchplate.zThickness.mm, gCodeParams)).map(line => code.push(line));
             }
             if (axes.y) {
-                (this.generateSingleAxisCommands('Y', touchplate.xyThickness, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('Y', touchplate.xyThickness.mm, gCodeParams)).map(line => code.push(line));
             }
             if (axes.x) {
-                (this.generateSingleAxisCommands('X', touchplate.xyThickness, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('X', touchplate.xyThickness.mm, gCodeParams)).map(line => code.push(line));
             }
         }
 
         if (axesCount > 1) {
-            (this.generateMultiAxisCommands(axes, touchplate.xyThickness, touchplate.zThickness, gCodeParams)).map(line => code.push(line));
+            (this.generateMultiAxisCommands(axes, touchplate.xyThickness.mm, touchplate.zThickness.mm, gCodeParams)).map(line => code.push(line));
         }
 
         return code;

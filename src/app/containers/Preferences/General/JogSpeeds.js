@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
+import _ from 'lodash';
 import store from 'app/store';
-
 import Input from '../Input';
 import styles from '../index.styl';
-
+import { Toaster, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
 import { convertToImperial, convertToMetric } from '../calculate';
 
 export default class JogSpeeds extends Component {
@@ -13,6 +13,14 @@ export default class JogSpeeds extends Component {
         jogSpeeds: this.getJogSpeeds(),
         currentPreset: { name: 'precise', ...this.getJogSpeeds().precise },
     }
+
+    showToast = _.throttle(() => {
+        Toaster.pop({
+            msg: 'Settings Updated',
+            type: TOASTER_SUCCESS,
+            duration: 3000
+        });
+    }, 5000, { trailing: false });
 
     pubsubTokens = [];
 
@@ -89,6 +97,8 @@ export default class JogSpeeds extends Component {
             mm: newObj.mm,
         } }));
         store.replace('widgets.axes', updated);
+
+        this.showToast();
     }
 
     componentDidMount() {

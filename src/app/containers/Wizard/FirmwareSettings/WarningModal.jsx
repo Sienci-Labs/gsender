@@ -16,7 +16,7 @@ class WarningModal extends PureComponent {
         this.props.handleWarningModal();
         controller.command('gcode', '$RST=$');
         controller.command('gcode', '$$');
-
+        this.props.modalClose();
         setTimeout(() => this.props.handleNoUpdates(), 3000);
     }
 

@@ -1,7 +1,9 @@
 import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
+import _ from 'lodash';
 import controller from 'app/lib/controller';
+import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import GeneralSettings from './GeneralSettings';
 import Keybindings from './Keybindings';
 import ProbeSettings from './Probe/ProbeSettings';
@@ -12,12 +14,20 @@ import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 
-
 class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
+
     visualizerConfig = new WidgetConfig('visualizer');
 
     state = this.getInitialState();
+
+    showToast = _.throttle(() => {
+        Toaster.pop({
+            msg: 'Settings Updated',
+            type: TOASTER_SUCCESS,
+            duration: 3000
+        });
+    }, 3000, { trailing: false });
 
     getInitialState() {
         return {
@@ -26,6 +36,7 @@ class PreferencesPage extends PureComponent {
             reverseWidgets: store.get('workspace.reverseWidgets', false),
             autoReconnect: store.get('widgets.connection.autoReconnect', false),
             baudrate: store.get('widgets.connection.baudrate', 115200),
+            safeRetractHeight: store.get('workspace.safeRetractHeight', 10),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -84,10 +95,17 @@ class PreferencesPage extends PureComponent {
             });
         },
         general: {
+            setSafeRetractHeight: (e) => {
+                const value = Number(e.target.value);
+                this.setState({
+                    safeRetractHeight: value
+                });
+                pubsub.publish('safeHeight:update', value);
+            },
             setUnits: (units) => {
                 this.setState({
                     units: units
-                });
+                }, this.convertUnits());
                 pubsub.publish('units:change', units);
             },
             setReverseWidgets: () => {
@@ -445,8 +463,9 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer } = this.state;
+        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight } = this.state;
         store.set('workspace.reverseWidgets', reverseWidgets);
+        store.set('workspace.safeRetractHeight', safeRetractHeight);
         store.set('widgets.connection.autoReconnect', autoReconnect);
         store.set('widgets.visualizer.theme', visualizer.theme);
         store.set('widgets.visualizer.disabled', visualizer.disabled);
@@ -461,6 +480,12 @@ class PreferencesPage extends PureComponent {
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
 
         controller.command('settings:updated', this.state);
+
+        if (prevState.selectedMenu !== this.state.selectedMenu) {
+            return;
+        }
+
+        this.showToast();
     }
 
     toolSortCompare(a, b) {
@@ -473,12 +498,25 @@ class PreferencesPage extends PureComponent {
         return 0;
     }
 
+    convertUnits() {
+        let { units, safeRetractHeight } = this.state;
+        if (units === METRIC_UNITS) {
+            safeRetractHeight = convertToImperial(safeRetractHeight);
+        } else {
+            safeRetractHeight = convertToMetric(safeRetractHeight);
+        }
+        this.setState({
+            safeRetractHeight: safeRetractHeight
+        });
+        pubsub.publish('safeHeight:update', safeRetractHeight);
+    }
+
     convertToMetric(diameter) {
-        return (diameter * 25.4).toFixed(3);
+        return (diameter * 25.4).toFixed(2);
     }
 
     convertToImperial(diameter) {
-        return (diameter / 25.4).toFixed(3);
+        return (diameter / 25.4).toFixed(4);
     }
 
     render() {

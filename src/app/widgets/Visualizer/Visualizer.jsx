@@ -267,12 +267,28 @@ class Visualizer extends Component {
         }
 
         // Whether to show cutting tool or cutting pointer
-        if (this.cuttingTool && this.cuttingPointer && (state.liteMode) ? (this.cuttingTool.visibleLite !== state.objects.cuttingTool.visibleLite) : (this.cuttingTool.visible !== state.objects.cuttingTool.visible)) {
+        if (this.cuttingTool && this.cuttingPointer) {
             const { liteMode } = state;
             this.cuttingTool.visible = liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible;
             this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
             needUpdateScene = true;
         }
+
+        /*if (
+            state.liteMode
+                ? (this.cuttingTool?.visibleLite !== state.objects.cuttingTool.visibleLite)
+                : (this.cuttingTool?.visible !== state.objects.cuttingTool.visible)
+        ) {
+            const { liteMode } = state;
+            if (this.cuttingTool?.visible) {
+                this.cuttingTool.visible = liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible;
+            }
+
+            if (this.cuttingPointer?.visible) {
+                this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
+            }
+            needUpdateScene = true;
+        }*/
 
         { // Update position
             let needUpdatePosition = false;

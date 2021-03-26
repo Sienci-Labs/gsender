@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import Select from 'react-select';
 import pubsub from 'pubsub-js';
 import _isEqual from 'lodash/isEqual';
+import _ from 'lodash';
 import ensureArray from 'ensure-array';
 import controller from 'app/lib/controller';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import store from 'app/store';
-
+import { Toaster, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
 import styles from '../index.styl';
 import defaultProfiles from './defaultMachineProfiles';
 
@@ -21,6 +22,14 @@ export default class Options extends Component {
         machineProfiles: defaultProfiles.sort((a, b) => a.company.localeCompare(b.company)),
         machineProfile: store.get('workspace.machineProfile')
     };
+
+    showToast = _.throttle(() => {
+        Toaster.pop({
+            msg: 'Settings Updated',
+            type: TOASTER_SUCCESS,
+            duration: 3000
+        });
+    }, 5000, { trailing: false });
 
     pubsubTokens = [];
 
@@ -111,12 +120,16 @@ export default class Options extends Component {
         }
 
         this.setState({ machineProfile });
+
+        this.showToast();
     };
 
     updateMachineProfilesFromSubscriber = (machineProfiles) => {
         this.setState({
             machineProfiles: ensureArray(machineProfiles)
         });
+
+        this.showToast();
     };
 
     subscribe() {
@@ -145,10 +158,29 @@ export default class Options extends Component {
         this.unsubscribe();
     }
 
+    shouldDisableEndstops(state) {
+        const { controller } = state;
+        const { settings } = controller;
+        // Handle case where we aren't connected - user unable to enable
+        if (Object.keys(settings).length === 0) {
+            return true;
+        }
+        const controllerSettings = settings.settings;
+        const { $22 } = controllerSettings;
+        // Handle case where endstops enabled - we should be able to enabled
+        if ($22 === '1') {
+            return false;
+        }
+        // default - disable
+        return true;
+    }
+
     render() {
         const { machineProfile, machineProfiles } = this.state;
-        // const { id, endstops, laser, spindle, coolant, width, depth, height, units } = machineProfile;
-        const { id, endstops, spindle, coolant, width, depth, height, units } = machineProfile;
+        const { state } = this.props;
+        const { id, endstops, spindle, width, depth, height, units } = machineProfile;
+        const disableEndstops = this.shouldDisableEndstops(state);
+
 
         return (
             <div>
@@ -199,22 +231,23 @@ export default class Options extends Component {
                     <div className={styles['machine-features-section']}>
                         <div className={styles['machine-options-inputgroup']}>
                             <ToggleSwitch
+                                label="Endstops"
                                 checked={endstops}
+                                disabled={disableEndstops}
                                 onChange={() => this.handleToggle('endstops')}
                             />
-                            <label htmlFor="">Endstops</label>
                         </div>
 
                         <div className={styles['machine-options-inputgroup']}>
                             <ToggleSwitch
+                                label="Spindle/Laser"
                                 checked={spindle}
                                 onChange={() => this.handleToggle('spindle')}
                             />
-                            <label htmlFor="">Spindle</label>
                         </div>
                     </div>
 
-                    <div className={styles['machine-features-section']}>
+                    {/* <div className={styles['machine-features-section']}>
                         <div className={styles['machine-options-inputgroup']} style={{ display: 'grid', gridTemplateColumns: '1fr 5fr', margin: '0' }}>
                             <ToggleSwitch
                                 checked={coolant}
@@ -223,14 +256,14 @@ export default class Options extends Component {
                             <label htmlFor="">Coolant</label>
                         </div>
 
-                        {/* <div className={styles['machine-options-inputgroup']} style={{ margin: 0 }}>
+                        <div className={styles['machine-options-inputgroup']} style={{ margin: 0 }}>
                             <label htmlFor="">Laser</label>
                             <ToggleSwitch
                                 checked={laser}
                                 onChange={() => this.handleToggle('laser')}
                             />
-                        </div> */}
-                    </div>
+                        </div>
+                    </div> */}
                 </div>
             </div>
         );

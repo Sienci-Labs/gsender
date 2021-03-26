@@ -17,7 +17,7 @@ const MachineProfiles = ({ active, state, actions }) => {
                 Machine Profiles
             </h3>
 
-            <Options />
+            <Options state={state} />
         </div>
     );
 };
