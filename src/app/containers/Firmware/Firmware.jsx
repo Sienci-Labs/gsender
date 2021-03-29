@@ -1,3 +1,4 @@
+/* eslint-disable no-new-wrappers */
 /* eslint-disable no-return-assign */
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
@@ -9,6 +10,8 @@ import Loading from '../../components/Loader';
 import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 import Notification from '../../components/Notification/Notification';
 import styles from './index.styl';
+import InputController from './Settings/Inputs/InputController';
+import * as GRBL_SETTINGS from '../../../server/controllers/Grbl/constants';
 
 class Firmware extends PureComponent {
     static propTypes = {
@@ -31,7 +34,8 @@ class Firmware extends PureComponent {
             properFormatFile: false,
             initiateFlashing: false,
             currentlyFlashing: false,
-            initiateRestoreDefaults: false
+            initiateRestoreDefaults: false,
+            newSettingsButtonDisabled: true
         };
         this.download = this.download.bind(this);
         this.upload = this.upload.bind(this);
@@ -217,9 +221,218 @@ class Firmware extends PureComponent {
         }
     }
 
+    grabNewSwitchInputSettings = (name, value) => {
+        this.setState(prevState => ({
+            valuesToApplyToGrbl: {
+                ...prevState.valuesToApplyToGrbl,
+                [name]: value
+            }
+        }));
+    }
+
+    grabNew$2InputSettings = (name, allTheValues) => {
+        let finalValue = '';
+        let zero = [0, 0, 0];
+        let one = [1, 0, 0];
+        let two = [0, 1, 0];
+        let three = [1, 1, 0];
+        let four = [0, 0, 1];
+        let five = [1, 0, 1];
+        let six = [0, 1, 1];
+        let seven = [1, 1, 1];
+
+        if (new String(zero).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 0;
+        }
+        if (new String(one).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 1;
+        }
+        if (new String(two).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 2;
+        }
+        if (new String(three).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 3;
+        }
+        if (new String(four).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 4;
+        }
+        if (new String(five).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 5;
+        }
+        if (new String(six).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 6;
+        }
+        if (new String(seven).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 7;
+        }
+
+        this.setState(prevState => ({
+            valuesToApplyToGrbl: {
+                ...prevState.valuesToApplyToGrbl,
+                $2: finalValue
+            }
+        }));
+    }
+
+    grabNew$3InputSettings = (name, allTheValues) => {
+        let finalValue = '';
+        let zero = [0, 0, 0];
+        let one = [1, 0, 0];
+        let two = [0, 1, 0];
+        let three = [1, 1, 0];
+        let four = [0, 0, 1];
+        let five = [1, 0, 1];
+        let six = [0, 1, 1];
+        let seven = [1, 1, 1];
+
+        if (new String(zero).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 0;
+        }
+        if (new String(one).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 1;
+        }
+        if (new String(two).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 2;
+        }
+        if (new String(three).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 3;
+        }
+        if (new String(four).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 4;
+        }
+        if (new String(five).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 5;
+        }
+        if (new String(six).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 6;
+        }
+        if (new String(seven).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 7;
+        }
+        this.setState(prevState => ({
+            valuesToApplyToGrbl: {
+                ...prevState.valuesToApplyToGrbl,
+                $3: finalValue
+            }
+        }));
+    }
+
+
+    grabNew$10InputSettings = (name, bothToggleValues) => {
+        let finalValue = '';
+        let zero = [0, 0];
+        let one = [1, 0];
+        let two = [0, 1];
+        let three = [1, 1];
+
+        if (new String(zero).valueOf() === new String(bothToggleValues).valueOf()) {
+            finalValue = 0;
+        }
+        if (new String(one).valueOf() === new String(bothToggleValues).valueOf()) {
+            finalValue = 1;
+        }
+        if (new String(two).valueOf() === new String(bothToggleValues).valueOf()) {
+            finalValue = 2;
+        }
+        if (new String(three).valueOf() === new String(bothToggleValues).valueOf()) {
+            finalValue = 3;
+        }
+
+        this.setState(prevState => ({
+            valuesToApplyToGrbl: {
+                ...prevState.valuesToApplyToGrbl,
+                $10: finalValue
+            }
+        }));
+    }
+
+    grabNew$23InputSettings = (name, allTheValues) => {
+        let finalValue = '';
+        let zero = [0, 0, 0];
+        let one = [1, 0, 0];
+        let two = [0, 1, 0];
+        let three = [1, 1, 0];
+        let four = [0, 0, 1];
+        let five = [1, 0, 1];
+        let six = [0, 1, 1];
+        let seven = [1, 1, 1];
+
+
+        if (new String(zero).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 0;
+        }
+        if (new String(one).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 1;
+        }
+        if (new String(two).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 2;
+        }
+        if (new String(three).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 3;
+        }
+        if (new String(four).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 4;
+        }
+        if (new String(five).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 5;
+        }
+        if (new String(six).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 6;
+        }
+        if (new String(seven).valueOf() === new String(allTheValues).valueOf()) {
+            finalValue = 7;
+        }
+
+        this.setState(prevState => ({
+            valuesToApplyToGrbl: {
+                ...prevState.valuesToApplyToGrbl,
+                $23: finalValue
+            }
+        }));
+    }
+
+    grabNewNumberInputSettings = (name, value) => {
+        this.setState(prevState => ({
+            valuesToApplyToGrbl: {
+                ...prevState.valuesToApplyToGrbl,
+                [name]: value
+            }
+        }));
+    }
+
+    disableSettingsButton = () => {
+        this.setState({ newSettingsButtonDisabled: false });
+    }
+
+    applyNewSettings = () => {
+        let numbersValues = this.state.valuesToApplyToGrbl;
+        let values = Object.values(numbersValues);
+        let keys = Object.keys(numbersValues);
+        let finalStrings = [];
+        const valuesToSubmit = [];
+        for (let i = 0; i < keys.length; i++) {
+            valuesToSubmit.push([keys[i], values[i]]);
+        }
+        let gCoded = this.gcode(valuesToSubmit);
+
+        //loops through array values, concatinates them with =
+        for (let j = 0; j < gCoded.length; j++) {
+            finalStrings[j] = gCoded[j].join('=');
+        }
+        controller.command('gcode', finalStrings);
+        controller.command('gcode', '$$');//Needed so next time wizard is opened changes are reflected
+        this.props.modalClose();
+        Toaster.pop({
+            msg: 'Settings Updated!',
+            type: TOASTER_INFO
+        });
+    }
 
     render() {
         const { modalClose } = this.props;
+        const loadedSettings = GRBL_SETTINGS.GRBL_SETTINGS;
+        // console.log(JSON.stringify(this.state.data[0].settings));
+        let currentSettings = this.state.data[0].settings;
         return (
             <Modal onClose={modalClose}>
                 <h3 className={styles.firmwareHeader}>Firmware Gadget</h3>
@@ -240,7 +453,37 @@ class Firmware extends PureComponent {
                             />
                         ) : ''}
                     </div>
-                    <div className={styles.settingsContainer} />
+                    <div className={styles.settingsContainer}>
+                        {loadedSettings.map((grbl) => (
+                            <div key={grbl.setting} className={styles.containerFluid}>
+                                <div className={styles.tableRow}>
+                                    <div className={styles.keyRow}>{grbl.setting}</div>
+                                    <div className={styles.itemText}>{grbl.message}</div>
+                                    <InputController
+                                        type={grbl.inputType}
+                                        title={grbl.setting}
+                                        currentSettings={currentSettings}
+                                        getUsersNewSettings={this.props.getUsersNewSettings}
+                                        switchSettings={this.state.settings}
+                                        min={grbl.min}
+                                        max={grbl.max}
+                                        step={grbl.step}
+                                        grabNewNumberInputSettings={this.grabNewNumberInputSettings}
+                                        grabNewSwitchInputSettings={this.grabNewSwitchInputSettings}
+                                        grabNew$2InputSettings={this.grabNew$2InputSettings}
+                                        grabNew$3InputSettings={this.grabNew$3InputSettings}
+                                        grabNew$10InputSettings={this.grabNew$10InputSettings}
+                                        grabNew$23InputSettings={this.grabNew$23InputSettings}
+                                        units={grbl.units}
+                                        disableSettingsButton={this.disableSettingsButton}
+                                    />
+
+                                </div>
+                                <div className={styles.descriptionRow}>{grbl.description}</div>
+                            </div>
+                        ))
+                        }
+                    </div>
                     <div className={styles.buttonsContainer}>
                         {this.state.properFormatFile ? (
                             <Notification
@@ -263,7 +506,12 @@ class Firmware extends PureComponent {
                             />
                         ) : ''}
                         <button type="button" className={styles.firmwareButtons} onClick={this.restoreSettings}>Restore Cnc Defaults</button>
-                        <button type="button" className={styles.firmwareButtons}>Apply New Settings</button>
+                        <button
+                            type="button"
+                            onClick={this.applyNewSettings}
+                            className={this.state.newSettingsButtonDisabled ? `${styles.firmwareButtonDisabled}` : `${styles.firmwareButtons}`}
+                        > Apply New Settings
+                        </button>
                         <button
                             type="button"
                             onClick={this.download}
