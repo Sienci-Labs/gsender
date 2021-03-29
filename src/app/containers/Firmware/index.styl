@@ -1,0 +1,54 @@
+.firmwareHeader {
+  padding: 1%;
+  border-bottom: solid 1px #4B5563;
+}
+
+.firmwareContainer {
+  height: 80vh;
+    width: 80vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.grblContainer{
+    display: flex;
+    justify-content: flex-end;
+  }
+
+.settingsContainer {
+  width: 65vw;
+    height: 48vh;
+  display: flex;  
+      margin: auto;
+  border: 1px solid black;
+}
+
+.buttonsContainer {
+ 
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.firmwareButtons {
+  border: 1px solid #9ca3af;
+  color: #3E85C7;
+  background-color: #D1D5DB;
+  border-radius: .25rem;
+  width: 100%;
+  max-width: 12rem;
+  font-size: 14px;
+  padding: 5px;
+margin: 2%;
+  transition: 200ms ease-in-out;
+  --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+
+  &:hover {
+    border: 1px solid #3e85c7;
+    transition: 200ms ease-in-out;
+    background-color: #E5E7EB;
+    border-radius: .25rem;
+    --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  }
+}

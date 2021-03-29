@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import LongMill from '!raw-loader!./EepromFiles/Sienci Long Mill.txt';
 import MillOne from '!raw-loader!./EepromFiles/Sienci MillOne.txt';
 import map from 'lodash/map';
@@ -10,7 +9,7 @@ const ApplyFirmwareProfile = (profile, recievedPortNumber) => {
         return (s.length > 0) ? (cmd + '' + s) : cmd;
     };
 
-    // console.log(`${profile} :Profile`);
+
     const controller = store.get('controllers["' + recievedPortNumber + '"]');
     let settings = '';
     if (profile === 'Sienci Long Mill') {
@@ -37,7 +36,6 @@ const ApplyFirmwareProfile = (profile, recievedPortNumber) => {
         }
         let gCoded = gcode(valuesToSubmit);
 
-        //loops through array values, concatinates them with =
         for (let j = 0; j < gCoded.length; j++) {
             finalStrings[j] = gCoded[j].join('=');
         }

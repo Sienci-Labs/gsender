@@ -1,9 +1,8 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/tabindex-no-positive */
-/* eslint-disable jsx-quotes */
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-
+/* eslint-disable jsx-quotes */
+/* eslint-disable jsx-a11y/tabindex-no-positive */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { PureComponent } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
@@ -41,6 +40,7 @@ class Firmwareprofiles extends PureComponent {
 
     controllerEvents = {
         'message': (files) => {
+            console.log(files);
             if (files !== null) {
                 this.actions.formatText(files);
                 this.setState({ filesFound: true });

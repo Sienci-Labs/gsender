@@ -3,8 +3,8 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import FirmwareFlashing from './FirmwareFlashing/FirmwareFlashing';
 import FirmwareSettings from './FirmwareSettings/FirmwareSettings';
-// import ImportExport from './ImportExport/ImportExport';
-// import Firmwareprofiles from './FirmwareProfiles/Firmwareprofiles';
+import ImportExport from './ImportExport/ImportExport';
+import Firmwareprofiles from './FirmwareProfiles/Firmwareprofiles';
 import styles from './index.styl';
 
 
@@ -30,16 +30,16 @@ class WizardModal extends PureComponent {
                     label: 'Firmware Flashing',
                     component: FirmwareFlashing
                 },
-                // {
-                //     id: 3,
-                //     label: 'Firmware Profiles',
-                //     component: Firmwareprofiles
-                // },
-                // {
-                //     id: 4,
-                //     label: 'Import/Export Firmware',
-                //     component: ImportExport
-                // },
+                {
+                    id: 3,
+                    label: 'Firmware Profiles',
+                    component: Firmwareprofiles
+                },
+                {
+                    id: 4,
+                    label: 'Import/Export Firmware',
+                    component: ImportExport
+                },
             ]
         };
     }
