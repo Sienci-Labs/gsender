@@ -118,8 +118,7 @@ class FirmwareSettings extends PureComponent {
         this.setState({ usersUpdatedSettings: settings });
     }
 
-    //Erases and restores the $$ Grbl settings back to defaults
-    //which is defined by the default settings file used when compiling Grbl
+
     restoreSettings = () => {
         this.setState({ warning: true });
     }

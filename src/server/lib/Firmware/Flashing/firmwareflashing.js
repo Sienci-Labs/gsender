@@ -25,8 +25,7 @@ const FlashingFirmware = (recievedPortNumber) => {
             }
         });
     } catch (error) {
-        // controller.command('flashing:failed', error);
-        log.debug(`${error} Error flashing board -CATCH`);
+        log.debug(`${error} Error flashing board`);
     }
 };
 

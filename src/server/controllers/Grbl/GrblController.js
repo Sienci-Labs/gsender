@@ -1061,25 +1061,21 @@ class GrblController {
                     FlashingFirmware(port);
                 });
             },
-            'flashing:success': (data) => {
-                console.log(`${data}FLASHING SUCCESS CALLED`);
-                this.emit('task:finish', data);
+            'flashing:success': () => {
+                let [data] = args;
+                this.emit('message', data);
             },
             'flashing:failed': () => {
                 let [error] = args;
                 setTimeout(() => this.emit('task:error', error), 2000);
-                // log.debug(`${error} flashing:failed`);
             },
             'firmware:getProfiles': (data) => {
                 let [port = 'COM3'] = args;
                 FirmwareProfiles(port);
-                // log.debug('firmware:getProfiles');
-                // console.log('firmware:getProfiles');
             },
             'firmware:recievedProfiles': () => {
                 let [files] = args;
                 this.emit('message', files);
-                // log.debug(`${files} files inside grblcontroller`);
             },
             'firmware:applyProfileSettings': () => {
                 let [chosenProfile, port] = args;

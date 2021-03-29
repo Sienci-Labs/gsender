@@ -5,6 +5,8 @@ import Modal from 'app/components/Modal';
 import map from 'lodash/map';
 import controller from '../../lib/controller';
 import Controller from '../../widgets/Grbl/Controller';
+import Loading from '../../components/Loader';
+// import WarningModal from './WarningModals/WarningModal';
 import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 import Notification from '../../components/Notification/Notification';
 import styles from './index.styl';
@@ -27,12 +29,22 @@ class Firmware extends PureComponent {
             status: '',
             data: [controller.settings],
             port: controller.port,
-            properFormatFile: false
+            properFormatFile: false,
+            initiateFlashing: false,
+            currentlyFlashing: false,
         };
         this.changeFileType = this.changeFileType.bind(this);
         this.download = this.download.bind(this);
         this.upload = this.upload.bind(this);
         this.openFile = this.openFile.bind(this);
+    }
+
+    componentDidMount() {
+        this.addControllerEvents();
+    }
+
+    componentWillUnmount() {
+        this.removeControllerEvents();
     }
 
     changeFileType(event) {
@@ -52,7 +64,6 @@ class Firmware extends PureComponent {
         console.log(fileDownloadUrl);
         this.setState({ fileDownloadUrl: fileDownloadUrl },
             () => {
-                console.log('fired');
                 this.dofileDownload.click();
                 URL.revokeObjectURL(fileDownloadUrl); // free up storage--no longer needed.
                 this.setState({ fileDownloadUrl: '' });
@@ -73,7 +84,6 @@ class Firmware extends PureComponent {
         let fileloaded = e => {
             // e.target.result is the file's content as text
             const fileContents = e.target.result;
-            console.log(fileContents);
             this.setState({ uploadedSettings: fileContents });
             status.push(`File name: "${fileObj.name}". Length: ${fileContents.length} bytes.`);
             // Show first 80 characters of the file
@@ -142,17 +152,30 @@ class Firmware extends PureComponent {
     }
 
     controllerEvents = {
+        'message': () => {
+            this.setState({ currentlyFlashing: false });
+            this.setState({ finishedMessage: `Flashing completed successfully on port: ${this.state.port}!` });
+            this.props.modalClose();
+            Toaster.pop({
+                msg: (this.state.finishedMessage),
+                type: 'TOASTER_INFO',
+            });
+        },
+        'error': () => {
+            this.setState({ currentlyFlashing: false });
+            this.setState({ finishedMessage: 'Error flashing board...' });
+            Toaster.pop({
+                msg: (this.state.finishedMessage),
+                type: 'TOASTER_WARNING',
+            });
+        },
         'serialport:open': (options) => {
             const { port } = options;
             this.setState({
                 port: port
             });
         },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState({ ...initialState });
-        },
-        'serialport:settings': (type, controllerSettings) => {
+        'serialport:settings': (type) => {
             this.setState(state => ({
                 controller: {
                     ...state.controller,
@@ -187,30 +210,63 @@ class Firmware extends PureComponent {
         });
     }
 
+    startFlashing=() => {
+        this.setState({ initiateFlashing: true });
+    }
+
+    stopFlashing=() => {
+        this.setState({ initiateFlashing: false });
+    }
+
+    actions = {
+        startFlash: (port) => {
+            Toaster.pop({
+                msg: `Flashing started on port: ${this.state.port} `,
+                type: 'TOASTER_INFO',
+            });
+            this.setState({ currentlyFlashing: true });
+            controller.command('flash:start', this.state.port);
+        }
+    }
+
 
     render() {
-        console.log(this.state.data[0].settings);
-        console.log(JSON.stringify(this.state));
+        // console.log(this.state.data[0].settings);
+        // console.log(JSON.stringify(this.state.currentlyFlashing));
+        // let port = this.state.port;
         const { modalClose } = this.props;
         // const state = { ...this.state };
         // const actions = { ...this.actions };
 
         return (
             <Modal onClose={modalClose}>
-                {this.state.properFormatFile ? (
-                    <Notification
-                        onClose={modalClose}
-                        message="Are you sure you want to apply these settings?"
-                        onYes={this.applySettings}
-                    />
-                ) : ''}
                 <h3 className={styles.firmwareHeader}>Firmware Gadget</h3>
                 <div className={styles.firmwareContainer}>
                     <div className={styles.grblContainer}>
-                        <button type="button" className={styles.firmwareButtons}>Grbl Flash</button>
+                        <button
+                            type="button"
+                            className={styles.firmwareButtons}
+                            onClick={this.startFlashing}
+                        >Grbl Flash
+                        </button>
+                        {this.state.initiateFlashing ? (
+                            <Notification
+                                onClose={modalClose}
+                                message="Are you sure you want to return to Grbl default values?"
+                                onYes={this.actions.startFlash}
+                                stopFlashing={this.stopFlashing}
+                            />
+                        ) : ''}
                     </div>
                     <div className={styles.settingsContainer} />
                     <div className={styles.buttonsContainer}>
+                        {this.state.properFormatFile ? (
+                            <Notification
+                                onClose={modalClose}
+                                message="Are you sure you want to apply these settings?"
+                                onYes={this.applySettings}
+                            />
+                        ) : ''}
                         <button
                             type="button" className={styles.firmwareButtons}
                             onClick={this.upload}
@@ -243,6 +299,7 @@ class Firmware extends PureComponent {
                         />
                     </div>
                 </div>
+                {this.state.currentlyFlashing ? <Loading size="lg" overlay={true} /> : ''}
             </Modal>
         );
     }
