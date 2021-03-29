@@ -119,7 +119,7 @@ const defaultState = {
                     in: {
                         xyStep: 1,
                         zStep: 0.5,
-                        feedrate: 5000,
+                        feedrate: 196.85,
                     }
                 },
                 normal: {
@@ -131,7 +131,7 @@ const defaultState = {
                     in: {
                         xyStep: 0.2,
                         zStep: 0.04,
-                        feedrate: 3000,
+                        feedrate: 118.11,
                     },
                 },
                 precise: {
@@ -143,7 +143,7 @@ const defaultState = {
                     in: {
                         xyStep: 0.02,
                         zStep: 0.004,
-                        feedrate: 1000,
+                        feedrate: 39.37,
                     },
                 },
                 imperial: {
