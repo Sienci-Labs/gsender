@@ -142,7 +142,7 @@ class PreferencesPage extends PureComponent {
         tool: {
             setImperialDiameter: (e) => {
                 const diameter = Number(e.target.value);
-                const metricDiameter = this.convertToMetric(diameter);
+                const metricDiameter = convertToMetric(diameter);
                 const tool = this.state.tool;
                 this.setState({
                     tool: {
@@ -154,7 +154,7 @@ class PreferencesPage extends PureComponent {
             },
             setMetricDiameter: (e) => {
                 const diameter = Number(e.target.value);
-                const imperialDiameter = this.convertToImperial(diameter);
+                const imperialDiameter = convertToImperial(diameter);
                 const tool = this.state.tool;
                 this.setState({
                     tool: {
@@ -509,14 +509,6 @@ class PreferencesPage extends PureComponent {
             safeRetractHeight: safeRetractHeight
         });
         pubsub.publish('safeHeight:update', safeRetractHeight);
-    }
-
-    convertToMetric(diameter) {
-        return (diameter * 25.4).toFixed(2);
-    }
-
-    convertToImperial(diameter) {
-        return (diameter / 25.4).toFixed(4);
     }
 
     render() {
