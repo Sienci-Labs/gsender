@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Select from 'react-select';
 import pubsub from 'pubsub-js';
-import _isEqual from 'lodash/isEqual';
 import _ from 'lodash';
 import ensureArray from 'ensure-array';
 import controller from 'app/lib/controller';
@@ -12,6 +11,7 @@ import styles from '../index.styl';
 import defaultProfiles from './defaultMachineProfiles';
 
 import Input from '../Input';
+import { convertToImperial } from '../calculate';
 
 
 /**
@@ -20,7 +20,8 @@ import Input from '../Input';
 export default class Options extends Component {
     state = {
         machineProfiles: defaultProfiles.sort((a, b) => a.company.localeCompare(b.company)),
-        machineProfile: store.get('workspace.machineProfile')
+        machineProfile: store.get('workspace.machineProfile'),
+        units: store.get('workspace.units')
     };
 
     showToast = _.throttle(() => {
@@ -115,13 +116,21 @@ export default class Options extends Component {
 
     updateMachineProfileFromStore = () => {
         const machineProfile = store.get('workspace.machineProfile');
-        if (!machineProfile || _isEqual(machineProfile, this.state.machineProfile)) {
+        const units = store.get('workspace.units');
+
+        if (!machineProfile) {
             return;
         }
 
-        this.setState({ machineProfile });
+        const updatedProfile = {
+            ...machineProfile,
+            width: units === 'mm' ? machineProfile.width : convertToImperial(machineProfile.width),
+            height: units === 'mm' ? machineProfile.height : convertToImperial(machineProfile.height),
+            depth: units === 'mm' ? machineProfile.depth : convertToImperial(machineProfile.depth),
+            units
+        };
 
-        this.showToast();
+        this.setState({ machineProfile: updatedProfile, units });
     };
 
     updateMachineProfilesFromSubscriber = (machineProfiles) => {
