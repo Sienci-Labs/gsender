@@ -6,7 +6,6 @@ import map from 'lodash/map';
 import controller from '../../lib/controller';
 import Controller from '../../widgets/Grbl/Controller';
 import Loading from '../../components/Loader';
-// import WarningModal from './WarningModals/WarningModal';
 import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 import Notification from '../../components/Notification/Notification';
 import styles from './index.styl';
@@ -32,8 +31,8 @@ class Firmware extends PureComponent {
             properFormatFile: false,
             initiateFlashing: false,
             currentlyFlashing: false,
+            initiateRestoreDefaults: false
         };
-        this.changeFileType = this.changeFileType.bind(this);
         this.download = this.download.bind(this);
         this.upload = this.upload.bind(this);
         this.openFile = this.openFile.bind(this);
@@ -47,26 +46,16 @@ class Firmware extends PureComponent {
         this.removeControllerEvents();
     }
 
-    changeFileType(event) {
-        const value = event.target.value;
-        this.setState({ fileType: value });
-    }
-
     download(event) {
         event.preventDefault();
         // Prepare the file
         let output = JSON.stringify(this.state.data[0].settings);
-
         // Download it
         const blob = new Blob([output]);
-        console.log(blob);
         const fileDownloadUrl = URL.createObjectURL(blob);
-        console.log(fileDownloadUrl);
         this.setState({ fileDownloadUrl: fileDownloadUrl },
             () => {
                 this.dofileDownload.click();
-                URL.revokeObjectURL(fileDownloadUrl); // free up storage--no longer needed.
-                this.setState({ fileDownloadUrl: '' });
             });
     }
 
@@ -77,18 +66,13 @@ class Firmware extends PureComponent {
 
 
     openFile(evt) {
-        let status = []; // Status output
         const fileObj = evt.target.files[0];
         const reader = new FileReader();
 
         let fileloaded = e => {
-            // e.target.result is the file's content as text
             const fileContents = e.target.result;
             this.setState({ uploadedSettings: fileContents });
-            status.push(`File name: "${fileObj.name}". Length: ${fileContents.length} bytes.`);
-            // Show first 80 characters of the file
             const first80char = fileContents.substring(0, 80);
-            status.push(`First 80 characters of the file:\n${first80char}`);
             if (first80char[3] !== '0') {
                 Toaster.pop({
                     msg: 'Incorrect file format',
@@ -97,7 +81,6 @@ class Firmware extends PureComponent {
             } else {
                 this.setState({ properFormatFile: true });
             }
-            this.setState({ status: status.join('\n') });
         };
 
         // Mainline of the method
@@ -218,12 +201,17 @@ class Firmware extends PureComponent {
         this.setState({ initiateFlashing: false });
     }
 
+    restoreSettings=() => {
+        this.setState({ initiateRestoreDefaults: true });
+    }
+
     actions = {
         startFlash: (port) => {
             Toaster.pop({
                 msg: `Flashing started on port: ${this.state.port} `,
                 type: 'TOASTER_INFO',
             });
+            this.setState({ initiateFlashing: false });
             this.setState({ currentlyFlashing: true });
             controller.command('flash:start', this.state.port);
         }
@@ -231,13 +219,7 @@ class Firmware extends PureComponent {
 
 
     render() {
-        // console.log(this.state.data[0].settings);
-        // console.log(JSON.stringify(this.state.currentlyFlashing));
-        // let port = this.state.port;
         const { modalClose } = this.props;
-        // const state = { ...this.state };
-        // const actions = { ...this.actions };
-
         return (
             <Modal onClose={modalClose}>
                 <h3 className={styles.firmwareHeader}>Firmware Gadget</h3>
@@ -252,7 +234,7 @@ class Firmware extends PureComponent {
                         {this.state.initiateFlashing ? (
                             <Notification
                                 onClose={modalClose}
-                                message="Are you sure you want to return to Grbl default values?"
+                                message={`This feature exists to flash the GRBL firmware onto compatible Arduino boards only! Are you sure youd like to wipe, and reflash the device on ${this.state.port} with GRBL 1.1h with its default settings?`}
                                 onYes={this.actions.startFlash}
                                 stopFlashing={this.stopFlashing}
                             />
@@ -272,7 +254,15 @@ class Firmware extends PureComponent {
                             onClick={this.upload}
                         >Import Settings...
                         </button>
-                        <button type="button" className={styles.firmwareButtons}>Restore Cnc Defaults</button>
+                        {this.state.initiateRestoreDefaults ? (
+                            <Notification
+                                onClose={modalClose}
+                                message="Pick a profile to restore to"
+                                // onYes={this.actions.startFlash}
+                                // stopFlashing={this.stopFlashing}
+                            />
+                        ) : ''}
+                        <button type="button" className={styles.firmwareButtons} onClick={this.restoreSettings}>Restore Cnc Defaults</button>
                         <button type="button" className={styles.firmwareButtons}>Apply New Settings</button>
                         <button
                             type="button"
