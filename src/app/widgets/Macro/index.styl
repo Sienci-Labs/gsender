@@ -111,6 +111,7 @@
     border-left: 1px solid rgba(grey, 0.5);
     cursor: pointer;
     outline: none;
+    width: 30px;
 }
 
 .macro-control-area {
@@ -146,10 +147,17 @@
 
 .macro-menu-item {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 2fr;
+    padding: 5px;
     font-size: 14px;
-    column-gap: 10px;
+    // column-gap: 10px;
     align-items: center;
+    outline: none;
+
+    &:hover {
+        background-color: rgba(#059669, 0.5);
+        border-radius: 5px;
+    }
 }
 
 .empty-result {
@@ -186,3 +194,9 @@
     animation: glowEffect 0.8s ease-in-out infinite alternate;
 }
 
+.dropdown {
+    background-color: white;
+    padding: 4px 6px;
+    border: 1px solid #3e85c7;
+    border-radius: 3px;
+}
