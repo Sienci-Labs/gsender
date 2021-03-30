@@ -11,6 +11,7 @@ import {
 import styles from './index.styl';
 import ProbeImage from './ProbeImage';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
+import ProbeDiameter from './ProbeDiameter';
 
 class Probe extends PureComponent {
     static propTypes = {
@@ -61,6 +62,7 @@ class Probe extends PureComponent {
                             <span id="helpBlock" className="help-block">Safe probe probes from the top and right to avoid breaking bits.</span>
                         </div>
                     }
+                    <ProbeDiameter actions={actions} state={state} />
                     {
                         probeCommand && probeCommand.tool &&
                         <div className="form-group">
