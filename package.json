@@ -247,6 +247,7 @@
     "push.js": "~1.0.9",
     "qs": "~6.7.0",
     "range_check": "~1.4.0",
+    "rc-dropdown": "^3.2.0",
     "rc-slider": "~8.6.9",
     "react": "^17.0.1",
     "react-bootstrap": "~0.32.1",

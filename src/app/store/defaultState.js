@@ -33,10 +33,16 @@ const defaultState = {
             company: 'Sienci Labs',
             name: 'LongMill',
             type: '30x30',
-            width: 792,
-            units: 'mm',
-            depth: 845,
-            height: 114.3,
+            mm: {
+                width: 792,
+                depth: 845,
+                height: 114.3
+            },
+            in: {
+                width: 31.18,
+                depth: 33.27,
+                height: 4.5
+            },
             endstops: false,
             spindle: false,
             coolant: false,
@@ -119,7 +125,7 @@ const defaultState = {
                     in: {
                         xyStep: 1,
                         zStep: 0.5,
-                        feedrate: 5000,
+                        feedrate: 196.85,
                     }
                 },
                 normal: {
@@ -131,7 +137,7 @@ const defaultState = {
                     in: {
                         xyStep: 0.2,
                         zStep: 0.04,
-                        feedrate: 3000,
+                        feedrate: 118.11,
                     },
                 },
                 precise: {
@@ -143,7 +149,7 @@ const defaultState = {
                     in: {
                         xyStep: 0.02,
                         zStep: 0.004,
-                        feedrate: 1000,
+                        feedrate: 39.37,
                     },
                 },
                 imperial: {
@@ -245,10 +251,19 @@ const defaultState = {
             probeCommand: 'G38.2',
             useTLO: false,
             probeDepth: 10,
-            probeFeedrate: 75,
-            probeFastFeedrate: 150,
-            touchPlateHeight: 10,
-            retractionDistance: 4
+            probeFeedrate: {
+                mm: 75,
+                in: 2.95
+            },
+            probeFastFeedrate: {
+                mm: 150,
+                in: 5.9
+            },
+            retractionDistance: {
+                mm: 4,
+                in: 0.15
+            },
+            touchPlateHeight: 10
         },
         spindle: {
             minimized: false,

@@ -353,10 +353,10 @@ class ProbeWidget extends PureComponent {
             retractionDistance
         } = this.state;
 
-        this.config.set('probeDepth', Number(probeDepth));
-        this.config.set('probeFeedrate', Number(probeFeedrate));
-        this.config.set('touchPlateHeight', Number(touchPlateHeight));
-        this.config.set('retractionDistance', Number(retractionDistance));
+        this.config.set('probeDepth', probeDepth);
+        this.config.set('probeFeedrate', probeFeedrate);
+        this.config.set('touchPlateHeight', touchPlateHeight);
+        this.config.set('retractionDistance', retractionDistance);
     }
 
     getInitialState() {
@@ -380,10 +380,10 @@ class ProbeWidget extends PureComponent {
             probeAxis: this.config.get('probeAxis', 'Z'),
             probeCommand: this.config.get('probeCommand', 'G38.2'),
             useTLO: this.config.get('useTLO'),
-            probeDepth: Number(this.config.get('probeDepth') || 0).toFixed(3) * 1,
-            probeFeedrate: Number(this.config.get('probeFeedrate') || 0).toFixed(3) * 1,
-            touchPlateHeight: Number(this.config.get('touchPlateHeight') || 0).toFixed(3) * 1,
-            retractionDistance: Number(this.config.get('retractionDistance') || 0).toFixed(3) * 1,
+            probeDepth: this.config.get('probeDepth') || {},
+            probeFeedrate: this.config.get('probeFeedrate') || {},
+            touchPlateHeight: this.config.get('touchPlateHeight') || {},
+            retractionDistance: this.config.get('retractionDistance') || {},
             touchplate: store.get('workspace[probeProfile]', {}),
             availableTools: store.get('workspace[tools]', []),
             selectedtool: 0,
@@ -670,8 +670,8 @@ class ProbeWidget extends PureComponent {
             wcs: wcs,
             isSafe: useSafeProbeOption,
             probeCommand: probeCommand,
-            retractDistance: retractionDistance,
-            normalFeedrate: probeFeedrate,
+            retractDistance: retractionDistance.mm,
+            normalFeedrate: probeFeedrate.mm,
             quickFeedrate: probeFeedrate + 25,
         };
 

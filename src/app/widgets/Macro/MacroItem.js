@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
+import Dropdown from 'rc-dropdown';
 import PropTypes from 'prop-types';
-
-import Dropdown, { MenuItem } from 'app/components/Dropdown';
+import 'rc-dropdown/assets/index.css';
 
 import styles from './index.styl';
 import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
@@ -73,6 +73,31 @@ export default class MacroItem extends Component {
         const { macro, onEdit, onDelete } = this.props;
         const { display } = this.state;
 
+        const Menu = (
+            <div className={styles.dropdown}>
+                <div
+                    className={styles['macro-menu-item']}
+                    style={{ marginBottom: '5px' }}
+                    onClick={onEdit(macro)}
+                    onKeyDown={onEdit(macro)}
+                    tabIndex={-1}
+                    role="button"
+                >
+                    <i className="fas fa-edit" style={{ color: '#3e85c7' }} /><span>Edit</span>
+                </div>
+
+                <div
+                    className={styles['macro-menu-item']}
+                    onClick={onDelete(macro.id)}
+                    onKeyDown={onDelete(macro.id)}
+                    tabIndex={-1}
+                    role="button"
+                >
+                    <i className="fas fa-trash-alt" style={{ color: '#dc2626' }} /> <span>Delete</span>
+                </div>
+            </div>
+        );
+
         return (
             <div
                 className={styles['macro-item']}
@@ -101,8 +126,16 @@ export default class MacroItem extends Component {
                     )}
                 </div>
 
+                <Dropdown
+                    trigger={['click']}
+                    overlay={Menu}
+                    animation="slide-up"
+                >
+                    <Toggle />
+                </Dropdown>
 
-                <Dropdown style={{ width: '15%', height: '100%' }} pullRight>
+
+                {/* <Dropdown style={{ width: '15%', height: '100%' }} pullRight>
                     <Dropdown.Toggle componentClass={Toggle} />
 
                     <Dropdown.Menu>
@@ -117,7 +150,7 @@ export default class MacroItem extends Component {
                             </div>
                         </MenuItem>
                     </Dropdown.Menu>
-                </Dropdown>
+                </Dropdown> */}
             </div>
         );
     }
