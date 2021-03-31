@@ -11,8 +11,7 @@ import styles from '../index.styl';
 import defaultProfiles from './defaultMachineProfiles';
 
 import Input from '../Input';
-import { convertToImperial } from '../calculate';
-
+import { convertToImperial, convertToMetric } from '../calculate';
 
 /**
  * Machine Profile Options Component
@@ -50,9 +49,9 @@ export default class Options extends Component {
                     xmin: 0,
                     ymin: 0,
                     zmin: 0,
-                    xmax: foundProfile.width,
-                    ymax: foundProfile.depth,
-                    zmax: foundProfile.height,
+                    xmax: foundProfile.mm.width,
+                    ymax: foundProfile.mm.depth,
+                    zmax: foundProfile.mm.height,
                 }
             };
             store.replace('workspace.machineProfile', updatedObj);
@@ -65,8 +64,12 @@ export default class Options extends Component {
      * @param {Object} e Changed element
      */
     handleChange = (e) => {
+        const { units } = this.state;
         const name = e.target.name;
         const value = Number(Number(e.target.value).toFixed(2)); //.toFixed returns a string, hence the extra Number wrapper
+
+        const metricValue = units === 'mm' ? value : convertToMetric(value);
+        const imperialValue = units === 'in' ? value : convertToImperial(value);
 
         const { machineProfile } = this.state;
 
@@ -85,9 +88,20 @@ export default class Options extends Component {
             return;
         }
 
+        const updatedUnits = {
+            mm: {
+                ...machineProfile.mm,
+                [name]: metricValue,
+            },
+            in: {
+                ...machineProfile.in,
+                [name]: imperialValue
+            }
+        };
+
         const updatedObj = {
             ...machineProfile,
-            [name]: value,
+            ...updatedUnits,
             limits: {
                 ...machineProfile.limits,
                 [limitMap]: value
@@ -118,19 +132,7 @@ export default class Options extends Component {
         const machineProfile = store.get('workspace.machineProfile');
         const units = store.get('workspace.units');
 
-        if (!machineProfile) {
-            return;
-        }
-
-        const updatedProfile = {
-            ...machineProfile,
-            width: units === 'mm' ? machineProfile.width : convertToImperial(machineProfile.width),
-            height: units === 'mm' ? machineProfile.height : convertToImperial(machineProfile.height),
-            depth: units === 'mm' ? machineProfile.depth : convertToImperial(machineProfile.depth),
-            units
-        };
-
-        this.setState({ machineProfile: updatedProfile, units });
+        this.setState({ machineProfile, units });
     };
 
     updateMachineProfilesFromSubscriber = (machineProfiles) => {
@@ -185,11 +187,12 @@ export default class Options extends Component {
     }
 
     render() {
-        const { machineProfile, machineProfiles } = this.state;
+        const { machineProfile, machineProfiles, units } = this.state;
         const { state } = this.props;
-        const { id, endstops, spindle, width, depth, height, units } = machineProfile;
+        const { id, endstops, spindle, mm, in: inches } = machineProfile;
         const disableEndstops = this.shouldDisableEndstops(state);
 
+        const { width = 0, depth = 0, height = 0 } = units === 'mm' ? mm : inches;
 
         return (
             <div>
