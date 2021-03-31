@@ -433,7 +433,6 @@ class ProbeWidget extends PureComponent {
     }
 
     generateInitialProbeSettings(axes, wcs, modal) {
-        console.log(modal);
         const axesToZero = {};
         Object.keys(axes).forEach((axis) => {
             if (axes[axis]) {
@@ -703,7 +702,6 @@ class ProbeWidget extends PureComponent {
             quickFeedrate: fastFeedrate,
             modal: modal
         };
-        console.log(gCodeParams);
 
         const axesCount = Object.keys(axes).filter(axis => axes[axis]).length;
         // Probe setup code

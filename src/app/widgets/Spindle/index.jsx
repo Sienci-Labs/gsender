@@ -159,7 +159,6 @@ class SpindleWidget extends PureComponent {
         },
         'controller:settings': (type, controllerSettings) => {
             const { settings } = controllerSettings;
-            console.log(settings);
             if (Object.keys(settings).length > 0) {
                 const { $30, $31 } = settings;
                 this.setState({

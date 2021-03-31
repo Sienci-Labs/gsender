@@ -48,9 +48,7 @@ const ConfirmationDialog = () => {
                 <div className={styles.confirmationDialogButtons}>
                     <ConfirmationDialogButton
                         onClick={() => {
-                            console.log(onConfirm);
                             if (onConfirm !== null) {
-                                console.log('IN CB');
                                 onClose();
                             }
                             return setShow(false);
@@ -64,9 +62,7 @@ const ConfirmationDialog = () => {
                     }
                     <ConfirmationDialogButton
                         onClick={() => {
-                            console.log(onConfirm);
                             if (onConfirm !== null) {
-                                console.log('IN CB');
                                 onConfirm();
                             }
                             return setShow(false);
