@@ -7,6 +7,10 @@ class JogHelper {
 
     startTime = 0;
 
+    didPress = false;
+
+    currentCoordinates = null;
+
     jog = null;
 
     continuousJog = null;
@@ -14,35 +18,49 @@ class JogHelper {
     stopContinuousJog = null;
 
     constructor({ jogCB, startContinuousJogCB, stopContinuousJogCB }) {
-        this.jog = _.throttle(jogCB, this.timeout, { trailing: false });
-        this.continuousJog = _.throttle(startContinuousJogCB, this.timeout, { trailing: false });
-        this.stopContinuousJog = _.throttle(stopContinuousJogCB, this.timeout, { trailing: false });
+        this.jog = _.throttle(jogCB, 150, { trailing: false });
+        this.continuousJog = _.throttle(startContinuousJogCB, 150, { trailing: false });
+        this.stopContinuousJog = _.throttle(stopContinuousJogCB, 150, { trailing: false });
+
+        // this.jog = jogCB;
+        // this.continuousJog = startContinuousJogCB;
+        // this.stopContinuousJog = stopContinuousJogCB;
     }
 
     onKeyDown(coordinates, feedrate) {
         const startTime = new Date();
 
+        if (this.timeoutFunction) {
+            return;
+        }
+
         this.startTime = startTime;
+        this.currentCoordinates = coordinates;
 
         this.timeoutFunction = setTimeout(() => {
             this.continuousJog(coordinates, feedrate);
         }, this.timeout);
+
+        this.didPress = true;
     }
 
     onKeyUp(coordinates) {
         const timer = new Date() - this.startTime;
 
         if (!this.timeoutFunction) {
-            this.stopContinuousJog();
             return;
         }
 
-        if (timer < this.timeout) {
+        if (timer < this.timeout && this.didPress) {
             this.jog(coordinates);
             this.startTime = new Date();
+            this.didPress = false;
+            this.currentCoordinates = null;
         } else {
             this.stopContinuousJog();
             this.startTime = new Date();
+            this.didPress = false;
+            this.currentCoordinates = null;
         }
 
         clearTimeout(this.timeoutFunction);
