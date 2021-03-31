@@ -260,8 +260,6 @@ class Keypad extends PureComponent {
                                     title: 'TEST',
                                     cancelLabel: 'STOP',
                                     confirmLabel: 'GO',
-                                    onClose: () => console.log('CLOSE'),
-                                    onConfirm: () => console.log('CONFIRM'),
                                     content: 'DO WE DO THE THING?'
                                 });
                                 actions.setSelectedSpeed(SPEED_RAPID);
@@ -274,6 +272,7 @@ class Keypad extends PureComponent {
                             className={cx({ [styles.activeButton]: normalActive })}
                             disabled={!canClick}
                             onClick={() => {
+                                Confirm();
                                 actions.setSelectedSpeed(SPEED_NORMAL);
                                 actions.setJogFromPreset('normal');
                             }}

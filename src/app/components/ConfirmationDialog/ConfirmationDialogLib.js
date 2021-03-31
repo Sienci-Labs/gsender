@@ -4,7 +4,7 @@ export const DIALOG_CONFIRM = 'confirm';
 export const DIALOG_CANCEL = 'cancel';
 export const DIALOG_INVERT = 'invert';
 
-export const Confirm = (options) => {
+export const Confirm = (options = {}) => {
     const {
         title = 'Confirm',
         buttons = [],

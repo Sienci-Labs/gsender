@@ -5,9 +5,10 @@ import { DIALOG_CANCEL, DIALOG_CONFIRM } from './ConfirmationDialogLib';
 
 
 const ConfirmationDialogButton = ({ children, onClick, variant = DIALOG_CONFIRM }) => {
+    console.log(onClick);
     return (
         <button
-            onClick={() => onClick()}
+            onClick={onClick}
             className={cx(styles.confirmationDialogButton,
                 { [styles.confirmationDialogButtonConfirm]: variant === DIALOG_CONFIRM },
                 { [styles.confirmationDialogButtonCancel]: variant === DIALOG_CANCEL })}
