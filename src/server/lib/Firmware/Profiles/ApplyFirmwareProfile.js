@@ -1,21 +1,33 @@
-import LongMill from '!raw-loader!./EepromFiles/Sienci Long Mill.txt';
-import MillOne from '!raw-loader!./EepromFiles/Sienci MillOne.txt';
+import defaultGrbl from '!raw-loader!./EepromFiles/DefaultGrblSettings.txt';
+import LongMill12x12 from '!raw-loader!./EepromFiles/Sienci Long Mill12X12.txt';
+import LongMill12x30 from '!raw-loader!./EepromFiles/Sienci Long Mill12X30.txt';
+import LongMill30x30 from '!raw-loader!./EepromFiles/Sienci Long Mill30X30.txt';
+import MillOne from '!raw-loader!./EepromFiles/Sienci Mill One.txt';
 import map from 'lodash/map';
 import store from '../../../store';
 
-const ApplyFirmwareProfile = (profile, recievedPortNumber) => {
+const ApplyFirmwareProfile = (nameOfMachine, typeOfMachine, recievedPortNumber) => {
     const gcode = (cmd, params) => {
         const s = map(params, (value, letter) => String(letter + value)).join('=');
         return (s.length > 0) ? (cmd + '' + s) : cmd;
     };
 
-
     const controller = store.get('controllers["' + recievedPortNumber + '"]');
-    let settings = '';
-    if (profile === 'Sienci Long Mill') {
-        settings = LongMill;
-    } else if (profile === 'Sienci MillOne') {
+
+    let settings = defaultGrbl;
+
+    if (nameOfMachine === 'Mill One') {
         settings = MillOne;
+    } else if (nameOfMachine === 'LongMill') {
+        if (typeOfMachine === '12x12') {
+            settings = LongMill12x12;
+        }
+        if (typeOfMachine === '12x30') {
+            settings = LongMill12x30;
+        }
+        if (typeOfMachine === '30x30') {
+            settings = LongMill30x30;
+        }
     }
     const obj = JSON.parse(settings);
     let values = Object.values(obj);

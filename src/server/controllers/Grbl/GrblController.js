@@ -1075,15 +1075,16 @@ class GrblController {
             },
             'firmware:recievedProfiles': () => {
                 let [files] = args;
-                this.emit('message', files);
+                this.emit('task:finish', files);
             },
             'firmware:applyProfileSettings': () => {
-                let [chosenProfile, port] = args;
-                ApplyFirmwareProfile(chosenProfile, port);
+                let [nameOfMachine, typeOfMachine, port] = args;
+                ApplyFirmwareProfile(nameOfMachine, typeOfMachine, port);
             },
-            'firmware:dubugging': () => {
-                let [values] = args;
-                this.emit('message', values);
+            'firmware:grabMachineProfile': () => {
+                // let [values] = args;
+                const machineProfile = store.get('machineProfile');
+                this.emit('sender:status', machineProfile);
             },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;
