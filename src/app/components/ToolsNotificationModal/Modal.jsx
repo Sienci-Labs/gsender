@@ -4,7 +4,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { CSSTransition } from 'react-transition-group';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+
 import './modal.css';
 
 const ToolsNotificationModal = (props) => {
@@ -17,7 +17,7 @@ const ToolsNotificationModal = (props) => {
             <div className={`modalFirmware ${props.show ? 'show' : ''}`} onClick={props.onClose}>
                 <div className="modal-content" onClick={e => e.stopPropagation()}>
                     <div className="modal-header">
-                        <div className="fas fa-exclamation" style={{ fontSize: 40, color: '#3e85c7', textAlign: 'center', marginTop: 5 }} />
+                        <div className="fas fa-exclamation-triangle" style={{ fontSize: 55, color: 'red', textAlign: 'center', margin: 2 }} />
                         <h4 className="modal-title">{props.title}</h4>
                     </div>
                     <div className="modal-body">{props.children}</div>
