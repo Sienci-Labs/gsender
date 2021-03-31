@@ -23,6 +23,7 @@ import JogControl from './components/JogControl';
 import JogCancel from './components/JogCancel';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from './constants';
+import { Confirm } from '../../components/ConfirmationDialog/ConfirmationDialogLib';
 
 const KeypadText = styled.span`
     position: relative;
@@ -255,6 +256,14 @@ class Keypad extends PureComponent {
                             className={cx({ [styles.activeButton]: rapidActive })}
                             disabled={!canClick} type="button"
                             onClick={() => {
+                                Confirm({
+                                    title: 'TEST',
+                                    cancelLabel: 'STOP',
+                                    confirmLabel: 'GO',
+                                    onClose: () => console.log('CLOSE'),
+                                    onConfirm: () => console.log('CONFIRM'),
+                                    content: 'DO WE DO THE THING?'
+                                });
                                 actions.setSelectedSpeed(SPEED_RAPID);
                                 actions.setJogFromPreset('rapid');
                             }}

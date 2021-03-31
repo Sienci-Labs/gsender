@@ -30,6 +30,7 @@ import {
 } from './constants';
 import UpdateAvailableAlert from './UpdateAvailableAlert/UpdateAvailableAlert';
 import Toaster from '../../lib/toaster/Toaster';
+import ConfirmationDialog from '../../components/ConfirmationDialog/ConfirmationDialog';
 
 
 const WAIT = '%wait';
@@ -519,6 +520,7 @@ class Workspace extends PureComponent {
                         <UpdateAvailableAlert restartHandler={this.action.sendRestartCommand} />
                         <Toaster />
                         <Header />
+                        <ConfirmationDialog />
                         <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
                             <DefaultWidgets
                                 ref={node => {

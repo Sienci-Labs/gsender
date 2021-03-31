@@ -394,7 +394,6 @@
     "Error opening serial port '{{- port}}'": "",
     "Error opening port '{{- port}}'": "",
     "Probe": "",
-    "Tool Profile": "",
     "Top": "",
     "Front": "",
     "3D": "",
