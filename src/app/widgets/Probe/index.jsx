@@ -382,6 +382,7 @@ class ProbeWidget extends PureComponent {
             useTLO: this.config.get('useTLO'),
             probeDepth: this.config.get('probeDepth') || {},
             probeFeedrate: this.config.get('probeFeedrate') || {},
+            probeFastFeedrate: this.config.get('probeFastFeedrate') || {},
             touchPlateHeight: this.config.get('touchPlateHeight') || {},
             retractionDistance: this.config.get('retractionDistance') || {},
             touchplate: store.get('workspace[probeProfile]', {}),
@@ -424,7 +425,8 @@ class ProbeWidget extends PureComponent {
         };
     }
 
-    generateInitialProbeSettings(axes, wcs) {
+    generateInitialProbeSettings(axes, wcs, modal) {
+        console.log(modal);
         const axesToZero = {};
         Object.keys(axes).forEach((axis) => {
             if (axes[axis]) {
@@ -440,7 +442,7 @@ class ProbeWidget extends PureComponent {
                 ...axesToZero
             }),
             this.gcode('G91', {
-                G: 21
+                G: modal
             }),
             this.gcode('G49')
         ];
@@ -660,39 +662,60 @@ class ProbeWidget extends PureComponent {
             retractionDistance,
             probeCommand,
             probeFeedrate,
-            touchplate
+            probeFastFeedrate,
+            touchplate,
+            units
         } = state;
         const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
         const wcs = this.getWorkCoordinateSystem();
         const code = [];
 
+        // Grab units for correct modal
+        let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
+        const modal = (units === METRIC_UNITS) ? '21' : '20';
+        if (units === METRIC_UNITS) {
+            zThickness = touchplate.zThickness.mm;
+            xyThickness = touchplate.xyThickness.mm;
+            feedrate = probeFeedrate.mm;
+            fastFeedrate = probeFastFeedrate.mm;
+            retractDistance = retractionDistance.mm;
+        } else {
+            zThickness = touchplate.zThickness.in;
+            xyThickness = touchplate.xyThickness.in;
+            feedrate = probeFeedrate.in;
+            fastFeedrate = probeFastFeedrate.in;
+            retractDistance = retractionDistance.in;
+        }
+
         const gCodeParams = {
             wcs: wcs,
             isSafe: useSafeProbeOption,
             probeCommand: probeCommand,
-            retractDistance: retractionDistance.mm,
-            normalFeedrate: probeFeedrate.mm,
-            quickFeedrate: probeFeedrate + 25,
+            retractDistance: retractDistance,
+            normalFeedrate: feedrate,
+            quickFeedrate: fastFeedrate,
+            modal: modal
         };
+        console.log(gCodeParams);
 
         const axesCount = Object.keys(axes).filter(axis => axes[axis]).length;
         // Probe setup code
-        this.generateInitialProbeSettings(axes, wcs).map(line => code.push(line));
+        this.generateInitialProbeSettings(axes, wcs, modal).map(line => code.push(line));
 
         if (axesCount === 1) {
             if (axes.z) {
-                (this.generateSingleAxisCommands('Z', touchplate.zThickness.mm, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('Z', zThickness, gCodeParams)).map(line => code.push(line));
             }
             if (axes.y) {
-                (this.generateSingleAxisCommands('Y', touchplate.xyThickness.mm, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('Y', xyThickness, gCodeParams)).map(line => code.push(line));
             }
             if (axes.x) {
-                (this.generateSingleAxisCommands('X', touchplate.xyThickness.mm, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('X', xyThickness, gCodeParams)).map(line => code.push(line));
             }
         }
 
         if (axesCount > 1) {
-            (this.generateMultiAxisCommands(axes, touchplate.xyThickness.mm, touchplate.zThickness.mm, gCodeParams)).map(line => code.push(line));
+            (this.generateMultiAxisCommands(axes, xyThickness, zThickness, gCodeParams)).map(line => code.push(line));
         }
 
         return code;

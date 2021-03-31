@@ -260,7 +260,10 @@ class Keypad extends PureComponent {
                                     title: 'TEST',
                                     cancelLabel: 'STOP',
                                     confirmLabel: 'GO',
-                                    content: 'DO WE DO THE THING?'
+                                    content: 'DO WE DO THE THING?',
+                                    onClose: () => {
+                                        console.log('CALLED IT');
+                                    }
                                 });
                                 actions.setSelectedSpeed(SPEED_RAPID);
                                 actions.setJogFromPreset('rapid');

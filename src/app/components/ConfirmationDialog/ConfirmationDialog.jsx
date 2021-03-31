@@ -15,24 +15,7 @@ const ConfirmationDialog = () => {
     const [confirmLabel, setConfirmLabel] = useState(null);
     const [cancelLabel, setCancelLabel] = useState(null);
 
-
     let hideModal = !show;
-
-    const onCloseCB = () => {
-        console.log(onClose);
-        if (onClose) {
-            onClose();
-        }
-        return setShow(false);
-    };
-    const onConfirmCB = () => {
-        console.log(onConfirm);
-        if (onConfirm) {
-            onConfirm();
-        }
-        return setShow(false);
-    };
-
 
     useEffect(() => {
         hideModal = !show;
@@ -63,11 +46,35 @@ const ConfirmationDialog = () => {
                     { content }
                 </div>
                 <div className={styles.confirmationDialogButtons}>
-                    <ConfirmationDialogButton onClick={onCloseCB} variant={DIALOG_CANCEL}>{ cancelLabel }</ConfirmationDialogButton>
+                    <ConfirmationDialogButton
+                        onClick={() => {
+                            console.log(onConfirm);
+                            if (onConfirm !== null) {
+                                console.log('IN CB');
+                                onClose();
+                            }
+                            return setShow(false);
+                        }}
+                        variant={DIALOG_CANCEL}
+                    >
+                        { cancelLabel }
+                    </ConfirmationDialogButton>
                     {
                         buttons.length > 0 && true
                     }
-                    <ConfirmationDialogButton onClick={onConfirmCB} variant={DIALOG_CONFIRM}>{ confirmLabel }</ConfirmationDialogButton>
+                    <ConfirmationDialogButton
+                        onClick={() => {
+                            console.log(onConfirm);
+                            if (onConfirm !== null) {
+                                console.log('IN CB');
+                                onConfirm();
+                            }
+                            return setShow(false);
+                        }}
+                        variant={DIALOG_CONFIRM}
+                    >
+                        { confirmLabel }
+                    </ConfirmationDialogButton>
                 </div>
             </div>
         </div>
