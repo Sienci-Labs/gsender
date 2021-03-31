@@ -8,7 +8,6 @@ import Tools from '../Tools/Tools';
 
 import Fieldset from '../FieldSet';
 import Input from '../Input';
-import { convertToImperial } from '../calculate';
 
 
 const ProbeSettings = ({ active, state, actions }) => {
@@ -21,9 +20,9 @@ const ProbeSettings = ({ active, state, actions }) => {
         width: units === 'mm' ? probe.plateWidth.mm : probe.plateWidth.in,
         xyThickness: units === 'mm' ? probe.xyThickness.mm : probe.xyThickness.in,
         zThickness: units === 'mm' ? probe.zThickness.mm : probe.zThickness.in,
-        fastFeedrate: units === 'mm' ? probeSettings.fastFeedrate : convertToImperial(probeSettings.fastFeedrate),
-        normalFeedrate: units === 'mm' ? probeSettings.normalFeedrate : convertToImperial(probeSettings.normalFeedrate),
-        retractionDistance: units === 'mm' ? probeSettings.retractionDistance : convertToImperial(probeSettings.retractionDistance),
+        fastFeedrate: units === 'mm' ? probeSettings.fastFeedrate.mm : probeSettings.fastFeedrate.in,
+        normalFeedrate: units === 'mm' ? probeSettings.normalFeedrate.mm : probeSettings.normalFeedrate.in,
+        retractionDistance: units === 'mm' ? probeSettings.retractionDistance.mm : probeSettings.retractionDistance.in,
     };
 
     return (
