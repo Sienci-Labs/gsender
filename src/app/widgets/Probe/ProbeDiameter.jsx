@@ -25,15 +25,13 @@ const inputStyle = {
 };
 
 const ProbeDiameter = ({ actions, state }) => {
+    const { setToolDiameter } = actions;
+    const { availableTools, units, toolDiameter } = state;
+
     const handleChange = (value) => {
-        console.log(value);
+        console.log('change');
+        setToolDiameter(value);
     };
-
-    const onInputChange = (value) => {
-        console.log(value);
-    };
-    const { availableTools, units } = state;
-
     const options = convertAvailableTools(availableTools, units);
 
     return (
@@ -44,7 +42,7 @@ const ProbeDiameter = ({ actions, state }) => {
                     isClearable
                     styles={inputStyle}
                     onChange={handleChange}
-                    onInputChange={onInputChange}
+                    value={{ label: `${toolDiameter} ${units}` }}
                     options={options}
                     menuPlacement="top"
                     singleValue
