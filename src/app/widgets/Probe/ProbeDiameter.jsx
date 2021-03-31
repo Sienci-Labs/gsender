@@ -29,7 +29,6 @@ const ProbeDiameter = ({ actions, state }) => {
     const { availableTools, units, toolDiameter } = state;
 
     const handleChange = (value) => {
-        console.log('change');
         setToolDiameter(value);
     };
     const options = convertAvailableTools(availableTools, units);

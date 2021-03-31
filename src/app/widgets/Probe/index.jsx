@@ -239,9 +239,7 @@ class ProbeWidget extends PureComponent {
         },
         setToolDiameter: (selection) => {
             const { value } = selection || 0.00;
-            console.log(value);
             const diameter = Number(value) || 0.00;
-            console.log(diameter);
             this.setState({
                 toolDiameter: diameter
             });
@@ -396,7 +394,6 @@ class ProbeWidget extends PureComponent {
             retractionDistance: this.config.get('retractionDistance') || {},
             touchplate: store.get('workspace[probeProfile]', {}),
             availableTools: store.get('workspace[tools]', []),
-            selectedtool: 0,
             toolDiameter: 0.00,
             useSafeProbeOption: false,
             availableProbeCommands: [],
@@ -500,8 +497,8 @@ class ProbeWidget extends PureComponent {
                 }),
             ]);
         } else {
-            const tool = this.state.availableTools[this.state.selectedtool];
-            const toolRadius = (tool.metricDiameter / 2);
+            const toolDiameter = this.state.toolDiameter;
+            const toolRadius = (toolDiameter / 2);
             const toolCompensatedThickness = ((-1 * toolRadius) - thickness);
             code = code.concat([
                 this.gcode('G91'),
@@ -549,8 +546,8 @@ class ProbeWidget extends PureComponent {
         const gcode = this.gcode;
 
         // Calculate tool offset using radius and block thickness to origin
-        const tool = this.state.availableTools[this.state.selectedtool];
-        const toolRadius = (tool.metricDiameter / 2);
+        const toolDiameter = this.state.toolDiameter;
+        const toolRadius = (toolDiameter / 2);
         const toolCompensatedThickness = ((-1 * toolRadius) - xyThickness);
 
         // Add Z Probe code if we're doing 3 axis probing
