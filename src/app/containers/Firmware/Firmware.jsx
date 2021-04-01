@@ -48,7 +48,6 @@ class Firmware extends PureComponent {
 
     componentDidMount() {
         this.addControllerEvents();
-        //controller.command('firmware:grabMachineProfile');
     }
 
     componentWillUnmount() {
