@@ -36,7 +36,7 @@ const ApplyFirmwareProfile = (nameOfMachine, typeOfMachine, recievedPortNumber) 
             settings = LongMill30x30;
         }
     }
-    console.log(settings);
+
     const obj = JSON.parse(settings);
     let values = Object.values(obj);
     if (values.length === 34) {

@@ -37,7 +37,6 @@ import {
 } from './constants';
 import { METRIC_UNITS } from '../../../app/constants';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
-import FirmwareProfiles from '../../lib/Firmware/Profiles/firmwareprofiles';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 
 
@@ -1068,10 +1067,6 @@ class GrblController {
             'flashing:failed': () => {
                 let [error] = args;
                 setTimeout(() => this.emit('task:error', error), 16000);
-            },
-            'firmware:getProfiles': (data) => {
-                let [port = 'COM3'] = args;
-                FirmwareProfiles(port);
             },
             'firmware:recievedProfiles': () => {
                 let [files] = args;
