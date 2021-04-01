@@ -24,7 +24,7 @@ const ToolsNotificationModal = (props) => {
                     <div className="modal-footer">
                         <h1 className="footer-text">{props.footer}</h1>
                         <div className="buttonContainer">
-                            <button className="button" onClick={props.yesFunction}>Yes</button>
+                            <button className="redButton" onClick={props.yesFunction}>Yes</button>
                             <button onClick={props.onClose} className="button">No</button>
                         </div>
                     </div>

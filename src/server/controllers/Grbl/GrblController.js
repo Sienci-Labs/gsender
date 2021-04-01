@@ -1067,7 +1067,7 @@ class GrblController {
             },
             'flashing:failed': () => {
                 let [error] = args;
-                setTimeout(() => this.emit('task:error', error), 2000);
+                setTimeout(() => this.emit('task:error', error), 16000);
             },
             'firmware:getProfiles': (data) => {
                 let [port = 'COM3'] = args;

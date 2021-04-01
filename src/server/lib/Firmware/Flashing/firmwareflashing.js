@@ -1,5 +1,5 @@
 import AvrgirlArduino from 'avrgirl-arduino';
-import hex from '!file-loader!./filetoflashuno.hex';
+import hex from '!file-loader!./grbl1.1h.hex';
 import logger from '../../logger';
 import store from '../../../store';
 
@@ -14,7 +14,6 @@ const FlashingFirmware = (recievedPortNumber) => {
             port: recievedPortNumber,
         });
 
-        // avrgirl.flash('../../BLANK HEX TO TEST.hex', error => {
         avrgirl.flash(hex, error => {
             if (error) {
                 controller.command('flashing:failed', error);
