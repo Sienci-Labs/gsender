@@ -451,7 +451,6 @@ class ProbeWidget extends PureComponent {
             this.gcode('G91', {
                 G: modal
             }),
-            this.gcode('G49')
         ];
     }
 
@@ -462,6 +461,7 @@ class ProbeWidget extends PureComponent {
         probeDistance = (isSafe) ? -probeDistance : probeDistance;
         probeDistance = (axis === 'Z') ? (-1 * Math.abs(probeDistance)) : probeDistance;
         retractDistance = (axis === 'Z') ? retractDistance : retractDistance * -1;
+        console.log(retractDistance);
         let code;
         code = [
             this.gcode(`; ${axis}-Probe`),
@@ -521,10 +521,11 @@ class ProbeWidget extends PureComponent {
 
         // Go up on Z if X or Y
         if (axis !== 'Z') {
-            const { touchPlateHeight } = this.state;
+            const { touchPlateHeight, units } = this.state;
+            const touchplateThickness = (units === METRIC_UNITS) ? touchPlateHeight : mm2in(touchPlateHeight);
             code = code.concat([
                 this.gcode('G0', {
-                    Z: -1 * ((retractDistance * 4) - touchPlateHeight)
+                    Z: -1 * ((retractDistance * 4) - touchplateThickness)
                 })
             ]);
         }
@@ -550,7 +551,6 @@ class ProbeWidget extends PureComponent {
         const toolDiameter = this.state.toolDiameter;
         const toolRadius = (toolDiameter / 2);
         const toolCompensatedThickness = ((-1 * toolRadius) - xyThickness);
-        console.log(toolCompensatedThickness);
 
         // Add Z Probe code if we're doing 3 axis probing
         if (axes.z) {
@@ -697,6 +697,7 @@ class ProbeWidget extends PureComponent {
             fastFeedrate = probeFastFeedrate.in;
             retractDistance = retractionDistance.in;
         }
+        console.log(retractDistance);
 
         const gCodeParams = {
             wcs: wcs,
