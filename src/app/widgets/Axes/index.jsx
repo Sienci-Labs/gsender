@@ -42,7 +42,8 @@ import {
 } from '../../constants';
 import {
     MODAL_NONE,
-    DEFAULT_AXES, SPEED_NORMAL
+    DEFAULT_AXES,
+    SPEED_NORMAL,
 } from './constants';
 import styles from './index.styl';
 
@@ -541,7 +542,7 @@ class AxesWidget extends PureComponent {
             if (!key) {
                 return;
             }
-
+            this.actions.setSelectedSpeed(key);
             this.actions.setJogFromPreset(key);
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
