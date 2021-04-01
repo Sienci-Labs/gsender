@@ -584,7 +584,7 @@ const defaultState = {
         },
         { // Select Normal Jog Preset
             id: 26,
-            title: 'Select Rapid Jog Preset',
+            title: 'Select Normal Jog Preset',
             keys: ['shift', 'x'].join('+'),
             cmd: 'SET_JOG_PRESET',
             payload: {
@@ -594,7 +594,7 @@ const defaultState = {
         },
         { // Select Precise Jog Preset
             id: 27,
-            title: 'Select Rapid Jog Preset',
+            title: 'Select Precise Jog Preset',
             keys: ['shift', 'c'].join('+'),
             cmd: 'SET_JOG_PRESET',
             payload: {
