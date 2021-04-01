@@ -3,6 +3,7 @@ import LongMill12x12 from '!raw-loader!./EepromFiles/Sienci Long Mill12X12.txt';
 import LongMill12x30 from '!raw-loader!./EepromFiles/Sienci Long Mill12X30.txt';
 import LongMill30x30 from '!raw-loader!./EepromFiles/Sienci Long Mill30X30.txt';
 import MillOne from '!raw-loader!./EepromFiles/Sienci Mill One.txt';
+import MillOneV3 from '!raw-loader!./EepromFiles/Sienci Mill OneV3.txt';
 import map from 'lodash/map';
 import store from '../../../store';
 
@@ -17,8 +18,14 @@ const ApplyFirmwareProfile = (nameOfMachine, typeOfMachine, recievedPortNumber) 
     let settings = defaultGrbl;
 
     if (nameOfMachine === 'Mill One') {
-        settings = MillOne;
-    } else if (nameOfMachine === 'LongMill') {
+        if (typeOfMachine === 'V3') {
+            settings = MillOneV3;
+        } else {
+            settings = MillOne;
+        }
+    }
+
+    if (nameOfMachine === 'LongMill') {
         if (typeOfMachine === '12x12') {
             settings = LongMill12x12;
         }
@@ -29,6 +36,7 @@ const ApplyFirmwareProfile = (nameOfMachine, typeOfMachine, recievedPortNumber) 
             settings = LongMill30x30;
         }
     }
+    console.log(settings);
     const obj = JSON.parse(settings);
     let values = Object.values(obj);
     if (values.length === 34) {

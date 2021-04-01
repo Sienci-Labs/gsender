@@ -6,7 +6,6 @@ import store from '../../../store';
 const log = logger('FlashLib: ');
 const FlashingFirmware = (recievedPortNumber) => {
     const controller = store.get('controllers["' + recievedPortNumber + '"]');
-
     try {
         let avrgirl = new AvrgirlArduino({
             board: 'uno',

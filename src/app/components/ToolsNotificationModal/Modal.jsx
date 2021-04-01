@@ -23,9 +23,10 @@ const ToolsNotificationModal = (props) => {
                     <div className="modal-body">{props.children}</div>
                     <div className="modal-footer">
                         <h1 className="footer-text">{props.footer}</h1>
+                        <h1 className="footer-textTwo">{props.footerTwo}</h1>
                         <div className="buttonContainer">
-                            <button className="redButton" onClick={props.yesFunction}>Yes</button>
-                            <button onClick={props.onClose} className="button">No</button>
+                            <button onClick={props.onClose} className="redButton">No</button>
+                            <button className="button" onClick={props.yesFunction}>Yes</button>
                         </div>
                     </div>
                 </div>
