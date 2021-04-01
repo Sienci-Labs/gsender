@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import Modal from 'app/components/Modal';
 import map from 'lodash/map';
 import download from 'downloadjs';
+import store from 'app/store';
 import controller from '../../lib/controller';
 import Controller from '../../widgets/Grbl/Controller';
 import Loading from '../../components/Loader';
@@ -26,7 +27,7 @@ class Firmware extends PureComponent {
 
         const defaultFileType = 'text';
         this.fileNames = {
-            text: 'My Cnc Settings'
+            text: 'My Cnc Settings.txt'
         };
         this.state = {
             fileType: defaultFileType,
@@ -48,7 +49,7 @@ class Firmware extends PureComponent {
 
     componentDidMount() {
         this.addControllerEvents();
-        controller.command('firmware:grabMachineProfile');
+        this.actions.getProfiles();
     }
 
     componentWillUnmount() {
@@ -196,13 +197,6 @@ class Firmware extends PureComponent {
                 currentMachineProfile: currentMachineProfile
             }));
         },
-        'task:finish': (machines) => {
-            if (machines !== null) {
-                this.actions.formatText(machines);
-            } else {
-                this.setState({ loadedFiles: 'Error loading files..' });
-            }
-        },
     };
 
     addControllerEvents() {
@@ -254,10 +248,6 @@ class Firmware extends PureComponent {
             controller.command('gcode', '$RST=$');
             controller.command('flash:start', this.state.port);
         },
-        startProfileLoading: () => {
-            let port = controller.port;
-            controller.command('firmware:getProfiles', port);
-        },
         formatText: (files) => {
             let string;
             let formatted = [];
@@ -268,7 +258,13 @@ class Firmware extends PureComponent {
             this.setState({ loadedMachines: formatted });
             this.setState({ showHeader: true });
             this.setState({ showstartButton: false });
-        }
+        },
+        getProfiles: () => {
+            let machine = store.get('workspace.machineProfile');
+            this.setState({ currentMachineProfile: machine });
+            let machines = ['Sienci Long Mill.txt', 'Sienci Mill One.txt'];
+            this.actions.formatText(machines);
+        },
     }
 
     grabNewSwitchInputSettings = (name, value) => {
@@ -620,7 +616,7 @@ class Firmware extends PureComponent {
                                 <input
                                     type="file" className="hidden"
                                     multiple={false}
-                                    // accept=".txt"
+                                    accept=".txt"
                                     onChange={evt => this.openFile(evt)}
                                     ref={e => this.dofileUpload = e}
                                 />
