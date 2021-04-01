@@ -511,6 +511,35 @@ class LocationWidget extends PureComponent {
                 this.actions.selectAxis(axis);
             }
         },
+        ZERO_AXIS: (event, { axis }) => {
+            if (!axis) {
+                return;
+            }
+
+            const wcs = this.actions.getWorkCoordinateSystem();
+
+            const p = {
+                'G54': 1,
+                'G55': 2,
+                'G56': 3,
+                'G57': 4,
+                'G58': 5,
+                'G59': 6
+            }[wcs] || 0;
+
+            axis = axis.toUpperCase();
+            controller.command('gcode', `G10 L20 P${p} ${axis}0`);
+        },
+        GO_TO_AXIS: (event, { axis }) => {
+            if (!axis) {
+                return;
+            }
+
+            axis = axis.toUpperCase();
+
+            controller.command('gcode', 'G90');
+            controller.command('gcode', `G0 ${axis}0`);
+        },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
                 this.actions.stepBackward();
