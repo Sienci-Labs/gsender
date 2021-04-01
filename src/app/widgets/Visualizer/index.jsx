@@ -4,6 +4,7 @@ import includes from 'lodash/includes';
 import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
+import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -937,9 +938,12 @@ class VisualizerWidget extends PureComponent {
 
     visualizer = null;
 
+    workflowControl = null;
+
     componentDidMount() {
         this.subscribe();
         this.addControllerEvents();
+        this.addShuttleControlEvents();
         this.subscribe();
 
         if (!WebGL.isWebGLAvailable() && !this.state.disabled) {
@@ -956,6 +960,7 @@ class VisualizerWidget extends PureComponent {
     componentWillUnmount() {
         this.unsubscribe();
         this.removeControllerEvents();
+        this.removeShuttleControlEvents();
         this.unsubscribe();
     }
 
@@ -1091,6 +1096,14 @@ class VisualizerWidget extends PureComponent {
         };
     }
 
+    shuttleControlEvents = {
+        LOAD_FILE: () => {
+            if (this.workflowControl) {
+                this.workflowControl.handleClickUpload();
+            }
+        }
+    }
+
     addControllerEvents() {
         Object.keys(this.controllerEvents).forEach(eventName => {
             const callback = this.controllerEvents[eventName];
@@ -1105,6 +1118,26 @@ class VisualizerWidget extends PureComponent {
         });
     }
 
+    addShuttleControlEvents() {
+        combokeys.reload();
+
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName];
+            combokeys.on(eventName, callback);
+        });
+    }
+
+    updateShuttleControlEvents = () => {
+        this.removeShuttleControlEvents();
+        this.addShuttleControlEvents();
+    }
+
+    removeShuttleControlEvents() {
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName];
+            combokeys.removeListener(eventName, callback);
+        });
+    }
 
     getVisualizerTheme() {
         const { theme } = store.get('widgets.visualizer');
@@ -1191,6 +1224,9 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('gcode:showLineWarnings', (_, shouldShow) => {
                 this.setState({ invalidLine: { shouldShow, show: false, line: '', } });
             }),
+            pubsub.subscribe('keybindingsUpdated', () => {
+                this.updateShuttleControlEvents();
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -1273,6 +1309,9 @@ class VisualizerWidget extends PureComponent {
                             />
 
                             <WorkflowControl
+                                ref={(node) => {
+                                    this.workflowControl = node;
+                                }}
                                 state={state}
                                 actions={actions}
                             />

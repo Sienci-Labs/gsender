@@ -532,6 +532,13 @@ class AxesWidget extends PureComponent {
 
             this.joggingHelper && this.joggingHelper.onKeyUp({ [givenAxis]: axisValue, F: feedrate });
         },
+        SET_JOG_PRESET: (event, { key }) => {
+            if (!key) {
+                return;
+            }
+
+            this.actions.setJogFromPreset(key);
+        },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
                 this.actions.stepBackward();
