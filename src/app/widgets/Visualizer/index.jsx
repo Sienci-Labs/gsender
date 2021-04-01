@@ -1216,7 +1216,7 @@ class VisualizerWidget extends PureComponent {
         // const showNotifications = showVisualizer && !!state.notification.type;
 
         const { liteMode } = this.state;
-
+        console.log(state);
         return (
             <Widget className={styles.vizWidgetOverride}>
                 <Widget.Header className={styles['visualizer-header']}>
