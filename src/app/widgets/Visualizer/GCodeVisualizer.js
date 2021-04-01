@@ -115,7 +115,6 @@ class GCodeVisualizer {
         const toolpathModal = toolpath.getModal();
         const { units } = toolpathModal;
         pubsub.publish('file:units', units);
-        console.log(units);
 
         const workpiece = new THREE.Line(
             new THREE.Geometry(),

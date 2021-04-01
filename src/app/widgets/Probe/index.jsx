@@ -38,6 +38,7 @@ import {
 } from './constants';
 import store from '../../store';
 import styles from './index.styl';
+import { mm2in } from '../../lib/units';
 
 
 class ProbeWidget extends PureComponent {
@@ -536,6 +537,7 @@ class ProbeWidget extends PureComponent {
 
     generateMultiAxisCommands(axes, xyThickness, zThickness, params) {
         let code = [];
+        const { units } = this.state;
         let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate } = params;
         const workspace = this.mapWCSToPValue(wcs);
         const XYRetract = -retractDistance;
@@ -548,6 +550,7 @@ class ProbeWidget extends PureComponent {
         const toolDiameter = this.state.toolDiameter;
         const toolRadius = (toolDiameter / 2);
         const toolCompensatedThickness = ((-1 * toolRadius) - xyThickness);
+        console.log(toolCompensatedThickness);
 
         // Add Z Probe code if we're doing 3 axis probing
         if (axes.z) {
@@ -577,15 +580,17 @@ class ProbeWidget extends PureComponent {
             ]);
         }
 
+        const zPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
+        const xyPositionAdjust = (units === METRIC_UNITS) ? 20 : mm2in(20).toFixed(3);
         // We always probe X and Y based if we're running this function
         code = code.concat([
             // X First - move to left of plate
             gcode('G0', {
-                X: -20
+                X: -xyPositionAdjust
             }),
             // Move down to impact plate from side
             gcode('G0', {
-                Z: -15
+                Z: -zPositionAdjust
             }),
             gcode(probeCommand, {
                 X: XYProbeDistance,
@@ -613,10 +618,10 @@ class ProbeWidget extends PureComponent {
                 X: -(2 * retractDistance)
             }),
             gcode('G0', {
-                Y: -20
+                Y: -xyPositionAdjust
             }),
             gcode('G0', {
-                X: 20
+                X: xyPositionAdjust
             }),
             gcode(probeCommand, {
                 Y: XYProbeDistance,
