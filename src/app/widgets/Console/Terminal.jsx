@@ -344,15 +344,15 @@ class TerminalWrapper extends PureComponent {
         const height = container.offsetHeight;
 
         // const columns = Math.floor((height / 4));
-        const rowss = Math.floor((width / 36) - 1);
+        const rowNumbers = Math.floor((width / 36) - 2);
 
-        // console.log(columns, rowss);
+        // console.log(columns, rowNumbers);
 
         if (width <= 0 || height <= 0) {
             return;
         }
 
-        this.term.resize(cols, rowss);
+        this.term.resize(cols, rowNumbers);
 
         // if (!(this.term && this.term.element)) {
         //     return;
