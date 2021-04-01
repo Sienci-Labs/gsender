@@ -103,6 +103,8 @@ const main = () => {
             const bounds = {
                 width: 1280, // Defaults to 1280
                 height: 768, // Defaults to 768
+                minWidth: 1280,
+                minHeight: 768,
                 ...store.get('bounds')
             };
             const options = {
