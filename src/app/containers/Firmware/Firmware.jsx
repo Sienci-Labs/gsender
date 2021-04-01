@@ -573,7 +573,7 @@ class Firmware extends PureComponent {
                                     <FunctionButton
                                         onClick={this.restoreSettings}
                                     >
-                                        <i className="fas fa-undo" />
+                                        <div className={styles.undoIcon}><i className="fas fa-undo" /></div>
                                     Restore Cnc Defaults
                                     </FunctionButton>
                                 </div>
@@ -614,7 +614,7 @@ class Firmware extends PureComponent {
                                     onClick={this.applyNewSettings}
                                     className={this.state.newSettingsButtonDisabled ? `${styles.firmwareButtonDisabled}` : `${styles.applySettingsButton}`}
                                 >
-                                    <i className="fas fa-tasks" />
+                                    <div className={styles.taskIcon}><i className="fas fa-tasks" /></div>
                                     Apply New Settings
                                 </FunctionButton>
                                 <input
