@@ -78,7 +78,7 @@ const VisualizerSettings = ({ active, state, actions }) => {
                                     label: value
                                 }))}
                                 searchable={false}
-                                value={theme}
+                                value={{ label: theme }}
                                 valueRenderer={themeRenderer}
                             />
                             <small>Colours used when visualizing a G-Code file.</small>

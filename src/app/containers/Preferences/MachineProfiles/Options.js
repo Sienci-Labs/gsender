@@ -189,8 +189,9 @@ export default class Options extends Component {
     render() {
         const { machineProfile, machineProfiles, units } = this.state;
         const { state } = this.props;
-        const { id, endstops, spindle, mm, in: inches } = machineProfile;
+        const { endstops, spindle, mm, in: inches, company, name, type } = machineProfile;
         const disableEndstops = this.shouldDisableEndstops(state);
+        const label = `${company} ${name} ${' - ' && type}`;
 
         const { width = 0, depth = 0, height = 0 } = units === 'mm' ? mm : inches;
 
@@ -202,7 +203,7 @@ export default class Options extends Component {
 
                         <Select
                             className={styles['machine-options-select']}
-                            value={id}
+                            value={{ label: label }}
                             options={machineProfiles.map(({ id, name, company, type }) => ({ key: id, value: id, label: `${company} ${name} ${' - ' && type}` }))}
                             onChange={this.handleSelect}
                             clearable={false}
