@@ -230,6 +230,12 @@
     background: none;
     border-radius: 9999px;
     background: #cccccc;
+    --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+
+    &:hover:enabled {
+        animation: pulse-red 1s infinite;
+    }
 
     i {
         font-size: 3rem !important;
@@ -258,4 +264,22 @@
     color: #3e85c7 !important;
     border: solid 1px #3e85c7 !important;
 
+}
+
+
+@keyframes pulse-red {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+    }
 }
