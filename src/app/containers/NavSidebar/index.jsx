@@ -56,27 +56,27 @@ class NavSidebar extends PureComponent {
                     disabled
                 />
                 <NavSidebarLink
-                    url="" icon="fa-mountain" label="Heightmap"
+                    url="" icon="fa fa-mountain" label="Heightmap"
                     disabled
                 />
                 <NavSidebarLink
-                    url="" icon="fa-ruler" label="Calibrate"
+                    url="" icon="fa fa-ruler" label="Calibrate"
                     disabled
                 />
                 <NavSidebarLink
                     url=""
                     onClick={() => actions.openModal(MODAL_FIRMWARE)}
-                    icon="fa-microchip"
+                    icon="fa fa-microchip"
                     label="Firmware"
                     disabled={this.props.wizardDisabled}
                 />
                 <NavSidebarLink
-                    icon="fa-share-square"
+                    icon="fa fa-share-square"
                     label=""
                     onClick={() => window.open('https://sienci.com/gsender-documentation/', '_blank')}
                 />
                 <NavSidebarLink
-                    url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa-cog"
+                    url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa fa-cog"
                     label=""
                 />
                 {

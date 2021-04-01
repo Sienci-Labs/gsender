@@ -13,7 +13,7 @@ import {
     GRBL,
     // Units
     IMPERIAL_UNITS,
-    METRIC_UNITS,
+    METRIC_UNITS, SPINDLE_MODE,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED
 } from '../../constants';
@@ -223,6 +223,14 @@ class JobStatusWidget extends PureComponent {
         this.config.set('probeFeedrate', Number(probeFeedrate));
     }
 
+    getSpindleOverrideLabel() {
+        const mode = store.get('widgets.spindle.mode', SPINDLE_MODE);
+        if (mode === SPINDLE_MODE) {
+            return 'Spindle';
+        }
+        return 'Laser';
+    }
+
     getInitialState() {
         return {
             minimized: this.config.get('minimized', false),
@@ -232,8 +240,10 @@ class JobStatusWidget extends PureComponent {
             feedrateMax: this.config.get('feedrateMax', 2000),
             spindleSpeedMin: this.config.get('spindleSpeedMin', 0),
             spindleSpeedMax: this.config.get('spindleSpeedMax', 1000),
+            spindleOverrideLabel: this.getSpindleOverrideLabel(),
             isFullscreen: false,
             connected: false,
+            fileModal: METRIC_UNITS,
             workflow: {
                 state: controller.workflow.state
             },
@@ -285,6 +295,7 @@ class JobStatusWidget extends PureComponent {
     subscribe() {
         const tokens = [
             pubsub.subscribe('gcode:bbox', (msg, bbox) => {
+                console.log(bbox);
                 const dX = bbox.max.x - bbox.min.x;
                 const dY = bbox.max.y - bbox.min.y;
                 const dZ = bbox.max.z - bbox.min.z;
@@ -309,6 +320,17 @@ class JobStatusWidget extends PureComponent {
                     }
                 });
             }),
+            pubsub.subscribe('file:units', (msg, unitModal) => {
+                if (unitModal === 'G21') {
+                    this.setState({
+                        fileModal: METRIC_UNITS
+                    });
+                } else {
+                    this.setState({
+                        fileModal: IMPERIAL_UNITS
+                    });
+                }
+            }),
             pubsub.subscribe('gcode:fileInfo', (msg, file) => {
                 if (!file) {
                     this.setState(this.getInitialState());
@@ -326,6 +348,11 @@ class JobStatusWidget extends PureComponent {
             pubsub.subscribe('units:change', (msg, units) => {
                 this.setState({
                     units: units
+                });
+            }),
+            pubsub.subscribe('spindle:mode', (msg, mode) => {
+                this.setState({
+                    spindleOverrideLabel: this.getSpindleOverrideLabel()
                 });
             })
         ];

@@ -47,9 +47,10 @@ class WindowManager {
         });
     }
 
-    openWindow(url, options) {
+    openWindow(url, options, splashScreen) {
         const window = new BrowserWindow({
             ...options,
+            show: false,
             webPreferences: {
                 nodeIntegration: true,
                 enableRemoteModule: true,
@@ -57,7 +58,7 @@ class WindowManager {
             }
         });
         const webContents = window.webContents;
-
+        window.removeMenu();
         window.webContents.on('did-finish-load', () => {
             window.setTitle(options.title);
         });
@@ -75,6 +76,12 @@ class WindowManager {
             shell.openExternal(url);
         });
 
+        webContents.once('dom-ready', () => {
+            splashScreen.hide();
+            window.show();
+            splashScreen.destroy();
+        });
+
         // Call `ses.setProxy` to ignore proxy settings
         // http://electron.atom.io/docs/latest/api/session/#sessetproxyconfig-callback
         const ses = webContents.session;
@@ -82,7 +89,7 @@ class WindowManager {
             window.loadURL(url);
         });
 
-        window.loadURL(url).then(() => {
+        /*window.loadURL(url).then(() => {
             dialog.showMessageBox({
                 message: `Loaded ${url}`
             });
@@ -92,15 +99,21 @@ class WindowManager {
                 message: e
             });
             console.log(`Error: ${e}`);
-        });
-
-        /*webContents.once('dom-ready', () => {
-            window.show();
         });*/
+
+
 
         this.windows.push(window);
 
         return window;
+    }
+
+    createSplashScreen(options) {
+        const splashScreen = new BrowserWindow({
+            ...options
+        });
+
+        return splashScreen;
     }
 
     getWindow(index = 0) {

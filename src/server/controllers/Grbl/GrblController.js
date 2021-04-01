@@ -1357,9 +1357,6 @@ class GrblController {
                 const unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132 } = this.settings.settings;
 
-                // Borrowed from UGS
-                // /ugs-core/src/com/willwinder/universalgcodesender/utils/ContinuousJogWorker.java Line 107
-                //const jogFeedrate = ((feedrate / 60.0) * (JOG_COMMAND_INTERVAL / 1000.0) * 1.2).toFixed(1);
                 let jogFeedrate;
                 if ($20 === '1') {
                     $130 = Number($130);

@@ -1,17 +1,21 @@
 import '@babel/polyfill';
-import { app, Menu, ipcMain } from 'electron';
+import { app, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
-import menuTemplate from './electron-app/menu-template';
+import path from 'path';
+//import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
+import './sentryInit';
 
+/* Whether to include menu or no */
+const BUILD_DEV = false;
 
 // The selection menu
-const selectionMenu = Menu.buildFromTemplate([
+/*const selectionMenu = Menu.buildFromTemplate([
     { role: 'copy' },
     { type: 'separator' },
     { role: 'selectall' }
@@ -27,7 +31,7 @@ const inputMenu = Menu.buildFromTemplate([
     { role: 'paste' },
     { type: 'separator' },
     { role: 'selectall' }
-]);
+]);*/
 
 let windowManager = null;
 
@@ -64,6 +68,20 @@ const main = () => {
 
     app.whenReady().then(async () => {
         try {
+            windowManager = new WindowManager();
+
+            // Create and show splash before server starts
+            const splashScreen = windowManager.createSplashScreen({
+                width: 500,
+                height: 400,
+                show: false,
+                frame: false
+            });
+            await splashScreen.loadFile(path.join(__dirname, 'app/assets/splashscreen.png'));
+            splashScreen.once('ready-to-show', () => {
+                splashScreen.show();
+            });
+
             const res = await launchServer();
             const { address, port, mountPoints } = { ...res };
             if (!(address && port)) {
@@ -71,10 +89,10 @@ const main = () => {
                 return;
             }
 
-            const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
-            Menu.setApplicationMenu(menu);
-
-            windowManager = new WindowManager();
+            /*if (BUILD_DEV) {
+                const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
+                Menu.setApplicationMenu(menu);
+            }*/
 
             const url = `http://${address}:${port}`;
             // The bounds is a rectangle object with the following properties:
@@ -85,13 +103,15 @@ const main = () => {
             const bounds = {
                 width: 1280, // Defaults to 1280
                 height: 768, // Defaults to 768
+                minWidth: 1280,
+                minHeight: 768,
                 ...store.get('bounds')
             };
             const options = {
                 ...bounds,
                 title: `gSender ${pkg.version}`,
             };
-            const window = windowManager.openWindow(url, options);
+            const window = windowManager.openWindow(url, options, splashScreen);
 
             // Save window size and position
             window.on('close', () => {
@@ -100,19 +120,6 @@ const main = () => {
 
             //Check for available updates
             await autoUpdater.checkForUpdatesAndNotify();
-
-            // https://github.com/electron/electron/issues/4068#issuecomment-274159726
-            window.webContents.on('context-menu', (event, props) => {
-                const { selectionText, isEditable } = props;
-
-                if (isEditable) {
-                    // Shows an input menu if editable
-                    inputMenu.popup(window);
-                } else if (selectionText && String(selectionText).trim() !== '') {
-                    // Shows a selection menu if there was selected text
-                    selectionMenu.popup(window);
-                }
-            });
 
             // What to do in cases where update is available
             autoUpdater.on('checking-for-updates', () => {
@@ -133,7 +140,6 @@ const main = () => {
             ipcMain.on('restart_app', () => {
                 autoUpdater.quitAndInstall();
             });
-
         } catch (err) {
             console.error('Error:', err);
         }

@@ -8,7 +8,7 @@ const PositionLabel = ({ value, small }) => {
     value = String(value);
     return (
         <div
-            style={{ fontSize: small ? '14px' : '2rem',
+            style={{ fontSize: small ? '14px' : '1.75rem',
                 padding: '0px 5px',
                 textAlign: 'center',
                 color: small ? SECONDARY_COLOR : PRIMARY_COLOR,

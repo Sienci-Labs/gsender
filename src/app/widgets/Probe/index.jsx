@@ -236,6 +236,13 @@ class ProbeWidget extends PureComponent {
             const { status } = controller.state || {};
             const { probeActive } = status || false;
             return probeActive;
+        },
+        setToolDiameter: (selection) => {
+            const { value } = selection || 0.00;
+            const diameter = Number(value) || 0.00;
+            this.setState({
+                toolDiameter: diameter
+            });
         }
     };
 
@@ -353,10 +360,10 @@ class ProbeWidget extends PureComponent {
             retractionDistance
         } = this.state;
 
-        this.config.set('probeDepth', Number(probeDepth));
-        this.config.set('probeFeedrate', Number(probeFeedrate));
-        this.config.set('touchPlateHeight', Number(touchPlateHeight));
-        this.config.set('retractionDistance', Number(retractionDistance));
+        this.config.set('probeDepth', probeDepth);
+        this.config.set('probeFeedrate', probeFeedrate);
+        this.config.set('touchPlateHeight', touchPlateHeight);
+        this.config.set('retractionDistance', retractionDistance);
     }
 
     getInitialState() {
@@ -380,13 +387,14 @@ class ProbeWidget extends PureComponent {
             probeAxis: this.config.get('probeAxis', 'Z'),
             probeCommand: this.config.get('probeCommand', 'G38.2'),
             useTLO: this.config.get('useTLO'),
-            probeDepth: Number(this.config.get('probeDepth') || 0).toFixed(3) * 1,
-            probeFeedrate: Number(this.config.get('probeFeedrate') || 0).toFixed(3) * 1,
-            touchPlateHeight: Number(this.config.get('touchPlateHeight') || 0).toFixed(3) * 1,
-            retractionDistance: Number(this.config.get('retractionDistance') || 0).toFixed(3) * 1,
+            probeDepth: this.config.get('probeDepth') || {},
+            probeFeedrate: this.config.get('probeFeedrate') || {},
+            probeFastFeedrate: this.config.get('probeFastFeedrate') || {},
+            touchPlateHeight: this.config.get('touchPlateHeight') || {},
+            retractionDistance: this.config.get('retractionDistance') || {},
             touchplate: store.get('workspace[probeProfile]', {}),
             availableTools: store.get('workspace[tools]', []),
-            selectedtool: 0,
+            toolDiameter: 0.00,
             useSafeProbeOption: false,
             availableProbeCommands: [],
             selectedProbeCommand: 0,
@@ -424,7 +432,7 @@ class ProbeWidget extends PureComponent {
         };
     }
 
-    generateInitialProbeSettings(axes, wcs) {
+    generateInitialProbeSettings(axes, wcs, modal) {
         const axesToZero = {};
         Object.keys(axes).forEach((axis) => {
             if (axes[axis]) {
@@ -440,7 +448,7 @@ class ProbeWidget extends PureComponent {
                 ...axesToZero
             }),
             this.gcode('G91', {
-                G: 21
+                G: modal
             }),
             this.gcode('G49')
         ];
@@ -488,8 +496,8 @@ class ProbeWidget extends PureComponent {
                 }),
             ]);
         } else {
-            const tool = this.state.availableTools[this.state.selectedtool];
-            const toolRadius = (tool.metricDiameter / 2);
+            const toolDiameter = this.state.toolDiameter;
+            const toolRadius = (toolDiameter / 2);
             const toolCompensatedThickness = ((-1 * toolRadius) - thickness);
             code = code.concat([
                 this.gcode('G91'),
@@ -537,8 +545,8 @@ class ProbeWidget extends PureComponent {
         const gcode = this.gcode;
 
         // Calculate tool offset using radius and block thickness to origin
-        const tool = this.state.availableTools[this.state.selectedtool];
-        const toolRadius = (tool.metricDiameter / 2);
+        const toolDiameter = this.state.toolDiameter;
+        const toolRadius = (toolDiameter / 2);
         const toolCompensatedThickness = ((-1 * toolRadius) - xyThickness);
 
         // Add Z Probe code if we're doing 3 axis probing
@@ -660,39 +668,59 @@ class ProbeWidget extends PureComponent {
             retractionDistance,
             probeCommand,
             probeFeedrate,
-            touchplate
+            probeFastFeedrate,
+            touchplate,
+            units
         } = state;
         const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
         const wcs = this.getWorkCoordinateSystem();
         const code = [];
 
+        // Grab units for correct modal
+        let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
+        const modal = (units === METRIC_UNITS) ? '21' : '20';
+        if (units === METRIC_UNITS) {
+            zThickness = touchplate.zThickness.mm;
+            xyThickness = touchplate.xyThickness.mm;
+            feedrate = probeFeedrate.mm;
+            fastFeedrate = probeFastFeedrate.mm;
+            retractDistance = retractionDistance.mm;
+        } else {
+            zThickness = touchplate.zThickness.in;
+            xyThickness = touchplate.xyThickness.in;
+            feedrate = probeFeedrate.in;
+            fastFeedrate = probeFastFeedrate.in;
+            retractDistance = retractionDistance.in;
+        }
+
         const gCodeParams = {
             wcs: wcs,
             isSafe: useSafeProbeOption,
             probeCommand: probeCommand,
-            retractDistance: retractionDistance,
-            normalFeedrate: probeFeedrate,
-            quickFeedrate: probeFeedrate + 25,
+            retractDistance: retractDistance,
+            normalFeedrate: feedrate,
+            quickFeedrate: fastFeedrate,
+            modal: modal
         };
 
         const axesCount = Object.keys(axes).filter(axis => axes[axis]).length;
         // Probe setup code
-        this.generateInitialProbeSettings(axes, wcs).map(line => code.push(line));
+        this.generateInitialProbeSettings(axes, wcs, modal).map(line => code.push(line));
 
         if (axesCount === 1) {
             if (axes.z) {
-                (this.generateSingleAxisCommands('Z', touchplate.zThickness.mm, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('Z', zThickness, gCodeParams)).map(line => code.push(line));
             }
             if (axes.y) {
-                (this.generateSingleAxisCommands('Y', touchplate.xyThickness.mm, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('Y', xyThickness, gCodeParams)).map(line => code.push(line));
             }
             if (axes.x) {
-                (this.generateSingleAxisCommands('X', touchplate.xyThickness.mm, gCodeParams)).map(line => code.push(line));
+                (this.generateSingleAxisCommands('X', xyThickness, gCodeParams)).map(line => code.push(line));
             }
         }
 
         if (axesCount > 1) {
-            (this.generateMultiAxisCommands(axes, touchplate.xyThickness.mm, touchplate.zThickness.mm, gCodeParams)).map(line => code.push(line));
+            (this.generateMultiAxisCommands(axes, xyThickness, zThickness, gCodeParams)).map(line => code.push(line));
         }
 
         return code;

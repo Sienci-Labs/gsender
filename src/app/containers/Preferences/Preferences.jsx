@@ -72,9 +72,9 @@ class PreferencesPage extends PureComponent {
             },
             probe: store.get('workspace[probeProfile]'),
             probeSettings: {
-                retractionDistance: Number(this.probeConfig.get('retractionDistance') || 0).toFixed(3) * 1,
-                normalFeedrate: Number(this.probeConfig.get('probeFeedrate') || 0).toFixed(3) * 1,
-                fastFeedrate: Number(this.probeConfig.get('probeFastFeedrate') || 0).toFixed(3) * 1,
+                retractionDistance: this.probeConfig.get('retractionDistance', {}),
+                normalFeedrate: this.probeConfig.get('probeFeedrate', {}),
+                fastFeedrate: this.probeConfig.get('probeFastFeedrate', {}),
                 probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
             },
             visualizer: {
@@ -142,7 +142,7 @@ class PreferencesPage extends PureComponent {
         tool: {
             setImperialDiameter: (e) => {
                 const diameter = Number(e.target.value);
-                const metricDiameter = this.convertToMetric(diameter);
+                const metricDiameter = convertToMetric(diameter);
                 const tool = this.state.tool;
                 this.setState({
                     tool: {
@@ -154,7 +154,7 @@ class PreferencesPage extends PureComponent {
             },
             setMetricDiameter: (e) => {
                 const diameter = Number(e.target.value);
-                const imperialDiameter = this.convertToImperial(diameter);
+                const imperialDiameter = convertToImperial(diameter);
                 const tool = this.state.tool;
                 this.setState({
                     tool: {
@@ -214,27 +214,61 @@ class PreferencesPage extends PureComponent {
             changeRetractionDistance: (e) => {
                 const probeSettings = { ...this.state.probeSettings };
                 const value = Number(e.target.value).toFixed(3) * 1;
+
+                const { units } = this.state;
+
+                const metricValue = units === 'mm' ? value : convertToMetric(value);
+                const imperialValue = units === 'in' ? value : convertToImperial(value);
+
                 this.setState({
                     probeSettings: {
                         ...probeSettings,
-                        retractionDistance: value
+                        retractionDistance: {
+                            mm: metricValue,
+                            in: imperialValue,
+                        }
                     }
                 });
             },
             changeNormalFeedrate: (e) => {
                 const probeSettings = { ...this.state.probeSettings };
                 const value = Number(e.target.value).toFixed(3) * 1;
+                const { units } = this.state;
+
+                const metricValue = units === 'mm' ? value : convertToMetric(value);
+                const imperialValue = units === 'in' ? value : convertToImperial(value);
+
                 this.setState({
                     probeSettings: {
                         ...probeSettings,
-                        normalFeedrate: value
+                        normalFeedrate: {
+                            mm: metricValue,
+                            in: imperialValue,
+                        }
+                    }
+                });
+            },
+            changeFastFeedrate: (e) => {
+                const probeSettings = { ...this.state.probeSettings };
+                const value = Number(e.target.value).toFixed(3) * 1;
+                const { units } = this.state;
+
+                const metricValue = units === 'mm' ? value : convertToMetric(value);
+                const imperialValue = units === 'in' ? value : convertToImperial(value);
+
+                this.setState({
+                    probeSettings: {
+                        ...probeSettings,
+                        fastFeedrate: {
+                            mm: metricValue,
+                            in: imperialValue,
+                        }
                     }
                 });
             },
             changeXYThickness: (e) => {
                 const value = Number(e.target.value);
                 const probe = { ...this.state.probe };
-
                 const { units } = this.state;
 
                 const metricValue = units === 'mm' ? value : convertToMetric(value);
@@ -253,7 +287,6 @@ class PreferencesPage extends PureComponent {
             changeZThickness: (e) => {
                 const value = Number(e.target.value);
                 const probe = { ...this.state.probe };
-
                 const { units } = this.state;
 
                 const metricValue = units === 'mm' ? value : convertToMetric(value);
@@ -304,16 +337,6 @@ class PreferencesPage extends PureComponent {
                             mm: metricValue,
                             in: imperialValue
                         }
-                    }
-                });
-            },
-            changeFastFeedrate: (e) => {
-                const probeSettings = { ...this.state.probeSettings };
-                const value = Number(e.target.value).toFixed(3) * 1;
-                this.setState({
-                    probeSettings: {
-                        ...probeSettings,
-                        fastFeedrate: value
                     }
                 });
             },
@@ -509,14 +532,6 @@ class PreferencesPage extends PureComponent {
             safeRetractHeight: safeRetractHeight
         });
         pubsub.publish('safeHeight:update', safeRetractHeight);
-    }
-
-    convertToMetric(diameter) {
-        return (diameter * 25.4).toFixed(2);
-    }
-
-    convertToImperial(diameter) {
-        return (diameter / 25.4).toFixed(4);
     }
 
     render() {

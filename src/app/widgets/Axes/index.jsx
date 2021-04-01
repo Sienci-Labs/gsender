@@ -20,6 +20,7 @@ import pubsub from 'pubsub-js';
 import store from '../../store';
 import Axes from './Axes';
 import ShuttleControl from './ShuttleControl';
+import JogHelper from './jogHelper';
 import {
     // Units
     IMPERIAL_UNITS,
@@ -41,7 +42,8 @@ import {
 } from '../../constants';
 import {
     MODAL_NONE,
-    DEFAULT_AXES
+    DEFAULT_AXES,
+    SPEED_NORMAL,
 } from './constants';
 import styles from './index.styl';
 
@@ -54,6 +56,8 @@ class AxesWidget extends PureComponent {
     };
 
     pubsubTokens = [];
+
+    joggingHelper = null;
 
     subscribe() {
         const tokens = [
@@ -200,6 +204,11 @@ class AxesWidget extends PureComponent {
             }
 
             return defaultWCS;
+        },
+        setSelectedSpeed: (speed) => {
+            this.setState({
+                selectedSpeed: speed
+            });
         },
         setWorkOffsets: (axis, value) => {
             const wcs = this.actions.getWorkCoordinateSystem();
@@ -470,24 +479,71 @@ class AxesWidget extends PureComponent {
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
             preventDefault(event);
             const { isContinuousJogging } = this.state;
+            const { getXYJogDistance, getZJogDistance } = this.actions;
+
+            const xyStep = getXYJogDistance();
+            const zStep = getZJogDistance();
 
             if (!axis || isContinuousJogging) {
                 return;
             }
 
             const givenAxis = axis.toUpperCase();
-            const feedrate = this.actions.getFeedrate();
+            const feedrate = Number(this.actions.getFeedrate());
 
-            this.actions.startContinuousJog({ [givenAxis]: direction }, feedrate);
+            const axisValue = {
+                X: xyStep,
+                Y: xyStep,
+                Z: zStep
+            }[givenAxis] * direction;
+
+            this.setState({ prevJog: { [givenAxis]: axisValue, F: feedrate } });
+
+            const jogCB = (given) => this.actions.jog(given);
+
+            const startContinuousJogCB = (coordinates, feedrate) => this.actions.startContinuousJog(coordinates, feedrate);
+
+            const stopContinuousJogCB = () => this.actions.stopContinuousJog();
+
+            if (!this.joggingHelper) {
+                this.joggingHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
+            }
+
+            this.joggingHelper.onKeyDown({ [givenAxis]: direction }, feedrate);
         },
-        STOP_JOG: (event) => {
+        STOP_JOG: (event, payload) => {
             preventDefault(event);
 
-            const { isContinuousJogging } = this.state;
+            const { prevJog } = this.state;
 
-            if (isContinuousJogging) {
-                this.actions.stopContinuousJog();
+            if (!payload) {
+                this.joggingHelper && this.joggingHelper.onKeyUp(prevJog);
+                return;
             }
+
+            const { axis, direction } = payload;
+
+            const { getXYJogDistance, getZJogDistance } = this.actions;
+
+            const xyStep = getXYJogDistance();
+            const zStep = getZJogDistance();
+
+            const givenAxis = axis.toUpperCase();
+            const axisValue = {
+                X: xyStep,
+                Y: xyStep,
+                Z: zStep
+            }[givenAxis] * direction;
+            const feedrate = Number(this.actions.getFeedrate());
+
+            this.joggingHelper && this.joggingHelper.onKeyUp({ [givenAxis]: axisValue, F: feedrate });
+        },
+        SET_JOG_PRESET: (event, { key }) => {
+            if (!key) {
+                return;
+            }
+            this.actions.setSelectedSpeed(key);
+            this.actions.setJogFromPreset(key);
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
@@ -811,6 +867,7 @@ class AxesWidget extends PureComponent {
             port: controller.port,
             units: store.get('workspace.units', METRIC_UNITS),
             isContinuousJogging: false,
+            selectedSpeed: SPEED_NORMAL,
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -861,7 +918,8 @@ class AxesWidget extends PureComponent {
             mdi: {
                 disabled: this.config.get('mdi.disabled'),
                 commands: []
-            }
+            },
+            prevJog: null,
         };
     }
 

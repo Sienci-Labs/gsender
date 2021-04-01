@@ -22,6 +22,7 @@ import styles from './index.styl';
 import JogControl from './components/JogControl';
 import JogCancel from './components/JogCancel';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
+import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from './constants';
 
 const KeypadText = styled.span`
     position: relative;
@@ -125,7 +126,7 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, actions, axes, activeState } = this.props;
+        const { canClick, actions, axes, activeState, selectedSpeed } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -138,6 +139,11 @@ class Keypad extends PureComponent {
         const xyDistance = actions.getXYJogDistance();
         const zDistance = actions.getZJogDistance();
         const feedrate = actions.getFeedrate();
+
+        // Which button is active
+        const rapidActive = canClick && (selectedSpeed === SPEED_RAPID);
+        const normalActive = canClick && (selectedSpeed === SPEED_NORMAL);
+        const preciseActive = canClick && (selectedSpeed === SPEED_PRECISE);
 
         return (
             <div className={styles.keypad}>
@@ -246,24 +252,30 @@ class Keypad extends PureComponent {
                     </div>
                     <div className={styles.presetControls}>
                         <FunctionButton
+                            className={cx({ [styles.activeButton]: rapidActive })}
                             disabled={!canClick} type="button"
                             onClick={() => {
+                                actions.setSelectedSpeed(SPEED_RAPID);
                                 actions.setJogFromPreset('rapid');
                             }}
                         >
                             Rapid
                         </FunctionButton>
                         <FunctionButton
+                            className={cx({ [styles.activeButton]: normalActive })}
                             disabled={!canClick}
                             onClick={() => {
+                                actions.setSelectedSpeed(SPEED_NORMAL);
                                 actions.setJogFromPreset('normal');
                             }}
                         >
                             Normal
                         </FunctionButton>
                         <FunctionButton
+                            className={cx({ [styles.activeButton]: preciseActive })}
                             disabled={!canClick}
                             onClick={() => {
+                                actions.setSelectedSpeed(SPEED_PRECISE);
                                 actions.setJogFromPreset('precise');
                             }}
                         >

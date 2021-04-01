@@ -107,7 +107,7 @@ class SecondaryFunctionality extends PureComponent {
         if (machineProfile.spindle) {
             const hasSpindleWidget = this.state.tabs.find(tab => tab.widgetId === 'spindle');
             if (!hasSpindleWidget) {
-                this.setState((prev) => ({ ...prev, tabs: [...prev.tabs, { label: 'Spindle', widgetId: 'spindle', component: SpindleWidget }] }));
+                this.setState((prev) => ({ ...prev, tabs: [...prev.tabs, { label: 'Spindle/Laser', widgetId: 'spindle', component: SpindleWidget }] }));
             }
         } else {
             const filteredTabs = this.state.tabs.filter(tab => tab.widgetId !== 'spindle');
@@ -119,8 +119,6 @@ class SecondaryFunctionality extends PureComponent {
     componentDidMount() {
         this.addControllerEvents();
         store.on('change', this.handleMachineProfileChange);
-
-        this.handleMachineProfileChange();
     }
 
     componentWillUnmount() {
@@ -172,16 +170,11 @@ class SecondaryFunctionality extends PureComponent {
                     widgetId: 'console',
                     component: ConsoleWidget,
                 },
-                // {
-                //     label: 'Spindle',
-                //     widgetId: 'spindle',
-                //     component: SpindleWidget,
-                // },
-                // {
-                //     label: 'Laser',
-                //     widgetId: 'laser',
-                //     component: LaserWidget
-                // },
+                {
+                    label: 'Spindle/Laser',
+                    widgetId: 'spindle',
+                    component: SpindleWidget,
+                },
             ]
         };
     }

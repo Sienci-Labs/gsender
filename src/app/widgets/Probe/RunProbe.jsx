@@ -56,6 +56,10 @@ class RunProbe extends PureComponent {
         this.startConnectivityTest(actions.returnProbeConnectivity);
     }
 
+    componentWillUnmount() {
+        clearInterval(this.testInterval);
+    }
+
     render() {
         const { actions } = this.props;
         const { state } = this.props;

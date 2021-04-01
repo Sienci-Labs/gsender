@@ -241,3 +241,41 @@
 .font-monospace {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 }
+
+.go-to-button {
+    writing-mode: tb-rl;
+    transform: rotate(-180deg);
+    border-radius: 0.25rem;
+    background: #3e85c7;
+    color: white;
+    outline: none;
+    border: solid 1px #9CA3AF;
+    --tw-shadow: 0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
+    box-shadow: var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow);
+    transition: 200ms ease-in-out;
+
+    &:hover {
+        color: #3e85c7;
+        border-color: #3e85c7;
+        background: #e5e7eb;
+    }
+
+    &:disabled {
+        color: #9ca3af;
+        background-color: #D9DCE1;
+        border-color: #9ca3af;
+        cursor: no-drop;
+    }
+}
+
+.controlRow {
+    display: flex;
+    align-items center;
+    gap: 0.3rem;
+}
+
+.workspace-input {
+    font-size: 0.9rem;
+    width: 90px;
+    text-align: center;
+}

@@ -15,6 +15,7 @@ import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import { in2mm, mapPositionToUnits } from 'app/lib/units';
+import Select from 'react-select';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import Location from './Location';
@@ -510,6 +511,35 @@ class LocationWidget extends PureComponent {
                 this.actions.selectAxis(axis);
             }
         },
+        ZERO_AXIS: (event, { axis }) => {
+            if (!axis) {
+                return;
+            }
+
+            const wcs = this.actions.getWorkCoordinateSystem();
+
+            const p = {
+                'G54': 1,
+                'G55': 2,
+                'G56': 3,
+                'G57': 4,
+                'G58': 5,
+                'G59': 6
+            }[wcs] || 0;
+
+            axis = axis.toUpperCase();
+            controller.command('gcode', `G10 L20 P${p} ${axis}0`);
+        },
+        GO_TO_AXIS: (event, { axis }) => {
+            if (!axis) {
+                return;
+            }
+
+            axis = axis.toUpperCase();
+
+            controller.command('gcode', 'G90');
+            controller.command('gcode', `G0 ${axis}0`);
+        },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
                 this.actions.stepBackward();
@@ -867,7 +897,7 @@ class LocationWidget extends PureComponent {
         const canSendCommand = this.canSendCommand();
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const config = this.config;
-        const wcs = this.getWorkCoordinateSystem();
+        //const wcs = this.getWorkCoordinateSystem();
         const state = {
             ...this.state,
             // Determine if the motion button is clickable
@@ -888,33 +918,33 @@ class LocationWidget extends PureComponent {
         const gcodes = [
             {
                 id: 0,
-                name: 'G54',
-                wcs: 'P1',
+                label: 'G54 (P1)',
+                value: 'G54',
             },
             {
                 id: 1,
-                name: 'G55',
-                wcs: 'P2',
+                label: 'G55 (P2)',
+                value: 'G55',
             },
             {
                 id: 2,
-                name: 'G56',
-                wcs: 'P3',
+                label: 'G56 (P3)',
+                value: 'G56',
             },
             {
                 id: 3,
-                name: 'G57',
-                wcs: 'P4',
+                label: 'G57 (P4)',
+                value: 'G57',
             },
             {
                 id: 4,
-                name: 'G58',
-                wcs: 'P5',
+                label: 'G58 (P5)',
+                value: 'G58',
             },
             {
                 id: 5,
-                name: 'G59',
-                wcs: 'P6',
+                label: 'G59 (P6)',
+                value: 'G59',
             },
         ];
 
@@ -931,35 +961,28 @@ class LocationWidget extends PureComponent {
                         }
                         {i18n._('Location')}
                     </Widget.Title>
-                    <Widget.Controls className={this.props.sortable.filterClassName}>
-
-                        <Widget.DropdownButton
-                            title={i18n._('Work Coordinate System')}
-                            className={styles.workspaceDropdown}
-                            disabled={!canSendCommand}
-                            toggle={(
-                                <div style={{ fontSize: '1.1rem', lineHeight: '1.5rem', margin: '0 5px', color: 'black' }}>
-                                    <label>Workspace: </label>
-
-                                    <div className={styles['position-label'] }>
-                                        {wcs}{' '}
-                                        <i className={cx('fas fa-chevron-down', styles.smallIcon)} />
-                                    </div>
-                                </div>
-                            )}
-                            onSelect={(positionName) => {
-                                controller.command('gcode', positionName);
+                    <Widget.Controls className={styles.controlRow}>
+                        <label>Workspace:</label>
+                        <Select
+                            styles={{
+                                // Fixes the overlapping problem of the component
+                                menu: provided => ({ ...provided, zIndex: 9999, marginTop: 0 }),
+                                valueContainer: provided => ({ ...provided, padding: 0, margin: 0, textAlign: 'center' }),
+                                option: provided => ({ ...provided, padding: 0 }),
+                                control: provided => ({ ...provided, minHeight: 'initial', lineHeight: 1, boxShadow: 'none' }),
+                                dropdownIndicator: provided => ({ ...provided, padding: 0 }),
+                                container: provided => ({ ...provided, padding: 0 })
                             }}
-                        >
-                            {
-                                gcodes.map(({ id, name, wcs }) => (
-                                    <Widget.DropdownMenuItem key={id} eventKey={name}>
-                                        {`${name} (${wcs})`}
-                                    </Widget.DropdownMenuItem>
-                                ))
-                            }
-                        </Widget.DropdownButton>
-
+                            defaultValue={gcodes[0]}
+                            isDisabled={!canSendCommand}
+                            isClearable={false}
+                            className={styles.workspaceInput}
+                            onChange={(selection) => {
+                                controller.command('gcode', selection.value);
+                            }}
+                            name="workspace"
+                            options={gcodes}
+                        />
                     </Widget.Controls>
                 </Widget.Header>
                 <Widget.Content

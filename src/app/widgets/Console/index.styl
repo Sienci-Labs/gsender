@@ -1,16 +1,8 @@
 .widget-content {
     position: relative;
-    overflow-y: auto;
-    height: clamp(163px, 9vw, 200px);
 
     &.hidden {
         display: none;
-    }
-
-    &.fullscreen {
-        .terminal-container {
-            height: 100%;
-        }
     }
 }
 
@@ -22,10 +14,10 @@
 
 .terminal-container {
     background: #000;
-    // overflow-x: hidden;
     overflow-y: hidden;
     width: 100%;
-    min-height: 200px;
+    padding: 5px;
+    min-height: 180px;
 }
 
 .icon {
@@ -40,6 +32,8 @@
     }
 }
 
-.height-override {
+.terminal-content {
     height: 100% !important;
+    padding: 0 !important;
+    display: flex;
 }

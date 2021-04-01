@@ -41,6 +41,7 @@ const SettingsArea = ({ state }) => {
 
     const feedrate = _.get(controllerState, 'status.feedrate');
     const spindle = _.get(controllerState, 'status.spindle');
+    const { spindleOverrideLabel } = state;
 
     return (
         <div className={styles['settings-area']}>
@@ -55,7 +56,7 @@ const SettingsArea = ({ state }) => {
                 <span>{`${ovF}%`}</span>
             </div>
             <div className={styles.overrides}>
-                <span>Spindle:</span>
+                <span>{ spindleOverrideLabel }:</span>
                 <span className={styles.overrideValue}>{spindle}</span>
                 <FeedControlButton value={-10} onClick={handleSpindleSpeedChange}>- -</FeedControlButton>
                 <FeedControlButton value={-1} onClick={handleSpindleSpeedChange}>-</FeedControlButton>

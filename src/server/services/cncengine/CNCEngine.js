@@ -10,15 +10,9 @@ import store from '../../store';
 import config from '../configstore';
 import taskRunner from '../taskrunner';
 import {
-    GrblController,
-    MarlinController,
-    SmoothieController,
-    TinyGController
+    GrblController
 } from '../../controllers';
 import { GRBL } from '../../controllers/Grbl/constants';
-import { MARLIN } from '../../controllers/Marlin/constants';
-import { SMOOTHIE } from '../../controllers/Smoothie/constants';
-import { G2CORE, TINYG } from '../../controllers/TinyG/constants';
 import {
     authorizeIPAddress,
     validateUser
@@ -36,18 +30,7 @@ const caseInsensitiveEquals = (str1, str2) => {
     return str1 === str2;
 };
 
-const isValidController = (controller) => (
-    // Grbl
-    caseInsensitiveEquals(GRBL, controller) ||
-    // Marlin
-    caseInsensitiveEquals(MARLIN, controller) ||
-    // Smoothie
-    caseInsensitiveEquals(SMOOTHIE, controller) ||
-    // g2core
-    caseInsensitiveEquals(G2CORE, controller) ||
-    // TinyG
-    caseInsensitiveEquals(TINYG, controller)
-);
+const isValidController = (controller) => caseInsensitiveEquals(GRBL, controller);
 
 class CNCEngine {
     controllerClass = {};
@@ -100,18 +83,6 @@ class CNCEngine {
         // Grbl
         if (!controller || caseInsensitiveEquals(GRBL, controller)) {
             this.controllerClass[GRBL] = GrblController;
-        }
-        // Marlin
-        if (!controller || caseInsensitiveEquals(MARLIN, controller)) {
-            this.controllerClass[MARLIN] = MarlinController;
-        }
-        // Smoothie
-        if (!controller || caseInsensitiveEquals(SMOOTHIE, controller)) {
-            this.controllerClass[SMOOTHIE] = SmoothieController;
-        }
-        // TinyG / G2core
-        if (!controller || caseInsensitiveEquals(G2CORE, controller) || caseInsensitiveEquals(TINYG, controller)) {
-            this.controllerClass[TINYG] = TinyGController;
         }
 
         if (Object.keys(this.controllerClass).length === 0) {
@@ -239,11 +210,6 @@ class CNCEngine {
                 let controller = store.get(`controllers["${port}"]`);
                 if (!controller) {
                     let { controllerType = GRBL, baudrate, rtscts } = { ...options };
-
-                    if (controllerType === 'TinyG2') {
-                        // TinyG2 is deprecated and will be removed in a future release
-                        controllerType = TINYG;
-                    }
 
                     const Controller = this.controllerClass[controllerType];
                     if (!Controller) {
