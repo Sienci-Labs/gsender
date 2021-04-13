@@ -8,13 +8,13 @@ gSender is a feature-packed CNC interface software designed to be clean and easy
 
 ![gSender](https://sienci.com/wp-content/uploads/2021/04/gSender-Main-Screen-0.5.6.png)
 
-## Download
+## 💻 Download
 
 ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (M1) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/linux.png)<br>Linux
 --- | --- | --- | --- | --- |
  In Progress | [0.5.6 (EXE)](https://github.com/Sienci-Labs/sender/releases/download/v0.5.6/gSender-Setup-0.5.6.exe) | [0.5.6 (DMG)](https://github.com/Sienci-Labs/sender/releases/download/v0.5.6/gSender-0.5.6.dmg) | In Progress | In Progress |
 
-## Features
+## 📦 Features
 
 * GRBL controllers supported ([Download](https://github.com/gnea/grbl/releases))
 * Smart machine connection
@@ -51,21 +51,21 @@ gSender is a feature-packed CNC interface software designed to be clean and easy
     - Mill One
 
 
-## Documentation
+## 🎓 Documentation
 
 In progress.
 
 
-## Example Files
+## 📃 Example Files
 
 If you'd like to test gSender's capabilities, there are several gcode files in the [examples](https://github.com/Sienci-Labs/sender/tree/master/examples) directory that can be downloaded and run locally.
 
 
-## License
+## 💼 License
 
 gSender is free software, provided as-is and available under the [GPLv3 license](https://github.com/Sienci-Labs/sender/blob/master/LICENSE).
 
-# Further Use
+# 👓 Further Use
 
 gSender is also designed in a way that it can be run locally on your computer browser or otherwise compiled for use on other systems which aren't listed in the downloads. The following is documentation on how to set this up yourself:
 
