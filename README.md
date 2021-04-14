@@ -6,6 +6,15 @@ gSender is a feature-packed CNC interface software designed to be clean and easy
 * Javascript-based CNC interface software which leverages [Electron](https://www.electronjs.org/) for cross platform use
 * Is a branch off of the popular [CNCjs CNC controller interface](https://github.com/cncjs/cncjs) 
 
+Some things that we’re looking to accomplish with this sender:
+* Reliability of operation
+* Accommodates all ranges of computing systems (low-end PC to RasPi | ‘light mode’)
+* Highly easy to use
+* Makes available all normally expected functions
+* Addresses common error throwing conditions automatically
+* Built-in gadgets for surface probing, stock flattening, firmware editing, and g-code editing with syntax highlighting, command navigation, and more
+* 3D cutting visualization
+
 ![gSender](https://sienci.com/wp-content/uploads/2021/04/gSender-Main-Screen-0.5.6.png)
 
 ## 💻 Download
@@ -14,7 +23,7 @@ gSender is a feature-packed CNC interface software designed to be clean and easy
 --- | --- | --- | --- | --- |
  In Progress | [0.5.6 (EXE)](https://github.com/Sienci-Labs/sender/releases/download/v0.5.6/gSender-Setup-0.5.6.exe) | [0.5.6 (DMG)](https://github.com/Sienci-Labs/sender/releases/download/v0.5.6/gSender-0.5.6.dmg) | In Progress | In Progress |
 
-## 📦 Features
+## 📦 Current Features
 
 * GRBL controllers supported ([Download](https://github.com/gnea/grbl/releases))
 * Smart machine connection
@@ -265,3 +274,83 @@ See https://github.com/cncjs/cncjs/issues/242#issuecomment-352294549 for a detai
   "users": []
 }
 ```
+
+# 🕣 Development History
+
+## Beta 0.5.6 (Apr 1, 2021)
+* Fixed jog stepping with keybindings, continuous jogging bugs, and other jogging unreliabilities
+* Added new keybindings for improved, keyboard-based actions (unsure if issues with particular symbols such as '*' have persisted)
+* Took another look through to ensure proper unit consistency and conversion
+* Repairs to probing
+* More work done on the Firmware tool for refined functions and display
+* Indication of current jog preset selected
+* New base modals created for use across tools and confirmations
+
+## Beta 0.5.5 (Mar 26, 2021)
+* Added combo laser/spindle widget (toggleable in settings)
+* Re-designed location widget
+* Re-designed layout of job status information to include min and max extents for file dimensions
+* Added safe-height retraction settings for goto XYZ0 (accessible in settings)
+* Added splash screen on application load
+* Migration to most recent Electron release plus implemented logging
+
+## Beta 0.5.4 (Mar 19, 2021)
+* Set up in-app feedback sumbmission button
+* Better formatting and sizing of various gSender elements
+* New visualizer theme "light mode" available in settings
+* Experimental "lightweight" options to reduce visualizer rendering computation (meant for less powerful hardware)
+* Keybinding tweaks to prevent jogging runaway and other small bugs
+* New bottom, left-hand toast notifications for feedback on certain actions
+* Imperial / metric units should now extend to all aspects of the sender
+* Buttons to goto X, Y, and Z individually
+* Better handling of Alarm states with unlock
+* New g-code validation on file load and job run
+* New feature to automatically download updates for future gSender Windows versions
+* Better handling of movement cancel button so that all positioning-related movements should be able to be cancelled
+* Migration to most recent React
+* New in-app updating management prompted via server releases
+
+## Beta 0.1 (Mar 5, 2021)
+* gSender decided as official name :D
+* Buttons added for homing quicktravel, jog cancel, diagonal jog, and an awesome isocube!
+* New macros widget
+* New customizable settings: jogging presets, baud rate, and more.
+* Visual overhaul on settings, probing, file attributes, and visual consistency accross entire program
+* Logo implemented and the loading of Louis
+* Responsiveness overhaul on entire program
+* Mac (intel) version released March 8
+    
+## Alpha 3.0 (Feb 19, 2021)
+* Continuous jogging!
+* Unit switching in settings (metric/imperial)
+* Keybinding functionality to jog and other key functions with keypresses (can change bindings in settings)
+* Probe returning to original position
+* New, separate settings files won't interfere with CNCjs
+* Small colour and styling changes to hopefully increase clarity of items on the screen
+* Some responsiveness addressed to help keep sender looking good across many screen sizes (though we still have a ways to go)
+* Fixes to excessive decimal places in some areas
+* New Firmware Tool in progress but will probably break your board right now
+
+## Alpha 2.0 (Feb 5, 2021)
+* Resolved non-functional buttons, missing console, and some errors during sending
+* New jogging widget and jog presets
+* Improved probe function plus probe continuity checking
+* New file attributes on load
+* More visual improvements and a large buildout in new settings options
+
+## Alpha 1.0 (Jan 29, 2021)
+* Still highly dependant on great infrastructure created by the CNCjs team
+* Established Electron installer, git, and certificates 
+* Large visual overhaul in how widgets and displayed and operational flow of sender
+* New probing widget, machine profiles, settings, and visualizer
+
+## Notable features still in progress:
+* Win x32 version and Raspi versions
+* "Flatten", "Surface", and "Calibrate" tools
+* Handling tool changing
+* Event hooks
+* Joystick control
+* Settings saving
+* G-code editing
+* Pendant
+* Full 3D Visualization
