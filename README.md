@@ -72,7 +72,7 @@ If you'd like to test gSender's capabilities, there are several gcode files in t
 
 ## 💼 License
 
-gSender is free software, provided as-is and available under the [GPLv3 license](https://github.com/Sienci-Labs/sender/blob/master/LICENSE).
+gSender is free software, provided as-is and available under the [GNU GPLv3 license](https://github.com/Sienci-Labs/sender/blob/master/LICENSE).
 
 # 👓 Further Use
 
