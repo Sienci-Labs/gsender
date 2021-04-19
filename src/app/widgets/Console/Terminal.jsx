@@ -334,18 +334,38 @@ class TerminalWrapper extends PureComponent {
     }
 
     resize(cols = this.props.cols, rows = this.props.rows) {
-        if (!(this.term && this.term.element)) {
+        const container = ReactDOM.findDOMNode(this.terminalContainer);
+
+        if (!container) {
             return;
         }
 
-        const geometry = fit.proposeGeometry(this.term);
-        if (!geometry) {
+        const width = container.offsetWidth;
+        const height = container.offsetHeight;
+
+        // const columns = Math.floor((height / 4));
+        const rowNumbers = Math.floor((width / 36) - 2);
+
+        // console.log(columns, rowNumbers);
+
+        if (width <= 0 || height <= 0) {
             return;
         }
 
-        cols = (!cols || cols === 'auto') ? geometry.cols : cols;
-        rows = (!rows || rows === 'auto') ? geometry.rows : rows;
-        this.term.resize(cols, rows);
+        this.term.resize(cols, rowNumbers);
+
+        // if (!(this.term && this.term.element)) {
+        //     return;
+        // }
+
+        // const geometry = fit.proposeGeometry(this.term);
+        // if (!geometry) {
+        //     return;
+        // }
+
+        // cols = (!cols || cols === 'auto') ? geometry.cols : cols;
+        // rows = (!rows || rows === 'auto') ? geometry.rows : rows;
+        // this.term.resize(cols, rows);
     }
 
     clear() {

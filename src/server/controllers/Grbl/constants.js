@@ -364,7 +364,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$11',
         message: 'Junction deviation',
-        units: 'millimeters',
+        units: 'mm',
         description: 'Sets how fast Grbl travels through consecutive motions. Lower value slows it down.',
         inputType: 'number',
         min: 0.001,
@@ -374,7 +374,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$12',
         message: 'Arc tolerance',
-        units: 'millimeters',
+        units: 'mm',
         description: 'Sets the G2 and G3 arc tracing accuracy based on radial error. Beware: A very small value may effect performance.',
         inputType: 'number',
         min: 0.001,
@@ -449,7 +449,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$27',
         message: 'Homing switch pull-off distance',
-        units: 'millimeters',
+        units: 'mm',
         description: 'Retract distance after triggering switch to disengage it. Homing will fail if switch isn\'t cleared.',
         inputType: 'number',
         min: 0,
@@ -459,7 +459,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$30',
         message: 'Maximum spindle speed',
-        units: 'RPM',
+        units: 'rpm',
         description: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
         inputType: 'number',
         min: 100,
@@ -469,7 +469,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$31',
         message: 'Minimum spindle speed',
-        units: 'RPM',
+        units: 'rpm',
         description: 'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
         inputType: 'number',
         min: 1,
@@ -576,7 +576,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$130',
         message: 'X-axis maximum travel',
-        units: 'millimeters',
+        units: 'mm',
         description: 'Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
         inputType: 'number',
         min: 1,
@@ -586,7 +586,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$131',
         message: 'Y-axis maximum travel',
-        units: 'millimeters',
+        units: 'mm',
         description: 'Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
         inputType: 'number',
         min: 1,
@@ -596,7 +596,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$132',
         message: 'Z-axis maximum travel',
-        units: 'millimeters',
+        units: 'mm',
         description: 'Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
         inputType: 'number',
         min: 1,

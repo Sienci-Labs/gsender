@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import { in2mm, mm2in } from '../../../lib/units';
 
 import styles from './IdleInfo.styl';
 import FileStat from './FileStat';
+import { IMPERIAL_UNITS, METRIC_UNITS } from '../../../constants';
 
 /**
  * Idle Information component displaying job information when status is set to idle
@@ -22,9 +24,19 @@ const IdleInfo = ({ state }) => {
         feedrateMin,
         feedrateMax,
         spindleSpeedMin,
-        spindleSpeedMax
+        spindleSpeedMax,
+        fileModal
     } = state;
 
+    let convertedFeedMin, convertedFeedMax, feedUnits;
+    feedUnits = (units === METRIC_UNITS) ? 'mm/min' : 'ipm';
+    if (units === METRIC_UNITS) {
+        convertedFeedMin = (fileModal === METRIC_UNITS) ? feedrateMin : in2mm(feedrateMin).toFixed(2);
+        convertedFeedMax = (fileModal === METRIC_UNITS) ? feedrateMax : in2mm(feedrateMax).toFixed(2);
+    } else {
+        convertedFeedMin = (fileModal === IMPERIAL_UNITS) ? feedrateMin : mm2in(feedrateMin).toFixed(3);
+        convertedFeedMax = (fileModal === IMPERIAL_UNITS) ? feedrateMax : mm2in(feedrateMax).toFixed(3);
+    }
     /**
      * Return formatted list of tools in use
      */
@@ -79,7 +91,7 @@ const IdleInfo = ({ state }) => {
             <div><span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)</div>
             <div className={styles.idleInfoRow}>
                 <FileStat label="Attributes">
-                    {`${outputFormattedTime(remainingTime)}`}<br /> {`${feedrateMin}`} to {`${feedrateMax} mm/min`}
+                    {`${outputFormattedTime(remainingTime)}`}<br /> {`${convertedFeedMin}`} to {`${convertedFeedMax} ${feedUnits}`}
                 </FileStat>
                 <FileStat label="Spindle">
                     {spindleSpeedMin} to {spindleSpeedMax} RPM

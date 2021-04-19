@@ -243,6 +243,7 @@ class JobStatusWidget extends PureComponent {
             spindleOverrideLabel: this.getSpindleOverrideLabel(),
             isFullscreen: false,
             connected: false,
+            fileModal: METRIC_UNITS,
             workflow: {
                 state: controller.workflow.state
             },
@@ -317,6 +318,17 @@ class JobStatusWidget extends PureComponent {
                         }
                     }
                 });
+            }),
+            pubsub.subscribe('file:units', (msg, unitModal) => {
+                if (unitModal === 'G21') {
+                    this.setState({
+                        fileModal: METRIC_UNITS
+                    });
+                } else {
+                    this.setState({
+                        fileModal: IMPERIAL_UNITS
+                    });
+                }
             }),
             pubsub.subscribe('gcode:fileInfo', (msg, file) => {
                 if (!file) {

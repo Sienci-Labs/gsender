@@ -51,7 +51,7 @@ class SwitchInput extends PureComponent {
 
     render() {
         let title = this.props.title;
-        let switchSettings = this.props.switchSettings.settings;
+        let switchSettings = this.props.currentSettings;
         //swaps 1 and 0s for true and false
         if (switchSettings[title] === '1') {
             switchSettings[title] = true;

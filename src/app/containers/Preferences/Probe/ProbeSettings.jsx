@@ -11,17 +11,18 @@ import Input from '../Input';
 
 
 const ProbeSettings = ({ active, state, actions }) => {
-    const { probeSettings, probe } = state;
+    const { probeSettings, probe, units } = state;
     const { functions } = probe;
     const probeActions = actions.probe;
-
-    const { units } = state;
 
     const values = {
         length: units === 'mm' ? probe.plateLength.mm : probe.plateLength.in,
         width: units === 'mm' ? probe.plateWidth.mm : probe.plateWidth.in,
         xyThickness: units === 'mm' ? probe.xyThickness.mm : probe.xyThickness.in,
-        zThickness: units === 'mm' ? probe.zThickness.mm : probe.zThickness.in
+        zThickness: units === 'mm' ? probe.zThickness.mm : probe.zThickness.in,
+        fastFeedrate: units === 'mm' ? probeSettings.fastFeedrate.mm : probeSettings.fastFeedrate.in,
+        normalFeedrate: units === 'mm' ? probeSettings.normalFeedrate.mm : probeSettings.normalFeedrate.in,
+        retractionDistance: units === 'mm' ? probeSettings.retractionDistance.mm : probeSettings.retractionDistance.in,
     };
 
     return (
@@ -38,23 +39,26 @@ const ProbeSettings = ({ active, state, actions }) => {
 
                         <Input
                             label="Fast Find"
-                            value={probeSettings.fastFeedrate}
+                            value={values.fastFeedrate}
                             onChange={probeActions.changeFastFeedrate}
                             additionalProps={{ type: 'number', id: 'fastFeedrate' }}
+                            units={units}
                         />
 
                         <Input
                             label="Slow Find"
-                            value={probeSettings.normalFeedrate}
+                            value={values.normalFeedrate}
                             onChange={probeActions.changeNormalFeedrate}
                             additionalProps={{ type: 'number', id: 'normalFeedrate' }}
+                            units={units}
                         />
 
                         <Input
                             label="Retraction"
-                            value={probeSettings.retractionDistance}
+                            value={values.retractionDistance}
                             onChange={probeActions.changeRetractionDistance}
                             additionalProps={{ type: 'number', id: 'retraction' }}
+                            units={units}
                         />
                     </Fieldset>
 

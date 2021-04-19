@@ -37,7 +37,6 @@ import {
 } from './constants';
 import { METRIC_UNITS } from '../../../app/constants';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
-import FirmwareProfiles from '../../lib/Firmware/Profiles/firmwareprofiles';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 
 
@@ -1061,33 +1060,26 @@ class GrblController {
                     FlashingFirmware(port);
                 });
             },
-            'flashing:success': (data) => {
-                console.log(`${data}FLASHING SUCCESS CALLED`);
-                this.emit('task:finish', data);
+            'flashing:success': () => {
+                let [data] = args;
+                this.emit('message', data);
             },
             'flashing:failed': () => {
                 let [error] = args;
-                setTimeout(() => this.emit('task:error', error), 2000);
-                // log.debug(`${error} flashing:failed`);
-            },
-            'firmware:getProfiles': (data) => {
-                let [port = 'COM3'] = args;
-                FirmwareProfiles(port);
-                // log.debug('firmware:getProfiles');
-                // console.log('firmware:getProfiles');
+                setTimeout(() => this.emit('task:error', error), 16000);
             },
             'firmware:recievedProfiles': () => {
                 let [files] = args;
-                this.emit('message', files);
-                // log.debug(`${files} files inside grblcontroller`);
+                this.emit('task:finish', files);
             },
             'firmware:applyProfileSettings': () => {
-                let [chosenProfile, port] = args;
-                ApplyFirmwareProfile(chosenProfile, port);
+                let [nameOfMachine, typeOfMachine, port] = args;
+                ApplyFirmwareProfile(nameOfMachine, typeOfMachine, port);
             },
-            'firmware:dubugging': () => {
-                let [values] = args;
-                this.emit('message', values);
+            'firmware:grabMachineProfile': () => {
+                // let [values] = args;
+                const machineProfile = store.get('machineProfile');
+                this.emit('sender:status', machineProfile);
             },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;
@@ -1360,9 +1352,6 @@ class GrblController {
                 const unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132 } = this.settings.settings;
 
-                // Borrowed from UGS
-                // /ugs-core/src/com/willwinder/universalgcodesender/utils/ContinuousJogWorker.java Line 107
-                //const jogFeedrate = ((feedrate / 60.0) * (JOG_COMMAND_INTERVAL / 1000.0) * 1.2).toFixed(1);
                 let jogFeedrate;
                 if ($20 === '1') {
                     $130 = Number($130);

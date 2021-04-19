@@ -4,6 +4,7 @@ import {
     METRIC_UNITS,
     SPINDLE_MODE
 } from '../constants';
+import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../widgets/Axes/constants';
 
 const AXIS_X = 'x';
 const AXIS_Y = 'y';
@@ -33,10 +34,16 @@ const defaultState = {
             company: 'Sienci Labs',
             name: 'LongMill',
             type: '30x30',
-            width: 792,
-            units: 'mm',
-            depth: 845,
-            height: 114.3,
+            mm: {
+                width: 792,
+                depth: 845,
+                height: 114.3
+            },
+            in: {
+                width: 31.18,
+                depth: 33.27,
+                height: 4.5
+            },
             endstops: false,
             spindle: false,
             coolant: false,
@@ -119,7 +126,7 @@ const defaultState = {
                     in: {
                         xyStep: 1,
                         zStep: 0.5,
-                        feedrate: 5000,
+                        feedrate: 196.85,
                     }
                 },
                 normal: {
@@ -131,7 +138,7 @@ const defaultState = {
                     in: {
                         xyStep: 0.2,
                         zStep: 0.04,
-                        feedrate: 3000,
+                        feedrate: 118.11,
                     },
                 },
                 precise: {
@@ -143,7 +150,7 @@ const defaultState = {
                     in: {
                         xyStep: 0.02,
                         zStep: 0.004,
-                        feedrate: 1000,
+                        feedrate: 39.37,
                     },
                 },
                 imperial: {
@@ -245,10 +252,19 @@ const defaultState = {
             probeCommand: 'G38.2',
             useTLO: false,
             probeDepth: 10,
-            probeFeedrate: 75,
-            probeFastFeedrate: 150,
-            touchPlateHeight: 10,
-            retractionDistance: 4
+            probeFeedrate: {
+                mm: 75,
+                in: 2.95
+            },
+            probeFastFeedrate: {
+                mm: 150,
+                in: 5.9
+            },
+            retractionDistance: {
+                mm: 4,
+                in: 0.15
+            },
+            touchPlateHeight: 10
         },
         spindle: {
             minimized: false,
@@ -373,8 +389,15 @@ const defaultState = {
             },
             preventDefault: true
         },
-        { // Homing
+        { // Load File
             id: 7,
+            title: 'Load File',
+            keys: ['shift', 'enter'].join('+'),
+            cmd: 'LOAD_FILE',
+            preventDefault: false
+        },
+        { // Homing
+            id: 8,
             title: 'Homing',
             keys: ['ctrl', 'alt', 'command', 'h'].join('+'),
             cmd: 'CONTROLLER_COMMAND',
@@ -384,7 +407,7 @@ const defaultState = {
             preventDefault: true
         },
         { // Unlock
-            id: 8,
+            id: 9,
             title: 'Unlock',
             keys: ['ctrl', 'alt', 'command', 'u'].join('+'),
             cmd: 'CONTROLLER_COMMAND',
@@ -394,7 +417,7 @@ const defaultState = {
             preventDefault: true
         },
         { // Reset
-            id: 9,
+            id: 10,
             title: 'Reset',
             keys: ['ctrl', 'alt', 'command', 'r'].join('+'),
             cmd: 'CONTROLLER_COMMAND',
@@ -404,7 +427,7 @@ const defaultState = {
             preventDefault: true
         },
         { // Change Jog Speed
-            id: 10,
+            id: 11,
             title: 'Increase Jog Speed',
             keys: '=',
             cmd: 'JOG_SPEED',
@@ -414,7 +437,7 @@ const defaultState = {
             preventDefault: false
         },
         { // Change Jog Speed
-            id: 11,
+            id: 12,
             title: 'Decrease Jog Speed',
             keys: '-',
             cmd: 'JOG_SPEED',
@@ -424,7 +447,7 @@ const defaultState = {
             preventDefault: false
         },
         { // Jog X+
-            id: 12,
+            id: 13,
             title: 'Jog: X+',
             keys: 'shift+right',
             cmd: 'JOG',
@@ -435,7 +458,7 @@ const defaultState = {
             preventDefault: false
         },
         { // Jog X-
-            id: 13,
+            id: 14,
             title: 'Jog: X-',
             keys: 'shift+left',
             cmd: 'JOG',
@@ -446,7 +469,7 @@ const defaultState = {
             preventDefault: false
         },
         { // Jog Y+
-            id: 14,
+            id: 15,
             title: 'Jog: Y+',
             keys: 'shift+up',
             cmd: 'JOG',
@@ -457,7 +480,7 @@ const defaultState = {
             preventDefault: false
         },
         { // Jog Y-
-            id: 15,
+            id: 16,
             title: 'Jog: Y-',
             keys: 'shift+down',
             cmd: 'JOG',
@@ -468,7 +491,7 @@ const defaultState = {
             preventDefault: false
         },
         { // Jog Z+
-            id: 16,
+            id: 17,
             title: 'Jog: Z+',
             keys: 'shift+pageup',
             cmd: 'JOG',
@@ -479,13 +502,103 @@ const defaultState = {
             preventDefault: false
         },
         { // Jog Z-
-            id: 17,
+            id: 18,
             title: 'Jog: Z-',
             keys: 'shift+pagedown',
             cmd: 'JOG',
             payload: {
                 axis: AXIS_Z,
                 direction: BACKWARD,
+            },
+            preventDefault: false
+        },
+        { // Zero X Axis
+            id: 19,
+            title: 'Zero X Axis',
+            keys: ['shift', 'q'].join('+'),
+            cmd: 'ZERO_AXIS',
+            payload: {
+                axis: AXIS_X,
+            },
+            preventDefault: false
+        },
+        { // Zero y Axis
+            id: 20,
+            title: 'Zero Y Axis',
+            keys: ['shift', 'w'].join('+'),
+            cmd: 'ZERO_AXIS',
+            payload: {
+                axis: AXIS_Y,
+            },
+            preventDefault: false
+        },
+        { // Zero Z Axis
+            id: 21,
+            title: 'Zero Z Axis',
+            keys: ['shift', 'e'].join('+'),
+            cmd: 'ZERO_AXIS',
+            payload: {
+                axis: AXIS_Z,
+            },
+            preventDefault: false
+        },
+        { // Go to X Axis
+            id: 22,
+            title: 'Go to X Axis',
+            keys: ['shift', 'r'].join('+'),
+            cmd: 'GO_TO_AXIS',
+            payload: {
+                axis: AXIS_X,
+            },
+            preventDefault: false
+        },
+        { // Go to Y Axis
+            id: 23,
+            title: 'Go to Y Axis',
+            keys: ['shift', 't'].join('+'),
+            cmd: 'GO_TO_AXIS',
+            payload: {
+                axis: AXIS_Y,
+            },
+            preventDefault: false
+        },
+        { // Go to Z Axis
+            id: 24,
+            title: 'Go to Z Axis',
+            keys: ['shift', 'y'].join('+'),
+            cmd: 'GO_TO_AXIS',
+            payload: {
+                axis: AXIS_Z,
+            },
+            preventDefault: false
+        },
+        { // Select Rapid Jog Preset
+            id: 25,
+            title: 'Select Rapid Jog Preset',
+            keys: ['shift', 'z'].join('+'),
+            cmd: 'SET_JOG_PRESET',
+            payload: {
+                key: SPEED_RAPID
+            },
+            preventDefault: false
+        },
+        { // Select Normal Jog Preset
+            id: 26,
+            title: 'Select Normal Jog Preset',
+            keys: ['shift', 'x'].join('+'),
+            cmd: 'SET_JOG_PRESET',
+            payload: {
+                key: SPEED_NORMAL
+            },
+            preventDefault: false
+        },
+        { // Select Precise Jog Preset
+            id: 27,
+            title: 'Select Precise Jog Preset',
+            keys: ['shift', 'c'].join('+'),
+            cmd: 'SET_JOG_PRESET',
+            payload: {
+                key: SPEED_PRECISE
             },
             preventDefault: false
         },

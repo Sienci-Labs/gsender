@@ -8,7 +8,8 @@ import {
     MODAL_FIRMWARE
 } from './constants';
 import Preferences from '../Preferences/Preferences';
-import WizardModal from '../Wizard/WizardModal';
+// import WizardModal from '../Wizard/WizardModal';
+import Firmware from '../Firmware/Firmware';
 
 class NavSidebar extends PureComponent {
     static propTypes = {
@@ -79,7 +80,7 @@ class NavSidebar extends PureComponent {
                     label=""
                 />
                 {
-                    state.modal.name === MODAL_FIRMWARE && <WizardModal state={state} modalClose={actions.closeModal} />
+                    state.modal.name === MODAL_FIRMWARE && <Firmware state={state} modalClose={actions.closeModal} />
                 }
                 {
                     state.modal.name === MODAL_PREFERENCES && <Preferences state={state} modalClose={actions.closeModal} />

@@ -42,7 +42,8 @@ import {
 } from '../../constants';
 import {
     MODAL_NONE,
-    DEFAULT_AXES
+    DEFAULT_AXES,
+    SPEED_NORMAL,
 } from './constants';
 import styles from './index.styl';
 
@@ -203,6 +204,11 @@ class AxesWidget extends PureComponent {
             }
 
             return defaultWCS;
+        },
+        setSelectedSpeed: (speed) => {
+            this.setState({
+                selectedSpeed: speed
+            });
         },
         setWorkOffsets: (axis, value) => {
             const wcs = this.actions.getWorkCoordinateSystem();
@@ -532,6 +538,13 @@ class AxesWidget extends PureComponent {
 
             this.joggingHelper && this.joggingHelper.onKeyUp({ [givenAxis]: axisValue, F: feedrate });
         },
+        SET_JOG_PRESET: (event, { key }) => {
+            if (!key) {
+                return;
+            }
+            this.actions.setSelectedSpeed(key);
+            this.actions.setJogFromPreset(key);
+        },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
                 this.actions.stepBackward();
@@ -854,6 +867,7 @@ class AxesWidget extends PureComponent {
             port: controller.port,
             units: store.get('workspace.units', METRIC_UNITS),
             isContinuousJogging: false,
+            selectedSpeed: SPEED_NORMAL,
             controller: {
                 type: controller.type,
                 settings: controller.settings,

@@ -40,7 +40,7 @@ const Baudrates = ({ onChange, baudrate }) => {
                     label: Number(value).toString()
                 }))}
                 searchable={false}
-                value={baudrate}
+                value={{ label: baudrate }}
                 valueRenderer={renderBaudrate}
             />
         </div>

@@ -1,7 +1,7 @@
 .widget-content {
     position: relative;
     padding: 10px;
-    
+
     &.hidden {
         display: none;
     }
@@ -129,4 +129,19 @@
 
 .height-override {
     height: 100% !important;
+}
+
+.probeDiameterWrapper {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    input {
+        width: 100%;
+        outline: none;
+        text-align center;
+        &:focus {
+            outline: none;
+        }
+    }
 }

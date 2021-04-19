@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import map from 'lodash/map';
 import { Toaster, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
-import WarningModal from './WarningModal';
+// import WarningModal from './WarningModal';
 import controller from '../../../lib/controller';
 import styles from '../index.styl';
 import * as GRBL_SETTINGS from '../../../../server/controllers/Grbl/constants';
@@ -118,8 +118,7 @@ class FirmwareSettings extends PureComponent {
         this.setState({ usersUpdatedSettings: settings });
     }
 
-    //Erases and restores the $$ Grbl settings back to defaults
-    //which is defined by the default settings file used when compiling Grbl
+
     restoreSettings = () => {
         this.setState({ warning: true });
     }
@@ -379,13 +378,13 @@ class FirmwareSettings extends PureComponent {
                         </button>
                     </div>
                 </header>
-                { this.state.warning && (
+                {/* { this.state.warning && (
                     <WarningModal
                         handleWarningModal={this.handleWarningModal}
                         handleNoUpdates={this.handleNoUpdates}
                         modalClose={this.props.modalClose}
                     />
-                )}
+                )} */}
                 {
                     this.state.alert
                     ? Toaster.pop({
