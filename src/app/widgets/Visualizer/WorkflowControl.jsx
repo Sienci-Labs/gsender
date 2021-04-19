@@ -5,7 +5,11 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
+import { Tooltip } from 'app/components/Tooltip';
+import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
+import FunctionButton from '../../components/FunctionButton/FunctionButton';
+import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 import {
     // Grbl
     GRBL,
@@ -25,6 +29,7 @@ import {
 } from '../../constants';
 import styles from './workflow-control.styl';
 
+
 class WorkflowControl extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
@@ -33,10 +38,22 @@ class WorkflowControl extends PureComponent {
 
     fileInputEl = null;
 
+    state = this.getInitialState();
+
+    getInitialState() {
+        return {
+            closeFile: false
+        };
+    }
+
     handleClickUpload = (event) => {
         this.fileInputEl.value = null;
         this.fileInputEl.click();
     };
+
+    handleCloseFile = () => {
+        this.setState({ closeFile: true });
+    }
 
     handleChangeFile = (event) => {
         const { actions } = this.props;
@@ -144,7 +161,7 @@ class WorkflowControl extends PureComponent {
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflow.state);
         // const canClose = isReady && includes([WORKFLOW_STATE_IDLE], workflow.state);
         // const canUpload = isReady ? canClose : (canClick && !gcode.loading);
-
+        console.log(this.props.actions.closeModal);
         return (
             <div className={styles.workflowControl}>
                 <input
@@ -170,7 +187,19 @@ class WorkflowControl extends PureComponent {
                 >
                     {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
                 </button>
-
+                <Tooltip
+                    placement="top"
+                    content={i18n._('Close File')}
+                    hideOnClick
+                >
+                    <button
+                        type="button"
+                        className={this.props.state.gcode.content ? `${styles['workflow-button-split']}` : `${styles['workflow-button-disabled']}`}
+                        onClick={this.handleCloseFile}
+                    >
+                        <i className="fas fa-times" />
+                    </button>
+                </Tooltip>
                 {
                     canRun && (
                         <button
@@ -183,6 +212,51 @@ class WorkflowControl extends PureComponent {
                             {i18n._(`${workflow.state === 'paused' ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
                         </button>
                     )
+                }
+                {
+                    (this.state.closeFile) ? (
+                        <Modal showCloseButton={false}>
+                            <Modal.Header className={styles.modalHeader}>
+                                <Modal.Title>Are You Sure?</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <div className={styles.runProbeBody}>
+                                    <div className={styles.left}>
+                                        <div className={styles.greyText}>
+                                            <p>Close this gcode File?</p>
+                                        </div>
+                                        <div className={styles.buttonsContainer}>
+                                            <FunctionButton
+                                                primary
+                                                onClick={() => {
+                                                    this.setState({ closeFile: false });
+                                                    actions.closeModal();
+                                                    actions.unloadGCode();
+                                                    Toaster.pop({
+                                                        msg: 'Gcode File Closed',
+                                                        type: TOASTER_INFO,
+                                                        icon: 'fa-exclamation'
+                                                    });
+                                                }}
+                                            >
+                                            Yes
+                                            </FunctionButton>
+                                            <FunctionButton
+                                                className={styles.activeButton}
+                                                onClick={() => {
+                                                    this.setState({ closeFile: false });
+                                                    actions.closeModal();
+                                                }}
+                                            >
+                            No
+                                            </FunctionButton>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </Modal.Body>
+                        </Modal>
+                    ) : ''
                 }
 
                 {
