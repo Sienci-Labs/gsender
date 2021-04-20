@@ -75,12 +75,6 @@ class NavbarConnectionWidget extends PureComponent {
                 this.openPort(port, { baudrate: baudrate });
             });
         },
-        onChangeBaudrateOption: (option) => {
-            this.setState(state => ({
-                alertMessage: '',
-                baudrate: option.value
-            }));
-        },
         toggleAutoReconnect: (event) => {
             const checked = event.target.checked;
             this.setState(state => ({

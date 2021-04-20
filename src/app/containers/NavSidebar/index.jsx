@@ -68,7 +68,6 @@ class NavSidebar extends PureComponent {
                     onClick={() => actions.openModal(MODAL_FIRMWARE)}
                     icon="fa fa-microchip"
                     label="Firmware"
-                    disabled={this.props.wizardDisabled}
                 />
                 <NavSidebarLink
                     icon="fa fa-share-square"
