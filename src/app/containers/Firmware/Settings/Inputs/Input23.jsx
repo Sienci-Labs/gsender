@@ -138,8 +138,8 @@ class InputTwentyThree extends PureComponent {
         let settingsOne = this.state.defaultSettings[1];
         let settingsTwo = this.state.defaultSettings[2];
         return (
-            <div className={styles.numberWidth}>
-                <div className={styles.maskTwo}>
+            <div className={styles.controlWrapper}>
+                <div className={styles.controlRow}>
                     <div className={styles.maskTwoTitles}>X: </div>
                     <div className={styles.threeToggles}>
                         <div className={styles.onoffswitch}>
@@ -155,6 +155,8 @@ class InputTwentyThree extends PureComponent {
                             <label className={styles.onoffswitchlabel} htmlFor="23-0" />
                         </div>
                     </div>
+                </div>
+                <div className={styles.controlRow} >
                     <div className={styles.maskTwoTitles}>Y: </div>
                     <div className={styles.threeToggles}>
                         <div className={styles.onoffswitch}>
@@ -170,6 +172,8 @@ class InputTwentyThree extends PureComponent {
                             <label className={styles.onoffswitchlabel} htmlFor="23-1" />
                         </div>
                     </div>
+                </div>
+                <div className={styles.controlRow}>
                     <div className={styles.maskTwoTitles}>Z: </div>
                     <div className={styles.threeToggles}>
                         <div className={styles.onoffswitch}>

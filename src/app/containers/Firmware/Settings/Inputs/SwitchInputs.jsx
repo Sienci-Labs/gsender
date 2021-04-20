@@ -3,8 +3,9 @@
 /* eslint-disable react/jsx-closing-bracket-location */
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-// import Space from 'app/components/Space';
+import ToggleSwitch from 'app/components/ToggleSwitch';
 import styles from './index.styl';
+
 
 class SwitchInput extends PureComponent {
     static propTypes = {
@@ -21,7 +22,8 @@ class SwitchInput extends PureComponent {
     getInitialState() {
         return {
             defaultSettings: '',
-            usersNewSettings: {}
+            usersNewSettings: {},
+            value: (this.props.currentSettings[this.props.title] === '1')
         };
     }
 
@@ -35,23 +37,26 @@ class SwitchInput extends PureComponent {
         this.setState({ defaultSettings: LoadedSettings });
     }
 
-    handleSingleToggleSettingsSwitches = (event) => {
-        let value = event.target.checked;
-        let name = event.target.name;
+    handleSingleToggleSettingsSwitches = (value) => {
+        this.setState({
+            value: value
+        });
         if (value === true) {
-            value = 1;
+            value = '1';
         }
         if (value === false) {
-            value = 0;
+            value = '0';
         }
+
         this.props.disableSettingsButton();
-        this.props.grabNewSwitchInputSettings(name, value);
+        this.props.grabNewSwitchInputSettings(this.props.title, value);
     }
 
 
     render() {
         let title = this.props.title;
         let switchSettings = this.props.currentSettings;
+        const { value } = this.state;
         //swaps 1 and 0s for true and false
         if (switchSettings[title] === '1') {
             switchSettings[title] = true;
@@ -62,21 +67,7 @@ class SwitchInput extends PureComponent {
         return (
             <div className={styles.switch}>
                 <div className={styles.disable}>Disabled</div>
-                <div className={styles.singleToggles}>
-                    <div className={styles.onoffswitch}>
-
-                        <input
-                            type="checkbox"
-                            name={title}
-                            className={styles.onoffswitchcheckbox}
-                            id={title}
-                            tabIndex="0"
-                            onClick={this.handleSingleToggleSettingsSwitches}
-                            defaultChecked={switchSettings[title]}
-                        />
-                        <label className={styles.onoffswitchlabel} htmlFor={title} />
-                    </div>
-                </div>
+                <ToggleSwitch checked={value} onChange={this.handleSingleToggleSettingsSwitches} />
                 <div className={styles.enable}>Enabled</div>
             </div>
         );

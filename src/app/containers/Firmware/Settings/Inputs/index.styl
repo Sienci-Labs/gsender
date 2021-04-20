@@ -6,15 +6,15 @@
 }
 
 .switch {
-  margin-left: 63%;
-  margin-right: 4%;
   display: flex;
+  flex-direction: row;
+  align-items center;
 }
 
 .inputGroupAddon {
   padding: 3px 14px;
   margin-left: -6px;
-  font-size: 18px;
+  font-size: 1rem;
   font-weight: normal;
   line-height: 1;
   color: #555;
@@ -24,9 +24,14 @@
   border-radius: 4px;
 }
 
-.numberInputs {
-  margin-left: 61%;
-      margin-bottom: 4%;
+.control-wrapper {
+  display: flex;
+  flex-direction column;
+}
+
+.control-row {
+  display: flex;
+  flex-direction: row;
 }
 
 .mask2 {
@@ -115,8 +120,6 @@
 }
 
 .threeToggles {
-  margin-left: 74%;
-  margin-top: 30px;
 }
 
 .singleToggles {
@@ -124,8 +127,8 @@
 }
 
 .maskTwoTitles {
-  font-size: large;
-  margin-right: 28%;
+  font-size: 1rem;
+  margin-right: 1rem;
   text-align: right;
 }
 
@@ -151,13 +154,13 @@ input.formControlModal[type='number']::-webkit-inner-spin-button {
 }
 
 .enable {
-  font-size: large;
+  font-size: 1rem;
   margin-left: 14px;
 }
 
 .disable {
   margin-right: 11px;
-  font-size: large;
+  font-size: 1rem;
 }
 
 input.formControlModal {
@@ -168,7 +171,7 @@ input.formControlModal {
   border: 1px solid #d8d8d8;
   position: relative;
   text-align: center;
-  font-size: 20px;
+  font-size: 1.2rem;
   outline: none;
   background-position: center right;
   background-repeat: no-repeat;

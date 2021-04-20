@@ -13,10 +13,10 @@ import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 import ToolsNotificationModal from '../../components/ToolsNotificationModal/Modal';
 import styles from './index.styl';
 import InputController from './Settings/Inputs/InputController';
-import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import * as GRBL_SETTINGS from '../../../server/controllers/Grbl/constants';
 import NotConnectedWarning from './NotConnectedWarning';
 import WidgetConfig from '../../widgets/WidgetConfig';
+import ToolModalButton from '../../components/ToolModalButton/ToolModalButton';
 
 class Firmware extends PureComponent {
     static propTypes = {
@@ -179,7 +179,6 @@ class Firmware extends PureComponent {
             }, controller.command('gcode', '$$'));
         },
         'serialport:settings': (type) => {
-            console.log('settings called');
             this.setState(state => ({
                 controller: {
                     ...state.controller,
@@ -505,10 +504,8 @@ class Firmware extends PureComponent {
     controllerSettingsLoaded () {
         const { settings } = controller.settings;
         if (settings) {
-            console.log('true');
             return (Object.keys(settings).length > 0);
         }
-        console.log('false return');
         return false;
     }
 
@@ -529,13 +526,11 @@ class Firmware extends PureComponent {
         const loadedSettings = GRBL_SETTINGS.GRBL_SETTINGS;
         let message = this.defineMessageForCncDefaultsButton();
         let currentSettings = controller.settings;
-        console.log('SETTING IN RENDER:');
-        console.log(currentSettings);
         let haveSettings = this.controllerSettingsLoaded();
 
         return (
-            <div>
-                <Modal onClose={modalClose}>
+            <Modal onClose={modalClose}>
+                <div className={styles.toolModal}>
                     <div className={styles.firmwareHeader}><h3 className={styles.firmwareHeaderText}>Firmware Gadget</h3></div>
                     <div className={styles.firmwareContainer}>
                         <div className={styles.settingsContainer}>
@@ -545,54 +540,44 @@ class Firmware extends PureComponent {
                             {haveSettings && loadedSettings.map((grbl) => (
                                 <div key={grbl.setting} className={styles.containerFluid}>
                                     <div className={styles.tableRow}>
-                                        <div className={styles.keyRow}>{grbl.setting}</div>
-                                        <div className={styles.itemText}>{grbl.message}</div>
-                                        <InputController
-                                            type={grbl.inputType}
-                                            title={grbl.setting}
-                                            currentSettings={currentSettings.settings}
-                                            getUsersNewSettings={this.props.getUsersNewSettings}
-                                            switchSettings={this.state.settings}
-                                            min={grbl.min}
-                                            max={grbl.max}
-                                            step={grbl.step}
-                                            grabNewNumberInputSettings={this.grabNewNumberInputSettings}
-                                            grabNewSwitchInputSettings={this.grabNewSwitchInputSettings}
-                                            grabNew$2InputSettings={this.grabNew$2InputSettings}
-                                            grabNew$3InputSettings={this.grabNew$3InputSettings}
-                                            grabNew$10InputSettings={this.grabNew$10InputSettings}
-                                            grabNew$23InputSettings={this.grabNew$23InputSettings}
-                                            units={grbl.units}
-                                            disableSettingsButton={this.disableSettingsButton}
-                                        />
-
+                                        <div className={styles.settingsInformation}>
+                                            <div className={styles.keyRow}>{grbl.setting}</div>
+                                            <div className={styles.settingsDescription}>
+                                                <div className={styles.itemText}>{grbl.message}</div>
+                                                <div className={styles.descriptionRow}>{grbl.description}</div>
+                                            </div>
+                                        </div>
+                                        <div className={styles.settingsControl}>
+                                            <InputController
+                                                type={grbl.inputType}
+                                                title={grbl.setting}
+                                                currentSettings={currentSettings.settings}
+                                                getUsersNewSettings={this.props.getUsersNewSettings}
+                                                switchSettings={this.state.settings}
+                                                min={grbl.min}
+                                                max={grbl.max}
+                                                step={grbl.step}
+                                                grabNewNumberInputSettings={this.grabNewNumberInputSettings}
+                                                grabNewSwitchInputSettings={this.grabNewSwitchInputSettings}
+                                                grabNew$2InputSettings={this.grabNew$2InputSettings}
+                                                grabNew$3InputSettings={this.grabNew$3InputSettings}
+                                                grabNew$10InputSettings={this.grabNew$10InputSettings}
+                                                grabNew$23InputSettings={this.grabNew$23InputSettings}
+                                                units={grbl.units}
+                                                disableSettingsButton={this.disableSettingsButton}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className={styles.descriptionRow}>{grbl.description}</div>
+
                                 </div>
                             ))
                             }
                         </div>
                         <div className={styles.buttonsContainer}>
                             <div className={styles.buttonsTop}>
-                                {this.state.initiateFlashing ? (
-                                    <ToolsNotificationModal
-                                        title="Grbl Flashing"
-                                        onClose={() => this.setState({ initiateFlashing: false })}
-                                        show={this.state.initiateFlashing}
-                                        footer="This process will disconnect your machine, and may take acouple minutes to complete."
-                                        footerTwo="Continue?"
-                                        yesFunction={this.actions.startFlash}
-                                    >
-                                        This feature exists to flash the GRBL firmware onto compatible Arduino boards only!
-                                        Improper flashing could damage your device on port: {this.state.port}.
-                                    </ToolsNotificationModal>
-                                ) : ''}
-                                <FunctionButton
-                                    onClick={this.startFlashing}
-                                >
-                                    <i className="fas fa-bolt" />
-                                    Grbl Flash
-                                </FunctionButton>
+                                <ToolModalButton icon="fas fa-bolt" onClick={this.startFlashing}>
+                                    Flash GRBL
+                                </ToolModalButton>
 
                                 {this.state.initiateRestoreDefaults ? (
                                     <ToolsNotificationModal
@@ -618,24 +603,22 @@ class Firmware extends PureComponent {
                                 </ToolsNotificationModal>
                             ) : ''}
                             <div className={styles.buttonsMiddle}>
-                                <FunctionButton
-                                    onClick={this.upload}
-                                >
-                                    <i className="fas fa-file-import" />
+                                <ToolModalButton onClick={this.upload} icon="fas fa-file-import">
                                     Import Settings
-                                </FunctionButton>
-                                <FunctionButton
+                                </ToolModalButton>
+
+                                <ToolModalButton
                                     onClick={this.download}
+                                    icon="fas fa-file-export"
                                 >
-                                    <i className="fas fa-file-export" />
                                     Export Settings
-                                </FunctionButton>
-                                <FunctionButton
+                                </ToolModalButton>
+                                <ToolModalButton
                                     onClick={this.restoreSettings}
+                                    icon="fas fa-undo"
                                 >
-                                    <div className={styles.undoIcon}><i className="fas fa-undo" /></div>
-                                    Restore Cnc Defaults
-                                </FunctionButton>
+                                    Restore Defaults
+                                </ToolModalButton>
                             </div>
                             <a
                                 action="Eeprom.txt"
@@ -645,13 +628,13 @@ class Firmware extends PureComponent {
                                 ref={e => this.dofileDownload = e}
                             >download it
                             </a>
-                            <FunctionButton
+                            <ToolModalButton
+                                icon="fas fa-tasks"
                                 onClick={this.applyNewSettings}
                                 className={this.state.newSettingsButtonDisabled ? `${styles.firmwareButtonDisabled}` : `${styles.applySettingsButton}`}
                             >
-                                <div className={styles.taskIcon}><i className="fas fa-tasks" /></div>
                                 Apply New Settings
-                            </FunctionButton>
+                            </ToolModalButton>
                             <input
                                 type="file" className="hidden"
                                 multiple={false}
@@ -661,9 +644,10 @@ class Firmware extends PureComponent {
                             />
                         </div>
                     </div>
-                    {this.state.currentlyFlashing ? <Loading size="lg" overlay={true} /> : ''}
-                </Modal>
-            </div>
+                </div>
+
+                {this.state.currentlyFlashing ? <Loading size="lg" overlay={true} /> : ''}
+            </Modal>
         );
     }
 }

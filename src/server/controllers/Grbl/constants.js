@@ -302,7 +302,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$0',
         message: 'Step pulse time',
-        units: 'microseconds',
+        units: 'μs',
         description: 'Sets time length per step. Minimum 3usec.',
         inputType: 'number',
         min: 3,
@@ -312,7 +312,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$1',
         message: 'Step idle delay',
-        units: 'milliseconds',
+        units: 'ms',
         description: 'Sets a short hold delay when stopping to let dynamics settle before disabling steppers. Value 255 keeps motors enabled with no delay.',
         inputType: 'number',
         min: 25,
@@ -439,7 +439,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$26',
         message: 'Homing switch debounce delay',
-        units: 'milliseconds',
+        units: 'ms',
         description: 'Sets a short delay between phases of homing cycle to let a switch debounce.',
         inputType: 'number',
         min: 5,
