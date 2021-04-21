@@ -44,7 +44,8 @@ class Firmware extends PureComponent {
             initiateRestoreDefaults: false,
             newSettingsButtonDisabled: true,
             currentMachineProfile: '',
-            loadingSettings: false
+            loadingSettings: false,
+            valuesToApplyToGrbl: {}
         };
         this.download = this.download.bind(this);
         this.upload = this.upload.bind(this);
@@ -376,75 +377,38 @@ class Firmware extends PureComponent {
     }
 
 
-    grabNew$10InputSettings = (name, bothToggleValues) => {
-        let finalValue = '';
-        let zero = [0, 0];
-        let one = [1, 0];
-        let two = [0, 1];
-        let three = [1, 1];
+    grabNew$10InputSettings = (name, values) => {
+        let sum = 0;
+        let [mpos, buffer] = values;
+        const { valuesToApplyToGrbl } = this.state;
 
-        if (new String(zero).valueOf() === new String(bothToggleValues).valueOf()) {
-            finalValue = 0;
-        }
-        if (new String(one).valueOf() === new String(bothToggleValues).valueOf()) {
-            finalValue = 1;
-        }
-        if (new String(two).valueOf() === new String(bothToggleValues).valueOf()) {
-            finalValue = 2;
-        }
-        if (new String(three).valueOf() === new String(bothToggleValues).valueOf()) {
-            finalValue = 3;
-        }
+        sum += mpos ? 1 : 0;
+        sum += buffer ? 2 : 0;
+        valuesToApplyToGrbl[name] = sum;
+        console.log(valuesToApplyToGrbl);
 
         this.setState(prevState => ({
             valuesToApplyToGrbl: {
                 ...prevState.valuesToApplyToGrbl,
-                $10: finalValue
+                ...valuesToApplyToGrbl
             }
         }));
     }
 
-    grabNew$23InputSettings = (name, allTheValues) => {
-        let finalValue = '';
-        let zero = [0, 0, 0];
-        let one = [1, 0, 0];
-        let two = [0, 1, 0];
-        let three = [1, 1, 0];
-        let four = [0, 0, 1];
-        let five = [1, 0, 1];
-        let six = [0, 1, 1];
-        let seven = [1, 1, 1];
+    handleShiftedValues = (name, values) => {
+        let sum = 0;
+        const { valuesToApplyToGrbl } = this.state || {};
 
+        const [x, y, z] = values;
+        sum += x ? 1 : 0;
+        sum += y ? 2 : 0;
+        sum += z ? 4 : 0;
 
-        if (new String(zero).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 0;
-        }
-        if (new String(one).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 1;
-        }
-        if (new String(two).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 2;
-        }
-        if (new String(three).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 3;
-        }
-        if (new String(four).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 4;
-        }
-        if (new String(five).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 5;
-        }
-        if (new String(six).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 6;
-        }
-        if (new String(seven).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 7;
-        }
-
+        valuesToApplyToGrbl[name] = sum;
         this.setState(prevState => ({
             valuesToApplyToGrbl: {
                 ...prevState.valuesToApplyToGrbl,
-                $23: finalValue
+                ...valuesToApplyToGrbl
             }
         }));
     }
@@ -559,10 +523,8 @@ class Firmware extends PureComponent {
                                                 step={grbl.step}
                                                 grabNewNumberInputSettings={this.grabNewNumberInputSettings}
                                                 grabNewSwitchInputSettings={this.grabNewSwitchInputSettings}
-                                                grabNew$2InputSettings={this.grabNew$2InputSettings}
-                                                grabNew$3InputSettings={this.grabNew$3InputSettings}
                                                 grabNew$10InputSettings={this.grabNew$10InputSettings}
-                                                grabNew$23InputSettings={this.grabNew$23InputSettings}
+                                                handleShiftedValues={this.handleShiftedValues}
                                                 units={grbl.units}
                                                 disableSettingsButton={this.disableSettingsButton}
                                             />

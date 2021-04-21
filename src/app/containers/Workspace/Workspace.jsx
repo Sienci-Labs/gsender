@@ -104,11 +104,6 @@ class Workspace extends PureComponent {
         }
     };
 
-    sortableGroup = {
-        primary: null,
-        secondary: null
-    };
-
     primaryContainer = null;
 
     secondaryContainer = null;

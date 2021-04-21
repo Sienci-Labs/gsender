@@ -4,12 +4,10 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 // import Space from 'app/components/Space';
-import MaskInputTwo from './Input2';
-import MaskInputThree from './Input3';
 import MaskInputTen from './Input10';
-import MaskInputTwentyThree from './Input23';
 import NumberInputs from './NumberInputs';
 import SwitchInput from './SwitchInputs';
+import BitShiftInput from './BitShiftInput';
 
 class InputController extends PureComponent {
     static propTypes = {
@@ -26,7 +24,7 @@ class InputController extends PureComponent {
         grabNew$2InputSettings: PropTypes.func,
         grabNew$3InputSettings: PropTypes.func,
         grabNew$10InputSettings: PropTypes.func,
-        grabNew$23InputSettings: PropTypes.func,
+        handleShiftedValues: PropTypes.func,
         units: PropTypes.string,
         disableSettingsButton: PropTypes.func
     }
@@ -66,25 +64,25 @@ class InputController extends PureComponent {
             );
         } else if (this.props.type === 'mask2') {
             return (
-                <MaskInputTwo
+                <BitShiftInput
                     name={title}
                     switchSettings={this.props.switchSettings}
                     currentSettings={currentSettings}
                     title={title}
                     getUsersNewSettings={this.props.getUsersNewSettings}
-                    grabNew$2InputSettings={this.props.grabNew$2InputSettings}
+                    handleShiftedValues={this.props.handleShiftedValues}
                     disableSettingsButton={this.props.disableSettingsButton}
                     />
             );
         } else if (this.props.type === 'mask3') {
             return (
-                <MaskInputThree
+                <BitShiftInput
                     name={title}
                     switchSettings={this.props.switchSettings}
                     currentSettings={currentSettings}
                     title={title}
                     getUsersNewSettings={this.props.getUsersNewSettings}
-                    grabNew$3InputSettings={this.props.grabNew$3InputSettings}
+                    handleShiftedValues={this.props.handleShiftedValues}
                     disableSettingsButton={this.props.disableSettingsButton}
                     />
             );
@@ -102,13 +100,13 @@ class InputController extends PureComponent {
             );
         } else if (this.props.type === 'mask23') {
             return (
-                <MaskInputTwentyThree
+                <BitShiftInput
                     name={title}
                     switchSettings={this.props.switchSettings}
                     currentSettings={currentSettings}
                     title={title}
                     getUsersNewSettings={this.props.getUsersNewSettings}
-                    grabNew$23InputSettings={this.props.grabNew$23InputSettings}
+                    handleShiftedValues={this.props.handleShiftedValues}
                     disableSettingsButton={this.props.disableSettingsButton}
                     />
             );

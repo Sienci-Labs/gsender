@@ -3,7 +3,7 @@
 /* eslint-disable react/jsx-closing-bracket-location */
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-// import Space from 'app/components/Space';
+import ToggleSwitch from 'app/components/ToggleSwitch';
 import styles from './index.styl';
 
 class InputTen extends PureComponent {
@@ -20,8 +20,7 @@ class InputTen extends PureComponent {
 
     getInitialState() {
         return {
-            defaultSettings: '',
-            usersNewSettings: {},
+            settings: [false, false], // [mpos/wpos], buffer
         };
     }
 
@@ -32,35 +31,40 @@ class InputTen extends PureComponent {
 
     getCurrentSettings = () => {
         let loadedSetting = this.props.currentSettings.$10;
-        let $10Options = [
+        let options = [
             [false, false], //$10=0
             [true, false],
             [false, true],
             [true, true],
 
         ];
+        const index = Number(loadedSetting);
+        const setting = options[index];
+        this.setState({ settings: setting });
+    }
 
-        if (loadedSetting === '0') {
-            loadedSetting = $10Options[0];
-            this.setState({ zero: false });
-            this.setState({ one: false });
-        }
-        if (loadedSetting === '1') {
-            loadedSetting = $10Options[1];
-            this.setState({ zero: true });
-            this.setState({ one: false });
-        }
-        if (loadedSetting === '2') {
-            loadedSetting = $10Options[2];
-            this.setState({ zero: false });
-            this.setState({ one: true });
-        }
-        if (loadedSetting === '3') {
-            loadedSetting = $10Options[3];
-            this.setState({ zero: true });
-            this.setState({ one: true });
-        }
-        this.setState({ defaultSettings: loadedSetting });
+    updateSettings = (value) => {
+        const { grabNew$10InputSettings, title, disableSettingsButton } = this.props;
+        grabNew$10InputSettings(title, value);
+        disableSettingsButton();
+    }
+
+    toggleMPos = (value) => {
+        const settings = [...this.state.settings];
+        settings[0] = value;
+        this.setState({
+            settings: settings
+        });
+        this.updateSettings(settings);
+    }
+
+    toggleBuffer = (value) => {
+        const settings = [...this.state.settings];
+        settings[1] = value;
+        this.setState({
+            settings: settings
+        });
+        this.updateSettings(settings);
     }
 
     handleSwitch = (event) => {
@@ -97,39 +101,23 @@ class InputTen extends PureComponent {
 
 
     render() {
-        let settingsZero = this.state.defaultSettings[0];
-        let settingsOne = this.state.defaultSettings[1];
+        let [wpos, buffer] = this.state.settings;
+
         return (
-            <div className={styles.maskTwo}>
-                <div className={styles.toggleTitles}>WPosition </div>
-                <div className={styles.threeToggles}>
-                    <div className={styles.onoffswitch}>
-                        <input
-                            type="checkbox"
-                            name="10-0"
-                            className={styles.onoffswitchcheckbox}
-                            id="10-0"
-                            tabIndex="0"
-                            onClick={this.handleSwitch}
-                            defaultChecked={settingsZero}
-                        />
-                        <label className={styles.onoffswitchlabel} htmlFor="10-0" />
-                    </div><div className={styles.mPos}>MPosition </div>
-                </div>
-                <div className={styles.toggleTitles}>Buffer </div>
-                <div className={styles.threeToggles}>
-                    <div className={styles.onoffswitch}>
-                        <input
-                            type="checkbox"
-                            name="10-1"
-                            className={styles.onoffswitchcheckbox}
-                            id="10-1"
-                            tabIndex="0"
-                            onClick={this.handleSwitch}
-                            defaultChecked={settingsOne}
-                        />
-                        <label className={styles.onoffswitchlabel} htmlFor="10-1" />
+            <div className={styles.controlWrapper}>
+                <div className={styles.controlGrid}>
+                    <span className={styles.leftLabel}>WPos</span>
+                    <div className={styles.centeredControl}>
+                        <ToggleSwitch checked={wpos} onChange={this.toggleMPos} />
                     </div>
+                    <span>MPos</span>
+                </div>
+                <div className={styles.controlGrid}>
+                    <span className={styles.leftLabel}>Buffer</span>
+                    <div className={styles.centeredControl}>
+                        <ToggleSwitch checked={buffer} onChange={this.toggleBuffer} />
+                    </div>
+                    <span />
                 </div>
             </div>
         );
