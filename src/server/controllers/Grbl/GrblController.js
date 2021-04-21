@@ -713,6 +713,8 @@ class GrblController {
             // $G - Parser State
             queryParserState();
 
+            console.log(this.state);
+
             // Check if the machine has stopped movement after completion
             if (this.actionTime.senderFinishTime > 0) {
                 const machineIdle = zeroOffset && this.runner.isIdle();
