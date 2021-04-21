@@ -53,6 +53,26 @@
     display: flex;
 }
 
+.recentFiles {
+    display: flex;
+    color: white;
+    justify-content: space-around;
+    margin-top: 7%;
+}
+
+.recentFilesContainer {
+    position: absolute;
+    border: 1px solid white;
+    top: -100px;
+    border-radius: 10px;
+    border-bottom-left-radius: initial;
+    left: 156px;
+    min-width: 190px;
+    max-width: fit-content;
+    height: 160px;
+    background-color: rgba(62, 133, 199, .8);
+}
+
 .workflow-button {
     btn-mixin(color) {
         @extend .workflow-btn;
@@ -73,16 +93,58 @@
         }
     }
 
-    &-split {
-        left: 131px;
+    &-split-top {
+        left: 132px;
         top: -3px;
         padding: 4px;
+        color: white;
+        position: absolute;
+        border-top-right-radius: 4px;
+        margin: 4px;
+        border: 1px solid #fff;
+        background-color: rgba(62, 133, 199, .8);
+        z-index: 1;
+    }
+
+    @media (min-width: 1296px) {
+        &-split-top {
+            left: 132px;
+            top: -3px;
+        }
+    }
+
+    &-split-bottom {
+        left: 132px;
+        top: 26px;
+        padding: 4px;
+        border-bottom-right-radius: 1px;
         color: white;
         position: absolute;
         margin: 4px;
         border: 1px solid #fff;
         background-color: rgba(62, 133, 199, .8);
         z-index: 1;
+    }
+
+    @media (min-width: 1050px) {
+        &-split-bottom {
+            left: 121px;
+            top: 24px;
+        }
+    }
+
+    @media (min-width: 1168px) {
+        &-split-bottom {
+            left: 121px;
+            top: 24px;
+        }
+    }
+
+    @media (min-width: 1296px) {
+        &-split-bottom {
+            left: 132px;
+            top: 26px;
+        }
     }
 
     &-disabled {

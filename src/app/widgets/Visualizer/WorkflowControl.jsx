@@ -1,10 +1,12 @@
+/* eslint-disable jsx-a11y/interactive-supports-focus */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import get from 'lodash/get';
 import includes from 'lodash/includes';
-import pick from 'lodash/pick';
 import PropTypes from 'prop-types';
+import pick from 'lodash/pick';
+import log from 'app/lib/log';
 import React, { PureComponent } from 'react';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
 import { Tooltip } from 'app/components/Tooltip';
 import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
@@ -42,7 +44,11 @@ class WorkflowControl extends PureComponent {
 
     getInitialState() {
         return {
-            closeFile: false
+            closeFile: false,
+            showRecent: false,
+            showLoadFile: false,
+            filetoLoad: '',
+            recentFiles: [JSON.parse(localStorage.getItem('Recent Gcode Files:'))]
         };
     }
 
@@ -55,12 +61,13 @@ class WorkflowControl extends PureComponent {
         this.setState({ closeFile: true });
     }
 
-    handleChangeFile = (event) => {
+    handleChangeFile = (event, fileToLoad) => {
         const { actions } = this.props;
         const files = event.target.files;
         const file = files[0];
         const reader = new FileReader();
-
+        let recentFiles = actions.savegCodeFilenameAsRecentFile(file.name, file);
+        this.setState({ recentFiles: recentFiles });
         reader.onloadend = (event) => {
             const { result, error } = event.target;
 
@@ -90,6 +97,10 @@ class WorkflowControl extends PureComponent {
         } catch (err) {
             // Ignore error
         }
+    };
+
+    handleLoadRecent = (event) => {
+        console.log(event);
     };
 
     canRun() {
@@ -143,10 +154,15 @@ class WorkflowControl extends PureComponent {
 
     handleOnStop = () => {
         const { actions: { handlePause, handleStop } } = this.props;
-
         handlePause();
         handleStop();
     }
+
+    handleShowRecentFiles = (event) => {
+        let clickedValue = event.currentTarget.innerHTML;
+        this.setState({ showLoadFile: true });
+        this.setState({ filetoLoad: clickedValue });
+    };
 
     render() {
         const { cameraPosition } = this.props.state;
@@ -161,7 +177,7 @@ class WorkflowControl extends PureComponent {
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflow.state);
         // const canClose = isReady && includes([WORKFLOW_STATE_IDLE], workflow.state);
         // const canUpload = isReady ? canClose : (canClick && !gcode.loading);
-        console.log(this.props.actions.closeModal);
+
         return (
             <div className={styles.workflowControl}>
                 <input
@@ -194,7 +210,7 @@ class WorkflowControl extends PureComponent {
                 >
                     <button
                         type="button"
-                        className={this.props.state.gcode.content ? `${styles['workflow-button-split']}` : `${styles['workflow-button-disabled']}`}
+                        className={this.props.state.gcode.content ? `${styles['workflow-button-split-top']}` : `${styles['workflow-button-disabled']}`}
                         onClick={this.handleCloseFile}
                     >
                         <i className="fas fa-times" />
@@ -214,7 +230,7 @@ class WorkflowControl extends PureComponent {
                     )
                 }
                 {
-                    (this.state.closeFile) ? (
+                    this.state.closeFile && (
                         <Modal showCloseButton={false}>
                             <Modal.Header className={styles.modalHeader}>
                                 <Modal.Title>Are You Sure?</Modal.Title>
@@ -239,7 +255,7 @@ class WorkflowControl extends PureComponent {
                                                     });
                                                 }}
                                             >
-                                            Yes
+                                                Yes
                                             </FunctionButton>
                                             <FunctionButton
                                                 className={styles.activeButton}
@@ -248,7 +264,7 @@ class WorkflowControl extends PureComponent {
                                                     actions.closeModal();
                                                 }}
                                             >
-                            No
+                                                No
                                             </FunctionButton>
                                         </div>
                                     </div>
@@ -256,8 +272,52 @@ class WorkflowControl extends PureComponent {
                                 </div>
                             </Modal.Body>
                         </Modal>
-                    ) : ''
+                    )
                 }
+
+                {this.state.showLoadFile && (
+                    <Modal showCloseButton={false}>
+                        <Modal.Header className={styles.modalHeader}>
+                            <Modal.Title>Are You Sure?</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className={styles.runProbeBody}>
+                                <div className={styles.left}>
+                                    <div className={styles.greyText}>
+                                        <p>Load {this.state.filetoLoad}?</p>
+                                    </div>
+                                    <div className={styles.buttonsContainer}>
+                                        <FunctionButton
+                                            primary
+                                            onClick={() => {
+                                                this.handleLoadRecent(this.state.filetoLoad);
+                                                this.setState({ showLoadFile: false });
+                                                actions.closeModal();
+                                                Toaster.pop({
+                                                    msg: `${this.state.filetoLoad} Loaded...`,
+                                                    type: TOASTER_INFO,
+                                                    icon: 'fa-exclamation'
+                                                });
+                                            }}
+                                        >
+                                                Yes
+                                        </FunctionButton>
+                                        <FunctionButton
+                                            className={styles.activeButton}
+                                            onClick={() => {
+                                                this.setState({ closeFile: false });
+                                                actions.closeModal();
+                                            }}
+                                        >
+                                                No
+                                        </FunctionButton>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </Modal.Body>
+                    </Modal>
+                )}
 
                 {
                     canPause && (
