@@ -19,7 +19,9 @@ class NumberInput extends PureComponent {
         if (value === 0) {
             return 0.1;
         }
-        if (value < 1) {
+        if (value < 0.1) {
+            step = 0.01;
+        } else if (value < 1) {
             step = 0.1;
         } else if (value < 10) {
             step = 1;
@@ -33,7 +35,7 @@ class NumberInput extends PureComponent {
             step = 10000;
         }
 
-        if (!increment && step !== 0.1 && value - step === 0) {
+        if (!increment && step !== 0.001 && value - step === 0) {
             step /= 10;
         }
         return step;
