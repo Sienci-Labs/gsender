@@ -385,7 +385,6 @@ class Firmware extends PureComponent {
         sum += mpos ? 1 : 0;
         sum += buffer ? 2 : 0;
         valuesToApplyToGrbl[name] = sum;
-        console.log(valuesToApplyToGrbl);
 
         this.setState(prevState => ({
             valuesToApplyToGrbl: {

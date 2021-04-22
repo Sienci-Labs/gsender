@@ -461,7 +461,7 @@ class ProbeWidget extends PureComponent {
         probeDistance = (isSafe) ? -probeDistance : probeDistance;
         probeDistance = (axis === 'Z') ? (-1 * Math.abs(probeDistance)) : probeDistance;
         retractDistance = (axis === 'Z') ? retractDistance : retractDistance * -1;
-        console.log(retractDistance);
+
         let code;
         code = [
             this.gcode(`; ${axis}-Probe`),
@@ -697,7 +697,6 @@ class ProbeWidget extends PureComponent {
             fastFeedrate = probeFastFeedrate.in;
             retractDistance = retractionDistance.in;
         }
-        console.log(retractDistance);
 
         const gCodeParams = {
             wcs: wcs,
