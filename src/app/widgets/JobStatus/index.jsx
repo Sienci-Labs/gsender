@@ -241,6 +241,8 @@ class JobStatusWidget extends PureComponent {
             spindleSpeedMin: this.config.get('spindleSpeedMin', 0),
             spindleSpeedMax: this.config.get('spindleSpeedMax', 1000),
             spindleOverrideLabel: this.getSpindleOverrideLabel(),
+            feedRates: [],
+            spindleRates: [],
             isFullscreen: false,
             connected: false,
             fileModal: METRIC_UNITS,
@@ -335,6 +337,16 @@ class JobStatusWidget extends PureComponent {
                     this.setState(this.getInitialState());
                     return;
                 }
+                /* Convert set commands to numbers and get max and min */
+                const spindleRates = [];
+                const feedRates = [];
+
+                file.movementSet.forEach(item => {
+                    feedRates.push(Number(item.substring(1)));
+                });
+                file.spindleSet.forEach(item => {
+                    spindleRates.push(Number(item.substring(1)));
+                });
 
                 this.setState({
                     fileName: file.name,
@@ -342,6 +354,8 @@ class JobStatusWidget extends PureComponent {
                     total: file.total,
                     toolsAmount: file.toolSet.size,
                     toolsUsed: file.toolSet,
+                    spindleRates: spindleRates,
+                    feedRates: feedRates
                 });
             }),
             pubsub.subscribe('units:change', (msg, units) => {

@@ -237,24 +237,35 @@ class VisualizerWidget extends PureComponent {
                 .filter(line => !comments.some(comment => line.includes(comment)));
 
             const tCommandRegex = /^[T]+[0-9]+/g;
+            const fCommandRegex = /[F]+[0-9]+/g;
+            const sCommandRegex = /[S]+[0-9]+/g;
             const invalidGCodeRegex = /([^NGMXYZIJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
 
             const toolSet = new Set();
+            const spindleSet = new Set();
+            const movementSet = new Set();
             const invalidGcode = new Set();
 
+            const collectCommandInstance = (line, set, command) => {
+                const lineItems = line.split(' ');
+                //Find the line item with the command and add it to the set
+                for (const item of lineItems) {
+                    if (item[0] === command) {
+                        set.add(item.trim());
+                    }
+                }
+            };
             //Iterate over the lines and use regex against them
             for (const line of lines) {
                 if (tCommandRegex.test(line)) {
-                    const lineItems = line.split(' ');
-
-                    //Find the line item with the T command and add it to the set
-                    for (const item of lineItems) {
-                        if (item[0] === 'T') {
-                            toolSet.add(item.trim());
-                        }
-                    }
+                    collectCommandInstance(line, toolSet, 'T');
                 }
-
+                if (fCommandRegex.test(line)) {
+                    collectCommandInstance(line, movementSet, 'F');
+                }
+                if (sCommandRegex.test(line)) {
+                    collectCommandInstance(line, spindleSet, 'S');
+                }
                 if (invalidGCodeRegex.test(line)) {
                     invalidGcode.add(line);
                 }
@@ -276,7 +287,7 @@ class VisualizerWidget extends PureComponent {
 
             this.setState({ total });
 
-            pubsub.publish('gcode:fileInfo', { name, size, total, toolSet });
+            pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet });
 
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller

@@ -21,15 +21,19 @@ const IdleInfo = ({ state }) => {
         fileSize,
         toolsAmount,
         toolsUsed,
-        feedrateMin,
-        feedrateMax,
-        spindleSpeedMin,
-        spindleSpeedMax,
-        fileModal
+        fileModal,
+        feedRates,
+        spindleRates
     } = state;
 
     let convertedFeedMin, convertedFeedMax, feedUnits;
     feedUnits = (units === METRIC_UNITS) ? 'mm/min' : 'ipm';
+
+    let feedrateMin = Math.min(...feedRates);
+    let feedrateMax = Math.max(...feedRates);
+    let spindleMin = Math.min(...spindleRates);
+    let spindleMax = Math.max(...spindleRates);
+
     if (units === METRIC_UNITS) {
         convertedFeedMin = (fileModal === METRIC_UNITS) ? feedrateMin : in2mm(feedrateMin).toFixed(2);
         convertedFeedMax = (fileModal === METRIC_UNITS) ? feedrateMax : in2mm(feedrateMax).toFixed(2);
@@ -86,15 +90,19 @@ const IdleInfo = ({ state }) => {
         return `${fileSize} bytes`;
     };
 
+    const feedString = (feedRates.length > 0) ? `${convertedFeedMin} to ${convertedFeedMax} ${feedUnits}` : 'No Feedrates';
+
     return fileName ? (
         <div className={styles['idle-info']}>
             <div><span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)</div>
             <div className={styles.idleInfoRow}>
                 <FileStat label="Attributes">
-                    {`${outputFormattedTime(remainingTime)}`}<br /> {`${convertedFeedMin}`} to {`${convertedFeedMax} ${feedUnits}`}
+                    {`${outputFormattedTime(remainingTime)}`}<br /> {`${feedString}`}
                 </FileStat>
                 <FileStat label="Spindle">
-                    {spindleSpeedMin} to {spindleSpeedMax} RPM
+                    {
+                        (spindleRates.length > 0) ? `${spindleMin} to ${spindleMax} RPM` : 'No Spindle Commands'
+                    }
                     <br />
                     {toolsAmount > 0 ? `${toolsAmount} (${formattedToolsUsed()})` : 'No Tools'}
                 </FileStat>
