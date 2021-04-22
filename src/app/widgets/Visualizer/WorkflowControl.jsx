@@ -66,8 +66,8 @@ class WorkflowControl extends PureComponent {
         const files = event.target.files;
         const file = files[0];
         const reader = new FileReader();
-        let recentFiles = actions.savegCodeFilenameAsRecentFile(file.name, file);
-        this.setState({ recentFiles: recentFiles });
+        // let recentFiles = actions.savegCodeFilenameAsRecentFile(file.name, file);
+        // this.setState({ recentFiles: recentFiles });
         reader.onloadend = (event) => {
             const { result, error } = event.target;
 
@@ -248,6 +248,7 @@ class WorkflowControl extends PureComponent {
                                                     this.setState({ closeFile: false });
                                                     actions.closeModal();
                                                     actions.unloadGCode();
+                                                    actions.reset();
                                                     Toaster.pop({
                                                         msg: 'Gcode File Closed',
                                                         type: TOASTER_INFO,
