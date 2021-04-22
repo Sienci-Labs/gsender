@@ -47,21 +47,16 @@ class Macro extends PureComponent {
     }
 
     render() {
-        const { state, actions } = this.props;
+        // const { state, actions } = this.props;
+        const { state } = this.props;
         const {
             macros = []
         } = state;
 
+        const disabled = !this.canRunMacro();
+
         return (
             <div className={styles['macro-container']}>
-                <button
-                    type="button"
-                    className={styles['add-macro-button']}
-                    title="Add Macro"
-                    onClick={actions.openAddMacroModal}
-                >
-                    <i className="fas fa-plus" />
-                </button>
                 {macros.length === 0 && (
                     <div className={styles.emptyResult}>
                         {i18n._('No macros...')}<br />
@@ -74,6 +69,7 @@ class Macro extends PureComponent {
                         onRun={this.handleRunMacro}
                         onEdit={this.handleEditMacro}
                         onDelete={this.handleDeleteMacro}
+                        disabled={disabled}
                     />
                 ))}
             </div>
