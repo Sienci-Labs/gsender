@@ -31,6 +31,7 @@ export default class MacroItem extends Component {
         onRun: PropTypes.func,
         onEdit: PropTypes.func,
         onDelete: PropTypes.func,
+        disabled: PropTypes.bool,
     }
 
     state = {
@@ -56,7 +57,12 @@ export default class MacroItem extends Component {
     }
 
     onMacroRun = () => {
-        const { macro, onRun } = this.props;
+        const { macro, onRun, disabled } = this.props;
+
+        if (disabled) {
+            return;
+        }
+
         onRun(macro);
         Toaster.pop({
             msg: `Started running macro '${macro.name}'!`,
@@ -70,7 +76,7 @@ export default class MacroItem extends Component {
     }
 
     render() {
-        const { macro, onEdit, onDelete } = this.props;
+        const { macro, onEdit, onDelete, disabled } = this.props;
         const { display } = this.state;
 
         const Menu = (
@@ -109,21 +115,31 @@ export default class MacroItem extends Component {
                     onKeyDown={this.onMacroRun}
                     role="button"
                     tabIndex={-1}
-                    className={styles['macro-item-control']}
+                    className={styles[disabled ? 'macro-item-control-disabled' : 'macro-item-control']}
                 >
-                    { display === 'name' && <div>{macro.name}</div>}
+                    {
+                        disabled
+                            ? <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}> {macro.name} </div>
+                            : (
+                                <>
+                                    { display === 'name' && (
+                                        <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}> {macro.name} </div>)
+                                    }
 
-                    { display === 'running' && <div className={styles['glowing-background']}>Running...</div>}
+                                    { display === 'running' && <div className={styles['glowing-background']}>Running...</div>}
 
-                    { display === 'icon' && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                            Run {`"${macro.name}"`}{' '}
-                            <i
-                                className="fa fa-play"
-                                style={{ fontSize: '1.25rem', color: '#059669', outline: 'none' }}
-                            />
-                        </div>
-                    )}
+                                    { display === 'icon' && (
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                            <i
+                                                className="fa fa-play"
+                                                style={{ fontSize: '1rem', color: '#059669', outline: 'none' }}
+                                            />
+                                            Run {`${macro.name}`}{' '}
+                                        </div>
+                                    )}
+                                </>
+                            )
+                    }
                 </div>
 
                 <Dropdown

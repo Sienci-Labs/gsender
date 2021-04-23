@@ -2,7 +2,7 @@ import uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
-import { Dropdown, MenuItem } from 'react-bootstrap';
+import { Dropdown } from 'react-bootstrap';
 import { Button } from 'app/components/Buttons';
 import Modal from 'app/components/Modal';
 import Space from 'app/components/Space';
@@ -14,6 +14,8 @@ import variables from './variables';
 import styles from './index.styl';
 
 import { modalStyle, modalHeaderStyle, modalTitleStyle, modalBodyStyle, modalFooterStyle } from './modalStyle';
+
+const MAX_CHARACTERS = '128';
 
 class AddMacro extends PureComponent {
     static propTypes = {
@@ -43,7 +45,12 @@ class AddMacro extends PureComponent {
         const { content = '' } = { ...state.modal.params };
 
         return (
-            <Modal size="md" onClose={actions.closeModal} style={modalStyle}>
+            <Modal
+                size="md"
+                onClose={actions.closeModal}
+                style={modalStyle}
+                disableOverlay
+            >
                 <Modal.Header style={modalHeaderStyle}>
                     <Modal.Title style={modalTitleStyle}>
                         {i18n._('New Macro')}
@@ -64,17 +71,16 @@ class AddMacro extends PureComponent {
                                 ref={c => {
                                     this.fields.name = c;
                                 }}
-                                maxLength="12"
+                                maxLength={MAX_CHARACTERS}
                                 type="text"
                                 className="form-control"
                                 name="name"
                                 value=""
                                 validations={[validations.required]}
                             />
-                            <small style={{ color: 'grey', marginLeft: '2px' }}>Max 12 characters</small>
                         </div>
                         <div className="form-group">
-                            <div>
+                            <div className={styles['macro-commands']}>
                                 <label>{i18n._('Macro Commands')}</label>
                                 <Dropdown
                                     id="add-macro-dropdown"
@@ -89,13 +95,10 @@ class AddMacro extends PureComponent {
                                             content: textarea.value
                                         });
                                     }}
-                                    pullRight
                                 >
                                     <Dropdown.Toggle
                                         className={styles.btnLink}
                                         style={{ boxShadow: 'none' }}
-                                        useAnchor
-                                        noCaret
                                     >
                                         <i className="fa fa-plus" />
                                         <Space width="8" />
@@ -106,23 +109,31 @@ class AddMacro extends PureComponent {
                                     <Dropdown.Menu className={styles.macroVariablesDropdown}>
                                         {variables.map(v => {
                                             if (typeof v === 'object') {
-                                                return (
-                                                    <MenuItem
-                                                        header={v.type === 'header'}
+                                                return v.type === 'header' ? (
+                                                    <Dropdown.Header
                                                         key={uniqueId()}
                                                     >
                                                         {v.text}
-                                                    </MenuItem>
+                                                    </Dropdown.Header>
+                                                ) : (
+                                                    <Dropdown.Item
+                                                        key={uniqueId()}
+                                                        eventKey={v}
+                                                        className={styles['dropdown-item']}
+                                                    >
+                                                        {v.text}
+                                                    </Dropdown.Item>
                                                 );
                                             }
 
                                             return (
-                                                <MenuItem
+                                                <Dropdown.Item
                                                     eventKey={v}
                                                     key={uniqueId()}
+                                                    className={styles['dropdown-item']}
                                                 >
                                                     {v}
-                                                </MenuItem>
+                                                </Dropdown.Item>
                                             );
                                         })}
                                     </Dropdown.Menu>
