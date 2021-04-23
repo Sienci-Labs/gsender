@@ -40,7 +40,6 @@ class GrblLineParserResultStatus {
             payload.activeState = states[0] || '';
             payload.subState = Number(states[1] || '');
         }
-        console.log(payload.activeState);
 
         for (let param of params) {
             const nv = param.match(/^(.+):(.+)/);
