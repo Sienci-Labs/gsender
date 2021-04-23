@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import includes from 'lodash/includes';
 import React, { PureComponent } from 'react';
+import _ from 'lodash';
 import api from 'app/api';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
@@ -14,6 +15,8 @@ import Macro from './Macro';
 import AddMacro from './AddMacro';
 import EditMacro from './EditMacro';
 import RunMacro from './RunMacro';
+import FunctionButton from '../../components/FunctionButton/FunctionButton';
+import { Toaster, TOASTER_SUCCESS, TOASTER_DANGER } from '../../lib/toaster/ToasterLib';
 import {
     // Grbl
     GRBL,
@@ -50,6 +53,15 @@ class MacroWidget extends PureComponent {
         sortable: PropTypes.object,
         embedded: PropTypes.bool
     };
+
+    toast = _.throttle(({ msg, type }) => {
+        Toaster.pop({
+            msg,
+            type
+        });
+    }, 3000, { 'trailing': false });
+
+    inputRef = React.createRef();
 
     // Public methods
     collapse = () => {
@@ -224,6 +236,58 @@ class MacroWidget extends PureComponent {
         }
     };
 
+    exportMacros() {
+        if (this.state.macros.length === 0) {
+            this.toast({ msg: 'No Macros to Export', type: TOASTER_DANGER });
+            return;
+        }
+
+        const macrosClean = this.state.macros.map(({ name, content }) => ({ name, content }));
+        const macros = JSON.stringify(macrosClean, null, 1);
+        const data = new Blob([macros], {
+            type: 'text/plain;charset=utf-8;'
+        });
+
+        const today = new Date();
+        const filename = `gSender-macros-${today.toLocaleDateString()}-${today.toLocaleTimeString()}.json`;
+
+        // IE11 & Edge
+        if (navigator.msSaveBlob) {
+            navigator.msSaveBlob(data, filename);
+        } else {
+            // In FF link must be added to DOM to be clicked
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(data);
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    importMacros = (e) => {
+        const file = e.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsText(file, 'UTF-8');
+            reader.onload = (event) => {
+                const macros = JSON.parse(event.target.result);
+
+                for (const { name, content } of macros) {
+                    if (name && content) {
+                        this.actions.addMacro({ name, content });
+                    }
+                }
+
+                this.toast({ msg: 'Macros Imported Succesfully', type: TOASTER_SUCCESS });
+            };
+            reader.onerror = () => {
+                this.toast({ msg: 'Error Importing Macros', type: TOASTER_DANGER });
+            };
+        }
+    }
+
     componentDidMount() {
         this.fetchMacros();
         this.addControllerEvents();
@@ -233,7 +297,7 @@ class MacroWidget extends PureComponent {
         this.removeControllerEvents();
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate() {
         const {
             minimized
         } = this.state;
@@ -421,13 +485,55 @@ class MacroWidget extends PureComponent {
                     {state.modal.name === MODAL_ADD_MACRO &&
                     <AddMacro state={state} actions={actions} />
                     }
+
                     {state.modal.name === MODAL_EDIT_MACRO &&
                     <EditMacro state={state} actions={actions} />
                     }
+
                     {state.modal.name === MODAL_RUN_MACRO &&
                     <RunMacro state={state} actions={actions} />
                     }
+
                     <Macro state={state} actions={actions} />
+
+                    <input
+                        type="file"
+                        onChange={this.importMacros}
+                        accept=".json"
+                        style={{ display: 'none' }}
+                        ref={this.inputRef}
+                    />
+
+                    <div className={styles['action-area']}>
+                        <FunctionButton
+                            primary
+                            type="button"
+                            title="Add Macro"
+                            onClick={actions.openAddMacroModal}
+                        >
+                            <i className="fas fa-plus" />
+                        </FunctionButton>
+                        <FunctionButton
+                            primary
+                            type="button"
+                            title="Import Macros"
+                            onClick={() => {
+                                this.inputRef.current.click();
+                            }}
+                        >
+                            <i className="fas fa-upload" />
+                        </FunctionButton>
+                        <FunctionButton
+                            primary
+                            type="button"
+                            title="Export Macros"
+                            onClick={() => {
+                                this.exportMacros();
+                            }}
+                        >
+                            <i className="fas fa-download" />
+                        </FunctionButton>
+                    </div>
                 </Widget.Content>
             </Widget>
         );
