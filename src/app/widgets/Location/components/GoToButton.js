@@ -4,8 +4,7 @@ import styles from '../index.styl';
 
 const GoToButton = ({ onClick, disabled }) => {
     return (
-        <div
-            role="button"
+        <button
             tabIndex={-1}
             disabled={disabled}
             onClick={onClick}
@@ -13,7 +12,7 @@ const GoToButton = ({ onClick, disabled }) => {
             className={styles['go-to-button']}
         >
             Go to
-        </div>
+        </button>
     );
 };
 

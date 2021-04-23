@@ -6,19 +6,19 @@ import Slider from './Slider';
 
 
 const LaserControls = ({ actions, state }) => {
-    const { laser } = state;
+    const { laser, canClick } = state;
     return (
         <div className={styles.controlContainer}>
             <div className={styles.controlRow}>
-                <FunctionButton onClick={actions.sendM3}>
+                <FunctionButton onClick={actions.sendM3} disabled={!canClick}>
                     <i className="fas fa-lightbulb" />
                     Laser On
                 </FunctionButton>
-                <FunctionButton onClick={actions.runLaserTest}>
+                <FunctionButton onClick={actions.runLaserTest} disabled={!canClick}>
                     <i className="fas fa-satellite-dish" />
                     Laser Test
                 </FunctionButton>
-                <FunctionButton onClick={actions.sendM5}>
+                <FunctionButton onClick={actions.sendM5} disabled={!canClick}>
                     <i className="far fa-lightbulb" />
                     Laser Off
                 </FunctionButton>

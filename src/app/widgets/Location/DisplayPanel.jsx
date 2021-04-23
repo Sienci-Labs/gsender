@@ -145,7 +145,6 @@ class DisplayPanel extends PureComponent {
 
             controller.command('gcode', `G10 L20 P${p} ${axisLabel}0`);
         };
-
         return (
             <tr>
                 <td className={styles.coordinate}>
