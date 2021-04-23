@@ -3,7 +3,10 @@
   "version": "0.5.7",
   "productName": "gSender",
   "description": "CNC Milling Controller",
-  "author": "Sienci Labs",
+  "author": {
+    "name": "Sienci Labs <hi@sienci.com>",
+    "email": "hi@sienci.com"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
