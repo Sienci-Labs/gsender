@@ -350,9 +350,7 @@ class SpindleWidget extends PureComponent {
             ...this.actions
         };
 
-        const { active, controller } = state;
-        const activeState = controller?.status?.activeState || 'Idle';
-        console.log(activeState);
+        const { active } = state;
 
         return (
             <Widget fullscreen={isFullscreen}>
@@ -368,7 +366,7 @@ class SpindleWidget extends PureComponent {
                     <div>
                         <div className={styles.modalRow}>
                             <ModalToggle mode={state.mode} onChange={actions.handleModeToggle} />
-                            <ActiveIndicator machineState={activeState} active={active} />
+                            <ActiveIndicator canClick={this.canClick()} active={active} />
                         </div>
                         <div>
                             {

@@ -32,7 +32,7 @@ class GrblRunner extends events.EventEmitter {
                 z: '0.000'
             },
             ov: [],
-            alarmCode: null,
+            alarmCode: 'Homing',
             probeActive: false
         },
         parserstate: {

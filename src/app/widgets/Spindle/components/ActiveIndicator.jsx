@@ -1,19 +1,20 @@
 import React from 'react';
 import cx from 'classnames';
-import { GRBL_ACTIVE_STATE_RUN } from '../../../constants';
 import styles from '../index.styl';
 
-const ActiveIndicator = ({ machineState, active = true }) => {
+const ActiveIndicator = ({ canClick, active = true }) => {
+    const showIndicator = canClick && active;
+
     return (
         <div className={styles.activeIndicatorWrapper}>
             <small>
                 {
-                    (machineState !== GRBL_ACTIVE_STATE_RUN && active) ? 'Active' : 'Not Active'
+                    showIndicator ? 'Active' : 'Not Active'
                 }
             </small>
-            <div className={cx(styles.activeIndicator, { [styles.activeIndicatorOn]: active })}>
+            <div className={cx(styles.activeIndicator, { [styles.activeIndicatorOn]: showIndicator })}>
                 {
-                    active && <i className={cx('fas fa-exclamation', styles.activePulse)} />
+                    showIndicator && <i className={cx('fas fa-exclamation', styles.activePulse)} />
                 }
             </div>
         </div>
