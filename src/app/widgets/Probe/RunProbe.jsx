@@ -31,7 +31,16 @@ class RunProbe extends PureComponent {
         });
     }
 
-    startConnectivityTest(probeStatus) {
+    startConnectivityTest(probeStatus, connectivityTest) {
+        // If we disabled test, immediately set connectionMade to true and return
+        console.log(connectivityTest);
+        if (!connectivityTest) {
+            this.setState({
+                connectionMade: true
+            });
+            return;
+        }
+
         this.setState({
             testRunning: true
         });
@@ -52,12 +61,14 @@ class RunProbe extends PureComponent {
     }
 
     componentDidMount() {
-        const { actions } = this.props;
-        this.startConnectivityTest(actions.returnProbeConnectivity);
+        const { actions, state } = this.props;
+        const { connectivityTest } = state;
+        console.log(state);
+        this.startConnectivityTest(actions.returnProbeConnectivity, connectivityTest);
     }
 
     componentWillUnmount() {
-        clearInterval(this.testInterval);
+        this.testInterval && clearInterval(this.testInterval);
     }
 
     render() {
