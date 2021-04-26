@@ -56,7 +56,6 @@ export default class ControlArea extends Component {
                         </div>
                     );
                 } else {
-                    console.log(state.status?.activeState);
                     return state.status?.activeState //Show disconnected until machine connection process is finished, otherwise an empty div is shown
                         ? (
                             <div className={styles[`machine-${state.status.activeState}`]}>

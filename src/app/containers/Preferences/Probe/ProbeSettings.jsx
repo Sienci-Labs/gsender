@@ -15,7 +15,6 @@ const ProbeSettings = ({ active, state, actions }) => {
     const { probeSettings, probe, units } = state;
     const { functions } = probe;
     const probeActions = actions.probe;
-    console.log(probeSettings);
 
     const values = {
         length: units === 'mm' ? probe.plateLength.mm : probe.plateLength.in,

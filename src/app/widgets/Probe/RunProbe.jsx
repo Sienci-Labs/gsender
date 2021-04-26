@@ -33,7 +33,6 @@ class RunProbe extends PureComponent {
 
     startConnectivityTest(probeStatus, connectivityTest) {
         // If we disabled test, immediately set connectionMade to true and return
-        console.log(connectivityTest);
         if (!connectivityTest) {
             this.setState({
                 connectionMade: true
@@ -63,7 +62,6 @@ class RunProbe extends PureComponent {
     componentDidMount() {
         const { actions, state } = this.props;
         const { connectivityTest } = state;
-        console.log(state);
         this.startConnectivityTest(actions.returnProbeConnectivity, connectivityTest);
     }
 
