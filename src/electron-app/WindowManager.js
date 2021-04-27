@@ -58,7 +58,7 @@ class WindowManager {
             }
         });
         const webContents = window.webContents;
-        window.removeMenu();
+        //window.removeMenu();
         window.webContents.on('did-finish-load', () => {
             window.setTitle(options.title);
         });
@@ -88,20 +88,6 @@ class WindowManager {
         ses.setProxy({ proxyRules: 'direct://' }).then(() => {
             window.loadURL(url);
         });
-
-        /*window.loadURL(url).then(() => {
-            dialog.showMessageBox({
-                message: `Loaded ${url}`
-            });
-            console.log(`Loaded ${url}`);
-        }).catch((e) => {
-            dialog.showMessageBox({
-                message: e
-            });
-            console.log(`Error: ${e}`);
-        });*/
-
-
 
         this.windows.push(window);
 

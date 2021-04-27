@@ -2,6 +2,7 @@ import get from 'lodash/get';
 import includes from 'lodash/includes';
 import pick from 'lodash/pick';
 import PropTypes from 'prop-types';
+import isElectron from 'is-electron';
 import React, { PureComponent } from 'react';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
@@ -33,10 +34,14 @@ class WorkflowControl extends PureComponent {
 
     fileInputEl = null;
 
-    handleClickUpload = (event) => {
-        this.fileInputEl.value = null;
-        this.fileInputEl.click();
+    handleClickUpload = (fileMetadata) => {
+        window.ipcRenderer.send('load-recent-file', fileMetadata);
     };
+
+    testRecentFile = () => {
+        console.log('test');
+        window.ipcRenderer.send('load-recent-file', { filePath: 'C:\\test.gcode' });
+    }
 
     handleChangeFile = (event) => {
         const { actions } = this.props;
@@ -46,6 +51,8 @@ class WorkflowControl extends PureComponent {
 
         reader.onloadend = (event) => {
             const { result, error } = event.target;
+            console.log(result);
+            console.log(error);
 
             if (error) {
                 log.error(error);
@@ -74,6 +81,17 @@ class WorkflowControl extends PureComponent {
             // Ignore error
         }
     };
+
+    loadRecentFile = (fileMetadata) => {
+        const { actions } = this.props;
+        const { result, name, size } = fileMetadata;
+        const meta = {
+            name: name,
+            size: size
+        };
+
+        actions.uploadFile(result, meta);
+    }
 
     canRun() {
         const { state } = this.props;
@@ -131,6 +149,15 @@ class WorkflowControl extends PureComponent {
         handleStop();
     }
 
+    componentDidMount() {
+        if (isElectron()) {
+            window.ipcRenderer.on('loaded-recent-file', (msg, fileMetaData) => {
+                console.log(fileMetaData);
+                this.loadRecentFile(fileMetaData);
+            });
+        }
+    }
+
     render() {
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
@@ -164,8 +191,7 @@ class WorkflowControl extends PureComponent {
                     type="button"
                     className={`${styles['workflow-button-upload']}`}
                     title={i18n._('Load File')}
-                    onClick={this.handleClickUpload}
-                    // disabled={!canUpload}
+                    onClick={this.testRecentFile}
                     style={{ writingMode: 'vertical-lr' }}
                 >
                     {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
