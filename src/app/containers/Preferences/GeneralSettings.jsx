@@ -16,6 +16,11 @@ import Input from './Input';
 
 const GeneralSettings = ({ active, state, actions }) => {
     const { units, reverseWidgets, autoReconnect, safeRetractHeight } = state;
+    let baudRateDisabled = true;
+    if (state.controller.type === '') {
+        baudRateDisabled = false;
+    }
+
     return (
         <div className={classNames(
             styles.hidden,
@@ -30,9 +35,11 @@ const GeneralSettings = ({ active, state, actions }) => {
                 <div className={styles.generalArea}>
                     <div className={styles.halfContainer}>
                         <Fieldset legend="Connection">
-                            <div className={styles.addMargin}>
+                            <div className={baudRateDisabled ? styles.disabled : styles.addMargin}>
                                 <Baudrates baudrate={state.baudrate} onChange={(option) => actions.general.setBaudrate(option)} />
                                 <br />
+                            </div>
+                            <div className={styles.reconnect}>
                                 <ToggleSwitch
                                     label="Re-connect automatically"
                                     checked={autoReconnect}

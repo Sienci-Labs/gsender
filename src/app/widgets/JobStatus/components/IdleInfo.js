@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
@@ -11,12 +12,14 @@ import { IMPERIAL_UNITS, METRIC_UNITS } from '../../../constants';
  * Idle Information component displaying job information when status is set to idle
  * @param {Object} state Default state given from parent component
  */
-const IdleInfo = ({ state }) => {
+const IdleInfo = ({ state, props }) => {
     const {
         bbox: { delta, min, max },
         units,
         total,
+        elapsedTime,
         remainingTime,
+        lastFileRan,
         fileName,
         fileSize,
         toolsAmount,
@@ -70,6 +73,18 @@ const IdleInfo = ({ state }) => {
         return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
     };
 
+    const outputFormattedTimeForLastFile = (givenTime) => {
+        //Given time is a unix timestamp to be compared to unix timestamp 0
+        const elapsedMinute = moment(moment(givenTime)).diff(moment.unix(0), 'minutes');
+        const elapsedSecond = String((moment(moment(givenTime)).diff(moment.unix(0), 'seconds')));
+
+        //Grab last two characters in the elapsedSecond variable, which represent the seconds that have passed
+        const strElapsedSecond = `${(elapsedSecond[elapsedSecond.length - 2] !== undefined ? elapsedSecond[elapsedSecond.length - 2] : '')}${String(elapsedSecond[elapsedSecond.length - 1])}`;
+        const formattedSeconds = Number(strElapsedSecond) < 59 ? Number(strElapsedSecond) : `${Number(strElapsedSecond) - 60}`;
+
+        return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
+    };
+
     /**
      * Determine the file size format between bytes, kilobytes (KB) and megabytes (MB)
      */
@@ -85,6 +100,15 @@ const IdleInfo = ({ state }) => {
 
         return `${fileSize} bytes`;
     };
+
+    if (elapsedTime > 0) {
+        state.lastFileRan = state.lastFileRan;
+        state.lastFileRunLength = state.lastFileRunLength;
+        state.fileSize = fileSizeFormat(state.fileSize);
+    }
+
+    // let fileSizeToDisplay = fileSizeFormat(state.fileSize);
+    let elapsedTimeToDisplay = outputFormattedTimeForLastFile(state.lastFileRunLength);
 
     return fileName ? (
         <div className={styles['idle-info']}>
@@ -119,6 +143,15 @@ const IdleInfo = ({ state }) => {
                     <br />
                     {`${max.z} ${units} (Z)`}
                 </FileStat>
+                <FileStat label="Previous Run">
+                    {`FileName: ${lastFileRan}`}
+                    <br />
+                    {`Run Length: ${elapsedTimeToDisplay}`}
+                    {/* <br />
+                    {`FileSize: ${fileSizeToDisplay}`} */}
+                    {/* <br />
+                    {`Run Length: ${elapsedTimeToDisplay}`} */}
+                </FileStat>
             </div>
         </div>
     ) : (
@@ -130,6 +163,15 @@ const IdleInfo = ({ state }) => {
                 <FileStat label="Dimensions">-</FileStat>
                 <FileStat label="Minimum">-</FileStat>
                 <FileStat label="Maximum">-</FileStat>
+                <FileStat label="Previous Run">
+                    {`FileName: ${lastFileRan}`}
+                    <br />
+                    {`Run Length: ${elapsedTimeToDisplay}`}
+                    {/*
+                    {`FileSize: ${fileSizeToDisplay}`} */}
+                    {/* <br />
+                    {`Run Length: ${elapsedTimeToDisplay}`} */}
+                </FileStat>
             </div>
         </div>
     );

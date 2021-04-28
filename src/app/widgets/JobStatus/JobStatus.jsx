@@ -15,12 +15,13 @@ class JobStatus extends PureComponent {
     };
 
     render() {
+        let lastFile = this.props.lastFile;
         const { state } = this.props;
         const { isRunningJob } = state;
         return (
             <div className={styles['job-status-wrapper']}>
                 {!isRunningJob
-                    ? <IdleInfo state={state} />
+                    ? <IdleInfo state={state} lastFile={lastFile} />
                     : <Overrides state={state} />
                 }
             </div>

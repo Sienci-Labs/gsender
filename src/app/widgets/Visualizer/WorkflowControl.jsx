@@ -47,8 +47,6 @@ class WorkflowControl extends PureComponent {
             closeFile: false,
             showRecent: false,
             showLoadFile: false,
-            filetoLoad: '',
-            recentFiles: [JSON.parse(localStorage.getItem('Recent Gcode Files:'))]
         };
     }
 
@@ -66,8 +64,6 @@ class WorkflowControl extends PureComponent {
         const files = event.target.files;
         const file = files[0];
         const reader = new FileReader();
-        // let recentFiles = actions.savegCodeFilenameAsRecentFile(file.name, file);
-        // this.setState({ recentFiles: recentFiles });
         reader.onloadend = (event) => {
             const { result, error } = event.target;
 
@@ -97,10 +93,6 @@ class WorkflowControl extends PureComponent {
         } catch (err) {
             // Ignore error
         }
-    };
-
-    handleLoadRecent = (event) => {
-        console.log(event);
     };
 
     canRun() {
