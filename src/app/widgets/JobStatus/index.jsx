@@ -85,13 +85,17 @@ class JobStatusWidget extends PureComponent {
         },
         'sender:status': (data) => {
             const { total, sent, received, startTime, finishTime, elapsedTime, fileName, size, remainingTime, name } = data;
-            this.config.set('lastFile', fileName);
-            this.config.set('lastFileSize', size);
-            this.config.set('lastFileRunLength', elapsedTime);
+            if (data.finishTime > 0) {
+                this.config.set('lastFile', fileName);
+                this.config.set('lastFileSize', size);
+                this.config.set('lastFileRunLength', elapsedTime);
+                this.setState({
+                    lastFileRan: name,
+                    lastFileSize: size,
+                    lastFileRunLength: elapsedTime,
+                });
+            }
             this.setState({
-                lastFileRan: name,
-                lastFileSize: size,
-                lastFileRunLength: elapsedTime,
                 total,
                 sent,
                 received,
@@ -212,8 +216,16 @@ class JobStatusWidget extends PureComponent {
     }
 
     componentWillUnmount() {
+        const {
+            fileName,
+            fileSize,
+            elapsedTime
+        } = this.state;
         this.removeControllerEvents();
         this.unsubscribe();
+        this.config.set('lastFile', fileName);
+        this.config.set('lastFileSize', fileSize);
+        this.config.set('lastFileRunLength', elapsedTime);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -221,14 +233,8 @@ class JobStatusWidget extends PureComponent {
             minimized,
             spindleSpeed,
             probeFeedrate,
-            fileName,
-            fileSize,
-            elapsedTime
         } = this.state;
 
-        this.config.set('lastFile', fileName);
-        this.config.set('lastFileSize', fileSize);
-        this.config.set('lastFileRunLength', elapsedTime);
         this.config.set('minimized', minimized);
         this.config.set('speed', spindleSpeed);
         this.config.set('probeFeedrate', Number(probeFeedrate));
@@ -363,9 +369,6 @@ class JobStatusWidget extends PureComponent {
                 });
 
                 this.setState({
-                    lastFile: file.name,
-                    fileName: file.name,
-                    fileSize: file.size,
                     total: file.total,
                     toolsAmount: file.toolSet.size,
                     toolsUsed: file.toolSet,

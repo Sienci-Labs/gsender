@@ -13,7 +13,7 @@ import { Tooltip } from 'app/components/Tooltip';
 import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
-import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
+import { Toaster, TOASTER_DANGER, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import {
     // Grbl
     GRBL,
