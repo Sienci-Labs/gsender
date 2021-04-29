@@ -360,6 +360,8 @@ class GrblController {
                 return;
             }
 
+            this.emit('serialport:read', line);
+
             this.connection.write(line + '\n');
             log.silly(`> ${line}`);
         });
@@ -459,6 +461,7 @@ class GrblController {
 
             const { hold, sent, received } = this.sender.state;
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
+                this.emit('serialport:read', res.raw);
                 if (hold && (received + 1 >= sent)) {
                     log.debug(`Continue sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
                     this.sender.unhold();
@@ -469,6 +472,7 @@ class GrblController {
             }
 
             if ((this.workflow.state === WORKFLOW_STATE_PAUSED) && (received < sent)) {
+                this.emit('serialport:read', res.raw);
                 if (!hold) {
                     log.error('The sender does not hold off during the paused state');
                 }
