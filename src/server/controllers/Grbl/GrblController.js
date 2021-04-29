@@ -349,10 +349,10 @@ class GrblController {
                 return;
             }
 
-            if (this.workflow.state === WORKFLOW_STATE_IDLE) {
-                log.error(`Unexpected workflow state: ${this.workflow.state}`);
-                return;
-            }
+            // if (this.workflow.state === WORKFLOW_STATE_IDLE) {
+            //     log.error(`Unexpected workflow state: ${this.workflow.state}`);
+            //     return;
+            // }
 
             line = String(line).trim();
             if (line.length === 0) {
@@ -368,6 +368,7 @@ class GrblController {
         this.sender.on('start', (startTime) => {
             this.actionTime.senderFinishTime = 0;
         });
+
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
         });
@@ -410,6 +411,7 @@ class GrblController {
         this.runner.on('raw', noop);
 
         this.runner.on('status', (res) => {
+            // console.log(`runner on status ${res}`);
             this.actionMask.queryStatusReport = false;
 
             if (this.actionMask.replyStatusReport) {
@@ -456,7 +458,6 @@ class GrblController {
             }
 
             const { hold, sent, received } = this.sender.state;
-
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
                 if (hold && (received + 1 >= sent)) {
                     log.debug(`Continue sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
@@ -546,6 +547,24 @@ class GrblController {
         });
 
         this.runner.on('parserstate', (res) => {
+            //errors in gCode file
+            let messageType = '';
+            if (this.sender.state.holdReason !== null && this.runner.state.status.activeState === 'Check') {
+                messageType = 'error';
+                this.emit('task:finish', this.sender.state, messageType);
+                this.workflow.resumeTesting();
+                this.write('Error found in file...');
+            }
+            //finished searching gCode file
+            if (this.sender.state.finishTime > 0 && this.runner.state.status.activeState === 'Check') {
+                messageType = 'finished';
+                this.command('gcode', '$c');
+                this.workflow.stopTesting();
+                this.emit('task:finish', this.sender.state, messageType);
+                return;
+            }
+
+
             this.actionMask.queryParserState.state = false;
             this.actionMask.queryParserState.reply = true;
 

@@ -153,3 +153,5 @@ export default class JogSpeeds extends Component {
         );
     }
 }
+// overflow: hidden;
+//                             white-space: nowrap;

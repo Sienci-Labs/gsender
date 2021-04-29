@@ -76,6 +76,7 @@ class PreferencesPage extends PureComponent {
                 normalFeedrate: this.probeConfig.get('probeFeedrate', {}),
                 fastFeedrate: this.probeConfig.get('probeFastFeedrate', {}),
                 probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
+                connectivityTest: this.probeConfig.get('connectivityTest', true)
             },
             visualizer: {
                 theme: this.visualizerConfig.get('theme'),
@@ -340,6 +341,16 @@ class PreferencesPage extends PureComponent {
                     }
                 });
             },
+            changeConnectivityTest: (value) => {
+                const probeSettings = { ...this.state.probeSettings };
+                this.setState({
+                    probeSettings: {
+                        ...probeSettings,
+                        connectivityTest: value
+                    }
+                });
+                pubsub.publish('probe:test', value);
+            }
         },
         visualizer: {
             handleThemeChange: (theme) => {
@@ -501,6 +512,7 @@ class PreferencesPage extends PureComponent {
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
+        this.probeConfig.set('connectivityTest', probeSettings.connectivityTest);
 
         controller.command('settings:updated', this.state);
 

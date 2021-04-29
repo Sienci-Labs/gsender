@@ -399,6 +399,7 @@ class ProbeWidget extends PureComponent {
             useSafeProbeOption: false,
             availableProbeCommands: [],
             selectedProbeCommand: 0,
+            connectivityTest: this.config.get('connectivityTest')
         };
     }
 
@@ -834,6 +835,11 @@ class ProbeWidget extends PureComponent {
                     touchplate: touchplate
                 }, () => {
                     this.actions.generatePossibleProbeCommands();
+                });
+            }),
+            pubsub.subscribe('probe:test', (msg, value) => {
+                this.setState({
+                    connectivityTest: value
                 });
             })
 

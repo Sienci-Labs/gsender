@@ -107,6 +107,7 @@ const defaultState = {
                 type: 'end mill'
             }
         ],
+        recentFiles: []
     },
     widgets: {
         axes: {
@@ -250,6 +251,7 @@ const defaultState = {
         probe: {
             minimized: false,
             probeCommand: 'G38.2',
+            connectivityTest: true,
             useTLO: false,
             probeDepth: 10,
             probeFeedrate: {

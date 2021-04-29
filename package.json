@@ -85,7 +85,8 @@
     },
     "nsis": {
       "allowToChangeInstallationDirectory": true,
-      "oneClick": false
+      "oneClick": false,
+      "license": "LICENSE"
     },
     "publish": {
       "provider": "github"

@@ -112,6 +112,17 @@ const normalizeState = (state) => {
         set(state, 'widgets.axes.axes', defaultAxes);
     }
 
+    //
+    // Remember recent files
+    //
+    const storedRecentFiles = ensureArray(get(cnc.state, 'workspace.recentFiles'));
+    const defaultRecentFiles = ensureArray(get(defaultState, 'workspace.recentFiles'));
+    if (configuredAxes.length > 0) {
+        set(state, 'workspace.recentFiles', storedRecentFiles);
+    } else {
+        set(state, 'workspace.recentFiles', defaultRecentFiles);
+    }
+
     // Get user tool definitions
     const userTools = ensureArray(get(cnc.state, 'workspace.tools'));
     const defaultTools = ensureArray(get(defaultState, 'workspace.tools'));

@@ -118,10 +118,10 @@ export default class Options extends Component {
      */
     handleToggle = (id) => {
         const { machineProfile } = this.state;
-
+        const value = !machineProfile[id];
         const updatedObj = {
             ...machineProfile,
-            [id]: !machineProfile[id]
+            [id]: value
         };
 
         store.replace('workspace.machineProfile', updatedObj);
@@ -188,6 +188,7 @@ export default class Options extends Component {
 
     render() {
         const { machineProfile, machineProfiles, units } = this.state;
+        console.log(machineProfile);
         const { state } = this.props;
         const { endstops, spindle, mm, in: inches, company, name, type } = machineProfile;
         const disableEndstops = this.shouldDisableEndstops(state);

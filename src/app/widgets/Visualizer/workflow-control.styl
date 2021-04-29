@@ -14,6 +14,10 @@
     }
 }
 
+.relative-wrapper {
+    position relative;
+}
+
 .icon {
     display: inline-block;
     width: 14px;
@@ -153,6 +157,14 @@
 
     &-upload {
         color = #3e85c7;
+        btn-mixin(color);
+    }
+    &-hidden {
+        display: none;
+    }
+     &-test {
+        color =#5191cc;
+        btn-mixin(color)
         btn-mixin(color);
     }
 

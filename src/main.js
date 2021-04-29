@@ -1,5 +1,5 @@
 import '@babel/polyfill';
-import { app, ipcMain } from 'electron';
+import { app, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -10,9 +10,9 @@ import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
 import './sentryInit';
+import { parseAndReturnGCode } from './electron-app/RecentFiles';
 
 /* Whether to include menu or no */
-const BUILD_DEV = false;
 
 // The selection menu
 /*const selectionMenu = Menu.buildFromTemplate([
@@ -140,8 +140,14 @@ const main = () => {
             ipcMain.on('restart_app', () => {
                 autoUpdater.quitAndInstall();
             });
+            ipcMain.on('load-recent-file', async (msg, recentFile) => {
+                const fileMetadata = await parseAndReturnGCode(recentFile);
+                window.webContents.send('loaded-recent-file', fileMetadata);
+            });
         } catch (err) {
-            console.error('Error:', err);
+            await dialog.showMessageBox({
+                message: `Error - ${err.message}!`
+            });
         }
     });
 };

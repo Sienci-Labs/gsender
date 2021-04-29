@@ -38,7 +38,7 @@ const SpeedControl = ({ state, actions }) => {
                 />
             </div>
             <div className={styles.controlGroup}>
-                <span>Speed ({units}/min)</span>
+                <span className={styles.speed}>Speed ({units}/min)</span>
                 <NumberInput
                     value={feedrate}
                     min={speedMin}

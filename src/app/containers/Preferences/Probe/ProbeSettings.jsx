@@ -8,6 +8,7 @@ import Tools from '../Tools/Tools';
 
 import Fieldset from '../FieldSet';
 import Input from '../Input';
+import ToggleSwitch from '../../../components/ToggleSwitch';
 
 
 const ProbeSettings = ({ active, state, actions }) => {
@@ -60,6 +61,14 @@ const ProbeSettings = ({ active, state, actions }) => {
                             additionalProps={{ type: 'number', id: 'retraction' }}
                             units={units}
                         />
+
+                        <div className={styles.inputSpread}>
+                            <label htmlFor="probeConnectivityTest">Probe connectivity test</label>
+                            <ToggleSwitch
+                                checked={probeSettings.connectivityTest}
+                                onChange={probeActions.changeConnectivityTest}
+                            />
+                        </div>
                     </Fieldset>
 
                     <Fieldset legend="Touch Plate" className={styles['mb-0']}>

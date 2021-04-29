@@ -445,5 +445,6 @@
     "Stop Job": "Stop Job",
     "Add New Macro": "Add New Macro",
     "No macros...": "No macros...",
-    "Close File": "Close File"
+    "Test Run File": "Test Run File",
+    "Test Run Gcode File": "Test Run Gcode File"
 }

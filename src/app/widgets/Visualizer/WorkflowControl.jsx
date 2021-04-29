@@ -5,13 +5,15 @@ import includes from 'lodash/includes';
 import PropTypes from 'prop-types';
 import pick from 'lodash/pick';
 import log from 'app/lib/log';
+import isElectron from 'is-electron';
+import controller from 'app/lib/controller';
 import React, { PureComponent } from 'react';
 import i18n from 'app/lib/i18n';
 import { Tooltip } from 'app/components/Tooltip';
 import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
-import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import {
     // Grbl
     GRBL,
@@ -30,12 +32,15 @@ import {
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
 import styles from './workflow-control.styl';
+import RecentFileButton from './RecentFileButton';
+import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
 
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
+        invalidGcode: PropTypes.string
     };
 
     fileInputEl = null;
@@ -44,6 +49,8 @@ class WorkflowControl extends PureComponent {
 
     getInitialState() {
         return {
+            testStarted: false,
+            fileLoaded: true,
             closeFile: false,
             showRecent: false,
             showLoadFile: false,
@@ -64,6 +71,12 @@ class WorkflowControl extends PureComponent {
         const files = event.target.files;
         const file = files[0];
         const reader = new FileReader();
+
+        if (isElectron()) {
+            const recentFile = createRecentFileFromRawPath(file.path, file.name);
+            addRecentFile(recentFile);
+        }
+
         reader.onloadend = (event) => {
             const { result, error } = event.target;
 
@@ -94,6 +107,24 @@ class WorkflowControl extends PureComponent {
             // Ignore error
         }
     };
+
+    loadRecentFile = (fileMetadata) => {
+        const { actions } = this.props;
+        if (fileMetadata === null) {
+            Toaster.pop({
+                type: TOASTER_DANGER,
+                msg: 'Unable to load file - file may have been moved or renamed.'
+            });
+            return;
+        }
+        const { result, name, size } = fileMetadata;
+        const meta = {
+            name: name,
+            size: size
+        };
+
+        actions.uploadFile(result, meta);
+    }
 
     canRun() {
         const { state } = this.props;
@@ -146,15 +177,89 @@ class WorkflowControl extends PureComponent {
 
     handleOnStop = () => {
         const { actions: { handlePause, handleStop } } = this.props;
+
         handlePause();
         handleStop();
+        if (this.state.fileLoaded === false) {
+            controller.command('gcode', '$C');
+            this.setState({ testStarted: false });
+        }
     }
 
-    handleShowRecentFiles = (event) => {
-        let clickedValue = event.currentTarget.innerHTML;
-        this.setState({ showLoadFile: true });
-        this.setState({ filetoLoad: clickedValue });
+
+    handleTestFile = (event) => {
+        const { actions } = this.props;
+        this.setState({ testStarted: true });
+        controller.command('gcode', '$c');
+        actions.onRunClick();
     };
+
+    startRun = () => {
+        this.setState({ fileLoaded: true });
+        this.setState({ testStarted: true });
+        const { actions } = this.props;
+        actions.onRunClick();
+    }
+
+    componentDidMount() {
+        this.addControllerEvents();
+        if (isElectron()) {
+            window.ipcRenderer.on('loaded-recent-file', (msg, fileMetaData) => {
+                this.loadRecentFile(fileMetaData);
+                const recentFile = createRecentFile(fileMetaData);
+                addRecentFile(recentFile);
+            });
+        }
+    }
+
+    componentWillUnmount() {
+        this.removeControllerEvents();
+    }
+
+    addControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.addListener(eventName, callback);
+        });
+    }
+
+    removeControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.removeListener(eventName, callback);
+        });
+    }
+
+    finishedTestingFileToast = () => {
+        Toaster.pop({
+            msg: `Finished Checking ${this.state.CurrentGCodeFile}!`,
+            type: TOASTER_UNTIL_CLOSE,
+            duration: 10000
+        });
+    }
+
+    errorInGCodeToast = () => {
+        Toaster.pop({
+            msg: `Error found at line: ${this.state.CurrentGCodeError}`,
+            type: TOASTER_UNTIL_CLOSE,
+            duration: 20000
+        });
+    }
+
+    controllerEvents = {
+        'task:finish': (data, message) => {
+            if (message === 'finished') {
+                this.setState({ CurrentGCodeFile: data.name });
+                this.finishedTestingFileToast();
+            }
+
+            if (message === 'error') {
+                this.setState({ CurrentGCodeFile: data.name });
+                this.setState({ CurrentGCodeError: this.props.invalidGcode });
+                this.errorInGCodeToast();
+            }
+        }
+    }
 
     render() {
         const { cameraPosition } = this.props.state;
@@ -169,6 +274,9 @@ class WorkflowControl extends PureComponent {
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflow.state);
         // const canClose = isReady && includes([WORKFLOW_STATE_IDLE], workflow.state);
         // const canUpload = isReady ? canClose : (canClick && !gcode.loading);
+        if (this.props.state.filename !== '') {
+            this.state.fileLoaded = false;
+        }
 
         return (
             <div className={styles.workflowControl}>
@@ -185,16 +293,18 @@ class WorkflowControl extends PureComponent {
                     accept=".gcode,.gc,.nc,.tap,.cnc"
                 />
 
-                <button
-                    type="button"
-                    className={`${styles['workflow-button-upload']}`}
-                    title={i18n._('Load File')}
-                    onClick={this.handleClickUpload}
-                    // disabled={!canUpload}
-                    style={{ writingMode: 'vertical-lr' }}
-                >
-                    {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
-                </button>
+                <div className={styles.relativeWrapper}>
+                    <button
+                        type="button"
+                        className={`${styles['workflow-button-upload']}`}
+                        title={i18n._('Load File')}
+                        onClick={this.handleClickUpload}
+                        style={{ writingMode: 'vertical-lr' }}
+                    >
+                        {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
+                    </button>
+                    <RecentFileButton />
+                </div>
                 <Tooltip
                     placement="top"
                     content={i18n._('Close File')}
@@ -212,9 +322,23 @@ class WorkflowControl extends PureComponent {
                     canRun && (
                         <button
                             type="button"
+                            className={this.state.fileLoaded ? `${styles['workflow-button-hidden']}` : `${styles['workflow-button-test']}`}
+                            title={i18n._('Test Run Gcode File')}
+                            onClick={this.handleTestFile}
+                            disabled={!canRun}
+                            style={{ writingMode: 'vertical-lr' }}
+                        >
+                            {i18n._('Test Run File')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
+                        </button>
+                    )
+                }
+                {
+                    canRun && (
+                        <button
+                            type="button"
                             className={styles['workflow-button-play']}
                             title={workflow.state === WORKFLOW_STATE_PAUSED ? i18n._('Resume') : i18n._('Run')}
-                            onClick={actions.onRunClick}
+                            onClick={this.startRun}
                             disabled={!canRun}
                         >
                             {i18n._(`${workflow.state === 'paused' ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
