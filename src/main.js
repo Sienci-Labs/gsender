@@ -140,12 +140,8 @@ const main = () => {
             ipcMain.on('restart_app', () => {
                 autoUpdater.quitAndInstall();
             });
-
             ipcMain.on('load-recent-file', async (msg, recentFile) => {
                 const fileMetadata = await parseAndReturnGCode(recentFile);
-                await dialog.showMessageBox({
-                    message: `${fileMetadata}`
-                });
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
         } catch (err) {

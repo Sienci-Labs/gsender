@@ -25,6 +25,8 @@ import {
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
 import styles from './workflow-control.styl';
+import RecentFileButton from './RecentFileButton';
+import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
@@ -34,14 +36,10 @@ class WorkflowControl extends PureComponent {
 
     fileInputEl = null;
 
-    handleClickUpload = (fileMetadata) => {
-        window.ipcRenderer.send('load-recent-file', fileMetadata);
+    handleClickUpload = (event) => {
+        this.fileInputEl.value = null;
+        this.fileInputEl.click();
     };
-
-    testRecentFile = () => {
-        console.log('test');
-        window.ipcRenderer.send('load-recent-file', { filePath: 'C:\\test.gcode' });
-    }
 
     handleChangeFile = (event) => {
         const { actions } = this.props;
@@ -49,10 +47,13 @@ class WorkflowControl extends PureComponent {
         const file = files[0];
         const reader = new FileReader();
 
+        if (isElectron()) {
+            const recentFile = createRecentFileFromRawPath(file.path, file.name);
+            addRecentFile(recentFile);
+        }
+
         reader.onloadend = (event) => {
             const { result, error } = event.target;
-            console.log(result);
-            console.log(error);
 
             if (error) {
                 log.error(error);
@@ -152,8 +153,9 @@ class WorkflowControl extends PureComponent {
     componentDidMount() {
         if (isElectron()) {
             window.ipcRenderer.on('loaded-recent-file', (msg, fileMetaData) => {
-                console.log(fileMetaData);
                 this.loadRecentFile(fileMetaData);
+                const recentFile = createRecentFile(fileMetaData);
+                addRecentFile(recentFile);
             });
         }
     }
@@ -187,15 +189,19 @@ class WorkflowControl extends PureComponent {
                     accept=".gcode,.gc,.nc,.tap,.cnc"
                 />
 
-                <button
-                    type="button"
-                    className={`${styles['workflow-button-upload']}`}
-                    title={i18n._('Load File')}
-                    onClick={this.testRecentFile}
-                    style={{ writingMode: 'vertical-lr' }}
-                >
-                    {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
-                </button>
+                <div className={styles.relativeWrapper}>
+                    <button
+                        type="button"
+                        className={`${styles['workflow-button-upload']}`}
+                        title={i18n._('Load File')}
+                        onClick={this.handleClickUpload}
+                        style={{ writingMode: 'vertical-lr' }}
+                    >
+                        {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
+                    </button>
+                    <RecentFileButton />
+                </div>
+
 
                 {
                     canRun && (

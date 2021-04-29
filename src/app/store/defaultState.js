@@ -107,6 +107,7 @@ const defaultState = {
                 type: 'end mill'
             }
         ],
+        recentFiles: []
     },
     widgets: {
         axes: {

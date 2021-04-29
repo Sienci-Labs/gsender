@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require('fs').promises;
 const fsBase = require('fs');
-const { dialog } = require('electron');
 
 const getFileInformation = (file) => {
     const fileName = path.parse(file).base;
@@ -18,16 +17,17 @@ const fileExistsAtPath = async (filePath) => {
     }
 };
 
-
 export const parseAndReturnGCode = async ({ filePath }) => {
     const [fileDir, fileName] = getFileInformation(filePath);
 
     try {
+        const fileExists = await fileExistsAtPath(filePath);
+        if (!fileExists) {
+            return null; // TODO: Handle null as FILENOTFOUND error
+        }
+
         const stats = fsBase.statSync(filePath);
         const { size } = stats;
-        await dialog.showMessageBox({
-            message: `size - ${size}`
-        });
 
         const data = await fs.readFile(filePath, 'utf-8');
         return {
@@ -35,12 +35,8 @@ export const parseAndReturnGCode = async ({ filePath }) => {
             size: size,
             name: fileName,
             dir: fileDir,
-            timeUploaded: Date.now()
         };
     } catch (err) {
-        await dialog.showMessageBox({
-            message: `Error in readFile: ${err}`
-        });
-        return err;
+        throw err;
     }
 };
