@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import controller from 'app/lib/controller';
-
 import styles from './machine-status-area.styl';
 import UnlockAlarmButton from './UnlockAlarmButton';
 
@@ -24,6 +23,7 @@ export default class ControlArea extends Component {
         controller.command('unlock');
     }
 
+
     render() {
         const { controller, port } = this.props.state;
         const { state = {} } = controller;
@@ -39,6 +39,7 @@ export default class ControlArea extends Component {
             Sleep: 'Sleep',
             Alarm: 'Alarm',
             Disconnected: 'Disconnected',
+
         };
 
         /**
@@ -55,7 +56,15 @@ export default class ControlArea extends Component {
                             <UnlockAlarmButton onClick={this.unlock} />
                         </div>
                     );
-                } else {
+                } else if (state.status?.activeState === 'Check') {
+                    return (
+                        <div className={styles['machine-status-wrapper']}>
+                            <div className={styles['machine-Jog']}>
+                             Checking Gcode File...
+                            </div>
+                        </div>
+                    );
+                } {
                     return state.status?.activeState //Show disconnected until machine connection process is finished, otherwise an empty div is shown
                         ? (
                             <div className={styles[`machine-${state.status.activeState}`]}>

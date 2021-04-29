@@ -1,22 +1,19 @@
 @import './theme';
 @import '../../styles/variables';
 
-PRIMARY_COLOR = #3e85c7
+PRIMARY_COLOR = #3e85c7;
 
 .widget {
     height: 100%;
 
-
     &.widget-borderless {
         border: none;
-        .widget-header,
-        .widget-content,
-        .widget-footer {
+
+        .widget-header, .widget-content, .widget-footer {
             border: 0;
         }
-        .widget-header + .widget-content,
-        .widget-header + .widget-footer,
-        .widget-content + .widget-footer {
+
+        .widget-header + .widget-content, .widget-header + .widget-footer, .widget-content + .widget-footer {
             border-top: 1px solid #ccc;
         }
     }
@@ -34,6 +31,7 @@ PRIMARY_COLOR = #3e85c7
             display: none;
         }
     }
+
     &.widget-fullscreen {
         .widget-content {
             position: absolute;
@@ -42,6 +40,7 @@ PRIMARY_COLOR = #3e85c7
             bottom: 0;
             left: 0;
         }
+
         .widget-header + .widget-content {
             position: absolute;
             top: 34px; // .widget-header height
@@ -56,6 +55,7 @@ PRIMARY_COLOR = #3e85c7
         background-color: #d1d5db;
         position: relative;
     }
+
     .widget-header-fixed {
         cursor: default;
     }
@@ -80,7 +80,6 @@ PRIMARY_COLOR = #3e85c7
         margin-bottom: 0;
         padding: 0 10px;
         color: PRIMARY_COLOR;
-
         // Truncate string with ellipsis
         text-overflow: ellipsis;
         overflow: hidden;
@@ -89,8 +88,7 @@ PRIMARY_COLOR = #3e85c7
         max-width: 100%;
     }
 
-    .widget-content,
-    .widget-footer {
+    .widget-content, .widget-footer {
         border: solid 1px #9CA3AF;
     }
 
@@ -103,9 +101,11 @@ PRIMARY_COLOR = #3e85c7
         padding: 0;
         margin: 0;
     }
+
     .widget-content {
         height: calc(100% - 1.9rem);
         padding: 15px;
+        min-width: 330px;
         background-color: #e5e7eb;
     }
 
@@ -116,6 +116,7 @@ PRIMARY_COLOR = #3e85c7
         cursor: auto;
         width: auto;
         background-color: transparent;
+
         .widget-button {
             min-width: 30px;
             height: 32px;
@@ -135,17 +136,19 @@ PRIMARY_COLOR = #3e85c7
             &.disabled:hover {
                 background-color: inherit;
             }
-            // &:hover {
-            //     background-color: rgba(0, 0, 0, .05);
-            // }
 
+            // &:hover {
+            // background-color: rgba(0, 0, 0, .05);
+            // }
             &.inverted {
                 color: #fff;
                 background-color: #404040;
             }
+
             &.inverted:hover {
                 background-color: #222;
             }
+
             &.inverted.disabled {
                 opacity: .4;
             }

@@ -1324,6 +1324,7 @@ class VisualizerWidget extends PureComponent {
                                 }}
                                 state={state}
                                 actions={actions}
+                                invalidGcode={this.state.invalidLine.line}
                             />
 
                             {
