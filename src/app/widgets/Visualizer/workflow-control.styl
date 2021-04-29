@@ -55,7 +55,7 @@
             disabled-color = rgba(color, 0.5);
 
             background-color: disabled-color;
-            color: rgba(black, 0.2);
+            color: rgba(black, 0.6);
         }
 
         &:not(:disabled):hover {
@@ -66,6 +66,13 @@
 
     &-upload {
         color = #3e85c7;
+        btn-mixin(color)
+    }
+    &-hidden {
+        display: none;
+    }
+     &-test {
+        color =#5191cc;
         btn-mixin(color)
     }
 
