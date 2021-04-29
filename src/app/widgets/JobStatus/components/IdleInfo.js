@@ -163,15 +163,7 @@ const IdleInfo = ({ state, props }) => {
                 <FileStat label="Dimensions">-</FileStat>
                 <FileStat label="Minimum">-</FileStat>
                 <FileStat label="Maximum">-</FileStat>
-                <FileStat label="Previous Run">
-                    {`FileName: ${lastFileRan}`}
-                    <br />
-                    {`Run Length: ${elapsedTimeToDisplay}`}
-                    {/*
-                    {`FileSize: ${fileSizeToDisplay}`} */}
-                    {/* <br />
-                    {`Run Length: ${elapsedTimeToDisplay}`} */}
-                </FileStat>
+                <FileStat label="Previous Run">-</FileStat>
             </div>
         </div>
     );

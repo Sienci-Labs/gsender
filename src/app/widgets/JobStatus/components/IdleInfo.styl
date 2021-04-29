@@ -3,7 +3,7 @@
     height: 100%;
     display: flex;
     flex-grow: 1;
-    align-items center;
+    align-items: center;
     flex-wrap: wrap;
     justify-content: space-evenly;
     gap: 1rem;
@@ -16,12 +16,13 @@
     flex-direction: column;
     height: 100%;
 }
+
 .idle-info-row {
     display: flex;
     flex-direction: row;
-    justify-content space-around;
+    justify-content: space-around;
     width: 100%;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     background: #e5e7eb;
 }
 
@@ -46,13 +47,14 @@
 
 .file-stat {
     display: flex;
-    flex-direction column;
+    flex-direction: column;
     border-left: solid 3px #d1d5db;
     width: 20%;
     padding-left: 1em;
-    align-items center;
+    align-items: center;
     flex-grow: 1;
-    box-sizing border-box;
+    box-sizing: border-box;
+
     &:first-child {
         border: none;
     }
@@ -60,21 +62,20 @@
 
 .file-stat-container {
     display: flex;
-    flex-direction column;
-    justify-content space-between;
-    align-items center;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
     flex-grow: 1;
-
 }
 
 .file-stat-content {
-    font-size: 0.9em;
+    font-size: .9em;
     font-weight: bold;
-    text-align center;
+    text-align: center;
 }
 
 .file-stat-label {
-    margin-top: 0.5em;
+    margin-top: .5em;
     color: #6b7280;
-    text-align center;
+    text-align: center;
 }
