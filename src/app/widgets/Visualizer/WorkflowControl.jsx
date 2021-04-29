@@ -27,6 +27,8 @@ import {
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
 import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
+import { TOASTER_DANGER } from '../../lib/toaster/ToasterLib';
+import Toaster from '../../lib/toaster/Toaster';
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
@@ -85,6 +87,13 @@ class WorkflowControl extends PureComponent {
 
     loadRecentFile = (fileMetadata) => {
         const { actions } = this.props;
+        if (fileMetadata === null) {
+            Toaster.pop({
+                type: TOASTER_DANGER,
+                msg: 'Unable to load file - file may have been moved or renamed.'
+            });
+            return;
+        }
         const { result, name, size } = fileMetadata;
         const meta = {
             name: name,

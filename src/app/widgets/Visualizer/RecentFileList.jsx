@@ -3,7 +3,7 @@ import cx from 'classnames';
 import { loadRecentFile } from './ClientRecentFiles';
 import styles from './RecentFileList.styl';
 
-const RecentFileList = ({ visible, recentFiles }) => {
+const RecentFileList = ({ visible, recentFiles, setShowPullout }) => {
     return (
         <div className={cx({ [styles.hidden]: !visible })}>
             <div className={cx(styles.recentFileList)}>
@@ -15,10 +15,10 @@ const RecentFileList = ({ visible, recentFiles }) => {
                             <button
                                 key={recentFile.filePath}
                                 className={styles.recentFile}
-                                onClick={() => loadRecentFile(recentFile.filePath)}
+                                onClick={() => loadRecentFile(recentFile.filePath) && setShowPullout(false)}
                                 title={`${recentFile.filePath} - Loaded ${date}`}
                             >
-                                {recentFile.fileName}
+                                <span>{recentFile.fileName}</span>
                             </button>
                         );
                     })

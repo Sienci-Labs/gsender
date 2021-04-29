@@ -1,5 +1,6 @@
 import store from 'app/store';
 import pubsub from 'pubsub-js';
+import { TOASTER_DANGER, Toaster } from '../../lib/toaster/ToasterLib';
 
 export const RECENT_FILE_LIMIT = 5;
 
@@ -34,6 +35,13 @@ export const updateRecentFileDate = (filepath, recentFiles) => {
 };
 
 export const addRecentFile = (fileMetaData) => {
+    if (fileMetaData === null) {
+        Toaster.pop({
+            type: TOASTER_DANGER,
+            msg: 'Unable to load file - file may have been moved or deleted.'
+        });
+        return;
+    }
     const recentFiles = getRecentFiles();
     let sortedFiles;
 
@@ -74,4 +82,5 @@ export const sortRecentFiles = (recentFiles = []) => {
 
 export const loadRecentFile = (filePath) => {
     window.ipcRenderer.send('load-recent-file', { filePath: filePath });
+    return true;
 };

@@ -43,7 +43,6 @@
 
 .recent-file {
   width: 100%;
-  text-overflow: ellipsis;
   padding: 0.5rem;
   border-radius 0.25rem;
   color: #6c6c6c;
@@ -52,7 +51,19 @@
   border-bottom: solid 1px #9d9d9d;
   outline: none;
   background: rgba(255, 255, 255, 0.7)
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   &:hover {
     background: rgba(255, 255, 255, 0.9)
+  }
+  &:focus {
+    outline: none;
   }
 }
