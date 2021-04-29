@@ -248,8 +248,6 @@ class WorkflowControl extends PureComponent {
         }
     }
 
-
-
     render() {
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;

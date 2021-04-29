@@ -26,7 +26,7 @@ const RecentFileButton = () => {
             tabIndex={0}
         >
             <i className="fas fa-chevron-right" />
-            <RecentFileList visible={showPullout} recentFiles={recentFiles} setShowPullout={setShowPullout()} />
+            <RecentFileList visible={showPullout} recentFiles={recentFiles} setShowPullout={setShowPullout} />
         </div>
     );
 };
