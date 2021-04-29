@@ -120,7 +120,7 @@ class Login extends PureComponent {
                 )}
                 <div className={styles.login}>
                     <div className={styles.logo}>
-                        <img src="images/logo-square-256x256.png" alt="" />
+                        <img src="images/icon-square.png" alt="" />
                     </div>
                     <div className={styles.title}>
                         {i18n._('Sign in to {{name}}', { name: settings.productName })}

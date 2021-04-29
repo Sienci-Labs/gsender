@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import classNames from 'classnames';
 import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';

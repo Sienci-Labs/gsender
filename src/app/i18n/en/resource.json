@@ -444,5 +444,6 @@
     "Pause Job": "Pause Job",
     "Stop Job": "Stop Job",
     "Add New Macro": "Add New Macro",
-    "No macros...": "No macros..."
+    "No macros...": "No macros...",
+    "Close File": "Close File"
 }

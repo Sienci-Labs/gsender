@@ -1,10 +1,10 @@
 .control-area {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 6fr 1fr 0;
     gap: 1.5rem;
     position: absolute;
     top: 20px;
-    right: 20px;
+    right: 0;
     left: 20px;
     pointer-events: none;
 }
@@ -54,7 +54,7 @@
     justify-self: center;
     font-size: clamp(1rem, 1.15vw, 2rem);
     height: calc(var(--vh, 1vh) * 10);
-    max-height: 70px
+    max-height: 70px;
     border-radius: 5px;
     width: 100%;
     max-width: 255px;
@@ -117,24 +117,24 @@
 
     &-Hold {
         bgColor = rgb(217, 119, 6);
-        color = rgb(255, 255, 255, 0.8);
-        status-mixin(bgColor, color)
+        color = rgb(255, 255, 255, .8);
+        status-mixin(bgColor, color);
     }
 
     &-Jog {
-        bgColor = rgb(6,184,129);
+        bgColor = rgb(6, 184, 129);
         color = rgb(255, 255, 255);
         status-mixin(bgColor, color);
     }
 }
 
 .big-text {
-    font-size: 5rem !important
-    color: #06b881
+    font-size: 5rem !important;
+    color: #06b881;
 }
 
 .unlock-machine {
     color: #3e85c7;
-    font-weight bold;
+    font-weight: bold;
     font-size: 1.2rem;
 }

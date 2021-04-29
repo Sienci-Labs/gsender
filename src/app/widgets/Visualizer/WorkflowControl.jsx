@@ -1,11 +1,17 @@
+/* eslint-disable jsx-a11y/interactive-supports-focus */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import get from 'lodash/get';
 import includes from 'lodash/includes';
-import pick from 'lodash/pick';
 import PropTypes from 'prop-types';
+import pick from 'lodash/pick';
+import log from 'app/lib/log';
 import React, { PureComponent } from 'react';
 import i18n from 'app/lib/i18n';
-import log from 'app/lib/log';
+import { Tooltip } from 'app/components/Tooltip';
+import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
+import FunctionButton from '../../components/FunctionButton/FunctionButton';
+import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 import {
     // Grbl
     GRBL,
@@ -25,6 +31,7 @@ import {
 } from '../../constants';
 import styles from './workflow-control.styl';
 
+
 class WorkflowControl extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
@@ -33,17 +40,30 @@ class WorkflowControl extends PureComponent {
 
     fileInputEl = null;
 
+    state = this.getInitialState();
+
+    getInitialState() {
+        return {
+            closeFile: false,
+            showRecent: false,
+            showLoadFile: false,
+        };
+    }
+
     handleClickUpload = (event) => {
         this.fileInputEl.value = null;
         this.fileInputEl.click();
     };
 
-    handleChangeFile = (event) => {
+    handleCloseFile = () => {
+        this.setState({ closeFile: true });
+    }
+
+    handleChangeFile = (event, fileToLoad) => {
         const { actions } = this.props;
         const files = event.target.files;
         const file = files[0];
         const reader = new FileReader();
-
         reader.onloadend = (event) => {
             const { result, error } = event.target;
 
@@ -126,10 +146,15 @@ class WorkflowControl extends PureComponent {
 
     handleOnStop = () => {
         const { actions: { handlePause, handleStop } } = this.props;
-
         handlePause();
         handleStop();
     }
+
+    handleShowRecentFiles = (event) => {
+        let clickedValue = event.currentTarget.innerHTML;
+        this.setState({ showLoadFile: true });
+        this.setState({ filetoLoad: clickedValue });
+    };
 
     render() {
         const { cameraPosition } = this.props.state;
@@ -170,7 +195,19 @@ class WorkflowControl extends PureComponent {
                 >
                     {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
                 </button>
-
+                <Tooltip
+                    placement="top"
+                    content={i18n._('Close File')}
+                    hideOnClick
+                >
+                    <button
+                        type="button"
+                        className={this.props.state.gcode.content ? `${styles['workflow-button-split-top']}` : `${styles['workflow-button-disabled']}`}
+                        onClick={this.handleCloseFile}
+                    >
+                        <i className="fas fa-times" />
+                    </button>
+                </Tooltip>
                 {
                     canRun && (
                         <button
@@ -184,6 +221,96 @@ class WorkflowControl extends PureComponent {
                         </button>
                     )
                 }
+                {
+                    this.state.closeFile && (
+                        <Modal showCloseButton={false}>
+                            <Modal.Header className={styles.modalHeader}>
+                                <Modal.Title>Are You Sure?</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <div className={styles.runProbeBody}>
+                                    <div className={styles.left}>
+                                        <div className={styles.greyText}>
+                                            <p>Close this gcode File?</p>
+                                        </div>
+                                        <div className={styles.buttonsContainer}>
+                                            <FunctionButton
+                                                primary
+                                                onClick={() => {
+                                                    this.setState({ closeFile: false });
+                                                    actions.closeModal();
+                                                    actions.unloadGCode();
+                                                    actions.reset();
+                                                    Toaster.pop({
+                                                        msg: 'Gcode File Closed',
+                                                        type: TOASTER_INFO,
+                                                        icon: 'fa-exclamation'
+                                                    });
+                                                }}
+                                            >
+                                                Yes
+                                            </FunctionButton>
+                                            <FunctionButton
+                                                className={styles.activeButton}
+                                                onClick={() => {
+                                                    this.setState({ closeFile: false });
+                                                    actions.closeModal();
+                                                }}
+                                            >
+                                                No
+                                            </FunctionButton>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </Modal.Body>
+                        </Modal>
+                    )
+                }
+
+                {this.state.showLoadFile && (
+                    <Modal showCloseButton={false}>
+                        <Modal.Header className={styles.modalHeader}>
+                            <Modal.Title>Are You Sure?</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div className={styles.runProbeBody}>
+                                <div className={styles.left}>
+                                    <div className={styles.greyText}>
+                                        <p>Load {this.state.filetoLoad}?</p>
+                                    </div>
+                                    <div className={styles.buttonsContainer}>
+                                        <FunctionButton
+                                            primary
+                                            onClick={() => {
+                                                this.handleLoadRecent(this.state.filetoLoad);
+                                                this.setState({ showLoadFile: false });
+                                                actions.closeModal();
+                                                Toaster.pop({
+                                                    msg: `${this.state.filetoLoad} Loaded...`,
+                                                    type: TOASTER_INFO,
+                                                    icon: 'fa-exclamation'
+                                                });
+                                            }}
+                                        >
+                                                Yes
+                                        </FunctionButton>
+                                        <FunctionButton
+                                            className={styles.activeButton}
+                                            onClick={() => {
+                                                this.setState({ closeFile: false });
+                                                actions.closeModal();
+                                            }}
+                                        >
+                                                No
+                                        </FunctionButton>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </Modal.Body>
+                    </Modal>
+                )}
 
                 {
                     canPause && (

@@ -123,7 +123,7 @@ class Header extends PureComponent {
                     body: code === 0
                         ? i18n._('Command succeeded')
                         : i18n._('Command failed ({{err}})', { err: err }),
-                    icon: 'images/logo-badge-32x32.png',
+                    icon: 'images/icon-round.png',
                     timeout: 10 * 1000,
                     onClick: function () {
                         window.focus();
@@ -153,7 +153,7 @@ class Header extends PureComponent {
             if (cmd && this.state.pushPermission === Push.Permission.GRANTED) {
                 Push.create(cmd.title, {
                     body: i18n._('Command failed ({{err}})', { err: err }),
-                    icon: 'images/logo-badge-32x32.png',
+                    icon: 'images/icon-round.png',
                     timeout: 10 * 1000,
                     onClick: function () {
                         window.focus();

@@ -84,9 +84,14 @@ class JobStatusWidget extends PureComponent {
             });
         },
         'sender:status': (data) => {
-            const { total, sent, received, startTime, finishTime, elapsedTime, remainingTime, name } = data;
-
+            const { total, sent, received, startTime, finishTime, elapsedTime, fileName, size, remainingTime, name } = data;
+            this.config.set('lastFile', fileName);
+            this.config.set('lastFileSize', size);
+            this.config.set('lastFileRunLength', elapsedTime);
             this.setState({
+                lastFileRan: name,
+                lastFileSize: size,
+                lastFileRunLength: elapsedTime,
                 total,
                 sent,
                 received,
@@ -216,8 +221,14 @@ class JobStatusWidget extends PureComponent {
             minimized,
             spindleSpeed,
             probeFeedrate,
+            fileName,
+            fileSize,
+            elapsedTime
         } = this.state;
 
+        this.config.set('lastFile', fileName);
+        this.config.set('lastFileSize', fileSize);
+        this.config.set('lastFileRunLength', elapsedTime);
         this.config.set('minimized', minimized);
         this.config.set('speed', spindleSpeed);
         this.config.set('probeFeedrate', Number(probeFeedrate));
@@ -233,6 +244,9 @@ class JobStatusWidget extends PureComponent {
 
     getInitialState() {
         return {
+            lastFileRan: this.config.get('lastFile', ''),
+            lastFileSize: this.config.get('lastFileSize', ''),
+            lastFileRunLength: this.config.get('lastFileRunLength', ''),
             minimized: this.config.get('minimized', false),
             spindleSpeed: this.config.get('speed', 1000),
             probeFeedrate: Number(this.config.get('probeFeedrate') || 0).toFixed(3) * 1,
@@ -349,6 +363,7 @@ class JobStatusWidget extends PureComponent {
                 });
 
                 this.setState({
+                    lastFile: file.name,
                     fileName: file.name,
                     fileSize: file.size,
                     total: file.total,
