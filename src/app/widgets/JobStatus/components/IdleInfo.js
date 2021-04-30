@@ -130,7 +130,6 @@ const IdleInfo = ({ state, props }) => {
         state.fileSize = fileSizeFormat(state.fileSize);
     }
 
-    // let fileSizeToDisplay = fileSizeFormat(state.fileSize);
     let elapsedTimeToDisplay = outputFormattedTimeForLastFile(state.lastFileRunLength);
 
     return fileName ? (
@@ -142,7 +141,7 @@ const IdleInfo = ({ state, props }) => {
                 </FileStat>
                 <FileStat label="Spindle">
                     {
-                        (spindleRates.length > 0) ? `${spindleMin} to ${spindleMax} RPM` : 'No Spindle Commands'
+                        (spindleRates.length > 0) ? `${spindleMin} to ${spindleMax} RPM` : 'No Spindle'
                     }
                     <br />
                     {toolsAmount > 0 ? `${toolsAmount} (${formattedToolsUsed()})` : 'No Tools'}
