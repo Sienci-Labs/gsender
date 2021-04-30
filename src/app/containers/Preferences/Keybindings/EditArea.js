@@ -95,7 +95,10 @@ export default class EditArea extends Component {
             ArrowRight: 'right',
             ArrowUp: 'up',
             ArrowDown: 'down',
-            Delete: 'delete',
+            Delete: 'del',
+            Insert: 'ins',
+            End: 'end',
+            Home: 'home',
         }[e.key];
 
         const key = keyMap || e.key.toLowerCase();
