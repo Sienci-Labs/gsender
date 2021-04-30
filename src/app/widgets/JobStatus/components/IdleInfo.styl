@@ -83,12 +83,19 @@
     justify-content: space-between;
     align-items: center;
     flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .file-stat-content {
     font-size: .9em;
     font-weight: bold;
     text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .file-stat-label {
@@ -101,6 +108,6 @@
     overflow: hidden;
     white-space:nowrap
     text-overflow: ellipsis;
-    max-width: 200px;
+    min-width: 0;
     display: block;
 }

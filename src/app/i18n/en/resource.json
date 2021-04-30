@@ -446,6 +446,5 @@
     "Add New Macro": "Add New Macro",
     "No macros...": "No macros...",
     "Test Run File": "Test Run File",
-    "Test Run Gcode File": "Test Run Gcode File",
-    "Close File": "Close File"
+    "Test Run Gcode File": "Test Run Gcode File"
 }
