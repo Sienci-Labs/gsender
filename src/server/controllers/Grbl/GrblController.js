@@ -50,7 +50,7 @@ import {
     GRBL_REALTIME_COMMANDS,
     GRBL_ALARMS,
     GRBL_ERRORS,
-    GRBL_SETTINGS
+    GRBL_SETTINGS, GRBL_ACTIVE_STATE_HOME
 } from './constants';
 import { METRIC_UNITS } from '../../../app/constants';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
@@ -1254,6 +1254,8 @@ class GrblController {
                 this.event.trigger('homing');
 
                 this.writeln('$H');
+                this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
+                this.emit('controller:state', GRBL, this.state);
             },
             'sleep': () => {
                 this.event.trigger('sleep');
