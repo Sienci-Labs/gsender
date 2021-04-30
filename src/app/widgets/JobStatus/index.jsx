@@ -298,6 +298,7 @@ class JobStatusWidget extends PureComponent {
 
             fileName: '',
             fileSize: 0,
+            estimatedTime: 0,
 
             // G-code Status (from server)
             total: 0,
@@ -390,7 +391,8 @@ class JobStatusWidget extends PureComponent {
                     toolsAmount: file.toolSet.size,
                     toolsUsed: file.toolSet,
                     spindleRates: spindleRates,
-                    feedRates: feedRates
+                    feedRates: feedRates,
+                    estimatedTime: file.estimatedTime,
                 });
             }),
             pubsub.subscribe('units:change', (msg, units) => {
