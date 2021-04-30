@@ -169,7 +169,7 @@ const IdleInfo = ({ state, props }) => {
                     {`${max.z} ${units} (Z)`}
                 </FileStat>
                 <FileStat label="Previous Run">
-                    {`FileName: ${lastFileRan}`}
+                    <span className={styles.textWrap}>{`${lastFileRan}`}</span>
                     <br />
                     {`Run Length: ${elapsedTimeToDisplay}`}
                 </FileStat>
