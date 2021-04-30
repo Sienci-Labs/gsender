@@ -44,7 +44,7 @@ export default class ControlArea extends Component {
     render() {
         const { controller, port } = this.props.state;
         const { state = {} } = controller;
-        const activeState = state?.status?.activeState || '';
+
         //Object to customize the message of the active machine state
         const message = {
             Idle: 'Idle',

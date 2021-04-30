@@ -28,7 +28,7 @@ const GoToButton = ({ onClick, disabled }) => {
             onKeyDown={onClick}
             className={styles['go-to-button']}
         >
-            <span>Goto</span>
+            <span>Go to</span>
         </button>
     );
 };
