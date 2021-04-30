@@ -553,6 +553,19 @@ class Firmware extends PureComponent {
                         </div>
                         <div className={styles.buttonsContainer}>
                             <div className={styles.buttonsTop}>
+                                {this.state.initiateFlashing ? (
+                                    <ToolsNotificationModal
+                                        title="Grbl Flashing"
+                                        onClose={() => this.setState({ initiateFlashing: false })}
+                                        show={this.state.initiateFlashing}
+                                        footer="This process will disconnect your machine, and may take a couple minutes to complete."
+                                        footerTwo="Continue?"
+                                        yesFunction={this.actions.startFlash}
+                                    >
+                                        This feature exists to flash the GRBL firmware onto compatible Arduino boards only!
+                                        Improper flashing could damage your device on port: {this.state.port}.
+                                    </ToolsNotificationModal>
+                                ) : ''}
                                 <ToolModalButton icon="fas fa-bolt" onClick={this.startFlashing}>
                                     Flash GRBL
                                 </ToolModalButton>
