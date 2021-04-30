@@ -20,19 +20,31 @@ import classnames from 'classnames';
 import styles from './index.styl';
 
 
-const UnlockAlarmButton = ({ onClick }) => {
+const UnlockAlarmButton = ({ onClick, newMessage }) => {
     return (
-        <div className={styles.alarmButtonWrap}>
-            <button className={styles.alarmButton} onClick={onClick}>
-                <i
-                    className={classnames('fas', 'fa-unlock')}
-                    role="button"
-                    tabIndex={-1}
-                />
+        newMessage ? (
+            <div className={styles.alarmButtonWrap}>
+                <button className={styles.alarmButton} onClick={onClick}>
+                    <i
+                        className={classnames('fas', 'fa-unlock')}
+                        role="button"
+                        tabIndex={-1}
+                    />
+                    {newMessage}
+                </button>
+            </div>
+        ) : (
+            <div className={styles.alarmButtonWrap}>
+                <button className={styles.alarmButton} onClick={onClick}>
+                    <i
+                        className={classnames('fas', 'fa-unlock')}
+                        role="button"
+                        tabIndex={-1}
+                    />
                 Click to Unlock Machine
-            </button>
-        </div>
-
+                </button>
+            </div>
+        )
     );
 };
 

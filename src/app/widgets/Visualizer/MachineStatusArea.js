@@ -40,6 +40,9 @@ export default class ControlArea extends Component {
         controller.command('unlock');
     }
 
+    handleHomeMachine = () => {
+        controller.command('homing');
+    }
 
     render() {
         const { controller, port } = this.props.state;
@@ -56,7 +59,6 @@ export default class ControlArea extends Component {
             Sleep: 'Sleep',
             Alarm: 'Alarm',
             Disconnected: 'Disconnected',
-
         };
 
         /**
@@ -64,6 +66,22 @@ export default class ControlArea extends Component {
          */
         const machineStateRender = () => {
             if (port) {
+                if (this.props.state.controller.state !== undefined) {
+                    if (this.props.state.controller.state.status !== undefined) {
+                        let alarmCode = this.props.state.controller.state.status.alarmCode;
+                        let softLimitsEnabled = this.props.state.controller.settings.settings.$20;
+                        if (alarmCode === 2 && softLimitsEnabled === '1') {
+                            return (
+                                <div className={styles['machine-status-wrapper']}>
+                                    <div className={styles['machine-Alarm']}>
+                                        {state.status.activeState} ({state.status.alarmCode}){' '}
+                                    </div>
+                                    <UnlockAlarmButton newMessage="Click To Home Machine" onClick={this.handleHomeMachine} />
+                                </div>
+                            );
+                        }
+                    }
+                }
                 if (state.status?.activeState === 'Alarm') {
                     return (
                         <div className={styles['machine-status-wrapper']}>
