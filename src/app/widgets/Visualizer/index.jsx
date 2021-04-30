@@ -86,6 +86,7 @@ import {
     DARK_THEME_VALUES
 } from './constants';
 import styles from './index.styl';
+import { calculateJobTime } from './helpers';
 
 const translateExpression = (function() {
     const { Parser } = ExpressionEvaluator;
@@ -289,6 +290,25 @@ class VisualizerWidget extends PureComponent {
                 }
             }
 
+            const feeds = [...movementSet].map(item => Number(item.slice(1)));
+            const maxFeed = Math.max(...feeds);
+
+            const mPos = this.state.machinePosition;
+
+            const machinePosition = [
+                Number(mPos.x),
+                Number(mPos.y),
+                Number(mPos.z),
+            ];
+
+            const estimatedTime = calculateJobTime({
+                lines,
+                currentPos: machinePosition,
+                options: { maxFeed }
+            });
+
+            console.log(estimatedTime);
+
             if (invalidGcode.size > 0) {
                 this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
                 if (this.state.invalidGcode.shouldShow) {
@@ -305,7 +325,7 @@ class VisualizerWidget extends PureComponent {
 
             this.setState({ total });
 
-            pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet });
+            pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
 
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
