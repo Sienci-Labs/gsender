@@ -1,3 +1,20 @@
+/*
+ *     This file is part of gSender.
+ *
+ *     gSender is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     gSender is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 .modalFirmware {
     position: fixed;
     left: 0;
@@ -13,16 +30,16 @@
     z-index: 1000;
     text-align: center;
   }
-  
+
   .modalFirmware.enter-done {
     opacity: 1;
     pointer-events: visible;
   }
-  
+
   .modalFirmware.exit {
     opacity: 1;
   }
-  
+
   .modal-content {
     border-top: 5px solid red;
     position: absolute;
@@ -33,26 +50,26 @@
     background-color: #fff;
     transition: all 0.3s ease-in-out;
   }
-  
+
   .modalFirmware.enter-done .modal-content {
     transform: translateY(0);
   }
-  
+
   .modalFirmware.exit .modal-content {
     transform: translateY(-200px);
   }
-  
+
   .modal-header, .modal-footer {
     padding: 10px;
   }
-  
+
   .modal-header {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 14px;
   }
-  
+
   .modal-footer {
     display: flex;
     flex-direction: column;
@@ -63,19 +80,19 @@
     height: 52%;
     margin-top: -10%;
   }
-  
+
   .modal-title {
     margin: 0;
     font-size: 2rem;
   }
-  
+
   .modal-body {
     height: 45%;
     font-size: 1.5rem;
     padding: 4%;
     border-top: 1px solid #eee;
   }
-  
+
   .button {
     border: 1px solid #9ca3af;
     color: #D1D5DB;
@@ -90,7 +107,7 @@
     --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   }
-  
+
   .button:hover {
     border: 1px solid #3e85c7;
     color: #3e85c7;
@@ -100,23 +117,23 @@
     --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   }
-  
+
   .buttonContainer {
     width: 100%;
     display: flex;
     justify-content: center;
   }
-  
+
   .footer-text {
     font-size: 1.5rem;
     text-align: center;
   }
-  
+
   .footer-textTwo {
     margin-top: 0%;
     font-size: 1.5rem;
   }
-  
+
   .redButton {
     border-radius: .25rem;
     width: 100%;
@@ -133,7 +150,7 @@
     cursor: pointer;
     text-align: center;
   }
-  
+
   .redButton:hover {
     transition: 200ms ease-in-out;
     background-color: #E5E7EB;

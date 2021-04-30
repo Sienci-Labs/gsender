@@ -1,3 +1,20 @@
+/*
+ *     This file is part of gSender.
+ *
+ *     gSender is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     gSender is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 /* eslint-disable jsx-a11y/interactive-supports-focus */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import get from 'lodash/get';
@@ -9,7 +26,6 @@ import isElectron from 'is-electron';
 import controller from 'app/lib/controller';
 import React, { PureComponent } from 'react';
 import i18n from 'app/lib/i18n';
-import { Tooltip } from 'app/components/Tooltip';
 import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
@@ -304,20 +320,14 @@ class WorkflowControl extends PureComponent {
                         {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
                     </button>
                     <RecentFileButton />
-                </div>
-                <Tooltip
-                    placement="top"
-                    content={i18n._('Close File')}
-                    hideOnClick
-                >
-                    <button
-                        type="button"
-                        className={this.props.state.gcode.content ? `${styles['workflow-button-split-top']}` : `${styles['workflow-button-disabled']}`}
+                    <div
+                        role="button"
+                        className={this.props.state.gcode.content ? `${styles.closeFileButton}` : `${styles['workflow-button-disabled']}`}
                         onClick={this.handleCloseFile}
                     >
                         <i className="fas fa-times" />
-                    </button>
-                </Tooltip>
+                    </div>
+                </div>
                 {
                     canRun && (
                         <button
@@ -391,51 +401,6 @@ class WorkflowControl extends PureComponent {
                         </Modal>
                     )
                 }
-
-                {this.state.showLoadFile && (
-                    <Modal showCloseButton={false}>
-                        <Modal.Header className={styles.modalHeader}>
-                            <Modal.Title>Are You Sure?</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <div className={styles.runProbeBody}>
-                                <div className={styles.left}>
-                                    <div className={styles.greyText}>
-                                        <p>Load {this.state.filetoLoad}?</p>
-                                    </div>
-                                    <div className={styles.buttonsContainer}>
-                                        <FunctionButton
-                                            primary
-                                            onClick={() => {
-                                                this.handleLoadRecent(this.state.filetoLoad);
-                                                this.setState({ showLoadFile: false });
-                                                actions.closeModal();
-                                                Toaster.pop({
-                                                    msg: `${this.state.filetoLoad} Loaded...`,
-                                                    type: TOASTER_INFO,
-                                                    icon: 'fa-exclamation'
-                                                });
-                                            }}
-                                        >
-                                                Yes
-                                        </FunctionButton>
-                                        <FunctionButton
-                                            className={styles.activeButton}
-                                            onClick={() => {
-                                                this.setState({ closeFile: false });
-                                                actions.closeModal();
-                                            }}
-                                        >
-                                                No
-                                        </FunctionButton>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </Modal.Body>
-                    </Modal>
-                )}
-
                 {
                     canPause && (
                         <button

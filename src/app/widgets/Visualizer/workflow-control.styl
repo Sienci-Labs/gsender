@@ -1,3 +1,20 @@
+/*
+ *     This file is part of gSender.
+ *
+ *     gSender is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     gSender is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 .workflow-control {
     position: absolute;
     left: 20px;
@@ -64,6 +81,24 @@
     margin-top: 7%;
 }
 
+.closeFileButton {
+    position: absolute;
+    bottom: 0;
+    right: 1rem;
+    border-left: solid 1px #FFFFFF;
+    height: 50%;
+    min-width: 30px;
+    display flex;
+    align-items center;
+    justify-content center;
+    z-index: 10;
+    color: #ffffff;
+    i {
+        margin: 0;
+        padding: 0;
+    }
+}
+
 .recentFilesContainer {
     position: absolute;
     border: 1px solid white;
@@ -98,8 +133,8 @@
     }
 
     &-split-top {
-        left: 132px;
-        top: -3px;
+        right: 132px;
+        bottom: 0;
         padding: 4px;
         color: white;
         position: absolute;
