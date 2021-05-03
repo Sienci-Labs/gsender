@@ -17,7 +17,7 @@ const IdleInfo = ({ state, props }) => {
         bbox: { delta, min, max },
         units,
         total,
-        elapsedTime,
+        // elapsedTime,
         remainingTime,
         lastFileRan,
         fileName,
@@ -101,15 +101,7 @@ const IdleInfo = ({ state, props }) => {
         return `${fileSize} bytes`;
     };
 
-    if (elapsedTime > 0) {
-        state.lastFileRan = state.lastFileRan;
-        state.lastFileRunLength = state.lastFileRunLength;
-        state.fileSize = fileSizeFormat(state.fileSize);
-    }
-
-    // let fileSizeToDisplay = fileSizeFormat(state.fileSize);
     let elapsedTimeToDisplay = outputFormattedTimeForLastFile(state.lastFileRunLength);
-
     return fileName ? (
         <div className={styles['idle-info']}>
             <div><span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)</div>
@@ -147,10 +139,6 @@ const IdleInfo = ({ state, props }) => {
                     {`FileName: ${lastFileRan}`}
                     <br />
                     {`Run Length: ${elapsedTimeToDisplay}`}
-                    {/* <br />
-                    {`FileSize: ${fileSizeToDisplay}`} */}
-                    {/* <br />
-                    {`Run Length: ${elapsedTimeToDisplay}`} */}
                 </FileStat>
             </div>
         </div>
@@ -163,7 +151,16 @@ const IdleInfo = ({ state, props }) => {
                 <FileStat label="Dimensions">-</FileStat>
                 <FileStat label="Minimum">-</FileStat>
                 <FileStat label="Maximum">-</FileStat>
-                <FileStat label="Previous Run">-</FileStat>
+                {
+                    lastFileRan
+                        ? (
+                            <FileStat label="Previous Run">
+                                {`FileName: ${lastFileRan}`}
+                                <br />
+                                {`Run Length: ${elapsedTimeToDisplay}`}
+                            </FileStat>
+                        ) : <FileStat label="Previous Run">-</FileStat>
+                }
             </div>
         </div>
     );

@@ -535,7 +535,6 @@ class PreferencesPage extends PureComponent {
     }
 
     render() {
-        console.log(this.state);
         const { modalClose } = this.props;
         const state = { ...this.state };
         const actions = { ...this.actions };

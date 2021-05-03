@@ -60,5 +60,5 @@ export const LIGHT_THEME_VALUES = {
     G3Color: '#111827', // Light Blue
 };
 
-export const DARK_THEME = 'dark';
-export const LIGHT_THEME = 'light';
+export const DARK_THEME = 'Dark';
+export const LIGHT_THEME = 'Light';
