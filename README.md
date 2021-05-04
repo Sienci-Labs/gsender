@@ -1,4 +1,4 @@
-# gSender: connect to and control [Grbl](https://github.com/grbl/grbl)-based CNCs
+# ![gSender logo](https://github.com/Sienci-Labs/sender/blob/master/src/app/images/icon-git.png?raw=true)gSender: connect to and control [Grbl](https://github.com/grbl/grbl)-based CNCs
 
 gSender is a feature-packed CNC interface software designed to be clean and easy to learn while retaining a depth of capabilites for advanced users. Its development was begun out of a passion for hobby CNC machines: an interface rebuilt to suit the needs of the at-home CNC user.
 * Accepts standard, GRBL-compliant g-code and has been verified to work with many of the common CAM programs
