@@ -129,14 +129,14 @@ const IdleInfo = ({ state, props }) => {
         }
 
         if (time > 60 && (time / 60) < 60) {
-            return `${(time / 60).toFixed(2)} minutes`;
+            return `${Math.ceil((time / 60))} minute(s)`;
         }
 
         if ((time / 60) >= 60) {
-            return `${(time / 3600).toFixed(2)} hours`;
+            return `${Math.ceil((time / 3600))} hour(s)`;
         }
 
-        return `${time} seconds`;
+        return `${Math.ceil(time)} seconds`;
     };
 
     const feedString = (feedRates.length > 0) ? `${convertedFeedMin} to ${convertedFeedMax} ${feedUnits}` : 'No Feedrates';
