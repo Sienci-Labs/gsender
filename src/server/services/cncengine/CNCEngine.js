@@ -146,7 +146,9 @@ class CNCEngine {
         this.io = socketIO(this.server, {
             serveClient: true,
             path: '/socket.io',
-            connectTimeout: 50000
+            connectTimeout: 50000,
+            pingTimeout: 60000,
+            pingInterval: 45000
         });
 
         this.io.use(socketioJwt.authorize({
