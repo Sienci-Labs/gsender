@@ -26,7 +26,8 @@ const IdleInfo = ({ state, props }) => {
         toolsUsed,
         fileModal,
         feedRates,
-        spindleRates
+        spindleRates,
+        estimatedTime
     } = state;
 
     let convertedFeedMin, convertedFeedMax, feedUnits;
@@ -105,6 +106,22 @@ const IdleInfo = ({ state, props }) => {
         return `${fileSize} bytes`;
     };
 
+    const formatEstimatedTime = (time) => {
+        if (time <= 1) {
+            return '-';
+        }
+
+        if (time > 60 && (time / 60) < 60) {
+            return `${Math.ceil((time / 60))} minute(s)`;
+        }
+
+        if ((time / 60) >= 60) {
+            return `${Math.ceil((time / 3600))} hour(s)`;
+        }
+
+        return `${Math.ceil(time)} seconds`;
+    };
+
     const feedString = (feedRates.length > 0) ? `${convertedFeedMin} to ${convertedFeedMax} ${feedUnits}` : 'No Feedrates';
 
     if (elapsedTime > 0) {
@@ -115,12 +132,16 @@ const IdleInfo = ({ state, props }) => {
 
     let elapsedTimeToDisplay = outputFormattedTimeForLastFile(state.lastFileRunLength);
 
+    const formattedEstimateTime = formatEstimatedTime(estimatedTime);
+
     return fileName ? (
         <div className={styles['idle-info']}>
             <div><span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)</div>
             <div className={styles.idleInfoRow}>
                 <FileStat label="Attributes">
-                    {`${outputFormattedTime(remainingTime)}`}<br /> {`${feedString}`}
+                    {`${outputFormattedTime(remainingTime)}`}<br />
+                    {`${feedString}`} <br/>
+                    {`${formattedEstimateTime}`}
                 </FileStat>
                 <FileStat label="Spindle">
                     {
