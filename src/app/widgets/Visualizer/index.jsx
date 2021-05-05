@@ -86,7 +86,7 @@ import {
     DARK_THEME_VALUES
 } from './constants';
 import styles from './index.styl';
-import { calculateJobTime } from './helpers';
+import { GCodeProcessor } from './helpers/GCodeProcessor';
 
 const translateExpression = (function() {
     const { Parser } = ExpressionEvaluator;
@@ -248,7 +248,7 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
-            const comments = ['#', ';', '(']; // We assume an opening parenthesis indicates a header line
+            const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
 
             //Clean up lines and remove ones that are comments and headers
             const lines = gcode.split('\n')
@@ -290,24 +290,26 @@ class VisualizerWidget extends PureComponent {
                 }
             }
 
-            const feeds = [...movementSet].map(item => Number(item.slice(1)));
-            const maxFeed = Math.max(...feeds);
+            const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
 
-            const mPos = this.state.machinePosition;
+            let estimatedTime;
+            try {
+                processor.process(lines);
+                console.log(processor);
+                estimatedTime = processor.vmState.totalTime;
+            } catch (error) {
+                console.log(error.message);
+                estimatedTime = 0;
 
-            const machinePosition = [
-                Number(mPos.x),
-                Number(mPos.y),
-                Number(mPos.z),
-            ];
-
-            const estimatedTime = calculateJobTime({
-                lines,
-                currentPos: machinePosition,
-                options: { maxFeed }
-            });
-
-            console.log(estimatedTime);
+                this.setState(prev => ({
+                    gcode: {
+                        ...prev.gcode,
+                        loading: false,
+                        rendering: false,
+                        ready: true,
+                    }
+                }));
+            }
 
             if (invalidGcode.size > 0) {
                 this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
