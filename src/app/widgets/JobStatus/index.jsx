@@ -124,13 +124,13 @@ class JobStatusWidget extends PureComponent {
             });
         },
         'sender:status': (data) => {
-            const { total, sent, received, startTime, finishTime, elapsedTime, fileName, size, remainingTime, name } = data;
+            const { total, sent, received, startTime, finishTime, elapsedTime, size, remainingTime, name } = data;
             if (data.finishTime > 0) {
-                this.config.set('lastFile', fileName);
+                this.config.set('lastFile', this.state.fileName);
                 this.config.set('lastFileSize', size);
                 this.config.set('lastFileRunLength', elapsedTime);
                 this.setState({
-                    lastFileRan: name,
+                    lastFileRan: this.state.fileName,
                     lastFileSize: size,
                     lastFileRunLength: elapsedTime,
                 });
@@ -409,6 +409,7 @@ class JobStatusWidget extends PureComponent {
                 });
 
                 this.setState({
+                    fileName: file.name,
                     total: file.total,
                     toolsAmount: file.toolSet.size,
                     toolsUsed: file.toolSet,
@@ -463,7 +464,6 @@ class JobStatusWidget extends PureComponent {
 
     jobIsPaused() {
         const { workflow } = this.state;
-
         if (workflow.state === WORKFLOW_STATE_PAUSED) {
             return true;
         }
