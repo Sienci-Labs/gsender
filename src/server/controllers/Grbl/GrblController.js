@@ -1111,6 +1111,7 @@ class GrblController {
 
     emit(eventName, ...args) {
         Object.keys(this.sockets).forEach(id => {
+            console.log('called emit');
             const socket = this.sockets[id];
             socket.emit(eventName, ...args);
         });
@@ -1144,6 +1145,10 @@ class GrblController {
                 // let [values] = args;
                 const machineProfile = store.get('machineProfile');
                 this.emit('sender:status', machineProfile);
+            },
+            'gcode:fsLoad': () => {
+                console.log('fsload-called');
+                this.emit('gcode:fsLoad', 'test message');
             },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;

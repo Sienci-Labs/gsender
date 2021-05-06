@@ -20,26 +20,9 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
-/*
- *     This file is part of gSender.
- *
- *     gSender is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     gSender is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with gSender.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import {
@@ -56,6 +39,11 @@ class Probe extends PureComponent {
         actions: PropTypes.object,
         probeActive: PropTypes.bool
     };
+
+    testFS() {
+        console.log('called');
+        controller.command('gcode:fsLoad');
+    }
 
     render() {
         const { state, actions } = this.props;
@@ -105,6 +93,13 @@ class Probe extends PureComponent {
                     </div>
                     <div className="row no-gutters">
                         <div className="col-xs-12">
+                            <FunctionButton
+                                onClick={() => {
+                                    this.testFS();
+                                }}
+                            >
+                                TEST
+                            </FunctionButton>
                             <FunctionButton
                                 onClick={() => {
                                     actions.openModal(MODAL_PREVIEW);
