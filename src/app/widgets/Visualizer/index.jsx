@@ -109,6 +109,7 @@ import {
     DARK_THEME_VALUES
 } from './constants';
 import styles from './index.styl';
+import { GCodeProcessor } from './helpers/GCodeProcessor';
 
 const translateExpression = (function() {
     const { Parser } = ExpressionEvaluator;
@@ -270,7 +271,7 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
-            const comments = ['#', ';', '(']; // We assume an opening parenthesis indicates a header line
+            const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
 
             //Clean up lines and remove ones that are comments and headers
             const lines = gcode.split('\n')
@@ -312,6 +313,27 @@ class VisualizerWidget extends PureComponent {
                 }
             }
 
+            const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
+
+            let estimatedTime;
+            try {
+                processor.process(lines);
+                console.log(processor);
+                estimatedTime = processor.vmState.totalTime;
+            } catch (error) {
+                console.log(error.message);
+                estimatedTime = 0;
+
+                this.setState(prev => ({
+                    gcode: {
+                        ...prev.gcode,
+                        loading: false,
+                        rendering: false,
+                        ready: true,
+                    }
+                }));
+            }
+
             if (invalidGcode.size > 0) {
                 this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
                 if (this.state.invalidGcode.shouldShow) {
@@ -328,7 +350,7 @@ class VisualizerWidget extends PureComponent {
 
             this.setState({ total });
 
-            pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet });
+            pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
 
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
