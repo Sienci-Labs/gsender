@@ -86,8 +86,8 @@ class GcodeLine {
             this.origLine = arg.origLine;
             this.modified = arg.modified;
         } else {
-            // throw new XError(XError.INVALID_ARGUMENT, 'Invalid call to GcodeLine constructor');
-            throw new Error('Invalid call to GcodeLine constructor');
+            // throw new Error('Invalid call to GcodeLine constructor');
+            console.error('Invalid call to GcodeLine constructor');
         }
     }
 
@@ -116,12 +116,14 @@ class GcodeLine {
             } else if (letter === 'M') {
                 mgroup = modalGroupsMByCode[mgroup];
             } else {
-                // throw new XError(XError.INVALID_ARGUMENT, 'Can only use modal group parameter with G or M codes');
-                throw new Error('Can only use modal group parameter with G or M codes');
+                // throw new Error('Can only use modal group parameter with G or M codes');
+                console.error('Can only use modal group parameter with G or M codes');
+                return null;
             }
             if (!mgroup) {
-                // throw new XError(XError.INVALID_ARGUMENT, 'Could not find modal group for code ' + omgroup);
-                throw new Error('Could not find modal group for code ' + omgroup);
+                // throw new Error('Could not find modal group for code ' + omgroup);
+                console.error('Could not find modal group for code ' + omgroup);
+                return null;
             }
         }
         let mgroupMap;
@@ -149,8 +151,9 @@ class GcodeLine {
                     matches.push(word[1]);
                 } else {
                     if (matches !== null) {
-                        // throw new XError(XError.INVALID_ARGUMENT, 'Multiple words with the same letter on gcode line: ' + this.toString());
-                        throw new Error('Multiple words with the same letter on gcode line: ' + this.toString());
+                        // throw new Error('Multiple words with the same letter on gcode line: ' + this.toString());
+                        console.error('Multiple words with the same letter on gcode line: ' + this.toString());
+                        return null;
                     }
                     matches = word[1];
                 }
@@ -189,8 +192,9 @@ class GcodeLine {
         for (let i = 0; i < this.words.length; i++) {
             if (this.words[i][0] === letter) {
                 if (wordIdx !== null) {
-                    // throw new XError(XError.INVALID_ARGUMENT, 'Multiple words with the same letter on gcode line');
-                    throw new Error('Multiple words with the same letter on gcode line');
+                    // throw new Error('Multiple words with the same letter on gcode line');
+                    console.error('Multiple words with the same letter on gcode line');
+                    return null;
                 }
                 wordIdx = i;
             }
@@ -368,7 +372,8 @@ class GcodeLine {
                 this.words.push([matches[1].toUpperCase(), (matches[2].indexOf('.') === -1) ? parseInt(matches[2], 10) : parseFloat(matches[2])]);
                 lastIndex = wordRegex.lastIndex;
             } else {
-                throw new Error('Error parsing gcode line ' + line);
+                // throw new Error('Error parsing gcode line ' + line);
+                console.error('Error parsing gcode line ' + line);
             }
         }
     }
