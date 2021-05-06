@@ -53,6 +53,7 @@ import NavbarConnection from 'app/widgets/NavbarConnection';
 import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
+import FunctionButton from '../../components/FunctionButton/FunctionButton';
 //const releases = 'https://github.com/cncjs/cncjs/releases';
 
 
