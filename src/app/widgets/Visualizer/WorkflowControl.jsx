@@ -35,6 +35,7 @@ import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
+import ReaderWorker from './FileReader.worker';
 import { Toaster, TOASTER_DANGER, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import {
     // Grbl
@@ -88,23 +89,22 @@ class WorkflowControl extends PureComponent {
         this.setState({ closeFile: true });
     }
 
-    handleReaderResponse (event) {
-        console.log('in onmessage');
-        console.log(event.data);
+    handleReaderResponse = ({ data }) => {
+        const { actions } = this.props;
+        const { meta, result } = data;
+        actions.uploadFile(result, meta);
     }
 
     handleChangeFile = (event, fileToLoad) => {
-        //const { actions } = this.props;
         const files = event.target.files;
         const file = files[0];
-        //const reader = new FileReader();
 
         const meta = {
             name: file.name,
             size: file.size
         };
 
-        const readerWorker = new Worker('FileReader.worker.js');
+        const readerWorker = new ReaderWorker();
         readerWorker.onmessage = this.handleReaderResponse;
 
         if (isElectron()) {
@@ -116,34 +116,6 @@ class WorkflowControl extends PureComponent {
             file: file,
             meta: meta
         });
-        /*
-        reader.onloadend = (event) => {
-            const { result, error } = event.target;
-
-            if (error) {
-                log.error(error);
-                return;
-            }
-
-            log.debug('FileReader:', pick(file, [
-                'lastModified',
-                'lastModifiedDate',
-                'meta',
-                'name',
-                'size',
-                'type'
-            ]));
-
-
-            actions.uploadFile(result, meta);
-        };
-
-        try {
-            reader.readAsText(file);
-        } catch (err) {
-            // Ignore error
-        }
-       */
     };
 
     loadRecentFile = (fileMetadata) => {

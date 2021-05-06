@@ -304,6 +304,7 @@
     "watch": "~1.0.2",
     "webappengine": "~1.2.0",
     "winston": "~3.2.1",
+    "worker-loader": "^3.0.8",
     "xterm": "~3.0.2"
   },
   "devDependencies": {
