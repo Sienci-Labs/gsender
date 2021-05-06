@@ -271,86 +271,35 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
-            const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
+            //Prevent thread blocking
+            setTimeout(() => {
+                const payload = this.processGCode(gcode);
 
-            //Clean up lines and remove ones that are comments and headers
-            const lines = gcode.split('\n')
-                .filter(line => (line.trim().length > 0))
-                .filter(line => !comments.some(comment => line.includes(comment)));
+                const {
+                    total,
+                    toolSet,
+                    spindleSet,
+                    movementSet,
+                    invalidGcode,
+                    estimatedTime,
+                } = payload;
 
-            const tCommandRegex = /^[T]+[0-9]+/g;
-            const fCommandRegex = /[F]+[0-9]+/g;
-            const sCommandRegex = /[S]+[0-9]+/g;
-            const invalidGCodeRegex = /([^NGMXYZIJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
-
-            const toolSet = new Set();
-            const spindleSet = new Set();
-            const movementSet = new Set();
-            const invalidGcode = new Set();
-
-            const collectCommandInstance = (line, set, command) => {
-                const lineItems = line.split(' ');
-                //Find the line item with the command and add it to the set
-                for (const item of lineItems) {
-                    if (item[0] === command) {
-                        set.add(item.trim());
+                if (invalidGcode.size > 0) {
+                    this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
+                    if (this.state.invalidGcode.shouldShow) {
+                        Toaster.pop({
+                            msg: `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
+                            type: TOASTER_WARNING,
+                            duration: TOASTER_LONG,
+                            icon: 'fa-exclamation-triangle'
+                        });
                     }
                 }
-            };
-            //Iterate over the lines and use regex against them
-            for (const line of lines) {
-                if (tCommandRegex.test(line)) {
-                    collectCommandInstance(line, toolSet, 'T');
-                }
-                if (fCommandRegex.test(line)) {
-                    collectCommandInstance(line, movementSet, 'F');
-                }
-                if (sCommandRegex.test(line)) {
-                    collectCommandInstance(line, spindleSet, 'S');
-                }
-                if (invalidGCodeRegex.test(line)) {
-                    invalidGcode.add(line);
-                }
-            }
 
-            const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
+                this.setState({ total });
 
-            let estimatedTime;
-            try {
-                processor.process(lines);
-                console.log(processor);
-                estimatedTime = processor.vmState.totalTime;
-            } catch (error) {
-                console.log(error.message);
-                estimatedTime = 0;
-
-                this.setState(prev => ({
-                    gcode: {
-                        ...prev.gcode,
-                        loading: false,
-                        rendering: false,
-                        ready: true,
-                    }
-                }));
-            }
-
-            if (invalidGcode.size > 0) {
-                this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
-                if (this.state.invalidGcode.shouldShow) {
-                    Toaster.pop({
-                        msg: `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
-                        type: TOASTER_WARNING,
-                        duration: TOASTER_LONG,
-                        icon: 'fa-exclamation-triangle'
-                    });
-                }
-            }
-
-            const total = lines.length + 1; //Dwell line added after every gcode parse
-
-            this.setState({ total });
-
-            pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
+                pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
+            }, 0);
 
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
@@ -999,6 +948,38 @@ class VisualizerWidget extends PureComponent {
 
     pubsubTokens = [];
 
+    processGCode = (gcode) => {
+        const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
+
+        //Clean up lines and remove ones that are comments and headers
+        const lines = gcode.split('\n')
+            .filter(line => (line.trim().length > 0))
+            .filter(line => !comments.some(comment => line.includes(comment)));
+
+        const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
+
+        let estimatedTime;
+        try {
+            processor.process(lines);
+            estimatedTime = processor.vmState.totalTime;
+        } catch (error) {
+            console.log(error.message);
+            estimatedTime = 0;
+        }
+
+        const total = lines.length + 1; //Dwell line added after every gcode parse
+
+        const payload = {
+            total,
+            toolSet: processor.vmState.tools,
+            spindleSet: processor.vmState.spindleRates,
+            movementSet: processor.vmState.feedrates,
+            invalidGcode: processor.vmState.invalidGcode,
+            estimatedTime,
+        };
+
+        return payload;
+    };
 
     unsubscribe() {
         this.pubsubTokens.forEach((token) => {
