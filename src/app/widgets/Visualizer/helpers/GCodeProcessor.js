@@ -1,6 +1,8 @@
 import objtools from 'objtools';
 import GcodeLine from './GCodeLine';
 
+export const INVALID_GCODE_REGEX = /([^NGMXYZIJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
+
 /**
  *
  * https://github.com/CrispyConductor/tightcnc/blob/332a3a67309d5fe258e2d1567f94ac1e172bac47/lib/gcode-vm.js
@@ -38,11 +40,15 @@ export class GCodeProcessor {
         let axisNum = (typeof axis === 'number') ? axis : this.vmState.axisLabels.indexOf(axis.toLowerCase());
 
         if (axisNum === -1) {
-            throw new Error('Invalid axis ' + axis);
+            // throw new Error('Invalid axis ' + axis);
+            console.error('Invalid axis ' + axis);
+            return 0;
         }
 
         if (axisNum < 0 || axisNum >= this.vmState.axisLabels.length) {
-            throw new Error('Axis out of bounds ' + axisNum);
+            // throw new Error('Axis out of bounds ' + axisNum);
+            console.error('Axis out of bounds ' + axisNum);
+            return 0;
         }
         if (typeof value === 'number') {
             while (axisNum >= coords.length) {
@@ -61,7 +67,12 @@ export class GCodeProcessor {
     }
 
     reset() {
-        let vmState = {};
+        let vmState = {
+            feedrates: new Set(),
+            tools: new Set(),
+            spindleRates: new Set(),
+            invalidGcode: new Set(),
+        };
         this.vmState = vmState;
         this.syncStateToMachine();
         vmState.coord = this.coord.bind(this);
@@ -216,11 +227,16 @@ export class GCodeProcessor {
             vmState.seenWordSet[word[0].toUpperCase()] = true;
         }
 
+        if (INVALID_GCODE_REGEX.test(gline.origLine)) {
+            vmState.invalidGcode.add(gline.origLine);
+        }
+
         // Check for other codes that set modals
         let tempCoordSys = false;
         let wordF = gline.get('F');
         if (typeof wordF === 'number') {
             vmState.feed = wordF;
+            vmState.feedrates.add('F' + wordF);
         }
         if (!isSimpleMotion) {
             if (gline.has('G17')) {
@@ -275,6 +291,7 @@ export class GCodeProcessor {
             let wordS = gline.get('S');
             if (typeof wordS === 'number') {
                 vmState.spindleSpeed = wordS;
+                vmState.spindleRates.add('S' + wordS);
             }
             if (gline.has('M3')) {
                 vmState.spindleDirection = 1;
@@ -348,8 +365,15 @@ export class GCodeProcessor {
             this._processMove(storedPos, null, vmState.feed, null, false);
             isMotion = true;
         } else if (doMotion) {
-            // throw new XError(XError.UNSUPPORTED_OPERATION, 'Unsupported motion gcode ' + doMotion + ': ' + gline.toString());
-            throw new Error('Unsupported motion gcode ' + doMotion + ': ' + gline.toString());
+            // throw new Error('Unsupported motion gcode ' + doMotion + ': ' + gline.toString());
+            console.error('Unsupported motion gcode ' + doMotion + ': ' + gline.toString());
+            return {
+                state: vmState, // VM state after executing line
+                isMotion: isMotion, // whether the line represents motion
+                motionCode: motionCode, // If motion, the G code associated with the motion
+                changedCoordOffsets: changedCoordOffsets, // whether or not anything was changed with coordinate systems
+                time: vmState.totalTime - origTotalTime // estimated duration of instruction execution, in seconds
+            };
         }
 
         if (!isSimpleMotion) {
@@ -424,7 +448,13 @@ export class GCodeProcessor {
 
             // Handle T
             if (gline.has('T')) {
-                vmState.tool = gline.get('T');
+                const values = gline.get('T', null, true);
+                vmState.tool = values[0];
+
+                for (const val of values) {
+                    vmState.tools.add('T' + val);
+                }
+
                 vmState.countT++;
             }
             if (gline.has('M6')) {
