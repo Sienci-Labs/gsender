@@ -417,6 +417,7 @@ class JobStatusWidget extends PureComponent {
                     spindleRates: spindleRates,
                     feedRates: feedRates,
                     estimatedTime: file.estimatedTime,
+                    fileSize: file.size,
                 });
             }),
             pubsub.subscribe('units:change', (msg, units) => {
