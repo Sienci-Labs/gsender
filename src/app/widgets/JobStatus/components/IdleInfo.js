@@ -57,7 +57,6 @@ const IdleInfo = ({ state, props }) => {
         return line.slice(0, -2); //Remove space and apostrophe at the end
     };
 
-
     const outputFormattedTimeForLastFile = (givenTime) => {
         //Given time is a unix timestamp to be compared to unix timestamp 0
         const elapsedMinute = moment(moment(givenTime)).diff(moment.unix(0), 'minutes');
