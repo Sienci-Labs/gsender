@@ -22,7 +22,6 @@
  */
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import {
@@ -39,11 +38,6 @@ class Probe extends PureComponent {
         actions: PropTypes.object,
         probeActive: PropTypes.bool
     };
-
-    testFS() {
-        console.log('called');
-        controller.command('gcode:fsLoad');
-    }
 
     render() {
         const { state, actions } = this.props;
@@ -93,13 +87,6 @@ class Probe extends PureComponent {
                     </div>
                     <div className="row no-gutters">
                         <div className="col-xs-12">
-                            <FunctionButton
-                                onClick={() => {
-                                    this.testFS();
-                                }}
-                            >
-                                TEST
-                            </FunctionButton>
                             <FunctionButton
                                 onClick={() => {
                                     actions.openModal(MODAL_PREVIEW);
