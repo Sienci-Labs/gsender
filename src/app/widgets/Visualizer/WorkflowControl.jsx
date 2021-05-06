@@ -21,30 +21,13 @@
  *
  */
 
-/*
- *     This file is part of gSender.
- *
- *     gSender is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     gSender is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with gSender.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 /* eslint-disable jsx-a11y/interactive-supports-focus */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import get from 'lodash/get';
 import includes from 'lodash/includes';
 import PropTypes from 'prop-types';
-import pick from 'lodash/pick';
-import log from 'app/lib/log';
+//import pick from 'lodash/pick';
+//import log from 'app/lib/log';
 import isElectron from 'is-electron';
 import controller from 'app/lib/controller';
 import React, { PureComponent } from 'react';
@@ -105,17 +88,35 @@ class WorkflowControl extends PureComponent {
         this.setState({ closeFile: true });
     }
 
+    handleReaderResponse (event) {
+        console.log('in onmessage');
+        console.log(event.data);
+    }
+
     handleChangeFile = (event, fileToLoad) => {
-        const { actions } = this.props;
+        //const { actions } = this.props;
         const files = event.target.files;
         const file = files[0];
-        const reader = new FileReader();
+        //const reader = new FileReader();
+
+        const meta = {
+            name: file.name,
+            size: file.size
+        };
+
+        const readerWorker = new Worker('FileReader.worker.js');
+        readerWorker.onmessage = this.handleReaderResponse;
 
         if (isElectron()) {
             const recentFile = createRecentFileFromRawPath(file.path, file.name);
             addRecentFile(recentFile);
         }
 
+        readerWorker.postMessage({
+            file: file,
+            meta: meta
+        });
+        /*
         reader.onloadend = (event) => {
             const { result, error } = event.target;
 
@@ -133,10 +134,7 @@ class WorkflowControl extends PureComponent {
                 'type'
             ]));
 
-            const meta = {
-                name: file.name,
-                size: file.size
-            };
+
             actions.uploadFile(result, meta);
         };
 
@@ -145,6 +143,7 @@ class WorkflowControl extends PureComponent {
         } catch (err) {
             // Ignore error
         }
+       */
     };
 
     loadRecentFile = (fileMetadata) => {
