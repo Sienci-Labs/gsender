@@ -18,7 +18,6 @@ const IdleInfo = ({ state, props }) => {
         units,
         total,
         elapsedTime,
-        remainingTime,
         lastFileRan,
         fileName,
         fileSize,
@@ -58,25 +57,6 @@ const IdleInfo = ({ state, props }) => {
         return line.slice(0, -2); //Remove space and apostrophe at the end
     };
 
-    /**
-     * Format given time value to display minutes and seconds
-     * @param {Number} givenTime given time value
-     */
-    const outputFormattedTime = (givenTime) => {
-        if (state.startTime === 0 || !givenTime || givenTime < 0) {
-            return 'N/A';
-        }
-
-        //Given time is a unix timestamp to be compared to unix timestamp 0
-        const elapsedMinute = moment(moment(givenTime)).diff(moment.unix(0), 'minutes');
-        const elapsedSecond = String((moment(moment(givenTime)).diff(moment.unix(0), 'seconds')));
-
-        //Grab last two characters in the elapsedSecond variable, which represent the seconds that have passed
-        const strElapsedSecond = `${(elapsedSecond[elapsedSecond.length - 2] !== undefined ? elapsedSecond[elapsedSecond.length - 2] : '')}${String(elapsedSecond[elapsedSecond.length - 1])}`;
-        const formattedSeconds = Number(strElapsedSecond) < 59 ? Number(strElapsedSecond) : `${Number(strElapsedSecond) - 60}`;
-
-        return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
-    };
 
     const outputFormattedTimeForLastFile = (givenTime) => {
         //Given time is a unix timestamp to be compared to unix timestamp 0
@@ -112,14 +92,14 @@ const IdleInfo = ({ state, props }) => {
         }
 
         if (time > 60 && (time / 60) < 60) {
-            return `${Math.ceil((time / 60))} minute(s)`;
+            return `~ ${Math.ceil((time / 60))} minute(s)`;
         }
 
         if ((time / 60) >= 60) {
-            return `${Math.ceil((time / 3600))} hour(s)`;
+            return `~ ${Math.ceil((time / 3600))} hour(s)`;
         }
 
-        return `${Math.ceil(time)} seconds`;
+        return `~ ${Math.ceil(time)} seconds`;
     };
 
     const feedString = (feedRates.length > 0) ? `${convertedFeedMin} to ${convertedFeedMax} ${feedUnits}` : 'No Feedrates';
@@ -139,9 +119,9 @@ const IdleInfo = ({ state, props }) => {
             <div><span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)</div>
             <div className={styles.idleInfoRow}>
                 <FileStat label="Attributes">
-                    {`${outputFormattedTime(remainingTime)}`}<br />
-                    {`${feedString}`} <br/>
                     {`${formattedEstimateTime}`}
+                    <br />
+                    {`${feedString}`}
                 </FileStat>
                 <FileStat label="Spindle">
                     {
