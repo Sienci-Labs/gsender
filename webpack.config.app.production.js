@@ -179,10 +179,10 @@ module.exports = {
                 path.resolve(__dirname, 'src/server/lib/Firmware/Flashing')
             ]
         },
-            {
-                test: /\.worker\.js$/,
-                use: { loader: 'worker-loader' },
-            },
+        {
+            test: /\.worker\.js$/,
+            use: { loader: 'worker-loader' },
+        },
         ].filter(Boolean)
     },
     node: {
