@@ -21,23 +21,6 @@
  *
  */
 
-/*
- *     This file is part of gSender.
- *
- *     gSender is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     gSender is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with gSender.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
@@ -593,10 +576,10 @@ class PreferencesPage extends PureComponent {
         const { menu, selectedMenu } = state;
 
         return (
-            <Modal onClose={ modalClose }>
-                <div className={ styles.preferencesContainer }>
-                    <div className={ styles.preferencesContent }>
-                        <div className={ styles.preferencesMenu }>
+            <Modal onClose={modalClose}>
+                <div className={styles.preferencesContainer}>
+                    <div className={styles.preferencesContent}>
+                        <div className={styles.preferencesMenu}>
                             <h3>Settings</h3>
                             {
                                 menu.map((menuItem, index) => (

@@ -21,23 +21,6 @@
  *
  */
 
-/*
- *     This file is part of gSender.
- *
- *     gSender is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- *
- *     gSender is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with gSender.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 import React from 'react';
 
 import PropTypes from 'prop-types';
@@ -46,7 +29,11 @@ const Chart = ({ fill, isMovement, disabled }) => {
     fill = (isMovement ? '#FFFFFF' : fill);
     fill = (disabled ? '#9ca3af' : fill);
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="512" height="512" x="0" y="0" viewBox="0 0 512.001 512.001" enableBackground="new 0 0 512 512" xmlSpace="preserve">
+        <svg
+            xmlns="http://www.w3.org/2000/svg" version="1.1" width="512"
+            height="512" x="0" y="0"
+            viewBox="0 0 512.001 512.001" enableBackground="new 0 0 512 512" xmlSpace="preserve"
+        >
             <g>
                 <g xmlns="http://www.w3.org/2000/svg">
                     <g>

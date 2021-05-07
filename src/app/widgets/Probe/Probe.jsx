@@ -64,27 +64,27 @@ class Probe extends PureComponent {
                                         key={`command-${index}`}
                                     >
                                         {command.id}
-                                    </option>))
+                                    </option>
+                                ))
                             }
                         </select>
                     </div>
                     {
-                        probeCommand && probeCommand.safe &&
-                        <div className="form-group hidden">
-                            <div className={styles.rowSpread}>
-                                <label htmlFor="exampleInputEmail2">Use Safe Probe:</label>
-                                <ToggleSwitch checked={useSafeProbeOption} onChange={actions.handleSafeProbeToggle}/>
+                        probeCommand && probeCommand.safe && (
+                            <div className="form-group hidden">
+                                <div className={styles.rowSpread}>
+                                    <label htmlFor="exampleInputEmail2">Use Safe Probe:</label>
+                                    <ToggleSwitch checked={useSafeProbeOption} onChange={actions.handleSafeProbeToggle} />
+                                </div>
+                                <span id="helpBlock" className="help-block">Safe probe probes from the top and right to avoid breaking bits.</span>
                             </div>
-                            <span id="helpBlock" className="help-block">Safe probe probes from the top and right to avoid breaking bits.</span>
-                        </div>
-                    }
+                        )}
 
                     {
                         probeCommand && probeCommand.tool &&
                         <ProbeDiameter actions={actions} state={state} />
                     }
-                    <div className="row no-gutters">
-                    </div>
+                    <div className="row no-gutters" />
                     <div className="row no-gutters">
                         <div className="col-xs-12">
                             <FunctionButton

@@ -35,6 +35,7 @@ const noop = () => {};
 
 class Controller {
     io = null;
+
     socket = null;
 
     listeners = {
@@ -95,13 +96,19 @@ class Controller {
 
     // User-defined baud rates and ports
     baudrates = [];
+
     ports = [];
 
     loadedControllers = [];
+
     port = '';
+
     type = '';
+
     settings = {};
+
     state = {};
+
     workflow = {
         state: 'idle' // running|paused|idle
     };
@@ -114,11 +121,13 @@ class Controller {
 
         this.io = io;
     }
+
     // Whether or not the client is connected.
     // @return {boolean} Returns true if the client is connected, false otherwise.
     get connected() {
         return !!(this.socket && this.socket.connected);
     }
+
     // Establish a connection to the server.
     // @param {string} host
     // @param {object} options
@@ -185,11 +194,13 @@ class Controller {
             }
         });
     }
+
     // Disconnect from the server.
     disconnect() {
         this.socket && this.socket.destroy();
         this.socket = null;
     }
+
     // Adds the `listener` function to the end of the listeners array for the event named `eventName`.
     // @param {string} eventName The name of the event.
     // @param {function} listener The listener function.
@@ -201,6 +212,7 @@ class Controller {
         listeners.push(listener);
         return true;
     }
+
     // Removes the specified `listener` from the listener array for the event named `eventName`.
     // @param {string} eventName The name of the event.
     // @param {function} listener The listener function.
@@ -212,6 +224,7 @@ class Controller {
         listeners.splice(listeners.indexOf(listener), 1);
         return true;
     }
+
     // Opens a connection to the given serial port.
     // @param {string} port The path of the serial port you want to open. For example, `dev/tty.XXX` on Mac and Linux, or `COM1` on Windows.
     // @param {object} [options] The options object.
@@ -228,6 +241,7 @@ class Controller {
         }
         this.socket && this.socket.emit('open', port, options, callback);
     }
+
     // Closes an open connection.
     // @param {string} port The path of the serial port you want to close. For example, `dev/tty.XXX` on Mac and Linux, or `COM1` on Windows.
     // @param {function} [callback] Called once a connection is closed.
@@ -237,11 +251,13 @@ class Controller {
         }
         this.socket && this.socket.emit('close', port, callback);
     }
+
     // Retrieves a list of available serial ports with metadata.
     // @param {function} [callback] Called once completed.
     listPorts(callback) {
         this.socket && this.socket.emit('list', callback);
     }
+
     // Executes a command on the server.
     // @param {string} cmd The command string
     // @example Example Usage
@@ -300,6 +316,7 @@ class Controller {
         }
         this.socket && this.socket.emit.apply(this.socket, ['command', port, cmd].concat(args));
     }
+
     // Writes data to the serial port.
     // @param {string} data The data to write.
     // @param {object} [context] The associated context information.
@@ -310,6 +327,7 @@ class Controller {
         }
         this.socket && this.socket.emit('write', port, data, context);
     }
+
     // Writes data and a newline character to the serial port.
     // @param {string} data The data to write.
     // @param {object} [context] The associated context information.
