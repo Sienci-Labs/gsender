@@ -1,6 +1,7 @@
 # https://stefanscherer.github.io/use-appveyor-to-build-multi-arch-docker-image/
 
 version: "{build}-{branch}"
+skip_non_tags: true
 
 environment:
   matrix:
