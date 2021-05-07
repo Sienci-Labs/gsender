@@ -123,7 +123,7 @@ for:
               yarn github-release delete \
                 --owner=gSender \
                 --repo=sender \
-                --tag="${CI_BRANCH}-latest" \
+                --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 "*-linux-i386.AppImage" \
                 "*-linux-i386.deb" \
@@ -132,7 +132,7 @@ for:
               yarn github-release upload \
                 --owner=Sienci \
                 --repo=sender \
-                --tag="${CI_BRANCH}-latest" \
+                --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 --body="${COMMIT_LOG}" \
                 "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.i686.rpm" \
@@ -168,7 +168,7 @@ for:
               yarn github-release delete \
                 --owner=Sienic \
                 --repo=sender \
-                --tag="${CI_BRANCH}-latest" \
+                --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 "*-linux.x86_64.rpm" \
                 "*-linux-x86_64.AppImage" \
@@ -177,7 +177,7 @@ for:
               yarn github-release upload \
                 --owner=sienci \
                 --repo=sender \
-                --tag="${CI_BRANCH}-latest" \
+                --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 --body="${GIT_COMMIT_LOG}" \
                 "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.x86_64.rpm" \
@@ -213,7 +213,7 @@ for:
               yarn github-release delete \
                 --owner=Sienci \
                 --repo=sender \
-                --tag="${CI_BRANCH}-latest" \
+                --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 "*-linux.armv7l.rpm" \
                 "*-linux-armv7l.AppImage" \
@@ -222,7 +222,7 @@ for:
               yarn github-release upload \
                 --owner=Sienci \
                 --repo=sender \
-                --tag="${CI_BRANCH}-latest" \
+                --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 --body="${GIT_COMMIT_LOG}" \
                 "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.armv7l.rpm" \
@@ -258,7 +258,7 @@ for:
               yarn github-release delete \
                 --owner=Sienci \
                 --repo=sender \
-                --tag="${CI_BRANCH}-latest" \
+                --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 "*-linux.arm64.rpm" \
                 "*-linux-arm64.AppImage" \
@@ -267,7 +267,7 @@ for:
               yarn github-release upload \
                 --owner=Sienci \
                 --repo=sender \
-                --tag="${CI_BRANCH}-latest" \
+                --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 --body="${GIT_COMMIT_LOG}" \
                 "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.arm64.rpm" \
@@ -361,13 +361,13 @@ for:
               yarn github-release delete \
                 --owner=Sienci \
                 --repo=sender \
-                --tag="${CI_BRANCH}-latest" \
+                --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 "*-macos.x64.dmg";
               yarn github-release upload \
                 --owner=Sienci \
                 --repo=sender \
-                --tag="${CI_BRANCH}-latest" \
+                --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 --body="${GIT_COMMIT_LOG}" \
                 "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.x64.dmg";
