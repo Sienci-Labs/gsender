@@ -5,10 +5,6 @@ skip_non_tags: true
 
 environment:
   matrix:
-    - job_name: Linux build (i386)
-      appveyor_build_worker_image: Ubuntu
-      nodejs_version: "12"
-      ARCH: i386
     - job_name: Linux build (amd64)
       appveyor_build_worker_image: Ubuntu2004
       nodejs_version: "12"
@@ -42,7 +38,6 @@ for:
   -
     matrix:
       only:
-        - job_name: Linux build (i386)
         - job_name: Linux build (amd64)
         - job_name: Linux build (arm)
         - job_name: Linux build (arm64)
@@ -297,7 +292,7 @@ for:
     deploy:
       - provider: GitHub
         auth_token:
-          secure: 14dS/9loZ4uMoKGOHGkagaYp5oS30HSIQcPB0FEa7aTEfpb2VJQiUms82hv8nWxY
+          secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
         draft: false
         prerelease: false
         on:
@@ -391,7 +386,7 @@ for:
     deploy:
       - provider: GitHub
         auth_token:
-          secure: 14dS/9loZ4uMoKGOHGkagaYp5oS30HSIQcPB0FEa7aTEfpb2VJQiUms82hv8nWxY
+          secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
         draft: false
         prerelease: false
         on:
