@@ -93,6 +93,7 @@ class WorkflowControl extends PureComponent {
             closeFile: false,
             showRecent: false,
             showLoadFile: false,
+            runHasStarted: false
         };
     }
 
@@ -145,6 +146,7 @@ class WorkflowControl extends PureComponent {
         } catch (err) {
             // Ignore error
         }
+        this.setState({ runHasStarted: false });
     };
 
     loadRecentFile = (fileMetadata) => {
@@ -163,6 +165,7 @@ class WorkflowControl extends PureComponent {
         };
 
         actions.uploadFile(result, meta);
+        this.setState({ runHasStarted: false });
     }
 
     canRun() {
@@ -170,7 +173,6 @@ class WorkflowControl extends PureComponent {
         const { port, gcode, workflow } = state;
         const controllerType = state.controller.type;
         const controllerState = state.controller.state;
-
         if (!port) {
             return false;
         }
@@ -216,7 +218,7 @@ class WorkflowControl extends PureComponent {
 
     handleOnStop = () => {
         const { actions: { handlePause, handleStop } } = this.props;
-
+        this.setState({ runHasStarted: false });
         handlePause();
         handleStop();
         if (this.state.fileLoaded === false) {
@@ -236,6 +238,7 @@ class WorkflowControl extends PureComponent {
     startRun = () => {
         this.setState({ fileLoaded: true });
         this.setState({ testStarted: true });
+        this.setState({ runHasStarted: true });
         const { actions } = this.props;
         actions.onRunClick();
     }
@@ -352,7 +355,7 @@ class WorkflowControl extends PureComponent {
                     </div>
                 </div>
                 {
-                    canRun && (
+                    !this.state.runHasStarted && (
                         <button
                             type="button"
                             className={this.state.fileLoaded ? `${styles['workflow-button-hidden']}` : `${styles['workflow-button-test']}`}
@@ -361,7 +364,7 @@ class WorkflowControl extends PureComponent {
                             disabled={!canRun}
                             style={{ writingMode: 'vertical-lr' }}
                         >
-                            {i18n._('Test Run File')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
+                            {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
                         </button>
                     )
                 }
