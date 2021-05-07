@@ -931,6 +931,10 @@ class VisualizerWidget extends PureComponent {
 
     pubsubTokens = [];
 
+    onProcessedGcode = ({ data }) => {
+        console.log(data);
+    }
+
     processGCode = (gcode) => {
         const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
 
@@ -943,7 +947,7 @@ class VisualizerWidget extends PureComponent {
 
         let estimatedTime;
         try {
-            processor.process(lines);
+            //processor.process(lines);
             estimatedTime = processor.vmState.totalTime;
         } catch (error) {
             console.log(error.message);
