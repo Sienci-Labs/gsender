@@ -293,7 +293,7 @@ for:
       - provider: GitHub
         auth_token:
           secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
-        draft: false
+        draft: true
         prerelease: false
         on:
           appveyor_repo_tag: true  # deploy on tag push only
@@ -387,7 +387,7 @@ for:
       - provider: GitHub
         auth_token:
           secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
-        draft: false
+        draft: true
         prerelease: false
         on:
           appveyor_repo_tag: true  # deploy on tag push only
