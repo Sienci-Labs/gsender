@@ -129,7 +129,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 />
                             </div>
                         </Fieldset>
-                        <Fieldset legend="Jog Speed Presets">
+                        <Fieldset legend="Jogging presets">
                             <JogSpeeds />
                         </Fieldset>
                     </div>
