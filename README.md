@@ -19,13 +19,16 @@ Some things that we’re looking to accomplish with this sender:
 
 ## 💻 Download
 
-![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (M1) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/linux.png)<br>Linux
---- | --- | --- | --- | --- |
- In Progress | [0.5.6 (EXE)](https://github.com/Sienci-Labs/sender/releases/download/v0.5.6/gSender-Setup-0.5.6.exe) | [0.5.6 (DMG)](https://github.com/Sienci-Labs/sender/releases/download/v0.5.6/gSender-0.5.6.dmg) | In Progress | In Progress |
+gSender is available for the following systems and does not yet support headless Pi operation
+| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (M1) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/linux.png)<br>Linux
+|-|-|-|-|-
+ ``` Available ``` | ``` Available ``` | ``` Available ``` | ``` In Progress ``` | ``` In Progress ```
+
+[Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
 ## 📦 Current Features
 
-* GRBL controllers supported ([Download](https://github.com/gnea/grbl/releases))
+* [GRBL](https://github.com/gnea/grbl/releases) controllers supported
 * Smart machine connection
 * 3-axis digital readout (DRO)
 * All-directional jogging with XY diagonals, jog presets, and incremental/continuous single-button handling
