@@ -26,8 +26,6 @@
 import get from 'lodash/get';
 import includes from 'lodash/includes';
 import PropTypes from 'prop-types';
-//import pick from 'lodash/pick';
-//import log from 'app/lib/log';
 import isElectron from 'is-electron';
 import controller from 'app/lib/controller';
 import React, { PureComponent } from 'react';

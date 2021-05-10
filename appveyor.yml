@@ -98,6 +98,7 @@ for:
           yarn clean
           yarn lint
           yarn test
+          yarn install serialport --unsfe
           if [[ -z "$CI_TAG" ]]; then
             yarn build-latest
           else

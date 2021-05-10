@@ -938,6 +938,7 @@ class VisualizerWidget extends PureComponent {
         const lines = gcode.split('\n')
             .filter(line => (line.trim().length > 0))
             .filter(line => !comments.some(comment => line.includes(comment)));
+        console.log(lines);
 
         const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
 
