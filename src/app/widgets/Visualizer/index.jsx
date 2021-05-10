@@ -25,6 +25,7 @@
 import classNames from 'classnames';
 import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
+
 import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
@@ -45,6 +46,7 @@ import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
 import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
+import EstimateWorker from './Estimate.worker';
 import WidgetConfig from '../WidgetConfig';
 import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
@@ -430,17 +432,6 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         onRunClick: () => {
-            //const { invalidGcode } = this.state;
-
-            /*if (invalidGcode.shouldShow) {
-                if (invalidGcode.list.size > 0) {
-                    this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
-                } else {
-                    this.actions.handleRun();
-                }
-            } else {
-                this.actions.handleRun();
-            }*/
             this.actions.handleRun();
         },
         handleRun: () => {
