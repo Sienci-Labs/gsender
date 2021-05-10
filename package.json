@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "0.5.9",
+  "version": "0.6.1",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -52,12 +52,13 @@
     "electron-rebuild": "electron-rebuild",
     "github-release": "github-release",
     "package-sync": "node scripts/package-sync.js",
-    "build:mac-x64": "bash -c 'scripts/electron-builder.sh --mac --x64'",
+    "build:macos-x64": "bash -c 'scripts/electron-builder.sh --macos --x64'",
     "build:linux-ia32": "bash -c 'scripts/electron-builder.sh --linux --ia32'",
     "build:linux-x64": "bash -c 'scripts/electron-builder.sh --linux --x64'",
     "build:linux-armv7l": "bash -c 'scripts/electron-builder.sh --linux --armv7l'",
-    "build:win-ia32": "bash -c 'scripts/electron-builder.sh --win --ia32'",
-    "build:win-x64": "bash -c 'scripts/electron-builder.sh --win --x64'",
+    "build:linux-arm64": "bash -c 'scripts/electron-builder.sh --linux --arm64'",
+    "build:windows-ia32": "bash -c 'scripts/electron-builder.sh --windows --ia32'",
+    "build:windows-x64": "bash -c 'scripts/electron-builder.sh --windows --x64'",
     "start": "./bin/cncjs",
     "start-electron": "electron ./dist/cncjs/main",
     "watch-dev": "cross-env NODE_ENV=development webpack-cli --watch --config webpack.config.server.development.js",
@@ -71,7 +72,7 @@
     "test": "tap test/*.js --no-timeout --node-arg=--require --node-arg=@babel/register --node-arg=--require --node-arg=@babel/polyfill",
     "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls",
     "postinstall": "opencollective postinstall",
-    "deploy-release": "electron-builder build --x64 --win --publish always"
+    "deploy-release": "electron-builder build --x64 --ia32 --publish always"
   },
   "build": {
     "appId": "org.sienci",
