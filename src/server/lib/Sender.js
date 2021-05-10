@@ -289,8 +289,12 @@ class Sender extends events.EventEmitter {
             return false;
         }
 
-        const lines = gcode.split('\n')
-            .filter(line => (line.trim().length > 0));
+        const comments = ['#', ';', '(', '%'];
+
+        const lines = gcode
+            .split('\n')
+            .filter(line => (line.trim().length > 0))
+            .filter(line => !comments.some(comment => line.includes(comment)));
 
         if (this.sp) {
             this.sp.clear();

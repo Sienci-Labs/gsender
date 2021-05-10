@@ -82,6 +82,25 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### Beta 0.6.0 (May 7, 2021)
+* Altered how files are loaded to improve UI performance
+* Added estimated time to run calculation on file load
+* File attributes now persists on disconnect
+* Fixed issues with macro editing and adding
+
+### Beta 0.5.8 (Apr 30, 2021)
+* New experimental Winx32 and RasPi builds
+* Firmware tool improvements and bug fixes
+* More accurate parsing of tool and spindle speeds
+* Various keybind bug fixes, addressing special characters
+* Added recent files button and file unloading
+* New Check mode state for testing files before starting job
+* Verbose commands now in console
+* New macro behaviours and import/export
+* gSender now officially licensed under GPLv3
+* Homing state and other small bugs and styling fixes
+* New logo/branding throughout!
+
 ### Beta 0.5.6 (Apr 1, 2021)
 * Fixed jog stepping with keybindings, continuous jogging bugs, and other jogging unreliabilities
 * Added new keybindings for improved, keyboard-based actions (unsure if issues with particular symbols such as '*' have persisted)
