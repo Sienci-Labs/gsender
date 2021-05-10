@@ -18,7 +18,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Sienci-Labs/sender.git"
+    "url": "https://github.com/Sienci-Labs/gsender"
   },
   "license": "MIT",
   "engines": {
