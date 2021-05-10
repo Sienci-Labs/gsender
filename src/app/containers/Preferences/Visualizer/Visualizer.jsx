@@ -43,6 +43,7 @@ import classNames from 'classnames';
 import map from 'lodash/map';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import Select from 'react-select';
+import TooltipCustom from '../../../components/TooltipCustom/ToolTip';
 import styles from '../index.styl';
 import Fieldset from '../FieldSet';
 import { DARK_THEME, LIGHT_THEME } from '../../../widgets/Visualizer/constants';
@@ -86,16 +87,24 @@ const VisualizerSettings = ({ active, state, actions }) => {
                                 <b>Option</b>
                                 <b>Regular</b>
                                 <b>Lightweight Mode</b>
-                                <span>Visualize G-Code</span>
+                                <TooltipCustom content="Toggle rendering of your project" location="default">
+                                    <span>Visualize G-Code</span>
+                                </TooltipCustom>
                                 <ToggleSwitch checked={!disabled} onChange={() => visualizerActions.handleVisEnabledToggle()} size="sm" />
                                 <ToggleSwitch checked={!disabledLite} onChange={() => visualizerActions.handleVisEnabledToggle(true)} size="lg" />
-                                <span>Show Bit</span>
+                                <TooltipCustom content="Toggle rendering of the Drill Bit" location="default">
+                                    <span>Show Bit</span>
+                                </TooltipCustom>
                                 <ToggleSwitch checked={objects.cuttingTool.visible} onChange={() => visualizerActions.handleBitToggle()} size="md" />
                                 <ToggleSwitch checked={objects.cuttingTool.visibleLite} onChange={() => visualizerActions.handleBitToggle(true)} size="md" />
-                                <span>Show Bit Animation</span>
+                                <TooltipCustom content="Show the Drill Bit spinning while project runs" location="default">
+                                    <span>Show Bit Animation</span>
+                                </TooltipCustom>
                                 <ToggleSwitch checked={objects.cuttingToolAnimation.visible} onChange={() => visualizerActions.handleAnimationToggle()} size="md" />
                                 <ToggleSwitch checked={objects.cuttingToolAnimation.visibleLite} onChange={() => visualizerActions.handleAnimationToggle(true)} size="md" />
-                                <span>Cutpath Animation</span>
+                                <TooltipCustom content="Show a dot in the visualizer instead of the Drill Bit" location="default">
+                                    <span>Cutpath Animation</span>
+                                </TooltipCustom>
                                 <ToggleSwitch checked={objects.cutPath.visible} onChange={() => visualizerActions.handleCutPathToggle()} size="md" />
                                 <ToggleSwitch checked={objects.cutPath.visibleLite} onChange={() => visualizerActions.handleCutPathToggle(true)} size="md" />
                             </div>
@@ -104,26 +113,28 @@ const VisualizerSettings = ({ active, state, actions }) => {
                     </Fieldset>
                 </div>
                 <div style={{ width: '48%' }}>
-                    <Fieldset legend="Theme">
-                        <div className={styles.addMargin}>
-                            <Select
-                                backspaceRemoves={false}
-                                className="sm"
-                                clearable={false}
-                                menuContainerStyle={{ zIndex: 5 }}
-                                name="theme"
-                                onChange={actions.visualizer.handleThemeChange}
-                                options={map(themes, (value) => ({
-                                    value: value,
-                                    label: value
-                                }))}
-                                searchable={false}
-                                value={{ label: theme }}
-                                valueRenderer={themeRenderer}
-                            />
-                            <small>Colours used when visualizing a G-Code file.</small>
-                        </div>
-                    </Fieldset>
+                    <TooltipCustom content="Toggle the main colour of the Visualizer" location="default">
+                        <Fieldset legend="Theme">
+                            <div className={styles.addMargin}>
+                                <Select
+                                    backspaceRemoves={false}
+                                    className="sm"
+                                    clearable={false}
+                                    menuContainerStyle={{ zIndex: 5 }}
+                                    name="theme"
+                                    onChange={actions.visualizer.handleThemeChange}
+                                    options={map(themes, (value) => ({
+                                        value: value,
+                                        label: value
+                                    }))}
+                                    searchable={false}
+                                    value={{ label: theme }}
+                                    valueRenderer={themeRenderer}
+                                />
+                                <small>Colours used when visualizing a G-Code file.</small>
+                            </div>
+                        </Fieldset>
+                    </TooltipCustom>
                 </div>
             </div>
         </div>

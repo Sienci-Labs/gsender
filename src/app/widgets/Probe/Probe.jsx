@@ -27,6 +27,7 @@ import ToggleSwitch from 'app/components/ToggleSwitch';
 import {
     MODAL_PREVIEW
 } from './constants';
+import TooltipCustom from '../../components/TooltipCustom/ToolTip';
 import styles from './index.styl';
 import ProbeImage from './ProbeImage';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
@@ -56,35 +57,37 @@ class Probe extends PureComponent {
                         <label className="control-label">
                             {i18n._('Probe')}
                         </label>
-                        <select className="form-control" onChange={actions.handleProbeCommandChange}>
-                            {
-                                availableProbeCommands.map((command, index) => (
-                                    <option
-                                        value={index}
-                                        key={`command-${index}`}
-                                    >
-                                        {command.id}
-                                    </option>))
-                            }
-                        </select>
+                        <TooltipCustom content="Specify axis to probe" location="default">
+                            <select className="form-control" onChange={actions.handleProbeCommandChange}>
+                                {
+                                    availableProbeCommands.map((command, index) => (
+                                        <option
+                                            value={index}
+                                            key={`command-${index}`}
+                                        >
+                                            {command.id}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                        </TooltipCustom>
                     </div>
                     {
-                        probeCommand && probeCommand.safe &&
-                        <div className="form-group hidden">
-                            <div className={styles.rowSpread}>
-                                <label htmlFor="exampleInputEmail2">Use Safe Probe:</label>
-                                <ToggleSwitch checked={useSafeProbeOption} onChange={actions.handleSafeProbeToggle}/>
+                        probeCommand && probeCommand.safe && (
+                            <div className="form-group hidden">
+                                <div className={styles.rowSpread}>
+                                    <label htmlFor="exampleInputEmail2">Use Safe Probe:</label>
+                                    <ToggleSwitch checked={useSafeProbeOption} onChange={actions.handleSafeProbeToggle} />
+                                </div>
+                                <span id="helpBlock" className="help-block">Safe probe probes from the top and right to avoid breaking bits.</span>
                             </div>
-                            <span id="helpBlock" className="help-block">Safe probe probes from the top and right to avoid breaking bits.</span>
-                        </div>
-                    }
+                        )}
 
                     {
                         probeCommand && probeCommand.tool &&
                         <ProbeDiameter actions={actions} state={state} />
                     }
-                    <div className="row no-gutters">
-                    </div>
+                    <div className="row no-gutters" />
                     <div className="row no-gutters">
                         <div className="col-xs-12">
                             <FunctionButton

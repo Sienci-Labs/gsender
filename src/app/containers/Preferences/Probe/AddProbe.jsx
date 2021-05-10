@@ -41,7 +41,7 @@
 import React from 'react';
 import ToggleSwitch from '../../../components/ToggleSwitch';
 import styles from '../index.styl';
-
+import TooltipCustom from '../../../components/TooltipCustom/ToolTip';
 import Input from '../Input';
 
 const AddProbe = ({ state, actions }) => {
@@ -62,35 +62,41 @@ const AddProbe = ({ state, actions }) => {
                 <span id="helpBlock" className="help-block">Supported probe axes for this specific touchplate</span>
                 {
                     functions.z && (
-                        <Input
-                            label="Z Thickness"
-                            units={units}
-                            value={values.zThickness}
-                            onChange={probeActions.changeZThickness}
-                            additionalProps={{ type: 'number', id: 'zThickness' }}
-                        />
+                        <TooltipCustom content="Specify the thickness of Z axis" location="default">
+                            <Input
+                                label="Z Thickness"
+                                units={units}
+                                value={values.zThickness}
+                                onChange={probeActions.changeZThickness}
+                                additionalProps={{ type: 'number', id: 'zThickness' }}
+                            />
+                        </TooltipCustom>
                     )
                 }
-                <div className={styles.inputSpread}>
-                    <label htmlFor="xProbe">XY Probe</label>
-                    <ToggleSwitch
-                        checked={functions.y}
-                        onChange={() => {
-                            probeActions.handleToggleChange('x', 'y');
-                        }}
-                    />
-                </div>
+                <TooltipCustom content="Turn XY Axis Probing on or off" location="default">
+                    <div className={styles.inputSpread}>
+                        <label htmlFor="xProbe">XY Probe</label>
+                        <ToggleSwitch
+                            checked={functions.y}
+                            onChange={() => {
+                                probeActions.handleToggleChange('x', 'y');
+                            }}
+                        />
+                    </div>
+                </TooltipCustom>
             </div>
 
             {
                 (functions.x && functions.y) && (
-                    <Input
-                        label="XY Thickness"
-                        units={units}
-                        value={values.xyThickness}
-                        onChange={probeActions.changeXYThickness}
-                        additionalProps={{ type: 'number', id: 'xyThickness' }}
-                    />
+                    <TooltipCustom content="Specify the thickness of XY axis" location="default">
+                        <Input
+                            label="XY Thickness"
+                            units={units}
+                            value={values.xyThickness}
+                            onChange={probeActions.changeXYThickness}
+                            additionalProps={{ type: 'number', id: 'xyThickness' }}
+                        />
+                    </TooltipCustom>
                 )
             }
         </div>
