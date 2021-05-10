@@ -2,6 +2,9 @@
 
 version: "{build}-{branch}"
 skip_non_tags: true
+branches:
+  only:
+    - master
 
 environment:
   matrix:
