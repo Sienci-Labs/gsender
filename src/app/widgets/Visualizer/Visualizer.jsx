@@ -143,7 +143,6 @@ class Visualizer extends Component {
         this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
         this.limits.name = 'Limits';
         this.limits.visible = state.objects.limits.visible;
-        // this.group.add(this.limits);
 
         this.updateLimitsPosition();
 
@@ -297,22 +296,6 @@ class Visualizer extends Component {
             needUpdateScene = true;
         }
 
-        /*if (
-            state.liteMode
-                ? (this.cuttingTool?.visibleLite !== state.objects.cuttingTool.visibleLite)
-                : (this.cuttingTool?.visible !== state.objects.cuttingTool.visible)
-        ) {
-            const { liteMode } = state;
-            if (this.cuttingTool?.visible) {
-                this.cuttingTool.visible = liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible;
-            }
-
-            if (this.cuttingPointer?.visible) {
-                this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
-            }
-            needUpdateScene = true;
-        }*/
-
         { // Update position
             let needUpdatePosition = false;
 
@@ -388,7 +371,7 @@ class Visualizer extends Component {
         });
     }
 
-    rerenderGCode(colors) {
+    rerenderGCode() {
         const { actions, state } = this.props;
         const { gcode } = state;
         const group = this.group.getObjectByName('Visualizer');
@@ -1149,13 +1132,14 @@ class Visualizer extends Component {
     load(name, gcode, callback) {
         // Remove previous G-code object
         this.unload();
-        const { currentTheme, disabled, disableLite, liteMode } = this.props.state;
+        const { currentTheme, disabled, disabledLite, liteMode } = this.props.state;
         const { setVisualizerReady } = this.props.actions;
         this.visualizer = new GCodeVisualizer(currentTheme);
 
-        const shouldRenderVisualization = !liteMode ? !disabled : !disableLite;
+        const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
         if (shouldRenderVisualization) {
+            console.log('render called');
             this.handleSceneRender(gcode, callback);
         } else {
             setVisualizerReady();
