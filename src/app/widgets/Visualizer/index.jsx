@@ -952,7 +952,6 @@ class VisualizerWidget extends PureComponent {
         }
 
         const total = lines.length + 1; //Dwell line added after every gcode parse
-
         const payload = {
             total,
             toolSet: processor.vmState.tools,

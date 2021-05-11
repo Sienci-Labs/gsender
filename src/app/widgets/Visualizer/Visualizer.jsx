@@ -1086,14 +1086,7 @@ class Visualizer extends Component {
         this.updateScene();
     }
 
-    load(name, gcode, callback) {
-        // Remove previous G-code object
-        this.unload();
-
-        const { currentTheme } = this.props.state;
-
-        this.visualizer = new GCodeVisualizer(currentTheme);
-
+    handleSceneRender(gcode, callback) {
         const obj = this.visualizer.render(gcode);
         obj.name = 'Visualizer';
         this.group.add(obj);
@@ -1153,6 +1146,19 @@ class Visualizer extends Component {
         }
 
         (typeof callback === 'function') && callback({ bbox: bbox });
+    }
+
+    load(name, gcode, callback) {
+        // Remove previous G-code object
+        this.unload();
+        const { currentTheme, disabled, disableLite, liteMode } = this.props.state;
+        this.visualizer = new GCodeVisualizer(currentTheme);
+
+        const shouldRenderVisualization = !liteMode ? !disabled : !disableLite;
+        console.log(shouldRenderVisualization);
+        if (shouldRenderVisualization) {
+            this.handleSceneRender(gcode, callback);
+        }
     }
 
     unload() {
