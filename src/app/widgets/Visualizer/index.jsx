@@ -368,8 +368,6 @@ class VisualizerWidget extends PureComponent {
                             zmax: bbox.max.z
                         };
 
-                        pubsub.publish('gcode:bbox', bbox);
-
                         const { port } = this.state;
 
                         this.setState((state) => ({
@@ -949,6 +947,8 @@ class VisualizerWidget extends PureComponent {
             estimatedTime = 0;
         }
 
+        pubsub.publish('gcode:bbox', processor.getBBox());
+
         const total = lines.length + 1; //Dwell line added after every gcode parse
         const payload = {
             total,
@@ -1264,6 +1264,15 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('keybindingsUpdated', () => {
                 this.updateShuttleControlEvents();
             }),
+            pubsub.subscribe('gcode:bbox', (msg, bbox) => {
+                const { gcode } = this.state;
+                this.setState({
+                    gcode: {
+                        ...gcode,
+                        bbox: bbox
+                    }
+                });
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
