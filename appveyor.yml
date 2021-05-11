@@ -98,7 +98,7 @@ for:
           yarn clean
           yarn lint
           yarn test
-          yarn install serialport --unsfe
+          yarn install serialport --unsafe-perms --rebuild-from-source
           if [[ -z "$CI_TAG" ]]; then
             yarn build-latest
           else
