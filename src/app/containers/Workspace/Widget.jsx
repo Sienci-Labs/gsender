@@ -25,7 +25,6 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import AxesWidget from 'app/widgets/Axes';
 import ConsoleWidget from 'app/widgets/Console';
-import GCodeWidget from 'app/widgets/GCode';
 import GrblWidget from 'app/widgets/Grbl';
 import JobStatusWidget from 'app/widgets/JobStatus';
 import LocationWidget from 'app/widgets/Location';
@@ -40,7 +39,6 @@ const getWidgetByName = (name) => {
     return {
         'axes': AxesWidget,
         'console': ConsoleWidget,
-        'gcode': GCodeWidget,
         'grbl': GrblWidget,
         'job_status': JobStatusWidget,
         'location': LocationWidget,
