@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Sienci-Labs/sender.git"
+    "url": "https://github.com/Sienci-Labs/gsender"
   },
   "main": "main.js",
   "dependencies": {
