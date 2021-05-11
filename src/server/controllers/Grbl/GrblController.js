@@ -358,8 +358,11 @@ class GrblController {
                 if (line) {
                     const regex = /([^NGMXYZIJKFPRS%\-?\.?\d+\.?\s])/gi;
                     if (regex.test(line)) {
+                        if (!preferences && !preferences.showLineWarnings) {
+                            this.emit('workflow:state', this.workflow.state, { validLine: false, line });
+                        }
                         if (preferences && preferences.showLineWarnings) {
-                            // this.workflow.pause({ data: line });
+                            this.workflow.pause({ data: line });
                             this.emit('workflow:state', this.workflow.state, { validLine: false, line });
                         } else {
                             line = '(' + line + ')'; //Surround with paranthesis to ignore line

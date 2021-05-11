@@ -38,7 +38,6 @@
  *     along with gSender.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable consistent-return */
 import classNames from 'classnames';
 import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
@@ -955,6 +954,7 @@ class VisualizerWidget extends PureComponent {
         const lines = gcode.split('\n')
             .filter(line => (line.trim().length > 0))
             .filter(line => !comments.some(comment => line.includes(comment)));
+        console.log(lines);
 
         const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
 
