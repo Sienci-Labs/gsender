@@ -88,6 +88,24 @@ export class GCodeProcessor {
         vmState.countM6 = 0;
     }
 
+    getBBox(returnMBounds = false) {
+        const [minBounds, maxBounds] = returnMBounds ? this.vmState.mbounds : this.vmState.bounds;
+        const [minX, minY, minZ] = minBounds;
+        const [maxX, maxY, maxZ] = maxBounds;
+        return {
+            min: {
+                x: minX,
+                y: minY,
+                z: minZ
+            },
+            max: {
+                x: maxX,
+                y: maxY,
+                z: maxZ
+            }
+        };
+    }
+
     syncStateToMachine(options = {}) {
         const shouldInclude = (prop) => {
             if (!options.include && !options.exclude) {

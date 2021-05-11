@@ -875,8 +875,6 @@ class Visualizer extends Component {
             this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
             this.limits.name = 'Limits';
             this.limits.visible = objects.limits.visible;
-            // this.group.add(this.limits);
-
             this.updateLimitsPosition();
         }
 
@@ -1152,12 +1150,15 @@ class Visualizer extends Component {
         // Remove previous G-code object
         this.unload();
         const { currentTheme, disabled, disableLite, liteMode } = this.props.state;
+        const { setVisualizerReady } = this.props.actions;
         this.visualizer = new GCodeVisualizer(currentTheme);
 
         const shouldRenderVisualization = !liteMode ? !disabled : !disableLite;
-        console.log(shouldRenderVisualization);
+
         if (shouldRenderVisualization) {
             this.handleSceneRender(gcode, callback);
+        } else {
+            setVisualizerReady();
         }
     }
 

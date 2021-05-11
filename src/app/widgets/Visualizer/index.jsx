@@ -430,17 +430,6 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         onRunClick: () => {
-            //const { invalidGcode } = this.state;
-
-            /*if (invalidGcode.shouldShow) {
-                if (invalidGcode.list.size > 0) {
-                    this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
-                } else {
-                    this.actions.handleRun();
-                }
-            } else {
-                this.actions.handleRun();
-            }*/
             this.actions.handleRun();
         },
         handleRun: () => {
@@ -649,6 +638,16 @@ class VisualizerWidget extends PureComponent {
                 this.actions.handleRun();
             },
             onCancel: () => this.actions.reset(),
+        },
+        setVisualizerReady: () => {
+            this.setState((state) => ({
+                gcode: {
+                    ...state.gcode,
+                    loading: false,
+                    rendering: false,
+                    ready: true,
+                }
+            }));
         },
         reset: () => {
             this.setState(this.getInitialState());
@@ -938,7 +937,6 @@ class VisualizerWidget extends PureComponent {
         const lines = gcode.split('\n')
             .filter(line => (line.trim().length > 0))
             .filter(line => !comments.some(comment => line.includes(comment)));
-        console.log(lines);
 
         const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
 
@@ -959,6 +957,7 @@ class VisualizerWidget extends PureComponent {
             movementSet: processor.vmState.feedrates,
             invalidGcode: processor.vmState.invalidGcode,
             estimatedTime,
+            bbox: processor.vmState.bounds
         };
 
         return payload;
