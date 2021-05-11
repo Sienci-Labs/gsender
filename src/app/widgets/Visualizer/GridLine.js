@@ -38,33 +38,31 @@ class GridLine {
         stepY = (typeof stepY === 'undefined') ? stepX : stepY;
 
         for (let i = -1 * sizeX; i <= sizeX; i += stepX) {
-            const geometry = new THREE.Geometry();
+            const points = [];
             const material = new THREE.LineBasicMaterial({
                 vertexColors: THREE.VertexColors
             });
-            const color = (i === 0) ? colorCenterLine : colorGrid;
 
-            geometry.vertices.push(
+            points.push(
                 new THREE.Vector3(-sizeX, i, 0),
                 new THREE.Vector3(sizeX, i, 0),
             );
-            geometry.colors.push(color, color);
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
             this.group.add(new THREE.Line(geometry, material));
         }
 
         for (let i = -1 * sizeY; i <= sizeY; i += stepY) {
-            const geometry = new THREE.Geometry();
+            const points = [];
             const material = new THREE.LineBasicMaterial({
                 vertexColors: THREE.VertexColors
             });
-            const color = (i === 0) ? colorCenterLine : colorGrid;
 
-            geometry.vertices.push(
+            points.push(
                 new THREE.Vector3(i, -sizeY, 0),
                 new THREE.Vector3(i, sizeY, 0),
             );
-            geometry.colors.push(color, color);
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
             this.group.add(new THREE.Line(geometry, material));
         }

@@ -24,8 +24,8 @@
 import * as THREE from 'three';
 
 const buildAxis = (src, dst, color, dashed) => {
-    let geometry = new THREE.Geometry();
     let material;
+    const points = [src.clone(), dst.clone()];
 
     if (dashed) {
         material = new THREE.LineDashedMaterial({
@@ -44,9 +44,7 @@ const buildAxis = (src, dst, color, dashed) => {
             transparent: true
         });
     }
-
-    geometry.vertices.push(src.clone());
-    geometry.vertices.push(dst.clone());
+    let geometry = new THREE.BufferGeometry().setFromPoints(points);
 
     const axisLine = new THREE.Line(geometry, material);
 
