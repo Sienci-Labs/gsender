@@ -17,14 +17,14 @@ const Tooltip = (props) => {
     const showTip = () => {
         timeout = setTimeout(() => {
             setActive(true);
-        }, props.delay || 400);
+        }, props.delay || 1000);
     };
 
     const hideTip = () => {
         clearInterval(timeout);
         setActive(false);
     };
-    console.log(hideTip);
+
     return (
         <div
             className={styles.TooltipWrapper}
