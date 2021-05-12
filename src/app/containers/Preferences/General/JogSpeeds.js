@@ -25,6 +25,7 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import _ from 'lodash';
 import store from 'app/store';
+import TooltipCustom from '../../../components/TooltipCustom/ToolTip';
 import Input from '../Input';
 import styles from '../index.styl';
 import { Toaster, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
@@ -148,29 +149,33 @@ export default class JogSpeeds extends Component {
                     <button type="button" onClick={() => this.handleJogClick('rapid')} className={styles[name === 'rapid' ? 'jog-speed-active' : 'jog-speed-inactive']}>Rapid</button>
                 </div>
                 <div className={styles['jog-spead-wrapper']}>
-
-                    <Input
-                        label="XY Move"
-                        units={units}
-                        onChange={this.handleChange}
-                        additionalProps={{ type: 'number', id: 'xyStep' }}
-                        value={xyValue}
-                    />
-
-                    <Input
-                        label="Z Move"
-                        units={units}
-                        onChange={this.handleChange}
-                        additionalProps={{ type: 'number', id: 'zStep' }}
-                        value={zValue}
-                    />
-                    <Input
-                        label="Speed"
-                        units={`${units}/min`}
-                        onChange={this.handleChange}
-                        additionalProps={{ type: 'number', id: 'feedrate' }}
-                        value={speedValue}
-                    />
+                    <TooltipCustom content="Set amount of movement for XY Jog Speed Preset Buttons" location="default">
+                        <Input
+                            label="XY Move"
+                            units={units}
+                            onChange={this.handleChange}
+                            additionalProps={{ type: 'number', id: 'xyStep' }}
+                            value={xyValue}
+                        />
+                    </TooltipCustom>
+                    <TooltipCustom content="Set amount of movement for Z Jog Speed Preset Buttons" location="default">
+                        <Input
+                            label="Z Move"
+                            units={units}
+                            onChange={this.handleChange}
+                            additionalProps={{ type: 'number', id: 'zStep' }}
+                            value={zValue}
+                        />
+                    </TooltipCustom>
+                    <TooltipCustom content="Set the speed for the Jog Speed Preset Buttons" location="default">
+                        <Input
+                            label="Speed"
+                            units={`${units}/min`}
+                            onChange={this.handleChange}
+                            additionalProps={{ type: 'number', id: 'feedrate' }}
+                            value={speedValue}
+                        />
+                    </TooltipCustom>
                 </div>
             </div>
         );

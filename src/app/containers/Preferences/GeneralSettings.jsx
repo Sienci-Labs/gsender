@@ -32,6 +32,7 @@ import {
     METRIC_UNITS,
 } from '../../constants';
 import JogSpeeds from './General/JogSpeeds';
+import TooltipCustom from '../../components/TooltipCustom/ToolTip';
 import MachineProfileOptions from './MachineProfiles/Options';
 import Fieldset from './FieldSet';
 import Baudrates from './General/Baudrates';
@@ -58,19 +59,26 @@ const GeneralSettings = ({ active, state, actions }) => {
                 <div className={styles.generalArea}>
                     <div className={styles.halfContainer}>
                         <Fieldset legend="Connection">
-                            <div className={baudRateDisabled ? styles.disabled : styles.addMargin}>
-                                <Baudrates baudrate={state.baudrate} onChange={(option) => actions.general.setBaudrate(option)} />
-                                <br />
-                            </div>
+                            <TooltipCustom content="Machine must be disconnected to change this value" location="top" disabled={!baudRateDisabled}>
+                                <TooltipCustom content="Baudrate specifies how fast data is sent over a serial line." location="bottom">
+                                    <div className={baudRateDisabled ? styles.disabled : styles.addMargin}>
+                                        <Baudrates baudrate={state.baudrate} onChange={(option) => actions.general.setBaudrate(option)} />
+                                        <br />
+                                    </div>
+                                </TooltipCustom>
+                            </TooltipCustom>
                             <div className={styles.reconnect}>
-                                <ToggleSwitch
-                                    label="Re-connect automatically"
-                                    checked={autoReconnect}
-                                    onChange={() => actions.general.setAutoReconnect()}
-                                    size="small"
-                                />
+                                <TooltipCustom content="Reconnect to the last machine you used automatically" location="default">
+                                    <ToggleSwitch
+                                        label="Re-connect automatically"
+                                        checked={autoReconnect}
+                                        onChange={() => actions.general.setAutoReconnect()}
+                                        size="small"
+                                    />
+                                </TooltipCustom>
                             </div>
                         </Fieldset>
+
                         <Fieldset legend="Workspace">
                             <div className={styles.addMargin}>
                                 <RadioGroup
@@ -88,28 +96,34 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 <small className={styles['item-info']}>Units to be displayed throughout the interface</small>
                             </div>
                             <div className={styles.addMargin}>
-                                <ToggleSwitch
-                                    label="Reverse workspace layout"
-                                    checked={reverseWidgets}
-                                    onChange={() => actions.general.setReverseWidgets()}
-                                    size="small"
-                                />
+                                <TooltipCustom content="Flip the location of the Visualizer with Machine Controls" location="default">
+                                    <ToggleSwitch
+                                        label="Reverse workspace layout"
+                                        checked={reverseWidgets}
+                                        onChange={() => actions.general.setReverseWidgets()}
+                                        size="small"
+                                    />
+                                </TooltipCustom>
                             </div>
                             <div style={{ marginBottom: '10px' }}>
-                                <ToggleSwitch
-                                    label="Warn if file contains invalid G-Code"
-                                    checked={state.showWarning}
-                                    onChange={() => actions.general.setShowWarning(!state.showWarning)}
-                                    size="small"
-                                />
+                                <TooltipCustom content="gSender will warn you on file load if any errorous commands are found in your file" location="default">
+                                    <ToggleSwitch
+                                        label="Warn if file contains invalid G-Code"
+                                        checked={state.showWarning}
+                                        onChange={() => actions.general.setShowWarning(!state.showWarning)}
+                                        size="small"
+                                    />
+                                </TooltipCustom>
                             </div>
                             <div style={{ marginBottom: '10px' }}>
-                                <ToggleSwitch
-                                    label="Warn if invalid line detected during job"
-                                    checked={state.showLineWarnings}
-                                    onChange={() => actions.general.setShowLineWarnings(!state.showLineWarnings)}
-                                    size="small"
-                                />
+                                <TooltipCustom content="gSender will warn you while running if any errorous commands are found in your file" location="default">
+                                    <ToggleSwitch
+                                        label="Warn if invalid line detected during job"
+                                        checked={state.showLineWarnings}
+                                        onChange={() => actions.general.setShowLineWarnings(!state.showLineWarnings)}
+                                        size="small"
+                                    />
+                                </TooltipCustom>
                             </div>
                         </Fieldset>
                         <Fieldset legend="Jog Speed Presets">
@@ -121,13 +135,15 @@ const GeneralSettings = ({ active, state, actions }) => {
                             <MachineProfileOptions state={state} />
                         </Fieldset>
                         <Fieldset legend="Movement">
-                            <Input
-                                label="Safe Height"
-                                units={units}
-                                value={safeRetractHeight}
-                                onChange={(e) => actions.general.setSafeRetractHeight(e)}
-                                additionalProps={{ name: 'safeRetractHeight', type: 'number' }}
-                            />
+                            <TooltipCustom content="Amount Z-Axis will move before making any X/Y-Axis movements" location="default">
+                                <Input
+                                    label="Safe Height"
+                                    units={units}
+                                    value={safeRetractHeight}
+                                    onChange={(e) => actions.general.setSafeRetractHeight(e)}
+                                    additionalProps={{ name: 'safeRetractHeight', type: 'number' }}
+                                />
+                            </TooltipCustom>
                         </Fieldset>
 
                     </div>

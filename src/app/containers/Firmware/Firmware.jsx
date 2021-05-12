@@ -30,6 +30,7 @@ import Modal from 'app/components/Modal';
 import map from 'lodash/map';
 import download from 'downloadjs';
 import store from 'app/store';
+import TooltipCustom from '../../components/TooltipCustom/ToolTip';
 import controller from '../../lib/controller';
 import Loading from '../../components/Loader';
 import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
@@ -572,10 +573,11 @@ class Firmware extends PureComponent {
                                         Improper flashing could damage your device on port: {this.state.port}.
                                     </ToolsNotificationModal>
                                 ) : ''}
-                                <ToolModalButton icon="fas fa-bolt" onClick={this.startFlashing}>
+                                <TooltipCustom content="Flash your Arduino board to GRBL default values" location="default">
+                                    <ToolModalButton icon="fas fa-bolt" onClick={this.startFlashing}>
                                     Flash GRBL
-                                </ToolModalButton>
-
+                                    </ToolModalButton>
+                                </TooltipCustom>
                                 {this.state.initiateRestoreDefaults ? (
                                     <ToolsNotificationModal
                                         title="Restore Cnc Defaults"
@@ -600,22 +602,27 @@ class Firmware extends PureComponent {
                                 </ToolsNotificationModal>
                             ) : ''}
                             <div className={styles.buttonsMiddle}>
-                                <ToolModalButton onClick={this.upload} icon="fas fa-file-import">
+                                <TooltipCustom content="Import your settings file you saved previously" location="default">
+                                    <ToolModalButton onClick={this.upload} icon="fas fa-file-import">
                                     Import Settings
-                                </ToolModalButton>
-
-                                <ToolModalButton
-                                    onClick={this.download}
-                                    icon="fas fa-file-export"
-                                >
+                                    </ToolModalButton>
+                                </TooltipCustom>
+                                <TooltipCustom content="Save your cutrrent GRBL settings to your device" location="default">
+                                    <ToolModalButton
+                                        onClick={this.download}
+                                        icon="fas fa-file-export"
+                                    >
                                     Export Settings
-                                </ToolModalButton>
-                                <ToolModalButton
-                                    onClick={this.restoreSettings}
-                                    icon="fas fa-undo"
-                                >
+                                    </ToolModalButton>
+                                </TooltipCustom>
+                                <TooltipCustom content="Restore the settings for your current Machine profile" location="default">
+                                    <ToolModalButton
+                                        onClick={this.restoreSettings}
+                                        icon="fas fa-undo"
+                                    >
                                     Restore Defaults
-                                </ToolModalButton>
+                                    </ToolModalButton>
+                                </TooltipCustom>
                             </div>
                             <a
                                 action="Eeprom.txt"
@@ -625,13 +632,15 @@ class Firmware extends PureComponent {
                                 ref={e => this.dofileDownload = e}
                             >download it
                             </a>
-                            <ToolModalButton
-                                icon="fas fa-tasks"
-                                onClick={this.applyNewSettings}
-                                className={this.state.newSettingsButtonDisabled ? `${styles.firmwareButtonDisabled}` : `${styles.applySettingsButton}`}
-                            >
+                            <TooltipCustom content="Apply your new changes to the settings" location="default" disabled={this.state.newSettingsButtonDisabled}>
+                                <ToolModalButton
+                                    icon="fas fa-tasks"
+                                    onClick={this.applyNewSettings}
+                                    className={this.state.newSettingsButtonDisabled ? `${styles.firmwareButtonDisabled}` : `${styles.applySettingsButton}`}
+                                >
                                 Apply New Settings
-                            </ToolModalButton>
+                                </ToolModalButton>
+                            </TooltipCustom>
                             <input
                                 type="file" className="hidden"
                                 multiple={false}
