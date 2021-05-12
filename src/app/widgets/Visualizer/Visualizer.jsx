@@ -399,12 +399,12 @@ class Visualizer extends Component {
     rerenderGCode() {
         const { actions, state } = this.props;
         const { gcode } = state;
-        console.log(gcode);
+
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
             this.group.remove(group);
-            actions.loadGCode('Visualizer', gcode.content);
         }
+        actions.loadGCode('Visualizer', gcode.content);
     }
 
     removeSceneGroup() {
@@ -452,7 +452,7 @@ class Visualizer extends Component {
         // Handle Background color
         this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
         this.redrawGrids();
-        this.rerenderGCode(currentTheme);
+        this.rerenderGCode();
     }
 
     subscribe() {

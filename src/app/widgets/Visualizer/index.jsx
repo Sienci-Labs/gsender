@@ -1285,10 +1285,7 @@ class VisualizerWidget extends PureComponent {
     renderIfNecessary(shouldRender) {
         const hasVisualization = this.visualizer.hasVisualization();
         if (shouldRender && !hasVisualization) {
-            console.log('IN BRANCH - Do Re-render');
             this.visualizer.rerenderGCode();
-        } else {
-            console.log('NO RENDER');
         }
     }
 
