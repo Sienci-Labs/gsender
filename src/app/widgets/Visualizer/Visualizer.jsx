@@ -41,6 +41,7 @@ import TrackballControls from 'app/lib/three/TrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
 import store from 'app/store';
+import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
 import Viewport from './Viewport';
 import CoordinateAxes from './CoordinateAxes';
@@ -189,6 +190,7 @@ class Visualizer extends Component {
 
     componentDidMount() {
         this.subscribe();
+        this.addControllerEvents();
         this.addResizeEventListener();
         store.on('change', this.changeMachineProfile);
         if (this.node) {
@@ -360,7 +362,26 @@ class Visualizer extends Component {
         }
     }
 
+    controllerEvents = {
+
+    };
+
+    addControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.addListener(eventName, callback);
+        });
+    }
+
+    removeControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.removeListener(eventName, callback);
+        });
+    }
+
     componentWillUnmount() {
+        this.removeControllerEvents();
         this.unsubscribe();
         this.removeResizeEventListener();
         store.removeListener('change', this.changeMachineProfile);

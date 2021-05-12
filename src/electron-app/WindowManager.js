@@ -100,9 +100,11 @@ class WindowManager {
         });
 
         webContents.once('dom-ready', () => {
-            splashScreen.hide();
-            window.show();
-            splashScreen.destroy();
+            setTimeout(() => {
+                splashScreen.hide();
+                window.show();
+                splashScreen.destroy();
+            }, 4000);
         });
 
         // Call `ses.setProxy` to ignore proxy settings
