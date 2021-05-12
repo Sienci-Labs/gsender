@@ -550,7 +550,9 @@ class GrblController {
 
                 this.sender.ack();
                 this.sender.next();
-
+                console.log(`ERROR: ${JSON.stringify(error)}`);
+                console.log(`code: ${code}`);
+                this.emit('gcode:error', error, code);
                 return;
             }
 
@@ -1231,6 +1233,10 @@ class GrblController {
             'resume': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:resume');
+            },
+            'gcode:error': () => {
+                const [errors] = args;
+                this.emit('serialport:write', errors);
             },
             'gcode:resume': () => {
                 this.event.trigger('gcode:resume');

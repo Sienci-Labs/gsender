@@ -653,6 +653,7 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         reset: () => {
+            this.actions.handleClose();
             this.setState(this.getInitialState());
             this.actions.unloadGCode();
             pubsub.publish('gcode:fileInfo');
