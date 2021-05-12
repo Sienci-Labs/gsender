@@ -41,6 +41,7 @@ import TrackballControls from 'app/lib/three/TrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
 import store from 'app/store';
+import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
 import Viewport from './Viewport';
 import CoordinateAxes from './CoordinateAxes';
@@ -143,12 +144,15 @@ class Visualizer extends Component {
         this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
         this.limits.name = 'Limits';
         this.limits.visible = state.objects.limits.visible;
-        // this.group.add(this.limits);
 
         this.updateLimitsPosition();
 
         this.updateScene();
     };
+
+    hasVisualization() {
+        return this.group.getObjectByName('Visualizer');
+    }
 
     renderAnimationLoop = () => {
         const showAnimation = this.showAnimation();
@@ -186,6 +190,7 @@ class Visualizer extends Component {
 
     componentDidMount() {
         this.subscribe();
+        this.addControllerEvents();
         this.addResizeEventListener();
         store.on('change', this.changeMachineProfile);
         if (this.node) {
@@ -297,22 +302,6 @@ class Visualizer extends Component {
             needUpdateScene = true;
         }
 
-        /*if (
-            state.liteMode
-                ? (this.cuttingTool?.visibleLite !== state.objects.cuttingTool.visibleLite)
-                : (this.cuttingTool?.visible !== state.objects.cuttingTool.visible)
-        ) {
-            const { liteMode } = state;
-            if (this.cuttingTool?.visible) {
-                this.cuttingTool.visible = liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible;
-            }
-
-            if (this.cuttingPointer?.visible) {
-                this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
-            }
-            needUpdateScene = true;
-        }*/
-
         { // Update position
             let needUpdatePosition = false;
 
@@ -373,7 +362,26 @@ class Visualizer extends Component {
         }
     }
 
+    controllerEvents = {
+
+    };
+
+    addControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.addListener(eventName, callback);
+        });
+    }
+
+    removeControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.removeListener(eventName, callback);
+        });
+    }
+
     componentWillUnmount() {
+        this.removeControllerEvents();
         this.unsubscribe();
         this.removeResizeEventListener();
         store.removeListener('change', this.changeMachineProfile);
@@ -388,14 +396,15 @@ class Visualizer extends Component {
         });
     }
 
-    rerenderGCode(colors) {
+    rerenderGCode() {
         const { actions, state } = this.props;
         const { gcode } = state;
+
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
             this.group.remove(group);
-            actions.loadGCode('Visualizer', gcode.content);
         }
+        actions.loadGCode('Visualizer', gcode.content);
     }
 
     removeSceneGroup() {
@@ -443,7 +452,7 @@ class Visualizer extends Component {
         // Handle Background color
         this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
         this.redrawGrids();
-        this.rerenderGCode(currentTheme);
+        this.rerenderGCode();
     }
 
     subscribe() {
@@ -875,8 +884,6 @@ class Visualizer extends Component {
             this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
             this.limits.name = 'Limits';
             this.limits.visible = objects.limits.visible;
-            // this.group.add(this.limits);
-
             this.updateLimitsPosition();
         }
 
@@ -1086,14 +1093,10 @@ class Visualizer extends Component {
         this.updateScene();
     }
 
-    load(name, gcode, callback) {
-        // Remove previous G-code object
-        this.unload();
-
-        const { currentTheme } = this.props.state;
-
-        this.visualizer = new GCodeVisualizer(currentTheme);
-
+    handleSceneRender(gcode, callback) {
+        if (!this.visualizer) {
+            return;
+        }
         const obj = this.visualizer.render(gcode);
         obj.name = 'Visualizer';
         this.group.add(obj);
@@ -1153,6 +1156,22 @@ class Visualizer extends Component {
         }
 
         (typeof callback === 'function') && callback({ bbox: bbox });
+    }
+
+    load(name, gcode, callback) {
+        // Remove previous G-code object
+        this.unload();
+        const { currentTheme, disabled, disabledLite, liteMode } = this.props.state;
+        const { setVisualizerReady } = this.props.actions;
+        this.visualizer = new GCodeVisualizer(currentTheme);
+
+        const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
+
+        if (shouldRenderVisualization) {
+            this.handleSceneRender(gcode, callback);
+        } else {
+            setVisualizerReady();
+        }
     }
 
     unload() {

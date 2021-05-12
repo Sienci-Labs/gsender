@@ -370,8 +370,6 @@ class VisualizerWidget extends PureComponent {
                             zmax: bbox.max.z
                         };
 
-                        pubsub.publish('gcode:bbox', bbox);
-
                         const { port } = this.state;
 
                         this.setState((state) => ({
@@ -391,6 +389,7 @@ class VisualizerWidget extends PureComponent {
             };
 
             this.setState(updater, callback);
+            this.visualizer.handleSceneRender(gcode);
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
@@ -616,9 +615,13 @@ class VisualizerWidget extends PureComponent {
             }
         },
         handleLiteModeToggle: () => {
-            const { liteMode } = this.state;
+            const { liteMode, disabled, disabledLite } = this.state;
+            const newLiteModeValue = !liteMode;
+            const shouldRenderVisualization = newLiteModeValue ? !disabledLite : !disabled;
+            this.renderIfNecessary(shouldRenderVisualization);
+
             this.setState({
-                liteMode: !liteMode
+                liteMode: newLiteModeValue
             });
         },
         lineWarning: {
@@ -641,7 +644,18 @@ class VisualizerWidget extends PureComponent {
             },
             onCancel: () => this.actions.reset(),
         },
+        setVisualizerReady: () => {
+            this.setState((state) => ({
+                gcode: {
+                    ...state.gcode,
+                    loading: false,
+                    rendering: false,
+                    ready: true,
+                }
+            }));
+        },
         reset: () => {
+            this.actions.handleClose();
             this.setState(this.getInitialState());
             this.actions.unloadGCode();
             pubsub.publish('gcode:fileInfo');
@@ -945,8 +959,9 @@ class VisualizerWidget extends PureComponent {
             estimatedTime = 0;
         }
 
-        const total = lines.length + 1; //Dwell line added after every gcode parse
+        pubsub.publish('gcode:bbox', processor.getBBox());
 
+        const total = lines.length + 1; //Dwell line added after every gcode parse
         const payload = {
             total,
             toolSet: processor.vmState.tools,
@@ -954,6 +969,7 @@ class VisualizerWidget extends PureComponent {
             movementSet: processor.vmState.feedrates,
             invalidGcode: processor.vmState.invalidGcode,
             estimatedTime,
+            bbox: processor.vmState.bounds
         };
 
         return payload;
@@ -1260,8 +1276,24 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('keybindingsUpdated', () => {
                 this.updateShuttleControlEvents();
             }),
+            pubsub.subscribe('gcode:bbox', (msg, bbox) => {
+                const { gcode } = this.state;
+                this.setState({
+                    gcode: {
+                        ...gcode,
+                        bbox: bbox
+                    }
+                });
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    renderIfNecessary(shouldRender) {
+        const hasVisualization = this.visualizer.hasVisualization();
+        if (shouldRender && !hasVisualization) {
+            this.visualizer.rerenderGCode();
+        }
     }
 
     render() {

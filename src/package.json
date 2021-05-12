@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "productName": "gSender",
   "description": "CNC Milling Controller",
   "author": {
@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Sienci-Labs/sender.git"
+    "url": "https://github.com/Sienci-Labs/gsender"
   },
   "main": "main.js",
   "dependencies": {

@@ -19,13 +19,16 @@ Some things that we’re looking to accomplish with this sender:
 
 ## 💻 Download
 
-![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (M1) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/linux.png)<br>Linux
---- | --- | --- | --- | --- |
- In Progress | [0.5.6 (EXE)](https://github.com/Sienci-Labs/sender/releases/download/v0.5.6/gSender-Setup-0.5.6.exe) | [0.5.6 (DMG)](https://github.com/Sienci-Labs/sender/releases/download/v0.5.6/gSender-0.5.6.dmg) | In Progress | In Progress |
+gSender is available for the following systems and does not yet support headless Pi operation
+| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (M1) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/linux.png)<br>Linux
+|-|-|-|-|-
+ ``` Available ``` | ``` Available ``` | ``` Available ``` | ``` In Progress ``` | ``` In Progress ```
+
+[Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
 ## 📦 Current Features
 
-* GRBL controllers supported ([Download](https://github.com/gnea/grbl/releases))
+* [GRBL](https://github.com/gnea/grbl/releases) controllers supported
 * Smart machine connection
 * 3-axis digital readout (DRO)
 * All-directional jogging with XY diagonals, jog presets, and incremental/continuous single-button handling
@@ -81,6 +84,25 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### Beta 0.6.0 (May 7, 2021)
+* Altered how files are loaded to improve UI performance
+* Added estimated time to run calculation on file load
+* File attributes now persists on disconnect
+* Fixed issues with macro editing and adding
+
+### Beta 0.5.8 (Apr 30, 2021)
+* New experimental Winx32 and RasPi builds
+* Firmware tool improvements and bug fixes
+* More accurate parsing of tool and spindle speeds
+* Various keybind bug fixes, addressing special characters
+* Added recent files button and file unloading
+* New Check mode state for testing files before starting job
+* Verbose commands now in console
+* New macro behaviours and import/export
+* gSender now officially licensed under GPLv3
+* Homing state and other small bugs and styling fixes
+* New logo/branding throughout!
 
 ### Beta 0.5.6 (Apr 1, 2021)
 * Fixed jog stepping with keybindings, continuous jogging bugs, and other jogging unreliabilities

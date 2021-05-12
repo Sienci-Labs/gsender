@@ -330,15 +330,6 @@
     "Enter Full Screen": "",
     "Exit Full Screen": "",
     "URL": "",
-    "Min": "",
-    "Max": "",
-    "Dimension": "",
-    "Sent": "",
-    "Received": "",
-    "Start Time": "",
-    "Elapsed Time": "",
-    "Finish Time": "",
-    "Remaining Time": "",
     "Controller State": "",
     "Controller Settings": "",
     "Hide": "",
@@ -445,6 +436,6 @@
     "Stop Job": "",
     "Add New Macro": "",
     "No macros...": "",
-    "Test Run File": "",
-    "Test Run Gcode File": ""
+    "Test Run Gcode File": "",
+    "Test Run": ""
 }

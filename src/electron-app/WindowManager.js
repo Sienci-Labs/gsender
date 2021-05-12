@@ -22,7 +22,7 @@
  */
 
 /* eslint import/no-unresolved: 0 */
-import { app, BrowserWindow, shell, dialog } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 
 import path from 'path';
 
@@ -81,7 +81,7 @@ class WindowManager {
             }
         });
         const webContents = window.webContents;
-        window.removeMenu();
+        //window.removeMenu();
         window.webContents.on('did-finish-load', () => {
             window.setTitle(options.title);
         });
@@ -100,9 +100,11 @@ class WindowManager {
         });
 
         webContents.once('dom-ready', () => {
-            splashScreen.hide();
-            window.show();
-            splashScreen.destroy();
+            setTimeout(() => {
+                splashScreen.hide();
+                window.show();
+                splashScreen.destroy();
+            }, 4000);
         });
 
         // Call `ses.setProxy` to ignore proxy settings
