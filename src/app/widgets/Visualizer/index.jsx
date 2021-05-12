@@ -667,6 +667,7 @@ class VisualizerWidget extends PureComponent {
             onCancel: () => this.actions.reset(),
         },
         reset: () => {
+            this.actions.handleClose();
             this.setState(this.getInitialState());
             this.actions.unloadGCode();
             pubsub.publish('gcode:fileInfo');
