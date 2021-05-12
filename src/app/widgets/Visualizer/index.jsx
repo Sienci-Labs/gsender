@@ -387,6 +387,7 @@ class VisualizerWidget extends PureComponent {
             };
 
             this.setState(updater, callback);
+            this.visualizer.handleSceneRender(gcode);
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
@@ -612,9 +613,13 @@ class VisualizerWidget extends PureComponent {
             }
         },
         handleLiteModeToggle: () => {
-            const { liteMode } = this.state;
+            const { liteMode, disabled, disabledLite } = this.state;
+            const newLiteModeValue = !liteMode;
+            const shouldRenderVisualization = newLiteModeValue ? !disabledLite : !disabled;
+            this.renderIfNecessary(shouldRenderVisualization);
+
             this.setState({
-                liteMode: !liteMode
+                liteMode: newLiteModeValue
             });
         },
         lineWarning: {
@@ -1275,6 +1280,16 @@ class VisualizerWidget extends PureComponent {
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    renderIfNecessary(shouldRender) {
+        const hasVisualization = this.visualizer.hasVisualization();
+        if (shouldRender && !hasVisualization) {
+            console.log('IN BRANCH - Do Re-render');
+            this.visualizer.rerenderGCode();
+        } else {
+            console.log('NO RENDER');
+        }
     }
 
     render() {

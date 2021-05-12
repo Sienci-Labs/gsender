@@ -149,6 +149,10 @@ class Visualizer extends Component {
         this.updateScene();
     };
 
+    hasVisualization() {
+        return this.group.getObjectByName('Visualizer');
+    }
+
     renderAnimationLoop = () => {
         const showAnimation = this.showAnimation();
         if (showAnimation) {
@@ -374,6 +378,7 @@ class Visualizer extends Component {
     rerenderGCode() {
         const { actions, state } = this.props;
         const { gcode } = state;
+        console.log(gcode);
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
             this.group.remove(group);
@@ -1068,6 +1073,9 @@ class Visualizer extends Component {
     }
 
     handleSceneRender(gcode, callback) {
+        if (!this.visualizer) {
+            return;
+        }
         const obj = this.visualizer.render(gcode);
         obj.name = 'Visualizer';
         this.group.add(obj);
@@ -1139,7 +1147,6 @@ class Visualizer extends Component {
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
         if (shouldRenderVisualization) {
-            console.log('render called');
             this.handleSceneRender(gcode, callback);
         } else {
             setVisualizerReady();
