@@ -24,6 +24,8 @@
 import { GCodeProcessor } from './helpers/GCodeProcessor';
 
 onmessage = function({ data }) {
+    console.log('in worker');
+    console.log(data);
     const { lines } = data;
 
     const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });

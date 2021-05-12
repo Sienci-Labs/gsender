@@ -45,7 +45,7 @@ import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
-import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
+//import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
 import EstimateWorker from './Estimate.worker';
 import WidgetConfig from '../WidgetConfig';
 import WorkflowControl from './WorkflowControl';
@@ -94,7 +94,6 @@ import {
     DARK_THEME_VALUES
 } from './constants';
 import styles from './index.styl';
-import { GCodeProcessor } from './helpers/GCodeProcessor';
 
 const translateExpression = (function() {
     const { Parser } = ExpressionEvaluator;
@@ -242,6 +241,7 @@ class VisualizerWidget extends PureComponent {
             });
         },
         uploadFile: (gcode, meta) => {
+            console.log('in uploadFile');
             const { name, size } = { ...meta };
             const context = {};
 
@@ -256,8 +256,11 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
+            // Start file parsing worker
+            this.processGCode(gcode);
+
             //Prevent thread blocking
-            setTimeout(() => {
+            /*setTimeout(() => {
                 const payload = this.processGCode(gcode);
 
                 const {
@@ -284,7 +287,7 @@ class VisualizerWidget extends PureComponent {
                 this.setState({ total });
 
                 pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
-            }, 0);
+            }, 0);*/
 
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
@@ -937,17 +940,25 @@ class VisualizerWidget extends PureComponent {
     pubsubTokens = [];
 
     onProcessedGcode = ({ data }) => {
+        console.log('in process');
         console.log(data);
     }
 
     processGCode = (gcode) => {
         const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
-
+        console.log('in processGCode');
         //Clean up lines and remove ones that are comments and headers
         const lines = gcode.split('\n')
             .filter(line => (line.trim().length > 0))
             .filter(line => !comments.some(comment => line.includes(comment)));
 
+        const estimateWorker = new EstimateWorker();
+        estimateWorker.onmessage = this.onProcessedGcode;
+        estimateWorker.postMessage({
+            lines: lines
+        });
+
+        /*
         const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
 
         let estimatedTime;
@@ -972,7 +983,7 @@ class VisualizerWidget extends PureComponent {
             bbox: processor.vmState.bounds
         };
 
-        return payload;
+        return payload;*/
     };
 
     unsubscribe() {
