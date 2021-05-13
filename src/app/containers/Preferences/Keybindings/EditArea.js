@@ -44,6 +44,7 @@ export default class EditArea extends Component {
         shortcuts: PropTypes.array,
         switchPages: PropTypes.func,
         edit: PropTypes.func,
+        onClose: PropTypes.func,
     }
 
     initialState = {
@@ -239,7 +240,7 @@ export default class EditArea extends Component {
             ctrlTriggered,
             state,
         } = this.state;
-        const { switchPages, shortcut } = this.props;
+        const { onClose, shortcut } = this.props;
 
         const infoWindowOutput = this.infoWindowOutput();
 
@@ -278,7 +279,7 @@ export default class EditArea extends Component {
 
                 <div className={styles['button-group-wrapper']}>
                     <ButtonGroup style={{ marginTop: '2rem' }}>
-                        <Button btnSize="lg" btnStyle="default" onClick={() => switchPages('Table')}>Back</Button>
+                        <Button btnSize="lg" btnStyle="default" onClick={onClose}>Cancel</Button>
                         <Button
                             btnSize="lg" btnStyle="primary" disabled={!state.available}
                             onClick={this.handleEdit}
