@@ -250,6 +250,8 @@ class VisualizerWidget extends PureComponent {
                 this.visualizer.unload();
             }
 
+            pubsub.publish('gcode:processing', true);
+
             this.setState((state) => ({
                 gcode: {
                     ...state.gcode,
@@ -954,7 +956,6 @@ class VisualizerWidget extends PureComponent {
 
 
         // Set "Loading" state to job info widget and start file VM processor
-        pubsub.publish('gcode:processing', true);
         const estimateWorker = new EstimateWorker();
         estimateWorker.onmessage = this.onProcessedGcode;
         estimateWorker.postMessage({
