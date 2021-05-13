@@ -42,8 +42,8 @@ for:
   -
     matrix:
       only:
-        - job_name: Linux build (amd64)
         - job_name: Linux build (arm)
+        - job_name: Linux build (amd64)
         - job_name: Linux build (arm64)
       fast_finish: true
 
@@ -99,7 +99,7 @@ for:
           yarn clean
           yarn lint
           yarn test
-          yarn install serialport --unsafe-perms --rebuild-from-source
+          yarn install serialport --unsafe-perms --build-from-source
           if [[ -z "$CI_TAG" ]]; then
             yarn build-latest
           else
