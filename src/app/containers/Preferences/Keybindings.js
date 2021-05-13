@@ -28,6 +28,8 @@ import pubsub from 'pubsub-js';
 import _ from 'lodash';
 
 import store from 'app/store';
+import Modal from 'app/components/Modal';
+
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 
 import Table from './Keybindings/MainTable';
@@ -54,23 +56,20 @@ export default class Keybindings extends Component {
 
     state = {
         keybindingsList: store.get('commandKeys', []),
-        currentPage: 'Table',
         currentShortcut: {},
-    }
-
-    switchPages = (page) => {
-        this.setState({ currentPage: page });
+        showEditModal: false,
     }
 
     handleEdit = (currentShortcut) => {
-        this.setState({ currentPage: 'Edit', currentShortcut });
+        // this.setState({ currentPage: 'Edit', currentShortcut });
+        this.setState({ showEditModal: true, currentShortcut });
     }
 
     /**
      * Function to edit the stores commandKeys array
      * @param {Object} shortcut The shortcut that was modifed
      */
-    editKeybinding = (shortcut) => {
+    editKeybinding = (shortcut, showToast = true) => {
         const { keybindingsList } = this.state;
 
         //Replace old keybinding item with new one
@@ -79,9 +78,11 @@ export default class Keybindings extends Component {
         store.set('commandKeys', editedKeybindingsList);
         pubsub.publish('keybindingsUpdated');
 
-        this.setState({ currentPage: 'Table', keybindingsList: editedKeybindingsList });
+        this.setState({ showEditModal: false, keybindingsList: editedKeybindingsList });
 
-        this.showToast();
+        if (showToast) {
+            this.showToast();
+        }
     }
 
     // Trigger pubsub for use in Location widget where keybindings are injected
@@ -97,10 +98,14 @@ export default class Keybindings extends Component {
         pubsub.publish('addKeybindingsListener');
     }
 
+    closeModal = () => {
+        this.setState({ showEditModal: false });
+    }
+
     render() {
-        const { handleEdit, switchPages, editKeybinding } = this;
+        const { handleEdit, editKeybinding, closeModal } = this;
         const { active } = this.props;
-        const { currentPage, currentShortcut, keybindingsList } = this.state;
+        const { currentShortcut, keybindingsList, showEditModal } = this.state;
 
         return (
             <div
@@ -112,20 +117,22 @@ export default class Keybindings extends Component {
             >
                 <h3 className={styles['settings-title']}>Keybindings</h3>
 
-                { currentPage === 'Table' && (
-                    <div className={styles['table-wrapper']}>
-                        <Table data={keybindingsList} onEdit={handleEdit} />
-                    </div>
-                )}
+                <div className={styles['table-wrapper']}>
+                    <Table data={keybindingsList} onEdit={handleEdit} onShortcutToggle={editKeybinding} />
+                </div>
 
-                { currentPage === 'Edit' && (
-                    <EditArea
-                        switchPages={switchPages}
-                        shortcut={currentShortcut}
-                        shortcuts={keybindingsList}
-                        edit={editKeybinding}
-                    />
-                )}
+                { showEditModal && (
+                    <Modal onClose={closeModal} size="md" style={{ padding: '1rem 1rem 2rem', backgroundColor: '#d1d5db' }}>
+                        <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>Edit Shortcut</h2>
+
+                        <EditArea
+                            shortcut={currentShortcut}
+                            shortcuts={keybindingsList}
+                            edit={editKeybinding}
+                            onClose={closeModal}
+                        />
+                    </Modal>
+                ) }
             </div>
         );
     }
