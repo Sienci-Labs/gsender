@@ -25,8 +25,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import Table from 'app/components/Table';
+import ToggleSwitch from 'app/components/ToggleSwitch';
 
 import { formatShortcut } from './helpers';
+import styles from './edit-area.styl';
 
 /**
  * Keybindings Table Component
@@ -36,6 +38,7 @@ import { formatShortcut } from './helpers';
 export default class MainTable extends Component {
     static propTypes = {
         onEdit: PropTypes.func,
+        onShortcutToggle: PropTypes.func,
         data: PropTypes.array,
     }
 
@@ -56,7 +59,19 @@ export default class MainTable extends Component {
 
             const output = cleanedShortcut ? formatShortcut(cleanedShortcut) : formatShortcut(shortcut);
 
-            return output;
+            return (
+                <div className={styles.shortcutRowHeader}>
+                    <span>{output}</span>
+                    <i
+                        role="button"
+                        tabIndex={-1}
+                        className="fas fa-edit"
+                        onClick={() => this.props.onEdit(row)}
+                        onKeyDown={() => this.props.onEdit(row)}
+                        style={{ alignSelf: 'center', color: '#2b5d8b' }}
+                    />
+                </div>
+            );
         },
         renderActionCell: (_, row) => {
             return (
@@ -68,13 +83,23 @@ export default class MainTable extends Component {
                     onKeyDown={() => this.props.onEdit(row)}
                 />
             );
+        },
+        renderToggleCell: (_, row) => {
+            return (
+                <ToggleSwitch
+                    checked={row.isActive}
+                    onChange={(isActive) => {
+                        this.props.onShortcutToggle({ ...row, isActive }, false);
+                    }}
+                />
+            );
         }
     }
 
     columns = [
         { dataIndex: 'title', title: 'Action', sortable: true, key: 'title', width: '45%' },
         { dataIndex: 'keys', title: 'Shortcut', sortable: true, key: 'keys', width: '45%', render: this.renders.renderShortcutCell },
-        { key: 'edit', title: 'Edit', render: this.renders.renderActionCell, width: '10%' },
+        { dataIndex: 'isActive', title: 'Active', key: 'isActive', width: '10%', render: this.renders.renderToggleCell }
     ];
 
     render() {
