@@ -52,7 +52,7 @@ import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
-import { Toaster, TOASTER_DANGER, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
+import { Toaster, TOASTER_DANGER, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import {
     // Grbl
     GRBL,
@@ -230,7 +230,7 @@ class WorkflowControl extends PureComponent {
 
     handleTestFile = (event) => {
         const { actions } = this.props;
-        this.setState({ testStarted: true });
+        this.setState({ runHasStarted: true });
         controller.command('gcode', '$c');
         actions.onRunClick();
     };
@@ -289,8 +289,9 @@ class WorkflowControl extends PureComponent {
     }
 
     controllerEvents = {
-        'task:finish': (data, message) => {
+        'gcode_error_checking_file': (data, message) => {
             if (message === 'finished') {
+                this.setState({ runHasStarted: false });
                 this.setState({ CurrentGCodeFile: data.name });
                 this.finishedTestingFileToast();
             }
@@ -359,7 +360,7 @@ class WorkflowControl extends PureComponent {
                         <button
                             type="button"
                             className={this.state.fileLoaded ? `${styles['workflow-button-hidden']}` : `${styles['workflow-button-test']}`}
-                            title={i18n._('Test Run Gcode File')}
+                            title={i18n._('Test Run')}
                             onClick={this.handleTestFile}
                             disabled={!canRun}
                             style={{ writingMode: 'vertical-lr' }}
@@ -401,11 +402,6 @@ class WorkflowControl extends PureComponent {
                                                     actions.closeModal();
                                                     actions.unloadGCode();
                                                     actions.reset();
-                                                    Toaster.pop({
-                                                        msg: 'Gcode File Closed',
-                                                        type: TOASTER_INFO,
-                                                        icon: 'fa-exclamation'
-                                                    });
                                                 }}
                                             >
                                                 Yes

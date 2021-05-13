@@ -667,10 +667,18 @@ class VisualizerWidget extends PureComponent {
             onCancel: () => this.actions.reset(),
         },
         reset: () => {
+            let activeState = this.state.controller.state.status.activeState;
+            if (activeState === 'Check') {
+                controller.command('gcode', '$c');
+            }
             this.actions.handleClose();
             this.setState(this.getInitialState());
             this.actions.unloadGCode();
             pubsub.publish('gcode:fileInfo');
+            Toaster.pop({
+                msg: 'Gcode File Closed',
+                icon: 'fa-exclamation'
+            });
         }
     };
 
