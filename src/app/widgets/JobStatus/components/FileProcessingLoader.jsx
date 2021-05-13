@@ -21,24 +21,17 @@
  *
  */
 
-.job-status-wrapper {
-    display: flex;
-    flex-direction row;
-    flex-grow: 1;
-    align-items: center;
-    width: 100%;
-    height: 8rem;
-}
+import React from 'react';
+import styles from '../index.styl';
 
+const FileProcessingLoader = () => {
+    return (
+        <div className={styles['job-status-wrapper']}>
+            <div className={styles.processingLoader}>
+                Calculating file statistics...
+            </div>
+        </div>
+    );
+};
 
-.processing-loader {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    justify-content center;
-    align-items center;
-    font-size: 1.2rem;
-    background:  #e5e7eb;
-    border: solid 1px #9CA3AF;
-}
+export default FileProcessingLoader;

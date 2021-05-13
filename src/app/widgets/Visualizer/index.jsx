@@ -910,7 +910,6 @@ class VisualizerWidget extends PureComponent {
     pubsubTokens = [];
 
     onProcessedGcode = ({ data }) => {
-        console.log(data);
         const {
             total,
             toolSet,
@@ -949,6 +948,9 @@ class VisualizerWidget extends PureComponent {
             .filter(line => (line.trim().length > 0))
             .filter(line => !comments.some(comment => line.includes(comment)));
 
+
+        // Set "Loading" state to job info widget and start file VM processor
+        pubsub.publish('gcode:processing', true);
         const estimateWorker = new EstimateWorker();
         estimateWorker.onmessage = this.onProcessedGcode;
         estimateWorker.postMessage({
@@ -956,33 +958,6 @@ class VisualizerWidget extends PureComponent {
             name,
             size
         });
-
-        /*
-        const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
-
-        let estimatedTime;
-        try {
-            //processor.process(lines);
-            estimatedTime = processor.vmState.totalTime;
-        } catch (error) {
-            console.log(error.message);
-            estimatedTime = 0;
-        }
-
-        pubsub.publish('gcode:bbox', processor.getBBox());
-
-        const total = lines.length + 1; //Dwell line added after every gcode parse
-        const payload = {
-            total,
-            toolSet: processor.vmState.tools,
-            spindleSet: processor.vmState.spindleRates,
-            movementSet: processor.vmState.feedrates,
-            invalidGcode: processor.vmState.invalidGcode,
-            estimatedTime,
-            bbox: processor.vmState.bounds
-        };
-
-        return payload;*/
     };
 
     unsubscribe() {
