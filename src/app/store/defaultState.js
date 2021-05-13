@@ -364,35 +364,40 @@ const defaultState = {
             title: 'Start Job',
             keys: '~',
             cmd: 'START_JOB',
-            preventDefault: true
+            preventDefault: true,
+            isActive: true,
         },
         { // Pause Job
             id: 1,
             title: 'Pause Job',
             keys: '!',
             cmd: 'PAUSE_JOB',
-            preventDefault: true
+            preventDefault: true,
+            isActive: true,
         },
         { // Stop Job
             id: 2,
             title: 'Stop Job',
             keys: '@',
             cmd: 'STOP_JOB',
-            preventDefault: true
+            preventDefault: true,
+            isActive: true,
         },
         { // Zero All
             id: 3,
             title: 'Zero All',
             keys: '$',
             cmd: 'ZERO_ALL',
-            preventDefault: true
+            preventDefault: true,
+            isActive: true,
         },
         { // Go to Zero
             id: 4,
             title: 'Go to Zero',
             keys: '%',
             cmd: 'GO_TO_ZERO',
-            preventDefault: true
+            preventDefault: true,
+            isActive: true,
         },
         { // Feed Hold
             id: 5,
@@ -402,7 +407,8 @@ const defaultState = {
             payload: {
                 command: 'feedhold'
             },
-            preventDefault: true
+            preventDefault: true,
+            isActive: true,
         },
         { // Cycle Start
             id: 6,
@@ -412,14 +418,16 @@ const defaultState = {
             payload: {
                 command: 'cyclestart'
             },
-            preventDefault: true
+            preventDefault: true,
+            isActive: true,
         },
         { // Load File
             id: 7,
             title: 'Load File',
             keys: ['shift', 'enter'].join('+'),
             cmd: 'LOAD_FILE',
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Homing
             id: 8,
@@ -429,7 +437,8 @@ const defaultState = {
             payload: {
                 command: 'homing'
             },
-            preventDefault: true
+            preventDefault: true,
+            isActive: true,
         },
         { // Unlock
             id: 9,
@@ -439,7 +448,8 @@ const defaultState = {
             payload: {
                 command: 'unlock'
             },
-            preventDefault: true
+            preventDefault: true,
+            isActive: true,
         },
         { // Reset
             id: 10,
@@ -449,7 +459,8 @@ const defaultState = {
             payload: {
                 command: 'reset'
             },
-            preventDefault: true
+            preventDefault: true,
+            isActive: true,
         },
         { // Change Jog Speed
             id: 11,
@@ -459,7 +470,8 @@ const defaultState = {
             payload: {
                 speed: 'increase'
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Change Jog Speed
             id: 12,
@@ -469,7 +481,8 @@ const defaultState = {
             payload: {
                 speed: 'decrease'
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Jog X+
             id: 13,
@@ -480,7 +493,8 @@ const defaultState = {
                 axis: AXIS_X,
                 direction: FORWARD,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Jog X-
             id: 14,
@@ -491,7 +505,8 @@ const defaultState = {
                 axis: AXIS_X,
                 direction: BACKWARD,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Jog Y+
             id: 15,
@@ -502,7 +517,8 @@ const defaultState = {
                 axis: AXIS_Y,
                 direction: FORWARD,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Jog Y-
             id: 16,
@@ -513,7 +529,8 @@ const defaultState = {
                 axis: AXIS_Y,
                 direction: BACKWARD,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Jog Z+
             id: 17,
@@ -524,7 +541,8 @@ const defaultState = {
                 axis: AXIS_Z,
                 direction: FORWARD,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Jog Z-
             id: 18,
@@ -535,7 +553,8 @@ const defaultState = {
                 axis: AXIS_Z,
                 direction: BACKWARD,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Zero X Axis
             id: 19,
@@ -545,7 +564,8 @@ const defaultState = {
             payload: {
                 axis: AXIS_X,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Zero y Axis
             id: 20,
@@ -555,7 +575,8 @@ const defaultState = {
             payload: {
                 axis: AXIS_Y,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Zero Z Axis
             id: 21,
@@ -565,7 +586,8 @@ const defaultState = {
             payload: {
                 axis: AXIS_Z,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Go to X Axis
             id: 22,
@@ -575,7 +597,8 @@ const defaultState = {
             payload: {
                 axis: AXIS_X,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: false,
         },
         { // Go to Y Axis
             id: 23,
@@ -585,7 +608,8 @@ const defaultState = {
             payload: {
                 axis: AXIS_Y,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Go to Z Axis
             id: 24,
@@ -595,7 +619,8 @@ const defaultState = {
             payload: {
                 axis: AXIS_Z,
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: false,
         },
         { // Select Rapid Jog Preset
             id: 25,
@@ -605,7 +630,8 @@ const defaultState = {
             payload: {
                 key: SPEED_RAPID
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Select Normal Jog Preset
             id: 26,
@@ -615,7 +641,8 @@ const defaultState = {
             payload: {
                 key: SPEED_NORMAL
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
         { // Select Precise Jog Preset
             id: 27,
@@ -625,7 +652,8 @@ const defaultState = {
             payload: {
                 key: SPEED_PRECISE
             },
-            preventDefault: false
+            preventDefault: false,
+            isActive: true,
         },
     ]
 };
