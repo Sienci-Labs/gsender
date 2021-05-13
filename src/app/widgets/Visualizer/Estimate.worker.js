@@ -24,19 +24,20 @@
 import { GCodeProcessor } from './helpers/GCodeProcessor';
 
 onmessage = function({ data }) {
-    console.log('in worker');
-    console.log(data);
-    const { lines } = data;
+    const { lines, name, size } = data;
 
     const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
     processor.process(lines);
 
     postMessage({
+        name,
+        size,
         total: (lines.length + 1),
         toolSet: processor.vmState.tools,
         spindleSet: processor.vmState.spindleRates,
         movementSet: processor.vmState.feedrates,
         invalidGcode: processor.vmState.invalidGcode,
-        estimatedTime: processor.vmState.totalTime
+        estimatedTime: processor.vmState.totalTime,
+        bbox: processor.getBBox()
     });
 };

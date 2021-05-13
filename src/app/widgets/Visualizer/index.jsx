@@ -45,7 +45,7 @@ import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
-//import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
 import EstimateWorker from './Estimate.worker';
 import WidgetConfig from '../WidgetConfig';
 import WorkflowControl from './WorkflowControl';
@@ -241,7 +241,6 @@ class VisualizerWidget extends PureComponent {
             });
         },
         uploadFile: (gcode, meta) => {
-            console.log('in uploadFile');
             const { name, size } = { ...meta };
             const context = {};
 
@@ -257,37 +256,8 @@ class VisualizerWidget extends PureComponent {
             }));
 
             // Start file parsing worker
-            this.processGCode(gcode);
+            this.processGCode(gcode, name, size);
 
-            //Prevent thread blocking
-            /*setTimeout(() => {
-                const payload = this.processGCode(gcode);
-
-                const {
-                    total,
-                    toolSet,
-                    spindleSet,
-                    movementSet,
-                    invalidGcode,
-                    estimatedTime,
-                } = payload;
-
-                if (invalidGcode.size > 0) {
-                    this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
-                    if (this.state.invalidGcode.shouldShow) {
-                        Toaster.pop({
-                            msg: `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
-                            type: TOASTER_WARNING,
-                            duration: TOASTER_LONG,
-                            icon: 'fa-exclamation-triangle'
-                        });
-                    }
-                }
-
-                this.setState({ total });
-
-                pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
-            }, 0);*/
 
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
@@ -940,13 +910,40 @@ class VisualizerWidget extends PureComponent {
     pubsubTokens = [];
 
     onProcessedGcode = ({ data }) => {
-        console.log('in process');
         console.log(data);
+        const {
+            total,
+            toolSet,
+            spindleSet,
+            movementSet,
+            invalidGcode,
+            estimatedTime,
+            bbox,
+            name,
+            size
+        } = data;
+
+        if (invalidGcode.size > 0) {
+            this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
+            if (this.state.invalidGcode.shouldShow) {
+                Toaster.pop({
+                    msg: `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
+                    type: TOASTER_WARNING,
+                    duration: TOASTER_LONG,
+                    icon: 'fa-exclamation-triangle'
+                });
+            }
+        }
+
+        this.setState({ total });
+
+        // Emit events on response with relevant data from processor worker
+        pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
+        pubsub.publish('gcode:bbox', bbox);
     }
 
-    processGCode = (gcode) => {
+    processGCode = (gcode, name, size) => {
         const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
-        console.log('in processGCode');
         //Clean up lines and remove ones that are comments and headers
         const lines = gcode.split('\n')
             .filter(line => (line.trim().length > 0))
@@ -955,7 +952,9 @@ class VisualizerWidget extends PureComponent {
         const estimateWorker = new EstimateWorker();
         estimateWorker.onmessage = this.onProcessedGcode;
         estimateWorker.postMessage({
-            lines: lines
+            lines: lines,
+            name,
+            size
         });
 
         /*
