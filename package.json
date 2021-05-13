@@ -79,6 +79,7 @@
     "asar": false,
     "asarUnpack": [],
     "productName": "gSender",
+    "npmRebuild":false,
     "directories": {
       "buildResources": "electron-build",
       "output": "output",
