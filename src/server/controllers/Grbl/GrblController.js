@@ -403,6 +403,7 @@ class GrblController {
 
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
+            console.log(finishTime);
         });
 
         // Workflow
@@ -526,33 +527,29 @@ class GrblController {
             const error = _.find(GRBL_ERRORS, { code: code });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
-                // const ignoreErrors = config.get('state.controller.exception.ignoreErrors');
-                // const pauseError = !ignoreErrors;
                 const { lines, received } = this.sender.state;
                 const line = lines[received] || '';
 
-                const preferences = store.get('preferences') || { showLineWarnings: true };
-
+                const preferences = store.get('preferences') || { showLineWarnings: false };
                 this.emit('serialport:read', `error:${code} (${error.message})`);
+
                 if (error) {
+                    if (preferences.showLineWarnings === false) {
+                        this.emit('gcode_error', error, code, line);
+                        this.workflow.pause({ err: `error:${code} (${error.message})` });
+                    }
+
                     if (preferences.showLineWarnings) {
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                         this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
+                        return;
                     }
                 } else {
                     this.emit('serialport:read', res.raw);
-
-                    if (preferences.showLineWarnings) {
-                        this.workflow.pause({ err: `error:${code} (${error.message})` });
-                        this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
-                    }
                 }
-
                 this.sender.ack();
                 this.sender.next();
-                console.log(`ERROR: ${JSON.stringify(error)}`);
-                console.log(`code: ${code}`);
-                this.emit('gcode:error', error, code);
+
                 return;
             }
 
@@ -583,20 +580,12 @@ class GrblController {
         });
 
         this.runner.on('parserstate', (res) => {
-            //errors in gCode file
-            let messageType = '';
-            if (this.sender.state.holdReason !== null && this.runner.state.status.activeState === 'Check') {
-                messageType = 'error';
-                this.emit('task:finish', this.sender.state, messageType);
-                this.workflow.resumeTesting();
-                this.write('Error found in file...');
-            }
-            //finished searching gCode file
+            //finished searching gCode file for errors
+
             if (this.sender.state.finishTime > 0 && this.runner.state.status.activeState === 'Check') {
-                messageType = 'finished';
                 this.command('gcode', '$c');
                 this.workflow.stopTesting();
-                this.emit('task:finish', this.sender.state, messageType);
+                this.emit('gcode_error_checking_file', this.sender.state, 'finished');
                 return;
             }
 
@@ -1233,10 +1222,6 @@ class GrblController {
             'resume': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:resume');
-            },
-            'gcode:error': () => {
-                const [errors] = args;
-                this.emit('serialport:write', errors);
             },
             'gcode:resume': () => {
                 this.event.trigger('gcode:resume');
