@@ -23,17 +23,11 @@
 
 import React from 'react';
 import styles from '../index.styl';
-import LoaderBar from './LoaderBar';
 
-const FileProcessingLoader = () => {
+const LoaderBar = () => {
     return (
-        <div className={styles['job-status-wrapper']}>
-            <div className={styles.processingLoader}>
-                Calculating file statistics...
-                <LoaderBar />
-            </div>
-        </div>
+        <div className={styles.loadingBar} />
     );
 };
 
-export default FileProcessingLoader;
+export default LoaderBar;

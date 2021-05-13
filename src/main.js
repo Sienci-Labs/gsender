@@ -32,7 +32,7 @@ import path from 'path';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
-import './sentryInit';
+//import './sentryInit';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 
 
