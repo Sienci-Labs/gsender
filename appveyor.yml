@@ -303,6 +303,100 @@ for:
           appveyor_repo_tag: true  # deploy on tag push only
           nodejs_version: "12"
 
+  # macOS
+  -
+    matrix:
+      only:
+        - job_name: macOS build (x64)
+      fast_finish: true
+
+    init:
+      - uname -a
+      - git --version
+      - git config --global core.autocrlf false
+      - git config --global user.name "AppVeyor"
+      - git config --global user.email "appveyor@ci.appveyor.com"
+      - sh: |
+          export CI_BRANCH=$APPVEYOR_REPO_BRANCH
+          export CI_BUILD_NUMBER=$APPVEYOR_BUILD_NUMBER
+          export CI_COMMIT=$APPVEYOR_REPO_COMMIT
+          export CI_COMMIT_SHORT=${APPVEYOR_REPO_COMMIT:0:8}
+          export CI_COMMIT_TIMESTAMP=$APPVEYOR_REPO_COMMIT_TIMESTAMP
+          export CI_TAG=$APPVEYOR_REPO_TAG_NAME
+          echo "• ARCH=$ARCH"
+          echo "• CI_BRANCH=$CI_BRANCH"
+          echo "• CI_BUILD_NUMBER=$CI_BUILD_NUMBER"
+          echo "• CI_COMMIT=$CI_COMMIT"
+          echo "• CI_COMMIT_SHORT=$CI_COMMIT_SHORT"
+          echo "• CI_COMMIT_TIMESTAMP=$CI_COMMIT_TIMESTAMP"
+          echo "• CI_TAG=$CI_TAG"
+    install:
+      - nvm install $nodejs_version
+      - security import "scripts/certs/Certum-Code-Signing-CA-SHA2.cer" -k ~/Library/Keychains/login.keychain -T /usr/bin/codesign
+      - npm config set loglevel warn
+      - npm config set scripts-prepend-node-path auto
+      - npm install -g npm
+      - npm install -g yarn
+      - yarn
+
+    build_script:
+      - sh: |
+          yarn clean
+          yarn lint
+          yarn test
+          if [[ -z "$CI_TAG" ]]; then
+            yarn build-latest
+          else
+            yarn build
+          fi
+      - sh: |
+          # x64
+          if [[ "$ARCH" == "x64" ]]; then
+            GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
+            PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
+            PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
+            PRODUCT_NAME=gSender
+            yarn build:macos-x64
+            ls -al output output/*
+            mkdir -p releases/macos
+            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.x64.dmg"
+            ls -al releases/macos/*
+            if [[ "$CI_BRANCH" == "master" && -z "$CI_TAG" ]]; then
+              yarn github-release delete \
+                --owner=Sienci \
+                --repo=sender \
+                --tag="${CI_BRANCH}" \
+                --release-name="${CI_BRANCH}" \
+                "*-macos.x64.dmg";
+              yarn github-release upload \
+                --owner=Sienci \
+                --repo=sender \
+                --tag="${CI_BRANCH}" \
+                --release-name="${CI_BRANCH}" \
+                --body="${GIT_COMMIT_LOG}" \
+                "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.x64.dmg";
+              #rm -f "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.x64.dmg";
+            fi
+          fi
+    test: off
+
+    # Packaging artifacts
+    # https://www.appveyor.com/docs/packaging-artifacts
+    artifacts:
+      - path: releases/macos/*
+
+    # Publishing artifacts to GitHub Releases
+    # https://www.appveyor.com/docs/deployment/github
+    deploy:
+      - provider: GitHub
+        auth_token:
+          secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
+        draft: true
+        prerelease: false
+        on:
+          appveyor_repo_tag: true  # deploy on tag push only
+          nodejs_version: "12"
+
   # Windows
   -
     matrix:
@@ -422,98 +516,3 @@ for:
         on:
           appveyor_repo_tag: true  # deploy on tag push only
           nodejs_version: "12"
-
-  # macOS
-  -
-    matrix:
-      only:
-        - job_name: macOS build (x64)
-      fast_finish: true
-
-    init:
-      - uname -a
-      - git --version
-      - git config --global core.autocrlf false
-      - git config --global user.name "AppVeyor"
-      - git config --global user.email "appveyor@ci.appveyor.com"
-      - sh: |
-          export CI_BRANCH=$APPVEYOR_REPO_BRANCH
-          export CI_BUILD_NUMBER=$APPVEYOR_BUILD_NUMBER
-          export CI_COMMIT=$APPVEYOR_REPO_COMMIT
-          export CI_COMMIT_SHORT=${APPVEYOR_REPO_COMMIT:0:8}
-          export CI_COMMIT_TIMESTAMP=$APPVEYOR_REPO_COMMIT_TIMESTAMP
-          export CI_TAG=$APPVEYOR_REPO_TAG_NAME
-          echo "• ARCH=$ARCH"
-          echo "• CI_BRANCH=$CI_BRANCH"
-          echo "• CI_BUILD_NUMBER=$CI_BUILD_NUMBER"
-          echo "• CI_COMMIT=$CI_COMMIT"
-          echo "• CI_COMMIT_SHORT=$CI_COMMIT_SHORT"
-          echo "• CI_COMMIT_TIMESTAMP=$CI_COMMIT_TIMESTAMP"
-          echo "• CI_TAG=$CI_TAG"
-    install:
-      - nvm install $nodejs_version
-      - security import "scripts/certs/Certum-Code-Signing-CA-SHA2.cer" -k ~/Library/Keychains/login.keychain -T /usr/bin/codesign
-      - npm config set loglevel warn
-      - npm config set scripts-prepend-node-path auto
-      - npm install -g npm
-      - npm install -g yarn
-      - yarn
-
-    build_script:
-      - sh: |
-          yarn clean
-          yarn lint
-          yarn test
-          if [[ -z "$CI_TAG" ]]; then
-            yarn build-latest
-          else
-            yarn build
-          fi
-      - sh: |
-          # x64
-          if [[ "$ARCH" == "x64" ]]; then
-            GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
-            PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
-            PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
-            PRODUCT_NAME=gSender
-            yarn build:macos-x64
-            ls -al output output/*
-            mkdir -p releases/macos
-            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.x64.dmg"
-            ls -al releases/macos/*
-            if [[ "$CI_BRANCH" == "master" && -z "$CI_TAG" ]]; then
-              yarn github-release delete \
-                --owner=Sienci \
-                --repo=sender \
-                --tag="${CI_BRANCH}" \
-                --release-name="${CI_BRANCH}" \
-                "*-macos.x64.dmg";
-              yarn github-release upload \
-                --owner=Sienci \
-                --repo=sender \
-                --tag="${CI_BRANCH}" \
-                --release-name="${CI_BRANCH}" \
-                --body="${GIT_COMMIT_LOG}" \
-                "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.x64.dmg";
-              #rm -f "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.x64.dmg";
-            fi
-          fi
-    test: off
-
-    # Packaging artifacts
-    # https://www.appveyor.com/docs/packaging-artifacts
-    artifacts:
-      - path: releases/macos/*
-
-    # Publishing artifacts to GitHub Releases
-    # https://www.appveyor.com/docs/deployment/github
-    deploy:
-      - provider: GitHub
-        auth_token:
-          secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
-        draft: true
-        prerelease: false
-        on:
-          appveyor_repo_tag: true  # deploy on tag push only
-          nodejs_version: "12"
-
