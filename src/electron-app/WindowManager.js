@@ -23,7 +23,6 @@
 
 /* eslint import/no-unresolved: 0 */
 import { app, BrowserWindow, shell } from 'electron';
-
 import path from 'path';
 
 class WindowManager {
@@ -33,6 +32,10 @@ class WindowManager {
 
     url = '';
 
+    width = 0;
+
+    height = 0;
+
     constructor() {
         // https://github.com/electron/electron/blob/master/docs/api/app.md#event-activate-os-x
         // Emitted when the application is activated, which usually happens
@@ -40,10 +43,14 @@ class WindowManager {
         app.on('activate', (e) => {
             const window = this.getWindow();
             if (!window) {
-                this.openWindow({
-                    title: this.title,
-                    url: this.url
-                });
+                this.openWindow(
+                    this.url,
+                    {
+                        title: this.title,
+                        width: this.width || 500,
+                        height: this.height || 400,
+                    },
+                );
             }
         });
 
@@ -60,8 +67,12 @@ class WindowManager {
                 const window = this.getWindow();
                 if (window) {
                     // Remember current window attributes that will be used for the next 'activate' event
-                    this.title = window.webContents.getTitle();
+                    this.title = window.title;
                     this.url = window.webContents.getURL();
+
+                    const [width, height] = window.getSize();
+                    this.width = width;
+                    this.height = height;
                 }
                 return;
             }
@@ -99,13 +110,17 @@ class WindowManager {
             shell.openExternal(url);
         });
 
-        webContents.once('dom-ready', () => {
-            setTimeout(() => {
-                splashScreen.hide();
-                window.show();
-                splashScreen.destroy();
-            }, 4000);
-        });
+        if (splashScreen) {
+            webContents.once('dom-ready', () => {
+                setTimeout(() => {
+                    splashScreen.hide();
+                    window.show();
+                    splashScreen.destroy();
+                }, 4000);
+            });
+        } else {
+            window.show();
+        }
 
         // Call `ses.setProxy` to ignore proxy settings
         // http://electron.atom.io/docs/latest/api/session/#sessetproxyconfig-callback
