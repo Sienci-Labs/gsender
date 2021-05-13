@@ -26,7 +26,12 @@ import styles from '../index.styl';
 
 const LoaderBar = () => {
     return (
-        <div className={styles.loadingBar} />
+        <div className={styles.loadingBar}>
+            <div />
+            <div />
+            <div />
+            <div />
+        </div>
     );
 };
 
