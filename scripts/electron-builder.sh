@@ -24,11 +24,11 @@ echo "Installing packages..."
 yarn --production
 popd
 
-echo "Rebuild native modules using electron ${electron_version}"
-npm run electron-rebuild -- \
-    --version=${electron_version:1} \
-    --module-dir=dist/cncjs \
-    --which-module=serialport
+#echo "Rebuild native modules using electron ${electron_version}"
+#npm run electron-rebuild -- \
+#    --version=${electron_version:1} \
+#    --module-dir=dist/cncjs \
+#    --which-module=serialport
 
 yarn electron-builder install-app-deps
 
