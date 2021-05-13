@@ -21,21 +21,18 @@
  *
  */
 
-import PropTypes from 'prop-types';
-import React, { PureComponent } from 'react';
-import GCodeStats from './GCodeStats';
+import React from 'react';
+import styles from '../index.styl';
 
-class GCode extends PureComponent {
-    static propTypes = {
-        state: PropTypes.object,
-        actions: PropTypes.object
-    };
+const LoaderBar = () => {
+    return (
+        <div className={styles.loadingBar}>
+            <div />
+            <div />
+            <div />
+            <div />
+        </div>
+    );
+};
 
-    render() {
-        return (
-            <GCodeStats {...this.props} />
-        );
-    }
-}
-
-export default GCode;
+export default LoaderBar;

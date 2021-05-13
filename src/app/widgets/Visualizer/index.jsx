@@ -25,6 +25,7 @@
 import classNames from 'classnames';
 import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
+
 import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
@@ -45,6 +46,7 @@ import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
 import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
+import EstimateWorker from './Estimate.worker';
 import WidgetConfig from '../WidgetConfig';
 import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
@@ -92,7 +94,6 @@ import {
     DARK_THEME_VALUES
 } from './constants';
 import styles from './index.styl';
-import { GCodeProcessor } from './helpers/GCodeProcessor';
 
 const translateExpression = (function() {
     const { Parser } = ExpressionEvaluator;
@@ -243,7 +244,13 @@ class VisualizerWidget extends PureComponent {
             const { name, size } = { ...meta };
             const context = {};
 
-            const { port } = this.state;
+            const { port, filename } = this.state;
+
+            if (filename) {
+                this.visualizer.unload();
+            }
+
+            pubsub.publish('gcode:processing', true);
 
             this.setState((state) => ({
                 gcode: {
@@ -254,35 +261,9 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
-            //Prevent thread blocking
-            setTimeout(() => {
-                const payload = this.processGCode(gcode);
+            // Start file parsing worker
+            this.processGCode(gcode, name, size);
 
-                const {
-                    total,
-                    toolSet,
-                    spindleSet,
-                    movementSet,
-                    invalidGcode,
-                    estimatedTime,
-                } = payload;
-
-                if (invalidGcode.size > 0) {
-                    this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
-                    if (this.state.invalidGcode.shouldShow) {
-                        Toaster.pop({
-                            msg: `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
-                            type: TOASTER_WARNING,
-                            duration: TOASTER_LONG,
-                            icon: 'fa-exclamation-triangle'
-                        });
-                    }
-                }
-
-                this.setState({ total });
-
-                pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
-            }, 0);
 
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
@@ -368,8 +349,6 @@ class VisualizerWidget extends PureComponent {
                             zmax: bbox.max.z
                         };
 
-                        pubsub.publish('gcode:bbox', bbox);
-
                         const { port } = this.state;
 
                         this.setState((state) => ({
@@ -389,6 +368,7 @@ class VisualizerWidget extends PureComponent {
             };
 
             this.setState(updater, callback);
+            this.visualizer.handleSceneRender(gcode);
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
@@ -430,17 +410,6 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         onRunClick: () => {
-            //const { invalidGcode } = this.state;
-
-            /*if (invalidGcode.shouldShow) {
-                if (invalidGcode.list.size > 0) {
-                    this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
-                } else {
-                    this.actions.handleRun();
-                }
-            } else {
-                this.actions.handleRun();
-            }*/
             this.actions.handleRun();
         },
         handleRun: () => {
@@ -625,9 +594,13 @@ class VisualizerWidget extends PureComponent {
             }
         },
         handleLiteModeToggle: () => {
-            const { liteMode } = this.state;
+            const { liteMode, disabled, disabledLite } = this.state;
+            const newLiteModeValue = !liteMode;
+            const shouldRenderVisualization = newLiteModeValue ? !disabledLite : !disabled;
+            this.renderIfNecessary(shouldRenderVisualization);
+
             this.setState({
-                liteMode: !liteMode
+                liteMode: newLiteModeValue
             });
         },
         lineWarning: {
@@ -650,7 +623,18 @@ class VisualizerWidget extends PureComponent {
             },
             onCancel: () => this.actions.reset(),
         },
+        setVisualizerReady: () => {
+            this.setState((state) => ({
+                gcode: {
+                    ...state.gcode,
+                    loading: false,
+                    rendering: false,
+                    ready: true,
+                }
+            }));
+        },
         reset: () => {
+            this.actions.handleClose();
             this.setState(this.getInitialState());
             this.actions.unloadGCode();
             pubsub.publish('gcode:fileInfo');
@@ -931,38 +915,54 @@ class VisualizerWidget extends PureComponent {
 
     pubsubTokens = [];
 
-    processGCode = (gcode) => {
-        const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
+    onProcessedGcode = ({ data }) => {
+        const {
+            total,
+            toolSet,
+            spindleSet,
+            movementSet,
+            invalidGcode,
+            estimatedTime,
+            bbox,
+            name,
+            size
+        } = data;
 
+        if (invalidGcode.size > 0) {
+            this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
+            if (this.state.invalidGcode.shouldShow) {
+                Toaster.pop({
+                    msg: `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
+                    type: TOASTER_WARNING,
+                    duration: TOASTER_LONG,
+                    icon: 'fa-exclamation-triangle'
+                });
+            }
+        }
+
+        this.setState({ total });
+
+        // Emit events on response with relevant data from processor worker
+        pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
+        pubsub.publish('gcode:bbox', bbox);
+    }
+
+    processGCode = (gcode, name, size) => {
+        const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
         //Clean up lines and remove ones that are comments and headers
         const lines = gcode.split('\n')
             .filter(line => (line.trim().length > 0))
             .filter(line => !comments.some(comment => line.includes(comment)));
-        console.log(lines);
 
-        const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
 
-        let estimatedTime;
-        try {
-            processor.process(lines);
-            estimatedTime = processor.vmState.totalTime;
-        } catch (error) {
-            console.log(error.message);
-            estimatedTime = 0;
-        }
-
-        const total = lines.length + 1; //Dwell line added after every gcode parse
-
-        const payload = {
-            total,
-            toolSet: processor.vmState.tools,
-            spindleSet: processor.vmState.spindleRates,
-            movementSet: processor.vmState.feedrates,
-            invalidGcode: processor.vmState.invalidGcode,
-            estimatedTime,
-        };
-
-        return payload;
+        // Set "Loading" state to job info widget and start file VM processor
+        const estimateWorker = new EstimateWorker();
+        estimateWorker.onmessage = this.onProcessedGcode;
+        estimateWorker.postMessage({
+            lines: lines,
+            name,
+            size
+        });
     };
 
     unsubscribe() {
@@ -1266,8 +1266,24 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('keybindingsUpdated', () => {
                 this.updateShuttleControlEvents();
             }),
+            pubsub.subscribe('gcode:bbox', (msg, bbox) => {
+                const { gcode } = this.state;
+                this.setState({
+                    gcode: {
+                        ...gcode,
+                        bbox: bbox
+                    }
+                });
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    renderIfNecessary(shouldRender) {
+        const hasVisualization = this.visualizer.hasVisualization();
+        if (shouldRender && !hasVisualization) {
+            this.visualizer.rerenderGCode();
+        }
     }
 
     render() {

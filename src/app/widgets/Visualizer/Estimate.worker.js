@@ -21,29 +21,23 @@
  *
  */
 
-.widget-content {
-    position: relative;
-    padding: 10px;
+import { GCodeProcessor } from './helpers/GCodeProcessor';
 
-    &.hidden {
-        display: none;
-    }
-}
+onmessage = function({ data }) {
+    const { lines, name, size } = data;
 
-.gcode-stats {
-    table[data-table="dimension"] {
-        width: 100%;
+    const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
+    processor.process(lines);
 
-        thead > tr > th.axis,
-        tbody > tr > td.axis {
-            width: 1%;
-            white-space: nowrap;
-        }
-        tbody > tr > td {
-            text-align: right;
-            &.axis {
-                text-align: center;
-            }
-        }
-    }
-}
+    postMessage({
+        name,
+        size,
+        total: (lines.length + 1),
+        toolSet: processor.vmState.tools,
+        spindleSet: processor.vmState.spindleRates,
+        movementSet: processor.vmState.feedrates,
+        invalidGcode: processor.vmState.invalidGcode,
+        estimatedTime: processor.vmState.totalTime,
+        bbox: processor.getBBox()
+    });
+};

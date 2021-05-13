@@ -23,6 +23,7 @@
 
 import React from 'react';
 import styles from './index.styl';
+import TooltipCustom from '../../components/TooltipCustom/ToolTip';
 import NumberInput from './NumberInput';
 import { METRIC_UNITS } from '../../constants';
 
@@ -42,33 +43,39 @@ const SpeedControl = ({ state, actions }) => {
         <div className={styles.speedControls}>
             <div className={styles.controlGroup}>
                 <span className={styles.controlGroupLabel}>XY move ({units})</span>
-                <NumberInput
-                    value={xyStep}
-                    min={xyMin}
-                    max={xyMax}
-                    changeHandler={actions.handleXYStepChange}
-                    decimals={decimals}
-                />
+                <TooltipCustom content="Specify XY axis jog distance" location="default">
+                    <NumberInput
+                        value={xyStep}
+                        min={xyMin}
+                        max={xyMax}
+                        changeHandler={actions.handleXYStepChange}
+                        decimals={decimals}
+                    />
+                </TooltipCustom>
             </div>
             <div className={styles.controlGroup}>
                 <span>Z move ({units})</span>
-                <NumberInput
-                    value={zStep}
-                    min={zMin}
-                    max={zMax}
-                    changeHandler={actions.handleZStepChange}
-                    decimals={decimals}
-                />
+                <TooltipCustom content="Specify Z axis jog distance" location="default">
+                    <NumberInput
+                        value={zStep}
+                        min={zMin}
+                        max={zMax}
+                        changeHandler={actions.handleZStepChange}
+                        decimals={decimals}
+                    />
+                </TooltipCustom>
             </div>
             <div className={styles.controlGroup}>
                 <span className={styles.speed}>Speed ({units}/min)</span>
-                <NumberInput
-                    value={feedrate}
-                    min={speedMin}
-                    max={speedMax}
-                    changeHandler={actions.handleFeedrateChange}
-                    decimals={0}
-                />
+                <TooltipCustom content="Specify jog speed all axis" location="default">
+                    <NumberInput
+                        value={feedrate}
+                        min={speedMin}
+                        max={speedMax}
+                        changeHandler={actions.handleFeedrateChange}
+                        decimals={0}
+                    />
+                </TooltipCustom>
             </div>
         </div>
     );

@@ -40,6 +40,7 @@ import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED
 } from '../../constants';
+import FileProcessingLoader from './components/FileProcessingLoader';
 
 class JobStatusWidget extends PureComponent {
     static propTypes = {
@@ -307,6 +308,7 @@ class JobStatusWidget extends PureComponent {
             estimatedTime: 0,
 
             // G-code Status (from server)
+            fileProcessing: false,
             total: 0,
             sent: 0,
             received: 0,
@@ -393,6 +395,7 @@ class JobStatusWidget extends PureComponent {
                 });
 
                 this.setState({
+                    fileProcessing: false,
                     fileName: file.name,
                     total: file.total,
                     toolsAmount: file.toolSet.size,
@@ -411,6 +414,11 @@ class JobStatusWidget extends PureComponent {
             pubsub.subscribe('spindle:mode', (msg, mode) => {
                 this.setState({
                     spindleOverrideLabel: this.getSpindleOverrideLabel()
+                });
+            }),
+            pubsub.subscribe('gcode:processing', (msg, value) => {
+                this.setState({
+                    fileProcessing: true
                 });
             })
         ];
@@ -458,7 +466,7 @@ class JobStatusWidget extends PureComponent {
     }
 
     render() {
-        const { units, bbox } = this.state;
+        const { units, bbox, fileProcessing } = this.state;
         const state = {
             ...this.state,
             isRunningJob: this.isRunningJob(),
@@ -474,10 +482,15 @@ class JobStatusWidget extends PureComponent {
         };
 
         return (
-            <JobStatus
-                state={state}
-                actions={actions}
-            />
+            <>
+                {fileProcessing
+                    ? <FileProcessingLoader />
+                    : <JobStatus
+                        state={state}
+                        actions={actions}
+                    />
+                }
+            </>
         );
     }
 }

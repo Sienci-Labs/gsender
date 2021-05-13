@@ -198,6 +198,17 @@ class GCodeVisualizer {
 
         this.frameIndex = frameIndex;
     }
+
+    unload() {
+        this.geometry.dispose();
+        this.group.clear();
+
+        this.group = new THREE.Object3D();
+        this.geometry = new THREE.Geometry();
+
+        this.frames = [];
+        this.frameIndex = 0;
+    }
 }
 
 export default GCodeVisualizer;

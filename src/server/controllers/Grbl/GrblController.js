@@ -338,11 +338,18 @@ class GrblController {
 
                 const machineProfile = store.get('machineProfile');
                 const preferences = store.get('preferences');
+
                 if (line) {
                     const regex = /([^NGMXYZIJKFPRS%\-?\.?\d+\.?\s])/gi;
                     if (regex.test(line)) {
+                        if (preferences === undefined) {
+                            this.emit('workflow:state', this.workflow.state, { validLine: false, line });
+                            return line;
+                        }
                         if (preferences && preferences.showLineWarnings) {
-                            // this.workflow.pause({ data: line });
+                            this.workflow.pause({ data: line });
+                            this.emit('workflow:state', this.workflow.state, { validLine: false, line });
+                        } if (!preferences && !preferences.showLineWarnings) {
                             this.emit('workflow:state', this.workflow.state, { validLine: false, line });
                         } else {
                             line = '(' + line + ')'; //Surround with paranthesis to ignore line
@@ -543,7 +550,9 @@ class GrblController {
 
                 this.sender.ack();
                 this.sender.next();
-
+                console.log(`ERROR: ${JSON.stringify(error)}`);
+                console.log(`code: ${code}`);
+                this.emit('gcode:error', error, code);
                 return;
             }
 
@@ -1224,6 +1233,10 @@ class GrblController {
             'resume': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:resume');
+            },
+            'gcode:error': () => {
+                const [errors] = args;
+                this.emit('serialport:write', errors);
             },
             'gcode:resume': () => {
                 this.event.trigger('gcode:resume');

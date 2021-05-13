@@ -32,29 +32,9 @@ import path from 'path';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
-import './sentryInit';
+//import './sentryInit';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 
-/* Whether to include menu or no */
-
-// The selection menu
-/*const selectionMenu = Menu.buildFromTemplate([
-    { role: 'copy' },
-    { type: 'separator' },
-    { role: 'selectall' }
-]);
-
-// The input menu
-const inputMenu = Menu.buildFromTemplate([
-    { role: 'undo' },
-    { role: 'redo' },
-    { type: 'separator' },
-    { role: 'cut' },
-    { role: 'copy' },
-    { role: 'paste' },
-    { type: 'separator' },
-    { role: 'selectall' }
-]);*/
 
 let windowManager = null;
 

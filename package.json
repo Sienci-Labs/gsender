@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -22,7 +22,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=10"
+    "node": ">=12"
   },
   "preferGlobal": true,
   "scripts": {
@@ -154,8 +154,6 @@
     "@fortawesome/fontawesome-free": "^5.15.2",
     "@fortawesome/fontawesome-free-brands": "^5.0.13",
     "@fortawesome/free-regular-svg-icons": "^5.15.2",
-    "@sentry/cli": "^1.63.1",
-    "@sentry/electron": "^2.4.0",
     "@sentry/webpack-plugin": "^1.14.2",
     "@trendmicro/react-anchor": "~0.5.6",
     "@trendmicro/react-breadcrumbs": "~0.5.5",
@@ -218,6 +216,7 @@
     "filereader": "^0.10.3",
     "final-form": "~4.12.0",
     "font-awesome": "^4.7.0",
+    "force": "^0.0.3",
     "frac": "~1.1.2",
     "gcode-interpreter": "~2.1.0",
     "gcode-parser": "~1.3.6",
@@ -298,7 +297,7 @@
     "styled-components": "^5.2.1",
     "superagent": "~3.8.3",
     "superagent-use": "~0.1.0",
-    "three": "~0.123.0",
+    "three": "~0.124.0",
     "universal-logger": "~1.0.1",
     "universal-logger-browser": "~1.0.2",
     "uuid": "~3.3.2",

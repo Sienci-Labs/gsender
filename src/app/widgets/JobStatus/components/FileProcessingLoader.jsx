@@ -21,35 +21,22 @@
  *
  */
 
-/* eslint-disable no-restricted-globals */
-import PropTypes from 'prop-types';
-import React, { PureComponent } from 'react';
-import IdleInfo from './components/IdleInfo';
-import Overrides from './components/Overrides';
-import styles from './index.styl';
+import React from 'react';
+import styles from '../index.styl';
+import idleStyles from './IdleInfo.styl';
+import LoaderBar from './LoaderBar';
 
-/**
- * Job Status component wrapper
- * @param {Object} state Default state given from parent component (main index.js for this widget)
- */
-class JobStatus extends PureComponent {
-    static propTypes = {
-        state: PropTypes.object,
-    };
-
-    render() {
-        const { state } = this.props;
-        const { isRunningJob } = state;
-
-        return (
-            <div className={styles['job-status-wrapper']}>
-                {!isRunningJob
-                    ? <IdleInfo state={state} />
-                    : <Overrides state={state} />
-                }
+const FileProcessingLoader = () => {
+    return (
+        <div className={styles['job-status-wrapper']}>
+            <div className={idleStyles.idleInfo}>
+                <div><span className={idleStyles.fileName}>Parsing File Attributes</span></div>
+                <div className={styles.processingLoader}>
+                    <LoaderBar />
+                </div>
             </div>
-        );
-    }
-}
+        </div>
+    );
+};
 
-export default JobStatus;
+export default FileProcessingLoader;
