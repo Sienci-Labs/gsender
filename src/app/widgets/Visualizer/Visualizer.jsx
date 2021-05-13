@@ -1181,6 +1181,7 @@ class Visualizer extends Component {
         }
 
         if (this.visualizer) {
+            this.visualizer.unload();
             this.visualizer = null;
         }
 
