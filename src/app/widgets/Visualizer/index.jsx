@@ -243,7 +243,11 @@ class VisualizerWidget extends PureComponent {
             const { name, size } = { ...meta };
             const context = {};
 
-            const { port } = this.state;
+            const { port, filename } = this.state;
+
+            if (filename) {
+                this.visualizer.unload();
+            }
 
             this.setState((state) => ({
                 gcode: {
