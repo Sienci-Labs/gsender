@@ -145,7 +145,6 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 />
                             </TooltipCustom>
                         </Fieldset>
-
                     </div>
                 </div>
             </div>

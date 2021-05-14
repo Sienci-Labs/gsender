@@ -215,14 +215,10 @@
 }
 
 .xy-keys {
-    width: 56%;
+    width: min(56%, 27vh);
     display: grid;
     grid-gap: 5px;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-
-    @media (max-height: 820px) {
-        width: 48%;
-    }
 }
 
 .xy-keys > div::before, .xy-keys > button::before {
