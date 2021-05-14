@@ -29,6 +29,7 @@ import _ from 'lodash';
 
 import store from 'app/store';
 import Modal from 'app/components/Modal';
+import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 
@@ -46,9 +47,9 @@ export default class Keybindings extends Component {
         active: PropTypes.bool,
     }
 
-    showToast = _.throttle(() => {
+    showToast = _.throttle((msg = 'Shortcut Updated') => {
         Toaster.pop({
-            msg: 'Shortcut Updated',
+            msg,
             type: TOASTER_SUCCESS,
             duration: 3000
         });
@@ -102,10 +103,35 @@ export default class Keybindings extends Component {
         this.setState({ showEditModal: false });
     }
 
+    enableAllKeybindings = () => {
+        const enabledKeybindingsArr = this.state.keybindingsList.map(keybinding => ({ ...keybinding, isActive: true }));
+
+        store.set('commandKeys', enabledKeybindingsArr);
+        pubsub.publish('keybindingsUpdated');
+
+        this.setState({ showEditModal: false, keybindingsList: enabledKeybindingsArr });
+
+        this.showToast('Keybindings Enabled');
+    }
+
+    disableAllKeybindings = () => {
+        const disabledKeybindingsArr = this.state.keybindingsList.map(keybinding => ({ ...keybinding, isActive: false }));
+
+        store.set('commandKeys', disabledKeybindingsArr);
+        pubsub.publish('keybindingsUpdated');
+
+        this.setState({ showEditModal: false, keybindingsList: disabledKeybindingsArr });
+
+        this.showToast('Keybindings Disabled');
+    }
+
     render() {
-        const { handleEdit, editKeybinding, closeModal } = this;
+        const { handleEdit, editKeybinding, closeModal, enableAllKeybindings, disableAllKeybindings } = this;
         const { active } = this.props;
         const { currentShortcut, keybindingsList, showEditModal } = this.state;
+
+        const allShortcutsEnabled = keybindingsList.every(shortcut => shortcut.isActive);
+        const allShortcutsDisabled = keybindingsList.every(shortcut => !shortcut.isActive);
 
         return (
             <div
@@ -119,6 +145,17 @@ export default class Keybindings extends Component {
 
                 <div className={styles['table-wrapper']}>
                     <Table data={keybindingsList} onEdit={handleEdit} onShortcutToggle={editKeybinding} />
+                </div>
+
+                <div style={{ display: 'grid', columnGap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
+                    <FunctionButton primary onClick={enableAllKeybindings} disabled={allShortcutsEnabled}>
+                        <i className="fas fa-toggle-on" />
+                        Enable All Keybindings
+                    </FunctionButton>
+                    <FunctionButton primary onClick={disableAllKeybindings} disabled={allShortcutsDisabled}>
+                        <i className="fas fa-toggle-off" />
+                        Disable All Keybindings
+                    </FunctionButton>
                 </div>
 
                 { showEditModal && (
