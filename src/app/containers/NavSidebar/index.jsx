@@ -93,8 +93,8 @@ class NavSidebar extends PureComponent {
                     label="Firmware"
                 />
                 <NavSidebarLink
-                    icon="fa fa-share-square"
-                    label=""
+                    icon="fa fa-question"
+                    label="Help"
                     onClick={() => window.open('https://sienci.com/gsender-documentation/', '_blank')}
                 />
                 <NavSidebarLink
