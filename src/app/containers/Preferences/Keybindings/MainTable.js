@@ -23,7 +23,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
+import cx from 'classnames';
 import Table from 'app/components/Table';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 
@@ -65,7 +65,7 @@ export default class MainTable extends Component {
                     <i
                         role="button"
                         tabIndex={-1}
-                        className="fas fa-edit"
+                        className={cx('fas fa-edit', styles.editIcon)}
                         onClick={() => this.props.onEdit(row)}
                         onKeyDown={() => this.props.onEdit(row)}
                         style={{ alignSelf: 'center', color: '#2b5d8b' }}
