@@ -33,7 +33,7 @@ environment:
       ARCH: x86
   global:
     GH_TOKEN:
-        secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
+      secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
     GITHUB_TOKEN:
       secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
 
