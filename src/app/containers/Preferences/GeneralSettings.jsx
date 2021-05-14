@@ -126,7 +126,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 </TooltipCustom>
                             </div>
                         </Fieldset>
-                        <Fieldset legend="Jogging presets">
+                        <Fieldset legend="Jogging Presets">
                             <JogSpeeds />
                         </Fieldset>
                     </div>
