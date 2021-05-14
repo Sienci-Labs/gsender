@@ -598,7 +598,7 @@ const defaultState = {
                 axis: AXIS_X,
             },
             preventDefault: false,
-            isActive: false,
+            isActive: true,
         },
         { // Go to Y Axis
             id: 23,
@@ -620,7 +620,7 @@ const defaultState = {
                 axis: AXIS_Z,
             },
             preventDefault: false,
-            isActive: false,
+            isActive: true,
         },
         { // Select Rapid Jog Preset
             id: 25,
