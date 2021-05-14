@@ -160,7 +160,7 @@ export default class Keybindings extends Component {
 
                 { showEditModal && (
                     <Modal onClose={closeModal} size="md" style={{ padding: '1rem 1rem 2rem', backgroundColor: '#d1d5db' }}>
-                        <h2 style={{ textAlign: 'center', marginBottom: '1rem' }}>Edit Shortcut</h2>
+                        <h3 style={{ textAlign: 'center', marginBottom: '1rem' }}>Edit Shortcut</h3>
 
                         <EditArea
                             shortcut={currentShortcut}

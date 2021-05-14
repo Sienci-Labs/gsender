@@ -60,7 +60,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                     <div className={styles.halfContainer}>
                         <Fieldset legend="Connection">
                             <TooltipCustom content="Machine must be disconnected to change this value" location="top" disabled={!baudRateDisabled}>
-                                <TooltipCustom content="Baudrate specifies how fast data is sent over a serial line." location="bottom">
+                                <TooltipCustom content="Baudrate specifies how fast data is sent over a serial line." location="default">
                                     <div className={baudRateDisabled ? styles.disabled : styles.addMargin}>
                                         <Baudrates baudrate={state.baudrate} onChange={(option) => actions.general.setBaudrate(option)} />
                                         <br />
@@ -106,7 +106,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 </TooltipCustom>
                             </div>
                             <div style={{ marginBottom: '10px' }}>
-                                <TooltipCustom content="gSender will warn you on file load if any errorous commands are found in your file" location="default">
+                                <TooltipCustom content="gSender will warn you on file load if any invalid commands are found" location="default">
                                     <ToggleSwitch
                                         label="Warn if file contains invalid G-Code"
                                         checked={state.showWarning}
@@ -116,7 +116,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                                 </TooltipCustom>
                             </div>
                             <div style={{ marginBottom: '10px' }}>
-                                <TooltipCustom content="gSender will warn you while running if any errorous commands are found in your file" location="default">
+                                <TooltipCustom content="gSender will warn you while running if any invalid commands are found" location="default">
                                     <ToggleSwitch
                                         label="Warn if invalid line detected during job"
                                         checked={state.showLineWarnings}
