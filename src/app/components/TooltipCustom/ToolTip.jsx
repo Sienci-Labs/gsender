@@ -1,45 +1,26 @@
-/* eslint-disable react/prop-types */
-import React, { useState } from 'react';
-import styles from './index.styl';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Tooltip as MainToolTip } from 'app/components/Tooltip';
 
-/*
- Custom Tooltip Component
- Content Prop: String to be displayed when hovered
- Disabled Prop: Varibale to set css display: none;
- Location Prop: Where tooltip should be displayed(See css file)
-*/
-
-const Tooltip = (props) => {
-    let disabled = props.disabled;
-    let timeout;
-    const [active, setActive] = useState(false);
-
-    const showTip = () => {
-        timeout = setTimeout(() => {
-            setActive(true);
-        }, props.delay || 1000);
-    };
-
-    const hideTip = () => {
-        clearInterval(timeout);
-        setActive(false);
-    };
-
+const Tooltip = ({ location, content, disabled, children }) => {
     return (
-        <div
-            className={styles.TooltipWrapper}
-            // When to show the tooltip
-            onMouseEnter={showTip}
-            onMouseLeave={hideTip}
+        <MainToolTip
+            content={content}
+            placement={location === 'default' ? 'bottom' : location}
+            enterDelay={1000}
+            disabled={disabled}
         >
-            {props.children}
-            {active && (
-                <div className={disabled ? styles.disabled : styles[`${props.location}`]}>
-                    {props.content}
-                </div>
-            )}
-        </div>
+            <div>
+                {children}
+            </div>
+        </MainToolTip>
     );
+};
+
+Tooltip.propTypes = {
+    location: PropTypes.string,
+    content: PropTypes.string || PropTypes.node,
+    disabled: PropTypes.bool,
 };
 
 export default Tooltip;
