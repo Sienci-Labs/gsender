@@ -1067,7 +1067,7 @@ class DisplayPanel extends PureComponent {
                                     }}
                                 >
                                     <Tooltip
-                                        placement="bottom"
+                                        placement="default"
                                         content={i18n._('Zero Out Machine')}
                                         disabled={!canZeroOutMachine}
                                         hideOnClick
@@ -1082,7 +1082,7 @@ class DisplayPanel extends PureComponent {
                                     }}
                                 >
                                     <Tooltip
-                                        placement="bottom"
+                                        placement="default"
                                         content={i18n._('Home Machine')}
                                         disabled={!canHomeMachine}
                                         hideOnClick
@@ -1121,7 +1121,7 @@ class DisplayPanel extends PureComponent {
                                     }}
                                 >
                                     <Tooltip
-                                        placement="bottom"
+                                        placement="default"
                                         content={i18n._('Move Backward')}
                                         disabled={!canMoveBackward}
                                         hideOnClick
@@ -1137,7 +1137,7 @@ class DisplayPanel extends PureComponent {
                                     }}
                                 >
                                     <Tooltip
-                                        placement="bottom"
+                                        placement="default"
                                         content={i18n._('Move Forward')}
                                         disabled={!canMoveForward}
                                         hideOnClick
@@ -1152,7 +1152,7 @@ class DisplayPanel extends PureComponent {
                                     }}
                                 >
                                     <Tooltip
-                                        placement="bottom"
+                                        placement="default"
                                         content={i18n._('Zero Out Work Offsets')}
                                         disabled={!canZeroOutWorkOffsets}
                                         hideOnClick
@@ -1166,7 +1166,7 @@ class DisplayPanel extends PureComponent {
                                     onClick={this.showPositionInput(axis)}
                                 >
                                     <Tooltip
-                                        placement="bottom"
+                                        placement="default"
                                         content={i18n._('Set Work Offsets')}
                                         disabled={!canModifyWorkPosition}
                                         hideOnClick
