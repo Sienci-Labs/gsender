@@ -200,7 +200,13 @@ class WorkflowControl extends PureComponent {
     handleTestFile = (event) => {
         const { actions } = this.props;
         this.setState({ runHasStarted: true });
-        controller.command('gcode', '$c');
+        const gcode = this.props.state.gcode.content; // or whatever the state member is
+        const comments = ['#', ';', '(', '%'];
+        const lines = gcode.split('\n')
+            .filter(line => (line.trim().length > 0))
+            .filter(line => !comments.some(comment => line.includes(comment)));
+        const testLines = ['$C', ...lines, '$C'];
+        controller.command('gcode', testLines);
         actions.onRunClick();
     };
 
