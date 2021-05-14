@@ -80,7 +80,7 @@ const main = () => {
                 show: false,
                 frame: false
             });
-            await splashScreen.loadFile(path.join(__dirname, 'app/assets/splashscreen.png'));
+            await splashScreen.loadFile(path.join(__dirname, 'app/assets/Splashscreen.gif'));
             splashScreen.once('ready-to-show', () => {
                 splashScreen.show();
             });
