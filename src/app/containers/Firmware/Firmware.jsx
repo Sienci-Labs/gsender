@@ -615,7 +615,7 @@ class Firmware extends PureComponent {
                                     Export Settings
                                     </ToolModalButton>
                                 </TooltipCustom>
-                                <TooltipCustom content="Restore the settings for your current Machine profile" location="default">
+                                <TooltipCustom content="Restore the settings for your current machine profile" location="default">
                                     <ToolModalButton
                                         onClick={this.restoreSettings}
                                         icon="fas fa-undo"
