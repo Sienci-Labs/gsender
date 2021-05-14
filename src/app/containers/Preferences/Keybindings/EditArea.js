@@ -89,7 +89,7 @@ export default class EditArea extends Component {
 
         //Ignore trigger keys
         if (triggerKeys.includes(e.key)) {
-            return '';
+            return [];
         }
 
         this.setState({
