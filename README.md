@@ -17,12 +17,12 @@ Some things that we’re looking to accomplish with this sender:
 
 ![gSender](https://sienci.com/wp-content/uploads/2021/05/gSender-Main-Screen-0.6.2.png)
 
-## 💻 Download
+## 💻 Download [![Github All Releases](https://img.shields.io/github/downloads/Sienci-Labs/gsender/total.svg)]()
 
 gSender is available for the following systems and does not yet support headless Pi operation
-| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (M1) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/linux.png)<br>Linux
+| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/linux.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ``` | ``` Available ``` | ``` Available ``` | ``` In Progress ``` | ``` In Progress ```
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.4/gSender-0.6.4-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.4/gSender-Setup-0.6.4.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.4/gSender-0.6.4.dmg) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.4/gSender-0.6.4.AppImage) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.4/gSender_0.6.4_arm64.deb)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
