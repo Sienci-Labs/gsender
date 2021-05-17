@@ -655,6 +655,8 @@ class LocationWidget extends PureComponent {
             }));
         },
         'controller:state': (type, controllerState) => {
+            console.log(type);
+            console.log(controllerState);
             // Grbl
             if (type === GRBL) {
                 const { status } = { ...controllerState };
