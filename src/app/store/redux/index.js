@@ -34,10 +34,8 @@ let enhancer;
 
 const configureStore = (preloadedState) => {
     if (env === 'production') {
-        console.log('p');
         enhancer = applyMiddleware(thunk, sagaMiddleware);
     } else {
-        console.log('d');
         const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
         enhancer = composeEnhancers(
             applyMiddleware(thunk, sagaMiddleware, createLogger({ collapsed: true })),

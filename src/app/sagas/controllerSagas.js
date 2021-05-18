@@ -21,8 +21,29 @@
  *
  */
 
+import reduxStore from 'app/store/redux';
+import controller from 'app/lib/controller';
+import * as controllerActions from 'app/actions/controllerActions';
+
 export function* initialize() {
+    console.log('initialize called');
+    controller.addListener('controller:settings', (type, settings) => {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_CONTROLLER_SETTINGS,
+            payload: { type, settings }
+        });
+    });
+
+    controller.addListener('controller:state', (type, state) => {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_CONTROLLER_STATE,
+            payload: { type, state }
+        });
+    });
+
     yield null;
 }
 
-export function* process() {}
+export function* process() {
+    yield null;
+}

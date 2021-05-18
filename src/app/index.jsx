@@ -39,6 +39,8 @@ import XHR from 'i18next-xhr-backend';
 import { TRACE, DEBUG, INFO, WARN, ERROR } from 'universal-logger';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as GridSystemProvider } from 'app/components/GridSystem';
+import rootSaga from 'app/sagas';
+import sagaMiddleware from 'app/store/redux/saga';
 import settings from './config/settings';
 import portal from './lib/portal';
 import controller from './lib/controller';
@@ -63,6 +65,8 @@ const renderPage = () => {
     const container = document.createElement('div');
     container.style.width = '100%';
     document.body.appendChild(container);
+
+    sagaMiddleware.run(rootSaga);
 
     ReactDOM.render(
         <ReduxProvider store={reduxStore}>
