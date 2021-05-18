@@ -21,21 +21,8 @@
  *
  */
 
-import { createStore, applyMiddleware } from 'redux';
-import { END } from 'redux-saga';
-import thunk from 'redux-thunk';
-import mainReducer from 'app/reducers';
-import sagaMiddleware from './saga';
+export function* initialize() {
+    yield null;
+}
 
-const enhancer = applyMiddleware(thunk, sagaMiddleware);
-
-const configureStore = (preloadedState) => {
-    const store = createStore(mainReducer, preloadedState, enhancer);
-    store.close = () => store.dispatch(END);
-    store.runSaga = sagaMiddleware.run;
-    return store;
-};
-
-const store = configureStore();
-
-export default store;
+export function* process() {}

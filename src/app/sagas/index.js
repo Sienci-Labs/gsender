@@ -20,22 +20,14 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import { all, call } from 'redux-saga/effects';
+import * as controller from './controllerSagas';
 
-import { createStore, applyMiddleware } from 'redux';
-import { END } from 'redux-saga';
-import thunk from 'redux-thunk';
-import mainReducer from 'app/reducers';
-import sagaMiddleware from './saga';
+const sagas = [
+    controller
+];
 
-const enhancer = applyMiddleware(thunk, sagaMiddleware);
-
-const configureStore = (preloadedState) => {
-    const store = createStore(mainReducer, preloadedState, enhancer);
-    store.close = () => store.dispatch(END);
-    store.runSaga = sagaMiddleware.run;
-    return store;
-};
-
-const store = configureStore();
-
-export default store;
+export default function* root() {
+    yield all(sagas.map(saga => call(saga.initialize)));
+    //yield all(sagas.map(saga => fork(saga.process)));
+}
