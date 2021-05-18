@@ -29,6 +29,7 @@ import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
 import store from 'app/store';
+import { connect } from 'react-redux';
 import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
 import api from 'app/api';
@@ -58,14 +59,8 @@ import {
     MARLIN,
     // Smoothie
     SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_IDLE,
-    SMOOTHIE_ACTIVE_STATE_RUN,
     // TinyG
     TINYG,
-    TINYG_MACHINE_STATE_READY,
-    TINYG_MACHINE_STATE_STOP,
-    TINYG_MACHINE_STATE_END,
-    TINYG_MACHINE_STATE_RUN,
     // Workflow
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_IDLE,
@@ -146,27 +141,13 @@ class LocationWidget extends PureComponent {
     state = this.getInitialState();
 
     getWorkCoordinateSystem = () => {
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
+        const controllerType = this.props.type;
+        const controllerState = this.props.state;
+        console.log(controllerState);
+        console.log(controllerType);
         const defaultWCS = 'G54';
 
-        if (controllerType === GRBL) {
-            return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
-        }
-
-        if (controllerType === MARLIN) {
-            return get(controllerState, 'modal.wcs') || defaultWCS;
-        }
-
-        if (controllerType === SMOOTHIE) {
-            return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
-        }
-
-        if (controllerType === TINYG) {
-            return get(controllerState, 'sr.modal.wcs') || defaultWCS;
-        }
-
-        return defaultWCS;
+        return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
     }
 
     actions = {
@@ -396,12 +377,13 @@ class LocationWidget extends PureComponent {
     };
 
     canSendCommand() {
-        const { port, controller, workflow } = this.state;
+        const { port, workflow } = this.state;
+        const { type, state } = this.props;
 
         if (!port) {
             return false;
         }
-        if (!controller.type || !controller.state) {
+        if (!type || !state) {
             return false;
         }
         if (workflow.state !== WORKFLOW_STATE_IDLE) {
@@ -855,8 +837,8 @@ class LocationWidget extends PureComponent {
 
     canClick() {
         const { port, workflow } = this.state;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
+        const controllerType = this.props.type;
+        const controllerState = this.props.state;
 
         if (!port) {
             return false;
@@ -877,31 +859,6 @@ class LocationWidget extends PureComponent {
                 return false;
             }
         }
-        if (controllerType === MARLIN) {
-            // Ignore
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_IDLE,
-                SMOOTHIE_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_READY,
-                TINYG_MACHINE_STATE_STOP,
-                TINYG_MACHINE_STATE_END,
-                TINYG_MACHINE_STATE_RUN
-            ];
-            if (!includes(states, machineState)) {
-                return false;
-            }
-        }
 
         return true;
     }
@@ -914,9 +871,9 @@ class LocationWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId } = this.props;
+        const { widgetId, machinePosition, workPosition } = this.props;
         const { minimized, isFullscreen } = this.state;
-        const { units, machinePosition, workPosition } = this.state;
+        const { units } = this.state;
         const canSendCommand = this.canSendCommand();
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const config = this.config;
@@ -1049,4 +1006,18 @@ class LocationWidget extends PureComponent {
     }
 }
 
-export default LocationWidget;
+
+export default connect((store) => {
+    const state = get(store, 'controller.state');
+    const settings = get(store, 'controller.settings');
+    const type = get(store, 'controller.type');
+    const machinePosition = get(store, 'controller.mpos');
+    const workPosition = get(store, 'controller.wpos');
+    return {
+        state,
+        settings,
+        type,
+        machinePosition,
+        workPosition
+    };
+})(LocationWidget);
