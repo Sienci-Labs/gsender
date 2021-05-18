@@ -627,46 +627,6 @@ class LocationWidget extends PureComponent {
                 }
             }));
         },
-        /*'controller:settings': (type, controllerSettings) => {
-            this.setState(state => ({
-                controller: {
-                    ...state.controller,
-                    type: type,
-                    settings: controllerSettings
-                }
-            }));
-        },
-        'controller:state': (type, controllerState) => {
-            // Grbl
-            if (type === GRBL) {
-                const { status } = { ...controllerState };
-                const { mpos, wpos } = status;
-
-                const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
-
-                this.setState(state => ({
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in mm ($13=0) or inches ($13=1)
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in mm ($13=0) or inches ($13=1)
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, val => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    })
-                }));
-            }
-        }*/
     };
 
     shuttleControl = null;
@@ -731,11 +691,6 @@ class LocationWidget extends PureComponent {
             port: controller.port,
             units: store.get('workspace.units', METRIC_UNITS),
             safeRetractHeight: store.get('workspace.safeRetractHeight'),
-            controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
-            },
             workflow: {
                 state: controller.workflow.state
             },
