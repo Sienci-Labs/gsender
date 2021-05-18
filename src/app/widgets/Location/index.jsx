@@ -37,7 +37,7 @@ import Widget from 'app/components/Widget';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import { in2mm, mapPositionToUnits } from 'app/lib/units';
+import { mapPositionToUnits } from 'app/lib/units';
 import Select from 'react-select';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
@@ -645,7 +645,7 @@ class LocationWidget extends PureComponent {
                 }
             }));
         },
-        'controller:settings': (type, controllerSettings) => {
+        /*'controller:settings': (type, controllerSettings) => {
             this.setState(state => ({
                 controller: {
                     ...state.controller,
@@ -655,8 +655,6 @@ class LocationWidget extends PureComponent {
             }));
         },
         'controller:state': (type, controllerState) => {
-            console.log(type);
-            console.log(controllerState);
             // Grbl
             if (type === GRBL) {
                 const { status } = { ...controllerState };
@@ -686,7 +684,7 @@ class LocationWidget extends PureComponent {
                     })
                 }));
             }
-        }
+        }*/
     };
 
     shuttleControl = null;
