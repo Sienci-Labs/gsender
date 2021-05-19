@@ -24,8 +24,13 @@ import { createReducer } from 'redux-action';
 import { ensurePositiveNumber } from 'ensure-type';
 import _get from 'lodash/get';
 import _mapValues from 'lodash/mapValues';
-import { UPDATE_CONTROLLER_SETTINGS, UPDATE_CONTROLLER_STATE } from '../actions/controllerActions';
+import {
+    UPDATE_CONTROLLER_SETTINGS,
+    UPDATE_CONTROLLER_STATE,
+    UPDATE_FEEDER_STATUS, UPDATE_SENDER_STATUS, UPDATE_WORKFLOW_STATE
+} from '../actions/controllerActions';
 import { in2mm } from '../lib/units';
+import { WORKFLOW_STATE_IDLE } from '../constants';
 
 
 const initialState = {
@@ -35,6 +40,15 @@ const initialState = {
     modal: {},
     mpos: {},
     wpos: {},
+    feeder: {
+        status: null
+    },
+    sender: {
+        status: null
+    },
+    workflow: {
+        state: WORKFLOW_STATE_IDLE
+    }
 };
 
 /**
@@ -110,6 +124,27 @@ const reducer = createReducer(initialState, {
             modal,
             wpos,
             mpos
+        };
+    },
+    [UPDATE_FEEDER_STATUS]: (payload, reducerState) => {
+        return {
+            feeder: {
+                status: _get(payload, 'status', _get(reducerState, 'status'))
+            }
+        };
+    },
+    [UPDATE_SENDER_STATUS]: (payload, reducerState) => {
+        return {
+            sender: {
+                status: _get(payload, 'status', _get(reducerState, 'status'))
+            }
+        };
+    },
+    [UPDATE_WORKFLOW_STATE]: (payload, reducerState) => {
+        return {
+            workflow: {
+                state: _get(payload, 'state,', _get(reducerState, 'state')) || initialState.state,
+            }
         };
     }
 });

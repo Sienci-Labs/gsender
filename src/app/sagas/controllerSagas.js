@@ -40,6 +40,27 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('feeder:status', (status) => {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_FEEDER_STATUS,
+            payload: { status },
+        });
+    });
+
+    controller.addListener('sender:status', (status) => {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_SENDER_STATUS,
+            payload: { status },
+        });
+    });
+
+    controller.addListener('workflow:state', (state) => {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_WORKFLOW_STATE,
+            payload: { state },
+        });
+    });
+
     yield null;
 }
 
