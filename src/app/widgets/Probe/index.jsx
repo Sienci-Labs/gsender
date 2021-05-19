@@ -25,6 +25,7 @@ import includes from 'lodash/includes';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
 import map from 'lodash/map';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
@@ -36,7 +37,6 @@ import Probe from './Probe';
 import RunProbe from './RunProbe';
 import {
     // Units
-    IMPERIAL_UNITS,
     METRIC_UNITS,
     // Grbl
     GRBL,
@@ -45,12 +45,8 @@ import {
     MARLIN,
     // Smoothie
     SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_IDLE,
     // TinyG
     TINYG,
-    TINYG_MACHINE_STATE_READY,
-    TINYG_MACHINE_STATE_STOP,
-    TINYG_MACHINE_STATE_END,
     // Workflow
     WORKFLOW_STATE_IDLE
 } from '../../constants';
@@ -288,60 +284,6 @@ class ProbeWidget extends PureComponent {
                     state: workflowState
                 }
             }));
-        },
-        'controller:state': (type, state) => {
-            let units = this.state.units;
-
-            // Grbl
-            if (type === GRBL) {
-                const { parserstate } = { ...state };
-                const { modal = {} } = { ...parserstate };
-                units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || units;
-            }
-
-            // Marlin
-            if (type === MARLIN) {
-                const { modal = {} } = { ...state };
-                units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || units;
-            }
-
-            // Smoothie
-            if (type === SMOOTHIE) {
-                const { parserstate } = { ...state };
-                const { modal = {} } = { ...parserstate };
-                units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || units;
-            }
-
-            // TinyG
-            if (type === TINYG) {
-                const { sr } = { ...state };
-                const { modal = {} } = { ...sr };
-                units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || units;
-            }
-
-            if (this.state.units !== units) {
-                // Set `this.unitsDidChange` to true if the unit has changed
-                this.unitsDidChange = true;
-            }
-
-            this.setState({
-                controller: {
-                    type: type,
-                    state: state
-                },
-            });
         },
     };
 
@@ -765,33 +707,15 @@ class ProbeWidget extends PureComponent {
     }
 
     getWorkCoordinateSystem() {
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
-        const defaultWCS = 'G54';
+        const controllerState = this.props.state;
 
-        if (controllerType === GRBL) {
-            return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
-        }
-
-        if (controllerType === MARLIN) {
-            return get(controllerState, 'modal.wcs') || defaultWCS;
-        }
-
-        if (controllerType === SMOOTHIE) {
-            return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
-        }
-
-        if (controllerType === TINYG) {
-            return get(controllerState, 'sr.modal.wcs') || defaultWCS;
-        }
-
-        return defaultWCS;
+        return get(controllerState, 'parserstate.modal.wcs');
     }
 
     canClick() {
         const { port, workflow } = this.state;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
+        const controllerType = this.props.type;
+        const controllerState = this.props.state;
 
         if (!port) {
             return false;
@@ -808,29 +732,6 @@ class ProbeWidget extends PureComponent {
                 GRBL_ACTIVE_STATE_IDLE
             ];
             if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_IDLE
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_READY,
-                TINYG_MACHINE_STATE_STOP,
-                TINYG_MACHINE_STATE_END
-            ];
-            if (!includes(states, machineState)) {
                 return false;
             }
         }
@@ -981,4 +882,11 @@ class ProbeWidget extends PureComponent {
     }
 }
 
-export default ProbeWidget;
+export default connect((store) => {
+    const state = get(store, 'controller.state');
+    const type = get(store, 'controller.type');
+    return {
+        state,
+        type
+    };
+})(ProbeWidget);
