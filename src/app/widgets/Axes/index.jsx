@@ -40,6 +40,7 @@ import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
+import { connect } from 'react-redux';
 import store from '../../store';
 import Axes from './Axes';
 import ShuttleControl from './ShuttleControl';
@@ -69,6 +70,7 @@ import {
     SPEED_NORMAL,
 } from './constants';
 import styles from './index.styl';
+
 
 class AxesWidget extends PureComponent {
     static propTypes = {
@@ -206,27 +208,10 @@ class AxesWidget extends PureComponent {
             return 0;
         },
         getWorkCoordinateSystem: () => {
-            const controllerType = this.state.controller.type;
-            const controllerState = this.state.controller.state;
+            const controllerState = this.props.state;
             const defaultWCS = 'G54';
 
-            if (controllerType === GRBL) {
-                return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
-            }
-
-            if (controllerType === MARLIN) {
-                return get(controllerState, 'modal.wcs') || defaultWCS;
-            }
-
-            if (controllerType === SMOOTHIE) {
-                return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
-            }
-
-            if (controllerType === TINYG) {
-                return get(controllerState, 'sr.modal.wcs') || defaultWCS;
-            }
-
-            return defaultWCS;
+            return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
         },
         setSelectedSpeed: (speed) => {
             this.setState({
@@ -271,7 +256,7 @@ class AxesWidget extends PureComponent {
             controller.command('jog:stop');
         },
         cancelJog: () => {
-            const state = this.state.controller.state.status.activeState || null;
+            const state = get(this.props.state, 'status.activeState');
             if (state) {
                 if (state === GRBL_ACTIVE_STATE_JOG) {
                     controller.command('jog:cancel');
@@ -650,7 +635,7 @@ class AxesWidget extends PureComponent {
                 }
             }));
         },
-        'controller:settings': (type, controllerSettings) => {
+        /*'controller:settings': (type, controllerSettings) => {
             this.setState(state => ({
                 controller: {
                     ...state.controller,
@@ -803,7 +788,7 @@ class AxesWidget extends PureComponent {
                     })
                 }));
             }
-        }
+        }*/
     };
 
     shuttleControl = null;
@@ -1030,7 +1015,7 @@ class AxesWidget extends PureComponent {
 
     canClick() {
         const { port, workflow, isContinuousJogging } = this.state;
-        const controllerType = this.state.controller.type;
+        const controllerType = this.props.type;
 
         if (!port) {
             return false;
@@ -1046,23 +1031,23 @@ class AxesWidget extends PureComponent {
     }
 
     isJogging() {
-        const { controller } = this.state;
-        const activeState = controller.state?.status?.activeState || '';
+        const activeState = get(this.props.state, 'status.activeState');
         return (activeState === GRBL_ACTIVE_STATE_JOG);
     }
 
     render() {
-        const { widgetId } = this.props;
+        const { widgetId, machinePosition, workPosition } = this.props;
         const { minimized, isFullscreen } = this.state;
-        const { units, machinePosition, workPosition } = this.state;
+        const { units } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const config = this.config;
+        const activeState = get(this.props.state, 'status.activeState', GRBL_ACTIVE_STATE_IDLE);
         const state = {
             ...this.state,
             // Determine if the motion button is clickable
             canClick: this.canClick(),
             isJogging: this.isJogging(),
-            activeState: controller.state?.status?.activeState || GRBL_ACTIVE_STATE_IDLE,
+            activeState: activeState,
             // Output machine position with the display units
             machinePosition: mapValues(machinePosition, (pos, axis) => {
                 return String(mapPositionToUnits(pos, units));
@@ -1105,4 +1090,17 @@ class AxesWidget extends PureComponent {
     }
 }
 
-export default AxesWidget;
+export default connect((store) => {
+    const settings = get(store, 'controller.settings');
+    const state = get(store, 'controller.state');
+    const type = get(store, 'controller.type');
+    const workPosition = get(store, 'controller.wpos');
+    const machinePosition = get(store, 'controller.mpos');
+    return {
+        settings,
+        state,
+        type,
+        workPosition,
+        machinePosition
+    };
+})(AxesWidget);
