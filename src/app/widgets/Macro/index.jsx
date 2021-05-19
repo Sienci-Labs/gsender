@@ -24,6 +24,7 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
+import { connect } from 'react-redux';
 import includes from 'lodash/includes';
 import React, { PureComponent } from 'react';
 import _ from 'lodash';
@@ -49,14 +50,8 @@ import {
     MARLIN,
     // Smoothie
     SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_IDLE,
-    SMOOTHIE_ACTIVE_STATE_RUN,
     // TinyG
     TINYG,
-    TINYG_MACHINE_STATE_READY,
-    TINYG_MACHINE_STATE_STOP,
-    TINYG_MACHINE_STATE_END,
-    TINYG_MACHINE_STATE_RUN,
     // Workflow
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
@@ -230,15 +225,6 @@ class MacroWidget extends PureComponent {
                 macros: [...state.macros]
             }));
         },
-        'controller:state': (type, controllerState) => {
-            this.setState(state => ({
-                controller: {
-                    ...state.controller,
-                    type: type,
-                    state: controllerState
-                }
-            }));
-        },
         'workflow:state': (workflowState) => {
             this.setState(state => ({
                 workflow: {
@@ -364,8 +350,8 @@ class MacroWidget extends PureComponent {
 
     canClick() {
         const { port, workflow } = this.state;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
+        const controllerType = this.props.type;
+        const controllerState = this.props.state;
 
         if (!port) {
             return false;
@@ -376,42 +362,15 @@ class MacroWidget extends PureComponent {
         if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
             return false;
         }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE,
-                GRBL_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_IDLE,
-                SMOOTHIE_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_READY,
-                TINYG_MACHINE_STATE_STOP,
-                TINYG_MACHINE_STATE_END,
-                TINYG_MACHINE_STATE_RUN
-            ];
-            if (!includes(states, machineState)) {
-                return false;
-            }
-        }
 
+        const activeState = get(controllerState, 'status.activeState');
+        const states = [
+            GRBL_ACTIVE_STATE_IDLE,
+            GRBL_ACTIVE_STATE_RUN
+        ];
+        if (!includes(states, activeState)) {
+            return false;
+        }
         return true;
     }
 
@@ -563,4 +522,11 @@ class MacroWidget extends PureComponent {
     }
 }
 
-export default MacroWidget;
+export default connect((store) => {
+    const type = get(store, 'controller.type');
+    const state = get(store, 'controller.state');
+    return {
+        type,
+        state
+    };
+})(MacroWidget);
