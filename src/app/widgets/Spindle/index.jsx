@@ -27,37 +27,34 @@ import debounce from 'lodash/debounce';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
+import { connect } from 'react-redux';
 import React, { PureComponent } from 'react';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import WidgetConfig from '../WidgetConfig';
 import {
-    // Grbl
     GRBL,
-    GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_HOLD,
-    // Marlin
+    GRBL_ACTIVE_STATE_IDLE,
+    LASER_MODE,
     MARLIN,
-    // Smoothie
     SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_IDLE,
     SMOOTHIE_ACTIVE_STATE_HOLD,
-    // TinyG
+    SMOOTHIE_ACTIVE_STATE_IDLE,
+    SPINDLE_MODE,
     TINYG,
-    TINYG_MACHINE_STATE_READY,
-    TINYG_MACHINE_STATE_STOP,
     TINYG_MACHINE_STATE_END,
     TINYG_MACHINE_STATE_HOLD,
-    // Workflow
-    WORKFLOW_STATE_RUNNING,
-    SPINDLE_MODE,
-    LASER_MODE
+    TINYG_MACHINE_STATE_READY,
+    TINYG_MACHINE_STATE_STOP,
+    WORKFLOW_STATE_RUNNING
 } from '../../constants';
 import styles from './index.styl';
 import SpindleControls from './components/SpindleControls';
 import LaserControls from './components/LaserControls';
 import ModalToggle from './components/ModalToggle';
 import ActiveIndicator from './components/ActiveIndicator';
+
 
 class SpindleWidget extends PureComponent {
     static propTypes = {
@@ -173,13 +170,6 @@ class SpindleWidget extends PureComponent {
             const initialState = this.getInitialState();
             this.setState({ ...initialState });
         },
-        'workflow:state': (workflowState) => {
-            this.setState(state => ({
-                workflow: {
-                    state: workflowState
-                }
-            }));
-        },
         'controller:settings': (type, controllerSettings) => {
             const { settings } = controllerSettings;
             if (Object.keys(settings).length > 0) {
@@ -251,9 +241,6 @@ class SpindleWidget extends PureComponent {
                     coolant: ''
                 }
             },
-            workflow: {
-                state: controller.workflow.state
-            },
             spindleSpeed: this.config.get('speed', 1000),
             spindleMin: this.config.get('spindleMin', 0),
             spindleMax: this.config.get('spindleMax', 5000),
@@ -310,7 +297,8 @@ class SpindleWidget extends PureComponent {
     }
 
     canClick() {
-        const { port, workflow } = this.state;
+        const { port } = this.state;
+        const { workflow } = this.props;
         const controllerType = this.state.controller.type;
         const controllerState = this.state.controller.state;
 
@@ -405,4 +393,9 @@ class SpindleWidget extends PureComponent {
     }
 }
 
-export default SpindleWidget;
+export default connect((store) => {
+    const workflow = get(store, 'controller.workflow');
+    return {
+        workflow
+    };
+})(SpindleWidget);

@@ -80,12 +80,6 @@ class DisplayPanel extends PureComponent {
                 homePosition: controllerSettings.settings.$23
             }));
         },
-        'sender:status': (data, controllerState) => {
-            let controllersAlarmState = this.state.controllersAlarmState;
-            if (controllersAlarmState === '1') {
-                controller.command('gcode:stop', { force: true });
-            }
-        }
     }
 
 
