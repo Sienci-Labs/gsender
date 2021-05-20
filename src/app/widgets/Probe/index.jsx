@@ -265,30 +265,13 @@ class ProbeWidget extends PureComponent {
         }
     };
 
-    controllerEvents = {
-        'gcode:fsLoad': () => {
-            console.log('responded');
-        },
-        'serialport:open': (options) => {
-            const { port } = options;
-            this.setState({ port: port });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState({ ...initialState });
-            this.actions.generatePossibleProbeCommands();
-        },
-    };
-
     unitsDidChange = false;
 
     componentDidMount() {
-        this.addControllerEvents();
         this.subscribe();
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
         this.unsubscribe();
     }
 
@@ -358,13 +341,6 @@ class ProbeWidget extends PureComponent {
             selectedProbeCommand: 0,
             connectivityTest: this.config.get('connectivityTest')
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
     }
 
     gcode(cmd, params) {
@@ -689,13 +665,6 @@ class ProbeWidget extends PureComponent {
         return code;
     }
 
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
-    }
-
     getWorkCoordinateSystem() {
         const controllerState = this.props.state;
 
@@ -703,30 +672,24 @@ class ProbeWidget extends PureComponent {
     }
 
     canClick() {
-        const { port } = this.state;
-        const { workflow } = this.props;
-        const controllerType = this.props.type;
-        const controllerState = this.props.state;
+        const { workflow, isConnected, type, state } = this.props;
 
-        if (!port) {
+        if (!isConnected) {
             return false;
         }
         if (workflow.state !== WORKFLOW_STATE_IDLE) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
+        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
             return false;
         }
 
-        const activeState = get(controllerState, 'status.activeState');
+        const activeState = get(state, 'status.activeState');
         const states = [
             GRBL_ACTIVE_STATE_IDLE
         ];
-        if (!includes(states, activeState)) {
-            return false;
-        }
 
-        return true;
+        return includes(states, activeState);
     }
 
     changeUnits(units) {
@@ -876,9 +839,11 @@ export default connect((store) => {
     const state = get(store, 'controller.state');
     const type = get(store, 'controller.type');
     const workflow = get(store, 'controller.workflow');
+    const isConnected = get(store, 'connection.isConnected');
     return {
         state,
         type,
-        workflow
+        workflow,
+        isConnected
     };
 })(ProbeWidget);
