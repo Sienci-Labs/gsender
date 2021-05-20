@@ -345,20 +345,12 @@ class JobStatusWidget extends PureComponent {
     isRunningJob() {
         const { workflow } = this.props;
 
-        if (workflow.state !== WORKFLOW_STATE_IDLE) {
-            return true;
-        }
-
-        return false;
+        return workflow.state !== WORKFLOW_STATE_IDLE;
     }
 
     jobIsPaused() {
         const { workflow } = this.props;
-        if (workflow.state === WORKFLOW_STATE_PAUSED) {
-            return true;
-        }
-
-        return false;
+        return workflow.state === WORKFLOW_STATE_PAUSED;
     }
 
     render() {
