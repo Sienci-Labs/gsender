@@ -31,7 +31,6 @@ import LocationWidget from 'app/widgets/Location';
 import MacroWidget from 'app/widgets/Macro';
 import ProbeWidget from 'app/widgets/Probe';
 import SpindleWidget from 'app/widgets/Spindle';
-import CustomWidget from 'app/widgets/Custom';
 import VisualizerWidget from 'app/widgets/Visualizer';
 import SecondaryFunctionality from 'app/widgets/SecondaryFunctionality';
 
@@ -45,7 +44,6 @@ const getWidgetByName = (name) => {
         'macro': MacroWidget,
         'probe': ProbeWidget,
         'spindle': SpindleWidget,
-        'custom': CustomWidget,
         'visualizer': VisualizerWidget,
         'secondary': SecondaryFunctionality
     }[name] || null;
