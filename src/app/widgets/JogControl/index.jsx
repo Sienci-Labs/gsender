@@ -29,7 +29,6 @@ import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import api from 'app/api';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import combokeys from 'app/lib/combokeys';
@@ -60,7 +59,6 @@ import {
     // TinyG
     TINYG,
     // Workflow
-    WORKFLOW_STATE_RUNNING,
     GRBL_ACTIVE_STATE_JOG,
     GRBL_ACTIVE_STATE_IDLE
 } from '../../constants';
@@ -488,11 +486,12 @@ class AxesWidget extends PureComponent {
             preventDefault(event);
             const { isContinuousJogging } = this.state;
             const { getXYJogDistance, getZJogDistance } = this.actions;
+            const { canJog } = this.props;
 
             const xyStep = getXYJogDistance();
             const zStep = getZJogDistance();
 
-            if (!axis || isContinuousJogging) {
+            if (!axis || isContinuousJogging || !canJog) {
                 return;
             }
 
@@ -562,48 +561,9 @@ class AxesWidget extends PureComponent {
                 this.actions.stepNext();
             }
         },
-        SHUTTLE: (event, { zone = 0 }) => {
-            const { canClick, jog } = this.state;
-
-            if (!canClick) {
-                return;
-            }
-
-            if (zone === 0) {
-                // Clear accumulated result
-                this.shuttleControl.clear();
-
-                if (jog.axis) {
-                    controller.command('gcode', 'G90');
-                }
-                return;
-            }
-
-            if (!jog.axis) {
-                return;
-            }
-
-            const distance = Math.min(this.actions.getJogDistance(), 1);
-            const feedrateMin = this.config.get('shuttle.feedrateMin');
-            const feedrateMax = this.config.get('shuttle.feedrateMax');
-            const hertz = this.config.get('shuttle.hertz');
-            const overshoot = this.config.get('shuttle.overshoot');
-
-            this.shuttleControl.accumulate(zone, {
-                axis: jog.axis,
-                distance: distance,
-                feedrateMin: feedrateMin,
-                feedrateMax: feedrateMax,
-                hertz: hertz,
-                overshoot: overshoot
-            });
-        },
     };
 
     controllerEvents = {
-        'config:change': () => {
-            this.fetchMDICommands();
-        },
         'serialport:open': (options) => {
             const { port } = options;
             this.setState({ port: port });
@@ -618,42 +578,9 @@ class AxesWidget extends PureComponent {
                 }
             }));
         },
-        'workflow:state': (workflowState) => {
-            const canJog = (workflowState !== WORKFLOW_STATE_RUNNING);
-
-            // Disable keypad jogging and shuttle wheel when the workflow state is 'running'.
-            // This prevents accidental movement while sending G-code commands.
-            this.setState(state => ({
-                jog: {
-                    ...state.jog,
-                    axis: canJog ? state.jog.axis : '',
-                    keypad: canJog ? state.jog.keypad : false
-                },
-                workflow: {
-                    ...state.workflow,
-                    state: workflowState
-                }
-            }));
-        }
     };
 
     shuttleControl = null;
-
-    fetchMDICommands = async () => {
-        try {
-            let res;
-            res = await api.mdi.fetch();
-            const { records: commands } = res.body;
-            this.setState(state => ({
-                mdi: {
-                    ...state.mdi,
-                    commands: commands
-                }
-            }));
-        } catch (err) {
-            // Ignore error
-        }
-    };
 
     updateJogPresets = () => {
         const { jog } = this.state;
@@ -677,7 +604,6 @@ class AxesWidget extends PureComponent {
     componentDidMount() {
         store.on('change', this.updateJogPresets);
 
-        this.fetchMDICommands();
         this.addControllerEvents();
         this.addShuttleControlEvents();
         this.subscribe();
@@ -687,7 +613,6 @@ class AxesWidget extends PureComponent {
         store.removeListener('change', this.updateJogPresets);
         this.unsubscribe();
         this.removeControllerEvents();
-        // this.removeShuttleControlEvents();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -696,7 +621,6 @@ class AxesWidget extends PureComponent {
             minimized,
             axes,
             jog,
-            mdi
         } = this.state;
 
         this.config.set('minimized', minimized);
@@ -708,7 +632,6 @@ class AxesWidget extends PureComponent {
         if (units === METRIC_UNITS) {
             this.config.set('jog.metric.step', Number(jog.metric.step) || 0);
         }
-        this.config.set('mdi.disabled', mdi.disabled);
     }
 
     getInitialState() {
@@ -726,9 +649,6 @@ class AxesWidget extends PureComponent {
                 type: controller.type,
                 settings: controller.settings,
                 state: controller.state
-            },
-            workflow: {
-                state: controller.workflow.state
             },
             modal: {
                 name: MODAL_NONE,
@@ -768,10 +688,6 @@ class AxesWidget extends PureComponent {
                     step: this.config.get('jog.metric.step'),
                     distances: ensureArray(this.config.get('jog.metric.distances', []))
                 }
-            },
-            mdi: {
-                disabled: this.config.get('mdi.disabled'),
-                commands: []
             },
             prevJog: null,
         };
@@ -860,16 +776,16 @@ class AxesWidget extends PureComponent {
     }
 
     canClick() {
-        const { port, workflow, isContinuousJogging } = this.state;
-        const controllerType = this.props.type;
+        const { port, isContinuousJogging } = this.state;
+        const { workflow, type } = this.props;
 
         if (!port) {
             return false;
         }
-        if (workflow.state === WORKFLOW_STATE_RUNNING && !isContinuousJogging) {
+        if (workflow.state !== GRBL_ACTIVE_STATE_IDLE && !isContinuousJogging) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
+        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
             return false;
         }
 
@@ -882,7 +798,7 @@ class AxesWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId, machinePosition, workPosition } = this.props;
+        const { widgetId, machinePosition, workPosition, canJog } = this.props;
         const { minimized, isFullscreen } = this.state;
         const { units } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
@@ -901,7 +817,8 @@ class AxesWidget extends PureComponent {
             // Output work position with the display units
             workPosition: mapValues(workPosition, (pos, axis) => {
                 return String(mapPositionToUnits(pos, units));
-            })
+            }),
+            canJog
         };
         const actions = {
             ...this.actions
@@ -942,11 +859,15 @@ export default connect((store) => {
     const type = get(store, 'controller.type');
     const workPosition = get(store, 'controller.wpos');
     const machinePosition = get(store, 'controller.mpos');
+    const workflow = get(store, 'controller.workflow');
+    const canJog = workflow.state === GRBL_ACTIVE_STATE_IDLE;
     return {
         settings,
         state,
         type,
         workPosition,
-        machinePosition
+        machinePosition,
+        workflow,
+        canJog
     };
 })(AxesWidget);
