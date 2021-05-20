@@ -66,7 +66,7 @@ class DisplayPanel extends PureComponent {
     controllerEvents = {
         'controller:state': (data, controllerState) => {
             let controllersAlarmState = this.state.controllersAlarmState;
-            let hardStopAlarm = controllerState.status.alarmcode;
+            let hardStopAlarm = controllerState.status.alarmCode;
             this.setState(prevState => ({
                 controllersAlarmState: hardStopAlarm
             }));
