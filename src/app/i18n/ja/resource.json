@@ -139,7 +139,6 @@
     "This widget shows the Smoothie state and provides Smoothie specific features.": "",
     "TinyG Widget": "",
     "This widget shows the TinyG state and provides TinyG specific features.": "",
-    "Axes Widget": "",
     "This widget shows the XYZ position. It includes jog controls, homing, and axis zeroing.": "",
     "This widget displays machine and work coordinates for all axes": "",
     "G-code Widget": "",
@@ -295,7 +294,6 @@
     "C-axis": "",
     "Custom Jog Distance (mm)": "",
     "Custom Jog Distance (inches)": "",
-    "Axes Settings": "",
     "Custom Commands": "",
     "ShuttleXpress": "",
     "New": "",
@@ -436,5 +434,7 @@
     "Stop Job": "",
     "Add New Macro": "",
     "No macros...": "",
-    "Test Run": ""
+    "Test Run": "",
+    "JogControl Widget": "",
+    "JogControl Settings": ""
 }

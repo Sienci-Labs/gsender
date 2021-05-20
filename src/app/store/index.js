@@ -232,7 +232,7 @@ const migrateStore = () => {
     // Removed "widgets.axes.jog.customDistance"
     // Removed "widgets.axes.jog.selectedDistance"
     if (semver.lt(cnc.version, '1.9.13')) {
-        // Axes widget
+        // JogControl widget
         store.unset('widgets.axes.wzero');
         store.unset('widgets.axes.mzero');
         store.unset('widgets.axes.jog.customDistance');

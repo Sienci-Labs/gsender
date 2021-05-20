@@ -132,7 +132,7 @@ class Settings extends PureComponent {
                 onClose={this.props.onCancel}
             >
                 <Modal.Header>
-                    <Modal.Title>{i18n._('Axes Settings')}</Modal.Title>
+                    <Modal.Title>{i18n._('JogControl Settings')}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body padding={false}>
                     <Nav

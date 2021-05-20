@@ -66,7 +66,7 @@ class CoordinateAxes {
 
     // Creates an axisHelper with lines of length size.
     // @param {number} size Define the size of the line representing the axes.
-    // @see [Drawing the Coordinate Axes]{@http://soledadpenades.com/articles/three-js-tutorials/drawing-the-coordinate-axes/}
+    // @see [Drawing the Coordinate JogControl]{@http://soledadpenades.com/articles/three-js-tutorials/drawing-the-coordinate-axes/}
     constructor(size) {
         const red = '#df3b3b';
         const green = '#06b881';

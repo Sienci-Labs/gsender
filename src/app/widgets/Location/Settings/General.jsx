@@ -62,7 +62,7 @@ class General extends PureComponent {
     };
 
     get value() {
-        // Axes
+        // JogControl
         const axes = [];
         axes.push('x');
         this.field.axisY.checked && axes.push('y');

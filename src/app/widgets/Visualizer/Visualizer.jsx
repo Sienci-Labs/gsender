@@ -645,7 +645,7 @@ class Visualizer extends Component {
             group.add(gridLine);
         }
 
-        { // Coordinate Axes
+        { // Coordinate JogControl
             const coordinateAxes = new CoordinateAxes(axisLength);
             coordinateAxes.name = 'CoordinateAxes';
             group.add(coordinateAxes);

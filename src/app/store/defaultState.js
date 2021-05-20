@@ -27,7 +27,7 @@ import {
     METRIC_UNITS,
     SPINDLE_MODE
 } from '../constants';
-import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../widgets/Axes/constants';
+import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../widgets/JogControl/constants';
 
 const AXIS_X = 'x';
 const AXIS_Y = 'y';
