@@ -564,16 +564,6 @@ class AxesWidget extends PureComponent {
     };
 
     controllerEvents = {
-        'serialport:open': (options) => {
-            const { port } = options;
-            this.setState({ port: port });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState(state => ({
-                ...initialState,
-            }));
-        },
     };
 
     shuttleControl = null;
@@ -599,8 +589,6 @@ class AxesWidget extends PureComponent {
 
     componentDidMount() {
         store.on('change', this.updateJogPresets);
-
-        this.addControllerEvents();
         this.addShuttleControlEvents();
         this.subscribe();
     }
@@ -608,7 +596,6 @@ class AxesWidget extends PureComponent {
     componentWillUnmount() {
         store.removeListener('change', this.updateJogPresets);
         this.unsubscribe();
-        this.removeControllerEvents();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -641,11 +628,6 @@ class AxesWidget extends PureComponent {
             units: store.get('workspace.units', METRIC_UNITS),
             isContinuousJogging: false,
             selectedSpeed: SPEED_NORMAL,
-            controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
-            },
             modal: {
                 name: MODAL_NONE,
                 params: {}
@@ -687,20 +669,6 @@ class AxesWidget extends PureComponent {
             },
             prevJog: null,
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     getInitialXYStep() {
@@ -772,10 +740,10 @@ class AxesWidget extends PureComponent {
     }
 
     canClick() {
-        const { port, isContinuousJogging } = this.state;
-        const { workflow, type } = this.props;
+        const { isContinuousJogging } = this.state;
+        const { workflow, type, isConnected } = this.props;
 
-        if (!port) {
+        if (!isConnected) {
             return false;
         }
         if (workflow.state !== WORKFLOW_STATE_IDLE && !isContinuousJogging) {
@@ -857,6 +825,7 @@ export default connect((store) => {
     const machinePosition = get(store, 'controller.mpos');
     const workflow = get(store, 'controller.workflow');
     const canJog = workflow.state === WORKFLOW_STATE_IDLE;
+    const isConnected = get(store, 'connection.isConnected');
     return {
         settings,
         state,
@@ -864,6 +833,7 @@ export default connect((store) => {
         workPosition,
         machinePosition,
         workflow,
-        canJog
+        canJog,
+        isConnected
     };
 })(AxesWidget);

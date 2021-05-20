@@ -214,17 +214,6 @@ class MacroWidget extends PureComponent {
         'config:change': () => {
             this.fetchMacros();
         },
-        'serialport:open': (options) => {
-            const { port } = options;
-            this.setState({ port: port });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState(state => ({
-                ...initialState,
-                macros: [...state.macros]
-            }));
-        },
     };
 
     fetchMacros = async () => {
@@ -311,16 +300,11 @@ class MacroWidget extends PureComponent {
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
-            port: controller.port,
-            controller: {
-                type: controller.type,
-                state: controller.state
-            },
+            macros: [],
             modal: {
                 name: MODAL_NONE,
                 params: {}
             },
-            macros: []
         };
     }
 
@@ -339,30 +323,24 @@ class MacroWidget extends PureComponent {
     }
 
     canClick() {
-        const { port } = this.state;
-        const { workflow } = this.props;
-        const controllerType = this.props.type;
-        const controllerState = this.props.state;
+        const { workflow, isConnected, type, state } = this.props;
 
-        if (!port) {
+        if (!isConnected) {
             return false;
         }
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
+        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
             return false;
         }
 
-        const activeState = get(controllerState, 'status.activeState');
+        const activeState = get(state, 'status.activeState');
         const states = [
             GRBL_ACTIVE_STATE_IDLE,
             GRBL_ACTIVE_STATE_RUN
         ];
-        if (!includes(states, activeState)) {
-            return false;
-        }
-        return true;
+        return includes(states, activeState);
     }
 
     render() {
@@ -517,9 +495,11 @@ export default connect((store) => {
     const type = get(store, 'controller.type');
     const state = get(store, 'controller.state');
     const workflow = get(store, 'controller.workflow');
+    const isConnected = get(store, 'connection.isConnected');
     return {
         type,
         state,
-        workflow
+        workflow,
+        isConnected
     };
 })(MacroWidget);

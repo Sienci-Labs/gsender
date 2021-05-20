@@ -39,14 +39,8 @@ import {
     LASER_MODE,
     MARLIN,
     SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_HOLD,
-    SMOOTHIE_ACTIVE_STATE_IDLE,
     SPINDLE_MODE,
     TINYG,
-    TINYG_MACHINE_STATE_END,
-    TINYG_MACHINE_STATE_HOLD,
-    TINYG_MACHINE_STATE_READY,
-    TINYG_MACHINE_STATE_STOP,
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
 import styles from './index.styl';
@@ -162,14 +156,6 @@ class SpindleWidget extends PureComponent {
     };
 
     controllerEvents = {
-        'serialport:open': (options) => {
-            const { port } = options;
-            this.setState({ port: port });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState({ ...initialState });
-        },
         'controller:settings': (type, controllerSettings) => {
             const { settings } = controllerSettings;
             if (Object.keys(settings).length > 0) {
@@ -230,7 +216,6 @@ class SpindleWidget extends PureComponent {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             canClick: true, // Defaults to true
-            port: controller.port,
             mode: this.config.get('mode'),
             active: false,
             controller: {
@@ -297,12 +282,11 @@ class SpindleWidget extends PureComponent {
     }
 
     canClick() {
-        const { port } = this.state;
-        const { workflow } = this.props;
+        const { workflow, isConnected } = this.props;
         const controllerType = this.state.controller.type;
         const controllerState = this.state.controller.state;
 
-        if (!port) {
+        if (!isConnected) {
             return false;
         }
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
@@ -311,43 +295,14 @@ class SpindleWidget extends PureComponent {
         if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
             return false;
         }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE,
-                GRBL_ACTIVE_STATE_HOLD
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_IDLE,
-                SMOOTHIE_ACTIVE_STATE_HOLD
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_READY,
-                TINYG_MACHINE_STATE_STOP,
-                TINYG_MACHINE_STATE_END,
-                TINYG_MACHINE_STATE_HOLD
-            ];
-            if (!includes(states, machineState)) {
-                return false;
-            }
-        }
 
-        return true;
+        const activeState = get(controllerState, 'status.activeState');
+        const states = [
+            GRBL_ACTIVE_STATE_IDLE,
+            GRBL_ACTIVE_STATE_HOLD
+        ];
+
+        return includes(states, activeState);
     }
 
     render() {
@@ -395,7 +350,9 @@ class SpindleWidget extends PureComponent {
 
 export default connect((store) => {
     const workflow = get(store, 'controller.workflow');
+    const isConnected = get(store, 'connection.isConnected');
     return {
-        workflow
+        workflow,
+        isConnected
     };
 })(SpindleWidget);

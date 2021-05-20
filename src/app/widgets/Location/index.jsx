@@ -495,30 +495,16 @@ class LocationWidget extends PureComponent {
         }
     };
 
-    controllerEvents = {
-        'serialport:open': (options) => {
-            const { port } = options;
-            this.setState({ port: port });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState(state => ({
-                ...initialState,
-            }));
-        },
-    };
 
     shuttleControl = null;
 
 
     componentDidMount() {
         this.subscribe();
-        this.addControllerEvents();
         this.addShuttleControlEvents();
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
         this.removeShuttleControlEvents();
         this.unsubscribe();
     }
@@ -547,7 +533,6 @@ class LocationWidget extends PureComponent {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             canClick: true, // Defaults to true
-            port: controller.port,
             units: store.get('workspace.units', METRIC_UNITS),
             safeRetractHeight: store.get('workspace.safeRetractHeight'),
             workflow: {
@@ -592,20 +577,6 @@ class LocationWidget extends PureComponent {
         };
     }
 
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
-    }
-
     updateShuttleControlEvents = () => {
         this.removeShuttleControlEvents();
         this.addShuttleControlEvents();
@@ -644,32 +615,24 @@ class LocationWidget extends PureComponent {
     }
 
     canClick() {
-        const { port } = this.state;
-        const controllerType = this.props.type;
-        const controllerState = this.props.state;
-        const workflow = this.props.workflow;
+        const { isConnected, workflow, type, state } = this.props;
 
-        if (!port) {
+        if (!isConnected) {
             return false;
         }
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
+        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
             return false;
         }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE,
-                GRBL_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
 
-        return true;
+        const activeState = get(state, 'status.activeState');
+        const states = [
+            GRBL_ACTIVE_STATE_IDLE,
+            GRBL_ACTIVE_STATE_RUN
+        ];
+        return includes(states, activeState);
     }
 
     changeUnits(units) {
@@ -824,7 +787,9 @@ export default connect((store) => {
     const workPosition = get(store, 'controller.wpos');
     const workflow = get(store, 'controller.workflow');
     const canJog = (workflow.state === WORKFLOW_STATE_IDLE);
+    const isConnected = get(store, 'connection.isConnected');
     return {
+        isConnected,
         state,
         settings,
         type,
