@@ -75,17 +75,6 @@ class JobStatusWidget extends PureComponent {
     };
 
     controllerEvents = {
-        'serialport:open': (options) => {
-            const { port } = options;
-            this.setState({
-                port: port,
-                connected: true,
-            });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState({ ...initialState });
-        },
         'gcode:unload': () => {
             this.setState({
                 bbox: {
@@ -188,9 +177,7 @@ class JobStatusWidget extends PureComponent {
             feedRates: [],
             spindleRates: [],
             isFullscreen: false,
-            connected: false,
             fileModal: METRIC_UNITS,
-            port: controller.port,
             units: store.get('workspace.units'),
             fileName: '',
             fileSize: 0,
@@ -348,7 +335,7 @@ class JobStatusWidget extends PureComponent {
 
     render() {
         const { units, bbox, fileProcessing } = this.state;
-        const { workflow } = this.props;
+        const { workflow, isConnected } = this.props;
         const state = {
             ...this.state,
             workflow,
@@ -358,7 +345,8 @@ class JobStatusWidget extends PureComponent {
                 return mapValues(position, (pos, axis) => {
                     return mapPositionToUnits(pos, units);
                 });
-            })
+            }),
+            isConnected
         };
         const actions = {
             ...this.actions
@@ -381,8 +369,10 @@ class JobStatusWidget extends PureComponent {
 export default connect((store) => {
     const workflow = get(store, 'controller.workflow');
     const senderStatus = get(store, 'controller.sender.status');
+    const isConnected = get(store, 'connection.isConnected');
     return {
         workflow,
-        senderStatus
+        senderStatus,
+        isConnected
     };
 })(JobStatusWidget);
