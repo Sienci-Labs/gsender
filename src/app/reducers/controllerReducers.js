@@ -30,7 +30,7 @@ import {
     UPDATE_FEEDER_STATUS, UPDATE_SENDER_STATUS, UPDATE_WORKFLOW_STATE
 } from '../actions/controllerActions';
 import { in2mm } from '../lib/units';
-import { WORKFLOW_STATE_IDLE } from '../constants';
+import { GRBL_ACTIVE_STATE_IDLE, WORKFLOW_STATE_IDLE } from '../constants';
 
 
 const initialState = {
@@ -134,6 +134,7 @@ const reducer = createReducer(initialState, {
         };
     },
     [UPDATE_SENDER_STATUS]: (payload, reducerState) => {
+        console.log(payload);
         return {
             sender: {
                 status: _get(payload, 'status', _get(reducerState, 'status'))
@@ -143,7 +144,7 @@ const reducer = createReducer(initialState, {
     [UPDATE_WORKFLOW_STATE]: (payload, reducerState) => {
         return {
             workflow: {
-                state: _get(payload, 'state,', _get(reducerState, 'state')) || initialState.state,
+                state: _get(payload, 'state,', _get(reducerState, 'state')) || GRBL_ACTIVE_STATE_IDLE,
             }
         };
     }

@@ -141,10 +141,8 @@ class LocationWidget extends PureComponent {
     state = this.getInitialState();
 
     getWorkCoordinateSystem = () => {
-        const controllerType = this.props.type;
         const controllerState = this.props.state;
-        console.log(controllerState);
-        console.log(controllerType);
+
         const defaultWCS = 'G54';
 
         return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
@@ -556,8 +554,9 @@ class LocationWidget extends PureComponent {
         },
         SHUTTLE: (event, { zone = 0 }) => {
             const { canClick, jog } = this.state;
+            const { canJog } = this.props;
 
-            if (!canClick) {
+            if (!canClick || !canJog) {
                 return;
             }
 
@@ -607,23 +606,6 @@ class LocationWidget extends PureComponent {
                 mdi: {
                     ...initialState.mdi,
                     commands: [...state.mdi.commands]
-                }
-            }));
-        },
-        'workflow:state': (workflowState) => {
-            const canJog = (workflowState === WORKFLOW_STATE_IDLE);
-
-            // Disable keypad jogging and shuttle wheel when the workflow state is 'running'.
-            // This prevents accidental movement while sending G-code commands.
-            this.setState(state => ({
-                jog: {
-                    ...state.jog,
-                    axis: canJog ? state.jog.axis : '',
-                    keypad: canJog
-                },
-                workflow: {
-                    ...state.workflow,
-                    state: workflowState
                 }
             }));
         },
@@ -791,9 +773,10 @@ class LocationWidget extends PureComponent {
     }
 
     canClick() {
-        const { port, workflow } = this.state;
+        const { port } = this.state;
         const controllerType = this.props.type;
         const controllerState = this.props.state;
+        const workflow = this.props.workflow;
 
         if (!port) {
             return false;
@@ -968,11 +951,15 @@ export default connect((store) => {
     const type = get(store, 'controller.type');
     const machinePosition = get(store, 'controller.mpos');
     const workPosition = get(store, 'controller.wpos');
+    const workflow = get(store, 'controller.workflow');
+    const canJog = (workflow.state === WORKFLOW_STATE_IDLE);
     return {
         state,
         settings,
         type,
         machinePosition,
-        workPosition
+        workPosition,
+        workflow,
+        canJog
     };
 })(LocationWidget);
