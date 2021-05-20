@@ -25,14 +25,12 @@ import cx from 'classnames';
 import ensureArray from 'ensure-array';
 import get from 'lodash/get';
 import includes from 'lodash/includes';
-import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
 import store from 'app/store';
 import { connect } from 'react-redux';
 import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
-import api from 'app/api';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import combokeys from 'app/lib/combokeys';
@@ -160,33 +158,6 @@ class LocationWidget extends PureComponent {
             const { minimized } = this.state;
             this.setState({ minimized: !minimized });
         },
-        openModal: (name = MODAL_NONE, params = {}) => {
-            this.setState({
-                modal: {
-                    name: name,
-                    params: params
-                }
-            });
-        },
-        closeModal: () => {
-            this.setState({
-                modal: {
-                    name: MODAL_NONE,
-                    params: {}
-                }
-            });
-        },
-        updateModalParams: (params = {}) => {
-            this.setState({
-                modal: {
-                    ...this.state.modal,
-                    params: {
-                        ...this.state.modal.params,
-                        ...params
-                    }
-                }
-            });
-        },
         getJogDistance: () => {
             const { units } = this.state;
 
@@ -231,32 +202,6 @@ class LocationWidget extends PureComponent {
             const gcode = `G10 L20 P${p} ${axis}${value}`;
 
             controller.command('gcode', gcode);
-        },
-        jog: (params = {}) => {
-            const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-            controller.command('gcode', 'G91'); // relative
-            controller.command('gcode', 'G0 ' + s);
-            controller.command('gcode', 'G90'); // absolute
-        },
-        move: (params = {}) => {
-            const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-            controller.command('gcode', 'G0 ' + s);
-        },
-        toggleMDIMode: () => {
-            this.setState(state => ({
-                mdi: {
-                    ...state.mdi,
-                    disabled: !state.mdi.disabled
-                }
-            }));
-        },
-        toggleKeypadJogging: () => {
-            this.setState(state => ({
-                jog: {
-                    ...state.jog,
-                    keypad: !state.jog.keypad
-                }
-            }));
         },
         selectAxis: (axis = '') => {
             this.setState(state => ({
@@ -384,11 +329,7 @@ class LocationWidget extends PureComponent {
         if (!type || !state) {
             return false;
         }
-        if (workflow.state !== WORKFLOW_STATE_IDLE) {
-            return false;
-        }
-
-        return true;
+        return workflow.state === WORKFLOW_STATE_IDLE;
     }
 
     shuttleControlEvents = {
@@ -551,50 +492,10 @@ class LocationWidget extends PureComponent {
             } else {
                 this.actions.stepNext();
             }
-        },
-        SHUTTLE: (event, { zone = 0 }) => {
-            const { canClick, jog } = this.state;
-            const { canJog } = this.props;
-
-            if (!canClick || !canJog) {
-                return;
-            }
-
-            if (zone === 0) {
-                // Clear accumulated result
-                this.shuttleControl.clear();
-
-                if (jog.axis) {
-                    controller.command('gcode', 'G90');
-                }
-                return;
-            }
-
-            if (!jog.axis) {
-                return;
-            }
-
-            const distance = Math.min(this.actions.getJogDistance(), 1);
-            const feedrateMin = this.config.get('shuttle.feedrateMin');
-            const feedrateMax = this.config.get('shuttle.feedrateMax');
-            const hertz = this.config.get('shuttle.hertz');
-            const overshoot = this.config.get('shuttle.overshoot');
-
-            this.shuttleControl.accumulate(zone, {
-                axis: jog.axis,
-                distance: distance,
-                feedrateMin: feedrateMin,
-                feedrateMax: feedrateMax,
-                hertz: hertz,
-                overshoot: overshoot
-            });
         }
     };
 
     controllerEvents = {
-        'config:change': () => {
-            this.fetchMDICommands();
-        },
         'serialport:open': (options) => {
             const { port } = options;
             this.setState({ port: port });
@@ -603,39 +504,17 @@ class LocationWidget extends PureComponent {
             const initialState = this.getInitialState();
             this.setState(state => ({
                 ...initialState,
-                mdi: {
-                    ...initialState.mdi,
-                    commands: [...state.mdi.commands]
-                }
             }));
         },
     };
 
     shuttleControl = null;
 
-    fetchMDICommands = async () => {
-        try {
-            let res;
-            res = await api.mdi.fetch();
-            const { records: commands } = res.body;
-            this.setState(state => ({
-                mdi: {
-                    ...state.mdi,
-                    commands: commands
-                }
-            }));
-        } catch (err) {
-            // Ignore error
-        }
-    };
 
     componentDidMount() {
         this.subscribe();
-        this.fetchMDICommands();
         this.addControllerEvents();
         this.addShuttleControlEvents();
-
-        this.actions.toggleKeypadJogging();
     }
 
     componentWillUnmount() {
@@ -649,8 +528,7 @@ class LocationWidget extends PureComponent {
             units,
             minimized,
             axes,
-            jog,
-            mdi
+            jog
         } = this.state;
 
         this.config.set('minimized', minimized);
@@ -662,7 +540,6 @@ class LocationWidget extends PureComponent {
         if (units === METRIC_UNITS) {
             this.config.set('jog.metric.step', Number(jog.metric.step) || 0);
         }
-        this.config.set('mdi.disabled', mdi.disabled);
     }
 
     getInitialState() {
@@ -702,11 +579,9 @@ class LocationWidget extends PureComponent {
                 keypad: this.config.get('jog.keypad'),
                 imperial: {
                     step: this.config.get('jog.imperial.step'),
-                    distances: ensureArray(this.config.get('jog.imperial.distances', []))
                 },
                 metric: {
                     step: this.config.get('jog.metric.step'),
-                    distances: ensureArray(this.config.get('jog.metric.distances', []))
                 },
                 speeds: {
                     xyStep: this.config.get('jog.speeds.xyStep'),
@@ -714,10 +589,6 @@ class LocationWidget extends PureComponent {
                     feedrate: this.config.get('jog.speeds.feedrate'),
                 }
             },
-            mdi: {
-                disabled: this.config.get('mdi.disabled'),
-                commands: []
-            }
         };
     }
 
