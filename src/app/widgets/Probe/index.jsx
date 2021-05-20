@@ -278,13 +278,6 @@ class ProbeWidget extends PureComponent {
             this.setState({ ...initialState });
             this.actions.generatePossibleProbeCommands();
         },
-        'workflow:state': (workflowState) => {
-            this.setState(state => ({
-                workflow: {
-                    state: workflowState
-                }
-            }));
-        },
     };
 
     unitsDidChange = false;
@@ -344,9 +337,6 @@ class ProbeWidget extends PureComponent {
             controller: {
                 type: controller.type,
                 state: controller.state
-            },
-            workflow: {
-                state: controller.workflow.state
             },
             modal: {
                 name: MODAL_NONE,
@@ -713,7 +703,8 @@ class ProbeWidget extends PureComponent {
     }
 
     canClick() {
-        const { port, workflow } = this.state;
+        const { port } = this.state;
+        const { workflow } = this.props;
         const controllerType = this.props.type;
         const controllerState = this.props.state;
 
@@ -726,14 +717,13 @@ class ProbeWidget extends PureComponent {
         if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
             return false;
         }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
+
+        const activeState = get(controllerState, 'status.activeState');
+        const states = [
+            GRBL_ACTIVE_STATE_IDLE
+        ];
+        if (!includes(states, activeState)) {
+            return false;
         }
 
         return true;
@@ -885,8 +875,10 @@ class ProbeWidget extends PureComponent {
 export default connect((store) => {
     const state = get(store, 'controller.state');
     const type = get(store, 'controller.type');
+    const workflow = get(store, 'controller.workflow');
     return {
         state,
-        type
+        type,
+        workflow
     };
 })(ProbeWidget);

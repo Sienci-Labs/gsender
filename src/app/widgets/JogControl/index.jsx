@@ -60,7 +60,7 @@ import {
     TINYG,
     // Workflow
     GRBL_ACTIVE_STATE_JOG,
-    GRBL_ACTIVE_STATE_IDLE
+    GRBL_ACTIVE_STATE_IDLE, WORKFLOW_STATE_IDLE
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -782,7 +782,7 @@ class AxesWidget extends PureComponent {
         if (!port) {
             return false;
         }
-        if (workflow.state !== GRBL_ACTIVE_STATE_IDLE && !isContinuousJogging) {
+        if (workflow.state !== WORKFLOW_STATE_IDLE && !isContinuousJogging) {
             return false;
         }
         if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
@@ -860,7 +860,7 @@ export default connect((store) => {
     const workPosition = get(store, 'controller.wpos');
     const machinePosition = get(store, 'controller.mpos');
     const workflow = get(store, 'controller.workflow');
-    const canJog = workflow.state === GRBL_ACTIVE_STATE_IDLE;
+    const canJog = workflow.state === WORKFLOW_STATE_IDLE;
     return {
         settings,
         state,
