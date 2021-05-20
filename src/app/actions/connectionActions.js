@@ -21,13 +21,16 @@
  *
  */
 
-import { combineReducers } from 'redux';
-import controller from './controllerReducers';
-import connection from './connectionReducers';
+import constants from 'namespace-constants';
+import { createAction } from 'redux-action';
 
-const consolidatedReducer = combineReducers({
-    controller,
-    connection
-});
+export const {
+    OPEN_CONNECTION,
+    CLOSE_CONNECTION,
+} = constants('connection', [
+    'OPEN_CONNECTION',
+    'CLOSE_CONNECTION',
+]);
 
-export default consolidatedReducer;
+export const openConnection = createAction(OPEN_CONNECTION);
+export const closeConnection = createAction(CLOSE_CONNECTION);

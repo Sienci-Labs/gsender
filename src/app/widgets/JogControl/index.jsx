@@ -572,10 +572,6 @@ class AxesWidget extends PureComponent {
             const initialState = this.getInitialState();
             this.setState(state => ({
                 ...initialState,
-                mdi: {
-                    ...initialState.mdi,
-                    commands: [...state.mdi.commands]
-                }
             }));
         },
     };

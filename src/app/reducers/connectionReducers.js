@@ -21,12 +21,36 @@
  *
  */
 
-import constants from 'namespace-constants';
+import { createReducer } from 'redux-action';
+import { CLOSE_CONNECTION, OPEN_CONNECTION } from 'app/actions/connectionActions';
 
-export const {
-    MODAL_NONE,
-    MODAL_CONTROLLER
-} = constants('widgets/Grbl', [
-    'MODAL_NONE',
-    'MODAL_CONTROLLER'
-]);
+const initialState = {
+    isConnected: false,
+    port: '',
+    baudrate: '',
+};
+
+const reducer = createReducer(initialState, {
+    [OPEN_CONNECTION]: (payload, reducerState) => {
+        const { options } = payload;
+        const { port, baudrate, inuse } = options;
+        console.log(options);
+        const isConnected = inuse;
+        return {
+            port,
+            baudrate,
+            isConnected
+        };
+    },
+    [CLOSE_CONNECTION]: (payload, reducerState) => {
+        const { options } = payload;
+        const { port } = options;
+        return {
+            ...reducerState,
+            port,
+            isConnected: false
+        };
+    }
+});
+
+export default reducer;

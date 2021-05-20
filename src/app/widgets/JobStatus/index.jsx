@@ -107,7 +107,7 @@ class JobStatusWidget extends PureComponent {
                 }
             });
         },
-        'sender:status': (data) => {
+        /*'sender:status': (data) => {
             const { total, sent, received, startTime, finishTime, elapsedTime, size, remainingTime, name } = data;
             if (data.finishTime > 0) {
                 this.config.set('lastFile', this.state.fileName);
@@ -129,7 +129,7 @@ class JobStatusWidget extends PureComponent {
                 elapsedTime,
                 remainingTime
             });
-        },
+        },*/
     };
 
     pubsubTokens = [];
@@ -192,13 +192,6 @@ class JobStatusWidget extends PureComponent {
             fileModal: METRIC_UNITS,
             port: controller.port,
             units: store.get('workspace.units'),
-
-            controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
-            },
-
             fileName: '',
             fileSize: 0,
             estimatedTime: 0,
@@ -387,7 +380,9 @@ class JobStatusWidget extends PureComponent {
 
 export default connect((store) => {
     const workflow = get(store, 'controller.workflow');
+    const senderStatus = get(store, 'controller.sender.status');
     return {
-        workflow
+        workflow,
+        senderStatus
     };
 })(JobStatusWidget);

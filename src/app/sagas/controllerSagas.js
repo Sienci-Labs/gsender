@@ -24,6 +24,7 @@
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import * as controllerActions from 'app/actions/controllerActions';
+import * as connectionActions from 'app/actions/connectionActions';
 
 export function* initialize() {
     controller.addListener('controller:settings', (type, settings) => {
@@ -58,6 +59,20 @@ export function* initialize() {
         reduxStore.dispatch({
             type: controllerActions.UPDATE_WORKFLOW_STATE,
             payload: { state },
+        });
+    });
+
+    controller.addListener('serialport:open', (options) => {
+        reduxStore.dispatch({
+            type: connectionActions.OPEN_CONNECTION,
+            payload: { options }
+        });
+    });
+
+    controller.addListener('serialport:close', (options) => {
+        reduxStore.dispatch({
+            type: connectionActions.CLOSE_CONNECTION,
+            payload: { options }
         });
     });
 
