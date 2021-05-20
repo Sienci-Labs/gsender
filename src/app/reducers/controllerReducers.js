@@ -144,7 +144,7 @@ const reducer = createReducer(initialState, {
     [UPDATE_WORKFLOW_STATE]: (payload, reducerState) => {
         return {
             workflow: {
-                state: _get(payload, 'state,', _get(reducerState, 'status.activeState')) || WORKFLOW_STATE_IDLE,
+                state: _get(payload, 'state', _get(reducerState, 'status.activeState')) || WORKFLOW_STATE_IDLE,
             }
         };
     }

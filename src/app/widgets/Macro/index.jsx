@@ -225,13 +225,6 @@ class MacroWidget extends PureComponent {
                 macros: [...state.macros]
             }));
         },
-        'workflow:state': (workflowState) => {
-            this.setState(state => ({
-                workflow: {
-                    state: workflowState
-                }
-            }));
-        }
     };
 
     fetchMacros = async () => {
@@ -323,9 +316,6 @@ class MacroWidget extends PureComponent {
                 type: controller.type,
                 state: controller.state
             },
-            workflow: {
-                state: controller.workflow.state
-            },
             modal: {
                 name: MODAL_NONE,
                 params: {}
@@ -349,7 +339,8 @@ class MacroWidget extends PureComponent {
     }
 
     canClick() {
-        const { port, workflow } = this.state;
+        const { port } = this.state;
+        const { workflow } = this.props;
         const controllerType = this.props.type;
         const controllerState = this.props.state;
 
@@ -525,8 +516,10 @@ class MacroWidget extends PureComponent {
 export default connect((store) => {
     const type = get(store, 'controller.type');
     const state = get(store, 'controller.state');
+    const workflow = get(store, 'controller.workflow');
     return {
         type,
-        state
+        state,
+        workflow
     };
 })(MacroWidget);
