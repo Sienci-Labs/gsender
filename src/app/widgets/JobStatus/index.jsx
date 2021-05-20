@@ -26,7 +26,9 @@ import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
 import store from 'app/store';
 import PropTypes from 'prop-types';
+import get from 'lodash/get';
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
 import controller from 'app/lib/controller';
 import { mapPositionToUnits } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
@@ -38,6 +40,7 @@ import {
     WORKFLOW_STATE_PAUSED
 } from '../../constants';
 import FileProcessingLoader from './components/FileProcessingLoader';
+
 
 class JobStatusWidget extends PureComponent {
     static propTypes = {
@@ -124,10 +127,7 @@ class JobStatusWidget extends PureComponent {
                 finishTime,
                 fileName: name,
                 elapsedTime,
-                remainingTime,
-                workflow: {
-                    state: controller.workflow.state
-                },
+                remainingTime
             });
         },
     };
@@ -190,10 +190,6 @@ class JobStatusWidget extends PureComponent {
             isFullscreen: false,
             connected: false,
             fileModal: METRIC_UNITS,
-            workflow: {
-                state: controller.workflow.state
-            },
-
             port: controller.port,
             units: store.get('workspace.units'),
 
@@ -347,7 +343,7 @@ class JobStatusWidget extends PureComponent {
     }
 
     isRunningJob() {
-        const { workflow } = this.state;
+        const { workflow } = this.props;
 
         if (workflow.state !== WORKFLOW_STATE_IDLE) {
             return true;
@@ -357,7 +353,7 @@ class JobStatusWidget extends PureComponent {
     }
 
     jobIsPaused() {
-        const { workflow } = this.state;
+        const { workflow } = this.props;
         if (workflow.state === WORKFLOW_STATE_PAUSED) {
             return true;
         }
@@ -367,8 +363,10 @@ class JobStatusWidget extends PureComponent {
 
     render() {
         const { units, bbox, fileProcessing } = this.state;
+        const { workflow } = this.props;
         const state = {
             ...this.state,
+            workflow,
             isRunningJob: this.isRunningJob(),
             jobIsPaused: this.jobIsPaused(),
             bbox: mapValues(bbox, (position) => {
@@ -395,4 +393,9 @@ class JobStatusWidget extends PureComponent {
     }
 }
 
-export default JobStatusWidget;
+export default connect((store) => {
+    const workflow = get(store, 'controller.workflow');
+    return {
+        workflow
+    };
+})(JobStatusWidget);
