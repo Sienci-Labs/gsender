@@ -22,19 +22,19 @@
  */
 
 import { createReducer } from 'redux-action';
-import { CLOSE_CONNECTION, OPEN_CONNECTION } from 'app/actions/connectionActions';
+import { CLOSE_CONNECTION, LIST_PORTS, OPEN_CONNECTION } from 'app/actions/connectionActions';
 
 const initialState = {
     isConnected: false,
     port: '',
     baudrate: '',
+    ports: []
 };
 
 const reducer = createReducer(initialState, {
     [OPEN_CONNECTION]: (payload, reducerState) => {
         const { options } = payload;
         const { port, baudrate, inuse } = options;
-        console.log(options);
         const isConnected = inuse;
         return {
             port,
@@ -46,9 +46,14 @@ const reducer = createReducer(initialState, {
         const { options } = payload;
         const { port } = options;
         return {
-            ...reducerState,
             port,
             isConnected: false
+        };
+    },
+    [LIST_PORTS]: (payload, reducerState) => {
+        const { ports } = payload;
+        return {
+            ports
         };
     }
 });

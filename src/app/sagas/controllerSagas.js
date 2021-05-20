@@ -76,6 +76,13 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('serialport:list', (ports) => {
+        reduxStore.dispatch({
+            type: connectionActions.LIST_PORTS,
+            payload: { ports }
+        });
+    });
+
     yield null;
 }
 
