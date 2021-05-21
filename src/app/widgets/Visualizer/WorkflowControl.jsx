@@ -184,7 +184,6 @@ class WorkflowControl extends PureComponent {
     }
 
     componentDidMount() {
-        this.addControllerEvents();
         if (isElectron()) {
             window.ipcRenderer.on('loaded-recent-file', (msg, fileMetaData) => {
                 this.loadRecentFile(fileMetaData);
@@ -192,24 +191,6 @@ class WorkflowControl extends PureComponent {
                 addRecentFile(recentFile);
             });
         }
-    }
-
-    componentWillUnmount() {
-        this.removeControllerEvents();
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     finishedTestingFileToast = () => {
@@ -228,22 +209,6 @@ class WorkflowControl extends PureComponent {
         });
     }
 
-    controllerEvents = {
-        'gcode_error_checking_file': (data, message) => {
-            if (message === 'finished') {
-                this.setState({ runHasStarted: false });
-                this.setState({ CurrentGCodeFile: data.name });
-                this.finishedTestingFileToast();
-            }
-
-            if (message === 'error') {
-                this.setState({ CurrentGCodeFile: data.name });
-                this.setState({ CurrentGCodeError: this.props.invalidGcode });
-                this.errorInGCodeToast();
-            }
-        }
-    }
-
     render() {
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
@@ -255,8 +220,6 @@ class WorkflowControl extends PureComponent {
         const canRun = this.canRun();
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflow.state);
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflow.state);
-        // const canClose = isReady && includes([WORKFLOW_STATE_IDLE], workflow.state);
-        // const canUpload = isReady ? canClose : (canClick && !gcode.loading);
         if (this.props.state.filename !== '') {
             this.state.fileLoaded = false;
         }
