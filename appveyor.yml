@@ -19,6 +19,10 @@ environment:
       appveyor_build_worker_image: macos
       nodejs_version: "12"
       ARCH: x64
+    - job_name: Linux Build (ARM7l)
+      appveyor_build_worker_image: Ubuntu2004
+      nodejs_version: "12"
+      ARCH: arm
     - job_name: Linux build (amd64)
       appveyor_build_worker_image: Ubuntu2004
       nodejs_version: "12"
