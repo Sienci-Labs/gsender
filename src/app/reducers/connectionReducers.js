@@ -26,9 +26,10 @@ import { CLOSE_CONNECTION, LIST_PORTS, OPEN_CONNECTION } from 'app/actions/conne
 
 const initialState = {
     isConnected: false,
-    port: '',
+    port: null,
     baudrate: '',
-    ports: []
+    ports: [],
+    err: ''
 };
 
 const reducer = createReducer(initialState, {

@@ -320,8 +320,7 @@ class LocationWidget extends PureComponent {
     };
 
     canSendCommand() {
-        const { port, workflow } = this.state;
-        const { type, state } = this.props;
+        const { type, state, workflow, port } = this.props;
 
         if (!port) {
             return false;
@@ -788,6 +787,7 @@ export default connect((store) => {
     const workflow = get(store, 'controller.workflow');
     const canJog = (workflow.state === WORKFLOW_STATE_IDLE);
     const isConnected = get(store, 'connection.isConnected');
+    const port = get(store, 'connection.port');
     return {
         isConnected,
         state,
@@ -796,6 +796,7 @@ export default connect((store) => {
         machinePosition,
         workPosition,
         workflow,
-        canJog
+        canJog,
+        port
     };
 })(LocationWidget);
