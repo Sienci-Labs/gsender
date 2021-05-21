@@ -164,19 +164,6 @@ class NavbarConnectionWidget extends PureComponent {
                 }));
             }
         },*/
-        'serialport:change': (options) => {
-            const { port, inuse } = options;
-            const ports = this.state.ports.map((o) => {
-                if (o.port !== port) {
-                    return o;
-                }
-                return { ...o, inuse };
-            });
-
-            this.setState(state => ({
-                ports: ports
-            }));
-        },
         'serialport:open': (options) => {
             setTimeout(() => {
                 this.props.disableWizardFunction();
