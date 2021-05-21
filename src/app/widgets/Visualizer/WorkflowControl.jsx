@@ -37,16 +37,8 @@ import ReaderWorker from './FileReader.worker';
 import { Toaster, TOASTER_DANGER, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import {
     // Grbl
-    GRBL,
     GRBL_ACTIVE_STATE_ALARM,
     // Marlin
-    MARLIN,
-    // Smoothie
-    SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_ALARM,
-    // TinyG
-    TINYG,
-    TINYG_MACHINE_STATE_ALARM,
     // Workflow
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
@@ -139,9 +131,8 @@ class WorkflowControl extends PureComponent {
 
     canRun() {
         const { state } = this.props;
-        const { port, gcode, workflow } = state;
-        const controllerType = state.controller.type;
-        const controllerState = state.controller.state;
+        const { port, gcode, workflow, controllerState } = state;
+
         if (!port) {
             return false;
         }
@@ -151,38 +142,12 @@ class WorkflowControl extends PureComponent {
         if (!includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state)) {
             return false;
         }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_ALARM
-            ];
-            if (includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_ALARM
-            ];
-            if (includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_ALARM
-            ];
-            if (includes(states, machineState)) {
-                return false;
-            }
-        }
+        const activeState = get(controllerState, 'status.activeState');
+        const states = [
+            GRBL_ACTIVE_STATE_ALARM
+        ];
 
-        return true;
+        return !includes(states, activeState);
     }
 
     handleOnStop = () => {
@@ -334,7 +299,7 @@ class WorkflowControl extends PureComponent {
                     !this.state.runHasStarted && (
                         <button
                             type="button"
-                            className={this.state.fileLoaded ? `${styles['workflow-button-hidden']}` : `${styles['workflow-button-test']}`}
+                            className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
                             title={i18n._('Test Run')}
                             onClick={this.handleTestFile}
                             disabled={!canRun}
