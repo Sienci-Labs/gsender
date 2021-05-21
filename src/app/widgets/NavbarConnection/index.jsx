@@ -25,8 +25,9 @@ import get from 'lodash/get';
 import reverse from 'lodash/reverse';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
+import { connect } from 'react-redux';
 import includes from 'lodash/includes';
-import map from 'lodash/map';
+//import map from 'lodash/map';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import React, { PureComponent } from 'react';
@@ -130,7 +131,7 @@ class NavbarConnectionWidget extends PureComponent {
     };
 
     controllerEvents = {
-        'serialport:list': (ports) => {
+        /*'serialport:list': (ports) => {
             log.debug('Received a list of serial ports:', ports);
 
             this.stopLoading();
@@ -162,7 +163,7 @@ class NavbarConnectionWidget extends PureComponent {
                     ports: ports
                 }));
             }
-        },
+        },*/
         'serialport:change': (options) => {
             const { port, inuse } = options;
             const ports = this.state.ports.map((o) => {
@@ -180,13 +181,7 @@ class NavbarConnectionWidget extends PureComponent {
             setTimeout(() => {
                 this.props.disableWizardFunction();
             }, 1500); // delay 1500ms so wizard can load settings
-            const { controllerType, port, baudrate, inuse } = options;
-            const ports = this.state.ports.map((o) => {
-                if (o.port !== port) {
-                    return o;
-                }
-                return { ...o, inuse };
-            });
+            const { controllerType, port, baudrate } = options;
 
             this.setState(state => ({
                 alertMessage: '',
@@ -195,7 +190,6 @@ class NavbarConnectionWidget extends PureComponent {
                 controllerType: controllerType, // Grbl|Marlin|Smoothie|TinyG
                 port: port,
                 baudrate: baudrate,
-                ports: ports
             }));
 
             log.debug(`Established a connection to the serial port "${port}"`);
@@ -282,13 +276,11 @@ class NavbarConnectionWidget extends PureComponent {
         ];
 
         return {
-            wizardDisabled: true,
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             loading: false,
             connecting: false,
             connected: false,
-            ports: [],
             baudrates: reverse(sortBy(uniq(controller.baudrates.concat(defaultBaudrates)))),
             controllerType: controllerType,
             port: controller.port,
@@ -398,7 +390,10 @@ class NavbarConnectionWidget extends PureComponent {
                 this.setState({
                     baudrate: value
                 });
-            })
+            }),
+            pubsub.subscribe('autoReconnect:attempt'), (msg) => {
+
+            }
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -411,8 +406,10 @@ class NavbarConnectionWidget extends PureComponent {
     }
 
     render() {
+        const { ports } = this.props;
         const state = {
-            ...this.state
+            ...this.state,
+            ports
         };
         const actions = {
             ...this.actions
@@ -424,4 +421,9 @@ class NavbarConnectionWidget extends PureComponent {
     }
 }
 
-export default NavbarConnectionWidget;
+export default connect((store) => {
+    const ports = get(store, 'connection.ports');
+    return {
+        ports,
+    };
+})(NavbarConnectionWidget);
