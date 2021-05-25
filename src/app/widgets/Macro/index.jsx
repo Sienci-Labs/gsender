@@ -211,8 +211,8 @@ class MacroWidget extends PureComponent {
     };
 
     controllerEvents = {
-        'config:change': () => {
-            this.fetchMacros();
+        'config:change': async () => {
+            await this.fetchMacros();
         },
     };
 

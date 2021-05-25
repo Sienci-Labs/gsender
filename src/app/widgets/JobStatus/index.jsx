@@ -96,29 +96,6 @@ class JobStatusWidget extends PureComponent {
                 }
             });
         },
-        /*'sender:status': (data) => {
-            const { total, sent, received, startTime, finishTime, elapsedTime, size, remainingTime, name } = data;
-            if (data.finishTime > 0) {
-                this.config.set('lastFile', this.state.fileName);
-                this.config.set('lastFileSize', size);
-                this.config.set('lastFileRunLength', elapsedTime);
-                this.setState({
-                    lastFileRan: this.state.fileName,
-                    lastFileSize: size,
-                    lastFileRunLength: elapsedTime,
-                });
-            }
-            this.setState({
-                total,
-                sent,
-                received,
-                startTime,
-                finishTime,
-                fileName: name,
-                elapsedTime,
-                remainingTime
-            });
-        },*/
     };
 
     pubsubTokens = [];
@@ -147,6 +124,19 @@ class JobStatusWidget extends PureComponent {
             spindleSpeed,
             probeFeedrate,
         } = this.state;
+        const prevSenderStatus = prevProps.senderStatus;
+        const { senderStatus } = this.props;
+
+        if (senderStatus && prevSenderStatus && prevSenderStatus.finishTime !== senderStatus.finishTime && senderStatus.finishTime > 0) {
+            this.config.set('lastFile', senderStatus.name);
+            this.config.set('lastFileSize', senderStatus.size);
+            this.config.set('lastFileRunLength', senderStatus.elapsedTime);
+            this.setState({
+                lastFileRan: senderStatus.name,
+                lastFileSize: senderStatus.size,
+                lastFileRunLength: senderStatus.elapsedTime,
+            });
+        }
 
         this.config.set('minimized', minimized);
         this.config.set('speed', spindleSpeed);
@@ -335,10 +325,11 @@ class JobStatusWidget extends PureComponent {
 
     render() {
         const { units, bbox, fileProcessing } = this.state;
-        const { workflow, isConnected } = this.props;
+        const { workflow, isConnected, senderStatus } = this.props;
         const state = {
             ...this.state,
             workflow,
+            senderStatus,
             isRunningJob: this.isRunningJob(),
             jobIsPaused: this.jobIsPaused(),
             bbox: mapValues(bbox, (position) => {

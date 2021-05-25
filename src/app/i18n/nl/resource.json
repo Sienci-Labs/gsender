@@ -354,7 +354,6 @@
     "Yes": "",
     "Macro": "",
     "Run": "",
-    "Error opening serial port '{{- port}}'": "",
     "Error opening port '{{- port}}'": "",
     "Probe": "",
     "Top": "",

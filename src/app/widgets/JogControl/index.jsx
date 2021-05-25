@@ -563,9 +563,6 @@ class AxesWidget extends PureComponent {
         },
     };
 
-    controllerEvents = {
-    };
-
     shuttleControl = null;
 
     updateJogPresets = () => {

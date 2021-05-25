@@ -35,12 +35,15 @@ import styles from './Overrides.styl';
  *
  */
 const ProgressArea = ({ state }) => {
+    const { senderStatus } = state;
+    const { total, received, elapsedTime, remainingTime, name, startTime } = senderStatus;
+
     /**
      * Format given time value to display minutes and seconds
      * @param {Number} givenTime given time value
      */
     const outputFormattedTime = (givenTime) => {
-        if (state.startTime === 0 || !givenTime || givenTime < 0) {
+        if (startTime === 0 || !givenTime || givenTime < 0) {
             return '-';
         }
 
@@ -55,14 +58,12 @@ const ProgressArea = ({ state }) => {
         return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
     };
 
-    const { total, received, elapsedTime, remainingTime, fileName } = state;
-
     // eslint-disable-next-line no-restricted-globals
     const percentageValue = isNaN(((received / total) * 100).toFixed(0)) ? 0 : ((received / total) * 100).toFixed(0);
 
     return (
         <div className={styles.progressArea}>
-            <span className={styles.progressName}>{ fileName }</span>
+            <span className={styles.progressName}>{ name }</span>
             <table className={styles['progress-area-table']}>
                 <tbody>
                     <tr>
