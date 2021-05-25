@@ -96,8 +96,6 @@ class SpindleWidget extends PureComponent {
             } else {
                 controller.command('gcode', `M3 S${spindleSpeed}`);
             }
-
-            this.setActive();
         },
         sendM4: () => {
             const { spindleSpeed, mode } = this.state;
@@ -106,11 +104,9 @@ class SpindleWidget extends PureComponent {
             } else {
                 controller.command('gcode', `M4 S${spindleSpeed}`);
             }
-            this.setActive();
         },
         sendM5: () => {
             controller.command('gcode', 'M5');
-            this.setInactive();
         },
         handleSpindleSpeedChange: (e) => {
             const value = Number(e.target.value) || 0;
@@ -155,44 +151,6 @@ class SpindleWidget extends PureComponent {
         }
     };
 
-    controllerEvents = {
-        'controller:settings': (type, controllerSettings) => {
-            const { settings } = controllerSettings;
-            if (Object.keys(settings).length > 0) {
-                const { $30, $31 } = settings;
-                this.setState({
-                    spindleMax: Number($30),
-                    spindleMin: Number($31)
-                });
-            }
-        },
-        /*'controller:state': (type, state) => {
-            // Grbl
-            if (type === GRBL) {
-                const { parserstate } = { ...state };
-                const { modal = {} } = { ...parserstate };
-                this.setState({
-                    controller: {
-                        type: type,
-                        state: state,
-                        modal: {
-                            spindle: modal.spindle || '',
-                            coolant: modal.coolant || ''
-                        }
-                    }
-                });
-            }
-        },*/
-    };
-
-    componentDidMount() {
-        this.addControllerEvents();
-    }
-
-    componentWillUnmount() {
-        this.removeControllerEvents();
-    }
-
     componentDidUpdate(prevProps, prevState) {
         const {
             minimized,
@@ -217,50 +175,13 @@ class SpindleWidget extends PureComponent {
             isFullscreen: false,
             canClick: true, // Defaults to true
             mode: this.config.get('mode'),
-            active: false,
-            controller: {
-                type: controller.type,
-                state: controller.state,
-                modal: {
-                    spindle: '',
-                    coolant: ''
-                }
-            },
             spindleSpeed: this.config.get('speed', 1000),
-            spindleMin: this.config.get('spindleMin', 0),
-            spindleMax: this.config.get('spindleMax', 5000),
             laser: this.config.get('laserTest')
         };
     }
 
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
-    }
-
-    setActive() {
-        this.setState({
-            active: true
-        });
-    }
-
-    setInactive() {
-        this.setState({
-            active: false
-        });
-    }
-
     enableSpindleMode() {
-        const { active } = this.state;
+        const active = this.getSpindleActiveState();
         if (active) {
             controller.command('gcode', 'M5');
             this.setInactive();
@@ -276,9 +197,13 @@ class SpindleWidget extends PureComponent {
         const { active } = this.state;
         if (active) {
             controller.command('gcode', 'M5');
-            this.setInactive();
         }
         controller.command('gcode', '$32=1');
+    }
+
+    getSpindleActiveState() {
+        const { spindleModal } = this.props;
+        return spindleModal && spindleModal !== 'M5';
     }
 
     canClick() {
@@ -304,17 +229,20 @@ class SpindleWidget extends PureComponent {
     }
 
     render() {
-        const { embedded } = this.props;
+        const { embedded, spindleModal, spindleMin, spindleMax } = this.props;
         const { minimized, isFullscreen } = this.state;
         const state = {
             ...this.state,
-            canClick: this.canClick()
+            spindleModal,
+            spindleMin,
+            spindleMax,
+            canClick: this.canClick(),
         };
         const actions = {
             ...this.actions
         };
 
-        const { active } = state;
+        const active = this.getSpindleActiveState();
 
         return (
             <Widget fullscreen={isFullscreen}>
@@ -351,10 +279,19 @@ export default connect((store) => {
     const state = get(store, 'controller.state');
     const isConnected = get(store, 'connection.isConnected');
     const type = get(store, 'controller.type');
+    const spindleModal = get(store, 'controller.modal.spindle');
+    const settings = get(store, 'controller.settings');
+    const spindleMin = Number(get(settings, 'settings.$30', 0));
+    const spindleMax = Number(get(settings, 'settings.$31', 2000));
+
     return {
         workflow,
         isConnected,
         state,
-        type
+        type,
+        spindleModal,
+        settings,
+        spindleMin,
+        spindleMax
     };
 })(SpindleWidget);
