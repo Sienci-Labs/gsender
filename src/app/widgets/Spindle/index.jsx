@@ -166,7 +166,7 @@ class SpindleWidget extends PureComponent {
                 });
             }
         },
-        'controller:state': (type, state) => {
+        /*'controller:state': (type, state) => {
             // Grbl
             if (type === GRBL) {
                 const { parserstate } = { ...state };
@@ -182,7 +182,7 @@ class SpindleWidget extends PureComponent {
                     }
                 });
             }
-        },
+        },*/
     };
 
     componentDidMount() {
@@ -282,9 +282,7 @@ class SpindleWidget extends PureComponent {
     }
 
     canClick() {
-        const { workflow, isConnected } = this.props;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
+        const { workflow, isConnected, state, type } = this.props;
 
         if (!isConnected) {
             return false;
@@ -292,11 +290,11 @@ class SpindleWidget extends PureComponent {
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
+        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
             return false;
         }
 
-        const activeState = get(controllerState, 'status.activeState');
+        const activeState = get(state, 'status.activeState');
         const states = [
             GRBL_ACTIVE_STATE_IDLE,
             GRBL_ACTIVE_STATE_HOLD
@@ -350,9 +348,13 @@ class SpindleWidget extends PureComponent {
 
 export default connect((store) => {
     const workflow = get(store, 'controller.workflow');
+    const state = get(store, 'controller.state');
     const isConnected = get(store, 'connection.isConnected');
+    const type = get(store, 'controller.type');
     return {
         workflow,
-        isConnected
+        isConnected,
+        state,
+        type
     };
 })(SpindleWidget);
