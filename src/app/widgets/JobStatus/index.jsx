@@ -106,16 +106,8 @@ class JobStatusWidget extends PureComponent {
     }
 
     componentWillUnmount() {
-        const {
-            fileName,
-            fileSize,
-            elapsedTime
-        } = this.state;
         this.removeControllerEvents();
         this.unsubscribe();
-        this.config.set('lastFile', fileName);
-        this.config.set('lastFileSize', fileSize);
-        this.config.set('lastFileRunLength', elapsedTime);
     }
 
     componentDidUpdate(prevProps, prevState) {
