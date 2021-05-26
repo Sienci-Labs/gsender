@@ -109,7 +109,7 @@ class SpindleWidget extends PureComponent {
             controller.command('gcode', 'M5');
         },
         handleSpindleSpeedChange: (e) => {
-            const value = Number(e.target.value) || 0;
+            const value = Number(e.target.value);
             this.setState({
                 spindleSpeed: value
             });
