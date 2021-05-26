@@ -23,6 +23,7 @@
 
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
+import api from 'app/api';
 import store from 'app/store';
 import Select from 'react-select';
 import map from 'lodash/map';
@@ -36,10 +37,25 @@ const options = [
     'Macro'
 ];
 
-
 const EventWidget = ({ active }) => {
     const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
+    const [availableMacros, setMacros] = useState([]);
+    const [selectedMacro, setSelectedMacro] = useState(store.get('workspace.toolChangeMacro'));
     const handleToolChange = (selection) => setToolChangeOption(selection.value);
+    const handleMacroSelection = (selection) => {
+        setSelectedMacro(selection);
+        store.set('workspace.toolChangeMacro', {
+            label: selection.label,
+            value: selection.value
+        });
+    };
+
+    useEffect(async () => {
+        let res;
+        res = await api.macros.fetch();
+        const { records: macros } = res.body;
+        setMacros(macros);
+    }, []);
 
     useEffect(() => {
         store.set('workspace.toolChangeOption', toolChangeOption);
@@ -71,6 +87,21 @@ const EventWidget = ({ active }) => {
                                 label: value
                             }))}
                             value={{ label: toolChangeOption }}
+                        />
+                    </div>
+                    <div className={styles.addMargin}>
+                        <Select
+                            backspaceRemoves={false}
+                            className="sm"
+                            clearable={false}
+                            menuContainerStyle={{ zIndex: 5 }}
+                            name="theme"
+                            onChange={handleMacroSelection}
+                            options={map(availableMacros, (macro) => ({
+                                value: macro.id,
+                                label: macro.name
+                            }))}
+                            value={{ label: selectedMacro.label }}
                         />
                     </div>
                 </FieldSet>

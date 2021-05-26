@@ -45,7 +45,10 @@ const defaultState = {
         reverseWidgets: false,
         safeRetractHeight: 0,
         toolChangeOption: 'Ignore',
-        toolChangeMacro: '',
+        toolChangeMacro: {
+            label: '',
+            value: ''
+        },
         container: {
             primary: {
                 show: true,

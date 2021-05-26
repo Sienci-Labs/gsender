@@ -29,7 +29,6 @@ import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import controller from 'app/lib/controller';
 import { mapPositionToUnits } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
 import JobStatus from './JobStatus';
@@ -74,39 +73,13 @@ class JobStatusWidget extends PureComponent {
         },
     };
 
-    controllerEvents = {
-        'gcode:unload': () => {
-            this.setState({
-                bbox: {
-                    min: {
-                        x: 0,
-                        y: 0,
-                        z: 0
-                    },
-                    max: {
-                        x: 0,
-                        y: 0,
-                        z: 0
-                    },
-                    delta: {
-                        x: 0,
-                        y: 0,
-                        z: 0
-                    }
-                }
-            });
-        },
-    };
-
     pubsubTokens = [];
 
     componentDidMount() {
         this.subscribe();
-        this.addControllerEvents();
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
         this.unsubscribe();
     }
 
@@ -288,20 +261,6 @@ class JobStatusWidget extends PureComponent {
             pubsub.unsubscribe(token);
         });
         this.pubsubTokens = [];
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     isRunningJob() {
