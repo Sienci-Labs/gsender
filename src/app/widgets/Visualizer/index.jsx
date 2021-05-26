@@ -1139,7 +1139,8 @@ class VisualizerWidget extends PureComponent {
                 shouldShow: this.config.get('showLineWarnings'),
                 show: false,
                 line: '',
-            }
+            },
+            layoutIsReversed: store.get('workspace.reverseWidgets'),
         };
     }
 
@@ -1282,6 +1283,11 @@ class VisualizerWidget extends PureComponent {
                         bbox: bbox
                     }
                 });
+            }),
+            pubsub.subscribe('widgets:reverse', (_, layoutIsReversed) => {
+                console.log(layoutIsReversed);
+                this.setState({ layoutIsReversed });
+            }),
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
