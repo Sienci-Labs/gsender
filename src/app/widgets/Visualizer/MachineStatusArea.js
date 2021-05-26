@@ -23,6 +23,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 import controller from 'app/lib/controller';
 import styles from './machine-status-area.styl';
 import UnlockAlarmButton from './UnlockAlarmButton';
@@ -53,7 +54,7 @@ export default class ControlArea extends Component {
     }
 
     render() {
-        const { controller, port } = this.props.state;
+        const { controller, port, layoutIsReversed } = this.props.state;
         const { state = {} } = controller;
 
         //Object to customize the message of the active machine state
@@ -122,7 +123,7 @@ export default class ControlArea extends Component {
         };
 
         return (
-            <div className={styles['control-area']}>
+            <div className={classnames(styles['control-area'], layoutIsReversed ? styles.inverted : '')}>
                 <div />
                 {machineStateRender()}
                 <div />
