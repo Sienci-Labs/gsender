@@ -44,6 +44,8 @@ const defaultState = {
         units: METRIC_UNITS,
         reverseWidgets: false,
         safeRetractHeight: 0,
+        toolChangeOption: 'Ignore',
+        toolChangeMacro: '',
         container: {
             primary: {
                 show: true,

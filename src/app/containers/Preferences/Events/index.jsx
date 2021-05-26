@@ -21,12 +21,30 @@
  *
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
+import store from 'app/store';
+import Select from 'react-select';
+import map from 'lodash/map';
 import styles from '../index.styl';
 import FieldSet from '../FieldSet';
 
+
+const options = [
+    'Ignore',
+    'Pause',
+    'Macro'
+];
+
+
 const EventWidget = ({ active }) => {
+    const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
+    const handleToolChange = (selection) => setToolChangeOption(selection.value);
+
+    useEffect(() => {
+        store.set('workspace.toolChangeOption', toolChangeOption);
+    }, [toolChangeOption]);
+
     return (
         <div className={classNames(
             styles.hidden,
@@ -39,7 +57,22 @@ const EventWidget = ({ active }) => {
             </h3>
             <div className={styles.generalArea}>
                 <FieldSet legend="Tool Change">
-
+                    <small>Strategy to handle M6 tool change commands</small>
+                    <div className={styles.addMargin}>
+                        <Select
+                            backspaceRemoves={false}
+                            className="sm"
+                            clearable={false}
+                            menuContainerStyle={{ zIndex: 5 }}
+                            name="theme"
+                            onChange={handleToolChange}
+                            options={map(options, (value) => ({
+                                value: value,
+                                label: value
+                            }))}
+                            value={{ label: toolChangeOption }}
+                        />
+                    </div>
                 </FieldSet>
             </div>
         </div>
