@@ -28,11 +28,13 @@ import styles from './index.styl';
 import {
     MODAL_NONE,
     MODAL_PREFERENCES,
-    MODAL_FIRMWARE
+    MODAL_FIRMWARE,
+    MODAL_SURFACING
 } from './constants';
 import Preferences from '../Preferences/Preferences';
 // import WizardModal from '../Wizard/WizardModal';
 import Firmware from '../Firmware/Firmware';
+import Surfacing from '../Surfacing';
 
 class NavSidebar extends PureComponent {
     static propTypes = {
@@ -75,8 +77,10 @@ class NavSidebar extends PureComponent {
         return (
             <div className={styles.Sidebar}>
                 <NavSidebarLink
-                    url="" icon="fab fa-codepen" label="Surfacing"
-                    disabled
+                    url=""
+                    icon="fab fa-codepen"
+                    label="Surfacing"
+                    onClick={() => actions.openModal(MODAL_SURFACING)}
                 />
                 <NavSidebarLink
                     url="" icon="fa fa-mountain" label="Heightmap"
@@ -106,6 +110,9 @@ class NavSidebar extends PureComponent {
                 }
                 {
                     state.modal.name === MODAL_PREFERENCES && <Preferences state={state} modalClose={actions.closeModal} />
+                }
+                {
+                    state.modal.name === MODAL_SURFACING && <Surfacing state={state} modalClose={actions.closeModal} />
                 }
             </div>
         );
