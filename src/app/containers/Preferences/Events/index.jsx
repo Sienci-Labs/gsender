@@ -80,7 +80,7 @@ const EventWidget = ({ active }) => {
                             className="sm"
                             clearable={false}
                             menuContainerStyle={{ zIndex: 5 }}
-                            name="theme"
+                            name="toolchangeoption"
                             onChange={handleToolChange}
                             options={map(options, (value) => ({
                                 value: value,
@@ -95,7 +95,7 @@ const EventWidget = ({ active }) => {
                             className="sm"
                             clearable={false}
                             menuContainerStyle={{ zIndex: 5 }}
-                            name="theme"
+                            name="macro"
                             onChange={handleMacroSelection}
                             options={map(availableMacros, (macro) => ({
                                 value: macro.id,
