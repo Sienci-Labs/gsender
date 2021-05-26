@@ -1183,7 +1183,6 @@ class VisualizerWidget extends PureComponent {
                 console.log(layoutIsReversed);
                 this.setState({ layoutIsReversed });
             }),
-            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
