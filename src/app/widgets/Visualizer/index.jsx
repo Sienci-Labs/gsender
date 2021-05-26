@@ -1282,6 +1282,9 @@ class VisualizerWidget extends PureComponent {
                         bbox: bbox
                     }
                 });
+            }),
+            pubsub.subscribe('gcode:surfacing', (_, { gcode, name, size }) => {
+                this.actions.uploadFile(gcode, { name, size });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
