@@ -23,6 +23,7 @@
 
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
+import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
 
@@ -81,6 +82,10 @@ export function* initialize() {
             type: connectionActions.LIST_PORTS,
             payload: { ports }
         });
+    });
+
+    controller.addListener('gcode:toolChange', (context) => {
+        pubsub.publish('gcode:toolChange', context);
     });
 
     yield null;

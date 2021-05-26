@@ -68,9 +68,6 @@ class WidgetWrapper extends PureComponent {
         return (
             <Widget
                 {...this.props}
-                ref={node => {
-                    this.widget = node;
-                }}
             />
         );
     }

@@ -298,7 +298,7 @@
     "socket.io": "~2.4.0",
     "socket.io-client": "~2.4.0",
     "socketio-jwt": "~4.5.0",
-    "sortablejs": "~1.9.0",
+    "sortablejs": "~1.10.2",
     "spawn-default-shell": "~2.0.0",
     "styled-components": "^5.2.1",
     "superagent": "~3.8.3",

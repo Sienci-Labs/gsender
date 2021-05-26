@@ -31,7 +31,6 @@ import store from 'app/store';
 import { connect } from 'react-redux';
 import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
-import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
@@ -703,10 +702,6 @@ class LocationWidget extends PureComponent {
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header>
                     <Widget.Title>
-                        <Widget.Sortable className={this.props.sortable.handleClassName}>
-                            <i className="fa fa-bars" />
-                            <Space width="8" />
-                        </Widget.Sortable>
                         {isForkedWidget &&
                         <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
                         }

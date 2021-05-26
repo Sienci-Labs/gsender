@@ -29,6 +29,7 @@ import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
 import controller from 'app/lib/controller';
 import React, { PureComponent } from 'react';
+import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
@@ -59,6 +60,8 @@ class WorkflowControl extends PureComponent {
     fileInputEl = null;
 
     state = this.getInitialState();
+
+    pubsubTokens = []
 
     getInitialState() {
         return {
@@ -191,6 +194,11 @@ class WorkflowControl extends PureComponent {
                 addRecentFile(recentFile);
             });
         }
+        this.subscribe();
+    }
+
+    componentWillUnmount() {
+        this.unsubscribe();
     }
 
     finishedTestingFileToast = () => {
@@ -207,6 +215,22 @@ class WorkflowControl extends PureComponent {
             type: TOASTER_UNTIL_CLOSE,
             duration: 20000
         });
+    }
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('gcode:toolChange', (msg) => {
+                console.log('Start Toolchange workflow');
+            }),
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
     }
 
     render() {

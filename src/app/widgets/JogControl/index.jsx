@@ -29,7 +29,6 @@ import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
@@ -789,16 +788,12 @@ class AxesWidget extends PureComponent {
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header>
                     <Widget.Title>
-                        <Widget.Sortable className={this.props.sortable.handleClassName}>
-                            <i className="fa fa-bars" />
-                            <Space width="8" />
-                        </Widget.Sortable>
                         {isForkedWidget &&
                         <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
                         }
                         {i18n._('Jog Control')}
                     </Widget.Title>
-                    <Widget.Controls className={this.props.sortable.filterClassName}>
+                    <Widget.Controls>
                     </Widget.Controls>
                 </Widget.Header>
                 <Widget.Content

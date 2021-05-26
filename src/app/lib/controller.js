@@ -80,6 +80,7 @@ class Controller {
         'serialport:write': [],
         'gcode:load': [],
         'gcode:unload': [],
+        'gcode:toolChange': [],
         'feeder:status': [],
         'sender:status': [],
         'workflow:state': [],

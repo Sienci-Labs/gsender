@@ -752,16 +752,12 @@ class ProbeWidget extends PureComponent {
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header embedded={embedded}>
                     <Widget.Title>
-                        <Widget.Sortable className={this.props.sortable.handleClassName}>
-                            <i className="fa fa-bars" />
-                            <Space width="8" />
-                        </Widget.Sortable>
                         {isForkedWidget &&
                         <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
                         }
                         {i18n._('Probe')}
                     </Widget.Title>
-                    <Widget.Controls className={this.props.sortable.filterClassName}>
+                    <Widget.Controls>
                         <Widget.Button
                             disabled={isFullscreen}
                             title={minimized ? i18n._('Expand') : i18n._('Collapse')}

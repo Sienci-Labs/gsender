@@ -359,16 +359,12 @@ class MacroWidget extends PureComponent {
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header embedded={embedded}>
                     <Widget.Title>
-                        <Widget.Sortable className={this.props.sortable.handleClassName}>
-                            <i className="fa fa-bars" />
-                            <Space width="8" />
-                        </Widget.Sortable>
                         {isForkedWidget &&
                         <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
                         }
                         {i18n._('Macro')}
                     </Widget.Title>
-                    <Widget.Controls className={this.props.sortable.filterClassName}>
+                    <Widget.Controls>
                         <Widget.Button
                             title={i18n._('New Macro')}
                             onClick={actions.openAddMacroModal}

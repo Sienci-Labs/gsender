@@ -65,6 +65,7 @@ import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfi
 
 // % commands
 const WAIT = '%wait';
+const TOOLCHANGE = '%toolchange';
 
 const log = logger('controller:Grbl');
 const noop = _.noop;
@@ -226,6 +227,10 @@ class GrblController {
                         log.debug('Wait for the planner to empty');
                         return 'G4 P0.5'; // dwell
                     }
+                    if (line === TOOLCHANGE) {
+                        log.debug('Pause for toolchange');
+                        return '';
+                    }
 
                     // Expression
                     // %_x=posx,_y=posy,_z=posz
@@ -313,6 +318,11 @@ class GrblController {
                         return 'G4 P0.5'; // dwell
                     }
 
+                    if (line === TOOLCHANGE) {
+                        this.sender.hold({ data: TOOLCHANGE });
+                        return '';
+                    }
+
                     // Expression
                     // %_x=posx,_y=posy,_z=posz
                     evaluateAssignmentExpression(line.slice(1), context);
@@ -361,14 +371,17 @@ class GrblController {
                     line = line.replace('G28', '(G28)');
                 }
 
-                // M6 Tool Change
-                // if (_.includes(words, 'M6')) {
-                //     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
-                //     this.workflow.pause({ data: 'M6' });
+                /* Emit event to UI for toolchange handler */
+                /*if (_.includes(words, 'M6')) {
+                    log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
+                    this.workflow.pause({ data: 'M6' });
+                    this.emit('gcode:toolChange', {
+                        line: sent + 1,
+                        block: line
+                    });
 
-                //     // Surround M6 with parentheses to ignore unsupported command error
-                //     line = line.replace('M6', '(M6)');
-                // }
+                    line = line.replace('M6', '(M6)');
+                }*/
 
                 return line;
             }

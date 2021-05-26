@@ -25,6 +25,7 @@ import { ensurePositiveNumber } from 'ensure-type';
 import _get from 'lodash/get';
 import _mapValues from 'lodash/mapValues';
 import {
+    TOOL_CHANGE,
     UPDATE_CONTROLLER_SETTINGS,
     UPDATE_CONTROLLER_STATE,
     UPDATE_FEEDER_STATUS, UPDATE_SENDER_STATUS, UPDATE_WORKFLOW_STATE
@@ -48,6 +49,9 @@ const initialState = {
     },
     workflow: {
         state: WORKFLOW_STATE_IDLE
+    },
+    tool: {
+        context: null
     }
 };
 
@@ -148,6 +152,9 @@ const reducer = createReducer(initialState, {
                 state: _get(payload, 'state', _get(reducerState, 'status.activeState')) || WORKFLOW_STATE_IDLE,
             }
         };
+    },
+    [TOOL_CHANGE]: (context, reducerState) => {
+        return {};
     }
 });
 
