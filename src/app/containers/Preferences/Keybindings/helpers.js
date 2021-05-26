@@ -23,13 +23,17 @@
 
 import React from 'react';
 
-export const formatShortcut = (shortcut = []) => {
+export const formatShortcut = (shortcut = [], isActive = true) => {
     const output = [];
+    const style = {
+        opacity: !isActive ? '0.4' : '1'
+    };
+
     for (let i = 0; i < shortcut.length; i++) {
         if (i === shortcut.length - 1) {
-            output.push(<span key={i}><kbd>{shortcut[i]}</kbd></span>);
+            output.push(<span key={i} style={style}><kbd>{shortcut[i]}</kbd></span>);
         } else {
-            output.push(<span key={i}><kbd>{shortcut[i]}</kbd> + </span>);
+            output.push(<span key={i} style={style}><kbd>{shortcut[i]}</kbd> + </span>);
         }
     }
 

@@ -76,10 +76,28 @@ export default class Keybindings extends Component {
         //Replace old keybinding item with new one
         const editedKeybindingsList = keybindingsList.map(keybinding => (keybinding.id === shortcut.id ? shortcut : keybinding));
 
-        store.set('commandKeys', editedKeybindingsList);
+        this.updateKeybindings(editedKeybindingsList, showToast);
+    }
+
+    toggleKeybinding = (shortcut, showToast) => {
+        const { keybindingsList } = this.state;
+
+        const shortcutInUse = keybindingsList.filter(keybinding => keybinding.id !== shortcut.id).find(keybinding => keybinding.keys === shortcut.keys);
+
+        if (shortcutInUse && shortcut.isActive) {
+            shortcut.keys = '';
+        }
+
+        const updatedKeybindingsList = keybindingsList.map(keybinding => (keybinding.id === shortcut.id ? shortcut : keybinding));
+
+        this.updateKeybindings(updatedKeybindingsList, showToast);
+    }
+
+    updateKeybindings = (keybindings, showToast) => {
+        store.set('commandKeys', keybindings);
         pubsub.publish('keybindingsUpdated');
 
-        this.setState({ showEditModal: false, keybindingsList: editedKeybindingsList });
+        this.setState({ showEditModal: false, keybindingsList: keybindings });
 
         if (showToast) {
             this.showToast();
@@ -126,7 +144,7 @@ export default class Keybindings extends Component {
     }
 
     render() {
-        const { handleEdit, editKeybinding, closeModal, enableAllKeybindings, disableAllKeybindings } = this;
+        const { handleEdit, editKeybinding, closeModal, enableAllKeybindings, disableAllKeybindings, toggleKeybinding } = this;
         const { active } = this.props;
         const { currentShortcut, keybindingsList, showEditModal } = this.state;
 
@@ -144,7 +162,7 @@ export default class Keybindings extends Component {
                 <h3 className={styles['settings-title']}>Keybindings</h3>
 
                 <div className={styles['table-wrapper']}>
-                    <Table data={keybindingsList} onEdit={handleEdit} onShortcutToggle={editKeybinding} />
+                    <Table data={keybindingsList} onEdit={handleEdit} onShortcutToggle={toggleKeybinding} />
                 </div>
 
                 <div style={{ display: 'grid', columnGap: '1rem', gridTemplateColumns: '1fr 1fr' }}>

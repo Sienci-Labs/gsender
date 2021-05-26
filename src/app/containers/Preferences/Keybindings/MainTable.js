@@ -44,8 +44,24 @@ export default class MainTable extends Component {
 
     renders = {
         renderShortcutCell: (_, row) => {
-            const { keys } = row;
+            const { keys, isActive } = row;
             const shortcut = keys.split('+');
+
+            if (!shortcut[0]) {
+                return (
+                    <div className={styles.shortcutRowHeader}>
+                        <span />
+                        <i
+                            role="button"
+                            tabIndex={-1}
+                            className={cx('fas fa-edit', styles.editIcon)}
+                            onClick={() => this.props.onEdit(row)}
+                            onKeyDown={() => this.props.onEdit(row)}
+                            style={{ alignSelf: 'center', color: '#2b5d8b' }}
+                        />
+                    </div>
+                );
+            }
 
             let cleanedShortcut = null;
 
@@ -57,7 +73,7 @@ export default class MainTable extends Component {
                 cleanedShortcut.push('+');
             }
 
-            const output = cleanedShortcut ? formatShortcut(cleanedShortcut) : formatShortcut(shortcut);
+            const output = cleanedShortcut ? formatShortcut(cleanedShortcut, isActive) : formatShortcut(shortcut, isActive);
 
             return (
                 <div className={styles.shortcutRowHeader}>

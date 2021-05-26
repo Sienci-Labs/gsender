@@ -145,7 +145,7 @@ export default class EditArea extends Component {
             return;
         }
 
-        const foundShortcut = this.props.shortcuts.find(shortcut => shortcut.keys === keyCombo);
+        const foundShortcut = this.props.shortcuts.filter(shortcut => shortcut.isActive).find(shortcut => shortcut.keys === keyCombo);
 
         const keyState = {
             singleKey,
@@ -222,7 +222,10 @@ export default class EditArea extends Component {
         //due to keys.split
         if (shortcutArray[shortcutArray.length - 1] === '') {
             cleanedShortcut = shortcutArray.filter(item => item !== '');
-            cleanedShortcut.push('+');
+
+            if (shortcutArray[0]) {
+                cleanedShortcut.push('+');
+            }
         }
 
         const output = cleanedShortcut ? formatShortcut(cleanedShortcut) : formatShortcut(shortcutArray);
