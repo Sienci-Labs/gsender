@@ -21,18 +21,24 @@
  *
  */
 
-import constants from 'namespace-constants';
+.loader {
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    top: 60%;
+    left: 50%;
+    text-align: center;
+    transform: translateX(-50%);
 
-export const {
-    MODAL_NONE,
-    MODAL_PREFERENCES,
-    MODAL_WIZARD,
-    MODAL_FIRMWARE,
-    MODAL_SURFACING
-} = constants('widgets/macro', [
-    'MODAL_NONE',
-    'MODAL_PREFERENCES',
-    'MODAL_WIZARD',
-    'MODAL_FIRMWARE',
-    'MODAL_SURFACING'
-]);
+    .loaderIcon {
+        > * {
+            font-size: 48px;
+            color: #111827;
+        }
+    }
+
+    .loaderText {
+        margin: 15px 0 10px;
+        color: #111827;
+    }
+}

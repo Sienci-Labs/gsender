@@ -1183,6 +1183,9 @@ class VisualizerWidget extends PureComponent {
                 console.log(layoutIsReversed);
                 this.setState({ layoutIsReversed });
             }),
+            pubsub.subscribe('gcode:surfacing', (_, { gcode, name, size }) => {
+                this.actions.uploadFile(gcode, { name, size });
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }

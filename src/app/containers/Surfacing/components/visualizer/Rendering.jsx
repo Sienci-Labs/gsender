@@ -21,18 +21,17 @@
  *
  */
 
-import constants from 'namespace-constants';
+import React from 'react';
+import i18n from 'app/lib/i18n';
+import styles from './loader.styl';
 
-export const {
-    MODAL_NONE,
-    MODAL_PREFERENCES,
-    MODAL_WIZARD,
-    MODAL_FIRMWARE,
-    MODAL_SURFACING
-} = constants('widgets/macro', [
-    'MODAL_NONE',
-    'MODAL_PREFERENCES',
-    'MODAL_WIZARD',
-    'MODAL_FIRMWARE',
-    'MODAL_SURFACING'
-]);
+export default () => (
+    <div className={styles.loader}>
+        <div className={styles.loaderIcon}>
+            <i className="fa fa-cube fa-spin" />
+        </div>
+        <div className={styles.loaderText}>
+            {i18n._('3D rendering')}
+        </div>
+    </div>
+);

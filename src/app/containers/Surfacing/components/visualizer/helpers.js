@@ -21,35 +21,37 @@
  *
  */
 
-import classNames from 'classnames';
-import React from 'react';
-import WidgetStyles from '../Widget/index.styl';
-import Tab from './Tab';
-import styles from './index.styl';
+import * as THREE from 'three';
+import STLLoader from 'app/lib/three/STLLoader';
 
-
-const Tabs = ({ className, tabs, activeTabIndex, onClick, ...props }) => (
-    <div
-        {...props}
-        className={classNames(
-            className,
-            WidgetStyles.widgetHeader,
-            styles.tabRow
-        )}
-    >
-        {
-            tabs.map((tab, index) => (
-                <Tab
-                    active={index === activeTabIndex}
-                    onClick={() => onClick(index)}
-                    key={`tab-${tab.widgetId}`}
-                    disabled={tab.disabled}
-                >
-                    {tab.label}
-                </Tab>
-            ))
+const getBoundingBox = (object) => {
+    const box = new THREE.Box3().setFromObject(object);
+    const boundingBox = {
+        min: {
+            x: box.min.x === Infinity ? 0 : box.min.x,
+            y: box.min.y === Infinity ? 0 : box.min.y,
+            z: box.min.z === Infinity ? 0 : box.min.z
+        },
+        max: {
+            x: box.max.x === -Infinity ? 0 : box.max.x,
+            y: box.max.y === -Infinity ? 0 : box.max.y,
+            z: box.max.z === -Infinity ? 0 : box.max.z
         }
-    </div>
-);
+    };
 
-export default Tabs;
+    return boundingBox;
+};
+
+const loadSTL = (url) => new Promise(resolve => {
+    new STLLoader().load(url, resolve);
+});
+
+const loadTexture = (url) => new Promise(resolve => {
+    new THREE.TextureLoader().load(url, resolve);
+});
+
+export {
+    getBoundingBox,
+    loadSTL,
+    loadTexture,
+};
