@@ -89,21 +89,25 @@ const EventWidget = ({ active }) => {
                             value={{ label: toolChangeOption }}
                         />
                     </div>
-                    <div className={styles.addMargin}>
-                        <Select
-                            backspaceRemoves={false}
-                            className="sm"
-                            clearable={false}
-                            menuContainerStyle={{ zIndex: 5 }}
-                            name="macro"
-                            onChange={handleMacroSelection}
-                            options={map(availableMacros, (macro) => ({
-                                value: macro.id,
-                                label: macro.name
-                            }))}
-                            value={{ label: selectedMacro.label }}
-                        />
-                    </div>
+                    {
+                        toolChangeOption === 'Macro' &&
+                        <div className={styles.addMargin}>
+                            <small>Macro to run on M6</small>
+                            <Select
+                                backspaceRemoves={false}
+                                className="sm"
+                                clearable={false}
+                                menuContainerStyle={{ zIndex: 5 }}
+                                name="macro"
+                                onChange={handleMacroSelection}
+                                options={map(availableMacros, (macro) => ({
+                                    value: macro.id,
+                                    label: macro.name
+                                }))}
+                                value={{ label: selectedMacro.label }}
+                            />
+                        </div>
+                    }
                 </FieldSet>
             </div>
         </div>

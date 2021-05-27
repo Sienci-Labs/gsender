@@ -228,7 +228,7 @@ class GrblController {
                         return 'G4 P0.5'; // dwell
                     }
                     if (line === TOOLCHANGE) {
-                        log.debug('Pause for toolchange');
+                        log.debug('Pause for tool change');
                         return '';
                     }
 
