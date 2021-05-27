@@ -306,16 +306,10 @@ const Surfacing = ({ modalClose }) => {
 
             <div className={styles.container}>
                 <div className={styles.mainContainer}>
-                    <InputArea values={surfacing} onChange={handleChange} units={units} />
-                    <Visualizer
-                        widgetId="visualizer"
-                        ref={visualizerRef}
-                        gcode={gcode}
-                    />
-                    <div>
-                        <p style={{ marginTop: '1rem' }}>
+                    <div style={{ margin: '0px 10px' }}>
+                        <p>
                             <strong>Instructions: </strong>
-                            Position your machine to the front left side of your machine and set it as your zero point
+                            Position your machine to the back left side of your machine and set it as your zero point
                         </p>
                         <p style={{ marginBottom: 0 }}>
                             <strong>Note: </strong>
@@ -323,6 +317,12 @@ const Surfacing = ({ modalClose }) => {
                             it may be limited in reaching the maximum x or y axis
                         </p>
                     </div>
+                    <InputArea values={surfacing} onChange={handleChange} units={units} />
+                    <Visualizer
+                        widgetId="visualizer"
+                        ref={visualizerRef}
+                        gcode={gcode}
+                    />
                 </div>
 
                 <ActionArea
