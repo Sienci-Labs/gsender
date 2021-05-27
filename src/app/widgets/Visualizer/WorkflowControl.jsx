@@ -221,7 +221,6 @@ class WorkflowControl extends PureComponent {
     subscribe() {
         const tokens = [
             pubsub.subscribe('gcode:toolChange', (msg) => {
-                console.log('Start Toolchange workflow');
                 Toaster.pop({
                     msg: 'Program execution paused due to M6 command',
                     type: TOASTER_WARNING
@@ -333,7 +332,6 @@ class WorkflowControl extends PureComponent {
                                                     this.setState({ closeFile: false });
                                                     actions.closeModal();
                                                     actions.unloadGCode();
-                                                    console.log(actions.reset);
                                                     actions.reset();
                                                 }}
                                             >

@@ -1180,7 +1180,6 @@ class VisualizerWidget extends PureComponent {
                 });
             }),
             pubsub.subscribe('widgets:reverse', (_, layoutIsReversed) => {
-                console.log(layoutIsReversed);
                 this.setState({ layoutIsReversed });
             }),
             pubsub.subscribe('gcode:surfacing', (_, { gcode, name, size }) => {

@@ -30,6 +30,7 @@ import Slider from './Slider';
 
 const LaserControls = ({ actions, state }) => {
     const { laser, canClick } = state;
+
     return (
         <div className={styles.controlContainer}>
             <div className={styles.controlRow}>

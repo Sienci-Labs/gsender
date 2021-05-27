@@ -134,7 +134,6 @@ class NavbarConnectionWidget extends PureComponent {
 
     setConnectedState() {
         const { port, connectedBaudrate } = this.props;
-        console.log(connectedBaudrate);
         this.setState(state => ({
             alertMessage: '',
             connecting: false,
@@ -148,10 +147,6 @@ class NavbarConnectionWidget extends PureComponent {
     }
 
     setDisconnectedState() {
-        const { port } = this.props;
-
-        console.log(`The serial port "${port}" is disconected`);
-
         this.setState(state => ({
             alertMessage: '',
             connecting: false,

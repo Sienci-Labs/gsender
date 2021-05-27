@@ -113,7 +113,6 @@ class SpindleWidget extends PureComponent {
             this.setState({
                 spindleSpeed: value
             });
-            //this.debouncedSpindleOverride(value);
         },
         handleLaserPowerChange: (e) => {
             const { laser } = this.state;
@@ -281,8 +280,8 @@ export default connect((store) => {
     const type = get(store, 'controller.type');
     const spindleModal = get(store, 'controller.modal.spindle');
     const settings = get(store, 'controller.settings');
-    const spindleMin = Number(get(settings, 'settings.$30', 0));
-    const spindleMax = Number(get(settings, 'settings.$31', 2000));
+    const spindleMin = Number(get(settings, 'settings.$31', 0));
+    const spindleMax = Number(get(settings, 'settings.$30', 2000));
 
     return {
         workflow,
