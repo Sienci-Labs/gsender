@@ -12,11 +12,11 @@ export class GCodeProcessor {
     constructor(options = {}) {
         this.options = options;
         if (!options.maxFeed) {
-            options.maxFeed = 1000;
+            options.maxFeed = 1500;
         }
 
         if (!options.acceleration) {
-            options.acceleration = 100000;
+            options.acceleration = 1800000;
         }
 
         if (!options.noInit) {

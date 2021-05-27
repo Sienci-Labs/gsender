@@ -24,9 +24,9 @@
 import { GCodeProcessor } from './helpers/GCodeProcessor';
 
 onmessage = function({ data }) {
-    const { lines, name, size } = data;
+    const { lines, name, size, feedArray, accelArray } = data;
 
-    const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
+    const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'], maxFeed: feedArray, acceleration: accelArray });
     processor.process(lines);
 
     postMessage({

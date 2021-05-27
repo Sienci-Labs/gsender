@@ -25,7 +25,7 @@
 import classNames from 'classnames';
 import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
-
+import { connect } from 'react-redux';
 import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
@@ -860,11 +860,17 @@ class VisualizerWidget extends PureComponent {
 
         // Set "Loading" state to job info widget and start file VM processor
         const estimateWorker = new EstimateWorker();
+        const { feedArray, accelArray } = this.props;
+        console.log(feedArray);
+        console.log(accelArray);
+
         estimateWorker.onmessage = this.onProcessedGcode;
         estimateWorker.postMessage({
             lines: lines,
             name,
-            size
+            size,
+            feedArray,
+            accelArray
         });
     };
 
@@ -1308,4 +1314,19 @@ class VisualizerWidget extends PureComponent {
     }
 }
 
-export default VisualizerWidget;
+export default connect((store) => {
+    const settings = get(store, 'controller.settings');
+    const xMaxFeed = Number(get(settings.settings, '$110', 1500));
+    const yMaxFeed = Number(get(settings.settings, '$111', 1500));
+    const zMaxFeed = Number(get(settings.settings, '$112', 1500));
+    const xMaxAccel = Number(get(settings.settings, '$120', 1800000));
+    const yMaxAccel = Number(get(settings.settings, '$121', 1800000));
+    const zMaxAccel = Number(get(settings.settings, '$122', 1800000));
+
+    const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
+    const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
+    return {
+        feedArray,
+        accelArray
+    };
+})(VisualizerWidget);
