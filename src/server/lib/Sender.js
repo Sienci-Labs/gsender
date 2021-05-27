@@ -245,6 +245,10 @@ class Sender extends events.EventEmitter {
         });
     }
 
+    getContext() {
+        return this.state.context;
+    }
+
     toJSON() {
         return {
             sp: this.sp.type,

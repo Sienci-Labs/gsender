@@ -35,7 +35,7 @@ import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import ReaderWorker from './FileReader.worker';
-import { Toaster, TOASTER_DANGER, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
+import { Toaster, TOASTER_DANGER, TOASTER_WARNING, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import {
     // Grbl
     GRBL_ACTIVE_STATE_ALARM,
@@ -81,6 +81,7 @@ class WorkflowControl extends PureComponent {
 
     handleCloseFile = () => {
         this.setState({ closeFile: true });
+        pubsub.publish('gcode:unload');
     }
 
     handleReaderResponse = ({ data }) => {
@@ -110,7 +111,7 @@ class WorkflowControl extends PureComponent {
             file: file,
             meta: meta
         });
-        this.setState({ runHasStarted: false });
+        this.setState({ fileLoaded: false });
     };
 
     loadRecentFile = (fileMetadata) => {
@@ -221,6 +222,10 @@ class WorkflowControl extends PureComponent {
         const tokens = [
             pubsub.subscribe('gcode:toolChange', (msg) => {
                 console.log('Start Toolchange workflow');
+                Toaster.pop({
+                    msg: 'Program execution paused due to M6 command',
+                    type: TOASTER_WARNING
+                });
             }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -328,6 +333,7 @@ class WorkflowControl extends PureComponent {
                                                     this.setState({ closeFile: false });
                                                     actions.closeModal();
                                                     actions.unloadGCode();
+                                                    console.log(actions.reset);
                                                     actions.reset();
                                                 }}
                                             >

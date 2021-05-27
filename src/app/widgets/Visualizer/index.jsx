@@ -245,7 +245,6 @@ class VisualizerWidget extends PureComponent {
                 option: store.get('workspace.toolChangeOption', ''),
                 macro: store.get('workspace.toolChangeMacro', {})
             };
-            console.log(context);
 
             const { port, filename } = this.state;
 
@@ -637,14 +636,11 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         reset: () => {
-            let activeState = this.state.controller.state.status.activeState;
-            if (activeState === 'Check') {
-                controller.command('gcode', '$c');
-            }
             this.actions.handleClose();
             this.setState(this.getInitialState());
             this.actions.unloadGCode();
             pubsub.publish('gcode:fileInfo');
+            pubsub.publish('gcode:unload');
             Toaster.pop({
                 msg: 'Gcode File Closed',
                 icon: 'fa-exclamation'

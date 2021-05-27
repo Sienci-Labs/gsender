@@ -251,6 +251,11 @@ class JobStatusWidget extends PureComponent {
                 this.setState({
                     fileProcessing: true
                 });
+            }),
+            pubsub.subscribe('gcode:unload', (msg) => {
+                this.setState({
+                    filename: ''
+                });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);

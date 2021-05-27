@@ -88,6 +88,11 @@ export function* initialize() {
         pubsub.publish('gcode:toolChange', context);
     });
 
+    controller.addListener('gcode:unload', () => {
+        // TODO:  Move file info to redux so we can dispatch action rather than pubsub
+        pubsub.publish('gcode:unload');
+    });
+
     yield null;
 }
 

@@ -372,16 +372,32 @@ class GrblController {
                 }
 
                 /* Emit event to UI for toolchange handler */
-                /*if (_.includes(words, 'M6')) {
+                if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
-                    this.workflow.pause({ data: 'M6' });
-                    this.emit('gcode:toolChange', {
-                        line: sent + 1,
-                        block: line
-                    });
+
+                    const senderContext = this.sender.getContext();
+                    const { option, macro } = senderContext;
+
+                    // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
+                    if (option === 'Pause') {
+                        this.workflow.pause({ data: 'M6' });
+                        this.emit('gcode:toolChange', {
+                            line: sent + 1,
+                            block: line,
+                            option: option
+                        });
+                    } else if (option === 'Macro') {
+                        this.workflow.pause({ data: 'M6' });
+                        this.emit('gcode:toolChange', {
+                            line: sent + 1,
+                            block: line,
+                            option: option
+                        });
+                        this.command('macro:run', macro.value);
+                    }
 
                     line = line.replace('M6', '(M6)');
-                }*/
+                }
 
                 return line;
             }
