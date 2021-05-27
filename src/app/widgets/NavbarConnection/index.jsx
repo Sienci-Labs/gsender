@@ -133,14 +133,15 @@ class NavbarConnectionWidget extends PureComponent {
 
 
     setConnectedState() {
-        const { port, baudrate } = this.props;
+        const { port, connectedBaudrate } = this.props;
+        console.log(connectedBaudrate);
         this.setState(state => ({
             alertMessage: '',
             connecting: false,
             connected: true,
             controllerType: GRBL,
             port: port,
-            baudrate: baudrate,
+            baudrate: connectedBaudrate
         }));
 
         log.debug(`Established a connection to the serial port "${port}"`);
@@ -358,11 +359,10 @@ class NavbarConnectionWidget extends PureComponent {
     }
 
     render() {
-        const { ports, baudrate } = this.props;
+        const { ports } = this.props;
         const state = {
             ...this.state,
             ports,
-            baudrate,
             controllerType: GRBL,
         };
         const actions = {
@@ -380,12 +380,12 @@ export default connect((store) => {
     const isConnected = get(store, 'connection.isConnected');
     const type = get(store, 'controller.type');
     const port = get(store, 'connection.port');
-    const baudrate = get(store, 'connection.baudrate');
+    const connectedBaudrate = get(store, 'connection.baudrate');
     return {
         ports,
         isConnected,
         type,
         port,
-        baudrate
+        connectedBaudrate
     };
 })(NavbarConnectionWidget);
