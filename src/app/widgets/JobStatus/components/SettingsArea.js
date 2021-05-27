@@ -27,15 +27,18 @@ import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import controller from 'app/lib/controller';
+import { IMPERIAL_UNITS, METRIC_UNITS } from 'app/constants';
+import { in2mm, mm2in } from 'app/lib/units';
 import styles from './Overrides.styl';
 import FeedControlButton from './FeedControlButton';
+
 
 /**
  * Settings Area component to display override controls for user
  * @prop {Object} state Default state given from parent component
  *
  */
-const SettingsArea = ({ state, controllerState }) => {
+const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
     /**
      * Override feed rate with given value
      * @param {Event} e Event Object
@@ -60,15 +63,27 @@ const SettingsArea = ({ state, controllerState }) => {
     const ovF = ov[0];
     const ovS = ov[2];
 
-    const feedrate = _.get(controllerState, 'status.feedrate');
-    const spindle = _.get(controllerState, 'status.spindle');
+    let convertedFeedRate, convertedSpindleRate;
+    const { fileModal, units } = state;
+
+    if (units === METRIC_UNITS) {
+        console.log('metric branch');
+        convertedFeedRate = (fileModal === METRIC_UNITS) ? feedrate : in2mm(feedrate).toFixed(2);
+        convertedSpindleRate = (fileModal === METRIC_UNITS) ? spindle : in2mm(spindle).toFixed(2);
+    } else {
+        console.log('imp branch');
+        convertedFeedRate = (fileModal === IMPERIAL_UNITS) ? feedrate : mm2in(feedrate).toFixed(3);
+        convertedSpindleRate = (fileModal === IMPERIAL_UNITS) ? spindle : mm2in(spindle).toFixed(3);
+    }
+
+
     const { spindleOverrideLabel } = state;
 
     return (
         <div className={styles['settings-area']}>
             <div className={styles.overrides}>
                 <span>Feed:</span>
-                <span className={styles.overrideValue}>{feedrate}</span>
+                <span className={styles.overrideValue}>{convertedFeedRate}</span>
                 <FeedControlButton value={-10} onClick={handleFeedRateChange}>- -</FeedControlButton>
                 <FeedControlButton value={-1} onClick={handleFeedRateChange}>-</FeedControlButton>
                 <FeedControlButton value={1} onClick={handleFeedRateChange}>+</FeedControlButton>
@@ -78,7 +93,7 @@ const SettingsArea = ({ state, controllerState }) => {
             </div>
             <div className={styles.overrides}>
                 <span>{ spindleOverrideLabel }:</span>
-                <span className={styles.overrideValue}>{spindle}</span>
+                <span className={styles.overrideValue}>{convertedSpindleRate}</span>
                 <FeedControlButton value={-10} onClick={handleSpindleSpeedChange}>- -</FeedControlButton>
                 <FeedControlButton value={-1} onClick={handleSpindleSpeedChange}>-</FeedControlButton>
                 <FeedControlButton value={1} onClick={handleSpindleSpeedChange}>+</FeedControlButton>
@@ -95,8 +110,21 @@ SettingsArea.propTypes = {
 };
 
 export default connect((store) => {
-    const state = get(store, 'controller.state');
+    const controllerState = get(store, 'controller.state');
+    // Map feedrates to MM if $13 is enabled - logic in render assumes rates are in MM
+    const $13 = get(store, 'controller.settings.settings.$13');
+    let spindle = get(controllerState, 'status.spindle');
+    let feedrate = get(controllerState, 'status.feedrate');
+    console.log(feedrate);
+    console.log(spindle);
+    if ($13 === '1') {
+        spindle = in2mm(spindle).toFixed(2);
+        feedrate = in2mm(feedrate).toFixed(2);
+    }
+
     return {
-        controllerState: state
+        controllerState,
+        spindle,
+        feedrate
     };
 })(SettingsArea);

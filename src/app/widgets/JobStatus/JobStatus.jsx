@@ -39,6 +39,7 @@ class JobStatus extends PureComponent {
 
     render() {
         const { state } = this.props;
+        console.log(state);
         const { isRunningJob } = state;
 
         return (
