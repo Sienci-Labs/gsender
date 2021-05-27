@@ -97,6 +97,7 @@ const InputArea = ({ values, onChange, units }) => {
                     additionalProps={{ type: 'number', id: 'maxDepth', min: 1, max: 100 }}
                     value={maxDepth}
                     onChange={onChange}
+                    className={styles.maxDepth}
                 />
             </div>
         </div>
