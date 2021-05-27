@@ -219,53 +219,38 @@ const Surfacing = ({ modalClose }) => {
         };
 
         //Draw initial full rectangle covering full length and width of the machine
+
+        if (maxDepth === depth) {
+            gCodeArr.push(`(Layer ${count})`);
+        }
         gCodeArr.push(
-            '\n',
-            `(Layer ${count})`,
             `G1 Z${fixedVal(Z)}`,
-            `G1 Y${fixedVal(length) * -1}`,
+            `G1 Y${fixedVal(length)}`,
             `G1 X${fixedVal(width)}`,
             'G1 Y0',
             'G1 X0',
-            `G1 X${fixedVal(stepoverAmount)} Y${fixedVal(stepoverAmount) * -1}`,
+            `G1 X${fixedVal(stepoverAmount)} Y${fixedVal(stepoverAmount)}`,
         );
 
-        let iterations = 1;
         // eslint-disable-next-line no-constant-condition
         while (true) {
             if (endPos.X <= currentPos.X || endPos.Y <= currentPos.Y) {
                 break;
             }
 
-            let newCurrentPosX = Number(fixedVal(endPos.X - stepoverAmount));
-            let newCurrentPosY = Number(fixedVal(endPos.Y - stepoverAmount));
-            let newEndPosX = Number(fixedVal(currentPos.X + stepoverAmount));
-            let newEndPosY = Number(fixedVal(currentPos.Y + stepoverAmount));
+            //Full rectangualar movement from up => right => bottom => left
+            gCodeArr.push(
+                '\n',
+                `G1 Y${fixedVal(endPos.Y)}`,
+                `G1 X${fixedVal(endPos.X)}`,
+                `G1 Y${fixedVal(currentPos.Y)}`,
+                `G1 X${fixedVal(currentPos.X)}`,
+            );
 
-            //On the first iteration we want the end position for the y axis to reach
-            //the maximum dimensions for the first spiral, every other spiral's end y position
-            //will be offset by the stepover amount
-            if (iterations === 1) {
-                //Full rectangualar movement from up => right => bottom => left
-                gCodeArr.push(
-                    '\n',
-                    `G1 Y${fixedVal(endPos.Y) * -1}`,
-                    `G1 X${fixedVal(endPos.X)}`,
-                    `G1 Y${fixedVal(currentPos.Y - stepoverAmount) * -1}`,
-                    `G1 X${fixedVal(currentPos.X)}`,
-                );
-
-                newEndPosY = Number(fixedVal(currentPos.Y));
-            } else {
-                //Full rectangualar movement from up => right => bottom => left
-                gCodeArr.push(
-                    '\n',
-                    `G1 Y${fixedVal(endPos.Y) * -1}`,
-                    `G1 X${fixedVal(endPos.X)}`,
-                    `G1 Y${fixedVal(currentPos.Y) * -1}`,
-                    `G1 X${fixedVal(currentPos.X)}`,
-                );
-            }
+            const newCurrentPosX = Number(fixedVal(endPos.X - stepoverAmount));
+            const newCurrentPosY = Number(fixedVal(endPos.Y - stepoverAmount));
+            const newEndPosX = Number(fixedVal(currentPos.X + stepoverAmount));
+            const newEndPosY = Number(fixedVal(currentPos.Y + stepoverAmount));
 
             //New position will be the previous end position minus the stepover amount
             const newPos = {
@@ -281,15 +266,15 @@ const Surfacing = ({ modalClose }) => {
 
             currentPos = Object.assign({}, newEndPos);
             endPos = Object.assign({}, newPos);
-
-            iterations++;
         }
 
         gCodeArr.push(
-            'G0 Z3',
+            `G0 Z${Math.abs(Z)}`,
             'G0 X0 Y0',
         );
-        gCodeArr.push(`(End of Layer ${count})`);
+        if (maxDepth === depth) {
+            gCodeArr.push(`(End of Layer ${count})`);
+        }
 
         return gCodeArr;
     };
@@ -303,6 +288,14 @@ const Surfacing = ({ modalClose }) => {
         pubsub.publish('gcode:surfacing', { gcode, name, size: (gcode.length * 2) });
     };
 
+    /**
+     * Function to clear generated gcode
+     */
+    const clear = () => {
+        setGcode('');
+        visualizerRef.current.actions.reset();
+    };
+
     const canLoad = !!gcode; //For accessing the gcode line viewer
 
     return (
@@ -313,16 +306,10 @@ const Surfacing = ({ modalClose }) => {
 
             <div className={styles.container}>
                 <div className={styles.mainContainer}>
-                    <InputArea values={surfacing} onChange={handleChange} units={units} />
-                    <Visualizer
-                        widgetId="visualizer"
-                        ref={visualizerRef}
-                        gcode={gcode}
-                    />
-                    <div>
-                        <p style={{ marginTop: '1rem' }}>
+                    <div style={{ margin: '0px 10px' }}>
+                        <p>
                             <strong>Instructions: </strong>
-                            Position your machine to the bottom left side of your machine and set it as your zero point
+                            Position your machine to the back left side of your machine and set it as your zero point
                         </p>
                         <p style={{ marginBottom: 0 }}>
                             <strong>Note: </strong>
@@ -330,10 +317,17 @@ const Surfacing = ({ modalClose }) => {
                             it may be limited in reaching the maximum x or y axis
                         </p>
                     </div>
+                    <InputArea values={surfacing} onChange={handleChange} units={units} />
+                    <Visualizer
+                        widgetId="visualizer"
+                        ref={visualizerRef}
+                        gcode={gcode}
+                    />
                 </div>
 
                 <ActionArea
                     handleCancel={modalClose}
+                    handleClear={clear}
                     handleGenerateGcode={handleGenerate}
                     handleLoadGcode={loadGcode}
                     surfacing={surfacing}
