@@ -1320,7 +1320,7 @@ export default connect((store) => {
     const yMaxFeed = Number(get(settings.settings, '$111', 1500));
     const zMaxFeed = Number(get(settings.settings, '$112', 1500));
     const xMaxAccel = Number(get(settings.settings, '$120', 1800000));
-    const yMaxAccel = Number(get(settings.settings, '$121', 1800000));
+    const yMaxAccel = Number(get(settings.settings, '$112', 1800000));
     const zMaxAccel = Number(get(settings.settings, '$122', 1800000));
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
