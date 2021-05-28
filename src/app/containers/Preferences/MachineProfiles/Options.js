@@ -147,7 +147,6 @@ export default class Options extends Component {
             ...machineProfile,
             [id]: value
         };
-        console.log(updatedObj);
 
         store.replace('workspace.machineProfile', updatedObj);
         controller.command('machineprofile:load', updatedObj);
