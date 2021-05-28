@@ -147,6 +147,7 @@ export default class Options extends Component {
             ...machineProfile,
             [id]: value
         };
+        console.log(updatedObj);
 
         store.replace('workspace.machineProfile', updatedObj);
         controller.command('machineprofile:load', updatedObj);
@@ -184,12 +185,12 @@ export default class Options extends Component {
     }
 
     componentDidMount() {
-        store.on('change', this.updateMachineProfileFromStore);
+        store.on('replace', this.updateMachineProfileFromStore);
         this.subscribe();
     }
 
     componentWillUnmount() {
-        store.removeListener('change', this.updateMachineProfileFromStore);
+        store.removeListener('replace', this.updateMachineProfileFromStore);
         this.unsubscribe();
     }
 
@@ -213,7 +214,7 @@ export default class Options extends Component {
     render() {
         const { machineProfile, machineProfiles, units } = this.state;
         const { state } = this.props;
-        const { endstops, spindle, mm, in: inches, company, name, type } = machineProfile;
+        const { endstops = false, spindle = false, mm, in: inches, company, name, type } = machineProfile;
         const disableEndstops = this.shouldDisableEndstops(state);
         const label = `${company} ${name} ${' - ' && type}`;
 
