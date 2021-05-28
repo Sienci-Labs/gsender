@@ -7,6 +7,10 @@ branches:
 
 environment:
   matrix:
+    - job_name: Linux build (arm)
+      appveyor_build_worker_image: Ubuntu2004
+      nodejs_version: "12"
+      ARCH: arm
     - job_name: Windows build (x86)
       appveyor_build_worker_image: Visual Studio 2019
       nodejs_version: "12"
@@ -95,7 +99,6 @@ for:
           yarn clean
           yarn lint
           yarn test
-          yarn install serialport --unsafe-perms --build-from-source
           if [[ -z "$CI_TAG" ]]; then
             yarn build-latest
           else
