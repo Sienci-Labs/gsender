@@ -202,7 +202,7 @@ class SpindleWidget extends PureComponent {
 
     getSpindleActiveState() {
         const { spindleModal } = this.props;
-        return spindleModal && spindleModal !== 'M5';
+        return spindleModal !== 'M5';
     }
 
     canClick() {
@@ -278,7 +278,7 @@ export default connect((store) => {
     const state = get(store, 'controller.state');
     const isConnected = get(store, 'connection.isConnected');
     const type = get(store, 'controller.type');
-    const spindleModal = get(store, 'controller.modal.spindle');
+    const spindleModal = get(store, 'controller.modal.spindle', 'M5');
     const settings = get(store, 'controller.settings');
     const spindleMin = Number(get(settings, 'settings.$31', 0));
     const spindleMax = Number(get(settings, 'settings.$30', 2000));
