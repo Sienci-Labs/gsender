@@ -1381,6 +1381,8 @@ class GrblController {
                     commands.push('M5');
                     commands.push('S0');
                 }
+                this.state.parserstate.modal.spindle = 'M3';
+                this.emit('controller:state', GRBL, this.state);
                 this.command('gcode', commands);
             },
             'lasertest:off': () => {
