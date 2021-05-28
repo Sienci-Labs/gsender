@@ -861,8 +861,6 @@ class VisualizerWidget extends PureComponent {
         // Set "Loading" state to job info widget and start file VM processor
         const estimateWorker = new EstimateWorker();
         const { feedArray, accelArray } = this.props;
-        console.log(feedArray);
-        console.log(accelArray);
 
         estimateWorker.onmessage = this.onProcessedGcode;
         estimateWorker.postMessage({

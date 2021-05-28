@@ -29,7 +29,7 @@ import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
-import { mapPositionToUnits } from 'app/lib/units';
+import { mapPositionToPreferredUnits } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
 import JobStatus from './JobStatus';
 import {
@@ -280,7 +280,7 @@ class JobStatusWidget extends PureComponent {
     }
 
     render() {
-        const { units, bbox, fileProcessing } = this.state;
+        const { units, bbox, fileProcessing, fileModal } = this.state;
         const { workflow, isConnected, senderStatus } = this.props;
         const state = {
             ...this.state,
@@ -290,11 +290,12 @@ class JobStatusWidget extends PureComponent {
             jobIsPaused: this.jobIsPaused(),
             bbox: mapValues(bbox, (position) => {
                 return mapValues(position, (pos, axis) => {
-                    return mapPositionToUnits(pos, units);
+                    return mapPositionToPreferredUnits(pos, fileModal, units);
                 });
             }),
             isConnected
         };
+
         const actions = {
             ...this.actions
         };

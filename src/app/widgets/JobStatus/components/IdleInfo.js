@@ -12,7 +12,7 @@ import { IMPERIAL_UNITS, METRIC_UNITS } from '../../../constants';
  * Idle Information component displaying job information when status is set to idle
  * @param {Object} state Default state given from parent component
  */
-const IdleInfo = ({ state, props }) => {
+const IdleInfo = ({ state }) => {
     const {
         bbox: { delta, min, max },
         units,
@@ -36,6 +36,7 @@ const IdleInfo = ({ state, props }) => {
     let feedrateMax = Math.max(...feedRates);
     let spindleMin = Math.min(...spindleRates);
     let spindleMax = Math.max(...spindleRates);
+
 
     if (units === METRIC_UNITS) {
         convertedFeedMin = (fileModal === METRIC_UNITS) ? feedrateMin : in2mm(feedrateMin).toFixed(2);

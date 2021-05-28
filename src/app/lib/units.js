@@ -81,3 +81,24 @@ export const mapPositionToUnits = (pos, units = METRIC_UNITS) => {
     }
     return Number(pos) || 0;
 };
+
+export const convertValueToImperialUnits = (pos) => {
+    pos = Number(pos) || 0;
+    return mm2in(pos).toFixed(3);
+};
+
+export const convertValueToMetricUnits = (pos) => {
+    pos = Number(pos) || 0;
+    return in2mm(pos).toFixed(2);
+};
+
+export const mapPositionToPreferredUnits = (pos, currentUnits, preferredUnits) => {
+    if (currentUnits !== preferredUnits) {
+        if (preferredUnits === IMPERIAL_UNITS) {
+            return convertValueToImperialUnits(pos);
+        } else {
+            return convertValueToMetricUnits(pos);
+        }
+    }
+    return Number(pos) || 0;
+};

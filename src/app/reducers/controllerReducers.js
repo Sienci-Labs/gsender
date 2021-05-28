@@ -107,14 +107,14 @@ const reducer = createReducer(initialState, {
         const state = _get(reducerState, 'state');
         const wpos = mapPosToFeedbackUnits(_get(state, 'status.wpos'), settings);
         const mpos = mapPosToFeedbackUnits(_get(state, 'status.mpos'), settings);
-        const modals = consolidateModals(state);
+        const modal = consolidateModals(state);
 
         return {
             type,
             settings,
             mpos,
             wpos,
-            modals
+            modal
         };
     },
     [UPDATE_CONTROLLER_STATE]: (payload, reducerState) => {
