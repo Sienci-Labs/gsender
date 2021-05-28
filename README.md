@@ -90,6 +90,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 ### Open Beta 0.6.5 (May 28, 2021)
 * New tool for surfacing
 * Moved most controllerEvent listeners to redux store to improve performance
+* Improved Job Time Estimation
 * Updates to Laser/Spindle widget to better track on/off state
 * New 'About' information
 * Fixed file units mismatch with preferred units
