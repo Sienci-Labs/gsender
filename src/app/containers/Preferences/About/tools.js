@@ -41,7 +41,7 @@ export const timeline = [
     {
         id: 2,
         date: 'May 14th',
-        text: 'Closed Beta Release'
+        text: 'Open Beta Release'
     },
     {
         id: 3,
