@@ -70,6 +70,8 @@
 }
 
 .arrow {
+    $color = rgba(black, 0.3);
+
     display: grid;
     grid-template-columns: 7fr 1fr;
     height: 5rem;
@@ -79,13 +81,13 @@
     .body {
         height: 1rem;
         align-self: center;
-        background-color: rgba(black, 0.2);
+        background-color: $color;
     }
 
     .head {
         border-top: 20px solid transparent;
         border-bottom: 20px solid transparent;
-        border-left: 2rem solid rgba(black, 0.2);
+        border-left: 2rem solid $color;
         height: 40px;
         align-self: center;
     }
