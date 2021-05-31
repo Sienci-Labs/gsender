@@ -34,7 +34,7 @@ const LaserControls = ({ actions, state }) => {
     return (
         <div className={styles.controlContainer}>
             <div className={styles.controlRow}>
-                <FunctionButton onClick={actions.sendM3} disabled={!canClick}>
+                <FunctionButton onClick={actions.sendLaserM3} disabled={!canClick}>
                     <i className="fas fa-lightbulb" />
                     Laser On
                 </FunctionButton>
