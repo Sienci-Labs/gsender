@@ -90,7 +90,7 @@ const AxisButton = ({ label, axis, onClick, disabled }) => {
         <Container
             role="button"
             onClick={onClick}
-            onKeyDown={onClick}
+            onKeyDown={null}
             tabIndex={0}
             className={disabled ? 'disabled' : 'active'}
         >
