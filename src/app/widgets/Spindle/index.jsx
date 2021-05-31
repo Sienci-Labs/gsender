@@ -256,7 +256,7 @@ class SpindleWidget extends PureComponent {
                 >
                     <div>
                         <div className={styles.modalRow}>
-                            <ModalToggle mode={state.mode} onChange={actions.handleModeToggle} />
+                            <ModalToggle mode={state.mode} onChange={actions.handleModeToggle} disabled={!this.canClick()} />
                             <ActiveIndicator canClick={this.canClick()} active={active} />
                         </div>
                         <div>
