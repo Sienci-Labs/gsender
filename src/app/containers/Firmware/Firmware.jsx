@@ -471,7 +471,10 @@ class Firmware extends PureComponent {
             msg: 'Settings Updated!',
             type: TOASTER_INFO
         });
-        this.setState({ currentSettings: finalStrings });
+        this.setState({
+            currentSettings: finalStrings,
+            newSettingsButtonDisabled: true
+        });
     }
 
     defineMessageForCncDefaultsButton = () => {
@@ -608,7 +611,7 @@ class Firmware extends PureComponent {
                                     Import Settings
                                     </ToolModalButton>
                                 </TooltipCustom>
-                                <TooltipCustom content="Save your cutrrent GRBL settings to your device" location="default">
+                                <TooltipCustom content="Save your current GRBL settings to your device" location="default">
                                     <ToolModalButton
                                         onClick={this.download}
                                         icon="fas fa-file-export"
