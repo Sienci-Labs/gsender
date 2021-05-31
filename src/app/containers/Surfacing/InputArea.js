@@ -87,14 +87,14 @@ const InputArea = ({ values, onChange, units }) => {
                 <Input
                     label="Layer Depth"
                     units={units}
-                    additionalProps={{ type: 'number', id: 'skimDepth', min: 0, max: 100 }}
+                    additionalProps={{ type: 'number', id: 'skimDepth', min: 0.001, max: 100 }}
                     value={skimDepth}
                     onChange={onChange}
                 />
                 <Input
                     label="Max Depth"
                     units={units}
-                    additionalProps={{ type: 'number', id: 'maxDepth', min: 1, max: 100 }}
+                    additionalProps={{ type: 'number', id: 'maxDepth', min: 0.001, max: 100 }}
                     value={maxDepth}
                     onChange={onChange}
                     className={styles.maxDepth}
