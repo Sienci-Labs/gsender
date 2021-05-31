@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 
 import styles from './index.styl';
 
@@ -9,8 +9,23 @@ const Actions = ({ handleCancel, handleGenerateGcode, handleLoadGcode, surfacing
 
     return (
         <div className={styles.container}>
-            <FunctionButton primary onClick={handleGenerateGcode} disabled={!canGenerateGcode}>Generate G-code</FunctionButton>
-            <FunctionButton primary disabled={!canLoad} onClick={handleLoadGcode}>Run on Main Visualizer</FunctionButton>
+            <ToolModalButton
+                icon="fas fa-code"
+                disabled={!canGenerateGcode}
+                style={{ margin: 0 }}
+                onClick={handleGenerateGcode}
+            >
+                Generate G-code
+            </ToolModalButton>
+
+            <ToolModalButton
+                icon="fas fa-play"
+                disabled={!canLoad}
+                style={{ margin: 0 }}
+                onClick={handleLoadGcode}
+            >
+                Run on Main Visualizer
+            </ToolModalButton>
         </div>
     );
 };
