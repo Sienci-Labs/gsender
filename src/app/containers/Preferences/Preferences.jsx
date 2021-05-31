@@ -33,6 +33,7 @@ import Keybindings from './Keybindings';
 import ProbeSettings from './Probe/ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import VisualizerSettings from './Visualizer/Visualizer';
+import About from './About';
 import store from '../../store';
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
@@ -93,6 +94,11 @@ class PreferencesPage extends PureComponent {
                     label: 'Events',
                     component: Events
                 }*/
+                {
+                    id: 5,
+                    label: 'About',
+                    component: About,
+                }
             ],
             tools: store.get('workspace[tools]', []),
             tool: {
