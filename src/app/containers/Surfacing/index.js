@@ -313,14 +313,11 @@ const Surfacing = ({ modalClose }) => {
 
             <div className={styles.container}>
                 <div className={styles.mainContainer}>
-                    <div style={{ margin: '0px 10px' }}>
-                        <p>
+                    <div style={{ margin: '3px 0 0' }}>
+                        <p style={{ marginBottom: '8px' }}>
                             <strong>Instructions: </strong>
-                            Position your machine to the back left side of your machine and set it as your zero point
-                        </p>
-                        <p style={{ marginBottom: 0 }}>
-                            <strong>Note: </strong>
-                            If you have any additional hardware installed on your machine (ex. dust shoe),{' '}
+                            Position your machine to the back left side of your machine and set it as your zero point.
+                            Note that if you have any additional hardware installed on your machine (ex. dust shoe),{' '}
                             it may be limited in reaching the maximum x or y axis
                         </p>
                     </div>
