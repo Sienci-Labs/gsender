@@ -23,39 +23,45 @@
 
 import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import api from 'app/api';
+import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+import { TOASTER_SUCCESS, Toaster } from 'app/lib/toaster/ToasterLib';
+import controller from 'app/lib/controller';
 import store from 'app/store';
 import Select from 'react-select';
 import map from 'lodash/map';
 import styles from '../index.styl';
 import FieldSet from '../FieldSet';
 
-
 const options = [
     'Ignore',
     'Pause',
-    'Macro'
+    'Code'
 ];
 
 const EventWidget = ({ active }) => {
+    // State
     const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
-    const [availableMacros, setMacros] = useState([]);
-    const [selectedMacro, setSelectedMacro] = useState(store.get('workspace.toolChangeMacro'));
+    const [preHook, setPreHook] = useState(store.get('workspace.toolChangeHooks.preHook'));
+    const [postHook, setPostHook] = useState(store.get('workspace.toolChangeHooks.postHook'));
+    // Handlers
     const handleToolChange = (selection) => setToolChangeOption(selection.value);
-    const handleMacroSelection = (selection) => {
-        setSelectedMacro(selection);
-        store.set('workspace.toolChangeMacro', {
-            label: selection.label,
-            value: selection.value
+    const handlePreHookChange = (e) => setPreHook(e.target.value);
+    const handlePostHookChange = (e) => setPostHook(e.target.value);
+    const handleSaveCode = (e) => {
+        store.set('workspace.toolChangeHooks.preHook', preHook);
+        store.set('workspace.toolChangeHooks.postHook', postHook);
+        const context = {
+            toolChangeOption,
+            postHook,
+            preHook
+        };
+        controller.command('toolchange:context', context);
+        Toaster.pop({
+            msg: 'Saved toolchange hooks',
+            type: TOASTER_SUCCESS,
+            icon: 'fa-check'
         });
     };
-
-    useEffect(async () => {
-        let res;
-        res = await api.macros.fetch();
-        const { records: macros } = res.body;
-        setMacros(macros);
-    }, []);
 
     useEffect(() => {
         store.set('workspace.toolChangeOption', toolChangeOption);
@@ -72,7 +78,7 @@ const EventWidget = ({ active }) => {
                 Events
             </h3>
             <div className={styles.generalArea}>
-                <FieldSet legend="Tool Change">
+                <FieldSet legend="Tool Change" className={styles.paddingBottom}>
                     <small>Strategy to handle M6 tool change commands</small>
                     <div className={styles.addMargin}>
                         <Select
@@ -90,22 +96,28 @@ const EventWidget = ({ active }) => {
                         />
                     </div>
                     {
-                        toolChangeOption === 'Macro' &&
-                        <div className={styles.addMargin}>
-                            <small>Macro to run on M6</small>
-                            <Select
-                                backspaceRemoves={false}
-                                className="sm"
-                                clearable={false}
-                                menuContainerStyle={{ zIndex: 5 }}
-                                name="macro"
-                                onChange={handleMacroSelection}
-                                options={map(availableMacros, (macro) => ({
-                                    value: macro.id,
-                                    label: macro.name
-                                }))}
-                                value={{ label: selectedMacro.label }}
+                        toolChangeOption === 'Code' &&
+                        <div>
+                            <label htmlFor="preHook">Pre-Hook</label>
+                            <textarea
+                                rows="10"
+                                className="form-control"
+                                name="preHook"
+                                value={preHook}
+                                onChange={handlePreHookChange}
                             />
+                            <small>The pre-hook will run once a M6 command has occurred and will pause once completed</small>
+                            <br />
+                            <label htmlFor="preHook">Post-Hook</label>
+                            <textarea
+                                rows="10"
+                                className="form-control"
+                                name="postHook"
+                                value={postHook}
+                                onChange={handlePostHookChange}
+                            />
+                            <small>The post-hook will run after the tool change has been confirmed in the user interface.</small>
+                            <FunctionButton primary onClick={handleSaveCode}>Save G-Code</FunctionButton>
                         </div>
                     }
                 </FieldSet>

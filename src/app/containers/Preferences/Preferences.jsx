@@ -26,7 +26,7 @@ import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
 import controller from 'app/lib/controller';
-//import Events from 'app/containers/Preferences/Events';
+import Events from 'app/containers/Preferences/Events';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import GeneralSettings from './GeneralSettings';
 import Keybindings from './Keybindings';
@@ -88,11 +88,11 @@ class PreferencesPage extends PureComponent {
                     label: 'Visualizer',
                     component: VisualizerSettings
                 },
-                /*{
+                {
                     id: 4,
                     label: 'Events',
                     component: Events
-                }*/
+                }
             ],
             tools: store.get('workspace[tools]', []),
             tool: {

@@ -121,6 +121,8 @@ class GrblController {
 
     settings = {};
 
+    toolChangeContext = {};
+
     queryTimer = null;
 
     actionMask = {
@@ -1540,6 +1542,10 @@ class GrblController {
                 };
 
                 store.set('preferences', updated);
+            },
+            'toolchange:context': () => {
+                const [context] = args;
+                this.toolChangeContext = context;
             }
         }[cmd];
 
