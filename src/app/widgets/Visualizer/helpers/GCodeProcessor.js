@@ -194,7 +194,12 @@ export class GCodeProcessor {
     }
 
     runGcodeLine(gline) {
+
         if (typeof gline === 'string') {
+            // Handle Grbl specific commands like homing by skipping the line entirely
+            if (gline[0] == '$') {
+                return;
+            }
             gline = new GcodeLine(gline);
         }
         // This is NOT a gcode validator.  Input gcode is expected to be valid and well-formed.
