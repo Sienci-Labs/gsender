@@ -30,7 +30,7 @@ const ReconnectButton = ({ onClick }) => {
             <div className={styles.reconnectIcon}>
                 <i className="fas fa-plug" />
             </div>
-            <div className={styles.reconnectButtonText}>Connect on port COM5</div>
+            <div className={styles.reconnectButtonText}>Connect on last active port</div>
         </button>
     );
 };

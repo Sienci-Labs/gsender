@@ -30,6 +30,7 @@ import Modal from 'app/components/Modal';
 import map from 'lodash/map';
 import download from 'downloadjs';
 import store from 'app/store';
+import { GRBL } from 'app/constants';
 import TooltipCustom from '../../components/TooltipCustom/ToolTip';
 import controller from '../../lib/controller';
 import Loading from '../../components/Loader';
@@ -41,6 +42,7 @@ import * as GRBL_SETTINGS from '../../../server/controllers/Grbl/constants';
 import NotConnectedWarning from './NotConnectedWarning';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import ToolModalButton from '../../components/ToolModalButton/ToolModalButton';
+
 
 class Firmware extends PureComponent {
     static propTypes = {
@@ -299,8 +301,7 @@ class Firmware extends PureComponent {
         connectToLastDevice: () => {
             const port = this.connectionConfig.get('port');
             const baud = this.connectionConfig.get('baudrate');
-            const controller = this.connectionConfig.get('controller.type');
-            this.reconnectToLastDevice(port, baud, controller);
+            this.reconnectToLastDevice(port, baud, GRBL);
         }
     }
 
