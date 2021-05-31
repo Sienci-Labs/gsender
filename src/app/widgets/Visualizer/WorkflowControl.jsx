@@ -268,23 +268,29 @@ class WorkflowControl extends PureComponent {
                 />
 
                 <div className={styles.relativeWrapper}>
-                    <button
-                        type="button"
-                        className={`${styles['workflow-button-upload']}`}
-                        title={i18n._('Load File')}
-                        onClick={this.handleClickUpload}
-                        style={{ writingMode: 'vertical-lr' }}
-                    >
-                        {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
-                    </button>
-                    <RecentFileButton />
-                    <div
-                        role="button"
-                        className={this.props.state.gcode.content ? `${styles.closeFileButton}` : `${styles['workflow-button-disabled']}`}
-                        onClick={this.handleCloseFile}
-                    >
-                        <i className="fas fa-times" />
-                    </div>
+                    {
+                        workflow.state !== WORKFLOW_STATE_RUNNING && (
+                            <>
+                                <button
+                                    type="button"
+                                    className={`${styles['workflow-button-upload']}`}
+                                    title={i18n._('Load File')}
+                                    onClick={this.handleClickUpload}
+                                    style={{ writingMode: 'vertical-lr' }}
+                                >
+                                    {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
+                                </button>
+                                <RecentFileButton />
+                                <div
+                                    role="button"
+                                    className={this.props.state.gcode.content ? `${styles.closeFileButton}` : `${styles['workflow-button-disabled']}`}
+                                    onClick={this.handleCloseFile}
+                                >
+                                    <i className="fas fa-times" />
+                                </div>
+                            </>
+                        )
+                    }
                 </div>
                 {
                     !this.state.runHasStarted && (

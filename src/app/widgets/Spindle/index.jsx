@@ -106,7 +106,15 @@ class SpindleWidget extends PureComponent {
             }
         },
         sendM5: () => {
-            controller.command('gcode', 'M5');
+            controller.command('gcode', 'M5 S0');
+        },
+        sendLaserM3: () => {
+            const { laser } = this.state;
+            const { power } = laser;
+            const { spindleMax } = this.props;
+            const laserPower = spindleMax * (power / 100);
+
+            controller.command('gcode', `M3 S${laserPower}`);
         },
         handleSpindleSpeedChange: (e) => {
             const value = Number(e.target.value);
@@ -256,7 +264,7 @@ class SpindleWidget extends PureComponent {
                 >
                     <div>
                         <div className={styles.modalRow}>
-                            <ModalToggle mode={state.mode} onChange={actions.handleModeToggle} />
+                            <ModalToggle mode={state.mode} onChange={actions.handleModeToggle} disabled={!this.canClick()} />
                             <ActiveIndicator canClick={this.canClick()} active={active} />
                         </div>
                         <div>
