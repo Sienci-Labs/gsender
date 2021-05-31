@@ -13,6 +13,27 @@ import Visualizer from './components/visualizer';
 
 import styles from './index.styl';
 
+const defaultMetricState = {
+    bitDiameter: 22,
+    stepover: 40,
+    feedrate: 1500,
+    length: 300,
+    width: 200,
+    skimDepth: 1,
+    maxDepth: 1,
+    spindleRPM: 17000,
+};
+
+const defaultImperialState = {
+    bitDiameter: 1,
+    stepover: 40,
+    feedrate: 1500,
+    length: 12,
+    width: 8,
+    skimDepth: 0.04,
+    maxDepth: 0.04,
+};
+
 
 /**
  * @component Surfacing
@@ -22,16 +43,7 @@ import styles from './index.styl';
 const Surfacing = ({ modalClose }) => {
     const visualizerRef = useRef();
 
-    const [surfacing, setSurfacing] = useState({
-        bitDiameter: 22,
-        stepover: 40,
-        feedrate: 1500,
-        length: 300,
-        width: 200,
-        skimDepth: 1,
-        spindleRPM: 17000,
-        maxDepth: 1,
-    });
+    const [surfacing, setSurfacing] = useState(defaultMetricState);
 
     const [gcode, setGcode] = useState('');
     const [units, setUnits] = useState(METRIC_UNITS);
@@ -48,20 +60,17 @@ const Surfacing = ({ modalClose }) => {
         }
 
         if (machineProfile) {
-            let length, width, skimDepth, stepover;
+            let length, width, additionalState = {};
 
             if (workspaceUnits === METRIC_UNITS) {
                 length = machineProfile.mm.depth;
                 width = machineProfile.mm.width;
-                skimDepth = 1;
-                stepover = 40;
             } else {
                 length = machineProfile.in.depth;
                 width = machineProfile.in.width;
-                skimDepth = 0.04;
-                stepover = 2;
+                additionalState = defaultImperialState;
             }
-            setSurfacing(prev => ({ ...prev, length, width, skimDepth, stepover }));
+            setSurfacing(prev => ({ ...prev, ...additionalState, length, width }));
         }
     }, []);
 
@@ -85,7 +94,7 @@ const Surfacing = ({ modalClose }) => {
 
         //Value may not exceed 3 decimal places
         let cleanedValue = val;
-        if ([...val.toString()].length > 4) { //Value spread into the array includes the decimal dot
+        if ([...value].length > 4) { //Value spread into the array includes the decimal dot
             cleanedValue = Number(cleanedValue.toFixed(3));
         }
 
