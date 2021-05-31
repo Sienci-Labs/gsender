@@ -30,13 +30,11 @@ import {
     MODAL_PREFERENCES,
     MODAL_FIRMWARE,
     MODAL_SURFACING,
-    MODAL_ABOUT
 } from './constants';
 import Preferences from '../Preferences/Preferences';
 // import WizardModal from '../Wizard/WizardModal';
 import Firmware from '../Firmware/Firmware';
 import Surfacing from '../Surfacing';
-import About from '../About';
 
 class NavSidebar extends PureComponent {
     static propTypes = {
@@ -104,11 +102,6 @@ class NavSidebar extends PureComponent {
                     onClick={() => window.open('https://sienci.com/gsender-documentation/', '_blank')}
                 />
                 <NavSidebarLink
-                    icon="fas fa-info-circle"
-                    label="About"
-                    onClick={() => actions.openModal(MODAL_ABOUT)}
-                />
-                <NavSidebarLink
                     url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa fa-cog"
                     label=""
                 />
@@ -120,9 +113,6 @@ class NavSidebar extends PureComponent {
                 }
                 {
                     state.modal.name === MODAL_SURFACING && <Surfacing state={state} modalClose={actions.closeModal} />
-                }
-                {
-                    state.modal.name === MODAL_ABOUT && <About modalClose={actions.closeModal} />
                 }
             </div>
         );
