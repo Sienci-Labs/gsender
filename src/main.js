@@ -28,6 +28,7 @@ import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
 import path from 'path';
+import fs from 'fs';
 //import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
@@ -42,6 +43,8 @@ const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
     const gotSingleInstanceLock = app.requestSingleInstanceLock();
     const shouldQuitImmediately = !gotSingleInstanceLock;
+
+    let prevDirectory = '';
 
     if (shouldQuitImmediately) {
         app.quit();
@@ -146,6 +149,38 @@ const main = () => {
             ipcMain.on('load-recent-file', async (msg, recentFile) => {
                 const fileMetadata = await parseAndReturnGCode(recentFile);
                 window.webContents.send('loaded-recent-file', fileMetadata);
+            });
+            ipcMain.on('open-dialog', async () => {
+                let additionalOptions = {};
+                if (process.platform === 'win32' && prevDirectory) {
+                    additionalOptions.defaultPath = prevDirectory;
+                }
+
+                const file = await dialog.showOpenDialog(
+                    {
+                        ...additionalOptions,
+                        properties: ['openFile'],
+                        filters: [{ name: 'Custom File Type', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] }]
+                    },
+                );
+                const path = file.filePaths[0];
+                const pathArr = path.split('/');
+                const name = pathArr.pop();
+                const folderPath = pathArr.join('/');
+                prevDirectory = folderPath;
+
+                if (file.canceled) {
+                    return;
+                }
+
+                fs.readFile(path, 'utf8', (err, data) => {
+                    if (err) {
+                        return;
+                    }
+
+                    const { size } = fs.statSync(path);
+                    window.webContents.send('returned-dialog-data', { data, size, name, path: folderPath });
+                });
             });
         } catch (err) {
             await dialog.showMessageBox({
