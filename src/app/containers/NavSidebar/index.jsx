@@ -22,7 +22,6 @@
  */
 
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import NavSidebarLink from './NavSideBarLink';
 import styles from './index.styl';
 import {
@@ -32,15 +31,10 @@ import {
     MODAL_SURFACING,
 } from './constants';
 import Preferences from '../Preferences/Preferences';
-// import WizardModal from '../Wizard/WizardModal';
 import Firmware from '../Firmware/Firmware';
 import Surfacing from '../Surfacing';
 
 class NavSidebar extends PureComponent {
-    static propTypes = {
-        wizardDisabled: PropTypes.bool
-    };
-
     state = this.getInitialState();
 
     actions = {

@@ -79,8 +79,6 @@ const renderPage = () => {
             >
                 <Router>
                     <div>
-                        {/* <Route path="/login" component={Login} /> */}
-                        {/* <ProtectedRoute path="/" component={App} /> */}
                         <Route path="/" component={App} />
                     </div>
                 </Router>

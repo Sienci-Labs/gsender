@@ -1,28 +1,28 @@
 export const team = [
     {
-        id: 0,
-        name: 'Walid Kayhan',
-        title: 'Development',
+        id: 3,
+        name: 'Chris T.',
+        title: 'Project Lead',
     },
     {
         id: 1,
-        name: 'Kevin Glover-Netherton',
-        title: 'Development',
+        name: 'Kevin G.',
+        title: 'Dev Lead',
+    },
+    {
+        id: 0,
+        name: 'Walid K.',
+        title: 'Dev',
     },
     {
         id: 2,
-        name: 'Justin Wozniak',
-        title: 'Development',
-    },
-    {
-        id: 3,
-        name: 'Chris Thorogood',
-        title: 'Administration',
+        name: 'Justin W.',
+        title: 'Dev',
     },
     {
         id: 4,
-        name: 'Kelly Zhu',
-        title: 'Graphic Design',
+        name: 'Kelly Z.',
+        title: 'Icon Design',
         isLastInList: true
     },
 ];
