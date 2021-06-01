@@ -241,10 +241,13 @@ class VisualizerWidget extends PureComponent {
         },
         uploadFile: (gcode, meta) => {
             const { name, size } = { ...meta };
+            // Send toolchange context on file load
+            const hooks = store.get('workspace.toolChangeHooks', {});
             const context = {
-                option: store.get('workspace.toolChangeOption', ''),
-                macro: store.get('workspace.toolChangeMacro', {})
+                toolChangeOption: store.get('workspace.toolChangeOption', 'Ignore'),
+                ...hooks
             };
+            console.log(context);
 
             const { port, filename } = this.state;
 
