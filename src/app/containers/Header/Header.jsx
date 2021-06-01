@@ -198,7 +198,6 @@ class Header extends PureComponent {
         }
 
         return {
-            wizardDisabled: true,
             pushPermission: pushPermission,
             commands: [],
             runningTasks: [],
@@ -256,14 +255,6 @@ class Header extends PureComponent {
         });
     }
 
-    toggleWizardDisabled = () => {
-        this.setState({ wizardDisabled: false });
-    }
-
-    toggleWizardEnabled = () => {
-        this.setState({ wizardDisabled: true });
-    }
-
     toggleUpdateToast() {
         pubsub.publish('showUpdateToast');
     }
@@ -295,12 +286,9 @@ class Header extends PureComponent {
                         state={this.state}
                         actions={this.actions}
                         widgetId="connection"
-                        isWizardDisabled={this.state.wizardDisabled}
-                        disableWizardFunction={this.toggleWizardDisabled}
-                        enableWizardFunction={this.toggleWizardEnabled}
                     />
                 </div>
-                <NavSidebar wizardDisabled={this.state.wizardDisabled} />
+                <NavSidebar />
             </div>
         );
     }
