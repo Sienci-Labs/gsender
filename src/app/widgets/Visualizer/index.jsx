@@ -247,7 +247,6 @@ class VisualizerWidget extends PureComponent {
                 toolChangeOption: store.get('workspace.toolChangeOption', 'Ignore'),
                 ...hooks
             };
-            console.log(context);
 
             const { port, filename } = this.state;
 
