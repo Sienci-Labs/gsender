@@ -75,8 +75,12 @@ class WorkflowControl extends PureComponent {
     }
 
     handleClickUpload = (event) => {
-        this.fileInputEl.value = null;
-        this.fileInputEl.click();
+        if (isElectron()) {
+            window.ipcRenderer.send('open-dialog');
+        } else {
+            this.fileInputEl.value = null;
+            this.fileInputEl.click();
+        }
     };
 
     handleCloseFile = () => {
@@ -111,6 +115,25 @@ class WorkflowControl extends PureComponent {
             file: file,
             meta: meta
         });
+        this.setState({ fileLoaded: false });
+    };
+
+    handleElectronFileUpload = (file) => {
+        const { actions } = this.props;
+
+        console.log(file);
+
+        const meta = {
+            name: file.name,
+            size: file.size
+        };
+
+        if (isElectron()) {
+            const recentFile = createRecentFileFromRawPath(file.path, file.name);
+            addRecentFile(recentFile);
+        }
+
+        actions.uploadFile(file.data, meta);
         this.setState({ fileLoaded: false });
     };
 
@@ -193,6 +216,10 @@ class WorkflowControl extends PureComponent {
                 this.loadRecentFile(fileMetaData);
                 const recentFile = createRecentFile(fileMetaData);
                 addRecentFile(recentFile);
+            });
+            window.ipcRenderer.on('returned-dialog-data', (msg, file) => {
+                console.log(file);
+                this.handleElectronFileUpload(file);
             });
         }
         this.subscribe();
@@ -387,7 +414,6 @@ class WorkflowControl extends PureComponent {
                         </button>
                     )
                 }
-
 
                 <CameraDisplay
                     camera={camera}
