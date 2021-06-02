@@ -121,8 +121,6 @@ class WorkflowControl extends PureComponent {
     handleElectronFileUpload = (file) => {
         const { actions } = this.props;
 
-        console.log(file);
-
         const meta = {
             name: file.name,
             size: file.size
