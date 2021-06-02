@@ -237,6 +237,7 @@ class GrblController {
                     }
                     if (line === POSTHOOK_COMPLETE) {
                         log.debug('Finished Post-hook, resuming program');
+                        this.sender.unhold();
                         return '(Post-Hook complete)';
                     }
 
@@ -326,11 +327,6 @@ class GrblController {
                         return 'G4 P0.5'; // dwell
                     }
 
-                    /*if (line === TOOLCHANGE) {
-                        this.sender.hold({ data: TOOLCHANGE });
-                        return '';
-                    }*/
-
                     // Expression
                     // %_x=posx,_y=posy,_z=posz
                     evaluateAssignmentExpression(line.slice(1), context);
@@ -395,7 +391,7 @@ class GrblController {
                         });
                     } else if (toolChangeOption === 'Code') {
                         this.workflow.pause({ data: 'M6' });
-                        this.emit('toolchange:start')
+                        this.emit('toolchange:start');
                         this.runPreChangeHook();
                     }
 
@@ -1166,7 +1162,6 @@ class GrblController {
                     // Handle toolchange context on file load
                     this.toolChangeContext = context;
                 }
-                console.log(this.toolChangeContext);
                 // G4 P0 or P with a very small value will empty the planner queue and then
                 // respond with an ok when the dwell is complete. At that instant, there will
                 // be no queued motions, as long as no more commands were sent after the G4.
@@ -1378,14 +1373,11 @@ class GrblController {
                 const commands = [
                     // https://github.com/gnea/grbl/wiki/Grbl-v1.1-Laser-Mode
                     // The laser will only turn on when Grbl is in a G1, G2, or G3 motion mode.
-                    'G1F1',
-                    'M3',
-                    'S' + ensurePositiveNumber(maxS * (power / 100))
+                    'G1F1 M3 S' + ensurePositiveNumber(maxS * (power / 100))
                 ];
                 if (duration > 0) {
                     commands.push('G4P' + ensurePositiveNumber(duration / 1000));
-                    commands.push('M5');
-                    commands.push('S0');
+                    commands.push('M5 S0');
                 }
                 this.state.parserstate.modal.spindle = 'M3';
                 this.emit('controller:state', GRBL, this.state);
@@ -1550,6 +1542,9 @@ class GrblController {
             'toolchange:context': () => {
                 const [context] = args;
                 this.toolChangeContext = context;
+            },
+            'toolchange:post': () => {
+                this.runPostChangeHook();
             }
         }[cmd];
 

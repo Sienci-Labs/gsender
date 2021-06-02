@@ -114,7 +114,7 @@ class SpindleWidget extends PureComponent {
             const { spindleMax } = this.props;
             const laserPower = spindleMax * (power / 100);
 
-            controller.command('gcode', `M3 S${laserPower}`);
+            controller.command('gcode', `G1F1 M3 S${laserPower}`);
         },
         handleSpindleSpeedChange: (e) => {
             const value = Number(e.target.value);
@@ -144,11 +144,10 @@ class SpindleWidget extends PureComponent {
             });
         },
         runLaserTest: () => {
-            const { laser, spindleMax } = this.state;
+            const { laser } = this.state;
+            const { spindleMax } = this.props;
             const { power, duration } = laser;
-            this.setState({
-                active: true
-            });
+
             controller.command('lasertest:on', power, duration, spindleMax);
             setTimeout(() => {
                 this.setState({

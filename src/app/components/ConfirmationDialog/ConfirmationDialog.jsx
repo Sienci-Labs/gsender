@@ -37,6 +37,7 @@ const ConfirmationDialog = () => {
     const [onConfirm, setOnConfirm] = useState(null);
     const [confirmLabel, setConfirmLabel] = useState(null);
     const [cancelLabel, setCancelLabel] = useState(null);
+    console.log(buttons);
 
     let hideModal = !show;
 
@@ -80,9 +81,6 @@ const ConfirmationDialog = () => {
                     >
                         { cancelLabel }
                     </ConfirmationDialogButton>
-                    {
-                        buttons.length > 0 && true
-                    }
                     <ConfirmationDialogButton
                         onClick={() => {
                             if (onConfirm !== null) {
