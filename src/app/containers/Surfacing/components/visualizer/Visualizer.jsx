@@ -386,10 +386,15 @@ class Visualizer extends Component {
         const { objects, units } = this.props.state;
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
+        const impLineNumbers = this.group.getObjectByName('ImperialGridLineNumbers');
+        const metLineNumbers = this.group.getObjectByName('MetricGridLineNumbers');
 
         this.group.remove(impGroup);
         this.group.remove(metGroup);
-        {
+        this.group.remove(impLineNumbers);
+        this.group.remove(metLineNumbers);
+
+        { // Imperial Grid Line Numbers
             const visible = objects.coordinateSystem.visible;
             const imperialCoordinateSystem = this.createCoordinateSystem(IMPERIAL_UNITS);
             imperialCoordinateSystem.name = 'ImperialCoordinateSystem';
@@ -403,6 +408,22 @@ class Visualizer extends Component {
             metricCoordinateSystem.name = 'MetricCoordinateSystem';
             metricCoordinateSystem.visible = visible && (units === METRIC_UNITS);
             this.group.add(metricCoordinateSystem);
+        }
+
+        { // Imperial Grid Line Numbers
+            const visible = objects.gridLineNumbers.visible;
+            const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
+            imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
+            imperialGridLineNumbers.visible = visible && (units === IMPERIAL_UNITS);
+            this.group.add(imperialGridLineNumbers);
+        }
+
+        { // Metric Grid Line Numbers
+            const visible = objects.gridLineNumbers.visible;
+            const metricGridLineNumbers = this.createGridLineNumbers(METRIC_UNITS);
+            metricGridLineNumbers.name = 'MetricGridLineNumbers';
+            metricGridLineNumbers.visible = visible && (units === METRIC_UNITS);
+            this.group.add(metricGridLineNumbers);
         }
     }
 
