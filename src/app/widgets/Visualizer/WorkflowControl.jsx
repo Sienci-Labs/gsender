@@ -214,7 +214,6 @@ class WorkflowControl extends PureComponent {
                 addRecentFile(recentFile);
             });
             window.ipcRenderer.on('returned-upload-dialog-data', (msg, file) => {
-                console.log(file);
                 this.handleElectronFileUpload(file);
             });
         }
