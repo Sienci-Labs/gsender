@@ -105,6 +105,9 @@ const Surfacing = ({ modalClose }) => {
      * Main function to generate gcode
      */
     const handleGenerate = () => {
+        visualizerRef.current.visualizer.unload();
+        visualizerRef.current.visualizer.redrawGrids();
+
         const { skimDepth, maxDepth, feedrate, spindleRPM } = surfacing;
 
         let wcs = controller.state?.parserstate?.modal?.wcs || 'G54';
