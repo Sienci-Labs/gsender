@@ -154,9 +154,10 @@ const main = () => {
                 const fileMetadata = await parseAndReturnGCode(recentFile);
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
-            ipcMain.on('open-dialog', async () => {
+            ipcMain.on('open-upload-dialog', async () => {
                 let additionalOptions = {};
-                if (process.platform === 'win32' && prevDirectory) {
+
+                if (prevDirectory) {
                     additionalOptions.defaultPath = prevDirectory;
                 }
 
@@ -167,23 +168,28 @@ const main = () => {
                         filters: [{ name: 'Custom File Type', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] }]
                     },
                 );
-                const path = file.filePaths[0];
-                const pathArr = path.split('/');
-                const name = pathArr.pop();
-                const folderPath = pathArr.join('/');
-                prevDirectory = folderPath;
+
+                const FULL_FILE_PATH = file.filePaths[0];
+
+                const getFileInformation = (file) => {
+                    const { base, dir } = path.parse(file);
+                    return [dir, base];
+                };
 
                 if (file.canceled) {
                     return;
                 }
 
-                fs.readFile(path, 'utf8', (err, data) => {
+                const [filePath, fileName] = getFileInformation(FULL_FILE_PATH);
+
+                fs.readFile(FULL_FILE_PATH, 'utf8', (err, data) => {
                     if (err) {
                         return;
                     }
 
-                    const { size } = fs.statSync(path);
-                    window.webContents.send('returned-dialog-data', { data, size, name, path: folderPath });
+                    prevDirectory = filePath; //Set the previous directory for later use
+                    const { size } = fs.statSync(filePath);
+                    window.webContents.send('returned-upload-dialog-data', { data, size, name: fileName, path: FULL_FILE_PATH });
                 });
             });
         } catch (err) {
