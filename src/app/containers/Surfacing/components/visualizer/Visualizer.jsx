@@ -180,7 +180,7 @@ class Visualizer extends Component {
 
         const { gcode } = this.props;
         if (gcode) {
-            // console.log(gcode);
+            this.redrawGrids();
             this.load('gSender_Surfacing', gcode);
         }
     }
@@ -587,8 +587,17 @@ class Visualizer extends Component {
     }
 
     createCoordinateSystem(units) {
-        const axisLength = (units === IMPERIAL_UNITS) ? IMPERIAL_AXIS_LENGTH : METRIC_AXIS_LENGTH;
-        const gridCount = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_COUNT : METRIC_GRID_COUNT;
+        const { length, width } = this.props.surfacingData;
+
+        const inchesMax = Math.max(width, length) + (IMPERIAL_GRID_SPACING * 10);
+        const mmMax = Math.max(width, length) + (METRIC_GRID_SPACING * 10);
+
+        const imperialGridCount = inchesMax / 3;
+        const metricGridCount = mmMax / 9;
+
+        const axisLength = (units === IMPERIAL_UNITS) ? inchesMax : mmMax;
+        const height = (units === IMPERIAL_UNITS) ? 8 : 100;
+        const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const group = new THREE.Group();
 
@@ -614,7 +623,7 @@ class Visualizer extends Component {
         }
 
         { // Coordinate Axes
-            const coordinateAxes = new CoordinateAxes(axisLength);
+            const coordinateAxes = new CoordinateAxes(axisLength, height);
             coordinateAxes.name = 'CoordinateAxes';
             group.add(coordinateAxes);
         }
@@ -639,7 +648,7 @@ class Visualizer extends Component {
             const axisZLabel = new TextSprite({
                 x: 0,
                 y: 0,
-                z: axisLength + 10,
+                z: height + 10,
                 size: 20,
                 text: 'Z',
                 color: zAxisColor
@@ -654,7 +663,16 @@ class Visualizer extends Component {
     }
 
     createGridLineNumbers(units) {
-        const gridCount = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_COUNT : METRIC_GRID_COUNT;
+        const { length, width } = this.props.surfacingData;
+
+        const inchesMax = Math.max(length, width) + (IMPERIAL_GRID_SPACING * 10);
+        const mmMax = Math.max(length, width) + (METRIC_GRID_SPACING * 10);
+
+        const imperialGridCount = Math.round(inchesMax / 3);
+        const metricGridCount = Math.round(mmMax / 9);
+
+        const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
+
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const textSize = (units === IMPERIAL_UNITS) ? (25.4 / 3) : (10 / 3);
         const textOffset = (units === IMPERIAL_UNITS) ? (25.4 / 5) : (10 / 5);
