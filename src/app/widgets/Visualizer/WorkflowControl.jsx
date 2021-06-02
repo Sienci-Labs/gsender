@@ -77,7 +77,7 @@ class WorkflowControl extends PureComponent {
 
     handleClickUpload = (event) => {
         if (isElectron()) {
-            window.ipcRenderer.send('open-dialog');
+            window.ipcRenderer.send('open-upload-dialog');
         } else {
             this.fileInputEl.value = null;
             this.fileInputEl.click();
@@ -213,7 +213,7 @@ class WorkflowControl extends PureComponent {
                 const recentFile = createRecentFile(fileMetaData);
                 addRecentFile(recentFile);
             });
-            window.ipcRenderer.on('returned-dialog-data', (msg, file) => {
+            window.ipcRenderer.on('returned-upload-dialog-data', (msg, file) => {
                 console.log(file);
                 this.handleElectronFileUpload(file);
             });
