@@ -71,6 +71,9 @@ const CAMERA_DISTANCE = 400; // Move the camera out a bit from the origin (0, 0,
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 
+const METRIC_GRID_DIVISOR = 9;
+const IMPERIAL_GRID_DIVISOR = 7;
+
 class Visualizer extends Component {
     static propTypes = {
         show: PropTypes.bool,
@@ -591,8 +594,8 @@ class Visualizer extends Component {
         const inchesMax = Math.max(width, length) + (IMPERIAL_GRID_SPACING * 10);
         const mmMax = Math.max(width, length) + (METRIC_GRID_SPACING * 10);
 
-        const imperialGridCount = inchesMax / 3;
-        const metricGridCount = mmMax / 9;
+        const imperialGridCount = inchesMax / IMPERIAL_GRID_DIVISOR;
+        const metricGridCount = mmMax / METRIC_GRID_DIVISOR;
 
         const axisLength = (units === IMPERIAL_UNITS) ? inchesMax : mmMax;
         const height = (units === IMPERIAL_UNITS) ? 8 : 100;
@@ -667,8 +670,8 @@ class Visualizer extends Component {
         const inchesMax = Math.max(length, width) + (IMPERIAL_GRID_SPACING * 10);
         const mmMax = Math.max(length, width) + (METRIC_GRID_SPACING * 10);
 
-        const imperialGridCount = Math.round(inchesMax / 3);
-        const metricGridCount = Math.round(mmMax / 9);
+        const imperialGridCount = Math.round(inchesMax / IMPERIAL_GRID_DIVISOR);
+        const metricGridCount = Math.round(mmMax / METRIC_GRID_DIVISOR);
 
         const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
 
