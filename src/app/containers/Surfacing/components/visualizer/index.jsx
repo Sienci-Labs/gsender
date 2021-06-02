@@ -128,8 +128,6 @@ class SurfacingVisualizer extends PureComponent {
         uploadFile: (gcode, meta) => {
             const { name, size } = { ...meta };
 
-            console.log(this);
-
             this.setState((state) => ({
                 gcode: {
                     ...state.gcode,
@@ -692,7 +690,7 @@ class SurfacingVisualizer extends PureComponent {
         };
         const showVisualizer = capable.view3D && !showLoader;
         const { currentTab } = state;
-        const { gcode } = this.props;
+        const { gcode, surfacingData } = this.props;
 
         const tabs = [
             {
@@ -708,6 +706,7 @@ class SurfacingVisualizer extends PureComponent {
                     state={state}
                     actions={actions}
                     gcode={gcode}
+                    surfacingData={surfacingData}
                 />
             },
             {
