@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
-
+import _ from 'lodash';
 import store from 'app/store';
 import Modal from 'app/components/Modal';
 import { METRIC_UNITS } from 'app/constants';
@@ -316,6 +316,7 @@ const Surfacing = ({ modalClose }) => {
     };
 
     const canLoad = !!gcode; //For accessing the gcode line viewer
+    const genereateThrottle = _.throttle(handleGenerate, 3000, { trailing: false }); //Prevent generate gcode spamming
 
     return (
         <Modal onClose={modalClose} size="lg" disableOverlay>
@@ -338,12 +339,13 @@ const Surfacing = ({ modalClose }) => {
                         widgetId="visualizer"
                         ref={visualizerRef}
                         gcode={gcode}
+                        surfacingData={surfacing}
                     />
                 </div>
 
                 <ActionArea
                     handleCancel={modalClose}
-                    handleGenerateGcode={handleGenerate}
+                    handleGenerateGcode={genereateThrottle}
                     handleLoadGcode={loadGcode}
                     surfacing={surfacing}
                     canLoad={canLoad}
