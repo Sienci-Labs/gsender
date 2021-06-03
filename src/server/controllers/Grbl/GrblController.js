@@ -65,7 +65,8 @@ import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfi
 
 // % commands
 const WAIT = '%wait';
-const TOOLCHANGE = '%toolchange';
+const PREHOOK_COMPLETE = '%pre_complete';
+const POSTHOOK_COMPLETE = '%post_complete';
 
 const log = logger('controller:Grbl');
 const noop = _.noop;
@@ -229,9 +230,15 @@ class GrblController {
                         log.debug('Wait for the planner to empty');
                         return 'G4 P0.5'; // dwell
                     }
-                    if (line === TOOLCHANGE) {
-                        log.debug('Pause for tool change');
-                        return '';
+                    if (line === PREHOOK_COMPLETE) {
+                        log.debug('Finished Pre-hook');
+                        this.emit('toolchange:preHookComplete');
+                        return '(Pre-Hook complete)';
+                    }
+                    if (line === POSTHOOK_COMPLETE) {
+                        log.debug('Finished Post-hook, resuming program');
+                        this.workflow.resume();
+                        return '(Post-Hook complete)';
                     }
 
                     // Expression
@@ -243,8 +250,8 @@ class GrblController {
                 // line="G0 X[posx - 8] Y[ymax]"
                 // > "G0 X2 Y50"
                 line = translateExpression(line, context);
-                // const data = parser.parseLine(line, { flatten: true });
-                // const words = ensureArray(data.words);
+                const data = parser.parseLine(line, { flatten: true });
+                const words = ensureArray(data.words);
 
                 // { // Program Mode: M0, M1
                 //     const programMode = _.intersection(words, ['M0', 'M1'])[0];
@@ -256,6 +263,12 @@ class GrblController {
                 //         this.feeder.hold({ data: 'M1' }); // Hold reason
                 //     }
                 // }
+
+                // More aggressive updating of spindle modals for safety
+                const spindleCommand = _.intersection(words, ['M3', 'M4'])[0];
+                if (spindleCommand) {
+                    this.updateSpindleModal(spindleCommand);
+                }
 
                 // // M6 Tool Change
                 // if (_.includes(words, 'M6')) {
@@ -320,11 +333,6 @@ class GrblController {
                         return 'G4 P0.5'; // dwell
                     }
 
-                    if (line === TOOLCHANGE) {
-                        this.sender.hold({ data: TOOLCHANGE });
-                        return '';
-                    }
-
                     // Expression
                     // %_x=posx,_y=posy,_z=posz
                     evaluateAssignmentExpression(line.slice(1), context);
@@ -373,29 +381,30 @@ class GrblController {
                     line = line.replace('G28', '(G28)');
                 }
 
+                // More aggressive updating of spindle modals for safety
+                const spindleCommand = _.intersection(words, ['M3', 'M4'])[0];
+                if (spindleCommand) {
+                    this.updateSpindleModal(spindleCommand);
+                }
+
                 /* Emit event to UI for toolchange handler */
                 if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
 
-                    const senderContext = this.sender.getContext();
-                    const { option, macro } = senderContext;
+                    const { toolChangeOption } = this.toolChangeContext;
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
-                    if (option === 'Pause') {
+                    if (toolChangeOption === 'Pause') {
                         this.workflow.pause({ data: 'M6' });
                         this.emit('gcode:toolChange', {
                             line: sent + 1,
                             block: line,
-                            option: option
+                            option: toolChangeOption
                         });
-                    } else if (option === 'Macro') {
+                    } else if (toolChangeOption === 'Code') {
                         this.workflow.pause({ data: 'M6' });
-                        this.emit('gcode:toolChange', {
-                            line: sent + 1,
-                            block: line,
-                            option: option
-                        });
-                        this.command('macro:run', macro.value);
+                        this.emit('toolchange:start');
+                        this.runPreChangeHook();
                     }
 
                     line = line.replace('M6', '(M6)');
@@ -1161,8 +1170,10 @@ class GrblController {
                 if (typeof context === 'function') {
                     callback = context;
                     context = {};
+                } else {
+                    // Handle toolchange context on file load
+                    this.toolChangeContext = context;
                 }
-
                 // G4 P0 or P with a very small value will empty the planner queue and then
                 // respond with an ok when the dwell is complete. At that instant, there will
                 // be no queued motions, as long as no more commands were sent after the G4.
@@ -1374,14 +1385,11 @@ class GrblController {
                 const commands = [
                     // https://github.com/gnea/grbl/wiki/Grbl-v1.1-Laser-Mode
                     // The laser will only turn on when Grbl is in a G1, G2, or G3 motion mode.
-                    'G1F1',
-                    'M3',
-                    'S' + ensurePositiveNumber(maxS * (power / 100))
+                    'G1F1 M3 S' + ensurePositiveNumber(maxS * (power / 100))
                 ];
                 if (duration > 0) {
                     commands.push('G4P' + ensurePositiveNumber(duration / 1000));
-                    commands.push('M5');
-                    commands.push('S0');
+                    commands.push('M5 S0');
                 }
                 this.state.parserstate.modal.spindle = 'M3';
                 this.emit('controller:state', GRBL, this.state);
@@ -1546,6 +1554,14 @@ class GrblController {
             'toolchange:context': () => {
                 const [context] = args;
                 this.toolChangeContext = context;
+            },
+            'toolchange:pre': () => {
+                log.debug('Starting pre hook');
+                this.runPreChangeHook();
+            },
+            'toolchange:post': () => {
+                log.debug('starting post hook');
+                this.runPostChangeHook();
             }
         }[cmd];
 
@@ -1582,6 +1598,38 @@ class GrblController {
         } else {
             this.write(data + '\n', context);
         }
+    }
+
+    convertGcodeToArray(gcode) {
+        const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
+        //Clean up lines and remove ones that are comments and headers
+        const lines = gcode
+            .split('\n')
+            .filter(line => (line.trim().length > 0))
+            .filter(line => !comments.some(comment => line.includes(comment)));
+        return lines;
+    }
+
+    updateSpindleModal(modal) {
+        this.state.parserstate.modal.spindle = modal;
+        this.emit('controller:state', GRBL, this.state);
+    }
+
+    /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
+    runPreChangeHook() {
+        const { preHook } = this.toolChangeContext || '';
+        const block = this.convertGcodeToArray(preHook);
+        block.push(PREHOOK_COMPLETE);
+
+        this.command('gcode', block);
+    }
+
+    runPostChangeHook() {
+        const { postHook } = this.toolChangeContext || '';
+        const block = this.convertGcodeToArray(postHook);
+        block.push(POSTHOOK_COMPLETE);
+
+        this.command('gcode', block);
     }
 }
 

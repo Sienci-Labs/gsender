@@ -26,6 +26,7 @@ import controller from 'app/lib/controller';
 import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 export function* initialize() {
     controller.addListener('controller:settings', (type, settings) => {
@@ -91,6 +92,19 @@ export function* initialize() {
     controller.addListener('gcode:unload', () => {
         // TODO:  Move file info to redux so we can dispatch action rather than pubsub
         pubsub.publish('gcode:unload');
+    });
+
+    controller.addListener('toolchange:start', () => {
+        const onConfirmhandler = () => {
+            controller.command('toolchange:post');
+        };
+
+        Confirm({
+            title: 'Confirm Toolchange',
+            content: 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.',
+            confirmLabel: 'Confirm toolchange',
+            onConfirm: onConfirmhandler
+        });
     });
 
     yield null;
