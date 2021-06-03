@@ -62,8 +62,19 @@ export default class Keybindings extends Component {
     }
 
     handleEdit = (currentShortcut) => {
-        // this.setState({ currentPage: 'Edit', currentShortcut });
         this.setState({ showEditModal: true, currentShortcut });
+    }
+
+    handleDelete = (shortcut) => {
+        const { keybindingsList } = this.state;
+
+        shortcut.keys = '';
+
+        const updatedKeybindingsList = keybindingsList.map(keybinding => (keybinding.id === shortcut.id ? shortcut : keybinding));
+
+        this.updateKeybindings(updatedKeybindingsList, false);
+
+        this.showToast('Shortcut Cleared');
     }
 
     /**
@@ -144,7 +155,7 @@ export default class Keybindings extends Component {
     }
 
     render() {
-        const { handleEdit, editKeybinding, closeModal, enableAllKeybindings, disableAllKeybindings, toggleKeybinding } = this;
+        const { handleEdit, handleDelete, editKeybinding, closeModal, enableAllKeybindings, disableAllKeybindings, toggleKeybinding } = this;
         const { active } = this.props;
         const { currentShortcut, keybindingsList, showEditModal } = this.state;
 
@@ -162,7 +173,12 @@ export default class Keybindings extends Component {
                 <h3 className={styles['settings-title']}>Keybindings</h3>
 
                 <div className={styles['table-wrapper']}>
-                    <Table data={keybindingsList} onEdit={handleEdit} onShortcutToggle={toggleKeybinding} />
+                    <Table
+                        data={keybindingsList}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        onShortcutToggle={toggleKeybinding}
+                    />
                 </div>
 
                 <div style={{ display: 'grid', columnGap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
