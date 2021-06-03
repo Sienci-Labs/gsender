@@ -72,7 +72,7 @@ const ConfirmationDialog = () => {
                 <div className={styles.confirmationDialogButtons}>
                     <ConfirmationDialogButton
                         onClick={() => {
-                            if (onConfirm !== null) {
+                            if (onClose !== null) {
                                 onClose();
                             }
                             return setShow(false);
