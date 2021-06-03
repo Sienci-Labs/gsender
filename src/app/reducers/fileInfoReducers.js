@@ -21,22 +21,34 @@
  *
  */
 import { createReducer } from 'redux-action';
-import { UNLOAD_FILE_INFO, PROCESS_FILE_INFO } from 'app/actions/fileInfoActions';
+import { UNLOAD_FILE_INFO, UPDATE_FILE_INFO } from 'app/actions/fileInfoActions';
 
 const initialState = {
     fileLoaded: false,
     name: null,
+    content: '',
     size: 0,
     total: 0,
-    toolSet: null,
-    spindleSet: null,
-    movementSet: null,
-    invalidGcode: null,
+    toolSet: [],
+    spindleSet: [],
+    movementSet: [],
+    invalidGcode: [],
     estimatedTime: 0,
     bbox: {
         min: { x: 0, y: 0, z: 0 },
         max: { x: 0, y: 0, z: 0 },
     },
+};
+
+const normalizeBBox = (bbox) => {
+    const defaultBBox = {
+        min: { x: 0, y: 0, z: 0 },
+        max: { x: 0, y: 0, z: 0 },
+    };
+    return {
+        ...defaultBBox,
+        ...bbox
+    };
 };
 
 const reducer = createReducer(initialState, {
@@ -45,9 +57,11 @@ const reducer = createReducer(initialState, {
             ...initialState
         };
     },
-    [PROCESS_FILE_INFO]: (payload, reducerState) => {
+    [UPDATE_FILE_INFO]: (payload, reducerState) => {
         return {
-            ...payload
+            ...payload,
+            fileLoaded: true,
+            bbox: normalizeBBox(payload.bbox)
         };
     }
 });

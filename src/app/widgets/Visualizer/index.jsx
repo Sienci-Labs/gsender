@@ -31,9 +31,11 @@ import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
 import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
+import reduxStore from 'app/store/redux';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import ToggleSwitch from 'app/components/ToggleSwitch';
+import { UPDATE_FILE_INFO } from 'app/actions/fileInfoActions';
 import Anchor from 'app/components/Anchor';
 import { Button } from 'app/components/Buttons';
 import ModalTemplate from 'app/components/ModalTemplate';
@@ -56,6 +58,7 @@ import Visualizer from './Visualizer';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
+
 import {
     // Units
     METRIC_UNITS,
@@ -93,6 +96,7 @@ import {
     DARK_THEME_VALUES
 } from './constants';
 import styles from './index.styl';
+
 
 const translateExpression = (function() {
     const { Parser } = ExpressionEvaluator;
@@ -848,6 +852,10 @@ class VisualizerWidget extends PureComponent {
         this.setState({ total });
 
         // Emit events on response with relevant data from processor worker
+        reduxStore.dispatch({
+            type: UPDATE_FILE_INFO,
+            payload: data
+        });
         pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
         pubsub.publish('gcode:bbox', bbox);
     }

@@ -27,13 +27,10 @@ import { createAction } from 'redux-action';
 export const {
     UPDATE_FILE_INFO,
     UNLOAD_FILE_INFO,
-    PROCESS_FILE_INFO
 } = constants('File', [
     'UPDATE_FILE_INFO',
     'UNLOAD_FILE_INFO',
-    'PROCESS_FILE_INFO'
 ]);
 
 export const updateFileInfo = createAction(UPDATE_FILE_INFO);
 export const unloadFileInfo = createAction(UNLOAD_FILE_INFO);
-export const processFileInfo = createAction(PROCESS_FILE_INFO);
