@@ -26,7 +26,6 @@ import { UNLOAD_FILE_INFO, UPDATE_FILE_INFO } from 'app/actions/fileInfoActions'
 const initialState = {
     fileLoaded: false,
     name: null,
-    content: '',
     size: 0,
     total: 0,
     toolSet: [],
@@ -38,6 +37,7 @@ const initialState = {
         min: { x: 0, y: 0, z: 0 },
         max: { x: 0, y: 0, z: 0 },
     },
+    content: '',
 };
 
 const normalizeBBox = (bbox) => {
