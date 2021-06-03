@@ -59,12 +59,8 @@ import {
 } from './constants';
 import styles from './index.styl';
 
-const IMPERIAL_GRID_COUNT = 32; // 32 in
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
-const IMPERIAL_AXIS_LENGTH = IMPERIAL_GRID_SPACING * 12; // 12 in
-const METRIC_GRID_COUNT = 60; // 60 cm
 const METRIC_GRID_SPACING = 10; // 10 mm
-const METRIC_AXIS_LENGTH = METRIC_GRID_SPACING * 30; // 300 mm
 const CAMERA_VIEWPORT_WIDTH = 300; // 300 mm
 const CAMERA_VIEWPORT_HEIGHT = 300; // 300 mm
 const PERSPECTIVE_FOV = 70;
@@ -147,9 +143,15 @@ class Visualizer extends Component {
         this.limits.name = 'Limits';
         this.limits.visible = state.objects.limits.visible;
 
+        this.unload();
+
+        this.updateCuttingToolPosition();
+        this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
 
         this.updateScene();
+        this.redrawGrids();
+        this.rerenderGCode();
     };
 
     hasVisualization() {
@@ -439,10 +441,15 @@ class Visualizer extends Component {
         const { objects, units } = this.props.state;
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
+        const impLineNumbers = this.group.getObjectByName('ImperialGridLineNumbers');
+        const metLineNumbers = this.group.getObjectByName('MetricGridLineNumbers');
 
         this.group.remove(impGroup);
         this.group.remove(metGroup);
-        {
+        this.group.remove(impLineNumbers);
+        this.group.remove(metLineNumbers);
+
+        { // Imperial Coordinate System
             const visible = objects.coordinateSystem.visible;
             const imperialCoordinateSystem = this.createCoordinateSystem(IMPERIAL_UNITS);
             imperialCoordinateSystem.name = 'ImperialCoordinateSystem';
@@ -456,6 +463,22 @@ class Visualizer extends Component {
             metricCoordinateSystem.name = 'MetricCoordinateSystem';
             metricCoordinateSystem.visible = visible && (units === METRIC_UNITS);
             this.group.add(metricCoordinateSystem);
+        }
+
+        { // Imperial Grid Line Numbers
+            const visible = objects.gridLineNumbers.visible;
+            const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
+            imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
+            imperialGridLineNumbers.visible = visible && (units === IMPERIAL_UNITS);
+            this.group.add(imperialGridLineNumbers);
+        }
+
+        { // Metric Grid Line Numbers
+            const visible = objects.gridLineNumbers.visible;
+            const metricGridLineNumbers = this.createGridLineNumbers(METRIC_UNITS);
+            metricGridLineNumbers.name = 'MetricGridLineNumbers';
+            metricGridLineNumbers.visible = visible && (units === METRIC_UNITS);
+            this.group.add(metricGridLineNumbers);
         }
     }
 
@@ -619,8 +642,17 @@ class Visualizer extends Component {
     }
 
     createCoordinateSystem(units) {
-        const axisLength = (units === IMPERIAL_UNITS) ? IMPERIAL_AXIS_LENGTH : METRIC_AXIS_LENGTH;
-        const gridCount = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_COUNT : METRIC_GRID_COUNT;
+        const { mm, in: inches } = this.machineProfile;
+
+        const inchesMax = Math.max(inches.width, inches.depth) + (IMPERIAL_GRID_SPACING * 10);
+        const mmMax = Math.max(mm.width, mm.depth) + (METRIC_GRID_SPACING * 10);
+
+        const imperialGridCount = inchesMax / 3;
+        const metricGridCount = mmMax / 9;
+
+        const axisLength = (units === IMPERIAL_UNITS) ? inchesMax : mmMax;
+        const height = (units === IMPERIAL_UNITS) ? inches.height : mm.height;
+        const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const group = new THREE.Group();
 
@@ -646,7 +678,7 @@ class Visualizer extends Component {
         }
 
         { // Coordinate JogControl
-            const coordinateAxes = new CoordinateAxes(axisLength);
+            const coordinateAxes = new CoordinateAxes(axisLength, height);
             coordinateAxes.name = 'CoordinateAxes';
             group.add(coordinateAxes);
         }
@@ -671,7 +703,7 @@ class Visualizer extends Component {
             const axisZLabel = new TextSprite({
                 x: 0,
                 y: 0,
-                z: axisLength + 10,
+                z: height + 10,
                 size: 20,
                 text: 'Z',
                 color: zAxisColor
@@ -686,7 +718,16 @@ class Visualizer extends Component {
     }
 
     createGridLineNumbers(units) {
-        const gridCount = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_COUNT : METRIC_GRID_COUNT;
+        const { mm, in: inches } = this.machineProfile;
+
+        const inchesMax = Math.max(inches.width, inches.depth) + (IMPERIAL_GRID_SPACING * 10);
+        const mmMax = Math.max(mm.width, mm.depth) + (METRIC_GRID_SPACING * 10);
+
+        const imperialGridCount = Math.round(inchesMax / 3);
+        const metricGridCount = Math.round(mmMax / 9);
+
+        const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
+
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const textSize = (units === IMPERIAL_UNITS) ? (25.4 / 3) : (10 / 3);
         const textOffset = (units === IMPERIAL_UNITS) ? (25.4 / 5) : (10 / 5);

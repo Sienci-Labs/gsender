@@ -57,12 +57,8 @@ import {
 } from './constants';
 import styles from './index.styl';
 
-const IMPERIAL_GRID_COUNT = 32; // 32 in
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
-const IMPERIAL_AXIS_LENGTH = IMPERIAL_GRID_SPACING * 12; // 12 in
-const METRIC_GRID_COUNT = 60; // 60 cm
 const METRIC_GRID_SPACING = 10; // 10 mm
-const METRIC_AXIS_LENGTH = METRIC_GRID_SPACING * 30; // 300 mm
 const CAMERA_VIEWPORT_WIDTH = 300; // 300 mm
 const CAMERA_VIEWPORT_HEIGHT = 300; // 300 mm
 const PERSPECTIVE_FOV = 15;
@@ -75,11 +71,17 @@ const CAMERA_DISTANCE = 400; // Move the camera out a bit from the origin (0, 0,
 const TRACKBALL_CONTROLS_MIN_DISTANCE = 1;
 const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 
+const METRIC_GRID_DIVISOR = 9;
+const IMPERIAL_GRID_DIVISOR = 7;
+
 class Visualizer extends Component {
     static propTypes = {
         show: PropTypes.bool,
         cameraPosition: PropTypes.oneOf(['top', '3d', 'front', 'left', 'right']),
-        state: PropTypes.object
+        state: PropTypes.object,
+        actions: PropTypes.object,
+        gcode: PropTypes.string,
+        surfacingData: PropTypes.object,
     };
 
     pubsubTokens = [];
@@ -180,7 +182,7 @@ class Visualizer extends Component {
 
         const { gcode } = this.props;
         if (gcode) {
-            // console.log(gcode);
+            this.redrawGrids();
             this.load('gSender_Surfacing', gcode);
         }
     }
@@ -386,10 +388,15 @@ class Visualizer extends Component {
         const { objects, units } = this.props.state;
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
+        const impLineNumbers = this.group.getObjectByName('ImperialGridLineNumbers');
+        const metLineNumbers = this.group.getObjectByName('MetricGridLineNumbers');
 
         this.group.remove(impGroup);
         this.group.remove(metGroup);
-        {
+        this.group.remove(impLineNumbers);
+        this.group.remove(metLineNumbers);
+
+        { // Imperial Grid Line Numbers
             const visible = objects.coordinateSystem.visible;
             const imperialCoordinateSystem = this.createCoordinateSystem(IMPERIAL_UNITS);
             imperialCoordinateSystem.name = 'ImperialCoordinateSystem';
@@ -403,6 +410,22 @@ class Visualizer extends Component {
             metricCoordinateSystem.name = 'MetricCoordinateSystem';
             metricCoordinateSystem.visible = visible && (units === METRIC_UNITS);
             this.group.add(metricCoordinateSystem);
+        }
+
+        { // Imperial Grid Line Numbers
+            const visible = objects.gridLineNumbers.visible;
+            const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
+            imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
+            imperialGridLineNumbers.visible = visible && (units === IMPERIAL_UNITS);
+            this.group.add(imperialGridLineNumbers);
+        }
+
+        { // Metric Grid Line Numbers
+            const visible = objects.gridLineNumbers.visible;
+            const metricGridLineNumbers = this.createGridLineNumbers(METRIC_UNITS);
+            metricGridLineNumbers.name = 'MetricGridLineNumbers';
+            metricGridLineNumbers.visible = visible && (units === METRIC_UNITS);
+            this.group.add(metricGridLineNumbers);
         }
     }
 
@@ -566,8 +589,17 @@ class Visualizer extends Component {
     }
 
     createCoordinateSystem(units) {
-        const axisLength = (units === IMPERIAL_UNITS) ? IMPERIAL_AXIS_LENGTH : METRIC_AXIS_LENGTH;
-        const gridCount = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_COUNT : METRIC_GRID_COUNT;
+        const { length, width } = this.props.surfacingData;
+
+        const inchesMax = Math.max(width, length) + (IMPERIAL_GRID_SPACING * 10);
+        const mmMax = Math.max(width, length) + (METRIC_GRID_SPACING * 10);
+
+        const imperialGridCount = inchesMax / IMPERIAL_GRID_DIVISOR;
+        const metricGridCount = mmMax / METRIC_GRID_DIVISOR;
+
+        const axisLength = (units === IMPERIAL_UNITS) ? inchesMax : mmMax;
+        const height = (units === IMPERIAL_UNITS) ? 8 : 100;
+        const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const group = new THREE.Group();
 
@@ -593,7 +625,7 @@ class Visualizer extends Component {
         }
 
         { // Coordinate Axes
-            const coordinateAxes = new CoordinateAxes(axisLength);
+            const coordinateAxes = new CoordinateAxes(axisLength, height);
             coordinateAxes.name = 'CoordinateAxes';
             group.add(coordinateAxes);
         }
@@ -618,7 +650,7 @@ class Visualizer extends Component {
             const axisZLabel = new TextSprite({
                 x: 0,
                 y: 0,
-                z: axisLength + 10,
+                z: height + 10,
                 size: 20,
                 text: 'Z',
                 color: zAxisColor
@@ -633,7 +665,16 @@ class Visualizer extends Component {
     }
 
     createGridLineNumbers(units) {
-        const gridCount = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_COUNT : METRIC_GRID_COUNT;
+        const { length, width } = this.props.surfacingData;
+
+        const inchesMax = Math.max(length, width) + (IMPERIAL_GRID_SPACING * 10);
+        const mmMax = Math.max(length, width) + (METRIC_GRID_SPACING * 10);
+
+        const imperialGridCount = Math.round(inchesMax / IMPERIAL_GRID_DIVISOR);
+        const metricGridCount = Math.round(mmMax / METRIC_GRID_DIVISOR);
+
+        const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
+
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const textSize = (units === IMPERIAL_UNITS) ? (25.4 / 3) : (10 / 3);
         const textOffset = (units === IMPERIAL_UNITS) ? (25.4 / 5) : (10 / 5);
