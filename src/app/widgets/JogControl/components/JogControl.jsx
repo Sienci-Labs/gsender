@@ -46,7 +46,17 @@ class JogControl extends PureComponent {
 
     timeoutFunction = null;
 
+    notLeftClick = (e) => {
+        if (e.button !== 0) {
+            return true;
+        }
+        return false;
+    }
+
     onMouseUp(e) {
+        if (this.notLeftClick(e)) {
+            return;
+        }
         const { startTime, didClick } = this.state;
         const { jog, stopContinuousJog } = this.props;
 
@@ -71,6 +81,9 @@ class JogControl extends PureComponent {
     }
 
     onMouseDown(e) {
+        if (this.notLeftClick(e)) {
+            return;
+        }
         const startTime = new Date();
         this.setState({
             startTime: startTime,
