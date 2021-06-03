@@ -851,10 +851,15 @@ class VisualizerWidget extends PureComponent {
 
         this.setState({ total });
 
+        const reduxPayload = {
+            ...data,
+            content: this.state.gcode.content
+        };
+
         // Emit events on response with relevant data from processor worker
         reduxStore.dispatch({
             type: UPDATE_FILE_INFO,
-            payload: data
+            payload: reduxPayload
         });
         pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
         pubsub.publish('gcode:bbox', bbox);

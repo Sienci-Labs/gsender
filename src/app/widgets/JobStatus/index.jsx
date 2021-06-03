@@ -191,9 +191,9 @@ class JobStatusWidget extends PureComponent {
                             z: bbox.max.z
                         },
                         delta: {
-                            x: dX,
-                            y: dY,
-                            z: dZ
+                            x: dX.toFixed(2),
+                            y: dY.toFixed(2),
+                            z: dZ.toFixed(2)
                         }
                     }
                 });
