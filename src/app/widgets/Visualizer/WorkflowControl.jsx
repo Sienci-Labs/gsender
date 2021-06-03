@@ -156,13 +156,9 @@ class WorkflowControl extends PureComponent {
 
     handleOnStop = () => {
         const { actions: { handlePause, handleStop } } = this.props;
-        this.setState({ runHasStarted: false });
+        //this.setState({ runHasStarted: false });
         handlePause();
         handleStop();
-        if (this.state.fileLoaded === false) {
-            controller.command('gcode', '$C');
-            this.setState({ testStarted: false });
-        }
     }
 
 
