@@ -138,10 +138,40 @@ info-window() {
 }
 
 .edit-icon {
+    align-self: center;
+    color: #2b5d8b;
+
     &:focus {
         outline: none;
     }
+
     &:active {
         outline: none;
     }
+}
+
+.delete-icon {
+    align-self: center;
+    color: #f00;
+
+
+    &:focus {
+        outline: none;
+    }
+
+    &:active {
+        outline: none;
+    }
+}
+
+.disabled-icon {
+    outline: none;
+    color: rgba(#f00, 0.5);
+    cursor: not-allowed !important;
+}
+
+.icon-area {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
 }
