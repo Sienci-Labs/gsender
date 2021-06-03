@@ -237,7 +237,7 @@ class GrblController {
                     }
                     if (line === POSTHOOK_COMPLETE) {
                         log.debug('Finished Post-hook, resuming program');
-                        this.sender.unhold();
+                        this.workflow.resume();
                         return '(Post-Hook complete)';
                     }
 
@@ -250,8 +250,8 @@ class GrblController {
                 // line="G0 X[posx - 8] Y[ymax]"
                 // > "G0 X2 Y50"
                 line = translateExpression(line, context);
-                // const data = parser.parseLine(line, { flatten: true });
-                // const words = ensureArray(data.words);
+                const data = parser.parseLine(line, { flatten: true });
+                const words = ensureArray(data.words);
 
                 // { // Program Mode: M0, M1
                 //     const programMode = _.intersection(words, ['M0', 'M1'])[0];
@@ -263,6 +263,12 @@ class GrblController {
                 //         this.feeder.hold({ data: 'M1' }); // Hold reason
                 //     }
                 // }
+
+                // More aggressive updating of spindle modals for safety
+                const spindleCommand = _.intersection(words, ['M3', 'M4'])[0];
+                if (spindleCommand) {
+                    this.updateSpindleModal(spindleCommand);
+                }
 
                 // // M6 Tool Change
                 // if (_.includes(words, 'M6')) {
@@ -373,6 +379,12 @@ class GrblController {
 
                 if (_.includes(words, 'G28') && !machineProfile.endstops) {
                     line = line.replace('G28', '(G28)');
+                }
+
+                // More aggressive updating of spindle modals for safety
+                const spindleCommand = _.intersection(words, ['M3', 'M4'])[0];
+                if (spindleCommand) {
+                    this.updateSpindleModal(spindleCommand);
                 }
 
                 /* Emit event to UI for toolchange handler */
@@ -1543,7 +1555,12 @@ class GrblController {
                 const [context] = args;
                 this.toolChangeContext = context;
             },
+            'toolchange:pre': () => {
+                log.debug('Starting pre hook');
+                this.runPreChangeHook();
+            },
             'toolchange:post': () => {
+                log.debug('starting post hook');
                 this.runPostChangeHook();
             }
         }[cmd];
@@ -1591,6 +1608,11 @@ class GrblController {
             .filter(line => (line.trim().length > 0))
             .filter(line => !comments.some(comment => line.includes(comment)));
         return lines;
+    }
+
+    updateSpindleModal(modal) {
+        this.state.parserstate.modal.spindle = modal;
+        this.emit('controller:state', GRBL, this.state);
     }
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */

@@ -31,13 +31,12 @@ import { DIALOG_CONFIRM, DIALOG_CANCEL } from './ConfirmationDialogLib';
 const ConfirmationDialog = () => {
     const [show, setShow] = useState(false);
     const [title, setTitle] = useState(null);
-    const [buttons, setButtons] = useState([]);
+    //const [buttons, setButtons] = useState([]);
     const [content, setContent] = useState(null);
     const [onClose, setOnClose] = useState(null);
     const [onConfirm, setOnConfirm] = useState(null);
     const [confirmLabel, setConfirmLabel] = useState(null);
     const [cancelLabel, setCancelLabel] = useState(null);
-    console.log(buttons);
 
     let hideModal = !show;
 
@@ -48,16 +47,17 @@ const ConfirmationDialog = () => {
     useEffect(() => {
         pubsub.subscribe('dialog:new', (event, options) => {
             setTitle(options.title);
-            setButtons(options.buttons);
+            //setButtons(options.buttons);
             setContent(options.content);
-            setOnClose(options.onClose);
-            setOnConfirm(options.onConfirm);
+            setOnClose(() => options.onClose);
+            setOnConfirm(() => options.onConfirm);
             setConfirmLabel(options.confirmLabel);
             setCancelLabel(options.cancelLabel);
             setShow(true);
         });
     });
 
+    console.log(onConfirm);
     return (
         <div className={cx(styles.confirmationDialogWrapper, { [styles.hidden]: hideModal })}>
             <div className={styles.confirmationDialog}>

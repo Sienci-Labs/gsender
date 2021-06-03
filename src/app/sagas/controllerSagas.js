@@ -95,10 +95,16 @@ export function* initialize() {
     });
 
     controller.addListener('toolchange:start', () => {
+        const onConfirmhandler = () => {
+            console.log('Running post command');
+            controller.command('toolchange:post');
+        };
+
         Confirm({
             title: 'Confirm Toolchange',
             content: 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.',
             confirmLabel: 'Confirm toolchange',
+            onConfirm: onConfirmhandler
         });
     });
 
