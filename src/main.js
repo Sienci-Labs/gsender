@@ -148,9 +148,10 @@ const main = () => {
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
         } catch (err) {
-            await dialog.showMessageBox({
+            /*await dialog.showMessageBox({
                 message: `Error - ${err.message}!`
-            });
+            });*/
+            console.log(err);
         }
     });
 };
