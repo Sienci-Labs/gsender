@@ -236,11 +236,11 @@ class MacroWidget extends PureComponent {
         const macrosClean = this.state.macros.map(({ name, content }) => ({ name, content }));
         const macros = JSON.stringify(macrosClean, null, 1);
         const data = new Blob([macros], {
-            type: 'text/plain;charset=utf-8;'
+            type: 'application/json'
         });
 
         const today = new Date();
-        const filename = `gSender-macros-${today.toLocaleDateString()}-${today.toLocaleTimeString()}.json`;
+        const filename = `gSender-macros-${today.toLocaleDateString()}-${today.toLocaleTimeString()}`;
 
         // IE11 & Edge
         if (navigator.msSaveBlob) {
