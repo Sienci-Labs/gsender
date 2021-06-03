@@ -38,6 +38,7 @@ import styles from './edit-area.styl';
 export default class MainTable extends Component {
     static propTypes = {
         onEdit: PropTypes.func,
+        onDelete: PropTypes.func,
         onShortcutToggle: PropTypes.func,
         data: PropTypes.array,
     }
@@ -47,18 +48,29 @@ export default class MainTable extends Component {
             const { keys, isActive } = row;
             const shortcut = keys.split('+');
 
+            const { onEdit, onDelete } = this.props;
+
             if (!shortcut[0]) {
                 return (
                     <div className={styles.shortcutRowHeader}>
-                        <span />
-                        <i
-                            role="button"
-                            tabIndex={-1}
-                            className={cx('fas fa-edit', styles.editIcon)}
-                            onClick={() => this.props.onEdit(row)}
-                            onKeyDown={() => this.props.onEdit(row)}
-                            style={{ alignSelf: 'center', color: '#2b5d8b' }}
-                        />
+                        <span style={{ height: '21px' }} />
+
+                        <div className={styles['icon-area']}>
+                            <i
+                                role="button"
+                                tabIndex={-1}
+                                className={cx('far fa-trash-alt', styles.deleteIcon, styles.disabledIcon)}
+                                onClick={() => onDelete(row)}
+                                onKeyDown={() => onDelete(row)}
+                            />
+                            <i
+                                role="button"
+                                tabIndex={-1}
+                                className={cx('fas fa-edit', styles.editIcon)}
+                                onClick={() => onEdit(row)}
+                                onKeyDown={() => onEdit(row)}
+                            />
+                        </div>
                     </div>
                 );
             }
@@ -78,14 +90,22 @@ export default class MainTable extends Component {
             return (
                 <div className={styles.shortcutRowHeader}>
                     <span>{output}</span>
-                    <i
-                        role="button"
-                        tabIndex={-1}
-                        className={cx('fas fa-edit', styles.editIcon)}
-                        onClick={() => this.props.onEdit(row)}
-                        onKeyDown={() => this.props.onEdit(row)}
-                        style={{ alignSelf: 'center', color: '#2b5d8b' }}
-                    />
+                    <div className={styles['icon-area']}>
+                        <i
+                            role="button"
+                            tabIndex={-1}
+                            className={cx('far fa-trash-alt', styles.deleteIcon)}
+                            onClick={() => onDelete(row)}
+                            onKeyDown={() => onDelete(row)}
+                        />
+                        <i
+                            role="button"
+                            tabIndex={-1}
+                            className={cx('fas fa-edit', styles.editIcon)}
+                            onClick={() => onEdit(row)}
+                            onKeyDown={() => onEdit(row)}
+                        />
+                    </div>
                 </div>
             );
         },
@@ -113,8 +133,8 @@ export default class MainTable extends Component {
     }
 
     columns = [
-        { dataIndex: 'title', title: 'Action', sortable: true, key: 'title', width: '45%' },
-        { dataIndex: 'keys', title: 'Shortcut', sortable: true, key: 'keys', width: '45%', render: this.renders.renderShortcutCell },
+        { dataIndex: 'title', title: 'Action', sortable: true, key: 'title', width: '35%' },
+        { dataIndex: 'keys', title: 'Shortcut', sortable: true, key: 'keys', width: '55%', render: this.renders.renderShortcutCell },
         { dataIndex: 'isActive', title: 'Active', key: 'isActive', width: '10%', render: this.renders.renderToggleCell }
     ];
 
