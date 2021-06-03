@@ -24,10 +24,12 @@
 import { combineReducers } from 'redux';
 import controller from './controllerReducers';
 import connection from './connectionReducers';
+import file from './fileInfoReducers';
 
 const consolidatedReducer = combineReducers({
     controller,
-    connection
+    connection,
+    file
 });
 
 export default consolidatedReducer;
