@@ -96,7 +96,6 @@ export function* initialize() {
 
     controller.addListener('toolchange:start', () => {
         const onConfirmhandler = () => {
-            console.log('Running post command');
             controller.command('toolchange:post');
         };
 

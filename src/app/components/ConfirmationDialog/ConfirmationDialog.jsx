@@ -57,7 +57,6 @@ const ConfirmationDialog = () => {
         });
     });
 
-    console.log(onConfirm);
     return (
         <div className={cx(styles.confirmationDialogWrapper, { [styles.hidden]: hideModal })}>
             <div className={styles.confirmationDialog}>
