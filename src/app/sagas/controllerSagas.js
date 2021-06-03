@@ -26,6 +26,7 @@ import controller from 'app/lib/controller';
 import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
+import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
 export function* initialize() {
@@ -90,8 +91,12 @@ export function* initialize() {
     });
 
     controller.addListener('gcode:unload', () => {
-        // TODO:  Move file info to redux so we can dispatch action rather than pubsub
-        pubsub.publish('gcode:unload');
+        reduxStore.dispatch({
+            type: fileActions.UNLOAD_FILE_INFO,
+            payload: {}
+        });
+        // TODO: refactor code to use redux action instead of pubsub subscription
+        //pubsub.publish('gcode:unload');
     });
 
     controller.addListener('toolchange:start', () => {
