@@ -156,7 +156,6 @@ class WorkflowControl extends PureComponent {
 
     handleOnStop = () => {
         const { actions: { handlePause, handleStop } } = this.props;
-        //this.setState({ runHasStarted: false });
         handlePause();
         handleStop();
     }
