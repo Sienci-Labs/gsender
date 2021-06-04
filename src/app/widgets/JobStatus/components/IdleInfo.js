@@ -2,8 +2,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import get from 'lodash/get';
+import { connect } from 'react-redux';
 import { in2mm, mm2in } from '../../../lib/units';
-
 import styles from './IdleInfo.styl';
 import FileStat from './FileStat';
 import { IMPERIAL_UNITS, METRIC_UNITS } from '../../../constants';
@@ -12,30 +13,31 @@ import { IMPERIAL_UNITS, METRIC_UNITS } from '../../../constants';
  * Idle Information component displaying job information when status is set to idle
  * @param {Object} state Default state given from parent component
  */
-const IdleInfo = ({ state }) => {
+const IdleInfo = ({ state, ...props }) => {
     const {
-        bbox: { delta, min, max },
         units,
-        total,
-        elapsedTime,
         lastFileRan,
-        fileName,
-        fileSize,
-        toolsAmount,
-        toolsUsed,
         fileModal,
-        feedRates,
-        spindleRates,
         estimatedTime
     } = state;
+    const {
+        fileLoaded,
+        name,
+        spindleSet,
+        toolSet,
+        movementSet,
+        total,
+        size,
+        bbox: { delta, min, max }
+    } = props;
 
     let convertedFeedMin, convertedFeedMax, feedUnits;
     feedUnits = (units === METRIC_UNITS) ? 'mm/min' : 'ipm';
 
-    let feedrateMin = Math.min(...feedRates);
-    let feedrateMax = Math.max(...feedRates);
-    let spindleMin = Math.min(...spindleRates);
-    let spindleMax = Math.max(...spindleRates);
+    let feedrateMin = Math.min(...movementSet);
+    let feedrateMax = Math.max(...movementSet);
+    let spindleMin = Math.min(...spindleSet);
+    let spindleMax = Math.max(...spindleSet);
 
 
     if (units === METRIC_UNITS) {
@@ -51,7 +53,7 @@ const IdleInfo = ({ state }) => {
     const formattedToolsUsed = () => {
         let line = '';
 
-        for (const item of toolsUsed) {
+        for (const item of toolSet) {
             line += `${item}, `;
         }
 
@@ -77,13 +79,13 @@ const IdleInfo = ({ state }) => {
         const ONE_KB = 1000;
         const ONE_MB = 1000000;
 
-        if (fileSize >= ONE_KB && fileSize < ONE_MB) {
-            return `${(fileSize / ONE_KB).toFixed(0)} KB`;
-        } else if (fileSize >= ONE_MB) {
-            return `${(fileSize / ONE_MB).toFixed(1)} MB`;
+        if (size >= ONE_KB && size < ONE_MB) {
+            return `${(size / ONE_KB).toFixed(0)} KB`;
+        } else if (size >= ONE_MB) {
+            return `${(size / ONE_MB).toFixed(1)} MB`;
         }
 
-        return `${fileSize} bytes`;
+        return `${size} bytes`;
     };
 
     const formatEstimatedTime = (time) => {
@@ -102,21 +104,15 @@ const IdleInfo = ({ state }) => {
         return `~ ${Math.ceil(time)} seconds`;
     };
 
-    const feedString = (feedRates.length > 0) ? `${convertedFeedMin} to ${convertedFeedMax} ${feedUnits}` : 'No Feedrates';
-
-    if (elapsedTime > 0) {
-        state.lastFileRan = state.lastFileRan;
-        state.lastFileRunLength = state.lastFileRunLength;
-        state.fileSize = fileSizeFormat(state.fileSize);
-    }
+    const feedString = (movementSet.length > 0) ? `${convertedFeedMin} to ${convertedFeedMax} ${feedUnits}` : 'No Feedrates';
 
     let elapsedTimeToDisplay = outputFormattedTimeForLastFile(state.lastFileRunLength);
 
     const formattedEstimateTime = formatEstimatedTime(estimatedTime);
 
-    return fileName ? (
+    return fileLoaded ? (
         <div className={styles['idle-info']}>
-            <div><span className={styles['file-name']}>{fileName}</span> ({fileSizeFormat()}, {total} lines)</div>
+            <div><span className={styles['file-name']}>{name}</span> ({fileSizeFormat()}, {total} lines)</div>
             <div className={styles.idleInfoRow}>
                 <FileStat label="Attributes">
                     {`${formattedEstimateTime}`}
@@ -125,10 +121,10 @@ const IdleInfo = ({ state }) => {
                 </FileStat>
                 <FileStat label="Spindle">
                     {
-                        (spindleRates.length > 0) ? `${spindleMin} to ${spindleMax} RPM` : 'No Spindle'
+                        (spindleSet.length > 0) ? `${spindleMin} to ${spindleMax} RPM` : 'No Spindle'
                     }
                     <br />
-                    {toolsAmount > 0 ? `${toolsAmount} (${formattedToolsUsed()})` : 'No Tools'}
+                    {toolSet.length > 0 ? `${toolSet.length} (${formattedToolsUsed()})` : 'No Tools'}
                 </FileStat>
                 <FileStat label="Dimensions">
                     {`${delta.x} ${units} (X)`}
@@ -184,4 +180,9 @@ IdleInfo.propTypes = {
     state: PropTypes.object,
 };
 
-export default IdleInfo;
+export default connect((store) => {
+    const file = get(store, 'file', {});
+    return {
+        ...file
+    };
+})(IdleInfo);
