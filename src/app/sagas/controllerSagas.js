@@ -107,8 +107,6 @@ export function* initialize() {
             type: fileActions.UNLOAD_FILE_INFO,
             payload: {}
         });
-        // TODO: refactor code to use redux action instead of pubsub subscription
-        //pubsub.publish('gcode:unload');
     });
 
     controller.addListener('toolchange:start', () => {

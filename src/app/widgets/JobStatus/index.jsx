@@ -149,55 +149,11 @@ class JobStatusWidget extends PureComponent {
             remainingTime: 0,
 
             pausedTime: 0, //
-
-            // Bounding box
-            bbox: {
-                min: {
-                    x: 0,
-                    y: 0,
-                    z: 0
-                },
-                max: {
-                    x: 0,
-                    y: 0,
-                    z: 0
-                },
-                delta: {
-                    x: 0,
-                    y: 0,
-                    z: 0
-                }
-            }
         };
     }
 
     subscribe() {
         const tokens = [
-            pubsub.subscribe('gcode:bbox', (msg, bbox) => {
-                const dX = bbox.max.x - bbox.min.x;
-                const dY = bbox.max.y - bbox.min.y;
-                const dZ = bbox.max.z - bbox.min.z;
-
-                this.setState({
-                    bbox: {
-                        min: {
-                            x: bbox.min.x,
-                            y: bbox.min.y,
-                            z: bbox.min.z
-                        },
-                        max: {
-                            x: bbox.max.x,
-                            y: bbox.max.y,
-                            z: bbox.max.z
-                        },
-                        delta: {
-                            x: dX.toFixed(2),
-                            y: dY.toFixed(2),
-                            z: dZ.toFixed(2)
-                        }
-                    }
-                });
-            }),
             pubsub.subscribe('file:units', (msg, unitModal) => {
                 if (unitModal === 'G21') {
                     this.setState({
@@ -280,8 +236,8 @@ class JobStatusWidget extends PureComponent {
     }
 
     render() {
-        const { units, bbox, fileProcessing, fileModal } = this.state;
-        const { workflow, isConnected, senderStatus } = this.props;
+        const { units, fileProcessing, fileModal } = this.state;
+        const { workflow, isConnected, senderStatus, bbox } = this.props;
         const state = {
             ...this.state,
             workflow,
@@ -318,9 +274,11 @@ export default connect((store) => {
     const workflow = get(store, 'controller.workflow');
     const senderStatus = get(store, 'controller.sender.status');
     const isConnected = get(store, 'connection.isConnected');
+    const bbox = get(store, 'file.bbox');
     return {
         workflow,
         senderStatus,
-        isConnected
+        isConnected,
+        bbox
     };
 })(JobStatusWidget);

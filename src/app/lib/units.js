@@ -100,5 +100,5 @@ export const mapPositionToPreferredUnits = (pos, currentUnits, preferredUnits) =
             return convertValueToMetricUnits(pos);
         }
     }
-    return Number(pos) || 0;
+    return Number(pos).toFixed(3) || 0;
 };
