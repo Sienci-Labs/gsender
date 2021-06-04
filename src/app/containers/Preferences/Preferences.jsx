@@ -91,7 +91,7 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 4,
-                    label: 'Events',
+                    label: 'Tool Change',
                     component: Events
                 },
                 {

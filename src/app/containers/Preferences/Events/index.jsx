@@ -57,7 +57,7 @@ const EventWidget = ({ active }) => {
         };
         controller.command('toolchange:context', context);
         Toaster.pop({
-            msg: 'Saved toolchange hooks',
+            msg: 'Saved tool change hooks',
             type: TOASTER_SUCCESS,
             icon: 'fa-check'
         });
@@ -75,7 +75,7 @@ const EventWidget = ({ active }) => {
         )}
         >
             <h3 className={styles.settingsTitle}>
-                Events
+                Tool Change
             </h3>
             <div className={styles.generalArea}>
                 <FieldSet legend="Tool Change" className={styles.paddingBottom}>

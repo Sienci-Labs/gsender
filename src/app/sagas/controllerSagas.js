@@ -90,6 +90,18 @@ export function* initialize() {
         pubsub.publish('gcode:toolChange', context);
     });
 
+    controller.addListener('gcode:load', (name, content) => {
+        const size = new Blob([content]).size;
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_CONTENT,
+            payload: {
+                name,
+                content,
+                size
+            }
+        });
+    });
+
     controller.addListener('gcode:unload', () => {
         reduxStore.dispatch({
             type: fileActions.UNLOAD_FILE_INFO,
