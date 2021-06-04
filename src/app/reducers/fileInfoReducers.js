@@ -21,10 +21,11 @@
  *
  */
 import { createReducer } from 'redux-action';
-import { UNLOAD_FILE_INFO, UPDATE_FILE_INFO, UPDATE_FILE_CONTENT } from 'app/actions/fileInfoActions';
+import { UNLOAD_FILE_INFO, UPDATE_FILE_INFO, UPDATE_FILE_CONTENT, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
 
 const initialState = {
     fileLoaded: false,
+    fileProcessing: false,
     name: null,
     size: 0,
     total: 0,
@@ -62,6 +63,7 @@ const reducer = createReducer(initialState, {
         return {
             ...payload,
             fileLoaded: true,
+            fileProcessing: false,
             bbox: normalizeBBox(payload.bbox)
         };
     },
@@ -71,6 +73,11 @@ const reducer = createReducer(initialState, {
             content,
             name,
             size
+        };
+    },
+    [UPDATE_FILE_PROCESSING]: ({ value }, reducerState) => {
+        return {
+            fileProcessing: value
         };
     }
 });

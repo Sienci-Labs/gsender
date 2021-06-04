@@ -87,7 +87,6 @@ class JobStatusWidget extends PureComponent {
         const {
             minimized,
             spindleSpeed,
-            probeFeedrate,
         } = this.state;
         const prevSenderStatus = prevProps.senderStatus;
         const { senderStatus } = this.props;
@@ -105,7 +104,6 @@ class JobStatusWidget extends PureComponent {
 
         this.config.set('minimized', minimized);
         this.config.set('speed', spindleSpeed);
-        this.config.set('probeFeedrate', Number(probeFeedrate));
     }
 
     getSpindleOverrideLabel() {
@@ -123,31 +121,12 @@ class JobStatusWidget extends PureComponent {
             lastFileRunLength: this.config.get('lastFileRunLength', ''),
             minimized: this.config.get('minimized', false),
             spindleSpeed: this.config.get('speed', 1000),
-            probeFeedrate: Number(this.config.get('probeFeedrate') || 0).toFixed(3) * 1,
-            feedrateMin: this.config.get('feedrateMin', 500),
-            feedrateMax: this.config.get('feedrateMax', 2000),
-            spindleSpeedMin: this.config.get('spindleSpeedMin', 0),
-            spindleSpeedMax: this.config.get('spindleSpeedMax', 1000),
             spindleOverrideLabel: this.getSpindleOverrideLabel(),
-            feedRates: [],
-            spindleRates: [],
             isFullscreen: false,
             fileModal: METRIC_UNITS,
             units: store.get('workspace.units'),
-            fileName: '',
-            fileSize: 0,
             estimatedTime: 0,
-
             // G-code Status (from server)
-            fileProcessing: false,
-            total: 0,
-            sent: 0,
-            received: 0,
-            startTime: 0,
-            finishTime: 0,
-            elapsedTime: 0,
-            remainingTime: 0,
-
             pausedTime: 0, //
         };
     }
@@ -165,34 +144,6 @@ class JobStatusWidget extends PureComponent {
                     });
                 }
             }),
-            pubsub.subscribe('gcode:fileInfo', (msg, file) => {
-                if (!file) {
-                    this.setState(this.getInitialState());
-                    return;
-                }
-                /* Convert set commands to numbers and get max and min */
-                const spindleRates = [];
-                const feedRates = [];
-
-                file.movementSet.forEach(item => {
-                    feedRates.push(Number(item.substring(1)));
-                });
-                file.spindleSet.forEach(item => {
-                    spindleRates.push(Number(item.substring(1)));
-                });
-
-                this.setState({
-                    fileProcessing: false,
-                    fileName: file.name,
-                    total: file.total,
-                    toolsAmount: file.toolSet.size,
-                    toolsUsed: file.toolSet,
-                    spindleRates: spindleRates,
-                    feedRates: feedRates,
-                    estimatedTime: file.estimatedTime,
-                    fileSize: file.size,
-                });
-            }),
             pubsub.subscribe('units:change', (msg, units) => {
                 this.setState({
                     units: units
@@ -203,16 +154,6 @@ class JobStatusWidget extends PureComponent {
                     spindleOverrideLabel: this.getSpindleOverrideLabel()
                 });
             }),
-            pubsub.subscribe('gcode:processing', (msg, value) => {
-                this.setState({
-                    fileProcessing: true
-                });
-            }),
-            pubsub.subscribe('gcode:unload', (msg) => {
-                this.setState({
-                    filename: ''
-                });
-            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -236,8 +177,8 @@ class JobStatusWidget extends PureComponent {
     }
 
     render() {
-        const { units, fileProcessing, fileModal } = this.state;
-        const { workflow, isConnected, senderStatus, bbox } = this.props;
+        const { units, fileModal } = this.state;
+        const { workflow, isConnected, senderStatus, bbox, fileProcessing } = this.props;
         const state = {
             ...this.state,
             workflow,
@@ -275,10 +216,12 @@ export default connect((store) => {
     const senderStatus = get(store, 'controller.sender.status');
     const isConnected = get(store, 'connection.isConnected');
     const bbox = get(store, 'file.bbox');
+    const fileProcessing = get(store, 'file.fileProcessing');
     return {
         workflow,
         senderStatus,
         isConnected,
-        bbox
+        bbox,
+        fileProcessing
     };
 })(JobStatusWidget);
