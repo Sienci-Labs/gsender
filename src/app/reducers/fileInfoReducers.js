@@ -36,6 +36,7 @@ const initialState = {
     bbox: {
         min: { x: 0, y: 0, z: 0 },
         max: { x: 0, y: 0, z: 0 },
+        delta: { x: 0, y: 0, z: 0 }
     },
     content: '',
 };

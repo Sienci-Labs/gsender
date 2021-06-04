@@ -92,6 +92,7 @@ export class GCodeProcessor {
         const [minBounds, maxBounds] = returnMBounds ? this.vmState.mbounds : this.vmState.bounds;
         const [minX, minY, minZ] = minBounds;
         const [maxX, maxY, maxZ] = maxBounds;
+
         return {
             min: {
                 x: minX,
@@ -102,6 +103,11 @@ export class GCodeProcessor {
                 x: maxX,
                 y: maxY,
                 z: maxZ
+            },
+            delta: {
+                x: maxX - minX,
+                y: maxY - minY,
+                z: maxZ - minZ
             }
         };
     }
