@@ -35,7 +35,7 @@ import reduxStore from 'app/store/redux';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import ToggleSwitch from 'app/components/ToggleSwitch';
-import { UPDATE_FILE_INFO } from 'app/actions/fileInfoActions';
+import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
 import Anchor from 'app/components/Anchor';
 import { Button } from 'app/components/Buttons';
 import ModalTemplate from 'app/components/ModalTemplate';
@@ -258,7 +258,10 @@ class VisualizerWidget extends PureComponent {
                 this.visualizer.unload();
             }
 
-            pubsub.publish('gcode:processing', true);
+            reduxStore.dispatch({
+                type: UPDATE_FILE_PROCESSING,
+                payload: { value: true }
+            });
 
             this.setState((state) => ({
                 gcode: {
@@ -827,14 +830,7 @@ class VisualizerWidget extends PureComponent {
     onProcessedGcode = ({ data }) => {
         const {
             total,
-            toolSet,
-            spindleSet,
-            movementSet,
             invalidGcode,
-            estimatedTime,
-            bbox,
-            name,
-            size
         } = data;
 
         if (invalidGcode.size > 0) {
@@ -861,8 +857,8 @@ class VisualizerWidget extends PureComponent {
             type: UPDATE_FILE_INFO,
             payload: reduxPayload
         });
-        pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
-        pubsub.publish('gcode:bbox', bbox);
+        //pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
+        //pubsub.publish('gcode:bbox', bbox);
     }
 
     processGCode = (gcode, name, size) => {
