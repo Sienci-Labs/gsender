@@ -29,6 +29,8 @@ onmessage = function({ data }) {
     const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'], maxFeed: feedArray, acceleration: accelArray });
     processor.process(lines);
 
+    console.log(processor.vmState);
+
     postMessage({
         name,
         size,
@@ -38,6 +40,7 @@ onmessage = function({ data }) {
         movementSet: processor.vmState.feedrates,
         invalidGcode: processor.vmState.invalidGcode,
         estimatedTime: processor.vmState.totalTime,
-        bbox: processor.getBBox()
+        bbox: processor.getBBox(),
+        fileModal: processor.vmState.units
     });
 };

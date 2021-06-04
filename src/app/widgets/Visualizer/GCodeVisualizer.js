@@ -23,7 +23,6 @@
 
 // import colornames from 'colornames';
 import Toolpath from 'gcode-toolpath';
-import pubsub from 'pubsub-js';
 import * as THREE from 'three';
 import log from 'app/lib/log';
 
@@ -134,10 +133,6 @@ class GCodeVisualizer {
                 vertexIndex: this.geometry.vertices.length // remember current vertex index
             });
         });
-
-        const toolpathModal = toolpath.getModal();
-        const { units } = toolpathModal;
-        pubsub.publish('file:units', units);
 
         const workpiece = new THREE.Line(
             new THREE.Geometry(),

@@ -22,6 +22,7 @@
  */
 import { createReducer } from 'redux-action';
 import { UNLOAD_FILE_INFO, UPDATE_FILE_INFO, UPDATE_FILE_CONTENT, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
+import { METRIC_UNITS } from 'app/constants';
 
 const initialState = {
     fileLoaded: false,
@@ -34,6 +35,7 @@ const initialState = {
     movementSet: [],
     invalidGcode: [],
     estimatedTime: 0,
+    fileModal: METRIC_UNITS,
     bbox: {
         min: { x: 0, y: 0, z: 0 },
         max: { x: 0, y: 0, z: 0 },
