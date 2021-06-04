@@ -59,9 +59,9 @@ class InputTen extends PureComponent {
             [true, false],
             [false, true],
             [true, true],
-
         ];
-        const index = Number(loadedSetting);
+        let index = Number(loadedSetting);
+        index = (index > options.length) ? 3 : index;
         const setting = options[index];
         this.setState({ settings: setting });
     }

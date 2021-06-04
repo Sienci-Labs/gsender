@@ -70,44 +70,37 @@ class InputThree extends PureComponent {
             this.setState({ zero: false });
             this.setState({ one: false });
             this.setState({ two: false });
-        }
-        if (loadedSettings === '1') {
+        } else if (loadedSettings === '1') {
             loadedSettings = $3Options[1];
             this.setState({ zero: true });
             this.setState({ one: false });
             this.setState({ two: false });
-        }
-        if (loadedSettings === '2') {
+        } else if (loadedSettings === '2') {
             loadedSettings = $3Options[2];
             this.setState({ zero: false });
             this.setState({ one: true });
             this.setState({ two: false });
-        }
-        if (loadedSettings === '3') {
+        } else if (loadedSettings === '3') {
             loadedSettings = $3Options[3];
             this.setState({ zero: true });
             this.setState({ one: true });
             this.setState({ two: false });
-        }
-        if (loadedSettings === '4') {
+        } else if (loadedSettings === '4') {
             loadedSettings = $3Options[4];
             this.setState({ zero: false });
             this.setState({ one: false });
             this.setState({ two: true });
-        }
-        if (loadedSettings === '5') {
+        } else if (loadedSettings === '5') {
             loadedSettings = $3Options[5];
             this.setState({ zero: true });
             this.setState({ one: false });
             this.setState({ two: true });
-        }
-        if (loadedSettings === '6') {
+        } else if (loadedSettings === '6') {
             loadedSettings = $3Options[6];
             this.setState({ zero: false });
             this.setState({ one: true });
             this.setState({ two: true });
-        }
-        if (loadedSettings === '7') {
+        } else {
             loadedSettings = $3Options[7];
             this.setState({ zero: true });
             this.setState({ one: true });
