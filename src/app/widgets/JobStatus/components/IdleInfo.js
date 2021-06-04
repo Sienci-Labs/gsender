@@ -182,7 +182,15 @@ IdleInfo.propTypes = {
 
 export default connect((store) => {
     const file = get(store, 'file', {});
+
+    const movementSet = [...file.movementSet].map(value => Number(value.slice(1)));
+    const toolSet = [...file.toolSet];
+    const spindleSet = [...file.spindleSet].map(value => Number(value.slice(1)));
+
     return {
-        ...file
+        ...file,
+        movementSet,
+        toolSet,
+        spindleSet
     };
 })(IdleInfo);
