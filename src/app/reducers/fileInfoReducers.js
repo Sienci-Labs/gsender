@@ -21,7 +21,7 @@
  *
  */
 import { createReducer } from 'redux-action';
-import { UNLOAD_FILE_INFO, UPDATE_FILE_INFO } from 'app/actions/fileInfoActions';
+import { UNLOAD_FILE_INFO, UPDATE_FILE_INFO, UPDATE_FILE_CONTENT } from 'app/actions/fileInfoActions';
 
 const initialState = {
     fileLoaded: false,
@@ -62,6 +62,14 @@ const reducer = createReducer(initialState, {
             ...payload,
             fileLoaded: true,
             bbox: normalizeBBox(payload.bbox)
+        };
+    },
+    [UPDATE_FILE_CONTENT]: ({ content, name, size }, reducerState) => {
+        return {
+            fileLoaded: true,
+            content,
+            name,
+            size
         };
     }
 });
