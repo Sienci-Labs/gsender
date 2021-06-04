@@ -18,7 +18,7 @@ const IdleInfo = ({ state, ...props }) => {
         units,
         lastFileRan,
         fileModal,
-        estimatedTime
+        bbox: { delta, min, max } // This is mapped to correct units from redux earlier in the component tree
     } = state;
     const {
         fileLoaded,
@@ -28,7 +28,7 @@ const IdleInfo = ({ state, ...props }) => {
         movementSet,
         total,
         size,
-        bbox: { delta, min, max }
+        estimatedTime
     } = props;
 
     let convertedFeedMin, convertedFeedMax, feedUnits;
