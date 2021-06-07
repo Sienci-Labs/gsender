@@ -72,6 +72,9 @@ class BitShiftInput extends PureComponent {
         ];
         const settings = this.props.currentSettings[title];
         let index = Number(settings);
+        if (index > 7) {
+            index = 7;
+        }
         this.setState({
             settings: values[index]
         });
