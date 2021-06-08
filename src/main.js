@@ -80,8 +80,8 @@ const main = () => {
                 show: false,
                 frame: false
             });
-            await splashScreen.loadFile(path.join(__dirname, 'app/assets/Splashscreen.gif'));
-            splashScreen.once('ready-to-show', () => {
+            splashScreen.loadFile(path.join(__dirname, 'app/assets/Splashscreen.gif'));
+            splashScreen.webContents.on('did-finish-load', () => {
                 splashScreen.show();
             });
 
@@ -148,9 +148,6 @@ const main = () => {
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
         } catch (err) {
-            /*await dialog.showMessageBox({
-                message: `Error - ${err.message}!`
-            });*/
             console.log(err);
         }
     });
