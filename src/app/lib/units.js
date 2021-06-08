@@ -79,7 +79,7 @@ export const mapPositionToUnits = (pos, units = METRIC_UNITS) => {
     if (units === METRIC_UNITS) {
         return mapPositionToMetricUnits(pos);
     }
-    return Number(pos) || 0;
+    return Number(pos).toFixed(2) || 0;
 };
 
 export const convertValueToImperialUnits = (pos) => {
