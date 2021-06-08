@@ -25,6 +25,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import get from 'lodash/get';
 import includes from 'lodash/includes';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
 import controller from 'app/lib/controller';
@@ -233,6 +234,8 @@ class WorkflowControl extends PureComponent {
     }
 
     render() {
+        const { isConnected, fileLoaded } = this.props;
+        const showPlayOrTest = isConnected && fileLoaded;
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
         const { handleOnStop } = this;
@@ -288,7 +291,7 @@ class WorkflowControl extends PureComponent {
                     }
                 </div>
                 {
-                    !this.state.runHasStarted && (
+                    showPlayOrTest && (
                         <button
                             type="button"
                             className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
@@ -302,7 +305,7 @@ class WorkflowControl extends PureComponent {
                     )
                 }
                 {
-                    canRun && (
+                    showPlayOrTest && (
                         <button
                             type="button"
                             className={styles['workflow-button-play']}
@@ -393,4 +396,11 @@ class WorkflowControl extends PureComponent {
     }
 }
 
-export default WorkflowControl;
+export default connect((store) => {
+    const fileLoaded = get(store, 'file.fileLoaded', false);
+    const isConnected = get(store, 'connection.isConnected', false);
+    return {
+        fileLoaded,
+        isConnected
+    };
+})(WorkflowControl);
