@@ -27,6 +27,8 @@ import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import controller from 'app/lib/controller';
+import { mapPositionToUnits } from 'app/lib/units';
+import { METRIC_UNITS } from 'app/constants';
 import styles from './Overrides.styl';
 import FeedControlButton from './FeedControlButton';
 
@@ -37,6 +39,12 @@ import FeedControlButton from './FeedControlButton';
  *
  */
 const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
+    const { units } = state;
+    if (units !== METRIC_UNITS) {
+        spindle = mapPositionToUnits(spindle, units);
+        feedrate = mapPositionToUnits(feedrate, units);
+    }
+
     /**
      * Override feed rate with given value
      * @param {Event} e Event Object
