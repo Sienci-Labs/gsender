@@ -36,7 +36,6 @@ const getCodeDescription = (code = 1) => {
 
 const AlarmDescriptionIcon = ({ code = 1 }) => {
     const alarmDescription = getCodeDescription(code);
-    console.log(alarmDescription);
     return (
         <Tooltip content={alarmDescription} placement="bottom">
             <div className={styles.alarmDescriptionButton}>
