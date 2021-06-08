@@ -29,8 +29,6 @@ onmessage = function({ data }) {
     const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'], maxFeed: feedArray, acceleration: accelArray });
     processor.process(lines);
 
-    console.log(processor.vmState);
-
     postMessage({
         name,
         size,
