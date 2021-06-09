@@ -20,39 +20,15 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
- .header {
-  display: flex;
-  align-items center;
-  margin-bottom: 0;
-  border-bottom: solid 1px #9CA3AF;
-  height: 96px;
-}
 
-.header-text {
-  margin: 0;
-  margin-left: 1rem;
-}
+import React from 'react';
 
-.container {
-  height: calc(100% - 96px);
-  display: flex;
-  background-color: #e5e7eb;
-  width: 100%;
-  //padding: 0.75rem;
-}
+const ToolIntroduction = () => {
+    return (
+        <div>
+            hi
+        </div>
+    );
+};
 
-.settings-container {
-  width: 80%;
-  flex-grow: 1
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-.toolModal {
-  width: 1000px;
-  height: 700px;
-  display: flex;
-  flex-direction column;
-  flex-grow: 1;
-}
+export default ToolIntroduction;

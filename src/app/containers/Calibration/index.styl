@@ -23,6 +23,7 @@
     background-color: white !important;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+    padding: 0.5rem 0;
 
     &::before {
         content: none !important;
@@ -72,6 +73,9 @@
   height: 50px;
   background-color: $color;
   position: absolute;
+  display: flex;
+  justify-content center;
+  align-items center;
 
   &-active {
     @keyframes {$keyframes} {

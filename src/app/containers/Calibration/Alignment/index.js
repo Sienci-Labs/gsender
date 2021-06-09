@@ -51,6 +51,7 @@ const Alignment = () => {
     const [actions, setActions] = useState(steps[currentStep]);
     const [currentAction, setCurrentAction] = useState(0);
     const [stepFinished, setStepFinished] = useState(false);
+    const [introComplete, setIntroComplete] = useState(false);
 
     const highlightShapes = () => {
         const foundAction = actions.find(action => action.id === Number(currentAction));
@@ -147,6 +148,10 @@ const Alignment = () => {
         }
     };
 
+    const startTool = () => {
+        setIntroComplete(true);
+    }
+
     const actionData = actions.find(action => action.id === currentAction);
 
     const prevDisabled = !!steps[currentStep - 1];
@@ -157,20 +162,24 @@ const Alignment = () => {
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
                     <h4 style={{ marginTop: 0 }}>Alignment</h4>
-
-                    <Step
-                        actions={actions}
-                        onChange={onChange}
-                        currentAction={currentAction}
-                    />
+                    {
+                        introComplete &&
+                        <Step
+                            actions={actions}
+                            onChange={onChange}
+                            currentAction={currentAction}
+                        />
+                    }
                 </div>
-
-                <NavigationButtons
-                    onNext={next}
-                    onPrevious={prev}
-                    prevDisabled={prevDisabled}
-                    nextDisabled={nextDisabled}
-                />
+                {
+                    introComplete &&
+                    <NavigationButtons
+                        onNext={next}
+                        onPrevious={prev}
+                        prevDisabled={prevDisabled}
+                        nextDisabled={nextDisabled}
+                    />
+                }
             </div>
 
             <div style={{ justifySelf: 'center', marginTop: '2rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%' }}>
