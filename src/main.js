@@ -188,7 +188,7 @@ const main = () => {
                     }
 
                     prevDirectory = filePath; //Set the previous directory for later use
-                    const { size } = fs.statSync(filePath);
+                    const { size } = fs.statSync(FULL_FILE_PATH);
                     window.webContents.send('returned-upload-dialog-data', { data, size, name: fileName, path: FULL_FILE_PATH });
                 });
             });
