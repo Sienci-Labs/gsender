@@ -220,9 +220,6 @@ const defaultState = {
         console: {
             minimized: false
         },
-        gcode: {
-            minimized: false
-        },
         job_status: {
             minimized: false,
             feedrateMin: 500,
@@ -302,9 +299,9 @@ const defaultState = {
             speed: 1000,
             spindleMax: 2000,
             spindleMin: 0,
-            laserTest: {
+            laser: {
                 power: 100,
-                duration: 1000,
+                duration: 1,
             }
         },
         visualizer: {

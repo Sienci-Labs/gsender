@@ -167,7 +167,7 @@ class SpindleWidget extends PureComponent {
             laser
         } = this.state;
 
-        this.config.set('laserTest', laser);
+        this.config.set('laser', laser);
         this.config.set('spindleMax', spindleMax);
         this.config.set('spindleMin', spindleMin);
         this.config.set('mode', mode);
@@ -182,7 +182,7 @@ class SpindleWidget extends PureComponent {
             canClick: true, // Defaults to true
             mode: this.config.get('mode'),
             spindleSpeed: this.config.get('speed', 1000),
-            laser: this.config.get('laserTest')
+            laser: this.config.get('laser')
         };
     }
 
