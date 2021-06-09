@@ -30,11 +30,13 @@ import {
     MODAL_PREFERENCES,
     MODAL_FIRMWARE,
     MODAL_SURFACING,
+    MODAL_CALIBRATE
 } from './constants';
 import Preferences from '../Preferences/Preferences';
 // import WizardModal from '../Wizard/WizardModal';
 import Firmware from '../Firmware/Firmware';
 import Surfacing from '../Surfacing';
+import Calibration from '../Calibration';
 
 class NavSidebar extends PureComponent {
     static propTypes = {
@@ -87,8 +89,10 @@ class NavSidebar extends PureComponent {
                     disabled
                 />
                 <NavSidebarLink
-                    url="" icon="fa fa-ruler" label="Calibrate"
-                    disabled
+                    url=""
+                    onClick={() => actions.openModal(MODAL_CALIBRATE)}
+                    icon="fa fa-ruler"
+                    label="Calibrate"
                 />
                 <NavSidebarLink
                     url=""
@@ -105,15 +109,10 @@ class NavSidebar extends PureComponent {
                     url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa fa-cog"
                     label=""
                 />
-                {
-                    state.modal.name === MODAL_FIRMWARE && <Firmware state={state} modalClose={actions.closeModal} />
-                }
-                {
-                    state.modal.name === MODAL_PREFERENCES && <Preferences state={state} modalClose={actions.closeModal} />
-                }
-                {
-                    state.modal.name === MODAL_SURFACING && <Surfacing state={state} modalClose={actions.closeModal} />
-                }
+                { state.modal.name === MODAL_FIRMWARE && <Firmware state={state} modalClose={actions.closeModal} /> }
+                { state.modal.name === MODAL_PREFERENCES && <Preferences state={state} modalClose={actions.closeModal} /> }
+                { state.modal.name === MODAL_SURFACING && <Surfacing state={state} modalClose={actions.closeModal} /> }
+                { state.modal.name === MODAL_CALIBRATE && <Calibration state={state} modalClose={actions.closeModal} /> }
             </div>
         );
     }
