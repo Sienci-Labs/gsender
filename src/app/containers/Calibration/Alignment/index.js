@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-
+import ToolIntroduction from 'app/containers/Calibration/Alignment/ToolIntroduction';
 import Step from './Step';
 import NavigationButtons from './NavigationButtons';
 import TriangleDiagram from '../TriangleDiagram';
-
 import styles from './index.styl';
-
 import { step1, step2 } from './data';
+
 
 const Alignment = () => {
     const initialShapes = {
@@ -150,7 +149,7 @@ const Alignment = () => {
 
     const startTool = () => {
         setIntroComplete(true);
-    }
+    };
 
     const actionData = actions.find(action => action.id === currentAction);
 
@@ -162,6 +161,11 @@ const Alignment = () => {
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div>
                     <h4 style={{ marginTop: 0 }}>Alignment</h4>
+
+                    {
+                        !introComplete &&
+                            <ToolIntroduction readyHandler={startTool} />
+                    }
                     {
                         introComplete &&
                         <Step
