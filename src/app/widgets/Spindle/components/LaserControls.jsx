@@ -63,7 +63,7 @@ const LaserControls = ({ actions, state }) => {
                         onChange={actions.handleLaserDurationChange}
                         className={classNames('form-control', styles.durationInput)}
                     />
-                    <span className="input-group-addon">ms</span>
+                    <span className="input-group-addon">s</span>
                 </div>
             </div>
         </div>
