@@ -85,6 +85,10 @@ const main = () => {
                 splashScreen.show();
             });
 
+            splashScreen.on('show', () => {
+                splashScreen.focus();
+            })
+
             const res = await launchServer();
             const { address, port, mountPoints } = { ...res };
             if (!(address && port)) {

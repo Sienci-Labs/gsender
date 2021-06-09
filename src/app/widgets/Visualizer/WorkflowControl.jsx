@@ -234,8 +234,6 @@ class WorkflowControl extends PureComponent {
     }
 
     render() {
-        const { isConnected, fileLoaded } = this.props;
-        const showPlayOrTest = isConnected && fileLoaded;
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
         const { handleOnStop } = this;
@@ -244,6 +242,8 @@ class WorkflowControl extends PureComponent {
         const canClick = !!port;
         const isReady = canClick && gcode.ready;
         const canRun = this.canRun();
+        const { isConnected, fileLoaded } = this.props;
+        const showPlayOrTest = isConnected && fileLoaded && canRun;
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflow.state);
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflow.state);
         if (this.props.state.filename !== '') {
