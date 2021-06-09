@@ -332,7 +332,7 @@ class LocationWidget extends PureComponent {
 
     shuttleControlEvents = {
         START_JOB: () => {
-            const { port, workflow } = this.state;
+            const { port, workflow } = this.props;
             if (!port) {
                 return;
             }
@@ -352,7 +352,7 @@ class LocationWidget extends PureComponent {
             }
         },
         PAUSE_JOB: () => {
-            const { port, workflow } = this.state;
+            const { port, workflow } = this.props;
             if (!port) {
                 return;
             }
@@ -362,7 +362,7 @@ class LocationWidget extends PureComponent {
             }
         },
         STOP_JOB: () => {
-            const { port } = this.state;
+            const { port } = this.props;
             if (!port) {
                 return;
             }
@@ -439,19 +439,6 @@ class LocationWidget extends PureComponent {
             }
 
             pubsub.publish('jogSpeeds', newSpeeds);
-        },
-        SELECT_AXIS: (event, { axis }) => {
-            const { canClick, jog } = this.state;
-
-            if (!canClick) {
-                return;
-            }
-
-            if (jog.axis === axis) {
-                this.actions.selectAxis(); // deselect axis
-            } else {
-                this.actions.selectAxis(axis);
-            }
         },
         ZERO_AXIS: (event, { axis }) => {
             if (!axis) {

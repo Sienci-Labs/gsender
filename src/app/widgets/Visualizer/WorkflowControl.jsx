@@ -246,9 +246,6 @@ class WorkflowControl extends PureComponent {
         const showPlayOrTest = isConnected && fileLoaded && canRun;
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflow.state);
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflow.state);
-        if (this.props.state.filename !== '') {
-            this.state.fileLoaded = false;
-        }
 
         return (
             <div className={styles.workflowControl}>
