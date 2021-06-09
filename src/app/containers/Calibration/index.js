@@ -18,7 +18,7 @@ const Calibration = ({ modalClose }) => {
             id: 0,
             label: 'Alignment',
             widgetId: 'calibration-alignment',
-            component: <Alignment />,
+            component: <Alignment onClose={modalClose} />,
         },
         {
             id: 1,
