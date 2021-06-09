@@ -946,6 +946,9 @@ class VisualizerWidget extends PureComponent {
         if (this.state.objects.cuttingTool.visible !== prevState.objects.cuttingTool.visible) {
             this.config.set('objects.cuttingTool.visible', this.state.objects.cuttingTool.visible);
         }
+        if (this.state.liteMode !== prevState.liteMode) {
+            this.config.set('liteMode', this.state.liteMode);
+        }
     }
 
     getInitialState() {
