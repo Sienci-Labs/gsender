@@ -23,7 +23,6 @@
 
 /* eslint max-classes-per-file: 0 */
 import events from 'events';
-import { stripComments } from './gcode-filtering';
 
 export const SP_TYPE_SEND_RESPONSE = 0;
 export const SP_TYPE_CHAR_COUNTING = 1;
@@ -300,8 +299,7 @@ class Sender extends events.EventEmitter {
             .filter(line => !comments.some(comment => line.includes(comment)));
         console.log(lines);*/
         let lines = gcode.split('\n');
-        lines = lines.map(line => stripComments(line));
-        lines.filter(line => (line.trim().length > 0));
+
         if (this.sp) {
             this.sp.clear();
         }
