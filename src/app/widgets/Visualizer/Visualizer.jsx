@@ -419,7 +419,9 @@ class Visualizer extends Component {
         if (group) {
             this.group.remove(group);
         }
-        actions.loadGCode('Visualizer', gcode.content);
+        if (gcode.content) {
+            actions.loadGCode('', gcode.content);
+        }
     }
 
     removeSceneGroup() {
@@ -1152,7 +1154,7 @@ class Visualizer extends Component {
             return;
         }
         const obj = this.visualizer.render(gcode);
-        obj.name = 'Visualizer';
+        obj.name = '';
         this.group.add(obj);
 
         const bbox = getBoundingBox(obj);
