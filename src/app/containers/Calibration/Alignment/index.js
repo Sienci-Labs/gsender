@@ -4,12 +4,13 @@ import PropTypes from 'prop-types';
 import Step from './Step';
 import NavigationButtons from './NavigationButtons';
 import TriangleDiagram from '../TriangleDiagram';
+import Result from './Result';
 
 import styles from './index.styl';
 
 import { step1, step2 } from './data';
 
-const Alignment = () => {
+const Alignment = ({ onClose }) => {
     const initialShapes = {
         circlePoints: [
             { id: 0, position: 'top', label: '1', show: false },
@@ -51,6 +52,13 @@ const Alignment = () => {
     const [actions, setActions] = useState(steps[currentStep]);
     const [currentAction, setCurrentAction] = useState(0);
     const [stepFinished, setStepFinished] = useState(false);
+    const [isFullyComplete, setIsFullyComplete] = useState(false);
+
+    const [triangle, setTriangle] = useState({
+        a: 0,
+        b: 0,
+        c: 0,
+    });
 
     const highlightShapes = () => {
         const foundAction = actions.find(action => action.id === Number(currentAction));
@@ -125,6 +133,10 @@ const Alignment = () => {
         setActions(updatedActions);
     };
 
+    const handleTriangleChange = ({ id, value }) => {
+        setTriangle(prev => ({ ...prev, [id]: value }));
+    };
+
     const next = () => {
         const nextStep = currentStep + 1;
         if (steps[nextStep]) {
@@ -133,52 +145,68 @@ const Alignment = () => {
             setShapes(initialShapes);
             setCurrentStep(nextStep);
             setStepFinished(false);
+        } else {
+            setIsFullyComplete(true);
         }
     };
 
     const prev = () => {
-        const nextStep = currentStep - 1;
-        if (steps[nextStep]) {
-            setActions(steps[nextStep]);
+        const prevStep = currentStep - 1;
+        if (steps[prevStep]) {
+            setActions(steps[prevStep]);
             setCurrentAction(0);
             setShapes(initialShapes);
-            setCurrentStep(nextStep);
+            setCurrentStep(prevStep);
             setStepFinished(false);
         }
+    };
+
+    const onBack = () => {
+        setIsFullyComplete(false);
     };
 
     const actionData = actions.find(action => action.id === currentAction);
 
     const prevDisabled = !!steps[currentStep - 1];
-    const nextDisabled = !!steps[currentStep + 1] && stepFinished;
+    const nextDisabled = stepFinished;
 
-    return (
-        <div className={styles.alignmentContainer}>
-            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <div>
-                    <h4 style={{ marginTop: 0 }}>Alignment</h4>
+    return isFullyComplete
+        ? <Result triangle={triangle} onBack={onBack} onClose={onClose} />
+        : (
+            <div className={styles.alignmentContainer}>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                        <h4 style={{ marginTop: 0 }}>Alignment</h4>
 
-                    <Step
-                        actions={actions}
-                        onChange={onChange}
-                        currentAction={currentAction}
+                        <Step
+                            actions={actions}
+                            onChange={onChange}
+                            currentAction={currentAction}
+                            triangle={triangle}
+                            onTriangleChange={handleTriangleChange}
+                        />
+                    </div>
+
+                    <NavigationButtons
+                        onNext={next}
+                        onPrevious={prev}
+                        prevDisabled={prevDisabled}
+                        nextDisabled={nextDisabled}
                     />
                 </div>
 
-                <NavigationButtons
-                    onNext={next}
-                    onPrevious={prev}
-                    prevDisabled={prevDisabled}
-                    nextDisabled={nextDisabled}
-                />
-            </div>
+                <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
+                    <TriangleDiagram
+                        circlePoints={shapes.circlePoints}
+                        arrows={shapes.arrows}
+                        triangle={triangle}
+                        onTriangleChange={handleTriangleChange}
+                    />
 
-            <div style={{ justifySelf: 'center', marginTop: '2rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%' }}>
-                <TriangleDiagram circlePoints={shapes.circlePoints} arrows={shapes.arrows} />
-                <p style={{ width: '100%', marginTop: '4rem' }}>{actionData?.description}</p>
+                    <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
+                </div>
             </div>
-        </div>
-    );
+        );
 }; Alignment.propTypes = { step: PropTypes.object };
 
 export default Alignment;
