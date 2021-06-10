@@ -23,17 +23,26 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Provider as ReduxProvider } from 'react-redux';
+import reduxStore from 'app/store/redux';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+
+import Keypad from '../JogControl';
 
 const ToolIntroduction = ({ readyHandler }) => {
     return (
-        <div>
-            <p>We&apos;ll be making a triangle to help align your machine.</p>
-            <p>You will need to make a few marks on a piece of tape and place them on your machines wasteboard</p>
-            <p>In addition, your cutting tool should be as pointy as possible for maximum accuracy when measuring distances.</p>
-            <p>Please jog your machine to the back left before beginning.</p>
-            <FunctionButton primary onClick={readyHandler}>Ready to start!</FunctionButton>
-        </div>
+        <ReduxProvider store={reduxStore}>
+            <div>
+                <p>We&apos;ll be making a triangle to help align your machine.</p>
+                <p>You will need to make a few marks on a piece of tape and place them on your machines wasteboard</p>
+                <p>In addition, your cutting tool should be as pointy as possible for maximum accuracy when measuring distances.</p>
+                <p>Please jog your machine to the back left before beginning.</p>
+
+                <Keypad />
+
+                <FunctionButton primary onClick={readyHandler}>Ready to start!</FunctionButton>
+            </div>
+        </ReduxProvider>
     );
 };
 
