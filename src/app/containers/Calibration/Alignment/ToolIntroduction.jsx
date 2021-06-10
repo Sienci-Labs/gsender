@@ -22,6 +22,7 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
 const ToolIntroduction = ({ readyHandler }) => {
@@ -31,9 +32,13 @@ const ToolIntroduction = ({ readyHandler }) => {
             <p>You will need to make a few marks on a piece of tape and place them on your machines wasteboard</p>
             <p>In addition, your cutting tool should be as pointy as possible for maximum accuracy when measuring distances.</p>
             <p>Please jog your machine to the back left before beginning.</p>
-            <FunctionButton primary onClick={readyHandler}>Ready</FunctionButton>
+            <FunctionButton primary onClick={readyHandler}>Ready to start!</FunctionButton>
         </div>
     );
+};
+
+ToolIntroduction.propTypes = {
+    readyHandler: PropTypes.func
 };
 
 export default ToolIntroduction;
