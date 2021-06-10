@@ -192,18 +192,17 @@ export const step2 = [
                 shapeID: 0,
                 isActive: true,
                 show: true,
-                // label: (
-                //     <div style={{ display: 'flex', gap: '0.5rem', flexDirection: 'column' }}>
-                //         <Input
-                //             className={styles.actionInput}
-                //             // style={inputStyle}
-                //             // disabled={!isCurrentAction}
-                //             units="mm"
-                //             // value={val}
-                //             // onChange={(e) => setVal(e.target.value)}
-                //         />
-                //     </div>
-                // )
+                label: ({ triangle, onTriangleChange }) => {
+                    return (
+                        <Input
+                            className={styles.actionInput}
+                            style={inputStyle}
+                            units="mm"
+                            value={triangle.a}
+                            onChange={(e) => onTriangleChange({ id: 'a', value: e.target.value })}
+                        />
+                    );
+                }
             },
             {
                 shapeType: 'circlePoints',
@@ -220,7 +219,7 @@ export const step2 = [
                 label: '2',
             },
         ],
-        description: ''
+        description: 'Measure the distance between the Location 1 and 2 and enter in the amount in the input beside the flashing arrow'
     },
     {
         id: 1,
@@ -236,9 +235,18 @@ export const step2 = [
                 isActive: true,
                 show: true,
                 clearPrevious: true,
+                label: ({ triangle, onTriangleChange }) => (
+                    <Input
+                        className={styles.actionInput}
+                        style={inputStyle}
+                        units="mm"
+                        value={triangle.b}
+                        onChange={(e) => onTriangleChange({ id: 'b', value: e.target.value })}
+                    />
+                )
             },
         ],
-        description: ''
+        description: 'Measure the distance between the Location 2 and 3 and enter in the amount in the input beside the flashing arrow'
     },
     {
         id: 2,
@@ -254,6 +262,15 @@ export const step2 = [
                 isActive: true,
                 show: true,
                 clearPrevious: true,
+                label: ({ triangle, onTriangleChange }) => (
+                    <Input
+                        className={styles.actionInput}
+                        style={inputStyle}
+                        units="mm"
+                        value={triangle.c}
+                        onChange={(e) => onTriangleChange({ id: 'c', value: e.target.value })}
+                    />
+                )
             },
             {
                 shapeType: 'circlePoints',
@@ -263,6 +280,6 @@ export const step2 = [
                 label: '3',
             },
         ],
-        description: ''
+        description: 'Measure the distance between the Location 3 and 1 and enter in the amount in the input beside the flashing arrow'
     },
 ];
