@@ -23,8 +23,13 @@ export const team = [
         id: 4,
         name: 'Kelly Z.',
         title: 'Icon Design',
-        isLastInList: true
     },
+    {
+        id: 5,
+        name: 'Aleks G.',
+        title: 'Research and Design',
+        isLastInList: true
+    }
 ];
 
 export const timeline = [

@@ -47,7 +47,7 @@ const EventWidget = ({ active }) => {
     const handleToolChange = (selection) => setToolChangeOption(selection.value);
     const handlePreHookChange = (e) => setPreHook(e.target.value);
     const handlePostHookChange = (e) => setPostHook(e.target.value);
-    const handleSaveCode = (e) => {
+    const handleSaveCode = () => {
         store.set('workspace.toolChangeHooks.preHook', preHook);
         store.set('workspace.toolChangeHooks.postHook', postHook);
         const context = {
