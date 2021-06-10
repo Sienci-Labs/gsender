@@ -42,7 +42,8 @@ export const step1 = [
         id: 1,
         checked: false,
         hasBeenChanged: false,
-        label: ({ isCurrentAction }) => {
+        hideCompleteButton: true,
+        label: ({ isCurrentAction, onChange }) => {
             const [val, setVal] = useState(100);
             const [didClick, setDidClick] = useState(false);
 
@@ -53,6 +54,8 @@ export const step1 = [
 
                 setDidClick(true); //Disable button
                 controller.command('gcode', `G0 Y${value}`);
+
+                onChange();
             };
 
             return (
@@ -112,7 +115,8 @@ export const step1 = [
         id: 3,
         checked: false,
         hasBeenChanged: false,
-        label: ({ isCurrentAction }) => {
+        hideCompleteButton: true,
+        label: ({ isCurrentAction, onChange }) => {
             const [val, setVal] = useState(100);
             const [didClick, setDidClick] = useState(false);
 
@@ -123,6 +127,8 @@ export const step1 = [
 
                 setDidClick(true); //Disable button
                 controller.command('gcode', `G0 X${value}`);
+
+                onChange();
             };
 
             return (
