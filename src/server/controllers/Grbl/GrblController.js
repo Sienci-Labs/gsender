@@ -1194,9 +1194,6 @@ class GrblController {
 
                 callback(null, this.sender.toJSON());
             },
-            'test': () => {
-                console.log('heard');
-            },
             'gcode:unload': () => {
                 this.workflow.stop();
 
