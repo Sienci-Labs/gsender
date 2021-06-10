@@ -9,14 +9,15 @@ const Step = ({ actions, currentAction, onChange }) => {
     return (
         <div className={styles.actionItemContainer}>
             {
-                actions.map(step => (
+                actions.map(action => (
                     <ActionItem
-                        key={step.id}
-                        id={step.id}
-                        checked={step.checked}
-                        isCurrentAction={step.id === currentAction}
-                        hasBeenChanged={step.hasBeenChanged}
-                        label={step.label}
+                        key={action.id}
+                        id={action.id}
+                        checked={action.checked}
+                        hideCompleteButton={action.hideCompleteButton}
+                        isCurrentAction={action.id === currentAction}
+                        hasBeenChanged={action.hasBeenChanged}
+                        label={action.label}
                         onChange={onChange}
                     />
                 ))
