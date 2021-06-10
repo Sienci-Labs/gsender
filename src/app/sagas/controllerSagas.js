@@ -109,6 +109,14 @@ export function* initialize() {
         });
     });
 
+    // Need this to handle unload when machine not connected since controller event isn't sent
+    pubsub.subscribe('gcode:unload', () => {
+        reduxStore.dispatch({
+            type: fileActions.UNLOAD_FILE_INFO,
+            payload: {}
+        });
+    });
+
     controller.addListener('toolchange:start', () => {
         const onConfirmhandler = () => {
             controller.command('toolchange:post');
