@@ -106,7 +106,7 @@ const Alignment = ({ onClose }) => {
 
     useEffect(() => {
         highlightShapes();
-    }, [currentAction]);
+    }, [currentAction, currentStep]);
 
     useEffect(() => {
         const isFinished = actions.every((action) => action.checked);
