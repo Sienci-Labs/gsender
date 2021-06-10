@@ -87,8 +87,14 @@ class TerminalWrapper extends PureComponent {
                     return;
                 }
 
+                // Ctrl-C copy
                 if (event.ctrlKey && event.code === 'KeyC') {
                     document.execCommand('copy');
+                    return;
+                }
+                // Ctrl-V paste
+                if (event.ctrlKey && event.code === 'KeyV') {
+                    term.paste();
                     return;
                 }
 
@@ -381,19 +387,6 @@ class TerminalWrapper extends PureComponent {
         }
 
         this.term.resize(cols, rowNumbers);
-
-        // if (!(this.term && this.term.element)) {
-        //     return;
-        // }
-
-        // const geometry = fit.proposeGeometry(this.term);
-        // if (!geometry) {
-        //     return;
-        // }
-
-        // cols = (!cols || cols === 'auto') ? geometry.cols : cols;
-        // rows = (!rows || rows === 'auto') ? geometry.rows : rows;
-        // this.term.resize(cols, rows);
     }
 
     clear() {
