@@ -23,31 +23,42 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import Modal from 'app/components/Modal';
+import classNames from 'classnames';
 
 import styles from './index.styl';
 
-const ToolModal = ({ onClose, title, children }) => {
+const Input = ({ value, units, onChange, additionalProps, className, style, disabled }) => {
     return (
-        <Modal onClose={onClose}>
-            <div className={styles.toolModal}>
-                <div className={styles.header}>
-                    <h3 className={styles.headerText}>{title}</h3>
-                </div>
-                <div className={styles.container}>
-                    <div className={styles.settingsContainer}>
-                        {children}
-                    </div>
-                </div>
+        <div className={classNames(styles.input, 'form-group', className)}>
+            <div className="input-group">
+                <input
+                    {...additionalProps}
+                    value={value}
+                    onChange={onChange}
+                    className={classNames('form-control', styles.inputText)}
+                    style={style}
+                    disabled={disabled}
+                />
+                {units && <span className="input-group-addon">{units}</span>}
             </div>
-        </Modal>
+        </div>
     );
 };
 
-ToolModal.propTypes = {
-    title: PropTypes.string.isRequired,
-    onClose: PropTypes.func.isRequired
+Input.propTypes = {
+    units: PropTypes.string,
+    onChange: PropTypes.func,
+    value: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number,
+    ]),
+    additionalProps: PropTypes.object,
+    className: PropTypes.string,
+    disabled: PropTypes.bool,
 };
 
-export default ToolModal;
+Input.defaultProps = {
+    additionalProps: { type: 'text' },
+};
+
+export default Input;
