@@ -87,6 +87,7 @@ class WorkflowControl extends PureComponent {
     handleCloseFile = () => {
         this.setState({ closeFile: true });
         pubsub.publish('gcode:unload');
+        controller.command('gcode:unload');
     }
 
     handleReaderResponse = ({ data }) => {
