@@ -719,7 +719,7 @@ class SurfacingVisualizer extends PureComponent {
             }
         ];
         return (
-            <div id="surface_visualizer_container">
+            <div id="surface_visualizer_container" style={{ height: '100%' }}>
                 {state.gcode.loading &&
                 <Loading />
                 }
@@ -732,7 +732,7 @@ class SurfacingVisualizer extends PureComponent {
                         tabs={tabs}
                         activeTabIndex={currentTab}
                         onClick={(index) => this.setCurrentTab(index)}
-                        style={{ backgroundColor: 'white' }}
+                        style={{ backgroundColor: '#e5e7eb' }}
                     >
                     </TabbedWidget.Tabs>
                     <TabbedWidget.Content>
