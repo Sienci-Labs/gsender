@@ -170,7 +170,7 @@ export default class Keybindings extends Component {
                     { [styles.visible]: active }
                 )}
             >
-                <h3 className={styles['settings-title']}>Keybindings</h3>
+                <h3 className={styles['settings-title']}>Keyboard Shortcuts</h3>
 
                 <div className={styles['table-wrapper']}>
                     <Table

@@ -233,6 +233,8 @@ class SurfacingVisualizer extends PureComponent {
             this.visualizer.handleSceneRender(gcode);
         },
         unloadGCode: () => {
+            controller.command('gcode:unload');
+            pubsub.publish('gcode:unload');
             const visualizer = this.visualizer;
             if (visualizer) {
                 visualizer.unload();

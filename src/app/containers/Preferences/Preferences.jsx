@@ -81,7 +81,7 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 2,
-                    label: 'Keybindings',
+                    label: 'Keyboard Shortcuts',
                     component: Keybindings
                 },
                 {
