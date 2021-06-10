@@ -3,12 +3,13 @@ import PropTypes from 'prop-types';
 
 import TabbedWidget from 'app/components/TabbedWidget';
 import ToolModal from 'app/components/ToolModal/ToolModal';
+import Surfacing from 'app/containers/Surfacing/Surfacing';
 
 import Alignment from './Alignment';
+import AxisTuning from './AxisTuning';
 
 import styles from './index.styl';
 
-import Tab from './Tab';
 
 const Calibration = ({ modalClose }) => {
     const [tab, setTab] = useState(0);
@@ -24,13 +25,13 @@ const Calibration = ({ modalClose }) => {
             id: 1,
             label: 'Axis Tuning',
             widgetId: 'calibration-axis-tuning',
-            component: <Tab title="Axis Tuning" />,
+            component: <AxisTuning onClose={modalClose} />,
         },
         {
             id: 2,
             label: 'Surfacing Wasteboard',
             widgetId: 'calibration-surfacing',
-            component: <Tab title="Surfacing Wasteboard" />,
+            component: <Surfacing onClose={modalClose} />,
         },
     ];
 
@@ -51,7 +52,7 @@ const Calibration = ({ modalClose }) => {
                                 const active = index === tab;
                                 return (
                                     <TabbedWidget.ChildComponent key={t.id} active={active}>
-                                        {t.component}
+                                        {active && t.component}
                                     </TabbedWidget.ChildComponent>
                                 );
                             })

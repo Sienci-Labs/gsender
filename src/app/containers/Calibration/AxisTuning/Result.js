@@ -43,6 +43,8 @@ const Result = ({ triangle, onBack, onClose }) => {
 
                 const FM = calculateFM({ b, beta: BETA });
 
+                console.log({ ALPHA, BETA, FM });
+
                 if (isNaN(ALPHA) || isNaN(BETA) || isNaN(FM)) {
                     throw new Error();
                 }
@@ -96,7 +98,6 @@ const Result = ({ triangle, onBack, onClose }) => {
                 <>
                     <Icon type="warning" />
                     <p>Your machine is pretty squared, but if you still want to have it full squared, move either the right y-axis rail backwards <strong>{fm}mm</strong> or the left y-axis rail forward by <strong>{fm}mm</strong></p>
-                    <p>We also noticed your steps-per-mm can be updated for improved accuray on your machine, you can click the button below to do so.</p>
                 </>
             );
         }
@@ -105,7 +106,6 @@ const Result = ({ triangle, onBack, onClose }) => {
             <>
                 <Icon type="error" />
                 <p>Your machine is off by <strong>{fm}mm</strong>, to properly square it, move either the right y-axis rail backwards <strong>{fm}mm</strong> or the left y-axis rail forward by <strong>{fm}mm</strong></p>
-                <p>We also noticed your steps-per-mm can be updated for improved accuray on your machine, you can click the button below to do so.</p>
             </>
         );
     };
@@ -118,17 +118,10 @@ const Result = ({ triangle, onBack, onClose }) => {
                 {renderResult()}
             </div>
 
-            { hasError && <FunctionButton primary onClick={onBack}>Go Back</FunctionButton> }
-
             {
-                machineIsSquared
-                    ? <FunctionButton primary onClick={onClose}>Exit Calibration Tool</FunctionButton>
-                    : (
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <FunctionButton primary>Update Machine Settings</FunctionButton>
-                            <FunctionButton primary onClick={onClose}>Exit Calibration Tool</FunctionButton>
-                        </div>
-                    )
+                hasError
+                    ? <FunctionButton primary onClick={onBack}>Go Back</FunctionButton>
+                    : <FunctionButton primary onClick={onClose}>Exit Calibration Tool</FunctionButton>
             }
         </div>
     );
