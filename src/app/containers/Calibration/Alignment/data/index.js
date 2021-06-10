@@ -49,7 +49,7 @@ export const step1 = [
             const handleClick = () => {
                 const { wpos } = controller?.state?.status;
 
-                const value = Number(wpos.y) - Number(val);
+                const value = (Number(wpos.y) - Number(val)).toFixed(3);
 
                 setDidClick(true); //Disable button
                 controller.command('gcode', `G0 Y${value}`);
@@ -72,6 +72,7 @@ export const step1 = [
                         units="mm"
                         value={val}
                         onChange={(e) => setVal(e.target.value)}
+                        additionalProps={{ type: 'number' }}
                     />
                 </div>
             );
@@ -118,7 +119,7 @@ export const step1 = [
             const handleClick = () => {
                 const { wpos } = controller?.state?.status;
 
-                const value = Number(wpos.y) - Number(val);
+                const value = (Number(wpos.y) - Number(val)).toFixed(3);
 
                 setDidClick(true); //Disable button
                 controller.command('gcode', `G0 X${value}`);
@@ -141,6 +142,7 @@ export const step1 = [
                         units="mm"
                         value={val}
                         onChange={(e) => setVal(e.target.value)}
+                        additionalProps={{ type: 'number' }}
                     />
                 </div>
             );
@@ -200,6 +202,7 @@ export const step2 = [
                             units="mm"
                             value={triangle.a}
                             onChange={(e) => onTriangleChange({ id: 'a', value: e.target.value })}
+                            additionalProps={{ type: 'number' }}
                         />
                     );
                 }
@@ -242,6 +245,7 @@ export const step2 = [
                         units="mm"
                         value={triangle.b}
                         onChange={(e) => onTriangleChange({ id: 'b', value: e.target.value })}
+                        additionalProps={{ type: 'number' }}
                     />
                 )
             },
@@ -269,6 +273,7 @@ export const step2 = [
                         units="mm"
                         value={triangle.c}
                         onChange={(e) => onTriangleChange({ id: 'c', value: e.target.value })}
+                        additionalProps={{ type: 'number' }}
                     />
                 )
             },
