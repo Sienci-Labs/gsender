@@ -197,23 +197,16 @@ const Alignment = ({ onClose }) => {
                         }
                     </div>
 
-                    <NavigationButtons
-                        onNext={next}
-                        onPrevious={prev}
-                        prevDisabled={prevDisabled}
-                        nextDisabled={nextDisabled}
-                    />
+                    {
+                        introComplete &&
+                        <NavigationButtons
+                            onNext={next}
+                            onPrevious={prev}
+                            prevDisabled={prevDisabled}
+                            nextDisabled={nextDisabled}
+                        />
+                    }
                 </div>
-                {
-                    introComplete &&
-                    <NavigationButtons
-                        onNext={next}
-                        onPrevious={prev}
-                        prevDisabled={prevDisabled}
-                        nextDisabled={nextDisabled}
-                    />
-                }
-            </div>
 
                 <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
                     <TriangleDiagram
