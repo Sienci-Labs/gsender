@@ -87,6 +87,11 @@ class TerminalWrapper extends PureComponent {
                     return;
                 }
 
+                if (event.ctrlKey && event.code === 'KeyC') {
+                    document.execCommand('copy');
+                    return;
+                }
+
                 // Home
                 if (event.key === 'Home' || (event.metaKey && event.key === 'ArrowLeft')) {
                     term.buffer.x = this.prompt.length;
