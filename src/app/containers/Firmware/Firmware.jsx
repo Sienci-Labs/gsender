@@ -26,8 +26,10 @@
 
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Modal from 'app/components/Modal';
 import map from 'lodash/map';
+import get from 'lodash/get';
 import download from 'downloadjs';
 import store from 'app/store';
 import { GRBL } from 'app/constants';
@@ -513,7 +515,7 @@ class Firmware extends PureComponent {
     }
 
     render() {
-        const { modalClose } = this.props;
+        const { modalClose, canClick } = this.props;
         const loadedSettings = GRBL_SETTINGS.GRBL_SETTINGS;
         let message = this.defineMessageForCncDefaultsButton();
         let currentSettings = controller.settings;
@@ -607,7 +609,7 @@ class Firmware extends PureComponent {
                             ) : ''}
                             <div className={styles.buttonsMiddle}>
                                 <TooltipCustom content="Import your settings file you saved previously" location="default">
-                                    <ToolModalButton onClick={this.upload} icon="fas fa-file-import">
+                                    <ToolModalButton onClick={this.upload} icon="fas fa-file-import" disabled={canClick}>
                                     Import Settings
                                     </ToolModalButton>
                                 </TooltipCustom>
@@ -615,6 +617,7 @@ class Firmware extends PureComponent {
                                     <ToolModalButton
                                         onClick={this.download}
                                         icon="fas fa-file-export"
+                                        disabled={canClick}
                                     >
                                     Export Settings
                                     </ToolModalButton>
@@ -623,6 +626,7 @@ class Firmware extends PureComponent {
                                     <ToolModalButton
                                         onClick={this.restoreSettings}
                                         icon="fas fa-undo"
+                                        disabled={canClick}
                                     >
                                     Restore Defaults
                                     </ToolModalButton>
@@ -641,6 +645,7 @@ class Firmware extends PureComponent {
                                     icon="fas fa-tasks"
                                     onClick={this.applyNewSettings}
                                     className={this.state.newSettingsButtonDisabled ? `${styles.firmwareButtonDisabled}` : `${styles.applySettingsButton}`}
+                                    disabled={canClick}
                                 >
                                 Apply New Settings
                                 </ToolModalButton>
@@ -662,4 +667,10 @@ class Firmware extends PureComponent {
     }
 }
 
-export default Firmware;
+
+export default connect((store) => {
+    const isConnected = get(store, 'connection.isConnected');
+    return {
+        canClick: !isConnected
+    };
+})(Firmware);
