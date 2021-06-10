@@ -1385,7 +1385,7 @@ class GrblController {
                     'G1F1 M3 S' + ensurePositiveNumber(maxS * (power / 100))
                 ];
                 if (duration > 0) {
-                    commands.push('G4P' + ensurePositiveNumber(duration / 1000));
+                    commands.push('G4P' + ensurePositiveNumber(duration));
                     commands.push('M5 S0');
                 }
                 this.state.parserstate.modal.spindle = 'M3';
