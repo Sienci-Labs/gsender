@@ -221,7 +221,7 @@ class GrblController {
         this.feeder = new Feeder({
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
-                line = line.replace(/\s*;.*/g, '').trim();
+                line = line.replace(/\s*;.*/g, '').replace(/\s*\(.*?\)\s*/g, '').trim();
                 context = this.populateContext(context);
 
                 if (line[0] === '%') {
@@ -320,7 +320,7 @@ class GrblController {
             bufferSize: (128 - 8), // The default buffer size is 128 bytes
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
-                line = line.replace(/\s*;.*/g, '').trim();
+                line = line.replace(/\s*;.*/g, '').replace(/\s*\(.*?\)\s*/g, '').trim();
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;
