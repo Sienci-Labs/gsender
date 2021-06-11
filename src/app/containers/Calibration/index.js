@@ -6,7 +6,7 @@ import ToolModal from 'app/components/ToolModal/ToolModal';
 import Surfacing from 'app/containers/Surfacing/Surfacing';
 
 import Alignment from './Alignment';
-import AxisTuning from './AxisTuning';
+// import AxisTuning from './AxisTuning';
 
 import styles from './index.styl';
 
@@ -21,12 +21,12 @@ const Calibration = ({ modalClose }) => {
             widgetId: 'calibration-alignment',
             component: <Alignment onClose={modalClose} />,
         },
-        {
-            id: 1,
-            label: 'Axis Tuning',
-            widgetId: 'calibration-axis-tuning',
-            component: <AxisTuning onClose={modalClose} />,
-        },
+        // {
+        //     id: 1,
+        //     label: 'Axis Tuning',
+        //     widgetId: 'calibration-axis-tuning',
+        //     component: <AxisTuning onClose={modalClose} />,
+        // },
         {
             id: 2,
             label: 'Surfacing Wasteboard',
