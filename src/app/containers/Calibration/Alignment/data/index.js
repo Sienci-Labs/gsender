@@ -47,15 +47,17 @@ export const step1 = [
             const [val, setVal] = useState(100);
             const [didClick, setDidClick] = useState(false);
 
+            const AXIS = 'Y';
+
             const handleClick = () => {
                 const { wpos } = controller?.state?.status;
 
                 const value = (Number(wpos.y) - Number(val)).toFixed(3);
 
                 setDidClick(true); //Disable button
-                controller.command('gcode', `G0 Y${value}`);
+                controller.command('gcode', `G0 ${AXIS}${value}`);
 
-                onChange();
+                onChange({ axis: AXIS.toLowerCase(), value: val });
             };
 
             return (
@@ -120,15 +122,17 @@ export const step1 = [
             const [val, setVal] = useState(100);
             const [didClick, setDidClick] = useState(false);
 
+            const AXIS = 'X';
+
             const handleClick = () => {
                 const { wpos } = controller?.state?.status;
 
                 const value = (Number(wpos.y) - Number(val)).toFixed(3);
 
                 setDidClick(true); //Disable button
-                controller.command('gcode', `G0 X${value}`);
+                controller.command('gcode', `G0 ${AXIS}${value}`);
 
-                onChange();
+                onChange({ axis: AXIS.toLowerCase(), value: val });
             };
 
             return (
