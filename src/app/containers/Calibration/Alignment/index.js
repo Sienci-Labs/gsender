@@ -3,10 +3,12 @@ import PropTypes from 'prop-types';
 import { Provider as ReduxProvider } from 'react-redux';
 import ToolIntroduction from 'app/containers/Calibration/Alignment/ToolIntroduction';
 import reduxStore from 'app/store/redux';
+import Modal from 'app/components/Modal';
 import Step from './Step';
 import NavigationButtons from './NavigationButtons';
 import TriangleDiagram from '../TriangleDiagram';
 import Result from './Result';
+import Keypad from '../JogControl';
 
 import styles from './index.styl';
 import { step1, step2 } from './data';
@@ -55,6 +57,7 @@ const Alignment = ({ onClose }) => {
     const [stepFinished, setStepFinished] = useState(false);
     const [isFullyComplete, setIsFullyComplete] = useState(false);
     const [introComplete, setIntroComplete] = useState(false);
+    const [showKeypad, setShowKeypad] = useState(false);
 
     const [triangle, setTriangle] = useState({
         a: 0,
@@ -192,47 +195,61 @@ const Alignment = ({ onClose }) => {
                 isFullyComplete
                     ? <Result triangle={triangle} jogValues={jogValues} onBack={onBack} onClose={onClose} />
                     : (
-                        <div className={styles.alignmentContainer}>
-                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                <div>
-                                    <h4 style={{ marginTop: 0 }}>Alignment</h4>
-                                    {
-                                        !introComplete && <ToolIntroduction readyHandler={startTool} />
-                                    }
+                        <>
+                            <div className={styles.alignmentContainer}>
+                                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                    <div>
+                                        <h4 style={{ marginTop: 0 }}>Alignment</h4>
+                                        {
+                                            !introComplete && <ToolIntroduction readyHandler={startTool} />
+                                        }
+                                        {
+                                            introComplete && (
+                                                <Step
+                                                    actions={actions}
+                                                    onChange={onChange}
+                                                    currentAction={currentAction}
+                                                />
+                                            )
+                                        }
+                                    </div>
+
                                     {
                                         introComplete && (
-                                            <Step
-                                                actions={actions}
-                                                onChange={onChange}
-                                                currentAction={currentAction}
+                                            <NavigationButtons
+                                                onNext={next}
+                                                onPrevious={prev}
+                                                prevDisabled={prevDisabled}
+                                                nextDisabled={nextDisabled}
+                                                onShowJogControls={() => setShowKeypad(true)}
                                             />
                                         )
                                     }
                                 </div>
 
-                                {
-                                    introComplete && (
-                                        <NavigationButtons
-                                            onNext={next}
-                                            onPrevious={prev}
-                                            prevDisabled={prevDisabled}
-                                            nextDisabled={nextDisabled}
-                                        />
-                                    )
-                                }
+                                <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
+                                    <TriangleDiagram
+                                        circlePoints={shapes.circlePoints}
+                                        arrows={shapes.arrows}
+                                        triangle={triangle}
+                                        onTriangleChange={handleTriangleChange}
+                                    />
+
+                                    <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
+                                </div>
                             </div>
 
-                            <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
-                                <TriangleDiagram
-                                    circlePoints={shapes.circlePoints}
-                                    arrows={shapes.arrows}
-                                    triangle={triangle}
-                                    onTriangleChange={handleTriangleChange}
-                                />
-
-                                <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
-                            </div>
-                        </div>
+                            <Modal size="xs" show={showKeypad} onClose={() => setShowKeypad(false)}>
+                                <Modal.Header>
+                                    <Modal.Title>Jog Control Keypad</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <ReduxProvider store={reduxStore}>
+                                        <Keypad />
+                                    </ReduxProvider>
+                                </Modal.Body>
+                            </Modal>
+                        </>
                     )
             }
         </ReduxProvider>
