@@ -83,11 +83,18 @@ class ProbeWidget extends PureComponent {
 
     state = this.getInitialState();
 
-    PROBE_DISTANCE = {
+    PROBE_DISTANCE_METRIC = {
         X: 25,
         Y: 25,
         Z: 15
     };
+
+    PROBE_DISTANCE_IMPERIAL = {
+        X: 1,
+        Y: 1,
+        Z: 0.6
+    };
+
 
     DWELL_TIME = 0.3;
 
@@ -389,9 +396,9 @@ class ProbeWidget extends PureComponent {
     }
 
     generateSingleAxisCommands(axis, thickness, params) {
-        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate } = params;
+        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
         const workspace = this.mapWCSToPValue(wcs);
-        let probeDistance = this.PROBE_DISTANCE[axis];
+        let probeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC[axis] : this.PROBE_DISTANCE_IMPERIAL[axis];
         probeDistance = (isSafe) ? -probeDistance : probeDistance;
         probeDistance = (axis === 'Z') ? (-1 * Math.abs(probeDistance)) : probeDistance;
         retractDistance = (axis === 'Z') ? retractDistance : retractDistance * -1;
@@ -476,8 +483,8 @@ class ProbeWidget extends PureComponent {
         let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate } = params;
         const workspace = this.mapWCSToPValue(wcs);
         const XYRetract = -retractDistance;
-        let XYProbeDistance = this.PROBE_DISTANCE.X;
-        let ZProbeDistance = this.PROBE_DISTANCE.Z * -1;
+        let XYProbeDistance = this.PROBE_DISTANCE_METRIC.X;
+        let ZProbeDistance = this.PROBE_DISTANCE_METRIC.Z * -1;
         XYProbeDistance = (isSafe) ? -XYProbeDistance : XYProbeDistance;
         const gcode = this.gcode;
 
@@ -614,7 +621,6 @@ class ProbeWidget extends PureComponent {
         const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
         const wcs = this.getWorkCoordinateSystem();
         const code = [];
-
         // Grab units for correct modal
         let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
         const modal = (units === METRIC_UNITS) ? '21' : '20';
@@ -639,7 +645,8 @@ class ProbeWidget extends PureComponent {
             retractDistance: retractDistance,
             normalFeedrate: feedrate,
             quickFeedrate: fastFeedrate,
-            modal: modal
+            modal: modal,
+            units
         };
 
         const axesCount = Object.keys(axes).filter(axis => axes[axis]).length;

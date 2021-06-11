@@ -43,8 +43,6 @@ const Result = ({ triangle, onBack, onClose }) => {
 
                 const FM = calculateFM({ b, beta: BETA });
 
-                console.log({ ALPHA, BETA, FM });
-
                 if (isNaN(ALPHA) || isNaN(BETA) || isNaN(FM)) {
                     throw new Error();
                 }

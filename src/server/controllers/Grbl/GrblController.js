@@ -443,7 +443,6 @@ class GrblController {
 
         this.sender.on('end', (finishTime) => {
             this.actionTime.senderFinishTime = finishTime;
-            console.log(finishTime);
         });
 
         // Workflow
@@ -461,7 +460,6 @@ class GrblController {
 
             if (args.length > 0) {
                 const reason = { ...args[0] };
-                // console.log(reason);
                 this.sender.hold(reason); // Hold reason
             } else {
                 this.sender.hold();
@@ -1420,6 +1418,7 @@ class GrblController {
             'gcode:safe': () => {
                 const [commands, prefUnits] = args;
                 const deviceUnits = this.state.parserstate.modal.units;
+                let code = [];
 
                 if (!deviceUnits) {
                     log.error('Unable to determine device unit modal');
@@ -1427,13 +1426,14 @@ class GrblController {
                 }
                 // Force command in preferred units
                 if (prefUnits !== deviceUnits) {
-                    this.command('gcode', prefUnits);
+                    code.push(prefUnits);
                 }
-                this.command('gcode', commands);
+                code = code.concat(commands);
                 // return modal to previous state if they were different previously
                 if (prefUnits !== deviceUnits) {
-                    this.command('gcode', deviceUnits);
+                    code = code.concat(deviceUnits);
                 }
+                this.command('gcode', code);
             },
             'jog:start': () => {
                 const [axes, feedrate = 1000, units = METRIC_UNITS] = args;

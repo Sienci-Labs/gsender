@@ -28,13 +28,13 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Modal from 'app/components/Modal';
+import controller from 'app/lib/controller';
 import map from 'lodash/map';
 import get from 'lodash/get';
 import download from 'downloadjs';
 import store from 'app/store';
 import { GRBL } from 'app/constants';
 import TooltipCustom from '../../components/TooltipCustom/ToolTip';
-import controller from '../../lib/controller';
 import Loading from '../../components/Loader';
 import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 import ToolsNotificationModal from '../../components/ToolsNotificationModal/Modal';
@@ -308,12 +308,13 @@ class Firmware extends PureComponent {
     }
 
     grabNewSwitchInputSettings = (name, value) => {
-        this.setState(prevState => ({
-            valuesToApplyToGrbl: {
-                ...prevState.valuesToApplyToGrbl,
-                [name]: value
-            }
-        }));
+        const settings = {
+            ...this.state.valuesToApplyToGrbl,
+            [name]: value
+        };
+        this.setState({
+            valuesToApplyToGrbl: settings
+        });
     }
 
     grabNew$2InputSettings = (name, allTheValues) => {
@@ -356,49 +357,6 @@ class Firmware extends PureComponent {
             valuesToApplyToGrbl: {
                 ...prevState.valuesToApplyToGrbl,
                 $2: finalValue
-            }
-        }));
-    }
-
-    grabNew$3InputSettings = (name, allTheValues) => {
-        let finalValue = '';
-        let zero = [0, 0, 0];
-        let one = [1, 0, 0];
-        let two = [0, 1, 0];
-        let three = [1, 1, 0];
-        let four = [0, 0, 1];
-        let five = [1, 0, 1];
-        let six = [0, 1, 1];
-        let seven = [1, 1, 1];
-
-        if (new String(zero).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 0;
-        }
-        if (new String(one).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 1;
-        }
-        if (new String(two).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 2;
-        }
-        if (new String(three).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 3;
-        }
-        if (new String(four).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 4;
-        }
-        if (new String(five).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 5;
-        }
-        if (new String(six).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 6;
-        }
-        if (new String(seven).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 7;
-        }
-        this.setState(prevState => ({
-            valuesToApplyToGrbl: {
-                ...prevState.valuesToApplyToGrbl,
-                $3: finalValue
             }
         }));
     }
@@ -462,7 +420,6 @@ class Firmware extends PureComponent {
             valuesToSubmit.push([keys[i], values[i]]);
         }
         let gCoded = this.gcode(valuesToSubmit);
-
         //loops through array values, concatinates them with =
         for (let j = 0; j < gCoded.length; j++) {
             finalStrings[j] = gCoded[j].join('=');
