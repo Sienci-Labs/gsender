@@ -37,7 +37,7 @@ const ToolIntroduction = ({ readyHandler }) => {
 
             <Keypad />
 
-            <FunctionButton primary onClick={readyHandler}>Ready to start!</FunctionButton>
+            <FunctionButton primary onClick={readyHandler} style={{ marginTop: '2rem' }}>Ready to start!</FunctionButton>
         </div>
     );
 };
