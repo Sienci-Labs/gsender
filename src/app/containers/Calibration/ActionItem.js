@@ -35,7 +35,7 @@ const ActionItem = ({ checked, onChange, id, isCurrentAction, hasBeenChanged, la
                 )
             }
 
-            <Label isCurrentAction={isCurrentAction} onChange={() => onChange({ id, checked: true })} />
+            <Label isCurrentAction={isCurrentAction} onChange={({ axis, value }) => onChange({ id, checked: true, axis, value })} />
         </div>
     );
 };
