@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Provider as ReduxProvider } from 'react-redux';
 import ToolIntroduction from 'app/containers/Calibration/Alignment/ToolIntroduction';
+import reduxStore from 'app/store/redux';
 import Step from './Step';
 import NavigationButtons from './NavigationButtons';
 import TriangleDiagram from '../TriangleDiagram';
@@ -60,6 +62,12 @@ const Alignment = ({ onClose }) => {
         c: 0,
     });
 
+    const [jogValues, setJogValues] = useState({
+        x: 0,
+        y: 0,
+        z: 0,
+    });
+
     const highlightShapes = () => {
         const foundAction = actions.find(action => action.id === Number(currentAction));
 
@@ -116,11 +124,15 @@ const Alignment = ({ onClose }) => {
         }
     }, [actions]);
 
-    const onChange = ({ id, checked }) => {
+    const onChange = ({ id, checked, axis, value }) => {
         const foundAction = actions.find(action => action.id === Number(id));
 
         if (foundAction && foundAction.hasBeenChanged) {
             return;
+        }
+
+        if (axis && value) {
+            setJogValues((prev) => ({ ...prev, [axis]: Number(value) }));
         }
 
         const updatedActions = actions.map(action => (
@@ -174,52 +186,57 @@ const Alignment = ({ onClose }) => {
     const prevDisabled = !!steps[currentStep - 1];
     const nextDisabled = stepFinished;
 
-    return isFullyComplete
-        ? <Result triangle={triangle} onBack={onBack} onClose={onClose} />
-        : (
-            <div className={styles.alignmentContainer}>
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                        <h4 style={{ marginTop: 0 }}>Alignment</h4>
-                        {
-                            !introComplete &&
-                            <ToolIntroduction readyHandler={startTool} />
-                        }
-                        {
-                            introComplete &&
-                            <Step
-                                actions={actions}
-                                onChange={onChange}
-                                currentAction={currentAction}
-                                triangle={triangle}
-                                onTriangleChange={handleTriangleChange}
-                            />
-                        }
-                    </div>
+    return (
+        <ReduxProvider store={reduxStore}>
+            {
+                isFullyComplete
+                    ? <Result triangle={triangle} jogValues={jogValues} onBack={onBack} onClose={onClose} />
+                    : (
+                        <div className={styles.alignmentContainer}>
+                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                <div>
+                                    <h4 style={{ marginTop: 0 }}>Alignment</h4>
+                                    {
+                                        !introComplete && <ToolIntroduction readyHandler={startTool} />
+                                    }
+                                    {
+                                        introComplete && (
+                                            <Step
+                                                actions={actions}
+                                                onChange={onChange}
+                                                currentAction={currentAction}
+                                            />
+                                        )
+                                    }
+                                </div>
 
-                    {
-                        introComplete &&
-                        <NavigationButtons
-                            onNext={next}
-                            onPrevious={prev}
-                            prevDisabled={prevDisabled}
-                            nextDisabled={nextDisabled}
-                        />
-                    }
-                </div>
+                                {
+                                    introComplete && (
+                                        <NavigationButtons
+                                            onNext={next}
+                                            onPrevious={prev}
+                                            prevDisabled={prevDisabled}
+                                            nextDisabled={nextDisabled}
+                                        />
+                                    )
+                                }
+                            </div>
 
-                <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
-                    <TriangleDiagram
-                        circlePoints={shapes.circlePoints}
-                        arrows={shapes.arrows}
-                        triangle={triangle}
-                        onTriangleChange={handleTriangleChange}
-                    />
+                            <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
+                                <TriangleDiagram
+                                    circlePoints={shapes.circlePoints}
+                                    arrows={shapes.arrows}
+                                    triangle={triangle}
+                                    onTriangleChange={handleTriangleChange}
+                                />
 
-                    <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
-                </div>
-            </div>
-        );
+                                <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
+                            </div>
+                        </div>
+                    )
+            }
+        </ReduxProvider>
+    );
 }; Alignment.propTypes = { step: PropTypes.object };
 
 export default Alignment;
