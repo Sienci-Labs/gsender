@@ -27,7 +27,7 @@ const ActionItem = ({ checked, onChange, id, isCurrentAction, hasBeenChanged, la
                     <FunctionButton
                         primary
                         style={{ margin: 0, width: '100px' }}
-                        disabled={!(isCurrentAction || hasBeenChanged)}
+                        disabled={(!isCurrentAction || hasBeenChanged)}
                         onClick={() => onChange({ id, checked: true })}
                     >
                         Complete
