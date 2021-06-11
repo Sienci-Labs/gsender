@@ -22,12 +22,15 @@
  */
 
 import React from 'react';
+import { connect } from 'react-redux';
+import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
 import Keypad from '../JogControl';
 
-const ToolIntroduction = ({ readyHandler }) => {
+const ToolIntroduction = ({ readyHandler, isConnected }) => {
+    const buttonText = isConnected ? 'Ready to start' : 'You must be connected to a device';
     return (
         <div>
             <p>We&apos;ll be making a triangle to help align your machine.</p>
@@ -37,13 +40,19 @@ const ToolIntroduction = ({ readyHandler }) => {
 
             <Keypad />
 
-            <FunctionButton primary onClick={readyHandler}>Ready to start!</FunctionButton>
+            <FunctionButton primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</FunctionButton>
         </div>
     );
 };
 
 ToolIntroduction.propTypes = {
-    readyHandler: PropTypes.func
+    readyHandler: PropTypes.func,
+    isConnected: PropTypes.bool
 };
 
-export default ToolIntroduction;
+export default connect((store) => {
+    const isConnected = get(store, 'connection.isConnected');
+    return {
+        isConnected
+    };
+})(ToolIntroduction);
