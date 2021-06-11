@@ -150,7 +150,7 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
             title: 'Update Machine Settings',
             content: (
                 <>
-                    <p>Your machines epprom settings will be updated to the following:</p>
+                    <p>Your machines EEPROM settings will be updated to the following:</p>
                     {x?.should && <p><strong>$100</strong> - X steps/mm will be updated to <strong>{x?.amount}</strong></p>}
                     {y?.should && <p><strong>$101</strong> - Y steps/mm will be updated to <strong>{y?.amount}</strong></p>}
                 </>
@@ -199,7 +199,7 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
                         stepsUpdate
                             ? (
                                 <>
-                                    <p className={styles.resultText}>We also noticed your steps-per-mm can be updated for improved accuray on your machine, you can click the button below to do so.</p>
+                                    <p className={styles.resultText}>We also noticed your steps-per-mm can be updated for improved accuracy on your machine, you can click the button below to do so.</p>
                                     <div style={{ display: 'flex', gap: '1rem' }}>
                                         <FunctionButton primary onClick={handleUpdateClick}>Update Machine Settings</FunctionButton>
                                         <FunctionButton primary onClick={onClose}>Exit Calibration Tool</FunctionButton>
