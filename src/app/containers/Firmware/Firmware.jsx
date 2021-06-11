@@ -481,7 +481,7 @@ class Firmware extends PureComponent {
         return (
             <Modal onClose={modalClose}>
                 <div className={styles.toolModal}>
-                    <div className={styles.firmwareHeader}><h3 className={styles.firmwareHeaderText}>Firmware Gadget</h3></div>
+                    <div className={styles.firmwareHeader}><h3 className={styles.firmwareHeaderText}>Firmware Tool</h3></div>
                     <div className={styles.firmwareContainer}>
                         <div className={styles.settingsContainer}>
                             {
