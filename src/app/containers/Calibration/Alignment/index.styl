@@ -42,12 +42,18 @@
 }
 
 .result {
+    $fontSize = 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     align-items: center;
-    font-size: 1.5rem;
+    font-size: $fontSize;
     line-height: 1.75;
+    width: 100%;
+
+    &-text {
+        font-size: $fontSize;
+    }
 
     p {
         margin: 0;
