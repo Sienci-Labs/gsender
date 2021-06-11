@@ -87,8 +87,8 @@ class TerminalWrapper extends PureComponent {
                     return;
                 }
 
-                // Ctrl-C copy
-                if (event.ctrlKey && event.code === 'KeyC') {
+                // Ctrl-C copy - ctrl + c on windows/linux, meta-c on mac
+                if ((event.ctrlKey || event.metaKey) && (event.code === 'KeyC')) {
                     document.execCommand('copy');
                     return;
                 }
