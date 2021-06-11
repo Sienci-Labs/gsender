@@ -9,7 +9,7 @@ gSender is a feature-packed CNC interface software designed to be clean and easy
 Some things that we’re looking to accomplish with this sender:
 * Reliability of operation
 * Accommodates all ranges of computing systems (low-end PC to RasPi | ‘light mode’)
-* Highly easy to use
+* Clean and easy to use no matter your previous CNC experience
 * Makes available all normally expected functions
 * Addresses common error throwing conditions automatically
 * Built-in gadgets for surface probing, stock flattening, firmware editing, and g-code editing with syntax highlighting, command navigation, and more
@@ -43,12 +43,17 @@ gSender is available for the following systems and does not yet support headless
 * Keybindings available for most functions for external keyboard/keypad control
 * Safe height movements
 * Homing cycle and quick-movement locations available for machines with homing hardware
-* Full spindle/laser support via manual control widgets and live overrides
+* Full spindle/laser support via manual control widgets, active alerting, and live overrides
 * Custom macros buttons with optional macro variables
 * Lightweight mode reduces processing intensity on less powerful hardware or when running larger files
 * Easy workspace swapping for more advanced jigging or alignment work
 * Optional automatic handling for common error throwing gcode
 * Firmware tool for easier GRBL eeprom changes, loading defaults, and GRBL flashing
+* Surfacing tool auto-generates surfacing gcode based on machine cutting area and other preferences, ready to execute
+* Calibration tool for axis alignment - a step by step process to make sure your CNC is square
+* Tool change functionality - pause, ignore, or run code blocks on M6 commands
+* Tooltips for data entry points
+* Alarm warning explanations to better contextualize CNC errors
 * Pre-build machine profiles, including:
     - Shapeoko
     - X-carve
@@ -87,6 +92,19 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### Open Beta 0.6.6 (June 11, 2021)
+* Sticky folders! Load files from the last place you navigated to
+* New tool change functionality - can now pause, ignore, or run code blocks on M6 commands
+* Added a prototype Calibration tool for axis alignment - step by step process to make sure your CNC is square
+* Alarm warnings now show an explanation of what the alarm code means
+* Faster splash screen
+* Spindle/Laser ‘active’ state changes are now updated more quickly in the UI along with other Laser widget improvements
+* Copy and paste text from the terminal
+* Tweaks to handling correct units display in overrides and surfacing
+* Refactored file information to Redux
+* Loads of small bug fixes pertaining to keyboard shortcuts, jogging, probing, comment processing, and the firmware tool
+* Minor styling changes
 
 ### Open Beta 0.6.5 (May 28, 2021)
 * New tool for surfacing
@@ -190,7 +208,6 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ### Notable features still in progress:
 * "Flatten", "Surface", and "Calibrate" tools
-* Handling tool changing
 * Event hooks
 * Joystick control
 * Settings saving
