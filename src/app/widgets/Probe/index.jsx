@@ -479,12 +479,12 @@ class ProbeWidget extends PureComponent {
 
     generateMultiAxisCommands(axes, xyThickness, zThickness, params) {
         let code = [];
-        const { units } = this.state;
-        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate } = params;
+        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
         const workspace = this.mapWCSToPValue(wcs);
         const XYRetract = -retractDistance;
-        let XYProbeDistance = this.PROBE_DISTANCE_METRIC.X;
-        let ZProbeDistance = this.PROBE_DISTANCE_METRIC.Z * -1;
+        let XYProbeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC.X : this.PROBE_DISTANCE_IMPERIAL.X;
+        let ZProbeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC.Z : this.PROBE_DISTANCE_IMPERIAL.Z;
+        ZProbeDistance *= -1;
         XYProbeDistance = (isSafe) ? -XYProbeDistance : XYProbeDistance;
         const gcode = this.gcode;
 
