@@ -336,6 +336,7 @@ const Surfacing = ({ onClose, showTitle }) => {
                         widgetId="visualizer"
                         ref={visualizerRef}
                         gcode={gcode}
+                        surfacingData={surfacing}
                     />
                 </div>
 
