@@ -40,7 +40,7 @@ const ToolIntroduction = ({ readyHandler, isConnected }) => {
 
             <Keypad />
 
-            <FunctionButton primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</FunctionButton>
+            <FunctionButton primary disabled={!isConnected} onClick={readyHandler} style={{ marginTop: '2rem' }}>{ buttonText }</FunctionButton>
         </div>
     );
 };

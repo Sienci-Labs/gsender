@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
 
+import store from 'app/store';
 import controller from 'app/lib/controller';
 import Button from 'app/components/FunctionButton/FunctionButton';
 
@@ -16,6 +17,18 @@ const inputStyle = {
 const buttonStyle = {
     margin: 0,
     width: '100px',
+};
+
+const jogMachine = ({ axis, value }) => {
+    const { jog } = store.get('widgets.axes');
+    // const units = store.get('workspace.units');
+    // const modal = units === 'mm' ? 'G21' : 'G20';
+    const modal = 'G21';
+
+    const commands = [
+        `$J=${modal}G91 ${axis}${value} F${jog.feedrate}`,
+    ];
+    controller.command('gcode', commands, modal);
 };
 
 export const step1 = [
@@ -44,19 +57,14 @@ export const step1 = [
         hasBeenChanged: false,
         hideCompleteButton: true,
         label: ({ isCurrentAction, onChange }) => {
-            const [val, setVal] = useState(100);
+            const [val, setVal] = useState(-100);
             const [didClick, setDidClick] = useState(false);
 
             const AXIS = 'Y';
 
             const handleClick = () => {
-                const { wpos } = controller?.state?.status;
-
-                const value = (Number(wpos.y) - Number(val)).toFixed(3);
-
                 setDidClick(true); //Disable button
-                controller.command('gcode', `G0 ${AXIS}${value}`);
-
+                jogMachine({ axis: AXIS, value: val });
                 onChange({ axis: AXIS.toLowerCase(), value: val });
             };
 
@@ -92,7 +100,7 @@ export const step1 = [
                 label: 'Y-Axis Movement'
             },
         ],
-        description: 'Here you will jog your machine in the Y-axis in the distance given which is customizable. Once you are ready, click the "Move Y-Axis" button.'
+        description: 'Here you will jog your machine down in the Y-axis, in the distance given which is customizable. Once you are ready, click the "Move Y-Axis" button.'
     },
     {
         id: 2,
@@ -125,13 +133,8 @@ export const step1 = [
             const AXIS = 'X';
 
             const handleClick = () => {
-                const { wpos } = controller?.state?.status;
-
-                const value = (Number(wpos.y) - Number(val)).toFixed(3);
-
                 setDidClick(true); //Disable button
-                controller.command('gcode', `G0 ${AXIS}${value}`);
-
+                jogMachine({ axis: AXIS, value: val });
                 onChange({ axis: AXIS.toLowerCase(), value: val });
             };
 
@@ -167,7 +170,7 @@ export const step1 = [
                 label: 'X-Axis Movement'
             },
         ],
-        description: 'Here you will jog your machine in the X-axis in the distance given which is customizable. Once you are ready, click the "Move X-Axis" button.'
+        description: 'Here you will jog your machine in the X-axis going right, in the distance given which is customizable. Once you are ready, click the "Move X-Axis" button.'
     },
     {
         id: 4,
