@@ -71,11 +71,11 @@ class CoordinateAxes {
         const blue = '#5191cc';
 
         this.group.add(
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(size, 0, 0), red, false), // +X
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(size, 0, 0), red, true), // +X
             buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(-size, 0, 0), red, true), // -X
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, size, 0), green, false), // +Y
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, size, 0), green, true), // +Y
             buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -size, 0), green, true), // -Y
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, height), blue, false), // +Z
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, height), blue, true), // +Z
             buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -height), blue, true) // -Z
         );
 

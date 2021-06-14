@@ -40,7 +40,7 @@ class GridLine {
         for (let i = -1 * sizeX; i <= sizeX; i += stepX) {
             const points = [];
             const material = new THREE.LineBasicMaterial({
-                vertexColors: THREE.VertexColors
+                color: colorGrid
             });
 
             points.push(
@@ -55,7 +55,7 @@ class GridLine {
         for (let i = -1 * sizeY; i <= sizeY; i += stepY) {
             const points = [];
             const material = new THREE.LineBasicMaterial({
-                vertexColors: THREE.VertexColors
+                color: colorGrid
             });
 
             points.push(

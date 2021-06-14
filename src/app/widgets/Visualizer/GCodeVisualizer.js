@@ -37,7 +37,8 @@ import log from 'app/lib/log';
 class GCodeVisualizer {
     constructor(theme) {
         this.group = new THREE.Object3D();
-        this.geometry = new THREE.Geometry();
+        this.geometry = new THREE.BufferGeometry();
+        this.geometryPoints = [];
         this.theme = theme;
 
         // Example
@@ -128,14 +129,15 @@ class GCodeVisualizer {
         }
 
         toolpath.loadFromStringSync(gcode, (line, index) => {
+            console.log(this.geometry);
             this.frames.push({
                 data: line,
-                vertexIndex: this.geometry.vertices.length // remember current vertex index
+                vertexIndex: this.geometry.groups.length // remember current vertex index
             });
         });
 
         const workpiece = new THREE.Line(
-            new THREE.Geometry(),
+            new THREE.BufferGeometry(),
             new THREE.LineBasicMaterial({
                 color: defaultColor,
                 linewidth: 1,
