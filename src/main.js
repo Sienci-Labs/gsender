@@ -165,7 +165,10 @@ const main = () => {
                     {
                         ...additionalOptions,
                         properties: ['openFile'],
-                        filters: [{ name: 'Custom File Type', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] }]
+                        filters: [
+                            { name: 'GCode Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
+                            { name: 'All Files', extensions: ['*'] }
+                        ]
                     },
                 );
 
