@@ -110,7 +110,7 @@ class WidgetManager extends PureComponent {
         },
         {
             id: 'axes',
-            caption: i18n._('Axes Widget'),
+            caption: i18n._('JogControl Widget'),
             details: i18n._('This widget shows the XYZ position. It includes jog controls, homing, and axis zeroing.'),
             visible: true,
             disabled: false

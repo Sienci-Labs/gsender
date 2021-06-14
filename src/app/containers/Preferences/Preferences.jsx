@@ -26,16 +26,19 @@ import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
 import controller from 'app/lib/controller';
+import Events from 'app/containers/Preferences/Events';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import GeneralSettings from './GeneralSettings';
 import Keybindings from './Keybindings';
 import ProbeSettings from './Probe/ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import VisualizerSettings from './Visualizer/Visualizer';
+import About from './About';
 import store from '../../store';
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
+
 
 class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
@@ -78,13 +81,23 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 2,
-                    label: 'Keybindings',
+                    label: 'Keyboard Shortcuts',
                     component: Keybindings
                 },
                 {
                     id: 3,
                     label: 'Visualizer',
                     component: VisualizerSettings
+                },
+                {
+                    id: 4,
+                    label: 'Tool Change',
+                    component: Events
+                },
+                {
+                    id: 5,
+                    label: 'About',
+                    component: About,
                 }
             ],
             tools: store.get('workspace[tools]', []),

@@ -40,7 +40,10 @@ import CombinedCamera from 'app/lib/three/CombinedCamera';
 import TrackballControls from 'app/lib/three/TrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
+import _ from 'lodash';
 import store from 'app/store';
+import { Toaster } from '../../lib/toaster/ToasterLib';
+import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
 import Viewport from './Viewport';
 import CoordinateAxes from './CoordinateAxes';
@@ -56,12 +59,8 @@ import {
 } from './constants';
 import styles from './index.styl';
 
-const IMPERIAL_GRID_COUNT = 32; // 32 in
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
-const IMPERIAL_AXIS_LENGTH = IMPERIAL_GRID_SPACING * 12; // 12 in
-const METRIC_GRID_COUNT = 60; // 60 cm
 const METRIC_GRID_SPACING = 10; // 10 mm
-const METRIC_AXIS_LENGTH = METRIC_GRID_SPACING * 30; // 300 mm
 const CAMERA_VIEWPORT_WIDTH = 300; // 300 mm
 const CAMERA_VIEWPORT_HEIGHT = 300; // 300 mm
 const PERSPECTIVE_FOV = 70;
@@ -143,12 +142,21 @@ class Visualizer extends Component {
         this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
         this.limits.name = 'Limits';
         this.limits.visible = state.objects.limits.visible;
-        // this.group.add(this.limits);
 
+        this.unload();
+
+        this.updateCuttingToolPosition();
+        this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
 
         this.updateScene();
+        this.redrawGrids();
+        this.rerenderGCode();
     };
+
+    hasVisualization() {
+        return this.group.getObjectByName('Visualizer');
+    }
 
     renderAnimationLoop = () => {
         const showAnimation = this.showAnimation();
@@ -186,6 +194,7 @@ class Visualizer extends Component {
 
     componentDidMount() {
         this.subscribe();
+        this.addControllerEvents();
         this.addResizeEventListener();
         store.on('change', this.changeMachineProfile);
         if (this.node) {
@@ -297,22 +306,6 @@ class Visualizer extends Component {
             needUpdateScene = true;
         }
 
-        /*if (
-            state.liteMode
-                ? (this.cuttingTool?.visibleLite !== state.objects.cuttingTool.visibleLite)
-                : (this.cuttingTool?.visible !== state.objects.cuttingTool.visible)
-        ) {
-            const { liteMode } = state;
-            if (this.cuttingTool?.visible) {
-                this.cuttingTool.visible = liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible;
-            }
-
-            if (this.cuttingPointer?.visible) {
-                this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
-            }
-            needUpdateScene = true;
-        }*/
-
         { // Update position
             let needUpdatePosition = false;
 
@@ -373,7 +366,37 @@ class Visualizer extends Component {
         }
     }
 
+    showToast = _.throttle(() => {
+        Toaster.pop({
+            msg: (this.state.finishedMessage),
+            type: 'TOASTER_DANGER',
+        });
+    }, 2000, { trailing: false });
+
+
+    controllerEvents = {
+        'gcode_error': (error, code, line) => {
+            this.setState({ finishedMessage: `Gcode Error: Line: ${line.length} Error:${code} - ${error.description}` });
+            this.showToast();
+        },
+    };
+
+    addControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.addListener(eventName, callback);
+        });
+    }
+
+    removeControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.removeListener(eventName, callback);
+        });
+    }
+
     componentWillUnmount() {
+        this.removeControllerEvents();
         this.unsubscribe();
         this.removeResizeEventListener();
         store.removeListener('change', this.changeMachineProfile);
@@ -388,13 +411,16 @@ class Visualizer extends Component {
         });
     }
 
-    rerenderGCode(colors) {
+    rerenderGCode() {
         const { actions, state } = this.props;
         const { gcode } = state;
+
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
             this.group.remove(group);
-            actions.loadGCode('Visualizer', gcode.content);
+        }
+        if (gcode.content) {
+            actions.loadGCode('', gcode.content);
         }
     }
 
@@ -417,10 +443,15 @@ class Visualizer extends Component {
         const { objects, units } = this.props.state;
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
+        const impLineNumbers = this.group.getObjectByName('ImperialGridLineNumbers');
+        const metLineNumbers = this.group.getObjectByName('MetricGridLineNumbers');
 
         this.group.remove(impGroup);
         this.group.remove(metGroup);
-        {
+        this.group.remove(impLineNumbers);
+        this.group.remove(metLineNumbers);
+
+        { // Imperial Coordinate System
             const visible = objects.coordinateSystem.visible;
             const imperialCoordinateSystem = this.createCoordinateSystem(IMPERIAL_UNITS);
             imperialCoordinateSystem.name = 'ImperialCoordinateSystem';
@@ -435,6 +466,22 @@ class Visualizer extends Component {
             metricCoordinateSystem.visible = visible && (units === METRIC_UNITS);
             this.group.add(metricCoordinateSystem);
         }
+
+        { // Imperial Grid Line Numbers
+            const visible = objects.gridLineNumbers.visible;
+            const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
+            imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
+            imperialGridLineNumbers.visible = visible && (units === IMPERIAL_UNITS);
+            this.group.add(imperialGridLineNumbers);
+        }
+
+        { // Metric Grid Line Numbers
+            const visible = objects.gridLineNumbers.visible;
+            const metricGridLineNumbers = this.createGridLineNumbers(METRIC_UNITS);
+            metricGridLineNumbers.name = 'MetricGridLineNumbers';
+            metricGridLineNumbers.visible = visible && (units === METRIC_UNITS);
+            this.group.add(metricGridLineNumbers);
+        }
     }
 
     recolorScene() {
@@ -443,7 +490,7 @@ class Visualizer extends Component {
         // Handle Background color
         this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
         this.redrawGrids();
-        this.rerenderGCode(currentTheme);
+        this.rerenderGCode();
     }
 
     subscribe() {
@@ -597,8 +644,17 @@ class Visualizer extends Component {
     }
 
     createCoordinateSystem(units) {
-        const axisLength = (units === IMPERIAL_UNITS) ? IMPERIAL_AXIS_LENGTH : METRIC_AXIS_LENGTH;
-        const gridCount = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_COUNT : METRIC_GRID_COUNT;
+        const { mm, in: inches } = this.machineProfile;
+
+        const inchesMax = Math.max(inches.width, inches.depth) + (IMPERIAL_GRID_SPACING * 10);
+        const mmMax = Math.max(mm.width, mm.depth) + (METRIC_GRID_SPACING * 10);
+
+        const imperialGridCount = inchesMax / 3;
+        const metricGridCount = mmMax / 9;
+
+        const axisLength = (units === IMPERIAL_UNITS) ? inchesMax : mmMax;
+        const height = (units === IMPERIAL_UNITS) ? inches.height : mm.height;
+        const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const group = new THREE.Group();
 
@@ -623,8 +679,8 @@ class Visualizer extends Component {
             group.add(gridLine);
         }
 
-        { // Coordinate Axes
-            const coordinateAxes = new CoordinateAxes(axisLength);
+        { // Coordinate JogControl
+            const coordinateAxes = new CoordinateAxes(axisLength, height);
             coordinateAxes.name = 'CoordinateAxes';
             group.add(coordinateAxes);
         }
@@ -649,7 +705,7 @@ class Visualizer extends Component {
             const axisZLabel = new TextSprite({
                 x: 0,
                 y: 0,
-                z: axisLength + 10,
+                z: height + 10,
                 size: 20,
                 text: 'Z',
                 color: zAxisColor
@@ -664,7 +720,16 @@ class Visualizer extends Component {
     }
 
     createGridLineNumbers(units) {
-        const gridCount = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_COUNT : METRIC_GRID_COUNT;
+        const { mm, in: inches } = this.machineProfile;
+
+        const inchesMax = Math.max(inches.width, inches.depth) + (IMPERIAL_GRID_SPACING * 10);
+        const mmMax = Math.max(mm.width, mm.depth) + (METRIC_GRID_SPACING * 10);
+
+        const imperialGridCount = Math.round(inchesMax / 3);
+        const metricGridCount = Math.round(mmMax / 9);
+
+        const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
+
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const textSize = (units === IMPERIAL_UNITS) ? (25.4 / 3) : (10 / 3);
         const textOffset = (units === IMPERIAL_UNITS) ? (25.4 / 5) : (10 / 5);
@@ -875,8 +940,6 @@ class Visualizer extends Component {
             this.limits = this.createLimits(xmin, xmax, ymin, ymax, zmin, zmax);
             this.limits.name = 'Limits';
             this.limits.visible = objects.limits.visible;
-            // this.group.add(this.limits);
-
             this.updateLimitsPosition();
         }
 
@@ -1086,16 +1149,12 @@ class Visualizer extends Component {
         this.updateScene();
     }
 
-    load(name, gcode, callback) {
-        // Remove previous G-code object
-        this.unload();
-
-        const { currentTheme } = this.props.state;
-
-        this.visualizer = new GCodeVisualizer(currentTheme);
-
+    handleSceneRender(gcode, callback) {
+        if (!this.visualizer) {
+            return;
+        }
         const obj = this.visualizer.render(gcode);
-        obj.name = 'Visualizer';
+        obj.name = '';
         this.group.add(obj);
 
         const bbox = getBoundingBox(obj);
@@ -1155,6 +1214,22 @@ class Visualizer extends Component {
         (typeof callback === 'function') && callback({ bbox: bbox });
     }
 
+    load(name, gcode, callback) {
+        // Remove previous G-code object
+        this.unload();
+        const { currentTheme, disabled, disabledLite, liteMode } = this.props.state;
+        const { setVisualizerReady } = this.props.actions;
+        this.visualizer = new GCodeVisualizer(currentTheme);
+
+        const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
+
+        if (shouldRenderVisualization) {
+            this.handleSceneRender(gcode, callback);
+        } else {
+            setVisualizerReady();
+        }
+    }
+
     unload() {
         const visualizerObject = this.group.getObjectByName('Visualizer');
         if (visualizerObject) {
@@ -1162,6 +1237,7 @@ class Visualizer extends Component {
         }
 
         if (this.visualizer) {
+            this.visualizer.unload();
             this.visualizer = null;
         }
 

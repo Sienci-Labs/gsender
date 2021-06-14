@@ -27,10 +27,13 @@ export const {
     MODAL_NONE,
     MODAL_PREFERENCES,
     MODAL_WIZARD,
-    MODAL_FIRMWARE
+    MODAL_FIRMWARE,
+    MODAL_SURFACING,
+    MODAL_CALIBRATE,
 } = constants('widgets/macro', [
     'MODAL_NONE',
     'MODAL_PREFERENCES',
     'MODAL_WIZARD',
     'MODAL_FIRMWARE',
+    'MODAL_CALIBRATE'
 ]);

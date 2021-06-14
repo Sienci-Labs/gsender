@@ -87,6 +87,17 @@ class TerminalWrapper extends PureComponent {
                     return;
                 }
 
+                // Ctrl-C copy - ctrl + c on windows/linux, meta-c on mac
+                if ((event.ctrlKey || event.metaKey) && (event.code === 'KeyC')) {
+                    document.execCommand('copy');
+                    return;
+                }
+                // Ctrl-V paste
+                if (event.ctrlKey && event.code === 'KeyV') {
+                    term.paste();
+                    return;
+                }
+
                 // Home
                 if (event.key === 'Home' || (event.metaKey && event.key === 'ArrowLeft')) {
                     term.buffer.x = this.prompt.length;
@@ -376,19 +387,6 @@ class TerminalWrapper extends PureComponent {
         }
 
         this.term.resize(cols, rowNumbers);
-
-        // if (!(this.term && this.term.element)) {
-        //     return;
-        // }
-
-        // const geometry = fit.proposeGeometry(this.term);
-        // if (!geometry) {
-        //     return;
-        // }
-
-        // cols = (!cols || cols === 'auto') ? geometry.cols : cols;
-        // rows = (!rows || rows === 'auto') ? geometry.rows : rows;
-        // this.term.resize(cols, rows);
     }
 
     clear() {

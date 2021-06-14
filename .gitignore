@@ -10,3 +10,4 @@ package-lock.json
 .idea
 /.vscode
 electron-builder.yml
+.DS_Store

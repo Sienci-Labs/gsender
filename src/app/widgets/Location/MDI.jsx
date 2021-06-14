@@ -71,17 +71,9 @@ class MDI extends PureComponent {
     }
 
     render() {
-        const { mdi } = this.props;
-
-        if (mdi.disabled || mdi.commands.length === 0) {
-            return null;
-        }
 
         return (
             <Container fluid style={{ padding: 0, margin: '-5px -4px 0 -4px' }}>
-                <Row gutterWidth={0}>
-                    {this.renderMDIButtons()}
-                </Row>
             </Container>
         );
     }

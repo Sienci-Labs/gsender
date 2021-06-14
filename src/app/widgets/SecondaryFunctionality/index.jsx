@@ -95,24 +95,6 @@ class SecondaryFunctionality extends PureComponent {
         }
     };
 
-    controllerEvents = {
-        'serialport:open': (options) => {
-            const { port } = options;
-            this.setState({ port: port });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState({ ...initialState });
-        },
-        'workflow:state': (workflowState) => {
-            this.setState(state => ({
-                workflow: {
-                    state: workflowState
-                }
-            }));
-        }
-    };
-
     content = null;
 
     component = null;
@@ -140,12 +122,10 @@ class SecondaryFunctionality extends PureComponent {
     }
 
     componentDidMount() {
-        this.addControllerEvents();
         store.on('change', this.handleMachineProfileChange);
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
         store.removeListener('change', this.handleMachineProfileChange);
     }
 
@@ -173,9 +153,6 @@ class SecondaryFunctionality extends PureComponent {
                 type: controller.type,
                 state: controller.state
             },
-            workflow: {
-                state: controller.workflow.state
-            },
             selectedTab: 0,
             tabs: [
                 {
@@ -202,19 +179,6 @@ class SecondaryFunctionality extends PureComponent {
         };
     }
 
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
-    }
 
     render() {
         const { isFullscreen, tabs, selectedTab } = this.state;

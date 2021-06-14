@@ -43,6 +43,7 @@ const Tabs = ({ className, tabs, activeTabIndex, onClick, ...props }) => (
                     active={index === activeTabIndex}
                     onClick={() => onClick(index)}
                     key={`tab-${tab.widgetId}`}
+                    disabled={tab.disabled}
                 >
                     {tab.label}
                 </Tab>

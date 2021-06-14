@@ -245,6 +245,10 @@ class Sender extends events.EventEmitter {
         });
     }
 
+    getContext() {
+        return this.state.context;
+    }
+
     toJSON() {
         return {
             sp: this.sp.type,
@@ -289,12 +293,12 @@ class Sender extends events.EventEmitter {
             return false;
         }
 
-        const comments = ['#', ';', '(', '%'];
-
-        const lines = gcode
-            .split('\n')
-            .filter(line => (line.trim().length > 0))
+        /*const comments = ['#', '(', '%'];
+        const lines = gcode.split('\n');
+        lines.filter(line => (line.trim().length > 0))
             .filter(line => !comments.some(comment => line.includes(comment)));
+        console.log(lines);*/
+        let lines = gcode.split('\n');
 
         if (this.sp) {
             this.sp.clear();

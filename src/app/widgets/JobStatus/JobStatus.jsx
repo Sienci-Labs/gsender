@@ -39,7 +39,9 @@ class JobStatus extends PureComponent {
 
     render() {
         const { state } = this.props;
+
         const { isRunningJob } = state;
+
         return (
             <div className={styles['job-status-wrapper']}>
                 {!isRunningJob

@@ -30,10 +30,11 @@ import Slider from './Slider';
 
 const LaserControls = ({ actions, state }) => {
     const { laser, canClick } = state;
+
     return (
         <div className={styles.controlContainer}>
             <div className={styles.controlRow}>
-                <FunctionButton onClick={actions.sendM3} disabled={!canClick}>
+                <FunctionButton onClick={actions.sendLaserM3} disabled={!canClick}>
                     <i className="fas fa-lightbulb" />
                     Laser On
                 </FunctionButton>
@@ -62,7 +63,7 @@ const LaserControls = ({ actions, state }) => {
                         onChange={actions.handleLaserDurationChange}
                         className={classNames('form-control', styles.durationInput)}
                     />
-                    <span className="input-group-addon">ms</span>
+                    <span className="input-group-addon">s</span>
                 </div>
             </div>
         </div>

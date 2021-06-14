@@ -12,11 +12,11 @@ export class GCodeProcessor {
     constructor(options = {}) {
         this.options = options;
         if (!options.maxFeed) {
-            options.maxFeed = 1000;
+            options.maxFeed = 1500;
         }
 
         if (!options.acceleration) {
-            options.acceleration = 100000;
+            options.acceleration = 1800000;
         }
 
         if (!options.noInit) {
@@ -86,6 +86,30 @@ export class GCodeProcessor {
         vmState.tool = null;
         vmState.countT = 0;
         vmState.countM6 = 0;
+    }
+
+    getBBox(returnMBounds = false) {
+        const [minBounds, maxBounds] = returnMBounds ? this.vmState.mbounds : this.vmState.bounds;
+        const [minX, minY, minZ] = minBounds;
+        const [maxX, maxY, maxZ] = maxBounds;
+
+        return {
+            min: {
+                x: minX,
+                y: minY,
+                z: minZ
+            },
+            max: {
+                x: maxX,
+                y: maxY,
+                z: maxZ
+            },
+            delta: {
+                x: maxX - minX,
+                y: maxY - minY,
+                z: maxZ - minZ
+            }
+        };
     }
 
     syncStateToMachine(options = {}) {
@@ -176,11 +200,7 @@ export class GCodeProcessor {
     }
 
     runGcodeLine(gline) {
-        if (typeof gline === 'string') {
-            gline = new GcodeLine(gline);
-        }
         // This is NOT a gcode validator.  Input gcode is expected to be valid and well-formed.
-        //
         let vmState = this.vmState;
         let origCoordSys = vmState.activeCoordSys;
         let origTotalTime = vmState.totalTime;
@@ -192,6 +212,20 @@ export class GCodeProcessor {
         let coordPos = vmState.incremental ? this.zerocoord() : objtools.deepCopy(vmState.pos); // Position indicated by coordinates present, filling in missing ones with current pos; unless incremental, then all zeroes
         let coordPosSparse = this.zerocoord(null); // Position indicated by coordinates present, with missing axes filled in with nulls
         let coordFlags = this.zerocoord(false); // True in positions where coordinates are present
+
+        if (typeof gline === 'string') {
+            // Handle Grbl specific commands like homing by skipping the line entirely
+            if (gline[0] === '$') {
+                return {
+                    state: vmState, // VM state after executing line
+                    isMotion: false, // whether the line represents motion
+                    motionCode: motionCode, // If motion, the G code associated with the motion
+                    changedCoordOffsets: changedCoordOffsets, // whether or not anything was changed with coordinate systems
+                    time: vmState.totalTime - origTotalTime // estimated duration of instruction execution, in seconds
+                };
+            }
+            gline = new GcodeLine(gline);
+        }
 
         // Determine which axis words are present and convert to coordinate arrays
         for (let axisNum = 0; axisNum < vmState.axisLabels.length; axisNum++) {

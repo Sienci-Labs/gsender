@@ -31,7 +31,7 @@ import { DIALOG_CONFIRM, DIALOG_CANCEL } from './ConfirmationDialogLib';
 const ConfirmationDialog = () => {
     const [show, setShow] = useState(false);
     const [title, setTitle] = useState(null);
-    const [buttons, setButtons] = useState([]);
+    //const [buttons, setButtons] = useState([]);
     const [content, setContent] = useState(null);
     const [onClose, setOnClose] = useState(null);
     const [onConfirm, setOnConfirm] = useState(null);
@@ -47,10 +47,10 @@ const ConfirmationDialog = () => {
     useEffect(() => {
         pubsub.subscribe('dialog:new', (event, options) => {
             setTitle(options.title);
-            setButtons(options.buttons);
+            //setButtons(options.buttons);
             setContent(options.content);
-            setOnClose(options.onClose);
-            setOnConfirm(options.onConfirm);
+            setOnClose(() => options.onClose);
+            setOnConfirm(() => options.onConfirm);
             setConfirmLabel(options.confirmLabel);
             setCancelLabel(options.cancelLabel);
             setShow(true);
@@ -71,7 +71,7 @@ const ConfirmationDialog = () => {
                 <div className={styles.confirmationDialogButtons}>
                     <ConfirmationDialogButton
                         onClick={() => {
-                            if (onConfirm !== null) {
+                            if (onClose !== null) {
                                 onClose();
                             }
                             return setShow(false);
@@ -80,9 +80,6 @@ const ConfirmationDialog = () => {
                     >
                         { cancelLabel }
                     </ConfirmationDialogButton>
-                    {
-                        buttons.length > 0 && true
-                    }
                     <ConfirmationDialogButton
                         onClick={() => {
                             if (onConfirm !== null) {

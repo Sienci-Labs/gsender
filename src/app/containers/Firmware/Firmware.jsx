@@ -26,11 +26,15 @@
 
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Modal from 'app/components/Modal';
+import controller from 'app/lib/controller';
 import map from 'lodash/map';
+import get from 'lodash/get';
 import download from 'downloadjs';
 import store from 'app/store';
-import controller from '../../lib/controller';
+import { GRBL } from 'app/constants';
+import TooltipCustom from '../../components/TooltipCustom/ToolTip';
 import Loading from '../../components/Loader';
 import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 import ToolsNotificationModal from '../../components/ToolsNotificationModal/Modal';
@@ -40,6 +44,7 @@ import * as GRBL_SETTINGS from '../../../server/controllers/Grbl/constants';
 import NotConnectedWarning from './NotConnectedWarning';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import ToolModalButton from '../../components/ToolModalButton/ToolModalButton';
+
 
 class Firmware extends PureComponent {
     static propTypes = {
@@ -298,18 +303,18 @@ class Firmware extends PureComponent {
         connectToLastDevice: () => {
             const port = this.connectionConfig.get('port');
             const baud = this.connectionConfig.get('baudrate');
-            const controller = this.connectionConfig.get('controller.type');
-            this.reconnectToLastDevice(port, baud, controller);
+            this.reconnectToLastDevice(port, baud, GRBL);
         }
     }
 
     grabNewSwitchInputSettings = (name, value) => {
-        this.setState(prevState => ({
-            valuesToApplyToGrbl: {
-                ...prevState.valuesToApplyToGrbl,
-                [name]: value
-            }
-        }));
+        const settings = {
+            ...this.state.valuesToApplyToGrbl,
+            [name]: value
+        };
+        this.setState({
+            valuesToApplyToGrbl: settings
+        });
     }
 
     grabNew$2InputSettings = (name, allTheValues) => {
@@ -352,49 +357,6 @@ class Firmware extends PureComponent {
             valuesToApplyToGrbl: {
                 ...prevState.valuesToApplyToGrbl,
                 $2: finalValue
-            }
-        }));
-    }
-
-    grabNew$3InputSettings = (name, allTheValues) => {
-        let finalValue = '';
-        let zero = [0, 0, 0];
-        let one = [1, 0, 0];
-        let two = [0, 1, 0];
-        let three = [1, 1, 0];
-        let four = [0, 0, 1];
-        let five = [1, 0, 1];
-        let six = [0, 1, 1];
-        let seven = [1, 1, 1];
-
-        if (new String(zero).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 0;
-        }
-        if (new String(one).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 1;
-        }
-        if (new String(two).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 2;
-        }
-        if (new String(three).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 3;
-        }
-        if (new String(four).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 4;
-        }
-        if (new String(five).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 5;
-        }
-        if (new String(six).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 6;
-        }
-        if (new String(seven).valueOf() === new String(allTheValues).valueOf()) {
-            finalValue = 7;
-        }
-        this.setState(prevState => ({
-            valuesToApplyToGrbl: {
-                ...prevState.valuesToApplyToGrbl,
-                $3: finalValue
             }
         }));
     }
@@ -458,7 +420,6 @@ class Firmware extends PureComponent {
             valuesToSubmit.push([keys[i], values[i]]);
         }
         let gCoded = this.gcode(valuesToSubmit);
-
         //loops through array values, concatinates them with =
         for (let j = 0; j < gCoded.length; j++) {
             finalStrings[j] = gCoded[j].join('=');
@@ -469,7 +430,10 @@ class Firmware extends PureComponent {
             msg: 'Settings Updated!',
             type: TOASTER_INFO
         });
-        this.setState({ currentSettings: finalStrings });
+        this.setState({
+            currentSettings: finalStrings,
+            newSettingsButtonDisabled: true
+        });
     }
 
     defineMessageForCncDefaultsButton = () => {
@@ -508,7 +472,7 @@ class Firmware extends PureComponent {
     }
 
     render() {
-        const { modalClose } = this.props;
+        const { modalClose, canClick } = this.props;
         const loadedSettings = GRBL_SETTINGS.GRBL_SETTINGS;
         let message = this.defineMessageForCncDefaultsButton();
         let currentSettings = controller.settings;
@@ -517,7 +481,7 @@ class Firmware extends PureComponent {
         return (
             <Modal onClose={modalClose}>
                 <div className={styles.toolModal}>
-                    <div className={styles.firmwareHeader}><h3 className={styles.firmwareHeaderText}>Firmware Gadget</h3></div>
+                    <div className={styles.firmwareHeader}><h3 className={styles.firmwareHeaderText}>Firmware Tool</h3></div>
                     <div className={styles.firmwareContainer}>
                         <div className={styles.settingsContainer}>
                             {
@@ -572,10 +536,11 @@ class Firmware extends PureComponent {
                                         Improper flashing could damage your device on port: {this.state.port}.
                                     </ToolsNotificationModal>
                                 ) : ''}
-                                <ToolModalButton icon="fas fa-bolt" onClick={this.startFlashing}>
+                                <TooltipCustom content="Flash your Arduino board to GRBL default values" location="default">
+                                    <ToolModalButton icon="fas fa-bolt" onClick={this.startFlashing}>
                                     Flash GRBL
-                                </ToolModalButton>
-
+                                    </ToolModalButton>
+                                </TooltipCustom>
                                 {this.state.initiateRestoreDefaults ? (
                                     <ToolsNotificationModal
                                         title="Restore Cnc Defaults"
@@ -600,22 +565,29 @@ class Firmware extends PureComponent {
                                 </ToolsNotificationModal>
                             ) : ''}
                             <div className={styles.buttonsMiddle}>
-                                <ToolModalButton onClick={this.upload} icon="fas fa-file-import">
+                                <TooltipCustom content="Import your settings file you saved previously" location="default">
+                                    <ToolModalButton onClick={this.upload} icon="fas fa-file-import" disabled={canClick}>
                                     Import Settings
-                                </ToolModalButton>
-
-                                <ToolModalButton
-                                    onClick={this.download}
-                                    icon="fas fa-file-export"
-                                >
+                                    </ToolModalButton>
+                                </TooltipCustom>
+                                <TooltipCustom content="Save your current GRBL settings to your device" location="default">
+                                    <ToolModalButton
+                                        onClick={this.download}
+                                        icon="fas fa-file-export"
+                                        disabled={canClick}
+                                    >
                                     Export Settings
-                                </ToolModalButton>
-                                <ToolModalButton
-                                    onClick={this.restoreSettings}
-                                    icon="fas fa-undo"
-                                >
+                                    </ToolModalButton>
+                                </TooltipCustom>
+                                <TooltipCustom content="Restore the settings for your current machine profile" location="default">
+                                    <ToolModalButton
+                                        onClick={this.restoreSettings}
+                                        icon="fas fa-undo"
+                                        disabled={canClick}
+                                    >
                                     Restore Defaults
-                                </ToolModalButton>
+                                    </ToolModalButton>
+                                </TooltipCustom>
                             </div>
                             <a
                                 action="Eeprom.txt"
@@ -625,13 +597,16 @@ class Firmware extends PureComponent {
                                 ref={e => this.dofileDownload = e}
                             >download it
                             </a>
-                            <ToolModalButton
-                                icon="fas fa-tasks"
-                                onClick={this.applyNewSettings}
-                                className={this.state.newSettingsButtonDisabled ? `${styles.firmwareButtonDisabled}` : `${styles.applySettingsButton}`}
-                            >
+                            <TooltipCustom content="Apply your new changes to the settings" location="default" disabled={this.state.newSettingsButtonDisabled}>
+                                <ToolModalButton
+                                    icon="fas fa-tasks"
+                                    onClick={this.applyNewSettings}
+                                    className={this.state.newSettingsButtonDisabled ? `${styles.firmwareButtonDisabled}` : `${styles.applySettingsButton}`}
+                                    disabled={canClick}
+                                >
                                 Apply New Settings
-                            </ToolModalButton>
+                                </ToolModalButton>
+                            </TooltipCustom>
                             <input
                                 type="file" className="hidden"
                                 multiple={false}
@@ -649,4 +624,10 @@ class Firmware extends PureComponent {
     }
 }
 
-export default Firmware;
+
+export default connect((store) => {
+    const isConnected = get(store, 'connection.isConnected');
+    return {
+        canClick: !isConnected
+    };
+})(Firmware);

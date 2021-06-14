@@ -21,36 +21,33 @@
  *
  */
 
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-
 import React from 'react';
 import PropTypes from 'prop-types';
+
+import Modal from 'app/components/Modal';
+
 import styles from './index.styl';
 
-const ToolModal = (props) => {
-    ToolModal.propTypes = {
-        onClose: PropTypes.string.isRequired,
-        component: PropTypes.object.isRequired,
-        title: PropTypes.string.isRequired,
-        handleClose: PropTypes.func.isRequired
-    };
-
+const ToolModal = ({ onClose, title, children }) => {
     return (
-        <div className={styles.toolModalOverlay}>
+        <Modal onClose={onClose}>
             <div className={styles.toolModal}>
-                <div className={styles.buttonContainer}>
-                    <button type="button" className="fas fa-times" onClick={props.handleClose} />
+                <div className={styles.header}>
+                    <h3 className={styles.headerText}>{title}</h3>
                 </div>
-                <div>
-                    <h3 className={styles.toolHeader}>{props.title}</h3>
-                    <div className={styles.toolContainer}>
-                        {props.component}
+                <div className={styles.container}>
+                    <div className={styles.settingsContainer}>
+                        {children}
                     </div>
                 </div>
             </div>
-        </div>
+        </Modal>
     );
+};
+
+ToolModal.propTypes = {
+    title: PropTypes.string.isRequired,
+    onClose: PropTypes.func.isRequired
 };
 
 export default ToolModal;

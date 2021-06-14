@@ -25,6 +25,7 @@ import includes from 'lodash/includes';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
 import map from 'lodash/map';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
@@ -36,7 +37,6 @@ import Probe from './Probe';
 import RunProbe from './RunProbe';
 import {
     // Units
-    IMPERIAL_UNITS,
     METRIC_UNITS,
     // Grbl
     GRBL,
@@ -45,12 +45,8 @@ import {
     MARLIN,
     // Smoothie
     SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_IDLE,
     // TinyG
     TINYG,
-    TINYG_MACHINE_STATE_READY,
-    TINYG_MACHINE_STATE_STOP,
-    TINYG_MACHINE_STATE_END,
     // Workflow
     WORKFLOW_STATE_IDLE
 } from '../../constants';
@@ -87,11 +83,18 @@ class ProbeWidget extends PureComponent {
 
     state = this.getInitialState();
 
-    PROBE_DISTANCE = {
+    PROBE_DISTANCE_METRIC = {
         X: 25,
         Y: 25,
         Z: 15
     };
+
+    PROBE_DISTANCE_IMPERIAL = {
+        X: 1,
+        Y: 1,
+        Z: 0.6
+    };
+
 
     DWELL_TIME = 0.3;
 
@@ -269,91 +272,13 @@ class ProbeWidget extends PureComponent {
         }
     };
 
-    controllerEvents = {
-        'gcode:fsLoad': () => {
-            console.log('responded');
-        },
-        'serialport:open': (options) => {
-            const { port } = options;
-            this.setState({ port: port });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState({ ...initialState });
-            this.actions.generatePossibleProbeCommands();
-        },
-        'workflow:state': (workflowState) => {
-            this.setState(state => ({
-                workflow: {
-                    state: workflowState
-                }
-            }));
-        },
-        'controller:state': (type, state) => {
-            let units = this.state.units;
-
-            // Grbl
-            if (type === GRBL) {
-                const { parserstate } = { ...state };
-                const { modal = {} } = { ...parserstate };
-                units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || units;
-            }
-
-            // Marlin
-            if (type === MARLIN) {
-                const { modal = {} } = { ...state };
-                units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || units;
-            }
-
-            // Smoothie
-            if (type === SMOOTHIE) {
-                const { parserstate } = { ...state };
-                const { modal = {} } = { ...parserstate };
-                units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || units;
-            }
-
-            // TinyG
-            if (type === TINYG) {
-                const { sr } = { ...state };
-                const { modal = {} } = { ...sr };
-                units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || units;
-            }
-
-            if (this.state.units !== units) {
-                // Set `this.unitsDidChange` to true if the unit has changed
-                this.unitsDidChange = true;
-            }
-
-            this.setState({
-                controller: {
-                    type: type,
-                    state: state
-                },
-            });
-        },
-    };
-
     unitsDidChange = false;
 
     componentDidMount() {
-        this.addControllerEvents();
         this.subscribe();
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
         this.unsubscribe();
     }
 
@@ -403,9 +328,6 @@ class ProbeWidget extends PureComponent {
                 type: controller.type,
                 state: controller.state
             },
-            workflow: {
-                state: controller.workflow.state
-            },
             modal: {
                 name: MODAL_NONE,
                 params: {}
@@ -426,13 +348,6 @@ class ProbeWidget extends PureComponent {
             selectedProbeCommand: 0,
             connectivityTest: this.config.get('connectivityTest')
         };
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
     }
 
     gcode(cmd, params) {
@@ -481,9 +396,9 @@ class ProbeWidget extends PureComponent {
     }
 
     generateSingleAxisCommands(axis, thickness, params) {
-        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate } = params;
+        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
         const workspace = this.mapWCSToPValue(wcs);
-        let probeDistance = this.PROBE_DISTANCE[axis];
+        let probeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC[axis] : this.PROBE_DISTANCE_IMPERIAL[axis];
         probeDistance = (isSafe) ? -probeDistance : probeDistance;
         probeDistance = (axis === 'Z') ? (-1 * Math.abs(probeDistance)) : probeDistance;
         retractDistance = (axis === 'Z') ? retractDistance : retractDistance * -1;
@@ -564,12 +479,12 @@ class ProbeWidget extends PureComponent {
 
     generateMultiAxisCommands(axes, xyThickness, zThickness, params) {
         let code = [];
-        const { units } = this.state;
-        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate } = params;
+        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
         const workspace = this.mapWCSToPValue(wcs);
         const XYRetract = -retractDistance;
-        let XYProbeDistance = this.PROBE_DISTANCE.X;
-        let ZProbeDistance = this.PROBE_DISTANCE.Z * -1;
+        let XYProbeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC.X : this.PROBE_DISTANCE_IMPERIAL.X;
+        let ZProbeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC.Z : this.PROBE_DISTANCE_IMPERIAL.Z;
+        ZProbeDistance *= -1;
         XYProbeDistance = (isSafe) ? -XYProbeDistance : XYProbeDistance;
         const gcode = this.gcode;
 
@@ -706,7 +621,6 @@ class ProbeWidget extends PureComponent {
         const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
         const wcs = this.getWorkCoordinateSystem();
         const code = [];
-
         // Grab units for correct modal
         let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
         const modal = (units === METRIC_UNITS) ? '21' : '20';
@@ -731,7 +645,8 @@ class ProbeWidget extends PureComponent {
             retractDistance: retractDistance,
             normalFeedrate: feedrate,
             quickFeedrate: fastFeedrate,
-            modal: modal
+            modal: modal,
+            units
         };
 
         const axesCount = Object.keys(axes).filter(axis => axes[axis]).length;
@@ -757,85 +672,31 @@ class ProbeWidget extends PureComponent {
         return code;
     }
 
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
-    }
-
     getWorkCoordinateSystem() {
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
-        const defaultWCS = 'G54';
+        const controllerState = this.props.state;
 
-        if (controllerType === GRBL) {
-            return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
-        }
-
-        if (controllerType === MARLIN) {
-            return get(controllerState, 'modal.wcs') || defaultWCS;
-        }
-
-        if (controllerType === SMOOTHIE) {
-            return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
-        }
-
-        if (controllerType === TINYG) {
-            return get(controllerState, 'sr.modal.wcs') || defaultWCS;
-        }
-
-        return defaultWCS;
+        return get(controllerState, 'parserstate.modal.wcs');
     }
 
     canClick() {
-        const { port, workflow } = this.state;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
+        const { workflow, isConnected, type, state } = this.props;
 
-        if (!port) {
+        if (!isConnected) {
             return false;
         }
         if (workflow.state !== WORKFLOW_STATE_IDLE) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
+        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
             return false;
         }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_IDLE
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_READY,
-                TINYG_MACHINE_STATE_STOP,
-                TINYG_MACHINE_STATE_END
-            ];
-            if (!includes(states, machineState)) {
-                return false;
-            }
-        }
 
-        return true;
+        const activeState = get(state, 'status.activeState');
+        const states = [
+            GRBL_ACTIVE_STATE_IDLE
+        ];
+
+        return includes(states, activeState);
     }
 
     changeUnits(units) {
@@ -898,16 +759,12 @@ class ProbeWidget extends PureComponent {
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header embedded={embedded}>
                     <Widget.Title>
-                        <Widget.Sortable className={this.props.sortable.handleClassName}>
-                            <i className="fa fa-bars" />
-                            <Space width="8" />
-                        </Widget.Sortable>
                         {isForkedWidget &&
                         <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
                         }
                         {i18n._('Probe')}
                     </Widget.Title>
-                    <Widget.Controls className={this.props.sortable.filterClassName}>
+                    <Widget.Controls>
                         <Widget.Button
                             disabled={isFullscreen}
                             title={minimized ? i18n._('Expand') : i18n._('Collapse')}
@@ -981,4 +838,15 @@ class ProbeWidget extends PureComponent {
     }
 }
 
-export default ProbeWidget;
+export default connect((store) => {
+    const state = get(store, 'controller.state');
+    const type = get(store, 'controller.type');
+    const workflow = get(store, 'controller.workflow');
+    const isConnected = get(store, 'connection.isConnected');
+    return {
+        state,
+        type,
+        workflow,
+        isConnected
+    };
+})(ProbeWidget);

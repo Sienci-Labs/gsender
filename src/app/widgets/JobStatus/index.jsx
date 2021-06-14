@@ -26,20 +26,19 @@ import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
 import store from 'app/store';
 import PropTypes from 'prop-types';
+import get from 'lodash/get';
 import React, { PureComponent } from 'react';
-import controller from 'app/lib/controller';
-// import i18n from 'app/lib/i18n';
-import { mapPositionToUnits } from 'app/lib/units';
+import { connect } from 'react-redux';
+import { mapPositionToPreferredUnits } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
 import JobStatus from './JobStatus';
 import {
-    GRBL,
-    // Units
-    IMPERIAL_UNITS,
     METRIC_UNITS, SPINDLE_MODE,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED
 } from '../../constants';
+import FileProcessingLoader from './components/FileProcessingLoader';
+
 
 class JobStatusWidget extends PureComponent {
     static propTypes = {
@@ -73,194 +72,37 @@ class JobStatusWidget extends PureComponent {
         },
     };
 
-    controllerEvents = {
-        'serialport:open': (options) => {
-            const { port } = options;
-            this.setState({
-                port: port,
-                connected: true,
-            });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState({ ...initialState });
-        },
-        'gcode:unload': () => {
-            this.setState({
-                bbox: {
-                    min: {
-                        x: 0,
-                        y: 0,
-                        z: 0
-                    },
-                    max: {
-                        x: 0,
-                        y: 0,
-                        z: 0
-                    },
-                    delta: {
-                        x: 0,
-                        y: 0,
-                        z: 0
-                    }
-                }
-            });
-        },
-        'sender:status': (data) => {
-            const { total, sent, received, startTime, finishTime, elapsedTime, size, remainingTime, name } = data;
-            if (data.finishTime > 0) {
-                this.config.set('lastFile', this.state.fileName);
-                this.config.set('lastFileSize', size);
-                this.config.set('lastFileRunLength', elapsedTime);
-                this.setState({
-                    lastFileRan: this.state.fileName,
-                    lastFileSize: size,
-                    lastFileRunLength: elapsedTime,
-                });
-            }
-            this.setState({
-                total,
-                sent,
-                received,
-                startTime,
-                finishTime,
-                fileName: name,
-                elapsedTime,
-                remainingTime,
-                workflow: {
-                    state: controller.workflow.state
-                },
-            });
-        },
-        'controller:state': (type, state) => {
-            // Grbl
-            if (type === GRBL) {
-                const { parserstate } = { ...state };
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                let unitsState = {};
-                if (this.state.units !== units) {
-                    unitsState = { units: units };
-                }
-
-                this.setState(prevState => ({
-                    controller: {
-                        ...prevState.controller,
-                        type: type,
-                        state: { ...state, ...unitsState }
-                    }
-                }));
-            }
-            // // Grbl
-            // if (type === GRBL) {
-            //     const { parserstate } = { ...state };
-            //     const { modal = {} } = { ...parserstate };
-            //     const units = {
-            //         'G20': IMPERIAL_UNITS,
-            //         'G21': METRIC_UNITS
-            //     }[modal.units] || this.state.units;
-
-            //     let unitsState = {};
-            //     if (this.state.units !== units) {
-            //         unitsState = { units: units };
-            //     }
-
-            //     const { activeState } = state.status;
-
-            //     //Set the paused time once the machine is paused
-            //     if (activeState === 'Hold') {
-            //         this.setState(prevState => ({
-            //             controller: {
-            //                 ...prevState.controller,
-            //                 type: type,
-            //                 state: { ...state }
-            //             },
-            //             ...unitsState,
-            //             pausedTime: Date.now()
-            //         }));
-
-            //     // Set the paused time back to 0 when machine is idle
-            //     } else if (activeState === 'Idle') {
-            //         this.setState(prevState => ({
-            //             controller: {
-            //                 ...prevState.controller,
-            //                 type: type,
-            //                 state: { ...state }
-            //             },
-            //             ...unitsState,
-            //             pausedTime: 0,
-            //         }));
-
-            //     // Calculate the time difference from the paused time to current time
-            //     // then subtract it from the elapsed time given by the machine
-            //     } else {
-            //         const { pausedTime, elapsedTime, controller: { state: prevState } } = this.state;
-
-            //         // If the previous state of the machine was on hold, perform the calculation
-            //         if (prevState.status.activeState !== 'Run') {
-            //             const now = Date.now();
-
-            //             const diff = pausedTime === 0 ? pausedTime : now - pausedTime;
-
-            //             this.setState(prevState => ({
-            //                 controller: {
-            //                     ...prevState.controller,
-            //                     type: type,
-            //                     state: { ...state }
-            //                 },
-            //                 ...unitsState,
-            //                 elapsedTime: elapsedTime - diff,
-            //                 pausedTime: 0,
-            //             }));
-            //         } else {
-            //             this.setState(prevState => ({
-            //                 controller: {
-            //                     ...prevState.controller,
-            //                     type: type,
-            //                     state: { ...state },
-            //                 },
-            //                 ...unitsState,
-            //             }));
-            //         }
-            //     }
-            // }
-        }
-    };
-
     pubsubTokens = [];
 
     componentDidMount() {
         this.subscribe();
-        this.addControllerEvents();
     }
 
     componentWillUnmount() {
-        const {
-            fileName,
-            fileSize,
-            elapsedTime
-        } = this.state;
-        this.removeControllerEvents();
         this.unsubscribe();
-        this.config.set('lastFile', fileName);
-        this.config.set('lastFileSize', fileSize);
-        this.config.set('lastFileRunLength', elapsedTime);
     }
 
     componentDidUpdate(prevProps, prevState) {
         const {
             minimized,
             spindleSpeed,
-            probeFeedrate,
         } = this.state;
+        const prevSenderStatus = prevProps.senderStatus;
+        const { senderStatus } = this.props;
+
+        if (senderStatus && prevSenderStatus && prevSenderStatus.finishTime !== senderStatus.finishTime && senderStatus.finishTime > 0) {
+            this.config.set('lastFile', senderStatus.name);
+            this.config.set('lastFileSize', senderStatus.size);
+            this.config.set('lastFileRunLength', senderStatus.elapsedTime);
+            this.setState({
+                lastFileRan: senderStatus.name,
+                lastFileSize: senderStatus.size,
+                lastFileRunLength: senderStatus.elapsedTime,
+            });
+        }
 
         this.config.set('minimized', minimized);
         this.config.set('speed', spindleSpeed);
-        this.config.set('probeFeedrate', Number(probeFeedrate));
     }
 
     getSpindleOverrideLabel() {
@@ -278,131 +120,18 @@ class JobStatusWidget extends PureComponent {
             lastFileRunLength: this.config.get('lastFileRunLength', ''),
             minimized: this.config.get('minimized', false),
             spindleSpeed: this.config.get('speed', 1000),
-            probeFeedrate: Number(this.config.get('probeFeedrate') || 0).toFixed(3) * 1,
-            feedrateMin: this.config.get('feedrateMin', 500),
-            feedrateMax: this.config.get('feedrateMax', 2000),
-            spindleSpeedMin: this.config.get('spindleSpeedMin', 0),
-            spindleSpeedMax: this.config.get('spindleSpeedMax', 1000),
             spindleOverrideLabel: this.getSpindleOverrideLabel(),
-            feedRates: [],
-            spindleRates: [],
             isFullscreen: false,
-            connected: false,
             fileModal: METRIC_UNITS,
-            workflow: {
-                state: controller.workflow.state
-            },
-
-            port: controller.port,
             units: store.get('workspace.units'),
-
-            controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
-            },
-
-            fileName: '',
-            fileSize: 0,
             estimatedTime: 0,
-
             // G-code Status (from server)
-            total: 0,
-            sent: 0,
-            received: 0,
-            startTime: 0,
-            finishTime: 0,
-            elapsedTime: 0,
-            remainingTime: 0,
-
             pausedTime: 0, //
-
-            // Bounding box
-            bbox: {
-                min: {
-                    x: 0,
-                    y: 0,
-                    z: 0
-                },
-                max: {
-                    x: 0,
-                    y: 0,
-                    z: 0
-                },
-                delta: {
-                    x: 0,
-                    y: 0,
-                    z: 0
-                }
-            }
         };
     }
 
     subscribe() {
         const tokens = [
-            pubsub.subscribe('gcode:bbox', (msg, bbox) => {
-                const dX = bbox.max.x - bbox.min.x;
-                const dY = bbox.max.y - bbox.min.y;
-                const dZ = bbox.max.z - bbox.min.z;
-
-                this.setState({
-                    bbox: {
-                        min: {
-                            x: bbox.min.x,
-                            y: bbox.min.y,
-                            z: bbox.min.z
-                        },
-                        max: {
-                            x: bbox.max.x,
-                            y: bbox.max.y,
-                            z: bbox.max.z
-                        },
-                        delta: {
-                            x: dX,
-                            y: dY,
-                            z: dZ
-                        }
-                    }
-                });
-            }),
-            pubsub.subscribe('file:units', (msg, unitModal) => {
-                if (unitModal === 'G21') {
-                    this.setState({
-                        fileModal: METRIC_UNITS
-                    });
-                } else {
-                    this.setState({
-                        fileModal: IMPERIAL_UNITS
-                    });
-                }
-            }),
-            pubsub.subscribe('gcode:fileInfo', (msg, file) => {
-                if (!file) {
-                    this.setState(this.getInitialState());
-                    return;
-                }
-                /* Convert set commands to numbers and get max and min */
-                const spindleRates = [];
-                const feedRates = [];
-
-                file.movementSet.forEach(item => {
-                    feedRates.push(Number(item.substring(1)));
-                });
-                file.spindleSet.forEach(item => {
-                    spindleRates.push(Number(item.substring(1)));
-                });
-
-                this.setState({
-                    fileName: file.name,
-                    total: file.total,
-                    toolsAmount: file.toolSet.size,
-                    toolsUsed: file.toolSet,
-                    spindleRates: spindleRates,
-                    feedRates: feedRates,
-                    estimatedTime: file.estimatedTime,
-                    fileSize: file.size,
-                });
-            }),
             pubsub.subscribe('units:change', (msg, units) => {
                 this.setState({
                     units: units
@@ -412,7 +141,7 @@ class JobStatusWidget extends PureComponent {
                 this.setState({
                     spindleOverrideLabel: this.getSpindleOverrideLabel()
                 });
-            })
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -424,62 +153,65 @@ class JobStatusWidget extends PureComponent {
         this.pubsubTokens = [];
     }
 
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
-    }
-
     isRunningJob() {
-        const { workflow } = this.state;
+        const { workflow } = this.props;
 
-        if (workflow.state !== WORKFLOW_STATE_IDLE) {
-            return true;
-        }
-
-        return false;
+        return workflow.state !== WORKFLOW_STATE_IDLE;
     }
 
     jobIsPaused() {
-        const { workflow } = this.state;
-        if (workflow.state === WORKFLOW_STATE_PAUSED) {
-            return true;
-        }
-
-        return false;
+        const { workflow } = this.props;
+        return workflow.state === WORKFLOW_STATE_PAUSED;
     }
 
     render() {
-        const { units, bbox } = this.state;
+        const { units } = this.state;
+        const { workflow, isConnected, senderStatus, bbox, fileProcessing, fileModal } = this.props;
         const state = {
             ...this.state,
+            workflow,
+            senderStatus,
             isRunningJob: this.isRunningJob(),
             jobIsPaused: this.jobIsPaused(),
             bbox: mapValues(bbox, (position) => {
                 return mapValues(position, (pos, axis) => {
-                    return mapPositionToUnits(pos, units);
+                    return mapPositionToPreferredUnits(pos, fileModal, units);
                 });
-            })
+            }),
+            isConnected
         };
+
         const actions = {
             ...this.actions
         };
 
         return (
-            <JobStatus
-                state={state}
-                actions={actions}
-            />
+            <>
+                {fileProcessing
+                    ? <FileProcessingLoader />
+                    : <JobStatus
+                        state={state}
+                        actions={actions}
+                    />
+                }
+            </>
         );
     }
 }
 
-export default JobStatusWidget;
+export default connect((store) => {
+    const workflow = get(store, 'controller.workflow');
+    const senderStatus = get(store, 'controller.sender.status');
+    const isConnected = get(store, 'connection.isConnected');
+    const bbox = get(store, 'file.bbox');
+    const fileProcessing = get(store, 'file.fileProcessing');
+    const fileModal = get(store, 'file.fileModal');
+    return {
+        workflow,
+        senderStatus,
+        isConnected,
+        bbox,
+        fileProcessing,
+        fileModal
+    };
+})(JobStatusWidget);

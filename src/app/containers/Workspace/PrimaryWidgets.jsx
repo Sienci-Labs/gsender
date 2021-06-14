@@ -230,18 +230,9 @@ class PrimaryWidgets extends Component {
             .map(widgetId => (
                 <div data-widget-id={widgetId} key={widgetId}>
                     <Widget
-                        ref={node => {
-                            if (node && node.widget) {
-                                this.widgetMap[widgetId] = node.widget;
-                            }
-                        }}
                         widgetId={widgetId}
                         onFork={this.forkWidget(widgetId)}
                         onRemove={this.removeWidget(widgetId)}
-                        sortable={{
-                            handleClassName: 'sortable-handle',
-                            filterClassName: 'sortable-filter'
-                        }}
                     />
                 </div>
             ));

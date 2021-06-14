@@ -64,26 +64,19 @@ class InputTwentyThree extends PureComponent {
 
         if (loadedSettings === '0') {
             loadedSettings = $23Options[0];
-        }
-        if (loadedSettings === '1') {
+        } else if (loadedSettings === '1') {
             loadedSettings = $23Options[1];
-        }
-        if (loadedSettings === '2') {
+        } else if (loadedSettings === '2') {
             loadedSettings = $23Options[2];
-        }
-        if (loadedSettings === '3') {
+        } else if (loadedSettings === '3') {
             loadedSettings = $23Options[3];
-        }
-        if (loadedSettings === '4') {
+        } else if (loadedSettings === '4') {
             loadedSettings = $23Options[4];
-        }
-        if (loadedSettings === '5') {
+        } else if (loadedSettings === '5') {
             loadedSettings = $23Options[5];
-        }
-        if (loadedSettings === '6') {
+        } else if (loadedSettings === '6') {
             loadedSettings = $23Options[6];
-        }
-        if (loadedSettings === '7') {
+        } else {
             loadedSettings = $23Options[7];
         }
         this.setState({

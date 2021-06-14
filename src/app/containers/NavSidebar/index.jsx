@@ -22,23 +22,21 @@
  */
 
 import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import NavSidebarLink from './NavSideBarLink';
 import styles from './index.styl';
 import {
     MODAL_NONE,
     MODAL_PREFERENCES,
-    MODAL_FIRMWARE
+    MODAL_FIRMWARE,
+    MODAL_SURFACING,
+    MODAL_CALIBRATE
 } from './constants';
 import Preferences from '../Preferences/Preferences';
-// import WizardModal from '../Wizard/WizardModal';
 import Firmware from '../Firmware/Firmware';
+import Surfacing from '../Surfacing';
+import Calibration from '../Calibration';
 
 class NavSidebar extends PureComponent {
-    static propTypes = {
-        wizardDisabled: PropTypes.bool
-    };
-
     state = this.getInitialState();
 
     actions = {
@@ -75,16 +73,20 @@ class NavSidebar extends PureComponent {
         return (
             <div className={styles.Sidebar}>
                 <NavSidebarLink
-                    url="" icon="fab fa-codepen" label="Surfacing"
-                    disabled
+                    url=""
+                    icon="fab fa-codepen"
+                    label="Surfacing"
+                    onClick={() => actions.openModal(MODAL_SURFACING)}
                 />
                 <NavSidebarLink
                     url="" icon="fa fa-mountain" label="Heightmap"
                     disabled
                 />
                 <NavSidebarLink
-                    url="" icon="fa fa-ruler" label="Calibrate"
-                    disabled
+                    url=""
+                    onClick={() => actions.openModal(MODAL_CALIBRATE)}
+                    icon="fa fa-ruler"
+                    label="Calibrate"
                 />
                 <NavSidebarLink
                     url=""
@@ -93,20 +95,18 @@ class NavSidebar extends PureComponent {
                     label="Firmware"
                 />
                 <NavSidebarLink
-                    icon="fa fa-share-square"
-                    label=""
+                    icon="fa fa-question"
+                    label="Help"
                     onClick={() => window.open('https://sienci.com/gsender-documentation/', '_blank')}
                 />
                 <NavSidebarLink
                     url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa fa-cog"
                     label=""
                 />
-                {
-                    state.modal.name === MODAL_FIRMWARE && <Firmware state={state} modalClose={actions.closeModal} />
-                }
-                {
-                    state.modal.name === MODAL_PREFERENCES && <Preferences state={state} modalClose={actions.closeModal} />
-                }
+                { state.modal.name === MODAL_FIRMWARE && <Firmware state={state} modalClose={actions.closeModal} /> }
+                { state.modal.name === MODAL_PREFERENCES && <Preferences state={state} modalClose={actions.closeModal} /> }
+                { state.modal.name === MODAL_SURFACING && <Surfacing state={state} modalClose={actions.closeModal} /> }
+                { state.modal.name === MODAL_CALIBRATE && <Calibration state={state} modalClose={actions.closeModal} /> }
             </div>
         );
     }

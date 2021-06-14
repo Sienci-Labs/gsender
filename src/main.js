@@ -28,11 +28,12 @@ import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
 import path from 'path';
+import fs from 'fs';
 //import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
-import './sentryInit';
+//import './sentryInit';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 
 
@@ -42,6 +43,8 @@ const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
     const gotSingleInstanceLock = app.requestSingleInstanceLock();
     const shouldQuitImmediately = !gotSingleInstanceLock;
+
+    let prevDirectory = '';
 
     if (shouldQuitImmediately) {
         app.quit();
@@ -80,10 +83,14 @@ const main = () => {
                 show: false,
                 frame: false
             });
-            await splashScreen.loadFile(path.join(__dirname, 'app/assets/splashscreen.png'));
-            splashScreen.once('ready-to-show', () => {
+            splashScreen.loadFile(path.join(__dirname, 'app/assets/Splashscreen.gif'));
+            splashScreen.webContents.on('did-finish-load', () => {
                 splashScreen.show();
             });
+
+            splashScreen.on('show', () => {
+                splashScreen.focus();
+            })
 
             const res = await launchServer();
             const { address, port, mountPoints } = { ...res };
@@ -147,10 +154,46 @@ const main = () => {
                 const fileMetadata = await parseAndReturnGCode(recentFile);
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
-        } catch (err) {
-            await dialog.showMessageBox({
-                message: `Error - ${err.message}!`
+            ipcMain.on('open-upload-dialog', async () => {
+                let additionalOptions = {};
+
+                if (prevDirectory) {
+                    additionalOptions.defaultPath = prevDirectory;
+                }
+
+                const file = await dialog.showOpenDialog(
+                    {
+                        ...additionalOptions,
+                        properties: ['openFile'],
+                        filters: [{ name: 'Custom File Type', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] }]
+                    },
+                );
+
+                const FULL_FILE_PATH = file.filePaths[0];
+
+                const getFileInformation = (file) => {
+                    const { base, dir } = path.parse(file);
+                    return [dir, base];
+                };
+
+                if (file.canceled) {
+                    return;
+                }
+
+                const [filePath, fileName] = getFileInformation(FULL_FILE_PATH);
+
+                fs.readFile(FULL_FILE_PATH, 'utf8', (err, data) => {
+                    if (err) {
+                        return;
+                    }
+
+                    prevDirectory = filePath; //Set the previous directory for later use
+                    const { size } = fs.statSync(FULL_FILE_PATH);
+                    window.webContents.send('returned-upload-dialog-data', { data, size, name: fileName, path: FULL_FILE_PATH });
+                });
             });
+        } catch (err) {
+            console.log(err);
         }
     });
 };

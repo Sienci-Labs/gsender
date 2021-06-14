@@ -24,6 +24,7 @@
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
+import { connect } from 'react-redux';
 import includes from 'lodash/includes';
 import React, { PureComponent } from 'react';
 import _ from 'lodash';
@@ -49,14 +50,8 @@ import {
     MARLIN,
     // Smoothie
     SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_IDLE,
-    SMOOTHIE_ACTIVE_STATE_RUN,
     // TinyG
     TINYG,
-    TINYG_MACHINE_STATE_READY,
-    TINYG_MACHINE_STATE_STOP,
-    TINYG_MACHINE_STATE_END,
-    TINYG_MACHINE_STATE_RUN,
     // Workflow
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
@@ -216,36 +211,9 @@ class MacroWidget extends PureComponent {
     };
 
     controllerEvents = {
-        'config:change': () => {
-            this.fetchMacros();
+        'config:change': async () => {
+            await this.fetchMacros();
         },
-        'serialport:open': (options) => {
-            const { port } = options;
-            this.setState({ port: port });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState(state => ({
-                ...initialState,
-                macros: [...state.macros]
-            }));
-        },
-        'controller:state': (type, controllerState) => {
-            this.setState(state => ({
-                controller: {
-                    ...state.controller,
-                    type: type,
-                    state: controllerState
-                }
-            }));
-        },
-        'workflow:state': (workflowState) => {
-            this.setState(state => ({
-                workflow: {
-                    state: workflowState
-                }
-            }));
-        }
     };
 
     fetchMacros = async () => {
@@ -268,11 +236,11 @@ class MacroWidget extends PureComponent {
         const macrosClean = this.state.macros.map(({ name, content }) => ({ name, content }));
         const macros = JSON.stringify(macrosClean, null, 1);
         const data = new Blob([macros], {
-            type: 'text/plain;charset=utf-8;'
+            type: 'application/json'
         });
 
         const today = new Date();
-        const filename = `gSender-macros-${today.toLocaleDateString()}-${today.toLocaleTimeString()}.json`;
+        const filename = `gSender-macros-${today.toLocaleDateString()}-${today.toLocaleTimeString()}`;
 
         // IE11 & Edge
         if (navigator.msSaveBlob) {
@@ -332,19 +300,11 @@ class MacroWidget extends PureComponent {
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
-            port: controller.port,
-            controller: {
-                type: controller.type,
-                state: controller.state
-            },
-            workflow: {
-                state: controller.workflow.state
-            },
+            macros: [],
             modal: {
                 name: MODAL_NONE,
                 params: {}
             },
-            macros: []
         };
     }
 
@@ -363,56 +323,24 @@ class MacroWidget extends PureComponent {
     }
 
     canClick() {
-        const { port, workflow } = this.state;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
+        const { workflow, isConnected, type, state } = this.props;
 
-        if (!port) {
+        if (!isConnected) {
             return false;
         }
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
+        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
             return false;
         }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_IDLE,
-                GRBL_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_IDLE,
-                SMOOTHIE_ACTIVE_STATE_RUN
-            ];
-            if (!includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_READY,
-                TINYG_MACHINE_STATE_STOP,
-                TINYG_MACHINE_STATE_END,
-                TINYG_MACHINE_STATE_RUN
-            ];
-            if (!includes(states, machineState)) {
-                return false;
-            }
-        }
 
-        return true;
+        const activeState = get(state, 'status.activeState');
+        const states = [
+            GRBL_ACTIVE_STATE_IDLE,
+            GRBL_ACTIVE_STATE_RUN
+        ];
+        return includes(states, activeState);
     }
 
     render() {
@@ -431,16 +359,12 @@ class MacroWidget extends PureComponent {
             <Widget fullscreen={isFullscreen}>
                 <Widget.Header embedded={embedded}>
                     <Widget.Title>
-                        <Widget.Sortable className={this.props.sortable.handleClassName}>
-                            <i className="fa fa-bars" />
-                            <Space width="8" />
-                        </Widget.Sortable>
                         {isForkedWidget &&
                         <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
                         }
                         {i18n._('Macro')}
                     </Widget.Title>
-                    <Widget.Controls className={this.props.sortable.filterClassName}>
+                    <Widget.Controls>
                         <Widget.Button
                             title={i18n._('New Macro')}
                             onClick={actions.openAddMacroModal}
@@ -563,4 +487,15 @@ class MacroWidget extends PureComponent {
     }
 }
 
-export default MacroWidget;
+export default connect((store) => {
+    const type = get(store, 'controller.type');
+    const state = get(store, 'controller.state');
+    const workflow = get(store, 'controller.workflow');
+    const isConnected = get(store, 'connection.isConnected');
+    return {
+        type,
+        state,
+        workflow,
+        isConnected
+    };
+})(MacroWidget);

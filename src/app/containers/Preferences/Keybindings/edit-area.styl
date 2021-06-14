@@ -126,8 +126,52 @@ info-window() {
 .edit-subtitle {
     color: #3e85c7;
     font-size: 1.5rem;
-    margin: 0 0 1.5rem 0;
     text-align: center;
     text-decoration: underline;
     font-weight: bold;
+}
+
+.shortcut-row-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.edit-icon {
+    align-self: center;
+    color: #2b5d8b;
+
+    &:focus {
+        outline: none;
+    }
+
+    &:active {
+        outline: none;
+    }
+}
+
+.delete-icon {
+    align-self: center;
+    color: #f00;
+
+
+    &:focus {
+        outline: none;
+    }
+
+    &:active {
+        outline: none;
+    }
+}
+
+.disabled-icon {
+    outline: none;
+    color: rgba(#f00, 0.5);
+    cursor: not-allowed !important;
+}
+
+.icon-area {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
 }

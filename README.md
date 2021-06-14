@@ -9,22 +9,23 @@ gSender is a feature-packed CNC interface software designed to be clean and easy
 Some things that we’re looking to accomplish with this sender:
 * Reliability of operation
 * Accommodates all ranges of computing systems (low-end PC to RasPi | ‘light mode’)
-* Highly easy to use
+* Clean and easy to use no matter your previous CNC experience
 * Makes available all normally expected functions
 * Addresses common error throwing conditions automatically
 * Built-in gadgets for surface probing, stock flattening, firmware editing, and g-code editing with syntax highlighting, command navigation, and more
 * 3D cutting visualization
 
-![gSender](https://sienci.com/wp-content/uploads/2021/04/gSender-Main-Screen-0.5.6.png)
+![gSender](https://sienci.com/wp-content/uploads/2021/05/gSender-Main-Screen-0.6.4.png)
 
-## 💻 Download
+## 💻 Download [![Github All Releases](https://img.shields.io/github/downloads/Sienci-Labs/gsender/total.svg)]()
 
 gSender is available for the following systems and does not yet support headless Pi operation
-| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (M1) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/linux.png)<br>Linux
+| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/linux.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ``` | ``` Available ``` | ``` Available ``` | ``` In Progress ``` | ``` In Progress ```
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.6/gSender-0.6.6-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.6/gSender-0.6.6-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.6/gSender-0.6.6.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.6/gSender_0.6.6_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.6/gSender-0.6.6-armv7l.AppImage)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
+
 
 ## 📦 Current Features
 
@@ -42,12 +43,17 @@ gSender is available for the following systems and does not yet support headless
 * Keybindings available for most functions for external keyboard/keypad control
 * Safe height movements
 * Homing cycle and quick-movement locations available for machines with homing hardware
-* Full spindle/laser support via manual control widgets and live overrides
+* Full spindle/laser support via manual control widgets, active alerting, and live overrides
 * Custom macros buttons with optional macro variables
 * Lightweight mode reduces processing intensity on less powerful hardware or when running larger files
 * Easy workspace swapping for more advanced jigging or alignment work
 * Optional automatic handling for common error throwing gcode
 * Firmware tool for easier GRBL eeprom changes, loading defaults, and GRBL flashing
+* Surfacing tool auto-generates surfacing gcode based on machine cutting area and other preferences, ready to execute
+* Calibration tool for axis alignment - a step by step process to make sure your CNC is square
+* Tool change functionality - pause, ignore, or run code blocks on M6 commands
+* Tooltips for data entry points
+* Alarm warning explanations to better contextualize CNC errors
 * Pre-build machine profiles, including:
     - Shapeoko
     - X-carve
@@ -65,7 +71,9 @@ gSender is available for the following systems and does not yet support headless
 
 ## 🎓 Documentation
 
-In progress.
+All up-to-date documentation on gSender can be found here: [https://sienci.com/gsender-documentation/](https://sienci.com/gsender-documentation/)
+
+If you encounter issues or would like to recommend improvements for gSender, there's a link for feedback submission on the documentation page. We also have a place for discussion on our forum: [https://forum.sienci.com/c/gsender/](https://forum.sienci.com/c/gsender/)
 
 
 ## 📃 Example Files
@@ -85,13 +93,40 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
-### Beta 0.6.0 (May 7, 2021)
+### Open Beta 0.6.6 (June 11, 2021)
+* Sticky folders! Load files from the last place you navigated to
+* New tool change functionality - can now pause, ignore, or run code blocks on M6 commands
+* Added a prototype Calibration tool for axis alignment - step by step process to make sure your CNC is square
+* Alarm warnings now show an explanation of what the alarm code means
+* Faster splash screen
+* Spindle/Laser ‘active’ state changes are now updated more quickly in the UI along with other Laser widget improvements
+* Copy and paste text from the terminal
+* Tweaks to handling correct units display in overrides and surfacing
+* Refactored file information to Redux
+* Loads of small bug fixes pertaining to keyboard shortcuts, jogging, probing, comment processing, and the firmware tool
+* Minor styling changes
+
+### Open Beta 0.6.5 (May 28, 2021)
+* New tool for surfacing
+* Moved most controllerEvent listeners to redux store to improve performance
+* Improved Job Time Estimation
+* Updates to Laser/Spindle widget to better track on/off state
+* New 'About' information
+* Fixed file units mismatch with preferred units
+
+### Open Beta 0.6.4 (May 14, 2021)
+* Improvements to job handling
+* Tooltips created for data entry points
+* Splashscreen tweaks
+* Working PI build!?
+
+### Closed Beta 0.6.0 (May 7, 2021)
 * Altered how files are loaded to improve UI performance
 * Added estimated time to run calculation on file load
 * File attributes now persists on disconnect
 * Fixed issues with macro editing and adding
 
-### Beta 0.5.8 (Apr 30, 2021)
+### Closed Beta 0.5.8 (Apr 30, 2021)
 * New experimental Winx32 and RasPi builds
 * Firmware tool improvements and bug fixes
 * More accurate parsing of tool and spindle speeds
@@ -104,7 +139,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Homing state and other small bugs and styling fixes
 * New logo/branding throughout!
 
-### Beta 0.5.6 (Apr 1, 2021)
+### Closed Beta 0.5.6 (Apr 1, 2021)
 * Fixed jog stepping with keybindings, continuous jogging bugs, and other jogging unreliabilities
 * Added new keybindings for improved, keyboard-based actions (unsure if issues with particular symbols such as '*' have persisted)
 * Took another look through to ensure proper unit consistency and conversion
@@ -113,7 +148,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Indication of current jog preset selected
 * New base modals created for use across tools and confirmations
 
-### Beta 0.5.5 (Mar 26, 2021)
+### Closed Beta 0.5.5 (Mar 26, 2021)
 * Added combo laser/spindle widget (toggleable in settings)
 * Re-designed location widget
 * Re-designed layout of job status information to include min and max extents for file dimensions
@@ -121,7 +156,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Added splash screen on application load
 * Migration to most recent Electron release plus implemented logging
 
-### Beta 0.5.4 (Mar 19, 2021)
+### Closed Beta 0.5.4 (Mar 19, 2021)
 * Set up in-app feedback sumbmission button
 * Better formatting and sizing of various gSender elements
 * New visualizer theme "light mode" available in settings
@@ -137,7 +172,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Migration to most recent React
 * New in-app updating management prompted via server releases
 
-### Beta 0.1 (Mar 5, 2021)
+### Closed Beta 0.1 (Mar 5, 2021)
 * gSender decided as official name :D
 * Buttons added for homing quicktravel, jog cancel, diagonal jog, and an awesome isocube!
 * New macros widget
@@ -147,7 +182,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Responsiveness overhaul on entire program
 * Mac (intel) version released March 8
     
-### Alpha 3.0 (Feb 19, 2021)
+### Closed Alpha 3.0 (Feb 19, 2021)
 * Continuous jogging!
 * Unit switching in settings (metric/imperial)
 * Keybinding functionality to jog and other key functions with keypresses (can change bindings in settings)
@@ -158,23 +193,21 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Fixes to excessive decimal places in some areas
 * New Firmware Tool in progress but will probably break your board right now
 
-### Alpha 2.0 (Feb 5, 2021)
+### Closed Alpha 2.0 (Feb 5, 2021)
 * Resolved non-functional buttons, missing console, and some errors during sending
 * New jogging widget and jog presets
 * Improved probe function plus probe continuity checking
 * New file attributes on load
 * More visual improvements and a large buildout in new settings options
 
-### Alpha 1.0 (Jan 29, 2021)
+### Closed Alpha 1.0 (Jan 29, 2021)
 * Still highly dependant on great infrastructure created by the CNCjs team
 * Established Electron installer, git, and certificates 
 * Large visual overhaul in how widgets and displayed and operational flow of sender
 * New probing widget, machine profiles, settings, and visualizer
 
 ### Notable features still in progress:
-* Win x32 version and Raspi versions
 * "Flatten", "Surface", and "Calibrate" tools
-* Handling tool changing
 * Event hooks
 * Joystick control
 * Settings saving

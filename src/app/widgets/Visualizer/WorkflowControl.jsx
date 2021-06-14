@@ -25,28 +25,22 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import get from 'lodash/get';
 import includes from 'lodash/includes';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
 import controller from 'app/lib/controller';
 import React, { PureComponent } from 'react';
+import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import ReaderWorker from './FileReader.worker';
-import { Toaster, TOASTER_DANGER, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
+import { Toaster, TOASTER_DANGER, TOASTER_WARNING, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import {
     // Grbl
-    GRBL,
     GRBL_ACTIVE_STATE_ALARM,
     // Marlin
-    MARLIN,
-    // Smoothie
-    SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_ALARM,
-    // TinyG
-    TINYG,
-    TINYG_MACHINE_STATE_ALARM,
     // Workflow
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
@@ -68,6 +62,8 @@ class WorkflowControl extends PureComponent {
 
     state = this.getInitialState();
 
+    pubsubTokens = []
+
     getInitialState() {
         return {
             testStarted: false,
@@ -80,8 +76,12 @@ class WorkflowControl extends PureComponent {
     }
 
     handleClickUpload = (event) => {
-        this.fileInputEl.value = null;
-        this.fileInputEl.click();
+        if (isElectron()) {
+            window.ipcRenderer.send('open-upload-dialog');
+        } else {
+            this.fileInputEl.value = null;
+            this.fileInputEl.click();
+        }
     };
 
     handleCloseFile = () => {
@@ -115,7 +115,24 @@ class WorkflowControl extends PureComponent {
             file: file,
             meta: meta
         });
-        this.setState({ runHasStarted: false });
+        this.setState({ fileLoaded: false });
+    };
+
+    handleElectronFileUpload = (file) => {
+        const { actions } = this.props;
+
+        const meta = {
+            name: file.name,
+            size: file.size
+        };
+
+        if (isElectron()) {
+            const recentFile = createRecentFileFromRawPath(file.path, file.name);
+            addRecentFile(recentFile);
+        }
+
+        actions.uploadFile(file.data, meta);
+        this.setState({ fileLoaded: false });
     };
 
     loadRecentFile = (fileMetadata) => {
@@ -139,9 +156,8 @@ class WorkflowControl extends PureComponent {
 
     canRun() {
         const { state } = this.props;
-        const { port, gcode, workflow } = state;
-        const controllerType = state.controller.type;
-        const controllerState = state.controller.state;
+        const { port, gcode, workflow, controllerState } = state;
+
         if (!port) {
             return false;
         }
@@ -151,56 +167,31 @@ class WorkflowControl extends PureComponent {
         if (!includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state)) {
             return false;
         }
-        if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                GRBL_ACTIVE_STATE_ALARM
-            ];
-            if (includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            const states = [
-                SMOOTHIE_ACTIVE_STATE_ALARM
-            ];
-            if (includes(states, activeState)) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            const states = [
-                TINYG_MACHINE_STATE_ALARM
-            ];
-            if (includes(states, machineState)) {
-                return false;
-            }
-        }
+        const activeState = get(controllerState, 'status.activeState');
+        const states = [
+            GRBL_ACTIVE_STATE_ALARM
+        ];
 
-        return true;
+        return !includes(states, activeState);
     }
 
     handleOnStop = () => {
         const { actions: { handlePause, handleStop } } = this.props;
-        this.setState({ runHasStarted: false });
         handlePause();
         handleStop();
-        if (this.state.fileLoaded === false) {
-            controller.command('gcode', '$C');
-            this.setState({ testStarted: false });
-        }
     }
 
 
     handleTestFile = (event) => {
         const { actions } = this.props;
-        this.setState({ testStarted: true });
-        controller.command('gcode', '$c');
+        this.setState({ runHasStarted: true });
+        const gcode = this.props.state.gcode.content; // or whatever the state member is
+        const comments = ['#', ';', '(', '%'];
+        const lines = gcode.split('\n')
+            .filter(line => (line.trim().length > 0))
+            .filter(line => !comments.some(comment => line.includes(comment)));
+        const testLines = ['$C', ...lines, '$C'];
+        controller.command('gcode', testLines);
         actions.onRunClick();
     };
 
@@ -213,32 +204,21 @@ class WorkflowControl extends PureComponent {
     }
 
     componentDidMount() {
-        this.addControllerEvents();
         if (isElectron()) {
             window.ipcRenderer.on('loaded-recent-file', (msg, fileMetaData) => {
                 this.loadRecentFile(fileMetaData);
                 const recentFile = createRecentFile(fileMetaData);
                 addRecentFile(recentFile);
             });
+            window.ipcRenderer.on('returned-upload-dialog-data', (msg, file) => {
+                this.handleElectronFileUpload(file);
+            });
         }
+        this.subscribe();
     }
 
     componentWillUnmount() {
-        this.removeControllerEvents();
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
+        this.unsubscribe();
     }
 
     finishedTestingFileToast = () => {
@@ -257,19 +237,23 @@ class WorkflowControl extends PureComponent {
         });
     }
 
-    controllerEvents = {
-        'task:finish': (data, message) => {
-            if (message === 'finished') {
-                this.setState({ CurrentGCodeFile: data.name });
-                this.finishedTestingFileToast();
-            }
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('gcode:toolChange', (msg) => {
+                Toaster.pop({
+                    msg: 'Program execution paused due to M6 command',
+                    type: TOASTER_WARNING
+                });
+            }),
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
 
-            if (message === 'error') {
-                this.setState({ CurrentGCodeFile: data.name });
-                this.setState({ CurrentGCodeError: this.props.invalidGcode });
-                this.errorInGCodeToast();
-            }
-        }
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
     }
 
     render() {
@@ -281,13 +265,10 @@ class WorkflowControl extends PureComponent {
         const canClick = !!port;
         const isReady = canClick && gcode.ready;
         const canRun = this.canRun();
+        const { isConnected, fileLoaded } = this.props;
+        const showPlayOrTest = isConnected && fileLoaded && canRun;
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflow.state);
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflow.state);
-        // const canClose = isReady && includes([WORKFLOW_STATE_IDLE], workflow.state);
-        // const canUpload = isReady ? canClose : (canClick && !gcode.loading);
-        if (this.props.state.filename !== '') {
-            this.state.fileLoaded = false;
-        }
 
         return (
             <div className={styles.workflowControl}>
@@ -305,30 +286,36 @@ class WorkflowControl extends PureComponent {
                 />
 
                 <div className={styles.relativeWrapper}>
-                    <button
-                        type="button"
-                        className={`${styles['workflow-button-upload']}`}
-                        title={i18n._('Load File')}
-                        onClick={this.handleClickUpload}
-                        style={{ writingMode: 'vertical-lr' }}
-                    >
-                        {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
-                    </button>
-                    <RecentFileButton />
-                    <div
-                        role="button"
-                        className={this.props.state.gcode.content ? `${styles.closeFileButton}` : `${styles['workflow-button-disabled']}`}
-                        onClick={this.handleCloseFile}
-                    >
-                        <i className="fas fa-times" />
-                    </div>
+                    {
+                        workflow.state !== WORKFLOW_STATE_RUNNING && (
+                            <>
+                                <button
+                                    type="button"
+                                    className={`${styles['workflow-button-upload']}`}
+                                    title={i18n._('Load File')}
+                                    onClick={this.handleClickUpload}
+                                    style={{ writingMode: 'vertical-lr' }}
+                                >
+                                    {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
+                                </button>
+                                <RecentFileButton />
+                                <div
+                                    role="button"
+                                    className={this.props.state.gcode.content ? `${styles.closeFileButton}` : `${styles['workflow-button-disabled']}`}
+                                    onClick={this.handleCloseFile}
+                                >
+                                    <i className="fas fa-times" />
+                                </div>
+                            </>
+                        )
+                    }
                 </div>
                 {
-                    !this.state.runHasStarted && (
+                    showPlayOrTest && (
                         <button
                             type="button"
-                            className={this.state.fileLoaded ? `${styles['workflow-button-hidden']}` : `${styles['workflow-button-test']}`}
-                            title={i18n._('Test Run Gcode File')}
+                            className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
+                            title={i18n._('Test Run')}
                             onClick={this.handleTestFile}
                             disabled={!canRun}
                             style={{ writingMode: 'vertical-lr' }}
@@ -338,7 +325,7 @@ class WorkflowControl extends PureComponent {
                     )
                 }
                 {
-                    canRun && (
+                    showPlayOrTest && (
                         <button
                             type="button"
                             className={styles['workflow-button-play']}
@@ -370,11 +357,6 @@ class WorkflowControl extends PureComponent {
                                                     actions.closeModal();
                                                     actions.unloadGCode();
                                                     actions.reset();
-                                                    Toaster.pop({
-                                                        msg: 'Gcode File Closed',
-                                                        type: TOASTER_INFO,
-                                                        icon: 'fa-exclamation'
-                                                    });
                                                 }}
                                             >
                                                 Yes
@@ -424,7 +406,6 @@ class WorkflowControl extends PureComponent {
                     )
                 }
 
-
                 <CameraDisplay
                     camera={camera}
                     cameraPosition={cameraPosition}
@@ -434,4 +415,11 @@ class WorkflowControl extends PureComponent {
     }
 }
 
-export default WorkflowControl;
+export default connect((store) => {
+    const fileLoaded = get(store, 'file.fileLoaded', false);
+    const isConnected = get(store, 'connection.isConnected', false);
+    return {
+        fileLoaded,
+        isConnected
+    };
+})(WorkflowControl);

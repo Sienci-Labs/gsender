@@ -61,6 +61,9 @@ class Controller {
         'reconnect_error': [],
         // Fired when couldn't reconnect within reconnectionAttempts.
         'reconnect_failed': [],
+        // Fired when gcode errors are found in files...
+        'gcode_error': [],
+        'gcode_error_checking_file': [],
 
         // System Events
         'startup': [],
@@ -77,12 +80,14 @@ class Controller {
         'serialport:write': [],
         'gcode:load': [],
         'gcode:unload': [],
+        'gcode:toolChange': [],
         'feeder:status': [],
         'sender:status': [],
         'workflow:state': [],
         'controller:settings': [],
         'controller:state': [],
-        'message': []
+        'message': [],
+        'toolchange:start': []
     };
 
     context = {

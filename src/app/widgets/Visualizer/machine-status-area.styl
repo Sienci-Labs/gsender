@@ -23,13 +23,17 @@
 
 .control-area {
     display: grid;
-    grid-template-columns: 6fr 1fr 0;
+    grid-template-columns: 4fr 1fr 0;
     gap: 1.5rem;
     position: absolute;
     top: 20px;
     right: 0;
-    left: 20px;
+    left: 0;
     pointer-events: none;
+
+    &.inverted {
+        grid-template-columns: 0 1fr 4fr;
+    }
 }
 
 .cameraControl {
@@ -127,9 +131,6 @@
         bgColor = rgb(255, 0, 0);
         color = rgb(255, 255, 255);
         status-mixin(bgColor, color)
-        i {
-            font-size: 5rem !important;
-        }
     }
 
     &-Run, &-Home {
@@ -145,6 +146,7 @@
     }
 
     &-Jog {
+        text-align: center;
         bgColor = rgb(6, 184, 129);
         color = rgb(255, 255, 255);
         status-mixin(bgColor, color);

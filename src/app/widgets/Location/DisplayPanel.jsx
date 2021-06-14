@@ -31,7 +31,6 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import store from 'app/store';
-// import cx from 'classnames';
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
 import GoToButton from './components/GoToButton';
@@ -67,7 +66,7 @@ class DisplayPanel extends PureComponent {
     controllerEvents = {
         'controller:state': (data, controllerState) => {
             let controllersAlarmState = this.state.controllersAlarmState;
-            let hardStopAlarm = controllerState.status.alarmcode;
+            let hardStopAlarm = controllerState.status.alarmCode;
             this.setState(prevState => ({
                 controllersAlarmState: hardStopAlarm
             }));
@@ -81,12 +80,6 @@ class DisplayPanel extends PureComponent {
                 homePosition: controllerSettings.settings.$23
             }));
         },
-        'sender:status': (data, controllerState) => {
-            let controllersAlarmState = this.state.controllersAlarmState;
-            if (controllersAlarmState === '1') {
-                controller.command('gcode:stop', { force: true });
-            }
-        }
     }
 
 
@@ -299,45 +292,6 @@ class DisplayPanel extends PureComponent {
                             <i className="fas fa-chart-line" />
                             Go XYZ0
                         </FunctionButton>
-                        {/* <div className={cx({ [styles.buttonWrap]: !endstops }, { [styles.columnZeros]: endstops })}>
-
-                            <FunctionButton
-                                onClick={() => {
-                                    controller.command('gcode', 'G90');
-                                    controller.command('gcode', 'G0 X0'); //Move to Work Position Zero
-                                }}
-                                disabled={!canClick}
-                                primary
-                                className={styles.fontMonospace}
-                            >
-                                <i className="fas fa-chart-line" />
-                                Go X0
-                            </FunctionButton>
-                            <FunctionButton
-                                onClick={() => {
-                                    controller.command('gcode', 'G90');
-                                    controller.command('gcode', 'G0 Y0'); //Move to Work Position Zero
-                                }}
-                                disabled={!canClick}
-                                primary
-                                className={styles.fontMonospace}
-                            >
-                                <i className="fas fa-chart-line" />
-                                Go Y0
-                            </FunctionButton>
-                            <FunctionButton
-                                onClick={() => {
-                                    controller.command('gcode', 'G90');
-                                    controller.command('gcode', 'G0 Z0'); //Move to Work Position Zero
-                                }}
-                                disabled={!canClick}
-                                className={styles.fontMonospace}
-                                primary
-                            >
-                                <i className="fas fa-chart-line" />
-                                Go Z0
-                            </FunctionButton>
-                        </div> */}
                     </div>
 
                     {

@@ -29,6 +29,7 @@ import ensureArray from 'ensure-array';
 import controller from 'app/lib/controller';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import store from 'app/store';
+import TooltipCustom from '../../../components/TooltipCustom/ToolTip';
 import { Toaster, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
 import styles from '../index.styl';
 import defaultProfiles from './defaultMachineProfiles';
@@ -183,12 +184,12 @@ export default class Options extends Component {
     }
 
     componentDidMount() {
-        store.on('change', this.updateMachineProfileFromStore);
+        store.on('replace', this.updateMachineProfileFromStore);
         this.subscribe();
     }
 
     componentWillUnmount() {
-        store.removeListener('change', this.updateMachineProfileFromStore);
+        store.removeListener('replace', this.updateMachineProfileFromStore);
         this.unsubscribe();
     }
 
@@ -212,7 +213,7 @@ export default class Options extends Component {
     render() {
         const { machineProfile, machineProfiles, units } = this.state;
         const { state } = this.props;
-        const { endstops, spindle, mm, in: inches, company, name, type } = machineProfile;
+        const { endstops = false, spindle = false, mm, in: inches, company, name, type } = machineProfile;
         const disableEndstops = this.shouldDisableEndstops(state);
         const label = `${company} ${name} ${' - ' && type}`;
 
@@ -223,42 +224,46 @@ export default class Options extends Component {
                 <div className={styles['machine-options-section']}>
                     <div className={styles['general-area-item']}>
                         <h4 className={styles['settings-subtitle']}>Presets</h4>
-
-                        <Select
-                            className={styles['machine-options-select']}
-                            value={{ label: label }}
-                            options={machineProfiles.map(({ id, name, company, type }) => ({ key: id, value: id, label: `${company} ${name} ${' - ' && type}` }))}
-                            onChange={this.handleSelect}
-                            clearable={false}
-                        />
+                        <TooltipCustom content="gSender comes pre-loaded with many CNC machine presets" location="default">
+                            <Select
+                                className={styles['machine-options-select']}
+                                value={{ label: label }}
+                                options={machineProfiles.map(({ id, name, company, type }) => ({ key: id, value: id, label: `${company} ${name} ${' - ' && type}` }))}
+                                onChange={this.handleSelect}
+                                clearable={false}
+                            />
+                        </TooltipCustom>
                     </div>
 
                     <div className={styles['general-area-item']}>
                         <h4 className={styles['settings-subtitle']}>Cutting Area</h4>
-
-                        <Input
-                            label="Width"
-                            units={units}
-                            value={width}
-                            onChange={this.handleChange}
-                            additionalProps={{ name: 'width', type: 'number' }}
-                        />
-
-                        <Input
-                            label="Depth"
-                            units={units}
-                            value={depth}
-                            onChange={this.handleChange}
-                            additionalProps={{ name: 'depth', type: 'number' }}
-                        />
-
-                        <Input
-                            label="Height"
-                            units={units}
-                            value={height}
-                            onChange={this.handleChange}
-                            additionalProps={{ name: 'height', type: 'number' }}
-                        />
+                        <TooltipCustom content="Specify the width of your machine surface" location="default">
+                            <Input
+                                label="Width"
+                                units={units}
+                                value={width}
+                                onChange={this.handleChange}
+                                additionalProps={{ name: 'width', type: 'number' }}
+                            />
+                        </TooltipCustom>
+                        <TooltipCustom content="Specify the depth of your machine surface" location="default">
+                            <Input
+                                label="Depth"
+                                units={units}
+                                value={depth}
+                                onChange={this.handleChange}
+                                additionalProps={{ name: 'depth', type: 'number' }}
+                            />
+                        </TooltipCustom>
+                        <TooltipCustom content="Specify the height of your machine surface" location="default">
+                            <Input
+                                label="Height"
+                                units={units}
+                                value={height}
+                                onChange={this.handleChange}
+                                additionalProps={{ name: 'height', type: 'number' }}
+                            />
+                        </TooltipCustom>
                     </div>
                 </div>
 
@@ -266,20 +271,24 @@ export default class Options extends Component {
                     <h4 className={styles['settings-subtitle']}>Machine Features</h4>
                     <div className={styles['machine-features-section']}>
                         <div className={styles['machine-options-inputgroup']}>
-                            <ToggleSwitch
-                                label="Endstops"
-                                checked={endstops}
-                                disabled={disableEndstops}
-                                onChange={() => this.handleToggle('endstops')}
-                            />
+                            <TooltipCustom content="Your machine must have endstops enabled to access this feature" location="default">
+                                <ToggleSwitch
+                                    label="Endstops"
+                                    checked={endstops}
+                                    disabled={disableEndstops}
+                                    onChange={() => this.handleToggle('endstops')}
+                                />
+                            </TooltipCustom>
                         </div>
 
                         <div className={styles['machine-options-inputgroup']}>
-                            <ToggleSwitch
-                                label="Spindle/Laser"
-                                checked={spindle}
-                                onChange={() => this.handleToggle('spindle')}
-                            />
+                            <TooltipCustom content="Toggle between Spindle/Laser (S commands)" location="default">
+                                <ToggleSwitch
+                                    label="Spindle/Laser"
+                                    checked={spindle}
+                                    onChange={() => this.handleToggle('spindle')}
+                                />
+                            </TooltipCustom>
                         </div>
                     </div>
 

@@ -316,6 +316,11 @@ export const GRBL_ALARMS = [
         code: 9,
         message: 'Homing fail',
         description: 'Homing fail. Could not find limit switch within search distances. Try increasing max travel, decreasing pull-off distance, or check wiring.'
+    },
+    {
+        code: 'Homing',
+        message: 'Homing required',
+        description: 'Homing must be run if limit switches and homing cycle is enabled in EEPROM'
     }
 ];
 

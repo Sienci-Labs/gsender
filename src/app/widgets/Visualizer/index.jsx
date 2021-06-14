@@ -25,14 +25,17 @@
 import classNames from 'classnames';
 import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
+import { connect } from 'react-redux';
 import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
 import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
+import reduxStore from 'app/store/redux';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import ToggleSwitch from 'app/components/ToggleSwitch';
+import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
 import Anchor from 'app/components/Anchor';
 import { Button } from 'app/components/Buttons';
 import ModalTemplate from 'app/components/ModalTemplate';
@@ -45,6 +48,7 @@ import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { in2mm } from 'app/lib/units';
 import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
+import EstimateWorker from './Estimate.worker';
 import WidgetConfig from '../WidgetConfig';
 import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
@@ -54,9 +58,9 @@ import Visualizer from './Visualizer';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
+
 import {
     // Units
-    IMPERIAL_UNITS,
     METRIC_UNITS,
     // Grbl
     GRBL,
@@ -92,7 +96,7 @@ import {
     DARK_THEME_VALUES
 } from './constants';
 import styles from './index.styl';
-import { GCodeProcessor } from './helpers/GCodeProcessor';
+
 
 const translateExpression = (function() {
     const { Parser } = ExpressionEvaluator;
@@ -241,9 +245,23 @@ class VisualizerWidget extends PureComponent {
         },
         uploadFile: (gcode, meta) => {
             const { name, size } = { ...meta };
-            const context = {};
+            // Send toolchange context on file load
+            const hooks = store.get('workspace.toolChangeHooks', {});
+            const context = {
+                toolChangeOption: store.get('workspace.toolChangeOption', 'Ignore'),
+                ...hooks
+            };
 
-            const { port } = this.state;
+            const { port, filename } = this.state;
+
+            if (filename) {
+                this.visualizer.unload();
+            }
+
+            reduxStore.dispatch({
+                type: UPDATE_FILE_PROCESSING,
+                payload: { value: true }
+            });
 
             this.setState((state) => ({
                 gcode: {
@@ -254,35 +272,9 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
-            //Prevent thread blocking
-            setTimeout(() => {
-                const payload = this.processGCode(gcode);
+            // Start file parsing worker
+            this.processGCode(gcode, name, size);
 
-                const {
-                    total,
-                    toolSet,
-                    spindleSet,
-                    movementSet,
-                    invalidGcode,
-                    estimatedTime,
-                } = payload;
-
-                if (invalidGcode.size > 0) {
-                    this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
-                    if (this.state.invalidGcode.shouldShow) {
-                        Toaster.pop({
-                            msg: `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
-                            type: TOASTER_WARNING,
-                            duration: TOASTER_LONG,
-                            icon: 'fa-exclamation-triangle'
-                        });
-                    }
-                }
-
-                this.setState({ total });
-
-                pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
-            }, 0);
 
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
@@ -368,8 +360,6 @@ class VisualizerWidget extends PureComponent {
                             zmax: bbox.max.z
                         };
 
-                        pubsub.publish('gcode:bbox', bbox);
-
                         const { port } = this.state;
 
                         this.setState((state) => ({
@@ -389,6 +379,7 @@ class VisualizerWidget extends PureComponent {
             };
 
             this.setState(updater, callback);
+            this.visualizer.handleSceneRender(gcode);
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
@@ -430,17 +421,6 @@ class VisualizerWidget extends PureComponent {
             }));
         },
         onRunClick: () => {
-            //const { invalidGcode } = this.state;
-
-            /*if (invalidGcode.shouldShow) {
-                if (invalidGcode.list.size > 0) {
-                    this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
-                } else {
-                    this.actions.handleRun();
-                }
-            } else {
-                this.actions.handleRun();
-            }*/
             this.actions.handleRun();
         },
         handleRun: () => {
@@ -625,9 +605,13 @@ class VisualizerWidget extends PureComponent {
             }
         },
         handleLiteModeToggle: () => {
-            const { liteMode } = this.state;
+            const { liteMode, disabled, disabledLite } = this.state;
+            const newLiteModeValue = !liteMode;
+            const shouldRenderVisualization = newLiteModeValue ? !disabledLite : !disabled;
+            this.renderIfNecessary(shouldRenderVisualization);
+
             this.setState({
-                liteMode: !liteMode
+                liteMode: newLiteModeValue
             });
         },
         lineWarning: {
@@ -650,10 +634,26 @@ class VisualizerWidget extends PureComponent {
             },
             onCancel: () => this.actions.reset(),
         },
+        setVisualizerReady: () => {
+            this.setState((state) => ({
+                gcode: {
+                    ...state.gcode,
+                    loading: false,
+                    rendering: false,
+                    ready: true,
+                }
+            }));
+        },
         reset: () => {
+            this.actions.handleClose();
             this.setState(this.getInitialState());
             this.actions.unloadGCode();
             pubsub.publish('gcode:fileInfo');
+            pubsub.publish('gcode:unload');
+            Toaster.pop({
+                msg: 'Gcode File Closed',
+                icon: 'fa-exclamation'
+            });
         }
     };
 
@@ -796,17 +796,11 @@ class VisualizerWidget extends PureComponent {
         'controller:state': (type, controllerState) => {
             // Grbl
             if (type === GRBL) {
-                const { status, parserstate } = { ...controllerState };
+                const { status } = { ...controllerState };
                 const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
                 const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
 
                 this.setState(state => ({
-                    units: units,
                     controller: {
                         ...state.controller,
                         type: type,
@@ -828,141 +822,65 @@ class VisualizerWidget extends PureComponent {
                     })
                 }));
             }
-
-            // Marlin
-            if (type === MARLIN) {
-                const { pos, modal = {} } = { ...controllerState };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in current units
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...pos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in current units
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...pos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    })
-                }));
-            }
-
-            // Smoothie
-            if (type === SMOOTHIE) {
-                const { status, parserstate } = { ...controllerState };
-                const { mpos, wpos } = status;
-                const { modal = {} } = { ...parserstate };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in current units
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in current units
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    })
-                }));
-            }
-
-            // TinyG
-            if (type === TINYG) {
-                const { sr } = { ...controllerState };
-                const { mpos, wpos, modal = {} } = { ...sr };
-                const units = {
-                    'G20': IMPERIAL_UNITS,
-                    'G21': METRIC_UNITS
-                }[modal.units] || this.state.units;
-
-                this.setState(state => ({
-                    units: units,
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // https://github.com/synthetos/g2/wiki/Status-Reports
-                    // Canonical machine position are always reported in millimeters with no offsets.
-                    machinePosition: {
-                        ...state.machinePosition,
-                        ...mpos
-                    },
-                    // Work position are reported in current units, and also apply any offsets.
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, (val) => {
-                        return (units === IMPERIAL_UNITS) ? in2mm(val) : val;
-                    })
-                }));
-            }
-        },
+        }
     };
 
     pubsubTokens = [];
 
-    processGCode = (gcode) => {
-        const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
+    onProcessedGcode = ({ data }) => {
+        const {
+            total,
+            invalidGcode,
+        } = data;
 
+        if (invalidGcode.size > 0) {
+            this.setState(prev => ({ invalidGcode: { ...prev.invalidGcode, list: invalidGcode } }));
+            if (this.state.invalidGcode.shouldShow) {
+                Toaster.pop({
+                    msg: `Found ${invalidGcode.size} line(s) of non-GRBL-supported G-Code in this file.  Your job may not run properly.`,
+                    type: TOASTER_WARNING,
+                    duration: TOASTER_LONG,
+                    icon: 'fa-exclamation-triangle'
+                });
+            }
+        }
+
+        this.setState({ total });
+
+        const reduxPayload = {
+            ...data,
+            content: this.state.gcode.content
+        };
+
+        // Emit events on response with relevant data from processor worker
+        reduxStore.dispatch({
+            type: UPDATE_FILE_INFO,
+            payload: reduxPayload
+        });
+        //pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
+        //pubsub.publish('gcode:bbox', bbox);
+    }
+
+    processGCode = (gcode, name, size) => {
+        const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
         //Clean up lines and remove ones that are comments and headers
         const lines = gcode.split('\n')
             .filter(line => (line.trim().length > 0))
             .filter(line => !comments.some(comment => line.includes(comment)));
-        console.log(lines);
 
-        const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'] });
 
-        let estimatedTime;
-        try {
-            processor.process(lines);
-            estimatedTime = processor.vmState.totalTime;
-        } catch (error) {
-            console.log(error.message);
-            estimatedTime = 0;
-        }
+        // Set "Loading" state to job info widget and start file VM processor
+        const estimateWorker = new EstimateWorker();
+        const { feedArray, accelArray } = this.props;
 
-        const total = lines.length + 1; //Dwell line added after every gcode parse
-
-        const payload = {
-            total,
-            toolSet: processor.vmState.tools,
-            spindleSet: processor.vmState.spindleRates,
-            movementSet: processor.vmState.feedrates,
-            invalidGcode: processor.vmState.invalidGcode,
-            estimatedTime,
-        };
-
-        return payload;
+        estimateWorker.onmessage = this.onProcessedGcode;
+        estimateWorker.postMessage({
+            lines: lines,
+            name,
+            size,
+            feedArray,
+            accelArray
+        });
     };
 
     unsubscribe() {
@@ -1027,6 +945,9 @@ class VisualizerWidget extends PureComponent {
         }
         if (this.state.objects.cuttingTool.visible !== prevState.objects.cuttingTool.visible) {
             this.config.set('objects.cuttingTool.visible', this.state.objects.cuttingTool.visible);
+        }
+        if (this.state.liteMode !== prevState.liteMode) {
+            this.config.set('liteMode', this.state.liteMode);
         }
     }
 
@@ -1131,7 +1052,8 @@ class VisualizerWidget extends PureComponent {
                 shouldShow: this.config.get('showLineWarnings'),
                 show: false,
                 line: '',
-            }
+            },
+            layoutIsReversed: store.get('workspace.reverseWidgets'),
         };
     }
 
@@ -1266,8 +1188,30 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('keybindingsUpdated', () => {
                 this.updateShuttleControlEvents();
             }),
+            pubsub.subscribe('gcode:bbox', (msg, bbox) => {
+                const { gcode } = this.state;
+                this.setState({
+                    gcode: {
+                        ...gcode,
+                        bbox: bbox
+                    }
+                });
+            }),
+            pubsub.subscribe('widgets:reverse', (_, layoutIsReversed) => {
+                this.setState({ layoutIsReversed });
+            }),
+            pubsub.subscribe('gcode:surfacing', (_, { gcode, name, size }) => {
+                this.actions.uploadFile(gcode, { name, size });
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    renderIfNecessary(shouldRender) {
+        const hasVisualization = this.visualizer.hasVisualization();
+        if (shouldRender && !hasVisualization) {
+            this.visualizer.rerenderGCode();
+        }
     }
 
     render() {
@@ -1347,9 +1291,9 @@ class VisualizerWidget extends PureComponent {
                             />
 
                             <WorkflowControl
-                                ref={(node) => {
+                                /*ref={(node) => {
                                     this.workflowControl = node;
-                                }}
+                                }}*/
                                 state={state}
                                 actions={actions}
                                 invalidGcode={this.state.invalidLine.line}
@@ -1382,4 +1326,19 @@ class VisualizerWidget extends PureComponent {
     }
 }
 
-export default VisualizerWidget;
+export default connect((store) => {
+    const settings = get(store, 'controller.settings');
+    const xMaxFeed = Number(get(settings.settings, '$110', 1500));
+    const yMaxFeed = Number(get(settings.settings, '$111', 1500));
+    const zMaxFeed = Number(get(settings.settings, '$112', 1500));
+    const xMaxAccel = Number(get(settings.settings, '$120', 1800000));
+    const yMaxAccel = Number(get(settings.settings, '$112', 1800000));
+    const zMaxAccel = Number(get(settings.settings, '$122', 1800000));
+
+    const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
+    const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
+    return {
+        feedArray,
+        accelArray
+    };
+})(VisualizerWidget);

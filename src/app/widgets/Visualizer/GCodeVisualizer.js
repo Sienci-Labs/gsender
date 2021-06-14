@@ -23,7 +23,6 @@
 
 // import colornames from 'colornames';
 import Toolpath from 'gcode-toolpath';
-import pubsub from 'pubsub-js';
 import * as THREE from 'three';
 import log from 'app/lib/log';
 
@@ -135,10 +134,6 @@ class GCodeVisualizer {
             });
         });
 
-        const toolpathModal = toolpath.getModal();
-        const { units } = toolpathModal;
-        pubsub.publish('file:units', units);
-
         const workpiece = new THREE.Line(
             new THREE.Geometry(),
             new THREE.LineBasicMaterial({
@@ -197,6 +192,17 @@ class GCodeVisualizer {
         }
 
         this.frameIndex = frameIndex;
+    }
+
+    unload() {
+        this.geometry.dispose();
+        this.group.clear();
+
+        this.group = new THREE.Object3D();
+        this.geometry = new THREE.Geometry();
+
+        this.frames = [];
+        this.frameIndex = 0;
     }
 }
 

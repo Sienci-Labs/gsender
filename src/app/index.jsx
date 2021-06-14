@@ -27,6 +27,7 @@ import moment from 'moment';
 import pubsub from 'pubsub-js';
 import qs from 'qs';
 import React from 'react';
+import reduxStore from 'app/store/redux';
 import ReactDOM from 'react-dom';
 import {
     HashRouter as Router,
@@ -36,24 +37,26 @@ import i18next from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import XHR from 'i18next-xhr-backend';
 import { TRACE, DEBUG, INFO, WARN, ERROR } from 'universal-logger';
+import { Provider as ReduxProvider } from 'react-redux';
 import { Provider as GridSystemProvider } from 'app/components/GridSystem';
+import rootSaga from 'app/sagas';
+import sagaMiddleware from 'app/store/redux/saga';
 import settings from './config/settings';
 import portal from './lib/portal';
 import controller from './lib/controller';
 import i18n from './lib/i18n';
 import log from './lib/log';
 import series from './lib/promise-series';
+
 import promisify from './lib/promisify';
 import * as user from './lib/user';
 import store from './store';
 import defaultState from './store/defaultState';
 import App from './containers/App';
-// import Login from './containers/Login';
 import Anchor from './components/Anchor';
 import { Button } from './components/Buttons';
 import ModalTemplate from './components/ModalTemplate';
 import Modal from './components/Modal';
-// import ProtectedRoute from './components/ProtectedRoute';
 import Space from './components/Space';
 import './styles/vendor.styl';
 import './styles/app.styl';
@@ -63,22 +66,24 @@ const renderPage = () => {
     container.style.width = '100%';
     document.body.appendChild(container);
 
+    sagaMiddleware.run(rootSaga);
+
     ReactDOM.render(
-        <GridSystemProvider
-            breakpoints={[576, 768, 992, 1200]}
-            containerWidths={[540, 720, 960, 1140]}
-            columns={12}
-            gutterWidth={0}
-            layout="floats"
-        >
-            <Router>
-                <div>
-                    {/* <Route path="/login" component={Login} /> */}
-                    {/* <ProtectedRoute path="/" component={App} /> */}
-                    <Route path="/" component={App} />
-                </div>
-            </Router>
-        </GridSystemProvider>,
+        <ReduxProvider store={reduxStore}>
+            <GridSystemProvider
+                breakpoints={[576, 768, 992, 1200]}
+                containerWidths={[540, 720, 960, 1140]}
+                columns={12}
+                gutterWidth={0}
+                layout="floats"
+            >
+                <Router>
+                    <div>
+                        <Route path="/" component={App} />
+                    </div>
+                </Router>
+            </GridSystemProvider>
+        </ReduxProvider>,
         container
     );
 };

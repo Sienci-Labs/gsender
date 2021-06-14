@@ -79,8 +79,14 @@ class Combokeys extends events.EventEmitter {
         if (this.state.didBindEvents) {
             return;
         }
-        this.commandKeys.forEach((o) => {
-            const { keys, cmd, payload = {} } = o;
+        this.commandKeys.filter(key => key.isActive).forEach((o) => {
+            const { keys, cmd, payload = {}, isActive } = o;
+
+            //Do not add any keybindings if the shortcut is disabled or there is no shortcut at all
+            if (!isActive || !keys) {
+                return;
+            }
+
             const callback = (event) => {
                 log.debug(`combokeys: keys=${keys} cmd=${cmd} payload=${JSON.stringify(payload)}`);
                 if (!!o.preventDefault) {

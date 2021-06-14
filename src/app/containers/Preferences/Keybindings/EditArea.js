@@ -44,6 +44,7 @@ export default class EditArea extends Component {
         shortcuts: PropTypes.array,
         switchPages: PropTypes.func,
         edit: PropTypes.func,
+        onClose: PropTypes.func,
     }
 
     initialState = {
@@ -88,7 +89,7 @@ export default class EditArea extends Component {
 
         //Ignore trigger keys
         if (triggerKeys.includes(e.key)) {
-            return '';
+            return [];
         }
 
         this.setState({
@@ -144,7 +145,7 @@ export default class EditArea extends Component {
             return;
         }
 
-        const foundShortcut = this.props.shortcuts.find(shortcut => shortcut.keys === keyCombo);
+        const foundShortcut = this.props.shortcuts.filter(shortcut => shortcut.isActive).find(shortcut => shortcut.keys === keyCombo);
 
         const keyState = {
             singleKey,
@@ -221,7 +222,10 @@ export default class EditArea extends Component {
         //due to keys.split
         if (shortcutArray[shortcutArray.length - 1] === '') {
             cleanedShortcut = shortcutArray.filter(item => item !== '');
-            cleanedShortcut.push('+');
+
+            if (shortcutArray[0]) {
+                cleanedShortcut.push('+');
+            }
         }
 
         const output = cleanedShortcut ? formatShortcut(cleanedShortcut) : formatShortcut(shortcutArray);
@@ -239,7 +243,7 @@ export default class EditArea extends Component {
             ctrlTriggered,
             state,
         } = this.state;
-        const { switchPages, shortcut } = this.props;
+        const { onClose, shortcut } = this.props;
 
         const infoWindowOutput = this.infoWindowOutput();
 
@@ -278,7 +282,7 @@ export default class EditArea extends Component {
 
                 <div className={styles['button-group-wrapper']}>
                     <ButtonGroup style={{ marginTop: '2rem' }}>
-                        <Button btnSize="lg" btnStyle="default" onClick={() => switchPages('Table')}>Back</Button>
+                        <Button btnSize="lg" btnStyle="default" onClick={onClose}>Cancel</Button>
                         <Button
                             btnSize="lg" btnStyle="primary" disabled={!state.available}
                             onClick={this.handleEdit}

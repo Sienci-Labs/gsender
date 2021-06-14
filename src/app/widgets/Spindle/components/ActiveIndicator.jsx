@@ -26,7 +26,7 @@ import cx from 'classnames';
 import styles from '../index.styl';
 
 const ActiveIndicator = ({ canClick, active = true }) => {
-    const showIndicator = canClick && active;
+    const showIndicator = active;
 
     return (
         <div className={styles.activeIndicatorWrapper}>

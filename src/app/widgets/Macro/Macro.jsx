@@ -25,6 +25,8 @@ import ensureArray from 'ensure-array';
 import PropTypes from 'prop-types';
 import includes from 'lodash/includes';
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
+import get from 'lodash/get';
 import i18n from 'app/lib/i18n';
 import {
     WORKFLOW_STATE_IDLE,
@@ -43,8 +45,8 @@ class Macro extends PureComponent {
     canRunMacro = () => {
         const {
             canClick,
-            workflow,
         } = this.props.state;
+        const { workflow } = this.props;
 
         return canClick && includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state);
     }
@@ -100,4 +102,9 @@ class Macro extends PureComponent {
     }
 }
 
-export default Macro;
+export default connect((store) => {
+    const workflow = get(store, 'controller.workflow');
+    return {
+        workflow
+    };
+})(Macro);
