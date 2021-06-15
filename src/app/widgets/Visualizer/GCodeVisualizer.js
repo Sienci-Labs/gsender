@@ -146,6 +146,7 @@ class GCodeVisualizer {
                 transparent: true
             })
         );
+        console.log(workpiece);
         //workpiece.geometry.vertices = this.geometry.vertices.slice();
         //workpiece.geometry.colors = this.geometry.colors.slice();
 
@@ -201,7 +202,9 @@ class GCodeVisualizer {
         this.group.clear();
 
         this.group = new THREE.Object3D();
-        this.geometry = new THREE.Geometry();
+        this.geometry = new THREE.BufferGeometry();
+        this.vertices = [];
+        this.colors = [];
 
         this.frames = [];
         this.frameIndex = 0;
