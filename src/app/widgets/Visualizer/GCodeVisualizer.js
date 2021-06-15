@@ -38,8 +38,9 @@ class GCodeVisualizer {
     constructor(theme) {
         this.group = new THREE.Object3D();
         this.geometry = new THREE.BufferGeometry();
-        this.geometryPoints = [];
         this.theme = theme;
+        this.vertices = [];
+        this.colors = [];
 
         // Example
         // [
@@ -73,8 +74,8 @@ class GCodeVisualizer {
             addLine: (modal, v1, v2) => {
                 const { motion } = modal;
                 const color = motionColor[motion] || defaultColor;
-                this.geometry.vertices.push(new THREE.Vector3(v2.x, v2.y, v2.z));
-                this.geometry.colors.push(color);
+                this.colors.push(color);
+                this.vertices.push(new THREE.Vector3(v2.x, v2.y, v2.z));
             },
             // @param {object} modal The modal object.
             // @param {object} v1 A 3D vector of the start point.
@@ -111,13 +112,13 @@ class GCodeVisualizer {
                     const z = ((v2.z - v1.z) / points.length) * i + v1.z;
 
                     if (plane === 'G17') { // XY-plane
-                        this.geometry.vertices.push(new THREE.Vector3(point.x, point.y, z));
+                        this.vertices.push(new THREE.Vector3(point.x, point.y, z));
                     } else if (plane === 'G18') { // ZX-plane
-                        this.geometry.vertices.push(new THREE.Vector3(point.y, z, point.x));
+                        this.vertices.push(new THREE.Vector3(point.y, z, point.x));
                     } else if (plane === 'G19') { // YZ-plane
-                        this.geometry.vertices.push(new THREE.Vector3(z, point.x, point.y));
+                        this.vertices.push(new THREE.Vector3(z, point.x, point.y));
                     }
-                    this.geometry.colors.push(color);
+                    this.colors.push(color);
                 }
             }
         });
@@ -129,25 +130,24 @@ class GCodeVisualizer {
         }
 
         toolpath.loadFromStringSync(gcode, (line, index) => {
-            console.log(this.geometry);
             this.frames.push({
                 data: line,
-                vertexIndex: this.geometry.groups.length // remember current vertex index
+                vertexIndex: this.vertices.length // remember current vertex index
             });
         });
 
         const workpiece = new THREE.Line(
-            new THREE.BufferGeometry(),
+            new THREE.BufferGeometry().setFromPoints(this.vertices),
             new THREE.LineBasicMaterial({
                 color: defaultColor,
-                linewidth: 1,
+                linewidth: 10,
                 vertexColors: THREE.VertexColors,
                 opacity: 0.5,
                 transparent: true
             })
         );
-        workpiece.geometry.vertices = this.geometry.vertices.slice();
-        workpiece.geometry.colors = this.geometry.colors.slice();
+        //workpiece.geometry.vertices = this.geometry.vertices.slice();
+        //workpiece.geometry.colors = this.geometry.colors.slice();
 
         this.group.add(workpiece);
 
