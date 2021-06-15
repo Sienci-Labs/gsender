@@ -136,19 +136,21 @@ class GCodeVisualizer {
             });
         });
 
+        this.geometry.setFromPoints(this.vertices);
+        const colorTyped = this.getColorTypedArray();
+        const colorBuffer = new THREE.BufferAttribute(colorTyped, 3);
+        this.geometry.setAttribute('color', colorBuffer);
+
         const workpiece = new THREE.Line(
-            new THREE.BufferGeometry().setFromPoints(this.vertices),
+            this.geometry,
             new THREE.LineBasicMaterial({
                 color: defaultColor,
-                linewidth: 10,
+                linewidth: 1, // Higher than 1 only supported in Safari
                 vertexColors: THREE.VertexColors,
                 opacity: 0.5,
                 transparent: true
             })
         );
-        console.log(workpiece);
-        //workpiece.geometry.vertices = this.geometry.vertices.slice();
-        //workpiece.geometry.colors = this.geometry.colors.slice();
 
         this.group.add(workpiece);
 
@@ -160,6 +162,17 @@ class GCodeVisualizer {
 
         return this.group;
     }
+
+    /* Turns our array of Three colors into a float typed array we can set as a bufferAttribute */
+    getColorTypedArray() {
+        const arr = [];
+        this.colors.forEach(color => {
+            arr.push(...color.toArray());
+        });
+        console.log(arr);
+        return new Float32Array(arr);
+    }
+
 
     setFrameIndex(frameIndex) {
         if (this.frames.length === 0) {
