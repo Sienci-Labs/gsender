@@ -136,8 +136,6 @@ class GCodeVisualizer {
             });
         });
 
-        console.log(this.frames);
-
         this.geometry.setFromPoints(this.vertices);
         const colorBuffer = new THREE.BufferAttribute(this.getColorTypedArray(), 3);
         this.geometry.setAttribute('color', colorBuffer);
@@ -154,6 +152,8 @@ class GCodeVisualizer {
         );
 
         this.group.add(workpiece);
+        console.log(workpiece.geometry);
+        console.log(workpiece.geometry.attributes);
 
         log.debug({
             workpiece: workpiece,
@@ -189,13 +189,9 @@ class GCodeVisualizer {
         const v1 = this.frames[this.frameIndex].vertexIndex;
         const v2 = this.frames[frameIndex].vertexIndex;
 
-        console.log(v1);
-        console.log(v2);
-
         // Completed path is grayed out
         if (v1 < v2) {
             const workpiece = this.group.children[0];
-            console.log(workpiece.geometry);
             for (let i = v1; i < v2; ++i) {
                 const offsetIndex = i * 3; // Account for RGB buffer
                 workpiece.geometry.attributes.color.set(defaultColor.toArray(), offsetIndex);
