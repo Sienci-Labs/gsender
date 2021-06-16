@@ -135,10 +135,10 @@ class GCodeVisualizer {
                 vertexIndex: this.vertices.length // remember current vertex index
             });
         });
+        console.log(this.frames);
 
         this.geometry.setFromPoints(this.vertices);
-        const colorTyped = this.getColorTypedArray();
-        const colorBuffer = new THREE.BufferAttribute(colorTyped, 3);
+        const colorBuffer = new THREE.BufferAttribute(this.getColorTypedArray(), 3);
         this.geometry.setAttribute('color', colorBuffer);
 
         const workpiece = new THREE.Line(
@@ -169,7 +169,6 @@ class GCodeVisualizer {
         this.colors.forEach(color => {
             arr.push(...color.toArray());
         });
-        console.log(arr);
         return new Float32Array(arr);
     }
 
@@ -189,22 +188,28 @@ class GCodeVisualizer {
         const v1 = this.frames[this.frameIndex].vertexIndex;
         const v2 = this.frames[frameIndex].vertexIndex;
 
+        console.log(v1);
+        console.log(v2);
+
         // Completed path is grayed out
         if (v1 < v2) {
             const workpiece = this.group.children[0];
+            console.log(workpiece.geometry);
             for (let i = v1; i < v2; ++i) {
-                workpiece.geometry.colors[i] = defaultColor;
+                const offsetIndex = i * 3; // Account for RGB buffer
+                workpiece.geometry.attributes.color.set(defaultColor.toArray(), offsetIndex);
             }
-            workpiece.geometry.colorsNeedUpdate = true;
+            workpiece.geometry.attributes.color.needsUpdate = true;
         }
 
         // Restore the path to its original colors
         if (v2 < v1) {
             const workpiece = this.group.children[0];
             for (let i = v2; i < v1; ++i) {
-                workpiece.geometry.colors[i] = this.geometry.colors[i];
+                const offsetIndex = i * 3; // Account for RGB buffer
+                workpiece.geometry.attributes.color.set(this.colors[i].toArray(), offsetIndex);
             }
-            workpiece.geometry.colorsNeedUpdate = true;
+            workpiece.geometry.attributes.color.needsUpdate = true;
         }
 
         this.frameIndex = frameIndex;
