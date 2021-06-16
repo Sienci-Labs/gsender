@@ -135,6 +135,7 @@ class GCodeVisualizer {
                 vertexIndex: this.vertices.length // remember current vertex index
             });
         });
+
         console.log(this.frames);
 
         this.geometry.setFromPoints(this.vertices);
