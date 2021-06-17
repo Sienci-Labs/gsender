@@ -200,7 +200,7 @@ class GCodeVisualizer {
             const workpiece = this.group.children[0];
             for (let i = v2; i < v1; ++i) {
                 const offsetIndex = i * 4; // Account for RGB buffer
-                workpiece.geometry.attributes.color.set([...this.colors[i].toArray(), 1], offsetIndex);
+                workpiece.geometry.attributes.color.set([...this.colors.slice(offsetIndex, offsetIndex + 4)], offsetIndex);
             }
             workpiece.geometry.attributes.color.needsUpdate = true;
         }
