@@ -74,7 +74,8 @@ class GCodeVisualizer {
             addLine: (modal, v1, v2) => {
                 const { motion } = modal;
                 const color = motionColor[motion] || defaultColor;
-                this.colors.push(color);
+                const opacity = (motion === 'G0') ? 0.1 : 1;
+                this.colors.push(...color.toArray(), opacity);
                 this.vertices.push(new THREE.Vector3(v2.x, v2.y, v2.z));
             },
             // @param {object} modal The modal object.
@@ -118,7 +119,7 @@ class GCodeVisualizer {
                     } else if (plane === 'G19') { // YZ-plane
                         this.vertices.push(new THREE.Vector3(z, point.x, point.y));
                     }
-                    this.colors.push(color);
+                    this.colors.push(...color.toArray(), 1);
                 }
             }
         });
@@ -137,23 +138,22 @@ class GCodeVisualizer {
         });
 
         this.geometry.setFromPoints(this.vertices);
-        const colorBuffer = new THREE.BufferAttribute(this.getColorTypedArray(), 3);
+        const colorBuffer = new THREE.BufferAttribute(this.getColorTypedArray(), 4);
         this.geometry.setAttribute('color', colorBuffer);
 
         const workpiece = new THREE.Line(
             this.geometry,
-            new THREE.LineBasicMaterial({
+            new THREE.PointsMaterial({
                 color: defaultColor,
-                linewidth: 1, // Higher than 1 only supported in Safari
-                vertexColors: THREE.VertexColors,
-                opacity: 0.5,
-                transparent: true
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6,
             })
         );
 
+        workpiece.computeLineDistances();
+
         this.group.add(workpiece);
-        console.log(workpiece.geometry);
-        console.log(workpiece.geometry.attributes);
 
         log.debug({
             workpiece: workpiece,
@@ -166,11 +166,7 @@ class GCodeVisualizer {
 
     /* Turns our array of Three colors into a float typed array we can set as a bufferAttribute */
     getColorTypedArray() {
-        const arr = [];
-        this.colors.forEach(color => {
-            arr.push(...color.toArray());
-        });
-        return new Float32Array(arr);
+        return new Float32Array(this.colors);
     }
 
 
@@ -193,8 +189,8 @@ class GCodeVisualizer {
         if (v1 < v2) {
             const workpiece = this.group.children[0];
             for (let i = v1; i < v2; ++i) {
-                const offsetIndex = i * 3; // Account for RGB buffer
-                workpiece.geometry.attributes.color.set(defaultColor.toArray(), offsetIndex);
+                const offsetIndex = i * 4; // Account for RGB buffer
+                workpiece.geometry.attributes.color.set([...defaultColor.toArray(), 0.1], offsetIndex);
             }
             workpiece.geometry.attributes.color.needsUpdate = true;
         }
@@ -203,8 +199,8 @@ class GCodeVisualizer {
         if (v2 < v1) {
             const workpiece = this.group.children[0];
             for (let i = v2; i < v1; ++i) {
-                const offsetIndex = i * 3; // Account for RGB buffer
-                workpiece.geometry.attributes.color.set(this.colors[i].toArray(), offsetIndex);
+                const offsetIndex = i * 4; // Account for RGB buffer
+                workpiece.geometry.attributes.color.set([...this.colors[i].toArray(), 1], offsetIndex);
             }
             workpiece.geometry.attributes.color.needsUpdate = true;
         }
