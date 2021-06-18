@@ -175,9 +175,9 @@ class GCodeVisualizer {
             return;
         }
 
-        const { cuttingCoordinateLines } = this.theme;
+        //const { cuttingCoordinateLines } = this.theme;
 
-        const defaultColor = new THREE.Color(cuttingCoordinateLines);
+        const defaultColor = new THREE.Color('#5191CC');
 
         frameIndex = Math.min(frameIndex, this.frames.length - 1);
         frameIndex = Math.max(frameIndex, 0);
@@ -190,7 +190,7 @@ class GCodeVisualizer {
             const workpiece = this.group.children[0];
             for (let i = v1; i < v2; ++i) {
                 const offsetIndex = i * 4; // Account for RGB buffer
-                workpiece.geometry.attributes.color.set([...defaultColor.toArray(), 0.1], offsetIndex);
+                workpiece.geometry.attributes.color.set([...defaultColor.toArray(), 0.3], offsetIndex);
             }
             workpiece.geometry.attributes.color.needsUpdate = true;
         }
