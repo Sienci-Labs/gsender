@@ -24,8 +24,8 @@
 import * as THREE from 'three';
 
 const buildAxis = (src, dst, color, dashed) => {
-    let geometry = new THREE.Geometry();
     let material;
+    const points = [src.clone(), dst.clone()];
 
     if (dashed) {
         material = new THREE.LineDashedMaterial({
@@ -44,9 +44,7 @@ const buildAxis = (src, dst, color, dashed) => {
             transparent: true
         });
     }
-
-    geometry.vertices.push(src.clone());
-    geometry.vertices.push(dst.clone());
+    let geometry = new THREE.BufferGeometry().setFromPoints(points);
 
     const axisLine = new THREE.Line(geometry, material);
 
@@ -66,19 +64,19 @@ class CoordinateAxes {
 
     // Creates an axisHelper with lines of length size.
     // @param {number} size Define the size of the line representing the axes.
-    // @see [Drawing the Coordinate Axes]{@http://soledadpenades.com/articles/three-js-tutorials/drawing-the-coordinate-axes/}
-    constructor(size) {
+    // @see [Drawing the Coordinate JogControl]{@http://soledadpenades.com/articles/three-js-tutorials/drawing-the-coordinate-axes/}
+    constructor(size, height) {
         const red = '#df3b3b';
         const green = '#06b881';
         const blue = '#5191cc';
 
         this.group.add(
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(size, 0, 0), red, false), // +X
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(size, 0, 0), red, true), // +X
             buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(-size, 0, 0), red, true), // -X
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, size, 0), green, false), // +Y
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, size, 0), green, true), // +Y
             buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -size, 0), green, true), // -Y
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, size), blue, false), // +Z
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -size), blue, true) // -Z
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, height), blue, true), // +Z
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -height), blue, true) // -Z
         );
 
         return this.group;
