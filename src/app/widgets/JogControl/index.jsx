@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -36,6 +37,8 @@ import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
 import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
+import GamepadHandler from 'app/lib/gamepad/index';
+import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
 import { connect } from 'react-redux';
@@ -482,67 +485,18 @@ class AxesWidget extends PureComponent {
             }
         },
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
-            preventDefault(event);
-            const { isContinuousJogging } = this.state;
-            const { getXYJogDistance, getZJogDistance } = this.actions;
-            const { canJog } = this.props;
-
-            const xyStep = getXYJogDistance();
-            const zStep = getZJogDistance();
-
-            if (!axis || isContinuousJogging || !canJog) {
-                return;
+            if (event) {
+                preventDefault(event);
             }
 
-            const givenAxis = axis.toUpperCase();
-            const feedrate = Number(this.actions.getFeedrate());
-
-            const axisValue = {
-                X: xyStep,
-                Y: xyStep,
-                Z: zStep
-            }[givenAxis] * direction;
-
-            this.setState({ prevJog: { [givenAxis]: axisValue, F: feedrate } });
-
-            const jogCB = (given) => this.actions.jog(given);
-
-            const startContinuousJogCB = (coordinates, feedrate) => this.actions.startContinuousJog(coordinates, feedrate);
-
-            const stopContinuousJogCB = () => this.actions.stopContinuousJog();
-
-            if (!this.joggingHelper) {
-                this.joggingHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
-            }
-
-            this.joggingHelper.onKeyDown({ [givenAxis]: direction }, feedrate);
+            this.handleShortcutJog({ axis, direction });
         },
         STOP_JOG: (event, payload) => {
-            preventDefault(event);
-
-            const { prevJog } = this.state;
-
-            if (!payload) {
-                this.joggingHelper && this.joggingHelper.onKeyUp(prevJog);
-                return;
+            if (event) {
+                preventDefault(event);
             }
 
-            const { axis, direction } = payload;
-
-            const { getXYJogDistance, getZJogDistance } = this.actions;
-
-            const xyStep = getXYJogDistance();
-            const zStep = getZJogDistance();
-
-            const givenAxis = axis.toUpperCase();
-            const axisValue = {
-                X: xyStep,
-                Y: xyStep,
-                Z: zStep
-            }[givenAxis] * direction;
-            const feedrate = Number(this.actions.getFeedrate());
-
-            this.joggingHelper && this.joggingHelper.onKeyUp({ [givenAxis]: axisValue, F: feedrate });
+            this.handleShortcutStop(payload);
         },
         SET_JOG_PRESET: (event, { key }) => {
             if (!key) {
@@ -561,6 +515,86 @@ class AxesWidget extends PureComponent {
             }
         },
     };
+
+    handleShortcutJog = ({ axis, direction }) => {
+        const { isContinuousJogging } = this.state;
+        const { getXYJogDistance, getZJogDistance } = this.actions;
+        const { canJog } = this.props;
+
+        const xyStep = getXYJogDistance();
+        const zStep = getZJogDistance();
+
+        if (!axis || isContinuousJogging || !canJog) {
+            return;
+        }
+
+        const feedrate = Number(this.actions.getFeedrate());
+
+        const axisValue = {
+            X: xyStep,
+            Y: xyStep,
+            Z: zStep
+        };
+
+        const jogCB = (given) => this.actions.jog(given);
+
+        const startContinuousJogCB = (coordinates, feedrate) => this.actions.startContinuousJog(coordinates, feedrate);
+
+        const stopContinuousJogCB = () => this.actions.stopContinuousJog();
+
+        if (!this.joggingHelper) {
+            this.joggingHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
+        }
+
+        //Axis will either be a single string value or an object containing multiple axis' (ex. axis.X, axis.Y, axis.Z)
+        if (typeof axis === 'object') {
+            const axisList = {};
+            if (axis.X) {
+                axisList.X = axisValue.X * axis.X;
+            }
+            if (axis.Y) {
+                axisList.Y = axisValue.Y * axis.Y;
+            }
+            if (axis.Z) {
+                axisList.Z = axisValue.Z * axis.Z;
+            }
+
+            this.setState({ prevJog: { ...axisList, F: feedrate } });
+            this.joggingHelper.onKeyDown({ ...axisList }, feedrate);
+        } else {
+            const givenAxis = axis.toUpperCase();
+            const givenAxisVal = axisValue[givenAxis] * direction;
+
+            this.setState({ prevJog: { [givenAxis]: givenAxisVal, F: feedrate } });
+            this.joggingHelper.onKeyDown({ [givenAxis]: direction }, feedrate);
+        }
+    }
+
+    handleShortcutStop = (payload) => {
+        const { prevJog } = this.state;
+
+        if (!payload) {
+            this.joggingHelper && this.joggingHelper.onKeyUp(prevJog);
+            return;
+        }
+
+        const { axis, direction } = payload;
+
+        const { getXYJogDistance, getZJogDistance } = this.actions;
+
+        const xyStep = getXYJogDistance();
+        const zStep = getZJogDistance();
+
+        const givenAxis = axis.toUpperCase();
+        const axisValue = {
+            X: xyStep,
+            Y: xyStep,
+            Z: zStep
+        }[givenAxis] * direction;
+        const feedrate = Number(this.actions.getFeedrate());
+
+        this.joggingHelper && this.joggingHelper.onKeyUp({ [givenAxis]: axisValue, F: feedrate });
+    }
 
     shuttleControl = null;
 
@@ -587,6 +621,85 @@ class AxesWidget extends PureComponent {
         store.on('change', this.updateJogPresets);
         this.addShuttleControlEvents();
         this.subscribe();
+
+        const events = [
+            {
+                name: 'gamepad:connected',
+                action: (e) => {
+                    const { id } = e.detail.gamepad;
+                    Toaster.pop({
+                        msg: `Gamepad '${id}' Connected`,
+                        type: TOASTER_SUCCESS
+                    });
+                }
+            },
+            {
+                name: 'gamepad:disconnected',
+                action: () => {
+                    Toaster.pop({
+                        msg: 'Gamepad Disconnected',
+                    });
+                }
+            },
+            {
+                name: 'gamepad:axis',
+                action: ({ detail }) => {
+                    const { prevJog } = this.state;
+                    const axisList = ['X', 'Y', 'Z'];
+                    const [X, Y] = axisList;
+                    const axis = axisList[detail.axis];
+                    const value = detail.value;
+                    const direction = value > 0 ? 1 : -1;
+
+                    // console.log(axis, value);
+
+                    if (!value) {
+                        this.handleShortcutStop();
+                        return;
+                    }
+
+                    if (prevJog) {
+                        console.log(prevJog[axis], value);
+                    }
+
+                    if (prevJog && (value === 1 || value === -1)) {
+                        this.handleShortcutStop();
+                    }
+
+                    if (value === 1 || value === -1) {
+                        this.handleShortcutJog({ axis, direction });
+                    } else if (axis === X && value < 0) {
+                        // console.log('Bottom Left');
+                        this.handleShortcutJog({ axis: { X: -1, Y: -1 }, direction });
+                    } else if (axis === Y && value > 0) {
+                        // console.log('Bottom Right');
+                        this.handleShortcutJog({ axis: { X: 1, Y: -1 }, direction });
+                    } else if (axis === X && value > 0) {
+                        // console.log('Top Right');
+                        this.handleShortcutJog({ axis: { X: 1, Y: 1 }, direction });
+                    } else if (axis === Y && value < 0) {
+                        // console.log('Top Left');
+                        this.handleShortcutJog({ axis: { X: -1, Y: 1 }, direction });
+                    }
+
+                    // const { axis, value } = detail;
+
+                    // if (value === 0) {
+                    //     this.shuttleControlEvents.STOP_JOG();
+                    //     return;
+                    // }
+
+                    // const cleanedValue = Number(value.toFixed(3));
+
+                    // this.shuttleControlEvents.JOG(null, { axis: AXIS, direction: value > 0 ? 1 : -1 });
+                }
+            },
+            { name: 'gamepad:button', action: (e) => console.log(e) },
+        ];
+
+        const gamepadHandler = new GamepadHandler(events);
+
+        gamepadHandler.listen();
     }
 
     componentWillUnmount() {
