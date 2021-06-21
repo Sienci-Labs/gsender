@@ -29,7 +29,7 @@ import controller from 'app/lib/controller';
 import Events from 'app/containers/Preferences/Events';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import GeneralSettings from './GeneralSettings';
-import Keybindings from './Keybindings';
+import Shortcuts from './Keybindings';
 import ProbeSettings from './Probe/ProbeSettings';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import VisualizerSettings from './Visualizer/Visualizer';
@@ -81,8 +81,8 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 2,
-                    label: 'Keyboard Shortcuts',
-                    component: Keybindings
+                    label: 'Shortcuts',
+                    component: Shortcuts
                 },
                 {
                     id: 3,
