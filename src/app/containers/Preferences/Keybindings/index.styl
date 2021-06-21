@@ -1,0 +1,132 @@
+$primary = #3e85c7;
+
+.container {
+  display: grid;
+  grid-template-rows: 19fr 1fr;
+  margin-top: 1rem;
+  height: 585px;
+}
+
+.table-wrapper {
+  height: 565px;
+  overflow-y: scroll;
+}
+
+.profile-item {
+  width: 100%;
+  height: 150px;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  justify-items: center;
+  align-items: center;
+  border: 2px solid $primary;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  color: $primary;
+  background-color: rgba(255, 255, 255, 0.5);
+
+  transition: 450ms ease-in-out;
+
+  &:hover {
+    $hoverColor = white;
+
+    background-color: $primary;
+    border: 2px solid $primary;
+
+    
+    hoverEffect() {
+      transition: 450ms ease-in-out;
+      color: $hoverColor;      
+    }
+
+    .profile-item-title, .profile-item-icon {
+      hoverEffect();
+    }
+
+    .profile-item-status {
+      border-bottom: 2px solid #3e85c7;
+      border-right: 2px solid #3e85c7;
+    }
+  }
+
+  &-icon {
+    font-size: 3rem !important;
+  }
+
+  &-title {
+    font-size: 1.5rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &-status {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-bottom: 2px solid #3e85c7;
+    border-right: 2px solid #3e85c7;
+    padding: 3px 6px;
+    border-bottom-right-radius: 5px;
+    color: limegreen;
+  }
+  
+  &-delete {
+    position: absolute;
+    top: 0px
+    right: 0;
+
+    width: 20px;
+    height: 20px;
+
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+
+    color: rgba(0,0,0,0.5);
+
+    transition: 250ms ease-in-out;
+
+    &:hover {
+      color: white;
+    }
+  }
+}
+
+.profile-list {
+  profileMixin() {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(150px, 1fr));
+    // grid-template-columns: repeat(6, calc(50% - 40px));
+    // grid-template-rows: minmax(150px, 1fr);
+    gap: 2rem;
+    justify-items: center;
+    align-items: center;
+    overflow-y: auto;
+    height: 100%;
+  }
+
+  profileMixin();
+
+  &-empty {
+    profileMixin();
+    grid-template-rows: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+.add-action-item {
+  display: grid;
+  grid-template-columns: 1fr 21fr;
+  align-items: center;
+
+  i {
+    font-size: 1.5rem !important;
+  }
+}
