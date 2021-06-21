@@ -26,10 +26,12 @@ import React, { PureComponent } from 'react';
 import store from 'app/store';
 import TabbedWidget from 'app/components/TabbedWidget';
 import controller from 'app/lib/controller';
+import CoolantWidget from 'app/widgets/Coolant';
 import WidgetConfig from '../WidgetConfig';
 import ProbeWidget from '../Probe';
 import MacroWidget from '../Macro';
 import ConsoleWidget from '../Console';
+
 // import LaserWidget from '../Laser';
 import SpindleWidget from '../Spindle';
 
@@ -175,6 +177,11 @@ class SecondaryFunctionality extends PureComponent {
                     widgetId: 'spindle',
                     component: SpindleWidget,
                 },
+                {
+                    label: 'Coolant',
+                    widgetId: 'coolant',
+                    component: CoolantWidget
+                }
             ]
         };
     }
