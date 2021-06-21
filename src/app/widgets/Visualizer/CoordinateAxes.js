@@ -24,8 +24,8 @@
 import * as THREE from 'three';
 
 const buildAxis = (src, dst, color, dashed) => {
-    let geometry = new THREE.Geometry();
     let material;
+    const points = [src.clone(), dst.clone()];
 
     if (dashed) {
         material = new THREE.LineDashedMaterial({
@@ -44,9 +44,7 @@ const buildAxis = (src, dst, color, dashed) => {
             transparent: true
         });
     }
-
-    geometry.vertices.push(src.clone());
-    geometry.vertices.push(dst.clone());
+    let geometry = new THREE.BufferGeometry().setFromPoints(points);
 
     const axisLine = new THREE.Line(geometry, material);
 
@@ -73,11 +71,11 @@ class CoordinateAxes {
         const blue = '#5191cc';
 
         this.group.add(
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(size, 0, 0), red, false), // +X
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(size, 0, 0), red, true), // +X
             buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(-size, 0, 0), red, true), // -X
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, size, 0), green, false), // +Y
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, size, 0), green, true), // +Y
             buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, -size, 0), green, true), // -Y
-            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, height), blue, false), // +Z
+            buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, height), blue, true), // +Z
             buildAxis(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -height), blue, true) // -Z
         );
 
