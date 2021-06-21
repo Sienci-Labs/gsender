@@ -23,11 +23,11 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
+import get from 'lodash/get';
 import cx from 'classnames';
 import styles from './index.styl';
 
-const CoolantActiveIndicator = () => {
-    const showIndicator = false;
+const CoolantActiveIndicator = ({ showIndicator }) => {
     return (
         <div className={styles.indicatorRow}>
             <small>
@@ -45,5 +45,11 @@ const CoolantActiveIndicator = () => {
 };
 
 export default connect((store) => {
-    return {};
+    const coolantModal = get(store, 'controller.modal.coolant');
+    const isConnected = get(store, 'connection.isConnected');
+    const showIndicator = isConnected && coolantModal !== 'M9';
+
+    return {
+        showIndicator
+    };
 })(CoolantActiveIndicator);
