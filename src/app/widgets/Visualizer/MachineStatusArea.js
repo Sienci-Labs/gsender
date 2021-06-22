@@ -43,7 +43,8 @@ export default class ControlArea extends Component {
     }
 
     state = {
-        currentAlarmIcon: 'fa-lock'
+        currentAlarmIcon: 'fa-lock',
+        homingRun: false
     }
 
     unlock = () => {
@@ -53,11 +54,15 @@ export default class ControlArea extends Component {
     handleHomeMachine = () => {
         controller.command('unlock');
         controller.command('homing');
+        this.setState({
+            homingRun: true
+        });
     }
 
     render() {
         const { controller, port, layoutIsReversed } = this.props.state;
         const { state = {} } = controller;
+        const { homingRun } = this.state;
 
         //Object to customize the message of the active machine state
         const message = {
@@ -80,7 +85,7 @@ export default class ControlArea extends Component {
                 if (controller?.state?.status) {
                     let alarmCode = controller.state.status.alarmCode;
                     let homingEnabled = controller.settings.settings.$22;
-                    if (alarmCode === 'Homing' && homingEnabled === '1') {
+                    if (!homingRun && alarmCode === 'Homing' && homingEnabled === '1') {
                         return (
                             <div className={styles['machine-status-wrapper']}>
                                 <div className={styles[`machine${state.status.activeState}`]}>
