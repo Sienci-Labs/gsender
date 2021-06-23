@@ -27,6 +27,19 @@ import cx from 'classnames';
 import Table from 'app/components/Table';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 
+import {
+    CARVING_CATEGORY,
+    OVERRIDES_CATEGORY,
+    VISUALIZER_CATEGORY,
+    LOCATION_CATEGORY,
+    JOGGING_CATEGORY,
+    PROBING_CATEGORY,
+    SPINDLE_LASER_CATEGORY,
+    GENERAL_CATEGORY,
+    TOOLBAR_CATEGORY,
+    MACRO_CATEGORY
+} from 'app/constants';
+
 import { formatShortcut } from './helpers';
 import styles from './edit-area.styl';
 
@@ -46,7 +59,7 @@ export default class MainTable extends Component {
     renders = {
         renderShortcutCell: (_, row) => {
             const { keys, isActive } = row;
-            const shortcut = keys.split('+');
+            const shortcut = [...keys][0] === '+' ? ['+'] : keys.split('+');
 
             const { onEdit, onDelete } = this.props;
 
@@ -88,9 +101,24 @@ export default class MainTable extends Component {
             const output = cleanedShortcut ? formatShortcut(cleanedShortcut, isActive) : formatShortcut(shortcut, isActive);
 
             return (
-                <div className={styles.shortcutRowHeader}>
-                    <span>{output}</span>
+                <div className={styles.shortcutComboColumn}>
+                    {
+                        hasShortcut
+                            ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>{output}</div>
+                            : <div style={{ height: '21px' }} />
+                    }
                     <div className={styles['icon-area']}>
+                        {
+                            hasShortcut && (
+                                <i
+                                    role="button"
+                                    tabIndex={-1}
+                                    className={cx('far fa-trash-alt', styles.deleteIcon, !hasShortcut ? styles.disabledIcon : '')}
+                                    onClick={() => onDelete(row)}
+                                    onKeyDown={() => onDelete(row)}
+                                />
+                            )
+                        }
                         <i
                             role="button"
                             tabIndex={-1}
@@ -129,13 +157,34 @@ export default class MainTable extends Component {
                     }}
                 />
             );
+        },
+        renderCategoryCell: (_, row) => {
+            const categories = {
+                [CARVING_CATEGORY]: 'categoryGreen',
+                [OVERRIDES_CATEGORY]: 'categoryBlue',
+                [VISUALIZER_CATEGORY]: 'categoryPink',
+                [LOCATION_CATEGORY]: 'categoryOrange',
+                [JOGGING_CATEGORY]: 'categoryRed',
+                [PROBING_CATEGORY]: 'categoryPurple',
+                [SPINDLE_LASER_CATEGORY]: 'categoryBlack',
+                [GENERAL_CATEGORY]: 'categoryGrey',
+                [TOOLBAR_CATEGORY]: 'categoryWhite',
+                [MACRO_CATEGORY]: 'categoryLightBlue'
+            };
+
+            const category = categories[row.category];
+
+            return (
+                <div className={styles[category]}>{row.category}</div>
+            );
         }
     }
 
     columns = [
-        { dataIndex: 'title', title: 'Action', sortable: true, key: 'title', width: '35%' },
-        { dataIndex: 'keys', title: 'Shortcut', sortable: true, key: 'keys', width: '55%', render: this.renders.renderShortcutCell },
-        { dataIndex: 'isActive', title: 'Active', key: 'isActive', width: '10%', render: this.renders.renderToggleCell }
+        { dataKey: 'title', title: 'Action', sortable: true, width: '25%' },
+        { dataKey: 'keys', title: 'Shortcut', sortable: true, width: '45%', render: this.renders.renderShortcutCell },
+        { dataKey: 'category', title: 'Category', sortable: true, width: '20%', render: this.renders.renderCategoryCell },
+        { dataKey: 'isActive', title: 'Active', width: '10%', render: this.renders.renderToggleCell }
     ];
 
     render() {
@@ -144,10 +193,10 @@ export default class MainTable extends Component {
 
         return (
             <Table
-                bordered
                 rowKey="id"
                 columns={columns}
                 data={data}
+                width={743}
             />
         );
     }
