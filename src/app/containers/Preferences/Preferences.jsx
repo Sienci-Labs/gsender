@@ -26,7 +26,8 @@ import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
 import controller from 'app/lib/controller';
-import Events from 'app/containers/Preferences/Events';
+import Events from 'app/containers/Preferences/ToolChange';
+import ProgramEvents from 'app/containers/Preferences/Events';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import GeneralSettings from './GeneralSettings';
 import Shortcuts from './Keybindings';
@@ -96,6 +97,11 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 5,
+                    label: 'Program Events',
+                    component: ProgramEvents,
+                },
+                {
+                    id: 6,
                     label: 'About',
                     component: About,
                 }

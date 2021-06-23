@@ -61,7 +61,7 @@ class Controller {
         // Fired when couldn't reconnect within reconnectionAttempts.
         'reconnect_failed': [],
 
-        // System Events
+        // System ToolChange
         'startup': [],
         'config:change': [],
         'task:start': [],
