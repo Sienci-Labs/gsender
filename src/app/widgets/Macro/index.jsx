@@ -446,6 +446,9 @@ class MacroWidget extends PureComponent {
                     <input
                         type="file"
                         onChange={this.importMacros}
+                        onClick={(e) => {
+                            (e.target.value = null);
+                        }}
                         accept=".json"
                         style={{ display: 'none' }}
                         ref={this.inputRef}
@@ -468,7 +471,7 @@ class MacroWidget extends PureComponent {
                                 this.inputRef.current.click();
                             }}
                         >
-                            <i className="fas fa-upload" />
+                            <i className="fas fa-download" />
                         </FunctionButton>
                         <FunctionButton
                             primary
@@ -478,7 +481,7 @@ class MacroWidget extends PureComponent {
                                 this.exportMacros();
                             }}
                         >
-                            <i className="fas fa-download" />
+                            <i className="fas fa-upload" />
                         </FunctionButton>
                     </div>
                 </Widget.Content>
