@@ -517,6 +517,7 @@ class AxesWidget extends PureComponent {
 
             this.actions.setSelectedSpeed(key);
             this.actions.setJogFromPreset(key);
+        },
         JOG_SPEED: (_, { speed }) => {
             const getStep = ({ value, increment = false }) => {
                 let step;
