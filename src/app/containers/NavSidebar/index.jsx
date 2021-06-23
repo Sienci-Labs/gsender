@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -22,6 +23,10 @@
  */
 
 import React, { PureComponent } from 'react';
+import combokeys from 'app/lib/combokeys';
+import controller from 'app/lib/controller';
+import { GRBL } from 'app/constants';
+import store from 'app/store';
 import NavSidebarLink from './NavSideBarLink';
 import styles from './index.styl';
 import {
@@ -38,6 +43,61 @@ import Calibration from '../Calibration';
 
 class NavSidebar extends PureComponent {
     state = this.getInitialState();
+
+    openHelpPage = () => {
+        window.open('https://sienci.com/gsender-documentation/', '_blank');
+    }
+
+    reconnectToLastDevice(port, baudrate, controllerType) {
+        controller.openPort(port, {
+            controllerType: controllerType,
+            baudrate: baudrate,
+            rtscts: false
+        }, (err) => {
+            if (err) {
+                return;
+            }
+        });
+    }
+
+    shuttleControlEvents = {
+        OPEN_TOOLBAR: (_, { toolbar, shouldConnect, shouldOpenHelpPage }) => {
+            if (shouldConnect) {
+                const connection = store.get('widgets.connection');
+                const { port, baudrate } = connection;
+
+                if (port && baudrate) {
+                    this.reconnectToLastDevice(port, baudrate, GRBL);
+                }
+                return;
+            }
+
+            if (shouldOpenHelpPage) {
+                this.openHelpPage();
+                return;
+            }
+
+            if (toolbar) {
+                this.actions.openModal(toolbar);
+            }
+        }
+    }
+
+    addShuttleControlEvents() {
+        combokeys.reload();
+
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName];
+            combokeys.on(eventName, callback);
+        });
+    }
+
+    removeShuttleControlEvents() {
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName];
+            combokeys.removeListener(eventName, callback);
+        });
+    }
 
     actions = {
         openModal: (name) => {
@@ -56,6 +116,14 @@ class NavSidebar extends PureComponent {
                 }
             });
         }
+    }
+
+    componentDidMount() {
+        this.addShuttleControlEvents();
+    }
+
+    componentWillUnmount() {
+        this.removeShuttleControlEvents();
     }
 
     getInitialState() {
