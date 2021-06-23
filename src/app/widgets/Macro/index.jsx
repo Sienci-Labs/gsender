@@ -29,9 +29,11 @@ import includes from 'lodash/includes';
 import React, { PureComponent } from 'react';
 import _ from 'lodash';
 import api from 'app/api';
+import store from 'app/store';
 import Space from 'app/components/Space';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
+import combokeys from 'app/lib/combokeys';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import WidgetConfig from '../WidgetConfig';
@@ -140,6 +142,8 @@ class MacroWidget extends PureComponent {
                 res = await api.macros.fetch();
                 const { records: macros } = res.body;
                 this.setState({ macros: macros });
+
+                combokeys.reload();
             } catch (err) {
                 // Ignore error
             }
@@ -151,6 +155,12 @@ class MacroWidget extends PureComponent {
                 res = await api.macros.fetch();
                 const { records: macros } = res.body;
                 this.setState({ macros: macros });
+
+                const commandKeys = store.get('commandKeys', []);
+                const filteredCommandKeys = commandKeys.filter(key => key.id !== id);
+
+                store.replace('commandKeys', filteredCommandKeys);
+                combokeys.reload();
             } catch (err) {
                 // Ignore error
             }
