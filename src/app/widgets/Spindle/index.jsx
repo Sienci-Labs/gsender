@@ -21,6 +21,7 @@
  *
  */
 
+import React, { PureComponent } from 'react';
 import classNames from 'classnames';
 import includes from 'lodash/includes';
 import debounce from 'lodash/debounce';
@@ -28,7 +29,7 @@ import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import { connect } from 'react-redux';
-import React, { PureComponent } from 'react';
+import combokeys from 'app/lib/combokeys';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import WidgetConfig from '../WidgetConfig';
@@ -58,6 +59,25 @@ class SpindleWidget extends PureComponent {
         sortable: PropTypes.object,
         embedded: PropTypes.bool
     };
+
+    shuttleControlEvents = {
+        TOGGLE_SPINDLE_LASER_MODE: () => {
+            this.actions.handleModeToggle();
+        },
+        CW_LASER_ON: () => {
+            this.state.mode === LASER_MODE
+                ? this.actions.sendLaserM3()
+                : this.actions.sendM3();
+        },
+        CCW_LASER_TEST: () => {
+            this.state.mode === LASER_MODE
+                ? this.actions.runLaserTest()
+                : this.actions.sendM4();
+        },
+        STOP_LASER_OFF: () => {
+            this.actions.sendM5();
+        }
+    }
 
     // Public methods
     collapse = () => {
@@ -156,6 +176,30 @@ class SpindleWidget extends PureComponent {
             }, laser.duration);
         }
     };
+
+    addShuttleControlEvents() {
+        combokeys.reload();
+
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName];
+            combokeys.on(eventName, callback);
+        });
+    }
+
+    removeShuttleControlEvents() {
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName];
+            combokeys.removeListener(eventName, callback);
+        });
+    }
+
+    componentDidMount() {
+        this.addShuttleControlEvents();
+    }
+
+    componentWillUnmount() {
+        this.removeShuttleControlEvents();
+    }
 
     componentDidUpdate(prevProps, prevState) {
         const {
