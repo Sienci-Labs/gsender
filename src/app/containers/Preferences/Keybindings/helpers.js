@@ -21,7 +21,7 @@
  *
  */
 
-import React from 'react';
+import React, { Fragment } from 'react';
 
 export const formatShortcut = (shortcut = [], isActive = true) => {
     const output = [];
@@ -31,9 +31,9 @@ export const formatShortcut = (shortcut = [], isActive = true) => {
 
     for (let i = 0; i < shortcut.length; i++) {
         if (i === shortcut.length - 1) {
-            output.push(<span key={i} style={style}><kbd>{shortcut[i]}</kbd></span>);
+            output.push(<kbd style={style} key={i}>{shortcut[i]}</kbd>);
         } else {
-            output.push(<span key={i} style={style}><kbd>{shortcut[i]}</kbd> + </span>);
+            output.push(<Fragment key={i}><kbd style={style}>{shortcut[i]}</kbd> <span>+</span> </Fragment>);
         }
     }
 
