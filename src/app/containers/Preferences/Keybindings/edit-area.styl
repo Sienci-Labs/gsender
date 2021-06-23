@@ -131,15 +131,23 @@ info-window() {
     font-weight: bold;
 }
 
-.shortcut-row-header {
+.shortcut-combo-column {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 2rem;
+    align-items: center;
 }
 
-.edit-icon {
+.action-icon {
+    $color = #2b5d8b;
     align-self: center;
-    color: #2b5d8b;
+    color: $color;
+    font-size: 1.15rem !important;
+    width: 15px;
+
+    &:hover {
+        color: lighten($color, 25);
+    }
 
     &:focus {
         outline: none;
@@ -151,9 +159,14 @@ info-window() {
 }
 
 .delete-icon {
+    $color = #f00;
     align-self: center;
-    color: #f00;
+    color: $color;
+    font-size: 1.15rem !important;
 
+    &:hover {
+        color: lighten($color, 25);
+    }
 
     &:focus {
         outline: none;
@@ -174,4 +187,51 @@ info-window() {
     display: flex;
     gap: 1rem;
     justify-content: center;
+}
+
+.category {
+    categoryMixin(backgroundColor = none, color = black, border = none) {
+        font-weight: bold;
+        background-color: backgroundColor;
+        color: rgba(color, 0.9);
+        text-align: center;
+        padding: 5px;
+        border-radius: 25px;
+        border: border;
+    }
+
+    categoryMixin();
+
+    $lightenAmount = 20;
+
+    &-green {
+        categoryMixin(lighten(green, $lightenAmount));
+    }
+    &-blue {
+        categoryMixin(lighten(blue, $lightenAmount), white);
+    }
+    &-pink {
+        categoryMixin(pink);
+    }
+    &-orange {
+        categoryMixin(lighten(orange, $lightenAmount));
+    }
+    &-red {
+        categoryMixin(lighten(red, $lightenAmount));
+    }
+    &-purple {
+        categoryMixin(lighten(purple, $lightenAmount), white);
+    }
+    &-black {
+        categoryMixin(lighten(black, $lightenAmount), white);
+    }
+    &-grey {
+        categoryMixin(lighten(grey, $lightenAmount));
+    }
+    &-white {
+        categoryMixin(white, black, 1px solid black);
+    }
+    &-light-blue {
+        categoryMixin(dodgerblue);
+    }
 }
