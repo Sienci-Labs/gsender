@@ -174,7 +174,7 @@
     "@trendmicro/react-popover": "~0.4.0",
     "@trendmicro/react-portal": "~0.4.3",
     "@trendmicro/react-radio": "~3.2.2",
-    "@trendmicro/react-table": "~1.0.1-alpha.2",
+    "@trendmicro/react-table": "^2.0.2",
     "@trendmicro/react-toggle-switch": "~0.5.7",
     "@trendmicro/react-tooltip": "~0.6.0",
     "@trendmicro/react-validation": "~0.1.0",
