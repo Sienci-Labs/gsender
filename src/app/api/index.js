@@ -310,7 +310,7 @@ users.update = (id, options) => new Promise((resolve, reject) => {
 });
 
 //
-// Events
+// ToolChange
 //
 const events = {};
 

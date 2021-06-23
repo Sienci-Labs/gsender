@@ -37,7 +37,7 @@ const CoolantActiveIndicator = ({ showIndicator }) => {
             </small>
             <div className={cx(styles.activeIndicator, { [styles.activeIndicatorOn]: showIndicator })}>
                 {
-                    showIndicator && <i className={cx('fas fa-exclamation', styles.activePulse)} />
+                    showIndicator && <i className={cx('fas fa-tint', styles.activePulse)} />
                 }
             </div>
         </div>

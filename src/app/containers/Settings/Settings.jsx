@@ -1188,7 +1188,7 @@ class Settings extends PureComponent {
                     }
                 }
             },
-            // Events
+            // ToolChange
             events: {
                 api: {
                     err: false,

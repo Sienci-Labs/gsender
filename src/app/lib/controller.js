@@ -65,7 +65,7 @@ class Controller {
         'gcode_error': [],
         'gcode_error_checking_file': [],
 
-        // System Events
+        // System ToolChange
         'startup': [],
         'config:change': [],
         'task:start': [],
