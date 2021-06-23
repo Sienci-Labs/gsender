@@ -137,3 +137,14 @@ export const TINYG_MACHINE_STATE_PANIC = 13; // Machine is in panic state. Needs
 
 export const LASER_MODE = 'laser';
 export const SPINDLE_MODE = 'spindle';
+
+export const CARVING_CATEGORY = 'Carving';
+export const OVERRIDES_CATEGORY = 'Overrides';
+export const VISUALIZER_CATEGORY = 'Visualizer';
+export const LOCATION_CATEGORY = 'Location';
+export const JOGGING_CATEGORY = 'Jogging';
+export const MACRO_CATEGORY = 'Macros';
+export const PROBING_CATEGORY = 'Probing';
+export const SPINDLE_LASER_CATEGORY = 'Spindle/Laser';
+export const GENERAL_CATEGORY = 'General';
+export const TOOLBAR_CATEGORY = 'Toolbar';
