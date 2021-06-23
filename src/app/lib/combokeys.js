@@ -23,14 +23,17 @@
 
 import events from 'events';
 import Mousetrap from 'mousetrap';
+import api from 'app/api';
+import { MACRO_CATEGORY } from 'app/constants';
 import log from './log';
 import { preventDefault } from './dom-events';
-
 import { modifierKeys } from './constants';
+
 
 import store from '../store';
 
 const STOP_CMD = 'STOP_JOG';
+const MACRO = 'MACRO';
 
 const BUGGED_KEYS = [
     {
@@ -63,24 +66,16 @@ class Combokeys extends events.EventEmitter {
         didBindEvents: false
     };
 
-    commandKeys = store.get('commandKeys', []);
-
     list = [];
 
-    constructor(options = {}) {
-        super();
-
-        if (options.autoBind) {
-            this.bind();
-        }
-    }
-
-    bind() {
+    async bind() {
         if (this.state.didBindEvents) {
             return;
         }
-        this.commandKeys.filter(key => key.isActive).forEach((o) => {
-            const { keys, cmd, payload = {}, isActive } = o;
+        const commandKeys = await this.getCommandKeys();
+
+        commandKeys.filter(key => key.isActive).forEach((o) => {
+            const { keys, cmd, payload = null, isActive } = o;
 
             //Do not add any keybindings if the shortcut is disabled or there is no shortcut at all
             if (!isActive || !keys) {
@@ -139,7 +134,40 @@ class Combokeys extends events.EventEmitter {
             Mousetrap.bind(keys, callback);
             this.list.push({ keys: keys, callback: callback });
         });
+
         this.state.didBindEvents = true;
+    }
+
+    async getCommandKeys() {
+        const commandKeys = store.get('commandKeys', []);
+
+        const res = await api.macros.fetch();
+        const macros = res.body.records;
+
+        const newCommandKeysList = [...commandKeys];
+        const lastID = commandKeys.length;
+
+        if (!commandKeys.find(command => command.category === MACRO_CATEGORY)) {
+            for (let i = lastID; i < macros.length + lastID; i++) {
+                const currentMacroIndex = i - lastID;
+                const currentMacro = macros[currentMacroIndex];
+
+                newCommandKeysList.push({
+                    id: currentMacro.id,
+                    keys: '',
+                    title: currentMacro.name,
+                    cmd: MACRO,
+                    payload: { macroID: currentMacro.id },
+                    preventDefault: false,
+                    isActive: false,
+                    category: MACRO_CATEGORY
+                });
+            }
+        }
+
+        store.set('commandKeys', newCommandKeysList);
+
+        return newCommandKeysList;
     }
 
     unbind() {
@@ -154,8 +182,6 @@ class Combokeys extends events.EventEmitter {
     }
 
     reload() {
-        this.commandKeys = store.get('commandKeys', []);
-
         this.reset();
         this.list = [];
 
