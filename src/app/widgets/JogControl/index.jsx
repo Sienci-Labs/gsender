@@ -68,6 +68,8 @@ import {
     MODAL_NONE,
     DEFAULT_AXES,
     SPEED_NORMAL,
+    SPEED_RAPID,
+    SPEED_PRECISE,
 } from './constants';
 import styles from './index.styl';
 
@@ -495,6 +497,7 @@ class AxesWidget extends PureComponent {
             if (event) {
                 preventDefault(event);
             }
+            const { axis: axisList, direction, force } = payload;
 
             this.handleShortcutStop(payload);
         },
@@ -505,15 +508,96 @@ class AxesWidget extends PureComponent {
             this.actions.setSelectedSpeed(key);
             this.actions.setJogFromPreset(key);
         },
-        JOG_LEVER_SWITCH: (event, { key = '' }) => {
-            if (key === '-') {
-                this.actions.stepBackward();
-            } else if (key === '+') {
-                this.actions.stepForward();
-            } else {
-                this.actions.stepNext();
+        CYCLE_JOG_PRESETS: () => {
+            const { selectedSpeed } = this.state;
+
+            const presets = [SPEED_RAPID, SPEED_NORMAL, SPEED_PRECISE];
+            const nextIndex = presets.findIndex(preset => preset === selectedSpeed) + 1;
+            const key = presets[nextIndex] ? presets[nextIndex] : presets[0];
+
+            this.actions.setSelectedSpeed(key);
+            this.actions.setJogFromPreset(key);
+        JOG_SPEED: (_, { speed }) => {
+            const getStep = ({ value, increment = false }) => {
+                let step;
+
+                if (value === 0) {
+                    return 0.1;
+                }
+                if (value < 0.1) {
+                    step = 0.01;
+                } else if (value < 1) {
+                    step = 0.1;
+                } else if (value < 10) {
+                    step = 1;
+                } else if (value < 100) {
+                    step = 10;
+                } else if (value < 1000) {
+                    step = 100;
+                } else if (value < 10000) {
+                    step = 1000;
+                } else {
+                    step = 10000;
+                }
+
+                if (!increment && step !== 0.001 && value - step === 0) {
+                    step /= 10;
+                }
+                return step;
+            };
+
+            const { rapid, normal, precise } = this.state.jog;
+            const presets = [rapid, normal, precise];
+            const newJogSpeeds = [];
+            const shouldIncrement = speed === 'increase';
+
+            for (const preset of presets) {
+                const metricKeys = Object.keys(preset[METRIC_UNITS]);
+                const imperialKeys = Object.keys(preset[IMPERIAL_UNITS]);
+
+                const newMetricJog = {};
+                const newImperialJog = {};
+
+                const fixedAmount = 3;
+
+                for (const key of metricKeys) {
+                    const presetVal = preset[METRIC_UNITS][key];
+                    const newVal = Number((presetVal - getStep({ value: presetVal, increment: shouldIncrement })).toFixed(fixedAmount));
+
+                    newMetricJog[key] = newVal;
+
+                    if (newVal !== 0 || newVal > 0) {
+                        newMetricJog[key] = newVal;
+                    }
+                }
+
+                for (const key of imperialKeys) {
+                    const presetVal = preset[IMPERIAL_UNITS][key];
+                    const newVal = Number((presetVal - getStep({ value: presetVal, increment: shouldIncrement })).toFixed(fixedAmount));
+
+                    newImperialJog[key] = newVal;
+
+                    if (newVal !== 0 || newVal > 0) {
+                        newImperialJog[key] = newVal;
+                    }
+                }
+
+                newJogSpeeds.push({
+                    mm: newMetricJog,
+                    in: newImperialJog
+                });
             }
-        },
+
+            this.setState((prev) => ({
+                ...prev,
+                jog: {
+                    ...prev.jog,
+                    rapid: newJogSpeeds[0],
+                    normal: newJogSpeeds[1],
+                    precise: newJogSpeeds[2],
+                }
+            }));
+        }
     };
 
     handleShortcutJog = ({ axis, direction }) => {
