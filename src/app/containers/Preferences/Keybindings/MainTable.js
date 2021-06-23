@@ -82,16 +82,20 @@ export default class MainTable extends Component {
                     {
                         hasShortcut
                             ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>{output}</div>
-                            : <div style={{ height: '24px' }} />
+                            : <div style={{ height: '21px' }} />
                     }
                     <div className={styles['icon-area']}>
-                        <i
-                            role="button"
-                            tabIndex={-1}
-                            className={cx('far fa-trash-alt', styles.deleteIcon, !hasShortcut ? styles.disabledIcon : '')}
-                            onClick={() => hasShortcut && onDelete(row)}
-                            onKeyDown={null}
-                        />
+                        {
+                            hasShortcut && (
+                                <i
+                                    role="button"
+                                    tabIndex={-1}
+                                    className={cx('far fa-trash-alt', styles.deleteIcon, !hasShortcut ? styles.disabledIcon : '')}
+                                    onClick={() => onDelete(row)}
+                                    onKeyDown={() => onDelete(row)}
+                                />
+                            )
+                        }
                         <i
                             role="button"
                             tabIndex={-1}
