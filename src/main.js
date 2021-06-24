@@ -90,7 +90,7 @@ const main = () => {
 
             splashScreen.on('show', () => {
                 splashScreen.focus();
-            })
+            });
 
             const res = await launchServer();
             const { address, port, mountPoints } = { ...res };
@@ -155,45 +155,51 @@ const main = () => {
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
             ipcMain.on('open-upload-dialog', async () => {
-                let additionalOptions = {};
+                try {
+                    let additionalOptions = {};
 
-                if (prevDirectory) {
-                    additionalOptions.defaultPath = prevDirectory;
-                }
+                    if (prevDirectory) {
+                        additionalOptions.defaultPath = prevDirectory;
+                    }
 
-                const file = await dialog.showOpenDialog(
-                    {
-                        ...additionalOptions,
-                        properties: ['openFile'],
-                        filters: [
-                            { name: 'GCode Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
-                            { name: 'All Files', extensions: ['*'] }
-                        ]
-                    },
-                );
+                    const file = await dialog.showOpenDialog(
+                        {
+                            ...additionalOptions,
+                            properties: ['openFile'],
+                            filters: [
+                                { name: 'GCode Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
+                                { name: 'All Files', extensions: ['*'] }
+                            ]
+                        },
+                    );
 
-                const FULL_FILE_PATH = file.filePaths[0];
+                    const FULL_FILE_PATH = file.filePaths[0];
 
-                const getFileInformation = (file) => {
-                    const { base, dir } = path.parse(file);
-                    return [dir, base];
-                };
+                    const getFileInformation = (file) => {
+                        const { base, dir } = path.parse(file);
+                        return [dir, base];
+                    };
 
-                if (file.canceled) {
-                    return;
-                }
-
-                const [filePath, fileName] = getFileInformation(FULL_FILE_PATH);
-
-                fs.readFile(FULL_FILE_PATH, 'utf8', (err, data) => {
-                    if (err) {
+                    if (file.canceled) {
                         return;
                     }
 
-                    prevDirectory = filePath; //Set the previous directory for later use
-                    const { size } = fs.statSync(FULL_FILE_PATH);
-                    window.webContents.send('returned-upload-dialog-data', { data, size, name: fileName, path: FULL_FILE_PATH });
-                });
+                    const [filePath, fileName] = getFileInformation(FULL_FILE_PATH);
+
+                    fs.readFile(FULL_FILE_PATH, 'utf8', (err, data) => {
+                        if (err) {
+                            return;
+                        }
+
+                        prevDirectory = filePath; //Set the previous directory for later use
+                        const { size } = fs.statSync(FULL_FILE_PATH);
+                        window.webContents.send('returned-upload-dialog-data', { data, size, name: fileName, path: FULL_FILE_PATH });
+                    });
+                } catch (e) {
+                    await dialog.showMessageBox({
+                        message: e.message
+                    });
+                }
             });
         } catch (err) {
             console.log(err);
