@@ -148,7 +148,6 @@ class Controller {
             'reconnectionDelay': 500,
             'reconnectionAttempts': 10
         };
-        console.log(options);
 
         this.socket && this.socket.destroy();
         this.socket = this.io.connect(host, options);
