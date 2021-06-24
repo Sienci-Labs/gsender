@@ -21,7 +21,7 @@ const Arrow = ({ position, hasTop, hasBottom, label: Label, isActive, triangle, 
     const labelPosition = {
         diagonal: 'arrow-label-diagonal',
         bottom: 'arrow-label-bottom',
-        left: 'arrow-label-left',
+        right: 'arrow-label-right',
     }[position];
 
     return (
