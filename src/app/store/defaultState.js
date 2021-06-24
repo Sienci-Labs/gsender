@@ -309,6 +309,27 @@ const defaultState = {
                 duration: 1,
             }
         },
+        surfacing: {
+            defaultMetricState: {
+                bitDiameter: 22,
+                stepover: 40,
+                feedrate: 1500,
+                length: 0,
+                width: 0,
+                skimDepth: 1,
+                maxDepth: 1,
+                spindleRPM: 17000,
+            },
+            defaultImperialState: {
+                bitDiameter: 1,
+                stepover: 40,
+                feedrate: 1500,
+                length: 0,
+                width: 0,
+                skimDepth: 0.04,
+                maxDepth: 0.04,
+            },
+        },
         visualizer: {
             minimized: false,
             // 3D View
