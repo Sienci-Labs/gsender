@@ -23,9 +23,13 @@
 
 import React from 'react';
 import classNames from 'classnames';
+import store from 'app/store';
+import defaultState from 'app/store/defaultState';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import { RadioGroup, RadioButton } from 'app/components/Radio';
+import Button from 'app/components/FunctionButton/FunctionButton';
 import i18n from 'app/lib/i18n';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import styles from './index.styl';
 import {
     IMPERIAL_UNITS,
@@ -44,6 +48,24 @@ const GeneralSettings = ({ active, state, actions }) => {
     if (state.controller.type === '') {
         baudRateDisabled = false;
     }
+
+    const handleRestoreClick = () => {
+        Confirm({
+            title: 'Restore Settings',
+            content: 'All your current settings will be removed. Are you sure you want to restore default settings on gSender?',
+            confirmLabel: 'Restore Settings',
+            onConfirm: restoreDefaultSettings
+        });
+    };
+
+    const restoreDefaultSettings = () => {
+        store.restoreState(defaultState);
+
+        setTimeout(() => {
+            // eslint-disable-next-line no-restricted-globals
+            location.reload();
+        }, 250);
+    };
 
     return (
         <div className={classNames(
@@ -144,6 +166,9 @@ const GeneralSettings = ({ active, state, actions }) => {
                                     additionalProps={{ name: 'safeRetractHeight', type: 'number' }}
                                 />
                             </TooltipCustom>
+                        </Fieldset>
+                        <Fieldset legend="Restore">
+                            <Button primary style={{ marginBottom: '1rem' }} onClick={handleRestoreClick}>Restore Default gSender Settings</Button>
                         </Fieldset>
                     </div>
                 </div>
