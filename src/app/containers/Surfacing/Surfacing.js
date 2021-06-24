@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 
 import store from 'app/store';
-import { METRIC_UNITS } from 'app/constants';
+import { METRIC_UNITS, IMPERIAL_UNITS } from 'app/constants';
 import controller from 'app/lib/controller';
 
 import InputArea from './InputArea';
@@ -11,27 +11,6 @@ import ActionArea from './components/actions';
 import Visualizer from './components/visualizer';
 
 import styles from './index.styl';
-
-const defaultMetricState = {
-    bitDiameter: 22,
-    stepover: 40,
-    feedrate: 1500,
-    length: 300,
-    width: 200,
-    skimDepth: 1,
-    maxDepth: 1,
-    spindleRPM: 17000,
-};
-
-const defaultImperialState = {
-    bitDiameter: 1,
-    stepover: 40,
-    feedrate: 1500,
-    length: 12,
-    width: 8,
-    skimDepth: 0.04,
-    maxDepth: 0.04,
-};
 
 
 /**
@@ -42,7 +21,7 @@ const defaultImperialState = {
 const Surfacing = ({ onClose, showTitle }) => {
     const visualizerRef = useRef();
 
-    const [surfacing, setSurfacing] = useState(defaultMetricState);
+    const [surfacing, setSurfacing] = useState(store.get('widgets.surfacing.defaultMetricState'));
 
     const [gcode, setGcode] = useState('');
     const [units, setUnits] = useState(METRIC_UNITS);
@@ -53,25 +32,50 @@ const Surfacing = ({ onClose, showTitle }) => {
     useEffect(() => {
         const machineProfile = store.get('workspace.machineProfile');
         const workspaceUnits = store.get('workspace.units');
+        const { defaultMetricState, defaultImperialState } = store.get('widgets.surfacing');
 
         if (workspaceUnits) {
             setUnits(workspaceUnits);
         }
 
         if (machineProfile) {
-            let length, width, additionalState = {};
-
             if (workspaceUnits === METRIC_UNITS) {
-                length = machineProfile.mm.depth;
-                width = machineProfile.mm.width;
-            } else {
-                length = machineProfile.in.depth;
-                width = machineProfile.in.width;
-                additionalState = defaultImperialState;
+                if ((!defaultMetricState.length && !defaultMetricState.width)) {
+                    setSurfacing(prev => ({
+                        ...prev,
+                        ...defaultMetricState,
+                        length: machineProfile.mm.depth,
+                        width: machineProfile.mm.width
+                    }));
+                } else {
+                    setSurfacing(prev => ({ ...prev, ...defaultMetricState }));
+                }
             }
-            setSurfacing(prev => ({ ...prev, ...additionalState, length, width }));
+
+            if (workspaceUnits === IMPERIAL_UNITS) {
+                if ((!defaultImperialState.length && !defaultImperialState.width)) {
+                    setSurfacing(prev => ({
+                        ...prev,
+                        ...defaultImperialState,
+                        length: machineProfile.in.depth,
+                        width: machineProfile.in.width
+                    }));
+                } else {
+                    setSurfacing(prev => ({ ...prev, ...defaultImperialState }));
+                }
+            }
         }
     }, []);
+
+    useEffect(() => {
+        const workspaceUnits = store.get('workspace.units');
+
+        if (workspaceUnits === METRIC_UNITS) {
+            store.set('widgets.surfacing.defaultMetricState', surfacing);
+        } else {
+            store.set('widgets.surfacing.defaultImperialState', surfacing);
+        }
+    }, [surfacing]);
 
     const handleChange = (e) => {
         const { id, value, min, max } = e.target;
