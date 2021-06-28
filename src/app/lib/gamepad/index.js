@@ -1,43 +1,24 @@
-import events from 'events';
 import { GamepadListener } from 'gamepad.js';
+import store from 'app/store';
 
-const deadZone = 0.5;
-const precision = 3;
-
-let listener = new GamepadListener({ deadZone, precision });
-listener.start();
-
-class Gamepad extends events.EventEmitter {
-    events = [];
-
-    constructor(events) {
-        super();
-        this.updateEvents(events);
+class Gamepad extends GamepadListener {
+    constructor() {
+        const { deadZone = 0.5, precision = 3 } = store.get('workspace.gamepad');
+        super({ deadZone, precision });
+        this.start();
     }
 
-    listen = () => {
-        for (const event of this.events) {
-            listener.on(event.name, event.action);
+    update = ({ deadZone, precision }) => {
+        if (deadZone) {
+            this.options.deadZone = deadZone;
         }
-    }
 
-    stopListening = () => {
-        listener.stop();
-    }
-
-    updateEvents = (events) => {
-        if (events && Array.isArray(events)) {
-            this.events = events;
+        if (precision) {
+            this.options.precision = precision;
         }
-    }
-
-    update = ({ deadZone = 0.4, precision = 3, events }) => {
-        listener = new GamepadListener({ deadZone, precision });
-
-        this.updateEvents(events);
-        this.listen();
-        listener.update();
     }
 }
 
-export default Gamepad;
+const gamepad = new Gamepad();
+
+export default gamepad;
