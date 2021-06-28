@@ -1062,6 +1062,118 @@ class VisualizerWidget extends PureComponent {
             if (this.workflowControl) {
                 this.workflowControl.handleClickUpload();
             }
+        },
+        UNLOAD_FILE: () => {
+            this.actions.closeModal();
+            this.actions.unloadGCode();
+            this.actions.reset();
+        },
+        TEST_RUN: () => {
+            const gcode = this.state.gcode.content;
+            const lines = gcode.split('\n');
+            const testLines = ['$C', ...lines, '$C'];
+            controller.command('gcode', testLines);
+            this.actions.onRunClick();
+        },
+        START_JOB: () => {
+            const { port, workflow } = this.state;
+            if (!port) {
+                return;
+            }
+
+            const canStart = (workflow.state !== WORKFLOW_STATE_RUNNING);
+
+            if (canStart) {
+                if (workflow.state === WORKFLOW_STATE_IDLE) {
+                    controller.command('gcode:start');
+                    return;
+                }
+
+                if (workflow.state === WORKFLOW_STATE_PAUSED) {
+                    controller.command('gcode:resume');
+                    return;
+                }
+            }
+        },
+        PAUSE_JOB: () => {
+            const { port, workflow } = this.state;
+            if (!port) {
+                return;
+            }
+
+            if (workflow.state === WORKFLOW_STATE_RUNNING) {
+                controller.command('gcode:pause');
+            }
+        },
+        STOP_JOB: () => {
+            const { port } = this.state;
+            if (!port) {
+                return;
+            }
+
+            controller.command('gcode:stop', { force: true });
+        },
+        FEEDRATE_OVERRIDE: (_, { amount }) => {
+            const feedRate = Number(amount) || 0;
+            controller.command('feedOverride', feedRate);
+        },
+        SPINDLE_OVERRIDE: (_, { amount }) => {
+            const spindleSpeed = Number(amount) || 0;
+            controller.command('spindleOverride', spindleSpeed);
+        },
+        VISUALIZER_VIEW: (_, { type }) => {
+            const {
+                to3DView,
+                toTopView,
+                toFrontView,
+                toRightSideView,
+                toLeftSideView,
+            } = this.actions.camera;
+
+            const changeCamera = {
+                isometirc: to3DView,
+                top: toTopView,
+                front: toFrontView,
+                right: toRightSideView,
+                left: toLeftSideView,
+                default: () => {
+                    const { cameraPosition } = this.getInitialState();
+                    this.setState({ cameraPosition });
+                }
+            }[type];
+
+            changeCamera();
+        },
+        LIGHTWEIGHT_MODE: () => this.actions.handleLiteModeToggle(),
+        CUT: () => {
+            document.execCommand('cut');
+        },
+        COPY: () => {
+            document.execCommand('copy');
+        },
+        PASTE: () => {
+            document.execCommand('paste');
+        },
+        UNDO: () => {
+            document.execCommand('undo');
+        },
+        MACRO: (_, { macroID }) => {
+            // console.log(macroID);
+
+            controller.command('macro:run', macroID, controller.context);
+        },
+        TOGGLE_SHORTCUTS: () => {
+            const shortcuts = store.get('commandKeys', []);
+
+            // Ignore shortcut for toggling all other shortcuts to
+            // allow them to be turned on and off
+            const allDisabled = shortcuts
+                .filter(shortcut => shortcut.title !== 'Toggle Shortcuts')
+                .every(({ isActive }) => !isActive);
+            const keybindingsArr = shortcuts.map(shortcut => (shortcut.title === 'Toggle Shortcuts' ? shortcut : { ...shortcut, isActive: allDisabled }));
+
+            store.set('commandKeys', keybindingsArr);
+            pubsub.publish('keybindingsUpdated');
         }
     }
 

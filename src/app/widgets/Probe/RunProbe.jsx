@@ -25,6 +25,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Modal from 'app/components/Modal';
 import i18n from 'app/lib/i18n';
+import combokeys from 'app/lib/combokeys';
 import styles from './index.styl';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
@@ -40,6 +41,23 @@ class RunProbe extends PureComponent {
     state = this.getInitialState();
 
     testInterval = null;
+
+    shuttleControlEvents = {
+        CONFIRM_PROBE: () => {
+            const { actions } = this.props;
+            const probeCommands = actions.generateProbeCommands();
+
+            actions.closeModal();
+            actions.runProbeCommands(probeCommands);
+            this.resetProbeState();
+            Toaster.pop({
+                msg: 'Initiated probing cycle',
+                type: TOASTER_INFO,
+                duration: 5000,
+                icon: 'fa-satellite-dish'
+            });
+        }
+    }
 
     getInitialState() {
         return {
@@ -86,10 +104,28 @@ class RunProbe extends PureComponent {
         const { actions, state } = this.props;
         const { connectivityTest } = state;
         this.startConnectivityTest(actions.returnProbeConnectivity, connectivityTest);
+        this.addShuttleControlEvents();
     }
 
     componentWillUnmount() {
         this.testInterval && clearInterval(this.testInterval);
+        this.removeShuttleControlEvents();
+    }
+
+    addShuttleControlEvents() {
+        combokeys.reload();
+
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName];
+            combokeys.on(eventName, callback);
+        });
+    }
+
+    removeShuttleControlEvents() {
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName];
+            combokeys.removeListener(eventName, callback);
+        });
     }
 
     render() {

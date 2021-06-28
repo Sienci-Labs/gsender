@@ -61,7 +61,6 @@ import {
     // Workflow
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_IDLE,
-    WORKFLOW_STATE_PAUSED,
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -331,58 +330,6 @@ class LocationWidget extends PureComponent {
     }
 
     shuttleControlEvents = {
-        START_JOB: () => {
-            const { port, workflow } = this.props;
-            if (!port) {
-                return;
-            }
-
-            const canStart = (workflow.state !== WORKFLOW_STATE_RUNNING);
-
-            if (canStart) {
-                if (workflow.state === WORKFLOW_STATE_IDLE) {
-                    controller.command('gcode:start');
-                    return;
-                }
-
-                if (workflow.state === WORKFLOW_STATE_PAUSED) {
-                    controller.command('gcode:resume');
-                    return;
-                }
-            }
-        },
-        PAUSE_JOB: () => {
-            const { port, workflow } = this.props;
-            if (!port) {
-                return;
-            }
-
-            if (workflow.state === WORKFLOW_STATE_RUNNING) {
-                controller.command('gcode:pause');
-            }
-        },
-        STOP_JOB: () => {
-            const { port } = this.props;
-            if (!port) {
-                return;
-            }
-
-            controller.command('gcode:stop', { force: true });
-        },
-        ZERO_ALL: () => {
-            const wcs = this.getWorkCoordinateSystem;
-
-            const p = {
-                'G54': 1,
-                'G55': 2,
-                'G56': 3,
-                'G57': 4,
-                'G58': 5,
-                'G59': 6
-            }[wcs] || 0;
-
-            controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
-        },
         GO_TO_ZERO: () => {
             controller.command('gcode', 'G0 X0 Y0 Z0'); //Move to Work Position Zero
         },
@@ -456,11 +403,21 @@ class LocationWidget extends PureComponent {
                 'G59': 6
             }[wcs] || 0;
 
+            if (axis === 'all') {
+                controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
+                return;
+            }
+
             axis = axis.toUpperCase();
             controller.command('gcode', `G10 L20 P${p} ${axis}0`);
         },
-        GO_TO_AXIS: (event, { axis }) => {
+        GO_TO_AXIS_ZERO: (event, { axis }) => {
             if (!axis) {
+                return;
+            }
+
+            if (axis === 'all') {
+                controller.command('gcode', 'G0 X0 Y0 Z0');
                 return;
             }
 
@@ -477,7 +434,7 @@ class LocationWidget extends PureComponent {
             } else {
                 this.actions.stepNext();
             }
-        }
+        },
     };
 
 
