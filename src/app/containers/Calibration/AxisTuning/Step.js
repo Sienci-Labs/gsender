@@ -5,7 +5,7 @@ import ActionItem from '../ActionItem';
 
 import styles from './index.styl';
 
-const Step = ({ actions, currentAction, onChange }) => {
+const Step = ({ actions, currentAction, onChange, setRequestedDistance, setActualDistance }) => {
     return (
         <div className={styles.actionItemContainer}>
             {
@@ -16,8 +16,11 @@ const Step = ({ actions, currentAction, onChange }) => {
                         checked={step.checked}
                         isCurrentAction={step.id === currentAction}
                         hasBeenChanged={step.hasBeenChanged}
+                        hideCompleteButton={step.hideCompleteButton}
                         label={step.label}
                         onChange={onChange}
+                        setRequestedDistance={setRequestedDistance}
+                        setActualDistance={setActualDistance}
                     />
                 ))
             }

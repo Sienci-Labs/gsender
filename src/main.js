@@ -197,7 +197,7 @@ const main = () => {
                     });
                 } catch (e) {
                     await dialog.showMessageBox({
-                        message: e.message
+                        message: e
                     });
                 }
             });

@@ -1,112 +1,88 @@
 /* eslint-disable no-restricted-globals */
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import controller from 'app/lib/controller';
+import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
 import styles from './index.styl';
 
-const OFFSET_THRESHOLD = 2; //in mm. If the FM is less than or equal to this number, only a small warning message would be enough
+const setEepromSetting = (setting, value) => {
+    controller.command('gcode', `${setting}=${value}`);
+    controller.command('gcode', '$$');
+    Toaster.pop({
+        msg: 'Successfully updated EEPROM values',
+        type: TOASTER_SUCCESS
+    });
+};
 
-const Icon = ({ type }) => {
-    switch (type) {
-    case 'error': {
-        return <i className="fas fa-exclamation-circle" style={{ color: 'red' }} />;
+const getEEPROMSetting = (axis) => {
+    if (axis === 'x') {
+        return '$100';
     }
-
-    case 'success': {
-        return <i className="fas fa-check-circle" style={{ color: 'green' }} />;
-    }
-
-    case 'warning': {
-        return <i className="fas fa-exclamation-triangle" style={{ color: 'orange' }} />;
-    }
-
-    default: {
-        return <i className="fas fa-exclamation-circle" />;
-    }
+    if (axis === 'y') {
+        return '$101';
+    } else {
+        return '$102';
     }
 };
 
-const Result = ({ triangle, onBack, onClose }) => {
-    const [machineIsSquared, setMachineIsSquared] = useState(false);
-    const [hasError, setHasError] = useState(false);
-    const [fm, setFm] = useState(false);
 
+const calculateNewStepsPerMM = (originalSteps, requestedDistance, actualDistance) => {
+    originalSteps = Number(originalSteps);
+    requestedDistance = Number(requestedDistance);
+    actualDistance = Number(actualDistance);
+
+    return originalSteps * (requestedDistance / actualDistance);
+};
+
+const Result = ({ options, onBack, onClose, xSteps, ySteps, zSteps }) => {
+    const [result, setResult] = useState(0);
     useEffect(() => {
-        const { a, b, c } = triangle;
-        const HYPOTENUSE = performPythagoreanEquation({ a, b });
+        const { currentAxis, requestedDistance, actualDistance } = options;
 
-        if (HYPOTENUSE !== c) {
-            try {
-                const ALPHA = calculateAlpha({ a, b, c });
-                const BETA = calculateBeta({ trueHypotenuse: HYPOTENUSE, userHypotenuse: c, alpha: ALPHA });
-
-                const FM = calculateFM({ b, beta: BETA });
-
-                if (isNaN(ALPHA) || isNaN(BETA) || isNaN(FM)) {
-                    throw new Error();
-                }
-
-                setFm(FM);
-                setHasError(false);
-            } catch (error) {
-                setHasError(true);
-            }
+        if (currentAxis === 'x') {
+            setResult(calculateNewStepsPerMM(xSteps, requestedDistance, actualDistance));
+        } else if (currentAxis === 'y') {
+            setResult(calculateNewStepsPerMM(ySteps, requestedDistance, actualDistance));
         } else {
-            setMachineIsSquared(true);
-            setHasError(false);
+            setResult(calculateNewStepsPerMM(zSteps, requestedDistance, actualDistance));
         }
     }, []);
 
-    const calculateAlpha = ({ a, b, c }) => (Math.acos((((a ** 2) + (b ** 2) - (c ** 2)) / (2 * a * b))) * (180 / Math.PI));
-
-    const calculateBeta = ({ trueHypotenuse, userHypotenuse, alpha }) => (userHypotenuse <= trueHypotenuse ? 90 - alpha : alpha - 90);
-
-    const calculateFM = ({ b, beta }) => Number((b * Math.sin(beta * (Math.PI / 180))).toFixed(2));
-
-    const performPythagoreanEquation = ({ a, b }) => {
-        if (!a || !b) {
-            return null;
+    const getEEPROMValue = (axis) => {
+        if (axis === 'x') {
+            return xSteps;
         }
-
-        return Math.sqrt((triangle.a ** 2) + (triangle.b ** 2));
+        if (axis === 'y') {
+            return ySteps;
+        } else {
+            return zSteps;
+        }
     };
 
     const renderResult = () => {
-        if (hasError) {
-            return (
-                <>
-                    <Icon type="error" />
-                    <p>There was an error in the calculation, please check the values you provided.</p>
-                </>
-            );
-        }
-
-        if (machineIsSquared || fm === 0) {
-            return (
-                <>
-                    <Icon type="success" />
-                    <p>Your machine is squared properly, no adjustments are needed!</p>
-                </>
-            );
-        }
-
-        if (fm <= OFFSET_THRESHOLD) {
-            return (
-                <>
-                    <Icon type="warning" />
-                    <p>Your machine is pretty squared, but if you still want to have it full squared, move either the right y-axis rail backwards <strong>{fm}mm</strong> or the left y-axis rail forward by <strong>{fm}mm</strong></p>
-                </>
-            );
-        }
-
+        const { currentAxis, requestedDistance, actualDistance } = options;
+        const eepromSetting = getEEPROMSetting(currentAxis);
+        const eepromValue = getEEPROMValue(currentAxis);
+        const roundedResult = result.toFixed(3);
         return (
             <>
-                <Icon type="error" />
-                <p>Your machine is off by <strong>{fm}mm</strong>, to properly square it, move either the right y-axis rail backwards <strong>{fm}mm</strong> or the left y-axis rail forward by <strong>{fm}mm</strong></p>
+                Optimal steps/mm for the { currentAxis } axis: <b>{ roundedResult } step/mm</b>
+                <div>How we got this:</div>
+                <div>
+                    You requested to move <b>{ requestedDistance }mm</b> but actually moved <b>{ actualDistance }mm</b>.
+                    Your <b>{ eepromSetting }</b> is currently set to <b>{ eepromValue }</b>
+                </div>
+                <div><b><i>{ eepromValue } × ({ requestedDistance } ÷ { actualDistance }) = { roundedResult }</i></b></div>
             </>
         );
     };
+
+    const hasError = false;
 
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'column', height: '100%', width: '100%' }}>
@@ -116,13 +92,40 @@ const Result = ({ triangle, onBack, onClose }) => {
                 {renderResult()}
             </div>
 
-            {
-                hasError
-                    ? <FunctionButton primary onClick={onBack}>Go Back</FunctionButton>
-                    : <FunctionButton primary onClick={onClose}>Exit Calibration Tool</FunctionButton>
-            }
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+                <FunctionButton
+                    primary
+                    onClick={() => {
+                        Confirm({
+                            content: 'Are you sure you want to update your EEPROM value to the new steps/mm?',
+                            title: 'Update EEPROM settings',
+                            onConfirm: () => setEepromSetting(getEEPROMSetting(options.currentAxis), result.toFixed(3))
+                        });
+                    }
+                    }
+                >
+                    Set EEPROM setting {getEEPROMSetting(options.currentAxis)} to {result.toFixed(3)}
+                </FunctionButton>
+
+                {
+                    hasError
+                        ? <FunctionButton onClick={onBack}>Go Back</FunctionButton>
+                        : <FunctionButton onClick={onClose}>Exit Axis Tuning Tool</FunctionButton>
+                }
+            </div>
         </div>
     );
-}; Result.propTypes = { triangle: PropTypes.object, onBack: PropTypes.func, onClose: PropTypes.func, };
+}; Result.propTypes = { options: PropTypes.object, onBack: PropTypes.func, onClose: PropTypes.func, };
 
-export default Result;
+export default connect((store) => {
+    const settings = get(store, 'controller.settings.settings');
+    const xSteps = get(settings, '$100');
+    const ySteps = get(settings, '$101');
+    const zSteps = get(settings, '$102');
+    return {
+        xSteps,
+        ySteps,
+        zSteps
+    };
+})(Result);

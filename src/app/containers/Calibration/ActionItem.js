@@ -5,7 +5,7 @@ import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
 import styles from './index.styl';
 
-const ActionItem = ({ checked, onChange, id, isCurrentAction, hasBeenChanged, label: Label, hideCompleteButton }) => {
+const ActionItem = ({ checked, onChange, id, isCurrentAction, hasBeenChanged, label: Label, hideCompleteButton, ...rest }) => {
     return (
         <div className={(isCurrentAction || hasBeenChanged) ? styles.action : styles.actionInactive}>
             {
@@ -35,7 +35,7 @@ const ActionItem = ({ checked, onChange, id, isCurrentAction, hasBeenChanged, la
                 )
             }
 
-            <Label isCurrentAction={isCurrentAction} onChange={({ axis, value }) => onChange({ id, checked: true, axis, value })} />
+            <Label {...rest} isCurrentAction={isCurrentAction} onChange={({ axis, value }) => onChange({ id, checked: true, axis, value })} />
         </div>
     );
 };

@@ -27,6 +27,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 import reduxStore from 'app/store/redux';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import Select from 'react-select';
+import Keypad from '../JogControl';
 
 const axisList = [
     { label: 'X', value: 'x' },
@@ -38,11 +39,11 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis }) => {
     return (
         <ReduxProvider store={reduxStore}>
             <div>
-                <p>We&apos;ll be moving your machine in a linear direction for each of the axis.</p>
-                <p>You will need to make a few marks on a piece of tape and place them on your machines wasteboard.</p>
-                <p>In addition, your cutting tool should be as pointy as possible for maximum accuracy when measuring distances.</p>
+                <p>We&apos;ll be moving your machine in a linear direction to calculate the motor steps.</p>
+                <p>You will need to make a few marks on a piece of tape and place them on your machines wasteboard or rail.</p>
                 <p>When jogging, please make sure it is in a position where it will not hit the machine limits.</p>
-
+                <b>Axis to calculate steps for:</b>
+                <br />
                 <Select
                     backspaceRemoves={false}
                     className="sm"
@@ -53,6 +54,9 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis }) => {
                     options={axisList}
                     value={{ label: currentAxis.toUpperCase(), value: currentAxis }}
                 />
+                <br />
+                <Keypad />
+
 
                 <FunctionButton primary onClick={readyHandler}>Ready to start!</FunctionButton>
             </div>
