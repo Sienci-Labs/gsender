@@ -37,8 +37,8 @@ import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
 import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
-import GamepadHandler from 'app/lib/gamepad/index';
-import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+// import gamepad from 'app/lib/gamepad/index';
+// import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
 import { connect } from 'react-redux';
@@ -622,84 +622,84 @@ class AxesWidget extends PureComponent {
         this.addShuttleControlEvents();
         this.subscribe();
 
-        const events = [
-            {
-                name: 'gamepad:connected',
-                action: (e) => {
-                    const { id } = e.detail.gamepad;
-                    Toaster.pop({
-                        msg: `Gamepad '${id}' Connected`,
-                        type: TOASTER_SUCCESS
-                    });
-                }
-            },
-            {
-                name: 'gamepad:disconnected',
-                action: () => {
-                    Toaster.pop({
-                        msg: 'Gamepad Disconnected',
-                    });
-                }
-            },
-            {
-                name: 'gamepad:axis',
-                action: ({ detail }) => {
-                    const { prevJog } = this.state;
-                    const axisList = ['X', 'Y', 'Z'];
-                    const [X, Y] = axisList;
-                    const axis = axisList[detail.axis];
-                    const value = detail.value;
-                    const direction = value > 0 ? 1 : -1;
+        // const events = [
+        //     {
+        //         name: 'gamepad:connected',
+        //         action: (e) => {
+        //             const { id } = e.detail.gamepad;
+        //             Toaster.pop({
+        //                 msg: `Gamepad '${id}' Connected`,
+        //                 type: TOASTER_SUCCESS
+        //             });
+        //         }
+        //     },
+        //     {
+        //         name: 'gamepad:disconnected',
+        //         action: () => {
+        //             Toaster.pop({
+        //                 msg: 'Gamepad Disconnected',
+        //             });
+        //         }
+        //     },
+        //     {
+        //         name: 'gamepad:axis',
+        //         action: ({ detail }) => {
+        //             const { prevJog } = this.state;
+        //             const axisList = ['X', 'Y', 'Z'];
+        //             const [X, Y] = axisList;
+        //             const axis = axisList[detail.axis];
+        //             const value = detail.value;
+        //             const direction = value > 0 ? 1 : -1;
 
-                    // console.log(axis, value);
+        //             // console.log(axis, value);
 
-                    if (!value) {
-                        this.handleShortcutStop();
-                        return;
-                    }
+        //             if (!value) {
+        //                 this.handleShortcutStop();
+        //                 return;
+        //             }
 
-                    if (prevJog) {
-                        console.log(prevJog[axis], value);
-                    }
+        //             if (prevJog) {
+        //                 console.log(prevJog[axis], value);
+        //             }
 
-                    if (prevJog && (value === 1 || value === -1)) {
-                        this.handleShortcutStop();
-                    }
+        //             if (prevJog && (value === 1 || value === -1)) {
+        //                 this.handleShortcutStop();
+        //             }
 
-                    if (value === 1 || value === -1) {
-                        this.handleShortcutJog({ axis, direction });
-                    } else if (axis === X && value < 0) {
-                        // console.log('Bottom Left');
-                        this.handleShortcutJog({ axis: { X: -1, Y: -1 }, direction });
-                    } else if (axis === Y && value > 0) {
-                        // console.log('Bottom Right');
-                        this.handleShortcutJog({ axis: { X: 1, Y: -1 }, direction });
-                    } else if (axis === X && value > 0) {
-                        // console.log('Top Right');
-                        this.handleShortcutJog({ axis: { X: 1, Y: 1 }, direction });
-                    } else if (axis === Y && value < 0) {
-                        // console.log('Top Left');
-                        this.handleShortcutJog({ axis: { X: -1, Y: 1 }, direction });
-                    }
+        //             if (value === 1 || value === -1) {
+        //                 this.handleShortcutJog({ axis, direction });
+        //             } else if (axis === X && value < 0) {
+        //                 // console.log('Bottom Left');
+        //                 this.handleShortcutJog({ axis: { X: -1, Y: -1 }, direction });
+        //             } else if (axis === Y && value > 0) {
+        //                 // console.log('Bottom Right');
+        //                 this.handleShortcutJog({ axis: { X: 1, Y: -1 }, direction });
+        //             } else if (axis === X && value > 0) {
+        //                 // console.log('Top Right');
+        //                 this.handleShortcutJog({ axis: { X: 1, Y: 1 }, direction });
+        //             } else if (axis === Y && value < 0) {
+        //                 // console.log('Top Left');
+        //                 this.handleShortcutJog({ axis: { X: -1, Y: 1 }, direction });
+        //             }
 
-                    // const { axis, value } = detail;
+        //             // const { axis, value } = detail;
 
-                    // if (value === 0) {
-                    //     this.shuttleControlEvents.STOP_JOG();
-                    //     return;
-                    // }
+        //             // if (value === 0) {
+        //             //     this.shuttleControlEvents.STOP_JOG();
+        //             //     return;
+        //             // }
 
-                    // const cleanedValue = Number(value.toFixed(3));
+        //             // const cleanedValue = Number(value.toFixed(3));
 
-                    // this.shuttleControlEvents.JOG(null, { axis: AXIS, direction: value > 0 ? 1 : -1 });
-                }
-            },
-            { name: 'gamepad:button', action: (e) => console.log(e) },
-        ];
+        //             // this.shuttleControlEvents.JOG(null, { axis: AXIS, direction: value > 0 ? 1 : -1 });
+        //         }
+        //     },
+        //     { name: 'gamepad:button', action: (e) => console.log(e) },
+        // ];
 
-        const gamepadHandler = new GamepadHandler(events);
 
-        gamepadHandler.listen();
+        // gamepad.update({ events });
+        // gamepad.listen();
     }
 
     componentWillUnmount() {
