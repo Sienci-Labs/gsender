@@ -28,7 +28,7 @@ const InputArea = ({ values, onChange, units }) => {
                             type: 'number',
                             id: 'length',
                             min: 1,
-                            max: 5000,
+                            max: 50000,
                             style: { paddingLeft: 5, paddingRight: 5, borderRadius: 4 }
                         }}
                         value={length}
@@ -44,7 +44,7 @@ const InputArea = ({ values, onChange, units }) => {
                             type: 'number',
                             id: 'width',
                             min: 1,
-                            max: 5000,
+                            max: 50000,
                             style: { paddingLeft: 5, paddingRight: 5 }
                         }}
                         value={width}
@@ -56,14 +56,14 @@ const InputArea = ({ values, onChange, units }) => {
                 <Input
                     label="Router Bit Diameter"
                     units={units}
-                    additionalProps={{ type: 'number', id: 'bitDiameter', min: 1, max: 100 }}
+                    additionalProps={{ type: 'number', id: 'bitDiameter', min: 1, max: 1000 }}
                     value={bitDiameter}
                     onChange={onChange}
                 />
                 <Input
                     label="Spindle RPM"
                     units={units}
-                    additionalProps={{ type: 'number', id: 'spindleRPM', min: 1, max: 20000 }}
+                    additionalProps={{ type: 'number', id: 'spindleRPM', min: 1, max: 200000 }}
                     value={spindleRPM}
                     onChange={onChange}
                 />
@@ -80,21 +80,21 @@ const InputArea = ({ values, onChange, units }) => {
                 <Input
                     label="Feedrate"
                     units={`${units}/min`}
-                    additionalProps={{ type: 'number', id: 'feedrate', min: 1, max: 500000 }}
+                    additionalProps={{ type: 'number', id: 'feedrate', min: 1, max: 1000000 }}
                     value={feedrate}
                     onChange={onChange}
                 />
                 <Input
                     label="Layer Depth"
                     units={units}
-                    additionalProps={{ type: 'number', id: 'skimDepth', min: 0.001, max: 100 }}
+                    additionalProps={{ type: 'number', id: 'skimDepth', min: 0.001, max: 500 }}
                     value={skimDepth}
                     onChange={onChange}
                 />
                 <Input
                     label="Max Depth"
                     units={units}
-                    additionalProps={{ type: 'number', id: 'maxDepth', min: 0.001, max: 100 }}
+                    additionalProps={{ type: 'number', id: 'maxDepth', min: 0.001, max: 500 }}
                     value={maxDepth}
                     onChange={onChange}
                     className={styles.maxDepth}
