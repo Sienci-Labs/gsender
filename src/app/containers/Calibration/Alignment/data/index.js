@@ -57,76 +57,6 @@ export const step1 = [
         hasBeenChanged: false,
         hideCompleteButton: true,
         label: ({ isCurrentAction, onChange }) => {
-            const [val, setVal] = useState(-100);
-            const [didClick, setDidClick] = useState(false);
-
-            const AXIS = 'Y';
-
-            const handleClick = () => {
-                setDidClick(true); //Disable button
-                jogMachine({ axis: AXIS, value: val });
-                onChange({ axis: AXIS.toLowerCase(), value: val });
-            };
-
-            return (
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Button
-                        primary
-                        disabled={!isCurrentAction || didClick}
-                        style={buttonStyle}
-                        onClick={handleClick}
-                    >
-                        Move Y-Axis
-                    </Button>{' '}
-                    <Input
-                        className={styles.actionInput}
-                        style={inputStyle}
-                        disabled={!isCurrentAction}
-                        units="mm"
-                        value={val}
-                        onChange={(e) => setVal(e.target.value)}
-                        additionalProps={{ type: 'number' }}
-                    />
-                </div>
-            );
-        },
-        shapeActions: [
-            {
-                shapeType: 'arrows',
-                shapeID: 0,
-                isActive: true,
-                show: true,
-                clearPrevious: true,
-                label: 'Y-Axis Movement'
-            },
-        ],
-        description: 'Here you will jog your machine down in the Y-axis, in the distance given which is customizable. Once you are ready, click the "Move Y-Axis" button.'
-    },
-    {
-        id: 2,
-        checked: false,
-        hasBeenChanged: false,
-        label: () => {
-            return <span>Mark Location 2</span>;
-        },
-        shapeActions: [
-            {
-                shapeType: 'circlePoints',
-                shapeID: 1,
-                isActive: true,
-                show: true,
-                clearPrevious: true,
-                label: '2',
-            },
-        ],
-        description: 'You will mark your machine here once again where you must place the piece tape directly under the cutting bit and make sure the end of the bit is pointing directly of the middle of the X.'
-    },
-    {
-        id: 3,
-        checked: false,
-        hasBeenChanged: false,
-        hideCompleteButton: true,
-        label: ({ isCurrentAction, onChange }) => {
             const [val, setVal] = useState(100);
             const [didClick, setDidClick] = useState(false);
 
@@ -163,14 +93,84 @@ export const step1 = [
         shapeActions: [
             {
                 shapeType: 'arrows',
-                shapeID: 1,
+                shapeID: 0,
                 isActive: true,
                 show: true,
                 clearPrevious: true,
                 label: 'X-Axis Movement'
             },
         ],
-        description: 'Here you will jog your machine in the X-axis going right, in the distance given which is customizable. Once you are ready, click the "Move X-Axis" button.'
+        description: 'Here you will jog your machine to the right in the X-axis, in the distance given which is customizable. Once you are ready, click the "Move X-Axis" button.'
+    },
+    {
+        id: 2,
+        checked: false,
+        hasBeenChanged: false,
+        label: () => {
+            return <span>Mark Location 2</span>;
+        },
+        shapeActions: [
+            {
+                shapeType: 'circlePoints',
+                shapeID: 1,
+                isActive: true,
+                show: true,
+                clearPrevious: true,
+                label: '2',
+            },
+        ],
+        description: 'You will mark your machine here once again where you must place the piece tape directly under the cutting bit and make sure the end of the bit is pointing directly of the middle of the X.'
+    },
+    {
+        id: 3,
+        checked: false,
+        hasBeenChanged: false,
+        hideCompleteButton: true,
+        label: ({ isCurrentAction, onChange }) => {
+            const [val, setVal] = useState(100);
+            const [didClick, setDidClick] = useState(false);
+
+            const AXIS = 'Y';
+
+            const handleClick = () => {
+                setDidClick(true); //Disable button
+                jogMachine({ axis: AXIS, value: val });
+                onChange({ axis: AXIS.toLowerCase(), value: val });
+            };
+
+            return (
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <Button
+                        primary
+                        disabled={!isCurrentAction || didClick}
+                        style={buttonStyle}
+                        onClick={handleClick}
+                    >
+                        Move Y-Axis
+                    </Button>{' '}
+                    <Input
+                        className={styles.actionInput}
+                        style={inputStyle}
+                        disabled={!isCurrentAction}
+                        units="mm"
+                        value={val}
+                        onChange={(e) => setVal(e.target.value)}
+                        additionalProps={{ type: 'number' }}
+                    />
+                </div>
+            );
+        },
+        shapeActions: [
+            {
+                shapeType: 'arrows',
+                shapeID: 1,
+                isActive: true,
+                show: true,
+                clearPrevious: true,
+                label: 'Y-Axis Movement'
+            },
+        ],
+        description: 'Here you will jog your machine up in the Y-axis, in the distance given which is customizable. Once you are ready, click the "Move Y-Axis" button.'
     },
     {
         id: 4,
@@ -262,6 +262,13 @@ export const step2 = [
                     />
                 )
             },
+            {
+                shapeType: 'circlePoints',
+                shapeID: 2,
+                isActive: false,
+                show: true,
+                label: '3',
+            },
         ],
         description: 'Measure the distance between the Location 2 and 3 and enter in the amount in the input beside the flashing arrow'
     },
@@ -289,13 +296,6 @@ export const step2 = [
                         additionalProps={{ type: 'number' }}
                     />
                 )
-            },
-            {
-                shapeType: 'circlePoints',
-                shapeID: 2,
-                isActive: false,
-                show: true,
-                label: '3',
             },
         ],
         description: 'Measure the distance between the Location 3 and 1 and enter in the amount in the input beside the flashing arrow'

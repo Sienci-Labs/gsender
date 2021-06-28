@@ -57,11 +57,11 @@
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 250px 0 0 250px;
-  border-color: transparent transparent transparent $color;
+  border-width: 0 0 250px 250px;
+  border-color: transparent transparent #6ea3d5 transparent;
   position: relative;
   align-self: center;
-  margin-left: 3rem;
+  margin: 5rem 5rem 0 0;
 }
 
 .circle-point {
@@ -99,18 +99,18 @@
 }
 
 .top {
-  right: 225px;
-  top: -270px;
+  right: -25px;
+  top: -25px;
 }
 
 .bottom-right {
-  right: -23px;
-  top: -28px;
+  right: -25px;
+  top: 225px;
 }
 
 .bottom-left {
   right: 225px;
-  top: -28px;
+  top: 225px;
 }
 
 .circle-label {
@@ -154,22 +154,22 @@
 
 .arrow-diagonal {
   height: 280px;
-  top: -275px;
-  right: 110px;
-  transform: rotate(315deg);
+  top: -25px;
+  right: 130px;
+  transform: rotate(45deg);
 }
 
 .arrow-bottom {
   height: 175px;
-  top: -75px;
-  right: 122px;
+  top: 175px;
+  right: 125px;
   transform: rotate(90deg);
 }
 
-.arrow-left {
+.arrow-right {
   height: 175px;
-  top: -211px;
-  left: -265px;
+  top: 40px;
+  left: 10px;
   transform: none;
 }
 
@@ -247,25 +247,25 @@
 
   &-diagonal {
     position: absolute;
-    top: -175px;
-    right: 0;
+    top: 70px;
+    right: 190px;
     width: 100px;
   }
 
   &-bottom {
     text-align: center;
     position: absolute;
-    top: 30px;
-    right: 60px;
+    top: 275px;
+    right: 55px;
     width: 150px;
   }
 
-  &-left {
+  &-right {
     position: absolute;
-    top: -135px;
-    right: 280px;
-    width: 145px;
-    text-align: right;
+    top: 110px;
+    left: 30px;
+    width: 135px;
+    text-align: left;
   }
 
 }

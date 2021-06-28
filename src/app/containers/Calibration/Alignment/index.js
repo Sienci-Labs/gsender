@@ -16,22 +16,22 @@ import { step1, step2 } from './data';
 const Alignment = ({ onClose }) => {
     const initialShapes = {
         circlePoints: [
-            { id: 0, position: 'top', label: '1', show: false },
-            { id: 1, position: 'bottom-left', label: '2', show: false },
-            { id: 2, position: 'bottom-right', label: '3', show: false },
+            { id: 0, position: 'bottom-left', label: '1', show: false },
+            { id: 1, position: 'bottom-right', label: '2', show: false },
+            { id: 2, position: 'top', label: '3', show: false },
         ],
         arrows: [
             {
                 id: 0,
-                position: 'left',
+                position: 'bottom',
                 label: '',
-                hasTop: false,
-                hasBottom: true,
+                hasTop: true,
+                hasBottom: false,
                 show: false
             },
             {
                 id: 1,
-                position: 'bottom',
+                position: 'right',
                 label: '',
                 hasTop: true,
                 hasBottom: false,
