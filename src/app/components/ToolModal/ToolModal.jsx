@@ -36,9 +36,7 @@ const ToolModal = ({ onClose, title, children, size, style }) => {
                     <h3 className={styles.headerText}>{title}</h3>
                 </div>
                 <div className={styles.container}>
-                    <div className={styles.settingsContainer}>
-                        {children}
-                    </div>
+                    {children}
                 </div>
             </div>
         </Modal>
