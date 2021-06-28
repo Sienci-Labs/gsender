@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import store from 'app/store';
+import { Toaster, TOASTER_SUCCESS, TOASTER_SHORT } from 'app/lib/toaster/ToasterLib';
 import Button from 'app/components/FunctionButton/FunctionButton';
 
 import styles from './index.styl';
@@ -10,13 +12,7 @@ import AddActionModal from './AddActionModal';
 import AddProfileModal from './AddProfileModal';
 
 const Joystick = () => {
-    const [profiles, setProfiles] = useState([
-        { id: 1, title: 'Logitech Gamepad', icon: 'fas fa-gamepad' },
-        { id: 2, title: 'Dualshock Playstation 5 Controller', icon: 'fas fa-gamepad' },
-        { id: 3, title: 'Xbox 360 Controller', icon: 'fas fa-gamepad' },
-        { id: 4, title: '1980\'s Arcade Joystick', icon: 'fas fa-gamepad' },
-        { id: 5, title: 'Xbox One X Controller', icon: 'fas fa-gamepad' },
-    ]);
+    const [profiles, setProfiles] = useState(store.get('workspace.gamepad.profiles'));
     const [currentProfile, setCurrentProfile] = useState(null);
     const [showAddAction, setShowAddAction] = useState(false);
     const [showAddProfile, setShowAddProfile] = useState(false);
@@ -34,6 +30,14 @@ const Joystick = () => {
 
         setProfiles(filteredProfiles);
         setCurrentProfile(null);
+
+        store.replace('workspace.gamepad.profiles', filteredProfiles);
+
+        Toaster.pop({
+            msg: 'Removed Profile',
+            type: TOASTER_SUCCESS,
+            duration: TOASTER_SHORT
+        });
     };
 
     return (
@@ -42,7 +46,7 @@ const Joystick = () => {
                 currentProfile
                     ? (
                         <>
-                            <Profile title={currentProfile.title} icon={currentProfile.icon} id={currentProfile.id} />
+                            <Profile currentProfile={currentProfile} />
 
                             <div style={{ display: 'flex', gap: '1rem' }}>
                                 <Button primary onClick={() => setShowAddAction(true)}>
@@ -63,7 +67,7 @@ const Joystick = () => {
                 showAddAction && <AddActionModal onClose={() => setShowAddAction(false)} />
             }
             {
-                showAddProfile && <AddProfileModal onClose={() => setShowAddProfile(false)} />
+                showAddProfile && <AddProfileModal onClose={() => setShowAddProfile(false)} onAdd={(newProfiles) => setProfiles(newProfiles)} />
             }
         </div>
     );
