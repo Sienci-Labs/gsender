@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import ToolIntroduction from 'app/containers/Calibration/AxisTuning/ToolIntroduction';
 import Step from './Step';
 import NavigationButtons from './NavigationButtons';
-import TriangleDiagram from '../TriangleDiagram';
+//import TriangleDiagram from '../TriangleDiagram';
 import Result from './Result';
 
 import styles from './index.styl';
@@ -54,12 +54,16 @@ const AxisTuning = ({ onClose }) => {
     const [isFullyComplete, setIsFullyComplete] = useState(false);
     const [introComplete, setIntroComplete] = useState(false);
     const [currentAxis, setCurrentAxis] = useState('x');
+    const [requestedDistance, setRequestedDistance] = useState(0);
+    const [actualDistance, setActualDistance] = useState(0);
 
-    const [triangle, setTriangle] = useState({
-        a: 0,
-        b: 0,
-        c: 0,
-    });
+    const getOptions = () => {
+        return {
+            currentAxis,
+            requestedDistance,
+            actualDistance,
+        };
+    };
 
     const highlightShapes = () => {
         const foundAction = actions.find(action => action.id === Number(currentAction));
@@ -142,10 +146,6 @@ const AxisTuning = ({ onClose }) => {
         setActions(updatedActions);
     };
 
-    const handleTriangleChange = ({ id, value }) => {
-        setTriangle(prev => ({ ...prev, [id]: value }));
-    };
-
     const next = () => {
         const nextStep = currentStep + 1;
         if (steps[nextStep]) {
@@ -182,9 +182,10 @@ const AxisTuning = ({ onClose }) => {
 
     const prevDisabled = !!steps[currentStep - 1];
     const nextDisabled = stepFinished;
+    const options = getOptions();
 
     return isFullyComplete
-        ? <Result triangle={triangle} onBack={onBack} onClose={onClose} />
+        ? <Result options={options} onBack={onBack} onClose={onClose} />
         : (
             <div className={styles.alignmentContainer}>
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -200,8 +201,9 @@ const AxisTuning = ({ onClose }) => {
                                 actions={actions}
                                 onChange={onChange}
                                 currentAction={currentAction}
-                                triangle={triangle}
-                                onTriangleChange={handleTriangleChange}
+                                options={options}
+                                setRequestedDistance={setRequestedDistance}
+                                setActualDistance={setActualDistance}
                             />
                         }
                     </div>
@@ -218,12 +220,15 @@ const AxisTuning = ({ onClose }) => {
                 </div>
 
                 <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
-                    <TriangleDiagram
-                        circlePoints={shapes.circlePoints}
-                        arrows={shapes.arrows}
-                        triangle={triangle}
-                        onTriangleChange={handleTriangleChange}
-                    />
+                    {
+                        /*<TriangleDiagram
+                            circlePoints={shapes.circlePoints}
+                            arrows={shapes.arrows}
+                            triangle={triangle}
+                            onTriangleChange={handleTriangleChange}
+                        />*/
+                    }
+                    <p>What a cool diagram</p>
 
                     <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
                 </div>

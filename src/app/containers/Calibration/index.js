@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import TabbedWidget from 'app/components/TabbedWidget';
 import ToolModal from 'app/components/ToolModal/ToolModal';
 import Surfacing from 'app/containers/Surfacing/Surfacing';
-
+import { Provider as ReduxProvider } from 'react-redux';
+import reduxStore from 'app/store/redux';
 import Alignment from './Alignment';
 import AxisTuning from './AxisTuning';
 
@@ -46,18 +47,20 @@ const Calibration = ({ modalClose }) => {
                 >
                 </TabbedWidget.Tabs>
                 <TabbedWidget.Content>
-                    <div className={styles.container}>
-                        {
-                            tabs.map((t, index) => {
-                                const active = index === tab;
-                                return (
-                                    <TabbedWidget.ChildComponent key={t.id} active={active}>
-                                        {active && t.component}
-                                    </TabbedWidget.ChildComponent>
-                                );
-                            })
-                        }
-                    </div>
+                    <ReduxProvider store={reduxStore}>
+                        <div className={styles.container}>
+                            {
+                                tabs.map((t, index) => {
+                                    const active = index === tab;
+                                    return (
+                                        <TabbedWidget.ChildComponent key={t.id} active={active}>
+                                            {active && t.component}
+                                        </TabbedWidget.ChildComponent>
+                                    );
+                                })
+                            }
+                        </div>
+                    </ReduxProvider>
                 </TabbedWidget.Content>
             </TabbedWidget>
         </ToolModal>
