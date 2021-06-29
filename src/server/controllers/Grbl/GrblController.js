@@ -1452,14 +1452,34 @@ class GrblController {
                     Object.keys(mpos).forEach((axis) => {
                         mpos[axis] = Number(mpos[axis]);
                     });
+
+                    const OFFSET = 0.1;
+                    const FIXED = 2;
+
+                    //If we are moving on the positive direction, we don't need to subtract
+                    //the max travel by it as we are moving towards the zero position, but if
+                    //we are moving in the negative direction we need to subtract the max travel
+                    //by it to reach the maximum amount in that direction
+                    const calculateAxisValue = ({ direction, position, maxTravel }) => {
+                        if (position === 0) {
+                            return ((maxTravel - OFFSET) * direction).toFixed(FIXED);
+                        }
+
+                        if (direction === 1) {
+                            return Number(((position * direction) - OFFSET).toFixed(FIXED));
+                        } else {
+                            return Number(-((maxTravel - position) - OFFSET).toFixed(FIXED));
+                        }
+                    };
+
                     if (axes.Z) {
-                        axes.Z *= (($132 - mpos.z) * 0.98).toFixed(1);
+                        axes.Z = calculateAxisValue({ direction: axes.Z, position: Math.abs(mpos.z), maxTravel: $132 });
                     }
                     if (axes.X) {
-                        axes.X *= (($130 - mpos.x) * 0.98).toFixed(1);
+                        axes.X = calculateAxisValue({ direction: axes.X, position: Math.abs(mpos.x), maxTravel: $130 });
                     }
                     if (axes.Y) {
-                        axes.Y *= (($131 - mpos.y) * 0.98).toFixed(1);
+                        axes.Y = calculateAxisValue({ direction: axes.Y, position: Math.abs(mpos.y), maxTravel: $131 });
                     }
                 } else {
                     jogFeedrate = 1000;
