@@ -75,7 +75,7 @@ class WorkflowControl extends PureComponent {
         };
     }
 
-    handleClickUpload = (event) => {
+    handleClickUpload = () => {
         if (isElectron()) {
             window.ipcRenderer.send('open-upload-dialog');
         } else {
@@ -94,7 +94,7 @@ class WorkflowControl extends PureComponent {
         actions.uploadFile(result, meta);
     }
 
-    handleChangeFile = (event, fileToLoad) => {
+    handleChangeFile = (event) => {
         const files = event.target.files;
         const file = files[0];
 
@@ -182,7 +182,7 @@ class WorkflowControl extends PureComponent {
     }
 
 
-    handleTestFile = (event) => {
+    handleTestFile = () => {
         const { actions } = this.props;
         this.setState({ runHasStarted: true });
         const gcode = this.props.state.gcode.content; // or whatever the state member is
@@ -239,7 +239,7 @@ class WorkflowControl extends PureComponent {
 
     subscribe() {
         const tokens = [
-            pubsub.subscribe('gcode:toolChange', (msg) => {
+            pubsub.subscribe('gcode:toolChange', () => {
                 Toaster.pop({
                     msg: 'Program execution paused due to M6 command',
                     type: TOASTER_WARNING
@@ -260,15 +260,16 @@ class WorkflowControl extends PureComponent {
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
         const { handleOnStop } = this;
-        const { state, actions } = this.props;
-        const { port, gcode, workflow } = state;
+        const { state, actions, workflowState } = this.props;
+        const { port, gcode } = state;
         const canClick = !!port;
         const isReady = canClick && gcode.ready;
         const canRun = this.canRun();
-        const { isConnected, fileLoaded } = this.props;
+        const { isConnected, fileLoaded, senderInHold } = this.props;
         const showPlayOrTest = isConnected && fileLoaded && canRun;
-        const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflow.state);
-        const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflow.state);
+        const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflowState);
+        const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
+        const workflowPaused = workflowState === WORKFLOW_STATE_PAUSED || senderInHold;
 
         return (
             <div className={styles.workflowControl}>
@@ -287,7 +288,7 @@ class WorkflowControl extends PureComponent {
 
                 <div className={styles.relativeWrapper}>
                     {
-                        workflow.state !== WORKFLOW_STATE_RUNNING && (
+                        workflowState !== WORKFLOW_STATE_RUNNING && (
                             <>
                                 <button
                                     type="button"
@@ -325,15 +326,15 @@ class WorkflowControl extends PureComponent {
                     )
                 }
                 {
-                    showPlayOrTest && (
+                    (canRun || workflowPaused) && (
                         <button
                             type="button"
                             className={styles['workflow-button-play']}
-                            title={workflow.state === WORKFLOW_STATE_PAUSED ? i18n._('Resume') : i18n._('Run')}
+                            title={workflowPaused ? i18n._('Resume') : i18n._('Run')}
                             onClick={this.startRun}
-                            disabled={!canRun}
+                            disabled={!isConnected}
                         >
-                            {i18n._(`${workflow.state === 'paused' ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
+                            {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
                         </button>
                     )
                 }
@@ -418,8 +419,12 @@ class WorkflowControl extends PureComponent {
 export default connect((store) => {
     const fileLoaded = get(store, 'file.fileLoaded', false);
     const isConnected = get(store, 'connection.isConnected', false);
+    const senderInHold = get(store, 'controller.sender.status.hold', false);
+    const workflowState = get(store, 'controller.workflow.state');
     return {
         fileLoaded,
-        isConnected
+        isConnected,
+        senderInHold,
+        workflowState
     };
 })(WorkflowControl);
