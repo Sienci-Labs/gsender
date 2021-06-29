@@ -82,6 +82,7 @@ class Controller {
         'gcode:unload': [],
         'gcode:toolChange': [],
         'feeder:status': [],
+        'workflow:pause': [],
         'sender:status': [],
         'workflow:state': [],
         'controller:settings': [],

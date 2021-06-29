@@ -345,16 +345,18 @@ class GrblController {
                 const data = parser.parseLine(line, { flatten: true });
                 const words = ensureArray(data.words);
 
-                // { // Program Mode: M0, M1
-                //     const programMode = _.intersection(words, ['M0', 'M1'])[0];
-                //     if (programMode === 'M0') {
-                //         log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
-                //         this.workflow.pause({ data: 'M0' });
-                //     } else if (programMode === 'M1') {
-                //         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
-                //         this.workflow.pause({ data: 'M1' });
-                //     }
-                // }
+                { // Program Mode: M0, M1
+                    const programMode = _.intersection(words, ['M0', 'M1'])[0];
+                    if (programMode === 'M0') {
+                        log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
+                        this.workflow.pause({ data: 'M0' });
+                        this.emit('workflow:pause', { data: 'M0' });
+                    } else if (programMode === 'M1') {
+                        log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
+                        this.workflow.pause({ data: 'M1' });
+                        this.emit('workflow:pause', { data: 'M1' });
+                    }
+                }
 
                 const machineProfile = store.get('machineProfile');
                 const preferences = store.get('preferences');

@@ -28,6 +28,7 @@ import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
 
 export function* initialize() {
     controller.addListener('controller:settings', (type, settings) => {
@@ -127,6 +128,15 @@ export function* initialize() {
             content: 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.',
             confirmLabel: 'Confirm toolchange',
             onConfirm: onConfirmhandler
+        });
+    });
+
+    controller.addListener('workflow:pause', (opts) => {
+        const { data } = opts;
+        Toaster.pop({
+            msg: `Program paused due to '${data}' command.`,
+            type: TOASTER_INFO,
+            duration: TOASTER_UNTIL_CLOSE
         });
     });
 
