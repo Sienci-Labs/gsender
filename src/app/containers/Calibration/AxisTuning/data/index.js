@@ -270,7 +270,7 @@ export const xAxisStep = [
         hasBeenChanged: false,
         hideCompleteButton: true,
         label: ({ isCurrentAction, onChange, options, setActualDistance }) => {
-            const [val, setVal] = useState(100);
+            const [val, setVal] = useState(30);
             const AXIS = 'X';
 
             const handleClick = () => {
