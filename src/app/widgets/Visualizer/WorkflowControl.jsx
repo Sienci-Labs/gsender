@@ -264,9 +264,11 @@ class WorkflowControl extends PureComponent {
         const { port, gcode } = state;
         const canClick = !!port;
         const isReady = canClick && gcode.ready;
+        const { runHasStarted } = this.state;
         const canRun = this.canRun();
         const { isConnected, fileLoaded, senderInHold } = this.props;
-        const showPlayOrTest = isConnected && fileLoaded && canRun;
+        const showPlay = isConnected && fileLoaded && canRun;
+        const showTest = showPlay && !runHasStarted;
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflowState);
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const workflowPaused = workflowState === WORKFLOW_STATE_PAUSED || senderInHold;
@@ -312,7 +314,7 @@ class WorkflowControl extends PureComponent {
                     }
                 </div>
                 {
-                    showPlayOrTest && (
+                    showTest && (
                         <button
                             type="button"
                             className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
@@ -326,7 +328,7 @@ class WorkflowControl extends PureComponent {
                     )
                 }
                 {
-                    (canRun || workflowPaused) && (
+                    canRun && (
                         <button
                             type="button"
                             className={styles['workflow-button-play']}
