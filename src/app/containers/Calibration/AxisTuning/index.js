@@ -189,24 +189,22 @@ const AxisTuning = ({ onClose }) => {
         : (
             <div className={styles.alignmentContainer}>
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <div>
-                        <h4 style={{ marginTop: 0 }}>Axis Tuning</h4>
-                        {
-                            !introComplete &&
-                            <ToolIntroduction readyHandler={startTool} onSelectAxis={(axis) => setCurrentAxis(axis)} currentAxis={currentAxis} />
-                        }
-                        {
-                            introComplete &&
-                            <Step
-                                actions={actions}
-                                onChange={onChange}
-                                currentAction={currentAction}
-                                options={options}
-                                setRequestedDistance={setRequestedDistance}
-                                setActualDistance={setActualDistance}
-                            />
-                        }
-                    </div>
+                    <h4 style={{ marginTop: 0 }}>Axis Tuning</h4>
+                    {
+                        !introComplete &&
+                        <ToolIntroduction readyHandler={startTool} onSelectAxis={(axis) => setCurrentAxis(axis)} currentAxis={currentAxis} />
+                    }
+                    {
+                        introComplete &&
+                        <Step
+                            actions={actions}
+                            onChange={onChange}
+                            currentAction={currentAction}
+                            options={options}
+                            setRequestedDistance={setRequestedDistance}
+                            setActualDistance={setActualDistance}
+                        />
+                    }
 
                     {
                         introComplete &&

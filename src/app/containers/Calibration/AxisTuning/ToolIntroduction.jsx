@@ -62,8 +62,8 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis, isConnected
                 <Keypad />
 
 
-                <FunctionButton primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</FunctionButton>
             </div>
+            <FunctionButton primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</FunctionButton>
         </ReduxProvider>
     );
 };
