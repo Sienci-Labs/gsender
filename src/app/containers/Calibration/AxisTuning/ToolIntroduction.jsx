@@ -23,11 +23,13 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Provider as ReduxProvider } from 'react-redux';
+import { Provider as ReduxProvider, connect } from 'react-redux';
 import reduxStore from 'app/store/redux';
+import get from 'lodash/get';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import Select from 'react-select';
 import Keypad from '../JogControl';
+
 
 const axisList = [
     { label: 'X', value: 'x' },
@@ -35,7 +37,9 @@ const axisList = [
     { label: 'Z', value: 'z' },
 ];
 
-const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis }) => {
+const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis, isConnected }) => {
+    const buttonText = isConnected ? 'Ready to start' : 'You must be connected to a device';
+
     return (
         <ReduxProvider store={reduxStore}>
             <div>
@@ -58,7 +62,7 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis }) => {
                 <Keypad />
 
 
-                <FunctionButton primary onClick={readyHandler}>Ready to start!</FunctionButton>
+                <FunctionButton primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</FunctionButton>
             </div>
         </ReduxProvider>
     );
@@ -68,4 +72,9 @@ ToolIntroduction.propTypes = {
     readyHandler: PropTypes.func
 };
 
-export default ToolIntroduction;
+export default connect((store) => {
+    const isConnected = get(store, 'connection.isConnected');
+    return {
+        isConnected
+    };
+})(ToolIntroduction);
