@@ -40,6 +40,7 @@ import { Toaster, TOASTER_DANGER, TOASTER_WARNING, TOASTER_UNTIL_CLOSE } from '.
 import {
     // Grbl
     GRBL_ACTIVE_STATE_ALARM,
+    GRBL_ACTIVE_STATE_CHECK,
     // Marlin
     // Workflow
     WORKFLOW_STATE_IDLE,
@@ -156,7 +157,7 @@ class WorkflowControl extends PureComponent {
 
     canRun() {
         const { state } = this.props;
-        const { port, gcode, workflow, controllerState } = state;
+        const { port, gcode, workflow } = state;
 
         if (!port) {
             return false;
@@ -167,10 +168,14 @@ class WorkflowControl extends PureComponent {
         if (!includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state)) {
             return false;
         }
-        const activeState = get(controllerState, 'status.activeState');
+        const { activeState } = this.props;
         const states = [
             GRBL_ACTIVE_STATE_ALARM
         ];
+
+        if (includes([GRBL_ACTIVE_STATE_CHECK], activeState) && !includes([WORKFLOW_STATE_PAUSED, WORKFLOW_STATE_IDLE], workflow.state)) {
+            return false;
+        }
 
         return !includes(states, activeState);
     }
@@ -181,8 +186,8 @@ class WorkflowControl extends PureComponent {
 
         handlePause();
         handleStop();
+        this.setState({ runHasStarted: false });
         if (status.activeState === 'Check') {
-            this.setState({ runHasStarted: false });
             controller.command('gcode', '$C');
         }
     }
@@ -202,8 +207,16 @@ class WorkflowControl extends PureComponent {
     };
 
     startRun = () => {
+        const { activeState } = this.props;
+
+        if (activeState === GRBL_ACTIVE_STATE_CHECK) {
+            this.setState({ testStarted: true, runHasStarted: true });
+
+            controller.command('gcode:resume');
+            controller.command('gcode:resume');
+            return;
+        }
         this.setState({ fileLoaded: true });
-        this.setState({ testStarted: true });
         this.setState({ runHasStarted: true });
         const { actions } = this.props;
         actions.onRunClick();
@@ -221,6 +234,18 @@ class WorkflowControl extends PureComponent {
             });
         }
         this.subscribe();
+    }
+
+    componentDidUpdate(prevProps) {
+        const { activeState: prevActiveState, state: prevState } = prevProps;
+        const { activeState: currentActiveState, state: currentState } = this.props;
+
+        const { gcode: { content: prevGcode } } = prevState;
+        const { gcode: { content: currentGcode } } = currentState;
+
+        if ((prevActiveState === GRBL_ACTIVE_STATE_CHECK && currentActiveState !== GRBL_ACTIVE_STATE_CHECK) || prevGcode !== currentGcode) {
+            this.setState({ runHasStarted: false });
+        }
     }
 
     componentWillUnmount() {
@@ -272,10 +297,10 @@ class WorkflowControl extends PureComponent {
         const isReady = canClick && gcode.ready;
         const { runHasStarted } = this.state;
         const canRun = this.canRun();
-        const { isConnected, fileLoaded, senderInHold } = this.props;
+        const { isConnected, fileLoaded, senderInHold, activeState } = this.props;
         const showPlay = isConnected && fileLoaded && canRun;
         const showTest = showPlay && !runHasStarted;
-        const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflowState);
+        const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const workflowPaused = workflowState === WORKFLOW_STATE_PAUSED || senderInHold;
 
@@ -429,10 +454,12 @@ export default connect((store) => {
     const isConnected = get(store, 'connection.isConnected', false);
     const senderInHold = get(store, 'controller.sender.status.hold', false);
     const workflowState = get(store, 'controller.workflow.state');
+    const activeState = get(store, 'controller.state.status.activeState');
     return {
         fileLoaded,
         isConnected,
         senderInHold,
-        workflowState
+        workflowState,
+        activeState
     };
 })(WorkflowControl);
