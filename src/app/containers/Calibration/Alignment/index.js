@@ -198,21 +198,19 @@ const Alignment = ({ onClose }) => {
                         <>
                             <div className={styles.alignmentContainer}>
                                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                    <div>
-                                        <h4 style={{ marginTop: 0 }}>Alignment</h4>
-                                        {
-                                            !introComplete && <ToolIntroduction readyHandler={startTool} />
-                                        }
-                                        {
-                                            introComplete && (
-                                                <Step
-                                                    actions={actions}
-                                                    onChange={onChange}
-                                                    currentAction={currentAction}
-                                                />
-                                            )
-                                        }
-                                    </div>
+                                    <h4 style={{ marginTop: 0 }}>Alignment</h4>
+                                    {
+                                        !introComplete && <ToolIntroduction readyHandler={startTool} />
+                                    }
+                                    {
+                                        introComplete && (
+                                            <Step
+                                                actions={actions}
+                                                onChange={onChange}
+                                                currentAction={currentAction}
+                                            />
+                                        )
+                                    }
 
                                     {
                                         introComplete && (
