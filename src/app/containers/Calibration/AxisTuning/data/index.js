@@ -60,10 +60,11 @@ export const yAxisStep = [
             const AXIS = 'Y';
 
             const handleClick = () => {
-                setRequestedDistance(val);
+                const value = Math.abs(val);
+                setRequestedDistance(value);
                 setDidClick(true); //Disable button
-                jogMachine({ axis: AXIS, value: val });
-                onChange({ axis: AXIS.toLowerCase(), value: val });
+                jogMachine({ axis: AXIS, value: value });
+                onChange({ axis: AXIS.toLowerCase(), value: value });
             };
 
             return (
@@ -105,33 +106,15 @@ export const yAxisStep = [
         id: 2,
         checked: false,
         hasBeenChanged: false,
-        label: () => {
-            return <span>Mark second location</span>;
-        },
-        shapeActions: [
-            {
-                shapeType: 'circlePoints',
-                shapeID: 2,
-                isActive: true,
-                show: true,
-                clearPrevious: true,
-                label: '3',
-            },
-        ],
-        description: 'Here you will make one last mark on the gantry using the tape or pencil. Once you\'ve done so, you may check off this step off and proceed to the next page'
-    },
-    {
-        id: 3,
-        checked: false,
-        hasBeenChanged: false,
         hideCompleteButton: true,
         label: ({ isCurrentAction, onChange, options, setActualDistance }) => {
             const [val, setVal] = useState(100);
             const AXIS = 'Y';
 
             const handleClick = () => {
-                setActualDistance(val);
-                onChange({ axis: AXIS.toLowerCase(), value: val });
+                const value = Math.abs(val);
+                setActualDistance(value);
+                onChange({ axis: AXIS.toLowerCase(), value: value });
             };
 
             return (
@@ -169,7 +152,7 @@ export const yAxisStep = [
                 label: '3',
             },
         ],
-        description: 'Measure the distance travelled between point A and point B and enter it in the provided input.  The more accurate the measurement, the more accurate the motor calibration will be.'
+        description: 'Measure the distance travelled between the original mark and the edge of the gantry and enter it in the provided input.  The more accurate the measurement, the more accurate the motor calibration will be.'
     },
 ];
 
@@ -249,33 +232,15 @@ export const xAxisStep = [
         id: 2,
         checked: false,
         hasBeenChanged: false,
-        label: () => {
-            return <span>Mark second location</span>;
-        },
-        shapeActions: [
-            {
-                shapeType: 'circlePoints',
-                shapeID: 2,
-                isActive: true,
-                show: true,
-                clearPrevious: true,
-                label: '3',
-            },
-        ],
-        description: 'Here you will make one last mark on the gantry using the tape or pencil. Once you\'ve done so, you may check off this step off and proceed to the next page'
-    },
-    {
-        id: 3,
-        checked: false,
-        hasBeenChanged: false,
         hideCompleteButton: true,
         label: ({ isCurrentAction, onChange, options, setActualDistance }) => {
-            const [val, setVal] = useState(30);
+            const [val, setVal] = useState(100);
             const AXIS = 'X';
 
             const handleClick = () => {
-                setActualDistance(val);
-                onChange({ axis: AXIS.toLowerCase(), value: val });
+                const value = Math.abs(val);
+                setActualDistance(value);
+                onChange({ axis: AXIS.toLowerCase(), value: value });
             };
 
             return (
@@ -313,7 +278,7 @@ export const xAxisStep = [
                 label: '3',
             },
         ],
-        description: 'Measure the distance travelled between point A and point B and enter it in the provided input.  The more accurate the measurement, the more accurate the motor calibration will be.'
+        description: 'Measure the distance travelled between the original mark and the edge of the gantry and enter it in the provided input.  The more accurate the measurement, the more accurate the motor calibration will be.'
     },
 ];
 
@@ -350,7 +315,8 @@ export const zAxisStep = [
             const handleClick = () => {
                 setRequestedDistance(val);
                 setDidClick(true); //Disable button
-                jogMachine({ axis: AXIS, value: val });
+                const value = Math.abs(val) * -1;
+                jogMachine({ axis: AXIS, value });
                 onChange({ axis: AXIS.toLowerCase(), value: val });
             };
 
@@ -386,35 +352,16 @@ export const zAxisStep = [
                 label: 'Z-Axis Movement'
             },
         ],
-        description: 'Here you will jog your machine in the Z-axis by a customizable distance.' +
-            'Larger distances are better but make sure you don\'t hit your machine limits. Once you are ready, click the "Move Z-Axis" button.'
+        description: 'Here you will jog your machine in the Z-axis by a customizable distance.  Note that this will move the head in a negative direction (down).' +
+            'Larger distances are better but make sure you don\'t hit your machine limits or the wasteboard. Once you are ready, click the "Move Z-Axis" button.'
     },
     {
         id: 2,
         checked: false,
         hasBeenChanged: false,
-        label: () => {
-            return <span>Mark second location</span>;
-        },
-        shapeActions: [
-            {
-                shapeType: 'circlePoints',
-                shapeID: 2,
-                isActive: true,
-                show: true,
-                clearPrevious: true,
-                label: '3',
-            },
-        ],
-        description: 'Here you will make one last mark on the gantry using the tape or pencil. Once you\'ve done so, you may check off this step off and proceed to the next page'
-    },
-    {
-        id: 3,
-        checked: false,
-        hasBeenChanged: false,
         hideCompleteButton: true,
         label: ({ isCurrentAction, onChange, options, setActualDistance }) => {
-            const [val, setVal] = useState(100);
+            const [val, setVal] = useState(30);
             const AXIS = 'Z';
 
             const handleClick = () => {
@@ -457,7 +404,7 @@ export const zAxisStep = [
                 label: '3',
             },
         ],
-        description: 'Measure the distance travelled between point A and point B and enter it in the provided input.  The more accurate the measurement, the more accurate the motor calibration will be.'
+        description: 'Measure the distance travelled between the original mark and the edge of the gantry and enter it in the provided input.  The more accurate the measurement, the more accurate the motor calibration will be.'
     },
 ];
 
