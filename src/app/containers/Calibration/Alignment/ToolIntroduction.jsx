@@ -32,16 +32,17 @@ import Keypad from '../JogControl';
 const ToolIntroduction = ({ readyHandler, isConnected }) => {
     const buttonText = isConnected ? 'Ready to start' : 'You must be connected to a device';
     return (
-        <div>
-            <p>We&apos;ll be making a triangle to help align your machine.</p>
-            <p>You will need to make a few marks on a piece of tape and place them on your machines wasteboard</p>
-            <p>In addition, your cutting tool should be as pointy as possible for maximum accuracy when measuring distances.</p>
-            <p>Please jog your machine to the back left before beginning.</p>
+        <>
+            <div>
+                <p>We&apos;ll be making a triangle to help align your machine.</p>
+                <p>You will need to make a few marks on a piece of tape and place them on your machines wasteboard</p>
+                <p>In addition, your cutting tool should be as pointy as possible for maximum accuracy when measuring distances.</p>
+                <p>Please jog your machine to the back left before beginning.</p>
 
-            <Keypad />
-
+                <Keypad />
+            </div>
             <FunctionButton primary disabled={!isConnected} onClick={readyHandler} style={{ marginTop: '2rem' }}>{ buttonText }</FunctionButton>
-        </div>
+        </>
     );
 };
 
