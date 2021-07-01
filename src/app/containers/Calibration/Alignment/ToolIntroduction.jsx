@@ -41,7 +41,6 @@ const ToolIntroduction = ({ readyHandler, isConnected }) => {
 
                     <p>Before starting, please jog your machine to a spot on the front, left corner of the wasteboard, with the tip only slightly offset from the board.</p>
                 </div>
-
                 <Keypad />
             </div>
             <FunctionButton primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</FunctionButton>
