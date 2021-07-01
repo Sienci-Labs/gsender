@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/linux.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.6/gSender-0.6.6-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.6/gSender-0.6.6-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.6/gSender-0.6.6.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.6/gSender_0.6.6_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.6/gSender-0.6.6-armv7l.AppImage)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.7/gSender-0.6.7-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.7/gSender-0.6.7-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.7/gSender-0.6.7.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.7/gSender_0.6.7_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.7/gSender-0.6.7-armv7l.AppImage)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -92,6 +92,22 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### Open Beta 0.6.7 (July 1, 2021)
+* New Movement Tuning tool to calibrate step motor movements
+* Visualizer improvements - Rapid movements are now less prominent in visualization so the final cut shape is clearer to see
+* Program Start/Stop code - run G-code blocks when starting a file and stopping a file
+* Ability to keybind specific macros
+* Added coolant buttons  
+* New keybinding options and categories
+* Better M0/M1 command support - notification in the UI when command encountered and easier to resume the program
+* Improvements to the surfacing tool limits and steps
+* Ability to reset program settings to default
+* Fixed an issue where the "Home machine" button wouldn't dissapear on homing cycle
+* Fixed an issue where macro exports were unable to be re-imported
+* Added reconnect logic to client to reduce instances of UI no longer updating on long jobs
+* Fixed issue with jogging while $15 was enabled
+* Other minor bug fixes
 
 ### Open Beta 0.6.6 (June 11, 2021)
 * Sticky folders! Load files from the last place you navigated to
