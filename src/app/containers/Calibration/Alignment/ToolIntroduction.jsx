@@ -34,14 +34,15 @@ const ToolIntroduction = ({ readyHandler, isConnected }) => {
     return (
         <>
             <div>
-                <p>We&apos;ll be making a triangle to help align your machine.</p>
-                <p>You will need to make a few marks on a piece of tape and place them on your machines wasteboard</p>
-                <p>In addition, your cutting tool should be as pointy as possible for maximum accuracy when measuring distances.</p>
-                <p>Please jog your machine to the back left before beginning.</p>
+                <div style={{ fontSize: '1rem' }}>
+                    <p>This tool will tell you how far out of square your CNC is and how to correct it. In many cases, reasonable care during assembly can ensure the rails will be well enough aligned, but if you’re looking to more finely tune the squareness of your machine this tool is for you.</p>
+                    <p>You’ll want to prepare your CNC router collet by placing a tipped geometry inside, this could be a tapered bit, a v-bit, or even a sharpened dowel. You’ll also want to prepare three squares of tape that you’ve marked with an ‘X’, and have a long straight-edge ruler or measuring tape on hand</p>
+                    <p>Before starting, please jog your machine to a spot on the front, left corner of the wasteboard, with the tip only slightly offset from the board.</p>
+                </div>
 
                 <Keypad />
             </div>
-            <FunctionButton primary disabled={!isConnected} onClick={readyHandler} style={{ marginTop: '2rem' }}>{ buttonText }</FunctionButton>
+            <FunctionButton primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</FunctionButton>
         </>
     );
 };

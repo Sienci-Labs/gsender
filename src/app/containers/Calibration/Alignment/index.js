@@ -9,6 +9,7 @@ import NavigationButtons from './NavigationButtons';
 import TriangleDiagram from '../TriangleDiagram';
 import Result from './Result';
 import Keypad from '../JogControl';
+import introImage from './assets/XY_squaring_example.jpg';
 
 import styles from './index.styl';
 import { step1, step2 } from './data';
@@ -198,7 +199,7 @@ const Alignment = ({ onClose }) => {
                         <>
                             <div className={styles.alignmentContainer}>
                                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                    <h4 style={{ marginTop: 0 }}>Alignment</h4>
+                                    <h4 style={{ marginTop: 0 }}>XY Squaring</h4>
                                     {
                                         !introComplete && <ToolIntroduction readyHandler={startTool} />
                                     }
@@ -226,14 +227,29 @@ const Alignment = ({ onClose }) => {
                                 </div>
 
                                 <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
-                                    <TriangleDiagram
-                                        circlePoints={shapes.circlePoints}
-                                        arrows={shapes.arrows}
-                                        triangle={triangle}
-                                        onTriangleChange={handleTriangleChange}
-                                    />
 
-                                    <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
+                                    {
+                                        introComplete
+                                            ? (
+                                                <>
+                                                    <TriangleDiagram
+                                                        circlePoints={shapes.circlePoints}
+                                                        arrows={shapes.arrows}
+                                                        triangle={triangle}
+                                                        onTriangleChange={handleTriangleChange}
+                                                    />
+                                                    <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
+                                                </>
+                                            )
+                                            : (
+                                                <>
+                                                    <img src={introImage} alt="Introduction Diagram" style={{ width: '75%', margin: 'auto' }} />
+                                                    <p style={{ width: '100%', fontWeight: 'bold' }}>
+                                                        Since many CNCs run on two independent rails in the Y-axis, misalignment between these rails can cause your cutting to become skewed.
+                                                    </p>
+                                                </>
+                                            )
+                                    }
                                 </div>
                             </div>
 

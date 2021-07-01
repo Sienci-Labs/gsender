@@ -18,7 +18,7 @@ const Calibration = ({ modalClose }) => {
     const tabs = [
         {
             id: 0,
-            label: 'Alignment',
+            label: 'XY Squaring',
             widgetId: 'calibration-alignment',
             component: <Alignment onClose={modalClose} />,
         },
