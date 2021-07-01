@@ -37,7 +37,7 @@ export const step1 = [
         checked: false,
         hasBeenChanged: false,
         label: () => {
-            return <span>Mark Location 1</span>;
+            return <span>Mark Point 1</span>;
         },
         shapeActions: [
             {
@@ -49,7 +49,7 @@ export const step1 = [
                 label: '1'
             },
         ],
-        description: 'This is the initial mark you will make. Like mentioned before, marking is simply drawing an X on a piece of tape and placing it on your wasteboard. In this instance, you would put it directly under where your cutting bit is where the end of the bit is pointing directly of the middle of the X you drew.'
+        description: 'The red ‘X’ at the bottom left of the triangle indicates the location your CNC should be at right now. Use your first piece of tape and place it onto the wasteboard, directly under where your tool tip is.'
     },
     {
         id: 1,
@@ -100,14 +100,14 @@ export const step1 = [
                 label: 'X-Axis Movement'
             },
         ],
-        description: 'Here you will jog your machine to the right in the X-axis, in the distance given which is customizable. Once you are ready, click the "Move X-Axis" button.'
+        description: 'Moving to the second point will happen in the X-axis. You can use the default value or enter your own value if you wish. Click the “Move X-Axis” button once you’re ready.'
     },
     {
         id: 2,
         checked: false,
         hasBeenChanged: false,
         label: () => {
-            return <span>Mark Location 2</span>;
+            return <span>Mark Point 2</span>;
         },
         shapeActions: [
             {
@@ -119,7 +119,7 @@ export const step1 = [
                 label: '2',
             },
         ],
-        description: 'You will mark your machine here once again where you must place the piece tape directly under the cutting bit and make sure the end of the bit is pointing directly of the middle of the X.'
+        description: 'Now mark the second location with your second piece of tape.'
     },
     {
         id: 3,
@@ -170,14 +170,14 @@ export const step1 = [
                 label: 'Y-Axis Movement'
             },
         ],
-        description: 'Here you will jog your machine up in the Y-axis, in the distance given which is customizable. Once you are ready, click the "Move Y-Axis" button.'
+        description: 'Moving to the third point will happen in the Y-axis. You can use the default value or enter your own value if you wish. Click the “Move Y-Axis” button once you’re ready.'
     },
     {
         id: 4,
         checked: false,
         hasBeenChanged: false,
         label: () => {
-            return <span>Mark Location 3</span>;
+            return <span>Mark Point 3</span>;
         },
         shapeActions: [
             {
@@ -189,7 +189,7 @@ export const step1 = [
                 label: '3',
             },
         ],
-        description: 'Here you will make one last mark. Once you\'ve done so, you may check off this step off and proceed to the next page'
+        description: 'This will be your last mark with the last piece of tape. Hitting the button to complete this step will enable you to move on to making your measurements.'
     },
 ];
 
@@ -199,7 +199,7 @@ export const step2 = [
         checked: false,
         hasBeenChanged: false,
         label: () => {
-            return <span>Measure and Record the Distance Between Location <strong>1</strong> and <strong>2</strong></span>;
+            return <span>Measure and Record the Distance Between Points <strong>1</strong> and <strong>2</strong></span>;
         },
         shapeActions: [
             {
@@ -235,14 +235,14 @@ export const step2 = [
                 label: '2',
             },
         ],
-        description: 'Measure the distance between the Location 1 and 2 and enter in the amount in the input beside the flashing arrow'
+        description: 'Measure the distance between points 1 and 2 and record it into the distance entry box.'
     },
     {
         id: 1,
         checked: false,
         hasBeenChanged: false,
         label: () => {
-            return <span>Measure and Record the Distance Between Location <strong>2</strong> and <strong>3</strong></span>;
+            return <span>Measure and Record the Distance Between Points <strong>2</strong> and <strong>3</strong></span>;
         },
         shapeActions: [
             {
@@ -270,14 +270,14 @@ export const step2 = [
                 label: '3',
             },
         ],
-        description: 'Measure the distance between the Location 2 and 3 and enter in the amount in the input beside the flashing arrow'
+        description: 'Now measure the distance between points 2 and 3 and record it into the distance entry box.'
     },
     {
         id: 2,
         checked: false,
         hasBeenChanged: false,
         label: () => {
-            return <span>Measure and Record the Distance Between Location <strong>3</strong> and <strong>1</strong></span>;
+            return <span>Measure and Record the Distance Between Points <strong>3</strong> and <strong>1</strong></span>;
         },
         shapeActions: [
             {
@@ -298,6 +298,6 @@ export const step2 = [
                 )
             },
         ],
-        description: 'Measure the distance between the Location 3 and 1 and enter in the amount in the input beside the flashing arrow'
+        description: 'Lastly, measure the distance between points 3 and 1 and record it into the distance entry box. The next page will show you the results of how square your CNC currently is and provide feedback on how to fix it if it needs some adjustment.'
     },
 ];
