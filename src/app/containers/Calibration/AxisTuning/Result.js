@@ -111,7 +111,7 @@ const Result = ({ options, onBack, onClose, xSteps, ySteps, zSteps }) => {
                 {
                     hasError
                         ? <FunctionButton onClick={onBack}>Go Back</FunctionButton>
-                        : <FunctionButton onClick={onClose}>Exit Axis Tuning Tool</FunctionButton>
+                        : <FunctionButton onClick={onClose}>Restart Tool</FunctionButton>
                 }
             </div>
         </div>

@@ -55,7 +55,7 @@ export const yAxisStep = [
                 label: '2',
             },
         ],
-        description: 'Mark your machine here directly on the gantry at the current position using the edge of a piece of tape or pencil.'
+        description: 'First, mark next to the gantry in the location shown with your marker, pencil, or using a strip of tape.'
     },
     {
         id: 1,
@@ -108,8 +108,8 @@ export const yAxisStep = [
                 label: 'Y-Axis Movement'
             },
         ],
-        description: 'Here you will jog your machine in the Y-axis by a customizable distance.' +
-            'Larger distances are better but make sure you don\'t hit your machine limits. Once you are ready, click the "Move Y-Axis" button.'
+        description: 'Now move any distance you wish. A larger value will better tune your movement just make sure you don’t hit your machine limits. ' +
+            'Once you are ready, click the “Move Y-Axis” button.'
     },
     {
         id: 2,
@@ -162,7 +162,7 @@ export const yAxisStep = [
                 label: '3',
             },
         ],
-        description: 'Measure the distance travelled between the original mark and the edge of the gantry and enter it in the provided input.  The more accurate the measurement, the more accurate the motor calibration will be.'
+        description: 'Lastly, measure the distance travelled between the original mark and the current gantry location. Take your time when entering this value, a more accurate measurement will give you better tuning results.'
     },
 ];
 
@@ -185,7 +185,7 @@ export const xAxisStep = [
                 label: '2',
             },
         ],
-        description: 'Mark your machine here directly on the gantry at the current position using the edge of a piece of tape or pencil.'
+        description: 'First, mark next to the gantry in the location shown with your marker, pencil, or using a strip of tape.'
     },
     {
         id: 1,
@@ -237,8 +237,8 @@ export const xAxisStep = [
                 label: 'X-Axis Movement'
             },
         ],
-        description: 'Here you will jog your machine in the X-axis by a customizable distance.' +
-            'Larger distances are better but make sure you don\'t hit your machine limits. Once you are ready, click the "Move X-Axis" button.'
+        description: 'Now move any distance you wish. A larger value will better tune your movement just make sure you don’t hit your machine limits. ' +
+            'Once you are ready, click the “Move X-Axis” button.'
     },
     {
         id: 2,
@@ -291,7 +291,7 @@ export const xAxisStep = [
                 label: '3',
             },
         ],
-        description: 'Measure the distance travelled between the original mark and the edge of the gantry and enter it in the provided input.  The more accurate the measurement, the more accurate the motor calibration will be.'
+        description: 'Lastly, measure the distance travelled between the original mark and the current gantry location. Take your time when entering this value, a more accurate measurement will give you better tuning results.'
     },
 ];
 
@@ -314,7 +314,7 @@ export const zAxisStep = [
                 label: '2',
             },
         ],
-        description: 'Mark your machine here directly on the gantry at the current position using the edge of a piece of tape or pencil.'
+        description: 'First, mark next to the gantry in the location shown with your marker, pencil, or using a strip of tape.'
     },
     {
         id: 1,
@@ -367,8 +367,8 @@ export const zAxisStep = [
                 label: 'Z-Axis Movement'
             },
         ],
-        description: 'Here you will jog your machine in the Z-axis by a customizable distance.  Note that this will move the head in a negative direction (down).' +
-            'Larger distances are better but make sure you don\'t hit your machine limits or the wasteboard. Once you are ready, click the "Move Z-Axis" button.'
+        description: 'Now move any distance you wish. A larger value will better tune your movement just make sure you don’t hit your machine limits. ' +
+            'Once you are ready, click the “Move Z-Axis” button.'
     },
     {
         id: 2,
@@ -420,7 +420,7 @@ export const zAxisStep = [
                 label: '3',
             },
         ],
-        description: 'Measure the distance travelled between the original mark and the edge of the gantry and enter it in the provided input.  The more accurate the measurement, the more accurate the motor calibration will be.'
+        description: 'Lastly, measure the distance travelled between the original mark and the current gantry location. Take your time when entering this value, a more accurate measurement will give you better tuning results.'
     },
 ];
 

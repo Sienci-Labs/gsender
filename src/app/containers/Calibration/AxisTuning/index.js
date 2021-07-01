@@ -12,44 +12,9 @@ import { axisSteps } from './data';
 
 
 const AxisTuning = ({ onClose }) => {
-    const initialShapes = {
-        circlePoints: [
-            { id: 0, position: 'top', label: '1', show: false },
-            { id: 1, position: 'bottom-left', label: '2', show: false },
-            { id: 2, position: 'bottom-right', label: '3', show: false },
-        ],
-        arrows: [
-            {
-                id: 0,
-                position: 'left',
-                label: '',
-                hasTop: false,
-                hasBottom: true,
-                show: false
-            },
-            {
-                id: 1,
-                position: 'bottom',
-                label: '',
-                hasTop: true,
-                hasBottom: false,
-                show: false
-            },
-            {
-                id: 2,
-                position: 'diagonal',
-                label: '',
-                hasTop: true,
-                hasBottom: true,
-                show: false,
-            },
-        ],
-    };
-
     const steps = [axisSteps.x];
 
     const [currentStep, setCurrentStep] = useState(0);
-    const [shapes, setShapes] = useState(initialShapes);
     const [actions, setActions] = useState(steps[currentStep]);
     const [currentAction, setCurrentAction] = useState(0);
     const [stepFinished, setStepFinished] = useState(false);
@@ -66,54 +31,6 @@ const AxisTuning = ({ onClose }) => {
             actualDistance,
         };
     };
-
-    const highlightShapes = () => {
-        const foundAction = actions.find(action => action.id === Number(currentAction));
-
-        if (foundAction && foundAction.shapeActions) {
-            for (const action of foundAction.shapeActions) {
-                const { shapeType, shapeID, isActive, show, clearPrevious, label } = action;
-
-                const foundShapeType = shapes[shapeType];
-
-                if (foundShapeType) {
-                    if (clearPrevious) {
-                        setShapes((prev) => {
-                            const updated = prev[shapeType].map(shape => (
-                                shape.id === shapeID
-                                    ? { ...shape, label, isActive, show }
-                                    : { ...shape, isActive: false }
-                            ));
-                            return ({
-                                ...prev,
-                                arrows: prev.arrows.map(arrow => ({ ...arrow, isActive: false })),
-                                circlePoints: prev.circlePoints.map(point => ({ ...point, isActive: false })),
-                                [shapeType]: updated,
-                            });
-                        });
-                    } else {
-                        setShapes((prev) => {
-                            const updated = prev[shapeType].map(shape => (shape.id === shapeID ? { ...shape, label, isActive, show } : shape));
-                            return ({
-                                ...prev,
-                                [shapeType]: updated,
-                            });
-                        });
-                    }
-                }
-            }
-        } else {
-            setShapes((prev) => ({
-                ...prev,
-                circlePoints: prev.circlePoints.map(point => ({ ...point, isActive: false })),
-                arrows: prev.arrows.map(arrow => ({ ...arrow, isActive: false })),
-            }));
-        }
-    };
-
-    useEffect(() => {
-        highlightShapes();
-    }, [currentAction, currentStep]);
 
     useEffect(() => {
         const isFinished = actions.every((action) => action.checked);
@@ -153,7 +70,6 @@ const AxisTuning = ({ onClose }) => {
         if (steps[nextStep]) {
             setActions(steps[nextStep]);
             setCurrentAction(0);
-            setShapes(initialShapes);
             setCurrentStep(nextStep);
             setStepFinished(false);
         } else {
@@ -166,9 +82,21 @@ const AxisTuning = ({ onClose }) => {
         if (steps[prevStep]) {
             setActions(steps[prevStep]);
             setCurrentAction(0);
-            setShapes(initialShapes);
             setCurrentStep(prevStep);
             setStepFinished(false);
+        }
+    };
+
+
+    const reset = () => {
+        setIntroComplete(false);
+        setCurrentStep(0);
+        setIsFullyComplete(false);
+        setCurrentAction(0);
+        const retrievedStep = axisSteps[currentAxis];
+
+        if (retrievedStep) {
+            setActions(retrievedStep);
         }
     };
 
@@ -187,11 +115,11 @@ const AxisTuning = ({ onClose }) => {
     const options = getOptions();
 
     return isFullyComplete
-        ? <Result options={options} onBack={onBack} onClose={onClose} />
+        ? <Result options={options} onBack={onBack} onClose={reset} />
         : (
             <div className={styles.alignmentContainer}>
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <h4 style={{ marginTop: 0 }}>Axis Tuning</h4>
+                    <h4 style={{ marginTop: 0 }}>Movement Tuning</h4>
                     {
                         !introComplete &&
                         <ToolIntroduction readyHandler={startTool} onSelectAxis={(axis) => setCurrentAxis(axis)} currentAxis={currentAxis} />
@@ -223,8 +151,12 @@ const AxisTuning = ({ onClose }) => {
                     {
                         <ImageDiagram actions={actions} currentAction={currentAction} />
                     }
-
-                    <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
+                    {
+                        !introComplete && <p style={{ width: '100%', fontWeight: 'bold' }}>Whichever axis you’ll be tuning, please place it in an initial location so that it’ll have space to move to the right (for X), backwards (for Y), and downwards (for Z).</p>
+                    }
+                    {
+                        introComplete && <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
+                    }
                 </div>
             </div>
         );

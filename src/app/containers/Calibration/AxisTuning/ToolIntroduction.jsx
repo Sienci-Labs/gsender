@@ -29,6 +29,7 @@ import get from 'lodash/get';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import Select from 'react-select';
 import Keypad from '../JogControl';
+import styles from '../index.styl';
 
 
 const axisList = [
@@ -42,12 +43,18 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis, isConnected
 
     return (
         <ReduxProvider store={reduxStore}>
-            <div>
-                <p>We&apos;ll be moving your machine in a linear direction to calculate the motor steps.</p>
-                <p>You will need to make a few marks on a piece of tape and place them on your machines wasteboard or rail.</p>
-                <p>When jogging, please make sure it is in a position where it will not hit the machine limits.</p>
-                <b>Axis to calculate steps for:</b>
-                <br />
+            <div className={styles.toolIntro}>
+                <p>
+                    All CNCs ship with standard settings so the controller knows how much to turn the motors in order to move 1mm,
+                     a factor of the specs of the motors and the pitch of the lead screws.
+                </p>
+
+                <p>
+                    Manufacturing tolerances can make these presets inaccurate, meaning a move of 200mm could move 200.5mm in reality.
+                    If you’re looking to use your CNC for more accurate work or run a diagnosis, this tool is for you.
+                </p>
+
+                <p>Before starting, you’ll want to have a marker or some tape on hand and a measuring tape to keep track of machine movements.</p>
                 <Select
                     backspaceRemoves={false}
                     className="sm"
@@ -58,7 +65,6 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis, isConnected
                     options={axisList}
                     value={{ label: currentAxis.toUpperCase(), value: currentAxis }}
                 />
-                <br />
                 <Keypad />
 
 
