@@ -93,13 +93,13 @@ class Firmware extends PureComponent {
         event.preventDefault();
 
         // Prepare the file
-        let output = JSON.stringify(this.state.data[0].settings);
+        let output = JSON.stringify(this.state.data.settings);
 
         // Download it
         const blob = new Blob([output]);
         const fileDownloadUrl = URL.createObjectURL(blob);
         this.setState({ fileDownloadUrl: fileDownloadUrl });
-        download(blob, 'My Cnc Settings', '');
+        download(blob, 'CNC Firmware Settings', '');
     }
 
     upload(event) {
@@ -165,10 +165,9 @@ class Firmware extends PureComponent {
             controller.command('gcode', finalStrings);
             controller.command('gcode', '$$');//Needed so next time wizard is opened changes are reflected
             Toaster.pop({
-                msg: 'Eeprom values updated!',
+                msg: 'Eeprom Values Updated',
                 type: TOASTER_INFO
             });
-            this.props.modalClose();
         } else {
             Toaster.pop({
                 msg: 'Incorrect file format, please try again',
