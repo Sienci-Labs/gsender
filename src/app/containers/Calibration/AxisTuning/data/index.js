@@ -5,6 +5,13 @@ import controller from 'app/lib/controller';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import store from 'app/store';
 
+import x1 from '../assets/X_axis-calibration_1.png';
+import x2 from '../assets/X_axis-calibration_2.png';
+import y1 from '../assets/Y_axis-calibration_1.png';
+import y2 from '../assets/Y_axis-calibration_2.png';
+import z1 from '../assets/Z_axis-calibration_1.png';
+import z2 from '../assets/Z_axis-calibration_2.png';
+
 import Input from '../../Input';
 
 import styles from '../index.styl';
@@ -34,6 +41,7 @@ export const yAxisStep = [
         id: 0,
         checked: false,
         hasBeenChanged: false,
+        image: y1,
         label: () => {
             return <span>Mark first location</span>;
         },
@@ -54,6 +62,7 @@ export const yAxisStep = [
         checked: false,
         hasBeenChanged: false,
         hideCompleteButton: true,
+        image: y1,
         label: ({ isCurrentAction, onChange, setRequestedDistance }) => {
             const [val, setVal] = useState(100);
             const [didClick, setDidClick] = useState(false);
@@ -107,6 +116,7 @@ export const yAxisStep = [
         checked: false,
         hasBeenChanged: false,
         hideCompleteButton: true,
+        image: y2,
         label: ({ isCurrentAction, onChange, options, setActualDistance }) => {
             const [val, setVal] = useState(100);
             const AXIS = 'Y';
@@ -161,6 +171,7 @@ export const xAxisStep = [
         id: 0,
         checked: false,
         hasBeenChanged: false,
+        image: x1,
         label: () => {
             return <span>Mark first location</span>;
         },
@@ -181,6 +192,7 @@ export const xAxisStep = [
         checked: false,
         hasBeenChanged: false,
         hideCompleteButton: true,
+        image: x1,
         label: ({ isCurrentAction, onChange, setRequestedDistance }) => {
             const [val, setVal] = useState(100);
             const [didClick, setDidClick] = useState(false);
@@ -233,6 +245,7 @@ export const xAxisStep = [
         checked: false,
         hasBeenChanged: false,
         hideCompleteButton: true,
+        image: x2,
         label: ({ isCurrentAction, onChange, options, setActualDistance }) => {
             const [val, setVal] = useState(100);
             const AXIS = 'X';
@@ -287,6 +300,7 @@ export const zAxisStep = [
         id: 0,
         checked: false,
         hasBeenChanged: false,
+        image: z1,
         label: () => {
             return <span>Mark first location</span>;
         },
@@ -307,6 +321,7 @@ export const zAxisStep = [
         checked: false,
         hasBeenChanged: false,
         hideCompleteButton: true,
+        image: z1,
         label: ({ isCurrentAction, onChange, setRequestedDistance }) => {
             const [val, setVal] = useState(30);
             const [didClick, setDidClick] = useState(false);
@@ -360,6 +375,7 @@ export const zAxisStep = [
         checked: false,
         hasBeenChanged: false,
         hideCompleteButton: true,
+        image: z2,
         label: ({ isCurrentAction, onChange, options, setActualDistance }) => {
             const [val, setVal] = useState(30);
             const AXIS = 'Z';
