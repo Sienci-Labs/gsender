@@ -88,7 +88,8 @@
     "nsis": {
       "allowToChangeInstallationDirectory": true,
       "oneClick": false,
-      "license": "LICENSE"
+      "license": "LICENSE",
+      "installerSidebar": "electron-build/sidebar.bmp"
     },
     "publish": {
       "provider": "github"
