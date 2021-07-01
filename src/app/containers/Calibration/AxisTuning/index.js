@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import ToolIntroduction from 'app/containers/Calibration/AxisTuning/ToolIntroduction';
+import ImageDiagram from 'app/containers/Calibration/AxisTuning/ImageDiagram';
 import Step from './Step';
 import NavigationButtons from './NavigationButtons';
 //import TriangleDiagram from '../TriangleDiagram';
@@ -8,6 +9,7 @@ import Result from './Result';
 
 import styles from './index.styl';
 import { axisSteps } from './data';
+
 
 const AxisTuning = ({ onClose }) => {
     const initialShapes = {
@@ -219,14 +221,8 @@ const AxisTuning = ({ onClose }) => {
 
                 <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
                     {
-                        /*<TriangleDiagram
-                            circlePoints={shapes.circlePoints}
-                            arrows={shapes.arrows}
-                            triangle={triangle}
-                            onTriangleChange={handleTriangleChange}
-                        />*/
+                        <ImageDiagram actions={actions} currentAction={currentAction} />
                     }
-                    <p>What a cool diagram</p>
 
                     <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
                 </div>
