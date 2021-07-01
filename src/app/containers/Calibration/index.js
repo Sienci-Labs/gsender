@@ -24,7 +24,7 @@ const Calibration = ({ modalClose }) => {
         },
         {
             id: 1,
-            label: 'Axis Tuning',
+            label: 'Movement Tuning',
             widgetId: 'calibration-axis-tuning',
             component: <AxisTuning onClose={modalClose} />,
         },
