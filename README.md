@@ -97,9 +97,8 @@ gSender is also designed in a way that it can be run locally on your computer br
 * New Movement Tuning tool to calibrate step motor movements
 * Visualizer improvements - Rapid movements are now less prominent in visualization so the final cut shape is clearer to see
 * Program Start/Stop code - run G-code blocks when starting a file and stopping a file
-* Ability to keybind specific macros
-* Added coolant buttons  
-* New keybinding options and categories
+* New keybinding options and categories - including ability to keybind specific macros!
+* Added coolant buttons
 * Better M0/M1 command support - notification in the UI when command encountered and easier to resume the program
 * Improvements to the surfacing tool limits and steps
 * Ability to reset program settings to default
