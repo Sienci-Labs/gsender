@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styles from './index.styl';
 
 const ImageDiagram = ({ actions, currentAction }) => {
-    console.log(currentAction);
     const imgIndex = (currentAction === actions.length) ? currentAction - 1 : currentAction;
     return (
         <div className={styles.diagramWrapper}>
