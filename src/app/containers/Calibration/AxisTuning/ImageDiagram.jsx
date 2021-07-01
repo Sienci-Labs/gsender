@@ -1,23 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import cx from 'classnames';
+//import cx from 'classnames';
 import styles from './index.styl';
 
 const ImageDiagram = ({ actions, currentAction }) => {
     console.log(currentAction);
+    const imgIndex = (currentAction === actions.length) ? currentAction - 1 : currentAction;
     return (
         <div className={styles.diagramWrapper}>
-            {
-                actions.map(action => {
-                    return <img
-                        key={`diagram-${action.id}`}
-                        src={action.image}
-                        alt="Axis tuning diagram"
-                        className={cx({ [styles.hidden]: action.id !== currentAction })}
-                    />;
-                })
-            }
-
+            <img src={actions[imgIndex].image} alt="Axis tuning diagram" />
         </div>
     );
 };
