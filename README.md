@@ -40,18 +40,21 @@ gSender is available for the following systems and does not yet support headless
 * 3D toolpath visualization (no machine connection required)
 * File insight on load (feed range, spindle range, tools used, estimated cutting time, and overall, max, and min dimensions)
 * Feed override and active job status indicators
-* Keybindings available for most functions for external keyboard/keypad control
+* Fully exposed keyboard shortcuts for external keyboard/keypad control
 * Safe height movements
 * Homing cycle and quick-movement locations available for machines with homing hardware
 * Full spindle/laser support via manual control widgets, active alerting, and live overrides
-* Custom macros buttons with optional macro variables
+* Full mist/flood coolant support via manual control widgets and active alerting
+* Custom macros buttons with optional macro variables and assignable keyboard shortcuts
 * Lightweight mode reduces processing intensity on less powerful hardware or when running larger files
 * Easy workspace swapping for more advanced jigging or alignment work
 * Optional automatic handling for common error throwing gcode
 * Firmware tool for easier GRBL eeprom changes, loading defaults, and GRBL flashing
 * Surfacing tool auto-generates surfacing gcode based on machine cutting area and other preferences, ready to execute
 * Calibration tool for axis alignment - a step by step process to make sure your CNC is square
+* Movement tuning tool for calibrating motor axis movements
 * Tool change functionality - pause, ignore, or run code blocks on M6 commands
+* Customizable g-code injection at job start & end
 * Tooltips for data entry points
 * Alarm warning explanations to better contextualize CNC errors
 * Pre-build machine profiles, including:
@@ -94,17 +97,18 @@ gSender is also designed in a way that it can be run locally on your computer br
 ## 🕣 Development History
 
 ### Open Beta 0.6.7 (July 1, 2021)
-* New Movement Tuning tool to calibrate step motor movements
-* Visualizer improvements - Rapid movements are now less prominent in visualization so the final cut shape is clearer to see
-* Program Start/Stop code - run G-code blocks when starting a file and stopping a file
-* New keybinding options and categories - including ability to keybind specific macros!
-* Added coolant buttons
+* New Movement Tuning tool that can be used to calibrate motor axis movements
+* New feature for running G-code at program Start and Stop - enter and save your own commands in the settings
+* More exposed keyboard shortcut options and new categorization
+* Now able to assign shortcuts to macros!
+* Added coolant buttons and status indicator
 * Better M0/M1 command support - notification in the UI when command encountered and easier to resume the program
-* Improvements to the surfacing tool limits and steps
-* Ability to reset program settings to default
-* Fixed an issue where the "Home machine" button wouldn't dissapear on homing cycle
-* Fixed an issue where macro exports were unable to be re-imported
+* Clearer visualization due to reduced rapid line opacity
+* Improvements to the surfacing tool limits and settings persisting
+* Ability to reset gSender settings to default
 * Added reconnect logic to client to reduce instances of UI no longer updating on long jobs
+* Fixed an issue where the "Home machine" button wouldn't disappear on homing cycle
+* Fixed an issue where macro exports were unable to be re-imported
 * Fixed issue with jogging while $15 was enabled
 * Other minor bug fixes
 
