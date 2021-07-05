@@ -131,29 +131,21 @@ const main = () => {
             //Check for available updates
             await autoUpdater.checkForUpdatesAndNotify();
 
-            // What to do in cases where update is available
-            autoUpdater.on('checking-for-updates', () => {
-                window.webContents.send('message', 'CHECKING UPDATES');
-            });
-            autoUpdater.on('update-not-available', (ev, info) => {
-                window.webContents.send('message', 'Update not available.');
-            });
-            autoUpdater.on('update-available', () => {
+            autoUpdater.once('update-available', () => {
                 window.webContents.send('message', 'Update Available');
             });
-            autoUpdater.on('update-downloaded', () => {
+            autoUpdater.once('update-downloaded', () => {
                 window.webContents.send('update_downloaded');
             });
-            autoUpdater.on('error', (ev, e) => {
-                window.webContents.send('message', `Error: ${e}`);
-            });
-            ipcMain.on('restart_app', () => {
+            ipcMain.once('restart_app', () => {
                 autoUpdater.quitAndInstall();
             });
+
             ipcMain.on('load-recent-file', async (msg, recentFile) => {
                 const fileMetadata = await parseAndReturnGCode(recentFile);
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
+
             ipcMain.on('open-upload-dialog', async () => {
                 try {
                     let additionalOptions = {};
