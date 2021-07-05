@@ -94,8 +94,8 @@ class WindowManager {
             }
         });
         const webContents = window.webContents;
-        window.removeMenu();
-        window.webContents.on('did-finish-load', () => {
+        //window.removeMenu();
+        window.webContents.once('did-finish-load', () => {
             window.setTitle(options.title);
         });
 

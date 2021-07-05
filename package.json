@@ -203,6 +203,8 @@
     "detect-browser": "~4.4.0",
     "downloadjs": "^1.4.7",
     "electron-download": "^4.1.1",
+    "electron-ipc-log": "^3.0.1",
+    "electron-log": "^4.3.5",
     "electron-store": "~3.2.0",
     "electron-updater": "^4.3.8",
     "ensure-array": "~1.0.0",
