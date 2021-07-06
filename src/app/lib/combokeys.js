@@ -139,14 +139,30 @@ class Combokeys extends events.EventEmitter {
     }
 
     async getCommandKeys() {
-        const commandKeys = store.get('commandKeys', []);
+        const setCommandKeys = store.get('commandKeys', []);
+        const setMacrosBinds = setCommandKeys.filter(command => command.category === MACRO_CATEGORY);
 
         const res = await api.macros.fetch();
         const macros = res.body.records;
 
-        const newCommandKeysList = [...commandKeys];
-        const lastID = commandKeys.length;
+        const newCommandKeysList = [...setCommandKeys];
 
+        macros.forEach(macro => {
+            const existingBind = setMacrosBinds.find(bind => bind.id === macro.id);
+            if (!existingBind) {
+                newCommandKeysList.push({
+                    id: macro.id,
+                    keys: '',
+                    title: macro.name,
+                    cmd: MACRO,
+                    payload: { macroID: macro.id },
+                    preventDefault: false,
+                    isActive: false,
+                    category: MACRO_CATEGORY
+                });
+            }
+        });
+        /*
         if (!commandKeys.find(command => command.category === MACRO_CATEGORY)) {
             for (let i = lastID; i < macros.length + lastID; i++) {
                 const currentMacroIndex = i - lastID;
@@ -163,7 +179,7 @@ class Combokeys extends events.EventEmitter {
                     category: MACRO_CATEGORY
                 });
             }
-        }
+        }*/
 
         store.set('commandKeys', newCommandKeysList);
 
