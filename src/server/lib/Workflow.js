@@ -77,10 +77,10 @@ class Workflow extends events.EventEmitter {
     }
 
     resume(...args) {
-        this.emit('resume', ...args);
         if (this.state === WORKFLOW_STATE_PAUSED) {
             this.state = WORKFLOW_STATE_RUNNING;
         }
+        this.emit('resume', ...args);
     }
 }
 
