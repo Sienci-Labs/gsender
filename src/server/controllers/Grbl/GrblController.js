@@ -351,10 +351,12 @@ class GrblController {
                         log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M0' });
                         this.emit('workflow:pause', { data: 'M0' });
+                        line = line.replace('M0', '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1' });
                         this.emit('workflow:pause', { data: 'M1' });
+                        line = line.replace('M1', '(M1)');
                     }
                 }
 
