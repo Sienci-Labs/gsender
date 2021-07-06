@@ -27,6 +27,7 @@ import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
+import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
 //import menuTemplate from './electron-app/menu-template';
@@ -41,6 +42,7 @@ let windowManager = null;
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
+
     const gotSingleInstanceLock = app.requestSingleInstanceLock();
     const shouldQuitImmediately = !gotSingleInstanceLock;
 
@@ -95,7 +97,7 @@ const main = () => {
             const res = await launchServer();
             const { address, port, mountPoints } = { ...res };
             if (!(address && port)) {
-                console.error('Unable to start the server at ' + chalk.cyan(`http://${address}:${port}`));
+                log.error('Unable to start the server at ' + chalk.cyan(`http://${address}:${port}`));
                 return;
             }
 
@@ -131,40 +133,33 @@ const main = () => {
             //Check for available updates
             await autoUpdater.checkForUpdatesAndNotify();
 
-            // What to do in cases where update is available
-            autoUpdater.on('checking-for-updates', () => {
-                window.webContents.send('message', 'CHECKING UPDATES');
-            });
-            autoUpdater.on('update-not-available', (ev, info) => {
-                window.webContents.send('message', 'Update not available.');
-            });
-            autoUpdater.on('update-available', () => {
+            autoUpdater.once('update-available', () => {
                 window.webContents.send('message', 'Update Available');
             });
-            autoUpdater.on('update-downloaded', () => {
+            autoUpdater.once('update-downloaded', () => {
                 window.webContents.send('update_downloaded');
             });
-            autoUpdater.on('error', (ev, e) => {
-                window.webContents.send('message', `Error: ${e}`);
-            });
-            ipcMain.on('restart_app', () => {
+            ipcMain.once('restart_app', () => {
                 autoUpdater.quitAndInstall();
             });
+
             ipcMain.on('load-recent-file', async (msg, recentFile) => {
                 const fileMetadata = await parseAndReturnGCode(recentFile);
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
+
             ipcMain.on('open-upload-dialog', async () => {
+                log.info('open-upload-dialog initialized');
                 try {
                     let additionalOptions = {};
 
                     if (prevDirectory) {
+                        log.info(`Found previous directory ${prevDirectory}`);
                         additionalOptions.defaultPath = prevDirectory;
                     }
-
-                    const file = await dialog.showOpenDialog(
+                    log.info('Opening file dialog');
+                    const file = await dialog.showOpenDialog(window,
                         {
-                            ...additionalOptions,
                             properties: ['openFile'],
                             filters: [
                                 { name: 'GCode Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
@@ -173,7 +168,17 @@ const main = () => {
                         },
                     );
 
+                    if (!file) {
+                        log.info('No file found');
+                        return;
+                    }
+                    if (file.canceled) {
+                        log.info('File dialog cancelled');
+                        return;
+                    }
+
                     const FULL_FILE_PATH = file.filePaths[0];
+                    log.info(`Requested load file ${FULL_FILE_PATH}`);
 
                     const getFileInformation = (file) => {
                         const { base, dir } = path.parse(file);
@@ -181,6 +186,7 @@ const main = () => {
                     };
 
                     if (file.canceled) {
+                        log.info('File dialog cancelled');
                         return;
                     }
 
@@ -188,6 +194,7 @@ const main = () => {
 
                     fs.readFile(FULL_FILE_PATH, 'utf8', (err, data) => {
                         if (err) {
+                            log.error(`Error in readFile: ${err}`);
                             return;
                         }
 
@@ -196,13 +203,11 @@ const main = () => {
                         window.webContents.send('returned-upload-dialog-data', { data, size, name: fileName, path: FULL_FILE_PATH });
                     });
                 } catch (e) {
-                    await dialog.showMessageBox({
-                        message: e
-                    });
+                    log.error(`Caught error in listener - ${e}`);
                 }
             });
         } catch (err) {
-            console.log(err);
+            log.error(err);
         }
     });
 };
