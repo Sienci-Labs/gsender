@@ -130,17 +130,18 @@ const main = () => {
                 store.set('bounds', window.getBounds());
             });
 
+            autoUpdater.on('update-available', (info) => {
+                window.webContents.send('update_available', info);
+            });
+            autoUpdater.on('error', (err) => {
+                window.webContents.send('updated_error', err);
+            });
             //Check for available updates
-            await autoUpdater.checkForUpdatesAndNotify();
+            await autoUpdater.checkForUpdates();
 
-            autoUpdater.once('update-available', () => {
-                window.webContents.send('message', 'Update Available');
-            });
-            autoUpdater.once('update-downloaded', () => {
-                window.webContents.send('update_downloaded');
-            });
-            ipcMain.once('restart_app', () => {
-                autoUpdater.quitAndInstall();
+            ipcMain.once('restart_app', async () => {
+                await autoUpdater.downloadUpdate();
+                autoUpdater.quitAndInstall(false, true);
             });
 
             ipcMain.on('load-recent-file', async (msg, recentFile) => {
