@@ -1159,8 +1159,6 @@ class VisualizerWidget extends PureComponent {
             document.execCommand('undo');
         },
         MACRO: (_, { macroID }) => {
-            // console.log(macroID);
-
             controller.command('macro:run', macroID, controller.context);
         },
         TOGGLE_SHORTCUTS: () => {
@@ -1404,9 +1402,9 @@ class VisualizerWidget extends PureComponent {
                             />
 
                             <WorkflowControl
-                                /*ref={(node) => {
+                                ref={(node) => {
                                     this.workflowControl = node;
-                                }}*/
+                                }}
                                 state={state}
                                 actions={actions}
                                 invalidGcode={this.state.invalidLine.line}

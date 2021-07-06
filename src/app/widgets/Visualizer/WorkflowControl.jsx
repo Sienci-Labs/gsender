@@ -462,4 +462,4 @@ export default connect((store) => {
         workflowState,
         activeState
     };
-})(WorkflowControl);
+}, null, null, { forwardRef: true })(WorkflowControl);
