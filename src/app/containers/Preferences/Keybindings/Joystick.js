@@ -34,7 +34,7 @@ const Joystick = () => {
         store.replace('workspace.gamepad.profiles', filteredProfiles);
 
         Toaster.pop({
-            msg: 'Removed Profile',
+            msg: 'Removed Joystick Profile',
             type: TOASTER_SUCCESS,
             duration: TOASTER_SHORT
         });
@@ -48,19 +48,20 @@ const Joystick = () => {
                         <>
                             <Profile currentProfile={currentProfile} />
 
-                            <div style={{ display: 'flex', gap: '1rem' }}>
-                                <Button primary onClick={() => setShowAddAction(true)}>
-                                    <i className="fas fa-plus" />
-                                    <span>Add Action to Profile</span>
-                                </Button>
-                                <Button primary onClick={() => setCurrentProfile(null)}>
-                                    <i className="fas fa-arrow-left" />
-                                    <span>Back to Profiles List</span>
-                                </Button>
-                            </div>
+                            <Button primary onClick={() => setCurrentProfile(null)}>
+                                <i className="fas fa-arrow-left" />
+                                <span>Back to Profiles List</span>
+                            </Button>
                         </>
                     )
-                    : <ProfileList profiles={profiles} onClick={handleClick} onDelete={handleDelete} onAdd={() => setShowAddProfile(true)} />
+                    : (
+                        <ProfileList
+                            profiles={profiles}
+                            onClick={handleClick}
+                            onDelete={handleDelete}
+                            onAdd={() => setShowAddProfile(true)}
+                        />
+                    )
             }
 
             {
