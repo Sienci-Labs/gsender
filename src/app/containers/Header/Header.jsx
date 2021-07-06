@@ -263,11 +263,14 @@ class Header extends PureComponent {
         window.ipcRenderer.on('message', (event, msg) => {
             console.log(msg);
         });
-        window.ipcRenderer.once('update_downloaded', () => {
+        window.ipcRenderer.on('updated_error', (event, err) => {
+            console.log(err);
+        });
+        window.ipcRenderer.once('update_available', (info) => {
             this.setState({
                 updateAvailable: true
             });
-            pubsub.publish('showUpdateToast');
+            pubsub.publish('showUpdateToast', info);
         });
     }
 
