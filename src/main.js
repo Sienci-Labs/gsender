@@ -157,7 +157,6 @@ const main = () => {
                         log.info(`Found previous directory ${prevDirectory}`);
                         additionalOptions.defaultPath = prevDirectory;
                     }
-                    log.info('Opening file dialog');
                     const file = await dialog.showOpenDialog(window,
                         {
                             properties: ['openFile'],
@@ -173,22 +172,14 @@ const main = () => {
                         return;
                     }
                     if (file.canceled) {
-                        log.info('File dialog cancelled');
                         return;
                     }
 
                     const FULL_FILE_PATH = file.filePaths[0];
-                    log.info(`Requested load file ${FULL_FILE_PATH}`);
-
                     const getFileInformation = (file) => {
                         const { base, dir } = path.parse(file);
                         return [dir, base];
                     };
-
-                    if (file.canceled) {
-                        log.info('File dialog cancelled');
-                        return;
-                    }
 
                     const [filePath, fileName] = getFileInformation(FULL_FILE_PATH);
 
