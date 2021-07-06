@@ -61,14 +61,14 @@ export default class MainTable extends Component {
                                 tabIndex={-1}
                                 className={cx('far fa-trash-alt', styles.deleteIcon, styles.disabledIcon)}
                                 onClick={() => onDelete(row)}
-                                onKeyDown={() => onDelete(row)}
+                                onKeyDown={null}
                             />
                             <i
                                 role="button"
                                 tabIndex={-1}
                                 className={cx('fas fa-edit', styles.editIcon)}
                                 onClick={() => onEdit(row)}
-                                onKeyDown={() => onEdit(row)}
+                                onKeyDown={null}
                             />
                         </div>
                     </div>
@@ -96,14 +96,14 @@ export default class MainTable extends Component {
                             tabIndex={-1}
                             className={cx('far fa-trash-alt', styles.deleteIcon)}
                             onClick={() => onDelete(row)}
-                            onKeyDown={() => onDelete(row)}
+                            onKeyDown={null}
                         />
                         <i
                             role="button"
                             tabIndex={-1}
                             className={cx('fas fa-edit', styles.editIcon)}
                             onClick={() => onEdit(row)}
-                            onKeyDown={() => onEdit(row)}
+                            onKeyDown={null}
                         />
                     </div>
                 </div>
@@ -116,7 +116,7 @@ export default class MainTable extends Component {
                     tabIndex={-1}
                     className="fas fa-edit"
                     onClick={() => this.props.onEdit(row)}
-                    onKeyDown={() => this.props.onEdit(row)}
+                    onKeyDown={null}
                 />
             );
         },
