@@ -133,10 +133,12 @@ const main = () => {
             autoUpdater.on('update-available', (info) => {
                 window.webContents.send('update_available', info);
             });
+
             autoUpdater.on('error', (err) => {
                 window.webContents.send('updated_error', err);
             });
             //Check for available updates
+            autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
             await autoUpdater.checkForUpdates();
 
             ipcMain.once('restart_app', async () => {
