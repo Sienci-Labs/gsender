@@ -210,42 +210,28 @@ const migrateStore = () => {
     if (!cnc.version) {
         return;
     }
+    // 0.6.8 -- duplicate keybinding fix
+    if (semver.lt(cnc.version, '0.6.8')) {
+        const setCommands = store.get('commandKeys');
+        const defaultCommands = get(defaultState, 'commandKeys');
 
-    // 1.9.0
-    // * Renamed "widgets.probe.tlo" to "widgets.probe.touchPlateHeight"
-    // * Removed "widgets.webcam.scale"
-    if (semver.lt(cnc.version, '1.9.0')) {
-        // Probe widget
-        const tlo = store.get('widgets.probe.tlo');
-        if (tlo !== undefined) {
-            store.set('widgets.probe.touchPlateHeight', Number(tlo));
-            store.unset('widgets.probe.tlo');
-        }
+        /**
+         * Return an array of keybindings matching the title
+         * @param title - string title of the keybind
+         * @returns {array}
+         */
+        const getCommandsWithName = (title) => {
+            return setCommands.filter(command => command.title === title);
+        };
 
-        // Webcam widget
-        store.unset('widgets.webcam.scale');
-    }
-
-    // 1.9.13
-    // Removed "widgets.axes.wzero"
-    // Removed "widgets.axes.mzero"
-    // Removed "widgets.axes.jog.customDistance"
-    // Removed "widgets.axes.jog.selectedDistance"
-    if (semver.lt(cnc.version, '1.9.13')) {
-        // JogControl widget
-        store.unset('widgets.axes.wzero');
-        store.unset('widgets.axes.mzero');
-        store.unset('widgets.axes.jog.customDistance');
-        store.unset('widgets.axes.jog.selectedDistance');
-    }
-
-    // 1.9.16
-    // Removed "widgets.axes.wzero"
-    // Removed "widgets.axes.mzero"
-    // Removed "widgets.axes.jog.customDistance"
-    // Removed "widgets.axes.jog.selectedDistance"
-    if (semver.lt(cnc.version, '1.9.16')) {
-        store.unset('widgets.axes.jog.step');
+        defaultCommands.forEach((command) => {
+            const currentBinding = getCommandsWithName(command.title)[0]; // first element in array should be original bind
+            if (currentBinding) {
+                command.keys = currentBinding.keys;
+            }
+        });
+        store.unset('commandKeys');
+        store.set('commandKeys', defaultCommands);
     }
 };
 
