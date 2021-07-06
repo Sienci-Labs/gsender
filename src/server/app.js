@@ -34,7 +34,7 @@ import errorhandler from 'errorhandler';
 import express from 'express';
 import expressJwt from 'express-jwt';
 import session from 'express-session';
-import 'hogan.js'; // required by consolidate
+import 'hogan.js';
 import i18next from 'i18next';
 import i18nextBackend from 'i18next-node-fs-backend';
 import jwt from 'jsonwebtoken';

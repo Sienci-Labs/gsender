@@ -168,6 +168,15 @@ const main = () => {
                         },
                     );
 
+                    if (!file) {
+                        log.info('No file found');
+                        return;
+                    }
+                    if (file.canceled) {
+                        log.info('File dialog cancelled');
+                        return;
+                    }
+
                     const FULL_FILE_PATH = file.filePaths[0];
                     log.info(`Requested load file ${FULL_FILE_PATH}`);
 
