@@ -45,12 +45,15 @@ const AddProfileModal = ({ onClose, onAdd }) => {
 
     const handleAddProfile = () => {
         const { profiles = [] } = store.get('workspace.gamepad');
+        const commandKeys = store.get('commandKeys', []);
 
         const newProfiles = [
             {
                 id: gamepadInfo.id,
                 active: true,
-                profileName: profileName || gamepadInfo.id
+                profileName: profileName || gamepadInfo.id,
+                shortcuts: commandKeys.map(({ id, title, cmd }) => ({ id, title, command: cmd, keys: '', isActive: false })),
+                icon: 'fas fa-gamepad'
             },
             ...profiles
         ];
@@ -58,7 +61,7 @@ const AddProfileModal = ({ onClose, onAdd }) => {
         store.replace('workspace.gamepad.profiles', newProfiles);
 
         Toaster.pop({
-            msg: 'Added New Profile',
+            msg: 'Added New Joystick Profile',
             type: TOASTER_SUCCESS,
             duration: TOASTER_SHORT
         });
