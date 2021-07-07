@@ -22,7 +22,7 @@
  */
 
 import '@babel/polyfill';
-import { app, ipcMain, dialog } from 'electron';
+import { app, ipcMain, dialog, powerSaveBlocker } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -39,6 +39,7 @@ import { parseAndReturnGCode } from './electron-app/RecentFiles';
 
 
 let windowManager = null;
+let powerSaverId = null;
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -67,6 +68,10 @@ const main = () => {
             window.focus();
         }
     });
+
+    // Power saver - display sleep higher precedance over app suspension
+    powerSaverId = powerSaveBlocker.start('prevent-display-sleep');
+    log.info(`Result of powerSaveBlocker: ${powerSaveBlocker.isStarted(powerSaverId)}`);
 
     const store = new Store();
 
@@ -152,7 +157,6 @@ const main = () => {
             });
 
             ipcMain.on('open-upload-dialog', async () => {
-                log.info('open-upload-dialog initialized');
                 try {
                     let additionalOptions = {};
 
