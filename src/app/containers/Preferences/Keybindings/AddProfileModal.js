@@ -52,7 +52,7 @@ const AddProfileModal = ({ onClose, onAdd }) => {
                 id: gamepadInfo.id,
                 active: true,
                 profileName: profileName || gamepadInfo.id,
-                shortcuts: commandKeys.map(({ id, title, cmd }) => ({ id, title, command: cmd, keys: '', isActive: false })),
+                shortcuts: commandKeys.map(({ id, title, cmd, category }) => ({ id, title, command: cmd, keys: '', category, isActive: false })),
                 icon: 'fas fa-gamepad'
             },
             ...profiles
