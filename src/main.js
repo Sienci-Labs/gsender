@@ -69,10 +69,6 @@ const main = () => {
         }
     });
 
-    // Power saver - display sleep higher precedance over app suspension
-    powerSaverId = powerSaveBlocker.start('prevent-display-sleep');
-    log.info(`Result of powerSaveBlocker: ${powerSaveBlocker.isStarted(powerSaverId)}`);
-
     const store = new Store();
 
     // Create the user data directory if it does not exist
@@ -81,6 +77,10 @@ const main = () => {
 
     app.whenReady().then(async () => {
         try {
+            // Power saver - display sleep higher precedance over app suspension
+            powerSaverId = powerSaveBlocker.start('prevent-display-sleep');
+            log.info(`Result of powerSaveBlocker: ${powerSaveBlocker.isStarted(powerSaverId)}`);
+
             windowManager = new WindowManager();
 
             // Create and show splash before server starts
