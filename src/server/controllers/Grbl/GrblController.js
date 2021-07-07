@@ -375,8 +375,6 @@ class GrblController {
                             this.emit('workflow:state', this.workflow.state, { validLine: false, line });
                         } if (!preferences && !preferences.showLineWarnings) {
                             this.emit('workflow:state', this.workflow.state, { validLine: false, line });
-                        } else {
-                            line = '(' + line + ')'; //Surround with paranthesis to ignore line
                         }
                     }
                 }
