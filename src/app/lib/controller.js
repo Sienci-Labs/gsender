@@ -88,7 +88,8 @@ class Controller {
         'controller:settings': [],
         'controller:state': [],
         'message': [],
-        'toolchange:start': []
+        'toolchange:start': [],
+        'hPong': []
     };
 
     context = {
@@ -350,6 +351,13 @@ class Controller {
             return;
         }
         this.socket && this.socket.emit('writeln', port, data, context);
+    }
+
+    /**
+     * Health check function run every 3 minutes
+     */
+    healthCheck() {
+        this.socket && this.socket.emit('hPing');
     }
 }
 
