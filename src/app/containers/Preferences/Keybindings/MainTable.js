@@ -63,30 +63,7 @@ export default class MainTable extends Component {
 
             const { onEdit, onDelete } = this.props;
 
-            if (!shortcut[0]) {
-                return (
-                    <div className={styles.shortcutRowHeader}>
-                        <span style={{ height: '21px' }} />
-
-                        <div className={styles['icon-area']}>
-                            <i
-                                role="button"
-                                tabIndex={-1}
-                                className={cx('far fa-trash-alt', styles.deleteIcon, styles.disabledIcon)}
-                                onClick={() => onDelete(row)}
-                                onKeyDown={null}
-                            />
-                            <i
-                                role="button"
-                                tabIndex={-1}
-                                className={cx('fas fa-edit', styles.editIcon)}
-                                onClick={() => onEdit(row)}
-                                onKeyDown={null}
-                            />
-                        </div>
-                    </div>
-                );
-            }
+            const hasShortcut = !!shortcut[0];
 
             let cleanedShortcut = null;
 
@@ -105,47 +82,25 @@ export default class MainTable extends Component {
                     {
                         hasShortcut
                             ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>{output}</div>
-                            : <div style={{ height: '21px' }} />
+                            : <div style={{ height: '24px' }} />
                     }
                     <div className={styles['icon-area']}>
-                        {
-                            hasShortcut && (
-                                <i
-                                    role="button"
-                                    tabIndex={-1}
-                                    className={cx('far fa-trash-alt', styles.deleteIcon, !hasShortcut ? styles.disabledIcon : '')}
-                                    onClick={() => onDelete(row)}
-                                    onKeyDown={() => onDelete(row)}
-                                />
-                            )
-                        }
                         <i
                             role="button"
                             tabIndex={-1}
-                            className={cx('far fa-trash-alt', styles.deleteIcon)}
-                            onClick={() => onDelete(row)}
+                            className={cx('far fa-trash-alt', styles.deleteIcon, !hasShortcut ? styles.disabledIcon : '')}
+                            onClick={() => hasShortcut && onDelete(row)}
                             onKeyDown={null}
                         />
                         <i
                             role="button"
                             tabIndex={-1}
-                            className={cx('fas fa-edit', styles.editIcon)}
+                            className={cx(hasShortcut ? 'fas fa-edit' : 'fas fa-plus', styles.actionIcon)}
                             onClick={() => onEdit(row)}
                             onKeyDown={null}
                         />
                     </div>
                 </div>
-            );
-        },
-        renderActionCell: (_, row) => {
-            return (
-                <i
-                    role="button"
-                    tabIndex={-1}
-                    className="fas fa-edit"
-                    onClick={() => this.props.onEdit(row)}
-                    onKeyDown={null}
-                />
             );
         },
         renderToggleCell: (_, row) => {
