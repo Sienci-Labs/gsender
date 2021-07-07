@@ -87,7 +87,8 @@ class Workspace extends PureComponent {
         isUploading: false,
         showPrimaryContainer: store.get('workspace.container.primary.show'),
         inactiveCount: _.size(widgetManager.getInactiveWidgets()),
-        reverseWidgets: store.get('workspace.reverseWidgets')
+        reverseWidgets: store.get('workspace.reverseWidgets'),
+        lastHealthUpdate: null
     };
 
     pubsubTokens = [];
@@ -142,6 +143,11 @@ class Workspace extends PureComponent {
     defaultContainer = null;
 
     controllerEvents = {
+        'hPong': () => {
+            this.setState({
+                lastHealthUpdate: new Date()
+            });
+        },
         'connect': () => {
             this.setState({ disabled: false });
             if (controller.connected) {

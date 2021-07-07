@@ -351,6 +351,11 @@ class CNCEngine {
 
                 controller.writeln(data, context);
             });
+
+            socket.on('hPing', () => {
+                log.debug(`Health check received at ${new Date().toLocaleTimeString()}`);
+                socket.emit('hPong');
+            });
         });
     }
 
