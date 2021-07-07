@@ -497,7 +497,6 @@ class AxesWidget extends PureComponent {
             if (event) {
                 preventDefault(event);
             }
-            const { axis: axisList, direction, force } = payload;
 
             this.handleShortcutStop(payload);
         },
