@@ -129,9 +129,8 @@ class CNCEngine {
         this.io = socketIO(this.server, {
             serveClient: true,
             path: '/socket.io',
-            connectTimeout: 50000,
             pingTimeout: 60000,
-            pingInterval: 45000
+            pingInterval: 25000
         });
 
         this.io.use(socketioJwt.authorize({
@@ -351,6 +350,11 @@ class CNCEngine {
                 }
 
                 controller.writeln(data, context);
+            });
+
+            socket.on('hPing', () => {
+                log.debug(`Health check received at ${new Date().toLocaleTimeString()}`);
+                socket.emit('hPong');
             });
         });
     }

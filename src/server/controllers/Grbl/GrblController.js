@@ -221,7 +221,7 @@ class GrblController {
         this.feeder = new Feeder({
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
-                line = line.replace(/\s*;.*/g, '').replace(/\s*\(.*?\)\s*/g, '').trim();
+                line = line.replace(/\s*;.*/g, '').trim();
                 context = this.populateContext(context);
 
                 if (line[0] === '%') {
@@ -320,7 +320,7 @@ class GrblController {
             bufferSize: (128 - 8), // The default buffer size is 128 bytes
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
-                line = line.replace(/\s*;.*/g, '').replace(/\s*\(.*?\)\s*/g, '').trim();
+                line = line.replace(/\s*;.*/g, '').trim();
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;
@@ -351,10 +351,12 @@ class GrblController {
                         log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M0' });
                         this.emit('workflow:pause', { data: 'M0' });
+                        return line.replace('M0', '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1' });
                         this.emit('workflow:pause', { data: 'M1' });
+                        return line.replace('M1', '(M1)');
                     }
                 }
 
@@ -373,8 +375,6 @@ class GrblController {
                             this.emit('workflow:state', this.workflow.state, { validLine: false, line });
                         } if (!preferences && !preferences.showLineWarnings) {
                             this.emit('workflow:state', this.workflow.state, { validLine: false, line });
-                        } else {
-                            line = '(' + line + ')'; //Surround with paranthesis to ignore line
                         }
                     }
                 }

@@ -42,15 +42,6 @@ class App extends PureComponent {
         const { location } = this.props;
         const accepted = ([
             '/workspace',
-            '/settings',
-            '/settings/general',
-            '/settings/workspace',
-            '/settings/machine-profiles',
-            '/settings/user-accounts',
-            '/settings/controller',
-            '/settings/commands',
-            '/settings/events',
-            '/settings/about'
         ].indexOf(location.pathname) >= 0);
 
         if (!accepted) {

@@ -31,6 +31,11 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
 
 export function* initialize() {
+    /* Health check - every 3 minutes */
+    setInterval(() => {
+        controller.healthCheck();
+    }, 1000 * 60 * 3);
+
     controller.addListener('controller:settings', (type, settings) => {
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_SETTINGS,

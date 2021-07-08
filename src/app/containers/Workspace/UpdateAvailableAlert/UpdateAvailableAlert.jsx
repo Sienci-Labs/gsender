@@ -31,7 +31,8 @@ class UpdateAvailableAlert extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            shown: false
+            shown: false,
+            buttonActive: true,
         };
     }
 
@@ -48,7 +49,8 @@ class UpdateAvailableAlert extends PureComponent {
 
     subscribe () {
         const tokens = [
-            pubsub.subscribe('showUpdateToast', (msg) => {
+            pubsub.subscribe('showUpdateToast', (msg, info) => {
+                console.log(info);
                 this.setState({
                     shown: true
                 });
@@ -73,7 +75,7 @@ class UpdateAvailableAlert extends PureComponent {
     }
 
     render() {
-        const { shown } = this.state;
+        const { shown, buttonActive } = this.state;
         const { restartHandler } = this.props;
         const actions = { ...this.actions };
         return (
@@ -83,10 +85,20 @@ class UpdateAvailableAlert extends PureComponent {
                 </div>
                 <div className={styles.updateContent}>
                     <div>
-                        Update downloaded and available to install.  Restart now?
+                        Update available to download.  Download and restart now?
                     </div>
-                    <button onClick={() => restartHandler()} className={styles.restartButton}>
-                        Restart and Install
+                    <button
+                        onClick={() => {
+                            this.setState({
+                                buttonActive: false
+                            });
+                            restartHandler();
+                        }}
+                        className={styles.restartButton}
+                    >
+                        {
+                            buttonActive ? 'Download and install' : 'Downloading...'
+                        }
                     </button>
                 </div>
                 <div className={styles.closeModal}>
