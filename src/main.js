@@ -27,6 +27,7 @@ import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
+import isOnline from 'is-online';
 import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
@@ -77,7 +78,7 @@ const main = () => {
 
     app.whenReady().then(async () => {
         try {
-            // Power saver - display sleep higher precedance over app suspension
+            // Power saver - display sleep higher precedence over app suspension
             powerSaverId = powerSaveBlocker.start('prevent-display-sleep');
             log.info(`Result of powerSaveBlocker: ${powerSaveBlocker.isStarted(powerSaverId)}`);
 
@@ -142,9 +143,6 @@ const main = () => {
             autoUpdater.on('error', (err) => {
                 window.webContents.send('updated_error', err);
             });
-            //Check for available updates
-            autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
-            await autoUpdater.checkForUpdates();
 
             ipcMain.once('restart_app', async () => {
                 await autoUpdater.downloadUpdate();
@@ -206,6 +204,12 @@ const main = () => {
             });
         } catch (err) {
             log.error(err);
+        }
+        //Check for available updates at end to avoid try-catch failing to load events
+        const internetConnectivity = await isOnline();
+        if (internetConnectivity) {
+            autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
+            await autoUpdater.checkForUpdates();
         }
     });
 };

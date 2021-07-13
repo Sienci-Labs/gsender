@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "0.6.8",
+  "version": "0.6.9",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -237,6 +237,7 @@
     "i18next-xhr-backend": "~2.0.1",
     "infinite-tree": "~1.16.2",
     "is-electron": "~2.2.0",
+    "is-online": "^9.0.1",
     "jimp": "~0.6.1",
     "js-polyfills": "~0.1.42",
     "jsonwebtoken": "~8.5.1",
