@@ -1,5 +1,5 @@
 Arguments: 
-  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js electron-builder
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add isonline
 
 PATH: 
   C:\sienci\sender\node_modules\.bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Users\kevin\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Go\bin;C:\Program Files\Git\cmd;C:\Program Files (x86)\Yarn\bin\;C:\HashiCorp\Vagrant\bin;C:\TDM-GCC-64\bin;C:\Users\kevin\AppData\Local\Microsoft\WindowsApps;C:\Program Files\JetBrains\WebStorm 2020.2.4\bin;;C:\Users\kevin\AppData\Local\hyper\app-3.0.2\resources\bin;C:\Program Files\JetBrains\IntelliJ IDEA 2020.2.4\bin;;C:\Users\kevin\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Users\kevin\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\JetBrains\GoLand 2020.3\bin;;C:\Users\kevin\go\bin;C:\Users\kevin\AppData\Local\Yarn\bin;C:\Program Files\JetBrains\PyCharm 2021.1.2\bin;
@@ -14,17 +14,22 @@ Platform:
   win32 x64
 
 Trace: 
-  SyntaxError: C:\sienci\sender\package.json: Unexpected token } in JSON at position 6173
-      at JSON.parse (<anonymous>)
-      at C:\Program Files (x86)\Yarn\lib\cli.js:1625:59
-      at Generator.next (<anonymous>)
-      at step (C:\Program Files (x86)\Yarn\lib\cli.js:310:30)
-      at C:\Program Files (x86)\Yarn\lib\cli.js:321:13
+  Error: https://registry.yarnpkg.com/isonline: Not found
+      at Request.params.callback [as _callback] (C:\Program Files (x86)\Yarn\lib\cli.js:66097:18)
+      at Request.self.callback (C:\Program Files (x86)\Yarn\lib\cli.js:140749:22)
+      at Request.emit (events.js:314:20)
+      at Request.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:141721:10)
+      at Request.emit (events.js:314:20)
+      at IncomingMessage.<anonymous> (C:\Program Files (x86)\Yarn\lib\cli.js:141643:12)
+      at Object.onceWrapper (events.js:420:28)
+      at IncomingMessage.emit (events.js:326:22)
+      at endReadableNT (_stream_readable.js:1241:12)
+      at processTicksAndRejections (internal/process/task_queues.js:84:21)
 
 npm manifest: 
   {
     "name": "gSender",
-    "version": "0.6.7",
+    "version": "0.6.9",
     "description": "Electron sender for GRBL based CNC machines",
     "author": {
       "name": "Sienci Labs <hi@sienci.com>",
@@ -113,7 +118,7 @@ npm manifest:
         "allowToChangeInstallationDirectory": true,
         "oneClick": false,
         "license": "LICENSE",
-        "installerSidebar": "electron-build/sidebar.png"
+        "installerSidebar": "electron-build/sidebar.bmp"
       },
       "publish": {
         "provider": "github"
@@ -148,7 +153,7 @@ npm manifest:
         "target": [
           "nsis"
         ],
-        "icon": "electron-build/icon.ico",
+        "icon": "electron-build/icon.ico"
       },
       "linux": {
         "category": "Utility",
@@ -227,6 +232,8 @@ npm manifest:
       "detect-browser": "~4.4.0",
       "downloadjs": "^1.4.7",
       "electron-download": "^4.1.1",
+      "electron-ipc-log": "^3.0.1",
+      "electron-log": "^4.3.5",
       "electron-store": "~3.2.0",
       "electron-updater": "^4.3.8",
       "ensure-array": "~1.0.0",
@@ -5999,6 +6006,16 @@ Lockfile:
       rc "^1.2.1"
       semver "^5.4.1"
       sumchecker "^2.0.2"
+  
+  electron-ipc-log@^3.0.1:
+    version "3.0.1"
+    resolved "https://registry.yarnpkg.com/electron-ipc-log/-/electron-ipc-log-3.0.1.tgz#4d97594f99f7bcdbe7ac4230bd20a1cc8121ff92"
+    integrity sha512-S5eWzUjhYkEBbQ94FgDakQH0FCE3BhhErUIy3EoTK8cDAndfXmHXzl8qGhtdyuFYmRjvPacHb7xfDtas9oGN8g==
+  
+  electron-log@^4.3.5:
+    version "4.3.5"
+    resolved "https://registry.yarnpkg.com/electron-log/-/electron-log-4.3.5.tgz#2aad5f93842b9b5214a1b4a10e47b5ac5c9ec104"
+    integrity sha512-J5Ew3axdk7W4jzzxKLSAi1sqbcAoo9CzHuBVsG0tT47j256xKulNrWFf3lZmHJ1KDXOQUcuwOngQF0jjmpEdpw==
   
   electron-publish@22.10.5:
     version "22.10.5"
