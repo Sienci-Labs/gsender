@@ -42,6 +42,7 @@ import translateExpression from '../../lib/translate-expression';
 import config from '../../services/configstore';
 import monitor from '../../services/monitor';
 import taskRunner from '../../services/taskrunner';
+import { getOutlineGcode } from '../../lib/outlineService';
 import store from '../../store';
 import {
     GLOBAL_OBJECTS as globalObjects,
@@ -61,7 +62,6 @@ import {
 import { METRIC_UNITS } from '../../../app/constants';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
-
 
 // % commands
 const WAIT = '%wait';
@@ -1581,6 +1581,11 @@ class GrblController {
             'toolchange:post': () => {
                 log.debug('starting post hook');
                 this.runPostChangeHook();
+            },
+            'gcode:outline': () => {
+                const [gcode = ''] = args;
+                const toRun = getOutlineGcode(gcode);
+                console.log(toRun);
             }
         }[cmd];
 
