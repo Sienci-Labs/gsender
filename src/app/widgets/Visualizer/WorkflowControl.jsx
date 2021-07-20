@@ -268,6 +268,11 @@ class WorkflowControl extends PureComponent {
         });
     }
 
+    runOutline = () => {
+        const { gcode } = this.props;
+        controller.command('gcode:outline', gcode);
+    }
+
     subscribe() {
         const tokens = [
             pubsub.subscribe('gcode:toolChange', () => {
@@ -358,6 +363,16 @@ class WorkflowControl extends PureComponent {
                         </button>
                     )
                 }
+                <button
+                    type="button"
+                    className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
+                    title={i18n._('Outline')}
+                    onClick={this.runOutline}
+                    disabled={!canRun}
+                    style={{ writingMode: 'vertical-lr' }}
+                >
+                    {i18n._('Outline')} <i className="far fa-star" style={{ writingMode: 'horizontal-tb' }} />
+                </button>
                 {
                     canRun && (
                         <button
@@ -455,11 +470,13 @@ export default connect((store) => {
     const senderInHold = get(store, 'controller.sender.status.hold', false);
     const workflowState = get(store, 'controller.workflow.state');
     const activeState = get(store, 'controller.state.status.activeState');
+    const gcode = get(store, 'file.content', '');
     return {
         fileLoaded,
         isConnected,
         senderInHold,
         workflowState,
-        activeState
+        activeState,
+        gcode
     };
 }, null, null, { forwardRef: true })(WorkflowControl);
