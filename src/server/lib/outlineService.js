@@ -22,17 +22,11 @@
  */
 
 import Toolpath from 'gcode-toolpath';
-import uniqueBy from 'lodash/uniqBy';
 import ch from 'hull.js';
 import * as THREE from 'three';
 import logger from './logger';
 
 const log = logger('service:outline');
-
-const COUNTER_CLOCKWISE = -1;
-const CLOCKWISE = 1;
-const COLLINEAR = 0;
-
 
 // Generate an ordered pair - we don't care about Z index for outline purposes so it's removed
 function vertex(x, y) {
@@ -97,26 +91,16 @@ export function getOutlineGcode(gcode) {
     });
     log.debug('Parsing g-code');
     toolpath.loadFromStringSync(gcode);
-    console.log(`Generated ${vertices.length} total vertices`);
-
-    // Remove duplicate points to speed up hull generation in large files
-    log.debug('Getting unique vertices');
-    const uniqueVertices = uniqueBy(vertices, (v) => JSON.stringify(v));
-    console.log(`Reduced to ${uniqueVertices.length} unique vertices`);
 
     log.debug('Generating hull');
-    let fileHull;
-    if (false) {
-        fileHull = generateConvexHull(uniqueVertices);
-        log.debug('Converting to g-code');
-    }
-    fileHull = ch(uniqueVertices, Infinity);
-    console.log(fileHull);
+    const fileHull = ch(vertices, 25);
+
     const gCode = convertPointsToGCode(fileHull);
+
     return gCode;
 }
 
-function generateConvexHull(points) {
+/*function generateConvexHull(points) {
     if (points.length < 3) {
         return [];
     }
@@ -163,7 +147,7 @@ function orientation(p, q, r) {
     }
     return (value > 0) ? CLOCKWISE : COUNTER_CLOCKWISE;
 }
-
+*/
 function convertPointsToGCode(points) {
     const gCode = [];
     points.forEach(point => {
