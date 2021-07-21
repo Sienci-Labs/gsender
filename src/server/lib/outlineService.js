@@ -22,21 +22,41 @@
  */
 
 import Toolpath from 'gcode-toolpath';
-import isEqual from 'lodash/isEqual';
+import uniqueBy from 'lodash/uniqBy';
+import ch from 'hull.js';
 import * as THREE from 'three';
+import logger from './logger';
+
+const log = logger('service:outline');
+
+const COUNTER_CLOCKWISE = -1;
+const CLOCKWISE = 1;
+const COLLINEAR = 0;
+
+
+// Generate an ordered pair - we don't care about Z index for outline purposes so it's removed
+function vertex(x, y) {
+    return [
+        x.toFixed(3),
+        y.toFixed(3)
+    ];
+    /*return {
+        x: x.toFixed(3),
+        y: y.toFixed(3),
+    };*/
+}
 
 export function getOutlineGcode(gcode) {
     const vertices = [];
     const toolpath = new Toolpath({
-        addLine: (modal, v1, v2) => {
-            const { motion } = modal;
+        addLine: ({ motion }, v1, v2) => {
             // We ignore G0 movements since they generally aren't cutting movements
             if (motion === 'G1') {
-                vertices.push([v2.x, v2.y, v2.z]);
+                vertices.push(vertex(v1.x, v1.y));
+                vertices.push(vertex(v2.x, v2.y));
             }
         },
-        addArcCurve: (modal, v1, v2, v0) => {
-            const { motion, plane } = modal;
+        addArcCurve: ({ motion, plane }, v1, v2, v0) => {
             const isClockwise = (motion === 'G2');
             const radius = Math.sqrt(
                 ((v1.x - v0.x) ** 2) + ((v1.y - v0.y) ** 2)
@@ -59,26 +79,39 @@ export function getOutlineGcode(gcode) {
             );
             const divisions = 30;
             const points = arcCurve.getPoints(divisions);
+            vertices.push(vertex(v1.x, v1.y));
 
             for (let i = 0; i < points.length; ++i) {
                 const point = points[i];
                 const z = ((v2.z - v1.z) / points.length) * i + v1.z;
 
                 if (plane === 'G17') { // XY-plane
-                    vertices.push([point.x, point.y, z]);
+                    vertices.push(vertex(point.x, point.y));
                 } else if (plane === 'G18') { // ZX-plane
-                    vertices.push([point.y, z, point.x]);
+                    vertices.push(vertex(point.y, z));
                 } else if (plane === 'G19') { // YZ-plane
-                    vertices.push([z, point.x, point.y]);
+                    vertices.push(vertex(z, point.x));
                 }
             }
         }
     });
-
+    log.debug('Parsing g-code');
     toolpath.loadFromStringSync(gcode);
+    console.log(`Generated ${vertices.length} total vertices`);
 
-    const fileHull = generateConvexHull(vertices);
+    // Remove duplicate points to speed up hull generation in large files
+    log.debug('Getting unique vertices');
+    const uniqueVertices = uniqueBy(vertices, (v) => JSON.stringify(v));
+    console.log(`Reduced to ${uniqueVertices.length} unique vertices`);
 
+    log.debug('Generating hull');
+    let fileHull;
+    if (false) {
+        fileHull = generateConvexHull(uniqueVertices);
+        log.debug('Converting to g-code');
+    }
+    fileHull = ch(uniqueVertices, Infinity);
+    console.log(fileHull);
     const gCode = convertPointsToGCode(fileHull);
     return gCode;
 }
@@ -91,16 +124,51 @@ function generateConvexHull(points) {
     const leftMostPoint = getLeftmostPoint(points);
     let currentPoint = leftMostPoint;
     do {
-        result.push(currentPoint);
+        result.push(points[currentPoint]);
         currentPoint = getNextOuterPoint(points, currentPoint);
-    } while (!isEqual(currentPoint, leftMostPoint));
+    } while (currentPoint !== leftMostPoint);
     return result;
 }
 
-function getLeftmostPoint(points) {}
+function getLeftmostPoint(points) {
+    let leftMostPoint = 0;
+    for (let i = 1; i < points.length; i++) {
+        const pointX = points[i].x;
+        const leftMostPointX = points[leftMostPoint].x;
+        if (pointX < leftMostPointX) {
+            leftMostPoint = i;
+        }
+    }
+    return leftMostPoint;
+}
 
-function getNextOuterPoint(points, currentPoint) {}
+function getNextOuterPoint(points, startingIndex) {
+    console.log(startingIndex);
+    let q = (startingIndex + 1) % points.length;
+    console.log(q);
+    for (let i = 0; i < points.length; i++) {
+        if (orientation(points[startingIndex], points[i], points[q]) === COUNTER_CLOCKWISE) {
+            q = i;
+        }
+    }
+    console.log(`Returning ${q}`);
+    return q;
+}
+
+function orientation(p, q, r) {
+    // https://www.geeksforgeeks.org/orientation-3-ordered-points/
+    const value = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+    if (value === 0) {
+        return COLLINEAR;
+    }
+    return (value > 0) ? CLOCKWISE : COUNTER_CLOCKWISE;
+}
 
 function convertPointsToGCode(points) {
-    return [];
+    const gCode = [];
+    points.forEach(point => {
+        const [x, y] = point;
+        gCode.push(`G21 G0 X${x} Y${y}`);
+    });
+    return gCode;
 }
