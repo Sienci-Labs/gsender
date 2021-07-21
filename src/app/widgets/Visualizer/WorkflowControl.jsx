@@ -371,7 +371,7 @@ class WorkflowControl extends PureComponent {
                     disabled={!canRun}
                     style={{ writingMode: 'vertical-lr' }}
                 >
-                    {i18n._('Outline')} <i className="far fa-star" style={{ writingMode: 'horizontal-tb' }} />
+                    {i18n._('Outline')} <i className="fas fa-vector-square" style={{ writingMode: 'horizontal-tb' }} />
                 </button>
                 {
                     canRun && (
