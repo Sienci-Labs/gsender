@@ -38,5 +38,8 @@ export const TOASTER_UNTIL_CLOSE = -1;
 export const Toaster = {
     pop: (options) => {
         pubsub.publish('toast:new', options);
+    },
+    clear: () => {
+        pubsub.publish('toast:clear');
     }
 };

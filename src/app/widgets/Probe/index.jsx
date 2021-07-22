@@ -456,7 +456,7 @@ class ProbeWidget extends PureComponent {
         code = code.concat([
             this.gcode('G91'),
             this.gcode('G0', {
-                [axis]: (retractDistance * 2)
+                [axis]: (retractDistance)
             })
         ]);
 

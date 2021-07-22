@@ -1586,6 +1586,7 @@ class GrblController {
                 const [gcode = ''] = args;
                 const toRun = getOutlineGcode(gcode);
                 log.debug('Running outline');
+                this.emit('outline:start');
                 this.command('gcode', toRun);
             }
         }[cmd];

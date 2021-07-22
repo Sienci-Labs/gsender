@@ -86,7 +86,7 @@ class Toaster extends PureComponent {
             pubsub.subscribe('toast:remove', (msg, id) => {
                 this.removeToast(id);
             }),
-            pubsub.subscribe('toast:removeAll', (msg, id) => {
+            pubsub.subscribe('toast:clear', (msg) => {
                 this.removeAll();
             })
         ];

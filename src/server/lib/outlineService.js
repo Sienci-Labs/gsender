@@ -34,10 +34,6 @@ function vertex(x, y) {
         x.toFixed(3),
         y.toFixed(3)
     ];
-    /*return {
-        x: x.toFixed(3),
-        y: y.toFixed(3),
-    };*/
 }
 
 export function getOutlineGcode(gcode) {
@@ -100,54 +96,6 @@ export function getOutlineGcode(gcode) {
     return gCode;
 }
 
-/*function generateConvexHull(points) {
-    if (points.length < 3) {
-        return [];
-    }
-    const result = [];
-    const leftMostPoint = getLeftmostPoint(points);
-    let currentPoint = leftMostPoint;
-    do {
-        result.push(points[currentPoint]);
-        currentPoint = getNextOuterPoint(points, currentPoint);
-    } while (currentPoint !== leftMostPoint);
-    return result;
-}
-
-function getLeftmostPoint(points) {
-    let leftMostPoint = 0;
-    for (let i = 1; i < points.length; i++) {
-        const pointX = points[i].x;
-        const leftMostPointX = points[leftMostPoint].x;
-        if (pointX < leftMostPointX) {
-            leftMostPoint = i;
-        }
-    }
-    return leftMostPoint;
-}
-
-function getNextOuterPoint(points, startingIndex) {
-    console.log(startingIndex);
-    let q = (startingIndex + 1) % points.length;
-    console.log(q);
-    for (let i = 0; i < points.length; i++) {
-        if (orientation(points[startingIndex], points[i], points[q]) === COUNTER_CLOCKWISE) {
-            q = i;
-        }
-    }
-    console.log(`Returning ${q}`);
-    return q;
-}
-
-function orientation(p, q, r) {
-    // https://www.geeksforgeeks.org/orientation-3-ordered-points/
-    const value = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-    if (value === 0) {
-        return COLLINEAR;
-    }
-    return (value > 0) ? CLOCKWISE : COUNTER_CLOCKWISE;
-}
-*/
 function convertPointsToGCode(points) {
     const gCode = [];
     points.forEach(point => {

@@ -28,7 +28,7 @@ import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
 export function* initialize() {
     /* Health check - every 3 minutes */
@@ -142,6 +142,14 @@ export function* initialize() {
             msg: `Program paused due to '${data}' command.`,
             type: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE
+        });
+    });
+
+    controller.addListener('outline:start', () => {
+        Toaster.clear();
+        Toaster.pop({
+            type: TOASTER_SUCCESS,
+            msg: 'Running file outline'
         });
     });
 
