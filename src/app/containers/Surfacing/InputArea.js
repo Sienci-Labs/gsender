@@ -56,7 +56,7 @@ const InputArea = ({ values, onChange, units }) => {
                 <Input
                     label="Router Bit Diameter"
                     units={units}
-                    additionalProps={{ type: 'number', id: 'bitDiameter', min: 1, max: 1000 }}
+                    additionalProps={{ type: 'number', id: 'bitDiameter', min: 0.01, max: 1000 }}
                     value={bitDiameter}
                     onChange={onChange}
                 />
