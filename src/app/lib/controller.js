@@ -89,7 +89,8 @@ class Controller {
         'controller:state': [],
         'message': [],
         'toolchange:start': [],
-        'hPong': []
+        'hPong': [],
+        'outline:start': []
     };
 
     context = {

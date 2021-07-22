@@ -36,7 +36,13 @@ import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import ReaderWorker from './FileReader.worker';
-import { Toaster, TOASTER_DANGER, TOASTER_WARNING, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
+import {
+    Toaster,
+    TOASTER_DANGER,
+    TOASTER_WARNING,
+    TOASTER_UNTIL_CLOSE,
+    TOASTER_INFO
+} from '../../lib/toaster/ToasterLib';
 import {
     // Grbl
     GRBL_ACTIVE_STATE_ALARM,
@@ -270,6 +276,11 @@ class WorkflowControl extends PureComponent {
 
     runOutline = () => {
         const { gcode } = this.props;
+        Toaster.pop({
+            TYPE: TOASTER_INFO,
+            duration: TOASTER_UNTIL_CLOSE,
+            msg: 'Generating outline for current file'
+        });
         controller.command('gcode:outline', gcode);
     }
 
@@ -363,16 +374,19 @@ class WorkflowControl extends PureComponent {
                         </button>
                     )
                 }
-                <button
-                    type="button"
-                    className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
-                    title={i18n._('Outline')}
-                    onClick={this.runOutline}
-                    disabled={!canRun}
-                    style={{ writingMode: 'vertical-lr' }}
-                >
-                    {i18n._('Outline')} <i className="fas fa-vector-square" style={{ writingMode: 'horizontal-tb' }} />
-                </button>
+                {
+                    showTest &&
+                    <button
+                        type="button"
+                        className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
+                        title={i18n._('Outline')}
+                        onClick={this.runOutline}
+                        disabled={!canRun}
+                        style={{ writingMode: 'vertical-lr' }}
+                    >
+                        {i18n._('Outline')} <i className="fas fa-vector-square" style={{ writingMode: 'horizontal-tb' }} />
+                    </button>
+                }
                 {
                     canRun && (
                         <button
