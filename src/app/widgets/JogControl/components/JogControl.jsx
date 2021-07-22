@@ -37,7 +37,8 @@ class JogControl extends PureComponent {
 
     state = {
         startTime: 0,
-        didClick: false
+        didClick: false,
+        isContinuousJogging: false,
     }
 
     timeout = 250;
@@ -54,9 +55,7 @@ class JogControl extends PureComponent {
     }
 
     onMouseUp(e) {
-        if (this.notLeftClick(e)) {
-            return;
-        }
+        console.log('Mouse Up');
         const { startTime, didClick } = this.state;
         const { jog, stopContinuousJog } = this.props;
 
@@ -70,8 +69,6 @@ class JogControl extends PureComponent {
                 timer: new Date()
             });
         } else {
-            this.continuousInterval && clearInterval(this.continuousInterval);
-            this.continuousInterval = null;
             stopContinuousJog();
             this.setState({
                 startTime: new Date(),
@@ -84,25 +81,41 @@ class JogControl extends PureComponent {
         if (this.notLeftClick(e)) {
             return;
         }
+        console.log('Mouse Down');
         const startTime = new Date();
         this.setState({
             startTime: startTime,
             didClick: true
         });
         this.timeoutFunction = setTimeout(() => {
+            console.log('Started Cont jogging');
             this.props.continuousJog();
+            this.setState({
+                isContinuousJogging: true
+            });
         }, this.timeout);
     }
 
     onMouseLeave(e) {
-        const { didClick, startTime } = this.state;
+        console.log('Mouse Leave');
+        const { didClick, startTime, isContinuousJogging } = this.state;
         const timer = new Date() - startTime;
         if (didClick && timer >= this.timeout) {
+            clearTimeout(this.timeoutFunction);
+            this.timeoutFunction = null;
             this.props.stopContinuousJog();
             this.setState({
                 didClick: false,
                 startTime: new Date()
             });
+            return;
+        }
+        // Always check if we're continuous jogging regardless on leave and send cancel command
+        if (isContinuousJogging) {
+            console.log('Fallback');
+            clearTimeout(this.timeoutFunction);
+            this.timeoutFunction = null;
+            this.props.stopContinuousJog();
         }
     }
 
