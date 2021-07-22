@@ -54,14 +54,17 @@ class JogControl extends PureComponent {
         return false;
     }
 
+    clearTimeout() {
+        clearTimeout(this.timeoutFunction);
+        this.timeoutFunction = null;
+    }
+
     onMouseUp(e) {
-        console.log('Mouse Up');
         const { startTime, didClick } = this.state;
         const { jog, stopContinuousJog } = this.props;
 
         const timer = new Date() - startTime;
-        clearTimeout(this.timeoutFunction);
-        this.timeoutFunction = null;
+        this.clearTimeout(); // remove timeout function so it doesn't fire if exists
         if (timer < this.timeout && didClick) {
             jog();
             this.setState({
@@ -81,14 +84,12 @@ class JogControl extends PureComponent {
         if (this.notLeftClick(e)) {
             return;
         }
-        console.log('Mouse Down');
         const startTime = new Date();
         this.setState({
             startTime: startTime,
             didClick: true
         });
         this.timeoutFunction = setTimeout(() => {
-            console.log('Started Cont jogging');
             this.props.continuousJog();
             this.setState({
                 isContinuousJogging: true
@@ -97,25 +98,26 @@ class JogControl extends PureComponent {
     }
 
     onMouseLeave(e) {
-        console.log('Mouse Leave');
         const { didClick, startTime, isContinuousJogging } = this.state;
+        this.clearTimeout();
         const timer = new Date() - startTime;
         if (didClick && timer >= this.timeout) {
-            clearTimeout(this.timeoutFunction);
-            this.timeoutFunction = null;
             this.props.stopContinuousJog();
             this.setState({
                 didClick: false,
-                startTime: new Date()
+                startTime: new Date(),
+                isContinuousJogging: false
             });
             return;
         }
         // Always check if we're continuous jogging regardless on leave and send cancel command
         if (isContinuousJogging) {
-            console.log('Fallback');
             clearTimeout(this.timeoutFunction);
             this.timeoutFunction = null;
             this.props.stopContinuousJog();
+            this.setState({
+                isContinuousJogging: false
+            });
         }
     }
 
