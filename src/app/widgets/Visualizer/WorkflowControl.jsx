@@ -360,32 +360,32 @@ class WorkflowControl extends PureComponent {
                         )
                     }
                 </div>
-                {
-                    showTest && (
-                        <button
-                            type="button"
-                            className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
-                            title={i18n._('Test Run')}
-                            onClick={this.handleTestFile}
-                            disabled={!canRun}
-                            style={{ writingMode: 'vertical-lr' }}
-                        >
-                            {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
-                        </button>
-                    )
-                }
+
                 {
                     showTest &&
-                    <button
-                        type="button"
-                        className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
-                        title={i18n._('Outline')}
-                        onClick={this.runOutline}
-                        disabled={!canRun}
-                        style={{ writingMode: 'vertical-lr' }}
-                    >
-                        {i18n._('Outline')} <i className="fas fa-vector-square" style={{ writingMode: 'horizontal-tb' }} />
-                    </button>
+                        <div className={styles.splitContainer}>
+                            <button
+                                type="button"
+                                className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
+                                title={i18n._('Outline')}
+                                onClick={this.runOutline}
+                                disabled={!canRun}
+                                style={{ writingMode: 'vertical-lr' }}
+                            >
+                                {i18n._('Outline')} <i className="fas fa-vector-square" style={{ writingMode: 'horizontal-tb' }} />
+                            </button>
+                            <button
+                                type="button"
+                                className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
+                                title={i18n._('Test Run')}
+                                onClick={this.handleTestFile}
+                                disabled={!canRun}
+                                style={{ writingMode: 'vertical-lr' }}
+                            >
+                                {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
+                            </button>
+                        </div>
+
                 }
                 {
                     canRun && (
