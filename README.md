@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/windows.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/linux.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.8/gSender-0.6.8-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.8/gSender-0.6.8-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.8/gSender-0.6.8.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.8/gSender_0.6.8_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v0.6.8/gSender-0.6.8-armv7l.AppImage)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/0.6.9/gSender-0.6.9-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/0.6.9/gSender-0.6.9-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/0.6.9/gSender-0.6.9.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/0.6.9/gSender_0.6.9_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/0.6.9/gSender-0.6.9-armv7l.AppImage)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -95,6 +95,13 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### Open Beta 0.6.9 (July 23, 2021)
+* Fixed issue where load file would not work if internet connection not available
+* Added outline tool to generate and run rough outline of project
+* Fixed issue where moving the cursor off the jog controls while button is depressed could result in jogging running away
+* Fixed issue with surfacing tool limits and ease of changing inputs
+* Fixed probe settings not being reflected in probe module until restart
 
 ### Open Beta 0.6.8 (July 8, 2021)
 * Fix for duplicated keybinds
