@@ -200,10 +200,22 @@
         color = #3e85c7;
         btn-mixin(color);
     }
+
      &-test {
         color =#5191cc;
         btn-mixin(color)
-        padding: 0.3rem 0.9rem !important;
+        padding: 0.3rem 1rem !important;
+        min-width: 0 !important;
+        display: flex;
+        flex-direction column-reverse;
+        align-items center;
+        justify-content: center
+        gap: 0.3rem;
+
+         i {
+             margin: 0 !important;
+             padding: 0 !important;
+         }
 
     }
 
@@ -244,7 +256,7 @@
 
 .split-container {
     display: flex;
-    flex-direction column;
+    flex-direction row;
     gap: 0.1rem;
     justify-content: space-between;
 }

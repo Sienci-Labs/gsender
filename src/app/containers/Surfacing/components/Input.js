@@ -24,7 +24,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
 import styles from './input.styl';
 
 const Input = ({ value, label, units, onChange, additionalProps, className, style, disabled }) => {
@@ -38,6 +37,7 @@ const Input = ({ value, label, units, onChange, additionalProps, className, styl
                     onChange={onChange}
                     className={classNames('form-control', styles.inputText)}
                     disabled={disabled}
+                    type="number"
                 />
                 {units && <span className="input-group-addon">{units}</span>}
             </div>
