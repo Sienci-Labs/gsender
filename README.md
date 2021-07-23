@@ -99,7 +99,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 ### Open Beta 0.6.9 (July 23, 2021)
 * Fixed issue where load file would not work if internet connection not available
 * Added outline tool to generate and run rough outline of project
-* Fixed issue where moving the cursor off the jog controls while button is depressed could result in jogging running away
+* Fixed issue where moving the cursor off the jog controls while buttongit is depressed could result in jogging running away
 * Fixed issue with surfacing tool limits and ease of changing inputs
 * Fixed probe settings not being reflected in probe module until restart
 
