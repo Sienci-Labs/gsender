@@ -281,7 +281,7 @@ class WorkflowControl extends PureComponent {
             duration: TOASTER_UNTIL_CLOSE,
             msg: 'Generating outline for current file'
         });
-        controller.command('gcode:outline', gcode);
+        controller.command('gcode:outline', gcode, 300);
     }
 
     subscribe() {

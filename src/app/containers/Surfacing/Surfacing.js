@@ -5,7 +5,6 @@ import pubsub from 'pubsub-js';
 import store from 'app/store';
 import { METRIC_UNITS, IMPERIAL_UNITS } from 'app/constants';
 import controller from 'app/lib/controller';
-
 import InputArea from './InputArea';
 import ActionArea from './components/actions';
 import Visualizer from './components/visualizer';
@@ -78,30 +77,12 @@ const Surfacing = ({ onClose, showTitle }) => {
     }, [surfacing]);
 
     const handleChange = (e) => {
-        const { id, value, min, max } = e.target;
-        const val = Number(value);
-        const minVal = Number(min);
-        const maxVal = Number(max);
+        const { id, value } = e.target;
+        let val = Number(value);
 
-        if (!val || val < 0) {
-            if (val !== 0) {
-                return;
-            }
-        }
-        if (min && val < minVal) {
-            return;
-        }
-        if (max && val > maxVal) {
-            return;
-        }
+        val = Math.abs(val);
 
-        //Value may not exceed 3 decimal places
-        let cleanedValue = val;
-        if ([...value].length > 4) { //Value spread into the array includes the decimal dot
-            cleanedValue = Number(cleanedValue.toFixed(3));
-        }
-
-        setSurfacing(prev => ({ ...prev, [id]: cleanedValue }));
+        setSurfacing(prev => ({ ...prev, [id]: val }));
     };
 
     /**
