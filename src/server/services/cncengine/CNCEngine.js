@@ -130,7 +130,8 @@ class CNCEngine {
             serveClient: true,
             path: '/socket.io',
             pingTimeout: 60000,
-            pingInterval: 25000
+            pingInterval: 25000,
+            maxHttpBufferSize: 40e6
         });
 
         this.io.use(socketioJwt.authorize({
