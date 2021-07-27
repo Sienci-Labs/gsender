@@ -686,6 +686,22 @@ machines.run = (id) => new Promise((resolve, reject) => {
         });
 });
 
+const file = {};
+
+file.upload = (file, port) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/file')
+        .attach('file', file)
+        .field('port', port)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 export default {
     getLatestVersion,
 
@@ -715,4 +731,7 @@ export default {
     macros,
     mdi,
     users,
+
+    // Files
+    file,
 };
