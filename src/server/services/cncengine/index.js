@@ -33,7 +33,12 @@ const stop = () => {
     cncengine.stop();
 };
 
+const load = (gcode) => {
+    cncengine.load(gcode);
+};
+
 export default {
     start,
-    stop
+    stop,
+    load
 };

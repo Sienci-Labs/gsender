@@ -87,6 +87,8 @@ class CNCEngine {
 
     sockets = [];
 
+    gcode = null;
+
     // Event Trigger
     event = new EventTrigger((event, trigger, commands) => {
         log.debug(`EventTrigger: event="${event}", trigger="${trigger}", commands="${commands}"`);
@@ -357,6 +359,10 @@ class CNCEngine {
                 log.debug(`Health check received at ${new Date().toLocaleTimeString()}`);
                 socket.emit('hPong');
             });
+
+            socket.on('gcode:fetch', () => {
+                socket.emit('gcode:load', this.gcode);
+            });
         });
     }
 
@@ -372,6 +378,10 @@ class CNCEngine {
         taskRunner.removeListener('finish', this.listener.taskFinish);
         taskRunner.removeListener('error', this.listener.taskError);
         config.removeListener('change', this.listener.configChange);
+    }
+
+    load(gcode) {
+        this.gcode = gcode;
     }
 }
 

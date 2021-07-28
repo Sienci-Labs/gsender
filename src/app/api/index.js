@@ -689,9 +689,10 @@ machines.run = (id) => new Promise((resolve, reject) => {
 const file = {};
 
 file.upload = (file, port) => new Promise((resolve, reject) => {
+    console.log(file);
     authrequest
         .post('/api/file')
-        .attach('file', file)
+        .attach('gcode', file)
         .field('port', port)
         .end((err, res) => {
             if (err) {

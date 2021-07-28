@@ -30,12 +30,13 @@ import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
 import controller from 'app/lib/controller';
 import React, { PureComponent } from 'react';
+import api from 'app/api';
 import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
-import ReaderWorker from './FileReader.worker';
+//import ReaderWorker from './FileReader.worker';
 import {
     Toaster,
     TOASTER_DANGER,
@@ -101,10 +102,15 @@ class WorkflowControl extends PureComponent {
         actions.uploadFile(result, meta);
     }
 
-    handleChangeFile = (event) => {
+    handleChangeFile = async (event) => {
         const files = event.target.files;
         const file = files[0];
-
+        console.log(file);
+        const start = Date.now();
+        const res = await api.file.upload(file, 'COM5');
+        console.log(Date.now() - start);
+        console.log(res);
+        /*
         const meta = {
             name: file.name,
             size: file.size
@@ -123,6 +129,7 @@ class WorkflowControl extends PureComponent {
             meta: meta
         });
         this.setState({ fileLoaded: false });
+        */
     };
 
     handleElectronFileUpload = (file) => {
