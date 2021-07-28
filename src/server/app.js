@@ -344,6 +344,9 @@ const appMain = () => {
         app.post(urljoin(settings.route, 'api/watch/files'), api.watch.getFiles);
         app.get(urljoin(settings.route, 'api/watch/file'), api.watch.readFile);
         app.post(urljoin(settings.route, 'api/watch/file'), api.watch.readFile);
+
+        // Files
+        app.post(urljoin(settings.route, 'api/file'), api.files.uploadFile);
     }
 
     // page
