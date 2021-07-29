@@ -97,7 +97,7 @@ export const fetch = (req, res) => {
 };
 
 export const create = (req, res) => {
-    const { name, content } = { ...req.body };
+    const { name, content, description } = { ...req.body };
 
     if (!name) {
         res.status(ERR_BAD_REQUEST).send({
@@ -115,11 +115,34 @@ export const create = (req, res) => {
 
     try {
         const records = getSanitizedRecords();
+        let column, rowIndex;
+
+        const column1Length = records
+            .filter(macro => macro.column === 'column1')
+            .sort((a, b) => a.rowIndex - b.rowIndex)
+            .length;
+
+        const column2Length = records
+            .filter(macro => macro.column === 'column2')
+            .sort((a, b) => a.rowIndex - b.rowIndex)
+            .length;
+
+        if (column2Length >= column1Length) {
+            column = 'column1';
+            rowIndex = column1Length;
+        } else {
+            column = 'column2';
+            rowIndex = column2Length;
+        }
+
         const record = {
             id: uuid.v4(),
             mtime: new Date().getTime(),
-            name: name,
-            content: content
+            name,
+            content,
+            description,
+            column,
+            rowIndex,
         };
 
         records.push(record);
