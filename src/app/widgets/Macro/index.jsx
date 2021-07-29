@@ -176,6 +176,29 @@ class MacroWidget extends PureComponent {
                 // Ignore error
             }
         },
+        updateMacros: async (macros = []) => {
+            try {
+                if (macros.length > 0) {
+                    for await (const macro of macros) {
+                        const { id, name, content, column, description, rowIndex } = macro;
+                        api.macros.update(id, { name, content, description, column, rowIndex });
+                    }
+
+                    const updatedMacros = this.state.macros.map(currentMacro => {
+                        for (const macro of macros) {
+                            if (macro.id === currentMacro.id) {
+                                return macro;
+                            }
+                        }
+                        return currentMacro;
+                    });
+
+                    this.setState({ macros: updatedMacros });
+                }
+            } catch (err) {
+                // Ignore error
+            }
+        },
         runMacro: (id, { name }) => {
             controller.command('macro:run', id, controller.context, (err, data) => {
                 if (err) {
