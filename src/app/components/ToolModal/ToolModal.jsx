@@ -28,9 +28,14 @@ import Modal from 'app/components/Modal';
 
 import styles from './index.styl';
 
-const ToolModal = ({ onClose, title, children }) => {
+const ToolModal = ({ onClose, title, style, className, size, children }) => {
     return (
-        <Modal onClose={onClose}>
+        <Modal
+            onClose={onClose}
+            style={style}
+            className={className}
+            size={size}
+        >
             <div className={styles.toolModal}>
                 <div className={styles.header}>
                     <h3 className={styles.headerText}>{title}</h3>
@@ -47,7 +52,8 @@ const ToolModal = ({ onClose, title, children }) => {
 
 ToolModal.propTypes = {
     title: PropTypes.string.isRequired,
-    onClose: PropTypes.func.isRequired
+    onClose: PropTypes.func.isRequired,
+    size: PropTypes.string,
 };
 
 export default ToolModal;
