@@ -29,6 +29,8 @@ import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import EstimateWorker from 'app/workers/Estimate.worker';
+import { estimateResponseHandler } from 'app/workers/Estimate.response';
 
 export function* initialize() {
     /* Health check - every 3 minutes */
@@ -116,6 +118,13 @@ export function* initialize() {
                 size,
                 name
             }
+        });
+        const estimateWorker = new EstimateWorker();
+        estimateWorker.onmessage = estimateResponseHandler;
+        estimateWorker.postMessage({
+            content,
+            name,
+            size
         });
     });
 

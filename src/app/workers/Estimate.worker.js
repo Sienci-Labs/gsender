@@ -1,0 +1,52 @@
+/*
+ * Copyright (C) 2021 Sienci Labs Inc.
+ *
+ * This file is part of gSender.
+ *
+ * gSender is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, under version 3 of the License.
+ *
+ * gSender is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Contact for information regarding this program and its license
+ * can be sent through gSender@sienci.com or mailed to the main office
+ * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
+ *
+ */
+
+import { GCodeProcessor } from '../lib/gcodeProcessor/GCodeProcessor';
+
+onmessage = function({ data }) {
+    console.log('worker started');
+    const { content, name, size, feedArray = null, accelArray = null } = data;
+    const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
+    //Clean up lines and remove ones that are comments and headers
+    const lines = content
+        .split('\n')
+        .filter(line => (line.trim().length > 0))
+        .filter(line => !comments.some(comment => line.includes(comment)));
+
+    const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'], maxFeed: feedArray, acceleration: accelArray });
+    processor.process(lines);
+    console.log(processor);
+
+    postMessage({
+        name,
+        size,
+        total: (lines.length + 1),
+        toolSet: processor.vmState.tools,
+        spindleSet: processor.vmState.spindleRates,
+        movementSet: processor.vmState.feedrates,
+        invalidGcode: processor.vmState.invalidGcode,
+        estimatedTime: processor.vmState.totalTime,
+        bbox: processor.getBBox(),
+        fileModal: processor.vmState.units
+    });
+};
