@@ -21,13 +21,15 @@
  *
  */
 
-import ensureArray from 'ensure-array';
 import PropTypes from 'prop-types';
 import includes from 'lodash/includes';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import i18n from 'app/lib/i18n';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+
 import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED
@@ -39,7 +41,8 @@ import styles from './index.styl';
 class Macro extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
+        workflow: PropTypes.object,
     };
 
     canRunMacro = () => {
@@ -129,27 +132,121 @@ class Macro extends PureComponent {
             macros = []
         } = state;
 
+        const computeColumn = ({ columnName }) => {
+            return macros
+                .filter(macro => macro.column === columnName)
+                .sort((a, b) => a.rowIndex - b.rowIndex);
+        };
+
+        const [column1, column2] = [computeColumn({ columnName: 'column1' }), computeColumn({ columnName: 'column2' })];
+
         const disabled = !this.canRunMacro();
 
-        return (
-            <div className={styles['macro-container']}>
-                {macros.length === 0 && (
-                    <div className={styles.emptyResult}>
-                        {i18n._('No macros...')}<br />
-                    </div>
-                )}
-                {ensureArray(macros).map((macro) => (
-                    <MacroItem
-                        key={macro.id}
-                        macro={macro}
-                        onRun={this.handleRunMacro}
-                        onEdit={this.handleEditMacro}
-                        onDelete={this.handleDeleteMacro}
-                        disabled={disabled}
-                    />
-                ))}
-            </div>
-        );
+        // return (
+        //     <div className={styles['macro-container']}>
+        //         {macros.length === 0 && (
+        //             <div className={styles.emptyResult}>
+        //                 {i18n._('No macros...')}<br />
+        //             </div>
+        //         )}
+
+        //         {ensureArray(macros).map((macro) => (
+        //             <div key={macro.id}>
+        //                 <MacroItem
+        //                     key={macro.id}
+        //                     macro={macro}
+        //                     onRun={this.handleRunMacro}
+        //                     onEdit={this.handleEditMacro}
+        //                     onDelete={this.handleDeleteMacro}
+        //                     disabled={disabled}
+        //                 />
+        //             </div>
+        //         ))}
+        //     </div>
+        // );
+        const getListStyle = isDraggingOver => ({
+            // background: isDraggingOver ? 'lightblue' : 'lightgrey',
+            padding: 8,
+            width: '100%',
+            display: 'grid',
+            gridAutoRows: 'min-content',
+            gap: 5,
+        });
+
+        const Container = ({ columns, children }) => {
+            const arr = new Array(columns).fill(columns);
+            const gridTemplateColumns = arr.reduce((acc) => acc + ' 1fr', '');
+
+            return (
+                <div style={{ display: 'grid', gridTemplateColumns, overflowY: 'auto' }}>
+                    {children}
+                </div>
+            );
+        };
+
+        const DroppableColumn = ({ droppableId, macros }) => {
+            return (
+                <Droppable droppableId={droppableId}>
+                    {(provided, snapshot) => (
+                        <div
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            style={getListStyle(snapshot.isDraggingOver)}
+                        >
+                            {macros.map((macro, index) => (
+                                <Draggable key={macro.id} draggableId={macro.id} index={index}>
+                                    {(provided) => (
+                                        <div
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                        >
+                                            {
+                                                macro.description
+                                                    ? (
+                                                        <TooltipCustom content={macro.description} location="default">
+                                                            <MacroItem
+                                                                key={macro.id}
+                                                                macro={macro}
+                                                                onRun={this.handleRunMacro}
+                                                                onEdit={this.handleEditMacro}
+                                                                onDelete={() => this.onDeleteClick({ name: macro.name, id: macro.id })}
+                                                                disabled={disabled}
+                                                            />
+                                                        </TooltipCustom>
+                                                    )
+                                                    : (
+                                                        <MacroItem
+                                                            key={macro.id}
+                                                            macro={macro}
+                                                            onRun={this.handleRunMacro}
+                                                            onEdit={this.handleEditMacro}
+                                                            onDelete={() => this.onDeleteClick({ name: macro.name, id: macro.id })}
+                                                            disabled={disabled}
+                                                        />
+                                                    )
+                                            }
+                                        </div>
+                                    )}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+            );
+        };
+
+        return macros.length === 0
+            ? <div className={styles['macro-container']}><div className={styles.emptyResult}>No Macros...</div></div>
+            : (
+                <DragDropContext onDragEnd={this.onDragEnd}>
+                    <Container columns={2}>
+                        <DroppableColumn droppableId="column1" macros={column1} />
+                        <DroppableColumn droppableId="column2" macros={column2} />
+                    </Container>
+                </DragDropContext>
+            );
     }
 }
 
