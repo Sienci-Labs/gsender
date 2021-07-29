@@ -105,31 +105,10 @@ class WorkflowControl extends PureComponent {
     handleChangeFile = async (event) => {
         const files = event.target.files;
         const file = files[0];
-        console.log(file);
+
         const start = Date.now();
-        const res = await api.file.upload(file, 'COM5');
+        await api.file.upload(file, 'COM5');
         console.log(Date.now() - start);
-        console.log(res);
-        /*
-        const meta = {
-            name: file.name,
-            size: file.size
-        };
-
-        const readerWorker = new ReaderWorker();
-        readerWorker.onmessage = this.handleReaderResponse;
-
-        if (isElectron()) {
-            const recentFile = createRecentFileFromRawPath(file.path, file.name);
-            addRecentFile(recentFile);
-        }
-
-        readerWorker.postMessage({
-            file: file,
-            meta: meta
-        });
-        this.setState({ fileLoaded: false });
-        */
     };
 
     handleElectronFileUpload = (file) => {

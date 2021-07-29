@@ -116,7 +116,13 @@ export function* initialize() {
             payload: {
                 content,
                 size,
-                name
+                name,
+            }
+        });
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_PROCESSING,
+            payload: {
+                value: true
             }
         });
         const estimateWorker = new EstimateWorker();

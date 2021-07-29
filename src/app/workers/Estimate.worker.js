@@ -24,7 +24,6 @@
 import { GCodeProcessor } from '../lib/gcodeProcessor/GCodeProcessor';
 
 onmessage = function({ data }) {
-    console.log('worker started');
     const { content, name, size, feedArray = null, accelArray = null } = data;
     const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
     //Clean up lines and remove ones that are comments and headers
@@ -35,7 +34,6 @@ onmessage = function({ data }) {
 
     const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'], maxFeed: feedArray, acceleration: accelArray });
     processor.process(lines);
-    console.log(processor);
 
     postMessage({
         name,
