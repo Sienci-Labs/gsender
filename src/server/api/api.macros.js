@@ -82,15 +82,15 @@ export const fetch = (req, res) => {
                 totalRecords: Number(totalRecords)
             },
             records: pagedRecords.map(record => {
-                const { id, mtime, name, content } = { ...record };
-                return { id, mtime, name, content };
+                const { id, mtime, name, content, description, column, rowIndex } = { ...record };
+                return { id, mtime, name, content, description, column, rowIndex };
             })
         });
     } else {
         res.send({
             records: records.map(record => {
-                const { id, mtime, name, content } = { ...record };
-                return { id, mtime, name, content };
+                const { id, mtime, name, content, description, column, rowIndex } = { ...record };
+                return { id, mtime, name, content, description, column, rowIndex };
             })
         });
     }
@@ -168,8 +168,8 @@ export const read = (req, res) => {
         return;
     }
 
-    const { mtime, name, content } = { ...record };
-    res.send({ id, mtime, name, content });
+    const { mtime, name, content, description, column, rowIndex } = { ...record };
+    res.send({ id, mtime, name, content, description, column, rowIndex });
 };
 
 export const update = (req, res) => {
@@ -186,7 +186,10 @@ export const update = (req, res) => {
 
     const {
         name = record.name,
-        content = record.content
+        content = record.content,
+        description = record.description,
+        column = record.column,
+        rowIndex = record.rowIndex
     } = { ...req.body };
 
     /*
@@ -209,6 +212,9 @@ export const update = (req, res) => {
         record.mtime = new Date().getTime();
         record.name = String(name || '');
         record.content = String(content || '');
+        record.description = String(description || '');
+        record.column = String(column || '');
+        record.rowIndex = Number(rowIndex || 0);
 
         config.set(CONFIG_KEY, records);
 
