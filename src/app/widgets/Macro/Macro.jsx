@@ -84,8 +84,46 @@ class Macro extends PureComponent {
             onConfirm: () => this.handleDeleteMacro(id),
         });
     }
+
+    onDragEnd = ({ source, destination, draggableId }) => {
+        if (!destination || !draggableId) {
+            return;
+        }
+
+        const { actions, state } = this.props;
+        const { macros } = state;
+        const macro = macros.find(macro => macro.id === draggableId);
+        if (!macro) {
+            return;
+        }
+
+        let filtered;
+
+        //If we are moving the macro in the same column, we only need to update it and
+        //all the other macros in that column and disregard the ones in the second column
+        if (source.droppableId === destination.droppableId) {
+            filtered = macros
+                .sort((a, b) => a.rowIndex - b.rowIndex)
+                .filter(currentMacro => currentMacro.column === macro.column)
+                .filter(currentMacro => currentMacro.id !== macro.id);
+        } else {
+            filtered = macros
+                .sort((a, b) => a.rowIndex - b.rowIndex);
+
+            console.log(filtered);
+
+            filtered = macros.filter(currentMacro => currentMacro.id !== macro.id);
+        }
+
+        filtered.splice(destination.index, 0, { ...macro, column: destination.droppableId, rowIndex: destination.index });
+
+        //Re-index the macros to match their position in the array
+        const newArr = filtered.map((currentMacro, i) => ({ ...currentMacro, rowIndex: i }));
+
+        actions.updateMacros(newArr);
+    }
+
     render() {
-        // const { state, actions } = this.props;
         const { state } = this.props;
         const {
             macros = []
