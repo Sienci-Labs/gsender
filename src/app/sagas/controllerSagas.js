@@ -108,6 +108,17 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('file:load', (content, ...meta) => {
+        console.log(meta);
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_CONTENT,
+            payload: {
+                content,
+                ...meta
+            }
+        });
+    });
+
     controller.addListener('gcode:unload', () => {
         reduxStore.dispatch({
             type: fileActions.UNLOAD_FILE_INFO,

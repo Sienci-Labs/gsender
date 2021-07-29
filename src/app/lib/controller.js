@@ -78,8 +78,8 @@ class Controller {
         'serialport:error': [],
         'serialport:read': [],
         'serialport:write': [],
-        'gcode:load': [],
-        'gcode:unload': [],
+        'gcode:load': [], // TO BE DEPRECATED
+        'gcode:unload': [], // TO BE DEPRECATED
         'gcode:toolChange': [],
         'feeder:status': [],
         'workflow:pause': [],
@@ -90,7 +90,9 @@ class Controller {
         'message': [],
         'toolchange:start': [],
         'hPong': [],
-        'outline:start': []
+        'outline:start': [],
+        'file:load': [],
+        'file:unload': []
     };
 
     context = {

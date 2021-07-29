@@ -43,9 +43,12 @@ export const uploadFile = (req, res) => {
     console.log(file);
     const { buffer } = file;
     const gcode = buffer.toString();
-    console.log(gcode.length);
 
-    CNCEngine.load(gcode);
+    CNCEngine.load({
+        gcode,
+        name: file.originalname,
+        size: file.size
+    });
 
     return res.send({
         msg: 'Successfully loaded file',

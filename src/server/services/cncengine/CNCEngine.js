@@ -87,7 +87,9 @@ class CNCEngine {
 
     sockets = [];
 
+    // File content and metadata
     gcode = null;
+    meta = null;
 
     // Event Trigger
     event = new EventTrigger((event, trigger, commands) => {
@@ -380,8 +382,28 @@ class CNCEngine {
         config.removeListener('change', this.listener.configChange);
     }
 
-    load(gcode) {
+    // Emit message across all sockets
+    emit(msg, ...args) {
+        this.sockets.forEach((socket) => {
+            socket.emit(msg, ...args);
+        });
+    }
+
+    // If gcode is going to live in CNCengine, we need functions to access or unload it.
+    load({ gcode, ...meta }) {
         this.gcode = gcode;
+        this.meta = meta;
+        this.emit('file:load', gcode, meta);
+    }
+
+    unload() {
+        this.gcode = null;
+        this.meta = null;
+        this.emit('file:unload');
+    }
+
+    fetchGcode() {
+        return this.gcode;
     }
 }
 
