@@ -393,7 +393,7 @@ class CNCEngine {
     load({ gcode, ...meta }) {
         this.gcode = gcode;
         this.meta = meta;
-        this.emit('file:load', gcode, meta);
+        this.emit('file:load', gcode, meta.size, meta.name);
     }
 
     unload() {

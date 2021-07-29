@@ -108,13 +108,13 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('file:load', (content, ...meta) => {
-        console.log(meta);
+    controller.addListener('file:load', (content, size, name) => {
         reduxStore.dispatch({
             type: fileActions.UPDATE_FILE_CONTENT,
             payload: {
                 content,
-                ...meta
+                size,
+                name
             }
         });
     });
