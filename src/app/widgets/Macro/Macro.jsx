@@ -66,11 +66,24 @@ class Macro extends PureComponent {
         actions.openEditMacroModal(macro.id);
     };
 
-    handleDeleteMacro = (macroID) => (event) => {
+    handleDeleteMacro = (macroID) => {
         const { actions } = this.props;
         actions.deleteMacro(macroID);
     }
 
+    onDeleteClick = ({ name, id }) => {
+        Confirm({
+            title: 'Delete Macro',
+            content: (
+                <>
+                    <p>Are you sure you want to delete this macro?</p>
+                    <p><strong>{name}</strong></p>
+                </>
+            ),
+            confirmLabel: 'Delete',
+            onConfirm: () => this.handleDeleteMacro(id),
+        });
+    }
     render() {
         // const { state, actions } = this.props;
         const { state } = this.props;
