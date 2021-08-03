@@ -302,7 +302,7 @@ class VisualizerWidget extends PureComponent {
                 log.debug(data);
             });
         },
-        loadGCode: (name, gcode, size) => {
+        loadGCode: (name, vizualization, size) => {
             const capable = {
                 view3D: !!this.visualizer
             };
@@ -314,7 +314,6 @@ class VisualizerWidget extends PureComponent {
                         loading: false,
                         rendering: capable.view3D,
                         ready: !capable.view3D,
-                        content: gcode,
                         bbox: {
                             min: {
                                 x: 0,
@@ -348,7 +347,7 @@ class VisualizerWidget extends PureComponent {
                 }
 
                 setTimeout(() => {
-                    this.visualizer.load(name, gcode, ({ bbox }) => {
+                    this.visualizer.load(name, vizualization, ({ bbox }) => {
                         // Set gcode bounding box
                         controller.context = {
                             ...controller.context,
@@ -379,7 +378,7 @@ class VisualizerWidget extends PureComponent {
             };
 
             this.setState(updater, callback);
-            this.visualizer.handleSceneRender(gcode);
+            this.visualizer.handleSceneRender(vizualization);
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;

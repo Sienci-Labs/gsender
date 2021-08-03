@@ -501,6 +501,9 @@ class Visualizer extends Component {
             pubsub.subscribe('visualizer:redraw', () => {
                 this.recolorScene();
                 this.updateScene({ forceUpdate: true });
+            }),
+            pubsub.subscribe('file:load', (msg, data) => {
+                this.load('', data);
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -520,31 +523,6 @@ class Visualizer extends Component {
 
     hasHorizontalScrollbar() {
         return window.innerHeight > document.documentElement.clientHeight;
-    }
-
-    // http://www.alexandre-gomes.com/?p=115
-    getScrollbarWidth() {
-        const inner = document.createElement('p');
-        inner.style.width = '100%';
-        inner.style.height = '200px';
-
-        const outer = document.createElement('div');
-        outer.style.position = 'absolute';
-        outer.style.top = '0px';
-        outer.style.left = '0px';
-        outer.style.visibility = 'hidden';
-        outer.style.width = '200px';
-        outer.style.height = '150px';
-        outer.style.overflow = 'hidden';
-        outer.appendChild(inner);
-
-        document.body.appendChild(outer);
-        const w1 = inner.offsetWidth;
-        outer.style.overflow = 'scroll';
-        const w2 = (w1 === inner.offsetWidth) ? outer.clientWidth : inner.offsetWidth;
-        document.body.removeChild(outer);
-
-        return (w1 - w2);
     }
 
     getVisibleWidth() {
@@ -1149,11 +1127,11 @@ class Visualizer extends Component {
         this.updateScene();
     }
 
-    handleSceneRender(gcode, callback) {
+    handleSceneRender(vizualization, callback) {
         if (!this.visualizer) {
             return;
         }
-        const obj = this.visualizer.render(gcode);
+        const obj = this.visualizer.render(vizualization);
         obj.name = '';
         this.group.add(obj);
 
@@ -1214,7 +1192,7 @@ class Visualizer extends Component {
         (typeof callback === 'function') && callback({ bbox: bbox });
     }
 
-    load(name, gcode, callback) {
+    load(name, vizualization, callback) {
         // Remove previous G-code object
         this.unload();
         const { currentTheme, disabled, disabledLite, liteMode } = this.props.state;
@@ -1224,7 +1202,7 @@ class Visualizer extends Component {
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
         if (shouldRenderVisualization) {
-            this.handleSceneRender(gcode, callback);
+            this.handleSceneRender(vizualization, callback);
         } else {
             setVisualizerReady();
         }
