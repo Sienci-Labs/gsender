@@ -33,6 +33,7 @@ import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
+import Input from 'app/containers/Preferences/Input';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import ReaderWorker from './FileReader.worker';
@@ -44,15 +45,13 @@ import {
     TOASTER_INFO
 } from '../../lib/toaster/ToasterLib';
 import {
-    // Grbl
     GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_CHECK,
-    // Marlin
-    // Workflow
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
-    WORKFLOW_STATE_RUNNING
+    WORKFLOW_STATE_RUNNING,
 } from '../../constants';
+// import { NOTIFICATION_PROGRAM_ERROR } from './constants';
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
 import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
@@ -78,7 +77,11 @@ class WorkflowControl extends PureComponent {
             closeFile: false,
             showRecent: false,
             showLoadFile: false,
-            runHasStarted: false
+            runHasStarted: false,
+            startFromLine: {
+                showModal: false,
+                value: 1,
+            },
         };
     }
 
@@ -252,6 +255,10 @@ class WorkflowControl extends PureComponent {
         if ((prevActiveState === GRBL_ACTIVE_STATE_CHECK && currentActiveState !== GRBL_ACTIVE_STATE_CHECK) || prevGcode !== currentGcode) {
             this.setState({ runHasStarted: false });
         }
+
+        if (this.props.senderStatus && prevProps.senderStatus && prevProps.senderStatus.received !== this.props.senderStatus.received) {
+            this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: this.props.senderStatus.received } }));
+        }
     }
 
     componentWillUnmount() {
@@ -284,6 +291,17 @@ class WorkflowControl extends PureComponent {
         controller.command('gcode:outline', gcode, 300);
     }
 
+    startFromLinePrompt = () => {
+        const { received } = this.props.senderStatus;
+        this.setState(prev => ({ startFromLine: { showModal: true, value: received !== 0 ? received : prev.startFromLine.value } }));
+    }
+
+    handleStartFromLine = () => {
+        this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
+
+        controller.command('gcode:start', this.state.startFromLine.value);
+    }
+
     subscribe() {
         const tokens = [
             pubsub.subscribe('gcode:toolChange', () => {
@@ -302,6 +320,7 @@ class WorkflowControl extends PureComponent {
         });
         this.pubsubTokens = [];
     }
+
 
     render() {
         const { cameraPosition } = this.props.state;
@@ -362,7 +381,7 @@ class WorkflowControl extends PureComponent {
                 </div>
 
                 {
-                    showTest &&
+                    showTest && (
                         <div className={styles.splitContainer}>
                             <button
                                 type="button"
@@ -385,19 +404,29 @@ class WorkflowControl extends PureComponent {
                                 {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
                             </button>
                         </div>
+                    )
 
                 }
                 {
                     canRun && (
-                        <button
-                            type="button"
-                            className={styles['workflow-button-play']}
-                            title={workflowPaused ? i18n._('Resume') : i18n._('Run')}
-                            onClick={this.startRun}
-                            disabled={!isConnected}
-                        >
-                            {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
-                        </button>
+                        <div className={styles.relativeWrapper}>
+                            <button
+                                type="button"
+                                className={styles['workflow-button-play']}
+                                title={workflowPaused ? i18n._('Resume') : i18n._('Run')}
+                                onClick={this.startRun}
+                                disabled={!isConnected}
+                            >
+                                {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
+                            </button>
+                            <div
+                                role="button"
+                                className={styles['start-from-line-button']}
+                                onClick={this.startFromLinePrompt}
+                            >
+                                <i className="fas fa-grip-lines" />
+                            </div>
+                        </div>
                     )
                 }
                 {
@@ -432,6 +461,50 @@ class WorkflowControl extends PureComponent {
                                                 }}
                                             >
                                                 No
+                                            </FunctionButton>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </Modal.Body>
+                        </Modal>
+                    )
+                }
+                {
+                    this.state.startFromLine.showModal && (
+                        <Modal showCloseButton={false}>
+                            <Modal.Header className={styles.modalHeader}>
+                                <Modal.Title>Start From Specified Line</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <div className={styles.runProbeBody}>
+                                    <div className={styles.left}>
+                                        <div className={styles.greyText}>
+                                            <p>You may start at a specific line in your gcode, based on the last job, the default value is set below</p>
+
+
+                                            <Input
+                                                label="Line:"
+                                                value={this.state.startFromLine.value}
+                                                onChange={(e) => this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: e.target.value } }))}
+                                                additionalProps={{ type: 'number' }}
+                                            />
+                                        </div>
+                                        <div className={styles.buttonsContainer}>
+                                            <FunctionButton
+                                                primary
+                                                onClick={this.handleStartFromLine}
+                                            >
+                                                Start From Line
+                                            </FunctionButton>
+                                            <FunctionButton
+                                                className={styles.activeButton}
+                                                onClick={() => {
+                                                    this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
+                                                    actions.closeModal();
+                                                }}
+                                            >
+                                                Cancel
                                             </FunctionButton>
                                         </div>
                                     </div>
@@ -482,6 +555,7 @@ export default connect((store) => {
     const fileLoaded = get(store, 'file.fileLoaded', false);
     const isConnected = get(store, 'connection.isConnected', false);
     const senderInHold = get(store, 'controller.sender.status.hold', false);
+    const senderStatus = get(store, 'controller.sender.status');
     const workflowState = get(store, 'controller.workflow.state');
     const activeState = get(store, 'controller.state.status.activeState');
     const gcode = get(store, 'file.content', '');
@@ -491,6 +565,7 @@ export default connect((store) => {
         senderInHold,
         workflowState,
         activeState,
-        gcode
+        gcode,
+        senderStatus
     };
 }, null, null, { forwardRef: true })(WorkflowControl);
