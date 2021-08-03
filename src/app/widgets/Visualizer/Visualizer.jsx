@@ -376,6 +376,7 @@ class Visualizer extends Component {
 
     controllerEvents = {
         'gcode_error': (error, code, line) => {
+            console.log(error, code, line);
             this.setState({ finishedMessage: `Gcode Error: Line: ${line.length} Error:${code} - ${error.description}` });
             this.showToast();
         },
