@@ -23,6 +23,7 @@
 
 import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
+import Toolpath from 'gcode-toolpath';
 import _ from 'lodash';
 import map from 'lodash/map';
 import SerialConnection from '../../lib/SerialConnection';
@@ -1208,15 +1209,70 @@ class GrblController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                this.event.trigger('gcode:start');
+                const [lineToStartFrom] = args;
+                const totalLines = this.sender.state.total;
 
-                this.workflow.start();
+                if (lineToStartFrom && lineToStartFrom <= totalLines) {
+                    const { lines = [] } = this.sender.state;
+                    const firstHalf = lines.slice(0, lineToStartFrom);
+                    // const secondHalf = lines.slice(lineToStartFrom);
+                    const toolpath = new Toolpath();
+                    toolpath.loadFromStringSync(firstHalf.join('\n'));
+                    const modal = toolpath.getModal();
+                    const position = toolpath.getPosition();
 
-                // Feeder
-                this.feeder.reset();
+                    // const feedrate = 10;
 
-                // Sender
-                this.sender.next();
+                    const {
+                        x: xVal,
+                        y: yVal,
+                        z: zVal,
+                    } = position;
+
+                    const foundLine = firstHalf.reverse().find(line => line.includes('F'));
+                    const feedrateArr = foundLine.split(' ');
+                    const feedrateIndex = feedrateArr.findIndex(word => word[0] === 'F');
+                    let feedrate = feedrateArr[feedrateIndex];
+
+                    //If there is only one character in the string, this means that the feedrate value
+                    //within the gcode is seperated by a space, in that case we need to join it and the
+                    //F command together so we can set the feedrate properly
+                    if ([...feedrate].length === 1) {
+                        feedrate = `${feedrateArr[feedrateIndex]}${feedrateArr[feedrateIndex + 1]}`;
+                    }
+
+
+                    let modalPrepareCommand = '';
+                    for (const group in modal) {
+                        if (!['program', 'motion'].includes(group)) {
+                            this.command('gcode', modal[group]);
+                        }
+                    }
+                    this.command('gcode', modalPrepareCommand);
+                    this.command('gcode', `${modal.motion} X${xVal} Y${yVal} Z${zVal} ${feedrate}`);
+                    // this.command('gcode', `${modal.motion} X${xVal} Y${yVal} Z${zVal}`);
+
+                    console.log('PREPEND_COMMAND', modalPrepareCommand);
+                    console.log('PREPEND_COMMAND', `${modal.motion} X${xVal} Y${yVal} Z${zVal} ${feedrate}`);
+                    console.log('FEEDRATE', feedrate);
+                    console.log('FEEDRATE_INDEX', feedrateIndex);
+                    // console.log('FIRST_HALF:', firstHalf);
+                    // console.log('FIRST_HALF_STR:', firstHalf.join('\n'));
+                    console.log('MODAL:', modal);
+                    console.log('POSITION:', position);
+                }
+
+                setTimeout(() => {
+                    this.event.trigger('gcode:start');
+
+                    this.workflow.start();
+
+                    // Feeder
+                    this.feeder.reset();
+
+                    // Sender
+                    this.sender.next({ lineToStartFrom });
+                }, 100);
             },
             'stop': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
