@@ -23,7 +23,7 @@
 
 /* eslint-disable consistent-return */
 import classNames from 'classnames';
-import ExpressionEvaluator from 'expr-eval';
+//import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -82,14 +82,6 @@ import {
     CAMERA_MODE_PAN,
     CAMERA_MODE_ROTATE,
     MODAL_WATCH_DIRECTORY,
-    NOTIFICATION_PROGRAM_ERROR,
-    NOTIFICATION_M0_PROGRAM_PAUSE,
-    NOTIFICATION_M1_PROGRAM_PAUSE,
-    NOTIFICATION_M2_PROGRAM_END,
-    NOTIFICATION_M30_PROGRAM_END,
-    NOTIFICATION_M6_TOOL_CHANGE,
-    NOTIFICATION_M109_SET_EXTRUDER_TEMPERATURE,
-    NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE,
     LIGHT_THEME,
     LIGHT_THEME_VALUES,
     DARK_THEME,
@@ -98,7 +90,7 @@ import {
 import styles from './index.styl';
 
 
-const translateExpression = (function() {
+/*const translateExpression = (function() {
     const { Parser } = ExpressionEvaluator;
     const reExpressionContext = new RegExp(/\[[^\]]+\]/g);
 
@@ -129,7 +121,7 @@ const translateExpression = (function() {
             return line;
         }).join('\n');
     };
-}());
+}());*/
 
 const displayWebGLErrorMessage = () => {
     portal(({ onClose }) => (
@@ -697,70 +689,8 @@ class VisualizerWidget extends PureComponent {
             this.setState({ port: port });
         },
         'serialport:close': (options) => {
-            this.actions.unloadGCode();
-
             const initialState = this.getInitialState();
             this.setState((state) => ({ ...initialState }));
-        },
-        'gcode:load': (name, gcode, context) => {
-            gcode = translateExpression(gcode, context); // e.g. xmin,xmax,ymin,ymax,zmin,zmax
-            this.actions.loadGCode(name, gcode);
-        },
-        'gcode:unload': () => {
-            this.actions.unloadGCode();
-        },
-        'sender:status': (data) => {
-            const { hold, holdReason, name, size, total, sent, received } = data;
-            const notification = {
-                type: '',
-                data: ''
-            };
-
-            if (hold) {
-                const { err, data } = { ...holdReason };
-
-                if (err) {
-                    notification.type = NOTIFICATION_PROGRAM_ERROR;
-                    notification.data = err;
-                } else if (data === 'M0') {
-                    // M0 Program Pause
-                    notification.type = NOTIFICATION_M0_PROGRAM_PAUSE;
-                } else if (data === 'M1') {
-                    // M1 Program Pause
-                    notification.type = NOTIFICATION_M1_PROGRAM_PAUSE;
-                } else if (data === 'M2') {
-                    // M2 Program End
-                    notification.type = NOTIFICATION_M2_PROGRAM_END;
-                } else if (data === 'M30') {
-                    // M30 Program End
-                    notification.type = NOTIFICATION_M30_PROGRAM_END;
-                } else if (data === 'M6') {
-                    // M6 Tool Change
-                    notification.type = NOTIFICATION_M6_TOOL_CHANGE;
-                } else if (data === 'M109') {
-                    // M109 Set Extruder Temperature
-                    notification.type = NOTIFICATION_M109_SET_EXTRUDER_TEMPERATURE;
-                } else if (data === 'M190') {
-                    // M190 Set Heated Bed Temperature
-                    notification.type = NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE;
-                }
-            }
-
-            this.setState(state => ({
-                total,
-                gcode: {
-                    ...state.gcode,
-                    name,
-                    size,
-                    total,
-                    sent,
-                    received
-                },
-                notification: {
-                    ...state.notification,
-                    ...notification
-                }
-            }));
         },
         'workflow:state': (workflowState, data) => {
             if (data) {
@@ -783,15 +713,6 @@ class VisualizerWidget extends PureComponent {
                     }
                 }));
             }
-        },
-        'controller:settings': (type, controllerSettings) => {
-            this.setState(state => ({
-                controller: {
-                    ...state.controller,
-                    type: type,
-                    settings: controllerSettings
-                }
-            }));
         },
         'controller:state': (type, controllerState) => {
             // Grbl
