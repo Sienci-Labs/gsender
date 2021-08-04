@@ -1244,12 +1244,11 @@ class GrblController {
                     //If the feedrate was not set and the word array only contains one element, this means
                     //the feedrate is in that element but it is not seperated by a string as it should be,
                     //so we need to parse just the feedrate from the string (ex. Z-11.125F1000)
-                    if (!feedrate && feedrateArr.length === 0) {
-                        const strToParse = feedrateArr[0];
-                        const letterToStartFromIndex = [...strToParse].findIndex((letter) => letter === 'F');
-                        const foundFeedrate = [...strToParse].slice(letterToStartFromIndex);
-
-                        console.log(strToParse, letterToStartFromIndex, foundFeedrate);
+                    if (!feedrate && feedrateArr.length === 1) {
+                        const strArr = [...feedrateArr[0]];
+                        const charToStartFromIndex = strArr.findIndex((letter) => letter === 'F');
+                        const charToEndWithIndex = strArr.slice(charToStartFromIndex).findIndex(char => char.match(/[a-z ]/i)) || undefined;
+                        const foundFeedrate = strArr.slice(charToStartFromIndex, charToEndWithIndex).join('');
 
                         feedrate = foundFeedrate;
                     }
@@ -1261,20 +1260,23 @@ class GrblController {
                             this.command('gcode', modal[group]);
                         }
                     }
-                    this.command('gcode', modalPrepareCommand);
-                    this.command('gcode', `${modal.motion} X${xVal} Y${yVal} Z${zVal} ${feedrate}`);
+                    this.command('gcode', `${modal.motion} ${modal.units === 'G21' ? 'Z4' : 'Z1'} ${feedrate}`); //Z command to move bit up so it does not drag over the board
+                    this.command('gcode', `${modal.motion} X${xVal} Y${yVal} Z${zVal} F1000`); //Go to the last position recorded from toolpath
+                    this.command('gcode', feedrate); //Set the feedrate to the last set one
                     // this.command('gcode', `${modal.motion} X${xVal} Y${yVal} Z${zVal}`);
 
-                    console.log('PREPEND_COMMAND', modalPrepareCommand);
-                    console.log('PREPEND_COMMAND', `${modal.motion} X${xVal} Y${yVal} Z${zVal} ${feedrate}`);
-                    console.log('FEEDRATE', feedrate);
-                    console.log('FEEDRATE_INDEX', feedrateIndex);
+                    // console.log('PREPEND_COMMAND', `${modal.motion} ${modal.units === 'G21' ? 'Z4' : 'Z1'}`);
+                    // console.log('PREPEND_COMMAND', modalPrepareCommand);
+                    // console.log('PREPEND_COMMAND', `${modal.motion} X${xVal} Y${yVal} Z${zVal} ${feedrate}`);
+                    // console.log('FEEDRATE', feedrate);
+                    // console.log('FEEDRATE_INDEX', feedrateIndex);
                     // console.log('FIRST_HALF:', firstHalf);
-                    // console.log('FIRST_HALF_STR:', firstHalf.join('\n'));
-                    console.log('MODAL:', modal);
-                    console.log('POSITION:', position);
+                    // // console.log('FIRST_HALF_STR:', firstHalf.join('\n'));
+                    // console.log('MODAL:', modal);
+                    // console.log('POSITION:', position);
                 }
 
+                //Allow the prepend commands to register before resuming job
                 setTimeout(() => {
                     this.event.trigger('gcode:start');
 
