@@ -39,6 +39,7 @@ import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import ReaderWorker from './FileReader.worker';
 import {
     Toaster,
+    TOASTER_SUCCESS,
     TOASTER_DANGER,
     TOASTER_WARNING,
     TOASTER_UNTIL_CLOSE,
@@ -336,11 +337,12 @@ class WorkflowControl extends PureComponent {
         const { port, gcode } = state;
         const canClick = !!port;
         const isReady = canClick && gcode.ready;
-        const { runHasStarted } = this.state;
+        // const { runHasStarted } = this.state;
         const canRun = this.canRun();
-        const { isConnected, fileLoaded, senderInHold, activeState } = this.props;
-        const showPlay = isConnected && fileLoaded && canRun;
-        const showTest = showPlay && !runHasStarted;
+        // const { isConnected, fileLoaded, senderInHold, activeState } = this.props;
+        const { isConnected, senderInHold, activeState } = this.props;
+        // const showPlay = isConnected && fileLoaded && canRun;
+        // const showTest = showPlay && !runHasStarted || workflowPaused;
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const workflowPaused = workflowState === WORKFLOW_STATE_PAUSED || senderInHold;
@@ -387,7 +389,7 @@ class WorkflowControl extends PureComponent {
                 </div>
 
                 {
-                    showTest && (
+                    !workflowPaused && (
                         <div className={styles.splitContainer}>
                             <button
                                 type="button"
@@ -425,13 +427,17 @@ class WorkflowControl extends PureComponent {
                             >
                                 {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
                             </button>
-                            <div
-                                role="button"
-                                className={styles['start-from-line-button']}
-                                onClick={this.startFromLinePrompt}
-                            >
-                                <i className="fas fa-grip-lines" />
-                            </div>
+                            {
+                                !workflowPaused && (
+                                    <div
+                                        role="button"
+                                        className={styles['start-from-line-button']}
+                                        onClick={this.startFromLinePrompt}
+                                    >
+                                        <i className="fas fa-grip-lines" />
+                                    </div>
+                                )
+                            }
                         </div>
                     )
                 }
