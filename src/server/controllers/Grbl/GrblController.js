@@ -1241,6 +1241,19 @@ class GrblController {
                         feedrate = `${feedrateArr[feedrateIndex]}${feedrateArr[feedrateIndex + 1]}`;
                     }
 
+                    //If the feedrate was not set and the word array only contains one element, this means
+                    //the feedrate is in that element but it is not seperated by a string as it should be,
+                    //so we need to parse just the feedrate from the string (ex. Z-11.125F1000)
+                    if (!feedrate && feedrateArr.length === 0) {
+                        const strToParse = feedrateArr[0];
+                        const letterToStartFromIndex = [...strToParse].findIndex((letter) => letter === 'F');
+                        const foundFeedrate = [...strToParse].slice(letterToStartFromIndex);
+
+                        console.log(strToParse, letterToStartFromIndex, foundFeedrate);
+
+                        feedrate = foundFeedrate;
+                    }
+
 
                     let modalPrepareCommand = '';
                     for (const group in modal) {
