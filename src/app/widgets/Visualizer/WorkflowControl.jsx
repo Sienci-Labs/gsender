@@ -148,24 +148,22 @@ class WorkflowControl extends PureComponent {
     }
 
     canRun() {
-        const { state } = this.props;
-        const { port, gcode, workflow } = state;
+        const { isConnected, fileLoaded, workflowState, activeState } = this.props;
 
-        if (!port) {
+        if (!isConnected) {
             return false;
         }
-        if (!gcode.ready) {
+        if (!fileLoaded) {
             return false;
         }
-        if (!includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state)) {
+        if (!includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflowState)) {
             return false;
         }
-        const { activeState } = this.props;
         const states = [
             GRBL_ACTIVE_STATE_ALARM
         ];
 
-        if (includes([GRBL_ACTIVE_STATE_CHECK], activeState) && !includes([WORKFLOW_STATE_PAUSED, WORKFLOW_STATE_IDLE], workflow.state)) {
+        if (includes([GRBL_ACTIVE_STATE_CHECK], activeState) && !includes([WORKFLOW_STATE_PAUSED, WORKFLOW_STATE_IDLE], workflowState)) {
             return false;
         }
 
@@ -293,13 +291,12 @@ class WorkflowControl extends PureComponent {
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
         const { handleOnStop } = this;
-        const { state, actions, workflowState } = this.props;
-        const { port, gcode } = state;
+        const { state, fileLoaded, actions, workflowState, isConnected, senderInHold, activeState } = this.props;
+        const { port } = state;
         const canClick = !!port;
-        const isReady = canClick && gcode.ready;
+        const isReady = canClick && fileLoaded;
         const { runHasStarted } = this.state;
         const canRun = this.canRun();
-        const { isConnected, fileLoaded, senderInHold, activeState } = this.props;
         const showPlay = isConnected && fileLoaded && canRun;
         const showTest = showPlay && !runHasStarted;
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
@@ -470,13 +467,15 @@ export default connect((store) => {
     const senderInHold = get(store, 'controller.sender.status.hold', false);
     const workflowState = get(store, 'controller.workflow.state');
     const activeState = get(store, 'controller.state.status.activeState');
-    const gcode = get(store, 'file.content', '');
+    const controllerState = get(store, 'controller.state');
+    const port = get(store, 'connection.port');
     return {
         fileLoaded,
         isConnected,
         senderInHold,
         workflowState,
         activeState,
-        gcode
+        controllerState,
+        port
     };
 }, null, null, { forwardRef: true })(WorkflowControl);

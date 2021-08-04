@@ -415,7 +415,7 @@ class VisualizerWidget extends PureComponent {
             this.actions.handleRun();
         },
         handleRun: () => {
-            const { workflow } = this.state;
+            const { workflow } = this.props;
             console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state));
             this.setState((prev) => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
 
@@ -426,11 +426,10 @@ class VisualizerWidget extends PureComponent {
 
             if (workflow.state === WORKFLOW_STATE_PAUSED) {
                 controller.command('gcode:resume');
-                controller.command('gcode:resume');
             }
         },
         handlePause: () => {
-            const { workflow } = this.state;
+            const { workflow } = this.prop;
             console.assert(includes([WORKFLOW_STATE_RUNNING], workflow.state));
 
             controller.command('gcode:pause');
@@ -1365,11 +1364,13 @@ export default connect((store) => {
     const xMaxAccel = Number(get(settings.settings, '$120', 1800000));
     const yMaxAccel = Number(get(settings.settings, '$112', 1800000));
     const zMaxAccel = Number(get(settings.settings, '$122', 1800000));
+    const workflow = get(store, 'controller.workflow');
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
     const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
     return {
         feedArray,
-        accelArray
+        accelArray,
+        workflow
     };
 })(VisualizerWidget);

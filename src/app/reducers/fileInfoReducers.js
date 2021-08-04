@@ -21,12 +21,13 @@
  *
  */
 import { createReducer } from 'redux-action';
-import { UNLOAD_FILE_INFO, UPDATE_FILE_INFO, UPDATE_FILE_CONTENT, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
-import { METRIC_UNITS } from 'app/constants';
+import { UNLOAD_FILE_INFO, UPDATE_FILE_INFO, UPDATE_FILE_CONTENT, UPDATE_FILE_PROCESSING, UPDATE_FILE_RENDER_STATE } from 'app/actions/fileInfoActions';
+import { METRIC_UNITS, RENDER_NO_FILE } from 'app/constants';
 
 const initialState = {
     fileLoaded: false,
     fileProcessing: false,
+    renderState: RENDER_NO_FILE,
     name: null,
     size: 0,
     total: 0,
@@ -81,7 +82,12 @@ const reducer = createReducer(initialState, {
         return {
             fileProcessing: value
         };
-    }
+    },
+    [UPDATE_FILE_RENDER_STATE]: ({ state }, reducerState) => {
+        return {
+            renderState: state
+        };
+    },
 });
 
 export default reducer;

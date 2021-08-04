@@ -113,6 +113,7 @@ export function* initialize() {
     });
 
     controller.addListener('file:load', (content, size, name) => {
+        // Basic file content
         reduxStore.dispatch({
             type: fileActions.UPDATE_FILE_CONTENT,
             payload: {
@@ -121,6 +122,7 @@ export function* initialize() {
                 name,
             }
         });
+        // Processing started for gcodeProcessor
         reduxStore.dispatch({
             type: fileActions.UPDATE_FILE_PROCESSING,
             payload: {

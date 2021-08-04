@@ -21,6 +21,8 @@
  *
  */
 
+import reduxStore from 'app/store/redux';
+import * as fileActions from 'app/actions/fileInfoActions';
 import _get from 'lodash/get';
 import _each from 'lodash/each';
 import _isEqual from 'lodash/isEqual';
@@ -34,7 +36,8 @@ import ReactDOM from 'react-dom';
 import * as THREE from 'three';
 import {
     IMPERIAL_UNITS,
-    METRIC_UNITS
+    METRIC_UNITS,
+    RENDER_RENDERED
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/CombinedCamera';
 import TrackballControls from 'app/lib/three/TrackballControls';
@@ -1188,6 +1191,13 @@ class Visualizer extends Component {
         default:
             this.toFrontView();
         }
+
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_RENDER_STATE,
+            payload: {
+                state: RENDER_RENDERED
+            }
+        });
 
         (typeof callback === 'function') && callback({ bbox: bbox });
     }
