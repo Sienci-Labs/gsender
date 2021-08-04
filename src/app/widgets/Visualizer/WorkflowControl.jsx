@@ -300,6 +300,12 @@ class WorkflowControl extends PureComponent {
         this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
 
         controller.command('gcode:start', this.state.startFromLine.value);
+
+        Toaster.pop({
+            msg: 'Running Start From Specific Line Command',
+            type: TOASTER_SUCCESS,
+            duration: 2000,
+        });
     }
 
     subscribe() {
