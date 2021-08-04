@@ -372,8 +372,8 @@ class Sender extends events.EventEmitter {
         }
 
         if (lineToStartFrom) {
-            this.state.sent = lineToStartFrom - 1;
-            this.state.received = lineToStartFrom - 1;
+            this.state.sent = lineToStartFrom;
+            this.state.received = lineToStartFrom;
         }
 
         const now = new Date().getTime();
