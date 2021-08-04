@@ -1237,7 +1237,7 @@ class GrblController {
                     //If there is only one character in the string, this means that the feedrate value
                     //within the gcode is seperated by a space, in that case we need to join it and the
                     //F command together so we can set the feedrate properly
-                    if ([...feedrate].length === 1) {
+                    if (feedrate && [...feedrate].length === 1) {
                         feedrate = `${feedrateArr[feedrateIndex]}${feedrateArr[feedrateIndex + 1]}`;
                     }
 
