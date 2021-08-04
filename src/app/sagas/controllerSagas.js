@@ -33,6 +33,7 @@ import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse } from 'app/workers/Visualize.response';
+import { RENDER_LOADING } from 'app/constants';
 
 export function* initialize() {
     /* Health check - every 3 minutes */
@@ -127,6 +128,12 @@ export function* initialize() {
             type: fileActions.UPDATE_FILE_PROCESSING,
             payload: {
                 value: true
+            }
+        });
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_RENDER_STATE,
+            payload: {
+                state: RENDER_LOADING
             }
         });
         const estimateWorker = new EstimateWorker();

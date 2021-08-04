@@ -76,7 +76,9 @@ import {
     // Workflow
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_PAUSED,
-    WORKFLOW_STATE_IDLE
+    WORKFLOW_STATE_IDLE,
+    RENDER_RENDERING,
+    RENDER_LOADING
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
@@ -1252,19 +1254,21 @@ class VisualizerWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-        const showLoader = state.gcode.loading || state.gcode.rendering;
-
+        const { renderState } = this.props;
+        const showRendering = renderState === RENDER_RENDERING;
+        const showLoading = renderState === RENDER_LOADING;
+        const showLoader = showLoading || showRendering;
         // Handle visualizer render
         const isVisualizerDisabled = (state.liteMode) ? state.disabledLite : state.disabled;
 
         const capable = {
             view3D: WebGL.isWebGLAvailable() && !isVisualizerDisabled
         };
-        // const showDashboard = !capable.view3D && !showLoader;
+
         const showVisualizer = capable.view3D && !showLoader;
-        // const showNotifications = showVisualizer && !!state.notification.type;
 
         const { liteMode } = this.state;
+
         return (
             <Widget className={styles.vizWidgetOverride}>
                 <Widget.Header className={styles['visualizer-header']}>
@@ -1291,10 +1295,10 @@ class VisualizerWidget extends PureComponent {
                     )}
                     id="visualizer_container"
                 >
-                    {state.gcode.loading &&
+                    {showLoading &&
                     <Loading />
                     }
-                    {state.gcode.rendering &&
+                    {showRendering &&
                     <Rendering />
                     }
                     {state.modal.name === MODAL_WATCH_DIRECTORY && (
@@ -1365,12 +1369,14 @@ export default connect((store) => {
     const yMaxAccel = Number(get(settings.settings, '$112', 1800000));
     const zMaxAccel = Number(get(settings.settings, '$122', 1800000));
     const workflow = get(store, 'controller.workflow');
+    const renderState = get(store, 'file.renderState');
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
     const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
     return {
         feedArray,
         accelArray,
-        workflow
+        workflow,
+        renderState
     };
 })(VisualizerWidget);
