@@ -347,6 +347,9 @@ class WorkflowControl extends PureComponent {
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const workflowPaused = workflowState === WORKFLOW_STATE_PAUSED || senderInHold;
 
+        const { showModal, value } = this.state.startFromLine;
+        const { total } = gcode;
+
         return (
             <div className={styles.workflowControl}>
                 <input
@@ -483,7 +486,7 @@ class WorkflowControl extends PureComponent {
                     )
                 }
                 {
-                    this.state.startFromLine.showModal && (
+                    showModal && (
                         <Modal showCloseButton={false}>
                             <Modal.Header className={styles.modalHeader}>
                                 <Modal.Title>Start From Specified Line</Modal.Title>
@@ -492,13 +495,18 @@ class WorkflowControl extends PureComponent {
                                 <div className={styles.runProbeBody}>
                                     <div className={styles.left}>
                                         <div className={styles.greyText}>
-                                            <p>You may start at a specific line in your gcode, based on the last job, the default value is set below</p>
+                                            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                                                <p>You may start at a specific line in your gcode</p>
 
+                                                <p>
+                                                    For this file the maximum line number you may start at is <strong>{this.props.state.gcode.total}</strong>
+                                                </p>
+                                            </div>
 
                                             <Input
-                                                label="Line:"
-                                                value={this.state.startFromLine.value}
-                                                onChange={(e) => this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: e.target.value } }))}
+                                                label="Line to Start From:"
+                                                value={value}
+                                                onChange={(e) => (e.target.value <= total && e.target.value > 0) && this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: Math.ceil(Number(e.target.value)) } }))}
                                                 additionalProps={{ type: 'number' }}
                                             />
                                         </div>
