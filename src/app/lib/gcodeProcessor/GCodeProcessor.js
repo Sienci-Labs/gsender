@@ -1,5 +1,7 @@
 import objtools from 'objtools';
-import GcodeLine from './GCodeLine';
+import Interpreter from 'gcode-interpreter';
+import GCodeBlock from 'app/lib/gcodeProcessor/GCodeBlock';
+
 
 export const INVALID_GCODE_REGEX = /([^NGMXYZIJKFRS%\-?\.?\d+\.?\s])|((G28)|(G29)|(\$H))/gi;
 
@@ -24,14 +26,14 @@ export class GCodeProcessor {
         }
     }
 
-    process(lines = []) {
+    process(lines = '') {
         if (lines.length === 0) {
             return;
         }
-
-        for (const line of lines) {
-            this.runGcodeLine(line);
-        }
+        const interpreter = new Interpreter();
+        interpreter.loadFromStringSync(lines, (data) => {
+            this.runGcodeLine(data);
+        });
     }
 
     // Gets or sets an axis value in a coordinate array.
@@ -199,8 +201,12 @@ export class GCodeProcessor {
         this.vmState.activeCoordSys = num;
     }
 
-    runGcodeLine(gline) {
+    runGcodeLine({ line, words }) {
         // This is NOT a gcode validator.  Input gcode is expected to be valid and well-formed.
+        if (words.length === 0) {
+            return null;
+        }
+        let gline = new GCodeBlock(words, line);
         let vmState = this.vmState;
         let origCoordSys = vmState.activeCoordSys;
         let origTotalTime = vmState.totalTime;
@@ -212,20 +218,6 @@ export class GCodeProcessor {
         let coordPos = vmState.incremental ? this.zerocoord() : objtools.deepCopy(vmState.pos); // Position indicated by coordinates present, filling in missing ones with current pos; unless incremental, then all zeroes
         let coordPosSparse = this.zerocoord(null); // Position indicated by coordinates present, with missing axes filled in with nulls
         let coordFlags = this.zerocoord(false); // True in positions where coordinates are present
-
-        if (typeof gline === 'string') {
-            // Handle Grbl specific commands like homing by skipping the line entirely
-            if (gline[0] === '$') {
-                return {
-                    state: vmState, // VM state after executing line
-                    isMotion: false, // whether the line represents motion
-                    motionCode: motionCode, // If motion, the G code associated with the motion
-                    changedCoordOffsets: changedCoordOffsets, // whether or not anything was changed with coordinate systems
-                    time: vmState.totalTime - origTotalTime // estimated duration of instruction execution, in seconds
-                };
-            }
-            gline = new GcodeLine(gline);
-        }
 
         // Determine which axis words are present and convert to coordinate arrays
         for (let axisNum = 0; axisNum < vmState.axisLabels.length; axisNum++) {
@@ -243,10 +235,10 @@ export class GCodeProcessor {
         }
 
         // Check if a motion gcode is indicated (either by presence of a motion gcode word, or presence of coordinates without any other gcode)
-        if (!gline.has('G') && hasCoords.length) {
+        if (!gline.hasLetter('G') && hasCoords.length) {
             motionCode = vmState.motionMode;
         } else {
-            motionCode = gline.get('G', 'G0');
+            motionCode = gline.getLetter('G');
             if (typeof motionCode === 'number') {
                 motionCode = 'G' + motionCode;
                 vmState.motionMode = motionCode;
@@ -254,15 +246,15 @@ export class GCodeProcessor {
         }
 
         // Check if this is simple motion that can skip extra checks (for efficiency in the most common case)
-        let isSimpleMotion = motionCode && (motionCode === 'G0' || motionCode === 'G1') && (gline.has(motionCode) ? 1 : 0) + (gline.has('F') ? 1 : 0) + (gline.has('N') ? 1 : 0) + hasCoords.length === gline.words.length;
-
+        //let isSimpleMotion = motionCode && (motionCode === 'G0' || motionCode === 'G1') && (gline.has(motionCode) ? 1 : 0) + (gline.has('F') ? 1 : 0) + (gline.has('N') ? 1 : 0);
+        let isSimpleMotion = gline.isSimpleMotion();
         // Update seenWordSet
         for (let word of gline.words) {
-            vmState.seenWordSet[word[0].toUpperCase()] = true;
+            vmState.seenWordSet[word[0]] = true;
         }
 
-        if (INVALID_GCODE_REGEX.test(gline.origLine)) {
-            vmState.invalidGcode.add(gline.origLine);
+        if (INVALID_GCODE_REGEX.test(gline.asString())) {
+            vmState.invalidGcode.add(gline.asString());
         }
 
         // Check for other codes that set modals
@@ -400,6 +392,8 @@ export class GCodeProcessor {
             isMotion = true;
         } else if (doMotion) {
             // throw new Error('Unsupported motion gcode ' + doMotion + ': ' + gline.toString());
+            /*console.log(doMotion);
+            console.log(gline.toString());
             console.error('Unsupported motion gcode ' + doMotion + ': ' + gline.toString());
             return {
                 state: vmState, // VM state after executing line
@@ -407,7 +401,7 @@ export class GCodeProcessor {
                 motionCode: motionCode, // If motion, the G code associated with the motion
                 changedCoordOffsets: changedCoordOffsets, // whether or not anything was changed with coordinate systems
                 time: vmState.totalTime - origTotalTime // estimated duration of instruction execution, in seconds
-            };
+            };*/
         }
 
         if (!isSimpleMotion) {
@@ -482,12 +476,9 @@ export class GCodeProcessor {
 
             // Handle T
             if (gline.has('T')) {
-                const values = gline.get('T', null, true);
-                vmState.tool = values[0];
-
-                for (const val of values) {
-                    vmState.tools.add('T' + val);
-                }
+                const value = gline.get('T');
+                vmState.tool = value;
+                vmState.tools.add('T' + value);
 
                 vmState.countT++;
             }

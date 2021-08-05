@@ -25,16 +25,11 @@ import { GCodeProcessor } from '../lib/gcodeProcessor/GCodeProcessor';
 
 onmessage = function({ data }) {
     const { content, name, size, feedArray = null, accelArray = null } = data;
-    const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
-    //Clean up lines and remove ones that are comments and headers
-    const lines = content
-        .split('\n')
-        .filter(line => (line.trim().length > 0))
-        .filter(line => !comments.some(comment => line.includes(comment)));
+    const lines = [];
 
     const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'], maxFeed: feedArray, acceleration: accelArray });
     const start = Date.now();
-    processor.process(lines);
+    processor.process(content);
     console.log(`Finished processing in ${Date.now() - start} ms`);
 
     postMessage({

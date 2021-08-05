@@ -54,42 +54,33 @@ const coordOrder = ['P', 'X', 'Y', 'Z', 'A', 'B', 'C', 'F'];
 class GcodeLine {
     /**
      * The constructor can be called in one of the following forms:
-     * - GcodeLine() - Creates an empty line to be filled in.
-     * - GcodeLine(string) - Parses the line string.
-     * - GcodeLine([ [ letter, value ] ]) - Uses the array of words given
-     * - GcodeLine([ word ]) - Concatenates the array of strings then parses
-     * - GcodeLine(gline) - Copy constructor
+     * - GcodeLine([ [ letter, value ]... ]) - Uses the array of words given
      */
-    constructor(arg) {
+    constructor(words) {
         this.modified = false;
         this.isGcodeLine = true;
-        if (arg === null || arg === undefined || (Array.isArray(arg) && arg.length === 0)) {
-            this.words = [];
+        if (Array.isArray(words)) {
+            this.words = words;
             this.comment = '';
             this.commentStyle = '(';
-            this.origLine = null;
-        } else if (typeof arg === 'string') {
-            this.origLine = arg;
-            this.parse(arg);
-        } else if (Array.isArray(arg) && typeof arg[0] === 'string') {
-            this.origLine = arg.join(' ');
-            this.parse(this.origLine);
-        } else if (Array.isArray(arg) && Array.isArray(arg[0])) {
-            this.words = arg;
-            this.comment = '';
-            this.commentStyle = '(';
-            this.origLine = this.toString();
-        } else if (arg && arg instanceof GcodeLine) {
-            this.words = objtools.deepCopy(arg.words);
-            this.comment = arg.comment;
-            this.commentStyle = arg.commentStyle;
-            this.origLine = arg.origLine;
-            this.modified = arg.modified;
+            this.origLine = '';
         } else {
             // throw new Error('Invalid call to GcodeLine constructor');
             console.error('Invalid call to GcodeLine constructor');
         }
     }
+
+    toPairs(words) {
+        const result = {};
+        for (let wordPair of words) {
+            const word = wordPair[0];
+            const value = wordPair[1];
+            result[word] = value;
+        }
+        return result;
+    }
+
+
 
     /**
      * Fetches the value associated with the given gcode letter.
