@@ -25,7 +25,6 @@ import { GCodeProcessor } from '../lib/gcodeProcessor/GCodeProcessor';
 
 onmessage = function({ data }) {
     const { content, name, size, feedArray = null, accelArray = null } = data;
-    const lines = [];
 
     const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'], maxFeed: feedArray, acceleration: accelArray });
     const start = Date.now();
@@ -35,7 +34,7 @@ onmessage = function({ data }) {
     postMessage({
         name,
         size,
-        total: (lines.length + 1),
+        total: processor.vmState.lineCounter,
         toolSet: processor.vmState.tools,
         spindleSet: processor.vmState.spindleRates,
         movementSet: processor.vmState.feedrates,
