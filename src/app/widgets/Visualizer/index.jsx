@@ -998,8 +998,8 @@ class VisualizerWidget extends PureComponent {
             this.actions.onRunClick();
         },
         START_JOB: () => {
-            const { port, workflow } = this.state;
-            if (!port) {
+            const { isConnected, workflow } = this.props;
+            if (!isConnected) {
                 return;
             }
 
@@ -1018,8 +1018,8 @@ class VisualizerWidget extends PureComponent {
             }
         },
         PAUSE_JOB: () => {
-            const { port, workflow } = this.state;
-            if (!port) {
+            const { isConnected, workflow } = this.props;
+            if (!isConnected) {
                 return;
             }
 
@@ -1028,8 +1028,8 @@ class VisualizerWidget extends PureComponent {
             }
         },
         STOP_JOB: () => {
-            const { port } = this.state;
-            if (!port) {
+            const { isConnected } = this.props;
+            if (!isConnected) {
                 return;
             }
 
@@ -1370,6 +1370,7 @@ export default connect((store) => {
     const zMaxAccel = Number(get(settings.settings, '$122', 1800000));
     const workflow = get(store, 'controller.workflow');
     const renderState = get(store, 'file.renderState');
+    const isConnected = get(store, 'connection.isConnected');
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
     const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
@@ -1377,6 +1378,7 @@ export default connect((store) => {
         feedArray,
         accelArray,
         workflow,
-        renderState
+        renderState,
+        isConnected
     };
 })(VisualizerWidget);

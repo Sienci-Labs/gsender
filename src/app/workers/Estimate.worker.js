@@ -33,7 +33,9 @@ onmessage = function({ data }) {
         .filter(line => !comments.some(comment => line.includes(comment)));
 
     const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'], maxFeed: feedArray, acceleration: accelArray });
+    const start = Date.now();
     processor.process(lines);
+    console.log(`Finished processing in ${Date.now() - start} ms`);
 
     postMessage({
         name,
