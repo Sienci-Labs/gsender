@@ -21,6 +21,7 @@
  *
  */
 
+import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import pubsub from 'pubsub-js';
@@ -77,6 +78,16 @@ export function* initialize() {
     });
 
     controller.addListener('serialport:open', (options) => {
+        const machineProfile = store.get('workspace.machineProfile');
+        const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
+
+        if (machineProfile) {
+            controller.command('machineprofile:load', machineProfile);
+        }
+
+        if (showLineWarnings) {
+            controller.command('settings:updated', { showLineWarnings });
+        }
         reduxStore.dispatch({
             type: connectionActions.OPEN_CONNECTION,
             payload: { options }

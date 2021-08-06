@@ -27,7 +27,6 @@ import classNames from 'classnames';
 import includes from 'lodash/includes';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
 import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
@@ -46,7 +45,6 @@ import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
-import { in2mm } from 'app/lib/units';
 import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
 import EstimateWorker from './Estimate.worker';
 import WidgetConfig from '../WidgetConfig';
@@ -431,19 +429,19 @@ class VisualizerWidget extends PureComponent {
             }
         },
         handlePause: () => {
-            const { workflow } = this.prop;
+            const { workflow } = this.props;
             console.assert(includes([WORKFLOW_STATE_RUNNING], workflow.state));
 
             controller.command('gcode:pause');
         },
         handleStop: () => {
-            const { workflow } = this.state;
+            const { workflow } = this.props;
             console.assert(includes([WORKFLOW_STATE_PAUSED], workflow.state));
 
             controller.command('gcode:stop', { force: true });
         },
         handleClose: () => {
-            const { workflow } = this.state;
+            const { workflow } = this.props;
             console.assert(includes([WORKFLOW_STATE_IDLE], workflow.state));
 
             controller.command('gcode:unload');
@@ -650,102 +648,7 @@ class VisualizerWidget extends PureComponent {
         }
     };
 
-    controllerEvents = {
-        'serialport:open': (options) => {
-            const { port } = options;
-            const { gcode } = this.state;
-
-            const machineProfile = store.get('workspace.machineProfile');
-            const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
-
-            if (machineProfile) {
-                controller.command('machineprofile:load', machineProfile);
-            }
-
-            if (showLineWarnings) {
-                controller.command('settings:updated', { showLineWarnings });
-            }
-
-            //If we uploaded a file before connecting to a machine, load the gcode to the controller
-            if (gcode.loadedBeforeConnection) {
-                controller.command('gcode:load', this.state.filename, gcode.content, {}, (err, data) => {
-                    if (err) {
-                        this.setState((state) => ({
-                            gcode: {
-                                ...state.gcode,
-                                loading: false,
-                                rendering: false,
-                                ready: false
-                            }
-                        }));
-
-                        log.error(err);
-                        return;
-                    }
-
-                    log.debug(data); // TODO
-                });
-            }
-
-            this.setState({ port: port });
-        },
-        'serialport:close': (options) => {
-            const initialState = this.getInitialState();
-            this.setState((state) => ({ ...initialState }));
-        },
-        'workflow:state': (workflowState, data) => {
-            if (data) {
-                this.setState(state => ({
-                    workflow: {
-                        ...state.workflow,
-                        state: workflowState
-                    },
-                    invalidLine: {
-                        ...state.invalidLine,
-                        show: true,
-                        line: data.line,
-                    }
-                }));
-            } else {
-                this.setState(state => ({
-                    workflow: {
-                        ...state.workflow,
-                        state: workflowState
-                    }
-                }));
-            }
-        },
-        'controller:state': (type, controllerState) => {
-            // Grbl
-            if (type === GRBL) {
-                const { status } = { ...controllerState };
-                const { mpos, wpos } = status;
-                const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
-
-                this.setState(state => ({
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in mm ($13=0) or inches ($13=1)
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in mm ($13=0) or inches ($13=1)
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, val => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    })
-                }));
-            }
-        }
-    };
+    controllerEvents = {};
 
     pubsubTokens = [];
 
@@ -1144,7 +1047,8 @@ class VisualizerWidget extends PureComponent {
     }
 
     isAgitated() {
-        const { workflow, disabled, objects } = this.state;
+        const { disabled, objects } = this.state;
+        const { workflow } = this.props;
         const controllerType = this.state.controller.type;
         const controllerState = this.state.controller.state;
 

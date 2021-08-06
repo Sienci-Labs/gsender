@@ -22,6 +22,7 @@
  */
 
 import reduxStore from 'app/store/redux';
+import { connect } from 'react-redux';
 import * as fileActions from 'app/actions/fileInfoActions';
 import _get from 'lodash/get';
 import _each from 'lodash/each';
@@ -310,22 +311,23 @@ class Visualizer extends Component {
         }
 
         { // Update position
+            const { machinePosition, workPosition } = this.props;
             let needUpdatePosition = false;
 
             // Machine position
             const { x: mpox0, y: mpoy0, z: mpoz0 } = this.machinePosition;
-            const { x: mpox1, y: mpoy1, z: mpoz1 } = state.machinePosition;
+            const { x: mpox1, y: mpoy1, z: mpoz1 } = machinePosition;
             if (mpox0 !== mpox1 || mpoy0 !== mpoy1 || mpoz0 !== mpoz1) {
-                this.machinePosition = state.machinePosition;
+                this.machinePosition = machinePosition;
                 needUpdatePosition = true;
                 needUpdateScene = true;
             }
 
             // Work position
             const { x: wpox0, y: wpoy0, z: wpoz0 } = this.workPosition;
-            const { x: wpox1, y: wpoy1, z: wpoz1 } = state.workPosition;
+            const { x: wpox1, y: wpoy1, z: wpoz1 } = workPosition;
             if (wpox0 !== wpox1 || wpoy0 !== wpoy1 || wpoz0 !== wpoz1) {
-                this.workPosition = state.workPosition;
+                this.workPosition = workPosition;
                 needUpdatePosition = true;
                 needUpdateScene = true;
             }
@@ -1432,4 +1434,11 @@ class Visualizer extends Component {
     }
 }
 
-export default Visualizer;
+export default connect((store) => {
+    const machinePosition = _get(store, 'controller.mpos');
+    const workPosition = _get(store, 'controller.wpos');
+    return {
+        machinePosition,
+        workPosition
+    };
+})(Visualizer);
