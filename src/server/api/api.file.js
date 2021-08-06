@@ -30,22 +30,18 @@ export const uploadFile = (req, res) => {
     const { port } = req.body;
     let { file } = req;
 
-    if (!port) {
-        return res.status(ERR_BAD_REQUEST).send({
-            msg: 'No port specified'
-        });
-    }
     if (!file) {
         return res.status(ERR_BAD_REQUEST).send({
             msg: 'No file attached'
         });
     }
-    console.log(file);
+
     const { buffer } = file;
     const gcode = buffer.toString();
 
     CNCEngine.load({
         gcode,
+        port,
         name: file.originalname,
         size: file.size
     });

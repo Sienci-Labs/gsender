@@ -258,6 +258,12 @@ class CNCEngine {
                 }
 
                 controller.addConnection(socket);
+                // Load file to controller if it exists
+                if (this.hasFileLoaded()) {
+                    controller.loadFile(this.gcode, this.meta);
+                } else {
+                    log.debug('No file in CNCEngine to load to sender');
+                }
 
                 if (controller.isOpen()) {
                     // Join the room
@@ -362,8 +368,8 @@ class CNCEngine {
                 socket.emit('hPong');
             });
 
-            socket.on('gcode:fetch', () => {
-                socket.emit('gcode:load', this.gcode);
+            socket.on('file:fetch', () => {
+                socket.emit('file:fetch', this.gcode, this.meta);
             });
         });
     }
@@ -389,10 +395,20 @@ class CNCEngine {
         });
     }
 
+    /* Functions related to loading file through server */
     // If gcode is going to live in CNCengine, we need functions to access or unload it.
-    load({ gcode, ...meta }) {
+    load({ port, gcode, ...meta }) {
+        log.info(`Loaded file '${meta.name}' to CNCEngine`);
         this.gcode = gcode;
         this.meta = meta;
+
+        // Load the file to the sender if controller connection exists
+        if (port) {
+            const controller = store.get(`controllers["${port}"]`);
+            if (controller) {
+                controller.loadFile(this.gcode, this.meta);
+            }
+        }
         this.emit('file:load', gcode, meta.size, meta.name);
     }
 
@@ -403,7 +419,11 @@ class CNCEngine {
     }
 
     fetchGcode() {
-        return this.gcode;
+        return [this.gcode, this.meta];
+    }
+
+    hasFileLoaded() {
+        return this.gcode !== null;
     }
 }
 

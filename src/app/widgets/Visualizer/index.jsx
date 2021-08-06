@@ -648,8 +648,6 @@ class VisualizerWidget extends PureComponent {
         }
     };
 
-    controllerEvents = {};
-
     pubsubTokens = [];
 
     onProcessedGcode = ({ data }) => {
@@ -724,7 +722,6 @@ class VisualizerWidget extends PureComponent {
 
     componentDidMount() {
         this.subscribe();
-        this.addControllerEvents();
         this.addShuttleControlEvents();
         this.subscribe();
 
@@ -741,7 +738,6 @@ class VisualizerWidget extends PureComponent {
 
     componentWillUnmount() {
         this.unsubscribe();
-        this.removeControllerEvents();
         this.removeShuttleControlEvents();
         this.unsubscribe();
     }
@@ -998,20 +994,6 @@ class VisualizerWidget extends PureComponent {
             store.set('commandKeys', keybindingsArr);
             pubsub.publish('keybindingsUpdated');
         }
-    }
-
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
     }
 
     addShuttleControlEvents() {

@@ -817,6 +817,8 @@ class GrblController {
                 }
             }
         }, 250);
+
+        // Load file if it exists in CNC engine (AKA it was loaded before connection
     }
 
     async initController() {
@@ -1069,6 +1071,11 @@ class GrblController {
         return !(this.isOpen());
     }
 
+    loadFile(gcode, { name }) {
+        log.debug(`Loading file '${name}' to controller`);
+        this.command('gcode:load', name, gcode);
+    }
+
     addConnection(socket) {
         if (!socket) {
             log.error('The socket parameter is not specified');
@@ -1185,8 +1192,8 @@ class GrblController {
                     return;
                 }
 
-                this.emit('gcode:load', name, gcode, context);
-                this.event.trigger('gcode:load');
+                //this.emit('gcode:load', name, gcode, context);
+                //this.event.trigger('gcode:load');
 
                 log.debug(`Load G-code: name="${this.sender.state.name}", size=${this.sender.state.gcode.length}, total=${this.sender.state.total}`);
 
@@ -1196,12 +1203,13 @@ class GrblController {
             },
             'gcode:unload': () => {
                 this.workflow.stop();
+                this.engine.unload();
 
                 // Sender
                 this.sender.unload();
 
-                this.emit('gcode:unload');
-                this.event.trigger('gcode:unload');
+                this.emit('file:unload');
+                this.event.trigger('file:unload');
             },
             'start': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
