@@ -1243,7 +1243,6 @@ class Visualizer extends Component {
         if (this.viewport) {
             this.viewport.reset();
         }
-
         // Update the scene
         this.updateScene();
     }

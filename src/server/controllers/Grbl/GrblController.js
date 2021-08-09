@@ -1018,10 +1018,10 @@ class GrblController {
             // Clear action values
             this.clearActionValues();
 
-            if (this.sender.state.gcode) {
+            /*if (this.sender.state.gcode) {
                 // Unload G-code
                 this.command('gcode:unload');
-            }
+            }*/
         });
     }
 

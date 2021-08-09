@@ -362,6 +362,10 @@ class Controller {
     healthCheck() {
         this.socket && this.socket.emit('hPing');
     }
+
+    unloadFile() {
+        this.socket && this.socket.emit('file:unload');
+    }
 }
 
 const controllerInstance = new Controller(io);

@@ -371,6 +371,11 @@ class CNCEngine {
             socket.on('file:fetch', () => {
                 socket.emit('file:fetch', this.gcode, this.meta);
             });
+
+            socket.on('file:unload', () => {
+                log.debug('Socket unload called');
+                this.unload();
+            });
         });
     }
 
@@ -398,7 +403,6 @@ class CNCEngine {
     /* Functions related to loading file through server */
     // If gcode is going to live in CNCengine, we need functions to access or unload it.
     load({ port, gcode, ...meta }) {
-        log.info(`Loaded file '${meta.name}' to CNCEngine`);
         this.gcode = gcode;
         this.meta = meta;
 
@@ -409,10 +413,12 @@ class CNCEngine {
                 controller.loadFile(this.gcode, this.meta);
             }
         }
+        log.info(`Loaded file '${meta.name}' to CNCEngine`);
         this.emit('file:load', gcode, meta.size, meta.name);
     }
 
     unload() {
+        log.info('Unloading file from CNCEngine');
         this.gcode = null;
         this.meta = null;
         this.emit('file:unload');

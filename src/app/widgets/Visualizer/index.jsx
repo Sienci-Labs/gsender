@@ -378,6 +378,7 @@ class VisualizerWidget extends PureComponent {
                 visualizer.unload();
             }
 
+
             // Clear gcode bounding box
             controller.context = {
                 ...controller.context,
