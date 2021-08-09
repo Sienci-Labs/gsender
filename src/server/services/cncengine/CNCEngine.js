@@ -25,10 +25,10 @@ import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
 import SerialPort from 'serialport';
 import socketIO from 'socket.io';
-import socketioJwt from 'socketio-jwt';
+//import socketioJwt from 'socketio-jwt';
 import EventTrigger from '../../lib/EventTrigger';
 import logger from '../../lib/logger';
-import settings from '../../config/settings';
+//import settings from '../../config/settings';
 import store from '../../store';
 import config from '../configstore';
 import taskRunner from '../taskrunner';
@@ -38,7 +38,7 @@ import {
 import { GRBL } from '../../controllers/Grbl/constants';
 import {
     authorizeIPAddress,
-    validateUser
+    //validateUser
 } from '../../access-control';
 
 const log = logger('service:cncengine');
@@ -138,10 +138,10 @@ class CNCEngine {
             maxHttpBufferSize: 40e6
         });
 
-        this.io.use(socketioJwt.authorize({
+        /*this.io.use(socketioJwt.authorize({
             secret: settings.secret,
             handshake: true
-        }));
+        }));*/
 
         this.io.use(async (socket, next) => {
             try {
@@ -150,8 +150,8 @@ class CNCEngine {
                 await authorizeIPAddress(ipaddr);
 
                 // User Validation
-                const user = socket.decoded_token || {};
-                await validateUser(user);
+                //const user = socket.decoded_token || {};
+                //await validateUser(user);
             } catch (err) {
                 log.warn(err);
                 next(err);
