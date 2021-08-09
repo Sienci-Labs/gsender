@@ -1441,4 +1441,4 @@ export default connect((store) => {
         machinePosition,
         workPosition
     };
-})(Visualizer);
+}, null, null, { forwardRef: true })(Visualizer);

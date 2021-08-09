@@ -1020,7 +1020,7 @@ class GrblController {
 
             if (this.sender.state.gcode) {
                 // Unload G-code
-                this.command('unload');
+                this.command('gcode:unload');
             }
         });
     }

@@ -106,9 +106,8 @@ class WorkflowControl extends PureComponent {
         const files = event.target.files;
         const file = files[0];
 
-        const start = Date.now();
         await api.file.upload(file, 'COM5');
-        console.log(Date.now() - start);
+        await api.file.upload(file, 'COM5');
     };
 
     handleElectronFileUpload = (file) => {
