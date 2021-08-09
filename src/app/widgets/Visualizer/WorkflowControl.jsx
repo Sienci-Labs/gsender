@@ -290,9 +290,8 @@ class WorkflowControl extends PureComponent {
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
         const { handleOnStop } = this;
-        const { state, fileLoaded, actions, workflowState, isConnected, senderInHold, activeState } = this.props;
-        const { port } = state;
-        const canClick = !!port;
+        const { fileLoaded, actions, workflowState, isConnected, senderInHold, activeState } = this.props;
+        const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
         const { runHasStarted } = this.state;
         const canRun = this.canRun();
@@ -333,7 +332,7 @@ class WorkflowControl extends PureComponent {
                                 <RecentFileButton />
                                 <div
                                     role="button"
-                                    className={this.props.state.gcode.content ? `${styles.closeFileButton}` : `${styles['workflow-button-disabled']}`}
+                                    className={fileLoaded ? `${styles.closeFileButton}` : `${styles['workflow-button-disabled']}`}
                                     onClick={this.handleCloseFile}
                                 >
                                     <i className="fas fa-times" />
