@@ -312,7 +312,7 @@ class WorkflowControl extends PureComponent {
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
         const { handleOnStop } = this;
-        const { fileLoaded, actions, workflowState, isConnected, senderInHold, activeState } = this.props;
+        const { fileLoaded, actions, workflowState, isConnected, senderInHold, activeState, lineTotal } = this.props;
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
         //const { runHasStarted } = this.state;
@@ -324,7 +324,6 @@ class WorkflowControl extends PureComponent {
         const workflowPaused = workflowState === WORKFLOW_STATE_PAUSED || senderInHold;
 
         const { showModal, value } = this.state.startFromLine;
-        const { total } = gcode;
 
         return (
             <div className={styles.workflowControl}>
@@ -475,14 +474,14 @@ class WorkflowControl extends PureComponent {
                                                 <p>You may start at a specific line in your gcode</p>
 
                                                 <p>
-                                                    For this file the maximum line number you may start at is <strong>{this.props.state.gcode.total}</strong>
+                                                    For this file the maximum line number you may start at is <strong>{lineTotal}</strong>
                                                 </p>
                                             </div>
 
                                             <Input
                                                 label="Line to Start From:"
                                                 value={value}
-                                                onChange={(e) => (e.target.value <= total && e.target.value > 0) && this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: Math.ceil(Number(e.target.value)) } }))}
+                                                onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) && this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: Math.ceil(Number(e.target.value)) } }))}
                                                 additionalProps={{ type: 'number' }}
                                             />
                                         </div>
@@ -555,6 +554,7 @@ export default connect((store) => {
     const workflowState = get(store, 'controller.workflow.state');
     const activeState = get(store, 'controller.state.status.activeState');
     const controllerState = get(store, 'controller.state');
+    const lineTotal = get(store, 'file.total');
     const port = get(store, 'connection.port');
     return {
         fileLoaded,
@@ -564,6 +564,7 @@ export default connect((store) => {
         activeState,
         senderStatus,
         controllerState,
-        port
+        port,
+        lineTotal
     };
 }, null, null, { forwardRef: true })(WorkflowControl);
