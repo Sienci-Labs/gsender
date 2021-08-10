@@ -24,7 +24,6 @@
 import cx from 'classnames';
 import color from 'cli-color';
 import PropTypes from 'prop-types';
-import pubsub from 'pubsub-js';
 import React, { PureComponent } from 'react';
 import uuid from 'uuid';
 import Widget from 'app/components/Widget';
@@ -35,7 +34,7 @@ import Console from './Console';
 import styles from './index.styl';
 
 // The buffer starts with 254 bytes free. The terminating <LF> or <CR> counts as a byte.
-const TERMINAL_COLS = 254;
+const TERMINAL_COLS = 50;
 const TERMINAL_ROWS = 12;
 
 class ConsoleWidget extends PureComponent {
@@ -72,16 +71,12 @@ class ConsoleWidget extends PureComponent {
                     ...state.terminal,
                     rows: state.isFullscreen ? TERMINAL_ROWS : 'auto'
                 }
-            }), () => {
-                this.resizeTerminal();
-            });
+            }));
         },
         toggleMinimized: () => {
             this.setState(state => ({
                 minimized: !state.minimized
-            }), () => {
-                this.resizeTerminal();
-            });
+            }));
         },
         clearAll: () => {
             this.terminal && this.terminal.clear();
@@ -182,21 +177,6 @@ class ConsoleWidget extends PureComponent {
         };
     }
 
-    subscribe() {
-        const tokens = [
-            pubsub.subscribe('resize', (msg) => {
-                this.resizeTerminal();
-            })
-        ];
-        this.pubsubTokens = this.pubsubTokens.concat(tokens);
-    }
-
-    unsubscribe() {
-        this.pubsubTokens.forEach((token) => {
-            pubsub.unsubscribe(token);
-        });
-        this.pubsubTokens = [];
-    }
 
     addControllerEvents() {
         Object.keys(this.controllerEvents).forEach(eventName => {
@@ -212,12 +192,6 @@ class ConsoleWidget extends PureComponent {
         });
     }
 
-    resizeTerminal() {
-        setTimeout(() => {
-            this.terminal && this.terminal.resize();
-        }, 0);
-    }
-
     render() {
         const { widgetId, embedded, active } = this.props;
         const { minimized, isFullscreen } = this.state;
@@ -228,8 +202,6 @@ class ConsoleWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-
-        active && this.resizeTerminal();
 
         return (
             <Widget fullscreen={isFullscreen}>
@@ -250,6 +222,7 @@ class ConsoleWidget extends PureComponent {
                         { [styles.hidden]: minimized },
                         { [styles.fullscreen]: isFullscreen }
                     )}
+                    style={{ width: '100%' }}
                 >
                     <Console
                         ref={node => {
@@ -259,6 +232,7 @@ class ConsoleWidget extends PureComponent {
                         }}
                         state={state}
                         actions={actions}
+                        active={active}
                     />
                 </Widget.Content>
             </Widget>

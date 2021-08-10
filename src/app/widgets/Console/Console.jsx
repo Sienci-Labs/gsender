@@ -30,7 +30,8 @@ import styles from './index.styl';
 class Console extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
+        active: PropTypes.bool,
     };
 
     terminal = null;
@@ -60,6 +61,7 @@ class Console extends PureComponent {
                 scrollback={state.terminal.scrollback}
                 tabStopWidth={state.terminal.tabStopWidth}
                 onData={actions.onTerminalData}
+                active={this.props.active}
             />
         );
     }

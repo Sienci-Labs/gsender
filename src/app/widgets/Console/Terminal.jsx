@@ -29,12 +29,14 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
 import { Terminal } from 'xterm';
-import * as fit from 'xterm/lib/addons/fit/fit';
+// import * as fit from 'xterm/lib/addons/fit/fit';
+import { FitAddon } from 'xterm-addon-fit';
+import { debounce } from 'lodash';
+import controller from 'app/lib/controller';
 import log from 'app/lib/log';
+import Button from 'app/components/FunctionButton/FunctionButton';
 import History from './History';
 import styles from './index.styl';
-
-Terminal.applyAddon(fit);
 
 class TerminalWrapper extends PureComponent {
     static propTypes = {
@@ -43,7 +45,8 @@ class TerminalWrapper extends PureComponent {
         cursorBlink: PropTypes.bool,
         scrollback: PropTypes.number,
         tabStopWidth: PropTypes.number,
-        onData: PropTypes.func
+        onData: PropTypes.func,
+        active: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -64,6 +67,12 @@ class TerminalWrapper extends PureComponent {
     terminalContainer = null;
 
     term = null;
+
+    fitAddon = null;
+
+    debounce = debounce
+
+    inputRef = React.createRef()
 
     eventHandler = {
         onResize: () => {
@@ -278,23 +287,20 @@ class TerminalWrapper extends PureComponent {
     };
 
     componentDidMount() {
-        const { cursorBlink, scrollback, tabStopWidth } = this.props;
-        this.term = new Terminal({
-            cursorBlink,
-            scrollback,
-            tabStopWidth
-        });
+        const { scrollback, tabStopWidth } = this.props;
+        this.term = new Terminal({ scrollback, tabStopWidth });
+
+        this.fitAddon = new FitAddon();
+
+        this.term.loadAddon(this.fitAddon);
         this.term.prompt = () => {
             this.term.write('\r\n');
             this.term.write(color.white(this.prompt));
         };
-        this.term.on('resize', this.eventHandler.onResize);
-        this.term.on('key', this.eventHandler.onKey);
-        this.term.on('paste', this.eventHandler.onPaste);
 
         const el = ReactDOM.findDOMNode(this.terminalContainer);
+
         this.term.open(el);
-        this.term.fit();
         this.term.focus(false);
 
         this.term.setOption('fontFamily', 'Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif');
@@ -306,7 +312,20 @@ class TerminalWrapper extends PureComponent {
         const viewportElement = el.querySelector('.xterm-viewport');
         this.verticalScrollbar = new PerfectScrollbar(viewportElement);
 
-        this.resize();
+        window.addEventListener('resize', this.debounce(() => {
+            if (this.props.active) {
+                // console.count('Refit Iterations');
+                this.refitTerminal();
+            }
+        }, 150));
+    }
+
+    componentDidUpdate() {
+        if (this.props.active) {
+            setTimeout(() => {
+                this.refitTerminal();
+            }, 150);
+        }
     }
 
     componentWillUnmount() {
@@ -315,31 +334,12 @@ class TerminalWrapper extends PureComponent {
             this.verticalScrollbar = null;
         }
         if (this.term) {
-            this.term.off('resize', this.eventHandler.onResize);
-            this.term.off('key', this.eventHandler.onKey);
-            this.term.off('paste', this.eventHandler.onPaste);
+            this.term.onKey(null);
             this.term = null;
+            this.fitAddon = null;
         }
-    }
 
-    // eslint-disable-next-line camelcase
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        if (nextProps.cursorBlink !== this.props.cursorBlink) {
-            this.term.setOption('cursorBlink', nextProps.cursorBlink);
-        }
-        if (nextProps.scrollback !== this.props.scrollback) {
-            this.term.setOption('scrollback', nextProps.scrollback);
-        }
-        if (nextProps.tabStopWidth !== this.props.tabStopWidth) {
-            this.term.setOption('tabStopWidth', nextProps.tabStopWidth);
-        }
-    }
-
-    componentDidUpdate(prevProps) {
-        if (this.props.cols !== prevProps.cols || this.props.rows !== prevProps.rows) {
-            const { cols, rows } = this.props;
-            this.resize(cols, rows);
-        }
+        window.removeEventListener('resize', this.debounce);
     }
 
     // http://www.alexandre-gomes.com/?p=115
@@ -367,26 +367,10 @@ class TerminalWrapper extends PureComponent {
         return (w1 - w2);
     }
 
-    resize(cols = this.props.cols, rows = this.props.rows) {
-        const container = ReactDOM.findDOMNode(this.terminalContainer);
-
-        if (!container) {
-            return;
+    refitTerminal() {
+        if (this.fitAddon) {
+            this.fitAddon.fit();
         }
-
-        const width = container.offsetWidth;
-        const height = container.offsetHeight;
-
-        // const columns = Math.floor((height / 4));
-        const rowNumbers = Math.floor((width / 36) - 2);
-
-        // console.log(columns, rowNumbers);
-
-        if (width <= 0 || height <= 0) {
-            return;
-        }
-
-        this.term.resize(cols, rowNumbers);
     }
 
     clear() {
@@ -406,23 +390,67 @@ class TerminalWrapper extends PureComponent {
     }
 
     writeln(data) {
-        this.term.eraseRight(0, this.term.buffer.y);
         this.term.write('\r');
         this.term.write(data);
         this.term.prompt();
+    }
+
+    handleCommandExecute = () => {
+        const command = this.inputRef.current.value;
+
+        if (!command) {
+            return;
+        }
+
+        this.inputRef.current.value = '';
+
+        controller.writeln(command);
     }
 
     render() {
         const { className, style } = this.props;
 
         return (
-            <div
-                ref={node => {
-                    this.terminalContainer = node;
-                }}
-                className={cx(className, styles.terminalContainer)}
-                style={style}
-            />
+            <div style={{ display: 'grid', width: '100%', gridTemplateRows: '11fr 1fr' }}>
+                <div
+                    ref={node => {
+                        this.terminalContainer = node;
+                    }}
+                    className={cx(className, styles.terminalContainer)}
+                    style={style}
+                />
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 18fr 5fr', alignItems: 'center', textAlign: 'center' }}>
+                    <span style={{ opacity: '0.6' }}>&gt;</span>
+                    <input
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                this.handleCommandExecute();
+                            }
+                        }}
+                        type="text"
+                        ref={this.inputRef}
+                        style={{
+                            border: 'none',
+                            background: '#e5e7eb',
+                            outline: 'none',
+                        }}
+                        placeholder="Enter Command Here..."
+                    />
+                    <Button
+                        onClick={this.handleCommandExecute}
+                        primary
+                        style={{
+                            margin: '0px',
+                            height: '100%',
+                            border: 'none',
+                            borderRadius: '0px',
+                        }}
+                    >
+                            Execute
+                    </Button>
+                </div>
+            </div>
         );
     }
 }
