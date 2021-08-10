@@ -135,15 +135,17 @@ class MacroWidget extends PureComponent {
                 }
             });
         },
-        addMacro: async ({ name, content }) => {
+        addMacro: async ({ name, content, description }) => {
             try {
                 let res;
-                res = await api.macros.create({ name, content });
+                res = await api.macros.create({ name, content, description });
                 res = await api.macros.fetch();
                 const { records: macros } = res.body;
                 this.setState({ macros: macros });
 
                 combokeys.reload();
+
+                this.toast({ msg: 'Added New Macro', type: TOASTER_SUCCESS });
             } catch (err) {
                 // Ignore error
             }
@@ -161,17 +163,42 @@ class MacroWidget extends PureComponent {
 
                 store.replace('commandKeys', filteredCommandKeys);
                 combokeys.reload();
+
+                this.toast({ msg: 'Deleted Macro', type: TOASTER_SUCCESS });
             } catch (err) {
                 // Ignore error
             }
         },
-        updateMacro: async (id, { name, content }) => {
+        updateMacro: async (id, { name, content, description }) => {
             try {
                 let res;
-                res = await api.macros.update(id, { name, content });
+                res = await api.macros.update(id, { name, content, description });
                 res = await api.macros.fetch();
                 const { records: macros } = res.body;
                 this.setState({ macros: macros });
+            } catch (err) {
+                // Ignore error
+            }
+        },
+        updateMacros: async (macros = []) => {
+            try {
+                if (macros.length > 0) {
+                    for await (const macro of macros) {
+                        const { id, name, content, column, description, rowIndex } = macro;
+                        api.macros.update(id, { name, content, description, column, rowIndex });
+                    }
+
+                    const updatedMacros = this.state.macros.map(currentMacro => {
+                        for (const macro of macros) {
+                            if (macro.id === currentMacro.id) {
+                                return macro;
+                            }
+                        }
+                        return currentMacro;
+                    });
+
+                    this.setState({ macros: updatedMacros });
+                }
             } catch (err) {
                 // Ignore error
             }
@@ -214,15 +241,15 @@ class MacroWidget extends PureComponent {
         openEditMacroModal: (id) => {
             api.macros.read(id)
                 .then((res) => {
-                    const { id, name, content } = res.body;
-                    this.actions.openModal(MODAL_EDIT_MACRO, { id, name, content });
+                    const { id, name, content, description } = res.body;
+                    this.actions.openModal(MODAL_EDIT_MACRO, { id, name, content, description });
                 });
         }
     };
 
     controllerEvents = {
         'config:change': async () => {
-            await this.fetchMacros();
+            // await this.fetchMacros();
         },
     };
 

@@ -108,7 +108,7 @@ export default class MacroItem extends Component {
                     className={styles['macro-menu-item']}
                     style={{ marginBottom: '5px' }}
                     onClick={onEdit(macro)}
-                    onKeyDown={onEdit(macro)}
+                    onKeyDown={null}
                     tabIndex={-1}
                     role="button"
                 >
@@ -117,8 +117,8 @@ export default class MacroItem extends Component {
 
                 <div
                     className={styles['macro-menu-item']}
-                    onClick={onDelete(macro.id)}
-                    onKeyDown={onDelete(macro.id)}
+                    onClick={() => onDelete(macro.id)}
+                    onKeyDown={null}
                     tabIndex={-1}
                     role="button"
                 >
@@ -135,7 +135,7 @@ export default class MacroItem extends Component {
             >
                 <div
                     onClick={this.onMacroRun}
-                    onKeyDown={this.onMacroRun}
+                    onKeyDown={null}
                     role="button"
                     tabIndex={-1}
                     className={styles[disabled ? 'macro-item-control-disabled' : 'macro-item-control']}

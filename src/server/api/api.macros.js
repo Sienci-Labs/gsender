@@ -82,22 +82,22 @@ export const fetch = (req, res) => {
                 totalRecords: Number(totalRecords)
             },
             records: pagedRecords.map(record => {
-                const { id, mtime, name, content } = { ...record };
-                return { id, mtime, name, content };
+                const { id, mtime, name, content, description, column, rowIndex } = { ...record };
+                return { id, mtime, name, content, description, column, rowIndex };
             })
         });
     } else {
         res.send({
             records: records.map(record => {
-                const { id, mtime, name, content } = { ...record };
-                return { id, mtime, name, content };
+                const { id, mtime, name, content, description, column, rowIndex } = { ...record };
+                return { id, mtime, name, content, description, column, rowIndex };
             })
         });
     }
 };
 
 export const create = (req, res) => {
-    const { name, content } = { ...req.body };
+    const { name, content, description } = { ...req.body };
 
     if (!name) {
         res.status(ERR_BAD_REQUEST).send({
@@ -115,11 +115,34 @@ export const create = (req, res) => {
 
     try {
         const records = getSanitizedRecords();
+        let column, rowIndex;
+
+        const column1Length = records
+            .filter(macro => macro.column === 'column1')
+            .sort((a, b) => a.rowIndex - b.rowIndex)
+            .length;
+
+        const column2Length = records
+            .filter(macro => macro.column === 'column2')
+            .sort((a, b) => a.rowIndex - b.rowIndex)
+            .length;
+
+        if (column2Length >= column1Length) {
+            column = 'column1';
+            rowIndex = column1Length;
+        } else {
+            column = 'column2';
+            rowIndex = column2Length;
+        }
+
         const record = {
             id: uuid.v4(),
             mtime: new Date().getTime(),
-            name: name,
-            content: content
+            name,
+            content,
+            description,
+            column,
+            rowIndex,
         };
 
         records.push(record);
@@ -145,8 +168,8 @@ export const read = (req, res) => {
         return;
     }
 
-    const { mtime, name, content } = { ...record };
-    res.send({ id, mtime, name, content });
+    const { mtime, name, content, description, column, rowIndex } = { ...record };
+    res.send({ id, mtime, name, content, description, column, rowIndex });
 };
 
 export const update = (req, res) => {
@@ -163,7 +186,10 @@ export const update = (req, res) => {
 
     const {
         name = record.name,
-        content = record.content
+        content = record.content,
+        description = record.description,
+        column = record.column,
+        rowIndex = record.rowIndex
     } = { ...req.body };
 
     /*
@@ -186,6 +212,9 @@ export const update = (req, res) => {
         record.mtime = new Date().getTime();
         record.name = String(name || '');
         record.content = String(content || '');
+        record.description = String(description || '');
+        record.column = String(column || '');
+        record.rowIndex = Number(rowIndex || 0);
 
         config.set(CONFIG_KEY, records);
 
