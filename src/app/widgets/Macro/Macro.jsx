@@ -113,7 +113,6 @@ class Macro extends PureComponent {
             filtered = macros
                 .sort((a, b) => a.rowIndex - b.rowIndex);
 
-            console.log(filtered);
 
             filtered = macros.filter(currentMacro => currentMacro.id !== macro.id);
         }

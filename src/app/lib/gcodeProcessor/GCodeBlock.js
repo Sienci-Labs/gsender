@@ -56,7 +56,6 @@ class GCodeBlock {
 
     has(word) {
         const result = word in this.pairs;
-        //console.log(`Has ${word} in line: ${result}`);
         return (result);
     }
 

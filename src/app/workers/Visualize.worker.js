@@ -25,7 +25,6 @@ import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
 
 onmessage = function({ data }) {
-    console.log('Started visualization worker');
     const { content } = data;
     const vertices = [];
     const colors = [];

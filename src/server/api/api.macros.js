@@ -53,6 +53,16 @@ const getSanitizedRecords = () => {
             record.id = uuid.v4();
             shouldUpdate = true;
         }
+
+        // Handle migration, should only run once
+        if (!record.description) {
+            record.description = '';
+            shouldUpdate = true;
+        }
+        if (!record.column) {
+            record.column = (i % 2 === 0) ? 'column1' : 'column2';
+            shouldUpdate = true;
+        }
     }
 
     if (shouldUpdate) {
@@ -97,7 +107,7 @@ export const fetch = (req, res) => {
 };
 
 export const create = (req, res) => {
-    const { name, content, description } = { ...req.body };
+    const { name, content, description = '' } = { ...req.body };
 
     if (!name) {
         res.status(ERR_BAD_REQUEST).send({

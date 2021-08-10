@@ -111,7 +111,6 @@ class WorkflowControl extends PureComponent {
 
     handleElectronFileUpload = async (file) => {
         const serializedFile = new File([file.data], file.name);
-        console.log(serializedFile);
 
         if (isElectron()) {
             const recentFile = createRecentFileFromRawPath(file.path, file.name);
