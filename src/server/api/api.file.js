@@ -21,29 +21,32 @@
  *
  */
 
-import CNCEngine from './CNCEngine';
+import CNCEngine from '../services/cncengine';
+import { ERR_BAD_REQUEST } from '../constants';
 
-const cncengine = new CNCEngine();
+// Upload files using superagent:
+// https://stackoverflow.com/questions/31748936/how-to-send-files-with-superagent
+export const uploadFile = (req, res) => {
+    const { port } = req.body;
+    let { file } = req;
 
-const start = (server, controller) => {
-    cncengine.start(server, controller);
-};
+    if (!file) {
+        return res.status(ERR_BAD_REQUEST).send({
+            msg: 'No file attached'
+        });
+    }
 
-const stop = () => {
-    cncengine.stop();
-};
+    const { buffer } = file;
+    const gcode = buffer.toString();
 
-const load = (gcode) => {
-    cncengine.load(gcode);
-};
+    CNCEngine.load({
+        gcode,
+        port,
+        name: file.originalname,
+        size: file.size
+    });
 
-const unload = () => {
-    cncengine.unload();
-};
-
-export default {
-    start,
-    stop,
-    load,
-    unload
+    return res.send({
+        msg: 'Successfully loaded file',
+    });
 };

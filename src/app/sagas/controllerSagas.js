@@ -21,6 +21,7 @@
  *
  */
 
+import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import pubsub from 'pubsub-js';
@@ -29,6 +30,11 @@ import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import EstimateWorker from 'app/workers/Estimate.worker';
+import VisualizeWorker from 'app/workers/Visualize.worker';
+import { estimateResponseHandler } from 'app/workers/Estimate.response';
+import { visualizeResponse } from 'app/workers/Visualize.response';
+import { RENDER_LOADING } from 'app/constants';
 
 export function* initialize() {
     /* Health check - every 3 minutes */
@@ -72,6 +78,16 @@ export function* initialize() {
     });
 
     controller.addListener('serialport:open', (options) => {
+        const machineProfile = store.get('workspace.machineProfile');
+        const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
+
+        if (machineProfile) {
+            controller.command('machineprofile:load', machineProfile);
+        }
+
+        if (showLineWarnings) {
+            controller.command('settings:updated', { showLineWarnings });
+        }
         reduxStore.dispatch({
             type: connectionActions.OPEN_CONNECTION,
             payload: { options }
@@ -105,6 +121,43 @@ export function* initialize() {
                 content,
                 size
             }
+        });
+    });
+
+    controller.addListener('file:load', (content, size, name) => {
+        // Basic file content
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_CONTENT,
+            payload: {
+                content,
+                size,
+                name,
+            }
+        });
+        // Processing started for gcodeProcessor
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_PROCESSING,
+            payload: {
+                value: true
+            }
+        });
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_RENDER_STATE,
+            payload: {
+                state: RENDER_LOADING
+            }
+        });
+        const estimateWorker = new EstimateWorker();
+        estimateWorker.onmessage = estimateResponseHandler;
+        estimateWorker.postMessage({
+            content,
+            name,
+            size
+        });
+        const visualizeWorker = new VisualizeWorker();
+        visualizeWorker.onmessage = visualizeResponse;
+        visualizeWorker.postMessage({
+            content,
         });
     });
 

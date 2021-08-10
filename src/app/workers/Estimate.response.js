@@ -21,29 +21,22 @@
  *
  */
 
-import CNCEngine from './CNCEngine';
+import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
+import reduxStore from 'app/store/redux';
 
-const cncengine = new CNCEngine();
-
-const start = (server, controller) => {
-    cncengine.start(server, controller);
-};
-
-const stop = () => {
-    cncengine.stop();
-};
-
-const load = (gcode) => {
-    cncengine.load(gcode);
-};
-
-const unload = () => {
-    cncengine.unload();
-};
-
-export default {
-    start,
-    stop,
-    load,
-    unload
+export const estimateResponseHandler = ({ data }) => {
+    const reduxPayload = {
+        ...data,
+        fileProcessing: false
+    };
+    reduxStore.dispatch({
+        type: UPDATE_FILE_INFO,
+        payload: reduxPayload
+    });
+    reduxStore.dispatch({
+        type: UPDATE_FILE_PROCESSING,
+        payload: {
+            value: false
+        }
+    });
 };

@@ -21,29 +21,26 @@
  *
  */
 
-import CNCEngine from './CNCEngine';
+import { GCodeProcessor } from '../lib/gcodeProcessor/GCodeProcessor';
 
-const cncengine = new CNCEngine();
+onmessage = function({ data }) {
+    const { content, name, size, feedArray = null, accelArray = null } = data;
 
-const start = (server, controller) => {
-    cncengine.start(server, controller);
-};
+    const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'], maxFeed: feedArray, acceleration: accelArray });
+    const start = Date.now();
+    processor.process(content);
+    console.log(`Finished processing in ${Date.now() - start} ms`);
 
-const stop = () => {
-    cncengine.stop();
-};
-
-const load = (gcode) => {
-    cncengine.load(gcode);
-};
-
-const unload = () => {
-    cncengine.unload();
-};
-
-export default {
-    start,
-    stop,
-    load,
-    unload
+    postMessage({
+        name,
+        size,
+        total: processor.vmState.lineCounter,
+        toolSet: processor.vmState.tools,
+        spindleSet: processor.vmState.spindleRates,
+        movementSet: processor.vmState.feedrates,
+        invalidGcode: processor.vmState.invalidGcode,
+        estimatedTime: processor.vmState.totalTime,
+        bbox: processor.getBBox(),
+        fileModal: processor.vmState.units
+    });
 };

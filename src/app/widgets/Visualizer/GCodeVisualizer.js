@@ -22,7 +22,6 @@
  */
 
 // import colornames from 'colornames';
-import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
 import log from 'app/lib/log';
 
@@ -55,91 +54,24 @@ class GCodeVisualizer {
         return this;
     }
 
-    render(gcode) {
+    render({ vertices, colors, frames }) {
         const { cuttingCoordinateLines, G0Color, G1Color, G2Color, G3Color } = this.theme;
-
+        this.vertices = vertices;
+        this.frames = frames;
         const defaultColor = new THREE.Color(cuttingCoordinateLines);
 
+        // Get line colors for current theme
         const motionColor = {
             'G0': new THREE.Color(G0Color),
             'G1': new THREE.Color(G1Color),
             'G2': new THREE.Color(G2Color),
-            'G3': new THREE.Color(G3Color)
+            'G3': new THREE.Color(G3Color),
+            'default': defaultColor
         };
 
-        const toolpath = new Toolpath({
-            // @param {object} modal The modal object.
-            // @param {object} v1 A 3D vector of the start point.
-            // @param {object} v2 A 3D vector of the end point.
-            addLine: (modal, v1, v2) => {
-                const { motion } = modal;
-                const color = motionColor[motion] || defaultColor;
-                const opacity = (motion === 'G0') ? 0.1 : 1;
-                this.colors.push(...color.toArray(), opacity);
-                this.vertices.push(new THREE.Vector3(v2.x, v2.y, v2.z));
-            },
-            // @param {object} modal The modal object.
-            // @param {object} v1 A 3D vector of the start point.
-            // @param {object} v2 A 3D vector of the end point.
-            // @param {object} v0 A 3D vector of the fixed point.
-            addArcCurve: (modal, v1, v2, v0) => {
-                const { motion, plane } = modal;
-                const isClockwise = (motion === 'G2');
-                const radius = Math.sqrt(
-                    ((v1.x - v0.x) ** 2) + ((v1.y - v0.y) ** 2)
-                );
-                let startAngle = Math.atan2(v1.y - v0.y, v1.x - v0.x);
-                let endAngle = Math.atan2(v2.y - v0.y, v2.x - v0.x);
-
-                // Draw full circle if startAngle and endAngle are both zero
-                if (startAngle === endAngle) {
-                    endAngle += (2 * Math.PI);
-                }
-
-                const arcCurve = new THREE.ArcCurve(
-                    v0.x, // aX
-                    v0.y, // aY
-                    radius, // aRadius
-                    startAngle, // aStartAngle
-                    endAngle, // aEndAngle
-                    isClockwise // isClockwise
-                );
-                const divisions = 30;
-                const points = arcCurve.getPoints(divisions);
-                const color = motionColor[motion] || defaultColor;
-
-                for (let i = 0; i < points.length; ++i) {
-                    const point = points[i];
-                    const z = ((v2.z - v1.z) / points.length) * i + v1.z;
-
-                    if (plane === 'G17') { // XY-plane
-                        this.vertices.push(new THREE.Vector3(point.x, point.y, z));
-                    } else if (plane === 'G18') { // ZX-plane
-                        this.vertices.push(new THREE.Vector3(point.y, z, point.x));
-                    } else if (plane === 'G19') { // YZ-plane
-                        this.vertices.push(new THREE.Vector3(z, point.x, point.y));
-                    }
-                    this.colors.push(...color.toArray(), 1);
-                }
-            }
-        });
-
-        while (this.group.children.length > 0) {
-            const child = this.group.children[0];
-            this.group.remove(child);
-            child.geometry.dispose();
-        }
-
-        toolpath.loadFromStringSync(gcode, (line, index) => {
-            this.frames.push({
-                data: line,
-                vertexIndex: this.vertices.length // remember current vertex index
-            });
-        });
-
         this.geometry.setFromPoints(this.vertices);
-        const colorBuffer = new THREE.BufferAttribute(this.getColorTypedArray(), 4);
-        this.geometry.setAttribute('color', colorBuffer);
+        this.colors = new THREE.BufferAttribute(this.getColorTypedArray(colors, motionColor), 4);
+        this.geometry.setAttribute('color', this.colors);
 
         const workpiece = new THREE.Line(
             this.geometry,
@@ -150,8 +82,6 @@ class GCodeVisualizer {
                 opacity: 0.6,
             })
         );
-
-        workpiece.computeLineDistances();
 
         this.group.add(workpiece);
 
@@ -165,8 +95,14 @@ class GCodeVisualizer {
     }
 
     /* Turns our array of Three colors into a float typed array we can set as a bufferAttribute */
-    getColorTypedArray() {
-        return new Float32Array(this.colors);
+    getColorTypedArray(colors, motionColor) {
+        const colorArray = [];
+        colors.forEach(colorTag => {
+            const [motion, opacity] = colorTag;
+            const color = motionColor[motion] || motionColor.default;
+            colorArray.push(...color.toArray(), opacity);
+        });
+        return new Float32Array(colorArray);
     }
 
 

@@ -27,7 +27,8 @@ import path from 'path';
 import bodyParser from 'body-parser';
 import compress from 'compression';
 import cookieParser from 'cookie-parser';
-import multiparty from 'connect-multiparty';
+import multer from 'multer';
+//import multiparty from 'connect-multiparty';
 import connectRestreamer from 'connect-restreamer';
 import engines from 'consolidate';
 import errorhandler from 'errorhandler';
@@ -188,7 +189,7 @@ const appMain = () => {
     // For multipart bodies, please use the following modules:
     // - [busboy](https://github.com/mscdex/busboy) and [connect-busboy](https://github.com/mscdex/connect-busboy)
     // - [multiparty](https://github.com/andrewrk/node-multiparty) and [connect-multiparty](https://github.com/andrewrk/connect-multiparty)
-    app.use(multiparty(settings.middleware.multiparty));
+    //app.use(multiparty(settings.middleware.multiparty));
 
     // https://github.com/dominictarr/connect-restreamer
     // connect's bodyParser has a problem when using it with a proxy.
@@ -344,6 +345,13 @@ const appMain = () => {
         app.post(urljoin(settings.route, 'api/watch/files'), api.watch.getFiles);
         app.get(urljoin(settings.route, 'api/watch/file'), api.watch.readFile);
         app.post(urljoin(settings.route, 'api/watch/file'), api.watch.readFile);
+
+        // Files - with multer
+        const storage = multer.memoryStorage();
+        const upload = multer({
+            storage
+        });
+        app.post(urljoin(settings.route, 'api/file'), upload.single('gcode'), api.files.uploadFile);
     }
 
     // page

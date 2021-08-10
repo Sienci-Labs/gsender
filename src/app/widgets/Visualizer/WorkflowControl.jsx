@@ -30,12 +30,13 @@ import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
 import controller from 'app/lib/controller';
 import React, { PureComponent } from 'react';
+import api from 'app/api';
 import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
-import ReaderWorker from './FileReader.worker';
+//import ReaderWorker from './FileReader.worker';
 import {
     Toaster,
     TOASTER_DANGER,
@@ -101,45 +102,27 @@ class WorkflowControl extends PureComponent {
         actions.uploadFile(result, meta);
     }
 
-    handleChangeFile = (event) => {
+    handleChangeFile = async (event) => {
         const files = event.target.files;
         const file = files[0];
 
-        const meta = {
-            name: file.name,
-            size: file.size
-        };
-
-        const readerWorker = new ReaderWorker();
-        readerWorker.onmessage = this.handleReaderResponse;
-
-        if (isElectron()) {
-            const recentFile = createRecentFileFromRawPath(file.path, file.name);
-            addRecentFile(recentFile);
-        }
-
-        readerWorker.postMessage({
-            file: file,
-            meta: meta
-        });
-        this.setState({ fileLoaded: false });
+        await api.file.upload(file, controller.port);
     };
 
-    handleElectronFileUpload = (file) => {
-        const { actions } = this.props;
-
-        const meta = {
-            name: file.name,
-            size: file.size
-        };
+    handleElectronFileUpload = async (file) => {
+        const serializedFile = new File([file.data], file.name);
+        console.log(serializedFile);
 
         if (isElectron()) {
             const recentFile = createRecentFileFromRawPath(file.path, file.name);
             addRecentFile(recentFile);
         }
 
-        actions.uploadFile(file.data, meta);
-        this.setState({ fileLoaded: false });
+        try {
+            await api.file.upload(serializedFile, controller.port);
+        } catch (e) {
+            console.log(e);
+        }
     };
 
     loadRecentFile = (fileMetadata) => {
@@ -162,24 +145,22 @@ class WorkflowControl extends PureComponent {
     }
 
     canRun() {
-        const { state } = this.props;
-        const { port, gcode, workflow } = state;
+        const { isConnected, fileLoaded, workflowState, activeState } = this.props;
 
-        if (!port) {
+        if (!isConnected) {
             return false;
         }
-        if (!gcode.ready) {
+        if (!fileLoaded) {
             return false;
         }
-        if (!includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state)) {
+        if (!includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflowState)) {
             return false;
         }
-        const { activeState } = this.props;
         const states = [
             GRBL_ACTIVE_STATE_ALARM
         ];
 
-        if (includes([GRBL_ACTIVE_STATE_CHECK], activeState) && !includes([WORKFLOW_STATE_PAUSED, WORKFLOW_STATE_IDLE], workflow.state)) {
+        if (includes([GRBL_ACTIVE_STATE_CHECK], activeState) && !includes([WORKFLOW_STATE_PAUSED, WORKFLOW_STATE_IDLE], workflowState)) {
             return false;
         }
 
@@ -187,8 +168,8 @@ class WorkflowControl extends PureComponent {
     }
 
     handleOnStop = () => {
-        const { actions: { handlePause, handleStop }, state } = this.props;
-        const { controller: { state: { status } } } = state;
+        const { actions: { handlePause, handleStop }, controllerState } = this.props;
+        const { status } = controllerState;
 
         handlePause();
         handleStop();
@@ -218,7 +199,6 @@ class WorkflowControl extends PureComponent {
         if (activeState === GRBL_ACTIVE_STATE_CHECK) {
             this.setState({ testStarted: true, runHasStarted: true });
 
-            controller.command('gcode:resume');
             controller.command('gcode:resume');
             return;
         }
@@ -307,13 +287,11 @@ class WorkflowControl extends PureComponent {
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
         const { handleOnStop } = this;
-        const { state, actions, workflowState } = this.props;
-        const { port, gcode } = state;
-        const canClick = !!port;
-        const isReady = canClick && gcode.ready;
+        const { fileLoaded, actions, workflowState, isConnected, senderInHold, activeState } = this.props;
+        const canClick = !!isConnected;
+        const isReady = canClick && fileLoaded;
         const { runHasStarted } = this.state;
         const canRun = this.canRun();
-        const { isConnected, fileLoaded, senderInHold, activeState } = this.props;
         const showPlay = isConnected && fileLoaded && canRun;
         const showTest = showPlay && !runHasStarted;
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
@@ -351,7 +329,7 @@ class WorkflowControl extends PureComponent {
                                 <RecentFileButton />
                                 <div
                                     role="button"
-                                    className={this.props.state.gcode.content ? `${styles.closeFileButton}` : `${styles['workflow-button-disabled']}`}
+                                    className={fileLoaded ? `${styles.closeFileButton}` : `${styles['workflow-button-disabled']}`}
                                     onClick={this.handleCloseFile}
                                 >
                                     <i className="fas fa-times" />
@@ -484,13 +462,15 @@ export default connect((store) => {
     const senderInHold = get(store, 'controller.sender.status.hold', false);
     const workflowState = get(store, 'controller.workflow.state');
     const activeState = get(store, 'controller.state.status.activeState');
-    const gcode = get(store, 'file.content', '');
+    const controllerState = get(store, 'controller.state');
+    const port = get(store, 'connection.port');
     return {
         fileLoaded,
         isConnected,
         senderInHold,
         workflowState,
         activeState,
-        gcode
+        controllerState,
+        port
     };
 }, null, null, { forwardRef: true })(WorkflowControl);

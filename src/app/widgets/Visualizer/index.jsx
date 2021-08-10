@@ -23,11 +23,10 @@
 
 /* eslint-disable consistent-return */
 import classNames from 'classnames';
-import ExpressionEvaluator from 'expr-eval';
+//import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import mapValues from 'lodash/mapValues';
 import pubsub from 'pubsub-js';
 import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
@@ -46,7 +45,6 @@ import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
-import { in2mm } from 'app/lib/units';
 import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
 import EstimateWorker from './Estimate.worker';
 import WidgetConfig from '../WidgetConfig';
@@ -76,20 +74,14 @@ import {
     // Workflow
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_PAUSED,
-    WORKFLOW_STATE_IDLE
+    WORKFLOW_STATE_IDLE,
+    RENDER_RENDERING,
+    RENDER_LOADING
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
     CAMERA_MODE_ROTATE,
     MODAL_WATCH_DIRECTORY,
-    NOTIFICATION_PROGRAM_ERROR,
-    NOTIFICATION_M0_PROGRAM_PAUSE,
-    NOTIFICATION_M1_PROGRAM_PAUSE,
-    NOTIFICATION_M2_PROGRAM_END,
-    NOTIFICATION_M30_PROGRAM_END,
-    NOTIFICATION_M6_TOOL_CHANGE,
-    NOTIFICATION_M109_SET_EXTRUDER_TEMPERATURE,
-    NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE,
     LIGHT_THEME,
     LIGHT_THEME_VALUES,
     DARK_THEME,
@@ -98,7 +90,7 @@ import {
 import styles from './index.styl';
 
 
-const translateExpression = (function() {
+/*const translateExpression = (function() {
     const { Parser } = ExpressionEvaluator;
     const reExpressionContext = new RegExp(/\[[^\]]+\]/g);
 
@@ -129,7 +121,7 @@ const translateExpression = (function() {
             return line;
         }).join('\n');
     };
-}());
+}());*/
 
 const displayWebGLErrorMessage = () => {
     portal(({ onClose }) => (
@@ -302,7 +294,7 @@ class VisualizerWidget extends PureComponent {
                 log.debug(data);
             });
         },
-        loadGCode: (name, gcode, size) => {
+        loadGCode: (name, vizualization, size) => {
             const capable = {
                 view3D: !!this.visualizer
             };
@@ -314,7 +306,6 @@ class VisualizerWidget extends PureComponent {
                         loading: false,
                         rendering: capable.view3D,
                         ready: !capable.view3D,
-                        content: gcode,
                         bbox: {
                             min: {
                                 x: 0,
@@ -348,7 +339,7 @@ class VisualizerWidget extends PureComponent {
                 }
 
                 setTimeout(() => {
-                    this.visualizer.load(name, gcode, ({ bbox }) => {
+                    this.visualizer.load(name, vizualization, ({ bbox }) => {
                         // Set gcode bounding box
                         controller.context = {
                             ...controller.context,
@@ -379,13 +370,14 @@ class VisualizerWidget extends PureComponent {
             };
 
             this.setState(updater, callback);
-            this.visualizer.handleSceneRender(gcode);
+            this.visualizer.handleSceneRender(vizualization);
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
             if (visualizer) {
                 visualizer.unload();
             }
+
 
             // Clear gcode bounding box
             controller.context = {
@@ -424,7 +416,7 @@ class VisualizerWidget extends PureComponent {
             this.actions.handleRun();
         },
         handleRun: () => {
-            const { workflow } = this.state;
+            const { workflow } = this.props;
             console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state));
             this.setState((prev) => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
 
@@ -435,23 +427,22 @@ class VisualizerWidget extends PureComponent {
 
             if (workflow.state === WORKFLOW_STATE_PAUSED) {
                 controller.command('gcode:resume');
-                controller.command('gcode:resume');
             }
         },
         handlePause: () => {
-            const { workflow } = this.state;
+            const { workflow } = this.props;
             console.assert(includes([WORKFLOW_STATE_RUNNING], workflow.state));
 
             controller.command('gcode:pause');
         },
         handleStop: () => {
-            const { workflow } = this.state;
+            const { workflow } = this.props;
             console.assert(includes([WORKFLOW_STATE_PAUSED], workflow.state));
 
             controller.command('gcode:stop', { force: true });
         },
         handleClose: () => {
-            const { workflow } = this.state;
+            const { workflow } = this.props;
             console.assert(includes([WORKFLOW_STATE_IDLE], workflow.state));
 
             controller.command('gcode:unload');
@@ -658,174 +649,6 @@ class VisualizerWidget extends PureComponent {
         }
     };
 
-    controllerEvents = {
-        'serialport:open': (options) => {
-            const { port } = options;
-            const { gcode } = this.state;
-
-            const machineProfile = store.get('workspace.machineProfile');
-            const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
-
-            if (machineProfile) {
-                controller.command('machineprofile:load', machineProfile);
-            }
-
-            if (showLineWarnings) {
-                controller.command('settings:updated', { showLineWarnings });
-            }
-
-            //If we uploaded a file before connecting to a machine, load the gcode to the controller
-            if (gcode.loadedBeforeConnection) {
-                controller.command('gcode:load', this.state.filename, gcode.content, {}, (err, data) => {
-                    if (err) {
-                        this.setState((state) => ({
-                            gcode: {
-                                ...state.gcode,
-                                loading: false,
-                                rendering: false,
-                                ready: false
-                            }
-                        }));
-
-                        log.error(err);
-                        return;
-                    }
-
-                    log.debug(data); // TODO
-                });
-            }
-
-            this.setState({ port: port });
-        },
-        'serialport:close': (options) => {
-            this.actions.unloadGCode();
-
-            const initialState = this.getInitialState();
-            this.setState((state) => ({ ...initialState }));
-        },
-        'gcode:load': (name, gcode, context) => {
-            gcode = translateExpression(gcode, context); // e.g. xmin,xmax,ymin,ymax,zmin,zmax
-            this.actions.loadGCode(name, gcode);
-        },
-        'gcode:unload': () => {
-            this.actions.unloadGCode();
-        },
-        'sender:status': (data) => {
-            const { hold, holdReason, name, size, total, sent, received } = data;
-            const notification = {
-                type: '',
-                data: ''
-            };
-
-            if (hold) {
-                const { err, data } = { ...holdReason };
-
-                if (err) {
-                    notification.type = NOTIFICATION_PROGRAM_ERROR;
-                    notification.data = err;
-                } else if (data === 'M0') {
-                    // M0 Program Pause
-                    notification.type = NOTIFICATION_M0_PROGRAM_PAUSE;
-                } else if (data === 'M1') {
-                    // M1 Program Pause
-                    notification.type = NOTIFICATION_M1_PROGRAM_PAUSE;
-                } else if (data === 'M2') {
-                    // M2 Program End
-                    notification.type = NOTIFICATION_M2_PROGRAM_END;
-                } else if (data === 'M30') {
-                    // M30 Program End
-                    notification.type = NOTIFICATION_M30_PROGRAM_END;
-                } else if (data === 'M6') {
-                    // M6 Tool Change
-                    notification.type = NOTIFICATION_M6_TOOL_CHANGE;
-                } else if (data === 'M109') {
-                    // M109 Set Extruder Temperature
-                    notification.type = NOTIFICATION_M109_SET_EXTRUDER_TEMPERATURE;
-                } else if (data === 'M190') {
-                    // M190 Set Heated Bed Temperature
-                    notification.type = NOTIFICATION_M190_SET_HEATED_BED_TEMPERATURE;
-                }
-            }
-
-            this.setState(state => ({
-                total,
-                gcode: {
-                    ...state.gcode,
-                    name,
-                    size,
-                    total,
-                    sent,
-                    received
-                },
-                notification: {
-                    ...state.notification,
-                    ...notification
-                }
-            }));
-        },
-        'workflow:state': (workflowState, data) => {
-            if (data) {
-                this.setState(state => ({
-                    workflow: {
-                        ...state.workflow,
-                        state: workflowState
-                    },
-                    invalidLine: {
-                        ...state.invalidLine,
-                        show: true,
-                        line: data.line,
-                    }
-                }));
-            } else {
-                this.setState(state => ({
-                    workflow: {
-                        ...state.workflow,
-                        state: workflowState
-                    }
-                }));
-            }
-        },
-        'controller:settings': (type, controllerSettings) => {
-            this.setState(state => ({
-                controller: {
-                    ...state.controller,
-                    type: type,
-                    settings: controllerSettings
-                }
-            }));
-        },
-        'controller:state': (type, controllerState) => {
-            // Grbl
-            if (type === GRBL) {
-                const { status } = { ...controllerState };
-                const { mpos, wpos } = status;
-                const $13 = Number(get(controller.settings, 'settings.$13', 0)) || 0;
-
-                this.setState(state => ({
-                    controller: {
-                        ...state.controller,
-                        type: type,
-                        state: controllerState
-                    },
-                    // Machine position are reported in mm ($13=0) or inches ($13=1)
-                    machinePosition: mapValues({
-                        ...state.machinePosition,
-                        ...mpos
-                    }, (val) => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    }),
-                    // Work position are reported in mm ($13=0) or inches ($13=1)
-                    workPosition: mapValues({
-                        ...state.workPosition,
-                        ...wpos
-                    }, val => {
-                        return ($13 > 0) ? in2mm(val) : val;
-                    })
-                }));
-            }
-        }
-    };
-
     pubsubTokens = [];
 
     onProcessedGcode = ({ data }) => {
@@ -900,7 +723,6 @@ class VisualizerWidget extends PureComponent {
 
     componentDidMount() {
         this.subscribe();
-        this.addControllerEvents();
         this.addShuttleControlEvents();
         this.subscribe();
 
@@ -917,7 +739,6 @@ class VisualizerWidget extends PureComponent {
 
     componentWillUnmount() {
         this.unsubscribe();
-        this.removeControllerEvents();
         this.removeShuttleControlEvents();
         this.unsubscribe();
     }
@@ -1077,8 +898,8 @@ class VisualizerWidget extends PureComponent {
             this.actions.onRunClick();
         },
         START_JOB: () => {
-            const { port, workflow } = this.state;
-            if (!port) {
+            const { isConnected, workflow } = this.props;
+            if (!isConnected) {
                 return;
             }
 
@@ -1097,8 +918,8 @@ class VisualizerWidget extends PureComponent {
             }
         },
         PAUSE_JOB: () => {
-            const { port, workflow } = this.state;
-            if (!port) {
+            const { isConnected, workflow } = this.props;
+            if (!isConnected) {
                 return;
             }
 
@@ -1107,8 +928,8 @@ class VisualizerWidget extends PureComponent {
             }
         },
         STOP_JOB: () => {
-            const { port } = this.state;
-            if (!port) {
+            const { isConnected } = this.props;
+            if (!isConnected) {
                 return;
             }
 
@@ -1176,20 +997,6 @@ class VisualizerWidget extends PureComponent {
         }
     }
 
-    addControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.addListener(eventName, callback);
-        });
-    }
-
-    removeControllerEvents() {
-        Object.keys(this.controllerEvents).forEach(eventName => {
-            const callback = this.controllerEvents[eventName];
-            controller.removeListener(eventName, callback);
-        });
-    }
-
     addShuttleControlEvents() {
         combokeys.reload();
 
@@ -1223,7 +1030,8 @@ class VisualizerWidget extends PureComponent {
     }
 
     isAgitated() {
-        const { workflow, disabled, objects } = this.state;
+        const { disabled, objects } = this.state;
+        const { workflow } = this.props;
         const controllerType = this.state.controller.type;
         const controllerState = this.state.controller.state;
 
@@ -1333,19 +1141,21 @@ class VisualizerWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-        const showLoader = state.gcode.loading || state.gcode.rendering;
-
+        const { renderState } = this.props;
+        const showRendering = renderState === RENDER_RENDERING;
+        const showLoading = renderState === RENDER_LOADING;
+        const showLoader = showLoading || showRendering;
         // Handle visualizer render
         const isVisualizerDisabled = (state.liteMode) ? state.disabledLite : state.disabled;
 
         const capable = {
             view3D: WebGL.isWebGLAvailable() && !isVisualizerDisabled
         };
-        // const showDashboard = !capable.view3D && !showLoader;
+
         const showVisualizer = capable.view3D && !showLoader;
-        // const showNotifications = showVisualizer && !!state.notification.type;
 
         const { liteMode } = this.state;
+
         return (
             <Widget className={styles.vizWidgetOverride}>
                 <Widget.Header className={styles['visualizer-header']}>
@@ -1372,10 +1182,10 @@ class VisualizerWidget extends PureComponent {
                     )}
                     id="visualizer_container"
                 >
-                    {state.gcode.loading &&
+                    {showLoading &&
                     <Loading />
                     }
-                    {state.gcode.rendering &&
+                    {showRendering &&
                     <Rendering />
                     }
                     {state.modal.name === MODAL_WATCH_DIRECTORY && (
@@ -1445,11 +1255,17 @@ export default connect((store) => {
     const xMaxAccel = Number(get(settings.settings, '$120', 1800000));
     const yMaxAccel = Number(get(settings.settings, '$112', 1800000));
     const zMaxAccel = Number(get(settings.settings, '$122', 1800000));
+    const workflow = get(store, 'controller.workflow');
+    const renderState = get(store, 'file.renderState');
+    const isConnected = get(store, 'connection.isConnected');
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
     const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
     return {
         feedArray,
-        accelArray
+        accelArray,
+        workflow,
+        renderState,
+        isConnected
     };
 })(VisualizerWidget);

@@ -32,6 +32,7 @@ import * as machines from './api.machines';
 import * as macros from './api.macros';
 import * as mdi from './api.mdi';
 import * as users from './api.users';
+import * as files from './api.file';
 
 export {
     version,
@@ -45,4 +46,5 @@ export {
     macros,
     mdi,
     users,
+    files
 };

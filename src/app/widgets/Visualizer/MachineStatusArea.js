@@ -22,8 +22,10 @@
  */
 
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import get from 'lodash/get';
 import controller from 'app/lib/controller';
 import AlarmDescriptionIcon from 'app/widgets/Visualizer/AlarmDescriptionIcon';
 import styles from './machine-status-area.styl';
@@ -36,7 +38,7 @@ import { GRBL_ACTIVE_STATE_HOME } from '../../constants';
  * @param {Object} state Default state given from parent component
  * @param {Object} actions Actions object given from parent component
  */
-export default class ControlArea extends Component {
+class ControlArea extends Component {
     static propTypes = {
         state: PropTypes.object,
         actions: PropTypes.object,
@@ -60,8 +62,8 @@ export default class ControlArea extends Component {
     }
 
     render() {
-        const { controller, port, layoutIsReversed } = this.props.state;
-        const { state = {} } = controller;
+        const { layoutIsReversed } = this.props.state;
+        const { $22, activeState, alarmCode, isConnected } = this.props;
         const { homingRun } = this.state;
 
         //Object to customize the message of the active machine state
@@ -81,33 +83,31 @@ export default class ControlArea extends Component {
          * Function to output the machine state based on multiple conditions
          */
         const machineStateRender = () => {
-            if (port) {
-                if (controller?.state?.status) {
-                    let alarmCode = controller.state.status.alarmCode;
-                    let homingEnabled = controller.settings.settings.$22;
-                    if (!homingRun && alarmCode === 'Homing' && homingEnabled === '1') {
-                        return (
-                            <div className={styles['machine-status-wrapper']}>
-                                <div className={styles[`machine${state.status.activeState}`]}>
-                                    {
-                                        state.status.activeState === GRBL_ACTIVE_STATE_HOME ? 'Homing...' : 'Run Homing'
-                                    }
-                                </div>
-                                <UnlockAlarmButton newMessage="Click To Home Machine" onClick={this.handleHomeMachine} />
+            if (isConnected) {
+                const homingEnabled = $22;
+                if (!homingRun && alarmCode === 'Homing' && homingEnabled === '1') {
+                    return (
+                        <div className={styles['machine-status-wrapper']}>
+                            <div className={styles[`machine${activeState}`]}>
+                                {
+                                    activeState === GRBL_ACTIVE_STATE_HOME ? 'Homing...' : 'Run Homing'
+                                }
                             </div>
-                        );
-                    }
+                            <UnlockAlarmButton newMessage="Click To Home Machine" onClick={this.handleHomeMachine} />
+                        </div>
+                    );
                 }
-                if (state.status?.activeState === 'Alarm') {
+
+                if (activeState === 'Alarm') {
                     return (
                         <div className={styles['machine-status-wrapper']}>
                             <div className={styles['machine-Alarm']}>
-                                {state.status.activeState} ({state.status.alarmCode})<AlarmDescriptionIcon code={state.status.alarmCode} />
+                                {activeState} ({alarmCode})<AlarmDescriptionIcon code={alarmCode} />
                             </div>
                             <UnlockAlarmButton onClick={this.unlock} />
                         </div>
                     );
-                } else if (state.status?.activeState === 'Check') {
+                } else if (activeState === 'Check') {
                     return (
                         <div className={styles['machine-status-wrapper']}>
                             <div className={styles['machine-Jog']}>
@@ -116,10 +116,10 @@ export default class ControlArea extends Component {
                         </div>
                     );
                 } {
-                    return state.status?.activeState //Show disconnected until machine connection process is finished, otherwise an empty div is shown
+                    return activeState //Show disconnected until machine connection process is finished, otherwise an empty div is shown
                         ? (
-                            <div className={styles[`machine-${state.status.activeState}`]}>
-                                { message[state.status.activeState] }
+                            <div className={styles[`machine-${activeState}`]}>
+                                { message[activeState] }
                             </div>
                         )
                         : <div className={styles['machine-Disconnected']}>Disconnected</div>;
@@ -138,3 +138,16 @@ export default class ControlArea extends Component {
         );
     }
 }
+
+export default connect((store) => {
+    const $22 = get(store, 'controller.settings.settings.$22', '0');
+    const alarmCode = get(store, 'controller.state.status.alarmCode');
+    const activeState = get(store, 'controller.state.status.activeState');
+    const isConnected = get(store, 'connection.isConnected');
+    return {
+        $22,
+        alarmCode,
+        activeState,
+        isConnected
+    };
+})(ControlArea);

@@ -25,10 +25,10 @@ import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
 import SerialPort from 'serialport';
 import socketIO from 'socket.io';
-import socketioJwt from 'socketio-jwt';
+//import socketioJwt from 'socketio-jwt';
 import EventTrigger from '../../lib/EventTrigger';
 import logger from '../../lib/logger';
-import settings from '../../config/settings';
+//import settings from '../../config/settings';
 import store from '../../store';
 import config from '../configstore';
 import taskRunner from '../taskrunner';
@@ -38,7 +38,7 @@ import {
 import { GRBL } from '../../controllers/Grbl/constants';
 import {
     authorizeIPAddress,
-    validateUser
+    //validateUser
 } from '../../access-control';
 
 const log = logger('service:cncengine');
@@ -87,6 +87,10 @@ class CNCEngine {
 
     sockets = [];
 
+    // File content and metadata
+    gcode = null;
+    meta = null;
+
     // Event Trigger
     event = new EventTrigger((event, trigger, commands) => {
         log.debug(`EventTrigger: event="${event}", trigger="${trigger}", commands="${commands}"`);
@@ -134,10 +138,10 @@ class CNCEngine {
             maxHttpBufferSize: 40e6
         });
 
-        this.io.use(socketioJwt.authorize({
+        /*this.io.use(socketioJwt.authorize({
             secret: settings.secret,
             handshake: true
-        }));
+        }));*/
 
         this.io.use(async (socket, next) => {
             try {
@@ -146,8 +150,8 @@ class CNCEngine {
                 await authorizeIPAddress(ipaddr);
 
                 // User Validation
-                const user = socket.decoded_token || {};
-                await validateUser(user);
+                //const user = socket.decoded_token || {};
+                //await validateUser(user);
             } catch (err) {
                 log.warn(err);
                 next(err);
@@ -254,6 +258,12 @@ class CNCEngine {
                 }
 
                 controller.addConnection(socket);
+                // Load file to controller if it exists
+                if (this.hasFileLoaded()) {
+                    controller.loadFile(this.gcode, this.meta);
+                } else {
+                    log.debug('No file in CNCEngine to load to sender');
+                }
 
                 if (controller.isOpen()) {
                     // Join the room
@@ -357,6 +367,15 @@ class CNCEngine {
                 log.debug(`Health check received at ${new Date().toLocaleTimeString()}`);
                 socket.emit('hPong');
             });
+
+            socket.on('file:fetch', () => {
+                socket.emit('file:fetch', this.gcode, this.meta);
+            });
+
+            socket.on('file:unload', () => {
+                log.debug('Socket unload called');
+                this.unload();
+            });
         });
     }
 
@@ -372,6 +391,45 @@ class CNCEngine {
         taskRunner.removeListener('finish', this.listener.taskFinish);
         taskRunner.removeListener('error', this.listener.taskError);
         config.removeListener('change', this.listener.configChange);
+    }
+
+    // Emit message across all sockets
+    emit(msg, ...args) {
+        this.sockets.forEach((socket) => {
+            socket.emit(msg, ...args);
+        });
+    }
+
+    /* Functions related to loading file through server */
+    // If gcode is going to live in CNCengine, we need functions to access or unload it.
+    load({ port, gcode, ...meta }) {
+        this.gcode = gcode;
+        this.meta = meta;
+
+        // Load the file to the sender if controller connection exists
+        if (port) {
+            const controller = store.get(`controllers["${port}"]`);
+            if (controller) {
+                controller.loadFile(this.gcode, this.meta);
+            }
+        }
+        log.info(`Loaded file '${meta.name}' to CNCEngine`);
+        this.emit('file:load', gcode, meta.size, meta.name);
+    }
+
+    unload() {
+        log.info('Unloading file from CNCEngine');
+        this.gcode = null;
+        this.meta = null;
+        this.emit('file:unload');
+    }
+
+    fetchGcode() {
+        return [this.gcode, this.meta];
+    }
+
+    hasFileLoaded() {
+        return this.gcode !== null;
     }
 }
 

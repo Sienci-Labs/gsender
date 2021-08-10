@@ -20,7 +20,6 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
 const path = require('path');
 const fs = require('fs').promises;
 const fsBase = require('fs');
