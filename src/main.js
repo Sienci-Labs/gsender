@@ -39,6 +39,7 @@ import pkg from './package.json';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 
 
+
 let windowManager = null;
 let powerSaverId = null;
 
@@ -188,13 +189,14 @@ const main = () => {
 
                     const [filePath, fileName] = getFileInformation(FULL_FILE_PATH);
 
+                    prevDirectory = filePath; // set previous directory
+
                     fs.readFile(FULL_FILE_PATH, 'utf8', (err, data) => {
                         if (err) {
                             log.error(`Error in readFile: ${err}`);
                             return;
                         }
 
-                        prevDirectory = filePath; //Set the previous directory for later use
                         const { size } = fs.statSync(FULL_FILE_PATH);
                         window.webContents.send('returned-upload-dialog-data', { data, size, name: fileName, path: FULL_FILE_PATH });
                     });

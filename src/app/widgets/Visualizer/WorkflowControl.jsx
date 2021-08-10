@@ -106,25 +106,23 @@ class WorkflowControl extends PureComponent {
         const files = event.target.files;
         const file = files[0];
 
-        await api.file.upload(file, 'COM5');
-        await api.file.upload(file, 'COM5');
+        await api.file.upload(file, controller.port);
     };
 
-    handleElectronFileUpload = (file) => {
-        const { actions } = this.props;
-
-        const meta = {
-            name: file.name,
-            size: file.size
-        };
+    handleElectronFileUpload = async (file) => {
+        const serializedFile = new File([file.data], file.name);
+        console.log(serializedFile);
 
         if (isElectron()) {
             const recentFile = createRecentFileFromRawPath(file.path, file.name);
             addRecentFile(recentFile);
         }
 
-        actions.uploadFile(file.data, meta);
-        this.setState({ fileLoaded: false });
+        try {
+            await api.file.upload(serializedFile, controller.port);
+        } catch (e) {
+            console.log(e);
+        }
     };
 
     loadRecentFile = (fileMetadata) => {
@@ -170,8 +168,8 @@ class WorkflowControl extends PureComponent {
     }
 
     handleOnStop = () => {
-        const { actions: { handlePause, handleStop }, state } = this.props;
-        const { controller: { state: { status } } } = state;
+        const { actions: { handlePause, handleStop }, controllerState } = this.props;
+        const { status } = controllerState;
 
         handlePause();
         handleStop();
@@ -201,7 +199,6 @@ class WorkflowControl extends PureComponent {
         if (activeState === GRBL_ACTIVE_STATE_CHECK) {
             this.setState({ testStarted: true, runHasStarted: true });
 
-            controller.command('gcode:resume');
             controller.command('gcode:resume');
             return;
         }
