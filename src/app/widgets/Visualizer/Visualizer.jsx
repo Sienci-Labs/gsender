@@ -229,7 +229,7 @@ class Visualizer extends Component {
 
         // Update visualizer's frame index
         if (this.visualizer) {
-            const frameIndex = state.gcode.sent;
+            const frameIndex = this.props.receivedLines;
             this.visualizer.setFrameIndex(frameIndex);
         }
 
@@ -1435,8 +1435,10 @@ class Visualizer extends Component {
 export default connect((store) => {
     const machinePosition = _get(store, 'controller.mpos');
     const workPosition = _get(store, 'controller.wpos');
+    const receivedLines = _get(store, 'controller.sender.status.received', 0);
     return {
         machinePosition,
-        workPosition
+        workPosition,
+        receivedLines
     };
 }, null, null, { forwardRef: true })(Visualizer);
