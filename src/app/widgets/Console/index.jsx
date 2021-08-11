@@ -144,12 +144,10 @@ class ConsoleWidget extends PureComponent {
 
     componentDidMount() {
         this.addControllerEvents();
-        this.subscribe();
     }
 
     componentWillUnmount() {
         this.removeControllerEvents();
-        this.unsubscribe();
     }
 
     componentDidUpdate(prevProps, prevState) {

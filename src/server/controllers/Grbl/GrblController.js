@@ -1262,7 +1262,7 @@ class GrblController {
                     }
 
 
-                    let modalPrepareCommand = '';
+                    //let modalPrepareCommand = '';
                     for (const group in modal) {
                         if (!['program', 'motion'].includes(group)) {
                             this.command('gcode', modal[group]);
