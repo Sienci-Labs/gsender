@@ -184,16 +184,14 @@ class WorkflowControl extends PureComponent {
 
 
     handleTestFile = () => {
-        const { actions } = this.props;
+        const { gcode } = this.props;
         this.setState({ runHasStarted: true });
-        const gcode = this.props.state.gcode.content; // or whatever the state member is
         const comments = ['#', ';', '(', '%'];
         const lines = gcode.split('\n')
             .filter(line => (line.trim().length > 0))
             .filter(line => !comments.some(comment => line.includes(comment)));
         const testLines = ['$C', ...lines, '$C'];
         controller.command('gcode', testLines);
-        actions.onRunClick();
     };
 
     startRun = () => {
@@ -263,6 +261,7 @@ class WorkflowControl extends PureComponent {
 
     runOutline = () => {
         const { gcode } = this.props;
+
         Toaster.pop({
             TYPE: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE,
@@ -556,6 +555,7 @@ export default connect((store) => {
     const controllerState = get(store, 'controller.state');
     const lineTotal = get(store, 'file.total');
     const port = get(store, 'connection.port');
+    const gcode = get(store, 'file.content');
     return {
         fileLoaded,
         isConnected,
@@ -565,6 +565,7 @@ export default connect((store) => {
         senderStatus,
         controllerState,
         port,
-        lineTotal
+        lineTotal,
+        gcode
     };
 }, null, null, { forwardRef: true })(WorkflowControl);
