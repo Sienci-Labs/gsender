@@ -629,12 +629,11 @@ class Visualizer extends Component {
 
     createCoordinateSystem(units) {
         const { mm, in: inches } = this.machineProfile;
-
         const inchesMax = Math.max(inches.width, inches.depth) + (IMPERIAL_GRID_SPACING * 10);
         const mmMax = Math.max(mm.width, mm.depth) + (METRIC_GRID_SPACING * 10);
 
-        const imperialGridCount = inchesMax / 3;
-        const metricGridCount = mmMax / 9;
+        const imperialGridCount = Math.ceil(inchesMax / 3);
+        const metricGridCount = Math.ceil(mmMax / 9);
 
         const axisLength = (units === IMPERIAL_UNITS) ? inchesMax : mmMax;
         const height = (units === IMPERIAL_UNITS) ? inches.height : mm.height;

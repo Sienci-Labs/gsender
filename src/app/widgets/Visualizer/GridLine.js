@@ -36,6 +36,11 @@ class GridLine {
         sizeY = (typeof sizeY === 'undefined') ? sizeX : sizeY;
         stepY = (typeof stepY === 'undefined') ? stepX : stepY;
 
+        console.log(sizeY);
+        console.log(sizeX);
+        console.log(stepX);
+        console.log(stepY);
+
         for (let i = -1 * sizeX; i <= sizeX; i += stepX) {
             const points = [];
             const material = new THREE.LineBasicMaterial({
