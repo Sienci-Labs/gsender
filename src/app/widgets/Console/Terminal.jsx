@@ -52,13 +52,13 @@ class TerminalWrapper extends PureComponent {
     static defaultProps = {
         cols: 'auto',
         rows: 'auto',
-        cursorBlink: true,
+        cursorBlink: false,
         scrollback: 1000,
         tabStopWidth: 4,
         onData: () => {}
     };
 
-    prompt = '> ';
+    prompt = ' ';
 
     history = new History(1000);
 
@@ -288,14 +288,14 @@ class TerminalWrapper extends PureComponent {
 
     componentDidMount() {
         const { scrollback, tabStopWidth } = this.props;
-        this.term = new Terminal({ scrollback, tabStopWidth });
+        this.term = new Terminal({ scrollback, tabStopWidth, cursorStyle: 'underline' });
 
         this.fitAddon = new FitAddon();
 
         this.term.loadAddon(this.fitAddon);
         this.term.prompt = () => {
             this.term.write('\r\n');
-            this.term.write(color.white(this.prompt));
+            //this.term.write(color.white(this.prompt));
         };
 
         const el = ReactDOM.findDOMNode(this.terminalContainer);

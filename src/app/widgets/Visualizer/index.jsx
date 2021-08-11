@@ -27,6 +27,7 @@ import classNames from 'classnames';
 import includes from 'lodash/includes';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+import api from 'app/api';
 import pubsub from 'pubsub-js';
 import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
@@ -1119,8 +1120,10 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('widgets:reverse', (_, layoutIsReversed) => {
                 this.setState({ layoutIsReversed });
             }),
-            pubsub.subscribe('gcode:surfacing', (_, { gcode, name, size }) => {
-                this.actions.uploadFile(gcode, { name, size });
+            pubsub.subscribe('gcode:surfacing', async (_, { gcode, name, size }) => {
+                const file = new File([gcode], name);
+                await api.file.upload(file, controller.port);
+                //this.actions.uploadFile(gcode, { name, size });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
