@@ -70,8 +70,8 @@ class GCodeVisualizer {
         };
 
         this.geometry.setFromPoints(this.vertices);
-        this.colors = new THREE.BufferAttribute(this.getColorTypedArray(colors, motionColor), 4);
-        this.geometry.setAttribute('color', this.colors);
+        this.colors = this.getColorTypedArray(colors, motionColor);
+        this.geometry.setAttribute('color', new THREE.BufferAttribute(this.colors, 4));
 
         const workpiece = new THREE.Line(
             this.geometry,
