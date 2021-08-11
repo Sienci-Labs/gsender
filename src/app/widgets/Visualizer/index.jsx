@@ -68,10 +68,8 @@ import {
     MARLIN,
     // Smoothie
     SMOOTHIE,
-    SMOOTHIE_ACTIVE_STATE_RUN,
     // TinyG
     TINYG,
-    TINYG_MACHINE_STATE_RUN,
     // Workflow
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_PAUSED,
@@ -1032,9 +1030,7 @@ class VisualizerWidget extends PureComponent {
 
     isAgitated() {
         const { disabled, objects } = this.state;
-        const { workflow } = this.props;
-        const controllerType = this.state.controller.type;
-        const controllerState = this.state.controller.state;
+        const { workflow, controllerType, activeState } = this.props;
 
         if (workflow.state !== WORKFLOW_STATE_RUNNING) {
             return false;
@@ -1051,24 +1047,7 @@ class VisualizerWidget extends PureComponent {
             return false;
         }
         if (controllerType === GRBL) {
-            const activeState = get(controllerState, 'status.activeState');
             if (activeState !== GRBL_ACTIVE_STATE_RUN) {
-                return false;
-            }
-        }
-        if (controllerType === MARLIN) {
-            // Marlin does not have machine state
-            return false;
-        }
-        if (controllerType === SMOOTHIE) {
-            const activeState = get(controllerState, 'status.activeState');
-            if (activeState !== SMOOTHIE_ACTIVE_STATE_RUN) {
-                return false;
-            }
-        }
-        if (controllerType === TINYG) {
-            const machineState = get(controllerState, 'sr.machineState');
-            if (machineState !== TINYG_MACHINE_STATE_RUN) {
                 return false;
             }
         }
@@ -1261,6 +1240,8 @@ export default connect((store) => {
     const workflow = get(store, 'controller.workflow');
     const renderState = get(store, 'file.renderState');
     const isConnected = get(store, 'connection.isConnected');
+    const controllerType = get(store, 'controller.type');
+    const activeState = get(store, 'controller.state.status.activeState');
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
     const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
@@ -1269,6 +1250,8 @@ export default connect((store) => {
         accelArray,
         workflow,
         renderState,
-        isConnected
+        isConnected,
+        controllerType,
+        activeState
     };
 })(VisualizerWidget);

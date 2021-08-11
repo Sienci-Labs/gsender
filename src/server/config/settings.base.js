@@ -26,7 +26,7 @@ import pkg from '../../package.json';
 import { languages } from '../../../build.config';
 
 const RC_FILE = '.sender_rc';
-const SESSION_PATH = '.cncjs-sessions';
+const SESSION_PATH = '.sienci-sessions';
 
 // Secret
 const secret = pkg.version;
