@@ -507,7 +507,10 @@ class AxesWidget extends PureComponent {
                 preventDefault(event);
             }
 
-            if (!axisList || isContinuousJogging || !canJog) {
+            this.handleShortcutStop(payload);
+        },
+        SET_JOG_PRESET: (event, { key }) => {
+            if (!key) {
                 return;
             }
             this.actions.setSelectedSpeed(key);
@@ -516,22 +519,41 @@ class AxesWidget extends PureComponent {
         CYCLE_JOG_PRESETS: () => {
             const { selectedSpeed } = this.state;
 
-            const feedrate = Number(this.actions.getFeedrate());
-            const axisListObj = {};
+            const presets = [SPEED_RAPID, SPEED_NORMAL, SPEED_PRECISE];
+            const nextIndex = presets.findIndex(preset => preset === selectedSpeed) + 1;
+            const key = presets[nextIndex] ? presets[nextIndex] : presets[0];
 
-            for (let i = 0; i < axisList.length; i++) {
-                const givenAxis = axisList[i].toUpperCase();
+            this.actions.setSelectedSpeed(key);
+            this.actions.setJogFromPreset(key);
+        },
+        JOG_SPEED: (_, { speed }) => {
+            const getStep = ({ value, increment = false }) => {
+                let step;
 
-                const axisValue = {
-                    X: xyStep,
-                    Y: xyStep,
-                    Z: zStep
-                }[givenAxis] * direction[i];
+                if (value === 0) {
+                    return 0.1;
+                }
+                if (value < 0.1) {
+                    step = 0.01;
+                } else if (value < 1) {
+                    step = 0.1;
+                } else if (value < 10) {
+                    step = 1;
+                } else if (value < 100) {
+                    step = 10;
+                } else if (value < 1000) {
+                    step = 100;
+                } else if (value < 10000) {
+                    step = 1000;
+                } else {
+                    step = 10000;
+                }
 
-                axisListObj[givenAxis] = axisValue;
-            }
-
-            this.setState({ prevJog: { ...axisListObj, F: feedrate } });
+                if (!increment && step !== 0.001 && value - step === 0) {
+                    step /= 10;
+                }
+                return step;
+            };
 
             const { rapid, normal, precise } = this.state.jog;
             const presets = [rapid, normal, precise];
@@ -631,6 +653,7 @@ class AxesWidget extends PureComponent {
             if (axis.Z) {
                 axisList.Z = axisValue.Z * axis.Z;
             }
+            // const { axis: axisList, direction, force } = payload;
 
             this.setState({ prevJog: { ...axisList, F: feedrate } });
             this.joggingHelper.onKeyDown({ ...axisList }, feedrate);
