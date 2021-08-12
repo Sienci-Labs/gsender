@@ -100,6 +100,7 @@ class GCodeVisualizer {
         colors.forEach(colorTag => {
             const [motion, opacity] = colorTag;
             const color = motionColor[motion] || motionColor.default;
+            console.log(color);
             colorArray.push(...color.toArray(), opacity);
         });
         return new Float32Array(colorArray);

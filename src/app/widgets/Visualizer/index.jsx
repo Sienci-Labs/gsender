@@ -1102,7 +1102,6 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('gcode:surfacing', async (_, { gcode, name, size }) => {
                 const file = new File([gcode], name);
                 await api.file.upload(file, controller.port);
-                //this.actions.uploadFile(gcode, { name, size });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);

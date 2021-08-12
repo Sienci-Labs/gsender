@@ -1018,11 +1018,13 @@ class GrblController {
 
             // Clear action values
             this.clearActionValues();
-
-            /*if (this.sender.state.gcode) {
-                // Unload G-code
-                this.command('gcode:unload');
-            }*/
+            // Get toolchange options on connect
+            const hooks = store.get('workspace.toolChangeHooks', {});
+            const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
+            this.toolChangeContext = {
+                ...hooks,
+                toolChangeOption
+            };
         });
     }
 
@@ -1182,6 +1184,14 @@ class GrblController {
                     // Handle toolchange context on file load
                     this.toolChangeContext = context;
                 }
+                const hooks = store.get('workspace.toolChangeHooks', {});
+                const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
+                this.toolChangeContext = {
+                    ...hooks,
+                    toolChangeOption
+                };
+
+
                 // G4 P0 or P with a very small value will empty the planner queue and then
                 // respond with an ok when the dwell is complete. At that instant, there will
                 // be no queued motions, as long as no more commands were sent after the G4.
