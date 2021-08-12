@@ -20,14 +20,17 @@ const AddProfileModal = ({ onClose, onAdd }) => {
 
     useEffect(() => {
         gamepad.start();
-        gamepad.on('gamepad:button', ({ detail }) => {
+
+        const gamepadListener = ({ detail }) => {
             const { gamepad: currentGamepad } = detail;
 
             setGamepadInfo(currentGamepad);
-        });
+        };
+
+        gamepad.on('gamepad:button', gamepadListener);
 
         return () => {
-            gamepad.stop();
+            gamepad.removeEventListener('gamepad:button', gamepadListener);
         };
     }, []);
 
