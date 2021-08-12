@@ -125,20 +125,6 @@ class SurfacingVisualizer extends PureComponent {
                 }
             }));
         },
-        uploadFile: (gcode, meta) => {
-            const { name, size } = { ...meta };
-
-            this.setState((state) => ({
-                gcode: {
-                    ...state.gcode,
-                    loading: true,
-                    rendering: false,
-                    ready: false
-                }
-            }));
-
-            this.actions.loadGCode(name, gcode, size);
-        },
         loadGCode: (name, gcode, size) => {
             const { filename } = this.state;
 

@@ -71,6 +71,8 @@ import {
     MODAL_NONE,
     DEFAULT_AXES,
     SPEED_NORMAL,
+    SPEED_RAPID,
+    SPEED_PRECISE
 } from './constants';
 import styles from './index.styl';
 

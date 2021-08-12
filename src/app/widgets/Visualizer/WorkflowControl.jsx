@@ -136,8 +136,7 @@ class WorkflowControl extends PureComponent {
         }
     };
 
-    loadRecentFile = (fileMetadata) => {
-        const { actions } = this.props;
+    loadRecentFile = async (fileMetadata) => {
         if (fileMetadata === null) {
             Toaster.pop({
                 type: TOASTER_DANGER,
@@ -145,14 +144,13 @@ class WorkflowControl extends PureComponent {
             });
             return;
         }
-        const { result, name, size } = fileMetadata;
-        const meta = {
-            name: name,
-            size: size
-        };
-
-        actions.uploadFile(result, meta);
-        this.setState({ runHasStarted: false });
+        const { result, name } = fileMetadata;
+        const serializedFile = new File([result], name);
+        try {
+            await api.file.upload(serializedFile, controller.port);
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     canRun() {
