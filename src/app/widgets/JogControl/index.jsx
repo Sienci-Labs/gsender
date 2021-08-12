@@ -28,6 +28,9 @@ import get from 'lodash/get';
 import includes from 'lodash/includes';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
+// import { debounce } from 'lodash';
+import { throttle } from 'lodash';
+// import { inRange } from 'lodash';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Widget from 'app/components/Widget';
@@ -37,7 +40,7 @@ import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
 import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
-// import GamepadHandler from 'app/lib/gamepad/index';
+import gamepad from 'app/lib/gamepad';
 // import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
@@ -73,7 +76,6 @@ import {
 } from './constants';
 import styles from './index.styl';
 
-
 class AxesWidget extends PureComponent {
     static propTypes = {
         widgetId: PropTypes.string.isRequired,
@@ -85,6 +87,10 @@ class AxesWidget extends PureComponent {
     pubsubTokens = [];
 
     joggingHelper = null;
+
+    axisDebounce = null;
+
+    axisThrottle = null;
 
     subscribe() {
         const tokens = [
@@ -630,8 +636,10 @@ class AxesWidget extends PureComponent {
             this.joggingHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
         }
 
-        //Axis will either be a single string value or an object containing multiple axis' (ex. axis.X, axis.Y, axis.Z)
-        if (typeof axis === 'object') {
+        console.log(axis, Array.isArray(axis));
+
+        //Axis will either be a single string value, array or an object containing multiple axis' (ex. axis.X, axis.Y, axis.Z)
+        if (typeof axis === 'object' && !Array.isArray(axis)) {
             const axisList = {};
             if (axis.X) {
                 axisList.X = axisValue.X * axis.X;
@@ -641,6 +649,17 @@ class AxesWidget extends PureComponent {
             }
             if (axis.Z) {
                 axisList.Z = axisValue.Z * axis.Z;
+            }
+
+            this.setState({ prevJog: { ...axisList, F: feedrate } });
+            this.joggingHelper.onKeyDown({ ...axisList }, feedrate);
+        } else if (Array.isArray(axis)) {
+            const axisList = {};
+            for (const item of axis) {
+                const givenAxis = item.toUpperCase();
+                const givenAxisVal = axisValue[givenAxis] * direction;
+
+                axisList[givenAxis] = givenAxisVal;
             }
 
             this.setState({ prevJog: { ...axisList, F: feedrate } });
@@ -662,22 +681,29 @@ class AxesWidget extends PureComponent {
             return;
         }
 
-        const { axis, direction } = payload;
+        const { axis: axisList, direction } = payload;
 
         const { getXYJogDistance, getZJogDistance } = this.actions;
 
         const xyStep = getXYJogDistance();
         const zStep = getZJogDistance();
 
-        const givenAxis = axis.toUpperCase();
-        const axisValue = {
-            X: xyStep,
-            Y: xyStep,
-            Z: zStep
-        }[givenAxis] * direction;
+        const axisObj = {};
+
+        for (const axis of axisList) {
+            const givenAxis = axis.toUpperCase();
+            const axisValue = {
+                X: xyStep,
+                Y: xyStep,
+                Z: zStep
+            }[givenAxis] * direction;
+
+            axisObj[givenAxis] = axisValue;
+        }
+
         const feedrate = Number(this.actions.getFeedrate());
 
-        this.joggingHelper && this.joggingHelper.onKeyUp({ [givenAxis]: axisValue, F: feedrate });
+        this.joggingHelper && this.joggingHelper.onKeyUp({ ...axisObj, F: feedrate });
     }
 
     shuttleControl = null;
@@ -705,6 +731,80 @@ class AxesWidget extends PureComponent {
         store.on('change', this.updateJogPresets);
         this.addShuttleControlEvents();
         this.subscribe();
+
+        gamepad.on('gamepad:axis', throttle(({ detail }) => {
+            // const { gamepad } = detail;
+            const { prevJog } = this.state;
+            // const THRESHOLD = 0.9;
+            // const { prevJog } = this.state;
+            const axisList = ['X', 'Y', 'Z'];
+            const [X, Y] = axisList;
+            const axis = axisList[detail.axis];
+            const value = detail.value;
+            const xDirection = value > 0 ? 1 : -1;
+            const yDirection = value > 0 ? -1 : 1;
+
+            const gamepadProfiles = store.get('workspace.gamepad.profiles', []);
+
+            const hasProfile = gamepadProfiles.find(profile => profile.id === detail.gamepad.id);
+
+            if (!hasProfile) {
+                return;
+            }
+
+            // const [leftStickX, leftStickY] = gamepad.axes;
+
+            // const isNegative = (num) => {
+            //     return num < 0;
+            // };
+
+            // const isPositive = (num) => {
+            //     return num > 0;
+            // };
+
+            // const determineDirection = (xAxis, yAxis) => {
+            //     if (isPositive(xAxis) && isNegative(yAxis)) {
+            //         this.handleShortcutJog({ axis: { X: 1, Y: 1 } }); // Top Right
+            //     } else if (isPositive(xAxis) && isPositive(yAxis)) {
+            //         this.handleShortcutJog({ axis: { X: 1, Y: -1 } }); // Bottom Right
+            //     } else if (isNegative(xAxis) && isPositive(yAxis)) {
+            //         this.handleShortcutJog({ axis: { X: -1, Y: -1 } }); // Bottom Left
+            //     } else if (isNegative(xAxis) && isNegative(yAxis)) {
+            //         this.handleShortcutJog({ axis: { X: -1, Y: 1 } }); // Top Left
+            //     }
+            // };
+
+            // determineDirection(leftStickX, leftStickY);
+
+            const handleJog = ({ axis, value, direction }) => {
+                if (!value) {
+                    this.handleShortcutStop();
+                    return;
+                }
+
+                if (prevJog && (value === 1 || value === -1)) {
+                    this.handleShortcutStop();
+                }
+
+                if (value === 1 || value === -1) {
+                    this.handleShortcutJog({ axis, direction });
+                } else if (axis === X && value < 0) {
+                    // console.log('Bottom Left');
+                    this.handleShortcutJog({ axis: { X: -1, Y: -1 } });
+                } else if (axis === Y && value > 0) {
+                    // console.log('Bottom Right');
+                    this.handleShortcutJog({ axis: { X: 1, Y: -1 } });
+                } else if (axis === X && value > 0) {
+                    // console.log('Top Right');
+                    this.handleShortcutJog({ axis: { X: 1, Y: 1 } });
+                } else if (axis === Y && value < 0) {
+                    // console.log('Top Left');
+                    this.handleShortcutJog({ axis: { X: -1, Y: 1 } });
+                }
+            };
+
+            handleJog({ axis, value, direction: axis === X ? xDirection : yDirection });
+        }, 500));
 
         // const events = [
         //     {
