@@ -258,10 +258,13 @@ class AxesWidget extends PureComponent {
             }, controller.command('jog:start', params, feedrate, units));
         },
         stopContinuousJog: () => {
-            this.setState({
-                isContinuousJogging: false
-            });
-            controller.command('jog:stop');
+            const throttled = throttle(() => {
+                this.setState({
+                    isContinuousJogging: false
+                });
+                controller.command('jog:stop');
+            }, 150, { trailing: true });
+            throttled();
         },
         cancelJog: () => {
             const state = get(this.props.state, 'status.activeState');
