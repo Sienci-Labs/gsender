@@ -42,6 +42,7 @@ import ModalTemplate from 'app/components/ModalTemplate';
 import Modal from 'app/components/Modal';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
+import gamepad, { onGamepadButtonClick } from 'app/lib/gamepad';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import portal from 'app/lib/portal';
@@ -913,6 +914,18 @@ class VisualizerWidget extends PureComponent {
                 }));
             }, 0);
         }
+
+        gamepad.on('gamepad:button', (e) => {
+            const command = onGamepadButtonClick(e);
+
+            // console.log(command);
+
+            const runEvent = this.shuttleControlEvents[command];
+
+            if (runEvent) {
+                runEvent();
+            }
+        });
     }
 
     componentWillUnmount() {
