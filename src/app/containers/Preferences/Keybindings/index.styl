@@ -165,3 +165,64 @@ $primary = #3e85c7;
   column-gap: 3rem;
   justify-items: center;
 }
+
+.active-pulse {
+  animation: bounce 1s infinite;
+  i {
+    text-align center;
+  }
+}
+
+.active-indicator {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background: #9CA3AF;
+  border: solid 1px #6B7280;
+  display: flex;
+  align-items center;
+  justify-content center;
+  justify-items center
+  color: #FFFFFF;
+}
+
+.active-indicator-on {
+  background: #dc2626;
+  border: solid 1px #9b1919;
+  animation: pulse-red 1s infinite;
+}
+
+@keyframes pulse-red {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(255, 82, 82, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(255, 82, 82, 0);
+  }
+}
+
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-15%);
+    animationTimingFunction: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animationTimingFunction: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.profile-action-wrapper {
+  padding: 1rem;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
