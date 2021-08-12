@@ -1258,27 +1258,18 @@ class GrblController {
                         feedrate = foundFeedrate;
                     }
 
+                    const modalGCode = [];
 
-                    //let modalPrepareCommand = '';
-                    for (const group in modal) {
-                        if (!['program', 'motion'].includes(group)) {
-                            this.command('gcode', modal[group]);
-                        }
-                    }
-                    this.command('gcode', `${modal.motion} ${modal.units === 'G21' ? 'Z4' : 'Z1'} ${feedrate}`); //Z command to move bit up so it does not drag over the board
-                    this.command('gcode', `${modal.motion} X${xVal} Y${yVal} Z${zVal} F1000`); //Go to the last position recorded from toolpath
-                    this.command('gcode', feedrate); //Set the feedrate to the last set one
-                    // this.command('gcode', `${modal.motion} X${xVal} Y${yVal} Z${zVal}`);
-
-                    // console.log('PREPEND_COMMAND', `${modal.motion} ${modal.units === 'G21' ? 'Z4' : 'Z1'}`);
-                    // console.log('PREPEND_COMMAND', modalPrepareCommand);
-                    // console.log('PREPEND_COMMAND', `${modal.motion} X${xVal} Y${yVal} Z${zVal} ${feedrate}`);
-                    // console.log('FEEDRATE', feedrate);
-                    // console.log('FEEDRATE_INDEX', feedrateIndex);
-                    // console.log('FIRST_HALF:', firstHalf);
-                    // // console.log('FIRST_HALF_STR:', firstHalf.join('\n'));
-                    // console.log('MODAL:', modal);
-                    // console.log('POSITION:', position);
+                    console.log(modal);
+                    // Move up and then to cut start position
+                    modalGCode.push('G0 G90 G21 Z10');
+                    modalGCode.push(`G0 G90 G21 X${xVal} Y${yVal}`);
+                    modalGCode.push(`G0 G90 G21 Z${zVal}`);
+                    // Set modals based on what's parsed so far in the file
+                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modal.feedrate} ${modal.wcs} ${modal.plane}`);
+                    modalGCode.push(`${feedrate}`);
+                    console.log(modalGCode);
+                    this.command('gcode', modalGCode);
                 }
 
                 //Allow the prepend commands to register before resuming job
