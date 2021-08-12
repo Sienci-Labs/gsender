@@ -31,7 +31,7 @@ const Toast = ({ id, msg = 'NO_MSG_SPECIFIED', type = TOASTER_INFO, closeHandler
     const hasDuration = duration !== TOASTER_UNTIL_CLOSE;
 
     return (
-        <div id={id} className={styles.toastWrapper}>
+        <div id={id} className={styles.toastWrapper} tabIndex="0" role="button" onClick={closeHandler}>
             <div
                 className={cx(styles.toastIcon,
                     { [styles.toastInfo]: (type === TOASTER_INFO) },
