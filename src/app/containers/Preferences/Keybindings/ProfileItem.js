@@ -15,8 +15,6 @@ const ProfileItem = ({ title, icon, id, onClick, onDelete }) => {
             <i className={classnames(icon, styles.profileItemIcon)} />
             <div className={styles.profileItemTitle}>{title}</div>
 
-            <i className={classnames('fas fa-circle', styles.profileItemStatus)} />
-
             <i
                 tabIndex={-1}
                 role="button"
