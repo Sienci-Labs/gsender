@@ -58,7 +58,7 @@ export default class MainTable extends Component {
 
     renders = {
         renderShortcutCell: (_, row) => {
-            const { keys, isActive } = row;
+            const { keys, isActive, keysName } = row;
             const shortcut = [...keys][0] === '+' ? ['+'] : keys.split('+');
 
             const { onEdit, onDelete } = this.props;
@@ -80,9 +80,13 @@ export default class MainTable extends Component {
             return (
                 <div className={styles.shortcutComboColumn}>
                     {
-                        hasShortcut
-                            ? <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>{output}</div>
-                            : <div style={{ height: '21px' }} />
+                        hasShortcut || keysName
+                            ? (
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+                                    {keysName ? <kbd>{keysName}</kbd> : output}
+                                </div>
+                            )
+                            : <div style={{ height: '24px' }} />
                     }
                     <div className={styles['icon-area']}>
                         {
@@ -99,31 +103,28 @@ export default class MainTable extends Component {
                         <i
                             role="button"
                             tabIndex={-1}
+                            className={cx('far fa-trash-alt', styles.deleteIcon, !hasShortcut ? styles.disabledIcon : '')}
+                            onClick={() => hasShortcut && onDelete(row)}
+                            onKeyDown={null}
+                        />
+                        <i
+                            role="button"
+                            tabIndex={-1}
                             className={cx(hasShortcut ? 'fas fa-edit' : 'fas fa-plus', styles.actionIcon)}
                             onClick={() => onEdit(row)}
-                            onKeyDown={() => onEdit(row)}
+                            onKeyDown={null}
                         />
                     </div>
                 </div>
             );
         },
-        renderActionCell: (_, row) => {
-            return (
-                <i
-                    role="button"
-                    tabIndex={-1}
-                    className="fas fa-edit"
-                    onClick={() => this.props.onEdit(row)}
-                    onKeyDown={() => this.props.onEdit(row)}
-                />
-            );
-        },
         renderToggleCell: (_, row) => {
+            const { onShortcutToggle } = this.props;
             return (
                 <ToggleSwitch
                     checked={row.isActive}
                     onChange={(isActive) => {
-                        this.props.onShortcutToggle({ ...row, isActive }, false);
+                        onShortcutToggle({ ...row, isActive }, false);
                     }}
                 />
             );

@@ -269,7 +269,6 @@ class WorkflowControl extends PureComponent {
 
     runOutline = () => {
         const { gcode } = this.props;
-
         Toaster.pop({
             TYPE: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE,
