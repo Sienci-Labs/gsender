@@ -25,6 +25,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import get from 'lodash/get';
 import includes from 'lodash/includes';
+import store from 'app/store';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
@@ -110,6 +111,13 @@ class WorkflowControl extends PureComponent {
         const files = event.target.files;
         const file = files[0];
 
+        const hooks = store.get('workspace.toolChangeHooks', {});
+        const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
+        const toolChangeContext = {
+            ...hooks,
+            toolChangeOption
+        };
+        controller.command('toolchange:context', toolChangeContext);
         await api.file.upload(file, controller.port);
     };
 

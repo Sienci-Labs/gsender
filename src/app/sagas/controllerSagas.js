@@ -88,6 +88,14 @@ export function* initialize() {
         if (showLineWarnings) {
             controller.command('settings:updated', { showLineWarnings });
         }
+        const hooks = store.get('workspace.toolChangeHooks', {});
+        const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
+        const toolChangeContext = {
+            ...hooks,
+            toolChangeOption
+        };
+        controller.command('toolchange:context', toolChangeContext);
+
         reduxStore.dispatch({
             type: connectionActions.OPEN_CONNECTION,
             payload: { options }

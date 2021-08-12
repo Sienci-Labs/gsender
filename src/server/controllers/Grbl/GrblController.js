@@ -1018,13 +1018,6 @@ class GrblController {
 
             // Clear action values
             this.clearActionValues();
-            // Get toolchange options on connect
-            const hooks = store.get('workspace.toolChangeHooks', {});
-            const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
-            this.toolChangeContext = {
-                ...hooks,
-                toolChangeOption
-            };
         });
     }
 
@@ -1184,12 +1177,6 @@ class GrblController {
                     // Handle toolchange context on file load
                     this.toolChangeContext = context;
                 }
-                const hooks = store.get('workspace.toolChangeHooks', {});
-                const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
-                this.toolChangeContext = {
-                    ...hooks,
-                    toolChangeOption
-                };
 
 
                 // G4 P0 or P with a very small value will empty the planner queue and then
@@ -1673,7 +1660,6 @@ class GrblController {
             },
             'gcode:outline': () => {
                 const [gcode = '', concavity = Infinity] = args;
-                console.log(concavity);
                 const toRun = getOutlineGcode(gcode, concavity);
                 log.debug('Running outline');
                 this.emit('outline:start');
