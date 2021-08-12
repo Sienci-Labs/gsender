@@ -28,6 +28,7 @@ import _ from 'lodash';
 import controller from 'app/lib/controller';
 import Events from 'app/containers/Preferences/ToolChange';
 import ProgramEvents from 'app/containers/Preferences/Events';
+import gamepad from 'app/lib/gamepad';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import GeneralSettings from './GeneralSettings';
 import Shortcuts from './Keybindings';
@@ -536,6 +537,12 @@ class PreferencesPage extends PureComponent {
 
     componentDidMount() {
         controller.command('settings:updated', this.state);
+
+        gamepad.holdListener();
+    }
+
+    componentWillUnmount() {
+        gamepad.unholdLisetner();
     }
 
     componentDidUpdate(prevProps, prevState) {
