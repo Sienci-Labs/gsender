@@ -100,7 +100,6 @@ class GCodeVisualizer {
         colors.forEach(colorTag => {
             const [motion, opacity] = colorTag;
             const color = motionColor[motion] || motionColor.default;
-            console.log(color);
             colorArray.push(...color.toArray(), opacity);
         });
         return new Float32Array(colorArray);
@@ -113,7 +112,7 @@ class GCodeVisualizer {
         }
 
         //const { cuttingCoordinateLines } = this.theme;
-
+        console.log(`FI: ${frameIndex}`);
         const defaultColor = new THREE.Color('#5191CC');
 
         frameIndex = Math.min(frameIndex, this.frames.length - 1);

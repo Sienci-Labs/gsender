@@ -419,7 +419,7 @@ class WorkflowControl extends PureComponent {
                                         className={styles['start-from-line-button']}
                                         onClick={this.startFromLinePrompt}
                                     >
-                                        <i className="fas fa-grip-lines" />
+                                        <i className="fas fa-list-ol" />
                                     </div>
                                 )
                             }
