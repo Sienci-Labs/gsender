@@ -55,7 +55,9 @@ class JogControl extends PureComponent {
     }
 
     clearTimeout() {
-        clearTimeout(this.timeoutFunction);
+        if (this.timeoutFunction) {
+            clearTimeout(this.timeoutFunction);
+        }
         this.timeoutFunction = null;
     }
 

@@ -22,7 +22,7 @@
  */
 
 import '@babel/polyfill';
-import { app, ipcMain, dialog, powerSaveBlocker } from 'electron';
+import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -37,8 +37,6 @@ import launchServer from './server-cli';
 import pkg from './package.json';
 //import './sentryInit';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
-
-
 
 let windowManager = null;
 let powerSaverId = null;
@@ -79,10 +77,6 @@ const main = () => {
 
     app.whenReady().then(async () => {
         try {
-            // Power saver - display sleep higher precedence over app suspension
-            powerSaverId = powerSaveBlocker.start('prevent-display-sleep');
-            log.info(`Result of powerSaveBlocker: ${powerSaveBlocker.isStarted(powerSaverId)}`);
-
             windowManager = new WindowManager();
 
             // Create and show splash before server starts
@@ -131,6 +125,18 @@ const main = () => {
                 title: `gSender ${pkg.version}`,
             };
             const window = windowManager.openWindow(url, options, splashScreen);
+
+            // Power saver - display sleep higher precedence over app suspension
+            powerSaverId = powerSaveBlocker.start('prevent-display-sleep');
+            log.info(`Result of powerSaveBlocker: ${powerSaveBlocker.isStarted(powerSaverId)}`);
+            powerMonitor.on('lock-screen', () => {
+                powerSaveBlocker.start('prevent-display-sleep');
+                log.info('Prevented sleep');
+            });
+            powerMonitor.on('suspend', () => {
+                powerSaveBlocker.start('prevent-app-suspension');
+                log.info('Prevented suspension');
+            });
 
             // Save window size and position
             window.on('close', () => {
