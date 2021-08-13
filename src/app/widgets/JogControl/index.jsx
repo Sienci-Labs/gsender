@@ -28,7 +28,7 @@ import get from 'lodash/get';
 import includes from 'lodash/includes';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
-import { throttle } from 'lodash';
+import { throttle, inRange } from 'lodash';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Widget from 'app/components/Widget';
@@ -39,7 +39,6 @@ import i18n from 'app/lib/i18n';
 import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
 import gamepad, { runAction } from 'app/lib/gamepad';
-// import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
 import { connect } from 'react-redux';
@@ -637,8 +636,6 @@ class AxesWidget extends PureComponent {
             this.joggingHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
         }
 
-        console.log(axis, Array.isArray(axis));
-
         //Axis will either be a single string value, array or an object containing multiple axis' (ex. axis.X, axis.Y, axis.Z)
         if (typeof axis === 'object' && !Array.isArray(axis)) {
             const axisList = {};
@@ -737,16 +734,10 @@ class AxesWidget extends PureComponent {
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
-            // const { gamepad } = detail;
-            const { prevJog } = this.state;
-            // const THRESHOLD = 0.9;
-            // const { prevJog } = this.state;
-            const axisList = ['X', 'Y', 'Z'];
-            const [X, Y] = axisList;
-            const axis = axisList[detail.axis];
+            const { gamepad } = detail;
+            const { prevJog, prevDirection } = this.state;
             const value = detail.value;
-            const xDirection = value > 0 ? 1 : -1;
-            const yDirection = value > 0 ? -1 : 1;
+            const stick = detail.stick;
 
             const gamepadProfiles = store.get('workspace.gamepad.profiles', []);
 
@@ -756,59 +747,200 @@ class AxesWidget extends PureComponent {
                 return;
             }
 
-            // const [leftStickX, leftStickY] = gamepad.axes;
+            const [leftStickX, leftStickY, rightStickX, rightStickY] = gamepad.axes;
 
-            // const isNegative = (num) => {
-            //     return num < 0;
-            // };
 
-            // const isPositive = (num) => {
-            //     return num > 0;
-            // };
+            // Y Positive Move
+            // AXIS X(0) ________ -0.25 to 0.25
+            // AXIS Y(1) ________ -1 to 0
 
-            // const determineDirection = (xAxis, yAxis) => {
-            //     if (isPositive(xAxis) && isNegative(yAxis)) {
-            //         this.handleShortcutJog({ axis: { X: 1, Y: 1 } }); // Top Right
-            //     } else if (isPositive(xAxis) && isPositive(yAxis)) {
-            //         this.handleShortcutJog({ axis: { X: 1, Y: -1 } }); // Bottom Right
-            //     } else if (isNegative(xAxis) && isPositive(yAxis)) {
-            //         this.handleShortcutJog({ axis: { X: -1, Y: -1 } }); // Bottom Left
-            //     } else if (isNegative(xAxis) && isNegative(yAxis)) {
-            //         this.handleShortcutJog({ axis: { X: -1, Y: 1 } }); // Top Left
+
+            // Y Negative Move
+            // AXIS X(0) ________ -0.25 to 0.25
+            // AXIS Y(1) ________ 0 to 1
+
+
+            // X Positive Move
+            // AXIS X(0) ________ 0 to 1
+            // AXIS Y(1) ________ -0.25 to 0.25
+
+
+            // X Negative Move
+            // AXIS X(0) ________ -1 to 0
+            // AXIS Y(1) ________ -0.25 to 0.25
+
+
+            // Top Left Move
+            // AXIS X(0) ________ -0.75 to -0.25
+            // AXIS Y(1) ________ -0.75 to -0.25
+
+
+            // Top Right Move
+            // AXIS X(0) ________ 0.75 to 0.25
+            // AXIS Y(1) ________ -0.75 to -0.25
+
+
+            // Bottom Right Move
+            // AXIS X(0) ________ 0.75 to 0.25
+            // AXIS Y(1) ________ 0.75 to 0.25
+
+
+            // Bottom Left Move
+            // AXIS X(0) ________ -0.75 to -0.25
+            // AXIS Y(1) ________ 0.75 to 0.25
+
+            const [
+                YPositive,
+                YNegative,
+                XPositive,
+                XNegative,
+                TopLeft,
+                TopRight,
+                BottomLeft,
+                BottomRight,
+                UNKNOWN_MOVE
+            ] = [
+                'YPositive',
+                'YNegative',
+                'XPositive',
+                'XNegative',
+                'TopLeft',
+                'TopRight',
+                'BottomLeft',
+                'BottomRight',
+                ''
+            ];
+
+            const determineDirection = (xAxis, yAxis) => {
+                if (inRange(xAxis, -0.25, 0.25) && inRange(yAxis, -1, 0)) {
+                    return YPositive;
+                }
+
+                if (inRange(xAxis, -0.25, 0.25) && inRange(yAxis, 0, 1)) {
+                    return YNegative;
+                }
+
+                if (inRange(xAxis, 0, 1) && inRange(yAxis, -0.25, 0.25)) {
+                    return XPositive;
+                }
+
+                if (inRange(xAxis, -1, 0) && inRange(yAxis, -0.25, 0.25)) {
+                    return XNegative;
+                }
+
+                if (inRange(xAxis, -0.75, -0.25) && inRange(yAxis, -0.75, -0.25)) {
+                    return TopLeft;
+                }
+
+                if (inRange(xAxis, 0.25, 0.75) && inRange(yAxis, -0.75, -0.25)) {
+                    return TopRight;
+                }
+
+                if (inRange(xAxis, 0.25, 0.75) && inRange(yAxis, 0.25, 0.75)) {
+                    return BottomRight;
+                }
+
+                if (inRange(xAxis, -0.75, -0.25) && inRange(yAxis, 0.25, 0.75)) {
+                    return BottomLeft;
+                }
+
+                return UNKNOWN_MOVE;
+            };
+
+            const direction = stick === 0
+                ? determineDirection(leftStickX, leftStickY)
+                : determineDirection(rightStickX, rightStickY);
+
+            if (!value) {
+                this.handleShortcutStop();
+                return;
+            }
+
+            if (prevJog || prevDirection !== direction) {
+                this.handleShortcutStop();
+            }
+
+            console.log(direction || 'Direction Not Found');
+
+            switch (direction) {
+            case YPositive: {
+                this.handleShortcutJog({ axis: 'Y', direction: 1 });
+                break;
+            }
+
+            case YNegative: {
+                this.handleShortcutJog({ axis: 'Y', direction: -1 });
+                break;
+            }
+
+            case XPositive: {
+                this.handleShortcutJog({ axis: 'X', direction: 1 });
+                break;
+            }
+
+            case XNegative: {
+                this.handleShortcutJog({ axis: 'X', direction: -1 });
+                break;
+            }
+
+            case TopLeft: {
+                this.handleShortcutJog({ axis: { X: -1, Y: 1 } });
+                break;
+            }
+
+            case TopRight: {
+                this.handleShortcutJog({ axis: { X: 1, Y: 1 } });
+                break;
+            }
+
+            case BottomLeft: {
+                this.handleShortcutJog({ axis: { X: -1, Y: -1 } });
+                break;
+            }
+
+            case BottomRight: {
+                this.handleShortcutJog({ axis: { X: 1, Y: -1 } });
+                break;
+            }
+
+            case UNKNOWN_MOVE: {
+                break;
+            }
+
+            default: {
+                break;
+            }
+            }
+
+            // const handleJog = ({ axis, value, direction }) => {
+            //     if (!value) {
+            //         this.handleShortcutStop();
+            //         return;
+            //     }
+
+            //     if (prevJog && (value === 1 || value === -1)) {
+            //         this.handleShortcutStop();
+            //     }
+
+            //     if (value === 1 || value === -1) {
+            //         this.handleShortcutJog({ axis, direction });
+            //     } else if (axis === X && value < 0) {
+            //         // console.log('Bottom Left');
+            //         this.handleShortcutJog({ axis: { X: -1, Y: -1 } });
+            //     } else if (axis === Y && value > 0) {
+            //         // console.log('Bottom Right');
+            //         this.handleShortcutJog({ axis: { X: 1, Y: -1 } });
+            //     } else if (axis === X && value > 0) {
+            //         // console.log('Top Right');
+            //         this.handleShortcutJog({ axis: { X: 1, Y: 1 } });
+            //     } else if (axis === Y && value < 0) {
+            //         // console.log('Top Left');
+            //         this.handleShortcutJog({ axis: { X: -1, Y: 1 } });
             //     }
             // };
 
-            // determineDirection(leftStickX, leftStickY);
-
-            const handleJog = ({ axis, value, direction }) => {
-                if (!value) {
-                    this.handleShortcutStop();
-                    return;
-                }
-
-                if (prevJog && (value === 1 || value === -1)) {
-                    this.handleShortcutStop();
-                }
-
-                if (value === 1 || value === -1) {
-                    this.handleShortcutJog({ axis, direction });
-                } else if (axis === X && value < 0) {
-                    // console.log('Bottom Left');
-                    this.handleShortcutJog({ axis: { X: -1, Y: -1 } });
-                } else if (axis === Y && value > 0) {
-                    // console.log('Bottom Right');
-                    this.handleShortcutJog({ axis: { X: 1, Y: -1 } });
-                } else if (axis === X && value > 0) {
-                    // console.log('Top Right');
-                    this.handleShortcutJog({ axis: { X: 1, Y: 1 } });
-                } else if (axis === Y && value < 0) {
-                    // console.log('Top Left');
-                    this.handleShortcutJog({ axis: { X: -1, Y: 1 } });
-                }
-            };
-
-            handleJog({ axis, value, direction: axis === X ? xDirection : yDirection });
-        }, 500));
+            // handleJog({ axis, value, direction: axis === X ? xDirection : yDirection });
+        }, 150));
 
         // const events = [
         //     {
@@ -965,6 +1097,7 @@ class AxesWidget extends PureComponent {
                 }
             },
             prevJog: null,
+            prevDirection: null,
         };
     }
 
