@@ -50,7 +50,6 @@ class UpdateAvailableAlert extends PureComponent {
     subscribe () {
         const tokens = [
             pubsub.subscribe('showUpdateToast', (msg, info) => {
-                console.log(info);
                 this.setState({
                     shown: true
                 });

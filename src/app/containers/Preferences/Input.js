@@ -29,8 +29,8 @@ import styles from './index.styl';
 
 const Input = ({ value, label, units, onChange, additionalProps, className }) => {
     return (
-        <div className={classNames(styles.input, 'form-group', className)}>
-            <label htmlFor="">{`${label}`}</label>
+        <div className={classNames(styles.input, 'form-group', className)} style={{ gridTemplateColumns: !label ? '1fr' : '' }}>
+            {label && <label htmlFor="">{`${label}`}</label>}
             <div className="input-group">
                 <input
                     {...additionalProps}

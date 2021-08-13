@@ -150,7 +150,12 @@ const defaultState = {
                 type: 'end mill'
             }
         ],
-        recentFiles: []
+        recentFiles: [],
+        gamepad: {
+            deadZone: 0.5,
+            precision: 3,
+            profiles: [],
+        }
     },
     widgets: {
         axes: {

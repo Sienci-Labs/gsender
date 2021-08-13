@@ -23,6 +23,7 @@
 
 import ensureArray from 'ensure-array';
 import * as parser from 'gcode-parser';
+import Toolpath from 'gcode-toolpath';
 import _ from 'lodash';
 import map from 'lodash/map';
 import SerialConnection from '../../lib/SerialConnection';
@@ -817,6 +818,8 @@ class GrblController {
                 }
             }
         }, 250);
+
+        // Load file if it exists in CNC engine (AKA it was loaded before connection
     }
 
     async initController() {
@@ -1015,11 +1018,6 @@ class GrblController {
 
             // Clear action values
             this.clearActionValues();
-
-            if (this.sender.state.gcode) {
-                // Unload G-code
-                this.command('unload');
-            }
         });
     }
 
@@ -1067,6 +1065,11 @@ class GrblController {
 
     isClose() {
         return !(this.isOpen());
+    }
+
+    loadFile(gcode, { name }) {
+        log.debug(`Loading file '${name}' to controller`);
+        this.command('gcode:load', name, gcode);
     }
 
     addConnection(socket) {
@@ -1174,6 +1177,8 @@ class GrblController {
                     // Handle toolchange context on file load
                     this.toolChangeContext = context;
                 }
+
+
                 // G4 P0 or P with a very small value will empty the planner queue and then
                 // respond with an ok when the dwell is complete. At that instant, there will
                 // be no queued motions, as long as no more commands were sent after the G4.
@@ -1185,8 +1190,8 @@ class GrblController {
                     return;
                 }
 
-                this.emit('gcode:load', name, gcode, context);
-                this.event.trigger('gcode:load');
+                //this.emit('gcode:load', name, gcode, context);
+                //this.event.trigger('gcode:load');
 
                 log.debug(`Load G-code: name="${this.sender.state.name}", size=${this.sender.state.gcode.length}, total=${this.sender.state.total}`);
 
@@ -1196,27 +1201,85 @@ class GrblController {
             },
             'gcode:unload': () => {
                 this.workflow.stop();
+                this.engine.unload();
 
                 // Sender
                 this.sender.unload();
 
-                this.emit('gcode:unload');
-                this.event.trigger('gcode:unload');
+                this.emit('file:unload');
+                this.event.trigger('file:unload');
             },
             'start': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                this.event.trigger('gcode:start');
+                const [lineToStartFrom] = args;
+                const totalLines = this.sender.state.total;
 
-                this.workflow.start();
 
-                // Feeder
-                this.feeder.reset();
+                if (lineToStartFrom && lineToStartFrom <= totalLines) {
+                    const { lines = [] } = this.sender.state;
+                    const firstHalf = lines.slice(0, lineToStartFrom);
+                    let feedRate = 200;
+                    let spindleRate = 0;
 
-                // Sender
-                this.sender.next();
+                    const getWordValue = (token, words) => {
+                        for (let wordPair of words) {
+                            const [word, value] = wordPair;
+                            if (word === token) {
+                                return value;
+                            }
+                        }
+                        return 0;
+                    };
+
+                    const toolpath = new Toolpath();
+                    toolpath.loadFromStringSync(firstHalf.join('\n'), (data) => {
+                        const { words, line } = data;
+                        if (line.includes('F')) {
+                            feedRate = getWordValue('F', words);
+                        }
+                        if (line.includes('S')) {
+                            spindleRate = getWordValue('S', words);
+                        }
+                    });
+
+                    const modal = toolpath.getModal();
+                    const position = toolpath.getPosition();
+
+                    const {
+                        x: xVal,
+                        y: yVal,
+                        z: zVal,
+                    } = position;
+
+                    const modalGCode = [];
+
+                    // Move up and then to cut start position
+                    modalGCode.push('G0 G90 G21 Z10');
+                    modalGCode.push(`G0 G90 G21 X${xVal} Y${yVal}`);
+                    modalGCode.push(`G0 G90 G21 Z${zVal}`);
+                    // Set modals based on what's parsed so far in the file
+                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modal.feedrate} ${modal.wcs} ${modal.plane}`);
+                    modalGCode.push(`F${feedRate} S${spindleRate}`);
+                    console.log(modalGCode);
+
+                    this.command('gcode', modalGCode);
+                }
+
+                //Allow the prepend commands to register before resuming job
+                setTimeout(() => {
+                    this.event.trigger('gcode:start');
+
+                    this.workflow.start();
+
+                    // Feeder
+                    this.feeder.reset();
+
+                    // Sender
+                    this.sender.next({ lineToStartFrom });
+                }, 100);
             },
             'stop': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
@@ -1584,7 +1647,6 @@ class GrblController {
             },
             'gcode:outline': () => {
                 const [gcode = '', concavity = Infinity] = args;
-                console.log(concavity);
                 const toRun = getOutlineGcode(gcode, concavity);
                 log.debug('Running outline');
                 this.emit('outline:start');

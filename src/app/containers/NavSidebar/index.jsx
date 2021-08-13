@@ -23,6 +23,7 @@
  */
 
 import React, { PureComponent } from 'react';
+import gamepad, { runAction } from 'app/lib/gamepad';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import { GRBL } from 'app/constants';
@@ -120,6 +121,8 @@ class NavSidebar extends PureComponent {
 
     componentDidMount() {
         this.addShuttleControlEvents();
+
+        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }
 
     componentWillUnmount() {

@@ -36,9 +36,18 @@ export const modalTitleStyle = {
 };
 
 export const modalBodyStyle = {
+    padding: '2rem'
+};
 
+export const modalContainerStyle = {
+    display: 'grid',
+    gridTemplateRows: '6fr 1fr',
+    height: '100%'
 };
 
 export const modalFooterStyle = {
-    backgroundColor: '#d1d5db'
+    backgroundColor: '#d1d5db',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
 };

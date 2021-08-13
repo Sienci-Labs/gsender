@@ -25,34 +25,36 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import get from 'lodash/get';
 import includes from 'lodash/includes';
+import store from 'app/store';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
 import controller from 'app/lib/controller';
 import React, { PureComponent } from 'react';
+import api from 'app/api';
 import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
+import Input from 'app/containers/Preferences/Input';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
-import ReaderWorker from './FileReader.worker';
+//import ReaderWorker from './FileReader.worker';
 import {
     Toaster,
+    TOASTER_SUCCESS,
     TOASTER_DANGER,
     TOASTER_WARNING,
     TOASTER_UNTIL_CLOSE,
     TOASTER_INFO
 } from '../../lib/toaster/ToasterLib';
 import {
-    // Grbl
     GRBL_ACTIVE_STATE_ALARM,
     GRBL_ACTIVE_STATE_CHECK,
-    // Marlin
-    // Workflow
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
-    WORKFLOW_STATE_RUNNING
+    WORKFLOW_STATE_RUNNING,
 } from '../../constants';
+// import { NOTIFICATION_PROGRAM_ERROR } from './constants';
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
 import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
@@ -78,7 +80,11 @@ class WorkflowControl extends PureComponent {
             closeFile: false,
             showRecent: false,
             showLoadFile: false,
-            runHasStarted: false
+            runHasStarted: false,
+            startFromLine: {
+                showModal: false,
+                value: 1,
+            },
         };
     }
 
@@ -101,49 +107,36 @@ class WorkflowControl extends PureComponent {
         actions.uploadFile(result, meta);
     }
 
-    handleChangeFile = (event) => {
+    handleChangeFile = async (event) => {
         const files = event.target.files;
         const file = files[0];
 
-        const meta = {
-            name: file.name,
-            size: file.size
+        const hooks = store.get('workspace.toolChangeHooks', {});
+        const toolChangeOption = store.get('workspace.toolChangeOption', 'Ignore');
+        const toolChangeContext = {
+            ...hooks,
+            toolChangeOption
         };
+        controller.command('toolchange:context', toolChangeContext);
+        await api.file.upload(file, controller.port);
+    };
 
-        const readerWorker = new ReaderWorker();
-        readerWorker.onmessage = this.handleReaderResponse;
+    handleElectronFileUpload = async (file) => {
+        const serializedFile = new File([file.data], file.name);
 
         if (isElectron()) {
             const recentFile = createRecentFileFromRawPath(file.path, file.name);
             addRecentFile(recentFile);
         }
 
-        readerWorker.postMessage({
-            file: file,
-            meta: meta
-        });
-        this.setState({ fileLoaded: false });
-    };
-
-    handleElectronFileUpload = (file) => {
-        const { actions } = this.props;
-
-        const meta = {
-            name: file.name,
-            size: file.size
-        };
-
-        if (isElectron()) {
-            const recentFile = createRecentFileFromRawPath(file.path, file.name);
-            addRecentFile(recentFile);
+        try {
+            await api.file.upload(serializedFile, controller.port);
+        } catch (e) {
+            console.log(e);
         }
-
-        actions.uploadFile(file.data, meta);
-        this.setState({ fileLoaded: false });
     };
 
-    loadRecentFile = (fileMetadata) => {
-        const { actions } = this.props;
+    loadRecentFile = async (fileMetadata) => {
         if (fileMetadata === null) {
             Toaster.pop({
                 type: TOASTER_DANGER,
@@ -151,35 +144,32 @@ class WorkflowControl extends PureComponent {
             });
             return;
         }
-        const { result, name, size } = fileMetadata;
-        const meta = {
-            name: name,
-            size: size
-        };
-
-        actions.uploadFile(result, meta);
-        this.setState({ runHasStarted: false });
+        const { result, name } = fileMetadata;
+        const serializedFile = new File([result], name);
+        try {
+            await api.file.upload(serializedFile, controller.port);
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     canRun() {
-        const { state } = this.props;
-        const { port, gcode, workflow } = state;
+        const { isConnected, fileLoaded, workflowState, activeState } = this.props;
 
-        if (!port) {
+        if (!isConnected) {
             return false;
         }
-        if (!gcode.ready) {
+        if (!fileLoaded) {
             return false;
         }
-        if (!includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state)) {
+        if (!includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflowState)) {
             return false;
         }
-        const { activeState } = this.props;
         const states = [
             GRBL_ACTIVE_STATE_ALARM
         ];
 
-        if (includes([GRBL_ACTIVE_STATE_CHECK], activeState) && !includes([WORKFLOW_STATE_PAUSED, WORKFLOW_STATE_IDLE], workflow.state)) {
+        if (includes([GRBL_ACTIVE_STATE_CHECK], activeState) && !includes([WORKFLOW_STATE_PAUSED, WORKFLOW_STATE_IDLE], workflowState)) {
             return false;
         }
 
@@ -187,12 +177,13 @@ class WorkflowControl extends PureComponent {
     }
 
     handleOnStop = () => {
-        const { actions: { handlePause, handleStop }, state } = this.props;
-        const { controller: { state: { status } } } = state;
+        const { actions: { handlePause, handleStop }, controllerState, senderStatus } = this.props;
+        const { status } = controllerState;
 
+        const { received } = senderStatus;
         handlePause();
         handleStop();
-        this.setState({ runHasStarted: false });
+        this.setState(prev => ({ runHasStarted: false, startFromLine: { ...prev.startFromLine, value: received } }));
         if (status.activeState === 'Check') {
             controller.command('gcode', '$C');
         }
@@ -200,16 +191,14 @@ class WorkflowControl extends PureComponent {
 
 
     handleTestFile = () => {
-        const { actions } = this.props;
+        const { gcode } = this.props;
         this.setState({ runHasStarted: true });
-        const gcode = this.props.state.gcode.content; // or whatever the state member is
         const comments = ['#', ';', '(', '%'];
         const lines = gcode.split('\n')
             .filter(line => (line.trim().length > 0))
             .filter(line => !comments.some(comment => line.includes(comment)));
         const testLines = ['$C', ...lines, '$C'];
         controller.command('gcode', testLines);
-        actions.onRunClick();
     };
 
     startRun = () => {
@@ -218,7 +207,6 @@ class WorkflowControl extends PureComponent {
         if (activeState === GRBL_ACTIVE_STATE_CHECK) {
             this.setState({ testStarted: true, runHasStarted: true });
 
-            controller.command('gcode:resume');
             controller.command('gcode:resume');
             return;
         }
@@ -284,6 +272,23 @@ class WorkflowControl extends PureComponent {
         controller.command('gcode:outline', gcode, 300);
     }
 
+    startFromLinePrompt = () => {
+        const { received } = this.props.senderStatus;
+        this.setState(prev => ({ startFromLine: { showModal: true, value: received !== 0 ? received : prev.startFromLine.value } }));
+    }
+
+    handleStartFromLine = () => {
+        this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
+
+        controller.command('gcode:start', this.state.startFromLine.value);
+
+        Toaster.pop({
+            msg: 'Running Start From Specific Line Command',
+            type: TOASTER_SUCCESS,
+            duration: 2000,
+        });
+    }
+
     subscribe() {
         const tokens = [
             pubsub.subscribe('gcode:toolChange', () => {
@@ -303,22 +308,23 @@ class WorkflowControl extends PureComponent {
         this.pubsubTokens = [];
     }
 
+
     render() {
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
         const { handleOnStop } = this;
-        const { state, actions, workflowState } = this.props;
-        const { port, gcode } = state;
-        const canClick = !!port;
-        const isReady = canClick && gcode.ready;
-        const { runHasStarted } = this.state;
+        const { fileLoaded, actions, workflowState, isConnected, senderInHold, activeState, lineTotal } = this.props;
+        const canClick = !!isConnected;
+        const isReady = canClick && fileLoaded;
+        //const { runHasStarted } = this.state;
         const canRun = this.canRun();
-        const { isConnected, fileLoaded, senderInHold, activeState } = this.props;
-        const showPlay = isConnected && fileLoaded && canRun;
-        const showTest = showPlay && !runHasStarted;
+        //const showPlay = isConnected && fileLoaded && canRun;
+        //const showTest = showPlay && !runHasStarted;
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const workflowPaused = workflowState === WORKFLOW_STATE_PAUSED || senderInHold;
+
+        const { showModal, value } = this.state.startFromLine;
 
         return (
             <div className={styles.workflowControl}>
@@ -351,7 +357,7 @@ class WorkflowControl extends PureComponent {
                                 <RecentFileButton />
                                 <div
                                     role="button"
-                                    className={this.props.state.gcode.content ? `${styles.closeFileButton}` : `${styles['workflow-button-disabled']}`}
+                                    className={fileLoaded ? `${styles.closeFileButton}` : `${styles['workflow-button-disabled']}`}
                                     onClick={this.handleCloseFile}
                                 >
                                     <i className="fas fa-times" />
@@ -362,7 +368,7 @@ class WorkflowControl extends PureComponent {
                 </div>
 
                 {
-                    showTest &&
+                    !workflowPaused && (
                         <div className={styles.splitContainer}>
                             <button
                                 type="button"
@@ -385,19 +391,33 @@ class WorkflowControl extends PureComponent {
                                 {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
                             </button>
                         </div>
+                    )
 
                 }
                 {
                     canRun && (
-                        <button
-                            type="button"
-                            className={styles['workflow-button-play']}
-                            title={workflowPaused ? i18n._('Resume') : i18n._('Run')}
-                            onClick={this.startRun}
-                            disabled={!isConnected}
-                        >
-                            {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
-                        </button>
+                        <div className={styles.relativeWrapper}>
+                            <button
+                                type="button"
+                                className={styles['workflow-button-play']}
+                                title={workflowPaused ? i18n._('Resume') : i18n._('Run')}
+                                onClick={this.startRun}
+                                disabled={!isConnected}
+                            >
+                                {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
+                            </button>
+                            {
+                                !workflowPaused && (
+                                    <div
+                                        role="button"
+                                        className={styles['start-from-line-button']}
+                                        onClick={this.startFromLinePrompt}
+                                    >
+                                        <i className="fas fa-list-ol" />
+                                    </div>
+                                )
+                            }
+                        </div>
                     )
                 }
                 {
@@ -432,6 +452,57 @@ class WorkflowControl extends PureComponent {
                                                 }}
                                             >
                                                 No
+                                            </FunctionButton>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </Modal.Body>
+                        </Modal>
+                    )
+                }
+                {
+                    showModal && (
+                        <Modal showCloseButton={false}>
+                            <Modal.Header className={styles.modalHeader}>
+                                <Modal.Title>Start From Specified Line</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <div className={styles.runProbeBody}>
+                                    <div className={styles.left}>
+                                        <div className={styles.greyText}>
+                                            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                                                <p>You may start at a specific line in your gcode</p>
+
+                                                <p>
+                                                    For this file the maximum line number you may start from is <strong>{lineTotal}</strong>
+                                                </p>
+
+                                                {value && <p>Last Recorded Line Number on Job Cancel: <strong>{value}</strong></p>}
+                                            </div>
+
+                                            <Input
+                                                label="Line to Start From:"
+                                                value={value}
+                                                onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) && this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: Math.ceil(Number(e.target.value)) } }))}
+                                                additionalProps={{ type: 'number' }}
+                                            />
+                                        </div>
+                                        <div className={styles.buttonsContainer}>
+                                            <FunctionButton
+                                                primary
+                                                onClick={this.handleStartFromLine}
+                                            >
+                                                Start From Line
+                                            </FunctionButton>
+                                            <FunctionButton
+                                                className={styles.activeButton}
+                                                onClick={() => {
+                                                    this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
+                                                    actions.closeModal();
+                                                }}
+                                            >
+                                                Cancel
                                             </FunctionButton>
                                         </div>
                                     </div>
@@ -482,15 +553,23 @@ export default connect((store) => {
     const fileLoaded = get(store, 'file.fileLoaded', false);
     const isConnected = get(store, 'connection.isConnected', false);
     const senderInHold = get(store, 'controller.sender.status.hold', false);
+    const senderStatus = get(store, 'controller.sender.status');
     const workflowState = get(store, 'controller.workflow.state');
     const activeState = get(store, 'controller.state.status.activeState');
-    const gcode = get(store, 'file.content', '');
+    const controllerState = get(store, 'controller.state');
+    const lineTotal = get(store, 'file.total');
+    const port = get(store, 'connection.port');
+    const gcode = get(store, 'file.content');
     return {
         fileLoaded,
         isConnected,
         senderInHold,
         workflowState,
         activeState,
+        senderStatus,
+        controllerState,
+        port,
+        lineTotal,
         gcode
     };
 }, null, null, { forwardRef: true })(WorkflowControl);

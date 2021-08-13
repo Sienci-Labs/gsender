@@ -33,7 +33,17 @@ const stop = () => {
     cncengine.stop();
 };
 
+const load = (gcode) => {
+    cncengine.load(gcode);
+};
+
+const unload = () => {
+    cncengine.unload();
+};
+
 export default {
     start,
-    stop
+    stop,
+    load,
+    unload
 };

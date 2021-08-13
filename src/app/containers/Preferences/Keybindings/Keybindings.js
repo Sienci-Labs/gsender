@@ -22,7 +22,6 @@
  */
 
 import React, { Component } from 'react';
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
@@ -31,10 +30,10 @@ import store from 'app/store';
 import Modal from 'app/components/Modal';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
-import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
+import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
-import Table from './Keybindings/MainTable';
-import EditArea from './Keybindings/EditArea';
+import Table from './MainTable';
+import EditArea from './EditArea';
 
 import styles from './index.styl';
 
@@ -156,22 +155,13 @@ export default class Keybindings extends Component {
 
     render() {
         const { handleEdit, handleDelete, editKeybinding, closeModal, enableAllKeybindings, disableAllKeybindings, toggleKeybinding } = this;
-        const { active } = this.props;
         const { currentShortcut, keybindingsList, showEditModal } = this.state;
 
         const allShortcutsEnabled = keybindingsList.every(shortcut => shortcut.isActive);
         const allShortcutsDisabled = keybindingsList.every(shortcut => !shortcut.isActive);
 
         return (
-            <div
-                className={classNames(
-                    styles.hidden,
-                    styles['settings-wrapper'],
-                    { [styles.visible]: active }
-                )}
-            >
-                <h3 className={styles['settings-title']}>Keyboard Shortcuts</h3>
-
+            <div>
                 <div className={styles['table-wrapper']}>
                     <Table
                         data={keybindingsList}

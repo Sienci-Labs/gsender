@@ -364,9 +364,16 @@ class Sender extends events.EventEmitter {
 
     // Tells the sender to send more data.
     // @return {boolean} Returns true on success, false otherwise.
-    next() {
+    next(options = {}) {
+        const { lineToStartFrom } = options;
+
         if (!this.state.gcode) {
             return false;
+        }
+
+        if (lineToStartFrom) {
+            this.state.sent = lineToStartFrom;
+            this.state.received = lineToStartFrom;
         }
 
         const now = new Date().getTime();

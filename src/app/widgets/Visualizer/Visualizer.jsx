@@ -21,6 +21,9 @@
  *
  */
 
+import reduxStore from 'app/store/redux';
+import { connect } from 'react-redux';
+import * as fileActions from 'app/actions/fileInfoActions';
 import _get from 'lodash/get';
 import _each from 'lodash/each';
 import _isEqual from 'lodash/isEqual';
@@ -34,7 +37,8 @@ import ReactDOM from 'react-dom';
 import * as THREE from 'three';
 import {
     IMPERIAL_UNITS,
-    METRIC_UNITS
+    METRIC_UNITS,
+    RENDER_RENDERED
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/CombinedCamera';
 import TrackballControls from 'app/lib/three/TrackballControls';
@@ -225,7 +229,7 @@ class Visualizer extends Component {
 
         // Update visualizer's frame index
         if (this.visualizer) {
-            const frameIndex = state.gcode.sent;
+            const frameIndex = this.props.receivedLines;
             this.visualizer.setFrameIndex(frameIndex);
         }
 
@@ -307,22 +311,23 @@ class Visualizer extends Component {
         }
 
         { // Update position
+            const { machinePosition, workPosition } = this.props;
             let needUpdatePosition = false;
 
             // Machine position
             const { x: mpox0, y: mpoy0, z: mpoz0 } = this.machinePosition;
-            const { x: mpox1, y: mpoy1, z: mpoz1 } = state.machinePosition;
+            const { x: mpox1, y: mpoy1, z: mpoz1 } = machinePosition;
             if (mpox0 !== mpox1 || mpoy0 !== mpoy1 || mpoz0 !== mpoz1) {
-                this.machinePosition = state.machinePosition;
+                this.machinePosition = machinePosition;
                 needUpdatePosition = true;
                 needUpdateScene = true;
             }
 
             // Work position
             const { x: wpox0, y: wpoy0, z: wpoz0 } = this.workPosition;
-            const { x: wpox1, y: wpoy1, z: wpoz1 } = state.workPosition;
+            const { x: wpox1, y: wpoy1, z: wpoz1 } = workPosition;
             if (wpox0 !== wpox1 || wpoy0 !== wpoy1 || wpoz0 !== wpoz1) {
-                this.workPosition = state.workPosition;
+                this.workPosition = workPosition;
                 needUpdatePosition = true;
                 needUpdateScene = true;
             }
@@ -501,6 +506,9 @@ class Visualizer extends Component {
             pubsub.subscribe('visualizer:redraw', () => {
                 this.recolorScene();
                 this.updateScene({ forceUpdate: true });
+            }),
+            pubsub.subscribe('file:load', (msg, data) => {
+                this.load('', data);
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -520,31 +528,6 @@ class Visualizer extends Component {
 
     hasHorizontalScrollbar() {
         return window.innerHeight > document.documentElement.clientHeight;
-    }
-
-    // http://www.alexandre-gomes.com/?p=115
-    getScrollbarWidth() {
-        const inner = document.createElement('p');
-        inner.style.width = '100%';
-        inner.style.height = '200px';
-
-        const outer = document.createElement('div');
-        outer.style.position = 'absolute';
-        outer.style.top = '0px';
-        outer.style.left = '0px';
-        outer.style.visibility = 'hidden';
-        outer.style.width = '200px';
-        outer.style.height = '150px';
-        outer.style.overflow = 'hidden';
-        outer.appendChild(inner);
-
-        document.body.appendChild(outer);
-        const w1 = inner.offsetWidth;
-        outer.style.overflow = 'scroll';
-        const w2 = (w1 === inner.offsetWidth) ? outer.clientWidth : inner.offsetWidth;
-        document.body.removeChild(outer);
-
-        return (w1 - w2);
     }
 
     getVisibleWidth() {
@@ -645,12 +628,11 @@ class Visualizer extends Component {
 
     createCoordinateSystem(units) {
         const { mm, in: inches } = this.machineProfile;
-
         const inchesMax = Math.max(inches.width, inches.depth) + (IMPERIAL_GRID_SPACING * 10);
         const mmMax = Math.max(mm.width, mm.depth) + (METRIC_GRID_SPACING * 10);
 
-        const imperialGridCount = inchesMax / 3;
-        const metricGridCount = mmMax / 9;
+        const imperialGridCount = Math.ceil(inchesMax / 3);
+        const metricGridCount = Math.ceil(mmMax / 9);
 
         const axisLength = (units === IMPERIAL_UNITS) ? inchesMax : mmMax;
         const height = (units === IMPERIAL_UNITS) ? inches.height : mm.height;
@@ -1149,11 +1131,11 @@ class Visualizer extends Component {
         this.updateScene();
     }
 
-    handleSceneRender(gcode, callback) {
+    handleSceneRender(vizualization, callback) {
         if (!this.visualizer) {
             return;
         }
-        const obj = this.visualizer.render(gcode);
+        const obj = this.visualizer.render(vizualization);
         obj.name = '';
         this.group.add(obj);
 
@@ -1211,10 +1193,17 @@ class Visualizer extends Component {
             this.toFrontView();
         }
 
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_RENDER_STATE,
+            payload: {
+                state: RENDER_RENDERED
+            }
+        });
+
         (typeof callback === 'function') && callback({ bbox: bbox });
     }
 
-    load(name, gcode, callback) {
+    load(name, vizualization, callback) {
         // Remove previous G-code object
         this.unload();
         const { currentTheme, disabled, disabledLite, liteMode } = this.props.state;
@@ -1224,7 +1213,7 @@ class Visualizer extends Component {
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
         if (shouldRenderVisualization) {
-            this.handleSceneRender(gcode, callback);
+            this.handleSceneRender(vizualization, callback);
         } else {
             setVisualizerReady();
         }
@@ -1253,7 +1242,6 @@ class Visualizer extends Component {
         if (this.viewport) {
             this.viewport.reset();
         }
-
         // Update the scene
         this.updateScene();
     }
@@ -1444,4 +1432,13 @@ class Visualizer extends Component {
     }
 }
 
-export default Visualizer;
+export default connect((store) => {
+    const machinePosition = _get(store, 'controller.mpos');
+    const workPosition = _get(store, 'controller.wpos');
+    const receivedLines = _get(store, 'controller.sender.status.received', 0);
+    return {
+        machinePosition,
+        workPosition,
+        receivedLines
+    };
+}, null, null, { forwardRef: true })(Visualizer);

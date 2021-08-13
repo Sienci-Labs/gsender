@@ -125,6 +125,15 @@ class Workspace extends PureComponent {
             if (isElectron()) {
                 window.ipcRenderer.send('restart_app');
             }
+        },
+        reconnect: () => {
+            log.debug('Create and establish a WebSocket connection');
+            const token = store.get('session.token');
+            const host = '';
+            const options = {
+                query: 'token=' + token
+            };
+            controller.connect(host, options);
         }
     };
 
@@ -169,6 +178,7 @@ class Workspace extends PureComponent {
                 this.action.closeModal();
             } else {
                 this.action.openModal(MODAL_SERVER_DISCONNECTED);
+                this.action.reconnect();
             }
         },
         'serialport:open': (options) => {

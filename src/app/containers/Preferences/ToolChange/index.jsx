@@ -65,6 +65,12 @@ const EventWidget = ({ active }) => {
 
     useEffect(() => {
         store.set('workspace.toolChangeOption', toolChangeOption);
+        const context = {
+            toolChangeOption,
+            postHook,
+            preHook
+        };
+        controller.command('toolchange:context', context);
     }, [toolChangeOption]);
 
     return (
