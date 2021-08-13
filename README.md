@@ -100,6 +100,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Start from line feature
 * Sortable macros
 * Preliminary support for joystick control and keybinding
+* Improvements to outline tool to prevent moving below the Z 0 on completion
 * Fixed issue where file would be re-rendered or unloaded when connecting and disconnecting
 * Fixed issue where inch grid lines weren't aligned with zero point
 * Improvements to file loading speed
