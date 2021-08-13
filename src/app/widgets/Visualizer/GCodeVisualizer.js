@@ -70,8 +70,8 @@ class GCodeVisualizer {
         };
 
         this.geometry.setFromPoints(this.vertices);
-        this.colors = this.getColorTypedArray(colors, motionColor);
-        this.geometry.setAttribute('color', new THREE.BufferAttribute(this.colors, 4));
+        const colorArray = this.getColorTypedArray(colors, motionColor);
+        this.geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 4));
 
         const workpiece = new THREE.Line(
             this.geometry,
@@ -102,6 +102,7 @@ class GCodeVisualizer {
             const color = motionColor[motion] || motionColor.default;
             colorArray.push(...color.toArray(), opacity);
         });
+        this.colors = colorArray;
         return new Float32Array(colorArray);
     }
 
@@ -112,7 +113,6 @@ class GCodeVisualizer {
         }
 
         //const { cuttingCoordinateLines } = this.theme;
-        console.log(`FI: ${frameIndex}`);
         const defaultColor = new THREE.Color('#5191CC');
 
         frameIndex = Math.min(frameIndex, this.frames.length - 1);
