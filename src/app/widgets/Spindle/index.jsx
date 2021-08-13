@@ -29,6 +29,7 @@ import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import { connect } from 'react-redux';
+import gamepad, { runAction } from 'app/lib/gamepad';
 import combokeys from 'app/lib/combokeys';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
@@ -195,6 +196,8 @@ class SpindleWidget extends PureComponent {
 
     componentDidMount() {
         this.addShuttleControlEvents();
+
+        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }
 
     componentWillUnmount() {

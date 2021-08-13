@@ -1,4 +1,5 @@
 import { GamepadListener } from 'gamepad.js';
+// import { throttle } from 'lodash';
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
@@ -52,6 +53,7 @@ export const onGamepadButtonClick = ({ detail }) => {
             .filter(button => button.pressed || button.touched)
             .map(button => button.buttonIndex)
     );
+
     if (!buttonCombo) {
         return null;
     }
@@ -59,6 +61,7 @@ export const onGamepadButtonClick = ({ detail }) => {
     const profiles = store.get('workspace.gamepad.profiles', []);
 
     const currentProfile = profiles.find(profile => profile.id === gamepadID);
+
     if (!currentProfile) {
         return null;
     }
@@ -75,7 +78,21 @@ export const onGamepadButtonClick = ({ detail }) => {
         return null;
     }
 
-    return foundAction.command;
+    return foundAction;
+};
+
+export const runAction = ({ event, shuttleControlEvents }) => { //Added throttle to prevent uncessary spam when controller is connecting
+    const action = onGamepadButtonClick(event);
+
+    if (!action) {
+        return;
+    }
+
+    const runEvent = shuttleControlEvents[action.cmd];
+
+    if (runEvent) {
+        runEvent(null, action.payload);
+    }
 };
 
 gamepadInstance.on('gamepad:connected', ({ detail }) => {

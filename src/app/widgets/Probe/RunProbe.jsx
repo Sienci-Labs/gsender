@@ -26,6 +26,7 @@ import React, { PureComponent } from 'react';
 import Modal from 'app/components/Modal';
 import i18n from 'app/lib/i18n';
 import combokeys from 'app/lib/combokeys';
+import gamepad, { runAction } from 'app/lib/gamepad';
 import styles from './index.styl';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
@@ -105,6 +106,8 @@ class RunProbe extends PureComponent {
         const { connectivityTest } = state;
         this.startConnectivityTest(actions.returnProbeConnectivity, connectivityTest);
         this.addShuttleControlEvents();
+
+        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }
 
     componentWillUnmount() {

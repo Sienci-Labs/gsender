@@ -31,6 +31,7 @@ import store from 'app/store';
 import { connect } from 'react-redux';
 import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
+import gamepad, { runAction } from 'app/lib/gamepad';
 import Widget from 'app/components/Widget';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
@@ -444,6 +445,8 @@ class LocationWidget extends PureComponent {
     componentDidMount() {
         this.subscribe();
         this.addShuttleControlEvents();
+
+        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }
 
     componentWillUnmount() {

@@ -177,12 +177,13 @@ class WorkflowControl extends PureComponent {
     }
 
     handleOnStop = () => {
-        const { actions: { handlePause, handleStop }, controllerState } = this.props;
+        const { actions: { handlePause, handleStop }, controllerState, senderStatus } = this.props;
         const { status } = controllerState;
 
+        const { received } = senderStatus;
         handlePause();
         handleStop();
-        this.setState({ runHasStarted: false });
+        this.setState(prev => ({ runHasStarted: false, startFromLine: { ...prev.startFromLine, value: received } }));
         if (status.activeState === 'Check') {
             controller.command('gcode', '$C');
         }
@@ -238,10 +239,6 @@ class WorkflowControl extends PureComponent {
 
         if ((prevActiveState === GRBL_ACTIVE_STATE_CHECK && currentActiveState !== GRBL_ACTIVE_STATE_CHECK) || prevGcode !== currentGcode) {
             this.setState({ runHasStarted: false });
-        }
-
-        if (this.props.senderStatus && prevProps.senderStatus && prevProps.senderStatus.received !== this.props.senderStatus.received) {
-            this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: this.props.senderStatus.received } }));
         }
     }
 
@@ -478,8 +475,10 @@ class WorkflowControl extends PureComponent {
                                                 <p>You may start at a specific line in your gcode</p>
 
                                                 <p>
-                                                    For this file the maximum line number you may start at is <strong>{lineTotal}</strong>
+                                                    For this file the maximum line number you may start from is <strong>{lineTotal}</strong>
                                                 </p>
+
+                                                {value && <p>Last Recorded Line Number on Job Cancel: <strong>{value}</strong></p>}
                                             </div>
 
                                             <Input
