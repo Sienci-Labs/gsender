@@ -200,7 +200,7 @@ export function* initialize() {
     controller.addListener('workflow:pause', (opts) => {
         const { data } = opts;
         Toaster.pop({
-            msg: `'${data}' pause command found in file - press "Resume Program" to continue the job.`,
+            msg: `'${data}' pause command found in file - press "Resume Job" to continue running.`,
             type: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE
         });
