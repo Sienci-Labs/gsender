@@ -260,7 +260,7 @@ class AxesWidget extends PureComponent {
                     isContinuousJogging: false
                 });
                 controller.command('jog:stop');
-            }, 150, { trailing: true });
+            }, 3, { trailing: false });
             throttled();
         },
         cancelJog: () => {

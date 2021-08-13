@@ -43,16 +43,7 @@ class JogControl extends PureComponent {
 
     timeout = 250;
 
-    continuousInterval = null;
-
     timeoutFunction = null;
-
-    notLeftClick = (e) => {
-        if (e.button !== 0) {
-            return true;
-        }
-        return false;
-    }
 
     clearTimeout() {
         if (this.timeoutFunction) {
@@ -62,30 +53,28 @@ class JogControl extends PureComponent {
     }
 
     onMouseUp(e) {
-        const { startTime, didClick } = this.state;
+        const { startTime, didClick, isContinuousJogging } = this.state;
         const { jog, stopContinuousJog } = this.props;
+        this.clearTimeout(); // remove timeout function so it doesn't fire if exists
 
         const timer = new Date() - startTime;
-        this.clearTimeout(); // remove timeout function so it doesn't fire if exists
         if (timer < this.timeout && didClick) {
             jog();
             this.setState({
                 didClick: false,
-                timer: new Date()
+                startTime: 0
             });
         } else {
-            stopContinuousJog();
+            isContinuousJogging && stopContinuousJog();
             this.setState({
-                startTime: new Date(),
+                startTime: 0,
                 didClick: false
             });
         }
     }
 
     onMouseDown(e) {
-        if (this.notLeftClick(e)) {
-            return;
-        }
+        console.log(this.props.stopContinuousJog);
         const startTime = new Date();
         this.setState({
             startTime: startTime,
@@ -104,7 +93,7 @@ class JogControl extends PureComponent {
         this.clearTimeout();
         const timer = new Date() - startTime;
         if (didClick && timer >= this.timeout) {
-            this.props.stopContinuousJog();
+            isContinuousJogging && this.props.stopContinuousJog();
             this.setState({
                 didClick: false,
                 startTime: new Date(),
@@ -116,7 +105,7 @@ class JogControl extends PureComponent {
         if (isContinuousJogging) {
             clearTimeout(this.timeoutFunction);
             this.timeoutFunction = null;
-            this.props.stopContinuousJog();
+            isContinuousJogging && this.props.stopContinuousJog();
             this.setState({
                 isContinuousJogging: false
             });
