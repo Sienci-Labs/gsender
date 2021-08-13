@@ -1217,16 +1217,36 @@ class GrblController {
                 const [lineToStartFrom] = args;
                 const totalLines = this.sender.state.total;
 
+
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
                     const firstHalf = lines.slice(0, lineToStartFrom);
-                    // const secondHalf = lines.slice(lineToStartFrom);
+                    let feedRate = 200;
+                    let spindleRate = 0;
+
+                    const getWordValue = (token, words) => {
+                        for (let wordPair of words) {
+                            const [word, value] = wordPair;
+                            if (word === token) {
+                                return value;
+                            }
+                        }
+                        return 0;
+                    };
+
                     const toolpath = new Toolpath();
-                    toolpath.loadFromStringSync(firstHalf.join('\n'));
+                    toolpath.loadFromStringSync(firstHalf.join('\n'), (data, index) => {
+                        const { words, line } = data;
+                        if (line.includes('F')) {
+                            feedRate = getWordValue('F', words);
+                        }
+                        if (line.includes('S')) {
+                            spindleRate = getWordValue('S', words);
+                        }
+                    });
+
                     const modal = toolpath.getModal();
                     const position = toolpath.getPosition();
-
-                    // const feedrate = 10;
 
                     const {
                         x: xVal,
@@ -1234,41 +1254,17 @@ class GrblController {
                         z: zVal,
                     } = position;
 
-                    const foundLine = firstHalf.reverse().find(line => line.includes('F'));
-                    const feedrateArr = foundLine.split(' ');
-                    const feedrateIndex = feedrateArr.findIndex(word => word[0] === 'F');
-                    let feedrate = feedrateArr[feedrateIndex];
-
-                    //If there is only one character in the string, this means that the feedrate value
-                    //within the gcode is seperated by a space, in that case we need to join it and the
-                    //F command together so we can set the feedrate properly
-                    if (feedrate && [...feedrate].length === 1) {
-                        feedrate = `${feedrateArr[feedrateIndex]}${feedrateArr[feedrateIndex + 1]}`;
-                    }
-
-                    //If the feedrate was not set and the word array only contains one element, this means
-                    //the feedrate is in that element but it is not seperated by a string as it should be,
-                    //so we need to parse just the feedrate from the string (ex. Z-11.125F1000)
-                    if (!feedrate && feedrateArr.length === 1) {
-                        const strArr = [...feedrateArr[0]];
-                        const charToStartFromIndex = strArr.findIndex((letter) => letter === 'F');
-                        const charToEndWithIndex = strArr.slice(charToStartFromIndex).findIndex(char => char.match(/[a-z ]/i)) || undefined;
-                        const foundFeedrate = strArr.slice(charToStartFromIndex, charToEndWithIndex).join('');
-
-                        feedrate = foundFeedrate;
-                    }
-
                     const modalGCode = [];
 
-                    console.log(modal);
                     // Move up and then to cut start position
                     modalGCode.push('G0 G90 G21 Z10');
                     modalGCode.push(`G0 G90 G21 X${xVal} Y${yVal}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal}`);
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modal.feedrate} ${modal.wcs} ${modal.plane}`);
-                    modalGCode.push(`${feedrate}`);
+                    modalGCode.push(`F${feedRate} S${spindleRate}`);
                     console.log(modalGCode);
+
                     this.command('gcode', modalGCode);
                 }
 
