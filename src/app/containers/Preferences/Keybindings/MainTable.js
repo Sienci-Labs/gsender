@@ -103,13 +103,6 @@ export default class MainTable extends Component {
                         <i
                             role="button"
                             tabIndex={-1}
-                            className={cx('far fa-trash-alt', styles.deleteIcon, !hasShortcut ? styles.disabledIcon : '')}
-                            onClick={() => hasShortcut && onDelete(row)}
-                            onKeyDown={null}
-                        />
-                        <i
-                            role="button"
-                            tabIndex={-1}
                             className={cx(hasShortcut ? 'fas fa-edit' : 'fas fa-plus', styles.actionIcon)}
                             onClick={() => onEdit(row)}
                             onKeyDown={null}
