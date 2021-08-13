@@ -17,6 +17,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
     const [gamepadShortcut, setGamepadShortcut] = useState(null);
     const [showIndicator, setShowIndicator] = useState(false);
     const [shortcutName, setShortcutName] = useState('');
+    const [inUseError, setInUseError] = useState(false);
 
     const gamepadListener = ({ detail }) => {
         const { gamepad: currentGamepad } = detail;
@@ -35,6 +36,16 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
             return;
         }
 
+        const profiles = store.get('workspace.gamepad.profiles', []);
+        const currentProfile = profiles.find(profile => profile.id === id);
+
+        const comboKeys = shortcutComboBuilder(clickedButtons.map(shortcut => shortcut.buttonIndex));
+
+        const comboInUse = currentProfile.shortcuts
+            .filter(currShortcut => currShortcut.id !== shortcut.id)
+            .find(shortcut => shortcut.keys === comboKeys);
+
+        setInUseError(!!comboInUse);
         setGamepadShortcut(clickedButtons);
         setShowIndicator(true);
 
@@ -122,6 +133,12 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
                         Last Button(s) Pressed: <RenderButtonsPressed />
                     </div>
 
+                    <div style={{ margin: '1.5rem 0', textAlign: 'center', fontSize: '1.3rem' }}>
+                        { (!gamepadShortcut && !inUseError) && <span>-</span> }
+                        { inUseError && <span style={{ color: '#dc2626' }}>This Shortcut is Already in Use, Please Use a Different One</span> }
+                        { (gamepadShortcut && !inUseError) && <span style={{ color: '#3e85c7' }}>Shortcut is Available</span>}
+                    </div>
+
                     <Input
                         value={shortcutName}
                         onChange={(e) => setShortcutName(e.target.value)}
@@ -129,7 +146,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
                     />
                 </div>
 
-                <Button primary onClick={handleAddShortcut} disabled={!gamepadShortcut}>Set shortcut</Button>
+                <Button primary onClick={handleAddShortcut} disabled={!gamepadShortcut || inUseError}>Set shortcut for {`"${shortcut.title}"`}</Button>
             </div>
         </Modal>
     );
