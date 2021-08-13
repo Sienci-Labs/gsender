@@ -26,7 +26,7 @@ import classNames from 'classnames';
 //import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
 import { connect } from 'react-redux';
-import get from 'lodash/get';
+import { get } from 'lodash';
 import api from 'app/api';
 import pubsub from 'pubsub-js';
 import combokeys from 'app/lib/combokeys';
@@ -42,7 +42,7 @@ import ModalTemplate from 'app/components/ModalTemplate';
 import Modal from 'app/components/Modal';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
-import gamepad, { onGamepadButtonClick } from 'app/lib/gamepad';
+import gamepad, { runAction } from 'app/lib/gamepad';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import portal from 'app/lib/portal';
@@ -737,16 +737,8 @@ class VisualizerWidget extends PureComponent {
             }, 0);
         }
 
-        gamepad.on('gamepad:button', (e) => {
-            const command = onGamepadButtonClick(e);
-
-            // console.log(command);
-
-            const runEvent = this.shuttleControlEvents[command];
-
-            if (runEvent) {
-                runEvent();
-            }
+        gamepad.on('gamepad:button', (event) => {
+            runAction({ event, shuttleControlEvents: this.shuttleControlEvents });
         });
     }
 

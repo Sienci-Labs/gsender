@@ -28,9 +28,7 @@ import get from 'lodash/get';
 import includes from 'lodash/includes';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
-// import { debounce } from 'lodash';
 import { throttle } from 'lodash';
-// import { inRange } from 'lodash';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Widget from 'app/components/Widget';
@@ -40,7 +38,7 @@ import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
 import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
-import gamepad from 'app/lib/gamepad';
+import gamepad, { runAction } from 'app/lib/gamepad';
 // import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
@@ -735,6 +733,8 @@ class AxesWidget extends PureComponent {
         store.on('change', this.updateJogPresets);
         this.addShuttleControlEvents();
         this.subscribe();
+
+        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
             // const { gamepad } = detail;
