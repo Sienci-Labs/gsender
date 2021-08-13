@@ -1235,7 +1235,7 @@ class GrblController {
                     };
 
                     const toolpath = new Toolpath();
-                    toolpath.loadFromStringSync(firstHalf.join('\n'), (data, index) => {
+                    toolpath.loadFromStringSync(firstHalf.join('\n'), (data) => {
                         const { words, line } = data;
                         if (line.includes('F')) {
                             feedRate = getWordValue('F', words);
