@@ -464,47 +464,44 @@ class WorkflowControl extends PureComponent {
                 }
                 {
                     showModal && (
-                        <Modal showCloseButton={false}>
+                        <Modal onClose={() => {
+                            this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
+                            actions.closeModal();
+                        }}
+                        >
                             <Modal.Header className={styles.modalHeader}>
-                                <Modal.Title>Start From Specified Line</Modal.Title>
+                                <Modal.Title>Start From Line</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
                                 <div className={styles.runProbeBody}>
                                     <div className={styles.left}>
                                         <div className={styles.greyText}>
-                                            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                                                <p>You may start at a specific line in your gcode</p>
-
-                                                <p>
-                                                    For this file the maximum line number you may start from is <strong>{lineTotal}</strong>
-                                                </p>
-
-                                                {value && <p>Last Recorded Line Number on Job Cancel: <strong>{value}</strong></p>}
-                                            </div>
-
                                             <Input
-                                                label="Line to Start From:"
+                                                label="Start at this line in gcode file:"
                                                 value={value}
                                                 onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) && this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: Math.ceil(Number(e.target.value)) } }))}
                                                 additionalProps={{ type: 'number' }}
                                             />
+                                            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                                                <p>Start from line will take into account the gcode before your start point, including modals and position.</p>
+                                                <p>
+                                                    For this file, the maximum line number is: <strong>{lineTotal}</strong>
+                                                </p>
+
+                                                {value && <p>The last job was stopped on line number: <strong>{value}</strong></p>}
+                                            </div>
                                         </div>
                                         <div className={styles.buttonsContainer}>
-                                            <FunctionButton
-                                                primary
+                                            <button
+                                                type="button"
+                                                className={styles['workflow-button-play']}
+                                                title="Start from Line"
                                                 onClick={this.handleStartFromLine}
+                                                disabled={!isConnected}
                                             >
-                                                Start From Line
-                                            </FunctionButton>
-                                            <FunctionButton
-                                                className={styles.activeButton}
-                                                onClick={() => {
-                                                    this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
-                                                    actions.closeModal();
-                                                }}
-                                            >
-                                                Cancel
-                                            </FunctionButton>
+                                                Start from Line
+                                                <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
+                                            </button>
                                         </div>
                                     </div>
 
