@@ -29,12 +29,14 @@ import api from 'app/api';
 import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
+import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import i18n from 'app/lib/i18n';
 import pubsub from 'pubsub-js';
 import NavbarConnection from 'app/widgets/NavbarConnection';
 import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
+
 //const releases = 'https://github.com/cncjs/cncjs/releases';
 
 
@@ -285,6 +287,24 @@ class Header extends PureComponent {
                         actions={this.actions}
                         widgetId="connection"
                     />
+                    <div>
+                        <FunctionButton
+                            primary
+                            onClick={() => {
+                                controller.disconnect();
+                            }}
+                        >
+                            Close Connection
+                        </FunctionButton>
+                        <FunctionButton
+                            primary
+                            onClick={() => {
+                                controller.reconnect();
+                            }}
+                        >
+                            Reconnect
+                        </FunctionButton>
+                    </div>
                 </div>
                 <NavSidebar />
             </div>

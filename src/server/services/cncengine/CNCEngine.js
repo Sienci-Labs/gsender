@@ -193,6 +193,10 @@ class CNCEngine {
                 this.sockets.splice(this.sockets.indexOf(socket), 1);
             });
 
+            socket.on('reconnect', () => {
+                console.log('reconnect logic');
+            });
+
             // List the available serial ports
             socket.on('list', () => {
                 log.debug(`socket.list(): id=${socket.id}`);

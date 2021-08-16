@@ -123,6 +123,10 @@ class Controller {
         state: 'idle' // running|paused|idle
     };
 
+    // Connection options
+    host = null;
+    next = null;
+
     // @param {object} io The socket.io-client module.
     constructor(io) {
         if (!io) {
@@ -135,6 +139,8 @@ class Controller {
     // Whether or not the client is connected.
     // @return {boolean} Returns true if the client is connected, false otherwise.
     get connected() {
+        console.log(this.socket);
+        console.log(this.socket.connected);
         return !!(this.socket && this.socket.connected);
     }
 
@@ -154,9 +160,12 @@ class Controller {
             'reconnectionAttempts': 10
         };
 
+        this.host = host;
+        this.next = next;
+
         this.socket && this.socket.destroy();
         this.socket = this.io.connect(host, options);
-
+        console.log(this.connected);
         Object.keys(this.listeners).forEach((eventName) => {
             if (!this.socket) {
                 return;
@@ -195,6 +204,7 @@ class Controller {
         });
 
         this.socket.on('startup', (data) => {
+            console.log('startup returned');
             const { loadedControllers, baudrates, ports } = { ...data };
 
             this.loadedControllers = ensureArray(loadedControllers);
@@ -216,6 +226,12 @@ class Controller {
     disconnect() {
         this.socket && this.socket.destroy();
         this.socket = null;
+    }
+
+    // Reconnect handler
+    reconnect() {
+        this.connect(this.host, this.next);
+        this.socket.emit('reconnect');
     }
 
     // Adds the `listener` function to the end of the listeners array for the event named `eventName`.
@@ -365,6 +381,10 @@ class Controller {
 
     unloadFile() {
         this.socket && this.socket.emit('file:unload');
+    }
+
+    initializeReduxListeners() {
+
     }
 }
 
