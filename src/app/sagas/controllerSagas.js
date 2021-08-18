@@ -64,10 +64,16 @@ export function* initialize() {
     });
 
     controller.addListener('sender:status', (status) => {
-        reduxStore.dispatch({
-            type: controllerActions.UPDATE_SENDER_STATUS,
-            payload: { status },
-        });
+        console.log('Sender status received');
+        console.log(status);
+        try {
+            reduxStore.dispatch({
+                type: controllerActions.UPDATE_SENDER_STATUS,
+                payload: { status },
+            });
+        } catch (e) {
+            console.log(e);
+        }
     });
 
     controller.addListener('workflow:state', (state) => {

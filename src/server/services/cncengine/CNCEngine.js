@@ -193,8 +193,21 @@ class CNCEngine {
                 this.sockets.splice(this.sockets.indexOf(socket), 1);
             });
 
-            socket.on('reconnect', () => {
-                console.log('reconnect logic');
+            socket.on('reconnect', (port) => {
+                let controller = store.get(`controllers["${port}"]`);
+                if (!controller) {
+                    log.info(`No controller found on port ${port} to reconnect to`);
+                    return;
+                }
+                log.info(`Reconnecting to open controller on port ${port} with socket ID ${socket.id}`);
+                controller.addConnection(socket);
+                log.info(`Controller state: ${controller.isOpen()}`);
+                if (controller.isOpen()) {
+                    log.info('Joining port room on socket');
+                    socket.join(port);
+                } else {
+                    log.info('Controller no longer open');
+                }
             });
 
             // List the available serial ports

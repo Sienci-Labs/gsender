@@ -126,6 +126,7 @@ class Controller {
     // Connection options
     host = null;
     next = null;
+    options = null;
 
     // @param {object} io The socket.io-client module.
     constructor(io) {
@@ -139,8 +140,8 @@ class Controller {
     // Whether or not the client is connected.
     // @return {boolean} Returns true if the client is connected, false otherwise.
     get connected() {
-        console.log(this.socket);
-        console.log(this.socket.connected);
+        console.log(`Socket: ${!!this.socket}`);
+        console.log(`Socket connected: ${this.socket.connected}`);
         return !!(this.socket && this.socket.connected);
     }
 
@@ -162,12 +163,15 @@ class Controller {
 
         this.host = host;
         this.next = next;
+        this.options = options;
 
         this.socket && this.socket.destroy();
         this.socket = this.io.connect(host, options);
-        console.log(this.connected);
+        console.log(`Socket connection: ${this.connected}`);
+
         Object.keys(this.listeners).forEach((eventName) => {
             if (!this.socket) {
+                console.log('No socket found, ending connect early');
                 return;
             }
 
@@ -204,7 +208,6 @@ class Controller {
         });
 
         this.socket.on('startup', (data) => {
-            console.log('startup returned');
             const { loadedControllers, baudrates, ports } = { ...data };
 
             this.loadedControllers = ensureArray(loadedControllers);
@@ -230,8 +233,10 @@ class Controller {
 
     // Reconnect handler
     reconnect() {
-        this.connect(this.host, this.next);
-        this.socket.emit('reconnect');
+        console.log(`Reconnecting on port ${this.port} with new socket connection`);
+        this.connect(this.host, this.options, this.next);
+        this.socket.emit('reconnect', this.port);
+        console.log(`Connection status: ${this.connected}`);
     }
 
     // Adds the `listener` function to the end of the listeners array for the event named `eventName`.
@@ -381,10 +386,6 @@ class Controller {
 
     unloadFile() {
         this.socket && this.socket.emit('file:unload');
-    }
-
-    initializeReduxListeners() {
-
     }
 }
 

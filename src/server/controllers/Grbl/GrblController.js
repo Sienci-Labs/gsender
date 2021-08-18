@@ -1108,11 +1108,7 @@ class GrblController {
         if (this.sender) {
             // sender status
             socket.emit('sender:status', this.sender.toJSON());
-
-            const { name, gcode, context } = this.sender.state;
-            if (gcode) {
-                socket.emit('gcode:load', name, gcode, context);
-            }
+            log.info('Emitting Sender');
         }
         if (this.workflow) {
             // workflow state
