@@ -127,13 +127,7 @@ class Workspace extends PureComponent {
             }
         },
         reconnect: () => {
-            log.debug('Create and establish a WebSocket connection');
-            const token = store.get('session.token');
-            const host = '';
-            const options = {
-                query: 'token=' + token
-            };
-            controller.connect(host, options);
+            controller.reconnect();
         }
     };
 

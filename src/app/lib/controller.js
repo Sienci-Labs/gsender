@@ -140,8 +140,6 @@ class Controller {
     // Whether or not the client is connected.
     // @return {boolean} Returns true if the client is connected, false otherwise.
     get connected() {
-        console.log(`Socket: ${!!this.socket}`);
-        console.log(`Socket connected: ${this.socket.connected}`);
         return !!(this.socket && this.socket.connected);
     }
 
@@ -167,7 +165,11 @@ class Controller {
 
         this.socket && this.socket.destroy();
         this.socket = this.io.connect(host, options);
-        console.log(`Socket connection: ${this.connected}`);
+
+        this.socket.on('disconnect', () => {
+            console.log('In disconnect event');
+            this.reconnect();
+        });
 
         Object.keys(this.listeners).forEach((eventName) => {
             if (!this.socket) {
@@ -227,16 +229,15 @@ class Controller {
 
     // Disconnect from the server.
     disconnect() {
+        this.socket && this.socket.disconnect();
         this.socket && this.socket.destroy();
         this.socket = null;
     }
 
     // Reconnect handler
     reconnect() {
-        console.log(`Reconnecting on port ${this.port} with new socket connection`);
         this.connect(this.host, this.options, this.next);
         this.socket.emit('reconnect', this.port);
-        console.log(`Connection status: ${this.connected}`);
     }
 
     // Adds the `listener` function to the end of the listeners array for the event named `eventName`.

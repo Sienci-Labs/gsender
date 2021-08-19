@@ -483,7 +483,7 @@ class WorkflowControl extends PureComponent {
                                                 additionalProps={{ type: 'number' }}
                                             />
                                             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                                                <p>Start from line will take into account the gcode before your start point, including modals and position.</p>
+                                                <p>Start from line will take into account all movements prior to this line.</p>
                                                 <p>
                                                     For this file, the maximum line number is: <strong>{lineTotal}</strong>
                                                 </p>
