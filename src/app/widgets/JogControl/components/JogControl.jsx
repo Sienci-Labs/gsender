@@ -70,7 +70,6 @@ class JogControl extends PureComponent {
         if (timer < this.timeout && this.didClick) {
             jog();
         } else {
-            console.log('In mouse up Cont jog branch');
             this.isContinuousJogging && this.throttledStopJog();
             this.didClick = false;
             this.isContinuousJogging = false;
@@ -91,7 +90,6 @@ class JogControl extends PureComponent {
         this.clearTimeout();
         const timer = new Date() - this.startTime;
         if (this.didClick && timer >= this.timeout) {
-            console.log('mouse leave branch 1');
             this.isContinuousJogging && this.throttledStopJog();
             this.didClick = false;
             this.startTime = new Date();
@@ -100,7 +98,6 @@ class JogControl extends PureComponent {
         }
         // Always check if we're continuous jogging regardless on leave and send cancel command
         if (this.isContinuousJogging) {
-            console.log('Mouse leave branch 2');
             clearTimeout(this.timeoutFunction);
             this.isContinuousJogging && this.throttledStopJog();
             this.isContinuousJogging = false;
