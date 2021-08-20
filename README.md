@@ -96,6 +96,14 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+
+### Open Beta 0.7.1 (August 20, 2021)
+* Improvements to UI connection to CNC machine to prevent frequent disconnections during long job runs
+* Program will now prevent your computer from going into sleep mode during long jobs
+* Several styling fixes across the UI
+* Fixed issue with machine locking up after pressing the jog control buttons in some situations
+* Fixed issue with program freezing after a job has finished
+
 ### Open Beta 0.7.0 (August 13, 2021)
 * Start from line feature
 * Sortable macros
