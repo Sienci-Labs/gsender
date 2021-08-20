@@ -427,7 +427,6 @@ class VisualizerWidget extends PureComponent {
 
             if (workflow.state === WORKFLOW_STATE_PAUSED) {
                 controller.command('gcode:resume');
-                controller.command('gcode:resume');
             }
         },
         handlePause: () => {

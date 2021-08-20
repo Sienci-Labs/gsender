@@ -232,7 +232,7 @@ const GeneralSettings = ({ active, state, actions }) => {
                             </TooltipCustom>
                         </Fieldset>
                         <Fieldset legend="Settings">
-                            <Button primary style={{ marginBottom: '1rem' }} onClick={handleRestoreClick}>Restore Default gSender Settings</Button>
+                            <Button primary style={{ margin: 0 }} onClick={handleRestoreClick}>Restore Default gSender Settings</Button>
 
                             <div style={{ display: 'flex', gap: '1rem' }}>
                                 <Button

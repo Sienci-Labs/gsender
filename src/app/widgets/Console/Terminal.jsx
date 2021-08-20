@@ -435,7 +435,7 @@ class TerminalWrapper extends PureComponent {
                             background: '#e5e7eb',
                             outline: 'none',
                         }}
-                        placeholder="Enter Command Here..."
+                        placeholder="Enter G-Code Here..."
                     />
                     <Button
                         onClick={this.handleCommandExecute}
@@ -447,7 +447,7 @@ class TerminalWrapper extends PureComponent {
                             borderRadius: '0px',
                         }}
                     >
-                            Execute
+                            Run
                     </Button>
                 </div>
             </div>

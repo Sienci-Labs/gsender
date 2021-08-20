@@ -50,6 +50,10 @@ const logger = winston.createLogger({
                 printf(log => `${log.timestamp} - ${log.level} ${log.message}`)
             ),
             handleExceptions: true
+        }),
+        new winston.transports.File({
+            filename: 'gsender_server_log.txt',
+            level: 'info'
         })
     ]
 });

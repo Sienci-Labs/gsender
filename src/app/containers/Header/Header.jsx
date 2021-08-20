@@ -29,12 +29,14 @@ import api from 'app/api';
 import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
+import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import i18n from 'app/lib/i18n';
 import pubsub from 'pubsub-js';
 import NavbarConnection from 'app/widgets/NavbarConnection';
 import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
+
 //const releases = 'https://github.com/cncjs/cncjs/releases';
 
 
@@ -113,6 +115,17 @@ class Header extends PureComponent {
     };
 
     controllerEvents = {
+        'disconnect': () => {
+            console.log('DISCO');
+            this.setState({
+                connected: false
+            });
+        },
+        'connect': () => {
+            this.setState({
+                connected: true
+            });
+        },
         'config:change': () => {
             this.actions.fetchCommands();
         },
@@ -203,7 +216,8 @@ class Header extends PureComponent {
             runningTasks: [],
             currentVersion: settings.version,
             latestVersion: settings.version,
-            updateAvailable: false
+            updateAvailable: false,
+            connected: controller.connected
         };
     }
 
@@ -275,7 +289,8 @@ class Header extends PureComponent {
     }
 
     render() {
-        const { updateAvailable } = this.state;
+        const { updateAvailable, connected } = this.state;
+        console.log(connected);
         return (
             <div className={styles.navBar}>
                 <div className={styles.primary}>
@@ -285,6 +300,29 @@ class Header extends PureComponent {
                         actions={this.actions}
                         widgetId="connection"
                     />
+                    <div>
+                        {
+                            /*<FunctionButton
+                            primary
+                            onClick={ () => {
+                                controller.disconnect();
+                            } }
+                        >
+                            Close Connection
+                        </FunctionButton>*/
+                        }
+                        {
+                            !connected &&
+                            <FunctionButton
+                                primary
+                                onClick={() => {
+                                    controller.reconnect();
+                                }}
+                            >
+                                Reconnect
+                            </FunctionButton>
+                        }
+                    </div>
                 </div>
                 <NavSidebar />
             </div>

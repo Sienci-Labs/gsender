@@ -112,9 +112,6 @@
     "Stop": "Stop",
     "Continue": "Continue",
     "Waiting for the planner to empty...": "Waiting for the planner to empty...",
-    "Server has stopped working": "Server has stopped working",
-    "A problem caused the server to stop working correctly. Check out the server status and try again.": "A problem caused the server to stop working correctly. Check out the server status and try again.",
-    "Reload": "Reload",
     "Fork Widget": "Fork Widget",
     "Are you sure you want to fork this widget?": "Are you sure you want to fork this widget?",
     "Remove Widget": "Remove Widget",
@@ -405,5 +402,8 @@
     "Test Run": "Test Run",
     "JogControl Widget": "JogControl Widget",
     "JogControl Settings": "JogControl Settings",
-    "Outline": "Outline"
+    "Outline": "Outline",
+    "Server Connection Lost": "Server Connection Lost",
+    "It looks like the server connection has been lost - attempt to reconnect?": "It looks like the server connection has been lost - attempt to reconnect?",
+    "Attempt Reconnect": "Attempt Reconnect"
 }

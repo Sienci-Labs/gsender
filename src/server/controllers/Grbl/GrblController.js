@@ -797,7 +797,6 @@ class GrblController {
             // $G - Parser State
             queryParserState();
 
-
             // Check if the machine has stopped movement after completion
             if (this.actionTime.senderFinishTime > 0) {
                 const machineIdle = zeroOffset && this.runner.isIdle();
@@ -1109,11 +1108,7 @@ class GrblController {
         if (this.sender) {
             // sender status
             socket.emit('sender:status', this.sender.toJSON());
-
-            const { name, gcode, context } = this.sender.state;
-            if (gcode) {
-                socket.emit('gcode:load', name, gcode, context);
-            }
+            log.info('Emitting Sender');
         }
         if (this.workflow) {
             // workflow state

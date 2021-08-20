@@ -40,7 +40,7 @@ import store from 'app/store';
 import * as widgetManager from './WidgetManager';
 import DefaultWidgets from './DefaultWidgets';
 import PrimaryWidgets from './PrimaryWidgets';
-
+import ScreenAwake from './ScreenAwake';
 import FeederPaused from './modals/FeederPaused';
 import FeederWait from './modals/FeederWait';
 import ServerDisconnected from './modals/ServerDisconnected';
@@ -127,13 +127,7 @@ class Workspace extends PureComponent {
             }
         },
         reconnect: () => {
-            log.debug('Create and establish a WebSocket connection');
-            const token = store.get('session.token');
-            const host = '';
-            const options = {
-                query: 'token=' + token
-            };
-            controller.connect(host, options);
+            controller.reconnect();
         }
     };
 
@@ -481,110 +475,112 @@ class Workspace extends PureComponent {
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
         return (
-            <div style={style} className={classNames(className, styles.workspace)}>
-                {modal.name === MODAL_FEEDER_PAUSED && (
-                    <FeederPaused
-                        title={modal.params.title}
-                        onClose={this.action.closeModal}
-                    />
-                )}
-                {modal.name === MODAL_FEEDER_WAIT && (
-                    <FeederWait
-                        title={modal.params.title}
-                        onClose={this.action.closeModal}
-                    />
-                )}
-                {modal.name === MODAL_SERVER_DISCONNECTED &&
-                    <ServerDisconnected />
-                }
-                <div
-                    className={classNames(
-                        styles.dropzoneOverlay,
-                        { [styles.hidden]: !(port && isDraggingFile) }
+            <ScreenAwake>
+                <div style={style} className={classNames(className, styles.workspace)}>
+                    {modal.name === MODAL_FEEDER_PAUSED && (
+                        <FeederPaused
+                            title={modal.params.title}
+                            onClose={this.action.closeModal}
+                        />
                     )}
-                >
-                    <div className={styles.textBlock}>
-                        {i18n._('Drop G-code file here')}
-                    </div>
-                </div>
-                <Dropzone
-                    className={styles.dropzone}
-                    disabled={controller.workflow.state !== WORKFLOW_STATE_IDLE}
-                    disableClick={true}
-                    disablePreview={true}
-                    multiple={false}
-                    onDragStart={(event) => {
-                    }}
-                    onDragEnter={(event) => {
-                        if (controller.workflow.state !== WORKFLOW_STATE_IDLE) {
-                            return;
-                        }
-                        if (isDraggingWidget) {
-                            return;
-                        }
-                        if (!isDraggingFile) {
-                            this.setState({ isDraggingFile: true });
-                        }
-                    }}
-                    onDragLeave={(event) => {
-                        if (controller.workflow.state !== WORKFLOW_STATE_IDLE) {
-                            return;
-                        }
-                        if (isDraggingWidget) {
-                            return;
-                        }
-                        if (isDraggingFile) {
-                            this.setState({ isDraggingFile: false });
-                        }
-                    }}
-                    onDrop={(acceptedFiles, rejectedFiles) => {
-                        if (controller.workflow.state !== WORKFLOW_STATE_IDLE) {
-                            return;
-                        }
-                        if (isDraggingWidget) {
-                            return;
-                        }
-                        if (isDraggingFile) {
-                            this.setState({ isDraggingFile: false });
-                        }
-                        this.onDrop(acceptedFiles);
-                    }}
-                >
-                    <div className={classNames(styles.workspaceTable)}>
-                        <UpdateAvailableAlert restartHandler={this.action.sendRestartCommand} />
-                        <Toaster />
-                        <Header />
-                        <ConfirmationDialog />
-                        <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
-                            <DefaultWidgets
-                                ref={node => {
-                                    this.defaultContainer = node;
-                                }}
-                            />
-                            <div
-                                ref={node => {
-                                    this.primaryContainer = node;
-                                }}
-                                className={classNames(
-                                    styles.primaryContainer,
-                                    { [styles.hidden]: hidePrimaryContainer },
-                                    { [styles.disabled]: disabled }
-                                )}
-                            >
-                                <PrimaryWidgets
-                                    ref={node => {
-                                        this.primaryWidgets = node;
-                                    }}
-                                    onForkWidget={this.widgetEventHandler.onForkWidget}
-                                    onRemoveWidget={this.widgetEventHandler.onRemoveWidget}
-                                    onDragStart={this.widgetEventHandler.onDragStart}
-                                    onDragEnd={this.widgetEventHandler.onDragEnd}
-                                />
-                            </div>
+                    {modal.name === MODAL_FEEDER_WAIT && (
+                        <FeederWait
+                            title={modal.params.title}
+                            onClose={this.action.closeModal}
+                        />
+                    )}
+                    {modal.name === MODAL_SERVER_DISCONNECTED &&
+                        <ServerDisconnected />
+                    }
+                    <div
+                        className={classNames(
+                            styles.dropzoneOverlay,
+                            { [styles.hidden]: !(port && isDraggingFile) }
+                        )}
+                    >
+                        <div className={styles.textBlock}>
+                            {i18n._('Drop G-code file here')}
                         </div>
                     </div>
-                </Dropzone>
-            </div>
+                    <Dropzone
+                        className={styles.dropzone}
+                        disabled={controller.workflow.state !== WORKFLOW_STATE_IDLE}
+                        disableClick={true}
+                        disablePreview={true}
+                        multiple={false}
+                        onDragStart={(event) => {
+                        }}
+                        onDragEnter={(event) => {
+                            if (controller.workflow.state !== WORKFLOW_STATE_IDLE) {
+                                return;
+                            }
+                            if (isDraggingWidget) {
+                                return;
+                            }
+                            if (!isDraggingFile) {
+                                this.setState({ isDraggingFile: true });
+                            }
+                        }}
+                        onDragLeave={(event) => {
+                            if (controller.workflow.state !== WORKFLOW_STATE_IDLE) {
+                                return;
+                            }
+                            if (isDraggingWidget) {
+                                return;
+                            }
+                            if (isDraggingFile) {
+                                this.setState({ isDraggingFile: false });
+                            }
+                        }}
+                        onDrop={(acceptedFiles, rejectedFiles) => {
+                            if (controller.workflow.state !== WORKFLOW_STATE_IDLE) {
+                                return;
+                            }
+                            if (isDraggingWidget) {
+                                return;
+                            }
+                            if (isDraggingFile) {
+                                this.setState({ isDraggingFile: false });
+                            }
+                            this.onDrop(acceptedFiles);
+                        }}
+                    >
+                        <div className={classNames(styles.workspaceTable)}>
+                            <UpdateAvailableAlert restartHandler={this.action.sendRestartCommand} />
+                            <Toaster />
+                            <Header />
+                            <ConfirmationDialog />
+                            <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
+                                <DefaultWidgets
+                                    ref={node => {
+                                        this.defaultContainer = node;
+                                    }}
+                                />
+                                <div
+                                    ref={node => {
+                                        this.primaryContainer = node;
+                                    }}
+                                    className={classNames(
+                                        styles.primaryContainer,
+                                        { [styles.hidden]: hidePrimaryContainer },
+                                        { [styles.disabled]: disabled }
+                                    )}
+                                >
+                                    <PrimaryWidgets
+                                        ref={node => {
+                                            this.primaryWidgets = node;
+                                        }}
+                                        onForkWidget={this.widgetEventHandler.onForkWidget}
+                                        onRemoveWidget={this.widgetEventHandler.onRemoveWidget}
+                                        onDragStart={this.widgetEventHandler.onDragStart}
+                                        onDragEnd={this.widgetEventHandler.onDragEnd}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </Dropzone>
+                </div>
+            </ScreenAwake>
         );
     }
 }

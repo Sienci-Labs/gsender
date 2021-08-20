@@ -22,11 +22,31 @@
  */
 
 import React, { PureComponent } from 'react';
+import throttle from 'lodash/throttle';
 import cx from 'classnames';
 import PropTypes from 'prop-types';
 import styles from '../index.styl';
 
 class JogControl extends PureComponent {
+    // Time to consider a jog movement to be a continuous movement
+    timeout = 250;
+    // Timeout function that triggers single jog or continuous jog
+    timeoutFunction = null;
+    // Throttled version of passed stop jog action
+    throttledStopJog = null;
+    // Toggle to indicate if we are continuous jogging
+    isContinuousJogging = false;
+    didClick = false;
+    startTime = 0;
+
+    constructor(props) {
+        super(props);
+        this.throttledStopJog = throttle(() => {
+            props.stopContinuousJog();
+            console.log(`in throttled jog at ${new Date()}`);
+        }, (this.timeout - 25), { leading: false, trailing: true });
+    }
+
     static propTypes = {
         disabled: PropTypes.bool,
         className: PropTypes.string,
@@ -34,16 +54,6 @@ class JogControl extends PureComponent {
         continuousJog: PropTypes.func,
         stopContinuousJog: PropTypes.func
     };
-
-    state = {
-        startTime: 0,
-        didClick: false,
-        isContinuousJogging: false,
-    }
-
-    timeout = 250;
-
-    timeoutFunction = null;
 
     clearTimeout() {
         if (this.timeoutFunction) {
@@ -53,69 +63,49 @@ class JogControl extends PureComponent {
     }
 
     onMouseUp(e) {
-        const { startTime, didClick, isContinuousJogging } = this.state;
-        const { jog, stopContinuousJog } = this.props;
+        const { jog } = this.props;
         this.clearTimeout(); // remove timeout function so it doesn't fire if exists
 
-        const timer = new Date() - startTime;
-        if (timer < this.timeout && didClick) {
+        const timer = new Date() - this.startTime;
+        if (timer < this.timeout && this.didClick) {
             jog();
-            this.setState({
-                didClick: false,
-                startTime: 0
-            });
         } else {
-            isContinuousJogging && stopContinuousJog();
-            this.setState({
-                startTime: 0,
-                didClick: false
-            });
+            this.isContinuousJogging && this.throttledStopJog();
+            this.didClick = false;
+            this.isContinuousJogging = false;
+            this.startTime = new Date();
         }
     }
 
     onMouseDown(e) {
-        console.log(this.props.stopContinuousJog);
-        const startTime = new Date();
-        this.setState({
-            startTime: startTime,
-            didClick: true
-        });
+        this.startTime = new Date();
+        this.didClick = true;
         this.timeoutFunction = setTimeout(() => {
             this.props.continuousJog();
-            this.setState({
-                isContinuousJogging: true
-            });
+            this.isContinuousJogging = true;
         }, this.timeout);
     }
 
     onMouseLeave(e) {
-        const { didClick, startTime, isContinuousJogging } = this.state;
         this.clearTimeout();
-        const timer = new Date() - startTime;
-        if (didClick && timer >= this.timeout) {
-            isContinuousJogging && this.props.stopContinuousJog();
-            this.setState({
-                didClick: false,
-                startTime: new Date(),
-                isContinuousJogging: false
-            });
+        const timer = new Date() - this.startTime;
+        if (this.didClick && timer >= this.timeout) {
+            this.isContinuousJogging && this.throttledStopJog();
+            this.didClick = false;
+            this.startTime = new Date();
+            this.isContinuousJogging = false;
             return;
         }
         // Always check if we're continuous jogging regardless on leave and send cancel command
-        if (isContinuousJogging) {
+        if (this.isContinuousJogging) {
             clearTimeout(this.timeoutFunction);
-            this.timeoutFunction = null;
-            isContinuousJogging && this.props.stopContinuousJog();
-            this.setState({
-                isContinuousJogging: false
-            });
+            this.isContinuousJogging && this.throttledStopJog();
+            this.isContinuousJogging = false;
         }
     }
 
     onMouseEnter(e) {
-        this.setState({
-            startTime: new Date()
-        });
+        this.startTime = new Date();
     }
 
     render() {

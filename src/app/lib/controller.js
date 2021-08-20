@@ -123,6 +123,11 @@ class Controller {
         state: 'idle' // running|paused|idle
     };
 
+    // Connection options
+    host = null;
+    next = null;
+    options = null;
+
     // @param {object} io The socket.io-client module.
     constructor(io) {
         if (!io) {
@@ -154,11 +159,21 @@ class Controller {
             'reconnectionAttempts': 10
         };
 
+        this.host = host;
+        this.next = next;
+        this.options = options;
+
         this.socket && this.socket.destroy();
         this.socket = this.io.connect(host, options);
 
+        this.socket.on('disconnect', () => {
+            console.log('In disconnect event');
+            this.reconnect();
+        });
+
         Object.keys(this.listeners).forEach((eventName) => {
             if (!this.socket) {
+                console.log('No socket found, ending connect early');
                 return;
             }
 
@@ -214,8 +229,15 @@ class Controller {
 
     // Disconnect from the server.
     disconnect() {
+        this.socket && this.socket.disconnect();
         this.socket && this.socket.destroy();
         this.socket = null;
+    }
+
+    // Reconnect handler
+    reconnect() {
+        this.connect(this.host, this.options, this.next);
+        this.socket.emit('reconnect', this.port);
     }
 
     // Adds the `listener` function to the end of the listeners array for the event named `eventName`.
