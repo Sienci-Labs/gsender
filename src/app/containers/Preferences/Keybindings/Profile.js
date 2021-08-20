@@ -47,7 +47,7 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
 
     return (
         <>
-            <div style={{ overflowY: 'clip' }}>
+            <div style={{ overflowY: 'hidden' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 11fr', alignItems: 'center', margin: '0 0 1rem' }}>
                     <i className={classnames(icon, styles.profileItemIcon)} /> <div style={{ fontSize: '1.5rem' }}>{profileName}</div>
                 </div>
