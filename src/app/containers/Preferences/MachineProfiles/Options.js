@@ -212,9 +212,7 @@ export default class Options extends Component {
 
     render() {
         const { machineProfile, machineProfiles, units } = this.state;
-        const { state } = this.props;
-        const { endstops = false, spindle = false, mm, in: inches, company, name, type } = machineProfile;
-        const disableEndstops = this.shouldDisableEndstops(state);
+        const { spindle = false, mm, in: inches, company, name, type } = machineProfile;
         const label = `${company} ${name} ${' - ' && type}`;
 
         const { width = 0, depth = 0, height = 0 } = units === 'mm' ? mm : inches;
@@ -270,17 +268,6 @@ export default class Options extends Component {
                 <div className={styles['general-area-item']}>
                     <h4 className={styles['settings-subtitle']}>Machine Features</h4>
                     <div className={styles['machine-features-section']}>
-                        <div className={styles['machine-options-inputgroup']}>
-                            <TooltipCustom content="Your machine must have endstops enabled to access this feature" location="default">
-                                <ToggleSwitch
-                                    label="Endstops"
-                                    checked={endstops}
-                                    disabled={disableEndstops}
-                                    onChange={() => this.handleToggle('endstops')}
-                                />
-                            </TooltipCustom>
-                        </div>
-
                         <div className={styles['machine-options-inputgroup']}>
                             <TooltipCustom content="Toggle between Spindle/Laser (S commands)" location="default">
                                 <ToggleSwitch
