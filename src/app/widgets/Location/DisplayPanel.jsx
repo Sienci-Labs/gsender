@@ -26,6 +26,7 @@
 
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
+import MachinePositionInput from 'app/widgets/Location/components/MachinePositionInput';
 import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
@@ -179,7 +180,7 @@ class DisplayPanel extends PureComponent {
                     <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick} />
                 </td>
                 <td className={styles.machinePosition}>
-                    <PositionLabel value={wpos} />
+                    <MachinePositionInput value={wpos} handleManualMovement={(value) => actions.handleManualMovement(value, axis)} />
                     {!showPositionInput && <PositionLabel value={mpos} small />}
                 </td>
             </tr>
