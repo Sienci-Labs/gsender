@@ -46,7 +46,10 @@ import {
     AXIS_B,
     AXIS_C,
     IMPERIAL_UNITS,
-    METRIC_UNITS
+    METRIC_UNITS,
+    GRBL_ACTIVE_STATE_IDLE,
+    WORKFLOW_STATE_RUNNING,
+    GRBL_ACTIVE_STATE_ALARM
 } from '../../constants';
 import styles from './index.styl';
 import AxisButton from './components/AxisButton';
@@ -236,7 +239,7 @@ class DisplayPanel extends PureComponent {
     }
 
     render() {
-        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled } = this.props;
+        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome } = this.props;
         let { homingHasBeenRun } = this.state;
         let houseIconPos = this.state.houseIconPos;
         const hasAxisX = includes(axes, AXIS_X);
@@ -298,7 +301,8 @@ class DisplayPanel extends PureComponent {
                         homingEnabled && (
                             <div className={styles.endStopActiveControls}>
                                 <FunctionButton
-                                    disabled={!canClick}
+                                    primary
+                                    disabled={!canHome}
                                     onClick={this.actions.startHoming}
                                     className={styles.runHomeButton}
                                 >
@@ -349,7 +353,12 @@ class DisplayPanel extends PureComponent {
 export default connect((store) => {
     const homingSetting = get(store, 'controller.settings.settings.$22', '0');
     const homingEnabled = homingSetting === '1';
+    const isConnected = get(store, 'connection.isConnected');
+    const workflowState = get(store, 'controller.workflow.state');
+    const activeState = get(store, 'controller.state.status.activeState');
+    const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
     return {
-        homingEnabled
+        homingEnabled,
+        canHome
     };
 })(DisplayPanel);
