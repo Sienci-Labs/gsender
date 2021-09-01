@@ -26,7 +26,9 @@
 
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
+import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
+import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
@@ -234,14 +236,12 @@ class DisplayPanel extends PureComponent {
     }
 
     render() {
-        const { axes, actions, canClick, safeRetractHeight, units } = this.props;
+        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled } = this.props;
         let { homingHasBeenRun } = this.state;
         let houseIconPos = this.state.houseIconPos;
         const hasAxisX = includes(axes, AXIS_X);
         const hasAxisY = includes(axes, AXIS_Y);
         const hasAxisZ = includes(axes, AXIS_Z);
-        const machineProfile = this.state.machineProfile;
-        let { endstops } = machineProfile;
 
         return (
             <Panel className={styles.displayPanel}>
@@ -295,8 +295,8 @@ class DisplayPanel extends PureComponent {
                     </div>
 
                     {
-                        endstops && (
-                            <div className={endstops ? styles.endStopActiveControls : styles.hideHoming}>
+                        homingEnabled && (
+                            <div className={styles.endStopActiveControls}>
                                 <FunctionButton
                                     disabled={!canClick}
                                     onClick={this.actions.startHoming}
@@ -346,4 +346,10 @@ class DisplayPanel extends PureComponent {
     }
 }
 
-export default DisplayPanel;
+export default connect((store) => {
+    const homingSetting = get(store, 'controller.settings.settings.$22', '0');
+    const homingEnabled = homingSetting === '1';
+    return {
+        homingEnabled
+    };
+})(DisplayPanel);
