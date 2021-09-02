@@ -146,7 +146,7 @@ class DisplayPanel extends PureComponent {
     };
 
     renderAxis = (axis) => {
-        const { canClick, machinePosition, workPosition, actions } = this.props;
+        const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units } = this.props;
         const mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';
         const axisLabel = axis.toUpperCase();
@@ -173,6 +173,11 @@ class DisplayPanel extends PureComponent {
                     <GoToButton
                         disabled={!canClick}
                         onClick={() => {
+                            const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+                            if (safeRetractHeight !== 0) {
+                                controller.command('gcode', 'G91');
+                                controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                            }
                             controller.command('gcode', 'G90');
                             controller.command('gcode', `G0 ${axisLabel}0`); //Move to Work Position Zero
                         }}
@@ -287,14 +292,13 @@ class DisplayPanel extends PureComponent {
 
                                 controller.command('gcode', 'G90');
                                 controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
-                                controller.command('gcode', 'G0 Z0'); // Move Z up
                             }}
                             disabled={!canClick}
                             className={styles.fontMonospace}
                             primary
                         >
                             <i className="fas fa-chart-line" />
-                            Go XYZ0
+                            Go to XY0
                         </FunctionButton>
                     </div>
 
