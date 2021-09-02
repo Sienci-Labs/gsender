@@ -25,7 +25,6 @@
 import cx from 'classnames';
 import ensureArray from 'ensure-array';
 import get from 'lodash/get';
-import includes from 'lodash/includes';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import { throttle, inRange } from 'lodash';
@@ -52,17 +51,9 @@ import {
     IMPERIAL_STEPS,
     METRIC_UNITS,
     METRIC_STEPS,
-    // Grbl
-    GRBL,
-    // Marlin
-    MARLIN,
-    // Smoothie
-    SMOOTHIE,
-    // TinyG
-    TINYG,
     // Workflow
     GRBL_ACTIVE_STATE_JOG,
-    GRBL_ACTIVE_STATE_IDLE, WORKFLOW_STATE_IDLE
+    GRBL_ACTIVE_STATE_IDLE, WORKFLOW_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -1058,7 +1049,7 @@ class AxesWidget extends PureComponent {
 
     canClick() {
         const { isContinuousJogging } = this.state;
-        const { workflow, type, isConnected } = this.props;
+        const { workflow, isConnected, activeState } = this.props;
 
         if (!isConnected) {
             return false;
@@ -1066,11 +1057,7 @@ class AxesWidget extends PureComponent {
         if (workflow.state !== WORKFLOW_STATE_IDLE && !isContinuousJogging) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
-            return false;
-        }
-
-        return true;
+        return activeState !== GRBL_ACTIVE_STATE_ALARM;
     }
 
     isJogging() {
@@ -1139,6 +1126,7 @@ export default connect((store) => {
     const workflow = get(store, 'controller.workflow');
     const canJog = workflow.state === WORKFLOW_STATE_IDLE;
     const isConnected = get(store, 'connection.isConnected');
+    const activeState = get(state, 'status.activeState');
     return {
         settings,
         state,
@@ -1147,6 +1135,7 @@ export default connect((store) => {
         machinePosition,
         workflow,
         canJog,
-        isConnected
+        isConnected,
+        activeState
     };
 })(AxesWidget);

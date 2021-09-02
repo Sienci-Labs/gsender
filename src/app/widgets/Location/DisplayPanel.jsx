@@ -298,7 +298,7 @@ class DisplayPanel extends PureComponent {
                             primary
                         >
                             <i className="fas fa-chart-line" />
-                            Go to XY0
+                            Go XY0
                         </FunctionButton>
                     </div>
 
