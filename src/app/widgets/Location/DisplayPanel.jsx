@@ -146,7 +146,7 @@ class DisplayPanel extends PureComponent {
     };
 
     renderAxis = (axis) => {
-        const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units } = this.props;
+        const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units, homingEnabled } = this.props;
         const mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';
         const axisLabel = axis.toUpperCase();
@@ -175,8 +175,12 @@ class DisplayPanel extends PureComponent {
                         onClick={() => {
                             const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                             if (safeRetractHeight !== 0) {
-                                controller.command('gcode', 'G91');
-                                controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                if (homingEnabled) {
+                                    controller.command('gcode:safe', `G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`, modal);
+                                } else {
+                                    controller.command('gcode', 'G91');
+                                    controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                }
                             }
                             controller.command('gcode', 'G90');
                             controller.command('gcode', `G0 ${axisLabel}0`); //Move to Work Position Zero
@@ -286,8 +290,12 @@ class DisplayPanel extends PureComponent {
                             onClick={() => {
                                 const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                                 if (safeRetractHeight !== 0) {
-                                    controller.command('gcode', 'G91');
-                                    controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                    if (homingEnabled) {
+                                        controller.command('gcode:safe', `G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`, modal);
+                                    } else {
+                                        controller.command('gcode', 'G91');
+                                        controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                    }
                                 }
 
                                 controller.command('gcode', 'G90');
