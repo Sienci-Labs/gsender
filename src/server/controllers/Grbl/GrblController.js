@@ -244,7 +244,6 @@ class GrblController {
 
                     // Expression
                     // %_x=posx,_y=posy,_z=posz
-                    console.log('Going into evaluate');
                     evaluateAssignmentExpression(line.slice(1), context);
                     return '';
                 }
@@ -1256,7 +1255,6 @@ class GrblController {
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modal.feedrate} ${modal.wcs} ${modal.plane}`);
                     modalGCode.push(`F${feedRate} S${spindleRate}`);
-                    console.log(modalGCode);
 
                     this.command('gcode', modalGCode);
                 }
@@ -1563,8 +1561,6 @@ class GrblController {
                     callback = context;
                     context = {};
                 }
-                console.log(context);
-                console.log(this.sharedContext);
 
                 const macros = config.get('macros');
                 const macro = _.find(macros, { id: id });
@@ -1575,7 +1571,6 @@ class GrblController {
                 }
 
                 this.event.trigger('macro:run');
-                console.log(macro.content);
                 this.command('gcode', macro.content, context);
 
                 callback(null);
@@ -1686,12 +1681,10 @@ class GrblController {
     }
 
     convertGcodeToArray(gcode) {
-        const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
         //Clean up lines and remove ones that are comments and headers
         const lines = gcode
             .split('\n')
-            .filter(line => (line.trim().length > 0))
-            .filter(line => !comments.some(comment => line.includes(comment)));
+            .filter(line => (line.trim().length > 0));
         return lines;
     }
 

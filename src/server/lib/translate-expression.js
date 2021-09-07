@@ -32,9 +32,6 @@ const translateExpression = (data, vars = {}) => {
         return '';
     }
 
-    console.log('TRANSLATE VARS:');
-    console.log(vars);
-
     try {
         data = String(data).replace(re, (match) => {
             const src = match.slice(1, -1);
