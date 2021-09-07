@@ -21,9 +21,10 @@
  *
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+import MacroVariableDropdown from 'app/components/MacroVariableDropdown';
 import { TOASTER_SUCCESS, Toaster } from 'app/lib/toaster/ToasterLib';
 import controller from 'app/lib/controller';
 import store from 'app/store';
@@ -31,6 +32,7 @@ import Select from 'react-select';
 import map from 'lodash/map';
 import styles from '../index.styl';
 import FieldSet from '../FieldSet';
+
 
 const options = [
     'Ignore',
@@ -47,6 +49,8 @@ const EventWidget = ({ active }) => {
     const handleToolChange = (selection) => setToolChangeOption(selection.value);
     const handlePreHookChange = (e) => setPreHook(e.target.value);
     const handlePostHookChange = (e) => setPostHook(e.target.value);
+    const preHookRef = useRef();
+    const postHookRef = useRef();
     const handleSaveCode = () => {
         store.set('workspace.toolChangeHooks.preHook', preHook);
         store.set('workspace.toolChangeHooks.postHook', postHook);
@@ -104,25 +108,29 @@ const EventWidget = ({ active }) => {
                     {
                         toolChangeOption === 'Code' &&
                         <div>
-                            <label htmlFor="preHook">Pre-Hook</label>
+                            <div className={styles.spreadRow}>
+                                <MacroVariableDropdown textarea={preHookRef} label="Before change code"/>
+                            </div>
                             <textarea
                                 rows="10"
                                 className="form-control"
                                 name="preHook"
                                 value={preHook}
                                 onChange={handlePreHookChange}
+                                ref={preHookRef}
                             />
-                            <small>The pre-hook will run once a M6 command has occurred and will pause once completed</small>
                             <br />
-                            <label htmlFor="preHook">Post-Hook</label>
+                            <div className={styles.spreadRow}>
+                                <MacroVariableDropdown textarea={postHookRef} label="After change code"/>
+                            </div>
                             <textarea
                                 rows="10"
                                 className="form-control"
                                 name="postHook"
                                 value={postHook}
                                 onChange={handlePostHookChange}
+                                ref={postHookRef}
                             />
-                            <small>The post-hook will run after the tool change has been confirmed in the user interface.</small>
                             <FunctionButton primary onClick={handleSaveCode}>Save G-Code</FunctionButton>
                         </div>
                     }
