@@ -26,18 +26,54 @@ import classNames from 'classnames';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import { Toaster, TOASTER_DANGER, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import api from 'app/api';
+import ToggleSwitch from 'app/components/ToggleSwitch';
 import FieldSet from '../FieldSet';
 import styles from '../index.styl';
-
 
 const Index = ({ active }) => {
     const [programStartEvent, setProgramStartEvent] = useState(null);
     const [programEndEvent, setProgramEndEvent] = useState(null);
     const [programStartCode, setProgramStartCode] = useState('');
     const [programEndCode, setProgramEndCode] = useState('');
+    const [startEnabled, setStartEnabled] = useState(true);
+    const [endEnabled, setEndEnabled] = useState(true);
 
     const changeStartCodeValue = (e) => setProgramStartCode(e.target.value);
     const changeEndCodeValue = (e) => setProgramEndCode(e.target.value);
+
+    const toggleStartEvent = async () => {
+        try {
+            if (programStartEvent) {
+                programStartEvent.enabled = !programStartEvent.enabled;
+                await api.events.update(programStartEvent.id, {
+                    enabled: programStartEvent.enabled
+                });
+                setStartEnabled(programStartEvent.enabled);
+            }
+        } catch (e) {
+            Toaster.pop({
+                msg: 'Unable to update Program Start event',
+                type: TOASTER_DANGER
+            });
+        }
+    };
+
+    const toggleEndEvent = async () => {
+        try {
+            if (programEndEvent) {
+                programEndEvent.enabled = !programEndEvent.enabled;
+                await api.events.update(programEndEvent.id, {
+                    enabled: programEndEvent.enabled
+                });
+                setEndEnabled(programEndEvent.enabled);
+            }
+        } catch (e) {
+            Toaster.pop({
+                msg: 'Unable to update Program End event',
+                type: TOASTER_DANGER
+            });
+        }
+    };
 
     const updateProgramStartEvent = async () => {
         try {
@@ -105,8 +141,10 @@ const Index = ({ active }) => {
             const endEvent = records.filter((record) => record.event === 'gcode:stop')[0];
             startEvent && setProgramStartEvent(startEvent);
             startEvent && setProgramStartCode(startEvent.commands);
+            startEvent && setStartEnabled(startEvent.enabled);
             endEvent && setProgramEndEvent(endEvent);
             endEvent && setProgramEndCode(endEvent.commands);
+            endEvent && setEndEnabled(endEvent.enabled);
         } catch (e) {
             Toaster.pop({
                 msg: 'Unable to fetch program event records',
@@ -124,11 +162,14 @@ const Index = ({ active }) => {
         )}
         >
             <h3 className={styles.settingsTitle}>
-                Program Events
+                Start/Stop G-Code
             </h3>
             <div className={styles.generalArea}>
                 <div className={styles.flexColumn}>
                     <FieldSet legend="Program Start" className={styles.paddingBottom}>
+                        <div className={styles.toggleContainer}>
+                            <ToggleSwitch checked={startEnabled} onChange={toggleStartEvent} label="Enabled" />
+                        </div>
                         <textarea
                             rows="11"
                             className="form-control"
@@ -141,6 +182,9 @@ const Index = ({ active }) => {
                         </FunctionButton>
                     </FieldSet>
                     <FieldSet legend="Program Stop" className={styles.paddingBottom}>
+                        <div className={styles.toggleContainer}>
+                            <ToggleSwitch checked={endEnabled} onChange={toggleEndEvent} label="Enabled" />
+                        </div>
                         <textarea
                             rows="11"
                             className="form-control"

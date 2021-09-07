@@ -114,11 +114,9 @@ class WindowManager {
 
         if (splashScreen) {
             webContents.once('dom-ready', () => {
-                setTimeout(() => {
-                    splashScreen.hide();
-                    window.show();
-                    splashScreen.destroy();
-                }, 4000);
+                splashScreen.hide();
+                window.show();
+                splashScreen.destroy();
             });
         } else {
             window.show();

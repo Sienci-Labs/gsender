@@ -244,6 +244,7 @@ class GrblController {
 
                     // Expression
                     // %_x=posx,_y=posy,_z=posz
+                    console.log('Going into evaluate');
                     evaluateAssignmentExpression(line.slice(1), context);
                     return '';
                 }
@@ -336,7 +337,7 @@ class GrblController {
 
                     // Expression
                     // %_x=posx,_y=posy,_z=posz
-                    evaluateAssignmentExpression(line.slice(1), context);
+                    this.sharedContext = evaluateAssignmentExpression(line.slice(1), context);
                     return '';
                 }
 
@@ -407,7 +408,7 @@ class GrblController {
                     } else if (toolChangeOption === 'Code') {
                         this.workflow.pause({ data: 'M6' });
                         this.emit('toolchange:start');
-                        this.runPreChangeHook();
+                        this.runPreChangeHook(this.populateContext());
                     }
 
                     line = line.replace('M6', '(M6)');
@@ -831,7 +832,7 @@ class GrblController {
         this.event.trigger('controller:ready');
     }
 
-    populateContext(context) {
+    populateContext(context = {}) {
         // Machine position
         const {
             x: mposx,
@@ -861,6 +862,7 @@ class GrblController {
         return Object.assign(context || {}, {
             // User-defined global variables
             global: this.sharedContext,
+            ...this.sharedContext,
 
             // Bounding box
             xmin: Number(context.xmin) || 0,
@@ -1168,11 +1170,7 @@ class GrblController {
                 if (typeof context === 'function') {
                     callback = context;
                     context = {};
-                } else {
-                    // Handle toolchange context on file load
-                    this.toolChangeContext = context;
                 }
-
 
                 // G4 P0 or P with a very small value will empty the planner queue and then
                 // respond with an ok when the dwell is complete. At that instant, there will
@@ -1565,6 +1563,8 @@ class GrblController {
                     callback = context;
                     context = {};
                 }
+                console.log(context);
+                console.log(this.sharedContext);
 
                 const macros = config.get('macros');
                 const macro = _.find(macros, { id: id });
@@ -1575,8 +1575,9 @@ class GrblController {
                 }
 
                 this.event.trigger('macro:run');
-
+                console.log(macro.content);
                 this.command('gcode', macro.content, context);
+
                 callback(null);
             },
             'macro:load': () => {

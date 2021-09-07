@@ -135,7 +135,8 @@ const evaluateAssignmentExpression = (src, vars = {}) => {
         log.error(`src="${src}", vars=${JSON.stringify(vars)}`);
         log.error(e);
     }
-
+    console.log('VARS:');
+    console.log(vars);
     return vars;
 };
 
