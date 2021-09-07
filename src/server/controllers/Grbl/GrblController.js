@@ -1543,6 +1543,9 @@ class GrblController {
                 }
 
                 axes.F = feedrate;
+                if (axes.Z) {
+                    axes.F *= 0.5;
+                }
 
                 const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
                 this.command('gcode', jogCommand);

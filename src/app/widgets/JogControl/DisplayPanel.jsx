@@ -65,7 +65,7 @@ class DisplayPanel extends PureComponent {
         machinePosition: PropTypes.object,
         workPosition: PropTypes.object,
         jog: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
     };
 
     state = {

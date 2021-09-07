@@ -45,6 +45,10 @@ class JogControl extends PureComponent {
             props.stopContinuousJog();
             console.log(`in throttled jog at ${new Date()}`);
         }, (this.timeout - 25), { leading: false, trailing: true });
+        if (props.timeout) {
+            this.timeout = props.timeout;
+            console.log(`timeout set to ${this.timeout}`);
+        }
     }
 
     static propTypes = {
@@ -52,7 +56,8 @@ class JogControl extends PureComponent {
         className: PropTypes.string,
         jog: PropTypes.func,
         continuousJog: PropTypes.func,
-        stopContinuousJog: PropTypes.func
+        stopContinuousJog: PropTypes.func,
+        timeout: PropTypes.number
     };
 
     clearTimeout() {
