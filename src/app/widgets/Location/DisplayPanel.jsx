@@ -34,6 +34,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import store from 'app/store';
+import { getHomingLocation } from 'app/widgets/Location/RapidPosition';
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
 import GoToButton from './components/GoToButton';
@@ -56,6 +57,7 @@ import styles from './index.styl';
 import AxisButton from './components/AxisButton';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import QuickPositionButton from './components/QuickPositionButton';
+
 
 class DisplayPanel extends PureComponent {
     static propTypes = {
@@ -108,7 +110,7 @@ class DisplayPanel extends PureComponent {
     }
 
     state = {
-        homingHasBeenRun: false,
+        homingRun: false,
         controllerAlarmState: null,
         positionInput: {
             [AXIS_E]: false,
@@ -218,40 +220,36 @@ class DisplayPanel extends PureComponent {
         jogtoFRCorner: () => {
             const xLimit = this.state.machineProfile.limits.xmax;
             const yLimit = this.state.machineProfile.limits.ymax;
-            const zLimit = this.state.machineProfile.limits.zmax;
-            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
+            controller.command('gcode', 'G53 G0 Z-2.5');
             controller.command('gcode', `G53 G0 X${xLimit} Y${yLimit} F5000`);
         },
         jogtoFLCorner: () => {
             const xLimit = this.state.machineProfile.limits.xmax;
             const yLimit = this.state.machineProfile.limits.ymax;
-            const zLimit = this.state.machineProfile.limits.zmax;
-            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
             controller.command('gcode', `G53 G0 X${-xLimit} Y${yLimit} F5000`);
         },
         jogtoBRCorner: () => {
             const xLimit = this.state.machineProfile.limits.xmax;
             const yLimit = this.state.machineProfile.limits.ymax;
-            const zLimit = this.state.machineProfile.limits.zmax;
-            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
             controller.command('gcode', `G53 G0 X${xLimit} Y${-yLimit} F5000`);
         },
         jogtoBLCorner: () => {
             const xLimit = this.state.machineProfile.limits.xmax;
             const yLimit = this.state.machineProfile.limits.ymax;
-            const zLimit = this.state.machineProfile.limits.zmax;
-            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
             controller.command('gcode', `G53 G0 X${-xLimit} Y${-yLimit} F5000`);
         },
         startHoming: () => {
+            this.setState({
+                homingRun: true
+            });
             controller.command('homing');
         }
     }
 
     render() {
-        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome } = this.props;
-        let { homingHasBeenRun } = this.state;
-        let houseIconPos = this.state.houseIconPos;
+        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome, homingDirection } = this.props;
+        let { homingRun } = this.state;
+        const homingLocation = getHomingLocation(homingDirection);
         const hasAxisX = includes(axes, AXIS_X);
         const hasAxisY = includes(axes, AXIS_Y);
         const hasAxisZ = includes(axes, AXIS_Z);
@@ -322,37 +320,37 @@ class DisplayPanel extends PureComponent {
                                     <i className="fas fa-home" /> Home
                                 </FunctionButton>
                                 <QuickPositionButton
-                                    disabled={!canClick || !homingHasBeenRun}
+                                    disabled={!canClick || !homingRun}
                                     className={styles.QPBL}
                                     onClick={() => {
                                         this.actions.jogtoBLCorner();
                                     }}
-                                    icon={(houseIconPos === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    icon={(homingLocation === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
                                 />
                                 <QuickPositionButton
-                                    disabled={!canClick || !homingHasBeenRun}
+                                    disabled={!canClick || !homingRun}
                                     className={styles.QPBR}
                                     rotate={45}
                                     onClick={() => {
                                         this.actions.jogtoBRCorner();
                                     }}
-                                    icon={(houseIconPos === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    icon={(homingLocation === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
                                 />
                                 <QuickPositionButton
-                                    disabled={!canClick || !homingHasBeenRun}
+                                    disabled={!canClick || !homingRun}
                                     className={styles.QPFL}
                                     onClick={() => {
                                         this.actions.jogtoFLCorner();
                                     }}
-                                    icon={(houseIconPos === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    icon={(homingLocation === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
                                 />
                                 <QuickPositionButton
-                                    disabled={!canClick || !homingHasBeenRun}
+                                    disabled={!canClick || !homingRun}
                                     className={styles.QPFR}
                                     onClick={() => {
                                         this.actions.jogtoFRCorner();
                                     }}
-                                    icon={(houseIconPos === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    icon={(homingLocation === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
                                 />
                             </div>
                         )
@@ -365,6 +363,7 @@ class DisplayPanel extends PureComponent {
 
 export default connect((store) => {
     const homingSetting = get(store, 'controller.settings.settings.$22', '0');
+    const homingDirection = get(store, 'controller.settings.settings.$23', '0');
     const homingEnabled = homingSetting === '1';
     const isConnected = get(store, 'connection.isConnected');
     const workflowState = get(store, 'controller.workflow.state');
@@ -372,6 +371,7 @@ export default connect((store) => {
     const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
     return {
         homingEnabled,
-        canHome
+        canHome,
+        homingDirection
     };
 })(DisplayPanel);
