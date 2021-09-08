@@ -71,6 +71,8 @@ export const getMovementGCode = (requestedPosition, homingPositionSetting) => {
         });
         return [];
     }
+
+
     gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`);
 
     console.log(gcode);
