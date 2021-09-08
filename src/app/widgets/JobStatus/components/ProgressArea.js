@@ -24,8 +24,7 @@
 import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-
-import i18n from 'app/lib/i18n';
+import Chart from 'react-apexcharts';
 
 import styles from './Overrides.styl';
 
@@ -61,31 +60,65 @@ const ProgressArea = ({ state }) => {
     // eslint-disable-next-line no-restricted-globals
     const percentageValue = isNaN(((received / total) * 100).toFixed(0)) ? 0 : ((received / total) * 100).toFixed(0);
 
+    const chart = {
+        series: [Number(percentageValue)],
+        options: {
+            colors: ['#3e85c7'],
+            chart: {
+                type: 'radialBar',
+                offsetY: -20,
+                sparkline: {
+                    enabled: true
+                }
+            },
+            plotOptions: {
+                radialBar: {
+                    startAngle: -90,
+                    endAngle: 90,
+                    track: {
+                        background: '#d1d5db',
+                        strokeWidth: '97%',
+                        margin: 5, // margin is in pixels
+                    },
+                    dataLabels: {
+                        name: {
+                            show: false
+                        },
+                        value: {
+                            offsetY: -12,
+                            fontSize: '22px'
+                        }
+                    }
+                }
+            },
+        },
+    };
+
     return (
         <div className={styles.progressArea}>
             <span className={styles.progressName}>{ name }</span>
-            <table className={styles['progress-area-table']}>
-                <tbody>
-                    <tr>
-                        <td style={{ width: '90%' }}>
-                            <div className="progress" style={{ margin: 0, height: '28px', backgroundColor: '#d1d5db' }}>
-                                <div className="progress-bar" style={{ width: `${percentageValue}%`, color: '#333', backgroundImage: 'linear-gradient(to right, #77AAD8 , #2B5D8B)' }} />
-                                <div className={styles['lines-processed']}>{` ${received} ${i18n._('of')} ${total} ${i18n._('lines')}`}</div>
-                            </div>
-                        </td>
-                        <td style={{ width: '10%', textAlign: 'right' }}>{percentageValue}%</td>
-                    </tr>
-                </tbody>
-            </table>
 
-            <div className={styles.times}>
-                <div style={{ color: 'grey' }}><span style={{ color: '#7a93d6' }}>{outputFormattedTime(elapsedTime)}</span> {i18n._('since start')}</div>
-                <div style={{ color: 'grey' }}><span style={{ color: '#7a93d6' }}>{outputFormattedTime(remainingTime)}</span> {i18n._('remaining')}</div>
+            <div className={styles.progressItemsWrapper}>
+                <div className={styles.progressItem}>
+                    <span className={styles.progressItemTime}>{outputFormattedTime(elapsedTime)}</span>
+                    <span>Time Cutting</span>
+                    <span style={{ color: 'black' }}>{received} Lines</span>
+                </div>
+
+                <div style={{ width: '100%', maxWidth: '250px' }}>
+                    <Chart options={chart.options} series={chart.series} type="radialBar" />
+                </div>
+
+                <div className={styles.progressItem}>
+                    <span className={styles.progressItemTime}>{outputFormattedTime(remainingTime)}</span>
+                    <span>Remaining</span>
+                    <span style={{ color: 'black' }}>{total} Lines</span>
+                </div>
             </div>
+
         </div>
     );
 };
-
 ProgressArea.propTypes = {
     state: PropTypes.object,
 };
