@@ -34,7 +34,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import store from 'app/store';
-import { getHomingLocation } from 'app/widgets/Location/RapidPosition';
+import { getHomingLocation, getMovementGCode } from 'app/widgets/Location/RapidPosition';
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
 import GoToButton from './components/GoToButton';
@@ -57,7 +57,6 @@ import styles from './index.styl';
 import AxisButton from './components/AxisButton';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import QuickPositionButton from './components/QuickPositionButton';
-
 
 class DisplayPanel extends PureComponent {
     static propTypes = {
@@ -218,25 +217,24 @@ class DisplayPanel extends PureComponent {
 
     actions = {
         jogtoFRCorner: () => {
-            const xLimit = this.state.machineProfile.limits.xmax;
-            const yLimit = this.state.machineProfile.limits.ymax;
-            controller.command('gcode', 'G53 G0 Z-2.5');
-            controller.command('gcode', `G53 G0 X${xLimit} Y${yLimit} F5000`);
+            const { homingDirection } = this.props;
+            const gcode = getMovementGCode('FR', homingDirection);
+            controller.command('gcode', gcode);
         },
         jogtoFLCorner: () => {
-            const xLimit = this.state.machineProfile.limits.xmax;
-            const yLimit = this.state.machineProfile.limits.ymax;
-            controller.command('gcode', `G53 G0 X${-xLimit} Y${yLimit} F5000`);
+            const { homingDirection } = this.props;
+            const gcode = getMovementGCode('FL', homingDirection);
+            controller.command('gcode', gcode);
         },
         jogtoBRCorner: () => {
-            const xLimit = this.state.machineProfile.limits.xmax;
-            const yLimit = this.state.machineProfile.limits.ymax;
-            controller.command('gcode', `G53 G0 X${xLimit} Y${-yLimit} F5000`);
+            const { homingDirection } = this.props;
+            const gcode = getMovementGCode('BR', homingDirection);
+            controller.command('gcode', gcode);
         },
         jogtoBLCorner: () => {
-            const xLimit = this.state.machineProfile.limits.xmax;
-            const yLimit = this.state.machineProfile.limits.ymax;
-            controller.command('gcode', `G53 G0 X${-xLimit} Y${-yLimit} F5000`);
+            const { homingDirection } = this.props;
+            const gcode = getMovementGCode('BL', homingDirection);
+            controller.command('gcode', gcode);
         },
         startHoming: () => {
             this.setState({

@@ -45,17 +45,32 @@ export const getHomingLocation = (setting) => {
     }
 };
 
-export const getMovementGCode = (requestedPosition, homingPositionSetting) => {
-    const gcode = [];
+const getMachineMovementLimits = () => {
     const machineProfile = store.get('workspace.machineProfile');
     if (!machineProfile) {
         Toaster.pop({
             msg: 'Unable to find machine profile - make sure it\'s set in preferences',
             type: TOASTER_DANGER
         });
-        return null;
+        return [null, null];
     }
-    console.log(machineProfile);
+    const { limits } = machineProfile;
+    const xLimit = limits.xmax - OFFSET_DISTANCE;
+    const yLimit = limits.ymax - OFFSET_DISTANCE;
+    return [xLimit, yLimit];
+};
+
+export const getMovementGCode = (requestedPosition, homingPositionSetting) => {
+    const gcode = [];
+    const [xLimit, yLimit] = getMachineMovementLimits();
+
+    if (!xLimit || !yLimit) {
+        Toaster.pop({
+            msg: 'Unable to find machine limits - make sure they\'re set in preferences',
+            type: TOASTER_DANGER
+        });
+        return [];
+    }
     gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`);
 
     console.log(gcode);
