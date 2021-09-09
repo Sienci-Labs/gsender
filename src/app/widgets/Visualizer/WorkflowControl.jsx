@@ -50,7 +50,7 @@ import {
 } from '../../lib/toaster/ToasterLib';
 import {
     GRBL_ACTIVE_STATE_ALARM,
-    GRBL_ACTIVE_STATE_CHECK,
+    GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_HOLD,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
@@ -162,12 +162,18 @@ class WorkflowControl extends PureComponent {
     canRun() {
         const { isConnected, fileLoaded, workflowState, activeState } = this.props;
 
+
         if (!isConnected) {
             return false;
         }
         if (!fileLoaded) {
             return false;
         }
+
+        if (activeState === GRBL_ACTIVE_STATE_HOLD) {
+            return true;
+        }
+
         if (!includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflowState)) {
             return false;
         }
@@ -328,13 +334,16 @@ class WorkflowControl extends PureComponent {
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
         const { handleOnStop } = this;
+        const { runHasStarted } = this.state;
+        console.log(runHasStarted);
         const { fileLoaded, actions, workflowState, isConnected, senderInHold, activeState, lineTotal } = this.props;
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
         const canRun = this.canRun();
-        const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
+        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
-        const workflowPaused = workflowState === WORKFLOW_STATE_PAUSED || senderInHold;
+        const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
+        const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
 
         const { showModal, value } = this.state.startFromLine;
 

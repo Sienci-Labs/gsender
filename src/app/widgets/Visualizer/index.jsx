@@ -76,7 +76,8 @@ import {
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_IDLE,
     RENDER_RENDERING,
-    RENDER_LOADING
+    RENDER_LOADING,
+    GRBL_ACTIVE_STATE_HOLD
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
@@ -416,8 +417,8 @@ class VisualizerWidget extends PureComponent {
             this.actions.handleRun();
         },
         handleRun: () => {
-            const { workflow } = this.props;
-            console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state));
+            const { workflow, activeState } = this.props;
+            console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state) || activeState === GRBL_ACTIVE_STATE_HOLD);
             this.setState((prev) => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
 
             if (workflow.state === WORKFLOW_STATE_IDLE) {
@@ -425,7 +426,7 @@ class VisualizerWidget extends PureComponent {
                 return;
             }
 
-            if (workflow.state === WORKFLOW_STATE_PAUSED) {
+            if (workflow.state === WORKFLOW_STATE_PAUSED || activeState === GRBL_ACTIVE_STATE_HOLD) {
                 controller.command('gcode:resume');
             }
         },

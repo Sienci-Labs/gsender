@@ -675,6 +675,9 @@ class GrblController {
             // Set ready flag to true when a startup message has arrived
             this.ready = true;
 
+            // Clear sender - for physical buttons
+            //this.sender.unload();
+
             if (!this.initialized) {
                 this.initialized = true;
 
