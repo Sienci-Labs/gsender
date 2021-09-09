@@ -29,6 +29,7 @@ import store from 'app/store';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
+import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import React, { PureComponent } from 'react';
 import api from 'app/api';
@@ -58,6 +59,7 @@ import {
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
 import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
+import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
 
 
 class WorkflowControl extends PureComponent {
@@ -122,7 +124,7 @@ class WorkflowControl extends PureComponent {
     };
 
     handleElectronFileUpload = async (file) => {
-        const serializedFile = new File([file.data], file.name);
+        const serializedFile = new File([file.data], file.name, { path: file.path });
 
         if (isElectron()) {
             const recentFile = createRecentFileFromRawPath(file.path, file.name);
@@ -131,6 +133,10 @@ class WorkflowControl extends PureComponent {
 
         try {
             await api.file.upload(serializedFile, controller.port);
+            reduxStore.dispatch({
+                type: UPDATE_FILE_INFO,
+                payload: { path: file.path },
+            });
         } catch (e) {
             console.log(e);
         }
