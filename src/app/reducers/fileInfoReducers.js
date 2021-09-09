@@ -29,6 +29,7 @@ const initialState = {
     fileProcessing: false,
     renderState: RENDER_NO_FILE,
     name: null,
+    path: '',
     size: 0,
     total: 0,
     toolSet: [],
@@ -63,11 +64,12 @@ const reducer = createReducer(initialState, {
         };
     },
     [UPDATE_FILE_INFO]: (payload, reducerState) => {
+        const bbox = payload.bbox ? { bbox: normalizeBBox(payload.bbox) } : {};
         return {
             ...payload,
             fileLoaded: true,
             fileProcessing: false,
-            bbox: normalizeBBox(payload.bbox)
+            ...bbox
         };
     },
     [UPDATE_FILE_CONTENT]: ({ content, name, size }, reducerState) => {
