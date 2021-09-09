@@ -26,6 +26,7 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
+import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
 
 import IdleInfo from './components/IdleInfo';
 import Overrides from './components/Overrides';
@@ -57,7 +58,7 @@ class JobStatus extends PureComponent {
     };
 
     render() {
-        const { state, name, size, total, fileLoaded } = this.props;
+        const { state, name, size, total, fileLoaded, path } = this.props;
         const { isRunningJob } = state;
 
         return (
@@ -65,8 +66,23 @@ class JobStatus extends PureComponent {
                 <div style={{ width: '100%' }}>
                     {
                         fileLoaded
-                            ? <><span className={styles['file-name']}>{name}</span> ({this.fileSizeFormat(size)}, {total} lines)</>
-                            : <span className={styles['file-name']}>No File Loaded</span>}
+                            ? (
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <TooltipCustom content={`${name} (${this.fileSizeFormat(size)}, ${total} lines)`} style={{ wordWrap: 'break-word' }}>
+                                        <div className={styles['file-item']}>
+                                            <span className={styles['file-text']}>{name}</span> ({this.fileSizeFormat(size)}, {total} lines)
+                                        </div>
+                                    </TooltipCustom>
+                                    {path && (
+                                        <TooltipCustom content={`File Path: ${path}`} style={{ wordWrap: 'break-word' }}>
+                                            <div className={styles['file-item']}>
+                                                <span className={styles['file-text']}>Path: {path}</span>
+                                            </div>
+                                        </TooltipCustom>
+                                    )}
+                                </div>
+                            )
+                            : <span className={styles['file-text']}>No File Loaded</span>}
                     {!isRunningJob
                         ? <IdleInfo state={state} />
                         : <Overrides state={state} />
