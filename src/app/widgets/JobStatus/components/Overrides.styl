@@ -35,7 +35,7 @@
 }
 
 .progress-area {
-    width: 50%;
+    width: 100%;
     padding-left: 1em;
     position: relative;
     height: 100%;
@@ -59,7 +59,7 @@
     min-height: 25px;
     primary = #D1D5DB;
     secondary = #333;
-    width: 50%;
+    width: 100%;
     padding: 0 2em;
     label {
         margin-bottom: 0;
@@ -104,7 +104,7 @@
 .seperator {
     background-color: #D3D3D3;
     width: 1px;
-    height: 100px;
+    height: 75px;
 
     @media(max-width: 1440px){
         display: none;
@@ -153,11 +153,12 @@
 
 .progress-items-wrapper {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     justify-items: center;
     align-items: center;
     height: 85%;
     width: 100%;
+    max-width: 500px;
 }
 
 .progress-item {
@@ -169,5 +170,6 @@
 
 .progress-item-time {
     color: #3e85c7;
-    font-size: 22px;
+    font-size: 1.75rem;
+    margin-bottom: 5px;
 }
