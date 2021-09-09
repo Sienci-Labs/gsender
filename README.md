@@ -41,11 +41,12 @@ gSender is available for the following systems and does not yet support headless
 * File insight on load (feed range, spindle range, tools used, estimated cutting time, and overall, max, and min dimensions)
 * Feed override and active job status indicators
 * Fully exposed keyboard shortcuts for external keyboard/keypad control
-* Safe height movements
+* Joystick support built-in for a variety of controllers
+* Safe height movements - accomodates machines with or without endstops
 * Homing cycle and quick-movement locations available for machines with homing hardware
 * Full spindle/laser support via manual control widgets, active alerting, and live overrides
 * Full mist/flood coolant support via manual control widgets and active alerting
-* Custom macros buttons with optional macro variables and assignable keyboard shortcuts
+* Macros buttons (rearrangeable) with enhanced macro variables and individually assignable keyboard shortcuts
 * Lightweight mode reduces processing intensity on less powerful hardware or when running larger files
 * Easy workspace swapping for more advanced jigging or alignment work
 * Optional automatic handling for common error throwing gcode
@@ -54,14 +55,18 @@ gSender is available for the following systems and does not yet support headless
 * Calibration tool for axis alignment - a step by step process to make sure your CNC is square
 * Movement tuning tool for calibrating motor axis movements
 * Tool change functionality - pause, ignore, or run code blocks on M6 commands
+* Start-from-line functionality to resume jobs part-way through in case of failure of abort
+* Outline functionality indicates the rough bounds of the job before cutting
 * Customizable g-code injection at job start & end
 * Tooltips for data entry points
 * Alarm warning explanations to better contextualize CNC errors
-* Pre-build machine profiles, including:
+* Sleep management to keep PC awake during g-code sending
+* Pre-built machine profiles, including:
     - Shapeoko
     - X-carve
     - LongMill
     - OpenBuilds CNCs
+    - 3018 CNC & PROVer
     - Onefinity
     - BobsCNC CNCs
     - CNC4Newbie CNCs
@@ -69,8 +74,7 @@ gSender is available for the following systems and does not yet support headless
     - Ooznest WorkBee
     - Nomad
     - Carvey
-    - Mill One
-
+    - Mill One, and more...
 
 ## 🎓 Documentation
 
@@ -261,10 +265,6 @@ gSender is also designed in a way that it can be run locally on your computer br
 * New probing widget, machine profiles, settings, and visualizer
 
 ### Notable features still in progress:
-* "Flatten", "Surface", and "Calibrate" tools
-* Event hooks
-* Joystick control
-* Settings saving
 * G-code editing
 * Pendant
 * Full 3D Visualization
