@@ -60,8 +60,7 @@ const getMachineMovementLimits = () => {
     return [xLimit, yLimit];
 };
 
-export const getMovementGCode = (requestedPosition, homingPositionSetting) => {
-    const gcode = [];
+const getPositionMovements = (requestedPosition, homingPosition) => {
     const [xLimit, yLimit] = getMachineMovementLimits();
 
     if (!xLimit || !yLimit) {
@@ -69,11 +68,68 @@ export const getMovementGCode = (requestedPosition, homingPositionSetting) => {
             msg: 'Unable to find machine limits - make sure they\'re set in preferences',
             type: TOASTER_DANGER
         });
-        return [];
+        return [null, null];
     }
 
+    if (homingPosition === FRONT_RIGHT) {
+        if (requestedPosition === FRONT_RIGHT) {
+            return [0, 0];
+        } else if (requestedPosition === FRONT_LEFT) {
+            return [xLimit * -1, 0];
+        } else if (requestedPosition === BACK_LEFT) {
+            return [(xLimit * -1), yLimit];
+        } else { // Back Right
+            return [0, (yLimit * -1)];
+        }
+    } else if (homingPosition === FRONT_LEFT) {
+        if (requestedPosition === FRONT_RIGHT) {
+            return [xLimit, 0];
+        } else if (requestedPosition === FRONT_LEFT) {
+            return [0, 0];
+        } else if (requestedPosition === BACK_LEFT) {
+            return [0, yLimit];
+        } else { // Back Right
+            return [xLimit, yLimit];
+        }
+    } else if (homingPosition === BACK_LEFT) {
+        if (requestedPosition === FRONT_RIGHT) {
+            return [xLimit, yLimit];
+        } else if (requestedPosition === FRONT_LEFT) {
+            return [xLimit, 0];
+        } else if (requestedPosition === BACK_LEFT) {
+            return [0, 0];
+        } else { // Back Right
+            return [-xLimit, 0];
+        }
+    } else if (homingPosition === BACK_RIGHT) {
+        if (requestedPosition === FRONT_RIGHT) {
+            return [xLimit, 0];
+        } else if (requestedPosition === FRONT_LEFT) {
+            return [xLimit * -1, yLimit * -1];
+        } else if (requestedPosition === BACK_LEFT) {
+            return [xLimit * -1, 0];
+        } else { // Back Right
+            return [0, 0];
+        }
+    }
 
-    gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`);
+    return [null, null];
+};
+
+export const getMovementGCode = (requestedPosition, homingPositionSetting) => {
+    const gcode = [];
+
+    gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`); // Always move up to the limit of Z travel minus offset
+
+    const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPositionSetting);
+    if (!xMovement || !yMovement) {
+        Toaster.pop({
+            msg: 'Unable to calculate position movements based on inputs - check arguments passed',
+            type: TOASTER_DANGER
+        });
+        return [];
+    }
+    gcode.push(`G53 G21 G0 X${xMovement} Y${yMovement}`);
 
     console.log(gcode);
     return gcode;

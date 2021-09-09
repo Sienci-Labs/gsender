@@ -233,13 +233,21 @@ class WorkflowControl extends PureComponent {
 
     componentDidUpdate(prevProps) {
         const { activeState: prevActiveState, state: prevState } = prevProps;
-        const { activeState: currentActiveState, state: currentState } = this.props;
+        const { activeState: currentActiveState, state: currentState, fileCompletion } = this.props;
 
         const { gcode: { content: prevGcode } } = prevState;
         const { gcode: { content: currentGcode } } = currentState;
 
         if ((prevActiveState === GRBL_ACTIVE_STATE_CHECK && currentActiveState !== GRBL_ACTIVE_STATE_CHECK) || prevGcode !== currentGcode) {
             this.setState({ runHasStarted: false });
+        }
+        if (prevProps.fileCompletion === 0 && fileCompletion !== 0) {
+            this.setState({
+                startFromLine: {
+                    showModal: false,
+                    value: 1,
+                }
+            });
         }
     }
 
@@ -558,6 +566,7 @@ export default connect((store) => {
     const lineTotal = get(store, 'file.total');
     const port = get(store, 'connection.port');
     const gcode = get(store, 'file.content');
+    const fileCompletion = get(store, 'controller.sender.timeCompleted', 10);
     return {
         fileLoaded,
         isConnected,
@@ -568,6 +577,7 @@ export default connect((store) => {
         controllerState,
         port,
         lineTotal,
-        gcode
+        gcode,
+        fileCompletion
     };
 }, null, null, { forwardRef: true })(WorkflowControl);
