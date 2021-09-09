@@ -24,6 +24,10 @@
 /* eslint-disable no-restricted-globals */
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import get from 'lodash/get';
+import { connect } from 'react-redux';
+import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
+
 import IdleInfo from './components/IdleInfo';
 import Overrides from './components/Overrides';
 import styles from './index.styl';
@@ -37,20 +41,60 @@ class JobStatus extends PureComponent {
         state: PropTypes.object,
     };
 
-    render() {
-        const { state } = this.props;
+    /**
+     * Determine the file size format between bytes, kilobytes (KB) and megabytes (MB)
+     */
+    fileSizeFormat = (size) => {
+        const ONE_KB = 1000;
+        const ONE_MB = 1000000;
 
+        if (size >= ONE_KB && size < ONE_MB) {
+            return `${(size / ONE_KB).toFixed(0)} KB`;
+        } else if (size >= ONE_MB) {
+            return `${(size / ONE_MB).toFixed(1)} MB`;
+        }
+
+        return `${size} bytes`;
+    };
+
+    render() {
+        const { state, name, size, total, fileLoaded, path } = this.props;
         const { isRunningJob } = state;
 
         return (
             <div className={styles['job-status-wrapper']}>
-                {!isRunningJob
-                    ? <IdleInfo state={state} />
-                    : <Overrides state={state} />
-                }
+                <div style={{ width: '100%' }}>
+                    {
+                        fileLoaded
+                            ? (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
+                                    <div className={styles['file-item']}>
+                                        <TooltipCustom content={`${name} (${this.fileSizeFormat(size)}, ${total} lines)`} style={{ wordWrap: 'break-word' }}>
+                                            <span className={styles['file-text']}>{name}</span> ({this.fileSizeFormat(size)}, {total} lines)
+                                        </TooltipCustom>
+                                    </div>
+                                    {path && (
+                                        <TooltipCustom content={`File Path: ${path}`} style={{ wordWrap: 'break-word' }}>
+                                            <div className={styles['file-item']}>
+                                                Path: <span className={styles['file-text']}>{path}</span>
+                                            </div>
+                                        </TooltipCustom>
+                                    )}
+                                </div>
+                            )
+                            : <span className={styles['file-text']}>No File Loaded</span>}
+                    {!isRunningJob
+                        ? <IdleInfo state={state} />
+                        : <Overrides state={state} />
+                    }
+                </div>
             </div>
         );
     }
 }
 
-export default JobStatus;
+export default connect((store) => {
+    const file = get(store, 'file', {});
+
+    return { ...file };
+})(JobStatus);

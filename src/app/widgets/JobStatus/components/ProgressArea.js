@@ -24,9 +24,9 @@
 import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import Chart from 'react-apexcharts';
 
 import styles from './Overrides.styl';
+import GaugeChart from '../GaugeChart';
 
 /**
  * Progress Area component to display running job information
@@ -35,7 +35,7 @@ import styles from './Overrides.styl';
  */
 const ProgressArea = ({ state }) => {
     const { senderStatus } = state;
-    const { total, received, elapsedTime, remainingTime, name, startTime } = senderStatus;
+    const { total, received, elapsedTime, remainingTime, startTime } = senderStatus;
 
     /**
      * Format given time value to display minutes and seconds
@@ -60,62 +60,24 @@ const ProgressArea = ({ state }) => {
     // eslint-disable-next-line no-restricted-globals
     const percentageValue = isNaN(((received / total) * 100).toFixed(0)) ? 0 : ((received / total) * 100).toFixed(0);
 
-    const chart = {
-        series: [Number(percentageValue)],
-        options: {
-            colors: ['#3e85c7'],
-            chart: {
-                type: 'radialBar',
-                offsetY: -20,
-                sparkline: {
-                    enabled: true
-                }
-            },
-            plotOptions: {
-                radialBar: {
-                    startAngle: -90,
-                    endAngle: 90,
-                    track: {
-                        background: '#d1d5db',
-                        strokeWidth: '97%',
-                        margin: 5, // margin is in pixels
-                    },
-                    dataLabels: {
-                        name: {
-                            show: false
-                        },
-                        value: {
-                            offsetY: -12,
-                            fontSize: '22px'
-                        }
-                    }
-                }
-            },
-        },
-    };
 
     return (
-        <div className={styles.progressArea}>
-            <span className={styles.progressName}>{ name }</span>
-
-            <div className={styles.progressItemsWrapper}>
-                <div className={styles.progressItem}>
-                    <span className={styles.progressItemTime}>{outputFormattedTime(elapsedTime)}</span>
-                    <span>Time Cutting</span>
-                    <span style={{ color: 'black' }}>{received} Lines</span>
-                </div>
-
-                <div style={{ width: '100%', maxWidth: '250px' }}>
-                    <Chart options={chart.options} series={chart.series} type="radialBar" />
-                </div>
-
-                <div className={styles.progressItem}>
-                    <span className={styles.progressItemTime}>{outputFormattedTime(remainingTime)}</span>
-                    <span>Remaining</span>
-                    <span style={{ color: 'black' }}>{total} Lines</span>
+        <div style={{ width: '100%' }}>
+            <div className={styles.progressArea}>
+                <div className={styles.progressItemsWrapper}>
+                    <div className={styles.progressItem}>
+                        <span className={styles.progressItemTime}>{outputFormattedTime(elapsedTime)}</span>
+                        <span>Time Cutting</span>
+                        <span style={{ color: 'black' }}>{received} Lines</span>
+                    </div>
+                    <GaugeChart color="#3e85c7" value={percentageValue} />
+                    <div className={styles.progressItem}>
+                        <span className={styles.progressItemTime}>{outputFormattedTime(remainingTime)}</span>
+                        <span>Remaining</span>
+                        <span style={{ color: 'black' }}>{total - received} Lines</span>
+                    </div>
                 </div>
             </div>
-
         </div>
     );
 };
