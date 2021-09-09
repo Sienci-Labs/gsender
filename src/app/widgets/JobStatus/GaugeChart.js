@@ -6,9 +6,9 @@ import styled from 'styled-components';
 const GaugeContainer = styled.div`
   width: 100%;
   max-width: 500px;
-  font-family: "Roboto", sans-serif;
-  font-size: 1.75rem;
+  font-size: 2.15rem;
   color: #3e85c7;
+  padding: 5px 5px 0 5px;
 `;
 
 const GaugeBody = styled.div`
