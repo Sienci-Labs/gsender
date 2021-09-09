@@ -22,12 +22,9 @@ const IdleInfo = ({ state, ...props }) => {
     } = state;
     const {
         fileLoaded,
-        name,
         spindleSet,
         toolSet,
         movementSet,
-        total,
-        size,
         estimatedTime
     } = props;
 
@@ -72,22 +69,6 @@ const IdleInfo = ({ state, ...props }) => {
         return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
     };
 
-    /**
-     * Determine the file size format between bytes, kilobytes (KB) and megabytes (MB)
-     */
-    const fileSizeFormat = () => {
-        const ONE_KB = 1000;
-        const ONE_MB = 1000000;
-
-        if (size >= ONE_KB && size < ONE_MB) {
-            return `${(size / ONE_KB).toFixed(0)} KB`;
-        } else if (size >= ONE_MB) {
-            return `${(size / ONE_MB).toFixed(1)} MB`;
-        }
-
-        return `${size} bytes`;
-    };
-
     const formatEstimatedTime = (time) => {
         if (time <= 1) {
             return '-';
@@ -112,7 +93,6 @@ const IdleInfo = ({ state, ...props }) => {
 
     return fileLoaded ? (
         <div className={styles['idle-info']}>
-            <div><span className={styles['file-name']}>{name}</span> ({fileSizeFormat()}, {total} lines)</div>
             <div className={styles.idleInfoRow}>
                 <FileStat label="Attributes">
                     {`${formattedEstimateTime}`}
@@ -155,7 +135,6 @@ const IdleInfo = ({ state, ...props }) => {
         </div>
     ) : (
         <div className={styles['idle-info']}>
-            <div><span className={styles['file-name']}>No File Loaded</span></div>
             <div className={styles.idleInfoRow}>
                 <FileStat label="Attributes">-</FileStat>
                 <FileStat label="Spindle">-</FileStat>
