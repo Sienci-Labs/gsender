@@ -76,7 +76,7 @@ class JobStatus extends PureComponent {
                                     {path && (
                                         <TooltipCustom content={`File Path: ${path}`} style={{ wordWrap: 'break-word' }}>
                                             <div className={styles['file-item']}>
-                                                Path:<span className={styles['file-text']}>{path}</span>
+                                                Path: <span className={styles['file-text']}>{path}</span>
                                             </div>
                                         </TooltipCustom>
                                     )}
