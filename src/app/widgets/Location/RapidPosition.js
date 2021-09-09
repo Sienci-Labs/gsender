@@ -29,7 +29,7 @@ export const BACK_RIGHT = 'BR';
 export const BACK_LEFT = 'BR';
 export const OTHER = 'OT';
 
-const OFFSET_DISTANCE = 2.5;
+const OFFSET_DISTANCE = 0.9;
 
 export const getHomingLocation = (setting) => {
     if (setting === '0') {
@@ -55,8 +55,8 @@ const getMachineMovementLimits = () => {
         return [null, null];
     }
     const { limits } = machineProfile;
-    const xLimit = limits.xmax - OFFSET_DISTANCE;
-    const yLimit = limits.ymax - OFFSET_DISTANCE;
+    const xLimit = Number(limits.xmax * OFFSET_DISTANCE).toFixed(3);
+    const yLimit = Number(limits.zmax * OFFSET_DISTANCE).toFixed(3);
     return [xLimit, yLimit];
 };
 
@@ -79,7 +79,7 @@ const getPositionMovements = (requestedPosition, homingPosition) => {
         } else if (requestedPosition === BACK_LEFT) {
             return [(xLimit * -1), yLimit];
         } else { // Back Right
-            return [0, (yLimit * -1)];
+            return [0, yLimit];
         }
     } else if (homingPosition === FRONT_LEFT) {
         if (requestedPosition === FRONT_RIGHT) {
@@ -87,23 +87,23 @@ const getPositionMovements = (requestedPosition, homingPosition) => {
         } else if (requestedPosition === FRONT_LEFT) {
             return [0, 0];
         } else if (requestedPosition === BACK_LEFT) {
-            return [0, yLimit];
-        } else { // Back Right
             return [xLimit, yLimit];
+        } else { // Back Right
+            return [0, yLimit];
         }
     } else if (homingPosition === BACK_LEFT) {
         if (requestedPosition === FRONT_RIGHT) {
-            return [xLimit, yLimit];
+            return [xLimit, yLimit * -1];
         } else if (requestedPosition === FRONT_LEFT) {
-            return [xLimit, 0];
+            return [0, yLimit * -1];
         } else if (requestedPosition === BACK_LEFT) {
             return [0, 0];
         } else { // Back Right
-            return [-xLimit, 0];
+            return [xLimit, 0];
         }
     } else if (homingPosition === BACK_RIGHT) {
         if (requestedPosition === FRONT_RIGHT) {
-            return [xLimit, 0];
+            return [0, yLimit * -1];
         } else if (requestedPosition === FRONT_LEFT) {
             return [xLimit * -1, yLimit * -1];
         } else if (requestedPosition === BACK_LEFT) {
@@ -120,9 +120,10 @@ export const getMovementGCode = (requestedPosition, homingPositionSetting) => {
     const gcode = [];
 
     gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`); // Always move up to the limit of Z travel minus offset
+    const homingPosition = getHomingLocation(homingPositionSetting);
+    const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPosition);
 
-    const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPositionSetting);
-    if (!xMovement || !yMovement) {
+    if (xMovement === null || yMovement === null) {
         Toaster.pop({
             msg: 'Unable to calculate position movements based on inputs - check arguments passed',
             type: TOASTER_DANGER

@@ -325,10 +325,7 @@ class WorkflowControl extends PureComponent {
         const { fileLoaded, actions, workflowState, isConnected, senderInHold, activeState, lineTotal } = this.props;
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
-        //const { runHasStarted } = this.state;
         const canRun = this.canRun();
-        //const showPlay = isConnected && fileLoaded && canRun;
-        //const showTest = showPlay && !runHasStarted;
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const workflowPaused = workflowState === WORKFLOW_STATE_PAUSED || senderInHold;
@@ -566,7 +563,7 @@ export default connect((store) => {
     const lineTotal = get(store, 'file.total');
     const port = get(store, 'connection.port');
     const gcode = get(store, 'file.content');
-    const fileCompletion = get(store, 'controller.sender.timeCompleted', 10);
+    const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
     return {
         fileLoaded,
         isConnected,

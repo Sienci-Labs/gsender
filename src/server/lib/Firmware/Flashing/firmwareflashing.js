@@ -22,7 +22,7 @@
  */
 
 import AvrgirlArduino from 'avrgirl-arduino';
-import hex from '!file-loader!./grbl1.1h.hex';
+import hex from '!file-loader!./grblsept9.hex';
 import logger from '../../logger';
 import store from '../../../store';
 

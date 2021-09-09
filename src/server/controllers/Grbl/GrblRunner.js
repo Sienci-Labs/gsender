@@ -56,7 +56,8 @@ class GrblRunner extends events.EventEmitter {
             },
             ov: [],
             alarmCode: 'Homing',
-            probeActive: false
+            probeActive: false,
+            pinState: {}
         },
         parserstate: {
             modal: {
@@ -126,6 +127,7 @@ class GrblRunner extends events.EventEmitter {
                 status: {
                     ...this.state.status,
                     probeActive: probeActive,
+                    pinState: payload.pinState,
                     ...payload
                 }
             };
@@ -154,6 +156,7 @@ class GrblRunner extends events.EventEmitter {
                 ...this.state,
                 status: {
                     ...this.state.status,
+                    activeState: GRBL_ACTIVE_STATE_ALARM,
                     alarmCode: Number(payload.message)
                 }
             };

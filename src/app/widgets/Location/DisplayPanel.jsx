@@ -175,7 +175,7 @@ class DisplayPanel extends PureComponent {
                         disabled={!canClick}
                         onClick={() => {
                             const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-                            if (safeRetractHeight !== 0) {
+                            if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
                                 if (homingEnabled) {
                                     controller.command('gcode:safe', `G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`, modal);
                                 } else {

@@ -49,6 +49,11 @@ class ControlArea extends Component {
     }
 
     unlock = () => {
+        const { alarmCode } = this.props;
+        if (alarmCode === 1) {
+            controller.command('reset:limit');
+            return;
+        }
         controller.command('unlock');
     }
 

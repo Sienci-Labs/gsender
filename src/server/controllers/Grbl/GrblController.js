@@ -294,7 +294,9 @@ class GrblController {
             }
 
             if (this.runner.isAlarm()) {
+                console.log('DATA ALARM');
                 this.feeder.reset();
+                this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
                 log.warn('Stopped sending G-code commands in Alarm mode');
                 return;
             }
@@ -610,10 +612,15 @@ class GrblController {
         this.runner.on('alarm', (res) => {
             const code = Number(res.message) || undefined;
             const alarm = _.find(GRBL_ALARMS, { code: code });
+            console.log('RUNNER ALARM');
 
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
+                // Force propogation of current state on alarm
+                this.state = this.runner.state;
+                console.log(this.state);
+                this.emit('controller:state', GRBL, this.state);
             } else {
                 // Grbl v0.9
                 this.emit('serialport:read', res.raw);
@@ -861,7 +868,6 @@ class GrblController {
         return Object.assign(context || {}, {
             // User-defined global variables
             global: this.sharedContext,
-            ...this.sharedContext,
 
             // Bounding box
             xmin: Number(context.xmin) || 0,
@@ -1370,6 +1376,12 @@ class GrblController {
                 this.feeder.reset();
 
                 this.write('\x18'); // ^x
+            },
+            'reset:limit': () => {
+                this.workflow.stop();
+                this.feeder.reset();
+                this.write('\x18'); // ^x
+                this.writeln('$X');
             },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
