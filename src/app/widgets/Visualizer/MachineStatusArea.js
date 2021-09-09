@@ -30,7 +30,6 @@ import controller from 'app/lib/controller';
 import AlarmDescriptionIcon from 'app/widgets/Visualizer/AlarmDescriptionIcon';
 import styles from './machine-status-area.styl';
 import UnlockAlarmButton from './UnlockAlarmButton';
-import { GRBL_ACTIVE_STATE_HOME } from '../../constants';
 
 
 /**
@@ -50,6 +49,11 @@ class ControlArea extends Component {
     }
 
     unlock = () => {
+        const { alarmCode } = this.props;
+        if (alarmCode === 1) {
+            controller.command('reset:limit');
+            return;
+        }
         controller.command('unlock');
     }
 
@@ -63,8 +67,7 @@ class ControlArea extends Component {
 
     render() {
         const { layoutIsReversed } = this.props.state;
-        const { $22, activeState, alarmCode, isConnected } = this.props;
-        const { homingRun } = this.state;
+        const { activeState, alarmCode, isConnected } = this.props;
 
         //Object to customize the message of the active machine state
         const message = {
@@ -84,7 +87,7 @@ class ControlArea extends Component {
          */
         const machineStateRender = () => {
             if (isConnected) {
-                const homingEnabled = $22;
+                /*const homingEnabled = $22;
                 if (!homingRun && alarmCode === 'Homing' && homingEnabled === '1') {
                     return (
                         <div className={styles['machine-status-wrapper']}>
@@ -96,7 +99,7 @@ class ControlArea extends Component {
                             <UnlockAlarmButton newMessage="Click To Home Machine" onClick={this.handleHomeMachine} />
                         </div>
                     );
-                }
+                }*/
 
                 if (activeState === 'Alarm') {
                     return (

@@ -294,7 +294,9 @@ class GrblController {
             }
 
             if (this.runner.isAlarm()) {
+                console.log('DATA ALARM');
                 this.feeder.reset();
+                this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
                 log.warn('Stopped sending G-code commands in Alarm mode');
                 return;
             }
@@ -336,7 +338,7 @@ class GrblController {
 
                     // Expression
                     // %_x=posx,_y=posy,_z=posz
-                    evaluateAssignmentExpression(line.slice(1), context);
+                    this.sharedContext = evaluateAssignmentExpression(line.slice(1), context);
                     return '';
                 }
 
@@ -407,7 +409,7 @@ class GrblController {
                     } else if (toolChangeOption === 'Code') {
                         this.workflow.pause({ data: 'M6' });
                         this.emit('toolchange:start');
-                        this.runPreChangeHook();
+                        this.runPreChangeHook(this.populateContext());
                     }
 
                     line = line.replace('M6', '(M6)');
@@ -610,10 +612,15 @@ class GrblController {
         this.runner.on('alarm', (res) => {
             const code = Number(res.message) || undefined;
             const alarm = _.find(GRBL_ALARMS, { code: code });
+            console.log('RUNNER ALARM');
 
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
+                // Force propogation of current state on alarm
+                this.state = this.runner.state;
+                console.log(this.state);
+                this.emit('controller:state', GRBL, this.state);
             } else {
                 // Grbl v0.9
                 this.emit('serialport:read', res.raw);
@@ -831,7 +838,7 @@ class GrblController {
         this.event.trigger('controller:ready');
     }
 
-    populateContext(context) {
+    populateContext(context = {}) {
         // Machine position
         const {
             x: mposx,
@@ -1168,11 +1175,7 @@ class GrblController {
                 if (typeof context === 'function') {
                     callback = context;
                     context = {};
-                } else {
-                    // Handle toolchange context on file load
-                    this.toolChangeContext = context;
                 }
-
 
                 // G4 P0 or P with a very small value will empty the planner queue and then
                 // respond with an ok when the dwell is complete. At that instant, there will
@@ -1258,7 +1261,6 @@ class GrblController {
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modal.feedrate} ${modal.wcs} ${modal.plane}`);
                     modalGCode.push(`F${feedRate} S${spindleRate}`);
-                    console.log(modalGCode);
 
                     this.command('gcode', modalGCode);
                 }
@@ -1374,6 +1376,12 @@ class GrblController {
                 this.feeder.reset();
 
                 this.write('\x18'); // ^x
+            },
+            'reset:limit': () => {
+                this.workflow.stop();
+                this.feeder.reset();
+                this.write('\x18'); // ^x
+                this.writeln('$X');
             },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
@@ -1547,6 +1555,9 @@ class GrblController {
                 }
 
                 axes.F = feedrate;
+                if (axes.Z) {
+                    axes.F *= 0.5;
+                }
 
                 const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
                 this.command('gcode', jogCommand);
@@ -1575,8 +1586,8 @@ class GrblController {
                 }
 
                 this.event.trigger('macro:run');
-
                 this.command('gcode', macro.content, context);
+
                 callback(null);
             },
             'macro:load': () => {
@@ -1685,12 +1696,10 @@ class GrblController {
     }
 
     convertGcodeToArray(gcode) {
-        const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
         //Clean up lines and remove ones that are comments and headers
         const lines = gcode
             .split('\n')
-            .filter(line => (line.trim().length > 0))
-            .filter(line => !comments.some(comment => line.includes(comment)));
+            .filter(line => (line.trim().length > 0));
         return lines;
     }
 

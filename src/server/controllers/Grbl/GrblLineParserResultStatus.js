@@ -45,9 +45,11 @@ class GrblLineParserResultStatus {
         }
 
         const payload = {};
-        const pattern = /[a-zA-Z]+(:[0-9\.\-]+(,[0-9\.\-]+){0,5})?/g;
+        //const pattern = /[a-zA-Z]+(:[0-9\.\-]+(,[0-9\.\-]+){0,5})?/g;
+        const pattern = /[a-zA-Z]+(:[a-zA-Z0-9\.\-]+(,[0-9\.\-[a]+){0,5})?/g;
         const params = r[1].match(pattern);
         const result = {};
+
 
         { // Active State (v0.9, v1.1)
             // * Valid states types: Idle, Run, Hold, Jog, Alarm, Door, Check, Home, Sleep
@@ -72,7 +74,6 @@ class GrblLineParserResultStatus {
                 result[type] = value;
             }
         }
-
         // Machine Position (v0.9, v1.1)
         if (_.has(result, 'MPos')) {
             const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
@@ -166,7 +167,11 @@ class GrblLineParserResultStatus {
         //   - Example: Pn:PZ indicates the probe and z-limit pins are 'triggered'.
         //   - Note: A may be added in later versions for an A-axis limit pin.
         if (_.has(result, 'Pn')) {
-            payload.pinState = _.get(result, 'Pn[0]', '');
+            const pins = _.get(result, 'Pn[0]', '');
+            payload.pinState = {};
+            pins.split('').forEach(pin => {
+                payload.pinState[pin] = true;
+            });
         }
 
         // Override Values (v1.1)

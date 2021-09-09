@@ -50,6 +50,7 @@ export function* initialize() {
     });
 
     controller.addListener('controller:state', (type, state) => {
+        console.log(state);
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_STATE,
             payload: { type, state }
@@ -64,8 +65,6 @@ export function* initialize() {
     });
 
     controller.addListener('sender:status', (status) => {
-        console.log('Sender status received');
-        console.log(status);
         try {
             reduxStore.dispatch({
                 type: controllerActions.UPDATE_SENDER_STATUS,

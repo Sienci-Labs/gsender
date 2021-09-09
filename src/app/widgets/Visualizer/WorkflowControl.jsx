@@ -233,13 +233,21 @@ class WorkflowControl extends PureComponent {
 
     componentDidUpdate(prevProps) {
         const { activeState: prevActiveState, state: prevState } = prevProps;
-        const { activeState: currentActiveState, state: currentState } = this.props;
+        const { activeState: currentActiveState, state: currentState, fileCompletion } = this.props;
 
         const { gcode: { content: prevGcode } } = prevState;
         const { gcode: { content: currentGcode } } = currentState;
 
         if ((prevActiveState === GRBL_ACTIVE_STATE_CHECK && currentActiveState !== GRBL_ACTIVE_STATE_CHECK) || prevGcode !== currentGcode) {
             this.setState({ runHasStarted: false });
+        }
+        if (prevProps.fileCompletion === 0 && fileCompletion !== 0) {
+            this.setState({
+                startFromLine: {
+                    showModal: false,
+                    value: 1,
+                }
+            });
         }
     }
 
@@ -317,10 +325,7 @@ class WorkflowControl extends PureComponent {
         const { fileLoaded, actions, workflowState, isConnected, senderInHold, activeState, lineTotal } = this.props;
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
-        //const { runHasStarted } = this.state;
         const canRun = this.canRun();
-        //const showPlay = isConnected && fileLoaded && canRun;
-        //const showTest = showPlay && !runHasStarted;
         const canPause = isReady && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const workflowPaused = workflowState === WORKFLOW_STATE_PAUSED || senderInHold;
@@ -558,6 +563,7 @@ export default connect((store) => {
     const lineTotal = get(store, 'file.total');
     const port = get(store, 'connection.port');
     const gcode = get(store, 'file.content');
+    const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
     return {
         fileLoaded,
         isConnected,
@@ -568,6 +574,7 @@ export default connect((store) => {
         controllerState,
         port,
         lineTotal,
-        gcode
+        gcode,
+        fileCompletion
     };
 }, null, null, { forwardRef: true })(WorkflowControl);

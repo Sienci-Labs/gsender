@@ -278,8 +278,11 @@ const Surfacing = ({ onClose, showTitle }) => {
             iterations++;
         }
 
+        const workspaceUnits = store.get('workspace.units');
+        const ZVALUE = workspaceUnits === METRIC_UNITS ? '3' : '0.12';
+
         gCodeArr.push(
-            'G0 Z3',
+            `G0 Z${ZVALUE}`,
             'G0 X0 Y0',
         );
         gCodeArr.push(`(End of Layer ${count})`);

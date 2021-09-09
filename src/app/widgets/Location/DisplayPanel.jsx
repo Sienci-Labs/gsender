@@ -26,11 +26,15 @@
 
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
+import MachinePositionInput from 'app/widgets/Location/components/MachinePositionInput';
+import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
+import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import store from 'app/store';
+import { getHomingLocation, getMovementGCode } from 'app/widgets/Location/RapidPosition';
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
 import GoToButton from './components/GoToButton';
@@ -44,7 +48,10 @@ import {
     AXIS_B,
     AXIS_C,
     IMPERIAL_UNITS,
-    METRIC_UNITS
+    METRIC_UNITS,
+    GRBL_ACTIVE_STATE_IDLE,
+    WORKFLOW_STATE_RUNNING,
+    GRBL_ACTIVE_STATE_ALARM
 } from '../../constants';
 import styles from './index.styl';
 import AxisButton from './components/AxisButton';
@@ -102,7 +109,7 @@ class DisplayPanel extends PureComponent {
     }
 
     state = {
-        homingHasBeenRun: false,
+        homingRun: false,
         controllerAlarmState: null,
         positionInput: {
             [AXIS_E]: false,
@@ -140,7 +147,7 @@ class DisplayPanel extends PureComponent {
     };
 
     renderAxis = (axis) => {
-        const { canClick, machinePosition, workPosition, actions } = this.props;
+        const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units, homingEnabled } = this.props;
         const mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';
         const axisLabel = axis.toUpperCase();
@@ -167,6 +174,15 @@ class DisplayPanel extends PureComponent {
                     <GoToButton
                         disabled={!canClick}
                         onClick={() => {
+                            const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+                            if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
+                                if (homingEnabled) {
+                                    controller.command('gcode:safe', `G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`, modal);
+                                } else {
+                                    controller.command('gcode', 'G91');
+                                    controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                }
+                            }
                             controller.command('gcode', 'G90');
                             controller.command('gcode', `G0 ${axisLabel}0`); //Move to Work Position Zero
                         }}
@@ -174,7 +190,7 @@ class DisplayPanel extends PureComponent {
                     <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick} />
                 </td>
                 <td className={styles.machinePosition}>
-                    <PositionLabel value={wpos} />
+                    <MachinePositionInput value={wpos} handleManualMovement={(value) => actions.handleManualMovement(value, axis)} />
                     {!showPositionInput && <PositionLabel value={mpos} small />}
                 </td>
             </tr>
@@ -201,47 +217,40 @@ class DisplayPanel extends PureComponent {
 
     actions = {
         jogtoFRCorner: () => {
-            const xLimit = this.state.machineProfile.limits.xmax;
-            const yLimit = this.state.machineProfile.limits.ymax;
-            const zLimit = this.state.machineProfile.limits.zmax;
-            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
-            controller.command('gcode', `G53 G0 X${xLimit} Y${yLimit} F5000`);
+            const { homingDirection } = this.props;
+            const gcode = getMovementGCode('FR', homingDirection);
+            controller.command('gcode', gcode);
         },
         jogtoFLCorner: () => {
-            const xLimit = this.state.machineProfile.limits.xmax;
-            const yLimit = this.state.machineProfile.limits.ymax;
-            const zLimit = this.state.machineProfile.limits.zmax;
-            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
-            controller.command('gcode', `G53 G0 X${-xLimit} Y${yLimit} F5000`);
+            const { homingDirection } = this.props;
+            const gcode = getMovementGCode('FL', homingDirection);
+            controller.command('gcode', gcode);
         },
         jogtoBRCorner: () => {
-            const xLimit = this.state.machineProfile.limits.xmax;
-            const yLimit = this.state.machineProfile.limits.ymax;
-            const zLimit = this.state.machineProfile.limits.zmax;
-            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
-            controller.command('gcode', `G53 G0 X${xLimit} Y${-yLimit} F5000`);
+            const { homingDirection } = this.props;
+            const gcode = getMovementGCode('BR', homingDirection);
+            controller.command('gcode', gcode);
         },
         jogtoBLCorner: () => {
-            const xLimit = this.state.machineProfile.limits.xmax;
-            const yLimit = this.state.machineProfile.limits.ymax;
-            const zLimit = this.state.machineProfile.limits.zmax;
-            controller.command('gcode', `G0 Z${zLimit} F10000`); // Move z out of the way
-            controller.command('gcode', `G53 G0 X${-xLimit} Y${-yLimit} F5000`);
+            const { homingDirection } = this.props;
+            const gcode = getMovementGCode('BL', homingDirection);
+            controller.command('gcode', gcode);
         },
         startHoming: () => {
+            this.setState({
+                homingRun: true
+            });
             controller.command('homing');
         }
     }
 
     render() {
-        const { axes, actions, canClick, safeRetractHeight, units } = this.props;
-        let { homingHasBeenRun } = this.state;
-        let houseIconPos = this.state.houseIconPos;
+        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome, homingDirection } = this.props;
+        let { homingRun } = this.state;
+        const homingLocation = getHomingLocation(homingDirection);
         const hasAxisX = includes(axes, AXIS_X);
         const hasAxisY = includes(axes, AXIS_Y);
         const hasAxisZ = includes(axes, AXIS_Z);
-        const machineProfile = this.state.machineProfile;
-        let { endstops } = machineProfile;
 
         return (
             <Panel className={styles.displayPanel}>
@@ -277,65 +286,69 @@ class DisplayPanel extends PureComponent {
                             onClick={() => {
                                 const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                                 if (safeRetractHeight !== 0) {
-                                    controller.command('gcode', 'G91');
-                                    controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                    if (homingEnabled) {
+                                        controller.command('gcode:safe', `G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`, modal);
+                                    } else {
+                                        controller.command('gcode', 'G91');
+                                        controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                    }
                                 }
 
                                 controller.command('gcode', 'G90');
                                 controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
-                                controller.command('gcode', 'G0 Z0'); // Move Z up
                             }}
                             disabled={!canClick}
                             className={styles.fontMonospace}
                             primary
                         >
                             <i className="fas fa-chart-line" />
-                            Go XYZ0
+                            Go XY0
                         </FunctionButton>
                     </div>
 
                     {
-                        endstops && (
-                            <div className={endstops ? styles.endStopActiveControls : styles.hideHoming}>
+                        homingEnabled && (
+                            <div className={styles.endStopActiveControls}>
                                 <FunctionButton
-                                    disabled={!canClick}
+                                    primary
+                                    disabled={!canHome}
                                     onClick={this.actions.startHoming}
                                     className={styles.runHomeButton}
                                 >
                                     <i className="fas fa-home" /> Home
                                 </FunctionButton>
                                 <QuickPositionButton
-                                    disabled={!canClick || !homingHasBeenRun}
+                                    disabled={!canClick || !homingRun}
                                     className={styles.QPBL}
                                     onClick={() => {
                                         this.actions.jogtoBLCorner();
                                     }}
-                                    icon={(houseIconPos === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    icon={(homingLocation === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
                                 />
                                 <QuickPositionButton
-                                    disabled={!canClick || !homingHasBeenRun}
+                                    disabled={!canClick || !homingRun}
                                     className={styles.QPBR}
                                     rotate={45}
                                     onClick={() => {
                                         this.actions.jogtoBRCorner();
                                     }}
-                                    icon={(houseIconPos === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    icon={(homingLocation === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
                                 />
                                 <QuickPositionButton
-                                    disabled={!canClick || !homingHasBeenRun}
+                                    disabled={!canClick || !homingRun}
                                     className={styles.QPFL}
                                     onClick={() => {
                                         this.actions.jogtoFLCorner();
                                     }}
-                                    icon={(houseIconPos === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    icon={(homingLocation === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
                                 />
                                 <QuickPositionButton
-                                    disabled={!canClick || !homingHasBeenRun}
+                                    disabled={!canClick || !homingRun}
                                     className={styles.QPFR}
                                     onClick={() => {
                                         this.actions.jogtoFRCorner();
                                     }}
-                                    icon={(houseIconPos === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    icon={(homingLocation === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
                                 />
                             </div>
                         )
@@ -346,4 +359,17 @@ class DisplayPanel extends PureComponent {
     }
 }
 
-export default DisplayPanel;
+export default connect((store) => {
+    const homingSetting = get(store, 'controller.settings.settings.$22', '0');
+    const homingDirection = get(store, 'controller.settings.settings.$23', '0');
+    const homingEnabled = homingSetting === '1';
+    const isConnected = get(store, 'connection.isConnected');
+    const workflowState = get(store, 'controller.workflow.state');
+    const activeState = get(store, 'controller.state.status.activeState');
+    const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
+    return {
+        homingEnabled,
+        canHome,
+        homingDirection
+    };
+})(DisplayPanel);

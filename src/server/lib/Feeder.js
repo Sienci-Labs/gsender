@@ -176,7 +176,6 @@ class Feeder extends events.EventEmitter {
                 }
             }, timer);
         } else {
-            console.log('Second interval found');
             clearInterval(this.state.interval);
             this.state.interval = null;
         }

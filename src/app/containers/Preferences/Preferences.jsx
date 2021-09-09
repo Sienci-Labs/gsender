@@ -98,7 +98,7 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 5,
-                    label: 'Program Events',
+                    label: 'Start/Stop G-Code',
                     component: ProgramEvents,
                 },
                 {

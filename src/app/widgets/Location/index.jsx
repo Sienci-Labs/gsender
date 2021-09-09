@@ -157,6 +157,20 @@ class LocationWidget extends PureComponent {
             const { minimized } = this.state;
             this.setState({ minimized: !minimized });
         },
+        handleManualMovement: (value, axis) => {
+            const wcs = this.actions.getWorkCoordinateSystem();
+            const p = {
+                'G54': 1,
+                'G55': 2,
+                'G56': 3,
+                'G57': 4,
+                'G58': 5,
+                'G59': 6
+            }[wcs] || 0;
+            //const command = `G90 G0 ${axis.toUpperCase()}${value}`;
+            const command = `G10 P${p} L20 ${axis.toUpperCase()}${value}`;
+            controller.command('gcode', command);
+        },
         getJogDistance: () => {
             const { units } = this.state;
 
