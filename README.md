@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.1/gSender-0.7.1-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.1/gSender-0.7.1-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.1/gSender-0.7.1.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.1/gSender_0.7.1_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.1/gSender-0.7.1-armv7l.AppImage)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.2/gSender-0.7.2-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.2/gSender-0.7.2-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.2/gSender-0.7.2.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.2/gSender_0.7.2_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.2/gSender-0.7.2-armv7l.AppImage)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -99,6 +99,23 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### Open Beta 0.7.2 (Sept 10, 2021)
+* Able to set workspace coordinates for specific axis quickly by clicking on location indicator 
+* Re-designed progress indicator
+* Able to use variables in tool change code
+* Ability to enable or disable start/stop g-code blocks without clearing code
+* Updates to included firmware image and Longmill default EEPROM settings in firmware tool
+* Homing improvements - functions will appear if $22 toggled on, home button clickable if alarmed
+* Rapid position buttons updated to use new firmware settings
+* Individual axis Go To buttons now use safe height if set in preferences
+* Better support of physical hold/unhold buttons on Longboard controller
+* Tweaks to Z jogging to make button more responsive and not continuous jog as easily as well as move slower in Z direction
+* Safe height movements will no longer descend and will now use machines coordinates if homing enabled
+* Fixed hard limit alarms to allow easier resuming of workflow
+* Fixed surfacing Z movement at end of program
+* Joystick jogging should now send jog cancel at direction control release
+* Fixed last line run to reset on job completion
 
 
 ### Open Beta 0.7.1 (August 20, 2021)
