@@ -67,18 +67,18 @@ class JobStatus extends PureComponent {
                     {
                         fileLoaded
                             ? (
-                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
-                                    <div className={styles['file-item']}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '3rem' }}>
+                                    <div style={{ whiteSpace: 'nowrap' }}>
                                         <TooltipCustom content={`${name} (${this.fileSizeFormat(size)}, ${total} lines)`} style={{ wordWrap: 'break-word' }}>
                                             <span className={styles['file-text']}>{name}</span> ({this.fileSizeFormat(size)}, {total} lines)
                                         </TooltipCustom>
                                     </div>
                                     {path && (
-                                        <TooltipCustom content={`File Path: ${path}`} style={{ wordWrap: 'break-word' }}>
-                                            <div className={styles['file-item']}>
-                                                Path: <span className={styles['file-text']}>{path}</span>
-                                            </div>
-                                        </TooltipCustom>
+                                        <div className={styles['file-path']}>
+                                            <TooltipCustom content={`File Path: ${path}`} style={{ wordWrap: 'break-word' }}>
+                                                    Path: <span className={styles['file-text']}>{path}</span>
+                                            </TooltipCustom>
+                                        </div>
                                     )}
                                 </div>
                             )
