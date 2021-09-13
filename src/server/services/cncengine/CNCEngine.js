@@ -23,6 +23,7 @@
 
 import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
+import partition from 'lodash/partition';
 import SerialPort from 'serialport';
 import socketIO from 'socket.io';
 //import socketioJwt from 'socketio-jwt';
@@ -218,28 +219,35 @@ class CNCEngine {
                     .then(ports => {
                         ports = ports.concat(ensureArray(config.get('ports', [])));
 
-                        // Filter ports by productId to avoid non-arduino devices from appearing
-                        const validProductIDs = ['6015', '6001', '606D', '003D', '0043', '2341', '7523', 'EA60', '2303', '2145', '0AD8', '08D8'];
-                        const validVendorIDs = ['1D50', '0403', '2341', '0042', '1A86', '10C4', '067B', '03EB', '16D0'];
-                        ports = ports.filter(port => validProductIDs.includes(port.productId));
-                        ports = ports.filter(port => validVendorIDs.includes(port.vendorId));
-
                         const controllers = store.get('controllers', {});
-                        const portsInUse = Object.keys(controllers)
-                            .filter(port => {
+                        const portsInUse =
+                            Object.keys(controllers).filter(port => {
                                 const controller = controllers[port];
                                 return controller && controller.isOpen();
                             });
 
-                        ports = ports.map(port => {
+                        // Filter ports by productId to avoid non-arduino devices from appearing
+                        const validProductIDs = ['6015', '6001', '606D', '003D', '0043', '2341', '7523', 'EA60', '2303', '2145', '0AD8', '08D8'];
+                        const validVendorIDs = ['1D50', '0403', '2341', '0042', '1A86', '10C4', '067B', '03EB', '16D0'];
+                        let [recognizedPorts, unrecognizedPorts] = partition(ports, (port) => {
+                            return validProductIDs.includes(port.productId) && validVendorIDs.includes(port.vendorId);
+                        });
+
+                        /*ports = ports.filter(port => validProductIDs.includes(port.productId));
+                        ports = ports.filter(port => validVendorIDs.includes(port.vendorId));*/
+
+                        const portInfoMapFn = (port) => {
                             return {
                                 port: port.comName,
                                 manufacturer: port.manufacturer,
                                 inuse: portsInUse.indexOf(port.comName) >= 0
                             };
-                        });
+                        };
 
-                        socket.emit('serialport:list', ports);
+                        recognizedPorts = recognizedPorts.map(portInfoMapFn);
+                        unrecognizedPorts = unrecognizedPorts.map(portInfoMapFn);
+
+                        socket.emit('serialport:list', recognizedPorts, unrecognizedPorts);
                     })
                     .catch(err => {
                         log.error(err);
