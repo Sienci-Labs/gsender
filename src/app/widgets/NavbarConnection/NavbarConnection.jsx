@@ -24,8 +24,10 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { find } from 'lodash';
+import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
 import PortListing from './PortListing';
 import styles from './Index.styl';
+
 
 class NavbarConnection extends PureComponent {
     static propTypes = {
@@ -105,11 +107,12 @@ class NavbarConnection extends PureComponent {
                             <i className="fa fa-unlink" />
                         Disconnect
                         </button>
+
                     )
                 }
                 <div className={styles.NavbarConnectionDropdownList}>
                     {
-                        !connected && <h5>Available Devices</h5>
+                        !connected && <h5>Recognized Devices</h5>
                     }
                     {
                         !connected && (ports.length === 0) && (
@@ -130,6 +133,9 @@ class NavbarConnection extends PureComponent {
                                 />
                             )
                         )
+                    }
+                    {
+                        !connected && !connecting && <UnrecognizedDevices />
                     }
                 </div>
             </div>

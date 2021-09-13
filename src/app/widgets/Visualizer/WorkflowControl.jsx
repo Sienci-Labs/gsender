@@ -217,6 +217,8 @@ class WorkflowControl extends PureComponent {
     startRun = () => {
         const { activeState } = this.props;
 
+        Toaster.clear();
+
         if (activeState === GRBL_ACTIVE_STATE_CHECK) {
             this.setState({ testStarted: true, runHasStarted: true });
 
