@@ -189,10 +189,12 @@ class JobStatusWidget extends PureComponent {
             <>
                 {fileProcessing
                     ? <FileProcessingLoader />
-                    : <JobStatus
-                        state={state}
-                        actions={actions}
-                    />
+                    : (
+                        <JobStatus
+                            state={state}
+                            actions={actions}
+                        />
+                    )
                 }
             </>
         );
