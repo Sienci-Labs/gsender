@@ -335,7 +335,6 @@ class WorkflowControl extends PureComponent {
         const { camera } = this.props.actions;
         const { handleOnStop } = this;
         const { runHasStarted } = this.state;
-        console.log(runHasStarted);
         const { fileLoaded, actions, workflowState, isConnected, senderInHold, activeState, lineTotal } = this.props;
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;

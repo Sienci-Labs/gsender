@@ -50,7 +50,6 @@ export function* initialize() {
     });
 
     controller.addListener('controller:state', (type, state) => {
-        console.log(state);
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_STATE,
             payload: { type, state }

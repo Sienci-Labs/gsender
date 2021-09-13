@@ -116,7 +116,6 @@ class Header extends PureComponent {
 
     controllerEvents = {
         'disconnect': () => {
-            console.log('DISCO');
             this.setState({
                 connected: false
             });

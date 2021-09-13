@@ -41,14 +41,14 @@ class JogControl extends PureComponent {
 
     constructor(props) {
         super(props);
-        this.throttledStopJog = throttle(() => {
-            props.stopContinuousJog();
-            console.log(`in throttled jog at ${new Date()}`);
-        }, (this.timeout - 25), { leading: false, trailing: true });
         if (props.timeout) {
             this.timeout = props.timeout;
-            console.log(`timeout set to ${this.timeout}`);
         }
+
+        this.throttledStopJog = throttle(() => {
+            console.log(`Stopped at ${Date.now()}`);
+            props.stopContinuousJog();
+        }, (this.timeout - 25), { leading: true, trailing: false });
     }
 
     static propTypes = {
@@ -70,7 +70,7 @@ class JogControl extends PureComponent {
     onMouseUp(e) {
         const { jog } = this.props;
         this.clearTimeout(); // remove timeout function so it doesn't fire if exists
-
+        console.log(`Mouse up at ${Date.now()}`);
         const timer = new Date() - this.startTime;
         if (timer < this.timeout && this.didClick) {
             jog();
