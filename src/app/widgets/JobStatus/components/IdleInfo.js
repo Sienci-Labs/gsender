@@ -58,6 +58,9 @@ const IdleInfo = ({ state, ...props }) => {
     };
 
     const outputFormattedTimeForLastFile = (givenTime) => {
+        if (!givenTime) {
+            return '-';
+        }
         //Given time is a unix timestamp to be compared to unix timestamp 0
         const elapsedMinute = moment(moment(givenTime)).diff(moment.unix(0), 'minutes');
         const elapsedSecond = String((moment(moment(givenTime)).diff(moment.unix(0), 'seconds')));
@@ -127,10 +130,15 @@ const IdleInfo = ({ state, ...props }) => {
                     <br />
                     {`${max.z} ${units} (Z)`}
                 </FileStat>
-                <FileStat label="Previous Run">
-                    <span className={styles.textWrap}>{`${lastFileRan}`}</span>
-                    {`Run Length: ${elapsedTimeToDisplay}`}
-                </FileStat>
+                {
+                    lastFileRan
+                        ? (
+                            <FileStat label="Previous Run">
+                                <span className={styles.textWrap}>{`${lastFileRan}`}</span>
+                                {`Run Length: ${elapsedTimeToDisplay}`}
+                            </FileStat>
+                        ) : <FileStat label="Previous Run">-</FileStat>
+                }
             </div>
         </div>
     ) : (
