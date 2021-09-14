@@ -27,3 +27,5 @@ export const modifierKeys = [
     'ctrl',
     'meta',
 ];
+
+export const MAX_TERMINAL_INPUT_ARRAY_SIZE = 100;

@@ -29,14 +29,16 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
 import { Terminal } from 'xterm';
-// import * as fit from 'xterm/lib/addons/fit/fit';
 import { FitAddon } from 'xterm-addon-fit';
 import { debounce } from 'lodash';
+import store from 'app/store';
 import controller from 'app/lib/controller';
 import log from 'app/lib/log';
 import Button from 'app/components/FunctionButton/FunctionButton';
+import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
 import History from './History';
 import styles from './index.styl';
+
 
 class TerminalWrapper extends PureComponent {
     static propTypes = {
@@ -57,6 +59,11 @@ class TerminalWrapper extends PureComponent {
         tabStopWidth: 4,
         onData: () => {}
     };
+
+    state = {
+        terminalInputHistory: store.get('workspace.terminal.inputHistory'),
+        terminalInputIndex: store.get('workspace.terminal.inputHistory')?.length
+    }
 
     prompt = ' ';
 
@@ -314,17 +321,29 @@ class TerminalWrapper extends PureComponent {
 
         window.addEventListener('resize', this.debounce(() => {
             if (this.props.active) {
-                // console.count('Refit Iterations');
                 this.refitTerminal();
             }
         }, 150));
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(_, prevState) {
         if (this.props.active) {
             setTimeout(() => {
                 this.refitTerminal();
             }, 150);
+        }
+
+        if (this.state.terminalInputIndex !== prevState.terminalInputIndex) {
+            const { terminalInputHistory } = this.state;
+
+            if (terminalInputHistory.length === 0) {
+                return;
+            }
+
+            // const inputSize = [...terminalInputHistory[this.state.terminalInputIndex] || ''].length;
+
+            this.inputRef.current.focus();
+            this.inputRef.current.value = terminalInputHistory[this.state.terminalInputIndex] || '';
         }
     }
 
@@ -402,13 +421,46 @@ class TerminalWrapper extends PureComponent {
             return;
         }
 
-        this.inputRef.current.value = '';
-
         controller.writeln(command);
+
+        const { terminalInputHistory = [] } = this.state;
+
+        const newTerminalInputHistory = [...terminalInputHistory];
+
+        if (terminalInputHistory.length === MAX_TERMINAL_INPUT_ARRAY_SIZE) {
+            newTerminalInputHistory.shift();
+        }
+
+        store.replace('workspace.terminal.inputHistory', [...newTerminalInputHistory, command]);
+
+        this.setState({ terminalInputHistory: [...newTerminalInputHistory, command], terminalInputIndex: newTerminalInputHistory.length + 1 });
+
+        this.inputRef.current.value = '';
+    }
+
+    updateInputHistoryIndex = (index) => {
+        const { terminalInputHistory } = this.state;
+        if (index < 0) {
+            return;
+        }
+
+        if (index >= terminalInputHistory.length) {
+            this.setState(current => ({ terminalInputIndex: current.terminalInputHistory.length }));
+            this.inputRef.current.value = '';
+            return;
+        }
+
+        this.setState({ terminalInputIndex: index });
+    }
+
+    resetTerminalInputIndex = () => {
+        this.setState(current => ({ terminalInputIndex: current.terminalInputHistory.length }));
+        this.inputRef.current.value = '';
     }
 
     render() {
         const { className, style } = this.props;
+        const { terminalInputIndex } = this.state;
 
         return (
             <div style={{ display: 'grid', width: '100%', gridTemplateRows: '11fr 1fr' }}>
@@ -424,8 +476,38 @@ class TerminalWrapper extends PureComponent {
                     <span style={{ opacity: '0.6' }}>&gt;</span>
                     <input
                         onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
+                            switch (e.key) {
+                            case 'Backspace': {
+                                const { value } = e.target;
+                                //If there is only one character left and the user has pressed the backspace,
+                                //this will mean the value is empty now
+                                if (!value || [...value].length === 1) {
+                                    this.resetTerminalInputIndex();
+                                }
+                                break;
+                            }
+                            case 'Enter': {
                                 this.handleCommandExecute();
+                                break;
+                            }
+
+                            case 'ArrowUp': {
+                                this.updateInputHistoryIndex(terminalInputIndex - 1);
+                                break;
+                            }
+
+                            case 'ArrowDown': {
+                                this.updateInputHistoryIndex(terminalInputIndex + 1);
+                                break;
+                            }
+                            default: {
+                                break;
+                            }
+                            }
+                        }}
+                        onChange={(e) => {
+                            if (!e.target.value) {
+                                this.resetTerminalInputIndex();
                             }
                         }}
                         type="text"
