@@ -154,6 +154,10 @@ class WorkflowControl extends PureComponent {
         const serializedFile = new File([result], name);
         try {
             await api.file.upload(serializedFile, controller.port);
+            reduxStore.dispatch({
+                type: UPDATE_FILE_INFO,
+                payload: { path: fileMetadata.fullPath },
+            });
         } catch (e) {
             console.log(e);
         }
