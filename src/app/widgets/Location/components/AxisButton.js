@@ -30,8 +30,9 @@ import { PRIMARY_COLOR, SECONDARY_COLOR } from '../constants';
 //Main styles
 const Container = styled.div`
         text-align: center;
-        border: 2px solid ${PRIMARY_COLOR};
+        border: 1px solid #9CA3AF;
         border-radius: 5px;
+        background-color: rgba(209, 213, 219, 0.6);
         width: 100%;
         max-width: 5rem;
         min-width: 4rem;
@@ -40,12 +41,12 @@ const Container = styled.div`
        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 
         &.active:hover {
-            color: white;
-            background-color: ${PRIMARY_COLOR};
+            //color: ${PRIMARY_COLOR};
+            background-color: #e5e7eb;
             transition: 200ms ease-in-out;
 
             h3 {
-                color: white;
+                //color: ${PRIMARY_COLOR};
                 transition: 200ms ease-in-out;
             }
         }
