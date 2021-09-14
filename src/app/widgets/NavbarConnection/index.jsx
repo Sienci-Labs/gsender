@@ -354,10 +354,11 @@ class NavbarConnectionWidget extends PureComponent {
     }
 
     render() {
-        const { ports } = this.props;
+        const { ports, unrecognizedPorts } = this.props;
         const state = {
             ...this.state,
             ports,
+            unrecognizedPorts,
             controllerType: GRBL,
         };
         const actions = {
@@ -372,6 +373,7 @@ class NavbarConnectionWidget extends PureComponent {
 
 export default connect((store) => {
     const ports = get(store, 'connection.ports');
+    const unrecognizedPorts = get(store, 'connection.unrecognizedPorts', []);
     const isConnected = get(store, 'connection.isConnected');
     const type = get(store, 'controller.type');
     const port = get(store, 'connection.port');
@@ -381,6 +383,7 @@ export default connect((store) => {
         isConnected,
         type,
         port,
-        connectedBaudrate
+        connectedBaudrate,
+        unrecognizedPorts
     };
 })(NavbarConnectionWidget);

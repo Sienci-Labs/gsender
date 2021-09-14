@@ -79,7 +79,7 @@ class NavbarConnection extends PureComponent {
 
     render() {
         const { state, actions } = this.props;
-        const { ports, connecting, connected, baudrate, controllerType, alertMessage, port } = state;
+        const { ports, connecting, connected, baudrate, controllerType, alertMessage, port, unrecognizedPorts } = state;
 
         const iconState = this.getIconState(connected, connecting, alertMessage);
 
@@ -135,7 +135,7 @@ class NavbarConnection extends PureComponent {
                         )
                     }
                     {
-                        !connected && !connecting && <UnrecognizedDevices />
+                        !connected && !connecting && (unrecognizedPorts.length > 0) && <UnrecognizedDevices ports={unrecognizedPorts}/>
                     }
                 </div>
             </div>

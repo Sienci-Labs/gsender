@@ -113,10 +113,10 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('serialport:list', (ports) => {
+    controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts) => {
         reduxStore.dispatch({
             type: connectionActions.LIST_PORTS,
-            payload: { ports }
+            payload: { recognizedPorts, unrecognizedPorts }
         });
     });
 

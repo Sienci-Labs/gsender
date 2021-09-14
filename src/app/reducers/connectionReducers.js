@@ -29,6 +29,7 @@ const initialState = {
     port: null,
     baudrate: '',
     ports: [],
+    unrecognizedPorts: [],
     err: ''
 };
 
@@ -52,9 +53,10 @@ const reducer = createReducer(initialState, {
         };
     },
     [LIST_PORTS]: (payload, reducerState) => {
-        const { ports } = payload;
+        const { recognizedPorts, unrecognizedPorts } = payload;
         return {
-            ports
+            ports: recognizedPorts,
+            unrecognizedPorts
         };
     }
 });

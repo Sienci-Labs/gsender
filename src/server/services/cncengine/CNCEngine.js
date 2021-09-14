@@ -227,7 +227,7 @@ class CNCEngine {
                             });
 
                         // Filter ports by productId to avoid non-arduino devices from appearing
-                        const validProductIDs = ['6015', '6001', '606D', '003D', '0043', '2341', '7523', 'EA60', '2303', '2145', '0AD8', '08D8'];
+                        const validProductIDs = ['6015', '6001', '606D', '003D', '0042', '0043', '2341', '7523', 'EA60', '2303', '2145', '0AD8', '08D8'];
                         const validVendorIDs = ['1D50', '0403', '2341', '0042', '1A86', '10C4', '067B', '03EB', '16D0'];
                         let [recognizedPorts, unrecognizedPorts] = partition(ports, (port) => {
                             return validProductIDs.includes(port.productId) && validVendorIDs.includes(port.vendorId);
@@ -238,14 +238,23 @@ class CNCEngine {
 
                         const portInfoMapFn = (port) => {
                             return {
-                                port: port.comName,
+                                port: port.path,
                                 manufacturer: port.manufacturer,
-                                inuse: portsInUse.indexOf(port.comName) >= 0
+                                inuse: portsInUse.indexOf(port.path) >= 0
                             };
                         };
 
                         recognizedPorts = recognizedPorts.map(portInfoMapFn);
-                        unrecognizedPorts = unrecognizedPorts.map(portInfoMapFn);
+                        //unrecognizedPorts = unrecognizedPorts.map(portInfoMapFn);
+                        unrecognizedPorts = [{
+                            port: 'COM3',
+                            manufacturer: 'Microsoft',
+                            inuse: false
+                        }, {
+                            port: 'COM7',
+                            manufacturer: 'Broadcom',
+                            inuse: false
+                        }];
 
                         socket.emit('serialport:list', recognizedPorts, unrecognizedPorts);
                     })
