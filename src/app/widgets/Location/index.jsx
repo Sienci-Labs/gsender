@@ -158,6 +158,7 @@ class LocationWidget extends PureComponent {
             this.setState({ minimized: !minimized });
         },
         handleManualMovement: (value, axis) => {
+            const { units } = this.state;
             const wcs = this.actions.getWorkCoordinateSystem();
             const p = {
                 'G54': 1,
@@ -168,8 +169,9 @@ class LocationWidget extends PureComponent {
                 'G59': 6
             }[wcs] || 0;
             //const command = `G90 G0 ${axis.toUpperCase()}${value}`;
+            const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
             const command = `G10 P${p} L20 ${axis.toUpperCase()}${value}`;
-            controller.command('gcode', command);
+            controller.command('gcode:safe', command, modal);
         },
         getJogDistance: () => {
             const { units } = this.state;

@@ -33,6 +33,7 @@ const Container = styled.div`
         border: 1px solid #9CA3AF;
         border-radius: 5px;
         background-color: rgba(209, 213, 219, 0.6);
+        color: ${PRIMARY_COLOR};
         width: 100%;
         max-width: 5rem;
         min-width: 4rem;
@@ -73,6 +74,7 @@ const Container = styled.div`
       font-weight: bold;
       line-height: 1.8rem;
       font-size: 1.6rem;
+      color: ${PRIMARY_COLOR};
     }
 
     p {

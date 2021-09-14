@@ -493,7 +493,6 @@ class MacroWidget extends PureComponent {
 
                     <div className={styles['action-area']}>
                         <FunctionButton
-                            primary
                             type="button"
                             title="Add Macro"
                             onClick={actions.openAddMacroModal}
@@ -501,7 +500,6 @@ class MacroWidget extends PureComponent {
                             <i className="fas fa-plus" />
                         </FunctionButton>
                         <FunctionButton
-                            primary
                             type="button"
                             title="Import Macros"
                             onClick={() => {
@@ -511,7 +509,6 @@ class MacroWidget extends PureComponent {
                             <i className="fas fa-download" />
                         </FunctionButton>
                         <FunctionButton
-                            primary
                             type="button"
                             title="Export Macros"
                             onClick={() => {
