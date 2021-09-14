@@ -28,12 +28,10 @@ import LoaderBar from './LoaderBar';
 
 const FileProcessingLoader = () => {
     return (
-        <div className={styles['job-status-wrapper']}>
-            <div className={idleStyles.idleInfo}>
-                <div><span className={idleStyles.fileName}>Parsing File Attributes</span></div>
-                <div className={styles.processingLoader}>
-                    <LoaderBar />
-                </div>
+        <div className={idleStyles.idleInfo}>
+            <div><span className={idleStyles.fileName}>Parsing File Attributes</span></div>
+            <div className={styles.processingLoader}>
+                <LoaderBar />
             </div>
         </div>
     );
