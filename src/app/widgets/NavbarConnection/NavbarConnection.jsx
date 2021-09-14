@@ -79,12 +79,12 @@ class NavbarConnection extends PureComponent {
 
     render() {
         const { state, actions } = this.props;
-        const { ports, connecting, connected, baudrate, controllerType, alertMessage, port, unrecognizedPorts } = state;
+        const { ports, connecting, connected, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
 
         const iconState = this.getIconState(connected, connecting, alertMessage);
 
         return (
-            <div className={styles.NavbarConnection} onMouseEnter={actions.handleRefreshPorts}>
+            <div className={styles.NavbarConnection} onMouseEnter={actions.handleRefreshPorts} onMouseLeave={actions.hideUnrecognizedDevices}>
                 <div className={`${styles.NavbarConnectionIcon} ${styles[iconState]}`}>
                     <i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />
                 </div>
@@ -135,7 +135,20 @@ class NavbarConnection extends PureComponent {
                         )
                     }
                     {
-                        !connected && !connecting && (unrecognizedPorts.length > 0) && <UnrecognizedDevices ports={unrecognizedPorts}/>
+                        !connected && !connecting && (unrecognizedPorts.length > 0) && <UnrecognizedDevices ports={unrecognizedPorts} onClick={actions.toggleShowUnrecognized} />
+                    }
+                    {
+                        !connected && !connecting && showUnrecognized && unrecognizedPorts.map(
+                            port => (
+                                <PortListing
+                                    {...port}
+                                    key={port.port}
+                                    baudrate={baudrate}
+                                    controllerType={controllerType}
+                                    onClick={() => actions.onClickPortListing(port)}
+                                />
+                            )
+                        )
                     }
                 </div>
             </div>

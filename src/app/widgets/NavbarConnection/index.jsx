@@ -118,6 +118,12 @@ class NavbarConnectionWidget extends PureComponent {
                 }
             }));
         },
+        toggleShowUnrecognized: () => {
+            const { showUnrecognized } = this.state;
+            this.setState({
+                showUnrecognized: !showUnrecognized
+            });
+        },
         handleRefreshPorts: (event) => {
             this.refreshPorts();
         },
@@ -128,9 +134,13 @@ class NavbarConnectionWidget extends PureComponent {
         handleClosePort: (event) => {
             const { port } = this.state;
             this.closePort(port);
+        },
+        hideUnrecognizedDevices: () => {
+            this.setState({
+                showUnrecognized: false
+            });
         }
     };
-
 
     setConnectedState() {
         const { port, connectedBaudrate } = this.props;
@@ -235,7 +245,8 @@ class NavbarConnectionWidget extends PureComponent {
             },
             autoReconnect: this.config.get('autoReconnect'),
             hasReconnected: false,
-            alertMessage: ''
+            alertMessage: '',
+            showUnrecognized: false
         };
     }
 
@@ -339,9 +350,6 @@ class NavbarConnectionWidget extends PureComponent {
                     baudrate: value
                 });
             }),
-            pubsub.subscribe('autoReconnect:attempt'), (msg) => {
-
-            }
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
