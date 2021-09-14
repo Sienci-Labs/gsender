@@ -245,8 +245,8 @@ class CNCEngine {
                         };
 
                         recognizedPorts = recognizedPorts.map(portInfoMapFn);
-                        //unrecognizedPorts = unrecognizedPorts.map(portInfoMapFn);
-                        unrecognizedPorts = [{
+                        unrecognizedPorts = unrecognizedPorts.map(portInfoMapFn);
+                        /*unrecognizedPorts = [{
                             port: 'COM3',
                             manufacturer: 'Microsoft',
                             inuse: false
@@ -254,7 +254,7 @@ class CNCEngine {
                             port: 'COM7',
                             manufacturer: 'Broadcom',
                             inuse: false
-                        }];
+                        }];*/
 
                         socket.emit('serialport:list', recognizedPorts, unrecognizedPorts);
                     })
