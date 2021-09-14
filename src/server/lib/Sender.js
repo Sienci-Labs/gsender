@@ -371,20 +371,26 @@ class Sender extends events.EventEmitter {
             return false;
         }
 
-        if (lineToStartFrom) {
-            this.state.sent = lineToStartFrom;
-            this.state.received = lineToStartFrom;
-        }
-
         const now = new Date().getTime();
 
-        if (this.state.total > 0 && this.state.sent === 0) {
+        const handleStart = () => {
             this.state.startTime = now;
             this.state.finishTime = 0;
             this.state.elapsedTime = 0;
             this.state.remainingTime = 0;
             this.emit('start', this.state.startTime);
             this.emit('change');
+        };
+
+        if (lineToStartFrom) {
+            this.state.sent = lineToStartFrom;
+            this.state.received = lineToStartFrom;
+
+            handleStart();
+        }
+
+        if (this.state.total > 0 && this.state.sent === 0) {
+            handleStart();
         }
 
         if (this.sp) {
