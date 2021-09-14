@@ -100,20 +100,42 @@
     }
 }
 
-.file-text {
-    color: #3e85c7;
-    font-size: 1.1rem;
-    height: 1.9rem;
-}
-
-.file-path {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    & div {
+.file {
+    wrapping() {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    &-info {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    &-name {
+        wrapping();
+
+        width: 100%;
+        max-width: 32vw;
+
+        & div {
+            wrapping();
+        }
+    }
+
+    &-text {
+        color: #3e85c7;
+        font-size: 1.1rem;
+        height: 1.75rem;
+    }
+
+    &-path {
+        width: 100%;
+        max-width: 32vw;
+    }
+
+    &-path, &-path div {
+        wrapping();
     }
 }
