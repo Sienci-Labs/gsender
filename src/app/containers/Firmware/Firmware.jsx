@@ -29,6 +29,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Modal from 'app/components/Modal';
 import controller from 'app/lib/controller';
+import CategoryTag from 'app/containers/Firmware/CategoryTag';
 import map from 'lodash/map';
 import get from 'lodash/get';
 import download from 'downloadjs';
@@ -44,7 +45,6 @@ import * as GRBL_SETTINGS from '../../../server/controllers/Grbl/constants';
 import NotConnectedWarning from './NotConnectedWarning';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import ToolModalButton from '../../components/ToolModalButton/ToolModalButton';
-
 
 class Firmware extends PureComponent {
     static propTypes = {
@@ -490,7 +490,10 @@ class Firmware extends PureComponent {
                                 <div key={grbl.setting} className={styles.containerFluid}>
                                     <div className={styles.tableRow}>
                                         <div className={styles.settingsInformation}>
-                                            <div className={styles.keyRow}>{grbl.setting}</div>
+                                            <div className={styles.keyRow}>
+                                                {grbl.setting}
+                                                <CategoryTag category={grbl.category} />
+                                            </div>
                                             <div className={styles.settingsDescription}>
                                                 <div className={styles.itemText}>{grbl.message}</div>
                                                 <div className={styles.descriptionRow}>{grbl.description}</div>
