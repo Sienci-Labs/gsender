@@ -27,6 +27,7 @@ import ensureArray from 'ensure-array';
 import get from 'lodash/get';
 import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
+import includes from 'lodash/includes';
 import { throttle, inRange } from 'lodash';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -53,7 +54,7 @@ import {
     METRIC_STEPS,
     // Workflow
     GRBL_ACTIVE_STATE_JOG,
-    GRBL_ACTIVE_STATE_IDLE, WORKFLOW_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM
+    GRBL_ACTIVE_STATE_IDLE, WORKFLOW_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD, WORKFLOW_STATE_RUNNING
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -1048,16 +1049,21 @@ class AxesWidget extends PureComponent {
     }
 
     canClick() {
-        const { isContinuousJogging } = this.state;
+        //const { isContinuousJogging } = this.state;
         const { workflow, isConnected, activeState } = this.props;
 
         if (!isConnected) {
             return false;
         }
-        if (workflow.state !== WORKFLOW_STATE_IDLE && !isContinuousJogging) {
+        if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        return activeState !== GRBL_ACTIVE_STATE_ALARM;
+        const states = [
+            GRBL_ACTIVE_STATE_IDLE,
+            GRBL_ACTIVE_STATE_HOLD,
+            GRBL_ACTIVE_STATE_JOG
+        ];
+        return includes(states, activeState);
     }
 
     isJogging() {

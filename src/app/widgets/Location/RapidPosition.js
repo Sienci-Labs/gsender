@@ -132,6 +132,5 @@ export const getMovementGCode = (requestedPosition, homingPositionSetting) => {
     }
     gcode.push(`G53 G21 G0 X${xMovement} Y${yMovement}`);
 
-    console.log(gcode);
     return gcode;
 };

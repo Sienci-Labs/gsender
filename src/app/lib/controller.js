@@ -171,6 +171,7 @@ class Controller {
             this.reconnect();
         });
 
+
         Object.keys(this.listeners).forEach((eventName) => {
             if (!this.socket) {
                 console.log('No socket found, ending connect early');

@@ -338,7 +338,7 @@ class GrblController {
 
                     // Expression
                     // %_x=posx,_y=posy,_z=posz
-                    this.sharedContext = evaluateAssignmentExpression(line.slice(1), context);
+                    evaluateAssignmentExpression(line.slice(1), context);
                     return '';
                 }
 
@@ -612,14 +612,13 @@ class GrblController {
         this.runner.on('alarm', (res) => {
             const code = Number(res.message) || undefined;
             const alarm = _.find(GRBL_ALARMS, { code: code });
-            console.log('RUNNER ALARM');
 
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
-                console.log(this.state);
+
                 this.emit('controller:state', GRBL, this.state);
             } else {
                 // Grbl v0.9

@@ -506,7 +506,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$30',
         message: 'Maximum spindle speed',
-        category: 'Limits',
+        category: 'Spindle',
         units: 'rpm',
         description: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
         inputType: 'number',
@@ -517,7 +517,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$31',
         message: 'Minimum spindle speed',
-        category: 'Limits',
+        category: 'Spindle',
         units: 'rpm',
         description: 'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
         inputType: 'number',
@@ -527,10 +527,10 @@ export const GRBL_SETTINGS = [
     },
     {
         setting: '$32',
-        message: 'Laser-mode enable',
-        category: 'GRBL',
+        message: 'Laser-mode enabled as spindle',
+        category: 'Spindle',
         units: 'boolean',
-        description: 'Enables laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed.',
+        description: 'Converts spindle commands into laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed.',
         inputType: 'switch'
     },
     {
@@ -635,7 +635,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$130',
         message: 'X-axis maximum travel',
-        category: 'Motors',
+        category: 'Limits',
         units: 'mm',
         description: 'Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
         inputType: 'number',
@@ -646,7 +646,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$131',
         message: 'Y-axis maximum travel',
-        category: 'Motors',
+        category: 'Limits',
         units: 'mm',
         description: 'Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
         inputType: 'number',
@@ -657,7 +657,7 @@ export const GRBL_SETTINGS = [
     {
         setting: '$132',
         message: 'Z-axis maximum travel',
-        category: 'Motors',
+        category: 'Limits',
         units: 'mm',
         description: 'Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
         inputType: 'number',

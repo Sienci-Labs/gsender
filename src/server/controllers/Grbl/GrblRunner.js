@@ -127,7 +127,6 @@ class GrblRunner extends events.EventEmitter {
                 status: {
                     ...this.state.status,
                     probeActive: probeActive,
-                    pinState: payload.pinState,
                     ...payload
                 }
             };

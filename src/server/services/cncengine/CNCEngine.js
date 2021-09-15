@@ -177,7 +177,6 @@ class CNCEngine {
                 baudrates: ensureArray(config.get('baudrates', [])),
                 ports: ensureArray(config.get('ports', []))
             });
-
             socket.on('disconnect', () => {
                 log.debug(`Disconnected from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`);
 
