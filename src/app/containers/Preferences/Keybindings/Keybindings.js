@@ -174,11 +174,11 @@ export default class Keybindings extends Component {
                 <div style={{ display: 'grid', columnGap: '1rem', gridTemplateColumns: '1fr 1fr' }}>
                     <FunctionButton primary onClick={enableAllKeybindings} disabled={allShortcutsEnabled}>
                         <i className="fas fa-toggle-on" />
-                        Enable All Keybindings
+                        Enable All Shortcuts
                     </FunctionButton>
                     <FunctionButton primary onClick={disableAllKeybindings} disabled={allShortcutsDisabled}>
                         <i className="fas fa-toggle-off" />
-                        Disable All Keybindings
+                        Disable All Shortcuts
                     </FunctionButton>
                 </div>
 

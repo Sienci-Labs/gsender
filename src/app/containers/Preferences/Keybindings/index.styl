@@ -11,6 +11,7 @@ $primary = #3e85c7;
   height: 565px;
   overflow-y: scroll;
   background-color: white;
+  overflow-x: hidden;
 }
 
 .profile-item {
@@ -37,10 +38,10 @@ $primary = #3e85c7;
     background-color: $primary;
     border: 2px solid $primary;
 
-    
+
     hoverEffect() {
       transition: 450ms ease-in-out;
-      color: $hoverColor;      
+      color: $hoverColor;
     }
 
     .profile-item-title, .profile-item-icon {
@@ -77,7 +78,7 @@ $primary = #3e85c7;
     border-bottom-right-radius: 5px;
     color: limegreen;
   }
-  
+
   &-delete {
     position: absolute;
     top: 0px
