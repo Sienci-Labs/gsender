@@ -38,6 +38,7 @@ import {
     WORKFLOW_STATE_PAUSED
 } from '../../constants';
 import FileProcessingLoader from './components/FileProcessingLoader';
+import styles from './index.styl';
 
 
 class JobStatusWidget extends PureComponent {
@@ -186,7 +187,7 @@ class JobStatusWidget extends PureComponent {
         };
 
         return (
-            <>
+            <div className={styles['job-status-wrapper']}>
                 {fileProcessing
                     ? <FileProcessingLoader />
                     : (
@@ -196,7 +197,7 @@ class JobStatusWidget extends PureComponent {
                         />
                     )
                 }
-            </>
+            </div>
         );
     }
 }
