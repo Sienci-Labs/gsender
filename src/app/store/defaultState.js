@@ -155,6 +155,9 @@ const defaultState = {
             deadZone: 0.5,
             precision: 3,
             profiles: [],
+        },
+        terminal: {
+            inputHistory: [],
         }
     },
     widgets: {
