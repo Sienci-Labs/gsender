@@ -30,9 +30,9 @@ import { PRIMARY_COLOR, SECONDARY_COLOR } from '../constants';
 //Main styles
 const Container = styled.div`
         text-align: center;
-        border: 1px solid #9CA3AF;
+        border: 2px solid ${PRIMARY_COLOR};
         border-radius: 5px;
-        background-color: rgba(209, 213, 219, 0.6);
+        background-color: #e5e7eb;
         color: ${PRIMARY_COLOR};
         width: 100%;
         max-width: 5rem;
@@ -43,7 +43,8 @@ const Container = styled.div`
 
         &.active:hover {
             //color: ${PRIMARY_COLOR};
-            background-color: #e5e7eb;
+            
+          background-color: rgba(209, 213, 219, 0.6);
             transition: 200ms ease-in-out;
 
             h3 {
@@ -74,7 +75,7 @@ const Container = styled.div`
       font-weight: bold;
       line-height: 1.8rem;
       font-size: 1.6rem;
-      color: ${PRIMARY_COLOR};
+      color: #000000;
     }
 
     p {
