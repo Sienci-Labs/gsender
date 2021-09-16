@@ -289,7 +289,6 @@ class Header extends PureComponent {
 
     render() {
         const { updateAvailable, connected } = this.state;
-        console.log(connected);
         return (
             <div className={styles.navBar}>
                 <div className={styles.primary}>

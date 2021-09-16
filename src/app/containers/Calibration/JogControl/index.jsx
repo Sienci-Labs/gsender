@@ -165,7 +165,6 @@ class AxesWidget extends PureComponent {
         getFeedrate: () => {
             const { jog } = this.state;
             const { feedrate } = jog;
-            console.log(jog);
             return feedrate;
         },
         getJogDistance: () => {
