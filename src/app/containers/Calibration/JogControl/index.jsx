@@ -62,7 +62,9 @@ import {
     MODAL_NONE,
     DEFAULT_AXES,
     SPEED_NORMAL,
+    SPEED_PRECISE
 } from './constants';
+
 
 class AxesWidget extends PureComponent {
     pubsubTokens = [];
@@ -163,6 +165,7 @@ class AxesWidget extends PureComponent {
         getFeedrate: () => {
             const { jog } = this.state;
             const { feedrate } = jog;
+            console.log(jog);
             return feedrate;
         },
         getJogDistance: () => {
@@ -567,6 +570,7 @@ class AxesWidget extends PureComponent {
 
     componentDidMount() {
         store.on('change', this.updateJogPresets);
+        this.actions.setJogFromPreset(SPEED_PRECISE);
         this.addShuttleControlEvents();
         this.subscribe();
     }
@@ -630,7 +634,7 @@ class AxesWidget extends PureComponent {
             jog: {
                 xyStep: this.getInitialXYStep(),
                 zStep: this.getInitialZStep(),
-                feedrate: this.config.get('jog.feedrate'),
+                feedrate: this.config.get('jog.precise.mm.feedrate'),
                 rapid,
                 normal,
                 precise,
