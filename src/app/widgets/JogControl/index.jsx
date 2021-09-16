@@ -54,7 +54,9 @@ import {
     METRIC_STEPS,
     // Workflow
     GRBL_ACTIVE_STATE_JOG,
-    GRBL_ACTIVE_STATE_IDLE, WORKFLOW_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD, WORKFLOW_STATE_RUNNING
+    GRBL_ACTIVE_STATE_IDLE, WORKFLOW_STATE_IDLE,
+    //GRBL_ACTIVE_STATE_HOLD,
+    WORKFLOW_STATE_RUNNING
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -1060,7 +1062,7 @@ class AxesWidget extends PureComponent {
         }
         const states = [
             GRBL_ACTIVE_STATE_IDLE,
-            GRBL_ACTIVE_STATE_HOLD,
+            //GRBL_ACTIVE_STATE_HOLD,
             GRBL_ACTIVE_STATE_JOG
         ];
         return includes(states, activeState);

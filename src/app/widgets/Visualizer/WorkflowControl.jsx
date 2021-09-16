@@ -49,7 +49,7 @@ import {
     TOASTER_INFO
 } from '../../lib/toaster/ToasterLib';
 import {
-    GRBL_ACTIVE_STATE_ALARM,
+    GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_CHECK, GRBL_ACTIVE_STATE_HOLD,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
@@ -182,14 +182,15 @@ class WorkflowControl extends PureComponent {
             return false;
         }
         const states = [
-            GRBL_ACTIVE_STATE_ALARM
+            GRBL_ACTIVE_STATE_IDLE,
+            GRBL_ACTIVE_STATE_HOLD
         ];
 
         if (includes([GRBL_ACTIVE_STATE_CHECK], activeState) && !includes([WORKFLOW_STATE_PAUSED, WORKFLOW_STATE_IDLE], workflowState)) {
             return false;
         }
 
-        return !includes(states, activeState);
+        return includes(states, activeState);
     }
 
     handleOnStop = () => {
