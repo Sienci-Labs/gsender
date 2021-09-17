@@ -250,6 +250,7 @@
 }
 
 .jog-cancel-button {
+    clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)
     color: #dc2626;
     border: none;
     outline: none;
@@ -257,13 +258,13 @@
     align-items: center;
     justify-content: center;
     background: none;
-    border-radius: 9999px;
+    //border: solid 1px #4b5563;
     background: #cccccc;
     --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 
     &:hover:enabled {
-        animation: pulse-red 1s infinite;
+        //animation: pulse-red 1s infinite;
     }
 
     i {

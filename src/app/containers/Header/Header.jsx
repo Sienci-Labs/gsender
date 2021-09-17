@@ -279,7 +279,7 @@ class Header extends PureComponent {
         window.ipcRenderer.on('updated_error', (event, err) => {
             console.log(err);
         });
-        window.ipcRenderer.once('update_available', (info) => {
+        window.ipcRenderer.on('update_available', (info) => {
             this.setState({
                 updateAvailable: true
             });
