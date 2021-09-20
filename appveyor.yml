@@ -37,6 +37,10 @@ environment:
       secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
     GITHUB_TOKEN:
       secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
+    CSC_KEY_PASSWORD:
+      secure: IwRZOEgY4HuJtp93f9eIfQ==
+    CSC_LINK:
+      secure: Sze/ew59fvwY6RZR3TdVBoHMxpc+LuW1XIoOTe69CLaa1PuOZn9hg7TZKfAvibKNg1sTxI+eKLm1i15WPE8atjqSJNzEr1OXi9nXQQNiv5bJiNhQQltgdNU2arDpfF0l
 
 for:
   # Linux
