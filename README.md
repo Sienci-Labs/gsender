@@ -101,13 +101,13 @@ gSender is also designed in a way that it can be run locally on your computer br
 ## 🕣 Development History
 
 ### Open Beta 0.7.3 (Sept 20, 2021)
-* Code signed!
-* Various fixes for homing related functions
-* Categorized EEPROM settings
+* Code signed! (this means security certification - i.e. no more firewall warnings)
+* New recognized CNCs added and unrecognized devices are now accesible from the connection widget
 * UI fixes for incorrect baudrate
-* Unrecognized devices are now accesible from the connection widget
-* Clearer directions to help
-* Updated firmware image
+* New EEPROM categories for easier navigation
+* Clearer Help menu
+* More fixes and improvements to endstop-related functions
+* New LongMill default firmware that better supports endstops
 * Fix for jog not stopping immediately due to debounce
 * Various styling fixes
 
