@@ -31,7 +31,7 @@ gSender is available for the following systems and does not yet support headless
 
 * [GRBL](https://github.com/gnea/grbl/releases) controllers supported
 * Smart machine connection
-* 3-axis digital readout (DRO)
+* 3-axis digital readout (DRO) with manual value entry
 * All-directional jogging with XY diagonals, jog presets, and incremental/continuous single-button handling
 * Zero-setting and gotos (independant and combined)
 * Probing in any direction plus safe continuity detection ensures no broken cutting tools
@@ -101,22 +101,20 @@ gSender is also designed in a way that it can be run locally on your computer br
 ## 🕣 Development History
 
 ### Open Beta 0.7.2 (Sept 10, 2021)
-* Able to set workspace coordinates for specific axis quickly by clicking on location indicator 
-* Re-designed progress indicator
-* Able to use variables in tool change code
+* Manual value entry for X, Y, and Z locations by clicking on the location indicator
+* Re-designed job progress indicator that better shows operating time and path of current file
+* Now able to use variables in start/stop g-code blocks and tool changing
 * Ability to enable or disable start/stop g-code blocks without clearing code
-* Updates to included firmware image and Longmill default EEPROM settings in firmware tool
-* Homing improvements - functions will appear if $22 toggled on, home button clickable if alarmed
-* Rapid position buttons updated to use new firmware settings
-* Individual axis Go To buttons now use safe height if set in preferences
+* Updates to included firmware image and Longmill default EEPROM settings in firmware tool to support endstops
+* Endstop buttons now appear automatically if homing is enabled, and the home button is available on machine connect
+* Rapid position buttons now available and updated to use new firmware settings
+* Individual X and Y axis Go To buttons now use safe height if set in preferences, GotoXYZ0 now changed to GotoXY0, and safe height now complies to endstop-enabled machines and doesn’t descend after movement
 * Better support of physical hold/unhold buttons on Longboard controller
-* Tweaks to Z jogging to make button more responsive and not continuous jog as easily as well as move slower in Z direction
-* Safe height movements will no longer descend and will now use machines coordinates if homing enabled
+* Tweaks to Z jogging to reduce runaway issues
 * Fixed hard limit alarms to allow easier resuming of workflow
-* Fixed surfacing Z movement at end of program
+* Fixed bug with Z movement at end of surfacing program in imperial units
 * Joystick jogging should now send jog cancel at direction control release
 * Fixed last line run to reset on job completion
-
 
 ### Open Beta 0.7.1 (August 20, 2021)
 * Improvements to UI connection to CNC machine to prevent frequent disconnections during long job runs
