@@ -102,7 +102,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ### Open Beta 0.7.3 (Sept 20, 2021)
 * Code signed! (this means security certification - i.e. no more firewall warnings)
-* New recognized CNCs added and unrecognized devices are now accesible from the connection widget
+* New recognized CNCs added and unrecognized devices are now accessible from the connection widget
 * UI fixes for incorrect baudrate
 * New EEPROM categories for easier navigation
 * Clearer Help menu
