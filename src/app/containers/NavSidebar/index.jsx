@@ -28,6 +28,7 @@ import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import { GRBL } from 'app/constants';
 import store from 'app/store';
+import HelpModal from 'app/containers/Help';
 import NavSidebarLink from './NavSideBarLink';
 import styles from './index.styl';
 import {
@@ -35,12 +36,14 @@ import {
     MODAL_PREFERENCES,
     MODAL_FIRMWARE,
     MODAL_SURFACING,
-    MODAL_CALIBRATE
+    MODAL_CALIBRATE,
+    MODAL_HELP
 } from './constants';
 import Preferences from '../Preferences/Preferences';
 import Firmware from '../Firmware/Firmware';
 import Surfacing from '../Surfacing';
 import Calibration from '../Calibration';
+
 
 class NavSidebar extends PureComponent {
     state = this.getInitialState();
@@ -166,9 +169,10 @@ class NavSidebar extends PureComponent {
                     label="Firmware"
                 />
                 <NavSidebarLink
+                    url=""
                     icon="fa fa-question"
                     label="Help"
-                    onClick={() => window.open('https://sienci.com/gsender-documentation/', '_blank')}
+                    onClick={() => actions.openModal(MODAL_HELP)}
                 />
                 <NavSidebarLink
                     url="" onClick={() => actions.openModal(MODAL_PREFERENCES)} icon="fa fa-cog"
@@ -178,6 +182,7 @@ class NavSidebar extends PureComponent {
                 { state.modal.name === MODAL_PREFERENCES && <Preferences state={state} modalClose={actions.closeModal} /> }
                 { state.modal.name === MODAL_SURFACING && <Surfacing state={state} modalClose={actions.closeModal} /> }
                 { state.modal.name === MODAL_CALIBRATE && <Calibration state={state} modalClose={actions.closeModal} /> }
+                { state.modal.name === MODAL_HELP && <HelpModal modalClose={actions.closeModal} /> }
             </div>
         );
     }

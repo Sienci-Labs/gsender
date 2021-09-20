@@ -21,21 +21,37 @@
  *
  */
 
-import constants from 'namespace-constants';
+.help-modal-header {
+  width: 100%
+  margin: 0;
+  //color: #3e85c7;
+  background: #d1d5db;
+  padding: 0.5rem 1rem;
+  border-bottom: solid 2px #6b7280;
+}
 
-export const {
-    MODAL_NONE,
-    MODAL_PREFERENCES,
-    MODAL_WIZARD,
-    MODAL_FIRMWARE,
-    MODAL_SURFACING,
-    MODAL_CALIBRATE,
-    MODAL_HELP
-} = constants('widgets/macro', [
-    'MODAL_NONE',
-    'MODAL_PREFERENCES',
-    'MODAL_WIZARD',
-    'MODAL_FIRMWARE',
-    'MODAL_CALIBRATE',
-    'MODAL_HELP'
-]);
+.help-modal {
+  width: 700px;
+  display: flex;
+  flex-direction column;
+  gap: 0.25rem;
+  padding: 2rem 1rem 0.5rem 1rem;
+
+  p {
+    margin-bottom: 2rem;
+    i {
+      margin-left: 0.5rem;
+    }
+  }
+
+
+  b {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+
+    i {
+      margin-right: 0.5rem;
+      font-size: 1.2rem !important;
+    }
+  }
+}
