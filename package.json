@@ -88,7 +88,7 @@
       "allowToChangeInstallationDirectory": true,
       "oneClick": false,
       "license": "LICENSE",
-      "perMachine": false,
+      "perMachine": true,
       "installerSidebar": "electron-build/sidebar.bmp"
     },
     "publish": {

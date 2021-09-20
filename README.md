@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.2/gSender-0.7.2-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.2/gSender-0.7.2-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.2/gSender-0.7.2.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.2/gSender_0.7.2_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.2/gSender-0.7.2-armv7l.AppImage)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.3/gSender-0.7.3-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.3/gSender-0.7.3-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.3/gSender-0.7.3.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.3/gSender_0.7.3_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.3/gSender-0.7.3-armv7l.AppImage)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -99,6 +99,17 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### Open Beta 0.7.3 (Sept 20, 2021)
+* Code signed!
+* Various fixes for homing related functions
+* Categorized EEPROM settings
+* UI fixes for incorrect baudrate
+* Unrecognized devices are now accesible from the connection widget
+* Clearer directions to help
+* Updated firmware image
+* Fix for jog not stopping immediately due to debounce
+* Various styling fixes
 
 ### Open Beta 0.7.2 (Sept 10, 2021)
 * Manual value entry for X, Y, and Z locations by clicking on the location indicator
