@@ -21,29 +21,26 @@
  *
  */
 
-.tool-modal {
-  width: 1000px;
-  height: 700px;
-  display: flex;
-  flex-direction column;
-  flex-grow: 1;
-}
+import React from 'react';
+import styles from './index.styl';
 
- .header {
-  display: flex;
-  align-items center;
-  margin-bottom: 0;
-  border-bottom: solid 1px #9CA3AF;
-  height: 60px;
-}
+const HelpCard = ({ title, text, link, icon, linkText }) => {
+    return (
+        <div className={styles.cardBase}>
+            <a href={link} target="_blank" className={styles.overLink}> </a>
+            <div className={styles.externalIcon}>
+                <i className="fas fa-external-link-alt" />
+            </div>
+            <h2>{ title }</h2>
+            <div className={styles.cardIcon}>
+                <i className={`fa ${icon}`} />
+            </div>
+            <div className={styles.cardText}>
+                { text }
+            </div>
+            <a className={styles.cardLink} target="_blank" href={link}>{ linkText }</a>
+        </div>
+    );
+};
 
-.header-text {
-  margin: 0;
-  margin-left: 1rem;
-}
-
-.container {
-  height: calc(100% - 60px);
-  background-color: #e5e7eb;
-  width: 100%;
-}
+export default HelpCard;

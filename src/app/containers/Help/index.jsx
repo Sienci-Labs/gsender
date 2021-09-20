@@ -22,8 +22,10 @@
  */
 
 import React from 'react';
-import Modal from 'app/components/Modal';
+import ToolModal from 'app/components/ToolModal/ToolModal';
+import HelpCard from 'app/containers/Help/HelpCard';
 import styles from './index.styl';
+
 
 const REPORT_FORM_LINK = 'https://docs.google.com/forms/d/e/1FAIpQLScKf48OZEcqqkcQmmdVRAwCud-sfNDphNK3rbd7VdkqUJKTDA/viewform';
 const DOCUMENTATION_LINK = 'https://resources.sienci.com/view/gs-using-gsender/';
@@ -31,17 +33,36 @@ const FORUM_LINK = 'https://forum.sienci.com/c/gsender/14';
 
 const HelpModal = ({ modalClose }) => {
     return (
-        <Modal onClose={modalClose}>
-            <h1 className={styles.helpModalHeader}>gSender Help</h1>
-            <div className={styles.helpModal}>
-                <b><i className="fa fa-bug" />Do you want to submit a bug or feedback on the current version?</b>
-                <p><a href={REPORT_FORM_LINK} target="_blank">&bull; Bugs and other feedback for the current beta version can be submitted here <i className="fa fa-external-link-alt" /></a></p>
-                <b><i className="fa fa-book"/>Do you want to learn how to use a specific feature in gSender?</b>
-                <p><a href={DOCUMENTATION_LINK} target="_blank">&bull; Documentation is constantly being updated and can be found here. <i className="fa fa-external-link-alt" /></a></p>
-                <b><i className="fa fa-comments" /> Do you want to ask the community a question about gSender?</b>
-                <p><a href={FORUM_LINK} target="_blank">&bull; Our helpful and friendly community members can be found here. <i className="fa fa-external-link-alt" /></a></p>
+        <ToolModal
+            onClose={modalClose}
+            title="gSender Help"
+        >
+            <div className={styles.helpWrapper}>
+                <div className={styles.helpModal}>
+                    <HelpCard
+                        link={REPORT_FORM_LINK}
+                        title="Feedback"
+                        text="Submit bugs or feedback about the current version of gSender."
+                        linkText="Help us improve"
+                        icon="fa-bug"
+                    />
+                    <HelpCard
+                        link={DOCUMENTATION_LINK}
+                        title="Documentation"
+                        text="Learn about starting with gSender and how to use specific features."
+                        linkText="Explore"
+                        icon="fa-book"
+                    />
+                    <HelpCard
+                        link={FORUM_LINK}
+                        title="Community"
+                        text="Our forums are a great place to go to have continued conversations with our friendly and helpful community."
+                        linkText="Engage"
+                        icon="fa-comments"
+                    />
+                </div>
             </div>
-        </Modal>
+        </ToolModal>
     );
 };
 
