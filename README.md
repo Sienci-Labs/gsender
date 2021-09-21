@@ -49,9 +49,9 @@ gSender is available for the following systems and does not yet support headless
 * Macros buttons (rearrangeable) with enhanced macro variables and individually assignable keyboard shortcuts
 * Lightweight mode reduces processing intensity on less powerful hardware or when running larger files
 * Easy workspace swapping for more advanced jigging or alignment work
-* Optional automatic handling for common error throwing gcode
-* Firmware tool for easier GRBL eeprom changes, loading defaults, and GRBL flashing
-* Surfacing tool auto-generates surfacing gcode based on machine cutting area and other preferences, ready to execute
+* Optional automatic handling for common error throwing g-code
+* Firmware tool for easier GRBL EEPROM changes, loading defaults, and GRBL flashing
+* Surfacing tool auto-generates surfacing g-code based on machine cutting area and other preferences, ready to execute
 * Calibration tool for axis alignment - a step by step process to make sure your CNC is square
 * Movement tuning tool for calibrating motor axis movements
 * Tool change functionality - pause, ignore, or run code blocks on M6 commands
