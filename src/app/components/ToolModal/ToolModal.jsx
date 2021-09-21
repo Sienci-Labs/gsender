@@ -34,7 +34,6 @@ const ToolModal = ({ onClose, title, style, className, size, children }) => {
             onClose={onClose}
             style={style}
             className={className}
-            size={size}
         >
             <div className={styles.toolModal}>
                 <div className={styles.header}>
