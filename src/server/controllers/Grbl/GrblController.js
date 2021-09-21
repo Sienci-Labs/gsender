@@ -352,8 +352,11 @@ class GrblController {
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
                     if (programMode === 'M0') {
                         log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
-                        this.workflow.pause({ data: 'M0' });
-                        this.emit('workflow:pause', { data: 'M0' });
+                        // Workaround for Carbide files - prevent M0 early from pausing program
+                        if (sent > 10) {
+                            this.workflow.pause({ data: 'M0' });
+                            this.emit('workflow:pause', { data: 'M0' });
+                        }
                         return line.replace('M0', '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);

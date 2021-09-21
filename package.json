@@ -104,6 +104,7 @@
     "dmg": {
       "background": "electron-build/background.png",
       "icon": "electron-build/icon.icns",
+      "CSC_IDENTITY_AUTO_DISCOVERY": false,
       "iconSize": 80,
       "iconTextSize": 12,
       "contents": [
