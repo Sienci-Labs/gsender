@@ -22,27 +22,26 @@
  */
 
 import React from 'react';
-import styles from '../index.styl';
 
-const Tool = ({ metricDiameter, imperialDiameter, type, onDelete }) => {
+import SettingWrapper from '../components/SettingWrapper';
+import GeneralArea from '../components/GeneralArea';
+
+import VisualizerOptions from './VisualizerOptions';
+import Theme from './Theme';
+
+const VisualizerSettings = ({ active, state, actions }) => {
     return (
-        <div className={styles.tool}>
-            <div className={styles.toolDimensions}>
-                <div><b>{metricDiameter}</b>mm</div>
-                <div><b>{imperialDiameter}</b>in</div>
-            </div>
-            <div>{type}</div>
-            <button
-                type="button"
-                className={styles.delete}
-                alt="Delete Tool"
-                onClick={onDelete}
-            >
-                <i className="far fa-trash-alt" />
-            </button>
-
-        </div>
+        <SettingWrapper title="Visualizer" show={active}>
+            <GeneralArea>
+                <GeneralArea.Half>
+                    <VisualizerOptions state={state} actions={actions} />
+                </GeneralArea.Half>
+                <GeneralArea.Half>
+                    <Theme state={state} actions={actions} />
+                </GeneralArea.Half>
+            </GeneralArea>
+        </SettingWrapper>
     );
 };
 
-export default Tool;
+export default VisualizerSettings;

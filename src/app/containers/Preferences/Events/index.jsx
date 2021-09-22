@@ -22,15 +22,19 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import classNames from 'classnames';
+
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import { Toaster, TOASTER_DANGER, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import api from 'app/api';
 import ToggleSwitch from 'app/components/ToggleSwitch';
-import FieldSet from '../FieldSet';
+
+import Fieldset from '../components/Fieldset';
+import SettingWrapper from '../components/SettingWrapper';
+import GeneralArea from '../components/GeneralArea';
+
 import styles from '../index.styl';
 
-const Index = ({ active }) => {
+const Events = ({ active }) => {
     const [programStartEvent, setProgramStartEvent] = useState(null);
     const [programEndEvent, setProgramEndEvent] = useState(null);
     const [programStartCode, setProgramStartCode] = useState('');
@@ -153,53 +157,46 @@ const Index = ({ active }) => {
         }
     }, []);
 
-
     return (
-        <div className={classNames(
-            styles.hidden,
-            styles['settings-wrapper'],
-            { [styles.visible]: active }
-        )}
-        >
-            <h3 className={styles.settingsTitle}>
-                Start/Stop G-Code
-            </h3>
-            <div className={styles.generalArea}>
-                <div className={styles.flexColumn}>
-                    <FieldSet legend="Program Start" className={styles.paddingBottom}>
+        <SettingWrapper title="Start/Stop G-Code" show={active}>
+            <GeneralArea>
+                <div className={styles.flexColumn} style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between' }}>
+                    <Fieldset legend="Program Start" className={styles.paddingBottom}>
                         <div className={styles.toggleContainer}>
                             <ToggleSwitch checked={startEnabled} onChange={toggleStartEvent} label="Enabled" />
                         </div>
                         <textarea
-                            rows="11"
+                            rows="10"
                             className="form-control"
+                            style={{ resize: 'none' }}
                             name="onStart"
                             value={programStartCode}
                             onChange={changeStartCodeValue}
                         />
-                        <FunctionButton primary onClick={updateProgramStartEvent}>
+                        <FunctionButton primary onClick={updateProgramStartEvent} style={{ marginBottom: '0.5rem' }}>
                             Update Start Event
                         </FunctionButton>
-                    </FieldSet>
-                    <FieldSet legend="Program Stop" className={styles.paddingBottom}>
+                    </Fieldset>
+                    <Fieldset legend="Program Stop" className={styles.paddingBottom}>
                         <div className={styles.toggleContainer}>
                             <ToggleSwitch checked={endEnabled} onChange={toggleEndEvent} label="Enabled" />
                         </div>
                         <textarea
-                            rows="11"
+                            rows="9"
                             className="form-control"
+                            style={{ resize: 'none' }}
                             name="onStop"
                             value={programEndCode}
                             onChange={changeEndCodeValue}
                         />
-                        <FunctionButton primary onClick={updateProgramEndEvent}>
+                        <FunctionButton primary onClick={updateProgramEndEvent} style={{ marginBottom: '0.5rem' }}>
                             Update Stop Event
                         </FunctionButton>
-                    </FieldSet>
+                    </Fieldset>
                 </div>
-            </div>
-        </div>
+            </GeneralArea>
+        </SettingWrapper>
     );
 };
 
-export default Index;
+export default Events;

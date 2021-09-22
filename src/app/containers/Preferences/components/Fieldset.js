@@ -22,18 +22,23 @@
  */
 
 import React from 'react';
-import SettingWrapper from '../components/SettingWrapper';
-import GeneralArea from '../components/GeneralArea';
-import ToolChange from './ToolChange';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
 
-const EventWidget = ({ active }) => {
+import styles from '../index.styl';
+
+const Fieldset = ({ children, legend, className }) => {
     return (
-        <SettingWrapper title="Tool Change" show={active}>
-            <GeneralArea>
-                <ToolChange />
-            </GeneralArea>
-        </SettingWrapper>
+        <fieldset className={classnames(styles.fieldset, className)}>
+            <legend className={styles.fieldsetLegend}>{legend}</legend>
+            {children}
+        </fieldset>
     );
 };
 
-export default EventWidget;
+Fieldset.propTypes = {
+    legend: PropTypes.string,
+    className: PropTypes.string,
+};
+
+export default Fieldset;

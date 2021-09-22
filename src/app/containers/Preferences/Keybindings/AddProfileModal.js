@@ -9,7 +9,7 @@ import ToolModal from 'app/components/ToolModal/ToolModal';
 import Button from 'app/components/FunctionButton/FunctionButton';
 
 // import ProfileItem from './ProfileItem';
-import Input from '../Input';
+import Input from '../components/Input';
 
 import styles from './index.styl';
 

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import classnames from 'classnames';
 
 import TabbedWidget from 'app/components/TabbedWidget';
 
 import KeyboardShortcuts from './Keybindings';
 import Joystick from './Joystick';
 
+import SettingWrapper from '../components/SettingWrapper';
 import styles from '../index.styl';
 
 const tabs = [
@@ -27,15 +27,7 @@ const Shortcuts = ({ active }) => {
     const [tab, setTab] = useState(0);
 
     return (
-        <div
-            className={classnames(
-                styles.hidden,
-                styles['settings-wrapper'],
-                { [styles.visible]: active }
-            )}
-        >
-
-            <h3 className={styles['settings-title']}>Shortcuts</h3>
+        <SettingWrapper title="Shortcuts" show={active}>
             <TabbedWidget>
                 <TabbedWidget.Tabs
                     tabs={tabs}
@@ -59,7 +51,7 @@ const Shortcuts = ({ active }) => {
                     </div>
                 </TabbedWidget.Content>
             </TabbedWidget>
-        </div>
+        </SettingWrapper>
     );
 };
 
