@@ -293,9 +293,19 @@
     background: rgba(119,169,215, 0.3) !important;
     color: #3e85c7 !important;
     border: solid 1px #3e85c7 !important;
-
+    position: relative;
 }
 
+.active-indicator {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #3e85c7;
+    clip-path: polygon(100% 50%, 0 0, 0 95%);
+    width: 1rem;
+    height: 1rem;
+}
 
 @keyframes pulse-red {
     0% {

@@ -285,6 +285,7 @@ class Keypad extends PureComponent {
                                 actions.setJogFromPreset('rapid');
                             }}
                         >
+                            { rapidActive && <div className={styles.activeIndicator} /> }
                             Rapid
                         </FunctionButton>
                         <FunctionButton
@@ -295,6 +296,7 @@ class Keypad extends PureComponent {
                                 actions.setJogFromPreset('normal');
                             }}
                         >
+                            { normalActive && <div className={styles.activeIndicator} /> }
                             Normal
                         </FunctionButton>
                         <FunctionButton
@@ -305,6 +307,7 @@ class Keypad extends PureComponent {
                                 actions.setJogFromPreset('precise');
                             }}
                         >
+                            { preciseActive && <div className={styles.activeIndicator} /> }
                             Precise
                         </FunctionButton>
                     </div>
