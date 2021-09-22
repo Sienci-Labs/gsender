@@ -30,11 +30,11 @@ import Events from 'app/containers/Preferences/ToolChange';
 import ProgramEvents from 'app/containers/Preferences/Events';
 import gamepad from 'app/lib/gamepad';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
-import GeneralSettings from './GeneralSettings';
+import General from './General';
 import Shortcuts from './Keybindings';
-import ProbeSettings from './Probe/ProbeSettings';
+import ProbeSettings from './Probe';
 import WidgetConfig from '../../widgets/WidgetConfig';
-import VisualizerSettings from './Visualizer/Visualizer';
+import VisualizerSettings from './Visualizer';
 import About from './About';
 import store from '../../store';
 import styles from './index.styl';
@@ -74,7 +74,7 @@ class PreferencesPage extends PureComponent {
                 {
                     id: 0,
                     label: 'General',
-                    component: GeneralSettings
+                    component: General
                 },
                 {
                     id: 1,
@@ -612,7 +612,7 @@ class PreferencesPage extends PureComponent {
                                     <button
                                         type="button"
                                         key={`section-${menuItem.label}`}
-                                        className={index === selectedMenu ? 'activeMenu' : ''}
+                                        className={index === selectedMenu ? styles.activeMenu : ''}
                                         onClick={() => actions.setSelectedMenu(index)}
                                     >
                                         { menuItem.label }
