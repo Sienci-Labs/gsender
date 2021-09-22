@@ -34,4 +34,4 @@ export const TOUCHPLATE_TYPE_STANDARD = 'Standard Block';
 export const TOUCHPLATE_TYPE_AUTOZERO = 'Auto Zero Touchplate';
 
 export const PROBE_TYPE_AUTO = 'Auto';
-export const PROBE_TYPE_ZERO = 'Zero';
+export const PROBE_TYPE_TIP = 'Tip';
