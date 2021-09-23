@@ -27,7 +27,7 @@ import HelpCard from 'app/containers/Help/HelpCard';
 import styles from './index.styl';
 
 
-const REPORT_FORM_LINK = 'https://docs.google.com/forms/d/e/1FAIpQLScKf48OZEcqqkcQmmdVRAwCud-sfNDphNK3rbd7VdkqUJKTDA/viewform';
+const REPORT_FORM_LINK = 'https://sienci.com/gsender-feedback/';
 const DOCUMENTATION_LINK = 'https://resources.sienci.com/view/gs-using-gsender/';
 const FORUM_LINK = 'https://forum.sienci.com/c/gsender/14';
 

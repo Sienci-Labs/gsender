@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -104,7 +104,6 @@
     "dmg": {
       "background": "electron-build/background.png",
       "icon": "electron-build/icon.icns",
-      "CSC_IDENTITY_AUTO_DISCOVERY": false,
       "iconSize": 80,
       "iconTextSize": 12,
       "contents": [
@@ -200,7 +199,6 @@
     "consolidate": "~0.15.1",
     "convex-hull": "^1.0.3",
     "cookie-parser": "~1.4.4",
-    "custom-electron-titlebar": "^3.2.6",
     "debug": "~4.1.1",
     "deep-keys": "~0.5.0",
     "detect-browser": "~4.4.0",
@@ -347,9 +345,9 @@
     "css-loader": "~2.1.1",
     "css-split-webpack-plugin": "~0.2.6",
     "dotenv": "~7.0.0",
-    "electron": "~10.4.1",
-    "electron-builder": "~22.10.5",
-    "electron-rebuild": "~2.3.5",
+    "electron": "^15.0.0",
+    "electron-builder": "^22.11.7",
+    "electron-rebuild": "^3.2.3",
     "eslint": "~5.16.0",
     "eslint-config-trendmicro": "~1.4.1",
     "eslint-import-resolver-webpack": "~0.11.1",
