@@ -22,16 +22,20 @@
  */
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import i18n from 'app/lib/i18n';
-import ToggleSwitch from 'app/components/ToggleSwitch';
+import Slider from 'rc-slider';
+
+// import ToggleSwitch from 'app/components/ToggleSwitch';
+import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+
+import './style.css';
+
 import {
     MODAL_PREVIEW
 } from './constants';
-import TooltipCustom from '../../components/TooltipCustom/ToolTip';
-import styles from './index.styl';
 import ProbeImage from './ProbeImage';
-import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import ProbeDiameter from './ProbeDiameter';
+import styles from './index.styl';
+
 
 class Probe extends PureComponent {
     static propTypes = {
@@ -46,64 +50,76 @@ class Probe extends PureComponent {
             canClick,
             availableProbeCommands,
             selectedProbeCommand,
-            useSafeProbeOption,
+            // useSafeProbeOption,
         } = state;
         const probeCommand = availableProbeCommands[selectedProbeCommand] || false;
 
-        return (
-            <div className={styles.probeFlex}>
-                <div className={styles.probeOptionsCol}>
-                    <div className="form-group">
-                        <label className="control-label">
-                            {i18n._('Probe')}
-                        </label>
-                        <TooltipCustom content="Specify axis to probe" location="default">
-                            <select className="form-control" onChange={actions.handleProbeCommandChange}>
-                                {
-                                    availableProbeCommands.map((command, index) => (
-                                        <option
-                                            value={index}
-                                            key={`command-${index}`}
-                                        >
-                                            {command.id}
-                                        </option>
-                                    ))
-                                }
-                            </select>
-                        </TooltipCustom>
-                    </div>
-                    {
-                        probeCommand && probeCommand.safe && (
-                            <div className="form-group hidden">
-                                <div className={styles.rowSpread}>
-                                    <label htmlFor="exampleInputEmail2">Use Safe Probe:</label>
-                                    <ToggleSwitch checked={useSafeProbeOption} onChange={actions.handleSafeProbeToggle} />
-                                </div>
-                                <span id="helpBlock" className="help-block">Safe probe probes from the top and right to avoid breaking bits.</span>
-                            </div>
-                        )}
+        const marks = {
+            ...availableProbeCommands.map((command, index) => (index === selectedProbeCommand
+                ? <strong style={{ fontSize: '16px' }}>{command.id.split(' ')[0]}</strong>
+                : <span>{command.id.split(' ')[0]}</span>))
+        };
 
-                    {
-                        probeCommand && probeCommand.tool &&
-                        <ProbeDiameter actions={actions} state={state} />
-                    }
-                    <div className="row no-gutters" />
-                    <div className="row no-gutters">
-                        <div className="col-xs-12">
-                            <FunctionButton
-                                onClick={() => {
-                                    actions.openModal(MODAL_PREVIEW);
+        return (
+            <div className={styles.mainWrapper}>
+                <div className={styles.mainGrid}>
+                    <div className={styles.mainGridItem}>
+                        <label>Axis</label>
+
+                        <div className={styles.sliderWrapper}>
+                            <Slider
+                                min={0}
+                                max={availableProbeCommands.length - 1}
+                                value={selectedProbeCommand}
+                                included={false}
+                                marks={marks}
+                                step={null}
+                                onChange={actions.handleProbeCommandChange}
+                                activeDotStyle={{ display: 'none' }}
+                                handleStyle={{
+                                    width: '0px',
+                                    height: '0px',
+                                    borderTop: '12px solid #3e85c7',
+                                    borderBottom: 'none',
+                                    borderLeft: '8px solid transparent',
+                                    borderRight: '8px solid transparent',
+                                    background: 'transparent',
+                                    borderRadius: 0,
+                                    outline: 'none',
+                                    boxShadow: 'none',
+                                    marginLeft: '-8px',
+                                    marginTop: '-3px'
                                 }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={styles.mainGridItem}>
+                        {/* {
+                            probeCommand && probeCommand.safe && (
+                                <div className="form-group hidden">
+                                    <div className={styles.rowSpread}>
+                                        <label htmlFor="exampleInputEmail2">Use Safe Probe:</label>
+                                        <ToggleSwitch checked={useSafeProbeOption} onChange={actions.handleSafeProbeToggle} />
+                                    </div>
+                                    <span id="helpBlock" className="help-block">Safe probe probes from the top and right to avoid breaking bits.</span>
+                                </div>
+                            )
+                        } */}
+                        <label>Tools</label>
+                        <div className={styles.toolsWrapper}>
+                            <ProbeDiameter actions={actions} state={state} probeCommand={probeCommand} />
+                            <FunctionButton
+                                onClick={() => actions.openModal(MODAL_PREVIEW)}
                                 disabled={!canClick}
+                                className={styles.probeButton}
                             >
                                 Probe
                             </FunctionButton>
                         </div>
                     </div>
                 </div>
-                <div className={styles.probeSettingsCol}>
-                    <ProbeImage probeCommand={probeCommand} />
-                </div>
+                <ProbeImage probeCommand={probeCommand} />
             </div>
         );
     }
