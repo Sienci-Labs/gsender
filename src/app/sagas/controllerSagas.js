@@ -33,8 +33,8 @@ import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app
 import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
-import { visualizeResponse } from 'app/workers/Visualize.response';
-import { RENDER_LOADING } from 'app/constants';
+import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
+import { RENDER_LOADING, RENDER_RENDERED } from 'app/constants';
 
 export function* initialize() {
     /* Health check - every 3 minutes */
@@ -159,6 +159,7 @@ export function* initialize() {
                 state: RENDER_LOADING
             }
         });
+
         const estimateWorker = new EstimateWorker();
         estimateWorker.onmessage = estimateResponseHandler;
         estimateWorker.postMessage({
@@ -166,11 +167,22 @@ export function* initialize() {
             name,
             size
         });
-        const visualizeWorker = new VisualizeWorker();
-        visualizeWorker.onmessage = visualizeResponse;
-        visualizeWorker.postMessage({
-            content,
-        });
+
+        const needsVisualization = shouldVisualize();
+        if (needsVisualization) {
+            const visualizeWorker = new VisualizeWorker();
+            visualizeWorker.onmessage = visualizeResponse;
+            visualizeWorker.postMessage({
+                content,
+            });
+        } else {
+            reduxStore.dispatch({
+                type: fileActions.UPDATE_FILE_RENDER_STATE,
+                payload: {
+                    state: RENDER_RENDERED
+                }
+            });
+        }
     });
 
     controller.addListener('gcode:unload', () => {

@@ -1,6 +1,7 @@
 import pubsub from 'pubsub-js';
 import reduxStore from 'app/store/redux';
 import * as fileActions from 'app/actions/fileInfoActions';
+import store from 'app/store';
 import { RENDER_RENDERING } from 'app/constants';
 
 export const visualizeResponse = ({ data }) => {
@@ -12,4 +13,10 @@ export const visualizeResponse = ({ data }) => {
             state: RENDER_RENDERING
         }
     });
+};
+
+
+export const shouldVisualize = () => {
+    const liteMode = store.get('widgets.visualizer.liteMode', false);
+    return (liteMode) ? store.get('widgets.visualizer.disableLite') : store.get('widgets.visualizer.disable');
 };
