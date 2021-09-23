@@ -112,7 +112,6 @@ class GCodeVisualizer {
             return;
         }
 
-        //const { cuttingCoordinateLines } = this.theme;
         const defaultColor = new THREE.Color('#5191CC');
 
         frameIndex = Math.min(frameIndex, this.frames.length - 1);
@@ -121,14 +120,17 @@ class GCodeVisualizer {
         const v1 = this.frames[this.frameIndex].vertexIndex;
         const v2 = this.frames[frameIndex].vertexIndex;
 
-        // Completed path is grayed out
         if (v1 < v2) {
             const workpiece = this.group.children[0];
-            for (let i = v1; i < v2; ++i) {
-                const offsetIndex = i * 4; // Account for RGB buffer
-                workpiece.geometry.attributes.color.set([...defaultColor.toArray(), 0.3], offsetIndex);
-            }
-            workpiece.geometry.attributes.color.needsUpdate = true;
+            const offsetIndex = v1 * 4;
+            const colorAttr = workpiece.geometry.getAttribute('color');
+            const defaultColorArray = [...defaultColor.toArray(), 0.3];
+            const colorArray = Array.from({ length: (v2 - v1) }, () => defaultColorArray).flat();
+            colorAttr.set([...colorArray], offsetIndex);
+            // only update the range we've updated;
+            colorAttr.updateRange.count = colorArray.length;
+            colorAttr.updateRange.offset = offsetIndex;
+            colorAttr.needsUpdate = true;
         }
 
         // Restore the path to its original colors
