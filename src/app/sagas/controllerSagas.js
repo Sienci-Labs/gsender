@@ -169,6 +169,7 @@ export function* initialize() {
         });
 
         const needsVisualization = shouldVisualize();
+
         if (needsVisualization) {
             const visualizeWorker = new VisualizeWorker();
             visualizeWorker.onmessage = visualizeResponse;

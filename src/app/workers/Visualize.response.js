@@ -18,5 +18,6 @@ export const visualizeResponse = ({ data }) => {
 
 export const shouldVisualize = () => {
     const liteMode = store.get('widgets.visualizer.liteMode', false);
-    return (liteMode) ? store.get('widgets.visualizer.disableLite') : store.get('widgets.visualizer.disable');
+    const isDisabled = (liteMode) ? store.get('widgets.visualizer.disabledLite') : store.get('widgets.visualizer.disabled');
+    return !isDisabled;
 };
