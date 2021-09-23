@@ -36,7 +36,7 @@ import api from 'app/api';
 import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
-import Input from 'app/containers/Preferences/Input';
+import Input from 'app/containers/Preferences/components/Input';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 //import ReaderWorker from './FileReader.worker';
