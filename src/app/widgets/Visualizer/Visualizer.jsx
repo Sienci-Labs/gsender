@@ -169,7 +169,7 @@ class Visualizer extends Component {
                 // Call the render() function up to 60 times per second (i.e. 60fps)
                 requestAnimationFrame(this.renderAnimationLoop);
 
-                const rpm = 600;
+                const rpm = 300;
                 this.rotateCuttingTool(rpm);
             } else {
                 const rpm = 0;
@@ -216,7 +216,7 @@ class Visualizer extends Component {
 
         // Update the visualizer size whenever the machine is running,
         // to fill the empty area between it and the job status widget when necessary
-        this.resizeRenderer();
+        //this.resizeRenderer();
 
         // Enable or disable 3D view
         if ((prevProps.show !== this.props.show) && (this.props.show === true)) {
