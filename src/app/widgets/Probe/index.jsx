@@ -167,8 +167,7 @@ class ProbeWidget extends PureComponent {
                 this.actions.generatePossibleProbeCommands();
             });
         },
-        handleProbeCommandChange: (e) => {
-            const index = Number(e.target.value);
+        handleProbeCommandChange: (index) => {
             this.setState({
                 useSafeProbeOption: false,
                 selectedProbeCommand: index
