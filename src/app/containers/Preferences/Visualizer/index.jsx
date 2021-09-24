@@ -22,27 +22,26 @@
  */
 
 import React from 'react';
-import classNames from 'classnames';
-import styles from './index.styl';
 
-import Options from './MachineProfiles/Options';
+import SettingWrapper from '../components/SettingWrapper';
+import GeneralArea from '../components/GeneralArea';
 
+import VisualizerOptions from './VisualizerOptions';
+import Theme from './Theme';
 
-const MachineProfiles = ({ active, state, actions }) => {
+const VisualizerSettings = ({ active, state, actions }) => {
     return (
-        <div className={classNames(
-            styles.hidden,
-            styles['settings-wrapper'],
-            { [styles.visible]: active }
-        )}
-        >
-            <h3 className={styles['settings-title']}>
-                Machine Profiles
-            </h3>
-
-            <Options state={state} />
-        </div>
+        <SettingWrapper title="Visualizer" show={active}>
+            <GeneralArea>
+                <GeneralArea.Half>
+                    <VisualizerOptions state={state} actions={actions} />
+                </GeneralArea.Half>
+                <GeneralArea.Half>
+                    <Theme state={state} actions={actions} />
+                </GeneralArea.Half>
+            </GeneralArea>
+        </SettingWrapper>
     );
 };
 
-export default MachineProfiles;
+export default VisualizerSettings;

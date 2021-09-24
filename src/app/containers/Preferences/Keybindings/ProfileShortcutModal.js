@@ -7,7 +7,7 @@ import gamepad, { shortcutComboBuilder } from 'app/lib/gamepad';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import Modal from 'app/components/ToolModal/ToolModal';
 
-import Input from '../Input';
+import Input from '../components/Input';
 
 import styles from './index.styl';
 

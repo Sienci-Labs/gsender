@@ -32,6 +32,9 @@ import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import pubsub from 'pubsub-js';
+import { PROBE_TYPE_AUTO } from 'app/lib/constants';
+import store from 'app/store';
+import { mm2in } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
 import Probe from './Probe';
 import RunProbe from './RunProbe';
@@ -54,9 +57,7 @@ import {
     MODAL_NONE,
     MODAL_PREVIEW
 } from './constants';
-import store from '../../store';
 import styles from './index.styl';
-import { mm2in } from '../../lib/units';
 
 
 class ProbeWidget extends PureComponent {
@@ -167,8 +168,7 @@ class ProbeWidget extends PureComponent {
                 this.actions.generatePossibleProbeCommands();
             });
         },
-        handleProbeCommandChange: (e) => {
-            const index = Number(e.target.value);
+        handleProbeCommandChange: (index) => {
             this.setState({
                 useSafeProbeOption: false,
                 selectedProbeCommand: index
@@ -200,40 +200,8 @@ class ProbeWidget extends PureComponent {
                 };
                 commands.push(command);
             }
+
             if (functions.x && functions.y) {
-                command = {
-                    id: 'X Touch',
-                    safe: true,
-                    tool: true,
-                    axes: {
-                        x: true,
-                        y: false,
-                        z: false
-                    }
-                };
-                commands.push(command);
-                command = {
-                    id: 'Y Touch',
-                    safe: true,
-                    tool: true,
-                    axes: {
-                        x: false,
-                        y: true,
-                        z: false
-                    }
-                };
-                commands.push(command);
-                command = {
-                    id: 'XY Touch',
-                    safe: true,
-                    tool: true,
-                    axes: {
-                        x: true,
-                        y: true,
-                        z: false
-                    }
-                };
-                commands.push(command);
                 if (functions.z) {
                     command = {
                         id: 'XYZ Touch',
@@ -247,6 +215,42 @@ class ProbeWidget extends PureComponent {
                     };
                     commands.push(command);
                 }
+
+                command = {
+                    id: 'XY Touch',
+                    safe: true,
+                    tool: true,
+                    axes: {
+                        x: true,
+                        y: true,
+                        z: false
+                    }
+                };
+                commands.push(command);
+
+                command = {
+                    id: 'X Touch',
+                    safe: true,
+                    tool: true,
+                    axes: {
+                        x: true,
+                        y: false,
+                        z: false
+                    }
+                };
+                commands.push(command);
+
+                command = {
+                    id: 'Y Touch',
+                    safe: true,
+                    tool: true,
+                    axes: {
+                        x: false,
+                        y: true,
+                        z: false
+                    }
+                };
+                commands.push(command);
             }
             this.setState({
                 availableProbeCommands: commands
@@ -269,6 +273,9 @@ class ProbeWidget extends PureComponent {
             this.setState({
                 toolDiameter: diameter
             });
+        },
+        setProbeType: (type) => {
+            this.setState({ probeType: type });
         }
     };
 
@@ -346,7 +353,8 @@ class ProbeWidget extends PureComponent {
             useSafeProbeOption: false,
             availableProbeCommands: [],
             selectedProbeCommand: 0,
-            connectivityTest: this.config.get('connectivityTest')
+            connectivityTest: this.config.get('connectivityTest'),
+            probeType: PROBE_TYPE_AUTO,
         };
     }
 

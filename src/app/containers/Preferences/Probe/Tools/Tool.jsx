@@ -22,7 +22,7 @@
  */
 
 import React from 'react';
-import styles from '../index.styl';
+import styles from '../../index.styl';
 
 const Tool = ({ metricDiameter, imperialDiameter, type, onDelete }) => {
     return (

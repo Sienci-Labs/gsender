@@ -25,7 +25,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
-import styles from './index.styl';
+import styles from '../index.styl';
 
 const Input = ({ value, label, units, onChange, additionalProps, className }) => {
     return (

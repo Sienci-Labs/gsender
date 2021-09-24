@@ -22,9 +22,9 @@
  */
 
 import React from 'react';
-import Input from '../Input';
-import TooltipCustom from '../../../components/TooltipCustom/ToolTip';
-import styles from '../index.styl';
+import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
+import Input from '../../components/Input';
+import styles from '../../index.styl';
 
 const AddTool = ({ actions, state }) => {
     const { tool } = state;

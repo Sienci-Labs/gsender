@@ -119,7 +119,8 @@ const defaultState = {
                 x: true,
                 y: true,
                 z: true
-            }
+            },
+            touchplateType: 'Standard Type'
         },
         tools: [
             {
@@ -312,7 +313,8 @@ const defaultState = {
                 mm: 4,
                 in: 0.15
             },
-            touchPlateHeight: 10
+            touchPlateHeight: 10,
+            probeType: 'Auto',
         },
         spindle: {
             minimized: false,
@@ -354,7 +356,7 @@ const defaultState = {
             disabledLite: false,
             projection: 'orthographic', // 'perspective' or 'orthographic'
             cameraMode: 'pan', // 'pan' or 'rotate',
-            theme: 'dark',
+            theme: 'Dark',
             gcode: {
                 displayName: true
             },

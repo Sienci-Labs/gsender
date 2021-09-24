@@ -25,13 +25,14 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import _ from 'lodash';
 import store from 'app/store';
-import TooltipCustom from '../../../components/TooltipCustom/ToolTip';
-import Input from '../Input';
+import Tooltip from 'app/components/TooltipCustom/ToolTip';
+import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import Fieldset from '../components/Fieldset';
+import Input from '../components/Input';
 import styles from '../index.styl';
-import { Toaster, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
 import { convertToImperial, convertToMetric } from '../calculate';
 
-export default class JogSpeeds extends Component {
+export default class JoggingPresets extends Component {
     state = {
         units: store.get('workspace.units'),
         jogSpeeds: this.getJogSpeeds(),
@@ -272,14 +273,14 @@ export default class JogSpeeds extends Component {
         const speedValue = currentPreset[units]?.feedrate;
 
         return (
-            <div>
+            <Fieldset legend="Jogging Presets">
                 <div className={classnames(styles.jogSpeedWrapper, styles.flexRow)}>
                     <button type="button" onClick={() => this.handleJogClick('precise')} className={styles[name === 'precise' ? 'jog-speed-active' : 'jog-speed-inactive']}>Precise</button>
                     <button type="button" onClick={() => this.handleJogClick('normal')} className={styles[name === 'normal' ? 'jog-speed-active' : 'jog-speed-inactive']}>Normal</button>
                     <button type="button" onClick={() => this.handleJogClick('rapid')} className={styles[name === 'rapid' ? 'jog-speed-active' : 'jog-speed-inactive']}>Rapid</button>
                 </div>
                 <div className={styles['jog-spead-wrapper']}>
-                    <TooltipCustom content="Set amount of movement for XY Jog Speed Preset Buttons" location="default">
+                    <Tooltip content="Set amount of movement for XY Jog Speed Preset Buttons" location="default">
                         <Input
                             label="XY Move"
                             units={units}
@@ -287,8 +288,8 @@ export default class JogSpeeds extends Component {
                             additionalProps={{ type: 'number', id: 'xyStep' }}
                             value={xyValue}
                         />
-                    </TooltipCustom>
-                    <TooltipCustom content="Set amount of movement for Z Jog Speed Preset Buttons" location="default">
+                    </Tooltip>
+                    <Tooltip content="Set amount of movement for Z Jog Speed Preset Buttons" location="default">
                         <Input
                             label="Z Move"
                             units={units}
@@ -296,8 +297,8 @@ export default class JogSpeeds extends Component {
                             additionalProps={{ type: 'number', id: 'zStep' }}
                             value={zValue}
                         />
-                    </TooltipCustom>
-                    <TooltipCustom content="Set the speed for the Jog Speed Preset Buttons" location="default">
+                    </Tooltip>
+                    <Tooltip content="Set the speed for the Jog Speed Preset Buttons" location="default">
                         <Input
                             label="Speed"
                             units={`${units}/min`}
@@ -305,11 +306,9 @@ export default class JogSpeeds extends Component {
                             additionalProps={{ type: 'number', id: 'feedrate' }}
                             value={speedValue}
                         />
-                    </TooltipCustom>
+                    </Tooltip>
                 </div>
-            </div>
+            </Fieldset>
         );
     }
 }
-// overflow: hidden;
-//                             white-space: nowrap;

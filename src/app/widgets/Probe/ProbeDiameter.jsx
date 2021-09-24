@@ -23,6 +23,10 @@
 
 import React from 'react';
 import CreatableSelect from 'react-select/creatable';
+
+import store from 'app/store';
+import { TOUCHPLATE_TYPE_AUTOZERO, PROBE_TYPE_AUTO, PROBE_TYPE_TIP } from 'app/lib/constants';
+
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 
@@ -47,31 +51,39 @@ const inputStyle = {
     })
 };
 
-const ProbeDiameter = ({ actions, state }) => {
+const ProbeDiameter = ({ actions, state, probeCommand }) => {
     const { setToolDiameter } = actions;
     const { availableTools, units, toolDiameter } = state;
 
     const handleChange = (value) => {
         setToolDiameter(value);
     };
-    const options = convertAvailableTools(availableTools, units);
+    const options = [];
+
+    const touchplateType = store.get('workspace.probeProfile.touchplateType');
+
+    if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
+        options.push(
+            { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP },
+            { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO },
+        );
+    }
+
+    options.push(...convertAvailableTools(availableTools, units));
 
     return (
-        <div>
-            <label className="control-label">Tool Diameter</label>
-            <div className={styles.probeDiameterWrapper}>
-                <CreatableSelect
-                    isClearable
-                    styles={inputStyle}
-                    onChange={handleChange}
-                    value={{ label: `${toolDiameter} ${units}` }}
-                    options={options}
-                    menuPlacement="top"
-                    singleValue
-                />
-            </div>
+        <div className={styles.probeDiameterWrapper}>
+            <CreatableSelect
+                isClearable
+                styles={inputStyle}
+                onChange={handleChange}
+                value={{ label: `${toolDiameter} ${units}` }}
+                options={options}
+                menuPlacement="top"
+                isDisabled={!probeCommand.tool}
+                singleValue
+            />
         </div>
-
     );
 };
 

@@ -22,10 +22,10 @@
  */
 
 import React from 'react';
-import styles from '../index.styl';
+import styles from '../../index.styl';
 import Tool from './Tool';
 import AddTool from './AddTool';
-import Fieldset from '../FieldSet';
+import Fieldset from '../../components/Fieldset';
 
 
 const ToolSettings = ({ active, state, actions }) => {
@@ -35,7 +35,7 @@ const ToolSettings = ({ active, state, actions }) => {
         <div className={styles.generalArea}>
 
             <Fieldset legend="Tools">
-                <div className={styles.addMargin}>
+                <div className={styles.toolWrapper}>
                     <div className={styles.tools}>
                         {
                             tools.map((tool, index) => (

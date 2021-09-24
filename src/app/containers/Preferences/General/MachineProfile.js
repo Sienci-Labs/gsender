@@ -33,14 +33,15 @@ import TooltipCustom from '../../../components/TooltipCustom/ToolTip';
 import { Toaster, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
 import styles from '../index.styl';
 import defaultProfiles from './defaultMachineProfiles';
+import Fieldset from '../components/Fieldset';
 
-import Input from '../Input';
+import Input from '../components/Input';
 import { convertToImperial, convertToMetric } from '../calculate';
 
 /**
  * Machine Profile Options Component
  */
-export default class Options extends Component {
+export default class MachineProfile extends Component {
     state = {
         machineProfiles: defaultProfiles.sort((a, b) => a.company.localeCompare(b.company)),
         machineProfile: store.get('workspace.machineProfile'),
@@ -218,7 +219,7 @@ export default class Options extends Component {
         const { width = 0, depth = 0, height = 0 } = units === 'mm' ? mm : inches;
 
         return (
-            <div>
+            <Fieldset legend="Machine Profile" className={styles['mb-0']}>
                 <div className={styles['machine-options-section']}>
                     <div className={styles['general-area-item']}>
                         <h4 className={styles['settings-subtitle']}>Presets</h4>
@@ -278,26 +279,8 @@ export default class Options extends Component {
                             </TooltipCustom>
                         </div>
                     </div>
-
-                    {/* <div className={styles['machine-features-section']}>
-                        <div className={styles['machine-options-inputgroup']} style={{ display: 'grid', gridTemplateColumns: '1fr 5fr', margin: '0' }}>
-                            <ToggleSwitch
-                                checked={coolant}
-                                onChange={() => this.handleToggle('coolant')}
-                            />
-                            <label htmlFor="">Coolant</label>
-                        </div>
-
-                        <div className={styles['machine-options-inputgroup']} style={{ margin: 0 }}>
-                            <label htmlFor="">Laser</label>
-                            <ToggleSwitch
-                                checked={laser}
-                                onChange={() => this.handleToggle('laser')}
-                            />
-                        </div>
-                    </div> */}
                 </div>
-            </div>
+            </Fieldset>
         );
     }
 }

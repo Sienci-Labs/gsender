@@ -25,9 +25,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
-import styles from './index.styl';
+import styles from '../index.styl';
 
-const FieldSet = ({ children, legend, className }) => {
+const Fieldset = ({ children, legend, className }) => {
     return (
         <fieldset className={classnames(styles.fieldset, className)}>
             <legend className={styles.fieldsetLegend}>{legend}</legend>
@@ -36,9 +36,9 @@ const FieldSet = ({ children, legend, className }) => {
     );
 };
 
-FieldSet.propTypes = {
+Fieldset.propTypes = {
     legend: PropTypes.string,
     className: PropTypes.string,
 };
 
-export default FieldSet;
+export default Fieldset;
