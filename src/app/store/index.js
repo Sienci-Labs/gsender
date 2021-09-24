@@ -34,7 +34,7 @@ import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
 import log from '../lib/log';
 import defaultState from './defaultState';
-import { METRIC_UNITS } from '../constants';
+import { JOGGING_CATEGORY, METRIC_UNITS } from '../constants';
 
 const store = new ImmutableStore(defaultState);
 
@@ -210,6 +210,25 @@ const migrateStore = () => {
     if (!cnc.version) {
         return;
     }
+
+    //  0.7.4 - changes to keyboard shortcut payload shape for machine jogging
+    if (semver.lt(cnc.version, '0.7.4')) {
+        const setCommands = store.get('commandKeys');
+        const defaultCommands = get(defaultState, 'commandKeys');
+
+        const updatedCommands = setCommands.map(command => {
+            if (command.category !== JOGGING_CATEGORY) {
+                return command;
+            }
+
+            const foundDefaultCommand = defaultCommands.find(defaultCommand => defaultCommand.id === command.id);
+
+            return foundDefaultCommand ? { ...command, payload: foundDefaultCommand.payload } : command;
+        });
+
+        store.replace('commandKeys', updatedCommands);
+    }
+
     // 0.7.0 - migrate macros to include column and description fields
     /*if (semver.lt(cnc.version, '0.7.0')) {
         const macroSet = await api.macros.fetch();
