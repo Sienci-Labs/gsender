@@ -71,7 +71,7 @@ class AddMacro extends PureComponent {
 
         return (
             <Modal
-                size="md"
+                size="large"
                 onClose={actions.closeModal}
                 title="Add New Macro"
                 disableOverlay
