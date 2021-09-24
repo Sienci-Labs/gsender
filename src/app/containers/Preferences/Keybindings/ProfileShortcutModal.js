@@ -117,7 +117,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
     };
 
     return (
-        <Modal onClose={onClose} size="medium" title="Joystick Profile Action">
+        <Modal onClose={onClose} size="small" title="Joystick Profile Action">
             <div className={styles.profileActionWrapper}>
                 <h5 style={{ marginTop: 0, textAlign: 'center' }}>Press Any Button on Your Gamepad/Joystick</h5>
 
