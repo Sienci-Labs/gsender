@@ -47,8 +47,6 @@ import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../widgets/JogControl/
 const AXIS_X = 'x';
 const AXIS_Y = 'y';
 const AXIS_Z = 'z';
-const FORWARD = 1;
-const BACKWARD = -1;
 
 const defaultState = {
     session: {
@@ -728,8 +726,7 @@ const defaultState = {
             keys: 'shift+right',
             cmd: 'JOG',
             payload: {
-                axis: [AXIS_X],
-                direction: [FORWARD],
+                axis: { [AXIS_X]: 1 },
             },
             preventDefault: false,
             isActive: true,
@@ -741,8 +738,7 @@ const defaultState = {
             keys: 'shift+left',
             cmd: 'JOG',
             payload: {
-                axis: [AXIS_X],
-                direction: [BACKWARD],
+                axis: { [AXIS_X]: -1 },
             },
             preventDefault: false,
             isActive: true,
@@ -754,8 +750,7 @@ const defaultState = {
             keys: 'shift+up',
             cmd: 'JOG',
             payload: {
-                axis: [AXIS_Y],
-                direction: [FORWARD],
+                axis: { [AXIS_Y]: 1 },
             },
             preventDefault: false,
             isActive: true,
@@ -767,8 +762,7 @@ const defaultState = {
             keys: 'shift+down',
             cmd: 'JOG',
             payload: {
-                axis: [AXIS_Y],
-                direction: [BACKWARD],
+                axis: { [AXIS_Y]: -1 },
             },
             preventDefault: false,
             isActive: true,
@@ -780,8 +774,7 @@ const defaultState = {
             keys: 'shift+pageup',
             cmd: 'JOG',
             payload: {
-                axis: [AXIS_Z],
-                direction: [FORWARD],
+                axis: { [AXIS_Z]: 1 },
             },
             preventDefault: false,
             isActive: true,
@@ -793,8 +786,7 @@ const defaultState = {
             keys: 'shift+pagedown',
             cmd: 'JOG',
             payload: {
-                axis: [AXIS_Z],
-                direction: [BACKWARD],
+                axis: { [AXIS_Z]: -1 },
             },
             preventDefault: false,
             isActive: true,
@@ -806,8 +798,7 @@ const defaultState = {
             keys: '',
             cmd: 'JOG',
             payload: {
-                axis: [AXIS_X, AXIS_Y],
-                direction: [FORWARD, BACKWARD],
+                axis: { [AXIS_X]: 1, [AXIS_Y]: -1 },
             },
             preventDefault: false,
             isActive: true,
@@ -819,8 +810,7 @@ const defaultState = {
             keys: '',
             cmd: 'JOG',
             payload: {
-                axis: [AXIS_X, AXIS_Y],
-                direction: [BACKWARD, FORWARD],
+                axis: { [AXIS_X]: -1, [AXIS_Y]: 1 },
             },
             preventDefault: false,
             isActive: true,
@@ -832,8 +822,7 @@ const defaultState = {
             keys: '',
             cmd: 'JOG',
             payload: {
-                axis: [AXIS_X, AXIS_Y],
-                direction: [FORWARD, FORWARD],
+                axis: { [AXIS_X]: 1, [AXIS_Y]: 1 },
             },
             preventDefault: false,
             isActive: true,
@@ -845,8 +834,7 @@ const defaultState = {
             keys: '',
             cmd: 'JOG',
             payload: {
-                axis: [AXIS_X, AXIS_Y],
-                direction: [BACKWARD, BACKWARD],
+                axis: { [AXIS_X]: -1, [AXIS_Y]: -1 },
             },
             preventDefault: false,
             isActive: true,

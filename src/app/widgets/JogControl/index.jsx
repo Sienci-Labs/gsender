@@ -597,7 +597,7 @@ class AxesWidget extends PureComponent {
         }
     };
 
-    handleShortcutJog = ({ axis, direction }) => {
+    handleShortcutJog = ({ axis }) => {
         const { isContinuousJogging } = this.state;
         const { getXYJogDistance, getZJogDistance } = this.actions;
         const { canJog } = this.props;
@@ -627,40 +627,21 @@ class AxesWidget extends PureComponent {
             this.joggingHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
         }
 
-        //Axis will either be a single string value, array or an object containing multiple axis' (ex. axis.X, axis.Y, axis.Z)
-        if (typeof axis === 'object' && !Array.isArray(axis)) {
-            const axisList = {};
-            if (axis.X) {
-                axisList.X = axisValue.X * axis.X;
-            }
-            if (axis.Y) {
-                axisList.Y = axisValue.Y * axis.Y;
-            }
-            if (axis.Z) {
-                axisList.Z = axisValue.Z * axis.Z;
-            }
-            // const { axis: axisList, direction, force } = payload;
+        //Axis will either be a single string value or an object containing multiple axis' (ex. axis.X, axis.Y, axis.Z)
+        const axisList = {};
 
-            this.setState({ prevJog: { ...axisList, F: feedrate } });
-            this.joggingHelper.onKeyDown({ ...axisList }, feedrate);
-        } else if (Array.isArray(axis)) {
-            const axisList = {};
-            for (const item of axis) {
-                const givenAxis = item.toUpperCase();
-                const givenAxisVal = axisValue[givenAxis] * direction;
-
-                axisList[givenAxis] = givenAxisVal;
-            }
-
-            this.setState({ prevJog: { ...axisList, F: feedrate } });
-            this.joggingHelper.onKeyDown({ ...axisList }, feedrate);
-        } else {
-            const givenAxis = axis.toUpperCase();
-            const givenAxisVal = axisValue[givenAxis] * direction;
-
-            this.setState({ prevJog: { [givenAxis]: givenAxisVal, F: feedrate } });
-            this.joggingHelper.onKeyDown({ [givenAxis]: direction }, feedrate);
+        if (axis.x) {
+            axisList.X = axisValue.X * axis.x;
         }
+        if (axis.y) {
+            axisList.Y = axisValue.Y * axis.y;
+        }
+        if (axis.z) {
+            axisList.Z = axisValue.Z * axis.z;
+        }
+
+        this.setState({ prevJog: { ...axisList, F: feedrate } });
+        this.joggingHelper.onKeyDown({ ...axisList }, feedrate);
     }
 
     handleShortcutStop = (payload) => {
@@ -671,7 +652,7 @@ class AxesWidget extends PureComponent {
             return;
         }
 
-        const { axis: axisList, direction } = payload;
+        const { axis: axisList } = payload;
 
         const { getXYJogDistance, getZJogDistance } = this.actions;
 
@@ -680,13 +661,14 @@ class AxesWidget extends PureComponent {
 
         const axisObj = {};
 
-        for (const axis of axisList) {
+        // eslint-disable-next-line guard-for-in
+        for (const axis in axisList) {
             const givenAxis = axis.toUpperCase();
             const axisValue = {
                 X: xyStep,
                 Y: xyStep,
                 Z: zStep
-            }[givenAxis] * direction;
+            }[givenAxis] * axisList[axis];
 
             axisObj[givenAxis] = axisValue;
         }

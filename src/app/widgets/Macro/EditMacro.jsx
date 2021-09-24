@@ -93,7 +93,7 @@ class EditMacro extends PureComponent {
 
 
         return (
-            <Modal size="md" onClose={actions.closeModal} title="Edit Macro">
+            <Modal size="large" onClose={actions.closeModal} title="Edit Macro">
                 <div style={modalContainerStyle}>
                     <div style={modalBodyStyle}>
                         <Form

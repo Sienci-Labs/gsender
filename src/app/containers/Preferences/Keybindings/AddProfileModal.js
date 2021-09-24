@@ -119,7 +119,6 @@ const AddProfileModal = ({ onClose, onAdd }) => {
             onClose={onClose}
             size="medium"
             title="Add Gamepad/Joystick Profile"
-            style={{ height: '500px' }}
         >
             <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
 
