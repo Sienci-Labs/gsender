@@ -17,7 +17,7 @@ const AddActionModal = ({ onClose }) => {
     }, []);
 
     return (
-        <ToolModal onClose={onClose} size="medium" title="Add Action to Profile" style={{ height: '500px' }}>
+        <ToolModal onClose={onClose} size="small" title="Add Action to Profile">
             <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <p>Select an Action</p>
                 <div className={styles.addActionItem}>
