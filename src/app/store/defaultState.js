@@ -798,7 +798,7 @@ const defaultState = {
             keys: '',
             cmd: 'JOG',
             payload: {
-                axis: { [AXIS_X]: 1, AXIS_Y: -1 },
+                axis: { [AXIS_X]: 1, [AXIS_Y]: -1 },
             },
             preventDefault: false,
             isActive: true,
@@ -810,7 +810,7 @@ const defaultState = {
             keys: '',
             cmd: 'JOG',
             payload: {
-                axis: { [AXIS_X]: -1, AXIS_Y: 1 },
+                axis: { [AXIS_X]: -1, [AXIS_Y]: 1 },
             },
             preventDefault: false,
             isActive: true,
@@ -822,7 +822,7 @@ const defaultState = {
             keys: '',
             cmd: 'JOG',
             payload: {
-                axis: { [AXIS_X]: 1, AXIS_Y: 1 },
+                axis: { [AXIS_X]: 1, [AXIS_Y]: 1 },
             },
             preventDefault: false,
             isActive: true,
@@ -834,7 +834,7 @@ const defaultState = {
             keys: '',
             cmd: 'JOG',
             payload: {
-                axis: { [AXIS_X]: -1, AXIS_Y: -1 },
+                axis: { [AXIS_X]: -1, [AXIS_Y]: -1 },
             },
             preventDefault: false,
             isActive: true,
