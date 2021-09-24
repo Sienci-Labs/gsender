@@ -211,22 +211,33 @@ const migrateStore = () => {
         return;
     }
 
-    //  0.7.4 - changes to keyboard shortcut payload shape for machine jogging
+    //  0.7.4 - changes to keyboard and gamepad profile shortcut payload shape for machine jogging
     if (semver.lt(cnc.version, '0.7.4')) {
-        const setCommands = store.get('commandKeys');
+        const currentCommands = store.get('commandKeys', []);
+        const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
         const defaultCommands = get(defaultState, 'commandKeys');
 
-        const updatedCommands = setCommands.map(command => {
-            if (command.category !== JOGGING_CATEGORY) {
-                return command;
-            }
+        const updateCommands = (commands) => {
+            return commands.map(command => {
+                if (command.category !== JOGGING_CATEGORY) {
+                    return command;
+                }
 
-            const foundDefaultCommand = defaultCommands.find(defaultCommand => defaultCommand.id === command.id);
+                const foundDefaultCommand = defaultCommands.find(defaultCommand => defaultCommand.id === command.id);
 
-            return foundDefaultCommand ? { ...command, payload: foundDefaultCommand.payload } : command;
+                return foundDefaultCommand ? { ...command, payload: foundDefaultCommand.payload } : command;
+            });
+        };
+
+        const updatedCommands = updateCommands(currentCommands);
+
+        const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
+            const updatedProfileShortcuts = updateCommands(profile.shortcuts);
+            return { ...profile, shortcuts: updatedProfileShortcuts };
         });
 
         store.replace('commandKeys', updatedCommands);
+        store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
     }
 
     // 0.7.0 - migrate macros to include column and description fields
