@@ -117,7 +117,7 @@ const AddProfileModal = ({ onClose, onAdd }) => {
     return (
         <ToolModal
             onClose={onClose}
-            size="medium"
+            size="small"
             title="Add Gamepad/Joystick Profile"
         >
             <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
