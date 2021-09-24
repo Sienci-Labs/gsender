@@ -835,42 +835,42 @@ class AxesWidget extends PureComponent {
 
             switch (direction) {
             case YPositive: {
-                this.handleShortcutJog({ axis: 'Y', direction: 1 });
+                this.handleShortcutJog({ axis: { y: 1 } });
                 break;
             }
 
             case YNegative: {
-                this.handleShortcutJog({ axis: 'Y', direction: -1 });
+                this.handleShortcutJog({ axis: { y: -1 } });
                 break;
             }
 
             case XPositive: {
-                this.handleShortcutJog({ axis: 'X', direction: 1 });
+                this.handleShortcutJog({ axis: { x: 1 } });
                 break;
             }
 
             case XNegative: {
-                this.handleShortcutJog({ axis: 'X', direction: -1 });
+                this.handleShortcutJog({ axis: { x: -1 } });
                 break;
             }
 
             case TopLeft: {
-                this.handleShortcutJog({ axis: { X: -1, Y: 1 } });
+                this.handleShortcutJog({ axis: { x: -1, y: 1 } });
                 break;
             }
 
             case TopRight: {
-                this.handleShortcutJog({ axis: { X: 1, Y: 1 } });
+                this.handleShortcutJog({ axis: { x: 1, y: 1 } });
                 break;
             }
 
             case BottomLeft: {
-                this.handleShortcutJog({ axis: { X: -1, Y: -1 } });
+                this.handleShortcutJog({ axis: { x: -1, y: -1 } });
                 break;
             }
 
             case BottomRight: {
-                this.handleShortcutJog({ axis: { X: 1, Y: -1 } });
+                this.handleShortcutJog({ axis: { x: 1, y: -1 } });
                 break;
             }
 
