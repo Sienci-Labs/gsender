@@ -206,6 +206,7 @@ class Visualizer extends Component {
             this.createScene(el);
             this.resizeRenderer();
         }
+        this.resizeRenderer();
     }
 
     componentDidUpdate(prevProps) {

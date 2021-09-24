@@ -43,7 +43,6 @@ let powerSaverId = null;
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
-
     const gotSingleInstanceLock = app.requestSingleInstanceLock();
     const shouldQuitImmediately = !gotSingleInstanceLock;
 
@@ -78,7 +77,6 @@ const main = () => {
     app.whenReady().then(async () => {
         try {
             windowManager = new WindowManager();
-
             // Create and show splash before server starts
             const splashScreen = windowManager.createSplashScreen({
                 width: 500,
