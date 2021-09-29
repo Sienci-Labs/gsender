@@ -327,6 +327,7 @@ class PreferencesPage extends PureComponent {
                         }
                     }
                 });
+                pubsub.publish('probe:updated');
             },
             changeZThickness: (e) => {
                 const value = Number(e.target.value);
@@ -345,6 +346,7 @@ class PreferencesPage extends PureComponent {
                         }
                     }
                 });
+                pubsub.publish('probe:updated');
             },
             changePlateWidth: (e) => {
                 const value = Number(e.target.value);
