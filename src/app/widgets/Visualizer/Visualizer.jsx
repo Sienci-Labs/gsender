@@ -941,7 +941,7 @@ class Visualizer extends Component {
     }
 
     clearScene() {
-        // to iterrate over all children (except the first) in a scene
+        // to iterate over all children (except the first) in a scene
         const objsToRemove = this.scene.children;
         _each(objsToRemove, (obj) => {
             this.scene.remove(obj);

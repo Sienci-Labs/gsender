@@ -87,7 +87,6 @@ class WindowManager {
         const window = new BrowserWindow({
             ...options,
             show: false,
-            backgroundThrottling: true,
             webPreferences: {
                 nodeIntegration: true,
                 enableRemoteModule: true,
@@ -116,8 +115,8 @@ class WindowManager {
 
         if (splashScreen) {
             webContents.once('dom-ready', () => {
-                splashScreen.hide();
                 window.show();
+                splashScreen.close();
                 splashScreen.destroy();
             });
         } else {
