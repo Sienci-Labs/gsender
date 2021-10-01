@@ -615,6 +615,27 @@ class ProbeWidget extends PureComponent {
         return code;
     }
 
+    generateAutoProbe(axes) {
+        const code = [];
+        if (axes === 'XYZ') {
+            code.push(
+
+            );
+        } else if (axes === 'XY') {
+            code.push();
+        } else {
+            code.push();
+        }
+
+        return code;
+    }
+
+    generateTipProbe(axes) {
+        const code = [];
+
+        return code;
+    }
+
     generateProbeCommands() {
         const state = { ...this.state };
         const {
@@ -624,11 +645,21 @@ class ProbeWidget extends PureComponent {
             probeFeedrate,
             probeFastFeedrate,
             touchplate,
-            units
+            units,
+            toolDiameter
         } = state;
         const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
         const wcs = this.getWorkCoordinateSystem();
         const code = [];
+
+        // Handle auto and tip selection to avoid code generation
+        if (toolDiameter === 'Auto') {
+            return this.generateAutoProbe(axes);
+        }
+        if (toolDiameter === 'Tip') {
+            return this.generateTipProbe(axes);
+        }
+
         // Grab units for correct modal
         let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
         const modal = (units === METRIC_UNITS) ? '21' : '20';
