@@ -53,7 +53,11 @@ const inputStyle = {
 
 const ProbeDiameter = ({ actions, state, probeCommand }) => {
     const { setToolDiameter } = actions;
-    const { availableTools, units, toolDiameter } = state;
+    let { availableTools, units, toolDiameter } = state;
+
+    if (toolDiameter === 'Tip' || toolDiameter === 'Auto') {
+        units = '';
+    }
 
     const handleChange = (value) => {
         setToolDiameter(value);

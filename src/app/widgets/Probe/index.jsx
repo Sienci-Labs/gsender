@@ -268,8 +268,13 @@ class ProbeWidget extends PureComponent {
             return probeActive;
         },
         setToolDiameter: (selection) => {
+            let diameter;
             const { value } = selection || 0.00;
-            const diameter = Number(value) || 0.00;
+            if (value === 'Tip' || value === 'Auto') {
+                diameter = value;
+            } else {
+                diameter = Number(value) || 0.00;
+            }
             this.setState({
                 toolDiameter: diameter
             });
@@ -617,6 +622,8 @@ class ProbeWidget extends PureComponent {
 
     generateAutoProbe(axes) {
         const code = [];
+        console.log(axes);
+
         if (axes === 'XYZ') {
             code.push(
 
@@ -632,6 +639,7 @@ class ProbeWidget extends PureComponent {
 
     generateTipProbe(axes) {
         const code = [];
+        console.log(axes);
 
         return code;
     }
