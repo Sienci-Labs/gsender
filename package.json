@@ -26,7 +26,7 @@
   },
   "preferGlobal": true,
   "scripts": {
-    "prepare": "npm run clean && npm run eslint && npm run stylint && npm run test && npm run build",
+    "prepare": "npm run clean && npm run eslint && npm run stylint",
     "prebuild-latest": "npm run package-sync && bash -c \"cd src; npm version ${npm_package_version}-${COMMIT_COUNT:-latest}\" && bash scripts/prebuild-prod.sh",
     "prebuild-dev": "npm run package-sync && bash scripts/prebuild-dev.sh",
     "prebuild-prod": "npm run package-sync && bash scripts/prebuild-prod.sh",
