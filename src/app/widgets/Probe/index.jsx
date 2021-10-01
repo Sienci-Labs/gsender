@@ -85,15 +85,15 @@ class ProbeWidget extends PureComponent {
     state = this.getInitialState();
 
     PROBE_DISTANCE_METRIC = {
-        X: 25,
-        Y: 25,
-        Z: 15
+        X: 50,
+        Y: 50,
+        Z: 30
     };
 
     PROBE_DISTANCE_IMPERIAL = {
-        X: 1,
-        Y: 1,
-        Z: 0.6
+        X: 2,
+        Y: 2,
+        Z: 1.5
     };
 
 
