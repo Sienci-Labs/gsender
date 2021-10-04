@@ -471,10 +471,10 @@ class Firmware extends PureComponent {
     }
 
     render() {
-        const { modalClose, canClick } = this.props;
+        const { modalClose, canClick, eeprom } = this.props;
         const loadedSettings = GRBL_SETTINGS.GRBL_SETTINGS;
         let message = this.defineMessageForCncDefaultsButton();
-        let currentSettings = controller.settings;
+        //let currentSettings = controller.settings;
         let haveSettings = this.controllerSettingsLoaded();
 
         return (
@@ -503,9 +503,9 @@ class Firmware extends PureComponent {
                                             <InputController
                                                 type={grbl.inputType}
                                                 title={grbl.setting}
-                                                currentSettings={currentSettings.settings}
+                                                currentSettings={eeprom}
                                                 getUsersNewSettings={this.props.getUsersNewSettings}
-                                                switchSettings={this.state.settings}
+                                                switchSettings={eeprom}
                                                 min={grbl.min}
                                                 max={grbl.max}
                                                 step={grbl.step}
@@ -629,7 +629,9 @@ class Firmware extends PureComponent {
 
 export default connect((store) => {
     const isConnected = get(store, 'connection.isConnected');
+    const eeprom = get(store, 'controller.settings.settings');
     return {
-        canClick: !isConnected
+        canClick: !isConnected,
+        eeprom
     };
 })(Firmware);
