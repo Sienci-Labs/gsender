@@ -370,8 +370,9 @@ class GrblController {
                 const preferences = store.get('preferences');
 
                 if (line) {
-                    const regex = /([^NGMXYZIJKFPRS%\-?\.?\d+\.?\s])/gi;
+                    const regex = /([^NGMXYZIJKFPRST%\-?\.?\d+\.?\s])/gi;
                     if (regex.test(line)) {
+                        console.log('DATA FILTER');
                         if (preferences === undefined) {
                             this.emit('workflow:state', this.workflow.state, { validLine: false, line });
                             return line;

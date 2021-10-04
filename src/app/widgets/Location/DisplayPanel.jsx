@@ -185,6 +185,10 @@ class DisplayPanel extends PureComponent {
                             }
                             controller.command('gcode', 'G90');
                             controller.command('gcode', `G0 ${axisLabel}0`); //Move to Work Position Zero
+                            // We go down if homing not enabled
+                            if (safeRetractHeight !== 0 && axisLabel !== 'Z' && !homingEnabled) {
+                                controller.command('gcode', `G0 Z-${safeRetractHeight}`);
+                            }
                         }}
                     />
                     <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick} />
