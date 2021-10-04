@@ -624,13 +624,17 @@ class ProbeWidget extends PureComponent {
         const code = [];
         console.log(axes);
 
-        if (axes === 'XYZ') {
+        if (axes.X && axes.Y && axes.Z) {
+            console.log('XYZ');
             code.push(
 
             );
-        } else if (axes === 'XY') {
+        } else if (axes.X && axes.Y) {
+            console.log('XY');
             code.push();
         } else {
+            const axis = Object.keys(axes)[0];
+            console.log(axis);
             code.push();
         }
 
@@ -640,6 +644,20 @@ class ProbeWidget extends PureComponent {
     generateTipProbe(axes) {
         const code = [];
         console.log(axes);
+
+        if (axes.X && axes.Y && axes.Z) {
+            console.log('XYZ');
+            code.push(
+
+            );
+        } else if (axes.X && axes.Y) {
+            console.log('XY');
+            code.push();
+        } else {
+            const axis = Object.keys(axes)[0];
+            console.log(axis);
+            code.push();
+        }
 
         return code;
     }
