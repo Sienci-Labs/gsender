@@ -26,7 +26,7 @@ import { Toaster, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
 export const FRONT_RIGHT = 'FR';
 export const FRONT_LEFT = 'FL';
 export const BACK_RIGHT = 'BR';
-export const BACK_LEFT = 'BR';
+export const BACK_LEFT = 'BL';
 export const OTHER = 'OT';
 
 const OFFSET_DISTANCE = 0.9;
