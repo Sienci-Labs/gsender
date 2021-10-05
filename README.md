@@ -62,12 +62,11 @@ gSender is available for the following systems and does not yet support headless
 * Alarm warning explanations to better contextualize CNC errors
 * Sleep management to keep PC awake during g-code sending
 * Pre-built machine profiles, including:
-    - Shapeoko
-    - X-carve
     - LongMill
+    - Shapeoko
+    - X-carve 
     - OpenBuilds CNCs
     - 3018 CNC & PROVer
-    - Onefinity
     - BobsCNC CNCs
     - CNC4Newbie CNCs
     - Mill Right CNCs
