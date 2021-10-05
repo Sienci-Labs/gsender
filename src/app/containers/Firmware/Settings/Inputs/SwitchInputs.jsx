@@ -72,11 +72,10 @@ class SwitchInput extends PureComponent {
 
 
     render() {
-        let title = this.props.title;
-        let switchSettings = this.props.currentSettings;
+        //let title = this.props.title;
+        //let switchSettings = this.props.currentSettings;
         const { value } = this.state;
-        //swaps 1 and 0s for true and false
-        switchSettings[title] = switchSettings[title] !== '0';
+
         return (
             <div className={styles.switch}>
                 <div className={styles.disable}>Disabled</div>
