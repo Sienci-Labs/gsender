@@ -24,16 +24,16 @@ const VisualizerOptions = ({ state, actions }) => {
                     </Tooltip>
                     <ToggleSwitch checked={!disabled} onChange={() => visualizerActions.handleVisEnabledToggle()} size="sm" />
                     <ToggleSwitch checked={!disabledLite} onChange={() => visualizerActions.handleVisEnabledToggle(true)} size="lg" />
-                    <Tooltip content="Toggle rendering of the Drill Bit" location="default">
-                        <span>Show Bit</span>
-                    </Tooltip>
-                    <ToggleSwitch checked={objects.cuttingTool.visible} onChange={() => visualizerActions.handleBitToggle()} size="md" />
-                    <ToggleSwitch checked={objects.cuttingTool.visibleLite} onChange={() => visualizerActions.handleBitToggle(true)} size="md" />
                     <Tooltip content="Show the Drill Bit spinning while project runs" location="default">
                         <span>Show Bit Animation</span>
                     </Tooltip>
                     <ToggleSwitch checked={objects.cuttingToolAnimation.visible} onChange={() => visualizerActions.handleAnimationToggle()} size="md" />
                     <ToggleSwitch checked={objects.cuttingToolAnimation.visibleLite} onChange={() => visualizerActions.handleAnimationToggle(true)} size="md" />
+                    <Tooltip content="Toggle rendering of the Drill Bit" location="default">
+                        <span>Show Bit</span>
+                    </Tooltip>
+                    <ToggleSwitch checked={objects.cuttingTool.visible} onChange={() => visualizerActions.handleBitToggle()} size="md" />
+                    <ToggleSwitch checked={objects.cuttingTool.visibleLite} onChange={() => visualizerActions.handleBitToggle(true)} size="md" />
                     <Tooltip content="Show a dot in the visualizer instead of the Drill Bit" location="default">
                         <span>Cutpath Animation</span>
                     </Tooltip>

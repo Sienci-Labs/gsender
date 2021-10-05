@@ -25,14 +25,6 @@
 import * as THREE from 'three';
 import log from 'app/lib/log';
 
-// const defaultColor = new THREE.Color(colornames('lightgrey'));
-// const motionColor = {
-//     'G0': new THREE.Color(colornames('green')),
-//     'G1': new THREE.Color(colornames('blue')),
-//     'G2': new THREE.Color(colornames('deepskyblue')),
-//     'G3': new THREE.Color(colornames('deepskyblue'))
-// };
-
 class GCodeVisualizer {
     constructor(theme) {
         this.group = new THREE.Object3D();

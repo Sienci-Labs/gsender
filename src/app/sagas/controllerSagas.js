@@ -43,7 +43,6 @@ export function* initialize() {
     }, 1000 * 60 * 3);
 
     controller.addListener('controller:settings', (type, settings) => {
-        console.log(settings);
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_SETTINGS,
             payload: { type, settings }

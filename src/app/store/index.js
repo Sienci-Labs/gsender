@@ -229,13 +229,6 @@ const migrateStore = () => {
         store.replace('commandKeys', updatedCommands);
     }
 
-    // 0.7.0 - migrate macros to include column and description fields
-    /*if (semver.lt(cnc.version, '0.7.0')) {
-        const macroSet = await api.macros.fetch();
-        const { records: macros } = macroSet.body;
-        console.log(macros);
-    }*/
-
     // 0.6.8 -- duplicate keybinding fix
     if (semver.lt(cnc.version, '0.6.8')) {
         const setCommands = store.get('commandKeys');

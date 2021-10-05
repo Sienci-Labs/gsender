@@ -102,13 +102,6 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
         const calculatedXStep = Math.round(movementCalculation({ currentStep: Number(currentYStep), movedDistance: y, actualDistance: a }));
         const calculatedYStep = Math.round(movementCalculation({ currentStep: Number(currentXStep), movedDistance: x, actualDistance: b }));
 
-        console.log({
-            calculatedXStep,
-            calculatedYStep,
-            currentXStep: Number(currentXStep),
-            currentYStep: Number(currentYStep),
-        });
-
         if (calculatedXStep !== Number(currentXStep)) {
             stepsToChange.x.should = true;
             stepsToChange.x.amount = calculatedXStep;

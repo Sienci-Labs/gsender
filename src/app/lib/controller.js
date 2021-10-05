@@ -167,14 +167,12 @@ class Controller {
         this.socket = this.io.connect(host, options);
 
         this.socket.on('disconnect', () => {
-            console.log('In disconnect event');
             this.reconnect();
         });
 
 
         Object.keys(this.listeners).forEach((eventName) => {
             if (!this.socket) {
-                console.log('No socket found, ending connect early');
                 return;
             }
 
