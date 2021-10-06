@@ -354,6 +354,7 @@ const defaultState = {
             liteMode: false,
             disabled: false,
             disabledLite: false,
+            minimizeRenders: false,
             projection: 'orthographic', // 'perspective' or 'orthographic'
             cameraMode: 'pan', // 'pan' or 'rotate',
             theme: 'Dark',
