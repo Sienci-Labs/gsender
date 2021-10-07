@@ -574,6 +574,7 @@ class SurfacingVisualizer extends PureComponent {
             filename: '',
             fileSize: 0, //in bytes
             total: 0,
+            minimizeRenders: this.config.get('minimizeRenders', false)
         };
     }
 
@@ -632,7 +633,8 @@ class SurfacingVisualizer extends PureComponent {
                 this.setState({
                     disabled: this.config.get('disabled'),
                     disabledLite: this.config.get('disabledLite'),
-                    objects: this.config.get('objects')
+                    objects: this.config.get('objects'),
+                    minimizeRenders: this.config.get('minimizeRenders')
                 });
             }),
             pubsub.subscribe('units:change', (msg, units) => {

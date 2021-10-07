@@ -44,7 +44,7 @@ const VisualizerOptions = ({ state, actions }) => {
             </div>
             <div className={styles.flexRow}>
                 <span>Force minimal renders</span>
-                <ToggleSwitch checked={minimizeRenders}/>
+                <ToggleSwitch checked={minimizeRenders} onChange={() => visualizerActions.handleMinimizeRenderToggle()} />
             </div>
             <small>This will force the visualizer to only re-render when new information is received from the controller during a job, increasing performance</small>
         </Fieldset>

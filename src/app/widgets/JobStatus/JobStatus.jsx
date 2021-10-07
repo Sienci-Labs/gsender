@@ -98,6 +98,6 @@ class JobStatus extends PureComponent {
 
 export default connect((store) => {
     const file = get(store, 'file', {});
-
+    console.log(file);
     return { ...file };
 })(JobStatus);

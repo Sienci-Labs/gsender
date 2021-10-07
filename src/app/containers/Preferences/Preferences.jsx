@@ -122,6 +122,7 @@ class PreferencesPage extends PureComponent {
                 connectivityTest: this.probeConfig.get('connectivityTest', true)
             },
             visualizer: {
+                minimizeRenders: this.visualizerConfig.get('minimizeRenders'),
                 theme: this.visualizerConfig.get('theme'),
                 objects: this.visualizerConfig.get('objects'),
                 disabled: this.visualizerConfig.get('disabled'),
@@ -398,6 +399,17 @@ class PreferencesPage extends PureComponent {
             }
         },
         visualizer: {
+            handleMinimizeRenderToggle: () => {
+                const { visualizer } = this.state;
+                const { minimizeRenders } = this.state;
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        minimizeRenders: !minimizeRenders
+                    }
+                });
+                pubsub.publish('visualizer:settings');
+            },
             handleThemeChange: (theme) => {
                 const { visualizer } = this.state;
                 this.setState({
@@ -555,6 +567,7 @@ class PreferencesPage extends PureComponent {
         store.set('widgets.visualizer.theme', visualizer.theme);
         store.set('widgets.visualizer.disabled', visualizer.disabled);
         store.set('widgets.visualizer.disabledLite', visualizer.disabledLite);
+        store.set('widgets.visualizer.minimizeRenders', visualizer.minimizeRenders);
         store.set('workspace.units', units);
         store.replace('workspace[tools]', tools);
         store.replace('widgets.visualizer.objects', visualizer.objects);
