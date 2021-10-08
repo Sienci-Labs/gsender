@@ -22,7 +22,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=14"
+    "node": ">=12"
   },
   "preferGlobal": true,
   "scripts": {
