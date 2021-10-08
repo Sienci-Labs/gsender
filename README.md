@@ -1,6 +1,6 @@
 # ![gSender logo](https://github.com/Sienci-Labs/sender/blob/master/src/app/images/icon-git.png?raw=true)gSender: connect to and control [Grbl](https://github.com/grbl/grbl)-based CNCs
 
-gSender is a feature-packed CNC interface software designed to be clean and easy to learn while retaining a depth of capabilites for advanced users. Its development was begun out of a passion for hobby CNC machines: an interface rebuilt to suit the needs of the at-home CNC user.
+gSender is a feature-packed CNC interface software designed to be clean and easy to learn while retaining a depth of capabilities for advanced users. Its development was begun out of a passion for hobby CNC machines: an interface rebuilt to suit the needs of the at-home CNC user.
 * Accepts standard, GRBL-compliant g-code and has been verified to work with many of the common CAM programs
 * Began development to bring new concepts to the existing landscape of GRBL senders in an effort to advance functionality and ease-of-use
 * Javascript-based CNC interface software which leverages [Electron](https://www.electronjs.org/) for cross platform use
@@ -33,7 +33,7 @@ gSender is available for the following systems and does not yet support headless
 * Smart machine connection
 * 3-axis digital readout (DRO) with manual value entry
 * All-directional jogging with XY diagonals, jog presets, and incremental/continuous single-button handling
-* Zero-setting and gotos (independant and combined)
+* Zero-setting and gotos (independent and combined)
 * Probing in any direction plus safe continuity detection ensures no broken cutting tools
 * Full imperial/metric compatibility
 * Responsive screen design and workspace customizations including visualizer light and dark theme
@@ -42,16 +42,16 @@ gSender is available for the following systems and does not yet support headless
 * Feed override and active job status indicators
 * Fully exposed keyboard shortcuts for external keyboard/keypad control
 * Joystick support built-in for a variety of controllers
-* Safe height movements - accomodates machines with or without endstops
+* Safe height movements - accommodates machines with or without endstops
 * Homing cycle and quick-movement locations available for machines with homing hardware
 * Full spindle/laser support via manual control widgets, active alerting, and live overrides
 * Full mist/flood coolant support via manual control widgets and active alerting
 * Macros buttons (rearrangeable) with enhanced macro variables and individually assignable keyboard shortcuts
 * Lightweight mode reduces processing intensity on less powerful hardware or when running larger files
 * Easy workspace swapping for more advanced jigging or alignment work
-* Optional automatic handling for common error throwing gcode
-* Firmware tool for easier GRBL eeprom changes, loading defaults, and GRBL flashing
-* Surfacing tool auto-generates surfacing gcode based on machine cutting area and other preferences, ready to execute
+* Optional automatic handling for common error throwing g-code
+* Firmware tool for easier GRBL EEPROM changes, loading defaults, and GRBL flashing
+* Surfacing tool auto-generates surfacing g-code based on machine cutting area and other preferences, ready to execute
 * Calibration tool for axis alignment - a step by step process to make sure your CNC is square
 * Movement tuning tool for calibrating motor axis movements
 * Tool change functionality - pause, ignore, or run code blocks on M6 commands
@@ -62,12 +62,11 @@ gSender is available for the following systems and does not yet support headless
 * Alarm warning explanations to better contextualize CNC errors
 * Sleep management to keep PC awake during g-code sending
 * Pre-built machine profiles, including:
-    - Shapeoko
-    - X-carve
     - LongMill
+    - Shapeoko
+    - X-carve 
     - OpenBuilds CNCs
     - 3018 CNC & PROVer
-    - Onefinity
     - BobsCNC CNCs
     - CNC4Newbie CNCs
     - Mill Right CNCs
@@ -113,13 +112,13 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Style changes
 
 ### Open Beta 0.7.3 (Sept 20, 2021)
-* Code signed!
-* Various fixes for homing related functions
-* Categorized EEPROM settings
-* UI fixes for incorrect baudrate
-* Unrecognized devices are now accesible from the connection widget
-* Clearer directions to help
-* Updated firmware image
+* Code signed! (this means security certification - i.e. no more firewall warnings)
+* New recognized CNCs added and unrecognized devices are now accessible from the connection widget
+* UI fixes for incorrect baud rate
+* New EEPROM categories for easier navigation
+* Clearer Help menu
+* More fixes and improvements to endstop-related functions
+* New LongMill default firmware that better supports endstops
 * Fix for jog not stopping immediately due to debounce
 * Various styling fixes
 
@@ -213,7 +212,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 ### Open Beta 0.6.4 (May 14, 2021)
 * Improvements to job handling
 * Tooltips created for data entry points
-* Splashscreen tweaks
+* Splash screen tweaks
 * Working PI build!?
 
 ### Closed Beta 0.6.0 (May 7, 2021)
@@ -228,7 +227,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * More accurate parsing of tool and spindle speeds
 * Various keybind bug fixes, addressing special characters
 * Added recent files button and file unloading
-* New Check mode state for testing files before starting job
+* New 'Check mode' state for testing files before starting job
 * Verbose commands now in console
 * New macro behaviours and import/export
 * gSender now officially licensed under GPLv3
@@ -253,7 +252,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Migration to most recent Electron release plus implemented logging
 
 ### Closed Beta 0.5.4 (Mar 19, 2021)
-* Set up in-app feedback sumbmission button
+* Set up in-app feedback submission button
 * Better formatting and sizing of various gSender elements
 * New visualizer theme "light mode" available in settings
 * Experimental "lightweight" options to reduce visualizer rendering computation (meant for less powerful hardware)
@@ -270,10 +269,10 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ### Closed Beta 0.1 (Mar 5, 2021)
 * gSender decided as official name :D
-* Buttons added for homing quicktravel, jog cancel, diagonal jog, and an awesome isocube!
+* Buttons added for homing, quick-travel, jog cancel, diagonal jog, and an awesome isocube!
 * New macros widget
 * New customizable settings: jogging presets, baud rate, and more.
-* Visual overhaul on settings, probing, file attributes, and visual consistency accross entire program
+* Visual overhaul on settings, probing, file attributes, and visual consistency across entire program
 * Logo implemented and the loading of Louis
 * Responsiveness overhaul on entire program
 * Mac (intel) version released March 8
