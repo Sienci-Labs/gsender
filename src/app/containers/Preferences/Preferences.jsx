@@ -401,7 +401,7 @@ class PreferencesPage extends PureComponent {
         visualizer: {
             handleMinimizeRenderToggle: () => {
                 const { visualizer } = this.state;
-                const { minimizeRenders } = this.state;
+                const { minimizeRenders } = visualizer;
                 this.setState({
                     visualizer: {
                         ...visualizer,

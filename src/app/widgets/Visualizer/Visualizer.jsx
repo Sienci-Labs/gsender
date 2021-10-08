@@ -164,6 +164,7 @@ class Visualizer extends Component {
 
     renderAnimationLoop = () => {
         const showAnimation = this.showAnimation();
+
         if (showAnimation) {
             if (this.isAgitated) {
                 // Call the render() function up to 60 times per second (i.e. 60fps)
@@ -436,7 +437,11 @@ class Visualizer extends Component {
 
     showAnimation = () => {
         const state = { ...this.props.state };
-        const { liteMode, objects } = state;
+        const { liteMode, objects, minimizeRenders } = state;
+        // We don't animate if minimizeRenders is turned on
+        if (minimizeRenders) {
+            return false;
+        }
         if (liteMode && objects.cuttingToolAnimation.visibleLite) {
             return true;
         } else if (!liteMode && objects.cuttingToolAnimation.visible) {
@@ -932,7 +937,6 @@ class Visualizer extends Component {
     // @param [options] The options object.
     // @param [options.forceUpdate] Force rendering
     updateScene(options) {
-        console.log('Update scene called');
         const { forceUpdate = false } = { ...options };
         const needUpdateScene = this.props.show || forceUpdate;
 

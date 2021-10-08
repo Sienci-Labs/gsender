@@ -838,6 +838,7 @@ class VisualizerWidget extends PureComponent {
             disabled: this.config.get('disabled', false),
             disabledLite: this.config.get('disabledLite'),
             liteMode: this.config.get('liteMode'),
+            minimizeRenders: this.config.get('minimizeRenders'),
             projection: this.config.get('projection', 'orthographic'),
             objects: {
                 limits: {
@@ -1076,7 +1077,8 @@ class VisualizerWidget extends PureComponent {
                 this.setState({
                     disabled: this.config.get('disabled'),
                     disabledLite: this.config.get('disabledLite'),
-                    objects: this.config.get('objects')
+                    objects: this.config.get('objects'),
+                    minimizeRenders: this.config.get('minimizeRenders')
                 });
             }),
             pubsub.subscribe('units:change', (msg, units) => {

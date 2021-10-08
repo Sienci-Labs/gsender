@@ -367,12 +367,11 @@ class GrblController {
                 }
 
                 const machineProfile = store.get('machineProfile');
-                const preferences = store.get('preferences');
+                //const preferences = store.get('preferences');
 
-                if (line) {
+                /*if (line) {
                     const regex = /([^NGMXYZIJKFPRST%\-?\.?\d+\.?\s])/gi;
                     if (regex.test(line)) {
-                        console.log('DATA FILTER');
                         if (preferences === undefined) {
                             this.emit('workflow:state', this.workflow.state, { validLine: false, line });
                             return line;
@@ -384,7 +383,7 @@ class GrblController {
                             this.emit('workflow:state', this.workflow.state, { validLine: false, line });
                         }
                     }
-                }
+                }*/
 
                 if (_.includes(words, 'G28') && !machineProfile.endstops) {
                     line = line.replace('G28', '(G28)');

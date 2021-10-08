@@ -58,7 +58,7 @@ class JobStatus extends PureComponent {
     };
 
     render() {
-        const { state, name, size, total, fileLoaded, path } = this.props;
+        const { state, name, size, total, fileLoaded, path, filteredPath } = this.props;
         const { isRunningJob } = state;
 
         return (
@@ -74,11 +74,11 @@ class JobStatus extends PureComponent {
                                         </TooltipCustom>
                                     </div>
 
-                                    {path && (
+                                    {filteredPath && (
                                         <div className={styles['file-path']}>
                                             <TooltipCustom content={`File Path: ${path}`} style={{ wordWrap: 'break-word' }}>
                                                 <div style={{ textAlign: 'right' }}>
-                                                    <span>Path:</span> <span className={styles['file-text']}>{path}</span>
+                                                    <span>Path:</span> <span className={styles['file-text']}>{filteredPath}</span>
                                                 </div>
                                             </TooltipCustom>
                                         </div>
@@ -98,6 +98,11 @@ class JobStatus extends PureComponent {
 
 export default connect((store) => {
     const file = get(store, 'file', {});
-    console.log(file);
-    return { ...file };
+    const path = get(file, 'path', '');
+    const name = get(file, 'name', '');
+    const filteredPath = path.replace(name, '');
+    return {
+        ...file,
+        filteredPath
+    };
 })(JobStatus);
