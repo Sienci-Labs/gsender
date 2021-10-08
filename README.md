@@ -104,6 +104,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Minimize render mode for visualizer to improve performance
 * Visualizer improvements to render speed
 * Fix render worker being started if visualizer disabled
+* Probe dimensions correctly update if changed in preferences
 * Can once again copy from console
 * Redesigned probe module
 * Fix for quick-movement buttons if home set to back-left

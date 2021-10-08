@@ -120,7 +120,7 @@ const defaultState = {
                 y: true,
                 z: true
             },
-            touchplateType: 'Standard Type'
+            touchplateType: 'Standard Block'
         },
         tools: [
             {
