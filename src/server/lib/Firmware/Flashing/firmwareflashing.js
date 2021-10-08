@@ -28,6 +28,10 @@ import store from '../../../store';
 
 const log = logger('FlashLib: ');
 const FlashingFirmware = (recievedPortNumber) => {
+    if (!recievedPortNumber) {
+        log.error('No port specified');
+        return;
+    }
     const controller = store.get('controllers["' + recievedPortNumber + '"]');
     try {
         let avrgirl = new AvrgirlArduino({
