@@ -56,7 +56,7 @@ const getMachineMovementLimits = () => {
     }
     const { limits } = machineProfile;
     const xLimit = Number(limits.xmax * OFFSET_DISTANCE).toFixed(3);
-    const yLimit = Number(limits.zmax * OFFSET_DISTANCE).toFixed(3);
+    const yLimit = Number(limits.ymax * OFFSET_DISTANCE).toFixed(3);
     return [xLimit, yLimit];
 };
 
@@ -86,7 +86,7 @@ const getPositionMovements = (requestedPosition, homingPosition) => {
             return [xLimit, 0];
         } else if (requestedPosition === FRONT_LEFT) {
             return [0, 0];
-        } else if (requestedPosition === BACK_LEFT) {
+        } else if (requestedPosition === BACK_RIGHT) {
             return [xLimit, yLimit];
         } else { // Back Right
             return [0, yLimit];
