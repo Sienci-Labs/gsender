@@ -11,3 +11,6 @@ package-lock.json
 /.vscode
 electron-builder.yml
 .DS_Store
+yarn.lock
+yarn-error.log
+gsender_server_log.txt
