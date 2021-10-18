@@ -604,7 +604,8 @@ class LocationWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId, machinePosition, workPosition } = this.props;
+        const { widgetId, machinePosition, workPosition, wcs } = this.props;
+        console.log(wcs);
         const { minimized, isFullscreen } = this.state;
         const { units } = this.state;
         const canSendCommand = this.canSendCommand();
@@ -630,32 +631,26 @@ class LocationWidget extends PureComponent {
 
         const gcodes = [
             {
-                id: 0,
                 label: 'G54 (P1)',
                 value: 'G54',
             },
             {
-                id: 1,
                 label: 'G55 (P2)',
                 value: 'G55',
             },
             {
-                id: 2,
                 label: 'G56 (P3)',
                 value: 'G56',
             },
             {
-                id: 3,
                 label: 'G57 (P4)',
                 value: 'G57',
             },
             {
-                id: 4,
                 label: 'G58 (P5)',
                 value: 'G58',
             },
             {
-                id: 5,
                 label: 'G59 (P6)',
                 value: 'G59',
             },
@@ -682,7 +677,7 @@ class LocationWidget extends PureComponent {
                                 dropdownIndicator: provided => ({ ...provided, padding: 0 }),
                                 container: provided => ({ ...provided, padding: 0 })
                             }}
-                            defaultValue={gcodes[0]}
+                            value={gcodes.filter(obj => obj.value === wcs)}
                             isDisabled={!canSendCommand}
                             isClearable={false}
                             className={styles.workspaceInput}
@@ -746,6 +741,7 @@ export default connect((store) => {
     const canJog = (workflow.state === WORKFLOW_STATE_IDLE);
     const isConnected = get(store, 'connection.isConnected');
     const port = get(store, 'connection.port');
+    const wcs = get(store, 'controller.modal.wcs', 'G54');
     return {
         isConnected,
         state,
@@ -755,6 +751,7 @@ export default connect((store) => {
         workPosition,
         workflow,
         canJog,
-        port
+        port,
+        wcs
     };
 })(LocationWidget);

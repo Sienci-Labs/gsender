@@ -254,16 +254,16 @@ class GrblController {
                 const data = parser.parseLine(line, { flatten: true });
                 const words = ensureArray(data.words);
 
-                // { // Program Mode: M0, M1
-                //     const programMode = _.intersection(words, ['M0', 'M1'])[0];
-                //     if (programMode === 'M0') {
-                //         log.debug('M0 Program Pause');
-                //         this.feeder.hold({ data: 'M0' }); // Hold reason
-                //     } else if (programMode === 'M1') {
-                //         log.debug('M1 Program Pause');
-                //         this.feeder.hold({ data: 'M1' }); // Hold reason
-                //     }
-                // }
+                { // Program Mode: M0, M1
+                    const programMode = _.intersection(words, ['M0', 'M1'])[0];
+                    if (programMode === 'M0') {
+                        log.debug('M0 Program Pause');
+                        this.feeder.hold({ data: 'M0' }); // Hold reason
+                    } else if (programMode === 'M1') {
+                        log.debug('M1 Program Pause');
+                        this.feeder.hold({ data: 'M1' }); // Hold reason
+                    }
+                }
 
                 // More aggressive updating of spindle modals for safety
                 const spindleCommand = _.intersection(words, ['M3', 'M4'])[0];
@@ -1149,7 +1149,7 @@ class GrblController {
     command(cmd, ...args) {
         const handler = {
             'flash:start': () => {
-                let [port = 'COM3'] = args;
+                let [port] = args;
                 this.close(() => {
                     FlashingFirmware(port);
                 });
@@ -1160,7 +1160,7 @@ class GrblController {
             },
             'flashing:failed': () => {
                 let [error] = args;
-                setTimeout(() => this.emit('task:error', error), 16000);
+                this.emit('task:error', error);
             },
             'firmware:recievedProfiles': () => {
                 let [files] = args;

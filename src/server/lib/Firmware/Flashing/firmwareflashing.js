@@ -36,11 +36,10 @@ const FlashingFirmware = (recievedPortNumber) => {
     try {
         let avrgirl = new AvrgirlArduino({
             board: 'uno',
-            debug: true,
             port: recievedPortNumber,
         });
 
-        avrgirl.flash(hex, error => {
+        avrgirl.flash(hex, (error) => {
             if (error) {
                 controller.command('flashing:failed', error);
                 log.debug(`${error} Error flashing board`);
