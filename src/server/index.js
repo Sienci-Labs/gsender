@@ -147,16 +147,6 @@ const createServer = (options, callback) => {
                 type: 'server',
                 route: mount.route,
                 server: (options) => {
-                    // route
-                    // > '/custom-widget/'
-                    // routeWithoutTrailingSlash
-                    // > '/custom-widget'
-                    // target
-                    // > 'https://cncjs.github.io/cncjs-widget-boilerplate/'
-                    // targetPathname
-                    // > '/cncjs-widget-boilerplate/'
-                    // proxyPathPattern
-                    // > RegExp('^/cncjs-widget-boilerplate/custom-widget')
                     const { route = '/' } = { ...options };
                     const routeWithoutTrailingSlash = trimEnd(route, '/');
                     const target = mount.target;

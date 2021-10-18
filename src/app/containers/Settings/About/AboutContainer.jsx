@@ -23,14 +23,11 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import Anchor from 'app/components/Anchor';
 import settings from 'app/config/settings';
 import i18n from 'app/lib/i18n';
 import styles from './index.styl';
 
 const AboutContainer = ({ version }) => {
-    const wiki = 'https://github.com/cncjs/cncjs/wiki';
-
     return (
         <div className={styles.aboutContainer}>
             <img src="images/icon-square.png" alt="" className={styles.productLogo} />
@@ -41,14 +38,6 @@ const AboutContainer = ({ version }) => {
                 <div className={styles.aboutProductDescription}>
                     {i18n._('A web-based interface for CNC milling controller running Grbl, Smoothieware, or TinyG')}
                 </div>
-                <Anchor
-                    className={styles.learnmore}
-                    href={wiki}
-                    target="_blank"
-                >
-                    {i18n._('Learn more')}
-                    <i className="fa fa-arrow-circle-right" style={{ marginLeft: 5 }} />
-                </Anchor>
             </div>
         </div>
     );
