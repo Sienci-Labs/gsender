@@ -37,7 +37,7 @@ module.exports = {
         ]
     },
     output: {
-        path: path.resolve(__dirname, 'dist/cncjs/server'),
+        path: path.resolve(__dirname, 'dist/gsender/server'),
         filename: '[name].js',
         libraryTarget: 'commonjs2'
     },
