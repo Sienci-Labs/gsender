@@ -4,11 +4,11 @@ require('@babel/polyfill');
 
 const chalk = require('chalk');
 
-console.warn(chalk.yellow('Warning: The "cnc" executable is deprecated and will be removed in the next major release. Use "cncjs" instead to avoid deprecation.\n'));
+console.warn(chalk.yellow('Warning: The "cnc" executable is deprecated and will be removed in the next major release. Use "gsender" instead to avoid deprecation.\n'));
 
 const launchServer = (process.env.NODE_ENV === 'development')
     ? require('../output/server-cli').default
-    : require('../dist/cncjs/server-cli').default;
+    : require('../dist/gsender/server-cli').default;
 
 launchServer().catch(err => {
     console.error('Error:', err);
