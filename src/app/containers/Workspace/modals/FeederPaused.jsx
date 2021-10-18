@@ -39,7 +39,7 @@ const FeederPaused = (props) => (
         <Modal.Body>
             <ModalTemplate type="warning">
                 <h5>{props.title}</h5>
-                <p>{i18n._('Click the Continue button to resume execution.')}</p>
+                <p>{i18n._('Click "Resume" to continue execution.')}</p>
             </ModalTemplate>
         </Modal.Body>
         <Modal.Footer>
@@ -63,7 +63,7 @@ const FeederPaused = (props) => (
                     props.onClose
                 )}
             >
-                {i18n._('Continue')}
+                {i18n._('Resume')}
             </Button>
         </Modal.Footer>
     </Modal>

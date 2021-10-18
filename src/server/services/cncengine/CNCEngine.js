@@ -139,11 +139,6 @@ class CNCEngine {
             maxHttpBufferSize: 40e6
         });
 
-        /*this.io.use(socketioJwt.authorize({
-            secret: settings.secret,
-            handshake: true
-        }));*/
-
         this.io.use(async (socket, next) => {
             try {
                 // IP Address Access Control

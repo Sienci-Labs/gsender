@@ -37,7 +37,7 @@ import store from 'app/store';
 import { GRBL } from 'app/constants';
 import TooltipCustom from '../../components/TooltipCustom/ToolTip';
 import Loading from '../../components/Loader';
-import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO, TOASTER_DANGER } from '../../lib/toaster/ToasterLib';
 import ToolsNotificationModal from '../../components/ToolsNotificationModal/Modal';
 import styles from './index.styl';
 import InputController from './Settings/Inputs/InputController';
@@ -272,9 +272,18 @@ class Firmware extends PureComponent {
             this.setState({ initiateRestoreDefaults: false });
         },
         startFlash: (port) => {
+            console.log(this.state.port);
+            if (!this.state.port) {
+                Toaster.pop({
+                    msg: 'No port specified - please connect to the device to determine what is being flashed',
+                    type: TOASTER_DANGER,
+                    duration: 15000
+                });
+                return;
+            }
             Toaster.pop({
                 msg: `Flashing started on port: ${this.state.port} `,
-                type: 'TOASTER_INFO',
+                type: TOASTER_INFO,
                 duration: 15000
             });
             this.setState({ initiateFlashing: false });

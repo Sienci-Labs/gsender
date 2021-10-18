@@ -106,9 +106,7 @@
     "Invalid file format.": "Invalid file format.",
     "Close": "Close",
     "Export": "Export",
-    "Click the Continue button to resume execution.": "Click the Continue button to resume execution.",
     "Stop": "Stop",
-    "Continue": "Continue",
     "Waiting for the planner to empty...": "Waiting for the planner to empty...",
     "Fork Widget": "Fork Widget",
     "Are you sure you want to fork this widget?": "Are you sure you want to fork this widget?",
@@ -399,5 +397,6 @@
     "Outline": "Outline",
     "Server Connection Lost": "Server Connection Lost",
     "It looks like the server connection has been lost - attempt to reconnect?": "It looks like the server connection has been lost - attempt to reconnect?",
-    "Attempt Reconnect": "Attempt Reconnect"
+    "Attempt Reconnect": "Attempt Reconnect",
+    "Click \"Resume\" to continue execution.": "Click \"Resume\" to continue execution."
 }
