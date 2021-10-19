@@ -30,6 +30,7 @@ import Header from 'app/containers/Header';
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import api from 'app/api';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import {
     WORKFLOW_STATE_IDLE
 } from 'app/constants';
@@ -221,9 +222,24 @@ class Workspace extends PureComponent {
                 'M190': i18n._('M190 Set Heated Bed Temperature')
             }[data] || data;
 
+            if (hold) {
+                Confirm({
+                    title,
+                    content: 'Press "Resume" to continue operation.',
+                    confirmLabel: 'Resume',
+                    cancelLabel: 'Stop',
+                    onConfirm: () => {
+                        controller.command('feeder:start');
+                    },
+                    onClose: () => {
+                        controller.command('feeder:stop');
+                    }
+                });
+            }
+            /*
             this.action.openModal(MODAL_FEEDER_PAUSED, {
                 title: title
-            });
+            });*/
         }
     };
 

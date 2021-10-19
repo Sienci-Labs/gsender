@@ -37,7 +37,7 @@ import store from 'app/store';
 import { GRBL } from 'app/constants';
 import TooltipCustom from '../../components/TooltipCustom/ToolTip';
 import Loading from '../../components/Loader';
-import { Toaster, TOASTER_INFO, TOASTER_DANGER } from '../../lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO, TOASTER_DANGER, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import ToolsNotificationModal from '../../components/ToolsNotificationModal/Modal';
 import styles from './index.styl';
 import InputController from './Settings/Inputs/InputController';
@@ -188,14 +188,10 @@ class Firmware extends PureComponent {
             });
         },
         'task:error': (error) => {
-            let errorNumber = error.errno;
-            let errorCode = error.code;
-            let errorMessage = `Error flashing board...Error Number: ${errorNumber} Error Code: ${errorCode}. If problem persists, please contact support`;
             this.setState({ currentlyFlashing: false });
-            this.setState({ finishedMessage: errorMessage });
             Toaster.pop({
-                msg: (this.state.finishedMessage),
-                type: 'TOASTER_UNTIL_CLOSE',
+                msg: error,
+                type: TOASTER_UNTIL_CLOSE,
                 duration: 10000
             });
         },
