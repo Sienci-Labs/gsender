@@ -6,9 +6,9 @@
     "name": "Sienci Labs <hi@sienci.com>",
     "email": "hi@sienci.com"
   },
-  "main": "./dist/cncjs/server-cli.js",
+  "main": "./dist/gsender/server-cli.js",
   "bin": {
-    "cncjs": "./bin/cncjs",
+    "gsender": "./bin/gsender",
     "cnc": "./bin/cnc"
   },
   "files": [
@@ -43,8 +43,8 @@
     "build-prod-app": "cross-env NODE_ENV=production webpack-cli --config webpack.config.app.production.js && npm run build-i18n-app",
     "postbuild-dev-server": "bash -c \"mkdir -p output/server; cp -af src/server/{i18n,views} output/server/\"",
     "postbuild-dev-app": "bash -c \"mkdir -p output/app; cp -af src/app/{favicon.ico,i18n,images,assets} output/app/\"",
-    "postbuild-prod-server": "bash -c \"mkdir -p dist/cncjs/server; cp -af src/server/{i18n,views} dist/cncjs/server/\"",
-    "postbuild-prod-app": "bash -c \"mkdir -p dist/cncjs/app; cp -af src/app/{favicon.ico,i18n,images,assets} dist/cncjs/app/\"",
+    "postbuild-prod-server": "bash -c \"mkdir -p dist/gsender/server; cp -af src/server/{i18n,views} dist/gsender/server/\"",
+    "postbuild-prod-app": "bash -c \"mkdir -p dist/gsender/app; cp -af src/app/{favicon.ico,i18n,images,assets} dist/gsender/app/\"",
     "clean": "bash -c 'rm -rf ./dist ./output'",
     "electron": "electron",
     "electron-builder": "electron-builder",
@@ -59,12 +59,12 @@
     "build:linux-arm64": "bash -c 'scripts/electron-builder.sh --linux --arm64'",
     "build:windows-ia32": "bash -c 'scripts/electron-builder.sh --windows --ia32'",
     "build:windows-x64": "bash -c 'scripts/electron-builder.sh --windows --x64'",
-    "start": "./bin/cncjs",
-    "start-electron": "electron ./dist/cncjs/main",
+    "start": "./bin/gsender",
+    "start-electron": "electron ./dist/gsender/main",
     "watch-dev": "cross-env NODE_ENV=development webpack-cli --watch --config webpack.config.server.development.js",
-    "start-dev": "cross-env NODE_ENV=development ./bin/cncjs -vv -p 8000 -m /widget:https://cncjs.github.io/cncjs-widget-boilerplate/v1/",
+    "start-dev": "cross-env NODE_ENV=development ./bin/gsender -vv -p 8000",
     "dev": "npm run build-dev && npm run start-dev",
-    "prod": "npm run build-prod && NODE_ENV=production ./bin/cncjs",
+    "prod": "npm run build-prod && NODE_ENV=production ./bin/gsender",
     "eslint": "npm run eslint:build",
     "eslint:build": "eslint --ext .js --ext .jsx *.js scripts test --fix",
     "eslint:debug": "echo \"Checking code style...\"; DEBUG=eslint:cli-engine eslint --ext .js --ext .jsx *.js src scripts test",
@@ -82,7 +82,7 @@
     "directories": {
       "buildResources": "electron-build",
       "output": "output",
-      "app": "dist/cncjs"
+      "app": "dist/gsender"
     },
     "nsis": {
       "allowToChangeInstallationDirectory": true,
@@ -136,7 +136,7 @@
     }
   },
   "keywords": [
-    "cncjs",
+    "gsender",
     "arduino",
     "raspberry",
     "pi",
@@ -397,6 +397,6 @@
   },
   "collective": {
     "type": "opencollective",
-    "url": "https://opencollective.com/cncjs"
+    "url": ""
   }
 }

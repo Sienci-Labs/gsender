@@ -29,7 +29,7 @@ import {
     ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
 
-const pkgName = 'cncjs';
+const pkgName = 'gsender';
 
 export const getLatestVersion = (req, res) => {
     const scope = pkgName.split('/')[0];

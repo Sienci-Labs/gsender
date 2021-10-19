@@ -37,9 +37,6 @@ import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
 
-//const releases = 'https://github.com/cncjs/cncjs/releases';
-
-
 class Header extends PureComponent {
     static propTypes = {
         ...withRouter.propTypes

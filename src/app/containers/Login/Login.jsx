@@ -110,7 +110,6 @@ class Login extends PureComponent {
         const state = { ...this.state };
         const actions = { ...this.actions };
         const { alertMessage, authenticating } = state;
-        const forgotPasswordLink = 'https://cnc.js.org/docs/faq/#forgot-your-password';
 
         if (state.redirectToReferrer) {
             const query = qs.parse(window.location.search, { ignoreQueryPrefix: true });
@@ -188,11 +187,6 @@ class Login extends PureComponent {
                                 {i18n._('Sign In')}
                             </button>
                         </div>
-                        <p>
-                            <Anchor href={forgotPasswordLink}>
-                                {i18n._('Forgot your password?')}
-                            </Anchor>
-                        </p>
                     </form>
                 </div>
             </div>

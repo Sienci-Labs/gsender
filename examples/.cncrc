@@ -9,7 +9,7 @@
   "mountPoints": [
     {
       "route": "/widget",
-      "target": "https://cncjs.github.io/cncjs-widget-boilerplate/v1/"
+      "target": ""
     }
   ],
   "watchDirectory": "/path/to/dir",
@@ -20,14 +20,6 @@
     "checkForUpdates": true
   },
   "commands": [
-    {
-      "title": "Update (root user)",
-      "commands": "sudo npm install -g cncjs@latest --unsafe-perm; pkill -f cncjs"
-    },
-    {
-      "title": "Update (non-root user)",
-      "commands": "npm install -g cncjs@latest; pkill -f cncjs"
-    },
     {
       "title": "Reboot",
       "commands": "sudo /sbin/reboot"
