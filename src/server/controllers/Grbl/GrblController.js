@@ -63,6 +63,7 @@ import {
 import { METRIC_UNITS } from '../../../app/constants';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
+import { BACK_RIGHT, determineMachineZeroLocation } from '../../lib/homing';
 
 // % commands
 const WAIT = '%wait';
@@ -159,6 +160,10 @@ class GrblController {
 
     // Workflow
     workflow = null;
+
+    // Homing information
+    homingStarted = false;
+    homingLocation = BACK_RIGHT;
 
     constructor(engine, options) {
         if (!engine) {
@@ -490,6 +495,13 @@ class GrblController {
         this.runner.on('raw', noop);
 
         this.runner.on('status', (res) => {
+            if (this.homingStarted) {
+                console.log('STATUS RES AFTER HOMING');
+                this.homingLocation = determineMachineZeroLocation(res, this.settings);
+                console.log(this.homingLocation);
+                this.homingStarted = false;
+            }
+
             // console.log(`runner on status ${res}`);
             this.actionMask.queryStatusReport = false;
 
@@ -1361,6 +1373,7 @@ class GrblController {
             },
             'homing': () => {
                 this.event.trigger('homing');
+                this.homingStarted = true; // Update homing cycle as having started
 
                 this.writeln('$H');
                 this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;

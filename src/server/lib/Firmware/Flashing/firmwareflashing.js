@@ -41,11 +41,15 @@ const FlashingFirmware = (recievedPortNumber) => {
 
         avrgirl.flash(hex, (error) => {
             if (error) {
-                controller.command('flashing:failed', error);
+                if (controller) {
+                    controller.command('flashing:failed', error);
+                }
                 log.debug(`${error} Error flashing board`);
             } else {
-                log.debug('FLASH SUCCESFULL!!!');
-                controller.command('flashing:success');
+                if (controller) {
+                    controller.command('flashing:success');
+                }
+                log.debug('Flash successful');
             }
         });
     } catch (error) {
