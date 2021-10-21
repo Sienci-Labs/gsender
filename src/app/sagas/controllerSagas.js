@@ -231,6 +231,15 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('homing:flag', (flag) => {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_HOMING_FLAG,
+            payload: {
+                homingFlag: flag
+            }
+        });
+    });
+
     yield null;
 }
 

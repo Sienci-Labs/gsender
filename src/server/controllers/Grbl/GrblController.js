@@ -63,7 +63,7 @@ import {
 import { METRIC_UNITS } from '../../../app/constants';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
-import { BACK_RIGHT, determineMachineZeroLocation } from '../../lib/homing';
+import { determineMachineZeroFlagSet } from '../../lib/homing';
 
 // % commands
 const WAIT = '%wait';
@@ -163,7 +163,7 @@ class GrblController {
 
     // Homing information
     homingStarted = false;
-    homingLocation = BACK_RIGHT;
+    homingFlagSet = false;
 
     constructor(engine, options) {
         if (!engine) {
@@ -497,8 +497,9 @@ class GrblController {
         this.runner.on('status', (res) => {
             if (this.homingStarted) {
                 console.log('STATUS RES AFTER HOMING');
-                this.homingLocation = determineMachineZeroLocation(res, this.settings);
-                console.log(this.homingLocation);
+                this.homingFlagSet = determineMachineZeroFlagSet(res, this.settings);
+                console.log(this.homingFlagSet);
+                this.emit('homing:flag', this.homingFlagSet);
                 this.homingStarted = false;
             }
 

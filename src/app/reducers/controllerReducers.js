@@ -28,7 +28,8 @@ import {
     TOOL_CHANGE,
     UPDATE_CONTROLLER_SETTINGS,
     UPDATE_CONTROLLER_STATE,
-    UPDATE_FEEDER_STATUS, UPDATE_SENDER_STATUS, UPDATE_WORKFLOW_STATE
+    UPDATE_FEEDER_STATUS, UPDATE_SENDER_STATUS, UPDATE_WORKFLOW_STATE,
+    UPDATE_HOMING_FLAG
 } from '../actions/controllerActions';
 import { in2mm } from '../lib/units';
 import { WORKFLOW_STATE_IDLE } from '../constants';
@@ -41,6 +42,7 @@ const initialState = {
     modal: {},
     mpos: {},
     wpos: {},
+    homingFlag: false,
     feeder: {
         status: null
     },
@@ -155,6 +157,13 @@ const reducer = createReducer(initialState, {
     },
     [TOOL_CHANGE]: (context, reducerState) => {
         return {};
+    },
+    [UPDATE_HOMING_FLAG]: (payload, reducerState) => {
+        const { homingFlag } = payload;
+        console.log(homingFlag);
+        return {
+            homingFlag
+        };
     }
 });
 

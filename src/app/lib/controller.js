@@ -92,7 +92,8 @@ class Controller {
         'hPong': [],
         'outline:start': [],
         'file:load': [],
-        'file:unload': []
+        'file:unload': [],
+        'homing:flag': []
     };
 
     context = {

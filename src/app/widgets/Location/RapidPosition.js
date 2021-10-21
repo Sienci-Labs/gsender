@@ -60,8 +60,14 @@ const getMachineMovementLimits = () => {
     return [xLimit, yLimit];
 };
 
-const getPositionMovements = (requestedPosition, homingPosition) => {
+const getPositionMovements = (requestedPosition, homingPosition, homingFlag) => {
     const [xLimit, yLimit] = getMachineMovementLimits();
+
+
+    // If homing flag not set, we treat all movements as negative space
+    if (!homingFlag) {
+        homingPosition = BACK_RIGHT;
+    }
 
     if (!xLimit || !yLimit) {
         Toaster.pop({
@@ -116,12 +122,12 @@ const getPositionMovements = (requestedPosition, homingPosition) => {
     return [null, null];
 };
 
-export const getMovementGCode = (requestedPosition, homingPositionSetting) => {
+export const getMovementGCode = (requestedPosition, homingPositionSetting, homingFlag) => {
     const gcode = [];
 
     gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`); // Always move up to the limit of Z travel minus offset
     const homingPosition = getHomingLocation(homingPositionSetting);
-    const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPosition);
+    const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPosition, homingFlag);
 
     if (xMovement === null || yMovement === null) {
         Toaster.pop({

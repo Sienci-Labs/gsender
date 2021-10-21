@@ -221,23 +221,23 @@ class DisplayPanel extends PureComponent {
 
     actions = {
         jogtoFRCorner: () => {
-            const { homingDirection } = this.props;
-            const gcode = getMovementGCode('FR', homingDirection);
+            const { homingDirection, homingFlag } = this.props;
+            const gcode = getMovementGCode('FR', homingDirection, homingFlag);
             controller.command('gcode', gcode);
         },
         jogtoFLCorner: () => {
-            const { homingDirection } = this.props;
-            const gcode = getMovementGCode('FL', homingDirection);
+            const { homingDirection, homingFlag } = this.props;
+            const gcode = getMovementGCode('FL', homingDirection, homingFlag);
             controller.command('gcode', gcode);
         },
         jogtoBRCorner: () => {
-            const { homingDirection } = this.props;
-            const gcode = getMovementGCode('BR', homingDirection);
+            const { homingDirection, homingFlag } = this.props;
+            const gcode = getMovementGCode('BR', homingDirection, homingFlag);
             controller.command('gcode', gcode);
         },
         jogtoBLCorner: () => {
-            const { homingDirection } = this.props;
-            const gcode = getMovementGCode('BL', homingDirection);
+            const { homingDirection, homingFlag } = this.props;
+            const gcode = getMovementGCode('BL', homingDirection, homingFlag);
             controller.command('gcode', gcode);
         },
         startHoming: () => {
@@ -366,6 +366,7 @@ class DisplayPanel extends PureComponent {
 export default connect((store) => {
     const homingSetting = get(store, 'controller.settings.settings.$22', '0');
     const homingDirection = get(store, 'controller.settings.settings.$23', '0');
+    const homingFlag = get(store, 'controller.homingFlag', false);
     const homingEnabled = homingSetting === '1';
     const isConnected = get(store, 'connection.isConnected');
     const workflowState = get(store, 'controller.workflow.state');
@@ -374,6 +375,7 @@ export default connect((store) => {
     return {
         homingEnabled,
         canHome,
-        homingDirection
+        homingDirection,
+        homingFlag
     };
 })(DisplayPanel);

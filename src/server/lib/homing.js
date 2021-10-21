@@ -21,7 +21,6 @@
  *
  */
 import get from 'lodash/get';
-import { OTHER } from 'src/app/widgets/Location/RapidPosition';
 
 export const FRONT_RIGHT = 'FR';
 export const FRONT_LEFT = 'FL';
@@ -37,25 +36,24 @@ export const getHomingLocation = (setting) => {
         return FRONT_RIGHT;
     } else if (setting === '3') {
         return FRONT_LEFT;
-    } else {
-        return OTHER;
     }
+    return BACK_RIGHT;
 };
 
-export const determineMachineZeroLocation = (res, settings) => {
-
+export const determineMachineZeroFlagSet = (res, settings) => {
     const homingMask = get(settings, 'settings.$23');
     const mpos = get(res, 'mpos');
     const homingLocation = getHomingLocation(homingMask);
-    const xPos = Number(mpos.x);
-    const yPos = Number(mpos.y);
-    const zPos = Number(mpos.z);
+    const xPos = parseInt(mpos.x, 10);
+    const yPos = parseInt(mpos.y, 10);
+    const zPos = parseInt(mpos.z, 10);
+    console.log(`x: ${xPos} y: ${yPos} z: ${zPos}`);
 
     if (homingLocation !== BACK_RIGHT) {
         if (xPos === 0 && yPos === 0 && zPos === 0) {
-            return homingLocation;
+            return true;
         }
     }
 
-    return BACK_RIGHT;
+    return false;
 };
