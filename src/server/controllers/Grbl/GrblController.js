@@ -63,7 +63,7 @@ import {
 import { METRIC_UNITS } from '../../../app/constants';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
-import { determineMachineZeroFlagSet } from '../../lib/homing';
+import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 
 // % commands
 const WAIT = '%wait';
@@ -1525,17 +1525,13 @@ class GrblController {
                 const [axes, feedrate = 1000, units = METRIC_UNITS] = args;
                 //const JOG_COMMAND_INTERVAL = 80;
                 const unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-                let { $20, $130, $131, $132 } = this.settings.settings;
+                let { $20, $130, $131, $132, $23 } = this.settings.settings;
 
                 let jogFeedrate;
                 if ($20 === '1') {
                     $130 = Number($130);
                     $131 = Number($131);
                     $132 = Number($132);
-                    let { mpos } = this.state.status;
-                    Object.keys(mpos).forEach((axis) => {
-                        mpos[axis] = Number(mpos[axis]);
-                    });
 
                     const OFFSET = 0.1;
                     const FIXED = 2;
@@ -1556,15 +1552,35 @@ class GrblController {
                         }
                     };
 
+
+                    let { mpos } = this.state.status;
+                    Object.keys(mpos).forEach((axis) => {
+                        mpos[axis] = Number(mpos[axis]);
+                    });
+
+                    if (this.homingFlagSet) {
+                        const [xMaxLoc, yMaxLoc] = getAxisMaximumLocation($23);
+                        console.log(xMaxLoc, yMaxLoc);
+                        if (axes.X) {
+                            axes.X = determineMaxMovement(Math.abs(mpos.x), axes.X, xMaxLoc, $130);
+                        }
+                        if (axes.Y) {
+                            axes.Y = determineMaxMovement(Math.abs(mpos.y), axes.Y, yMaxLoc, $131);
+                        }
+                    } else {
+                        if (axes.X) {
+                            axes.X = calculateAxisValue({ direction: axes.X, position: Math.abs(mpos.x), maxTravel: $130 });
+                        }
+                        if (axes.Y) {
+                            axes.Y = calculateAxisValue({ direction: axes.Y, position: Math.abs(mpos.y), maxTravel: $131 });
+                        }
+                    }
+
                     if (axes.Z) {
                         axes.Z = calculateAxisValue({ direction: axes.Z, position: Math.abs(mpos.z), maxTravel: $132 });
                     }
-                    if (axes.X) {
-                        axes.X = calculateAxisValue({ direction: axes.X, position: Math.abs(mpos.x), maxTravel: $130 });
-                    }
-                    if (axes.Y) {
-                        axes.Y = calculateAxisValue({ direction: axes.Y, position: Math.abs(mpos.y), maxTravel: $131 });
-                    }
+                    console.log('MATH PART');
+                    console.log(axes);
                 } else {
                     jogFeedrate = 1000;
                     Object.keys(axes).forEach((axis) => {
