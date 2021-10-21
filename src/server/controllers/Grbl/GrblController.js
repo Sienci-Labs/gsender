@@ -1579,8 +1579,6 @@ class GrblController {
                     if (axes.Z) {
                         axes.Z = calculateAxisValue({ direction: axes.Z, position: Math.abs(mpos.z), maxTravel: $132 });
                     }
-                    console.log('MATH PART');
-                    console.log(axes);
                 } else {
                     jogFeedrate = 1000;
                     Object.keys(axes).forEach((axis) => {
