@@ -160,7 +160,6 @@ const reducer = createReducer(initialState, {
     },
     [UPDATE_HOMING_FLAG]: (payload, reducerState) => {
         const { homingFlag } = payload;
-        console.log(homingFlag);
         return {
             homingFlag
         };

@@ -605,7 +605,6 @@ class LocationWidget extends PureComponent {
 
     render() {
         const { widgetId, machinePosition, workPosition, wcs } = this.props;
-        console.log(wcs);
         const { minimized, isFullscreen } = this.state;
         const { units } = this.state;
         const canSendCommand = this.canSendCommand();

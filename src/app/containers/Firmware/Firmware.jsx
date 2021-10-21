@@ -268,7 +268,6 @@ class Firmware extends PureComponent {
             this.setState({ initiateRestoreDefaults: false });
         },
         startFlash: (port) => {
-            console.log(this.state.port);
             if (!this.state.port) {
                 Toaster.pop({
                     msg: 'No port specified - please connect to the device to determine what is being flashed',
