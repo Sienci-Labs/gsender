@@ -24,7 +24,7 @@
 import React, { useState } from 'react';
 
 import store from 'app/store';
-
+import pubsub from 'pubsub-js';
 import TouchPlate from './TouchPlate';
 import ProbeSettings from './ProbeSettings';
 import Tools from './Tools';
@@ -53,6 +53,7 @@ const Probe = ({ active, state, actions }) => {
         const { value } = option;
         store.set('workspace.probeProfile.touchplateType', value);
         setType(value);
+        pubsub.publish('probe:updated');
     };
 
     return (

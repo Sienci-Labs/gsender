@@ -23,10 +23,8 @@
 
 import React from 'react';
 import Select from 'react-select';
-
-import ToggleSwitch from 'app/components/ToggleSwitch';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
-import { TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_STANDARD } from 'app/lib/constants';
+import { TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_STANDARD, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
 
 import Input from '../components/Input';
 import Fieldset from '../components/Fieldset';
@@ -46,8 +44,9 @@ const TouchPlate = ({ state, actions, values, type, onTypeChange }) => {
                     options={[
                         //{ label: TOUCHPLATE_TYPE_AUTOZERO, value: TOUCHPLATE_TYPE_AUTOZERO },
                         { label: TOUCHPLATE_TYPE_STANDARD, value: TOUCHPLATE_TYPE_STANDARD },
+                        { label: TOUCHPLATE_TYPE_ZERO, value: TOUCHPLATE_TYPE_ZERO },
                     ]}
-                    placeholder="Select Type..."
+                    placeholder="Select Type"
                     value={{ label: type, value: type }}
                     onChange={onTypeChange}
                 />
@@ -70,21 +69,10 @@ const TouchPlate = ({ state, actions, values, type, onTypeChange }) => {
                                     </Tooltip>
                                 )
                             }
-                            <Tooltip content="Turn XY Axis Probing on or off" location="default">
-                                <div className={styles.inputSpread}>
-                                    <label htmlFor="xProbe">XY Probe</label>
-                                    <ToggleSwitch
-                                        checked={functions.y}
-                                        onChange={() => {
-                                            probeActions.handleToggleChange('x', 'y');
-                                        }}
-                                    />
-                                </div>
-                            </Tooltip>
                         </div>
 
                         {
-                            (functions.x && functions.y) && (
+                            (type !== TOUCHPLATE_TYPE_ZERO) && (
                                 <>
                                     <Tooltip content="Specify the thickness of XY axis" location="default">
                                         <Input

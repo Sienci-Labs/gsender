@@ -114,7 +114,7 @@ class ControlArea extends Component {
                     return (
                         <div className={styles['machine-status-wrapper']}>
                             <div className={styles['machine-Jog']}>
-                             Checking Gcode File...
+                             Checking G-code File
                             </div>
                         </div>
                     );

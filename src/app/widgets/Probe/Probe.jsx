@@ -50,7 +50,7 @@ class Probe extends PureComponent {
             canClick,
             availableProbeCommands,
             selectedProbeCommand,
-            // useSafeProbeOption,
+            // useSafeProbeOptixon,
         } = state;
         const probeCommand = availableProbeCommands[selectedProbeCommand] || false;
 

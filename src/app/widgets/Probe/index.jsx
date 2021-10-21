@@ -32,7 +32,7 @@ import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import pubsub from 'pubsub-js';
-import { PROBE_TYPE_AUTO } from 'app/lib/constants';
+import { PROBE_TYPE_AUTO, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
 import store from 'app/store';
 import { mm2in } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
@@ -184,7 +184,15 @@ class ProbeWidget extends PureComponent {
             const commands = [];
             let command;
             const selectedProfile = this.state.touchplate;
-            const { functions } = selectedProfile;
+            const functions = {};
+
+            if (selectedProfile.touchplateType === TOUCHPLATE_TYPE_ZERO) {
+                functions.z = true;
+            } else {
+                functions.z = true;
+                functions.y = true;
+                functions.x = true;
+            }
 
             //Z
             if (functions.z) {
