@@ -544,7 +544,7 @@ class Firmware extends PureComponent {
                                     </ToolsNotificationModal>
                                 ) : ''}
                                 <TooltipCustom content="Flash your Arduino board to GRBL default values" location="default">
-                                    <ToolModalButton icon="fas fa-bolt" onClick={this.startFlashing}>
+                                    <ToolModalButton icon="fas fa-bolt" onClick={this.startFlashing} disabled={canClick}>
                                     Flash GRBL
                                     </ToolModalButton>
                                 </TooltipCustom>
