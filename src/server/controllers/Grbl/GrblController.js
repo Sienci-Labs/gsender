@@ -496,9 +496,7 @@ class GrblController {
 
         this.runner.on('status', (res) => {
             if (this.homingStarted) {
-                console.log('STATUS RES AFTER HOMING');
                 this.homingFlagSet = determineMachineZeroFlagSet(res, this.settings);
-                console.log(this.homingFlagSet);
                 this.emit('homing:flag', this.homingFlagSet);
                 this.homingStarted = false;
             }
