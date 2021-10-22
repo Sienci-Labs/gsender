@@ -45,7 +45,6 @@ class ControlArea extends Component {
 
     state = {
         currentAlarmIcon: 'fa-lock',
-        homingRun: false
     }
 
     unlock = () => {
@@ -53,16 +52,11 @@ class ControlArea extends Component {
         if (alarmCode === 1) {
             controller.command('reset:limit');
             return;
+        } else if (alarmCode === 'Homing') {
+            controller.command('homing');
+            return;
         }
         controller.command('unlock');
-    }
-
-    handleHomeMachine = () => {
-        controller.command('unlock');
-        controller.command('homing');
-        this.setState({
-            homingRun: true
-        });
     }
 
     render() {
@@ -87,27 +81,13 @@ class ControlArea extends Component {
          */
         const machineStateRender = () => {
             if (isConnected) {
-                /*const homingEnabled = $22;
-                if (!homingRun && alarmCode === 'Homing' && homingEnabled === '1') {
-                    return (
-                        <div className={styles['machine-status-wrapper']}>
-                            <div className={styles[`machine${activeState}`]}>
-                                {
-                                    activeState === GRBL_ACTIVE_STATE_HOME ? 'Homing...' : 'Run Homing'
-                                }
-                            </div>
-                            <UnlockAlarmButton newMessage="Click To Home Machine" onClick={this.handleHomeMachine} />
-                        </div>
-                    );
-                }*/
-
                 if (activeState === 'Alarm') {
                     return (
                         <div className={styles['machine-status-wrapper']}>
                             <div className={styles['machine-Alarm']}>
                                 {activeState} ({alarmCode})<AlarmDescriptionIcon code={alarmCode} />
                             </div>
-                            <UnlockAlarmButton onClick={this.unlock} />
+                            <UnlockAlarmButton onClick={this.unlock} alarmCode={alarmCode} />
                         </div>
                     );
                 } else if (activeState === 'Check') {

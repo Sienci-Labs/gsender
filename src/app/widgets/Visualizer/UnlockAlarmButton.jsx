@@ -26,7 +26,11 @@ import classnames from 'classnames';
 import styles from './index.styl';
 
 
-const UnlockAlarmButton = ({ onClick, newMessage }) => {
+const UnlockAlarmButton = ({ onClick, newMessage, alarmCode }) => {
+    let message = 'Click to Unlock Machine';
+    if (alarmCode === 'Homing') {
+        message = 'Click to Run Homing';
+    }
     return (
         newMessage ? (
             <div className={styles.alarmButtonWrap}>
@@ -47,7 +51,7 @@ const UnlockAlarmButton = ({ onClick, newMessage }) => {
                         role="button"
                         tabIndex={-1}
                     />
-                Click to Unlock Machine
+                    { message }
                 </button>
             </div>
         )
