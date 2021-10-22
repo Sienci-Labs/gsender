@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.4/gSender-0.7.4-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.4/gSender-0.7.4-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.4/gSender-0.7.4.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.4/gSender_0.7.4_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.4/gSender-0.7.4-armv7l.AppImage)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.5/gSender-0.7.5-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.5/gSender-0.7.5-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.5/gSender-0.7.5.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.5/gSender_0.7.5_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v0.7.5/gSender-0.7.5-armv7l.AppImage)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -98,6 +98,17 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### Open Beta 0.7.5 (Oct 22, 2021)
+* Improvements to surfacing tool - new motions and layout
+* Improvements to pause commands (M0/M1) in macros
+* WCS dropdown now accurately reflects workspace modal
+* Improvements to flashing workflow and reduced situations where it's possible to fail
+* Improvements to probe settings
+* Fixed issue with quick movement buttons
+* Fixed issue with soft limit behaviour and continuous jogging if firmware flag to set machine 0,0,0 not set
+* Fixed issue with imperial units and continuous jogging with soft limits enabled
+* Fixed numerous UI inconsistencies and other styling issues
 
 ### Open Beta 0.7.4 (Oct 08, 2021)
 * Minimize render mode for visualizer to improve performance
