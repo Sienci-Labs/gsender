@@ -25,7 +25,7 @@ import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
 
 onmessage = function({ data }) {
-    const { content } = data;
+    const { content, visualizer } = data;
     const vertices = [];
     const colors = [];
     const frames = [];
@@ -98,6 +98,7 @@ onmessage = function({ data }) {
     postMessage({
         vertices,
         colors,
-        frames
+        frames,
+        visualizer
     });
 };
