@@ -54,6 +54,7 @@ import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
+    VISUALIZER_PRIMARY,
 } from '../../constants';
 // import { NOTIFICATION_PROGRAM_ERROR } from './constants';
 import styles from './workflow-control.styl';
@@ -119,8 +120,9 @@ class WorkflowControl extends PureComponent {
             ...hooks,
             toolChangeOption
         };
+
         controller.command('toolchange:context', toolChangeContext);
-        await api.file.upload(file, controller.port);
+        await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
     };
 
     handleElectronFileUpload = async (file) => {
@@ -132,7 +134,7 @@ class WorkflowControl extends PureComponent {
         }
 
         try {
-            await api.file.upload(serializedFile, controller.port);
+            await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
             reduxStore.dispatch({
                 type: UPDATE_FILE_INFO,
                 payload: { path: file.path },
@@ -153,7 +155,7 @@ class WorkflowControl extends PureComponent {
         const { result, name } = fileMetadata;
         const serializedFile = new File([result], name);
         try {
-            await api.file.upload(serializedFile, controller.port);
+            await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
             reduxStore.dispatch({
                 type: UPDATE_FILE_INFO,
                 payload: { path: fileMetadata.fullPath },
