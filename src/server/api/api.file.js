@@ -27,7 +27,7 @@ import { ERR_BAD_REQUEST } from '../constants';
 // Upload files using superagent:
 // https://stackoverflow.com/questions/31748936/how-to-send-files-with-superagent
 export const uploadFile = (req, res) => {
-    const { port } = req.body;
+    const { port, visualizer } = req.body;
     let { file } = req;
 
     if (!file) {
@@ -43,7 +43,8 @@ export const uploadFile = (req, res) => {
         gcode,
         port,
         name: file.originalname,
-        size: file.size
+        size: file.size,
+        visualizer,
     });
 
     return res.send({
