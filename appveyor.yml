@@ -333,7 +333,6 @@ for:
           echo "• CI_TAG=$CI_TAG"
     install:
       - nvm install $nodejs_version
-      - security import "scripts/certs/Certum-Code-Signing-CA-SHA2.cer" -k ~/Library/Keychains/login.keychain -T /usr/bin/codesign
       - npm config set loglevel warn
       - npm config set scripts-prepend-node-path auto
       - npm install -g npm
