@@ -1,15 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+// import React, { createRef, useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
+import { inRange, throttle } from 'lodash';
 
+import reduxStore from 'app/store/redux';
+import { SET_CURRENT_VISUALIZER } from 'app/actions/visualizerActions';
 import store from 'app/store';
-import { METRIC_UNITS, IMPERIAL_UNITS } from 'app/constants';
 import controller from 'app/lib/controller';
+import { METRIC_UNITS, IMPERIAL_UNITS, VISUALIZER_PRIMARY, VISUALIZER_SECONDARY } from 'app/constants';
+import Visualizer from 'app/widgets/Visualizer';
+import api from 'app/api';
+
 import InputArea from './InputArea';
 import ActionArea from './components/actions';
-import Visualizer from './components/visualizer';
-
 import styles from './index.styl';
+import Generator from './helpers/Generator';
+import GcodeViewer from './components/GcodeViewer';
+import TabArea from './TabArea';
 
 
 /**
@@ -18,12 +26,83 @@ import styles from './index.styl';
  * @prop {Function} onClose - Function to close the current modal
  */
 const Surfacing = ({ onClose, showTitle }) => {
-    const visualizerRef = useRef();
+    // let visualizerRef = createRef();
 
     const [surfacing, setSurfacing] = useState(store.get('widgets.surfacing.defaultMetricState'));
 
     const [gcode, setGcode] = useState('');
     const [units, setUnits] = useState(METRIC_UNITS);
+
+    const [currentTab, setCurrentTab] = useState(0);
+
+    const runGenerate = throttle(async () => {
+        const generator = new Generator({ surfacing, units, controller });
+
+        const gcode = generator.handleGenerate();
+
+        const serializedFile = new File([gcode], 'surfacing.gcode');
+
+        await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
+
+        setGcode(gcode);
+    }, 1000, { leading: true });
+
+    const handleChange = (e) => {
+        const { id, value, min, max } = e.target;
+
+        const convertToImperial = (value) => Math.round(Number(value) / 25.4);
+
+        const minimum = Number(units === METRIC_UNITS ? min : convertToImperial(min));
+        const maxiumum = Number(units === METRIC_UNITS ? max : convertToImperial(max));
+        const val = Math.abs(Number(value));
+
+        if (!inRange(val, minimum, maxiumum + 1)) {
+            return;
+        }
+
+        setSurfacing(prev => ({ ...prev, [id]: val }));
+    };
+
+    const handleSelect = ({ type, value }) => {
+        setSurfacing(prev => ({ ...prev, [type]: value }));
+    };
+
+    /**
+     * Function to load generated gcode to main visualizer
+     */
+    const loadGcode = () => {
+        const name = 'gSender_Surfacing';
+        pubsub.publish('gcode:surfacing', { gcode, name, size: (gcode.length * 2) });
+        onClose();
+    };
+
+    const canLoad = !!gcode; //For accessing the gcode line viewer
+
+    const tabs = [
+        {
+            id: 0,
+            label: 'Visualizer Preview',
+            widgetId: 'viz-preview',
+            component: <Visualizer
+                isSecondary
+                widgetId="surfacing_visualizer"
+                // ref={(ref) => {
+                //     if (ref !== null) {
+                //         visualizerRef = ref;
+                //     }
+                // }}
+                gcode={gcode}
+                surfacingData={surfacing}
+            />
+        },
+        {
+            id: 1,
+            label: `G-code Viewer ${gcode && `(${gcode.split('\n').length} lines)`}`,
+            widgetId: 'gcode-viewer',
+            component: <GcodeViewer gcode={gcode} />,
+            disabled: !gcode,
+        }
+    ];
 
     /**
      * Grab the set machine profile and workspace units on component mount
@@ -64,242 +143,25 @@ const Surfacing = ({ onClose, showTitle }) => {
                 }
             }
         }
+
+        reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
+
+        return () => {
+            reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_PRIMARY });
+        };
     }, []);
 
     useEffect(() => {
         const workspaceUnits = store.get('workspace.units');
 
-        if (workspaceUnits === METRIC_UNITS) {
-            store.set('widgets.surfacing.defaultMetricState', surfacing);
-        } else {
-            store.set('widgets.surfacing.defaultImperialState', surfacing);
-        }
+        workspaceUnits === METRIC_UNITS ? store.set('widgets.surfacing.defaultMetricState', surfacing) : store.set('widgets.surfacing.defaultImperialState', surfacing);
     }, [surfacing]);
 
-    const handleChange = (e) => {
-        const { id, value } = e.target;
-        let val = Number(value);
-
-        val = Math.abs(val);
-
-        setSurfacing(prev => ({ ...prev, [id]: val }));
-    };
-
-    /**
-     * Main function to generate gcode
-     */
-    const handleGenerate = () => {
-        const { skimDepth, maxDepth, feedrate, spindleRPM } = surfacing;
-
-        let wcs = controller.state?.parserstate?.modal?.wcs || 'G54';
-
-        let depth = skimDepth;
-        let gCodeArr = [
-            '(Header)',
-            '(Generated by gSender from Sienci Labs)',
-            wcs,
-            units === METRIC_UNITS ? 'G21 ;mm' : 'G20 ;inches',
-            'G90',
-            'G0 X0 Y0',
-            `G1 F${feedrate}`,
-            `M3 S${spindleRPM}`,
-            '(Header End)',
-        ];
-        let count = 1;
-
-        const processGcode = (obj) => {
-            const generatedArr = generateGcode({ depth: obj.depth, count: obj.count });
-            gCodeArr.push(...generatedArr);
-            count++;
-            depth += skimDepth;
-        };
-
-        //Skip loop if there is only 1 layer
-        if (depth === maxDepth) {
-            processGcode({ depth: maxDepth, count });
-        } else {
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-                const remainder = maxDepth % depth;
-
-                //If we reach the max depth, use it as the final depth value
-                //(which would be the remainder) and exit the loop
-                if (maxDepth === remainder && maxDepth - remainder === 0) {
-                    processGcode({ depth: maxDepth, count });
-                    break;
-                } else {
-                    processGcode({ depth, count });
-                }
-            }
-        }
-        gCodeArr.push(
-            '\n',
-            '(Footer)',
-            'M5 ;Turn off spindle',
-            '(Footer End)'
-        );
-
-        //Convert to string for visualizer to interperate it
-        const gCodeArrStr = gCodeArr.reduce((str, current) => {
-            return `${str}${current}\n`;
-        }, '');
-
-        visualizerRef.current.actions.loadGCode('gcode', gCodeArrStr);
-
-        setGcode(gCodeArrStr);
-    };
-
-    /**
-     * Function to generate gcode array
-     * @param {number} depth - Depth value for Z axis
-     * @param {number} count - Count value keeping track of the number of layers
-     * @returns {array} - Returns the generated gcode set in an array
-     */
-    const generateGcode = ({ depth, count }) => {
-        const {
-            bitDiameter,
-            stepover,
-            length,
-            width,
-            maxDepth
-        } = surfacing;
-
-        const stepoverAmount = bitDiameter * (stepover / 100);
-
-        const gCodeArr = [];
-
-        const options = {
-            depth,
-            length,
-            width,
-            count,
-            stepoverAmount,
-            maxDepth
-        };
-
-        const traversed = draw(options);
-
-        gCodeArr.push(...traversed);
-
-        return gCodeArr;
-    };
-
-    /**
-     * Function to draw a square spiral
-     * @param {number} depth - Depth value for Z axis
-     * @param {number} maxDepth - Maximum depth specified, this determines the number of layers to cut
-     * @param {number} length - Length of machine (Y axis)
-     * @param {number} width - Width of machine (X axis)
-     * @param {number} count - Count value keeping track of the number of layers
-     * @param {number} stepoverAmount - Space between each square spiral
-     * @returns {array} - Returns the generated gcode set in an array
-     */
-    const draw = ({ depth, maxDepth, length, width, count, stepoverAmount }) => {
-        const gCodeArr = [];
-
-        const fixedVal = (val) => Number(val.toFixed(3));
-
-        const Z = depth * -1;
-
-        let currentPos = {
-            X: stepoverAmount * 2,
-            Y: stepoverAmount * 2,
-        };
-
-        let endPos = {
-            X: width - stepoverAmount,
-            Y: length - stepoverAmount
-        };
-
-        //Draw initial full rectangle covering full length and width of the machine
-        gCodeArr.push(
-            '\n',
-            `(Layer ${count})`,
-            `G1 Z${fixedVal(Z)}`,
-            `G1 Y${fixedVal(length) * -1}`,
-            `G1 X${fixedVal(width)}`,
-            'G1 Y0',
-            'G1 X0',
-            `G1 X${fixedVal(stepoverAmount)} Y${fixedVal(stepoverAmount) * -1}`,
-        );
-
-        let iterations = 1;
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-            if (endPos.X <= currentPos.X || endPos.Y <= currentPos.Y) {
-                break;
-            }
-
-            let newCurrentPosX = Number(fixedVal(endPos.X - stepoverAmount));
-            let newCurrentPosY = Number(fixedVal(endPos.Y - stepoverAmount));
-            let newEndPosX = Number(fixedVal(currentPos.X + stepoverAmount));
-            let newEndPosY = Number(fixedVal(currentPos.Y + stepoverAmount));
-
-            //On the first iteration we want the end position for the y axis to reach
-            //the maximum dimensions for the first spiral, every other spiral's end y position
-            //will be offset by the stepover amount
-            if (iterations === 1) {
-                //Full rectangualar movement from up => right => bottom => left
-                gCodeArr.push(
-                    '\n',
-                    `G1 Y${fixedVal(endPos.Y) * -1}`,
-                    `G1 X${fixedVal(endPos.X)}`,
-                    `G1 Y${fixedVal(currentPos.Y - stepoverAmount) * -1}`,
-                    `G1 X${fixedVal(currentPos.X)}`,
-                );
-
-                newEndPosY = Number(fixedVal(currentPos.Y));
-            } else {
-                //Full rectangualar movement from up => right => bottom => left
-                gCodeArr.push(
-                    '\n',
-                    `G1 Y${fixedVal(endPos.Y) * -1}`,
-                    `G1 X${fixedVal(endPos.X)}`,
-                    `G1 Y${fixedVal(currentPos.Y) * -1}`,
-                    `G1 X${fixedVal(currentPos.X)}`,
-                );
-            }
-
-            //New position will be the previous end position minus the stepover amount
-            const newPos = {
-                X: newCurrentPosX,
-                Y: newCurrentPosY,
-            };
-
-            //New end position will be the previous position plus the stepover amount
-            const newEndPos = {
-                X: newEndPosX,
-                Y: newEndPosY,
-            };
-
-            currentPos = Object.assign({}, newEndPos);
-            endPos = Object.assign({}, newPos);
-
-            iterations++;
-        }
-
-        const workspaceUnits = store.get('workspace.units');
-        const ZVALUE = workspaceUnits === METRIC_UNITS ? '3' : '0.12';
-
-        gCodeArr.push(
-            `G0 Z${ZVALUE}`,
-            'G0 X0 Y0',
-        );
-        gCodeArr.push(`(End of Layer ${count})`);
-
-        return gCodeArr;
-    };
-
-    /**
-     * Function to load generated gcode to main visualizer
-     */
-    const loadGcode = () => {
-        onClose();
-        const name = 'gSender_Surfacing';
-        pubsub.publish('gcode:surfacing', { gcode, name, size: (gcode.length * 2) });
-    };
-
-    const canLoad = !!gcode; //For accessing the gcode line viewer
+    // useMemo(() => {
+    //     if (currentTab === 0) {
+    //         console.log(visualizerRef);
+    //     }
+    // }, [currentTab]);
 
     return (
         <>
@@ -311,26 +173,18 @@ const Surfacing = ({ onClose, showTitle }) => {
 
             <div className={styles.container}>
                 <div className={styles.mainContainer}>
-                    <div style={{ margin: '3px 0 0' }}>
-                        <p style={{ marginBottom: '8px' }}>
-                            <strong>Instructions: </strong>
-                            Position your machine to the back left side of your machine and set it as your zero point.
-                            Note that if you have any additional hardware installed on your machine (ex. dust shoe),{' '}
-                            it may be limited in reaching the maximum x or y axis
-                        </p>
-                    </div>
-                    <InputArea values={surfacing} onChange={handleChange} units={units} />
-                    <Visualizer
-                        widgetId="visualizer"
-                        ref={visualizerRef}
-                        gcode={gcode}
-                        surfacingData={surfacing}
+                    <InputArea
+                        values={surfacing}
+                        onChange={handleChange}
+                        onSelect={handleSelect}
+                        units={units}
                     />
+                    <TabArea tabs={tabs} currentTab={currentTab} onTabChange={(index) => setCurrentTab(index)} />
                 </div>
 
                 <ActionArea
                     handleCancel={onClose}
-                    handleGenerateGcode={handleGenerate}
+                    handleGenerateGcode={runGenerate}
                     handleLoadGcode={loadGcode}
                     surfacing={surfacing}
                     canLoad={canLoad}
