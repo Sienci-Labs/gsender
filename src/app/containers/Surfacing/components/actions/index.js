@@ -4,7 +4,7 @@ import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 
 import styles from './index.styl';
 
-const Actions = ({ handleCancel, handleGenerateGcode, handleLoadGcode, surfacing, canLoad }) => {
+const Actions = ({ handleGenerateGcode, handleLoadGcode, surfacing, canLoad }) => {
     const canGenerateGcode = Object.keys(surfacing).every(key => surfacing[key]);
 
     return (
@@ -31,7 +31,6 @@ const Actions = ({ handleCancel, handleGenerateGcode, handleLoadGcode, surfacing
 };
 
 Actions.propTypes = {
-    handleCancel: PropTypes.func,
     handleGenerateGcode: PropTypes.func,
     handleLoadGcode: PropTypes.func,
     surfacing: PropTypes.object,
