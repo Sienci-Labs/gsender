@@ -35,6 +35,8 @@ import {
     SPINDLE_LASER_CATEGORY,
     GENERAL_CATEGORY,
     TOOLBAR_CATEGORY,
+    SPIRAL_MOVEMENT,
+    START_POSITION_BACK_LEFT
 } from 'app/constants';
 import {
     MODAL_PREFERENCES,
@@ -335,6 +337,8 @@ const defaultState = {
                 skimDepth: 1,
                 maxDepth: 1,
                 spindleRPM: 17000,
+                type: SPIRAL_MOVEMENT,
+                startPosition: START_POSITION_BACK_LEFT,
             },
             defaultImperialState: {
                 bitDiameter: 1,
@@ -344,6 +348,8 @@ const defaultState = {
                 width: 0,
                 skimDepth: 0.04,
                 maxDepth: 0.04,
+                type: SPIRAL_MOVEMENT,
+                startPosition: START_POSITION_BACK_LEFT,
             },
         },
         visualizer: {
