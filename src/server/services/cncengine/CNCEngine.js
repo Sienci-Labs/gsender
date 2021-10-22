@@ -441,8 +441,9 @@ class CNCEngine {
                 controller.loadFile(this.gcode, this.meta);
             }
         }
+
         log.info(`Loaded file '${meta.name}' to CNCEngine`);
-        this.emit('file:load', gcode, meta.size, meta.name);
+        this.emit('file:load', gcode, meta.size, meta.name, meta.visualizer);
     }
 
     unload() {

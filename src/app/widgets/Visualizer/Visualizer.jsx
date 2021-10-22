@@ -38,7 +38,9 @@ import * as THREE from 'three';
 import {
     IMPERIAL_UNITS,
     METRIC_UNITS,
-    RENDER_RENDERED
+    RENDER_RENDERED,
+    VISUALIZER_PRIMARY,
+    VISUALIZER_SECONDARY
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/CombinedCamera';
 import TrackballControls from 'app/lib/three/TrackballControls';
@@ -81,7 +83,8 @@ class Visualizer extends Component {
     static propTypes = {
         show: PropTypes.bool,
         cameraPosition: PropTypes.oneOf(['top', '3d', 'front', 'left', 'right']),
-        state: PropTypes.object
+        state: PropTypes.object,
+        isSecondary: PropTypes.bool,
     };
 
     pubsubTokens = [];
@@ -514,7 +517,20 @@ class Visualizer extends Component {
                 this.updateScene({ forceUpdate: true });
             }),
             pubsub.subscribe('file:load', (msg, data) => {
-                this.load('', data);
+                const { isSecondary, activeVisualizer } = this.props;
+
+                const isPrimaryVisualizer = !isSecondary && activeVisualizer === VISUALIZER_PRIMARY;
+                const isSecondaryVisualizer = isSecondary && activeVisualizer === VISUALIZER_SECONDARY;
+
+                if (isPrimaryVisualizer) {
+                    this.load('', data);
+                    return;
+                }
+
+                if (isSecondaryVisualizer) {
+                    this.load('', data);
+                    return;
+                }
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -549,7 +565,8 @@ class Visualizer extends Component {
 
     // TODO: fix resizing on visualizer
     getVisibleHeight() {
-        const container = document.getElementById('visualizer_container');
+        const { containerID } = this.props;
+        const container = document.getElementById(containerID);
 
         const clientHeight = container.clientHeight - 30;
         return clientHeight;
@@ -1438,13 +1455,19 @@ class Visualizer extends Component {
     }
 }
 
+Visualizer.defaultProps = {
+    isSecondary: false,
+};
+
 export default connect((store) => {
     const machinePosition = _get(store, 'controller.mpos');
     const workPosition = _get(store, 'controller.wpos');
     const receivedLines = _get(store, 'controller.sender.status.received', 0);
+    const { activeVisualizer } = store.visualizer;
     return {
         machinePosition,
         workPosition,
-        receivedLines
+        receivedLines,
+        activeVisualizer
     };
 }, null, null, { forwardRef: true })(Visualizer);

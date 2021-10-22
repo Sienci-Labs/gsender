@@ -35,7 +35,7 @@ const Input = ({ value, label, units, onChange, additionalProps, className, styl
                     {...additionalProps}
                     value={value}
                     onChange={onChange}
-                    className={classNames('form-control', styles.inputText)}
+                    className={classNames('form-control', styles.text)}
                     disabled={disabled}
                     type="number"
                 />

@@ -34,7 +34,7 @@ import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
-import { RENDER_LOADING, RENDER_RENDERED } from 'app/constants';
+import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY } from 'app/constants';
 
 export function* initialize() {
     /* Health check - every 3 minutes */
@@ -136,7 +136,36 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('file:load', (content, size, name) => {
+    controller.addListener('file:load', (content, size, name, visualizer) => {
+        if (visualizer === VISUALIZER_SECONDARY) {
+            reduxStore.dispatch({
+                type: fileActions.UPDATE_FILE_RENDER_STATE,
+                payload: {
+                    state: RENDER_LOADING
+                }
+            });
+
+            const needsVisualization = shouldVisualize();
+
+            if (needsVisualization) {
+                const visualizeWorker = new VisualizeWorker();
+                visualizeWorker.onmessage = visualizeResponse;
+                visualizeWorker.postMessage({
+                    content,
+                    visualizer
+                });
+            } else {
+                reduxStore.dispatch({
+                    type: fileActions.UPDATE_FILE_RENDER_STATE,
+                    payload: {
+                        state: RENDER_RENDERED
+                    }
+                });
+            }
+
+            return;
+        }
+
         // Basic file content
         reduxStore.dispatch({
             type: fileActions.UPDATE_FILE_CONTENT,
@@ -175,6 +204,7 @@ export function* initialize() {
             visualizeWorker.onmessage = visualizeResponse;
             visualizeWorker.postMessage({
                 content,
+                visualizer
             });
         } else {
             reduxStore.dispatch({

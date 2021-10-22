@@ -22,8 +22,6 @@
  */
 
 /* eslint-disable consistent-return */
-import classNames from 'classnames';
-//import ExpressionEvaluator from 'expr-eval';
 import includes from 'lodash/includes';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -33,14 +31,12 @@ import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import PropTypes from 'prop-types';
-import React, { PureComponent } from 'react';
-import ToggleSwitch from 'app/components/ToggleSwitch';
+import React, { PureComponent, createRef } from 'react';
 import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
 import Anchor from 'app/components/Anchor';
 import { Button } from 'app/components/Buttons';
 import ModalTemplate from 'app/components/ModalTemplate';
 import Modal from 'app/components/Modal';
-import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import i18n from 'app/lib/i18n';
@@ -50,14 +46,7 @@ import * as WebGL from 'app/lib/three/WebGL';
 import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
 import EstimateWorker from './Estimate.worker';
 import WidgetConfig from '../WidgetConfig';
-import WorkflowControl from './WorkflowControl';
-import MachineStatusArea from './MachineStatusArea';
-import ValidationModal from './ValidationModal';
-import WarningModal from './WarningModal';
-import Visualizer from './Visualizer';
-import Loading from './Loading';
-import Rendering from './Rendering';
-import WatchDirectory from './WatchDirectory';
+import PrimaryVisualizer from './PrimaryVisualizer';
 
 import {
     // Units
@@ -77,52 +66,19 @@ import {
     WORKFLOW_STATE_IDLE,
     RENDER_RENDERING,
     RENDER_LOADING,
-    GRBL_ACTIVE_STATE_HOLD
+    GRBL_ACTIVE_STATE_HOLD,
+    VISUALIZER_PRIMARY,
+    VISUALIZER_SECONDARY,
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
     CAMERA_MODE_ROTATE,
-    MODAL_WATCH_DIRECTORY,
     LIGHT_THEME,
     LIGHT_THEME_VALUES,
     DARK_THEME,
     DARK_THEME_VALUES
 } from './constants';
-import styles from './index.styl';
-
-
-/*const translateExpression = (function() {
-    const { Parser } = ExpressionEvaluator;
-    const reExpressionContext = new RegExp(/\[[^\]]+\]/g);
-
-    return function (gcode, context = controller.context) {
-        if (typeof gcode !== 'string') {
-            log.error(`Invalid parameter: gcode=${gcode}`);
-            return '';
-        }
-
-        const lines = gcode.split('\n');
-
-        // The work position (i.e. posx, posy, posz) are not included in the context
-        context = {
-            ...controller.context,
-            ...context
-        };
-
-        return lines.map(line => {
-            try {
-                line = line.replace(reExpressionContext, (match) => {
-                    const expr = match.slice(1, -1);
-                    return Parser.evaluate(expr, context);
-                });
-            } catch (e) {
-                // Bypass unknown expression
-            }
-
-            return line;
-        }).join('\n');
-    };
-}());*/
+import SecondaryVisualizer from './SecondaryVisualizer';
 
 const displayWebGLErrorMessage = () => {
     portal(({ onClose }) => (
@@ -163,7 +119,8 @@ const displayWebGLErrorMessage = () => {
 
 class VisualizerWidget extends PureComponent {
     static propTypes = {
-        widgetId: PropTypes.string.isRequired
+        widgetId: PropTypes.string.isRequired,
+        isSecondary: PropTypes.bool,
     };
 
     config = new WidgetConfig(this.props.widgetId);
@@ -716,11 +673,11 @@ class VisualizerWidget extends PureComponent {
     }
 
     // refs
-    widgetContent = null;
+    widgetContent = createRef();
 
-    visualizer = null;
+    visualizer = createRef();
 
-    workflowControl = null;
+    workflowControl = createRef();
 
     componentDidMount() {
         this.subscribe();
@@ -1109,7 +1066,7 @@ class VisualizerWidget extends PureComponent {
             }),
             pubsub.subscribe('gcode:surfacing', async (_, { gcode, name, size }) => {
                 const file = new File([gcode], name);
-                await api.file.upload(file, controller.port);
+                await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -1130,7 +1087,7 @@ class VisualizerWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-        const { renderState } = this.props;
+        const { renderState, isSecondary, gcode, surfacingData, activeVisualizer } = this.props;
         const showRendering = renderState === RENDER_RENDERING;
         const showLoading = renderState === RENDER_LOADING;
         const showLoader = showLoading || showRendering;
@@ -1141,98 +1098,51 @@ class VisualizerWidget extends PureComponent {
             view3D: WebGL.isWebGLAvailable() && !isVisualizerDisabled
         };
 
-        const showVisualizer = capable.view3D && !showLoader;
+        const showVisualizer =
+            capable.view3D &&
+            !showLoader &&
+            (
+                (isSecondary && activeVisualizer === VISUALIZER_SECONDARY) ||
+                !isSecondary && activeVisualizer === VISUALIZER_PRIMARY
+            );
 
-        const { liteMode } = this.state;
-
-        return (
-            <Widget className={styles.vizWidgetOverride}>
-                <Widget.Header className={styles['visualizer-header']}>
-                    <Widget.Title>
-                        Visualizer
-                    </Widget.Title>
-                    <Widget.Controls style={{ top: '-4px' }}>
-                        <ToggleSwitch
-                            label="Lightweight Mode"
-                            checked={liteMode}
-                            onChange={() => this.actions.handleLiteModeToggle()}
-                            className={styles.litetoggle}
-                            size="md"
-                        />
-                    </Widget.Controls>
-                </Widget.Header>
-                <Widget.Content
-                    reference={node => {
-                        this.widgetContent = node;
+        const MainComponent = isSecondary
+            ? (
+                <SecondaryVisualizer
+                    state={state}
+                    actions={actions}
+                    showLoading={showLoading}
+                    showRendering={showRendering}
+                    showVisualizer={showVisualizer}
+                    visualizerRef={(ref) => {
+                        this.visualizer = ref;
                     }}
-                    className={classNames(
-                        { [styles.view3D]: capable.view3D },
-                        styles['visualizer-component'],
-                    )}
-                    id="visualizer_container"
-                >
-                    {showLoading &&
-                    <Loading />
-                    }
-                    {showRendering &&
-                    <Rendering />
-                    }
-                    {state.modal.name === MODAL_WATCH_DIRECTORY && (
-                        <WatchDirectory
-                            state={state}
-                            actions={actions}
-                        />
-                    )}
+                    gcode={gcode}
+                    surfacingData={surfacingData}
+                    cameraPosition="top"
+                />
+            )
+            : (
+                <PrimaryVisualizer
+                    state={state}
+                    actions={actions}
+                    capable={capable}
+                    showLoading={showLoading}
+                    showRendering={showRendering}
+                    showVisualizer={showVisualizer}
+                    visualizerRef={(ref) => {
+                        this.visualizer = ref;
+                    }}
+                    workflowRef={(ref) => {
+                        this.workflowControl = ref;
+                    }}
+                    widgetContentRef={(ref) => {
+                        this.widgetContent = ref;
+                    }}
+                />
+            );
 
-                    {WebGL.isWebGLAvailable() && (
-                        <div className={styles.visualizerWrapper}>
-                            <MachineStatusArea
-                                state={state}
-                                actions={actions}
-                            />
-                            <Visualizer
-                                show={showVisualizer}
-                                cameraPosition={state.cameraPosition}
-                                ref={node => {
-                                    this.visualizer = node;
-                                }}
-                                state={state}
-                                actions={actions}
-                            />
-
-                            <WorkflowControl
-                                ref={(node) => {
-                                    this.workflowControl = node;
-                                }}
-                                state={state}
-                                actions={actions}
-                                invalidGcode={this.state.invalidLine.line}
-                            />
-
-                            {
-                                state.invalidGcode.shouldShow && state.invalidGcode.showModal && (
-                                    <ValidationModal
-                                        invalidGcode={state.invalidGcode}
-                                        onProceed={this.actions.handleRun}
-                                        onCancel={this.actions.reset}
-                                    />
-                                )
-                            }
-                            {
-                                state.invalidLine.shouldShow && state.invalidLine.show && (
-                                    <WarningModal
-                                        onContinue={actions.lineWarning.onContinue}
-                                        onIgnoreWarning={actions.lineWarning.onIgnoreWarning}
-                                        onCancel={actions.lineWarning.onCancel}
-                                        invalidLine={state.invalidLine.line}
-                                    />
-                                )
-                            }
-                        </div>
-                    )}
-                </Widget.Content>
-            </Widget>
-        );
+        return MainComponent;
     }
 }
 
@@ -1249,6 +1159,7 @@ export default connect((store) => {
     const isConnected = get(store, 'connection.isConnected');
     const controllerType = get(store, 'controller.type');
     const activeState = get(store, 'controller.state.status.activeState');
+    const { activeVisualizer } = store.visualizer;
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
     const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
@@ -1259,6 +1170,7 @@ export default connect((store) => {
         renderState,
         isConnected,
         controllerType,
-        activeState
+        activeState,
+        activeVisualizer
     };
-})(VisualizerWidget);
+}, null, null, { forwardRef: true })(VisualizerWidget);

@@ -1,0 +1,82 @@
+.box {
+  width: 91%;
+  height: 125px;
+  margin: auto;
+  border: 5px solid black;
+  position: relative;
+}
+
+.radio {
+    margin: 0 !important;
+    transform: scale(2);
+    
+    i::before {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+}
+
+.radio-top-left {
+    @extend .radio;
+    position: absolute !important;
+    left: -10px;
+    top: -13px;
+}
+
+.radio-top-right {
+    @extend .radio;
+    position: absolute !important;
+    right: -10px;
+    top: -13px;
+}
+
+.radio-bottom-left {
+    @extend .radio;
+    position: absolute !important;
+    bottom: -13px;
+    left: -10px;
+}
+
+.radio-bottom-right {
+    @extend .radio;
+    position: absolute !important;
+    bottom: -13px;
+    right: -10px;
+}
+
+.surfacing-type-wrapper {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.surfacing-type {
+    fill: black;
+    padding: 1rem;
+    height: 60%;
+    width: 30%;
+    border: 3px solid black;
+    border-radius: 10px;
+    transition: all 400ms ease-in-out;
+
+    &:hover {
+        cursor: pointer;
+        background-color: gray;
+        fill: white;
+    }
+}
+
+.surfacing-type-active {
+    @extend .surfacing-type;
+    $activeColor = #059669;
+
+    background-color: $activeColor;
+    fill: white;
+
+    &:hover {
+        background-color: $activeColor;
+        fill: white;
+    }
+}

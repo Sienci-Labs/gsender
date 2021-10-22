@@ -15,11 +15,15 @@
 .container {
   padding: 0.5rem 1rem;
   background-color: #e5e7eb;
+  display: grid;
+  grid-template-rows: 9fr 1fr;
+  height: 100%;
 }
 
 .main-container {
     display: grid;
-    grid-template-rows: 0fr 2fr 3fr;
+    grid-template-columns: 3fr 4fr;
+    gap: 2rem;
 }
 
 .input {
@@ -57,7 +61,7 @@
 
 .dimensions {
   display: grid;
-  grid-template-columns: 2fr 4fr 1fr 4fr;
+  grid-template-columns: 4fr 1fr 5fr;
 }
 
 .dimension-input {

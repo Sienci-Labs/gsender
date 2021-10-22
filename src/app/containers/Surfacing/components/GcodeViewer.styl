@@ -1,20 +1,24 @@
 .wrapper {
     overflow-y: scroll;
-    height: 236px;
+    height: 511px;
     background-color: white;
     border: 1px solid #eee;
 }
 
 .line {
     display: grid;
-    grid-template-columns: 1fr 19fr;
+    grid-template-columns: 1fr 9fr;
 }
 
 .line-number {
     margin: 0 0.75rem;
     color: rgba(0, 0, 0, 0.5);
+    text-align: center;
 }
 
 .line-code {
     user-select: text;
+    border-radius: 0;
+    height: 25px;
+    padding-left: 0.5rem;
 }
