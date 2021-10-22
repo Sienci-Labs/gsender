@@ -1520,9 +1520,9 @@ class GrblController {
                 this.command('gcode', code);
             },
             'jog:start': () => {
-                const [axes, feedrate = 1000, units = METRIC_UNITS] = args;
+                let [axes, feedrate = 1000, units = METRIC_UNITS] = args;
                 //const JOG_COMMAND_INTERVAL = 80;
-                const unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+                let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23 } = this.settings.settings;
 
                 let jogFeedrate;
@@ -1530,6 +1530,13 @@ class GrblController {
                     $130 = Number($130);
                     $131 = Number($131);
                     $132 = Number($132);
+
+                    // Convert feedrate to metric if working in imperial - easier to convert feedrate and treat everything else as MM than opposite
+                    if (units !== METRIC_UNITS) {
+                        feedrate = (feedrate * 25.5).toFixed(2);
+                        unitModal = 'G21';
+                        console.log(feedrate);
+                    }
 
                     const OFFSET = 0.1;
                     const FIXED = 2;
@@ -1558,7 +1565,7 @@ class GrblController {
 
                     if (this.homingFlagSet) {
                         const [xMaxLoc, yMaxLoc] = getAxisMaximumLocation($23);
-                        console.log(xMaxLoc, yMaxLoc);
+
                         if (axes.X) {
                             axes.X = determineMaxMovement(Math.abs(mpos.x), axes.X, xMaxLoc, $130);
                         }
