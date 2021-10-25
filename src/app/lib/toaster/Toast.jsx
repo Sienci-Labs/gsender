@@ -52,9 +52,9 @@ const Toast = ({ id, msg = 'NO_MSG_SPECIFIED', type = TOASTER_INFO, closeHandler
                 </button>
             </div>
             {
-                hasDuration &&
+                /*hasDuration &&
                 // eslint-disable-next-line react/style-prop-object
-                <ToastTimer duration={duration} createdAt={createdAt} />
+                <ToastTimer duration={duration} createdAt={createdAt} />*/
             }
         </div>
     );
