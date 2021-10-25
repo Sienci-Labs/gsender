@@ -152,10 +152,12 @@ class NavSidebar extends PureComponent {
                     label="Surfacing"
                     onClick={() => actions.openModal(MODAL_SURFACING)}
                 />
-                <NavSidebarLink
-                    url="" icon="fa fa-mountain" label="Heightmap"
-                    disabled
-                />
+                {
+                    /*<NavSidebarLink
+                        url="" icon="fa fa-mountain" label="Heightmap"
+                        disabled
+                    />*/
+                }
                 <NavSidebarLink
                     url=""
                     onClick={() => actions.openModal(MODAL_CALIBRATE)}
