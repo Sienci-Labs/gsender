@@ -31,7 +31,6 @@ import AlarmDescriptionIcon from 'app/widgets/Visualizer/AlarmDescriptionIcon';
 import styles from './machine-status-area.styl';
 import UnlockAlarmButton from './UnlockAlarmButton';
 
-
 /**
  * Control Area component displaying machine status
  * @param {Object} state Default state given from parent component

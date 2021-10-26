@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import * as WebGL from 'app/lib/three/WebGL';
 import Widget from 'app/components/Widget';
 import ToggleSwitch from 'app/components/ToggleSwitch';
-
+import UnlockButton from 'app/widgets/Visualizer/UnlockButton';
 import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
 import ValidationModal from './ValidationModal';
@@ -14,9 +14,7 @@ import Visualizer from './Visualizer';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
-
 import { MODAL_WATCH_DIRECTORY } from './constants';
-
 import styles from './index.styl';
 
 
@@ -66,6 +64,7 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
 
                 {WebGL.isWebGLAvailable() && (
                     <div className={styles.visualizerWrapper}>
+                        <UnlockButton />
                         <MachineStatusArea
                             state={state}
                             actions={actions}

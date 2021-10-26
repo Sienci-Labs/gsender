@@ -238,6 +238,7 @@ class GrblController {
                     }
                     if (line === PREHOOK_COMPLETE) {
                         log.debug('Finished Pre-hook');
+                        this.feeder.hold({ data: '%toolchange' });
                         this.emit('toolchange:preHookComplete');
                         return '(Pre-Hook complete)';
                     }
@@ -1687,6 +1688,7 @@ class GrblController {
             },
             'toolchange:post': () => {
                 log.debug('starting post hook');
+                this.command('feeder:start');
                 this.runPostChangeHook();
             },
             'gcode:outline': () => {

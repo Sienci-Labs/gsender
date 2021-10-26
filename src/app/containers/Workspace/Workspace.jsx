@@ -58,6 +58,7 @@ import ConfirmationDialog from '../../components/ConfirmationDialog/Confirmation
 
 
 const WAIT = '%wait';
+const TOOLCHANGE = '%toolchange';
 
 const startWaiting = () => {
     // Adds the 'wait' class to <html>
@@ -209,6 +210,10 @@ class Workspace extends PureComponent {
                 this.action.openModal(MODAL_FEEDER_WAIT, {
                     title: '%wait'
                 });
+                return;
+            }
+
+            if (data === TOOLCHANGE) {
                 return;
             }
 

@@ -36,7 +36,7 @@ const UnlockAlarmButton = ({ onClick, newMessage, alarmCode }) => {
             <div className={styles.alarmButtonWrap}>
                 <button className={styles.alarmButton} onClick={onClick}>
                     <i
-                        className={classnames('fas', 'fa-unlock')}
+                        className={classnames('fas', alarmCode !== 'Homing' ? 'fa-unlock' : 'fa-home')}
                         role="button"
                         tabIndex={-1}
                     />
@@ -47,7 +47,7 @@ const UnlockAlarmButton = ({ onClick, newMessage, alarmCode }) => {
             <div className={styles.alarmButtonWrap}>
                 <button className={styles.alarmButton} onClick={onClick}>
                     <i
-                        className={classnames('fas', 'fa-unlock')}
+                        className={classnames('fas', alarmCode !== 'Homing' ? 'fa-unlock' : 'fa-home')}
                         role="button"
                         tabIndex={-1}
                     />

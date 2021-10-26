@@ -231,8 +231,10 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('toolchange:start', () => {
+    controller.addListener('toolchange:preHookComplete', () => {
+        console.log('pre hook');
         const onConfirmhandler = () => {
+            console.log('Send post');
             controller.command('toolchange:post');
         };
 

@@ -89,6 +89,7 @@ class Controller {
         'controller:state': [],
         'message': [],
         'toolchange:start': [],
+        'toolchange:preHookComplete': [],
         'hPong': [],
         'outline:start': [],
         'file:load': [],
