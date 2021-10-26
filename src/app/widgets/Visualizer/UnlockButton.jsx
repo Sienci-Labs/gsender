@@ -22,10 +22,14 @@
  */
 
 import React, { useState } from 'react';
+import { connect } from 'react-redux';
+import get from 'lodash/get';
+import controller from 'app/lib/controller';
+import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import styles from './UnlockButton.styl';
 
 
-const UnlockButton = () => {
+const UnlockButton = ({ activeState, alarmCode }) => {
     const [isHovering, setIsHovering] = useState(false);
     const onMouseOver = () => {
         setIsHovering(true);
@@ -33,8 +37,16 @@ const UnlockButton = () => {
     const onMouseOut = () => {
         setIsHovering(false);
     };
+    const handleUnlock = () => {
+        if (activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode === 'Homing') {
+            controller.command('unlock');
+        } else {
+            controller.command('cyclestart');
+        }
+    };
+
     return (
-        <div className={styles.unlockButton} onMouseOver={onMouseOver} onMouseLeave={onMouseOut}>
+        <button onClick={handleUnlock} className={styles.unlockButton} onMouseOver={onMouseOver} onMouseLeave={onMouseOut}>
             <div className={styles.unlockIndicator}>
                 <i className="fas fa-caret-right" />
             </div>
@@ -45,8 +57,15 @@ const UnlockButton = () => {
                     Unlock Machine
                 </div>
             }
-        </div>
+        </button>
     );
 };
 
-export default UnlockButton;
+export default connect((store) => {
+    const activeState = get(store, 'controller.state.status.activeState');
+    const alarmCode = get(store, 'controller.state.status.alarmCode');
+    return {
+        activeState,
+        alarmCode
+    };
+})(UnlockButton);
