@@ -34,7 +34,7 @@ import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
 import log from '../lib/log';
 import defaultState from './defaultState';
-import { JOGGING_CATEGORY, METRIC_UNITS } from '../constants';
+import { JOGGING_CATEGORY, LOCATION_CATEGORY, METRIC_UNITS } from '../constants';
 
 const store = new ImmutableStore(defaultState);
 
@@ -209,6 +209,34 @@ store.on('change', debounce((state) => {
 const migrateStore = () => {
     if (!cnc.version) {
         return;
+    }
+
+    //  0.7.6 - changes to go to axis zero naming and payload
+    if (semver.lt(cnc.version, '0.7.6')) {
+        const currentCommandKeys = store.get('commandKeys', []);
+        const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
+        const defaultCommandKeys = get(defaultState, 'commandKeys');
+
+        const updateCommands = (commands) => {
+            return commands.map(command => {
+                if (command.category !== LOCATION_CATEGORY) {
+                    return command;
+                }
+
+                const foundDefaultCommand = defaultCommandKeys.find(defaultCommand => defaultCommand.id === command.id);
+
+                return foundDefaultCommand ? { ...command, title: foundDefaultCommand.title, payload: foundDefaultCommand.payload } : command;
+            });
+        };
+        const updatedCommandKeys = updateCommands(currentCommandKeys);
+
+        const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
+            const updatedProfileShortcuts = updateCommands(profile.shortcuts);
+            return { ...profile, shortcuts: updatedProfileShortcuts };
+        });
+
+        store.replace('commandKeys', updatedCommandKeys);
+        store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
     }
 
     //  0.7.4 - changes to keyboard and gamepad profile shortcut payload shape for machine jogging
