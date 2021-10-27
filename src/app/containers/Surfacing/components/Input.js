@@ -38,6 +38,7 @@ const Input = ({ value, label, units, onChange, additionalProps, className, styl
                     className={classNames('form-control', styles.text)}
                     disabled={disabled}
                     type="number"
+                    title=""
                 />
                 {units && <span className="input-group-addon">{units}</span>}
             </div>
