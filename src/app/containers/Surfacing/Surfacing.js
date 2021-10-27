@@ -163,11 +163,12 @@ const Surfacing = ({ onClose, showTitle }) => {
         workspaceUnits === METRIC_UNITS ? store.set('widgets.surfacing.defaultMetricState', surfacing) : store.set('widgets.surfacing.defaultImperialState', surfacing);
     }, [surfacing]);
 
-    // useMemo(() => {
-    //     if (currentTab === 0) {
-    //         console.log(visualizerRef);
-    //     }
-    // }, [currentTab]);
+    useEffect(() => {
+        // Need to re-visualize the gcode once the visualizer is re-mounted
+        if (currentTab === 0 && canLoad) {
+            runGenerate();
+        }
+    }, [currentTab]);
 
     return (
         <>
