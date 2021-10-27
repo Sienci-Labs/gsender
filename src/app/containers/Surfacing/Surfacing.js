@@ -1,4 +1,3 @@
-// import React, { createRef, useState, useEffect, useMemo } from 'react';
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
@@ -9,9 +8,9 @@ import { SET_CURRENT_VISUALIZER } from 'app/actions/visualizerActions';
 import store from 'app/store';
 import controller from 'app/lib/controller';
 import { METRIC_UNITS, IMPERIAL_UNITS, VISUALIZER_PRIMARY, VISUALIZER_SECONDARY } from 'app/constants';
-import Visualizer from 'app/widgets/Visualizer';
 import api from 'app/api';
 
+import Visualizer from './Visualizer';
 import InputArea from './InputArea';
 import ActionArea from './components/actions';
 import styles from './index.styl';
@@ -26,8 +25,6 @@ import TabArea from './TabArea';
  * @prop {Function} onClose - Function to close the current modal
  */
 const Surfacing = ({ onClose, showTitle }) => {
-    // let visualizerRef = createRef();
-
     const [surfacing, setSurfacing] = useState(store.get('widgets.surfacing.defaultMetricState'));
 
     const [gcode, setGcode] = useState('');
@@ -89,17 +86,7 @@ const Surfacing = ({ onClose, showTitle }) => {
             id: 0,
             label: 'Visualizer Preview',
             widgetId: 'viz-preview',
-            component: <Visualizer
-                isSecondary
-                widgetId="surfacing_visualizer"
-                // ref={(ref) => {
-                //     if (ref !== null) {
-                //         visualizerRef = ref;
-                //     }
-                // }}
-                gcode={gcode}
-                surfacingData={surfacing}
-            />
+            component: <Visualizer gcode={gcode} surfacing={surfacing} />,
         },
         {
             id: 1,
@@ -107,7 +94,7 @@ const Surfacing = ({ onClose, showTitle }) => {
             widgetId: 'gcode-viewer',
             component: <GcodeViewer gcode={gcode} />,
             disabled: !gcode,
-        }
+        },
     ];
 
     /**
@@ -202,8 +189,8 @@ const Surfacing = ({ onClose, showTitle }) => {
 };
 
 Surfacing.propTypes = {
-    state: PropTypes.object,
     onClose: PropTypes.func.isRequired,
+    showTitle: PropTypes.bool,
 };
 
 export default Surfacing;
