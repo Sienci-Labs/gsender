@@ -31,7 +31,7 @@ import combokeys from 'app/lib/combokeys';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import PropTypes from 'prop-types';
-import React, { PureComponent, createRef } from 'react';
+import React, { PureComponent } from 'react';
 import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
 import Anchor from 'app/components/Anchor';
 import { Button } from 'app/components/Buttons';
@@ -673,11 +673,11 @@ class VisualizerWidget extends PureComponent {
     }
 
     // refs
-    widgetContent = createRef();
+    widgetContent = null;
 
-    visualizer = createRef();
+    visualizer = null;
 
-    workflowControl = createRef();
+    workflowControl = null;
 
     componentDidMount() {
         this.subscribe();
@@ -861,42 +861,17 @@ class VisualizerWidget extends PureComponent {
             this.actions.onRunClick();
         },
         START_JOB: () => {
-            const { isConnected, workflow } = this.props;
-            if (!isConnected) {
-                return;
-            }
-
-            const canStart = (workflow.state !== WORKFLOW_STATE_RUNNING);
-
-            if (canStart) {
-                if (workflow.state === WORKFLOW_STATE_IDLE) {
-                    controller.command('gcode:start');
-                    return;
-                }
-
-                if (workflow.state === WORKFLOW_STATE_PAUSED) {
-                    controller.command('gcode:resume');
-                    return;
-                }
+            if (this.workflowControl) {
+                this.workflowControl.startRun();
             }
         },
         PAUSE_JOB: () => {
-            const { isConnected, workflow } = this.props;
-            if (!isConnected) {
-                return;
-            }
-
-            if (workflow.state === WORKFLOW_STATE_RUNNING) {
-                controller.command('gcode:pause');
-            }
+            this.actions.handlePause();
         },
         STOP_JOB: () => {
-            const { isConnected } = this.props;
-            if (!isConnected) {
-                return;
+            if (this.workflowControl) {
+                this.workflowControl.handleOnStop();
             }
-
-            controller.command('gcode:stop', { force: true });
         },
         FEEDRATE_OVERRIDE: (_, { amount }) => {
             const feedRate = Number(amount) || 0;
