@@ -76,7 +76,9 @@ const Surfacing = ({ onClose, showTitle }) => {
      */
     const loadGcode = () => {
         const name = 'gSender_Surfacing';
-        pubsub.publish('gcode:surfacing', { gcode, name, size: (gcode.length * 2) });
+        const { size } = new File([gcode], name);
+
+        pubsub.publish('gcode:surfacing', { gcode, name, size });
         onClose();
     };
 
