@@ -47,8 +47,8 @@ const Surfacing = ({ onClose, showTitle }) => {
         setGcode(gcode);
     }, 1000, { leading: true });
 
-    const handleChange = (e) => {
-        const { id, value, min, max } = e.target;
+    const handleChange = ({ target, shouldConvert = true }) => {
+        const { id, value, min, max } = target;
 
         const convertToImperial = (value) => Math.round(Number(value) / 25.4);
 
@@ -56,7 +56,11 @@ const Surfacing = ({ onClose, showTitle }) => {
         const maxiumum = Number(units === METRIC_UNITS ? max : convertToImperial(max));
         const val = Math.abs(Number(value));
 
-        if (!inRange(val, minimum, maxiumum + 1)) {
+        if (shouldConvert && !inRange(val, minimum, maxiumum + 1)) {
+            return;
+        }
+
+        if (!shouldConvert && !inRange(val, Number(min), Number(max) + 1)) {
             return;
         }
 
