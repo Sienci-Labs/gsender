@@ -428,20 +428,19 @@ class LocationWidget extends PureComponent {
             axis = axis.toUpperCase();
             controller.command('gcode', `G10 L20 P${p} ${axis}0`);
         },
-        GO_TO_AXIS_ZERO: (event, { axis }) => {
-            if (!axis) {
+        GO_TO_AXIS_ZERO: (_, { axisList }) => {
+            if (!axisList || axisList.length === 0) {
                 return;
             }
 
-            if (axis === 'all') {
-                controller.command('gcode', 'G0 X0 Y0 Z0');
-                return;
-            }
+            let commandStr = '';
 
-            axis = axis.toUpperCase();
+            for (const axis of axisList) {
+                commandStr += `${axis.toUpperCase()}0 `;
+            }
 
             controller.command('gcode', 'G90');
-            controller.command('gcode', `G0 ${axis}0`);
+            controller.command('gcode', `G0 ${commandStr}`);
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
