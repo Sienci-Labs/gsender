@@ -1021,5 +1021,25 @@ export default [
         'spindle': true,
         'coolant': false,
         'laser': false
+    },
+    {
+        'id': 50,
+        'company': 'Whittle',
+        'name': '',
+        'type': 'WhittleCNC',
+        'mm': {
+            'width': 228,
+            'depth': 356,
+            'height': 203
+        },
+        'in': {
+            'width': 9,
+            'depth': 14,
+            'height': 8
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false
     }
 ];
