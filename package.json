@@ -267,7 +267,6 @@
     "qs": "~6.7.0",
     "range_check": "~1.4.0",
     "rc-dropdown": "^3.2.0",
-    "rc-slider": "~8.6.9",
     "react": "^17.0.1",
     "react-beautiful-dnd": "^13.1.0",
     "react-bootstrap": "^1.5.2",
