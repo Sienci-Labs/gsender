@@ -3,6 +3,7 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 import * as WebGL from 'app/lib/three/WebGL';
+import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD, WORKFLOW_STATE_IDLE } from 'app/constants';
 import Widget from 'app/components/Widget';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import UnlockButton from 'app/widgets/Visualizer/UnlockButton';
@@ -19,8 +20,10 @@ import styles from './index.styl';
 
 
 const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering, showVisualizer, visualizerRef, workflowRef, widgetContentRef }) => {
-    const { liteMode, modal, cameraPosition, invalidLine, invalidGcode } = state;
-
+    const { liteMode, modal, cameraPosition, invalidLine, invalidGcode, alarmCode, activeState, workflow } = state;
+    const isHomingAlarm = activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode === 'Homing'; // We are alarmed and
+    const holdWithoutWorkflowPause = activeState === GRBL_ACTIVE_STATE_HOLD && workflow.state === WORKFLOW_STATE_IDLE;
+    const showUnlockButton = isHomingAlarm || holdWithoutWorkflowPause;
     const { handleLiteModeToggle, handleRun, reset } = actions;
 
     const containerID = 'visualizer_container';
@@ -64,7 +67,9 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
 
                 {WebGL.isWebGLAvailable() && (
                     <div className={styles.visualizerWrapper}>
-                        <UnlockButton />
+                        {
+                            showUnlockButton && <UnlockButton />
+                        }
                         <MachineStatusArea
                             state={state}
                             actions={actions}

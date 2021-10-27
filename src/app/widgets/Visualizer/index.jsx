@@ -1080,14 +1080,18 @@ class VisualizerWidget extends PureComponent {
     }
 
     render() {
+        const { renderState, isSecondary, gcode, surfacingData, activeVisualizer, activeState, alarmCode, workflow } = this.props;
         const state = {
             ...this.state,
+            alarmCode,
+            activeState,
+            workflow,
             isAgitated: this.isAgitated()
         };
         const actions = {
             ...this.actions
         };
-        const { renderState, isSecondary, gcode, surfacingData, activeVisualizer } = this.props;
+
         const showRendering = renderState === RENDER_RENDERING;
         const showLoading = renderState === RENDER_LOADING;
         const showLoader = showLoading || showRendering;
@@ -1159,6 +1163,7 @@ export default connect((store) => {
     const isConnected = get(store, 'connection.isConnected');
     const controllerType = get(store, 'controller.type');
     const activeState = get(store, 'controller.state.status.activeState');
+    const alarmCode = get(store, 'controller.state.status.alarmCode');
     const { activeVisualizer } = store.visualizer;
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
@@ -1171,6 +1176,7 @@ export default connect((store) => {
         isConnected,
         controllerType,
         activeState,
-        activeVisualizer
+        activeVisualizer,
+        alarmCode
     };
 }, null, null, { forwardRef: true })(VisualizerWidget);
