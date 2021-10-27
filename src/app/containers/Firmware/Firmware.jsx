@@ -34,7 +34,7 @@ import map from 'lodash/map';
 import get from 'lodash/get';
 import download from 'downloadjs';
 import store from 'app/store';
-import { GRBL } from 'app/constants';
+import { GRBL, GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import TooltipCustom from '../../components/TooltipCustom/ToolTip';
 import Loading from '../../components/Loader';
 import { Toaster, TOASTER_INFO, TOASTER_DANGER, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
@@ -475,7 +475,7 @@ class Firmware extends PureComponent {
     }
 
     render() {
-        const { modalClose, canClick, eeprom } = this.props;
+        const { modalClose, canClick, eeprom, canSendSettings } = this.props;
         const loadedSettings = GRBL_SETTINGS.GRBL_SETTINGS;
         let message = this.defineMessageForCncDefaultsButton();
         //let currentSettings = controller.settings;
@@ -572,7 +572,7 @@ class Firmware extends PureComponent {
                             ) : ''}
                             <div className={styles.buttonsMiddle}>
                                 <TooltipCustom content="Import your settings file you saved previously" location="default">
-                                    <ToolModalButton onClick={this.upload} icon="fas fa-file-import" disabled={canClick}>
+                                    <ToolModalButton onClick={this.upload} icon="fas fa-file-import" disabled={!canSendSettings}>
                                     Import Settings
                                     </ToolModalButton>
                                 </TooltipCustom>
@@ -589,7 +589,7 @@ class Firmware extends PureComponent {
                                     <ToolModalButton
                                         onClick={this.restoreSettings}
                                         icon="fas fa-undo"
-                                        disabled={canClick}
+                                        disabled={!canSendSettings}
                                     >
                                     Restore Defaults
                                     </ToolModalButton>
@@ -608,7 +608,7 @@ class Firmware extends PureComponent {
                                     icon="fas fa-tasks"
                                     onClick={this.applyNewSettings}
                                     className={this.state.newSettingsButtonDisabled ? `${styles.firmwareButtonDisabled}` : `${styles.applySettingsButton}`}
-                                    disabled={canClick}
+                                    disabled={!canSendSettings}
                                 >
                                 Apply New Settings
                                 </ToolModalButton>
@@ -634,8 +634,11 @@ class Firmware extends PureComponent {
 export default connect((store) => {
     const isConnected = get(store, 'connection.isConnected');
     const eeprom = get(store, 'controller.settings.settings');
+    const activeState = get(store, 'controller.state.status.activeState');
+    const canSendSettings = isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
     return {
         canClick: !isConnected,
-        eeprom
+        eeprom,
+        canSendSettings
     };
 })(Firmware);
