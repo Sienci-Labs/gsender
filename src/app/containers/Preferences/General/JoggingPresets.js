@@ -85,13 +85,13 @@ export default class JoggingPresets extends Component {
         const { currentPreset, units } = this.state;
 
         if (units === 'mm') {
-            if (value >= 300.1) {
+            if (value >= 1000.1) {
                 return;
             }
         }
 
         if (units === 'in') {
-            if (value >= 10.1) {
+            if (value >= 40.1) {
                 return;
             }
         }
@@ -144,13 +144,13 @@ export default class JoggingPresets extends Component {
         const { currentPreset, units } = this.state;
 
         if (units === 'mm') {
-            if (value >= 30) {
+            if (value > 1000) {
                 return;
             }
         }
 
         if (units === 'in') {
-            if (value >= 1) {
+            if (value > 4) {
                 return;
             }
         }
