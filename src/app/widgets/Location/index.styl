@@ -101,14 +101,10 @@
 }
 
 .end-stop-active-controls {
-    width: 30%;
-    height: 0;
+    width: 24%;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: repeat(3, minmax(0,1fr));
-    right: 15px;
-    top: 0;
-    padding-bottom: 40%;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    height: max-content;
 }
 
 .quickPositionButton {
@@ -149,14 +145,12 @@
 	height: 0;
 	padding: 0;
 	padding-top: 130%;
-	margin-top: 100%;
+	margin: 30% 0 0 70%;
 
     i {
-        transform: translateY(-420%) rotate(45deg);
-		display: block;
-		text-align: right;
-        font-size: 1.7rem;
-        position: relative;
+        transform: translateX(10%) rotate(45deg);
+        width: 265%;
+        text-align: left;
     }
 }
 .QPBL {
@@ -167,14 +161,13 @@
     height: 0;
 	padding: 0;
 	padding-top: 130%;
-	margin-top: 100%;
+	margin-top: 30%;
 
 
     i {
-       transform: translateY(-420%) rotate(315deg);
-		display: block;
-        font-size: 1.7rem;
-        position: relative;
+         transform: translateX(-73%) rotate(-45deg);
+        width: 265%;
+        text-align: right;
     }
 }
 .QPFR {
@@ -183,11 +176,10 @@
     grid-column: 2/3;
     width: 130%;
 
-    margin: 70% 0 0 70%;
-		height: 0;
-		padding: 0;
-		padding-top: 130%;
-		margin-top: 260%;
+    margin: 30% 0 0 70%;
+	height: 0;
+	padding: 0;
+	padding-top: 130%;
 
     i {
         transform: rotate(135deg);
@@ -196,21 +188,18 @@
         position: relative;
         bottom: 8px;
 		display: block;
-
     }
 }
 .QPFL {
     clip-path: polygon(0% 100%, 100% 100%, 100% 55%, 45% 55%, 45% 0%, 0% 0%);
     grid-row: 3;
     grid-column: 1/2;
-    margin-top: 70%;
+    margin-top: 30%;
     width: 130%;
 
-
     height: 0;
-		padding: 0;
-		padding-top: 130%;
-		margin-top: 260%;
+	padding: 0;
+	padding-top: 130%;
 
     i {
         transform: rotate(225deg);
