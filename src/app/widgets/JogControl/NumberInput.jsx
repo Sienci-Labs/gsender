@@ -22,6 +22,7 @@
  */
 
 import React, { PureComponent } from 'react';
+import ControlledNumberInput from 'app/components/ControlledNumberInput';
 import styles from './numberInput.styl';
 
 class NumberInput extends PureComponent {
@@ -136,11 +137,11 @@ class NumberInput extends PureComponent {
                 <button type="button" className={styles.stepButton} onClick={(e) => this.decrementValue(e)}>
                     <i className="fa fa-minus fa-fw" style={{ verticalAlign: 'super', margin: 'auto', fontSize: 'clamp(10px, 1vw, 14px)' }} />
                 </button>
-                <input
+                <ControlledNumberInput
                     value={value}
                     type="text"
                     inputMode="decimal"
-                    onChange={(e) => this.setValue(e)}
+                    externalOnChange={(e) => this.setValue(e)}
                     onFocus={(e) => e.target.select()}
                     onClick={(e) => e.target.select()}
                 />
