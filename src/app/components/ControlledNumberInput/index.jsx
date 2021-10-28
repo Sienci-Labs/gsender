@@ -24,7 +24,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import debounce from 'lodash/debounce';
 
-const ControlledNumberInput = ({ className, value, externalOnChange = null }) => {
+const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnChange = null }) => {
     const inputRef = useRef();
     const [originalValue, setOriginalValue] = useState(value);
     const [localValue, setLocalValue] = useState(value);
@@ -36,10 +36,10 @@ const ControlledNumberInput = ({ className, value, externalOnChange = null }) =>
     }, [value]);
 
     // Memoized debounced onChange to avoid creating a new function on each re-render
-    const debouncedExternalOnChange = useMemo(() => debounce(externalOnChange, 300), []);
+    const debouncedExternalOnChange = useMemo(() => debounce(externalOnChange, 500), []);
 
     const onFocus = () => {
-        setLocalValue('');
+        //setLocalValue('');
     };
 
     const onBlur = (e) => {
@@ -67,7 +67,7 @@ const ControlledNumberInput = ({ className, value, externalOnChange = null }) =>
 
     return (
         <input
-            type="decimal"
+            type={type}
             className={className}
             ref={inputRef}
             onFocus={onFocus}
