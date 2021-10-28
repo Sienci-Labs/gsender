@@ -249,8 +249,7 @@ class DisplayPanel extends PureComponent {
     }
 
     render() {
-        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome, homingDirection } = this.props;
-        let { homingRun } = this.state;
+        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome, homingDirection, homingRun } = this.props;
         const homingLocation = getHomingLocation(homingDirection);
         const hasAxisX = includes(axes, AXIS_X);
         const hasAxisY = includes(axes, AXIS_Y);
@@ -367,6 +366,7 @@ export default connect((store) => {
     const homingSetting = get(store, 'controller.settings.settings.$22', '0');
     const homingDirection = get(store, 'controller.settings.settings.$23', '0');
     const homingFlag = get(store, 'controller.homingFlag', false);
+    const homingRun = get(store, 'controller.homingRun', false);
     const homingEnabled = homingSetting === '1';
     const isConnected = get(store, 'connection.isConnected');
     const workflowState = get(store, 'controller.workflow.state');
@@ -376,6 +376,7 @@ export default connect((store) => {
         homingEnabled,
         canHome,
         homingDirection,
-        homingFlag
+        homingFlag,
+        homingRun
     };
 })(DisplayPanel);

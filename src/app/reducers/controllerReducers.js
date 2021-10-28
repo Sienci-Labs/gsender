@@ -43,6 +43,7 @@ const initialState = {
     mpos: {},
     wpos: {},
     homingFlag: false,
+    homingRun: false,
     feeder: {
         status: null
     },
@@ -161,7 +162,8 @@ const reducer = createReducer(initialState, {
     [UPDATE_HOMING_FLAG]: (payload, reducerState) => {
         const { homingFlag } = payload;
         return {
-            homingFlag
+            homingFlag,
+            homingRun: true
         };
     }
 });
