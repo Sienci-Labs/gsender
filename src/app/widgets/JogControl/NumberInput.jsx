@@ -98,6 +98,7 @@ class NumberInput extends PureComponent {
     }
 
     setValue(e) {
+        console.log(e);
         const { max, min } = this.state;
         const { changeHandler } = this.props;
         let value = e.target.value;
