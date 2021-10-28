@@ -341,7 +341,6 @@
     "G-code not loaded": "G-code not loaded",
     "Click the Resume button to resume program execution.": "Click the Resume button to resume program execution.",
     "Click the Stop button to stop program execution.": "Click the Stop button to stop program execution.",
-    "Run a tool change macro to change the tool and adjust the Z-axis offset. Afterwards, click the Resume button to resume program execution.": "Run a tool change macro to change the tool and adjust the Z-axis offset. Afterwards, click the Resume button to resume program execution.",
     "Waiting for the target temperature to be reached...": "Waiting for the target temperature to be reached...",
     "WebGL: <1>Enabled</1>": "WebGL: <1>Enabled</1>",
     "WebGL: <1>Disabled</1>": "WebGL: <1>Disabled</1>",
