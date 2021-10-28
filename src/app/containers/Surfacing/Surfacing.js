@@ -1,4 +1,3 @@
-// import React, { createRef, useState, useEffect, useMemo } from 'react';
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
@@ -9,9 +8,9 @@ import { SET_CURRENT_VISUALIZER } from 'app/actions/visualizerActions';
 import store from 'app/store';
 import controller from 'app/lib/controller';
 import { METRIC_UNITS, IMPERIAL_UNITS, VISUALIZER_PRIMARY, VISUALIZER_SECONDARY } from 'app/constants';
-import Visualizer from 'app/widgets/Visualizer';
 import api from 'app/api';
 
+import Visualizer from './Visualizer';
 import InputArea from './InputArea';
 import ActionArea from './components/actions';
 import styles from './index.styl';
@@ -26,8 +25,6 @@ import TabArea from './TabArea';
  * @prop {Function} onClose - Function to close the current modal
  */
 const Surfacing = ({ onClose, showTitle }) => {
-    // let visualizerRef = createRef();
-
     const [surfacing, setSurfacing] = useState(store.get('widgets.surfacing.defaultMetricState'));
 
     const [gcode, setGcode] = useState('');
@@ -47,8 +44,8 @@ const Surfacing = ({ onClose, showTitle }) => {
         setGcode(gcode);
     }, 1000, { leading: true });
 
-    const handleChange = (e) => {
-        const { id, value, min, max } = e.target;
+    const handleChange = ({ target, shouldConvert = true }) => {
+        const { id, value, min, max } = target;
 
         const convertToImperial = (value) => Math.round(Number(value) / 25.4);
 
@@ -56,7 +53,11 @@ const Surfacing = ({ onClose, showTitle }) => {
         const maxiumum = Number(units === METRIC_UNITS ? max : convertToImperial(max));
         const val = Math.abs(Number(value));
 
-        if (!inRange(val, minimum, maxiumum + 1)) {
+        if (shouldConvert && !inRange(val, minimum, maxiumum + 1)) {
+            return;
+        }
+
+        if (!shouldConvert && !inRange(val, Number(min), Number(max) + 1)) {
             return;
         }
 
@@ -72,7 +73,9 @@ const Surfacing = ({ onClose, showTitle }) => {
      */
     const loadGcode = () => {
         const name = 'gSender_Surfacing';
-        pubsub.publish('gcode:surfacing', { gcode, name, size: (gcode.length * 2) });
+        const { size } = new File([gcode], name);
+
+        pubsub.publish('gcode:surfacing', { gcode, name, size });
         onClose();
     };
 
@@ -83,17 +86,7 @@ const Surfacing = ({ onClose, showTitle }) => {
             id: 0,
             label: 'Visualizer Preview',
             widgetId: 'viz-preview',
-            component: <Visualizer
-                isSecondary
-                widgetId="surfacing_visualizer"
-                // ref={(ref) => {
-                //     if (ref !== null) {
-                //         visualizerRef = ref;
-                //     }
-                // }}
-                gcode={gcode}
-                surfacingData={surfacing}
-            />
+            component: <Visualizer gcode={gcode} surfacing={surfacing} />,
         },
         {
             id: 1,
@@ -101,7 +94,7 @@ const Surfacing = ({ onClose, showTitle }) => {
             widgetId: 'gcode-viewer',
             component: <GcodeViewer gcode={gcode} />,
             disabled: !gcode,
-        }
+        },
     ];
 
     /**
@@ -157,11 +150,12 @@ const Surfacing = ({ onClose, showTitle }) => {
         workspaceUnits === METRIC_UNITS ? store.set('widgets.surfacing.defaultMetricState', surfacing) : store.set('widgets.surfacing.defaultImperialState', surfacing);
     }, [surfacing]);
 
-    // useMemo(() => {
-    //     if (currentTab === 0) {
-    //         console.log(visualizerRef);
-    //     }
-    // }, [currentTab]);
+    useEffect(() => {
+        // Need to re-visualize the gcode once the visualizer is re-mounted
+        if (currentTab === 0 && canLoad) {
+            runGenerate();
+        }
+    }, [currentTab]);
 
     return (
         <>
@@ -195,8 +189,8 @@ const Surfacing = ({ onClose, showTitle }) => {
 };
 
 Surfacing.propTypes = {
-    state: PropTypes.object,
     onClose: PropTypes.func.isRequired,
+    showTitle: PropTypes.bool,
 };
 
 export default Surfacing;

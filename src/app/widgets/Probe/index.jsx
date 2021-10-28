@@ -338,12 +338,17 @@ class ProbeWidget extends PureComponent {
     }
 
     getInitialState() {
+        const units = store.get('workspace.units');
+        const availableTools = store.get('workspace.tools', []);
+
+        const toolDiameter = availableTools[0][units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'];
+
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             canClick: true, // Defaults to true
             port: controller.port,
-            units: store.get('workspace.units'),
+            units,
             controller: {
                 type: controller.type,
                 state: controller.state
@@ -361,8 +366,8 @@ class ProbeWidget extends PureComponent {
             touchPlateHeight: this.config.get('touchPlateHeight') || {},
             retractionDistance: this.config.get('retractionDistance') || {},
             touchplate: store.get('workspace[probeProfile]', {}),
-            availableTools: store.get('workspace[tools]', []),
-            toolDiameter: 0.00,
+            availableTools,
+            toolDiameter,
             useSafeProbeOption: false,
             availableProbeCommands: [],
             selectedProbeCommand: 0,

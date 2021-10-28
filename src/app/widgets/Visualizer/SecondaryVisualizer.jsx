@@ -10,7 +10,7 @@ import Rendering from './Rendering';
 
 const SecondaryVisualizer = ({ state, actions, surfacingData, showVisualizer, cameraPosition, visualizerRef, showLoading, showRendering }) => {
     return (
-        <div style={{ border: '1px solid black', height: 'calc(100% - 28px)', width: '100%' }}>
+        <div style={{ border: '1px solid black', height: '100%', width: '100%' }}>
             { showLoading && <Loading /> }
             { showRendering && <Rendering /> }
 

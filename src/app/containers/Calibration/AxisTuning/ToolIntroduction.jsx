@@ -55,16 +55,20 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis, isConnected
                 </p>
 
                 <p>Before starting, you’ll want to have a marker or some tape on hand and a measuring tape to keep track of machine movements.</p>
-                <Select
-                    backspaceRemoves={false}
-                    className="sm"
-                    clearable={false}
-                    menuContainerStyle={{ zIndex: 5 }}
-                    name="toolchangeoption"
-                    onChange={(selected) => onSelectAxis(selected.value)}
-                    options={axisList}
-                    value={{ label: currentAxis.toUpperCase(), value: currentAxis }}
-                />
+
+                <div style={{ marginBottom: '1rem' }}>
+                    <Select
+                        backspaceRemoves={false}
+                        className="sm"
+                        clearable={false}
+                        menuContainerStyle={{ zIndex: 5 }}
+                        name="toolchangeoption"
+                        onChange={(selected) => onSelectAxis(selected.value)}
+                        options={axisList}
+                        value={{ label: currentAxis.toUpperCase(), value: currentAxis }}
+                    />
+                </div>
+
                 <Keypad />
 
 

@@ -17,6 +17,27 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
     const [currentShortcut, setCurrentShortcut] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
+    const [name, setName] = useState(profileName);
+
+    const handleEditName = () => {
+        if (name === profileName) {
+            return;
+        }
+
+        const profiles = store.get('workspace.gamepad.profiles', []);
+
+        const updatedProfiles =
+            profiles.map(profile => (currentProfile.id === profile.id ? ({ ...profile, profileName: name }) : currentProfile));
+
+        onUpdateProfiles(updatedProfiles);
+
+        Toaster.pop({
+            msg: 'Updated Shortcut Profile Name',
+            type: TOASTER_SUCCESS,
+            duration: 2000
+        });
+    };
+
     const handleDelete = (currShortcut) => {
         const updatedShortcuts = shortcuts.map((shortcut) => (shortcut.id === currShortcut.id ? { ...shortcut, keys: '', keysName: '', isActive: false } : shortcut));
 
@@ -48,8 +69,15 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
     return (
         <>
             <div style={{ overflowY: 'hidden' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 11fr', alignItems: 'center', margin: '0 0 1rem' }}>
-                    <i className={classnames(icon, styles.profileItemIcon)} /> <div style={{ fontSize: '1.5rem' }}>{profileName}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 13fr', alignItems: 'center', margin: '0 0 0.5rem' }}>
+                    <i className={classnames(icon, styles.profileItemIcon)} />
+                    <input
+                        type="text"
+                        value={name}
+                        className={styles.profileName}
+                        onChange={(e) => setName(e.target.value)}
+                        onBlur={handleEditName}
+                    />
                 </div>
                 <div style={{ overflowY: 'auto', height: '90%', backgroundColor: 'white' }}>
                     <MainTable

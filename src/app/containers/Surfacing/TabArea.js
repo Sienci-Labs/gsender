@@ -22,7 +22,7 @@ const TabArea = ({ tabs, currentTab, onTabChange }) => {
                             const active = index === currentTab;
                             return (
                                 <TabbedWidget.ChildComponent key={tab.id} active={active}>
-                                    {tab.component}
+                                    {active && tab.component}
                                 </TabbedWidget.ChildComponent>
                             );
                         })

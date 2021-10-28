@@ -172,6 +172,9 @@ export default class MachineProfile extends Component {
         const tokens = [
             pubsub.subscribe('updateMachineProfiles', (msg, machineProfiles) => {
                 this.updateMachineProfilesFromSubscriber(machineProfiles);
+            }),
+            pubsub.subscribe('units:change', (_, units) => {
+                this.setState({ units });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);

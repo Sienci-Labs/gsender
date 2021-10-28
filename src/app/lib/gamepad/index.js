@@ -2,12 +2,10 @@ import { GamepadListener } from 'gamepad.js';
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
-const JOG_CMD = 'JOG';
 const STOP_JOG_CMD = 'STOP_JOG';
 
 class Gamepad extends GamepadListener {
     constructor() {
-        // const { deadZone = 0.4 } = store.get('workspace.gamepad');
         super({ deadZone: 0.5, precision: 2, analog: false });
         this.shouldHold = false;
         this.start();
@@ -45,12 +43,16 @@ export const onGamepadButtonClick = ({ detail }) => {
         return null;
     }
 
-    const { gamepad, pressed, button } = detail;
+    const { gamepad, pressed } = detail;
     const buttons = gamepad.buttons;
     const gamepadID = gamepad.id;
 
     const profiles = store.get('workspace.gamepad.profiles', []);
     const currentProfile = profiles.find(profile => profile.id === gamepadID);
+
+    if (!currentProfile) {
+        return null;
+    }
 
     const buttonCombo = shortcutComboBuilder(
         buttons
@@ -59,41 +61,22 @@ export const onGamepadButtonClick = ({ detail }) => {
             .map(button => button.buttonIndex)
     );
 
-    const foundAction = currentProfile.shortcuts.find(shortcut => {
-        return shortcut.keys === buttonCombo;
-    });
+    const foundAction = currentProfile.shortcuts.find(shortcut => shortcut.keys === buttonCombo);
 
-    if (!buttonCombo) {
-        const foundAction = currentProfile.shortcuts.find(shortcut => {
-            return shortcut.keys === String(button);
-        });
-
-        //If we found a jog action and the current button was not pressed (lifted up), send a stop jog command instead
-        if (foundAction?.cmd === JOG_CMD && !pressed) {
-            const foundStopCommand = currentProfile.shortcuts.find(shortcut => shortcut.cmd === STOP_JOG_CMD);
-            delete foundStopCommand?.payload; //We don't need to send a payload
-            return foundStopCommand;
-        }
-
-        return null;
+    if (!pressed) {
+        const foundStopCommand = currentProfile.shortcuts.find(shortcut => shortcut.cmd === STOP_JOG_CMD);
+        delete foundStopCommand?.payload; //We don't need to send a payload
+        return foundStopCommand;
     }
 
-    if (!currentProfile) {
-        return null;
-    }
-
-    if (!foundAction) {
-        return null;
-    }
-
-    if (!foundAction.isActive) {
+    if (!buttonCombo || !foundAction?.isActive) {
         return null;
     }
 
     return foundAction;
 };
 
-export const runAction = ({ event, shuttleControlEvents }) => { //Added throttle to prevent uncessary spam when controller is connecting
+export const runAction = ({ event, shuttleControlEvents }) => {
     const action = onGamepadButtonClick(event);
 
     if (!action) {

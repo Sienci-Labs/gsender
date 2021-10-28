@@ -3,7 +3,7 @@ $primary = #3e85c7;
 .container {
   display: grid;
   grid-template-rows: 19fr 1fr;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   height: 585px;
 }
 
@@ -106,8 +106,6 @@ $primary = #3e85c7;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     grid-template-rows: repeat(auto-fill, minmax(150px, 1fr));
-    // grid-template-columns: repeat(6, calc(50% - 40px));
-    // grid-template-rows: minmax(150px, 1fr);
     gap: 2rem;
     justify-items: center;
     align-items: center;
@@ -226,4 +224,19 @@ $primary = #3e85c7;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  height: 2.5rem;
+  background-color: transparent;
+  border: transparent;
+
+  transition: 250ms ease-in-out;
+
+  &:focus-visible {
+    background-color: white;
+    border: 1px solid #ccc;
+    outline: none;
+  }
 }

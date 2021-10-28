@@ -22,12 +22,8 @@
  */
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import Slider from 'rc-slider';
 
-// import ToggleSwitch from 'app/components/ToggleSwitch';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
-
-import './style.css';
 
 import {
     MODAL_PREVIEW
@@ -50,73 +46,48 @@ class Probe extends PureComponent {
             canClick,
             availableProbeCommands,
             selectedProbeCommand,
-            // useSafeProbeOptixon,
         } = state;
         const probeCommand = availableProbeCommands[selectedProbeCommand] || false;
-
-        const marks = {
-            ...availableProbeCommands.map((command, index) => (index === selectedProbeCommand
-                ? <strong style={{ fontSize: '16px' }}>{command.id.split(' ')[0]}</strong>
-                : <span>{command.id.split(' ')[0]}</span>))
-        };
 
         return (
             <div className={styles.mainWrapper}>
                 <div className={styles.mainGrid}>
-                    <div className={styles.mainGridItem}>
-                        <label>Axis</label>
+                    <div className={styles.secondaryFlexbox}>
+                        <div className={styles.mainGridItem}>
+                            <label style={{ margin: 0 }}>Axis</label>
 
-                        <div className={styles.sliderWrapper}>
-                            <Slider
-                                min={0}
-                                max={availableProbeCommands.length - 1}
-                                value={selectedProbeCommand}
-                                included={false}
-                                marks={marks}
-                                step={null}
-                                onChange={actions.handleProbeCommandChange}
-                                activeDotStyle={{ display: 'none' }}
-                                handleStyle={{
-                                    width: '0px',
-                                    height: '0px',
-                                    borderTop: '12px solid #3e85c7',
-                                    borderBottom: 'none',
-                                    borderLeft: '8px solid transparent',
-                                    borderRight: '8px solid transparent',
-                                    background: 'transparent',
-                                    borderRadius: 0,
-                                    outline: 'none',
-                                    boxShadow: 'none',
-                                    marginLeft: '-8px',
-                                    marginTop: '-3px'
-                                }}
-                            />
+                            <div className={styles.axisButtonsWrapper}>
+                                {
+                                    availableProbeCommands.map((command, index) => (
+                                        <FunctionButton
+                                            key={command.id}
+                                            onClick={() => actions.handleProbeCommandChange(index)}
+                                            className={index === selectedProbeCommand ? styles.axisButtonActive : styles.axisButton}
+                                        >
+                                            { index === selectedProbeCommand && (<div className={styles.axisButtonActiveIndicator} />) }
+                                            {command.id.split(' ')[0]}
+                                        </FunctionButton>
+                                    ))
+                                }
+                            </div>
+                        </div>
+                        <div className={styles.mainGridItem}>
+                            <label>Tool</label>
+                            <div className={styles.toolsWrapper}>
+                                <ProbeDiameter actions={actions} state={state} probeCommand={probeCommand} />
+                            </div>
                         </div>
                     </div>
 
                     <div className={styles.mainGridItem}>
-                        {/* {
-                            probeCommand && probeCommand.safe && (
-                                <div className="form-group hidden">
-                                    <div className={styles.rowSpread}>
-                                        <label htmlFor="exampleInputEmail2">Use Safe Probe:</label>
-                                        <ToggleSwitch checked={useSafeProbeOption} onChange={actions.handleSafeProbeToggle} />
-                                    </div>
-                                    <span id="helpBlock" className="help-block">Safe probe probes from the top and right to avoid breaking bits.</span>
-                                </div>
-                            )
-                        } */}
-                        <label>Tools</label>
-                        <div className={styles.toolsWrapper}>
-                            <ProbeDiameter actions={actions} state={state} probeCommand={probeCommand} />
-                            <FunctionButton
-                                onClick={() => actions.openModal(MODAL_PREVIEW)}
-                                disabled={!canClick}
-                                className={styles.probeButton}
-                            >
-                                Probe
-                            </FunctionButton>
-                        </div>
+                        <div />
+                        <FunctionButton
+                            onClick={() => actions.openModal(MODAL_PREVIEW)}
+                            disabled={!canClick}
+                            className={styles.probeButton}
+                        >
+                            Probe
+                        </FunctionButton>
                     </div>
                 </div>
                 <ProbeImage probeCommand={probeCommand} />

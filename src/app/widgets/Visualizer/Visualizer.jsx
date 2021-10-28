@@ -563,12 +563,12 @@ class Visualizer extends Component {
         return visibleWidth;
     }
 
-    // TODO: fix resizing on visualizer
     getVisibleHeight() {
-        const { containerID } = this.props;
+        const { containerID, isSecondary } = this.props;
         const container = document.getElementById(containerID);
 
-        const clientHeight = container.clientHeight - 30;
+        const clientHeight = isSecondary ? container.clientHeight - 2 : container.clientHeight - 30;
+
         return clientHeight;
     }
 
