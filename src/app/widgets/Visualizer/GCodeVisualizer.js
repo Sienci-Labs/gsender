@@ -103,8 +103,9 @@ class GCodeVisualizer {
         if (this.frames.length === 0) {
             return;
         }
-
-        const defaultColor = new THREE.Color('#5191CC');
+        const { cuttingCoordinateLine } = this.theme;
+        //const defaultColor = new THREE.Color('#f9a13b');
+        const defaultColor = new THREE.Color(cuttingCoordinateLine);
 
         frameIndex = Math.min(frameIndex, this.frames.length - 1);
         frameIndex = Math.max(frameIndex, 0);
