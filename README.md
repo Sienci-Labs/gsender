@@ -99,6 +99,19 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### Open Beta 0.7.6 (Oct 22, 2021)
+* Unlock button on UI to avoid homing/unlock from M0 state
+* More user-friendly number inputs that allow clearing are more forgiving on changing value
+* Minimize Renders turned on by default when lite mode toggled on
+* Styling changes to probe widget
+* Various UI look and feel changes
+* New machine profiles
+* Slight alteration to colour of lines that have entered planner to make them more visible
+* Fixed issue with jog/play shortcuts
+* Fixed bug where homing using the visualizer Home button did not unlock rapid position buttons
+* Fixed issue where firmware settings could be sent when machine was locked/alarmed resulting in settings not updating
+* Fixed issue where M0 commands in toolchange hooks would result in post hook not executing
+
 ### Open Beta 0.7.5 (Oct 22, 2021)
 * Improvements to surfacing tool - new motions and layout
 * Improvements to pause commands (M0/M1) in macros
