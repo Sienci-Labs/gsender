@@ -54,7 +54,9 @@ import {
     METRIC_STEPS,
     // Workflow
     GRBL_ACTIVE_STATE_JOG,
-    GRBL_ACTIVE_STATE_IDLE, WORKFLOW_STATE_IDLE,
+    GRBL_ACTIVE_STATE_RUN,
+    GRBL_ACTIVE_STATE_IDLE,
+    WORKFLOW_STATE_IDLE,
     //GRBL_ACTIVE_STATE_HOLD,
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
@@ -1057,6 +1059,24 @@ class AxesWidget extends PureComponent {
         return (activeState === GRBL_ACTIVE_STATE_JOG);
     }
 
+    canClickCancel() {
+        //const { isContinuousJogging } = this.state;
+        const { workflow, isConnected, activeState } = this.props;
+
+        if (!isConnected) {
+            return false;
+        }
+        if (workflow.state === WORKFLOW_STATE_RUNNING) {
+            return false;
+        }
+        const states = [
+            GRBL_ACTIVE_STATE_IDLE,
+            GRBL_ACTIVE_STATE_RUN,
+            GRBL_ACTIVE_STATE_JOG
+        ];
+        return includes(states, activeState);
+    }
+
     render() {
         const { widgetId, machinePosition, workPosition, canJog } = this.props;
         const { minimized, isFullscreen } = this.state;
@@ -1068,6 +1088,7 @@ class AxesWidget extends PureComponent {
             ...this.state,
             // Determine if the motion button is clickable
             canClick: this.canClick(),
+            canClickCancel: this.canClickCancel(),
             isJogging: this.isJogging(),
             activeState: activeState,
             // Output machine position with the display units

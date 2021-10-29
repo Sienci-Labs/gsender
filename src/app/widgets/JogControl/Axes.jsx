@@ -33,6 +33,7 @@ const Axes = (props) => {
         <div className={styles.jogWidget}>
             <Keypad
                 canClick={state.canClick}
+                canClickCancel={state.canClickCancel}
                 units={state.units}
                 axes={state.axes}
                 jog={state.jog}
