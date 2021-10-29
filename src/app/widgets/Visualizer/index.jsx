@@ -1055,12 +1055,13 @@ class VisualizerWidget extends PureComponent {
     }
 
     render() {
-        const { renderState, isSecondary, gcode, surfacingData, activeVisualizer, activeState, alarmCode, workflow } = this.props;
+        const { renderState, isSecondary, gcode, surfacingData, activeVisualizer, activeState, alarmCode, workflow, isConnected } = this.props;
         const state = {
             ...this.state,
             alarmCode,
             activeState,
             workflow,
+            isConnected,
             isAgitated: this.isAgitated()
         };
         const actions = {
