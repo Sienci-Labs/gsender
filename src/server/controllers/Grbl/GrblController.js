@@ -1533,7 +1533,7 @@ class GrblController {
 
                     // Convert feedrate to metric if working in imperial - easier to convert feedrate and treat everything else as MM than opposite
                     if (units !== METRIC_UNITS) {
-                        feedrate = (feedrate * 25.5).toFixed(2);
+                        feedrate = (feedrate * 25.4).toFixed(2);
                         unitModal = 'G21';
                     }
 
