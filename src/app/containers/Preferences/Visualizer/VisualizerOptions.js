@@ -9,7 +9,7 @@ import Fieldset from '../components/Fieldset';
 import styles from '../index.styl';
 
 const VisualizerOptions = ({ state, actions }) => {
-    const { objects, disabled, disabledLite, minimizeRenders } = state.visualizer;
+    const { objects, disabled, disabledLite } = state.visualizer;
     const visualizerActions = actions.visualizer;
 
     return (
@@ -42,11 +42,17 @@ const VisualizerOptions = ({ state, actions }) => {
                 </div>
                 <small>Specify which visualizer features are enabled or disable in both regular mode and light-mode, in order to save computer resources</small>
             </div>
-            <div className={styles.flexRow}>
+            {
+                /*
+                            <div className={styles.flexRow}>
                 <span>Force minimal renders</span>
                 <ToggleSwitch checked={minimizeRenders} onChange={() => visualizerActions.handleMinimizeRenderToggle()} />
             </div>
             <small>This will force the visualizer to only re-render when new information is received from the controller during a job, increasing performance</small>
+
+                 */
+            }
+
         </Fieldset>
     );
 };

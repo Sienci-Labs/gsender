@@ -561,7 +561,8 @@ class VisualizerWidget extends PureComponent {
             this.renderIfNecessary(shouldRenderVisualization);
 
             this.setState({
-                liteMode: newLiteModeValue
+                liteMode: newLiteModeValue,
+                minimizeRenders: newLiteModeValue
             });
         },
         lineWarning: {
