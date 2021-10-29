@@ -300,7 +300,6 @@ class GrblController {
             }
 
             if (this.runner.isAlarm()) {
-                console.log('DATA ALARM');
                 this.feeder.reset();
                 this.emit('workflow:state', this.workflow.state); // Propogate alarm code to UI
                 log.warn('Stopped sending G-code commands in Alarm mode');
@@ -1536,7 +1535,6 @@ class GrblController {
                     if (units !== METRIC_UNITS) {
                         feedrate = (feedrate * 25.5).toFixed(2);
                         unitModal = 'G21';
-                        console.log(feedrate);
                     }
 
                     const OFFSET = 0.1;

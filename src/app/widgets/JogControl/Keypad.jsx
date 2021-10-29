@@ -150,7 +150,6 @@ class Keypad extends PureComponent {
 
     render() {
         const { canClick, canClickCancel, actions, axes, activeState, selectedSpeed } = this.props;
-        console.log(canClickCancel);
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;

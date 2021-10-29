@@ -461,8 +461,6 @@ class AxesWidget extends PureComponent {
         setJogFromPreset: (presetKey) => {
             const { jog, units } = this.state;
             const jogObj = jog[presetKey][units];
-            console.log('in preset');
-            console.log(presetKey);
 
             this.setState({
                 jog: {
