@@ -15,7 +15,7 @@ Some things that we’re looking to accomplish with this sender:
 * Built-in gadgets for surface probing, stock flattening, firmware editing, and g-code editing with syntax highlighting, command navigation, and more
 * 3D cutting visualization
 
-![gSender](https://sienci.com/wp-content/uploads/2021/05/gSender-Main-Screen-0.6.4.png)
+![gSender](https://resources.sienci.com/wp-content/uploads/2021/04/gSender-main-page-machine-interface-850x479.png)
 
 ## 💻 Download [![Github All Releases](https://img.shields.io/github/downloads/Sienci-Labs/gsender/total.svg)]()
 
