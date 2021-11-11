@@ -35,11 +35,13 @@ const convertAvailableTools = (tools, units) => {
     const optionLabels = [];
 
     for (let tool of tools) {
-        let diameter = (units === METRIC_UNITS) ? tool.metricDiameter : tool.imperialDiameter;
-        optionLabels.push({
-            value: diameter,
-            label: `${diameter} ${units}`
-        });
+        if (tool !== PROBE_TYPE_AUTO || tool !== PROBE_TYPE_TIP) {
+            let diameter = (units === METRIC_UNITS) ? tool.metricDiameter : tool.imperialDiameter;
+            optionLabels.push({
+                value: diameter,
+                label: `${diameter} ${units}`
+            });
+        }
     }
     return optionLabels;
 };
@@ -68,8 +70,8 @@ const ProbeDiameter = ({ actions, state, probeCommand }) => {
 
     if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
         options.push(
-            { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP },
             { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO },
+            { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP },
         );
     }
 

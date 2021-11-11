@@ -42,9 +42,9 @@ const TouchPlate = ({ state, actions, values, type, onTypeChange }) => {
                 <label htmlFor="touchplateType">Touchplate Type</label>
                 <Select
                     options={[
-                        //{ label: TOUCHPLATE_TYPE_AUTOZERO, value: TOUCHPLATE_TYPE_AUTOZERO },
                         { label: TOUCHPLATE_TYPE_STANDARD, value: TOUCHPLATE_TYPE_STANDARD },
                         { label: TOUCHPLATE_TYPE_ZERO, value: TOUCHPLATE_TYPE_ZERO },
+                        { label: TOUCHPLATE_TYPE_AUTOZERO, value: TOUCHPLATE_TYPE_AUTOZERO },
                     ]}
                     placeholder="Select Type"
                     value={{ label: type, value: type }}
