@@ -40,6 +40,7 @@ import FeedControlButton from './FeedControlButton';
  */
 const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
     const { units } = state;
+    const unitString = `${units}/min`;
     if (units !== METRIC_UNITS) {
         spindle = mapPositionToUnits(spindle, units);
         feedrate = mapPositionToUnits(feedrate, units);
@@ -75,7 +76,7 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
         <div className={styles['settings-area']}>
             <div className={styles.overrides}>
                 <span>Feed:</span>
-                <span className={styles.overrideValue}>{feedrate}</span>
+                <span className={styles.overrideValue}>{feedrate}{unitString}</span>
                 <FeedControlButton value={-10} onClick={handleFeedRateChange}>- -</FeedControlButton>
                 <FeedControlButton value={-1} onClick={handleFeedRateChange}>-</FeedControlButton>
                 <FeedControlButton value={1} onClick={handleFeedRateChange}>+</FeedControlButton>
@@ -85,7 +86,7 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
             </div>
             <div className={styles.overrides}>
                 <span>{ spindleOverrideLabel }:</span>
-                <span className={styles.overrideValue}>{spindle}</span>
+                <span className={styles.overrideValue}>{spindle}{unitString}</span>
                 <FeedControlButton value={-10} onClick={handleSpindleSpeedChange}>- -</FeedControlButton>
                 <FeedControlButton value={-1} onClick={handleSpindleSpeedChange}>-</FeedControlButton>
                 <FeedControlButton value={1} onClick={handleSpindleSpeedChange}>+</FeedControlButton>
