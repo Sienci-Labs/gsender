@@ -390,9 +390,6 @@ class GrblController {
                     }
                 }*/
 
-                if (_.includes(words, 'G28') && !machineProfile.endstops) {
-                    line = line.replace('G28', '(G28)');
-                }
 
                 // More aggressive updating of spindle modals for safety
                 const spindleCommand = _.intersection(words, ['M3', 'M4'])[0];

@@ -1061,5 +1061,25 @@ export default [
         'spindle': false,
         'coolant': false,
         'laser': false
+    },
+    {
+        'id': 52,
+        'company': 'Generic',
+        'name': '',
+        'type': 'GRBL',
+        'mm': {
+            'width': 530,
+            'depth': 450,
+            'height': 465
+        },
+        'in': {
+            'width': 20.8,
+            'depth': 17.7,
+            'height': 18.3
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false
     }
 ];
