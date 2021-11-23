@@ -788,6 +788,52 @@ class ProbeWidget extends PureComponent {
         return code;
     }
 
+    generateAutoZeroAxesProbe(axes, diameter) {
+        const code = [];
+
+        if (axes.z && axes.y && axes.z) {
+            code.push(
+                '(Probe XYZ AutoZero Specific Diameter)',
+                'G21 G91',
+                '(Probe Z)',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
+                'G38.2 Z-5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 Z5',
+                'G21 G91 G0 Z2',
+                '(Probe X)',
+                'G21 G91 G0 X13',
+                'G38.2 X30 F250',
+                'G21 G91 G0 X-2',
+                'G38.2 X5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 X19.325',
+                'G21 G90 G0 X0',
+                '(Probe Y)',
+                'G21 G91 G0 Y13',
+                'G38.2 Y30 F250',
+                'G21 G91 G0 Y-2',
+                'G38.2 Y5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 Y19.325',
+                'G21 G90 G0 X0 Y0',
+                'G10 L20 P1 X22.5 Y22.5',
+                'G21 G90 G0 X0 Y0',
+                'G21 G90 G0 Z0.5',
+            );
+        } else if (axes.x && axes.y) {
+            code.push();
+        } else if (axes.z) {
+            code.push();
+        } else if (axes.y) {
+            code.push();
+        } else if (axes.z) {
+            code.push();
+        }
+
+        return code;
+    }
     generateTipProbe(axes) {
         const code = [];
 
@@ -953,6 +999,11 @@ class ProbeWidget extends PureComponent {
         }
         if (toolDiameter === 'Tip') {
             return this.generateTipProbe(axes);
+        }
+
+        const { selectedProfile } = this.state.touchplate;
+        if (selectedProfile.touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
+            return this.generateAutoZeroAxesProbe(axes, toolDiameter);
         }
 
         // Grab units for correct modal
