@@ -659,13 +659,13 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Z2',
                 '(Probe X)',
                 'G21 G91 G0 X-13',
-                'G38.2 X-30 F250',
+                'G38.2 X-30 F150',
                 'G21 G91 G0 X2',
                 'G38.2 X-5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 X0',
                 'G21 G91 G0 X26',
-                'G38.2 X30 F250',
+                'G38.2 X30 F150',
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
@@ -687,7 +687,6 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 X0 Y0',
                 'G10 L20 P1 X22.5 Y22.5',
                 'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',
             );
         } else if (axes.x && axes.y) {
             code.push(
@@ -697,13 +696,13 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Z2',
                 '(Probe X)',
                 'G21 G91 G0 X-13',
-                'G38.2 X-30 F250',
+                'G38.2 X-30 F150',
                 'G21 G91 G0 X2',
                 'G38.2 X-5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 X0',
                 'G21 G91 G0 X26',
-                'G38.2 X30 F250',
+                'G38.2 X30 F150',
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
@@ -711,13 +710,13 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 X0',
                 '(Probe Y)',
                 'G21 G91 G0 Y-13',
-                'G38.2 Y-30 F250',
+                'G38.2 Y-30 F150',
                 'G21 G91 G0 Y2',
                 'G38.2 Y-5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 Y0',
                 'G21 G91 G0 Y26',
-                'G38.2 Y30 F250',
+                'G38.2 Y30 F150',
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
@@ -725,7 +724,6 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 X0 Y0',
                 'G10 L20 P1 X22.5 Y22.5',
                 'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',
             );
         } else if (axes.z) {
             code.push(
@@ -747,17 +745,20 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Z2',
                 '(Probe X)',
                 'G21 G91 G0 X-13',
-                'G38.2 X-30 F250',
+                'G38.2 X-30 F150',
                 'G21 G91 G0 X2',
                 'G38.2 X-5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 X0',
                 'G21 G91 G0 X26',
-                'G38.2 X30 F250',
+                'G38.2 X30 F150',
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 X[posx/2]',
+                'G21 G90 G0 X0',
+                'G10 L20 P1 X22.5',
+                'G21 G91 G0 Z30',
                 'G21 G90 G0 X0',
             );
         } else if (axes.y) {
@@ -768,21 +769,22 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Z2',
                 '(Probe Y)',
                 'G21 G91 G0 Y-13',
-                'G38.2 Y-30 F250',
+                'G38.2 Y-30 F150',
                 'G21 G91 G0 Y2',
                 'G38.2 Y-5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 Y0',
                 'G21 G91 G0 Y26',
-                'G38.2 Y30 F250',
+                'G38.2 Y30 F150',
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 Y[posy/2]',
-                'G21 G90 G0 X0 Y0',
-                'G10 L20 P1 X22.5 Y22.5',
-                'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',);
+                'G21 G90 G0 Y0',
+                'G10 L20 P1 Y22.5',
+                'G21 G91 G0 Z30',
+                'G21 G90 G0 Y0',
+            );
         }
 
         return code;
@@ -790,6 +792,10 @@ class ProbeWidget extends PureComponent {
 
     generateAutoZeroAxesProbe(axes, diameter) {
         const code = [];
+
+        const toolRadius = (diameter / 2);
+        const toolCompensatedThickness = ((-1 * toolRadius));
+        console.log(toolCompensatedThickness);
 
         if (axes.z && axes.y && axes.z) {
             code.push(
@@ -823,9 +829,43 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 Z0.5',
             );
         } else if (axes.x && axes.y) {
-            code.push();
+            code.push(
+                '(Probe XY AutoZero Specific Diameter)',
+                'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
+                '(Probe X)',
+                'G21 G91 G0 X13',
+                'G38.2 X30 F250',
+                'G21 G91 G0 X-2',
+                'G38.2 X5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 X19.325',
+                'G21 G90 G0 X0',
+                '(Probe Y)',
+                'G21 G91 G0 Y13',
+                'G38.2 Y30 F250',
+                'G21 G91 G0 Y-2',
+                'G38.2 Y5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 Y19.325',
+                'G21 G90 G0 X0 Y0',
+                'G10 L20 P1 X22.5 Y22.5',
+                'G21 G90 G0 X0 Y0',
+                'G21 G90 G0 Z0.5',
+            );
         } else if (axes.z) {
-            code.push();
+            code.push(
+                '(Probe Z AutoZero Specific Diameter)',
+                'G21 G91',
+                '(Probe Z)',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
+                'G38.2 Z-5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 Z5',
+                'G21 G91 G0 Z2',
+            );
         } else if (axes.y) {
             code.push();
         } else if (axes.z) {
@@ -916,7 +956,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 X0 Y0',
                 'G10 L20 P1 X22.5 Y22.5',
                 'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',);
+            );
         } else if (axes.z) {
             code.push(
                 '(Probe Z Auto Tip)',
@@ -949,6 +989,7 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 'G10 L20 P1 X[posx/2]',
                 'G21 G90 G0 X0',
+                'G10 L20 P1 X22.5',
             );
         } else if (axes.y) {
             code.push(
@@ -967,10 +1008,8 @@ class ProbeWidget extends PureComponent {
                 'G38.2 Y5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 Y[posy/2]',
-                'G21 G90 G0 X0 Y0',
-                'G10 L20 P1 X22.5 Y22.5',
-                'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',
+                'G21 G90 G0 Y0',
+                'G10 L20 P1 Y22.5',
             );
         }
 
@@ -1000,9 +1039,7 @@ class ProbeWidget extends PureComponent {
         if (toolDiameter === 'Tip') {
             return this.generateTipProbe(axes);
         }
-
-        const { selectedProfile } = this.state.touchplate;
-        if (selectedProfile.touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
+        if (this.state.touchplate.touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
             return this.generateAutoZeroAxesProbe(axes, toolDiameter);
         }
 
