@@ -33,6 +33,7 @@ import {
 } from '../actions/controllerActions';
 import { in2mm } from '../lib/units';
 import { WORKFLOW_STATE_IDLE } from '../constants';
+import store from '../store';
 
 
 const initialState = {
@@ -103,6 +104,21 @@ function consolidateModals(state) {
     };
 }
 
+const updateMachineLimitsFromEEPROM = ({ settings }) => {
+    const { $130, $131, $132 } = settings;
+    let xmax = Number($130);
+    let ymax = Number($131);
+    let zmax = Number($132);
+    const machineProfile = store.get('workspace.machineProfile');
+    machineProfile.limits = {
+        ...machineProfile.limits,
+        xmax,
+        ymax,
+        zmax
+    };
+    store.set('workspace.machineProfile', machineProfile);
+};
+
 
 const reducer = createReducer(initialState, {
     [UPDATE_CONTROLLER_SETTINGS]: (payload, reducerState) => {
@@ -111,6 +127,8 @@ const reducer = createReducer(initialState, {
         const wpos = mapPosToFeedbackUnits(_get(state, 'status.wpos'), settings);
         const mpos = mapPosToFeedbackUnits(_get(state, 'status.mpos'), settings);
         const modal = consolidateModals(state);
+        console.log(updateMachineLimitsFromEEPROM(settings));
+
 
         return {
             type,

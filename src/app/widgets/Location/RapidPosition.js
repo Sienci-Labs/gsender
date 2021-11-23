@@ -29,7 +29,7 @@ export const BACK_RIGHT = 'BR';
 export const BACK_LEFT = 'BL';
 export const OTHER = 'OT';
 
-const OFFSET_DISTANCE = 0.9;
+const OFFSET_DISTANCE = 0.95;
 
 export const getHomingLocation = (setting) => {
     if (setting === '0') {
@@ -122,7 +122,7 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag) => 
     return [null, null];
 };
 
-export const getMovementGCode = (requestedPosition, homingPositionSetting, homingFlag) => {
+export const getMovementGCode = (requestedPosition, homingPositionSetting, homingFlag, eeprom) => {
     const gcode = [];
 
     gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`); // Always move up to the limit of Z travel minus offset
