@@ -693,6 +693,8 @@ class ProbeWidget extends PureComponent {
             code.push(
                 '(Probe XY Auto Endmill)',
                 'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
                 '(Probe X)',
                 'G21 G91 G0 X-13',
                 'G38.2 X-30 F250',
@@ -741,6 +743,8 @@ class ProbeWidget extends PureComponent {
             code.push(
                 '(Probe X Auto Endmill)',
                 'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
                 '(Probe X)',
                 'G21 G91 G0 X-13',
                 'G38.2 X-30 F250',
@@ -760,6 +764,8 @@ class ProbeWidget extends PureComponent {
             code.push(
                 '(Probe Y Auto Endmill)',
                 'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
                 '(Probe Y)',
                 'G21 G91 G0 Y-13',
                 'G38.2 Y-30 F250',
@@ -832,6 +838,8 @@ class ProbeWidget extends PureComponent {
             code.push(
                 '(Probe XY Auto Tip)',
                 'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z0.5',
                 '(Probe X)',
                 'G21 G91 G0 X-3',
                 'G38.2 X-30 F150',
@@ -879,6 +887,8 @@ class ProbeWidget extends PureComponent {
             code.push(
                 '(Probe X Auto Tip)',
                 'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z0.5',
                 '(Probe X)',
                 'G21 G91 G0 X-3',
                 'G38.2 X-30 F150',
@@ -897,6 +907,8 @@ class ProbeWidget extends PureComponent {
         } else if (axes.y) {
             code.push(
                 '(Probe Y Auto Tip)',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z0.5',
                 'G21 G91 G0 Y-7',
                 'G38.2 Y-10 F150',
                 'G21 G91 G0 Y2',
