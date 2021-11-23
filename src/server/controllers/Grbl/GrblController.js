@@ -371,7 +371,7 @@ class GrblController {
                     }
                 }
 
-                const machineProfile = store.get('machineProfile');
+                //const machineProfile = store.get('machineProfile');
                 //const preferences = store.get('preferences');
 
                 /*if (line) {
