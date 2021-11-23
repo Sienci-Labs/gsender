@@ -852,7 +852,6 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 X0 Y0',
                 'G10 L20 P1 X22.5 Y22.5',
                 'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',
             );
         } else if (axes.z) {
             code.push(
@@ -867,9 +866,37 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Z2',
             );
         } else if (axes.y) {
-            code.push();
-        } else if (axes.z) {
-            code.push();
+            code.push(
+                '(Probe Y)',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
+                'G21 G91 G0 Y13',
+                'G38.2 Y30 F250',
+                'G21 G91 G0 Y-2',
+                'G38.2 Y5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 Y19.325',
+                'G21 G90 G0 Y0',
+                'G10 L20 P1 Y22.5',
+                'G21 G91 G0 Z30',
+                'G21 G90 G0 Y0',
+            );
+        } else if (axes.x) {
+            code.push(
+                '(Probe X)',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
+                'G21 G91 G0 X13',
+                'G38.2 X30 F250',
+                'G21 G91 G0 X-2',
+                'G38.2 X5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 X19.325',
+                'G21 G90 G0 X0',
+                'G10 L20 P1 X22.5',
+                'G21 G91 G0 Z30',
+                'G21 G90 G0 X0',
+            );
         }
 
         return code;
