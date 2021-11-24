@@ -84,6 +84,10 @@ export function* initialize() {
     controller.addListener('serialport:open', (options) => {
         const machineProfile = store.get('workspace.machineProfile');
         const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
+        // Reset homing run flag to prevent rapid position without running homing
+        reduxStore.dispatch({
+            type: controllerActions.RESET_HOMING,
+        });
 
         if (machineProfile) {
             controller.command('machineprofile:load', machineProfile);
@@ -107,6 +111,10 @@ export function* initialize() {
     });
 
     controller.addListener('serialport:close', (options) => {
+        // Reset homing run flag to prevent rapid position without running homing
+        reduxStore.dispatch({
+            type: controllerActions.RESET_HOMING,
+        });
         reduxStore.dispatch({
             type: connectionActions.CLOSE_CONNECTION,
             payload: { options }

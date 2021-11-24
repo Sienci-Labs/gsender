@@ -29,9 +29,10 @@ import {
     UPDATE_CONTROLLER_SETTINGS,
     UPDATE_CONTROLLER_STATE,
     UPDATE_FEEDER_STATUS, UPDATE_SENDER_STATUS, UPDATE_WORKFLOW_STATE,
-    UPDATE_HOMING_FLAG
+    UPDATE_HOMING_FLAG,
+    RESET_HOMING
 } from '../actions/controllerActions';
-import { in2mm } from '../lib/units';
+import { in2mm, mm2in } from '../lib/units';
 import { WORKFLOW_STATE_IDLE } from '../constants';
 import store from '../store';
 
@@ -116,6 +117,16 @@ const updateMachineLimitsFromEEPROM = ({ settings }) => {
         ymax,
         zmax
     };
+    machineProfile.mm = {
+        depth: ymax,
+        height: zmax,
+        width: xmax
+    };
+    machineProfile.in = {
+        depth: Number(mm2in(ymax).toFixed(2)),
+        height: Number(mm2in(zmax).toFixed(2)),
+        width: Number(mm2in(xmax).toFixed(2))
+    };
     store.set('workspace.machineProfile', machineProfile);
 };
 
@@ -127,7 +138,7 @@ const reducer = createReducer(initialState, {
         const wpos = mapPosToFeedbackUnits(_get(state, 'status.wpos'), settings);
         const mpos = mapPosToFeedbackUnits(_get(state, 'status.mpos'), settings);
         const modal = consolidateModals(state);
-        console.log(updateMachineLimitsFromEEPROM(settings));
+        updateMachineLimitsFromEEPROM(settings);
 
 
         return {
@@ -182,6 +193,12 @@ const reducer = createReducer(initialState, {
         return {
             homingFlag,
             homingRun: true
+        };
+    },
+    [RESET_HOMING]: (payload, reducerState) => {
+        return {
+            homingFlag: false,
+            homingRun: false
         };
     }
 });
