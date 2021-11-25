@@ -183,11 +183,11 @@ class DisplayPanel extends PureComponent {
                                     controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
                                 }
                             }
-                            controller.command('gcode', 'G90');
-                            controller.command('gcode', `G0 ${axisLabel}0`); //Move to Work Position Zero
+                            controller.command('gcode', `G90 G0 ${axisLabel}0`); //Move to Work Position Zero
                             // We go down if homing not enabled
                             if (safeRetractHeight !== 0 && axisLabel !== 'Z' && !homingEnabled) {
                                 controller.command('gcode', `G91 G0 Z${safeRetractHeight * -1}`);
+                                controller.command('gcode', 'G90');
                             }
                         }}
                     />
