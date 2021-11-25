@@ -65,11 +65,15 @@
   margin: 0;
   border: 0;
   --tw-bg-opacity: 0.8;
-  font-size: 0.8rem;
+  transition: background 250ms ease-in-out;
 
-   &:hover{
-      background-color: #193550;
-    }
+  &:hover {
+    background: #193550;
+  }
+
+  i {
+    font-size: 1.2rem !important;
+  }
 }
 
 
@@ -85,9 +89,9 @@
   background: #060d14;
 
   h5 {
-    padding-left: 10px;
+    padding: 0 0.5rem;
     color: #CCCCCC;
-    font-size: 0.8rem;
+    font-size: 1rem;
     border-bottom: solid 1px #4B5563;
   }
 }
@@ -151,7 +155,6 @@
   height: 100%;
   border: none;
   margin: 0;
-  // padding: 0.25rem 1rem;
   border-radius: .25rem;
   background: #DC2626;
   box-sizing: border-box;
@@ -208,15 +211,25 @@
 
 
 .other-devices {
-  padding: 0 10px;
+  $bgColor = #000000;
+  padding: 0.5rem;
   color: #CCCCCC;
-  font-size: 0.8rem;
+  font-size: 1rem;
   border: none;
   outline: none;
   width: 100%;
   border-top: solid 1px #111827;
   display: flex;
   align-items center;
-  background: #000000;
+  background: $bgColor;
   justify-content space-between;
+  transition: background 250ms ease-in-out;
+
+  i {
+    font-size: 1.25rem !important;
+  }
+
+  &:hover {
+    background: lighten($bgColor, 25);
+  }
 }
