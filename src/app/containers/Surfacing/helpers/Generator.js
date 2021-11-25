@@ -258,7 +258,7 @@ export default class Generator {
         const Z = depth * -1;
         const { x: xFactor, y: yFactor } = axisFactors;
 
-        let startPosY = stepoverAmount * 3;
+        let startPosY = stepoverAmount;
         let endPosY = stepoverAmount * 2;
 
         //Draw initial full rectangle covering full length and width of the machine
@@ -270,28 +270,26 @@ export default class Generator {
             `G1 X${fixedVal(width) * xFactor}`,
             'G1 Y0',
             'G1 X0',
-            `G1 Y${fixedVal(stepoverAmount) * yFactor}`, //-1
         );
 
         // eslint-disable-next-line no-constant-condition
         while (true) {
-            if (endPosY >= length) {
+            if (endPosY > length) {
                 break;
             }
 
-            let newStartPosY = Number(fixedVal(startPosY + (stepoverAmount)));
-            let newEndPosY = Number(fixedVal(endPosY + (stepoverAmount * 3)));
-
             gCodeArr.push(
                 '\n',
+                `G1 Y${fixedVal(startPosY) * yFactor}`,
                 `G1 X${width * xFactor}`,
                 `G1 Y${fixedVal(endPosY) * yFactor}`,
                 'G1 X0',
-                `G1 Y${fixedVal(startPosY) * yFactor}`
             );
 
+            const newEndPosY = Number(fixedVal(endPosY + (stepoverAmount)));
+
             startPosY = newEndPosY;
-            endPosY = newStartPosY;
+            endPosY = newEndPosY + stepoverAmount;
         }
 
         const workspaceUnits = store.get('workspace.units');
