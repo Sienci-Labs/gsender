@@ -84,6 +84,11 @@ function mapPosToFeedbackUnits(pos, settings) {
     });
 }
 
+function mapFeedrateToFeedbackUnits(feedrate, settings) {
+    const $13 = ensurePositiveNumber(_get(settings, 'settings.$13'));
+    return ($13 > 0) ? in2mm(feedrate) : feedrate;
+}
+
 
 function consolidateModals(state) {
     const defaultModals = {
@@ -140,7 +145,6 @@ const reducer = createReducer(initialState, {
         const modal = consolidateModals(state);
         updateMachineLimitsFromEEPROM(settings);
 
-
         return {
             type,
             settings,
@@ -150,11 +154,12 @@ const reducer = createReducer(initialState, {
         };
     },
     [UPDATE_CONTROLLER_STATE]: (payload, reducerState) => {
-        const { type, state } = payload;
+        let { type, state } = payload;
         const settings = _get(reducerState, 'settings');
         const modal = consolidateModals(state);
         const wpos = mapPosToFeedbackUnits(_get(state, 'status.wpos'), settings);
         const mpos = mapPosToFeedbackUnits(_get(state, 'status.mpos'), settings);
+        state.status.feedrate = mapFeedrateToFeedbackUnits(_get(state, 'status.feedrate'), settings);
 
         return {
             type,

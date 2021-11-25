@@ -86,7 +86,7 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
             </div>
             <div className={styles.overrides}>
                 <span>{ spindleOverrideLabel }:</span>
-                <span className={styles.overrideValue}>{spindle}<span className={styles.unitString}>{unitString}</span></span>
+                <span className={styles.overrideValue}>{spindle}<span className={styles.unitString}>rpm</span></span>
                 <FeedControlButton value={-10} onClick={handleSpindleSpeedChange}>- -</FeedControlButton>
                 <FeedControlButton value={-1} onClick={handleSpindleSpeedChange}>-</FeedControlButton>
                 <FeedControlButton value={1} onClick={handleSpindleSpeedChange}>+</FeedControlButton>
