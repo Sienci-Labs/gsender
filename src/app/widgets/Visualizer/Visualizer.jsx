@@ -204,7 +204,7 @@ class Visualizer extends Component {
         this.subscribe();
         this.addControllerEvents();
         this.addResizeEventListener();
-        store.on('change', this.changeMachineProfile);
+        //store.on('change', this.changeMachineProfile);
         if (this.node) {
             const el = ReactDOM.findDOMNode(this.node);
             this.createScene(el);
