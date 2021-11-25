@@ -31,6 +31,7 @@ import merge from 'lodash/merge';
 import uniq from 'lodash/uniq';
 import semver from 'semver';
 import { TOUCHPLATE_TYPE_STANDARD, TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
+import { MODAL_HELP } from 'app/containers/NavSidebar/constants';
 import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
 import log from '../lib/log';
@@ -213,6 +214,8 @@ const migrateStore = () => {
     }
 
     //  1.0.1 - changes to go to axis zero naming and payload
+    //        - update default touchplate type if its none of the 3 options
+    //        - update payload for opening help modal
     if (semver.lt(cnc.version, '1.0.1')) {
         const currentCommandKeys = store.get('commandKeys', []);
         const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
@@ -220,6 +223,10 @@ const migrateStore = () => {
 
         const updateCommands = (commands) => {
             return commands.map(command => {
+                if (command.title === 'Help') {
+                    return { ...command, payload: { toolbar: MODAL_HELP } };
+                }
+
                 if (command.category !== LOCATION_CATEGORY) {
                     return command;
                 }
@@ -243,34 +250,6 @@ const migrateStore = () => {
         if (![TOUCHPLATE_TYPE_STANDARD, TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_ZERO].includes(currentTouchplateType)) {
             store.replace('workspace.probeProfile.touchplateType', TOUCHPLATE_TYPE_STANDARD);
         }
-    }
-
-    //  0.7.6 - changes to go to axis zero naming and payload
-    if (semver.lt(cnc.version, '0.7.6')) {
-        const currentCommandKeys = store.get('commandKeys', []);
-        const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
-        const defaultCommandKeys = get(defaultState, 'commandKeys');
-
-        const updateCommands = (commands) => {
-            return commands.map(command => {
-                if (command.category !== LOCATION_CATEGORY) {
-                    return command;
-                }
-
-                const foundDefaultCommand = defaultCommandKeys.find(defaultCommand => defaultCommand.id === command.id);
-
-                return foundDefaultCommand ? { ...command, title: foundDefaultCommand.title, payload: foundDefaultCommand.payload } : command;
-            });
-        };
-        const updatedCommandKeys = updateCommands(currentCommandKeys);
-
-        const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
-            const updatedProfileShortcuts = updateCommands(profile.shortcuts);
-            return { ...profile, shortcuts: updatedProfileShortcuts };
-        });
-
-        store.replace('commandKeys', updatedCommandKeys);
-        store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
     }
 
     //  0.7.4 - changes to keyboard and gamepad profile shortcut payload shape for machine jogging
