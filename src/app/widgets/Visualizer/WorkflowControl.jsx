@@ -284,14 +284,6 @@ class WorkflowControl extends PureComponent {
         });
     }
 
-    errorInGCodeToast = () => {
-        Toaster.pop({
-            msg: `Error found at line: ${this.state.CurrentGCodeError}`,
-            type: TOASTER_UNTIL_CLOSE,
-            duration: 20000
-        });
-    }
-
     runOutline = () => {
         const { gcode } = this.props;
         Toaster.pop({

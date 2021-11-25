@@ -587,7 +587,8 @@ class GrblController {
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        this.emit('gcode_error', error, code, line);
+                        const msg = `Error ${code} on line ${received} - ${error.message}`;
+                        this.emit('gcode_error', msg);
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                     }
 

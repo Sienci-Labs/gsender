@@ -92,7 +92,7 @@ class ProbeWidget extends PureComponent {
     PROBE_DISTANCE_IMPERIAL = {
         X: 2,
         Y: 2,
-        Z: 1.5
+        Z: 1.2
     };
 
 
@@ -554,7 +554,7 @@ class ProbeWidget extends PureComponent {
         }
 
         const zPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
-        const xyPositionAdjust = (units === METRIC_UNITS) ? 20 : mm2in(20).toFixed(3);
+        const xyPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
         // We always probe X and Y based if we're running this function
         code = code.concat([
             // X First - move to left of plate
