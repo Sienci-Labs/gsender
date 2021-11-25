@@ -35,22 +35,22 @@ export const team = [
 export const timeline = [
     {
         id: 0,
-        date: 'January 29th',
+        date: 'January 29th, 2021',
         text: 'Closed Alpha Release'
     },
     {
         id: 1,
-        date: 'March 5th',
+        date: 'March 5th, 2021',
         text: 'Closed Beta Release'
     },
     {
         id: 2,
-        date: 'May 14th',
+        date: 'May 14th, 2021',
         text: 'Open Beta Release'
     },
     {
         id: 3,
-        date: 'TBA',
+        date: 'October 29th, 2021',
         text: 'Full Version Release',
         isLastInList: true
     },

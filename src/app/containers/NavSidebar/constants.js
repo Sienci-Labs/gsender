@@ -36,6 +36,7 @@ export const {
     'MODAL_PREFERENCES',
     'MODAL_WIZARD',
     'MODAL_FIRMWARE',
+    'MODAL_SURFACING',
     'MODAL_CALIBRATE',
     'MODAL_HELP'
 ]);
