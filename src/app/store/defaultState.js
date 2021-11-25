@@ -42,8 +42,10 @@ import {
     MODAL_PREFERENCES,
     MODAL_FIRMWARE,
     MODAL_SURFACING,
-    MODAL_CALIBRATE
+    MODAL_CALIBRATE,
+    MODAL_HELP
 } from 'app/containers/NavSidebar/constants';
+
 import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../widgets/JogControl/constants';
 
 const AXIS_X = 'x';
@@ -1131,7 +1133,7 @@ const defaultState = {
             title: 'Help',
             keys: 'f6',
             cmd: 'OPEN_TOOLBAR',
-            payload: { shouldOpenHelpPage: true },
+            payload: { toolbar: MODAL_HELP },
             preventDefault: false,
             isActive: true,
             category: TOOLBAR_CATEGORY,
