@@ -48,10 +48,6 @@ import Calibration from '../Calibration';
 class NavSidebar extends PureComponent {
     state = this.getInitialState();
 
-    openHelpPage = () => {
-        window.open('https://sienci.com/gsender-documentation/', '_blank');
-    }
-
     reconnectToLastDevice(port, baudrate, controllerType) {
         controller.openPort(port, {
             controllerType: controllerType,
@@ -73,11 +69,6 @@ class NavSidebar extends PureComponent {
                 if (port && baudrate) {
                     this.reconnectToLastDevice(port, baudrate, GRBL);
                 }
-                return;
-            }
-
-            if (shouldOpenHelpPage) {
-                this.openHelpPage();
                 return;
             }
 
