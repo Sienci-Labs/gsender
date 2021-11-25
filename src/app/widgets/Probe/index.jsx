@@ -32,7 +32,7 @@ import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import pubsub from 'pubsub-js';
-import { TOUCHPLATE_TYPE_AUTOZERO, PROBE_TYPE_AUTO, PROBE_TYPE_TIP, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
+import { TOUCHPLATE_TYPE_AUTOZERO, PROBE_TYPE_AUTO, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
 import store from 'app/store';
 import { mm2in } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
@@ -344,10 +344,6 @@ class ProbeWidget extends PureComponent {
         let toolDiameter;
 
         if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
-            availableTools.push(
-                { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO },
-                { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP },
-            );
             toolDiameter = PROBE_TYPE_AUTO;
         } else {
             toolDiameter = availableTools[0][units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'];
