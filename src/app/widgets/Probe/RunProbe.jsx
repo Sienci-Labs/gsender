@@ -137,7 +137,7 @@ class RunProbe extends PureComponent {
         const { canClick } = state;
         const probeCommands = actions.generateProbeCommands();
         const probeCommand = state.availableProbeCommands[state.selectedProbeCommand];
-        console.log(probeCommands);
+        console.log(probeCommands.join('\n'));
 
         const probeActive = actions.returnProbeConnectivity();
         const { connectionMade } = this.state;
