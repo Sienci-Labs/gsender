@@ -56,10 +56,14 @@
 }
 
 .settings-area {
-    min-height: 25px;
     primary = #D1D5DB;
     secondary = #333;
+
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    min-height: 25px;
+    
     label {
         margin-bottom: 0;
         background-color: primary;
@@ -111,13 +115,14 @@
 }
 
 .overrides {
+    width: 95%;
     display: grid;
     grid-gap: 0.25rem;
     gap: 0.25rem;
     align-items: center;
     justify-items: stretch;
     margin: 0.5rem auto;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-columns: 3fr 5fr 2fr 2fr 2fr 2fr 2fr 2fr;
     grid-template-rows: repeat(1, minmax(0, 1fr));
 }
 
@@ -171,5 +176,9 @@
 .progress-item-time {
     color: #3e85c7;
     font-size: 1.75rem;
-    margin: 4px 0; 
+    margin: 4px 0;
+}
+
+.unitString {
+    font-size: 0.7rem;
 }

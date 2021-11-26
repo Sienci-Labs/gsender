@@ -1061,5 +1061,85 @@ export default [
         'spindle': false,
         'coolant': false,
         'laser': false
-    }
+    },
+    {
+        'id': 52,
+        'company': 'Generic',
+        'name': '',
+        'type': 'GRBL',
+        'mm': {
+            'width': 530,
+            'depth': 450,
+            'height': 465
+        },
+        'in': {
+            'width': 20.8,
+            'depth': 17.7,
+            'height': 18.3
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false
+    },
+    {
+        'id': 53,
+        'company': 'Carbide 3D',
+        'name': 'Shapeoko',
+        'type': '4 Standard',
+        'mm': {
+            'width': 444.5,
+            'depth': 444.5,
+            'height': 101.6
+        },
+        'in': {
+            'width': 17.5,
+            'depth': 17.5,
+            'height': 4
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false
+    },
+    {
+        'id': 54,
+        'company': 'Carbide 3D',
+        'name': 'Shapeoko',
+        'type': '4 XL',
+        'mm': {
+            'width': 838.2,
+            'depth': 444.5,
+            'height': 101.6
+        },
+        'in': {
+            'width': 33,
+            'depth': 17.5,
+            'height': 4
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false
+    },
+    {
+        'id': 55,
+        'company': 'Carbide 3D',
+        'name': 'Shapeoko',
+        'type': '4 XXL',
+        'mm': {
+            'width': 838.2,
+            'depth': 838.2,
+            'height': 101.6
+        },
+        'in': {
+            'width': 33,
+            'depth': 33,
+            'height': 4
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false
+    },
 ];

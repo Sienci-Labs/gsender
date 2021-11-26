@@ -48,7 +48,7 @@ import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
 import _ from 'lodash';
 import store from 'app/store';
-import { Toaster } from '../../lib/toaster/ToasterLib';
+import { Toaster, TOASTER_DANGER, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
 import Viewport from './Viewport';
@@ -204,7 +204,7 @@ class Visualizer extends Component {
         this.subscribe();
         this.addControllerEvents();
         this.addResizeEventListener();
-        store.on('change', this.changeMachineProfile);
+        //store.on('change', this.changeMachineProfile);
         if (this.node) {
             const el = ReactDOM.findDOMNode(this.node);
             this.createScene(el);
@@ -385,9 +385,15 @@ class Visualizer extends Component {
 
 
     controllerEvents = {
-        'gcode_error': (error, code, line) => {
-            this.setState({ finishedMessage: `Gcode Error: Line: ${line.length} Error:${code} - ${error.description}` });
-            this.showToast();
+        'gcode_error': (msg) => {
+            console.log(msg);
+            Toaster.pop({
+                msg,
+                type: TOASTER_DANGER,
+                duration: TOASTER_UNTIL_CLOSE
+            });
+            //this.setState({ finishedMessage: `Gcode Error: Line: ${line.length} Error:${code} - ${error.description}` });
+            //this.showToast();
         },
     };
 

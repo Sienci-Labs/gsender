@@ -29,10 +29,12 @@ import {
     UPDATE_CONTROLLER_SETTINGS,
     UPDATE_CONTROLLER_STATE,
     UPDATE_FEEDER_STATUS, UPDATE_SENDER_STATUS, UPDATE_WORKFLOW_STATE,
-    UPDATE_HOMING_FLAG
+    UPDATE_HOMING_FLAG,
+    RESET_HOMING
 } from '../actions/controllerActions';
-import { in2mm } from '../lib/units';
+import { in2mm, mm2in } from '../lib/units';
 import { WORKFLOW_STATE_IDLE } from '../constants';
+import store from '../store';
 
 
 const initialState = {
@@ -82,6 +84,11 @@ function mapPosToFeedbackUnits(pos, settings) {
     });
 }
 
+function mapFeedrateToFeedbackUnits(feedrate, settings) {
+    const $13 = ensurePositiveNumber(_get(settings, 'settings.$13'));
+    return ($13 > 0) ? in2mm(feedrate) : feedrate;
+}
+
 
 function consolidateModals(state) {
     const defaultModals = {
@@ -103,6 +110,31 @@ function consolidateModals(state) {
     };
 }
 
+const updateMachineLimitsFromEEPROM = ({ settings }) => {
+    const { $130, $131, $132 } = settings;
+    let xmax = Number($130);
+    let ymax = Number($131);
+    let zmax = Number($132);
+    const machineProfile = store.get('workspace.machineProfile');
+    machineProfile.limits = {
+        ...machineProfile.limits,
+        xmax,
+        ymax,
+        zmax
+    };
+    machineProfile.mm = {
+        depth: ymax,
+        height: zmax,
+        width: xmax
+    };
+    machineProfile.in = {
+        depth: Number(mm2in(ymax).toFixed(2)),
+        height: Number(mm2in(zmax).toFixed(2)),
+        width: Number(mm2in(xmax).toFixed(2))
+    };
+    store.set('workspace.machineProfile', machineProfile);
+};
+
 
 const reducer = createReducer(initialState, {
     [UPDATE_CONTROLLER_SETTINGS]: (payload, reducerState) => {
@@ -111,6 +143,7 @@ const reducer = createReducer(initialState, {
         const wpos = mapPosToFeedbackUnits(_get(state, 'status.wpos'), settings);
         const mpos = mapPosToFeedbackUnits(_get(state, 'status.mpos'), settings);
         const modal = consolidateModals(state);
+        updateMachineLimitsFromEEPROM(settings);
 
         return {
             type,
@@ -121,11 +154,12 @@ const reducer = createReducer(initialState, {
         };
     },
     [UPDATE_CONTROLLER_STATE]: (payload, reducerState) => {
-        const { type, state } = payload;
+        let { type, state } = payload;
         const settings = _get(reducerState, 'settings');
         const modal = consolidateModals(state);
         const wpos = mapPosToFeedbackUnits(_get(state, 'status.wpos'), settings);
         const mpos = mapPosToFeedbackUnits(_get(state, 'status.mpos'), settings);
+        state.status.feedrate = mapFeedrateToFeedbackUnits(_get(state, 'status.feedrate'), settings);
 
         return {
             type,
@@ -164,6 +198,12 @@ const reducer = createReducer(initialState, {
         return {
             homingFlag,
             homingRun: true
+        };
+    },
+    [RESET_HOMING]: (payload, reducerState) => {
+        return {
+            homingFlag: false,
+            homingRun: false
         };
     }
 });

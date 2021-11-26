@@ -371,7 +371,7 @@ class GrblController {
                     }
                 }
 
-                const machineProfile = store.get('machineProfile');
+                //const machineProfile = store.get('machineProfile');
                 //const preferences = store.get('preferences');
 
                 /*if (line) {
@@ -390,9 +390,6 @@ class GrblController {
                     }
                 }*/
 
-                if (_.includes(words, 'G28') && !machineProfile.endstops) {
-                    line = line.replace('G28', '(G28)');
-                }
 
                 // More aggressive updating of spindle modals for safety
                 const spindleCommand = _.intersection(words, ['M3', 'M4'])[0];
@@ -590,7 +587,8 @@ class GrblController {
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        this.emit('gcode_error', error, code, line);
+                        const msg = `Error ${code} on line ${received} - ${error.message}`;
+                        this.emit('gcode_error', msg);
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                     }
 
@@ -1409,6 +1407,13 @@ class GrblController {
             'feedOverride': () => {
                 const [value] = args;
 
+                const currFeedOverride = this.runner.state.status.ov[0];
+                const nextFeedOverride = currFeedOverride + value;
+
+                if (nextFeedOverride > 230 || nextFeedOverride < 0) {
+                    return;
+                }
+
                 if (value === 0) {
                     this.write('\x90');
                 } else if (value === 10) {
@@ -1707,6 +1712,7 @@ class GrblController {
     }
 
     write(data, context) {
+        console.log(data);
         // Assertion check
         if (this.isClose()) {
             log.error(`Serial port "${this.options.port}" is not accessible`);

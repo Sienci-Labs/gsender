@@ -31,7 +31,8 @@ export const {
     UPDATE_SENDER_STATUS,
     UPDATE_WORKFLOW_STATE,
     TOOL_CHANGE,
-    UPDATE_HOMING_FLAG
+    UPDATE_HOMING_FLAG,
+    RESET_HOMING
 } = constants('controller', [
     'UPDATE_CONTROLLER_STATE',
     'UPDATE_CONTROLLER_SETTINGS',
@@ -39,7 +40,8 @@ export const {
     'UPDATE_SENDER_STATUS',
     'UPDATE_WORKFLOW_STATE',
     'TOOL_CHANGE',
-    'UPDATE_HOMING_FLAG'
+    'UPDATE_HOMING_FLAG',
+    'RESET_HOMING'
 ]);
 
 export const updateControllerState = createAction(UPDATE_CONTROLLER_STATE);
@@ -49,3 +51,4 @@ export const updateSenderStatus = createAction(UPDATE_SENDER_STATUS);
 export const updateWorkflowState = createAction(UPDATE_WORKFLOW_STATE);
 export const toolChange = createAction(TOOL_CHANGE);
 export const updateHomingFlag = createAction(UPDATE_HOMING_FLAG);
+export const resetHoming = createAction(RESET_HOMING);

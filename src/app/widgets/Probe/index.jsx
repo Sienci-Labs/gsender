@@ -32,7 +32,7 @@ import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import pubsub from 'pubsub-js';
-import { TOUCHPLATE_TYPE_AUTOZERO, PROBE_TYPE_AUTO, PROBE_TYPE_TIP, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
+import { TOUCHPLATE_TYPE_AUTOZERO, PROBE_TYPE_AUTO, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
 import store from 'app/store';
 import { mm2in } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
@@ -92,7 +92,7 @@ class ProbeWidget extends PureComponent {
     PROBE_DISTANCE_IMPERIAL = {
         X: 2,
         Y: 2,
-        Z: 1.5
+        Z: 1.2
     };
 
 
@@ -344,10 +344,6 @@ class ProbeWidget extends PureComponent {
         let toolDiameter;
 
         if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
-            availableTools.push(
-                { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO },
-                { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP },
-            );
             toolDiameter = PROBE_TYPE_AUTO;
         } else {
             toolDiameter = availableTools[0][units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'];
@@ -528,6 +524,8 @@ class ProbeWidget extends PureComponent {
         const toolDiameter = this.state.toolDiameter;
         const toolRadius = (toolDiameter / 2);
         const toolCompensatedThickness = ((-1 * toolRadius) - xyThickness);
+        const zPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
+        const xyPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
 
         // Add Z Probe code if we're doing 3 axis probing
         if (axes.z) {
@@ -554,21 +552,33 @@ class ProbeWidget extends PureComponent {
                 gcode('G0', {
                     Z: retractDistance
                 }),
+                // X First - move to left of plate
+                gcode('G0', {
+                    X: -xyPositionAdjust
+                }),
+                // Move down to impact plate from side
+                gcode('G0', {
+                    Z: -zPositionAdjust
+                }),
             ]);
         }
 
-        const zPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
-        const xyPositionAdjust = (units === METRIC_UNITS) ? 20 : mm2in(20).toFixed(3);
+        // Different movement based on either XYZ or XY probe
+        if (!axes.z) {
+            code = code.concat([
+                gcode('G0', {
+                    X: XYRetract,
+                    Y: XYRetract
+                }),
+                gcode('G0', {
+                    Y: xyPositionAdjust
+                })
+            ]);
+        }
+
+
         // We always probe X and Y based if we're running this function
         code = code.concat([
-            // X First - move to left of plate
-            gcode('G0', {
-                X: -xyPositionAdjust
-            }),
-            // Move down to impact plate from side
-            gcode('G0', {
-                Z: -zPositionAdjust
-            }),
             gcode(probeCommand, {
                 X: XYProbeDistance,
                 F: quickFeedrate
@@ -659,13 +669,13 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Z2',
                 '(Probe X)',
                 'G21 G91 G0 X-13',
-                'G38.2 X-30 F250',
+                'G38.2 X-30 F150',
                 'G21 G91 G0 X2',
                 'G38.2 X-5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 X0',
                 'G21 G91 G0 X26',
-                'G38.2 X30 F250',
+                'G38.2 X30 F150',
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
@@ -687,21 +697,22 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 X0 Y0',
                 'G10 L20 P1 X22.5 Y22.5',
                 'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',
             );
         } else if (axes.x && axes.y) {
             code.push(
                 '(Probe XY Auto Endmill)',
                 'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
                 '(Probe X)',
                 'G21 G91 G0 X-13',
-                'G38.2 X-30 F250',
+                'G38.2 X-30 F150',
                 'G21 G91 G0 X2',
                 'G38.2 X-5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 X0',
                 'G21 G91 G0 X26',
-                'G38.2 X30 F250',
+                'G38.2 X30 F150',
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
@@ -709,13 +720,13 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 X0',
                 '(Probe Y)',
                 'G21 G91 G0 Y-13',
-                'G38.2 Y-30 F250',
+                'G38.2 Y-30 F150',
                 'G21 G91 G0 Y2',
                 'G38.2 Y-5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 Y0',
                 'G21 G91 G0 Y26',
-                'G38.2 Y30 F250',
+                'G38.2 Y30 F150',
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
@@ -723,7 +734,6 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 X0 Y0',
                 'G10 L20 P1 X22.5 Y22.5',
                 'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',
             );
         } else if (axes.z) {
             code.push(
@@ -741,47 +751,166 @@ class ProbeWidget extends PureComponent {
             code.push(
                 '(Probe X Auto Endmill)',
                 'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
                 '(Probe X)',
                 'G21 G91 G0 X-13',
-                'G38.2 X-30 F250',
+                'G38.2 X-30 F150',
                 'G21 G91 G0 X2',
                 'G38.2 X-5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 X0',
                 'G21 G91 G0 X26',
-                'G38.2 X30 F250',
+                'G38.2 X30 F150',
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 X[posx/2]',
+                'G21 G90 G0 X0',
+                'G10 L20 P1 X22.5',
+                'G21 G91 G0 Z30',
                 'G21 G90 G0 X0',
             );
         } else if (axes.y) {
             code.push(
                 '(Probe Y Auto Endmill)',
                 'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
                 '(Probe Y)',
                 'G21 G91 G0 Y-13',
-                'G38.2 Y-30 F250',
+                'G38.2 Y-30 F150',
                 'G21 G91 G0 Y2',
                 'G38.2 Y-5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 Y0',
                 'G21 G91 G0 Y26',
-                'G38.2 Y30 F250',
+                'G38.2 Y30 F150',
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 Y[posy/2]',
-                'G21 G90 G0 X0 Y0',
-                'G10 L20 P1 X22.5 Y22.5',
-                'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',);
+                'G21 G90 G0 Y0',
+                'G10 L20 P1 Y22.5',
+                'G21 G91 G0 Z30',
+                'G21 G90 G0 Y0',
+            );
         }
 
         return code;
     }
 
+    generateAutoZeroAxesProbe(axes, diameter) {
+        const code = [];
+
+        const toolRadius = (diameter / 2);
+        const toolCompensatedThickness = ((-1 * toolRadius));
+        console.log(toolCompensatedThickness);
+
+        if (axes.z && axes.y && axes.z) {
+            code.push(
+                '(Probe XYZ AutoZero Specific Diameter)',
+                'G21 G91',
+                '(Probe Z)',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
+                'G38.2 Z-5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 Z5',
+                'G21 G91 G0 Z2',
+                '(Probe X)',
+                'G21 G91 G0 X13',
+                'G38.2 X30 F250',
+                'G21 G91 G0 X-2',
+                'G38.2 X5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 X19.325',
+                'G21 G90 G0 X0',
+                '(Probe Y)',
+                'G21 G91 G0 Y13',
+                'G38.2 Y30 F250',
+                'G21 G91 G0 Y-2',
+                'G38.2 Y5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 Y19.325',
+                'G21 G90 G0 X0 Y0',
+                'G10 L20 P1 X22.5 Y22.5',
+                'G21 G90 G0 X0 Y0',
+                'G21 G90 G0 Z0.5',
+            );
+        } else if (axes.x && axes.y) {
+            code.push(
+                '(Probe XY AutoZero Specific Diameter)',
+                'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
+                '(Probe X)',
+                'G21 G91 G0 X13',
+                'G38.2 X30 F250',
+                'G21 G91 G0 X-2',
+                'G38.2 X5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 X19.325',
+                'G21 G90 G0 X0',
+                '(Probe Y)',
+                'G21 G91 G0 Y13',
+                'G38.2 Y30 F250',
+                'G21 G91 G0 Y-2',
+                'G38.2 Y5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 Y19.325',
+                'G21 G90 G0 X0 Y0',
+                'G10 L20 P1 X22.5 Y22.5',
+                'G21 G90 G0 X0 Y0',
+            );
+        } else if (axes.z) {
+            code.push(
+                '(Probe Z AutoZero Specific Diameter)',
+                'G21 G91',
+                '(Probe Z)',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
+                'G38.2 Z-5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 Z5',
+                'G21 G91 G0 Z2',
+            );
+        } else if (axes.y) {
+            code.push(
+                '(Probe Y)',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
+                'G21 G91 G0 Y13',
+                'G38.2 Y30 F250',
+                'G21 G91 G0 Y-2',
+                'G38.2 Y5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 Y19.325',
+                'G21 G90 G0 Y0',
+                'G10 L20 P1 Y22.5',
+                'G21 G91 G0 Z30',
+                'G21 G90 G0 Y0',
+            );
+        } else if (axes.x) {
+            code.push(
+                '(Probe X)',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z2',
+                'G21 G91 G0 X13',
+                'G38.2 X30 F250',
+                'G21 G91 G0 X-2',
+                'G38.2 X5 F75',
+                'G4 P0.15',
+                'G10 L20 P1 X19.325',
+                'G21 G90 G0 X0',
+                'G10 L20 P1 X22.5',
+                'G21 G91 G0 Z30',
+                'G21 G90 G0 X0',
+            );
+        }
+
+        return code;
+    }
     generateTipProbe(axes) {
         const code = [];
 
@@ -832,6 +961,8 @@ class ProbeWidget extends PureComponent {
             code.push(
                 '(Probe XY Auto Tip)',
                 'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z0.5',
                 '(Probe X)',
                 'G21 G91 G0 X-3',
                 'G38.2 X-30 F150',
@@ -862,7 +993,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 X0 Y0',
                 'G10 L20 P1 X22.5 Y22.5',
                 'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',);
+            );
         } else if (axes.z) {
             code.push(
                 '(Probe Z Auto Tip)',
@@ -879,6 +1010,8 @@ class ProbeWidget extends PureComponent {
             code.push(
                 '(Probe X Auto Tip)',
                 'G21 G91',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z0.5',
                 '(Probe X)',
                 'G21 G91 G0 X-3',
                 'G38.2 X-30 F150',
@@ -893,10 +1026,13 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 'G10 L20 P1 X[posx/2]',
                 'G21 G90 G0 X0',
+                'G10 L20 P1 X22.5',
             );
         } else if (axes.y) {
             code.push(
                 '(Probe Y Auto Tip)',
+                'G38.2 Z-25 F200',
+                'G21 G91 G0 Z0.5',
                 'G21 G91 G0 Y-7',
                 'G38.2 Y-10 F150',
                 'G21 G91 G0 Y2',
@@ -909,10 +1045,8 @@ class ProbeWidget extends PureComponent {
                 'G38.2 Y5 F75',
                 'G4 P0.15',
                 'G10 L20 P1 Y[posy/2]',
-                'G21 G90 G0 X0 Y0',
-                'G10 L20 P1 X22.5 Y22.5',
-                'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',
+                'G21 G90 G0 Y0',
+                'G10 L20 P1 Y22.5',
             );
         }
 
@@ -941,6 +1075,9 @@ class ProbeWidget extends PureComponent {
         }
         if (toolDiameter === 'Tip') {
             return this.generateTipProbe(axes);
+        }
+        if (this.state.touchplate.touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
+            return this.generateAutoZeroAxesProbe(axes, toolDiameter);
         }
 
         // Grab units for correct modal
@@ -1027,6 +1164,14 @@ class ProbeWidget extends PureComponent {
         });
     }
 
+    onStoreChange = ({ workspace }) => {
+        const { probeProfile } = workspace;
+
+        if (probeProfile.touchplateType === TOUCHPLATE_TYPE_ZERO) {
+            this.actions.handleProbeCommandChange(0);
+        }
+    }
+
     subscribe() {
         const tokens = [
             pubsub.subscribe('units:change', (msg, units) => {
@@ -1053,6 +1198,8 @@ class ProbeWidget extends PureComponent {
 
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
+
+        store.on('change', this.onStoreChange);
     }
 
     unsubscribe() {
@@ -1060,6 +1207,8 @@ class ProbeWidget extends PureComponent {
             pubsub.unsubscribe(token);
         });
         this.pubsubTokens = [];
+
+        store.removeListener('change', this.onStoreChange);
     }
 
     render() {
