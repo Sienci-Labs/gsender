@@ -524,6 +524,8 @@ class ProbeWidget extends PureComponent {
         const toolDiameter = this.state.toolDiameter;
         const toolRadius = (toolDiameter / 2);
         const toolCompensatedThickness = ((-1 * toolRadius) - xyThickness);
+        const zPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
+        const xyPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
 
         // Add Z Probe code if we're doing 3 axis probing
         if (axes.z) {
@@ -550,21 +552,33 @@ class ProbeWidget extends PureComponent {
                 gcode('G0', {
                     Z: retractDistance
                 }),
+                // X First - move to left of plate
+                gcode('G0', {
+                    X: -xyPositionAdjust
+                }),
+                // Move down to impact plate from side
+                gcode('G0', {
+                    Z: -zPositionAdjust
+                }),
             ]);
         }
 
-        const zPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
-        const xyPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
+        // Different movement based on either XYZ or XY probe
+        if (!axes.z) {
+            code = code.concat([
+                gcode('G0', {
+                    X: XYRetract,
+                    Y: XYRetract
+                }),
+                gcode('G0', {
+                    Y: xyPositionAdjust
+                })
+            ]);
+        }
+
+
         // We always probe X and Y based if we're running this function
         code = code.concat([
-            // X First - move to left of plate
-            gcode('G0', {
-                X: -xyPositionAdjust
-            }),
-            // Move down to impact plate from side
-            gcode('G0', {
-                Z: -zPositionAdjust
-            }),
             gcode(probeCommand, {
                 X: XYProbeDistance,
                 F: quickFeedrate
