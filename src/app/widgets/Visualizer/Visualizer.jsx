@@ -48,7 +48,7 @@ import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
 import _ from 'lodash';
 import store from 'app/store';
-import { Toaster, TOASTER_DANGER } from '../../lib/toaster/ToasterLib';
+import { Toaster, TOASTER_DANGER, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
 import Viewport from './Viewport';
@@ -390,6 +390,7 @@ class Visualizer extends Component {
             Toaster.pop({
                 msg,
                 type: TOASTER_DANGER,
+                duration: TOASTER_UNTIL_CLOSE
             });
             //this.setState({ finishedMessage: `Gcode Error: Line: ${line.length} Error:${code} - ${error.description}` });
             //this.showToast();
