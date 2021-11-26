@@ -1150,6 +1150,14 @@ class ProbeWidget extends PureComponent {
         });
     }
 
+    onStoreChange = ({ workspace }) => {
+        const { probeProfile } = workspace;
+
+        if (probeProfile.touchplateType === TOUCHPLATE_TYPE_ZERO) {
+            this.actions.handleProbeCommandChange(0);
+        }
+    }
+
     subscribe() {
         const tokens = [
             pubsub.subscribe('units:change', (msg, units) => {
@@ -1176,6 +1184,8 @@ class ProbeWidget extends PureComponent {
 
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
+
+        store.on('change', this.onStoreChange);
     }
 
     unsubscribe() {
@@ -1183,6 +1193,8 @@ class ProbeWidget extends PureComponent {
             pubsub.unsubscribe(token);
         });
         this.pubsubTokens = [];
+
+        store.removeListener('change', this.onStoreChange);
     }
 
     render() {
