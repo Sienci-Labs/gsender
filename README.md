@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/mac.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.0/gSender-1.0.0-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.0/gSender-1.0.0-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.0/gSender-1.0.0.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.0/gSender_1.0.0_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.0/gSender-1.0.0-armv7l.deb)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.1/gSender-1.0.1-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.1/gSender-1.0.1-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.1/gSender-1.0.1.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.1/gSender_1.0.1_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.1/gSender-1.0.1-armv7l.deb)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -98,6 +98,20 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### 1.0.1 (November 26th, 2021)
+* Rapid position buttons now use EEPROM values for more accurate movements and machine profile limits should be set from EEPROM on connect
+* Spindle rate hidden by default - Spindle/Laser must be toggled on in machine profile to view overrides during job run
+* Surfacing tool now runs last pass in Zig-Zag pattern
+* Added support for $13 in feedrate reporting
+* Safe height should no longer send router to Z0
+* Added new machine profiles
+* Fix for F-key shortcuts not working
+* Added missing units
+* G28 commands no longer ignored
+* Alterations to XY probing
+* More accurate error line reporting
+* Various styling issue fixed
 
 ### 1.0.0 (Oct 29, 2021)
 * Unlock button on UI to avoid homing/unlock from M0 state
