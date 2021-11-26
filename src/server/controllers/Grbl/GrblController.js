@@ -1407,6 +1407,13 @@ class GrblController {
             'feedOverride': () => {
                 const [value] = args;
 
+                const currFeedOverride = this.runner.state.status.ov[0];
+                const nextFeedOverride = currFeedOverride + value;
+
+                if (nextFeedOverride > 230 || nextFeedOverride < 0) {
+                    return;
+                }
+
                 if (value === 0) {
                     this.write('\x90');
                 } else if (value === 10) {
@@ -1705,6 +1712,7 @@ class GrblController {
     }
 
     write(data, context) {
+        console.log(data);
         // Assertion check
         if (this.isClose()) {
             log.error(`Serial port "${this.options.port}" is not accessible`);
