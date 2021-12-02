@@ -561,6 +561,7 @@ class PreferencesPage extends PureComponent {
 
     componentDidUpdate(prevProps, prevState) {
         const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight } = this.state;
+        console.log(probe);
         store.set('workspace.reverseWidgets', reverseWidgets);
         store.set('workspace.safeRetractHeight', safeRetractHeight);
         store.set('widgets.connection.autoReconnect', autoReconnect);
