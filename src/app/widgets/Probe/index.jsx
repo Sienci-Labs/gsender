@@ -1167,8 +1167,10 @@ class ProbeWidget extends PureComponent {
     onStoreChange = ({ workspace }) => {
         const { probeProfile } = workspace;
 
-        if (probeProfile.touchplateType === TOUCHPLATE_TYPE_ZERO) {
-            this.actions.handleProbeCommandChange(0);
+        if (probeProfile) {
+            if (probeProfile.touchplateType === TOUCHPLATE_TYPE_ZERO) {
+                this.actions.handleProbeCommandChange(0);
+            }
         }
     }
 
