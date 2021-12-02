@@ -44,13 +44,6 @@ import {
     // Grbl
     GRBL,
     GRBL_ACTIVE_STATE_IDLE,
-    // Marlin
-    MARLIN,
-    // Smoothie
-    SMOOTHIE,
-    // TinyG
-    TINYG,
-    // Workflow
     WORKFLOW_STATE_IDLE
 } from '../../constants';
 import {
@@ -525,8 +518,8 @@ class ProbeWidget extends PureComponent {
         const toolRadius = (toolDiameter / 2);
         const toolCompensatedThickness = ((-1 * toolRadius) - xyThickness);
         const zPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
-        const xyPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
-
+        let xyMovement = toolDiameter + 20; // 20mm + width of the tool
+        const xyPositionAdjust = (units === METRIC_UNITS) ? xyMovement : mm2in(xyMovement).toFixed(3);
         // Add Z Probe code if we're doing 3 axis probing
         if (axes.z) {
             code = code.concat([
@@ -1146,7 +1139,7 @@ class ProbeWidget extends PureComponent {
         if (workflow.state !== WORKFLOW_STATE_IDLE) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
+        if (!includes([GRBL], type)) {
             return false;
         }
 
