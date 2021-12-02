@@ -1165,7 +1165,7 @@ class ProbeWidget extends PureComponent {
     }
 
     onStoreChange = ({ workspace }) => {
-        const { probeProfile } = workspace;
+        const probeProfile = get(workspace, 'probeProfile', null);
 
         if (probeProfile) {
             if (probeProfile.touchplateType === TOUCHPLATE_TYPE_ZERO) {
