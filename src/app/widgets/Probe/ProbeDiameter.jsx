@@ -65,6 +65,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }) => {
     const handleChange = (value) => {
         setToolDiameter(value);
     };
+
     const options = [];
 
     const touchplateType = store.get('workspace.probeProfile.touchplateType');

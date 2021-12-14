@@ -371,26 +371,6 @@ class GrblController {
                     }
                 }
 
-                //const machineProfile = store.get('machineProfile');
-                //const preferences = store.get('preferences');
-
-                /*if (line) {
-                    const regex = /([^NGMXYZIJKFPRST%\-?\.?\d+\.?\s])/gi;
-                    if (regex.test(line)) {
-                        if (preferences === undefined) {
-                            this.emit('workflow:state', this.workflow.state, { validLine: false, line });
-                            return line;
-                        }
-                        if (preferences && preferences.showLineWarnings) {
-                            this.workflow.pause({ data: line });
-                            this.emit('workflow:state', this.workflow.state, { validLine: false, line });
-                        } if (!preferences && !preferences.showLineWarnings) {
-                            this.emit('workflow:state', this.workflow.state, { validLine: false, line });
-                        }
-                    }
-                }*/
-
-
                 // More aggressive updating of spindle modals for safety
                 const spindleCommand = _.intersection(words, ['M3', 'M4'])[0];
                 if (spindleCommand) {
@@ -575,6 +555,7 @@ class GrblController {
         });
 
         this.runner.on('error', (res) => {
+            console.error(res);
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
 
@@ -1712,7 +1693,6 @@ class GrblController {
     }
 
     write(data, context) {
-        console.log(data);
         // Assertion check
         if (this.isClose()) {
             log.error(`Serial port "${this.options.port}" is not accessible`);
@@ -1720,6 +1700,7 @@ class GrblController {
         }
 
         const cmd = data.trim();
+        console.log(data);
         this.actionMask.replyStatusReport = (cmd === '?') || this.actionMask.replyStatusReport;
         this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
 

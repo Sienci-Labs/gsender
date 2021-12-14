@@ -968,20 +968,16 @@ class AxesWidget extends PureComponent {
 
     getInitialXYStep() {
         const units = store.get('workspace.units', METRIC_UNITS);
+        const speeds = this.config.get('jog.normal');
 
-        if (units === IMPERIAL_UNITS) {
-            return 0.2;
-        }
-        return 5;
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.xyStep') : get(speeds, 'in.xyStep');
     }
 
     getInitialZStep() {
         const units = store.get('workspace.units', METRIC_UNITS);
+        const speeds = this.config.get('jog.normal');
 
-        if (units === IMPERIAL_UNITS) {
-            return 0.04;
-        }
-        return 2;
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.zStep') : get(speeds, 'in.zStep');
     }
 
     changeUnits(units) {

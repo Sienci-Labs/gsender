@@ -374,6 +374,7 @@ class Sender extends events.EventEmitter {
         const now = new Date().getTime();
 
         const handleStart = () => {
+            console.log('handleStart called');
             this.state.startTime = now;
             this.state.finishTime = 0;
             this.state.elapsedTime = 0;
