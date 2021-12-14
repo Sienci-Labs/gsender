@@ -1468,6 +1468,7 @@ class GrblController {
             },
             'gcode': () => {
                 const [commands, context] = args;
+                log.debug(`GCODE command called with line ${commands}`);
                 const data = ensureArray(commands)
                     .join('\n')
                     .split(/\r?\n/)
