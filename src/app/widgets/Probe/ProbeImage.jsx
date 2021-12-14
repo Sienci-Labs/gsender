@@ -25,10 +25,11 @@ import React from 'react';
 import cx from 'classnames';
 import Image from 'app/components/Image';
 import styles from './index.styl';
-import XProbe from './assets/x_probe.svg';
-import YProbe from './assets/y_probe.svg';
-import XYProbe from './assets/xy_probe.svg';
+import XProbe from './assets/Block-X.gif';
+import YProbe from './assets/Block-Y.gif';
+import XYProbe from './assets/Block-XY.gif';
 import XYZProbe from './assets/Block-XYZ.gif';
+import ZProbe from './assets/Block-Z.gif';
 
 const ProbeImage = ({ probeCommand, visible = true }) => {
     const getProbeImage = () => {
@@ -39,6 +40,8 @@ const ProbeImage = ({ probeCommand, visible = true }) => {
             return YProbe;
         } else if (id === 'XY Touch') {
             return XYProbe;
+        } else if (id === 'Z Touch') {
+            return ZProbe;
         }
         return XYZProbe;
     };
