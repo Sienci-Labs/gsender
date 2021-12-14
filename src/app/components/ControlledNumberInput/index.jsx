@@ -61,7 +61,6 @@ const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnC
 
     const onChange = (e) => {
         setLocalValue(inputRef.current.value);
-        console.log(`local: ${localValue}`);
         if (externalOnChange) {
             debouncedExternalOnChange(e);
         }

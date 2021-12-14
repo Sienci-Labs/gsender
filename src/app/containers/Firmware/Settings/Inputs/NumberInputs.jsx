@@ -62,7 +62,6 @@ class NumberInputs extends PureComponent {
     handleNumberInputs = (event) => {
         let value = event.target.value;
         let name = event.target.name;
-        console.log(`number: ${value}`);
         if (!value) {
             return;
         }
