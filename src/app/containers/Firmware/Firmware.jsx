@@ -91,15 +91,16 @@ class Firmware extends PureComponent {
 
     download(event) {
         event.preventDefault();
+        const { eeprom } = this.props;
 
         // Prepare the file
-        let output = JSON.stringify(this.state.data.settings);
+        let output = JSON.stringify(eeprom);
 
         // Download it
         const blob = new Blob([output]);
         const fileDownloadUrl = URL.createObjectURL(blob);
-        this.setState({ fileDownloadUrl: fileDownloadUrl });
-        download(blob, 'CNC Firmware Settings', '');
+        this.setState({ fileDownloadUrl });
+        download(blob, 'gSender_firmware_settings', '');
     }
 
     upload(event) {
@@ -114,15 +115,21 @@ class Firmware extends PureComponent {
 
         let fileloaded = e => {
             const fileContents = e.target.result;
-            this.setState({ uploadedSettings: fileContents });
-            const first80char = fileContents.substring(0, 80);
-            if (first80char[3] !== '0') {
-                Toaster.pop({
-                    msg: 'Incorrect file format',
-                    type: TOASTER_INFO
+            try {
+                const parsedFile = JSON.parse(fileContents);
+                this.setState({
+                    uploadedSettings: parsedFile,
+                    properFormatFile: true
                 });
-            } else {
-                this.setState({ properFormatFile: true });
+            } catch (e) {
+                this.setState({
+                    uploadedSettings: '',
+                    properFormatFile: false
+                });
+                Toaster.pop({
+                    msg: 'Unable to parse file contents.',
+                    type: TOASTER_DANGER
+                });
             }
         };
 
@@ -137,43 +144,19 @@ class Firmware extends PureComponent {
         return (s.length > 0) ? (cmd + '' + s) : cmd;
     }
 
-    applySettings = () => {
-        let uploadedSettings = this.state.uploadedSettings;
-        const obj = JSON.parse(uploadedSettings);
-        let values = Object.values(obj);
-        if (values.length === 34) {
-            for (let i = 0; i < values.length; i++) {
-                if (values[i] === true) {
-                    values[i] = '1';
-                } if (values[i] === false) {
-                    values[i] = '0';
-                }
-            }
+    applySettings = (content) => {
+        const { uploadedSettings } = this.state;
+        const settings = [];
 
-            let keys = Object.keys(obj);
-            let finalStrings = [];
-            const valuesToSubmit = [];
-            for (let i = 0; i < keys.length; i++) {
-                valuesToSubmit.push([keys[i], values[i]]);
-            }
-            let gCoded = this.gcode(valuesToSubmit);
-
-            //loops through array values, concatinates them with =
-            for (let j = 0; j < gCoded.length; j++) {
-                finalStrings[j] = gCoded[j].join('=');
-            }
-            controller.command('gcode', finalStrings);
-            controller.command('gcode', '$$');//Needed so next time wizard is opened changes are reflected
-            Toaster.pop({
-                msg: 'Eeprom Values Updated',
-                type: TOASTER_INFO
-            });
-        } else {
-            Toaster.pop({
-                msg: 'Incorrect file format, please try again',
-                type: TOASTER_INFO
-            });
-        }
+        Object.keys(uploadedSettings).forEach(setting => {
+            settings.push(`${setting}=${uploadedSettings[setting]}`);
+        });
+        settings.push('$$'); // Force refresh of EEPROM in controller
+        controller.command('gcode', settings.join('\n'));
+        Toaster.pop({
+            msg: 'Eeprom Values Updated',
+            type: TOASTER_INFO
+        });
         this.setState({ properFormatFile: false });
     }
 

@@ -28,7 +28,7 @@ import styles from './index.styl';
 import XProbe from './assets/x_probe.svg';
 import YProbe from './assets/y_probe.svg';
 import XYProbe from './assets/xy_probe.svg';
-import XYZProbe from './assets/xyz_probe.svg';
+import XYZProbe from './assets/Block-XYZ.gif';
 
 const ProbeImage = ({ probeCommand, visible = true }) => {
     const getProbeImage = () => {
