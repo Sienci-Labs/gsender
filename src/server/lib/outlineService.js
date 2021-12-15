@@ -43,7 +43,6 @@ export function getOutlineGcode(gcode, concavity = 60) {
         addLine: ({ motion }, v1, v2) => {
             // We ignore G0 movements since they generally aren't cutting movements
             if (motion === 'G1') {
-                //vertices.push(vertex(v1.x, v1.y));
                 vertices.push(vertex(v2.x, v2.y));
             }
         },
@@ -102,11 +101,13 @@ export function getOutlineGcode(gcode, concavity = 60) {
 
 function convertPointsToGCode(points) {
     const gCode = [];
+    gCode.push('%X0=posx,Y0=posy,Z0=posz');
     gCode.push('G21 G91 G0 Z5');
     points.forEach(point => {
         const [x, y] = point;
         gCode.push(`G21 G90 G0 X${x} Y${y}`);
     });
+    gCode.push('G0 X[X0] Y[Y0]');
     gCode.push('G21 G91 G0 Z-5');
     return gCode;
 }

@@ -71,6 +71,7 @@ class SerialConnection extends EventEmitter {
             this.emit('close', err);
         },
         error: (err) => {
+            console.error('Serialport Error');
             this.emit('error', err);
         }
     };
