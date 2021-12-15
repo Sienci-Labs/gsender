@@ -971,7 +971,7 @@ class ProbeWidget extends PureComponent {
                 'G10 L20 P1 X[posx/2]',
                 'G21 G90 G0 X0',
                 '(Probe Y)',
-                'G21 G91 G0 Y-7',
+                'G21 G91 G0 Y-3',
                 'G38.2 Y-10 F150',
                 'G21 G91 G0 Y2',
                 'G38.2 Y-5 F75',

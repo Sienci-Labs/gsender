@@ -1319,7 +1319,10 @@ class GrblController {
                 this.event.trigger('gcode:resume');
 
                 this.write('~');
-                this.workflow.resume();
+                setTimeout(() => {
+                    log.debug('gcode:resume workflow restarted');
+                    this.workflow.resume();
+                }, 1000);
             },
             'feeder:feed': () => {
                 const [commands, context = {}] = args;
