@@ -24,6 +24,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+
+import ControlledNumberInput from 'app/components/ControlledNumberInput';
+
 import styles from './input.styl';
 
 const Input = ({ value, label, units, onChange, additionalProps, className, style, disabled }) => {
@@ -31,14 +34,14 @@ const Input = ({ value, label, units, onChange, additionalProps, className, styl
         <div className={classNames(styles.input, 'form-group', className)} style={style}>
             {label && <label htmlFor="">{`${label}`}</label>}
             <div className="input-group">
-                <input
+                <ControlledNumberInput
                     {...additionalProps}
                     value={value}
-                    onChange={onChange}
-                    className={classNames('form-control', styles.text)}
-                    disabled={disabled}
+                    externalOnChange={onChange}
+                    onFocus={(e) => e.target.select()}
+                    onClick={(e) => e.target.select()}
                     type="number"
-                    title=""
+                    className={classNames('form-control', styles.text)}
                 />
                 {units && <span className="input-group-addon">{units}</span>}
             </div>
