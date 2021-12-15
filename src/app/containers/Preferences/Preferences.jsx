@@ -33,6 +33,7 @@ import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import General from './General';
 import Shortcuts from './Keybindings';
 import ProbeSettings from './Probe';
+import Laser from './Laser';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import VisualizerSettings from './Visualizer';
 import About from './About';
@@ -78,31 +79,36 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 1,
+                    label: 'Laser',
+                    component: Laser
+                },
+                {
+                    id: 2,
                     label: 'Probe',
                     component: ProbeSettings
                 },
                 {
-                    id: 2,
+                    id: 3,
                     label: 'Shortcuts',
                     component: Shortcuts
                 },
                 {
-                    id: 3,
+                    id: 4,
                     label: 'Visualizer',
                     component: VisualizerSettings
                 },
                 {
-                    id: 4,
+                    id: 5,
                     label: 'Tool Change',
                     component: Events
                 },
                 {
-                    id: 5,
+                    id: 6,
                     label: 'Start/Stop G-Code',
                     component: ProgramEvents,
                 },
                 {
-                    id: 6,
+                    id: 7,
                     label: 'About',
                     component: About,
                 }
