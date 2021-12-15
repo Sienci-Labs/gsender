@@ -226,7 +226,7 @@ export default class MachineProfile extends Component {
                 <div className={styles['machine-options-section']}>
                     <div className={styles['general-area-item']}>
                         <h4 className={styles['settings-subtitle']}>Presets</h4>
-                        <TooltipCustom content="gSender comes pre-loaded with many CNC machine presets" location="default">
+                        <TooltipCustom content="gSender comes pre-loaded with many CNC machine presets" location="top">
                             <Select
                                 className={styles['machine-options-select']}
                                 value={{ label: label }}
