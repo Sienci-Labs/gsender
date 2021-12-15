@@ -170,17 +170,3 @@ const getTouchplateParameters = (wcs) => {
         wcs
     };
 };
-
-export const generateProbeProfile = (axes, tool, wcs) => {
-    let code;
-
-    if (tool === 'Auto') {
-        code = generateAutoProbe(axes, wcs);
-    } else if (tool === 'Tip') {
-        code = generateTipProbe(axes, wcs);
-    } else {
-        code = generateStandardProbe(axes, tool, wcs);
-    }
-
-    return code;
-};
