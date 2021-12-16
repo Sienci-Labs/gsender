@@ -242,7 +242,7 @@ class GrblController {
                     if (line === PREHOOK_COMPLETE) {
                         log.debug('Finished Pre-hook');
                         this.feeder.hold({ data: '%toolchange' });
-                        this.emit('toolchange:preHookComplete');
+                        this.emit('toolchange:preHookComplete', commentString);
                         return '(Pre-Hook complete)';
                     }
                     if (line === POSTHOOK_COMPLETE) {
@@ -325,7 +325,10 @@ class GrblController {
             bufferSize: (128 - 8), // The default buffer size is 128 bytes
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
-                line = line.replace(/\s*;.*/g, '').trim();
+                let commentMatcher = /\s*;.*/g;
+                let comment = line.match(commentMatcher);
+                const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
+                line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;
@@ -356,13 +359,13 @@ class GrblController {
                         log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         // Workaround for Carbide files - prevent M0 early from pausing program
                         if (sent > 10) {
-                            this.workflow.pause({ data: 'M0' });
+                            this.workflow.pause({ data: 'M0', comment: commentString });
                             this.emit('workflow:pause', { data: 'M0' });
                         }
                         return line.replace('M0', '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
-                        this.workflow.pause({ data: 'M1' });
+                        this.workflow.pause({ data: 'M1', comment: commentString });
                         this.emit('workflow:pause', { data: 'M1' });
                         return line.replace('M1', '(M1)');
                     }
@@ -382,16 +385,16 @@ class GrblController {
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     if (toolChangeOption === 'Pause') {
-                        this.workflow.pause({ data: 'M6' });
+                        this.workflow.pause({ data: 'M6', comment: commentString });
                         this.emit('gcode:toolChange', {
                             line: sent + 1,
                             block: line,
                             option: toolChangeOption
                         });
                     } else if (toolChangeOption === 'Code') {
-                        this.workflow.pause({ data: 'M6' });
+                        this.workflow.pause({ data: 'M6', comment: commentString });
                         this.emit('toolchange:start');
-                        this.runPreChangeHook(this.populateContext());
+                        this.runPreChangeHook(commentString);
                     }
 
                     line = line.replace('M6', '(M6)');
@@ -1735,10 +1738,11 @@ class GrblController {
     }
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
-    runPreChangeHook() {
+    runPreChangeHook(comment = '') {
         const { preHook } = this.toolChangeContext || '';
+        console.log(comment);
         const block = this.convertGcodeToArray(preHook);
-        block.push(PREHOOK_COMPLETE);
+        block.push(`${PREHOOK_COMPLETE} ;${comment}`);
 
         this.command('gcode', block);
     }

@@ -20,7 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
+import React from 'react';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
@@ -35,6 +35,7 @@ import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY } from 'app/constants';
+
 
 export function* initialize() {
     /* Health check - every 3 minutes */
@@ -239,14 +240,18 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('toolchange:preHookComplete', () => {
+    controller.addListener('toolchange:preHookComplete', (comment = '') => {
         const onConfirmhandler = () => {
             controller.command('toolchange:post');
         };
 
+        const content = (comment.length > 0)
+            ? <div><p>A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.</p><p>Comment: <b>{comment}</b></p></div>
+            : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
+
         Confirm({
             title: 'Confirm Toolchange',
-            content: 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.',
+            content,
             confirmLabel: 'Confirm toolchange',
             onConfirm: onConfirmhandler
         });
