@@ -27,6 +27,7 @@ import SerialPort from 'serialport';
 const Readline = SerialPort.parsers.Readline;
 
 // Validation
+
 const DATABITS = Object.freeze([5, 6, 7, 8]);
 const STOPBITS = Object.freeze([1, 2]);
 const PARITY = Object.freeze(['none', 'even', 'mark', 'odd', 'space']);
@@ -195,7 +196,7 @@ class SerialConnection extends EventEmitter {
         }
 
         data = this.writeFilter(data, context);
-
+        console.log(`Data at ${Date.now()}: ${data}`);
         this.port.write(data);
     }
 }

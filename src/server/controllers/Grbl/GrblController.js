@@ -88,6 +88,7 @@ class GrblController {
     connectionEventListener = {
         data: (data) => {
             log.silly(`< ${data}`);
+            console.log(`Data received: ${data}`);
             this.runner.parse('' + data);
         },
         close: (err) => {
@@ -322,7 +323,7 @@ class GrblController {
         // Sender
         this.sender = new Sender(SP_TYPE_CHAR_COUNTING, {
             // Deduct the buffer size to prevent from buffer overrun
-            bufferSize: (128 - 8), // The default buffer size is 128 bytes
+            bufferSize: (128 - 18), // The default buffer size is 128 bytes
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
@@ -555,9 +556,9 @@ class GrblController {
         });
 
         this.runner.on('error', (res) => {
-            console.error(res);
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
+            log.error(`Error occurred at ${Date.now()}`);
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { lines, received } = this.sender.state;
@@ -814,7 +815,7 @@ class GrblController {
                     this.command('gcode:stop');
                 }
             }
-        }, 250);
+        }, 300);
 
         // Load file if it exists in CNC engine (AKA it was loaded before connection
     }
@@ -1305,24 +1306,22 @@ class GrblController {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:pause');
             },
-            'gcode:pause': () => {
+            'gcode:pause': async () => {
                 this.event.trigger('gcode:pause');
 
                 this.workflow.pause();
+                await delay(100);
                 this.write('!');
             },
             'resume': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:resume');
             },
-            'gcode:resume': () => {
-                this.event.trigger('gcode:resume');
-
+            'gcode:resume': async () => {
                 this.write('~');
-                setTimeout(() => {
-                    log.debug('gcode:resume workflow restarted');
-                    this.workflow.resume();
-                }, 1000);
+                await delay(1500);
+                this.workflow.resume();
+                this.event.trigger('gcode:resume');
             },
             'feeder:feed': () => {
                 const [commands, context = {}] = args;
