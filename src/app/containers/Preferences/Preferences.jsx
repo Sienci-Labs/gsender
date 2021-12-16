@@ -78,11 +78,6 @@ class PreferencesPage extends PureComponent {
                     component: General
                 },
                 {
-                    id: 1,
-                    label: 'Laser',
-                    component: Laser
-                },
-                {
                     id: 2,
                     label: 'Probe',
                     component: ProbeSettings
@@ -96,6 +91,11 @@ class PreferencesPage extends PureComponent {
                     id: 4,
                     label: 'Visualizer',
                     component: VisualizerSettings
+                },
+                {
+                    id: 1,
+                    label: 'Laser',
+                    component: Laser
                 },
                 {
                     id: 5,
