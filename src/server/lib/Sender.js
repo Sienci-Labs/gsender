@@ -66,7 +66,6 @@ class SPCharCounting {
     };
 
     constructor(options, callback = noop) {
-        console.log(callback);
         if (typeof options === 'function') {
             callback = options;
             options = {};
@@ -194,12 +193,9 @@ class Sender extends events.EventEmitter {
                         sp.line = this.dataFilter(sp.line, this.state.context) || '';
                     }
 
-                    console.log(`Data length: ${sp.dataLength}`);
-                    console.log(`Line length: ${sp.line.length}`);
-                    console.log(`Together: ${sp.dataLength + sp.line.length + 1}`);
+
                     // The newline character (\n) consumed the RX buffer space
                     if ((sp.line.length > 0) && ((sp.dataLength + sp.line.length + 1) >= sp.bufferSize)) {
-                        console.log(`Break due to going over ${sp.bufferSize}`);
                         break;
                     }
 

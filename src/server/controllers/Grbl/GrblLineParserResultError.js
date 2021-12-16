@@ -32,7 +32,7 @@ class GrblLineParserResultError {
         const payload = {
             message: r[1]
         };
-        console.log(line);
+
         return {
             type: GrblLineParserResultError,
             payload: payload

@@ -196,7 +196,6 @@ class SerialConnection extends EventEmitter {
         }
 
         data = this.writeFilter(data, context);
-        console.log(`Data at ${Date.now()}: ${data}`);
         this.port.write(data);
     }
 }

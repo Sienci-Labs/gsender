@@ -56,7 +56,7 @@ const getSanitizedRecords = () => {
 
         // Handle migration, should only run once
         if (!record.description) {
-            record.description = '';
+            record.description = ' ';
             shouldUpdate = true;
         }
         if (!record.column) {
@@ -66,8 +66,6 @@ const getSanitizedRecords = () => {
     }
 
     if (shouldUpdate) {
-        log.debug(`update sanitized records: ${JSON.stringify(records)}`);
-
         // Pass `{ silent changes }` will suppress the change event
         config.set(CONFIG_KEY, records, { silent: true });
     }
