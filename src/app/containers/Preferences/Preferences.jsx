@@ -47,6 +47,7 @@ class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
 
     visualizerConfig = new WidgetConfig('visualizer');
+    spindleConfig = new WidgetConfig('spindle');
 
     state = this.getInitialState();
 
@@ -126,6 +127,9 @@ class PreferencesPage extends PureComponent {
                 fastFeedrate: this.probeConfig.get('probeFastFeedrate', {}),
                 probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
                 connectivityTest: this.probeConfig.get('connectivityTest', true)
+            },
+            laser: {
+                ...this.spindleConfig.get('laser')
             },
             visualizer: {
                 minimizeRenders: this.visualizerConfig.get('minimizeRenders'),
@@ -404,6 +408,27 @@ class PreferencesPage extends PureComponent {
                 pubsub.publish('probe:test', value);
             }
         },
+        laser: {
+            handleOffsetChange: (e, axis) => {
+                const { laser } = this.state;
+                const value = Number(e.target.value) || 0;
+                if (axis === 'X') {
+                    this.setState({
+                        laser: {
+                            ...laser,
+                            xOffset: value
+                        }
+                    });
+                } else if (axis === 'Y') {
+                    this.setState({
+                        laser: {
+                            ...laser,
+                            yOffset: value
+                        }
+                    });
+                }
+            }
+        },
         visualizer: {
             handleMinimizeRenderToggle: () => {
                 const { visualizer } = this.state;
@@ -566,8 +591,8 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight } = this.state;
-        console.log(probe);
+        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight, laser } = this.state;
+
         store.set('workspace.reverseWidgets', reverseWidgets);
         store.set('workspace.safeRetractHeight', safeRetractHeight);
         store.set('widgets.connection.autoReconnect', autoReconnect);
@@ -580,6 +605,7 @@ class PreferencesPage extends PureComponent {
         store.replace('widgets.visualizer.objects', visualizer.objects);
         store.set('workspace[tool]', tool);
         store.replace('workspace[probeProfile]', probe);
+        store.replace('widgets.spindle.laser', laser);
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);

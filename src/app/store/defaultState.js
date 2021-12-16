@@ -329,6 +329,8 @@ const defaultState = {
             laser: {
                 power: 100,
                 duration: 1,
+                xOffset: 0,
+                yOffset: 0
             }
         },
         surfacing: {
