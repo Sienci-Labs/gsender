@@ -315,9 +315,10 @@ class WorkflowControl extends PureComponent {
 
     subscribe() {
         const tokens = [
-            pubsub.subscribe('gcode:toolChange', () => {
+            pubsub.subscribe('gcode:toolChange', (msg, context) => {
+                const { comment } = context;
                 Toaster.pop({
-                    msg: 'Program execution paused due to M6 command',
+                    msg: `Program execution paused due to M6 command with the following comment: ${comment}`,
                     type: TOASTER_WARNING
                 });
             }),

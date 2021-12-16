@@ -390,7 +390,7 @@ class GrblController {
                             line: sent + 1,
                             block: line,
                             option: toolChangeOption
-                        });
+                        }, commentString);
                     } else if (toolChangeOption === 'Code') {
                         this.workflow.pause({ data: 'M6', comment: commentString });
                         this.emit('toolchange:start');
@@ -1680,7 +1680,7 @@ class GrblController {
                 this.runPostChangeHook();
             },
             'gcode:outline': () => {
-                const [gcode = '', concavity = Infinity] = args;
+                const [gcode = '', concavity = 450] = args;
                 const toRun = getOutlineGcode(gcode, concavity);
                 log.debug('Running outline');
                 this.emit('outline:start');
@@ -1704,7 +1704,7 @@ class GrblController {
         }
 
         const cmd = data.trim();
-        console.log(data);
+
         this.actionMask.replyStatusReport = (cmd === '?') || this.actionMask.replyStatusReport;
         this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
 
@@ -1740,7 +1740,6 @@ class GrblController {
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
     runPreChangeHook(comment = '') {
         const { preHook } = this.toolChangeContext || '';
-        console.log(comment);
         const block = this.convertGcodeToArray(preHook);
         block.push(`${PREHOOK_COMPLETE} ;${comment}`);
 

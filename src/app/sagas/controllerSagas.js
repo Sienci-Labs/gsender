@@ -129,7 +129,8 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('gcode:toolChange', (context) => {
+    controller.addListener('gcode:toolChange', (context, commentString = '') => {
+        context.comment = commentString.length > 0 ? commentString : 'None';
         pubsub.publish('gcode:toolChange', context);
     });
 
