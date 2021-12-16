@@ -52,9 +52,18 @@ const ProgressArea = ({ state }) => {
 
         //Grab last two characters in the elapsedSecond variable, which represent the seconds that have passed
         const strElapsedSecond = `${(elapsedSecond[elapsedSecond.length - 2] !== undefined ? elapsedSecond[elapsedSecond.length - 2] : '')}${String(elapsedSecond[elapsedSecond.length - 1])}`;
-        const formattedSeconds = Number(strElapsedSecond) < 59 ? Number(strElapsedSecond) : `${Number(strElapsedSecond) - 60}`;
+        const formattedSeconds = Math.abs(Number(strElapsedSecond) < 59 ? Number(strElapsedSecond) : `${Number(strElapsedSecond) - 60}`);
 
-        return `${elapsedMinute}m ${Math.abs(formattedSeconds)}s`;
+        if (elapsedMinute > 59) {
+            const hours = elapsedMinute / 60;
+            const flooredHours = Math.floor(hours);
+            const minutes = (hours - flooredHours) * 60;
+            const roundedMinutes = Math.round(minutes);
+
+            return `${flooredHours < 10 ? `0${flooredHours}` : flooredHours}h ${minutes < 10 ? `0${roundedMinutes}` : roundedMinutes}m`;
+        }
+
+        return `${elapsedMinute < 10 ? `0${elapsedMinute}` : elapsedMinute}m ${formattedSeconds < 10 ? `0${formattedSeconds}` : formattedSeconds}s`;
     };
 
     // eslint-disable-next-line no-restricted-globals

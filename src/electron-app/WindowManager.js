@@ -115,11 +115,13 @@ class WindowManager {
 
         if (splashScreen) {
             webContents.once('dom-ready', () => {
+                window.maximize();
                 window.show();
                 splashScreen.close();
                 splashScreen.destroy();
             });
         } else {
+            window.maximize();
             window.show();
         }
 

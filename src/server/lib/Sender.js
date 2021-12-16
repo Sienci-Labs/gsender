@@ -392,9 +392,7 @@ class Sender extends events.EventEmitter {
             this.state.received = lineToStartFrom;
 
             handleStart();
-        }
-
-        if (this.state.total > 0 && this.state.sent === 0) {
+        } else if (this.state.total > 0 && this.state.sent === 0) {
             handleStart();
         }
 
