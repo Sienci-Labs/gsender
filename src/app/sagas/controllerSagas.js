@@ -129,9 +129,20 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('gcode:toolChange', (context, commentString = '') => {
-        context.comment = commentString.length > 0 ? commentString : 'None';
-        pubsub.publish('gcode:toolChange', context);
+    controller.addListener('gcode:toolChange', (context, comment = '') => {
+        const content = (comment.length > 0)
+            ? <div><p>Press Resume to continue operation.</p><p>Line contained following comment: <b>{comment}</b></p></div>
+            : 'Press Resume to continue operation.';
+
+        Confirm({
+            title: 'M6 Tool Change',
+            content,
+            confirmLabel: 'Resume',
+            cancelLabel: 'Stop',
+            onConfirm: () => {
+                controller.command('gcode:resume');
+            }
+        });
     });
 
     controller.addListener('gcode:load', (name, content) => {

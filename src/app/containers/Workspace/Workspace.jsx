@@ -247,10 +247,6 @@ class Workspace extends PureComponent {
                     }
                 });
             }
-            /*
-            this.action.openModal(MODAL_FEEDER_PAUSED, {
-                title: title
-            });*/
         }
     };
 
