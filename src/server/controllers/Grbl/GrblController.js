@@ -227,7 +227,10 @@ class GrblController {
         this.feeder = new Feeder({
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
-                line = line.replace(/\s*;.*/g, '').trim();
+                let commentMatcher = /\s*;.*/g;
+                let comment = line.match(commentMatcher);
+                const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
+                line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
                 if (line[0] === '%') {
@@ -264,10 +267,10 @@ class GrblController {
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
                     if (programMode === 'M0') {
                         log.debug('M0 Program Pause');
-                        this.feeder.hold({ data: 'M0' }); // Hold reason
+                        this.feeder.hold({ data: 'M0', comment: commentString }); // Hold reason
                     } else if (programMode === 'M1') {
                         log.debug('M1 Program Pause');
-                        this.feeder.hold({ data: 'M1' }); // Hold reason
+                        this.feeder.hold({ data: 'M1', comment: commentString }); // Hold reason
                     }
                 }
 
@@ -278,17 +281,11 @@ class GrblController {
                 }
 
                 // // M6 Tool Change
-                // if (_.includes(words, 'M6')) {
-                //     log.debug('M6 Tool Change');
-                //     this.feeder.hold({ data: 'M6' }); // Hold reason
-
-                //     // Surround M6 with parentheses to ignore
-                //     // unsupported command error. If we nuke the whole
-                //     // line, then we'll likely lose other commands that
-                //     // share the line, like a T~.  This makes tool
-                //     // changes complicated.
-                //     line = line.replace('M6', '(M6)');
-                // }
+                if (_.includes(words, 'M6')) {
+                    log.debug('M6 Tool Change');
+                    this.feeder.hold({ data: 'M6', comment: commentString }); // Hold reason
+                    line = line.replace('M6', '(M6)');
+                }
 
                 return line;
             }
