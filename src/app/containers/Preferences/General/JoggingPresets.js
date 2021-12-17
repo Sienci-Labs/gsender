@@ -62,14 +62,12 @@ export default class JoggingPresets extends Component {
     }
 
     updateState = () => {
+        console.log('WE HERE IN THE UPDATE FUNCTION');
         const units = store.get('workspace.units');
-        const data = store.get('widgets.axes');
-        if (!data) {
-            this.setState({ units });
-            return;
-        }
 
         const jogSpeeds = this.getJogSpeeds();
+        console.log('in state update');
+        console.log(jogSpeeds);
         this.setState({
             units,
             jogSpeeds: { ...jogSpeeds }
@@ -121,6 +119,7 @@ export default class JoggingPresets extends Component {
         };
 
         store.replace('widgets.axes', updated);
+        this.updateState();
         this.showToast();
     }
 
@@ -165,6 +164,7 @@ export default class JoggingPresets extends Component {
         };
 
         store.replace('widgets.axes', updated);
+        this.updateState();
         this.showToast();
     }
 
@@ -208,15 +208,8 @@ export default class JoggingPresets extends Component {
         };
 
         store.replace('widgets.axes', updated);
+        this.updateState();
         this.showToast();
-    }
-
-    componentDidMount() {
-        store.on('change', this.updateState);
-    }
-
-    componentWillUnmount() {
-        store.removeListener('change', this.updateState);
     }
 
     render() {
