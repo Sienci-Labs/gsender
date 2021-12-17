@@ -26,7 +26,6 @@ import castArray from 'lodash/castArray';
 import isPlainObject from 'lodash/isPlainObject';
 import uuid from 'uuid';
 import settings from '../config/settings';
-import logger from '../lib/logger';
 import config from '../services/configstore';
 import { getPagingRange } from './paging';
 import {
