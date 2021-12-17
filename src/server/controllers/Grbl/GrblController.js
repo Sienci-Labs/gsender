@@ -208,7 +208,7 @@ class GrblController {
                         }
                     }
                 }
-
+                console.log(data);
                 return data;
             }
         });
@@ -409,11 +409,6 @@ class GrblController {
                 return;
             }
 
-            // if (this.workflow.state === WORKFLOW_STATE_IDLE) {
-            //     log.error(`Unexpected workflow state: ${this.workflow.state}`);
-            //     return;
-            // }
-
             line = String(line).trim();
             if (line.length === 0) {
                 log.warn(`Expected non-empty line: N=${this.sender.state.sent}`);
@@ -576,7 +571,6 @@ class GrblController {
                     if (preferences.showLineWarnings) {
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                         this.emit('workflow:state', this.workflow.state, { validLine: false, line: `${lines.length} ${line}` });
-                        return;
                     }
                 } else {
                     this.emit('serialport:read', res.raw);

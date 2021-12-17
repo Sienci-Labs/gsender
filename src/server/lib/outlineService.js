@@ -23,7 +23,6 @@
 
 import Toolpath from 'gcode-toolpath';
 import ch from 'hull.js';
-import uniqBy from 'lodash/uniqBy';
 import * as THREE from 'three';
 import logger from './logger';
 
@@ -87,12 +86,8 @@ export function getOutlineGcode(gcode, concavity = 60) {
     });
     log.debug('Parsing g-code');
     toolpath.loadFromStringSync(gcode);
-    log.debug('Reducing to unique vertices');
-    const uniqueVertices = uniqBy(vertices, v => JSON.stringify(v));
-    log.debug(`Dataset reduced from ${vertices.length} to ${uniqueVertices.length} points.`);
-
     log.debug(`Generating hull with accuracy of ${concavity}`);
-    const fileHull = ch(uniqueVertices, concavity);
+    const fileHull = ch(vertices, concavity);
 
     const gCode = convertPointsToGCode(fileHull);
 

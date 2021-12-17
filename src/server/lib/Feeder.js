@@ -109,7 +109,6 @@ class Feeder extends events.EventEmitter {
         this.state.queue = [];
         this.state.pending = false;
         this.state.outstanding = 0;
-        clearInterval(this.state.interval);
         this.state.interval = null;
         this.emit('change');
     }
@@ -163,22 +162,6 @@ class Feeder extends events.EventEmitter {
 
     hasOutstanding() {
         return this.state.outstanding > 0;
-    }
-
-    repeatCommand(command, timer = 200) {
-        if (!this.state.interval) {
-            this.state.interval = setInterval(() => {
-                if (!this.hasOutstanding()) {
-                    this.feed(command);
-                    if (!this.isPending()) {
-                        this.next();
-                    }
-                }
-            }, timer);
-        } else {
-            clearInterval(this.state.interval);
-            this.state.interval = null;
-        }
     }
 }
 
