@@ -33,6 +33,7 @@ import {
     ERR_NOT_FOUND,
     ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
+
 const CONFIG_KEY = 'macros';
 
 const getSanitizedRecords = () => {
