@@ -1583,8 +1583,7 @@ class GrblController {
             },
             'jog:stop': () => {
                 this.feeder.reset();
-                this.command('jog:cancel');
-                this.feeder.reset();
+                this.write('\x85');
             },
             'jog:cancel': () => {
                 this.command('gcode', '\x85');
