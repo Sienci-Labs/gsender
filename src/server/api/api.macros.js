@@ -34,8 +34,6 @@ import {
     ERR_NOT_FOUND,
     ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
-
-const log = logger('api:macros');
 const CONFIG_KEY = 'macros';
 
 const getSanitizedRecords = () => {
