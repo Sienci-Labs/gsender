@@ -88,7 +88,6 @@ class GrblController {
     connectionEventListener = {
         data: (data) => {
             log.silly(`< ${data}`);
-            console.log(`Data received: ${data}`);
             this.runner.parse('' + data);
         },
         close: (err) => {
