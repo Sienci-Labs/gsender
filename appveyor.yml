@@ -449,7 +449,7 @@ for:
             $PACKAGE_VERSION = node -e "console.log(require('./src/package.json').version)"
             $PRODUCT_NAME = "gSender"
             mkdir -Force -Path releases\windows
-            yarn build:windows-x64
+            yarn build:all
             Get-ChildItem output
             Copy-Item "output\${PRODUCT_NAME} Setup ${PACKAGE_VERSION}.exe" "releases\windows\${PACKAGE_NAME}-${PACKAGE_VERSION}-windows-x64.exe"
             Get-ChildItem releases\windows
