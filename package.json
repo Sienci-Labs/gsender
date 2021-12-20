@@ -24,7 +24,6 @@
   "engines": {
     "node": ">=14"
   },
-  "preferGlobal": true,
   "scripts": {
     "prepare": "npm run clean && npm run eslint && npm run stylint",
     "prebuild-latest": "npm run package-sync && bash -c \"cd src; npm version ${npm_package_version}-${COMMIT_COUNT:-latest}\" && bash scripts/prebuild-prod.sh",
@@ -59,6 +58,7 @@
     "build:linux-arm64": "bash -c 'scripts/electron-builder.sh --linux --arm64'",
     "build:windows-ia32": "bash -c 'scripts/electron-builder.sh --windows --ia32'",
     "build:windows-x64": "bash -c 'scripts/electron-builder.sh --windows --x64'",
+    "build:windows-all": "bash -c 'scripts/electron-builder.sh --windows --ia32 --x64'",
     "start": "./bin/gsender",
     "start-electron": "electron ./dist/gsender/main",
     "watch-dev": "cross-env NODE_ENV=development webpack-cli --watch --config webpack.config.server.development.js",
@@ -70,8 +70,7 @@
     "eslint:debug": "echo \"Checking code style...\"; DEBUG=eslint:cli-engine eslint --ext .js --ext .jsx *.js src scripts test",
     "stylint": "stylint src/app",
     "test": "tap test/*.js --no-timeout --node-arg=--require --node-arg=@babel/register --node-arg=--require --node-arg=@babel/polyfill",
-    "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls",
-    "postinstall": "opencollective postinstall"
+    "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls"
   },
   "build": {
     "appId": "org.sienci",
@@ -395,9 +394,5 @@
     "webpack-manifest-plugin": "~2.0.4",
     "webpack-node-externals": "~1.7.2",
     "write-file-webpack-plugin": "~4.5.0"
-  },
-  "collective": {
-    "type": "opencollective",
-    "url": ""
   }
 }

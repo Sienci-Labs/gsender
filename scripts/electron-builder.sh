@@ -21,7 +21,7 @@ pushd "$__dirname/../dist/gsender"
 echo "Cleaning up \"`pwd`/node_modules\""
 rm -rf node_modules
 echo "Installing packages..."
-yarn --production
+yarn --production --ignore-engines
 popd
 
 #echo "Rebuild native modules using electron ${electron_version}"
