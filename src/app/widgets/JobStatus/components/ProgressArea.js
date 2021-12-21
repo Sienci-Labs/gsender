@@ -54,8 +54,18 @@ const ProgressArea = ({ state }) => {
         const strElapsedSecond = `${(elapsedSecond[elapsedSecond.length - 2] !== undefined ? elapsedSecond[elapsedSecond.length - 2] : '')}${String(elapsedSecond[elapsedSecond.length - 1])}`;
         const formattedSeconds = Math.abs(Number(strElapsedSecond) < 59 ? Number(strElapsedSecond) : `${Number(strElapsedSecond) - 60}`);
 
+        const hours = elapsedMinute / 60;
+
+        if (hours > 23) {
+            const days = hours / 24;
+            const flooredDays = Math.floor(days);
+            const numberOfhours = (days - flooredDays) * 24;
+            const roundedHours = Math.round(numberOfhours);
+
+            return `${flooredDays < 10 ? `0${flooredDays}` : flooredDays}d ${numberOfhours < 10 ? `0${roundedHours}` : roundedHours}h`;
+        }
+
         if (elapsedMinute > 59) {
-            const hours = elapsedMinute / 60;
             const flooredHours = Math.floor(hours);
             const minutes = (hours - flooredHours) * 60;
             const roundedMinutes = Math.round(minutes);
