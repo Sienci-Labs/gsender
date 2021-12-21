@@ -1246,7 +1246,7 @@ class GrblController {
                     modalGCode.push(`G0 G90 G21 X${xVal} Y${yVal}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal}`);
                     // Set modals based on what's parsed so far in the file
-                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modal.feedrate} ${modal.wcs} ${modal.plane} ${modal.spindle} ${modal.coolant}`);
+                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.feedrate} ${modal.plane} ${modal.spindle} ${modal.coolant}`);
                     modalGCode.push(`F${feedRate} S${spindleRate}`);
 
                     this.command('gcode', modalGCode);
