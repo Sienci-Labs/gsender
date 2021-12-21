@@ -1729,8 +1729,9 @@ class GrblController {
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
     runPreChangeHook(comment = '') {
-        const { preHook } = this.toolChangeContext || '';
-
+        let { preHook } = this.toolChangeContext || '';
+        preHook = `G4 P1\n${preHook}`;
+        console.log(preHook);
         const block = this.convertGcodeToArray(preHook);
         block.push(`${PREHOOK_COMPLETE} ;${comment}`);
 
@@ -1738,7 +1739,8 @@ class GrblController {
     }
 
     runPostChangeHook() {
-        const { postHook } = this.toolChangeContext || '';
+        let { postHook } = this.toolChangeContext || '';
+        postHook = `G4 P1\n${postHook}`;
         const block = this.convertGcodeToArray(postHook);
         block.push(POSTHOOK_COMPLETE);
 
