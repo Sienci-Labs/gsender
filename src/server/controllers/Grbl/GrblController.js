@@ -1233,6 +1233,20 @@ class GrblController {
                     const modal = toolpath.getModal();
                     const position = toolpath.getPosition();
 
+                    const coolant = {
+                        mist: '',
+                        flood: '',
+                    };
+
+                    if (modal.coolant) {
+                        if (modal.coolant.includes('M7')) {
+                            coolant.mist = 'M7';
+                        }
+                        if (modal.coolant.includes('M8')) {
+                            coolant.flood = 'M8';
+                        }
+                    }
+
                     const {
                         x: xVal,
                         y: yVal,
@@ -1246,7 +1260,7 @@ class GrblController {
                     modalGCode.push(`G0 G90 G21 X${xVal} Y${yVal}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal}`);
                     // Set modals based on what's parsed so far in the file
-                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modal.feedrate} ${modal.wcs} ${modal.plane} ${modal.spindle} ${modal.coolant}`);
+                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modal.feedrate} ${modal.wcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(`F${feedRate} S${spindleRate}`);
 
                     this.command('gcode', modalGCode);
