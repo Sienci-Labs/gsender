@@ -159,6 +159,7 @@ class RunProbe extends PureComponent {
                                      (indicated by a green light) before returning the probe to the probing position.
                                 </p>
                                 <p>Probing cannot be run without confirming the circuit.</p>
+                                <p>Consider holding your touch plate in place during probing to get a more consistent measurement.</p>
                             </div>
                             <FunctionButton
                                 primary
