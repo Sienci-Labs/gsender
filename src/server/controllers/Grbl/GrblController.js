@@ -1731,7 +1731,6 @@ class GrblController {
     runPreChangeHook(comment = '') {
         let { preHook } = this.toolChangeContext || '';
         preHook = `G4 P1\n${preHook}`;
-        console.log(preHook);
         const block = this.convertGcodeToArray(preHook);
         block.push(`${PREHOOK_COMPLETE} ;${comment}`);
 
