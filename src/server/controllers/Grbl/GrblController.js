@@ -322,7 +322,7 @@ class GrblController {
         // Sender
         this.sender = new Sender(SP_TYPE_CHAR_COUNTING, {
             // Deduct the buffer size to prevent from buffer overrun
-            bufferSize: (128 - 18), // The default buffer size is 128 bytes
+            bufferSize: (128 - 28), // The default buffer size is 128 bytes
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
@@ -362,12 +362,12 @@ class GrblController {
                             this.workflow.pause({ data: 'M0', comment: commentString });
                             this.emit('workflow:pause', { data: 'M0' });
                         }
-                        return line.replace('M0', '(M0)');
+                        line = line.replace('M0', '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1', comment: commentString });
                         this.emit('workflow:pause', { data: 'M1' });
-                        return line.replace('M1', '(M1)');
+                        line = line.replace('M1', '(M1)');
                     }
                 }
 
