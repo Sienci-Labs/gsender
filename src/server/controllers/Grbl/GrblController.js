@@ -1311,7 +1311,7 @@ class GrblController {
             },
             'gcode:resume': async () => {
                 this.write('~');
-                await delay(1500);
+                await delay(1000);
                 this.workflow.resume();
                 this.event.trigger('gcode:resume');
             },
