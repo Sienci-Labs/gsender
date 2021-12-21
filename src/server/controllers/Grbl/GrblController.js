@@ -208,7 +208,6 @@ class GrblController {
                         }
                     }
                 }
-                console.log(data);
                 return data;
             }
         });
@@ -1731,6 +1730,7 @@ class GrblController {
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
     runPreChangeHook(comment = '') {
         const { preHook } = this.toolChangeContext || '';
+
         const block = this.convertGcodeToArray(preHook);
         block.push(`${PREHOOK_COMPLETE} ;${comment}`);
 
