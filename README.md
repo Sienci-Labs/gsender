@@ -99,6 +99,24 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.0.2 (December 22nd, 2021)
+* ; Comments are now emitted to UI on M0, M1, and M6 workflow stops
+* Fixed issue where jog cancel realtime command wasn't properly sent to controller
+* Fixed issue where default values instead of custom jog speeds weren't used on initial program load
+* Start from line now sends more modals to make sure IoT devices are enabled if that line is skipped
+* Improvements to outline feature - head should now return to original position, better support for disjointed/tiled carves
+* Fixed timestamps from causing UI elements to jump around
+* Fixed DRO being cut off on small resolutions or screen sizes
+* Fixed application not being full-screen on startup
+* UI fields should be more easily clearable and return to previous value if not changed
+* Workflow controls no longer disappear during jogging
+* Changes to updater to prevent 32 bit application to update to 64 bit
+* Added new laser support preferences with basic offset
+* Alarm 2 should now be unlockable
+* Fixed edge case where surfacing would leave an unfinished pass in the center
+* Updates to serial connection library and workflow
+* New touchplate images and support for upcoming auto-diameter touchplate
+
 ### 1.0.2 (December 3rd, 2021)
 * Fixed regression with XYZ probe
 * Fixed regression in probe preferences
