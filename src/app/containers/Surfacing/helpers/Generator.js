@@ -274,7 +274,7 @@ export default class Generator {
 
         // eslint-disable-next-line no-constant-condition
         while (true) {
-            if (endPosY > length) {
+            if (startPosY >= length) {
                 break;
             }
 
@@ -282,9 +282,15 @@ export default class Generator {
                 '\n',
                 `G1 Y${fixedVal(startPosY) * yFactor}`,
                 `G1 X${width * xFactor}`,
-                `G1 Y${fixedVal(endPosY) * yFactor}`,
-                'G1 X0',
             );
+
+            //Do not draw the second half of the rectangle if its end position is out of bounds
+            if (endPosY < length) {
+                gCodeArr.push(
+                    `G1 Y${fixedVal(endPosY) * yFactor}`,
+                    'G1 X0',
+                );
+            }
 
             const newEndPosY = Number(fixedVal(endPosY + (stepoverAmount)));
 
