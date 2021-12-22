@@ -108,9 +108,10 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Fixed timestamps from causing UI elements to jump around
 * Fixed DRO being cut off on small resolutions or screen sizes
 * Fixed application not being full-screen on startup
+* Increases on movement limits for jog presets
 * UI fields should be more easily clearable and return to previous value if not changed
 * Workflow controls no longer disappear during jogging
-* Changes to updater to prevent 32 bit application to update to 64 bit
+* Changes to updater to prevent 32 bit application updating to 64 bit
 * Added new laser support preferences with basic offset
 * Alarm 2 should now be unlockable
 * Fixed edge case where surfacing would leave an unfinished pass in the center
