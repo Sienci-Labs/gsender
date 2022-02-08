@@ -174,21 +174,23 @@ class DisplayPanel extends PureComponent {
                     <GoToButton
                         disabled={!canClick}
                         onClick={() => {
+                            const commands = [];
                             const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                             if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
                                 if (homingEnabled) {
-                                    controller.command('gcode:safe', `G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`, modal);
+                                    commands.push(`G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`);
                                 } else {
-                                    controller.command('gcode', 'G91');
-                                    controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                    commands.push('G91');
+                                    commands.push(`G0 Z${safeRetractHeight}`); // Retract Z when moving across workspace
                                 }
                             }
-                            controller.command('gcode', `G90 G0 ${axisLabel}0`); //Move to Work Position Zero
+                            commands.push(`G90 G0 ${axisLabel}0`); //Move to Work Position Zero
                             // We go down if homing not enabled
                             if (safeRetractHeight !== 0 && axisLabel !== 'Z' && !homingEnabled) {
-                                controller.command('gcode', `G91 G0 Z${safeRetractHeight * -1}`);
-                                controller.command('gcode', 'G90');
+                                commands.push(`G91 G0 Z${safeRetractHeight * -1}`);
+                                commands.push('G90');
                             }
+                            controller.command('gcode:safe', commands, modal);
                         }}
                     />
                     <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick} />
