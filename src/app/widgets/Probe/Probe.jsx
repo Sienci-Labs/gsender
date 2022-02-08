@@ -22,7 +22,7 @@
  */
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-
+import cx from 'classnames';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
 import {
@@ -74,7 +74,7 @@ class Probe extends PureComponent {
                                 }
                             </div>
                         </div>
-                        <div className={styles.mainGridItem}>
+                        <div className={cx(styles.mainGridItem, { [styles.hidden]: !probeCommand.tool })}>
                             <label>Tool</label>
                             <div className={styles.toolsWrapper}>
                                 <ProbeDiameter actions={actions} state={state} probeCommand={probeCommand} />

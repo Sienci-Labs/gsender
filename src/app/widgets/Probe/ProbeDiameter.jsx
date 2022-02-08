@@ -22,6 +22,7 @@
  */
 
 import React from 'react';
+import cx from 'classnames';
 import CreatableSelect from 'react-select/creatable';
 
 import store from 'app/store';
@@ -80,7 +81,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }) => {
     options.push(...convertAvailableTools(tools, units));
 
     return (
-        <div className={styles.probeDiameterWrapper}>
+        <div className={cx(styles.probeDiameterWrapper, { [styles.hidden]: !probeCommand.tool })}>
             <CreatableSelect
                 isClearable
                 styles={inputStyle}
