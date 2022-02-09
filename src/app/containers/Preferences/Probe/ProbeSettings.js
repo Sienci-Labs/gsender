@@ -66,7 +66,7 @@ const ProbeSettings = ({ state, probeActions, values, type }) => {
                                 value={values.retractionDistance}
                                 onChange={probeActions.changeRetractionDistance}
                                 additionalProps={{ type: 'number', id: 'retraction' }}
-                                units={`${units}/min`}
+                                units={`${units}`}
                             />
                         </Tooltip>
                     </>

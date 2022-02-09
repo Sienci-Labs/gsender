@@ -28,15 +28,15 @@ import _ from 'lodash';
 import ensureArray from 'ensure-array';
 import controller from 'app/lib/controller';
 import ToggleSwitch from 'app/components/ToggleSwitch';
+import UneditableInput from 'app/containers/Preferences/components/UneditableInput';
 import store from 'app/store';
 import TooltipCustom from '../../../components/TooltipCustom/ToolTip';
 import { Toaster, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
 import styles from '../index.styl';
 import defaultProfiles from './defaultMachineProfiles';
 import Fieldset from '../components/Fieldset';
-
-import Input from '../components/Input';
 import { convertToImperial, convertToMetric } from '../calculate';
+
 
 /**
  * Machine Profile Options Component
@@ -240,30 +240,24 @@ export default class MachineProfile extends Component {
                     <div className={styles['general-area-item']}>
                         <h4 className={styles['settings-subtitle']}>Cutting Area from EEPROM</h4>
                         <TooltipCustom content="Specify the width of your machine surface" location="default">
-                            <Input
+                            <UneditableInput
                                 label="Width"
                                 units={units}
                                 value={width}
-                                onChange={this.handleChange}
-                                additionalProps={{ name: 'width', type: 'number' }}
                             />
                         </TooltipCustom>
                         <TooltipCustom content="Specify the depth of your machine surface" location="default">
-                            <Input
+                            <UneditableInput
                                 label="Depth"
                                 units={units}
                                 value={depth}
-                                onChange={this.handleChange}
-                                additionalProps={{ name: 'depth', type: 'number' }}
                             />
                         </TooltipCustom>
                         <TooltipCustom content="Specify the height of your machine surface" location="default">
-                            <Input
+                            <UneditableInput
                                 label="Height"
                                 units={units}
                                 value={height}
-                                onChange={this.handleChange}
-                                additionalProps={{ name: 'height', type: 'number' }}
                             />
                         </TooltipCustom>
                     </div>
