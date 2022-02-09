@@ -42,7 +42,7 @@ const ProbeSettings = ({ state, probeActions, values, type }) => {
             {
                 type !== TOUCHPLATE_TYPE_AUTOZERO && (
                     <>
-                        <Tooltip content="Specify starting point between Touch Plate and Tool" location="default">
+                        <Tooltip content="Probe speed during initial touch-off" location="default">
                             <Input
                                 label="Fast Find"
                                 value={values.fastFeedrate}
@@ -51,7 +51,7 @@ const ProbeSettings = ({ state, probeActions, values, type }) => {
                                 units={`${units}/min`}
                             />
                         </Tooltip>
-                        <Tooltip content="Specify starting point between Touch Plate and Tool" location="default">
+                        <Tooltip content="Probe speed during second touch-off - slower for more accuracy" location="default">
                             <Input
                                 label="Slow Find"
                                 value={values.normalFeedrate}
@@ -60,7 +60,7 @@ const ProbeSettings = ({ state, probeActions, values, type }) => {
                                 units={`${units}/min`}
                             />
                         </Tooltip>
-                        <Tooltip content="Specify how high the head lifts while probing" location="default">
+                        <Tooltip content="Specify far the probe reverses after a successful touch" location="default">
                             <Input
                                 label="Retraction"
                                 value={values.retractionDistance}

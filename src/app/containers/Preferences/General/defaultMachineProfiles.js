@@ -144,7 +144,7 @@ export default [
     },
     {
         'id': 6,
-        'company': 'Carbide 3D',
+        'company': '',
         'name': 'Shapeoko',
         'type': '',
         'mm': {
@@ -163,50 +163,10 @@ export default [
         'laser': false
     },
     {
-        'id': 12,
-        'company': 'Carbide 3D',
-        'name': 'Nomad',
-        'type': '',
-        'mm': {
-            'width': 203.2,
-            'depth': 203.2,
-            'height': 76.2
-        },
-        'in': {
-            'width': 8,
-            'depth': 8,
-            'height': 3
-        },
-        'endstops': true,
-        'spindle': true,
-        'coolant': false,
-        'laser': false
-    },
-    {
-        'id': 15,
-        'company': 'Inventables',
-        'name': 'XCarve',
-        'type': '500mm',
-        'mm': {
-            'width': 250,
-            'depth': 250,
-            'height': 65
-        },
-        'in': {
-            'width': 9.84,
-            'depth': 9.84,
-            'height': 2.56
-        },
-        'endstops': false,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
         'id': 18,
-        'company': 'Inventables',
+        'company': '',
         'name': 'XCarve',
-        'type': 'Pro 4x2',
+        'type': '',
         'mm': {
             'width': 1219.2,
             'depth': 609.6,
@@ -223,50 +183,10 @@ export default [
         'laser': false
     },
     {
-        'id': 20,
-        'company': 'Inventables',
-        'name': 'Carvey',
-        'type': '',
-        'mm': {
-            'width': 294.64,
-            'depth': 203.2,
-            'height': 63.5
-        },
-        'in': {
-            'width': 11.6,
-            'depth': 8,
-            'height': 2.5
-        },
-        'endstops': true,
-        'spindle': true,
-        'coolant': false,
-        'laser': false
-    },
-    {
-        'id': 21,
-        'company': 'Kibre Enterprises',
-        'name': 'Onefinity',
-        'type': 'Machinist',
-        'mm': {
-            'width': 412.75,
-            'depth': 412.75,
-            'height': 113.35
-        },
-        'in': {
-            'width': 16.25,
-            'depth': 16.25,
-            'height': 4.46
-        },
-        'endstops': true,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
         'id': 22,
-        'company': 'Kibre Enterprises',
+        'company': '',
         'name': 'Onefinity',
-        'type': 'Woodworker',
+        'type': '',
         'mm': {
             'width': 819.15,
             'depth': 819.15,
@@ -285,7 +205,7 @@ export default [
     {
         'id': 23,
         'company': 'OpenBuilds',
-        'name': 'C-Beam',
+        'name': '',
         'type': '',
         'mm': {
             'width': 270,
@@ -303,89 +223,9 @@ export default [
         'laser': false
     },
     {
-        'id': 25,
-        'company': 'OpenBuilds',
-        'name': 'Lead',
-        'type': '',
-        'mm': {
-            'width': 810,
-            'depth': 730,
-            'height': 90
-        },
-        'in': {
-            'width': 31.89,
-            'depth': 28.74,
-            'height': 3.54
-        },
-        'endstops': true,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
-        'id': 27,
-        'company': 'OpenBuilds',
-        'name': 'MiniMill',
-        'type': '',
-        'mm': {
-            'width': 120,
-            'depth': 120,
-            'height': 60
-        },
-        'in': {
-            'width': 4.72,
-            'depth': 4.72,
-            'height': 2.36
-        },
-        'endstops': true,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
-        'id': 28,
-        'company': 'OpenBuilds',
-        'name': 'Sphinx',
-        'type': '',
-        'mm': {
-            'width': 333,
-            'depth': 325,
-            'height': 85
-        },
-        'in': {
-            'width': 13.11,
-            'depth': 12.8,
-            'height': 3.35
-        },
-        'endstops': true,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
-        'id': 30,
-        'company': 'OpenBuilds',
-        'name': 'WorkBee',
-        'type': '',
-        'mm': {
-            'width': 824,
-            'depth': 780,
-            'height': 122
-        },
-        'in': {
-            'width': 32.44,
-            'depth': 30.71,
-            'height': 4.8
-        },
-        'endstops': true,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
         'id': 33,
         'company': 'Ooznest',
-        'name': 'WorkBee',
+        'name': '',
         'type': '',
         'mm': {
             'width': 300,
@@ -405,7 +245,7 @@ export default [
     {
         'id': 34,
         'company': 'Mill Right',
-        'name': 'M3',
+        'name': '',
         'type': '',
         'mm': {
             'width': 260,
@@ -423,69 +263,9 @@ export default [
         'laser': false
     },
     {
-        'id': 35,
-        'company': 'Mill Right',
-        'name': 'Carve King',
-        'type': '',
-        'mm': {
-            'width': 438.15,
-            'depth': 438.15,
-            'height': 101.6
-        },
-        'in': {
-            'width': 17.25,
-            'depth': 17.25,
-            'height': 4
-        },
-        'endstops': false,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
-        'id': 37,
-        'company': 'Mill Right',
-        'name': 'Mega V',
-        'type': '',
-        'mm': {
-            'width': 482.6,
-            'depth': 482.6,
-            'height': 95.25
-        },
-        'in': {
-            'width': 19,
-            'depth': 19,
-            'height': 3.75
-        },
-        'endstops': false,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
-        'id': 39,
-        'company': 'Mill Right',
-        'name': 'Power Route',
-        'type': '',
-        'mm': {
-            'width': 635,
-            'depth': 635,
-            'height': 127
-        },
-        'in': {
-            'width': 25,
-            'depth': 25,
-            'height': 5
-        },
-        'endstops': false,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
         'id': 41,
         'company': 'CNC4newbie',
-        'name': 'New-Carve',
+        'name': '',
         'type': '',
         'mm': {
             'width': 400.05,
@@ -503,29 +283,9 @@ export default [
         'laser': false
     },
     {
-        'id': 42,
-        'company': 'CNC4newbie',
-        'name': 'C4N48xx',
-        'type': '',
-        'mm': {
-            'width': 1270,
-            'depth': 660.4,
-            'height': 177.8
-        },
-        'in': {
-            'width': 50,
-            'depth': 26,
-            'height': 7
-        },
-        'endstops': true,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
         'id': 43,
         'company': 'BobsCNC',
-        'name': 'EV3',
+        'name': '',
         'type': '',
         'mm': {
             'width': 457.2,
@@ -543,69 +303,9 @@ export default [
         'laser': false
     },
     {
-        'id': 44,
-        'company': 'BobsCNC',
-        'name': 'EV4',
-        'type': '',
-        'mm': {
-            'width': 609.6,
-            'depth': 609.6,
-            'height': 83.82
-        },
-        'in': {
-            'width': 24,
-            'depth': 24,
-            'height': 3.3
-        },
-        'endstops': true,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
-        'id': 45,
-        'company': 'BobsCNC',
-        'name': 'KL733',
-        'type': '',
-        'mm': {
-            'width': 914.4,
-            'depth': 914.4,
-            'height': 127
-        },
-        'in': {
-            'width': 36,
-            'depth': 36,
-            'height': 5
-        },
-        'endstops': true,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
-        'id': 46,
-        'company': 'BobsCNC',
-        'name': 'KL744',
-        'type': '',
-        'mm': {
-            'width': 1219.2,
-            'depth': 1219.2,
-            'height': 127
-        },
-        'in': {
-            'width': 48,
-            'depth': 48,
-            'height': 5
-        },
-        'endstops': true,
-        'spindle': false,
-        'coolant': false,
-        'laser': false
-    },
-    {
         'id': 47,
         'company': 'SainSmart',
-        'name': 'Genmitsu',
+        'name': '',
         'type': '',
         'mm': {
             'width': 180,
@@ -624,7 +324,7 @@ export default [
     },
     {
         'id': 50,
-        'company': 'Whittle',
+        'company': '',
         'name': '',
         'type': 'WhittleCNC',
         'mm': {
@@ -646,7 +346,7 @@ export default [
         'id': 51,
         'company': 'Makerdreams',
         'name': '',
-        'type': 'Evo-One',
+        'type': '',
         'mm': {
             'width': 530,
             'depth': 450,

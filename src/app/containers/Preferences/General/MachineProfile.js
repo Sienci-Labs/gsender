@@ -238,7 +238,7 @@ export default class MachineProfile extends Component {
                     </div>
 
                     <div className={styles['general-area-item']}>
-                        <h4 className={styles['settings-subtitle']}>Cutting Area</h4>
+                        <h4 className={styles['settings-subtitle']}>Cutting Area from EEPROM</h4>
                         <TooltipCustom content="Specify the width of your machine surface" location="default">
                             <Input
                                 label="Width"
