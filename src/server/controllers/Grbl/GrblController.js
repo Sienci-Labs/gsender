@@ -353,7 +353,7 @@ class GrblController {
                 line = translateExpression(line, context);
                 const data = parser.parseLine(line, { flatten: true });
                 const words = ensureArray(data.words);
-                console.log(words);
+                console.log(data);
 
                 { // Program Mode: M0, M1
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
@@ -399,7 +399,7 @@ class GrblController {
                         this.runPreChangeHook(commentString);
                     }
 
-                    line = line.replace('M6', '(M6)');
+                    line = '(M6)';
                 }
 
                 return line;
