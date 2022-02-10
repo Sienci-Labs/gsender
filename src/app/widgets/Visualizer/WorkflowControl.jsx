@@ -198,11 +198,10 @@ class WorkflowControl extends PureComponent {
     }
 
     handleOnStop = () => {
-        const { actions: { handlePause, handleStop }, controllerState, senderStatus } = this.props;
+        const { actions: { handleStop }, controllerState, senderStatus } = this.props;
         const { status } = controllerState;
 
         const { received } = senderStatus;
-        handlePause();
         handleStop();
         this.setState(prev => ({ runHasStarted: false, startFromLine: { ...prev.startFromLine, value: received } }));
         if (status.activeState === 'Check') {

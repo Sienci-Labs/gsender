@@ -325,6 +325,8 @@ class GrblController {
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
+                let bracketCommentLine = /^\s*\([^\)]*\)/gm;
+                line = line.replace(bracketCommentLine, '').trim();
                 let comment = line.match(commentMatcher);
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').trim();
@@ -351,6 +353,7 @@ class GrblController {
                 line = translateExpression(line, context);
                 const data = parser.parseLine(line, { flatten: true });
                 const words = ensureArray(data.words);
+                console.log(words);
 
                 { // Program Mode: M0, M1
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
@@ -1293,6 +1296,7 @@ class GrblController {
                 const [options] = args;
                 const { force = false } = { ...options };
                 if (force) {
+                    console.log('in force');
                     let activeState;
 
                     activeState = _.get(this.state, 'status.activeState', '');
@@ -1300,7 +1304,7 @@ class GrblController {
                         this.write('!'); // hold
                     }
 
-                    await delay(500); // delay 500ms
+                    await delay(700); // delay 700ms
 
                     activeState = _.get(this.state, 'status.activeState', '');
                     if (activeState === GRBL_ACTIVE_STATE_HOLD) {
