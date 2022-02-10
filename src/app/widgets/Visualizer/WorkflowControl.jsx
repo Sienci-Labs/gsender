@@ -367,7 +367,7 @@ class WorkflowControl extends PureComponent {
 
                 <div className={styles.relativeWrapper}>
                     {
-                        workflowState !== WORKFLOW_STATE_RUNNING && (
+                        workflowState === WORKFLOW_STATE_IDLE && (
                             <>
                                 <button
                                     type="button"
