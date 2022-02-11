@@ -189,7 +189,10 @@ class Workspace extends PureComponent {
         'feeder:status': (status) => {
             const { modal } = this.state;
             const { hold, holdReason } = { ...status };
+            console.log('FEEDER STATUS CHANGE');
+            console.log(hold);
             console.log(holdReason);
+
 
             if (!hold) {
                 if (_.includes([MODAL_FEEDER_PAUSED, MODAL_FEEDER_WAIT], modal.name)) {
@@ -198,7 +201,8 @@ class Workspace extends PureComponent {
                 return;
             }
 
-            const { err, data, comment } = { ...holdReason };
+            const { err, data, comment, strategy } = { ...holdReason };
+            console.log(strategy);
 
             if (err) {
                 this.action.openModal(MODAL_FEEDER_PAUSED, {
@@ -233,7 +237,7 @@ class Workspace extends PureComponent {
                 ? <div><p>Press Resume to continue operation.</p><p>Line contained following comment: <b>{commentString}</b></p></div>
                 : 'Press Resume to continue operation.';
 
-            if (hold) {
+            if (hold && strategy !== 'Manual' && strategy !== 'Pause') {
                 Confirm({
                     title,
                     content,

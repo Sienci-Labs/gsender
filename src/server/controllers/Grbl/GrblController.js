@@ -353,7 +353,6 @@ class GrblController {
                 line = translateExpression(line, context);
                 const data = parser.parseLine(line, { flatten: true });
                 const words = ensureArray(data.words);
-                console.log(data);
 
                 { // Program Mode: M0, M1
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
@@ -386,12 +385,12 @@ class GrblController {
                     const { toolChangeOption } = this.toolChangeContext;
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
-                    if (toolChangeOption === 'Pause') {
-                        this.workflow.pause({ data: 'M6', comment: commentString });
+                    if (toolChangeOption === 'Pause' || toolChangeOption === 'Manual') {
+                        this.workflow.pause({ data: 'M6', comment: commentString});
                         this.emit('gcode:toolChange', {
                             line: sent + 1,
                             block: line,
-                            option: toolChangeOption
+                            option: 'Manual'
                         }, commentString);
                     } else if (toolChangeOption === 'Code') {
                         this.workflow.pause({ data: 'M6', comment: commentString });

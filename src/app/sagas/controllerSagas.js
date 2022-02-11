@@ -129,10 +129,17 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('gcode:toolChange', (context, comment = '') => {
+    controller.addListener('gcode:toolChange', (context, comment = '',) => {
         const content = (comment.length > 0)
             ? <div><p>Press Resume to continue operation.</p><p>Line contained following comment: <b>{comment}</b></p></div>
             : 'Press Resume to continue operation.';
+
+        const { option } = context;
+
+        // We don't throw a modal on manual tool changes
+        if (option === 'Manual') {
+            return;
+        }
 
         Confirm({
             title: 'M6 Tool Change',

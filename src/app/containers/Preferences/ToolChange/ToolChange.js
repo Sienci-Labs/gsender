@@ -14,7 +14,7 @@ import styles from '../index.styl';
 
 const options = [
     'Ignore',
-    'Pause',
+    'Manual',
     'Code'
 ];
 

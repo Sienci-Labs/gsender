@@ -165,7 +165,27 @@ export default [
     {
         'id': 18,
         'company': '',
-        'name': 'XCarve',
+        'name': 'X-Carve',
+        'type': '',
+        'mm': {
+            'width': 1219.2,
+            'depth': 609.6,
+            'height': 101.6
+        },
+        'in': {
+            'width': 48,
+            'depth': 24,
+            'height': 4
+        },
+        'endstops': true,
+        'spindle': true,
+        'coolant': false,
+        'laser': false
+    },
+    {
+        'id': 19,
+        'company': '',
+        'name': 'Nomad',
         'type': '',
         'mm': {
             'width': 1219.2,
@@ -344,7 +364,7 @@ export default [
     },
     {
         'id': 51,
-        'company': 'Makerdreams',
+        'company': 'Evo-One',
         'name': '',
         'type': '',
         'mm': {
@@ -364,9 +384,9 @@ export default [
     },
     {
         'id': 52,
-        'company': 'Generic',
+        'company': 'Generic CNC',
         'name': '',
-        'type': 'GRBL',
+        'type': '',
         'mm': {
             'width': 530,
             'depth': 450,
