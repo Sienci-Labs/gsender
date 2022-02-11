@@ -112,7 +112,7 @@ const main = () => {
             // * `width` Number - The width of the rectangle.
             // * `height` Number - The height of the rectangle.
             const bounds = {
-                minWidth: 1140,
+                minWidth: 1024,
                 minHeight: 768,
                 ...store.get('bounds')
             };

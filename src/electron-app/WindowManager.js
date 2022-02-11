@@ -49,7 +49,7 @@ class WindowManager {
                         title: this.title,
                         width: this.width || 500,
                         height: this.height || 400,
-                        minWidth: 1280,
+                        minWidth: 1024,
                         minHeight: 768,
                     },
                 );
