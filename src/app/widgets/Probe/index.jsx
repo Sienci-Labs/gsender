@@ -862,6 +862,7 @@ class ProbeWidget extends PureComponent {
         } else if (axes.y) {
             code.push(
                 '; Probe Y',
+                'G21 G91',
                 'G38.2 Z-25 F200',
                 'G21 G91 G0 Z2',
                 'G21 G91 G0 Y13',
@@ -878,6 +879,7 @@ class ProbeWidget extends PureComponent {
         } else if (axes.x) {
             code.push(
                 '; Probe X',
+                'G21 G91',
                 'G38.2 Z-25 F200',
                 'G21 G91 G0 Z2',
                 'G21 G91 G0 X13',
@@ -1012,6 +1014,7 @@ class ProbeWidget extends PureComponent {
         } else if (axes.y) {
             code.push(
                 '; Probe Y Auto Tip',
+                'G21 G91',
                 'G38.2 Z-25 F200',
                 'G21 G91 G0 Z0.5',
                 'G21 G91 G0 Y-3',
