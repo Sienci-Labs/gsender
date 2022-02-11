@@ -33,7 +33,7 @@ const CoolantWidget = ({ widgetId, embedded }) => {
         <Widget>
             <Widget.Header embedded={embedded}>
             </Widget.Header>
-            <Widget.Content>
+            <Widget.Content style={{ height: '100%' }}>
                 <CoolantActiveIndicator />
                 <CoolantControls />
             </Widget.Content>
