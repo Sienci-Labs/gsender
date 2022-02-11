@@ -5,8 +5,9 @@ import styled from 'styled-components';
 
 const GaugeContainer = styled.div`
   width: 100%;
+  min-width: 115px;
   max-width: 500px;
-  font-size: 2.15rem;
+  font-size: 2rem;
   color: #3e85c7;
   padding: 5px 5px 0 5px;
 `;
