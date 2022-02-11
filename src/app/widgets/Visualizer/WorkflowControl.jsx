@@ -364,10 +364,10 @@ class WorkflowControl extends PureComponent {
                     accept=".gcode,.gc,.nc,.tap,.cnc"
                 />
 
-                <div className={styles.relativeWrapper}>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', width: 'calc(100% - 9rem)' }}>
                     {
                         workflowState === WORKFLOW_STATE_IDLE && (
-                            <>
+                            <div className={styles.relativeWrapper}>
                                 <button
                                     type="button"
                                     className={`${styles['workflow-button-upload']}`}
@@ -385,64 +385,94 @@ class WorkflowControl extends PureComponent {
                                 >
                                     <i className="fas fa-times" />
                                 </div>
-                            </>
+                            </div>
                         )
                     }
+
+                    {
+                        !workflowPaused && (
+                            <div className={styles.splitContainer} style={{ display: !canRun ? 'none' : '' }}>
+                                <button
+                                    type="button"
+                                    className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
+                                    title={i18n._('Outline')}
+                                    onClick={this.runOutline}
+                                    disabled={!canRun}
+                                    style={{ writingMode: 'vertical-lr', marginRight: '1rem' }}
+                                >
+                                    {i18n._('Outline')} <i className="fas fa-vector-square" style={{ writingMode: 'horizontal-tb' }} />
+                                </button>
+                                <button
+                                    type="button"
+                                    className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
+                                    title={i18n._('Test Run')}
+                                    onClick={this.handleTestFile}
+                                    disabled={!canRun}
+                                    style={{ writingMode: 'vertical-lr' }}
+                                >
+                                    {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
+                                </button>
+                            </div>
+                        )
+
+                    }
+                    {
+                        canRun && (
+                            <div className={styles.relativeWrapper}>
+                                <button
+                                    type="button"
+                                    className={styles['workflow-button-play']}
+                                    title={workflowPaused ? i18n._('Resume') : i18n._('Run')}
+                                    onClick={this.startRun}
+                                    disabled={!isConnected}
+                                >
+                                    {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
+                                </button>
+                                {
+                                    !workflowPaused && (
+                                        <div
+                                            role="button"
+                                            className={styles['start-from-line-button']}
+                                            onClick={this.startFromLinePrompt}
+                                        >
+                                            <i className="fas fa-list-ol" />
+                                        </div>
+                                    )
+                                }
+                            </div>
+                        )
+                    }
+
+                    {
+                        canPause && (
+                            <button
+                                type="button"
+                                className={styles['workflow-button-pause']}
+                                title={i18n._('Pause')}
+                                onClick={actions.handlePause}
+                                disabled={!canPause}
+                            >
+                                {i18n._('Pause Job')} <i className="fa fa-pause" style={{ writingMode: 'vertical-lr' }} />
+                            </button>
+                        )
+                    }
+
+                    {
+                        canStop && (
+                            <button
+                                type="button"
+                                className={styles['workflow-button-stop']}
+                                title={i18n._('Stop')}
+                                onClick={handleOnStop}
+                                disabled={!canStop}
+                            >
+                                {i18n._('Stop Job')} <i className="fa fa-stop" style={{ writingMode: 'vertical-lr' }} />
+                            </button>
+                        )
+                    }
+
                 </div>
 
-                {
-                    !workflowPaused && (
-                        <div className={styles.splitContainer}>
-                            <button
-                                type="button"
-                                className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
-                                title={i18n._('Outline')}
-                                onClick={this.runOutline}
-                                disabled={!canRun}
-                                style={{ writingMode: 'vertical-lr' }}
-                            >
-                                {i18n._('Outline')} <i className="fas fa-vector-square" style={{ writingMode: 'horizontal-tb' }} />
-                            </button>
-                            <button
-                                type="button"
-                                className={!canRun ? `${styles['workflow-button-disabled']}` : `${styles['workflow-button-test']}`}
-                                title={i18n._('Test Run')}
-                                onClick={this.handleTestFile}
-                                disabled={!canRun}
-                                style={{ writingMode: 'vertical-lr' }}
-                            >
-                                {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
-                            </button>
-                        </div>
-                    )
-
-                }
-                {
-                    canRun && (
-                        <div className={styles.relativeWrapper}>
-                            <button
-                                type="button"
-                                className={styles['workflow-button-play']}
-                                title={workflowPaused ? i18n._('Resume') : i18n._('Run')}
-                                onClick={this.startRun}
-                                disabled={!isConnected}
-                            >
-                                {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
-                            </button>
-                            {
-                                !workflowPaused && (
-                                    <div
-                                        role="button"
-                                        className={styles['start-from-line-button']}
-                                        onClick={this.startFromLinePrompt}
-                                    >
-                                        <i className="fas fa-list-ol" />
-                                    </div>
-                                )
-                            }
-                        </div>
-                    )
-                }
                 {
                     this.state.closeFile && (
                         <Modal showCloseButton={false}>
@@ -530,33 +560,6 @@ class WorkflowControl extends PureComponent {
                                 </div>
                             </Modal.Body>
                         </Modal>
-                    )
-                }
-                {
-                    canPause && (
-                        <button
-                            type="button"
-                            className={styles['workflow-button-pause']}
-                            title={i18n._('Pause')}
-                            onClick={actions.handlePause}
-                            disabled={!canPause}
-                        >
-                            {i18n._('Pause Job')} <i className="fa fa-pause" style={{ writingMode: 'vertical-lr' }} />
-                        </button>
-                    )
-                }
-
-                {
-                    canStop && (
-                        <button
-                            type="button"
-                            className={styles['workflow-button-stop']}
-                            title={i18n._('Stop')}
-                            onClick={handleOnStop}
-                            disabled={!canStop}
-                        >
-                            {i18n._('Stop Job')} <i className="fa fa-stop" style={{ writingMode: 'vertical-lr' }} />
-                        </button>
                     )
                 }
 
