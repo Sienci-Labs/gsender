@@ -54,7 +54,7 @@ import GrblRunner from './GrblRunner';
 import {
     GRBL,
     GRBL_ACTIVE_STATE_RUN,
-    GRBL_ACTIVE_STATE_HOLD,
+    //GRBL_ACTIVE_STATE_HOLD,
     GRBL_REALTIME_COMMANDS,
     GRBL_ALARMS,
     GRBL_ERRORS,
@@ -386,7 +386,7 @@ class GrblController {
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     if (toolChangeOption === 'Pause' || toolChangeOption === 'Manual') {
-                        this.workflow.pause({ data: 'M6', comment: commentString});
+                        this.workflow.pause({ data: 'M6', comment: commentString });
                         this.emit('gcode:toolChange', {
                             line: sent + 1,
                             block: line,
@@ -1304,11 +1304,7 @@ class GrblController {
                     }
 
                     await delay(700); // delay 700ms
-
-                    activeState = _.get(this.state, 'status.activeState', '');
-                    if (activeState === GRBL_ACTIVE_STATE_HOLD) {
-                        this.write('\x18'); // ^x
-                    }
+                    this.write('\x18'); // ^x
                 }
             },
             'pause': () => {
