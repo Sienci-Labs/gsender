@@ -24,10 +24,10 @@
 import React from 'react';
 import styles from './Overrides.styl';
 
-const FeedControlButton = ({ children, ...props }) => {
+const FeedControlButton = ({ children, hideOnSmallScreens, ...props }) => {
     return (
         <button
-            className={styles.feedControlButton}
+            className={hideOnSmallScreens ? styles.feedControlButtonHidden : styles.feedControlButton}
             {...props}
         >
             {children}
