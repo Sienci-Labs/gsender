@@ -687,8 +687,10 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 X0 Y0',
+                'G4 P0.15',
                 `G10 L20 ${p} X22.5 Y22.5`,
                 'G21 G90 G0 X0 Y0',
+                'G21 G90 Z1'
             );
         } else if (axes.x && axes.y) {
             code.push(
@@ -722,6 +724,7 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 X0 Y0',
+                'G4 P0.15',
                 `G10 L20 ${p} X22.5 Y22.5`,
                 'G21 G90 G0 X0 Y0',
             );
@@ -755,6 +758,7 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} X[posx/2]`,
                 'G21 G90 G0 X0',
+                'G4 P0.15',
                 `G10 L20 ${p} X22.5`,
                 'G21 G91 G0 Z30',
                 'G21 G90 G0 X0',
@@ -778,6 +782,7 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 Y0',
+                'G4 P0.15',
                 `G10 L20 ${p} Y22.5`,
                 'G21 G91 G0 Z30',
                 'G21 G90 G0 Y0',
@@ -821,9 +826,10 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} Y19.325`,
                 'G21 G90 G0 X0 Y0',
+                'G4 P0.15',
                 `G10 L20 ${p} X22.5 Y22.5`,
                 'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',
+                'G21 G90 G0 Z1',
             );
         } else if (axes.x && axes.y) {
             code.push(
@@ -845,7 +851,9 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} Y19.325`,
                 'G21 G90 G0 X0 Y0',
+                'G4 P0.15',
                 `G10 L20 ${p} X22.5 Y22.5`,
+                'G4 P0.15',
                 'G21 G90 G0 X0 Y0',
             );
         } else if (axes.z) {
@@ -857,6 +865,7 @@ class ProbeWidget extends PureComponent {
                 'G38.2 Z-5 F75',
                 'G4 P0.15',
                 `G10 L20 ${p} Z5`,
+                'G4 P0.15',
                 'G21 G91 G0 Z2',
             );
         } else if (axes.y) {
@@ -872,6 +881,7 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} Y19.325`,
                 'G21 G90 G0 Y0',
+                'G4 P0.15',
                 `G10 L20 ${p} Y22.5`,
                 'G21 G91 G0 Z30',
                 'G21 G90 G0 Y0',
@@ -889,6 +899,7 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} X19.325`,
                 'G21 G90 G0 X0',
+                'G4 P0.15',
                 `G10 L20 ${p} X22.5`,
                 'G21 G91 G0 Z30',
                 'G21 G90 G0 X0',
@@ -940,9 +951,10 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 X0 Y0',
+                'G4 P0.15',
                 `G10 L20 ${p} X22.5 Y22.5`,
                 'G21 G90 G0 X0 Y0',
-                'G21 G90 G0 Z0.5',
+                'G21 G90 G0 Z1',
             );
         } else if (axes.x && axes.y) {
             code.push(
@@ -976,6 +988,7 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 X0 Y0',
+                'G4 P0.15',
                 `G10 L20 ${p} X22.5 Y22.5`,
                 'G21 G90 G0 X0 Y0',
             );
@@ -988,7 +1001,8 @@ class ProbeWidget extends PureComponent {
                 'G38.2 Z-5 F75',
                 'G4 P0.15',
                 `G10 L20 ${p} Z5`,
-                'G21 G91 G0 Z0.5',
+                'G4 P0.15',
+                'G21 G91 G0 Z1',
             );
         } else if (axes.x) {
             code.push(
@@ -1009,6 +1023,7 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} X[posx/2]`,
                 'G21 G90 G0 X0',
+                'G4 P0.15',
                 `G10 L20 ${p} X22.5`,
             );
         } else if (axes.y) {
@@ -1030,6 +1045,7 @@ class ProbeWidget extends PureComponent {
                 'G4 P0.15',
                 `G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 Y0',
+                'G4 P0.15',
                 `G10 L20 ${p} Y22.5`,
             );
         }
