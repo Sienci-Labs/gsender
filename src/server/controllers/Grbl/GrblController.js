@@ -1208,6 +1208,7 @@ class GrblController {
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
                     const firstHalf = lines.slice(0, lineToStartFrom);
+                    let feedFound = false;
                     let feedRate = 200;
                     let spindleRate = 0;
 
@@ -1226,6 +1227,7 @@ class GrblController {
                         const { words, line } = data;
                         if (line.includes('F')) {
                             feedRate = getWordValue('F', words);
+                            feedFound = true;
                         }
                         if (line.includes('S')) {
                             spindleRate = getWordValue('S', words);
@@ -1256,6 +1258,9 @@ class GrblController {
                     } = position;
 
                     const modalGCode = [];
+                    if (!feedFound) {
+                        feedRate = modal.units === 'G21' ? 200 : 8;
+                    }
 
                     // Move up and then to cut start position
                     modalGCode.push('G0 G90 G21 Z10');
