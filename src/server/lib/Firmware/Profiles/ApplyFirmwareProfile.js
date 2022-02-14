@@ -27,6 +27,8 @@ import LongMill12x30 from '!raw-loader!./EepromFiles/Sienci Long Mill12X30.txt';
 import LongMill30x30 from '!raw-loader!./EepromFiles/Sienci Long Mill30X30.txt';
 import MillOne from '!raw-loader!./EepromFiles/Sienci Mill One.txt';
 import MillOneV3 from '!raw-loader!./EepromFiles/Sienci Mill OneV3.txt';
+import MK230x30 from '!raw-loader!./EepromFiles/MK2_30x30.txt';
+import MK212x30 from '!raw-loader!./EepromFiles/MK2_12x30.txt';
 import map from 'lodash/map';
 import store from '../../../store';
 
@@ -57,6 +59,15 @@ const ApplyFirmwareProfile = (nameOfMachine, typeOfMachine, recievedPortNumber) 
         }
         if (typeOfMachine === '30x30') {
             settings = LongMill30x30;
+        }
+    }
+
+    if (nameOfMachine === 'LongMill MK2') {
+        if (typeOfMachine === '12X30') {
+            settings = MK212x30;
+        }
+        if (typeOfMachine === '30x30') {
+            settings = MK230x30;
         }
     }
 

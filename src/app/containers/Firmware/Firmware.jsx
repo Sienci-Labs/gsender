@@ -249,7 +249,7 @@ class Firmware extends PureComponent {
             controller.command('firmware:applyProfileSettings', nameOfMachine, typeOfMachine, this.state.port);
             this.props.modalClose();
             Toaster.pop({
-                msg: (`${nameOfMachine} ${typeOfMachine} settings updated!`),
+                msg: ('Settings updated!'),
                 type: 'TOASTER_INFO',
             });
             this.setState({ initiateRestoreDefaults: false });
