@@ -26,6 +26,7 @@ import ensureArray from 'ensure-array';
 import frac from 'frac';
 import _uniqueId from 'lodash/uniqueId';
 import _includes from 'lodash/includes';
+import JogControl from 'app/widgets/JogControl/components/JogControl';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 import React, { PureComponent } from 'react';
@@ -42,7 +43,7 @@ import {
 } from 'app/constants';
 import Fraction from './components/Fraction';
 import styles from './index.styl';
-import JogControl from './components/JogControl';
+
 import JogCancel from './components/JogCancel';
 
 const KeypadText = styled.span`
