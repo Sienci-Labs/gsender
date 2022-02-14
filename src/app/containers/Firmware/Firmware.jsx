@@ -240,7 +240,8 @@ class Firmware extends PureComponent {
 
     actions = {
         getMachineProfileVersion: () => {
-            return 'MK2';
+            const machineProfile = store.get('workspace.machineProfile');
+            return get(machineProfile, 'version', 'MK1');
         },
         applySettings: () => {
             let nameOfMachine = this.state.currentMachineProfile.name;
