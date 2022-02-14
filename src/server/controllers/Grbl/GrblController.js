@@ -1129,13 +1129,13 @@ class GrblController {
     command(cmd, ...args) {
         const handler = {
             'flash:start': () => {
-                let [port] = args;
+                let [port, type] = args;
                 if (!port) {
                     this.emit('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
                     return;
                 }
                 this.close(() => {
-                    FlashingFirmware(port);
+                    FlashingFirmware(port, type);
                 });
             },
             'flashing:success': () => {

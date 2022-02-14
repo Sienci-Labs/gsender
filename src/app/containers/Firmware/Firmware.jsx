@@ -239,6 +239,9 @@ class Firmware extends PureComponent {
     }
 
     actions = {
+        getMachineProfileVersion: () => {
+            return 'MK2';
+        },
         applySettings: () => {
             let nameOfMachine = this.state.currentMachineProfile.name;
             let typeOfMachine = this.state.currentMachineProfile.type;
@@ -266,8 +269,8 @@ class Firmware extends PureComponent {
             });
             this.setState({ initiateFlashing: false });
             this.setState({ currentlyFlashing: true });
-            controller.command('gcode', '$RST=$');
-            controller.command('flash:start', this.state.port);
+            const imageType = this.actions.getMachineProfileVersion();
+            controller.command('flash:start', this.state.port, imageType);
         },
         formatText: (files) => {
             let string;

@@ -22,24 +22,26 @@
  */
 
 import AvrgirlArduino from 'avrgirl-arduino';
-import hex from '!file-loader!./grblsept15.hex';
+import mk1Image from '!file-loader!./mk1_20220214.hex';
+import mk2Image from '!file-loader!./mk2_20220214.hex';
 import logger from '../../logger';
 import store from '../../../store';
 
 const log = logger('FlashLib: ');
-const FlashingFirmware = (recievedPortNumber) => {
+const FlashingFirmware = (recievedPortNumber, imageType = 'MK1') => {
     if (!recievedPortNumber) {
         log.error('No port specified');
         return;
     }
+    console.log(imageType);
     const controller = store.get('controllers["' + recievedPortNumber + '"]');
     try {
         let avrgirl = new AvrgirlArduino({
             board: 'uno',
             port: recievedPortNumber,
         });
-
-        avrgirl.flash(hex, (error) => {
+        let imageHex = (imageType === 'MK2') ? mk2Image : mk1Image;
+        avrgirl.flash(imageHex, (error) => {
             if (error) {
                 if (controller) {
                     controller.command('flashing:failed', error);
