@@ -99,7 +99,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
-### 1.0.4 (February 14th, 2022)
+### 1.0.4 (February 15th, 2022)
 * Add support for distinct Spindle max and Spindle Min while in laser or spindle mode
 * "Pause" toolchange workflow renamed to "Manual", and now allows jogging and macros to be run 
 * Default feedrate in "start from line" now reflects file unit modal
