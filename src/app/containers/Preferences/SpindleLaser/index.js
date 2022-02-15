@@ -10,7 +10,7 @@ import Laser from './Laser';
 import Spindle from './Spindle';
 
 const SpindleLaser = ({ active, state, actions }) => {
-    const [toggle, setToggle] = useState(0);
+    const [toggle, setToggle] = useState(false);
 
     const handleToggle = (val) => {
         setToggle(val);
