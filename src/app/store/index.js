@@ -213,6 +213,13 @@ const migrateStore = () => {
         return;
     }
 
+    // 1.0.4 - need to add
+    if (semver.lt(cnc.version, '1.0.4')) {
+        const currSpindleVal = store.get('widgets.spindle', {});
+
+        store.replace('widgets.spindle', { currSpindleVal, laser: { ...currSpindleVal.laser, minPower: 1, maxPower: 100 } });
+    }
+
     //  1.0.1 - changes to go to axis zero naming and payload
     //        - update default touchplate type if its none of the 3 options
     //        - update payload for opening help modal
