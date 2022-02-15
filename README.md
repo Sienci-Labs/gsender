@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.3/gSender-1.0.3-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.3/gSender-1.0.3-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.3/gSender-1.0.3.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.3/gSender_1.0.3_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.3/gSender-1.0.3-armv7l.deb)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.4/gSender-1.0.4-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.4/gSender-1.0.4-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.4/gSender-1.0.4.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.4/gSender_1.0.4_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.4/gSender-1.0.4-armv7l.deb)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -98,6 +98,23 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### 1.0.4 (February 14th, 2022)
+* Add support for distinct Spindle max and Spindle Min while in laser or spindle mode
+* "Pause" toolchange workflow renamed to "Manual", and now allows jogging and macros to be run 
+* Default feedrate in "start from line" now reflects file unit modal
+* Fixed issue where units weren't consistent on Go-To buttons leading to Z plunge
+* Tool diameter selection hidden on Z probe to prevent user confusion.
+* Lowered minimum resolution from 1280X960 to 1024X768 and added responsiveness to account for that.
+* Trimmed machine profile list to generic set and made it more obvious that machine dimensions are as reported from EEPROM.
+* Added MK2 machine profiles and support for default settings for new machines.
+* Updated firmware images for MK1 and MK2
+* Fixed regression where comments weren't properly stripped before sending to GBRL
+* Corrections to Auto-diameter probe profiles
+* Fixed issue where T commands could cause errors when on a line with M6 commands
+* Stop job should now consistently reset board (0x18) as intended
+* Fixed various tooltip errors
+* Fixed issue where calibration tools weren't using correct jog controls
 
 ### 1.0.3 (December 22nd, 2021)
 * ; Comments are now emitted to UI on M0, M1, and M6 workflow stops
