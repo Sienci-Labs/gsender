@@ -12,10 +12,10 @@ const Spindle = ({ state, actions }) => {
 
     return (
         <>
-            <Fieldset legend="Speed">
+            <Fieldset legend="Spindle Speed">
                 <TooltipCustom content="Minimum spindle amount" location="default">
                     <Input
-                        label="Minimum Spindle Speed"
+                        label="Minimum Speed"
                         units="RPM"
                         value={spindleMin}
                         onChange={(e) => spindleActions.setSpeed(e.target.value, 'spindleMin')}
@@ -24,7 +24,7 @@ const Spindle = ({ state, actions }) => {
                 </TooltipCustom>
                 <TooltipCustom content="Maximum spindle speed" location="default">
                     <Input
-                        label="Maximum Spindle Speed"
+                        label="Maximum Speed"
                         units="RPM"
                         value={spindleMax}
                         onChange={(e) => spindleActions.setSpeed(e.target.value, 'spindleMax')}
