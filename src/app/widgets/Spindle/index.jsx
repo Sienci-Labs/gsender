@@ -186,7 +186,7 @@ class SpindleWidget extends PureComponent {
                 this.setState({ laser: { ...laser, ...data } });
             }),
             pubsub.subscribe('spindle:updated', (msg, data) => {
-                console.log(data);
+                this.setState({ spindleMax: data.spindleMax, spindleMin: data.spindleMin });
             }),
         ];
 
@@ -253,7 +253,9 @@ class SpindleWidget extends PureComponent {
             canClick: true, // Defaults to true
             mode: this.config.get('mode'),
             spindleSpeed: this.config.get('speed', 1000),
-            laser: this.config.get('laser')
+            laser: this.config.get('laser'),
+            spindleMax: this.props.spindleMax,
+            spindleMin: this.props.spindleMin
         };
     }
 
@@ -306,8 +308,8 @@ class SpindleWidget extends PureComponent {
     }
 
     render() {
-        const { embedded, spindleModal, spindleMin, spindleMax } = this.props;
-        const { minimized, isFullscreen } = this.state;
+        const { embedded, spindleModal } = this.props;
+        const { minimized, isFullscreen, spindleMin, spindleMax } = this.state;
         const state = {
             ...this.state,
             spindleModal,
