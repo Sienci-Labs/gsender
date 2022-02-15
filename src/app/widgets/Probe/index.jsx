@@ -760,8 +760,6 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 X0',
                 'G4 P0.15',
                 `G10 L20 ${p} X22.5`,
-                'G21 G91 G0 Z30',
-                'G21 G90 G0 X0',
             );
         } else if (axes.y) {
             code.push(
@@ -784,8 +782,6 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 Y0',
                 'G4 P0.15',
                 `G10 L20 ${p} Y22.5`,
-                'G21 G91 G0 Z30',
-                'G21 G90 G0 Y0',
             );
         }
 
@@ -883,8 +879,6 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 Y0',
                 'G4 P0.15',
                 `G10 L20 ${p} Y22.5`,
-                'G21 G91 G0 Z30',
-                'G21 G90 G0 Y0',
             );
         } else if (axes.x) {
             code.push(
@@ -901,8 +895,6 @@ class ProbeWidget extends PureComponent {
                 'G21 G90 G0 X0',
                 'G4 P0.15',
                 `G10 L20 ${p} X22.5`,
-                'G21 G91 G0 Z30',
-                'G21 G90 G0 X0',
             );
         }
 
