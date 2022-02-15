@@ -93,6 +93,8 @@ class SpindleWidget extends PureComponent {
 
     state = this.getInitialState();
 
+    pubsubTokens = [];
+
     actions = {
         handleModeToggle: () => {
             const { mode } = this.state;
@@ -132,8 +134,7 @@ class SpindleWidget extends PureComponent {
         sendLaserM3: () => {
             const { laser } = this.state;
             const { power } = laser;
-            const { spindleMax } = this.props;
-            const laserPower = spindleMax * (power / 100);
+            const laserPower = laser.maxPower * (power / 100);
 
             controller.command('gcode', `G1F1 M3 S${laserPower}`);
         },
@@ -166,10 +167,9 @@ class SpindleWidget extends PureComponent {
         },
         runLaserTest: () => {
             const { laser } = this.state;
-            const { spindleMax } = this.props;
-            const { power, duration } = laser;
+            const { power, duration, maxPower } = laser;
 
-            controller.command('lasertest:on', power, duration, spindleMax);
+            controller.command('lasertest:on', power, duration, maxPower);
             setTimeout(() => {
                 this.setState({
                     active: false
@@ -177,6 +177,28 @@ class SpindleWidget extends PureComponent {
             }, laser.duration);
         }
     };
+
+    subscribe() {
+        const tokens = [
+            pubsub.subscribe('laser:updated', (msg, data) => {
+                const { laser } = this.state;
+
+                this.setState({ laser: { ...laser, ...data } });
+            }),
+            pubsub.subscribe('spindle:updated', (msg, data) => {
+                console.log(data);
+            }),
+        ];
+
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
+    }
+
+    unsubscribe() {
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
+    }
 
     addShuttleControlEvents() {
         combokeys.reload();
@@ -195,12 +217,14 @@ class SpindleWidget extends PureComponent {
     }
 
     componentDidMount() {
+        this.subscribe();
         this.addShuttleControlEvents();
 
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }
 
     componentWillUnmount() {
+        this.unsubscribe();
         this.removeShuttleControlEvents();
     }
 
