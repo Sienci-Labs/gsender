@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
 import ToggleSwitch from 'app/components/ToggleSwitch';
+import store from 'app/store';
+import controller from 'app/lib/controller';
 
 import SettingWrapper from '../components/SettingWrapper';
 import Fieldset from '../components/Fieldset';
@@ -10,32 +12,42 @@ import Laser from './Laser';
 import Spindle from './Spindle';
 
 const SpindleLaser = ({ active, state, actions }) => {
-    const [toggle, setToggle] = useState(false);
+    const [machineProfile, setMachineProfile] = useState(store.get('workspace.machineProfile', {}));
 
-    const handleToggle = (val) => {
-        setToggle(val);
+    const handleToggle = () => {
+        const value = !machineProfile.spindle;
+        const updatedObj = {
+            ...machineProfile,
+            spindle: value
+        };
+
+        store.replace('workspace.machineProfile', updatedObj);
+        controller.command('machineprofile:load', updatedObj);
+
+        setMachineProfile(updatedObj);
     };
 
-    const ActiveSection = toggle ? Laser : Spindle;
+    const { spindle } = machineProfile;
 
     return (
-        <SettingWrapper title={toggle ? 'Laser' : 'Spindle'} show={active}>
+        <SettingWrapper title="Spindle/Laser" show={active}>
             <GeneralArea>
                 <GeneralArea.Half>
                     <Fieldset legend="Toggle">
-                        <TooltipCustom content="Switch Between Laser and Spindle" location="default">
+                        <TooltipCustom content="Enable or Disable Spindle/Laser" location="default">
                             <ToggleSwitch
                                 label="Spindle/Laser"
-                                checked={toggle}
+                                checked={spindle}
                                 onChange={handleToggle}
                                 style={{ marginBottom: '1rem' }}
                             />
                         </TooltipCustom>
                     </Fieldset>
+                    <Spindle state={state} actions={actions} />
                 </GeneralArea.Half>
 
                 <GeneralArea.Half>
-                    <ActiveSection state={state} actions={actions} />
+                    <Laser state={state} actions={actions} />
                 </GeneralArea.Half>
             </GeneralArea>
         </SettingWrapper>
