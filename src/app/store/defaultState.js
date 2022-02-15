@@ -324,13 +324,15 @@ const defaultState = {
             minimized: false,
             mode: SPINDLE_MODE,
             speed: 1000,
-            spindleMax: 2000,
-            spindleMin: 0,
+            spindleMax: 30000,
+            spindleMin: 1000,
             laser: {
                 power: 100,
                 duration: 1,
                 xOffset: 0,
-                yOffset: 0
+                yOffset: 0,
+                minPower: 0,
+                maxPower: 1000
             }
         },
         surfacing: {
