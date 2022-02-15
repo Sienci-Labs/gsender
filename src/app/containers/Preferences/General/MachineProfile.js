@@ -27,7 +27,6 @@ import pubsub from 'pubsub-js';
 import _ from 'lodash';
 import ensureArray from 'ensure-array';
 import controller from 'app/lib/controller';
-import ToggleSwitch from 'app/components/ToggleSwitch';
 import UneditableInput from 'app/containers/Preferences/components/UneditableInput';
 import store from 'app/store';
 import TooltipCustom from '../../../components/TooltipCustom/ToolTip';
@@ -216,7 +215,7 @@ export default class MachineProfile extends Component {
 
     render() {
         const { machineProfile, machineProfiles, units } = this.state;
-        const { spindle = false, mm, in: inches, company, name, type } = machineProfile;
+        const { mm, in: inches, company, name, type } = machineProfile;
         const label = `${company} ${name} ${' - ' && type}`;
 
         const { width = 0, depth = 0, height = 0 } = units === 'mm' ? mm : inches;
@@ -260,21 +259,6 @@ export default class MachineProfile extends Component {
                                 value={height}
                             />
                         </TooltipCustom>
-                    </div>
-                </div>
-
-                <div className={styles['general-area-item']}>
-                    <h4 className={styles['settings-subtitle']}>Machine Features</h4>
-                    <div className={styles['machine-features-section']}>
-                        <div className={styles['machine-options-inputgroup']}>
-                            <TooltipCustom content="Toggle between Spindle/Laser (S commands)" location="default">
-                                <ToggleSwitch
-                                    label="Spindle/Laser"
-                                    checked={spindle}
-                                    onChange={() => this.handleToggle('spindle')}
-                                />
-                            </TooltipCustom>
-                        </div>
                     </div>
                 </div>
             </Fieldset>
