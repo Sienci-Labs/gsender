@@ -33,7 +33,7 @@ import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import General from './General';
 import Shortcuts from './Keybindings';
 import ProbeSettings from './Probe';
-import Laser from './Laser';
+import SpindleLaser from './SpindleLaser';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import VisualizerSettings from './Visualizer';
 import About from './About';
@@ -47,6 +47,7 @@ class PreferencesPage extends PureComponent {
     probeConfig = new WidgetConfig('probe');
 
     visualizerConfig = new WidgetConfig('visualizer');
+
     spindleConfig = new WidgetConfig('spindle');
 
     state = this.getInitialState();
@@ -95,8 +96,8 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 1,
-                    label: 'Laser',
-                    component: Laser
+                    label: 'Spindle/Laser',
+                    component: SpindleLaser
                 },
                 {
                     id: 5,
@@ -130,6 +131,9 @@ class PreferencesPage extends PureComponent {
             },
             laser: {
                 ...this.spindleConfig.get('laser')
+            },
+            spindle: {
+                ...this.spindleConfig.get()
             },
             visualizer: {
                 minimizeRenders: this.visualizerConfig.get('minimizeRenders'),
@@ -427,6 +431,36 @@ class PreferencesPage extends PureComponent {
                         }
                     });
                 }
+            },
+            setPower: (val, type) => {
+                const amount = Number(val);
+                const { spindle, laser } = this.state;
+
+                if (!val || !type || amount < 0) {
+                    return;
+                }
+
+                const newLaserValue = { ...laser, [type]: amount };
+
+                this.setState({ spindle: { ...spindle, laser: newLaserValue } });
+
+                pubsub.publish('laser:updated', newLaserValue);
+            },
+        },
+        spindle: {
+            setSpeed: (val, type) => {
+                const amount = Number(val);
+                const { spindle } = this.state;
+
+                if (!val || !type) {
+                    return;
+                }
+
+                const newSpindleValue = { ...spindle, [type]: amount };
+
+                this.setState({ spindle: newSpindleValue });
+
+                pubsub.publish('spindle:updated', newSpindleValue);
             }
         },
         visualizer: {
@@ -591,7 +625,7 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight, laser } = this.state;
+        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight, spindle } = this.state;
 
         store.set('workspace.reverseWidgets', reverseWidgets);
         store.set('workspace.safeRetractHeight', safeRetractHeight);
@@ -605,7 +639,7 @@ class PreferencesPage extends PureComponent {
         store.replace('widgets.visualizer.objects', visualizer.objects);
         store.set('workspace[tool]', tool);
         store.replace('workspace[probeProfile]', probe);
-        store.replace('widgets.spindle.laser', laser);
+        store.replace('widgets.spindle', spindle);
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
