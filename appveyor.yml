@@ -91,7 +91,6 @@ for:
       - nvm install $nodejs_version
       - npm config set loglevel warn
       - npm config set scripts-prepend-node-path auto
-      - npm install -g npm
       - npm install -g yarn
       - yarn
 
@@ -335,7 +334,6 @@ for:
       - nvm install $nodejs_version
       - npm config set loglevel warn
       - npm config set scripts-prepend-node-path auto
-      - npm install -g npm
       - npm install -g yarn
       - yarn
 
@@ -428,7 +426,6 @@ for:
       - ps: Install-Product node $env:nodejs_version
       - npm config set loglevel warn
       - npm config set scripts-prepend-node-path auto
-      - npm install -g npm
       - npm install -g yarn
       - yarn
 
