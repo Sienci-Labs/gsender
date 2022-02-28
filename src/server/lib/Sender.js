@@ -363,10 +363,15 @@ class Sender extends events.EventEmitter {
         return true;
     }
 
+    setStartLine(line = 0) {
+        this.state.sent = line;
+        this.state.received = line;
+    }
+
     // Tells the sender to send more data.
     // @return {boolean} Returns true on success, false otherwise.
     next(options = {}) {
-        const { lineToStartFrom } = options;
+        const { startFromLine } = options;
 
         if (!this.state.gcode) {
             return false;
@@ -383,10 +388,7 @@ class Sender extends events.EventEmitter {
             this.emit('change');
         };
 
-        if (lineToStartFrom) {
-            this.state.sent = lineToStartFrom;
-            this.state.received = lineToStartFrom;
-
+        if (startFromLine) {
             handleStart();
         } else if (this.state.total > 0 && this.state.sent === 0) {
             handleStart();

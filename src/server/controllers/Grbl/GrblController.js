@@ -249,6 +249,17 @@ class GrblController {
                         this.workflow.resume();
                         return 'G4 P0.5 (Post-Hook complete)';
                     }
+                    if (line === '%_GCODE_START') {
+                        const { sent } = this.sender.state;
+                        this.event.trigger('gcode:start');
+                        this.workflow.start();
+                        // Feeder
+                        this.feeder.reset();
+                        // Sender (fast forward to sent which was set previous to this to account for rewind)
+                        this.sender.setStartLine(sent);
+                        this.sender.next({ startFromLine: true });
+                        return '';
+                    }
 
                     // Expression
                     // %_x=posx,_y=posy,_z=posz
@@ -1269,12 +1280,14 @@ class GrblController {
                     // Set modals based on what's parsed so far in the file
                     modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modal.wcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(`F${feedRate} S${spindleRate}`);
+                    modalGCode.push('G4 P1');
+                    modalGCode.push('%_GCODE_START');
+
+                    // Fast forward sender to line
+                    this.sender.setStartLine(lineToStartFrom);
 
                     this.command('gcode', modalGCode);
-                }
-
-                //Allow the prepend commands to register before resuming job
-                setTimeout(() => {
+                } else {
                     this.event.trigger('gcode:start');
 
                     this.workflow.start();
@@ -1283,8 +1296,8 @@ class GrblController {
                     this.feeder.reset();
 
                     // Sender
-                    this.sender.next({ lineToStartFrom });
-                }, 100);
+                    this.sender.next();
+                }
             },
             'stop': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
@@ -1300,7 +1313,6 @@ class GrblController {
                 const [options] = args;
                 const { force = false } = { ...options };
                 if (force) {
-                    console.log('in force');
                     let activeState;
 
                     activeState = _.get(this.state, 'status.activeState', '');
