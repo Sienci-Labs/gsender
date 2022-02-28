@@ -21,13 +21,33 @@
  *
  */
 
-import React, { PureComponent } from 'react';
-import throttle from 'lodash/throttle';
+import React from 'react';
+import { useLongPress } from 'use-long-press';
+//import throttle from 'lodash/throttle';
 import cx from 'classnames';
-import PropTypes from 'prop-types';
 import styles from '../index.styl';
 
-class JogControl extends PureComponent {
+const JogControl = ({ timeout = 750, disabled = false, jog, continuousJog, stopContinuousJog, className, children }) => {
+    const bind = useLongPress(() => {
+        continuousJog();
+    }, {
+        threshold: timeout,
+        onCancel: jog,
+        onFinish: stopContinuousJog
+    });
+
+    return (
+        <button
+            className={cx(styles.btnKeypad, className)}
+            disabled={disabled}
+            {...bind}
+        >
+            {children}
+        </button>
+    );
+};
+
+/*class JogControl extends PureComponent {
     // Time to consider a jog movement to be a continuous movement
     timeout = 750;
     // Timeout function that triggers single jog or continuous jog
@@ -127,6 +147,6 @@ class JogControl extends PureComponent {
             </button>
         );
     }
-}
+}*/
 
 export default JogControl;
