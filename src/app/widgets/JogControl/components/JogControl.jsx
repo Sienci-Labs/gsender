@@ -27,7 +27,7 @@ import { useLongPress } from 'use-long-press';
 import cx from 'classnames';
 import styles from '../index.styl';
 
-const JogControl = ({ timeout = 750, disabled = false, jog, continuousJog, stopContinuousJog, className, children }) => {
+const JogControl = ({ timeout = 600, disabled = false, jog, continuousJog, stopContinuousJog, className, children }) => {
     const bind = useLongPress(() => {
         continuousJog();
     }, {
