@@ -29,7 +29,7 @@ import styles from '../index.styl';
 
 class JogControl extends PureComponent {
     // Time to consider a jog movement to be a continuous movement
-    timeout = 250;
+    timeout = 750;
     // Timeout function that triggers single jog or continuous jog
     timeoutFunction = null;
     // Throttled version of passed stop jog action

@@ -211,7 +211,6 @@ class Keypad extends PureComponent {
                             continuousJog={() => actions.startContinuousJog({ Z: 1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
                             disabled={zControlsDisabled}
-                            timeout={500}
                         >
                             <KeypadText>Z</KeypadText>
                             <KeypadDirectionText>+</KeypadDirectionText>
@@ -270,7 +269,6 @@ class Keypad extends PureComponent {
                             continuousJog={() => actions.startContinuousJog({ Z: -1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
                             disabled={zControlsDisabled}
-                            timeout={500}
                         >
                             <KeypadText>Z</KeypadText>
                             <KeypadDirectionText>-</KeypadDirectionText>

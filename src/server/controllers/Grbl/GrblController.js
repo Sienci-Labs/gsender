@@ -1595,14 +1595,14 @@ class GrblController {
                 }
 
                 const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-                this.command('gcode', jogCommand);
+                //this.command('gcode', jogCommand);
+                this.writeln(jogCommand);
             },
             'jog:stop': () => {
-                this.feeder.reset();
                 this.write('\x85');
             },
             'jog:cancel': () => {
-                this.command('gcode', '\x85');
+                this.write('\x85');
             },
             'macro:run': () => {
                 let [id, context = {}, callback = noop] = args;

@@ -288,8 +288,8 @@ class SpindleWidget extends PureComponent {
             controller.command('gcode', 'M5');
         }
         const commands = [
-            `$30=${minPower}`,
-            `$31=${maxPower}`,
+            `$30=${maxPower}`,
+            `$31=${minPower}`,
             '$32=1'
         ];
         controller.command('gcode', commands);

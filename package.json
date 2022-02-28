@@ -317,6 +317,7 @@
     "three": "^0.135.0",
     "universal-logger": "~1.0.1",
     "universal-logger-browser": "~1.0.2",
+    "use-long-press": "^1.1.2",
     "use-stay-awake": "^0.1.7",
     "utf-8-validate": "^5.0.6",
     "uuid": "~3.3.2",
