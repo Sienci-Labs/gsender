@@ -242,12 +242,12 @@ class GrblController {
                         log.debug('Finished Pre-hook');
                         this.feeder.hold({ data: '%toolchange' });
                         this.emit('toolchange:preHookComplete', commentString);
-                        return 'G4 P0.5 (Pre-Hook complete)';
+                        return 'G4 P0.5';
                     }
                     if (line === POSTHOOK_COMPLETE) {
                         log.debug('Finished Post-hook, resuming program');
                         this.workflow.resume();
-                        return 'G4 P0.5 (Post-Hook complete)';
+                        return 'G4 P0.5';
                     }
                     if (line === '%_GCODE_START') {
                         const { sent } = this.sender.state;
