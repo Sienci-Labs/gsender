@@ -516,7 +516,7 @@ class ProbeWidget extends PureComponent {
         // Calculate tool offset using radius and block thickness to origin
         const toolDiameter = this.state.toolDiameter;
         const toolRadius = (toolDiameter / 2);
-        const toolCompensatedThickness = ((-1 * toolRadius) - xyThickness);
+        const toolCompensatedThickness = ((-1 * toolRadius) - xyThickness).toFixed(3);
         const zPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
         let xyMovement = toolDiameter + 20; // 20mm + width of the tool
         const xyPositionAdjust = (units === METRIC_UNITS) ? xyMovement : mm2in(xyMovement).toFixed(3);

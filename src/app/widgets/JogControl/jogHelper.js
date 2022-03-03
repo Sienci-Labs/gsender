@@ -26,7 +26,7 @@ import _ from 'lodash';
 class JogHelper {
     timeoutFunction = null;
 
-    timeout = 250; //250ms
+    timeout = 600; // 600 ms to be consistent with jog controls
 
     startTime = 0;
 
@@ -43,11 +43,7 @@ class JogHelper {
     constructor({ jogCB, startContinuousJogCB, stopContinuousJogCB }) {
         this.jog = _.throttle(jogCB, 150, { trailing: false });
         this.continuousJog = _.throttle(startContinuousJogCB, 150, { trailing: false });
-        this.stopContinuousJog = _.throttle(stopContinuousJogCB, 150, { trailing: false });
-
-        // this.jog = jogCB;
-        // this.continuousJog = startContinuousJogCB;
-        // this.stopContinuousJog = stopContinuousJogCB;
+        this.stopContinuousJog = _.throttle(stopContinuousJogCB, this.timeout - 25, { leading: true, trailing: false });
     }
 
     onKeyDown(coordinates, feedrate) {
@@ -59,12 +55,11 @@ class JogHelper {
 
         this.startTime = startTime;
         this.currentCoordinates = coordinates;
+        this.didPress = true;
 
         this.timeoutFunction = setTimeout(() => {
             this.continuousJog(coordinates, feedrate);
         }, this.timeout);
-
-        this.didPress = true;
     }
 
     onKeyUp(coordinates) {
@@ -73,6 +68,9 @@ class JogHelper {
         if (!this.timeoutFunction) {
             return;
         }
+
+        clearTimeout(this.timeoutFunction);
+        this.timeoutFunction = null;
 
         if (timer < this.timeout && this.didPress) {
             this.jog(coordinates);
@@ -85,9 +83,6 @@ class JogHelper {
             this.didPress = false;
             this.currentCoordinates = null;
         }
-
-        clearTimeout(this.timeoutFunction);
-        this.timeoutFunction = null;
     }
 }
 
