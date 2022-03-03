@@ -1306,8 +1306,6 @@ class GrblController {
             // @param {object} options The options object.
             // @param {boolean} [options.force] Whether to force stop a G-code program. Defaults to false.
             'gcode:stop': async () => {
-                this.event.trigger('gcode:stop');
-
                 this.workflow.stop();
 
                 const [options] = args;
@@ -1323,6 +1321,8 @@ class GrblController {
                     await delay(700); // delay 700ms
                     this.write('\x18'); // ^x
                 }
+                // Moved this to end so it triggers AFTER the reset on force stop
+                this.event.trigger('gcode:stop');
             },
             'pause': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
