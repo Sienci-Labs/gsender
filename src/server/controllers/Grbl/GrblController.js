@@ -340,9 +340,10 @@ class GrblController {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
                 let bracketCommentLine = /^\s*\([^\)]*\)/gm;
+                let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
                 line = line.replace(bracketCommentLine, '').trim();
                 let comment = line.match(commentMatcher);
-                const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
+                let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
@@ -367,7 +368,6 @@ class GrblController {
                 line = translateExpression(line, context);
                 const data = parser.parseLine(line, { flatten: true });
                 const words = ensureArray(data.words);
-                console.log(data);
 
                 { // Program Mode: M0, M1
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
@@ -396,11 +396,16 @@ class GrblController {
                 /* Emit event to UI for toolchange handler */
                 if (_.includes(words, 'M6')) {
                     log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
-
                     const { toolChangeOption } = this.toolChangeContext;
+
+                    let tool = line.match(toolCommand);
+                    console.log(tool);
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     if (toolChangeOption === 'Pause' || toolChangeOption === 'Manual') {
+                        if (tool) {
+                            this.emit('toolchange:tool', tool[0]);
+                        }
                         this.workflow.pause({ data: 'M6', comment: commentString });
                         this.emit('gcode:toolChange', {
                             line: sent + 1,
@@ -408,6 +413,9 @@ class GrblController {
                             option: 'Manual'
                         }, commentString);
                     } else if (toolChangeOption === 'Code') {
+                        if (tool) {
+                            commentString = `${tool[0]} - ${commentString}`;
+                        }
                         this.workflow.pause({ data: 'M6', comment: commentString });
                         this.emit('toolchange:start');
                         this.runPreChangeHook(commentString);

@@ -42,9 +42,7 @@ const Toast = ({ id, msg = 'NO_MSG_SPECIFIED', type = TOASTER_INFO, closeHandler
                 <i className={`fas ${icon}`} />
             </div>
             <div className={styles.toastContent}>
-                <div>
-                    { msg }
-                </div>
+                <div dangerouslySetInnerHTML={{ __html: msg }} />
             </div>
             <div className={styles.toastClose}>
                 <button onClick={closeHandler}>

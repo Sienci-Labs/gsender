@@ -302,6 +302,15 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('toolchange:tool', (tool) => {
+        Toaster.clear();
+        Toaster.pop({
+            type: TOASTER_INFO,
+            msg: `Tool command found - <b>${tool}</b>`,
+            duration: TOASTER_UNTIL_CLOSE
+        });
+    });
+
     yield null;
 }
 
