@@ -17,7 +17,7 @@ G90         ; Absolute positioning
 ; Rapid to initial position
 G1 X43.9090 Y-28.2880 F1500
 M3 S80
-G4 P0.5
+g4 P0.5
 ; cut
 G1 X43.7449 Y-28.2892 F100
 G1 X43.6631 Y-28.2908

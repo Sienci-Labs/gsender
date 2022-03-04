@@ -246,7 +246,10 @@ class GrblController {
                     }
                     if (line === POSTHOOK_COMPLETE) {
                         log.debug('Finished Post-hook, resuming program');
-                        this.workflow.resume();
+                        setTimeout(() => {
+                            this.workflow.resume();
+                        }, 1500);
+                        //this.workflow.resume();
                         return 'G4 P0.5';
                     }
                     if (line === '%_GCODE_START') {
@@ -364,6 +367,7 @@ class GrblController {
                 line = translateExpression(line, context);
                 const data = parser.parseLine(line, { flatten: true });
                 const words = ensureArray(data.words);
+                console.log(data);
 
                 { // Program Mode: M0, M1
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
@@ -1349,11 +1353,12 @@ class GrblController {
                 const [commands, context = {}] = args;
                 this.command('gcode', commands, context);
             },
-            'feeder:start': () => {
+            'feeder:start': async () => {
                 if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
                     return;
                 }
                 this.write('~');
+                await delay(1000);
                 this.feeder.unhold();
                 this.feeder.next();
             },
