@@ -122,7 +122,7 @@ class ControlArea extends Component {
 }
 
 export default connect((store) => {
-    const $22 = get(store, 'controller.settings.settings.$22', '0');
+    const $22 = get(store, 'controller.settings.settings.$22', '1');
     const alarmCode = get(store, 'controller.state.status.alarmCode');
     const activeState = get(store, 'controller.state.status.activeState');
     const isConnected = get(store, 'connection.isConnected');

@@ -401,7 +401,7 @@ class DisplayPanel extends PureComponent {
 }
 
 export default connect((store) => {
-    const homingSetting = get(store, 'controller.settings.settings.$22', '0');
+    const homingSetting = get(store, 'controller.settings.settings.$22', '1');
     const homingDirection = get(store, 'controller.settings.settings.$23', '0');
     const pullOff = get(store, 'controller.settings.settings.$27', '1');
     const homingFlag = get(store, 'controller.homingFlag', false);

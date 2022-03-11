@@ -113,6 +113,12 @@ function consolidateModals(state) {
 
 const updateMachineLimitsFromEEPROM = ({ settings }) => {
     const { $130, $131, $132 } = settings;
+
+    // FluidNC is not reporting $130, $131 and $132. Use manual settings instead...
+    if (Number.isNan($130) || Number.isNan($131) || Number.isNan($132)) {
+        return;
+    }
+
     let xmax = Number($130);
     let ymax = Number($131);
     let zmax = Number($132);
