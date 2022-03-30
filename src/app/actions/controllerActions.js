@@ -32,7 +32,8 @@ export const {
     UPDATE_WORKFLOW_STATE,
     TOOL_CHANGE,
     UPDATE_HOMING_FLAG,
-    RESET_HOMING
+    RESET_HOMING,
+    UPDATE_PARTIAL_CONTROLLER_SETTINGS,
 } = constants('controller', [
     'UPDATE_CONTROLLER_STATE',
     'UPDATE_CONTROLLER_SETTINGS',
@@ -41,7 +42,8 @@ export const {
     'UPDATE_WORKFLOW_STATE',
     'TOOL_CHANGE',
     'UPDATE_HOMING_FLAG',
-    'RESET_HOMING'
+    'RESET_HOMING',
+    'UPDATE_PARTIAL_CONTROLLER_SETTINGS'
 ]);
 
 export const updateControllerState = createAction(UPDATE_CONTROLLER_STATE);
@@ -52,3 +54,4 @@ export const updateWorkflowState = createAction(UPDATE_WORKFLOW_STATE);
 export const toolChange = createAction(TOOL_CHANGE);
 export const updateHomingFlag = createAction(UPDATE_HOMING_FLAG);
 export const resetHoming = createAction(RESET_HOMING);
+export const partialSettingsUpdate = createAction(UPDATE_PARTIAL_CONTROLLER_SETTINGS);

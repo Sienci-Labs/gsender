@@ -24,6 +24,8 @@
 import React, { PureComponent } from 'react';
 import classNames from 'classnames';
 import includes from 'lodash/includes';
+import reduxStore from 'app/store/redux';
+import * as controllerActions from 'app/actions/controllerActions';
 import debounce from 'lodash/debounce';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
@@ -272,12 +274,24 @@ class SpindleWidget extends PureComponent {
             `$31=${spindleMin}`,
             '$32=0'
         ];
+        this.updateControllerSettings(spindleMax, spindleMin, 0);
         controller.command('gcode', commands);
     }
 
     debouncedSpindleOverride = debounce((spindleSpeed) => {
         controller.command('spindleOverride', spindleSpeed);
     }, 250);
+
+    updateControllerSettings(max, min, mode) {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_PARTIAL_CONTROLLER_SETTINGS,
+            payload: {
+                $30: max,
+                $31: min,
+                $32: `${mode}`
+            }
+        });
+    }
 
     enableLaserMode() {
         const { active } = this.state;
@@ -292,6 +306,7 @@ class SpindleWidget extends PureComponent {
             `$31=${minPower}`,
             '$32=1'
         ];
+        this.updateControllerSettings(maxPower, minPower, 1);
         controller.command('gcode', commands);
     }
 

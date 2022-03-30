@@ -30,7 +30,8 @@ import {
     UPDATE_CONTROLLER_STATE,
     UPDATE_FEEDER_STATUS, UPDATE_SENDER_STATUS, UPDATE_WORKFLOW_STATE,
     UPDATE_HOMING_FLAG,
-    RESET_HOMING
+    RESET_HOMING,
+    UPDATE_PARTIAL_CONTROLLER_SETTINGS
 } from '../actions/controllerActions';
 import { in2mm, mm2in } from '../lib/units';
 import { WORKFLOW_STATE_IDLE } from '../constants';
@@ -151,6 +152,17 @@ const reducer = createReducer(initialState, {
             mpos,
             wpos,
             modal
+        };
+    },
+    [UPDATE_PARTIAL_CONTROLLER_SETTINGS]: (payload, reducerState) => {
+        return {
+            settings: {
+                ...reducerState.settings,
+                settings: {
+                    ...reducerState.settings.settings,
+                    ...payload
+                }
+            }
         };
     },
     [UPDATE_CONTROLLER_STATE]: (payload, reducerState) => {
