@@ -1323,6 +1323,8 @@ class GrblController {
 
                 const [options] = args;
                 const { force = false } = { ...options };
+
+                const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
                 if (force) {
                     let activeState;
 
@@ -1333,6 +1335,11 @@ class GrblController {
 
                     await delay(700); // delay 700ms
                     this.write('\x18'); // ^x
+                    // Handle resetting workspace after stop back to selected one
+                    if (wcs !== 'G54') {
+                        await delay(200);
+                        this.writeln(wcs);
+                    }
                 }
                 // Moved this to end so it triggers AFTER the reset on force stop
                 this.event.trigger('gcode:stop');
