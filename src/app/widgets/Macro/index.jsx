@@ -187,17 +187,6 @@ class MacroWidget extends PureComponent {
                         const { id, name, content, column, description, rowIndex } = macro;
                         api.macros.update(id, { name, content, description, column, rowIndex });
                     }
-
-                    const updatedMacros = this.state.macros.map(currentMacro => {
-                        for (const macro of macros) {
-                            if (macro.id === currentMacro.id) {
-                                return macro;
-                            }
-                        }
-                        return currentMacro;
-                    });
-
-                    this.setState({ macros: updatedMacros });
                 }
             } catch (err) {
                 // Ignore error
