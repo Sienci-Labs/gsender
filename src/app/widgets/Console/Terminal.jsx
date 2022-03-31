@@ -31,9 +31,9 @@ import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { debounce } from 'lodash';
 import store from 'app/store';
-import controller from 'app/lib/controller';
 import Button from 'app/components/FunctionButton/FunctionButton';
-import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
+// import controller from 'app/lib/controller';
+// import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
 import History from './History';
 import styles from './index.styl';
 
@@ -221,28 +221,35 @@ class TerminalWrapper extends PureComponent {
         this.term.prompt();
     }
 
-    handleCommandExecute = () => {
-        const command = this.inputRef.current.value;
+    handleCommandExecute = async () => {
+        const LINES_TO_COPY = 50;
 
-        if (!command) {
-            return;
-        }
+        this.term.selectAll();
+        const selection = this.term.getSelection().split('\n');
+        await navigator.clipboard.writeText(selection.slice(LINES_TO_COPY).join('\n'));
+        this.term.clearSelection();
 
-        controller.writeln(command);
+        // const command = this.inputRef.current.value;
 
-        const { terminalInputHistory = [] } = this.state;
+        // if (!command) {
+        //     return;
+        // }
 
-        const newTerminalInputHistory = [...terminalInputHistory];
+        // controller.writeln(command);
 
-        if (terminalInputHistory.length === MAX_TERMINAL_INPUT_ARRAY_SIZE) {
-            newTerminalInputHistory.shift();
-        }
+        // const { terminalInputHistory = [] } = this.state;
 
-        store.replace('workspace.terminal.inputHistory', [...newTerminalInputHistory, command]);
+        // const newTerminalInputHistory = [...terminalInputHistory];
 
-        this.setState({ terminalInputHistory: [...newTerminalInputHistory, command], terminalInputIndex: newTerminalInputHistory.length + 1 });
+        // if (terminalInputHistory.length === MAX_TERMINAL_INPUT_ARRAY_SIZE) {
+        //     newTerminalInputHistory.shift();
+        // }
 
-        this.inputRef.current.value = '';
+        // store.replace('workspace.terminal.inputHistory', [...newTerminalInputHistory, command]);
+
+        // this.setState({ terminalInputHistory: [...newTerminalInputHistory, command], terminalInputIndex: newTerminalInputHistory.length + 1 });
+
+        // this.inputRef.current.value = '';
     }
 
     updateInputHistoryIndex = (index) => {
