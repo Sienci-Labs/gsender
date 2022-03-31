@@ -146,18 +146,17 @@ export default class MacroItem extends Component {
                             : (
                                 <>
                                     { display === 'name' && (
-                                        <div> {macro.name} </div>)
+                                        <div style={{ padding: '0 0.75rem' }}> {macro.name} </div>)
                                     }
 
-                                    { display === 'running' && <div className={styles['glowing-background']}>Running...</div>}
+                                    { display === 'running' && <div style={{ padding: 0 }} className={styles['glowing-background']}>Running...</div>}
 
                                     { display === 'icon' && (
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                        <div style={{ padding: '0 0.75rem' }}>
                                             <i
                                                 className="fa fa-play"
                                                 style={{ fontSize: '1rem', color: '#059669', outline: 'none' }}
-                                            />
-                                            Run <strong>{macro.name}</strong>
+                                            /> Run <strong>{macro.name}</strong>
                                         </div>
                                     )}
                                 </>
