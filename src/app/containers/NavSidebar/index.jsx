@@ -23,10 +23,12 @@
  */
 
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
+import get from 'lodash/get';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
-import { GRBL } from 'app/constants';
+import { GRBL, WORKFLOW_STATE_RUNNING } from 'app/constants';
 import store from 'app/store';
 import HelpModal from 'app/containers/Help';
 import NavSidebarLink from './NavSideBarLink';
@@ -135,6 +137,10 @@ class NavSidebar extends PureComponent {
     render() {
         const actions = { ...this.actions };
         const state = { ...this.state };
+        const { workflow } = this.props;
+
+        const isDisabled = workflow?.state === WORKFLOW_STATE_RUNNING;
+
         return (
             <div className={styles.Sidebar}>
                 <NavSidebarLink
@@ -142,6 +148,7 @@ class NavSidebar extends PureComponent {
                     icon="fab fa-codepen"
                     label="Surfacing"
                     onClick={() => actions.openModal(MODAL_SURFACING)}
+                    disabled={isDisabled}
                 />
                 {
                     /*<NavSidebarLink
@@ -154,12 +161,14 @@ class NavSidebar extends PureComponent {
                     onClick={() => actions.openModal(MODAL_CALIBRATE)}
                     icon="fa fa-ruler"
                     label="Calibrate"
+                    disabled={isDisabled}
                 />
                 <NavSidebarLink
                     url=""
                     onClick={() => actions.openModal(MODAL_FIRMWARE)}
                     icon="fa fa-microchip"
                     label="Firmware"
+                    disabled={isDisabled}
                 />
                 <NavSidebarLink
                     url=""
@@ -181,4 +190,7 @@ class NavSidebar extends PureComponent {
     }
 }
 
-export default NavSidebar;
+export default connect((store) => {
+    const workflow = get(store, 'controller.workflow');
+    return { workflow };
+})(NavSidebar);
