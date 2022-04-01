@@ -502,11 +502,12 @@ const TrackballControls = function ( object, domElement ) {
     }
 
     function mousedown( event ) {
-
         if ( _this.enabled === false ) return;
 
         event.preventDefault();
         event.stopPropagation();
+
+        if (event.button === 4 || event.button === 5) return;
 
         if ( _state === STATE.NONE ) {
             var buttonState = _this.getMouseButtonState(event.button);

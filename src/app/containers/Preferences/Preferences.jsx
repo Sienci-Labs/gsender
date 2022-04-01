@@ -423,6 +423,7 @@ class PreferencesPage extends PureComponent {
                             xOffset: value
                         }
                     });
+                    this.spindleConfig.set('laser.xOffset', value);
                 } else if (axis === 'Y') {
                     this.setState({
                         laser: {
@@ -430,6 +431,7 @@ class PreferencesPage extends PureComponent {
                             yOffset: value
                         }
                     });
+                    this.spindleConfig.set('laser.yOffset', value);
                 }
             },
             setPower: (val, type) => {

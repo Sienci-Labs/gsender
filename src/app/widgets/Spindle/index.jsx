@@ -270,6 +270,7 @@ class SpindleWidget extends PureComponent {
         const spindleMin = this.config.get('spindleMin');
         const spindleMax = this.config.get('spindleMax');
         const commands = [
+            ...this.getSpindleOffsetCode(),
             `$30=${spindleMax}`,
             `$31=${spindleMin}`,
             '$32=0'
@@ -293,6 +294,38 @@ class SpindleWidget extends PureComponent {
         });
     }
 
+    getWCS() {
+        const { wcs } = this.props;
+        const p = {
+            'G54': 1,
+            'G55': 2,
+            'G56': 3,
+            'G57': 4,
+            'G58': 5,
+            'G59': 6
+        }[wcs] || 0;
+        return p;
+    }
+
+    getLaserOffsetCode() {
+        const laser = this.config.get('laser');
+        const { xOffset, yOffset } = laser;
+        return [
+            `G10 L20 P${this.getWCS()} X${xOffset} Y${yOffset}`
+        ];
+    }
+
+    getSpindleOffsetCode() {
+        const laser = this.config.get('laser');
+        let { xOffset, yOffset } = laser;
+        xOffset = Number(xOffset) * -1;
+        yOffset = Number(yOffset) * -1;
+        return [
+            `G10 L20 P${this.getWCS()} X${xOffset} Y${yOffset}`
+        ];
+    }
+
+
     enableLaserMode() {
         const { active } = this.state;
         const laser = this.config.get('laser');
@@ -302,6 +335,7 @@ class SpindleWidget extends PureComponent {
             controller.command('gcode', 'M5');
         }
         const commands = [
+            ...this.getLaserOffsetCode(),
             `$30=${maxPower}`,
             `$31=${minPower}`,
             '$32=1'
@@ -392,6 +426,7 @@ export default connect((store) => {
     const settings = get(store, 'controller.settings');
     const spindleMin = Number(get(settings, 'settings.$31', 1000));
     const spindleMax = Number(get(settings, 'settings.$30', 30000));
+    const wcs = get(store, 'controller.modal.wcs');
 
     return {
         workflow,
@@ -401,6 +436,7 @@ export default connect((store) => {
         spindleModal,
         settings,
         spindleMin,
-        spindleMax
+        spindleMax,
+        wcs
     };
 })(SpindleWidget);
