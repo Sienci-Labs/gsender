@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip as MainToolTip } from 'app/components/Tooltip';
 
-const Tooltip = ({ location, content, disabled, children, style }) => {
+const Tooltip = ({ location, content, disabled, children, style, wrapperStyle }) => {
     return (
         <MainToolTip
             content={content}
@@ -11,7 +11,7 @@ const Tooltip = ({ location, content, disabled, children, style }) => {
             disabled={disabled}
             tooltipStyle={style}
         >
-            <div>
+            <div style={wrapperStyle}>
                 {children}
             </div>
         </MainToolTip>
