@@ -54,7 +54,6 @@ import GrblRunner from './GrblRunner';
 import {
     GRBL,
     GRBL_ACTIVE_STATE_RUN,
-    //GRBL_ACTIVE_STATE_HOLD,
     GRBL_REALTIME_COMMANDS,
     GRBL_ALARMS,
     GRBL_ERRORS,
@@ -163,7 +162,7 @@ class GrblController {
 
     // Homing information
     homingStarted = false;
-    homingFlagSet = false;
+    homingFlagSet = true;
 
     constructor(engine, options) {
         if (!engine) {
@@ -1568,7 +1567,6 @@ class GrblController {
                         unitModal = 'G21';
                     }
 
-                    const OFFSET = 0.1;
                     const FIXED = 2;
 
                     //If we are moving on the positive direction, we don't need to subtract
@@ -1577,13 +1575,13 @@ class GrblController {
                     //by it to reach the maximum amount in that direction
                     const calculateAxisValue = ({ direction, position, maxTravel }) => {
                         if (position === 0) {
-                            return ((maxTravel - OFFSET) * direction).toFixed(FIXED);
+                            return ((maxTravel) * direction).toFixed(FIXED);
                         }
 
                         if (direction === 1) {
-                            return Number(((position * direction) - OFFSET).toFixed(FIXED));
+                            return Number((position * direction)).toFixed(FIXED);
                         } else {
-                            return Number(-((maxTravel - position) - OFFSET).toFixed(FIXED));
+                            return Number(-1 * (maxTravel - position)).toFixed(FIXED);
                         }
                     };
 
@@ -1628,7 +1626,6 @@ class GrblController {
                 }
 
                 const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-                //this.command('gcode', jogCommand);
                 this.writeln(jogCommand);
             },
             'jog:stop': () => {

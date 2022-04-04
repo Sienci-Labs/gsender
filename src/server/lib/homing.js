@@ -30,22 +30,21 @@ export const POSITIVE_DIRECTION = 1;
 export const NEGATIVE_DIRECTION = -1;
 
 export const getHomingLocation = (setting) => {
-    if (setting === '0') {
+    setting = Number(setting);
+    console.log(setting);
+    if (setting === 0) {
         return BACK_RIGHT;
-    } else if (setting === '1') {
+    } else if (setting === 1) {
         return BACK_LEFT;
-    } else if (setting === '2') {
+    } else if (setting === 2) {
         return FRONT_RIGHT;
-    } else if (setting === '3') {
+    } else if (setting === 3) {
         return FRONT_LEFT;
     }
     return BACK_RIGHT;
 };
 
 export const determineMaxMovement = (position, movementDirection, limitLocation, limit) => {
-    const OFFSET = 0.1;
-    limit -= OFFSET; // We reduce limit to account for bumping into edges
-
     if (position === 0) {
         return ((limit) * movementDirection).toFixed(2);
     }
@@ -54,13 +53,13 @@ export const determineMaxMovement = (position, movementDirection, limitLocation,
         if (limitLocation === POSITIVE_DIRECTION) {
             return (limit - position).toFixed(2);
         } else {
-            return (position - OFFSET).toFixed(2);
+            return (position).toFixed(2);
         }
     } else if (movementDirection === NEGATIVE_DIRECTION) {
         if (limitLocation === POSITIVE_DIRECTION) {
-            return (-1 * (position - OFFSET)).toFixed(2);
+            return (-1 * (position)).toFixed(2);
         } else {
-            return (-1 * (limit - position)).toFixed(2);
+            return (-1 * (limit)).toFixed(2);
         }
     }
     return 0;
