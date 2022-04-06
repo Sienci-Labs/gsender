@@ -99,7 +99,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
-### 1.0.4 (March 4th, 2022)
+### 1.0.5 (March 4th, 2022)
 * Tool commands now emitted to UI if they occur alongside M6 commands
 * Start from line should more consistently set feedrate/spindle rate
 * Fixed issue where laser min and laser max were reversed on initializing laser mode.
