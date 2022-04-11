@@ -48,7 +48,6 @@ class RunProbe extends PureComponent {
             const { actions } = this.props;
             const probeCommands = actions.generateProbeCommands();
 
-            actions.closeModal();
             actions.runProbeCommands(probeCommands);
             this.resetProbeState();
             Toaster.pop({
@@ -57,6 +56,7 @@ class RunProbe extends PureComponent {
                 duration: 5000,
                 icon: 'fa-satellite-dish'
             });
+            actions.closeModal();
         }
     }
 

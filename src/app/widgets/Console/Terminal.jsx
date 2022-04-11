@@ -22,7 +22,6 @@
  */
 
 import cx from 'classnames';
-// import trimEnd from 'lodash/trimEnd';
 import PerfectScrollbar from 'perfect-scrollbar';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -30,14 +29,18 @@ import ReactDOM from 'react-dom';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { debounce } from 'lodash';
+
 import store from 'app/store';
 import Button from 'app/components/FunctionButton/FunctionButton';
-// import controller from 'app/lib/controller';
-// import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
+import controller from 'app/lib/controller';
+import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
+import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
+import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+
 import History from './History';
 import styles from './index.styl';
 
-
+const LINES_TO_COPY = 50;
 class TerminalWrapper extends PureComponent {
     static propTypes = {
         cols: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -221,35 +224,40 @@ class TerminalWrapper extends PureComponent {
         this.term.prompt();
     }
 
-    handleCommandExecute = async () => {
-        const LINES_TO_COPY = 50;
+    handleCommandExecute = () => {
+        const command = this.inputRef.current.value;
 
+        if (!command) {
+            return;
+        }
+
+        controller.writeln(command);
+
+        const { terminalInputHistory = [] } = this.state;
+
+        const newTerminalInputHistory = [...terminalInputHistory];
+
+        if (terminalInputHistory.length === MAX_TERMINAL_INPUT_ARRAY_SIZE) {
+            newTerminalInputHistory.shift();
+        }
+
+        store.replace('workspace.terminal.inputHistory', [...newTerminalInputHistory, command]);
+
+        this.setState({ terminalInputHistory: [...newTerminalInputHistory, command], terminalInputIndex: newTerminalInputHistory.length + 1 });
+
+        this.inputRef.current.value = '';
+    }
+
+    handleCopyLines = async () => {
         this.term.selectAll();
         const selection = this.term.getSelection().split('\n');
-        await navigator.clipboard.writeText(selection.slice(LINES_TO_COPY).join('\n'));
         this.term.clearSelection();
+        await navigator.clipboard.writeText(selection.slice(-LINES_TO_COPY).join('\n'));
 
-        // const command = this.inputRef.current.value;
-
-        // if (!command) {
-        //     return;
-        // }
-
-        // controller.writeln(command);
-
-        // const { terminalInputHistory = [] } = this.state;
-
-        // const newTerminalInputHistory = [...terminalInputHistory];
-
-        // if (terminalInputHistory.length === MAX_TERMINAL_INPUT_ARRAY_SIZE) {
-        //     newTerminalInputHistory.shift();
-        // }
-
-        // store.replace('workspace.terminal.inputHistory', [...newTerminalInputHistory, command]);
-
-        // this.setState({ terminalInputHistory: [...newTerminalInputHistory, command], terminalInputIndex: newTerminalInputHistory.length + 1 });
-
-        // this.inputRef.current.value = '';
+        Toaster.pop({
+            msg: `Copied Last ${selection.length} Lines from the Terminal to Clipboard`,
+            type: TOASTER_INFO
+        });
     }
 
     updateInputHistoryIndex = (index) => {
@@ -286,7 +294,7 @@ class TerminalWrapper extends PureComponent {
                     style={style}
                 />
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 18fr 5fr', alignItems: 'center', textAlign: 'center' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 18fr 3fr 5fr', alignItems: 'center', textAlign: 'center' }}>
                     <span style={{ opacity: '0.6' }}>&gt;</span>
                     <input
                         onKeyDown={(e) => {
@@ -333,6 +341,21 @@ class TerminalWrapper extends PureComponent {
                         }}
                         placeholder="Enter G-Code Here..."
                     />
+
+                    <TooltipCustom content={`Copy the last ${LINES_TO_COPY} lines from the terminal`} location="top" wrapperStyle={{ height: '100%' }}>
+                        <Button
+                            onClick={this.handleCopyLines}
+                            style={{
+                                margin: '0px',
+                                height: '100%',
+                                border: 'none',
+                                borderRadius: '0px',
+                                borderLeft: '1px solid #9ca3af'
+                            }}
+                        >
+                            <i className="fas fa-copy" />
+                        </Button>
+                    </TooltipCustom>
                     <Button
                         onClick={this.handleCommandExecute}
                         primary
@@ -343,7 +366,7 @@ class TerminalWrapper extends PureComponent {
                             borderRadius: '0px',
                         }}
                     >
-                            Run
+                        Run
                     </Button>
                 </div>
             </div>
