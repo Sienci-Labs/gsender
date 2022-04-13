@@ -208,6 +208,9 @@ const main = () => {
             });
         } catch (err) {
             log.error(err);
+            await dialog.showMessageBox({
+                message: err
+            });
         }
         //Check for available updates at end to avoid try-catch failing to load events
         const internetConnectivity = await isOnline();
