@@ -27,11 +27,12 @@ import Modal from 'app/components/Modal';
 import i18n from 'app/lib/i18n';
 import combokeys from 'app/lib/combokeys';
 import gamepad, { runAction } from 'app/lib/gamepad';
+import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+
 import styles from './index.styl';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
-import FunctionButton from '../../components/FunctionButton/FunctionButton';
-import { Toaster, TOASTER_INFO } from '../../lib/toaster/ToasterLib';
 
 class RunProbe extends PureComponent {
     static propTypes = {
@@ -44,19 +45,22 @@ class RunProbe extends PureComponent {
     testInterval = null;
 
     shuttleControlEvents = {
+        START_PROBE: () => {
+            this.startProbe();
+        },
         CONFIRM_PROBE: () => {
-            const { actions } = this.props;
-            const probeCommands = actions.generateProbeCommands();
-
-            actions.runProbeCommands(probeCommands);
-            this.resetProbeState();
+            if (this.state.connectionMade) {
+                return;
+            }
             Toaster.pop({
-                msg: 'Initiated probing cycle',
+                msg: 'Probe Confirmed Manually',
                 type: TOASTER_INFO,
                 duration: 5000,
                 icon: 'fa-satellite-dish'
             });
-            actions.closeModal();
+            this.setState({
+                connectionMade: true,
+            });
         }
     }
 
@@ -71,6 +75,26 @@ class RunProbe extends PureComponent {
         this.setState({
             ...this.getInitialState()
         });
+    }
+
+    startProbe = () => {
+        const { actions } = this.props;
+        const { connectionMade } = this.state;
+        if (!connectionMade) {
+            return;
+        }
+
+        const probeCommands = actions.generateProbeCommands();
+
+        actions.runProbeCommands(probeCommands);
+        this.resetProbeState();
+        Toaster.pop({
+            msg: 'Initiated probing cycle',
+            type: TOASTER_INFO,
+            duration: 5000,
+            icon: 'fa-satellite-dish'
+        });
+        actions.closeModal();
     }
 
     startConnectivityTest(probeStatus, connectivityTest) {
@@ -164,17 +188,7 @@ class RunProbe extends PureComponent {
                             <FunctionButton
                                 primary
                                 disabled={!connectionMade}
-                                onClick={() => {
-                                    actions.closeModal();
-                                    actions.runProbeCommands(probeCommands);
-                                    this.resetProbeState();
-                                    Toaster.pop({
-                                        msg: 'Initiated probing cycle',
-                                        type: TOASTER_INFO,
-                                        duration: 5000,
-                                        icon: 'fa-satellite-dish'
-                                    });
-                                }}
+                                onClick={this.startProbe}
                             >
                                 {
                                     !connectionMade ? 'Waiting on probe circuit confirmation...' : ' Start Probe'
