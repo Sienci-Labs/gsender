@@ -79,9 +79,9 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag) => 
 
     if (homingPosition === FRONT_RIGHT) {
         if (requestedPosition === FRONT_RIGHT) {
-            return [1, 1];
+            return [0, 0];
         } else if (requestedPosition === FRONT_LEFT) {
-            return [xLimit * -1, 1];
+            return [xLimit * -1, 0];
         } else if (requestedPosition === BACK_LEFT) {
             return [(xLimit * -1), yLimit];
         } else { // Back Right
@@ -109,13 +109,13 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag) => 
         }
     } else if (homingPosition === BACK_RIGHT) {
         if (requestedPosition === FRONT_RIGHT) {
-            return [1, yLimit * -1];
+            return [-1, yLimit * -1];
         } else if (requestedPosition === FRONT_LEFT) {
             return [xLimit * -1, yLimit * -1];
         } else if (requestedPosition === BACK_LEFT) {
-            return [xLimit * -1, 1];
+            return [xLimit * -1, 0];
         } else { // Back Right
-            return [1, 1];
+            return [0, 0];
         }
     }
 
