@@ -1284,12 +1284,18 @@ class GrblController {
                         feedRate = modal.units === 'G21' ? 200 : 8;
                     }
 
+                    const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
+                    let modalWcs = modal.wcs;
+                    if (modalWcs !== wcs && modalWcs !== 'G54') {
+                        modalWcs = wcs;
+                    }
+
                     // Move up and then to cut start position
                     modalGCode.push('G0 G90 G21 Z10');
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
-                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modal.wcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
+                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(`F${feedRate} S${spindleRate}`);
                     modalGCode.push(`${modal.motion}`);
                     modalGCode.push('G4 P1');
