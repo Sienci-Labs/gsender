@@ -45,21 +45,28 @@ export const getHomingLocation = (setting) => {
 };
 
 export const determineMaxMovement = (position, movementDirection, limitLocation, limit) => {
+    limit -= 2; // We add a slight offset to make sure calculations don't fail due to rounding, 2mm is not noticeable in most cases
+
     if (position === 0) {
+        console.log('zero branch');
         return ((limit) * movementDirection).toFixed(2);
     }
 
     if (movementDirection === POSITIVE_DIRECTION) {
         if (limitLocation === POSITIVE_DIRECTION) {
+            console.log('+ +');
             return (limit - position).toFixed(2);
         } else {
+            console.log('+ -');
             return (position).toFixed(2);
         }
     } else if (movementDirection === NEGATIVE_DIRECTION) {
         if (limitLocation === POSITIVE_DIRECTION) {
+            console.log('- +');
             return (-1 * (position)).toFixed(2);
         } else {
-            return (-1 * (limit)).toFixed(2);
+            console.log('- -');
+            return (-1 * (limit - position)).toFixed(2);
         }
     }
     return 0;
