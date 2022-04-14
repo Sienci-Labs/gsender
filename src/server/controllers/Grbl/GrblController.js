@@ -162,7 +162,7 @@ class GrblController {
 
     // Homing information
     homingStarted = false;
-    homingFlagSet = true;
+    homingFlagSet = false;
 
     constructor(engine, options) {
         if (!engine) {
