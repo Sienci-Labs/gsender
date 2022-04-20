@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.5/gSender-1.0.5-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.5/gSender-1.0.5-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.5/gSender-1.0.5.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.5/gSender_1.0.5_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.5/gSender-1.0.5-armv7l.deb)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender_1.0.6_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6-armv7l.deb)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -99,7 +99,23 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
-### 1.0.4 (March 4th, 2022)
+### 1.0.6 (April 14th, 2022)
+* Fixed issue that could cause continuous jog to fail in some situations with soft limits enabled
+* Fixed issues with start probe and confirm probe keybinds
+* Laser offset now saved and applied correctly
+* Fixed mouse button combination that could crash visualizer
+* WCS is reset to current selection on job stop
+* Movement modal included in start-from-line functionality
+* Start-from-line should prefer selected WCS if different from default G54
+* Fixed issue with spindle max/min not saving in some situations
+* Disabled surfacing generation when job is running
+* Laser/Spindle EEPROM ($31) and spindle/laser min/max should more accurately be reflected in firmware UI 
+* Macro movement and re-ordering should be easier and more consistent.
+* Start-from-line should use a more sane decimal place for position values
+* Rapid position buttons should now account for machines not running Sienci-specific firmware and offset position from 0.
+* Dependency updates
+
+### 1.0.5 (March 4th, 2022)
 * Tool commands now emitted to UI if they occur alongside M6 commands
 * Start from line should more consistently set feedrate/spindle rate
 * Fixed issue where laser min and laser max were reversed on initializing laser mode.

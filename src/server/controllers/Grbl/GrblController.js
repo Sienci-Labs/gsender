@@ -162,7 +162,7 @@ class GrblController {
 
     // Homing information
     homingStarted = false;
-    homingFlagSet = true;
+    homingFlagSet = false;
 
     constructor(engine, options) {
         if (!engine) {
@@ -1284,12 +1284,18 @@ class GrblController {
                         feedRate = modal.units === 'G21' ? 200 : 8;
                     }
 
+                    const wcs = _.get(this.state, 'parserstate.modal.wcs', 'G54');
+                    let modalWcs = modal.wcs;
+                    if (modalWcs !== wcs && modalWcs !== 'G54') {
+                        modalWcs = wcs;
+                    }
+
                     // Move up and then to cut start position
                     modalGCode.push('G0 G90 G21 Z10');
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
-                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modal.wcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
+                    modalGCode.push(`${modal.units} ${modal.distance} ${modal.arc} ${modalWcs} ${modal.plane} ${modal.spindle} ${coolant.flood} ${coolant.mist}`);
                     modalGCode.push(`F${feedRate} S${spindleRate}`);
                     modalGCode.push(`${modal.motion}`);
                     modalGCode.push('G4 P1');
@@ -1595,9 +1601,11 @@ class GrblController {
                         const [xMaxLoc, yMaxLoc] = getAxisMaximumLocation($23);
 
                         if (axes.X) {
+                            console.log('X');
                             axes.X = determineMaxMovement(Math.abs(mpos.x), axes.X, xMaxLoc, $130);
                         }
                         if (axes.Y) {
+                            console.log('Y');
                             axes.Y = determineMaxMovement(Math.abs(mpos.y), axes.Y, yMaxLoc, $131);
                         }
                     } else {
@@ -1624,6 +1632,7 @@ class GrblController {
                     axes.F *= 0.8;
                     axes.F = axes.F.toFixed(3);
                 }
+                console.log(axes);
 
                 const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
                 this.writeln(jogCommand);

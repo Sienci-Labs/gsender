@@ -109,7 +109,7 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag) => 
         }
     } else if (homingPosition === BACK_RIGHT) {
         if (requestedPosition === FRONT_RIGHT) {
-            return [0, yLimit * -1];
+            return [-1, yLimit * -1];
         } else if (requestedPosition === FRONT_LEFT) {
             return [xLimit * -1, yLimit * -1];
         } else if (requestedPosition === BACK_LEFT) {
