@@ -20,7 +20,13 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
 // We need to be able to access IPC within react but can't import it directly since it relies on FS - this is the workaround
 window.ipcRenderer = require('electron').ipcRenderer;
+const { contextBridge } = require('electron');
 
+const WINDOW_API = {
+    persistConfig: (state) => window.ipcRenderer.send('persist-app-config', state),
+    getAppPath: (state) => window.ipcRenderer.invoke('get-app-path')
+};
+
+contextBridge.exposeInMainWorld('api', WINDOW_API);

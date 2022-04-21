@@ -170,7 +170,7 @@ export default [
         'laser': false
     },
     {
-        'id': 7,
+        'id': 8,
         'company': 'Sienci Labs',
         'name': 'LongMill MK2',
         'type': '12x30',

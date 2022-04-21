@@ -40,39 +40,41 @@ import { JOGGING_CATEGORY, LOCATION_CATEGORY, METRIC_UNITS } from '../constants'
 
 const store = new ImmutableStore(defaultState);
 
-let userData = null;
+const getDataPath = async () => {
+    const dataPath = await window.ipcRenderer.invoke('get-app-path');
+    return dataPath;
+};
 
 // Check whether the code is running in Electron renderer process
-if (isElectron()) {
-    //const electron = window.require('electron');
-    const path = window.require('path'); // Require the path module within Electron
-    const app = window.require('@electron/remote').app;
-    userData = {
-        path: path.join(app.getPath('userData'), 'gsender-0.5.6.json')
-    };
-}
+/*if (isElectron()) {
+    window.ipcRenderer.invoke('get-app-path').then((dataPath) => {
+        console.log(dataPath);
+    });
+}*/
 
-const getConfig = () => {
+const getConfig = async () => {
     let content = '';
 
     // Check whether the code is running in Electron renderer process
     if (isElectron()) {
         const fs = window.require('fs'); // Require the fs module within Electron
-        if (fs.existsSync(userData.path)) {
-            content = fs.readFileSync(userData.path, 'utf8') || '{}';
+        const path = await getDataPath();
+        if (fs.existsSync(path)) {
+            content = fs.readFileSync(path, 'utf8') || '{}';
+            console.log(content);
         }
     } else {
         content = localStorage.getItem('sienci') || '{}';
     }
 
     if (content === '{}') {
-        content = this.normalizeState().toString();
+        content = normalizeState().toString();
     }
 
     return content;
 };
 
-const persist = (data) => {
+const persist = async (data) => {
     const { version, state } = { ...data };
 
     data = {
@@ -88,8 +90,11 @@ const persist = (data) => {
 
         // Check whether the code is running in Electron renderer process
         if (isElectron()) {
+            console.log(value);
             const fs = window.require('fs'); // Use window.require to require fs module in Electron
-            fs.writeFileSync(userData.path, value);
+            const path = await getDataPath();
+            console.log('path');
+            fs.writeFileSync(path, value);
         } else {
             localStorage.setItem('sienci', value);
         }
@@ -189,10 +194,11 @@ const cnc = {
 };
 
 try {
-    const text = getConfig();
-    const data = JSON.parse(text);
-    cnc.version = get(data, 'version', settings.version);
-    cnc.state = get(data, 'state', {});
+    getConfig().then(text => {
+        const data = JSON.parse(text);
+        cnc.version = get(data, 'version', settings.version);
+        cnc.state = get(data, 'state', {});
+    });
 } catch (e) {
     // set(settings, 'error.corruptedWorkspaceSettings', true);
     log.error(e);
@@ -201,8 +207,8 @@ try {
 store.state = normalizeState(merge({}, defaultState, cnc.state || {}));
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
-store.on('change', debounce((state) => {
-    persist({ state: state });
+store.on('change', debounce(async (state) => {
+    await persist({ state: state });
 }, 100));
 
 //

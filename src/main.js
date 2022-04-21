@@ -157,6 +157,10 @@ const main = () => {
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
 
+            ipcMain.handle('get-app-path', (event) => {
+                return path.join(app.getPath('userData'), 'gsender-0.5.6.json');
+            });
+
             ipcMain.on('open-upload-dialog', async () => {
                 try {
                     let additionalOptions = {};
