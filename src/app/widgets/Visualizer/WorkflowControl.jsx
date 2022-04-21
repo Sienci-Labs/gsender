@@ -128,6 +128,8 @@ class WorkflowControl extends PureComponent {
     };
 
     handleElectronFileUpload = async (file) => {
+        console.log('FILE:');
+        console.log(file);
         const serializedFile = new File([file.data], file.name, { path: file.path });
 
         if (isElectron()) {
@@ -241,12 +243,14 @@ class WorkflowControl extends PureComponent {
 
     componentDidMount() {
         if (isElectron()) {
-            window.api.registerListener('loaded-recent-file', async (msg, fileMetaData) => {
+            window.api.registerListener('loaded-recent-file', async (fileMetaData) => {
+                console.log(fileMetaData);
                 await this.loadRecentFile(fileMetaData);
                 const recentFile = createRecentFile(fileMetaData);
                 addRecentFile(recentFile);
             });
-            window.api.registerListener('returned-upload-dialog-data', async (msg, file) => {
+            window.api.registerListener('returned-upload-dialog-data', async (file) => {
+                console.log(file);
                 await this.handleElectronFileUpload(file);
             });
         }

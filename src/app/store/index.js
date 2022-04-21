@@ -52,7 +52,6 @@ const getConfig = async () => {
     // Check whether the code is running in Electron renderer process
     if (isElectron()) {
         content = await window.api.getConfig('gsender-0.5.6.json');
-        console.log('RECEIVED CONTENT:');
     } else {
         content = localStorage.getItem('sienci') || '{}';
     }
@@ -80,10 +79,8 @@ const persist = (data) => {
 
         // Check whether the code is running in Electron renderer process
         if (isElectron()) {
-            console.log('persisting...');
             window.api.persistConfig('gsender-0.5.6.json', value);
         } else {
-            console.log('Local Persist');
             localStorage.setItem('sienci', value);
         }
     } catch (e) {
@@ -92,7 +89,6 @@ const persist = (data) => {
 };
 
 const normalizeState = (state) => {
-    console.log('NORMALIZE CALLED');
     //
     // Normalize workspace widgets
     // Update primary widgets
@@ -297,8 +293,6 @@ try {
             const data = JSON.parse(text);
             cnc.version = get(data, 'version', settings.version);
             cnc.state = get(data, 'state', {});
-            console.log('CNC OBJECT');
-            console.log(cnc);
         }]).then(() => {
         store.state = normalizeState(merge({}, defaultState, cnc.state || {}));
         try {
