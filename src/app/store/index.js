@@ -34,11 +34,17 @@ import { TOUCHPLATE_TYPE_STANDARD, TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_ZER
 import { MODAL_HELP } from 'app/containers/NavSidebar/constants';
 import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
+import series from '../lib/promise-series';
 import log from '../lib/log';
 import defaultState from './defaultState';
 import { JOGGING_CATEGORY, LOCATION_CATEGORY, METRIC_UNITS } from '../constants';
 
 const store = new ImmutableStore(defaultState);
+
+const cnc = {
+    version: settings.version,
+    state: {}
+};
 
 const getConfig = async () => {
     let content = '';
@@ -46,6 +52,7 @@ const getConfig = async () => {
     // Check whether the code is running in Electron renderer process
     if (isElectron()) {
         content = await window.api.getConfig('gsender-0.5.6.json');
+        console.log('RECEIVED CONTENT:');
     } else {
         content = localStorage.getItem('sienci') || '{}';
     }
@@ -85,6 +92,7 @@ const persist = (data) => {
 };
 
 const normalizeState = (state) => {
+    console.log('NORMALIZE CALLED');
     //
     // Normalize workspace widgets
     // Update primary widgets
@@ -168,31 +176,6 @@ const normalizeState = (state) => {
 
     return state;
 };
-
-const cnc = {
-    version: settings.version,
-    state: {}
-};
-
-try {
-    getConfig().then(text => {
-        console.log('received text');
-        const data = JSON.parse(text);
-        cnc.version = get(data, 'version', settings.version);
-        cnc.state = get(data, 'state', {});
-    });
-} catch (e) {
-    // set(settings, 'error.corruptedWorkspaceSettings', true);
-    log.error(e);
-}
-
-store.state = normalizeState(merge({}, defaultState, cnc.state || {}));
-
-// Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
-store.on('change', debounce((state) => {
-    console.log('Store Change Event');
-    persist({ state: state });
-}, 100));
 
 //
 // Migration
@@ -302,10 +285,31 @@ const migrateStore = () => {
     }
 };
 
+// Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
+store.on('change', debounce((state) => {
+    persist({ state: state });
+}, 100));
+
 try {
-    migrateStore();
-} catch (err) {
-    log.error(err);
+    series([
+        async () => {
+            const text = await getConfig();
+            const data = JSON.parse(text);
+            cnc.version = get(data, 'version', settings.version);
+            cnc.state = get(data, 'state', {});
+            console.log('CNC OBJECT');
+            console.log(cnc);
+        }]).then(() => {
+        store.state = normalizeState(merge({}, defaultState, cnc.state || {}));
+        try {
+            migrateStore();
+        } catch (err) {
+            log.error(err);
+        }
+    });
+} catch (e) {
+    // set(settings, 'error.corruptedWorkspaceSettings', true);
+    log.error(e);
 }
 
 store.getConfig = getConfig;

@@ -20,6 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+
 const fs = require('fs');
 
 export const persistConfig = (path, state) => {
