@@ -40,29 +40,12 @@ import { JOGGING_CATEGORY, LOCATION_CATEGORY, METRIC_UNITS } from '../constants'
 
 const store = new ImmutableStore(defaultState);
 
-const getDataPath = async () => {
-    const dataPath = await window.ipcRenderer.invoke('get-app-path');
-    return dataPath;
-};
-
-// Check whether the code is running in Electron renderer process
-/*if (isElectron()) {
-    window.ipcRenderer.invoke('get-app-path').then((dataPath) => {
-        console.log(dataPath);
-    });
-}*/
-
 const getConfig = async () => {
     let content = '';
 
     // Check whether the code is running in Electron renderer process
     if (isElectron()) {
-        const fs = window.require('fs'); // Require the fs module within Electron
-        const path = await getDataPath();
-        if (fs.existsSync(path)) {
-            content = fs.readFileSync(path, 'utf8') || '{}';
-            console.log(content);
-        }
+        content = await window.api.getConfig('gsender-0.5.6.json');
     } else {
         content = localStorage.getItem('sienci') || '{}';
     }
@@ -74,7 +57,7 @@ const getConfig = async () => {
     return content;
 };
 
-const persist = async (data) => {
+const persist = (data) => {
     const { version, state } = { ...data };
 
     data = {
@@ -90,12 +73,10 @@ const persist = async (data) => {
 
         // Check whether the code is running in Electron renderer process
         if (isElectron()) {
-            console.log(value);
-            const fs = window.require('fs'); // Use window.require to require fs module in Electron
-            const path = await getDataPath();
-            console.log('path');
-            fs.writeFileSync(path, value);
+            console.log('persisting...');
+            window.api.persistConfig('gsender-0.5.6.json', value);
         } else {
+            console.log('Local Persist');
             localStorage.setItem('sienci', value);
         }
     } catch (e) {
@@ -195,6 +176,7 @@ const cnc = {
 
 try {
     getConfig().then(text => {
+        console.log('received text');
         const data = JSON.parse(text);
         cnc.version = get(data, 'version', settings.version);
         cnc.state = get(data, 'state', {});
@@ -207,8 +189,9 @@ try {
 store.state = normalizeState(merge({}, defaultState, cnc.state || {}));
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
-store.on('change', debounce(async (state) => {
-    await persist({ state: state });
+store.on('change', debounce((state) => {
+    console.log('Store Change Event');
+    persist({ state: state });
 }, 100));
 
 //

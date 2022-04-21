@@ -104,6 +104,7 @@ export const sortRecentFiles = (recentFiles = []) => {
 };
 
 export const loadRecentFile = (filePath) => {
-    window.ipcRenderer.send('load-recent-file', { filePath: filePath });
+    window.api.loadRecentFile({ filePath: filePath });
+    //window.ipcRenderer.send('load-recent-file', { filePath: filePath });
     return true;
 };

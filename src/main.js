@@ -37,6 +37,7 @@ import launchServer from './server-cli';
 import pkg from './package.json';
 //import './sentryInit';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
+import { loadConfig, persistConfig } from './electron-app/store';
 
 let windowManager = null;
 let powerSaverId = null;
@@ -127,7 +128,6 @@ const main = () => {
             log.info(`Result of powerSaveBlocker: ${powerSaveBlocker.isStarted(powerSaverId)}`);
             powerMonitor.on('lock-screen', () => {
                 powerSaveBlocker.start('prevent-display-sleep');
-                log.info('Prevented sleep');
             });
             powerMonitor.on('suspend', () => {
                 powerSaveBlocker.start('prevent-app-suspension');
@@ -157,8 +157,27 @@ const main = () => {
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
 
+            ipcMain.on('log-error', (channel, err) => {
+                log.error(err.message);
+            });
+
+            /**
+             * gSender config events - move electron store changes out of renderer process
+             */
             ipcMain.handle('get-app-path', (event) => {
                 return path.join(app.getPath('userData'), 'gsender-0.5.6.json');
+            });
+
+            ipcMain.handle('get-app-config', (event, filename) => {
+                const filePath = path.join(app.getPath('userData'), filename);
+                return loadConfig(filePath);
+            });
+
+            ipcMain.on('persist-app-config', (event, filename, state) => {
+                log.info('PERSIST CALL');
+                log.info(filename);
+                const filePath = path.join(app.getPath('userData'), filename);
+                persistConfig(filePath, state);
             });
 
             ipcMain.on('open-upload-dialog', async () => {

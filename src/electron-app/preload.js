@@ -21,12 +21,18 @@
  *
  */
 // We need to be able to access IPC within react but can't import it directly since it relies on FS - this is the workaround
-window.ipcRenderer = require('electron').ipcRenderer;
-const { contextBridge } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 const WINDOW_API = {
-    persistConfig: (state) => window.ipcRenderer.send('persist-app-config', state),
-    getAppPath: (state) => window.ipcRenderer.invoke('get-app-path')
+    persistConfig: (fileName, value) => ipcRenderer.send('persist-app-config', fileName, value),
+    getConfig: (fileName) => ipcRenderer.invoke('get-app-config', fileName),
+    getAppPath: (state) => ipcRenderer.invoke('get-app-path'),
+    restartApp: () => ipcRenderer.send('restart_app'),
+    loadRecentFile: (path) => ipcRenderer.send('load-recent-file', path),
+    openUploadDialog: () => ipcRenderer.send('open-upload-dialog'),
+    registerListener: (channel, fn) => {
+        ipcRenderer.on(channel, (event, ...args) => fn(...args));
+    }
 };
 
 contextBridge.exposeInMainWorld('api', WINDOW_API);

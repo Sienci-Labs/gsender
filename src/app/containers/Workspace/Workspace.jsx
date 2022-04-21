@@ -125,7 +125,7 @@ class Workspace extends PureComponent {
         },
         sendRestartCommand: () => {
             if (isElectron()) {
-                window.ipcRenderer.send('restart_app');
+                window.api.restartApp();
             }
         },
         reconnect: () => {
