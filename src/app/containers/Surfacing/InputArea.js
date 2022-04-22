@@ -3,13 +3,15 @@ import PropTypes from 'prop-types';
 
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import defaultState from 'app/store/defaultState';
-import { METRIC_UNITS } from 'app/constants';
+import { METRIC_UNITS, SPINDLE_MODES } from 'app/constants';
+import { RadioGroup, RadioButton } from 'app/components/Radio';
 
 import Input from './components/Input';
 import MachinePosition from './components/MachinePosition';
 import styles from './index.styl';
 import inputStyles from './components/input.styl';
 
+const [M3, M4] = SPINDLE_MODES;
 
 const InputArea = ({ values, onChange, onSelect, units }) => {
     const { widgets } = defaultState;
@@ -25,6 +27,7 @@ const InputArea = ({ values, onChange, onSelect, units }) => {
         maxDepth,
         type,
         startPosition,
+        spindle
     } = values;
 
     const defaultValues = units === METRIC_UNITS ? widgets.surfacing.defaultMetricState : widgets.surfacing.defaultImperialState;
@@ -128,6 +131,29 @@ const InputArea = ({ values, onChange, onSelect, units }) => {
                         value={maxDepth}
                         onChange={onChange}
                     />
+                </Tooltip>
+
+                <Tooltip content={`Default Value: ${defaultValues.spindle}`}>
+                    <div style={{ marginTop: '2.5rem' }}>
+                        <div className={inputStyles.input}>
+                            <label htmlFor="">Spindle</label>
+
+                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                <RadioGroup
+                                    name="spindle"
+                                    value={spindle}
+                                    depth={2}
+                                    onChange={(value) => onSelect({ value, type: 'spindle' })}
+                                    size="small"
+                                >
+                                    <div>
+                                        <RadioButton className={styles.prefferedradio} label="M3" value={M3} />
+                                        <RadioButton className={styles.prefferedradio} label="M4" value={M4} />
+                                    </div>
+                                </RadioGroup>
+                            </div>
+                        </div>
+                    </div>
                 </Tooltip>
 
                 <div style={{ marginTop: '2.5rem' }}>

@@ -21,7 +21,7 @@ export default class Generator {
      */
     handleGenerate = () => {
         const { surfacing, controller, units, generateGcode } = this;
-        const { skimDepth, maxDepth, feedrate, spindleRPM } = surfacing;
+        const { skimDepth, maxDepth, feedrate, spindleRPM, spindle = 'M3' } = surfacing;
 
         let wcs = controller.state?.parserstate?.modal?.wcs || 'G54';
 
@@ -34,7 +34,7 @@ export default class Generator {
             'G90',
             'G0 X0 Y0',
             `G1 F${feedrate}`,
-            `M3 S${spindleRPM}`,
+            `${spindle} S${spindleRPM}`,
             '(Header End)',
         ];
         let count = 1;
