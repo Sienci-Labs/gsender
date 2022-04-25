@@ -37,7 +37,7 @@ import ImmutableStore from '../lib/immutable-store';
 import series from '../lib/promise-series';
 import log from '../lib/log';
 import defaultState from './defaultState';
-import { JOGGING_CATEGORY, LOCATION_CATEGORY, METRIC_UNITS } from '../constants';
+import { JOGGING_CATEGORY, LOCATION_CATEGORY, METRIC_UNITS, SPINDLE_MODES } from '../constants';
 
 const store = new ImmutableStore(defaultState);
 
@@ -179,6 +179,16 @@ const normalizeState = (state) => {
 const migrateStore = () => {
     if (!cnc.version) {
         return;
+    }
+
+    // 1.0.7 - Update default state for surfacing, added spindle parameter to choose between m3 and m4
+    if (semver.lt(cnc.version, '1.0.7')) {
+        const [M3] = SPINDLE_MODES;
+        const metricState = store.get('widgets.surfacing.defaultMetricState');
+        const imperialState = store.get('widgets.surfacing.defaultMetricState');
+
+        store.set('widgets.surfacing.defaultMetricState', { ...metricState, spindle: M3 });
+        store.set('widgets.surfacing.defaultImperialState', { ...imperialState, spindle: M3 });
     }
 
     // 1.0.4 - need to add

@@ -36,7 +36,8 @@ import {
     GENERAL_CATEGORY,
     TOOLBAR_CATEGORY,
     SPIRAL_MOVEMENT,
-    START_POSITION_BACK_LEFT
+    START_POSITION_BACK_LEFT,
+    SPINDLE_MODES
 } from 'app/constants';
 import {
     MODAL_PREFERENCES,
@@ -51,6 +52,8 @@ import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../widgets/JogControl/
 const AXIS_X = 'x';
 const AXIS_Y = 'y';
 const AXIS_Z = 'z';
+
+const [M3] = SPINDLE_MODES;
 
 const defaultState = {
     session: {
@@ -347,6 +350,7 @@ const defaultState = {
                 spindleRPM: 17000,
                 type: SPIRAL_MOVEMENT,
                 startPosition: START_POSITION_BACK_LEFT,
+                spindle: M3,
             },
             defaultImperialState: {
                 bitDiameter: 1,
@@ -358,6 +362,7 @@ const defaultState = {
                 maxDepth: 0.04,
                 type: SPIRAL_MOVEMENT,
                 startPosition: START_POSITION_BACK_LEFT,
+                spindle: M3,
             },
         },
         visualizer: {
