@@ -244,13 +244,11 @@ class WorkflowControl extends PureComponent {
     componentDidMount() {
         if (isElectron()) {
             window.api.registerListener('loaded-recent-file', async (fileMetaData) => {
-                console.log(fileMetaData);
                 await this.loadRecentFile(fileMetaData);
                 const recentFile = createRecentFile(fileMetaData);
                 addRecentFile(recentFile);
             });
             window.api.registerListener('returned-upload-dialog-data', async (file) => {
-                console.log(file);
                 await this.handleElectronFileUpload(file);
             });
         }
