@@ -240,7 +240,8 @@ class SpindleWidget extends PureComponent {
             laser
         } = this.state;
 
-        this.config.set('laser', laser);
+        this.config.set('laser.duration', laser.duration);
+        this.config.set('laser.power', laser.power);
         this.config.set('spindleMax', spindleMax);
         this.config.set('spindleMin', spindleMin);
         this.config.set('mode', mode);
@@ -309,6 +310,9 @@ class SpindleWidget extends PureComponent {
 
     getLaserOffsetCode() {
         const laser = this.config.get('laser');
+        this.setState({
+            laser
+        });
         const { xOffset, yOffset } = laser;
         return [
             `G10 L20 P${this.getWCS()} X${xOffset} Y${yOffset}`
@@ -317,6 +321,9 @@ class SpindleWidget extends PureComponent {
 
     getSpindleOffsetCode() {
         const laser = this.config.get('laser');
+        this.setState({
+            laser
+        });
         let { xOffset, yOffset } = laser;
         xOffset = Number(xOffset) * -1;
         yOffset = Number(yOffset) * -1;

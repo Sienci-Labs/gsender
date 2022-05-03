@@ -414,24 +414,24 @@ class PreferencesPage extends PureComponent {
         },
         laser: {
             handleOffsetChange: (e, axis) => {
-                const { laser } = this.state;
+                const { laser } = this.spindleConfig.get('laser');
                 const value = Number(e.target.value) || 0;
                 if (axis === 'X') {
+                    this.spindleConfig.set('laser.xOffset', value);
                     this.setState({
                         laser: {
                             ...laser,
                             xOffset: value
                         }
                     });
-                    this.spindleConfig.set('laser.xOffset', value);
                 } else if (axis === 'Y') {
+                    this.spindleConfig.set('laser.yOffset', value);
                     this.setState({
                         laser: {
                             ...laser,
                             yOffset: value
                         }
                     });
-                    this.spindleConfig.set('laser.yOffset', value);
                 }
             },
             setPower: (val, type) => {
@@ -641,7 +641,8 @@ class PreferencesPage extends PureComponent {
         store.replace('widgets.visualizer.objects', visualizer.objects);
         store.set('workspace[tool]', tool);
         store.replace('workspace[probeProfile]', probe);
-        store.replace('widgets.spindle', spindle);
+        store.set('widgets.spindle.spindleMax', spindle.spindleMax);
+        store.set('widgets.spindle.spindleMin', spindle.spindleMin);
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);

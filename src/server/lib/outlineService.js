@@ -97,6 +97,7 @@ export function getOutlineGcode(gcode, concavity = 60) {
 function convertPointsToGCode(points) {
     const gCode = [];
     gCode.push('%X0=posx,Y0=posy,Z0=posz');
+    gCode.push('%MM=modal.distance');
     gCode.push('G21 G91 G0 Z5');
     points.forEach(point => {
         const [x, y] = point;
@@ -104,5 +105,6 @@ function convertPointsToGCode(points) {
     });
     gCode.push('G0 X[X0] Y[Y0]');
     gCode.push('G21 G91 G0 Z-5');
+    gCode.push('[MM]');
     return gCode;
 }
