@@ -83,9 +83,6 @@
       "output": "output",
       "app": "dist/gsender"
     },
-    "extraResources": [
-      "./node_modules/@electron/remote/**"
-    ],
     "nsis": {
       "allowToChangeInstallationDirectory": true,
       "oneClick": false,
