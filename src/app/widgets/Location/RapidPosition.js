@@ -60,8 +60,11 @@ const getMachineMovementLimits = () => {
     return [xLimit, yLimit];
 };
 
-const getPositionMovements = (requestedPosition, homingPosition, homingFlag) => {
+const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pullOff) => {
     const [xLimit, yLimit] = getMachineMovementLimits();
+
+    pullOff = Number(pullOff) || 2;
+    console.log(pullOff);
 
 
     // If homing flag not set, we treat all movements as negative space
@@ -79,55 +82,55 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag) => 
 
     if (homingPosition === FRONT_RIGHT) {
         if (requestedPosition === FRONT_RIGHT) {
-            return [0, 0];
+            return [pullOff * -1, pullOff];
         } else if (requestedPosition === FRONT_LEFT) {
-            return [xLimit * -1, 0];
+            return [xLimit * -1, pullOff];
         } else if (requestedPosition === BACK_LEFT) {
             return [(xLimit * -1), yLimit];
         } else { // Back Right
-            return [0, yLimit];
+            return [pullOff * -1, yLimit];
         }
     } else if (homingPosition === FRONT_LEFT) {
         if (requestedPosition === FRONT_RIGHT) {
-            return [xLimit, 0];
+            return [xLimit, pullOff];
         } else if (requestedPosition === FRONT_LEFT) {
-            return [0, 0];
+            return [pullOff, pullOff];
         } else if (requestedPosition === BACK_RIGHT) {
             return [xLimit, yLimit];
         } else { // Back Right
-            return [0, yLimit];
+            return [pullOff, yLimit];
         }
     } else if (homingPosition === BACK_LEFT) {
         if (requestedPosition === FRONT_RIGHT) {
             return [xLimit, yLimit * -1];
         } else if (requestedPosition === FRONT_LEFT) {
-            return [0, yLimit * -1];
+            return [pullOff, yLimit * -1];
         } else if (requestedPosition === BACK_LEFT) {
-            return [0, 0];
+            return [pullOff, pullOff * -1];
         } else { // Back Right
-            return [xLimit, 0];
+            return [xLimit, pullOff * -1];
         }
     } else if (homingPosition === BACK_RIGHT) {
         if (requestedPosition === FRONT_RIGHT) {
-            return [-1, yLimit * -1];
+            return [pullOff * -1, yLimit * -1];
         } else if (requestedPosition === FRONT_LEFT) {
             return [xLimit * -1, yLimit * -1];
         } else if (requestedPosition === BACK_LEFT) {
-            return [xLimit * -1, 0];
+            return [xLimit * -1, pullOff * -1];
         } else { // Back Right
-            return [0, 0];
+            return [pullOff * -1, pullOff * -1];
         }
     }
 
     return [null, null];
 };
 
-export const getMovementGCode = (requestedPosition, homingPositionSetting, homingFlag, eeprom) => {
+export const getMovementGCode = (requestedPosition, homingPositionSetting, homingFlag, pullOff) => {
     const gcode = [];
 
     gcode.push(`G53 G21 G0 Z-${OFFSET_DISTANCE}`); // Always move up to the limit of Z travel minus offset
     const homingPosition = getHomingLocation(homingPositionSetting);
-    const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPosition, homingFlag);
+    const [xMovement, yMovement] = getPositionMovements(requestedPosition, homingPosition, homingFlag, pullOff);
 
     if (xMovement === null || yMovement === null) {
         Toaster.pop({
