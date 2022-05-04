@@ -33,6 +33,7 @@ import {
     JOGGING_CATEGORY,
     PROBING_CATEGORY,
     SPINDLE_LASER_CATEGORY,
+    COOLANT_CATEGORY,
     GENERAL_CATEGORY,
     TOOLBAR_CATEGORY,
     SPIRAL_MOVEMENT,
@@ -579,7 +580,7 @@ const defaultState = {
         },
         { // 3D / Isometric
             id: 16,
-            title: '3D / Isometirc',
+            title: '3D / Isometric',
             keys: '',
             cmd: 'VISUALIZER_VIEW',
             payload: { type: 'isometirc' },
@@ -997,8 +998,33 @@ const defaultState = {
             isActive: true,
             category: SPINDLE_LASER_CATEGORY,
         },
-
-
+        { // Soft Reset
+            id: 71,
+            title: 'Mist Coolant',
+            keys: '',
+            cmd: 'MIST_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+        },
+        {
+            id: 72,
+            title: 'Flood Coolant',
+            keys: '',
+            cmd: 'FLOOD_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+        },
+        {
+            id: 73,
+            title: 'Stop Coolant',
+            keys: '',
+            cmd: 'STOP_COOLANT',
+            preventDefault: false,
+            isActive: true,
+            category: COOLANT_CATEGORY,
+        },
         { // Cut
             id: 55,
             title: 'Cut',

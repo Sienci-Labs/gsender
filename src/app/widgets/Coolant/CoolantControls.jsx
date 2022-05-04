@@ -21,11 +21,13 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import controller from 'app/lib/controller';
+import combokeys from 'app/lib/combokeys';
+import gamepad, { runAction } from 'app/lib/gamepad';
 import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import styles from './index.styl';
 
@@ -40,7 +42,43 @@ const sendM9 = () => {
     controller.command('gcode', 'M9');
 };
 
+const shuttleControlEvents = {
+    MIST_COOLANT: () => {
+        sendM7();
+    },
+    FLOOD_COOLANT: () => {
+        sendM8();
+    },
+    STOP_COOLANT: () => {
+        sendM9();
+    }
+};
+
+const subscribeShuttleControl = () => {
+    combokeys.reload();
+
+    Object.keys(shuttleControlEvents).forEach(eventName => {
+        const callback = shuttleControlEvents[eventName];
+        combokeys.on(eventName, callback);
+    });
+
+    gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
+};
+
+const unsubscribeShuttleControl = () => {
+    Object.keys(shuttleControlEvents).forEach(eventName => {
+        const callback = shuttleControlEvents[eventName];
+        combokeys.removeListener(eventName, callback);
+    });
+};
+
 const CoolantControls = ({ canClick }) => {
+    useEffect(() => {
+        subscribeShuttleControl();
+        return function cleanup() {
+            unsubscribeShuttleControl();
+        };
+    }, []);
     return (
         <div className={styles.flexRow}>
             <FunctionButton onClick={sendM7} disabled={!canClick}>

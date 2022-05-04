@@ -181,6 +181,17 @@ const migrateStore = () => {
         return;
     }
 
+    // Add migration for new command keys for mist and coolant
+    if (semver.lt(cnc.version, '1.0.7')) {
+        const currentCommandKeys = store.get('commandKeys', []);
+        const defaultCommandKeys = get(defaultState, 'commandKeys');
+        // Splice the new binds into the location of the spindle binds
+        const spindleBindIndex = currentCommandKeys.map(cmd => cmd.id).indexOf(54);
+        const newCommands = defaultCommandKeys.filter(command => command.id === 72 || command.id === 71);
+        currentCommandKeys.splice(spindleBindIndex + 1, 0, ...newCommands);
+        store.replace('commandKeys', currentCommandKeys);
+    }
+
     // 1.0.7 - Update default state for surfacing, added spindle parameter to choose between m3 and m4
     if (semver.lt(cnc.version, '1.0.7')) {
         const [M3] = SPINDLE_MODES;

@@ -148,9 +148,10 @@ export const PROBING_CATEGORY = 'Probing';
 export const SPINDLE_LASER_CATEGORY = 'Spindle/Laser';
 export const GENERAL_CATEGORY = 'General';
 export const TOOLBAR_CATEGORY = 'Toolbar';
+export const COOLANT_CATEGORY = 'Coolant';
 
 export const RENDER_NO_FILE = 'RENDER_NO_FILE';
-export const RENDER_LOADING = 'RENDER_LOADNG';
+export const RENDER_LOADING = 'RENDER_LOADING';
 export const RENDER_RENDERING = 'RENDER_RENDERING';
 export const RENDER_RENDERED = 'RENDER_RENDERED';
 

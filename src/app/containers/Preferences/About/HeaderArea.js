@@ -19,7 +19,7 @@ const HeaderArea = () => {
             </div>
 
             <div className={styles.headerRight}>
-                <p>Copyright &copy; 2021 Sienci Labs Inc.</p>
+                <p>Copyright &copy; 2022 Sienci Labs Inc.</p>
                 <div className={styles.country}><span>Made in Canada</span> <img src={canadaFlagIcon} alt="Canada Flag" /></div>
                 <p>
                     <a

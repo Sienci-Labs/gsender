@@ -37,7 +37,8 @@ import {
     SPINDLE_LASER_CATEGORY,
     GENERAL_CATEGORY,
     TOOLBAR_CATEGORY,
-    MACRO_CATEGORY
+    MACRO_CATEGORY,
+    COOLANT_CATEGORY
 } from 'app/constants';
 
 import { formatShortcut } from './helpers';
@@ -133,7 +134,8 @@ export default class MainTable extends Component {
                 [SPINDLE_LASER_CATEGORY]: 'categoryBlack',
                 [GENERAL_CATEGORY]: 'categoryGrey',
                 [TOOLBAR_CATEGORY]: 'categoryWhite',
-                [MACRO_CATEGORY]: 'categoryLightBlue'
+                [MACRO_CATEGORY]: 'categoryLightBlue',
+                [COOLANT_CATEGORY]: 'categoryDarkRed'
             };
 
             const category = categories[row.category];
