@@ -84,7 +84,7 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
             return null;
         }
 
-        return Math.sqrt((triangle.a ** 2) + (triangle.b ** 2));
+        return Math.sqrt((a ** 2) + (b ** 2));
     };
 
     const checkStepsPerMM = () => {
