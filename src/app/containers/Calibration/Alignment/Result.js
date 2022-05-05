@@ -37,6 +37,7 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
     const [machineIsSquared, setMachineIsSquared] = useState(false);
     const [hasError, setHasError] = useState(false);
     const [fm, setFm] = useState(false);
+    const [directions, setDirections] = useState(['backwards', 'forward']);
 
     const [stepsUpdate, setStepsUpdate] = useState(null);
 
@@ -50,6 +51,9 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
                 const BETA = calculateBeta({ trueHypotenuse: HYPOTENUSE, userHypotenuse: c, alpha: ALPHA });
 
                 const FM = calculateFM({ b, beta: BETA });
+                if (c < HYPOTENUSE) {
+                    setDirections(['forward', 'backwards']);
+                }
 
                 if (isNaN(ALPHA) || isNaN(BETA) || isNaN(FM)) {
                     throw new Error();
@@ -205,11 +209,13 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
             );
         }
 
+        let [rightDirection, leftDirection] = directions;
+
         return (
             <>
                 <div className={styles.result}>
                     <Icon type="error" />
-                    <p>Your machine is off by <strong>{fm}mm</strong>, to properly square it, move either the right y-axis rail backwards <strong>{fm}mm</strong> or the left y-axis rail forward by <strong>{fm}mm</strong></p>
+                    <p>Your machine is off by <strong>{fm}mm</strong>, to properly square it, move either the right y-axis rail { rightDirection } <strong>{fm}mm</strong> or the left y-axis rail { leftDirection } by <strong>{fm}mm</strong></p>
                 </div>
 
                 {
