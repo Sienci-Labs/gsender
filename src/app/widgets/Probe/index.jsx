@@ -796,6 +796,7 @@ class ProbeWidget extends PureComponent {
 
         const toolRadius = (diameter / 2);
         const toolCompensatedThickness = ((-1 * toolRadius));
+        console.log(toolCompensatedThickness);
 
         if (axes.z && axes.y && axes.z) {
             code.push(

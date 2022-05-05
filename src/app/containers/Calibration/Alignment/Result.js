@@ -216,7 +216,7 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
                     stepsUpdate
                         ? (
                             <>
-                                <p className={styles.resultText}>We also noticed your steps-per-mm can be updated for improved accuray on your machine, you can click the button below to do so.</p>
+                                <p className={styles.resultText}>We also noticed your steps-per-mm can be updated for improved accuracy on your machine, you can click the button below to do so.</p>
                                 <div style={{ display: 'flex', gap: '1rem' }}>
                                     <FunctionButton primary onClick={handleUpdateClick}>Update Machine Settings</FunctionButton>
                                     <FunctionButton primary onClick={onClose}>Exit Calibration Tool</FunctionButton>
