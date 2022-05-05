@@ -31,7 +31,6 @@ export const NEGATIVE_DIRECTION = -1;
 
 export const getHomingLocation = (setting) => {
     setting = Number(setting);
-    console.log(setting);
     if (setting === 0) {
         return BACK_RIGHT;
     } else if (setting === 1) {

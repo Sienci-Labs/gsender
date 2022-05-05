@@ -189,11 +189,6 @@ class Workspace extends PureComponent {
         'feeder:status': (status) => {
             const { modal } = this.state;
             const { hold, holdReason } = { ...status };
-            console.log('FEEDER STATUS CHANGE');
-            console.log(hold);
-            console.log(holdReason);
-
-
             if (!hold) {
                 if (_.includes([MODAL_FEEDER_PAUSED, MODAL_FEEDER_WAIT], modal.name)) {
                     this.action.closeModal();
@@ -202,7 +197,6 @@ class Workspace extends PureComponent {
             }
 
             const { err, data, comment, strategy } = { ...holdReason };
-            console.log(strategy);
 
             if (err) {
                 this.action.openModal(MODAL_FEEDER_PAUSED, {

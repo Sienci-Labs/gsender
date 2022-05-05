@@ -128,8 +128,6 @@ class WorkflowControl extends PureComponent {
     };
 
     handleElectronFileUpload = async (file) => {
-        console.log('FILE:');
-        console.log(file);
         const serializedFile = new File([file.data], file.name, { path: file.path });
 
         if (isElectron()) {

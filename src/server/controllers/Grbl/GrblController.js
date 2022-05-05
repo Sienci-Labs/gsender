@@ -398,7 +398,6 @@ class GrblController {
                     const { toolChangeOption } = this.toolChangeContext;
 
                     let tool = line.match(toolCommand);
-                    console.log(tool);
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     if (toolChangeOption === 'Pause' || toolChangeOption === 'Manual') {
@@ -1601,11 +1600,9 @@ class GrblController {
                         const [xMaxLoc, yMaxLoc] = getAxisMaximumLocation($23);
 
                         if (axes.X) {
-                            console.log('X');
                             axes.X = determineMaxMovement(Math.abs(mpos.x), axes.X, xMaxLoc, $130);
                         }
                         if (axes.Y) {
-                            console.log('Y');
                             axes.Y = determineMaxMovement(Math.abs(mpos.y), axes.Y, yMaxLoc, $131);
                         }
                     } else {
@@ -1632,7 +1629,6 @@ class GrblController {
                     axes.F *= 0.8;
                     axes.F = axes.F.toFixed(3);
                 }
-                console.log(axes);
 
                 const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
                 this.writeln(jogCommand);

@@ -64,9 +64,6 @@ const getPositionMovements = (requestedPosition, homingPosition, homingFlag, pul
     const [xLimit, yLimit] = getMachineMovementLimits();
 
     pullOff = Number(pullOff) || 2;
-    console.log(pullOff);
-
-
     // If homing flag not set, we treat all movements as negative space
     if (!homingFlag) {
         homingPosition = BACK_RIGHT;

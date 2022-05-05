@@ -386,7 +386,6 @@ class Visualizer extends Component {
 
     controllerEvents = {
         'gcode_error': (msg) => {
-            console.log(msg);
             Toaster.pop({
                 msg,
                 type: TOASTER_DANGER,

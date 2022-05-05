@@ -33,7 +33,6 @@ const FlashingFirmware = (recievedPortNumber, imageType = 'MK1') => {
         log.error('No port specified');
         return;
     }
-    console.log(imageType);
     const controller = store.get('controllers["' + recievedPortNumber + '"]');
     try {
         let avrgirl = new AvrgirlArduino({

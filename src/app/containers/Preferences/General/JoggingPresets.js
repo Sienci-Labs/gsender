@@ -62,12 +62,9 @@ export default class JoggingPresets extends Component {
     }
 
     updateState = () => {
-        console.log('WE HERE IN THE UPDATE FUNCTION');
         const units = store.get('workspace.units');
 
         const jogSpeeds = this.getJogSpeeds();
-        console.log('in state update');
-        console.log(jogSpeeds);
         this.setState({
             units,
             jogSpeeds: { ...jogSpeeds }

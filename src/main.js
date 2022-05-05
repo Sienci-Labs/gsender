@@ -125,7 +125,6 @@ const main = () => {
 
             // Power saver - display sleep higher precedence over app suspension
             powerSaverId = powerSaveBlocker.start('prevent-display-sleep');
-            log.info(`Result of powerSaveBlocker: ${powerSaveBlocker.isStarted(powerSaverId)}`);
             powerMonitor.on('lock-screen', () => {
                 powerSaveBlocker.start('prevent-display-sleep');
             });
@@ -174,8 +173,6 @@ const main = () => {
             });
 
             ipcMain.on('persist-app-config', (event, filename, state) => {
-                log.info('PERSIST CALL');
-                log.info(filename);
                 const filePath = path.join(app.getPath('userData'), filename);
                 persistConfig(filePath, state);
             });
@@ -185,7 +182,6 @@ const main = () => {
                     let additionalOptions = {};
 
                     if (prevDirectory) {
-                        log.info(`Found previous directory ${prevDirectory}`);
                         additionalOptions.defaultPath = prevDirectory;
                     }
                     const file = await dialog.showOpenDialog(window,
@@ -199,7 +195,6 @@ const main = () => {
                     );
 
                     if (!file) {
-                        log.info('No file found');
                         return;
                     }
                     if (file.canceled) {
