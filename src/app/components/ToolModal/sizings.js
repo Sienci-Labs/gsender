@@ -1,14 +1,20 @@
 export const SMALL = {
-    width: '600px',
-    height: '400px'
+    height: '99vh',
+    width: '99vw',
+    maxWidth: '600px',
+    maxHeight: '400px'
 };
 
 export const MEDIUM = {
-    width: '800px',
-    height: '500px'
+    height: '99vh',
+    width: '99vw',
+    maxWidth: '800px',
+    maxHeight: '500px'
 };
 
 export const LARGE = {
-    width: '1000px',
-    height: '700px'
+    height: '99vh',
+    width: '99vw',
+    maxWidth: '1000px',
+    maxHeight: '750px'
 };
