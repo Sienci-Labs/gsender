@@ -192,14 +192,16 @@ const migrateStore = () => {
         store.replace('commandKeys', currentCommandKeys);
     }
 
-    // 1.0.7 - Update default state for surfacing, added spindle parameter to choose between m3 and m4
+    // 1.0.7 - Update default state for surfacing,
+    //       - Added spindle parameter to choose between m3 and m4
+    //       - Added missing spindleRPM property for default surfacing imperial state
     if (semver.lt(cnc.version, '1.0.7')) {
         const [M3] = SPINDLE_MODES;
         const metricState = store.get('widgets.surfacing.defaultMetricState');
         const imperialState = store.get('widgets.surfacing.defaultMetricState');
 
         store.set('widgets.surfacing.defaultMetricState', { ...metricState, spindle: M3 });
-        store.set('widgets.surfacing.defaultImperialState', { ...imperialState, spindle: M3 });
+        store.set('widgets.surfacing.defaultImperialState', { ...imperialState, spindle: M3, spindleRPM: 669 });
     }
 
     // 1.0.4 - need to add

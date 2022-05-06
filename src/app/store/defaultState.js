@@ -361,6 +361,7 @@ const defaultState = {
                 width: 0,
                 skimDepth: 0.04,
                 maxDepth: 0.04,
+                spindleRPM: 669,
                 type: SPIRAL_MOVEMENT,
                 startPosition: START_POSITION_BACK_LEFT,
                 spindle: M3,
