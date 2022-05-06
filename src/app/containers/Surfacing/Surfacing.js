@@ -18,7 +18,7 @@ import Generator from './helpers/Generator';
 import GcodeViewer from './components/GcodeViewer';
 import TabArea from './TabArea';
 
-const convertTo = (type, val) => Number((type === METRIC_UNITS ? (val * 25.4) : (val / 25.4)).toFixed(2));
+const convertTo = (type, val) => (type === METRIC_UNITS ? Math.round(val * 25.4) : Number((val / 25.4).toFixed(2)));
 
 /**
  * @component Surfacing
