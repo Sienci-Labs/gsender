@@ -134,29 +134,27 @@ const InputArea = ({ values, onChange, onSelect, units }) => {
                 </Tooltip>
 
                 <Tooltip content={`Default Value: ${defaultValues.spindle}`}>
-                    <div style={{ marginTop: '2.5rem' }}>
-                        <div className={inputStyles.input}>
-                            <label htmlFor="">Spindle</label>
+                    <div className={inputStyles.input}>
+                        <label htmlFor="">Spindle</label>
 
-                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                <RadioGroup
-                                    name="spindle"
-                                    value={spindle}
-                                    depth={2}
-                                    onChange={(value) => onSelect({ value, type: 'spindle' })}
-                                    size="small"
-                                >
-                                    <div>
-                                        <RadioButton className={styles.prefferedradio} label="M3" value={M3} />
-                                        <RadioButton className={styles.prefferedradio} label="M4" value={M4} />
-                                    </div>
-                                </RadioGroup>
-                            </div>
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                            <RadioGroup
+                                name="spindle"
+                                value={spindle}
+                                depth={2}
+                                onChange={(value) => onSelect({ value, type: 'spindle' })}
+                                size="small"
+                            >
+                                <div>
+                                    <RadioButton className={styles.prefferedradio} label="M3" value={M3} />
+                                    <RadioButton className={styles.prefferedradio} label="M4" value={M4} />
+                                </div>
+                            </RadioGroup>
                         </div>
                     </div>
                 </Tooltip>
 
-                <div style={{ marginTop: '2.5rem' }}>
+                <div style={{ marginTop: '2rem' }}>
                     <div className={inputStyles.input}>
                         <label htmlFor="">Start Position</label>
 
