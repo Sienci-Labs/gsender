@@ -190,10 +190,6 @@ export default class Generator {
         let iterations = 1;
         // eslint-disable-next-line no-constant-condition
         while (true) {
-            if (endPos.X <= currentPos.X || endPos.Y <= currentPos.Y) {
-                break;
-            }
-
             let newCurrentPosX = Number(fixedVal(endPos.X - stepoverAmount));
             let newCurrentPosY = Number(fixedVal(endPos.Y - stepoverAmount));
             let newEndPosX = Number(fixedVal(currentPos.X + stepoverAmount));
@@ -238,6 +234,16 @@ export default class Generator {
             endPos = Object.assign({}, newPos);
 
             iterations++;
+
+            if (endPos.X <= currentPos.X || endPos.Y <= currentPos.Y) {
+                //Draw the last partial spiral that will cover the remaining area in the middle
+                gCodeArr.push(
+                    `G1 Y${fixedVal(endPos.Y) * yFactor}`,
+                    `G1 X${fixedVal(endPos.X) * xFactor}`,
+                    `G1 Y${fixedVal(currentPos.Y) * yFactor}`,
+                );
+                break;
+            }
         }
 
         const workspaceUnits = store.get('workspace.units');
