@@ -167,12 +167,17 @@ const Surfacing = ({ onClose, showTitle }) => {
 
             <div className={styles.container}>
                 <div className={styles.mainContainer}>
-                    <InputArea
-                        values={surfacing}
-                        onChange={handleChange}
-                        onSelect={handleSelect}
-                        units={units}
-                    />
+                    <div>
+                        <p style={{ fontSize: '1.25rem', lineHeight: '1.25', fontWeight: 'bold', textAlign: 'center' }}>
+                            * Please disable your hard or soft limits on your machine before surfacing *
+                        </p>
+                        <InputArea
+                            values={surfacing}
+                            onChange={handleChange}
+                            onSelect={handleSelect}
+                            units={units}
+                        />
+                    </div>
                     <TabArea tabs={tabs} currentTab={currentTab} onTabChange={(index) => setCurrentTab(index)} />
                 </div>
 
