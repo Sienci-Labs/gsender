@@ -36,7 +36,7 @@ const Container = styled.div`
         color: ${PRIMARY_COLOR};
         width: 100%;
         max-width: 5rem;
-        min-width: 4rem;
+        min-width: 3.25rem;
         transition: 200ms ease-in-out;
       --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
@@ -89,7 +89,7 @@ const Container = styled.div`
 
 `;
 
-const AxisButton = ({ label, axis, onClick, disabled }) => {
+const AxisButton = ({ label, onClick, disabled }) => {
     return (
         <Container
             role="button"
@@ -99,15 +99,13 @@ const AxisButton = ({ label, axis, onClick, disabled }) => {
             className={disabled ? 'disabled' : 'active'}
         >
             <p>{label}</p>
-
-            <h3>{axis.toUpperCase()}</h3>
+            <i className="fas fa-bullseye fa-2x" />
         </Container>
     );
 };
 
 AxisButton.propTypes = {
     label: PropTypes.string,
-    axis: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
     disabled: PropTypes.bool,
 };
