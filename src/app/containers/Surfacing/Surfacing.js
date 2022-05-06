@@ -18,6 +18,7 @@ import Generator from './helpers/Generator';
 import GcodeViewer from './components/GcodeViewer';
 import TabArea from './TabArea';
 
+const convertTo = (type, val) => Number((type === METRIC_UNITS ? (val * 25.4) : (val / 25.4)).toFixed(2));
 
 /**
  * @component Surfacing
@@ -47,10 +48,8 @@ const Surfacing = ({ onClose, showTitle }) => {
     const handleChange = ({ target, shouldConvert = true }) => {
         const { id, value, min, max } = target;
 
-        const convertToImperial = (value) => Math.round(Number(value) / 25.4);
-
-        const minimum = Number(units === METRIC_UNITS ? min : convertToImperial(min));
-        const maxiumum = Number(units === METRIC_UNITS ? max : convertToImperial(max));
+        const minimum = Number(units === METRIC_UNITS ? min : convertTo(IMPERIAL_UNITS, min));
+        const maxiumum = Number(units === METRIC_UNITS ? max : convertTo(IMPERIAL_UNITS, max));
         const val = Math.abs(Number(value));
 
         if (shouldConvert && !inRange(val, minimum, maxiumum + 1)) {
@@ -147,7 +146,35 @@ const Surfacing = ({ onClose, showTitle }) => {
     useEffect(() => {
         const workspaceUnits = store.get('workspace.units');
 
-        workspaceUnits === METRIC_UNITS ? store.set('widgets.surfacing.defaultMetricState', surfacing) : store.set('widgets.surfacing.defaultImperialState', surfacing);
+        if (workspaceUnits === METRIC_UNITS) {
+            const imperialValues = {
+                length: convertTo(IMPERIAL_UNITS, surfacing.length),
+                width: convertTo(IMPERIAL_UNITS, surfacing.width),
+                bitDiameter: convertTo(IMPERIAL_UNITS, surfacing.bitDiameter),
+                spindleRPM: convertTo(IMPERIAL_UNITS, surfacing.spindleRPM),
+                skimDepth: convertTo(IMPERIAL_UNITS, surfacing.skimDepth),
+                maxDepth: convertTo(IMPERIAL_UNITS, surfacing.maxDepth),
+                feedrate: convertTo(IMPERIAL_UNITS, surfacing.feedrate)
+            };
+
+            store.set('widgets.surfacing.defaultMetricState', surfacing);
+            store.set('widgets.surfacing.defaultImperialState', { ...surfacing, ...imperialValues });
+        }
+
+        if (workspaceUnits === IMPERIAL_UNITS) {
+            const metricValues = {
+                length: convertTo(METRIC_UNITS, surfacing.length),
+                width: convertTo(METRIC_UNITS, surfacing.width),
+                bitDiameter: convertTo(METRIC_UNITS, surfacing.bitDiameter),
+                spindleRPM: convertTo(METRIC_UNITS, surfacing.spindleRPM),
+                skimDepth: convertTo(METRIC_UNITS, surfacing.skimDepth),
+                maxDepth: convertTo(METRIC_UNITS, surfacing.maxDepth),
+                feedrate: convertTo(METRIC_UNITS, surfacing.feedrate)
+            };
+
+            store.set('widgets.surfacing.defaultImperialState', surfacing);
+            store.set('widgets.surfacing.defaultMetricState', { ...surfacing, ...metricValues });
+        }
     }, [surfacing]);
 
     useEffect(() => {
