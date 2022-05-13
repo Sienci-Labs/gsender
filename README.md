@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender_1.0.6_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6-armv7l.deb)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.7/gSender-1.0.7-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.7/gSender-1.0.7-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.7/gSender-1.0.7.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.7/gSender_1.0.7_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.7/gSender-1.0.7-armv7l.deb)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -98,6 +98,18 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### 1.0.7 (May 13th, 2022)
+* MK2 12X30 configuration now properly selectable
+* Added Mist, flood, and stop coolant keyboard shortcuts
+* Fixed issue with surfacing spiral pattern where center strip could be missed with some parameters
+* Fixed issue in calibration where the direction it asked you to move gantries wasn't correct in some situations.
+* Laser offset no longer resets to previous value on toggle of laser mode
+* Numerous surfacing tooltip and unit conversion issues fixed
+* Rapid position buttons now use $27 pulloff value for determining final positions
+* Outline tool now stores and restores modals on completion 
+* Improvements to settings storage and persistence
+* Migrated from Electron 10 to Electron 18
 
 ### 1.0.6 (April 14th, 2022)
 * Fixed issue that could cause continuous jog to fail in some situations with soft limits enabled

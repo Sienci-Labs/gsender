@@ -187,7 +187,7 @@ const migrateStore = () => {
         const defaultCommandKeys = get(defaultState, 'commandKeys');
         // Splice the new binds into the location of the spindle binds
         const spindleBindIndex = currentCommandKeys.map(cmd => cmd.id).indexOf(54);
-        const newCommands = defaultCommandKeys.filter(command => command.id === 72 || command.id === 71);
+        const newCommands = defaultCommandKeys.filter(command => command.id === 72 || command.id === 71 || command.id === 73);
         currentCommandKeys.splice(spindleBindIndex + 1, 0, ...newCommands);
         store.replace('commandKeys', currentCommandKeys);
     }
