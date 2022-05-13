@@ -106,6 +106,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Fixed issue in calibration where the direction it asked you to move gantries wasn't correct in some situations.
 * Laser offset no longer resets to previous value on toggle of laser mode
 * Numerous surfacing tooltip and unit conversion issues fixed
+* Surfacing now lets you select M3 or M4 movement
 * Rapid position buttons now use $27 pulloff value for determining final positions
 * Outline tool now stores and restores modals on completion 
 * Improvements to settings storage and persistence
