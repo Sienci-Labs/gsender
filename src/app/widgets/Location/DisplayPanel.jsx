@@ -26,19 +26,19 @@
 
 import ensureArray from 'ensure-array';
 import includes from 'lodash/includes';
-//import MachinePositionInput from 'app/widgets/Location/components/MachinePositionInput';
+import MachinePositionInput from 'app/widgets/Location/components/MachinePositionInput';
 import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
-import DRO from 'app/widgets/Location/components/DRO';
+//import DRO from 'app/widgets/Location/components/DRO';
 import store from 'app/store';
 import { getHomingLocation, getMovementGCode } from 'app/widgets/Location/RapidPosition';
 import Panel from './components/Panel';
-//import PositionLabel from './components/PositionLabel';
-//import GoToButton from './components/GoToButton';
+import PositionLabel from './components/PositionLabel';
+import GoToButton from './components/GoToButton';
 
 import {
     AXIS_E,
@@ -55,7 +55,7 @@ import {
     GRBL_ACTIVE_STATE_ALARM
 } from '../../constants';
 import styles from './index.styl';
-//import AxisButton from './components/AxisButton';
+import AxisButton from './components/AxisButton';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import QuickPositionButton from './components/QuickPositionButton';
 
@@ -152,7 +152,7 @@ class DisplayPanel extends PureComponent {
         const mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';
         const axisLabel = axis.toUpperCase();
-        //const showPositionInput = canClick && this.state.positionInput[axis];
+        const showPositionInput = canClick && this.state.positionInput[axis];
 
         //Function to zero out given axis
         const handleAxisButtonClick = () => {
@@ -170,7 +170,7 @@ class DisplayPanel extends PureComponent {
             controller.command('gcode', `G10 L20 P${p} ${axisLabel}0`);
         };
 
-        const gotoHandler = () => {
+        /*const gotoHandler = () => {
             const commands = [];
             const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
             if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
@@ -202,8 +202,8 @@ class DisplayPanel extends PureComponent {
                 droHandler={droHandler}
                 canClick={canClick}
             />
-        );
-        /*
+        );*/
+
         return (
             <tr>
                 <td className={styles.coordinate}>
@@ -236,7 +236,7 @@ class DisplayPanel extends PureComponent {
                     {!showPositionInput && <PositionLabel value={mpos} small />}
                 </td>
             </tr>
-        );*/
+        );
     };
 
     /**
