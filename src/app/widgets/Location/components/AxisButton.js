@@ -89,7 +89,7 @@ const Container = styled.div`
 
 `;
 
-const AxisButton = ({ label, onClick, disabled }) => {
+const AxisButton = ({ axis, label, onClick, disabled }) => {
     return (
         <Container
             role="button"
@@ -99,7 +99,7 @@ const AxisButton = ({ label, onClick, disabled }) => {
             className={disabled ? 'disabled' : 'active'}
         >
             <p>{label}</p>
-            <i className="fas fa-bullseye fa-2x" />
+            <h3>{axis.toUpperCase()}</h3>
         </Container>
     );
 };
