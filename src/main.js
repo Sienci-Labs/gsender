@@ -101,11 +101,6 @@ const main = () => {
                 return;
             }
 
-            /*if (BUILD_DEV) {
-                const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
-                Menu.setApplicationMenu(menu);
-            }*/
-
             const url = `http://${address}:${port}`;
             // The bounds is a rectangle object with the following properties:
             // * `x` Number - The x coordinate of the origin of the rectangle.
