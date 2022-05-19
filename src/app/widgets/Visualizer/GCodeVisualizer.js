@@ -40,13 +40,11 @@ class GCodeVisualizer {
         return this;
     }
 
-    updateLaserModeColors() {
+    updateLaserModeColors(colorArray) {
         const { G1Color } = this.theme;
         const defaultColor = new THREE.Color(G1Color);
         const fillColor = new THREE.Color('#d97706');
-        console.log(this.spindleSpeeds);
         const maxSpindleValue = Math.max(...[...this.spindleSpeeds]);
-        console.log(maxSpindleValue);
 
         for (let i = 0; i < this.frames.length; ++i) {
             const { spindleOn, spindleSpeed } = this.frames[i];
@@ -54,11 +52,12 @@ class GCodeVisualizer {
             if (spindleOn) {
                 console.log('Spindle on');
                 let opacity = (maxSpindleValue === 0) ? 1 : (spindleSpeed / maxSpindleValue);
+                console.log(`Opacity: ${opacity}`);
                 const color = [...defaultColor.toArray(), opacity];
                 this.colors.splice(offsetIndex, 4, ...color);
             } else {
                 console.log('Spindle Off');
-                const color = [...fillColor.toArray(), 0.1];
+                const color = [...fillColor.toArray(), 0];
                 this.colors.splice(offsetIndex, 4, ...color);
             }
         }
@@ -102,14 +101,10 @@ class GCodeVisualizer {
         this.geometry.setFromPoints(this.vertices);
         const colorArray = this.getColorTypedArray(colors, motionColor);
 
-        if (isLaser && spindleSpeeds.size > 0) {
-            this.updateLaserModeColors();
-        }
-
         this.geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 4));
 
         const workpiece = new THREE.Line(
-            this.geometry,
+            this.geometry.toNonIndexed(),
             new THREE.PointsMaterial({
                 color: defaultColor,
                 vertexColors: true,
@@ -131,15 +126,19 @@ class GCodeVisualizer {
 
     /* Turns our array of Three colors into a float typed array we can set as a bufferAttribute */
     getColorTypedArray(colors, motionColor) {
-        const colorArray = [];
+        let colorArray = [];
         colors.forEach(colorTag => {
-            console.log(colorTag);
             const [motion, opacity] = colorTag;
             const color = motionColor[motion] || motionColor.default;
             colorArray.push(...color.toArray(), opacity);
         });
         this.colors = colorArray;
-        return new Float32Array(colorArray);
+
+        if (this.isLaser && this.spindleSpeeds.size > 0) {
+            this.updateLaserModeColors(colorArray);
+        }
+
+        return new Float32Array(this.colors);
     }
 
 
