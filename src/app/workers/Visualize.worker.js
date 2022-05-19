@@ -29,6 +29,21 @@ onmessage = function({ data }) {
     const vertices = [];
     const colors = [];
     const frames = [];
+    // Laser mode variables
+    const isLaser = true;
+    const spindleSpeeds = new Set();
+    let spindleSpeed = 0;
+    let spindleOn = false;
+
+    const updateSpindleStateFromLine = ({ words }) => {
+        const spindleMatches = words.filter((word) => word[0] === 'S');
+        const [spindleCommand, spindleValue] = spindleMatches[0] || [];
+        if (spindleCommand) {
+            spindleSpeeds.add(spindleValue);
+            spindleSpeed = spindleValue;
+            spindleOn = spindleValue > 0;
+        }
+    };
 
     const toolpath = new Toolpath({
         // @param {object} modal The modal object.
@@ -88,9 +103,18 @@ onmessage = function({ data }) {
     });
 
     toolpath.loadFromStringSync(content, (line, index) => {
+        let spindleValues = {};
+        if (isLaser) {
+            updateSpindleStateFromLine(line);
+            spindleValues = {
+                spindleOn,
+                spindleSpeed
+            };
+        }
         frames.push({
             data: line,
-            vertexIndex: vertices.length // remember current vertex index
+            vertexIndex: vertices.length, // remember current vertex index
+            ...spindleValues
         });
     });
 
@@ -99,6 +123,8 @@ onmessage = function({ data }) {
         vertices,
         colors,
         frames,
-        visualizer
+        visualizer,
+        spindleSpeeds,
+        isLaser
     });
 };

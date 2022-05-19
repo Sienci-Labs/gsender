@@ -32,24 +32,62 @@ class GCodeVisualizer {
         this.theme = theme;
         this.vertices = [];
         this.colors = [];
-
-        // Example
-        // [
-        //   {
-        //     code: 'G1 X1',
-        //     vertexIndex: 2
-        //   }
-        // ]
+        this.spindleSpeeds = null;
+        this.isLaser = false;
         this.frames = []; // Example
         this.frameIndex = 0;
 
         return this;
     }
 
-    render({ vertices, colors, frames }) {
+    updateLaserModeColors() {
+        const { G1Color } = this.theme;
+        const defaultColor = new THREE.Color(G1Color);
+        const fillColor = new THREE.Color('#d97706');
+        console.log(this.spindleSpeeds);
+        const maxSpindleValue = Math.max(...[...this.spindleSpeeds]);
+        console.log(maxSpindleValue);
+
+        for (let i = 0; i < this.frames.length; ++i) {
+            const { spindleOn, spindleSpeed } = this.frames[i];
+            const offsetIndex = (this.frames[i].vertexIndex) * 4;
+            if (spindleOn) {
+                console.log('Spindle on');
+                let opacity = (maxSpindleValue === 0) ? 1 : (spindleSpeed / maxSpindleValue);
+                const color = [...defaultColor.toArray(), opacity];
+                this.colors.splice(offsetIndex, 4, ...color);
+            } else {
+                console.log('Spindle Off');
+                const color = [...fillColor.toArray(), 0.1];
+                this.colors.splice(offsetIndex, 4, ...color);
+            }
+        }
+
+        /*for (let i = 0; i < this.frames.length; ++i) {
+            const frame = this.frames[i];
+            const { spindleOn } = frame;
+            if (spindleOn) {
+                let v1 = this.frames[i].vertexIndex;
+                console.log(`Starting spindle at frame ${i}, vertexindex ${v1}`);
+                while (i < (this.frames.length - 1) && this.frames[i].spindleOn) {
+                    ++i;
+                }
+                let v2 = this.frames[i].vertexIndex;
+                console.log(`Stopping spindle at frame ${i}, vertexindex ${v2}`);
+                for (let j = v1; j < v2; ++j) {
+                    const offsetIndex = j * 4; // Account for RGBA buffer
+                    this.colors.splice(offsetIndex, 4, ...defaultColor.toArray(), 1);
+                }
+            }
+        }*/
+    }
+
+    render({ vertices, colors, frames, spindleSpeeds, isLaser = false }) {
         const { cuttingCoordinateLines, G0Color, G1Color, G2Color, G3Color } = this.theme;
         this.vertices = vertices;
         this.frames = frames;
+        this.spindleSpeeds = spindleSpeeds;
+        this.isLaser = isLaser;
         const defaultColor = new THREE.Color(cuttingCoordinateLines);
 
         // Get line colors for current theme
@@ -63,6 +101,11 @@ class GCodeVisualizer {
 
         this.geometry.setFromPoints(this.vertices);
         const colorArray = this.getColorTypedArray(colors, motionColor);
+
+        if (isLaser && spindleSpeeds.size > 0) {
+            this.updateLaserModeColors();
+        }
+
         this.geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 4));
 
         const workpiece = new THREE.Line(
@@ -90,6 +133,7 @@ class GCodeVisualizer {
     getColorTypedArray(colors, motionColor) {
         const colorArray = [];
         colors.forEach(colorTag => {
+            console.log(colorTag);
             const [motion, opacity] = colorTag;
             const color = motionColor[motion] || motionColor.default;
             colorArray.push(...color.toArray(), opacity);
