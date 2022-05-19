@@ -53,8 +53,11 @@ onmessage = function({ data }) {
             const { motion } = modal;
             const opacity = (motion === 'G0') ? 0.1 : 1;
             const color = [motion, opacity];
-            colors.push(color);
-            vertices.push(new THREE.Vector3(v2.x, v2.y, v2.z));
+            colors.push(color, color);
+            vertices.push(
+                new THREE.Vector3(v1.x, v1.y, v1.z),
+                new THREE.Vector3(v2.x, v2.y, v2.z)
+            );
         },
         // @param {object} modal The modal object.
         // @param {object} v1 A 3D vector of the start point.
