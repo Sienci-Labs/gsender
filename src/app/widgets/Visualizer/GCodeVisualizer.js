@@ -40,24 +40,65 @@ class GCodeVisualizer {
         return this;
     }
 
-    updateLaserModeColors(colorArray) {
-        const { G1Color, backgroundColor } = this.theme;
-        const defaultColor = new THREE.Color(G1Color);
+    updateLaserModeColors() {
+        const { /*G1Color, */backgroundColor } = this.theme;
+        const defaultColor = new THREE.Color(255, 0, 0);
         const fillColor = new THREE.Color(backgroundColor);
         const maxSpindleValue = Math.max(...[...this.spindleSpeeds]);
 
-        for (let i = 0; i < this.frames.length; ++i) {
+        const calculateOpacity = (speed) => ((maxSpindleValue === 0) ? 1 : (speed / maxSpindleValue));
+
+        for (let i = 0; i < this.frames.length; i++) {
             const { spindleOn, spindleSpeed } = this.frames[i];
-            const offsetIndex = this.frames[i].vertexIndex * 4;
+            const offsetIndex = (this.frames[i].vertexIndex * 4);
             if (spindleOn) {
-                let opacity = (maxSpindleValue === 0) ? 1 : (spindleSpeed / maxSpindleValue);
+                let opacity = calculateOpacity(spindleSpeed);
                 const color = [...defaultColor.toArray(), opacity];
-                this.colors.splice(offsetIndex, 4, ...color);
+                this.colors.splice(offsetIndex, 8, ...color, ...color);
             } else {
-                const color = [...fillColor.toArray(), 0];
-                this.colors.splice(offsetIndex, 4, ...color);
+                const color = [...fillColor.toArray(), 0.05];
+                this.colors.splice(offsetIndex, 8, ...color, ...color);
             }
         }
+
+        /* for (let i = 0; i < this.frames.length; ++i) {
+            const { spindleOn } = this.frames[i];
+            if (spindleOn) {
+                let v1 = this.frames[i].vertexIndex;
+                console.log(`Starting spindle at frame ${i}, vertexindex ${v1}`);
+                while (i < (this.frames.length - 1) && this.frames[i].spindleOn) {
+                    ++i;
+                }
+                let v2 = this.frames[i].vertexIndex;
+                console.log(`Stopping spindle at frame ${i}, vertexindex ${v2}`);
+                for (let j = v1; j < v2; ++j) {
+                    const offsetIndex = j * 4; // Account for RGBA buffer
+                    let opacity = calculateOpacity(this.frames[j].spindleSpeed || 0);
+                    console.log(opacity);
+                    console.log(j);
+                    console.log(this.frames[j]);
+                    this.colors.splice(offsetIndex, 4, ...fillColor.toArray(), opacity);
+                }
+            }
+        }*/
+        /*for (let i = 1; i < this.frames.length; i++) {
+    const { spindleOn, spindleSpeed, vertexIndex } = this.frames[i];
+    let v1, v2;
+
+    if (spindleOn) {
+        v1 = vertexIndex;
+        // Look ahead to find next point where spindle is off
+        while (i < this.frames.length && this.frames[i].spindleOn) {
+            i++;
+        }
+        v2 = this.frames[i].vertexIndex;
+        for (let j = v1; j < v2; j++) {
+
+        }
+    } else {
+
+    }
+}*/
     }
 
     render({ vertices, colors, frames, spindleSpeeds, isLaser = false }) {
@@ -88,7 +129,7 @@ class GCodeVisualizer {
                 color: defaultColor,
                 vertexColors: true,
                 transparent: true,
-                opacity: 1,
+                opacity: 0.8,
             })
         );
 
@@ -114,7 +155,7 @@ class GCodeVisualizer {
         this.colors = colorArray;
 
         if (this.isLaser && this.spindleSpeeds.size > 0) {
-            this.updateLaserModeColors(colorArray);
+            this.updateLaserModeColors();
         }
 
         return new Float32Array(this.colors);

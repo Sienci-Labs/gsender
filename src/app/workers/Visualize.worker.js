@@ -109,6 +109,7 @@ onmessage = function({ data }) {
         let spindleValues = {};
         if (isLaser) {
             updateSpindleStateFromLine(line);
+            //console.log(`Spindle: ${spindleOn} - ${line.line}`);
             spindleValues = {
                 spindleOn,
                 spindleSpeed
@@ -120,7 +121,6 @@ onmessage = function({ data }) {
             ...spindleValues
         });
     });
-
 
     postMessage({
         vertices,
