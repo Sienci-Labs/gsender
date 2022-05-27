@@ -174,6 +174,7 @@ const main = () => {
             ipcMain.on('persist-app-config', (event, filename, state) => {
                 const filePath = path.join(app.getPath('userData'), filename);
                 persistConfig(filePath, state);
+                appConfig = state;
             });
 
             ipcMain.on('open-upload-dialog', async () => {
