@@ -317,10 +317,16 @@ try {
             migrateStore();
         } catch (err) {
             log.error(err);
+            if (isElectron()) {
+                window.api.logError(err);
+            }
         }
     });
 } catch (e) {
     // set(settings, 'error.corruptedWorkspaceSettings', true);
+    if (isElectron()) {
+        window.api.logError(e);
+    }
     log.error(e);
 }
 

@@ -30,6 +30,7 @@ const WINDOW_API = {
     restartApp: () => ipcRenderer.send('restart_app'),
     loadRecentFile: (path) => ipcRenderer.send('load-recent-file', path),
     openUploadDialog: () => ipcRenderer.send('open-upload-dialog'),
+    logError: (err) => ipcRenderer.send('log-error', err),
     registerListener: (channel, fn) => {
         ipcRenderer.on(channel, (event, ...args) => fn(...args));
     }
