@@ -187,7 +187,7 @@ series([
     }
 
     if (settings.error.corruptedWorkspaceSettings) {
-        const text = store.getConfig();
+        const text = await store.getConfig();
         const url = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
         const filename = `${settings.name}-${settings.version}.json`;
 
