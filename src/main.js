@@ -38,6 +38,7 @@ import pkg from './package.json';
 //import './sentryInit';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import { loadConfig, persistConfig } from './electron-app/store';
+import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 
 let windowManager = null;
 let powerSaverId = null;
@@ -234,7 +235,9 @@ const main = () => {
         const internetConnectivity = await isOnline();
         if (internetConnectivity) {
             autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
-            await autoUpdater.checkForUpdates();
+            // There may be situations where something is blocking the update check outside of internet connectivity
+            // This sets a 5 second timeout on the await.
+            asyncCallWithTimeout(autoUpdater.checkForUpdates(), 4000);
         }
     });
 };
