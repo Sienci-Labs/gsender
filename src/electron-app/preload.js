@@ -25,7 +25,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 const WINDOW_API = {
     persistConfig: (fileName, value) => ipcRenderer.send('persist-app-config', fileName, value),
-    getConfig: (fileName) => ipcRenderer.invoke('get-app-config', fileName),
+    getConfig: (fileName) => ipcRenderer.invoke('get-app-config'),
     getAppPath: (state) => ipcRenderer.invoke('get-app-path'),
     restartApp: () => ipcRenderer.send('restart_app'),
     loadRecentFile: (path) => ipcRenderer.send('load-recent-file', path),

@@ -41,6 +41,7 @@ import { loadConfig, persistConfig } from './electron-app/store';
 
 let windowManager = null;
 let powerSaverId = null;
+let appConfig = null;
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -74,6 +75,10 @@ const main = () => {
     // Create the user data directory if it does not exist
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
+
+    // Load app config into variable
+    const filePath = path.join(app.getPath('userData'), 'gsender-0.5.6.json');
+    appConfig = loadConfig(filePath);
 
     app.whenReady().then(async () => {
         try {
@@ -162,9 +167,8 @@ const main = () => {
                 return path.join(app.getPath('userData'), 'gsender-0.5.6.json');
             });
 
-            ipcMain.handle('get-app-config', (event, filename) => {
-                const filePath = path.join(app.getPath('userData'), filename);
-                return loadConfig(filePath);
+            ipcMain.handle('get-app-config', (event) => {
+                return appConfig;
             });
 
             ipcMain.on('persist-app-config', (event, filename, state) => {
