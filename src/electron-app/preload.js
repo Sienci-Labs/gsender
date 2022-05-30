@@ -20,16 +20,17 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-// We need to be able to access IPC within react but can't import it directly since it relies on FS - this is the workaround
+
 const { contextBridge, ipcRenderer } = require('electron');
 
 const WINDOW_API = {
     persistConfig: (fileName, value) => ipcRenderer.send('persist-app-config', fileName, value),
-    getConfig: (fileName) => ipcRenderer.invoke('get-app-config', fileName),
+    getConfig: (fileName) => ipcRenderer.invoke('get-app-config'),
     getAppPath: (state) => ipcRenderer.invoke('get-app-path'),
     restartApp: () => ipcRenderer.send('restart_app'),
     loadRecentFile: (path) => ipcRenderer.send('load-recent-file', path),
     openUploadDialog: () => ipcRenderer.send('open-upload-dialog'),
+    logError: (err) => ipcRenderer.send('log-error', err),
     registerListener: (channel, fn) => {
         ipcRenderer.on(channel, (event, ...args) => fn(...args));
     }

@@ -51,7 +51,7 @@ const getConfig = async () => {
 
     // Check whether the code is running in Electron renderer process
     if (isElectron()) {
-        content = await window.api.getConfig('gsender-0.5.6.json');
+        content = await window.api.getConfig();
     } else {
         content = localStorage.getItem('sienci') || '{}';
     }
@@ -183,7 +183,7 @@ const migrateStore = () => {
     // 1.0.7 - Update default state for surfacing,
     //       - Added spindle parameter to choose between m3 and m4
     //       - Added missing spindleRPM property for default surfacing imperial state
-    if (semver.lt(cnc.version, '1.0.8')) {
+    if (semver.lt(cnc.version, '1.0.7')) {
         const [M3] = SPINDLE_MODES;
         const metricState = store.get('widgets.surfacing.defaultMetricState');
         const imperialState = store.get('widgets.surfacing.defaultMetricState');
@@ -317,10 +317,16 @@ try {
             migrateStore();
         } catch (err) {
             log.error(err);
+            if (isElectron()) {
+                window.api.logError(err);
+            }
         }
     });
 } catch (e) {
     // set(settings, 'error.corruptedWorkspaceSettings', true);
+    if (isElectron()) {
+        window.api.logError(e);
+    }
     log.error(e);
 }
 
