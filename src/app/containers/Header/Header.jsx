@@ -23,6 +23,7 @@
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import without from 'lodash/without';
+import HeadlessIndicator from 'app/components/HeadlessIndicator';
 import Push from 'push.js';
 import isElectron from 'is-electron';
 import api from 'app/api';
@@ -36,6 +37,7 @@ import NavbarConnection from 'app/widgets/NavbarConnection';
 import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
+
 
 class Header extends PureComponent {
     static propTypes = {
@@ -292,6 +294,7 @@ class Header extends PureComponent {
                         actions={this.actions}
                         widgetId="connection"
                     />
+                    <HeadlessIndicator />
                     <div>
                         {
                             /*<FunctionButton

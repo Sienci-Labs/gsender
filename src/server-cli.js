@@ -70,7 +70,7 @@ const parseController = (val) => {
     }
 };
 
-const defaultHost = isElectron() ? '127.0.0.1' : '0.0.0.0';
+const defaultHost = isElectron() ? '0.0.0.0' : '127.0.0.1';
 const defaultPort = isElectron() ? 0 : 8000;
 
 program
@@ -84,7 +84,7 @@ program
     .option('-m, --mount <route-path>:<target>', 'Add a mount point for serving static files', parseMountPoint, [])
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
-    .option('--allow-remote-access', 'Allow remote access to the server (default: false)')
+    .option('--headless', 'Allow remote access to the server (default: false)')
     .option('--controller <type>', 'Specify CNC controller: Grbl|Marlin|Smoothie|TinyG|g2core (default: \'\')', parseController, '');
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
@@ -109,7 +109,7 @@ export default () => new Promise((resolve, reject) => {
         mountPoints: program.mount,
         watchDirectory: program.watchDirectory,
         accessTokenLifetime: program.accessTokenLifetime,
-        allowRemoteAccess: !!program.allowRemoteAccess,
+        allowRemoteAccess: !!program.headless,
         controller: program.controller
     }, (err, data) => {
         if (err) {
