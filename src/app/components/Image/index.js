@@ -21,4 +21,4 @@
  *
  */
 
-export default from './Image';
+export { Image } from './Image';

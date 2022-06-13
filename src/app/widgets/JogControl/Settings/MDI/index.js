@@ -21,4 +21,4 @@
  *
  */
 
-export default from './MDI';
+export { default } from './MDI';

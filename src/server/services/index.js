@@ -21,7 +21,7 @@
  *
  */
 
-export cncengine from './cncengine';
-export configstore from './configstore';
-export monitor from './monitor';
-export taskrunner from './taskrunner';
+export { default as cncengine } from './cncengine';
+export { default as configstore } from './configstore';
+export { default as monitor } from './monitor';
+export { default as taskrunner } from './taskrunner';

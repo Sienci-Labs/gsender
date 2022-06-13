@@ -90,6 +90,7 @@ class CNCEngine {
 
     // File content and metadata
     gcode = null;
+
     meta = null;
 
     // Event Trigger

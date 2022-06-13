@@ -21,4 +21,4 @@
  *
  */
 
-export default from '@trendmicro/react-portal';
+export { default } from '@trendmicro/react-portal';
