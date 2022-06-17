@@ -21,14 +21,14 @@
  *
  */
 
-import defaultGrbl from './EepromFiles/DefaultGrblSettings.json';
-import longMill12x12 from './EepromFiles/Sienci Long Mill12X12.json';
-import longMill12x30 from './EepromFiles/Sienci Long Mill12X30.json';
-import longMill30x30 from './EepromFiles/Sienci Long Mill30X30.json';
-import millOne from './EepromFiles/Sienci Mill One.json';
-import millOneV3 from './EepromFiles/Sienci Mill OneV3.json';
-import mK230x30 from './EepromFiles/MK2_30x30.json';
-import mK212x30 from './EepromFiles/MK2_12x30.json';
+import defaultGrbl from '../../../../app/containers/Firmware/eepromFiles/DefaultGrblSettings.json';
+import longMill12x12 from '../../../../app/containers/Firmware/eepromFiles/Sienci Long Mill12X12.json';
+import longMill12x30 from '../../../../app/containers/Firmware/eepromFiles/Sienci Long Mill12X30.json';
+import longMill30x30 from '../../../../app/containers/Firmware/eepromFiles/Sienci Long Mill30X30.json';
+import millOne from '../../../../app/containers/Firmware/eepromFiles/Sienci Mill One.json';
+import millOneV3 from '../../../../app/containers/Firmware/eepromFiles/Sienci Mill OneV3.json';
+import mK230x30 from '../../../../app/containers/Firmware/eepromFiles/MK2_30x30.json';
+import mK212x30 from '../../../../app/containers/Firmware/eepromFiles/MK2_12x30.json';
 
 import store from '../../../store';
 
