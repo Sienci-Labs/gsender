@@ -21,37 +21,24 @@
  *
  */
 
-.wrapper {
-  border-radius: 5px;
-  //border: solid 1px #9CA3AF
-  display: flex;
-  flex-direction row;
-  gap: 0.5rem;
-  align-items center;
-  justify-content space-between;
-  padding: 0.25rem 0.25rem 0.25rem 0.75rem;
-  margin-bottom: 0.5rem;
-  position: relative;
-  //--tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  //box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+/**
+ * Call an async function with a maximum time limit (in milliseconds) for the timeout
+ * @param {Promise<any>} asyncPromise An asynchronous promise to resolve
+ * @param {number} timeLimit Time limit to attempt function in milliseconds
+ * @returns {Promise<any> | undefined} Resolved promise for async function call, or an error if time limit reached
+ */
+export const asyncCallWithTimeout = async (asyncPromise, timeLimit) => {
+    let timeoutHandle = null;
 
-  label {
-    font-weight: bold;
-    font-size: 1.4rem;
-    position: absolute;
-    left: -0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: #E5E7EB;
-    padding: 0.6rem 0;
-    justify-content center;
-    align-items center;
-  }
-}
+    const timeoutPromise = new Promise((_resolve, reject) => {
+        timeoutHandle = setTimeout(
+            () => reject(new Error('Async call timeout limit reached')),
+            timeLimit
+        );
+    });
 
-.position-wrapper {
-  display: flex;
-  flex-direction column;
-  align-items center;
-  justify-content center;
-}
+    return Promise.race([asyncPromise, timeoutPromise]).then(result => {
+        clearTimeout(timeoutHandle);
+        return result;
+    });
+};

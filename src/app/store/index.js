@@ -51,7 +51,7 @@ const getConfig = async () => {
 
     // Check whether the code is running in Electron renderer process
     if (isElectron()) {
-        content = await window.api.getConfig('gsender-0.5.6.json');
+        content = await window.api.getConfig();
     } else {
         content = localStorage.getItem('sienci') || '{}';
     }
@@ -180,18 +180,6 @@ const migrateStore = () => {
     if (!cnc.version) {
         return;
     }
-
-    // Add migration for new command keys for mist and coolant
-    if (semver.lt(cnc.version, '1.0.7')) {
-        const currentCommandKeys = store.get('commandKeys', []);
-        const defaultCommandKeys = get(defaultState, 'commandKeys');
-        // Splice the new binds into the location of the spindle binds
-        const spindleBindIndex = currentCommandKeys.map(cmd => cmd.id).indexOf(54);
-        const newCommands = defaultCommandKeys.filter(command => command.id === 72 || command.id === 71 || command.id === 73);
-        currentCommandKeys.splice(spindleBindIndex + 1, 0, ...newCommands);
-        store.replace('commandKeys', currentCommandKeys);
-    }
-
     // 1.0.7 - Update default state for surfacing,
     //       - Added spindle parameter to choose between m3 and m4
     //       - Added missing spindleRPM property for default surfacing imperial state
@@ -199,9 +187,16 @@ const migrateStore = () => {
         const [M3] = SPINDLE_MODES;
         const metricState = store.get('widgets.surfacing.defaultMetricState');
         const imperialState = store.get('widgets.surfacing.defaultMetricState');
-
         store.set('widgets.surfacing.defaultMetricState', { ...metricState, spindle: M3 });
         store.set('widgets.surfacing.defaultImperialState', { ...imperialState, spindle: M3, spindleRPM: 669 });
+
+        const currentCommandKeys = store.get('commandKeys', []);
+        const defaultCommandKeys = get(defaultState, 'commandKeys');
+        // Splice the new binds into the location of the spindle binds
+        const spindleBindIndex = currentCommandKeys.map(cmd => cmd.id).indexOf(54) || 0;
+        const newCommands = defaultCommandKeys.filter(command => command.id === 72 || command.id === 71 || command.id === 73);
+        currentCommandKeys.splice(spindleBindIndex + 1, 0, ...newCommands);
+        store.replace('commandKeys', currentCommandKeys);
     }
 
     // 1.0.4 - need to add
@@ -322,10 +317,16 @@ try {
             migrateStore();
         } catch (err) {
             log.error(err);
+            if (isElectron()) {
+                window.api.logError(err);
+            }
         }
     });
 } catch (e) {
     // set(settings, 'error.corruptedWorkspaceSettings', true);
+    if (isElectron()) {
+        window.api.logError(e);
+    }
     log.error(e);
 }
 

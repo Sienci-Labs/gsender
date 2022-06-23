@@ -38,9 +38,11 @@ import pkg from './package.json';
 //import './sentryInit';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import { loadConfig, persistConfig } from './electron-app/store';
+import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 
 let windowManager = null;
 let powerSaverId = null;
+let appConfig = null;
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -75,6 +77,10 @@ const main = () => {
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
 
+    // Load app config into variable
+    const filePath = path.join(app.getPath('userData'), 'gsender-0.5.6.json');
+    appConfig = loadConfig(filePath);
+
     app.whenReady().then(async () => {
         try {
             windowManager = new WindowManager();
@@ -100,11 +106,6 @@ const main = () => {
                 log.error('Unable to start the server at ' + chalk.cyan(`http://${address}:${port}`));
                 return;
             }
-
-            /*if (BUILD_DEV) {
-                const menu = Menu.buildFromTemplate(menuTemplate({ address, port, mountPoints }));
-                Menu.setApplicationMenu(menu);
-            }*/
 
             const url = `http://${address}:${port}`;
             // The bounds is a rectangle object with the following properties:
@@ -167,14 +168,14 @@ const main = () => {
                 return path.join(app.getPath('userData'), 'gsender-0.5.6.json');
             });
 
-            ipcMain.handle('get-app-config', (event, filename) => {
-                const filePath = path.join(app.getPath('userData'), filename);
-                return loadConfig(filePath);
+            ipcMain.handle('get-app-config', (event) => {
+                return appConfig;
             });
 
             ipcMain.on('persist-app-config', (event, filename, state) => {
                 const filePath = path.join(app.getPath('userData'), filename);
                 persistConfig(filePath, state);
+                appConfig = state;
             });
 
             ipcMain.on('open-upload-dialog', async () => {
@@ -234,7 +235,9 @@ const main = () => {
         const internetConnectivity = await isOnline();
         if (internetConnectivity) {
             autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
-            await autoUpdater.checkForUpdates();
+            // There may be situations where something is blocking the update check outside of internet connectivity
+            // This sets a 5 second timeout on the await.
+            asyncCallWithTimeout(autoUpdater.checkForUpdates(), 4000);
         }
     });
 };

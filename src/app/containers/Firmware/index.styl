@@ -152,7 +152,7 @@
 }
 
 .keyRow {
-  width: 20%;
+  min-width: 70px;
   text-align center;
   font-size: 2rem;
   color: #6B7280;
@@ -184,8 +184,10 @@
 
 .table-row {
   display: grid;
-  grid-template-columns 2fr 1fr;
+  grid-template-columns 1fr 8fr 4fr;
   padding: 1rem 0;
+
+  border-top: 1px solid lightgrey;
 }
 
 .itemText {
@@ -271,6 +273,7 @@
   flex-direction: row;
   width: 100%;
   align-items center
+  gap: 1rem;
 }
 
 .settings-control {
@@ -298,7 +301,6 @@
     border: solid 1px color;
     border-radius: 5px;
     padding: 3px;
-    margin: 0 1rem;
     font-size: 1rem;
   }
 
@@ -324,5 +326,15 @@
 
   &-Spindle {
     tag-mixin(#13283c, #d8e7f4)
+  }
+}
+
+.non-default-value {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  i {
+    font-size: 2rem !important;
   }
 }

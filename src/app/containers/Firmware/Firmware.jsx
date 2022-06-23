@@ -35,7 +35,7 @@ import get from 'lodash/get';
 import download from 'downloadjs';
 import store from 'app/store';
 import { GRBL, GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
-import TooltipCustom from '../../components/TooltipCustom/ToolTip';
+import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
 import Loading from '../../components/Loader';
 import { Toaster, TOASTER_INFO, TOASTER_DANGER, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import ToolsNotificationModal from '../../components/ToolsNotificationModal/Modal';
@@ -244,13 +244,15 @@ class Firmware extends PureComponent {
             return get(machineProfile, 'version', 'MK1');
         },
         applySettings: () => {
-            let nameOfMachine = this.state.currentMachineProfile.name;
-            let typeOfMachine = this.state.currentMachineProfile.type;
-            controller.command('firmware:applyProfileSettings', nameOfMachine, typeOfMachine, this.state.port);
-            this.props.modalClose();
+            const { currentMachineProfile } = this.state;
+            const eepromSettings = currentMachineProfile?.eepromSettings ?? [];
+            const values = Object.entries(eepromSettings).map(([key, value]) => (`${key}=${value}`));
+            values.push('$$');
+
+            controller.command('gcode', values);
             Toaster.pop({
                 msg: ('Settings updated!'),
-                type: 'TOASTER_INFO',
+                type: TOASTER_INFO,
             });
             this.setState({ initiateRestoreDefaults: false });
         },
@@ -427,17 +429,12 @@ class Firmware extends PureComponent {
     }
 
     defineMessageForCncDefaultsButton = () => {
-        let name = this.state.currentMachineProfile.name;
-        let type = this.state.currentMachineProfile.type;
-        let message = '';
-        if (name === 'Mill One') {
-            message = `Are you sure you want to restore your ${name} ${type} back to its default state?`;
-        } else if (name === 'LongMill') {
-            message = `Are you sure you want to restore your ${name} ${type} back to its default state??`;
-        } else {
-            message = `We dont have the default settings for your ${name} ${type}. Would you 
-            like to Restore your machine to the Grbl defaults?`;
-        }
+        const { name, type } = this.state.currentMachineProfile;
+        const supportedMachines = ['Mill One', 'LongMill', 'LongMill MK2'];
+        const message = supportedMachines.includes(name)
+            ? `Are you sure you want to restore your ${name} ${type} back to its default state?`
+            : `We dont have the default settings for your ${name} ${type}. Would you like to Restore your machine to the Grbl defaults?`;
+
         return message;
     }
 
@@ -463,9 +460,9 @@ class Firmware extends PureComponent {
 
     render() {
         const { modalClose, canClick, eeprom, canSendSettings } = this.props;
-        const loadedSettings = GRBL_SETTINGS.GRBL_SETTINGS;
+        const loadedSettings = GRBL_SETTINGS.GRBL_SETTINGS.map(item => ({ ...item, value: eeprom[item.setting] }));
         let message = this.defineMessageForCncDefaultsButton();
-        //let currentSettings = controller.settings;
+        const { currentMachineProfile } = this.state;
         let haveSettings = this.controllerSettingsLoaded();
 
         return (
@@ -477,41 +474,58 @@ class Firmware extends PureComponent {
                             {
                                 !haveSettings && <NotConnectedWarning handleConnect={() => this.actions.connectToLastDevice()} />
                             }
-                            {haveSettings && loadedSettings.map((grbl) => (
-                                <div key={grbl.setting} className={styles.containerFluid}>
-                                    <div className={styles.tableRow}>
-                                        <div className={styles.settingsInformation}>
-                                            <div className={styles.keyRow}>
-                                                {grbl.setting}
-                                                <CategoryTag category={grbl.category} />
-                                            </div>
-                                            <div className={styles.settingsDescription}>
-                                                <div className={styles.itemText}>{grbl.message}</div>
-                                                <div className={styles.descriptionRow}>{grbl.description}</div>
-                                            </div>
-                                        </div>
-                                        <div className={styles.settingsControl}>
-                                            <InputController
-                                                type={grbl.inputType}
-                                                title={grbl.setting}
-                                                currentSettings={eeprom}
-                                                getUsersNewSettings={this.props.getUsersNewSettings}
-                                                switchSettings={eeprom}
-                                                min={grbl.min}
-                                                max={grbl.max}
-                                                step={grbl.step}
-                                                grabNewNumberInputSettings={this.grabNewNumberInputSettings}
-                                                grabNewSwitchInputSettings={this.grabNewSwitchInputSettings}
-                                                grabNew$10InputSettings={this.grabNew$10InputSettings}
-                                                handleShiftedValues={this.handleShiftedValues}
-                                                units={grbl.units}
-                                                disableSettingsButton={this.disableSettingsButton}
-                                            />
-                                        </div>
-                                    </div>
+                            {haveSettings && loadedSettings.map((grbl) => {
+                                const [, defaultValue] = Object.entries(currentMachineProfile?.eepromSettings ?? {})
+                                    .find(([key]) => key === grbl.setting) ?? [];
+                                const isSameAsDefault = defaultValue === grbl.value;
+                                const labelMap = { '0': 'Disabled', '1': 'Enabled' };
+                                const defaultValueLabel = grbl.inputType === 'switch' ? labelMap[defaultValue] : defaultValue;
 
-                                </div>
-                            ))
+                                const highlighted = isSameAsDefault ? {} : { backgroundColor: '#f2f2c2' };
+
+                                //WRITE MIGRATE SCRIPT TO UPDATE USERS CURRENTLY SELECTED MACHINE PROFILE, AS THE PAYLOAD OF IT HAS CHANGED
+
+                                return (
+                                    <div key={grbl.setting} className={styles.containerFluid} style={highlighted}>
+                                        <div className={styles.tableRow}>
+                                            {
+                                                isSameAsDefault
+                                                    ? <div />
+                                                    : <div className={styles['non-default-value']}><TooltipCustom content={`Default Value: ${defaultValueLabel}`}><i className="fas fa-info-circle" /></TooltipCustom></div>
+                                            }
+                                            <div className={styles.settingsInformation}>
+                                                <div className={styles.keyRow}>
+                                                    {grbl.setting}
+                                                    <CategoryTag category={grbl.category} />
+                                                </div>
+                                                <div className={styles.settingsDescription}>
+                                                    <div className={styles.itemText}>{grbl.message}</div>
+                                                    <div className={styles.descriptionRow}>{grbl.description}</div>
+                                                </div>
+                                            </div>
+                                            <div className={styles.settingsControl}>
+                                                <InputController
+                                                    type={grbl.inputType}
+                                                    title={grbl.setting}
+                                                    currentSettings={eeprom}
+                                                    getUsersNewSettings={this.props.getUsersNewSettings}
+                                                    switchSettings={eeprom}
+                                                    min={grbl.min}
+                                                    max={grbl.max}
+                                                    step={grbl.step}
+                                                    grabNewNumberInputSettings={this.grabNewNumberInputSettings}
+                                                    grabNewSwitchInputSettings={this.grabNewSwitchInputSettings}
+                                                    grabNew$10InputSettings={this.grabNew$10InputSettings}
+                                                    handleShiftedValues={this.handleShiftedValues}
+                                                    units={grbl.units}
+                                                    disableSettingsButton={this.disableSettingsButton}
+                                                />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                );
+                            })
                             }
                         </div>
                         <div className={styles.buttonsContainer}>

@@ -21,81 +21,54 @@
  *
  */
 
-import defaultGrbl from '!raw-loader!./EepromFiles/DefaultGrblSettings.txt';
-import LongMill12x12 from '!raw-loader!./EepromFiles/Sienci Long Mill12X12.txt';
-import LongMill12x30 from '!raw-loader!./EepromFiles/Sienci Long Mill12X30.txt';
-import LongMill30x30 from '!raw-loader!./EepromFiles/Sienci Long Mill30X30.txt';
-import MillOne from '!raw-loader!./EepromFiles/Sienci Mill One.txt';
-import MillOneV3 from '!raw-loader!./EepromFiles/Sienci Mill OneV3.txt';
-import MK230x30 from '!raw-loader!./EepromFiles/MK2_30x30.txt';
-import MK212x30 from '!raw-loader!./EepromFiles/MK2_12x30.txt';
-import map from 'lodash/map';
+import defaultGrbl from '../../../../app/containers/Firmware/eepromFiles/DefaultGrblSettings.json';
+import longMill12x12 from '../../../../app/containers/Firmware/eepromFiles/Sienci Long Mill12X12.json';
+import longMill12x30 from '../../../../app/containers/Firmware/eepromFiles/Sienci Long Mill12X30.json';
+import longMill30x30 from '../../../../app/containers/Firmware/eepromFiles/Sienci Long Mill30X30.json';
+import millOne from '../../../../app/containers/Firmware/eepromFiles/Sienci Mill One.json';
+import millOneV3 from '../../../../app/containers/Firmware/eepromFiles/Sienci Mill OneV3.json';
+import mK230x30 from '../../../../app/containers/Firmware/eepromFiles/MK2_30x30.json';
+import mK212x30 from '../../../../app/containers/Firmware/eepromFiles/MK2_12x30.json';
+
 import store from '../../../store';
 
 const ApplyFirmwareProfile = (nameOfMachine, typeOfMachine, recievedPortNumber) => {
-    const gcode = (cmd, params) => {
-        const s = map(params, (value, letter) => String(letter + value)).join('=');
-        return (s.length > 0) ? (cmd + '' + s) : cmd;
-    };
-
-    const controller = store.get('controllers["' + recievedPortNumber + '"]');
-
+    const controller = store.get(`controllers[${recievedPortNumber}]`);
     let settings = defaultGrbl;
 
     if (nameOfMachine === 'Mill One') {
         if (typeOfMachine === 'V3') {
-            settings = MillOneV3;
+            settings = millOneV3;
         } else {
-            settings = MillOne;
+            settings = millOne;
         }
     }
 
     if (nameOfMachine === 'LongMill') {
         if (typeOfMachine === '12x12') {
-            settings = LongMill12x12;
+            settings = longMill12x12;
         }
         if (typeOfMachine === '12x30') {
-            settings = LongMill12x30;
+            settings = longMill12x30;
         }
         if (typeOfMachine === '30x30') {
-            settings = LongMill30x30;
+            settings = longMill30x30;
         }
     }
 
     if (nameOfMachine === 'LongMill MK2') {
         if (typeOfMachine === '12X30') {
-            settings = MK212x30;
+            settings = mK212x30;
         }
         if (typeOfMachine === '30x30') {
-            settings = MK230x30;
+            settings = mK230x30;
         }
     }
 
-    const obj = JSON.parse(settings);
-    let values = Object.values(obj);
-    if (values.length === 34) {
-        for (let i = 0; i < values.length; i++) {
-            if (values[i] === true) {
-                values[i] = '1';
-            } if (values[i] === false) {
-                values[i] = '0';
-            }
-        }
+    const values = Object.entries(settings).map(([key, value]) => (`${key}=${value}`));
+    values.push('$$');
 
-        let keys = Object.keys(obj);
-        let finalStrings = [];
-        const valuesToSubmit = [];
-        for (let i = 0; i < keys.length; i++) {
-            valuesToSubmit.push([keys[i], values[i]]);
-        }
-        let gCoded = gcode(valuesToSubmit);
-
-        for (let j = 0; j < gCoded.length; j++) {
-            finalStrings[j] = gCoded[j].join('=');
-        }
-        controller.command('gcode', finalStrings);
-        controller.command('gcode', '$$');
-    }
+    controller.command('gcode', values);
 };
 
 export default ApplyFirmwareProfile;
