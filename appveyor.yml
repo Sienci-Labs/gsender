@@ -1,13 +1,13 @@
 # https://stefanscherer.github.io/use-appveyor-to-build-multi-arch-docker-image/
 -
-  version: "{build}-{branch}"
   branches:
       only:
         - master
         - /v\d+\.\d+\.\d+/
     configuration: Release
+    version: "{build}-{branch}"
     deploy:
-      - provider: GitHub
+      provider: GitHub
         auth_token:
           secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
         draft: true
@@ -73,6 +73,10 @@ environment:
       secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
     GITHUB_TOKEN:
       secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
+
+configuration:
+  - Beta
+  - Release
 
 for:
   # Linux
