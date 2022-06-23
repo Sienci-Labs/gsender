@@ -294,11 +294,6 @@ class Sender extends events.EventEmitter {
             return false;
         }
 
-        /*const comments = ['#', '(', '%'];
-        const lines = gcode.split('\n');
-        lines.filter(line => (line.trim().length > 0))
-            .filter(line => !comments.some(comment => line.includes(comment)));
-        console.log(lines);*/
         let lines = gcode.split('\n');
 
         if (this.sp) {

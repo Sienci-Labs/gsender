@@ -56,6 +56,20 @@ class EventTrigger {
                 }
             });
     }
+
+    hasEnabledStartEvent() {
+        let isEnabled = false;
+        const events = config.get('events', []);
+        events
+            .filter(event => event && event.event === 'gcode:start')
+            .forEach(options => {
+                const { enabled } = { ...options };
+                if (enabled) {
+                    isEnabled = true;
+                }
+            });
+        return isEnabled;
+    }
 }
 
 export default EventTrigger;
