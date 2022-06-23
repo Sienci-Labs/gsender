@@ -153,6 +153,7 @@ class GrblController {
 
     // Feeder
     feeder = null;
+    feederCB = noop;
 
     // Sender
     sender = null;
@@ -166,6 +167,7 @@ class GrblController {
     // Homing information
     homingStarted = false;
     homingFlagSet = false;
+
 
     constructor(engine, options) {
         if (!engine) {
@@ -216,7 +218,6 @@ class GrblController {
 
         // Event Trigger
         this.event = new EventTrigger((event, trigger, commands) => {
-            console.log(this.sharedContext);
             log.debug(`EventTrigger: event="${event}", trigger="${trigger}", commands="${commands}"`);
             if (trigger === 'system') {
                 taskRunner.run(commands);
@@ -332,20 +333,20 @@ class GrblController {
         });
         this.feeder.on('hold', noop);
         this.feeder.on('unhold', noop);
+        this.feeder.on('complete', () => {
+            this.consumeFeederCB();
+        });
 
         // Sender
         this.sender = new Sender(SP_TYPE_CHAR_COUNTING, {
             // Deduct the buffer size to prevent from buffer overrun
             bufferSize: (128 - 28), // The default buffer size is 128 bytes
             dataFilter: (line, context) => {
-                // Remove comments that start with a semicolon `;`
-                let commentMatcher = /\s*;.*/g;
-                let bracketCommentLine = /^\s*\([^\)]*\)/gm;
                 let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
-                line = line.replace(bracketCommentLine, '').trim();
-                let comment = line.match(commentMatcher);
-                let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').trim();
+                const original = line;
+                const parts = original.split(/;(.*)/s);
+                line = ensureString(parts[0]).trim();
+                let commentString = ensureString(parts[1]).trim();
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;
@@ -1149,6 +1150,12 @@ class GrblController {
         });
     }
 
+    consumeFeederCB() {
+        console.log('Feeder Complete');
+        this.feederCB();
+        this.feederCB = noop;
+    }
+
     command(cmd, ...args) {
         const handler = {
             'flash:start': () => {
@@ -1200,8 +1207,6 @@ class GrblController {
                     return;
                 }
 
-                //this.emit('gcode:load', name, gcode, context);
-                //this.event.trigger('gcode:load');
 
                 log.debug(`Load G-code: name="${this.sender.state.name}", size=${this.sender.state.gcode.length}, total=${this.sender.state.total}`);
 
@@ -1226,6 +1231,8 @@ class GrblController {
             'gcode:start': () => {
                 const [lineToStartFrom] = args;
                 const totalLines = this.sender.state.total;
+                const startEventEnabled = this.event.hasEnabledStartEvent();
+                console.log(`event enabled: ${startEventEnabled}`);
 
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
@@ -1306,9 +1313,19 @@ class GrblController {
                     this.sender.setStartLine(lineToStartFrom);
 
                     this.command('gcode', modalGCode);
-                } else {
-                    this.event.trigger('gcode:start');
+                } else if (startEventEnabled) {
+                    this.feederCB = () => {
+                        console.log('START LATER');
+                        this.workflow.start();
 
+                        // Feeder
+                        this.feeder.reset();
+
+                        // Sender
+                        this.sender.next();
+                    };
+                    this.event.trigger('gcode:start');
+                } else {
                     this.workflow.start();
 
                     // Feeder
