@@ -21,7 +21,7 @@
   branches:
     only:
       - beta
-    configuration: beta
+    configuration: Beta
     deploy:
       - provider: GitHub
         auth_token:
