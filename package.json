@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
