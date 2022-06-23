@@ -1,53 +1,17 @@
 # https://stefanscherer.github.io/use-appveyor-to-build-multi-arch-docker-image/
--
-  version: "{build}-{branch}"
-  branches:
-      only:
-        - master
-        - /v\d+\.\d+\.\d+/
-    configuration: Release
-    deploy:
-      - provider: GitHub
-        auth_token:
-          secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
-        draft: true
-        prerelease: false
-        on:
-          appveyor_repo_tag: true  # deploy on tag push only
-          nodejs_version: "14"
 
--
-  version: "{build}-{branch}-beta"
-  branches:
-    only:
-      - beta
-    configuration: Beta
-    deploy:
-      - provider: GitHub
-        auth_token:
-          secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
-        draft: true
-        prerelease: true
-        on:
-          appveyor_repo_tag: false  # deploy on tag push only
-          nodejs_version: "14"
-
-#branches:
-#    only:
-#      - master
-#      - /v\d+\.\d+\.\d+/
-#    deploy:
-#      provider: GitHub
-#       auth_token:
-#        secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
-
+version: "{build}-{branch}"
+branches:
+  only:
+    - master
+    - /v\d+\.\d+\.\d+/
 
 environment:
   matrix:
-#    - job_name: Linux build (arm)
-#      appveyor_build_worker_image: Ubuntu2004
-#      nodejs_version: "14"
-#      ARCH: arm
+    #    - job_name: Linux build (arm)
+    #      appveyor_build_worker_image: Ubuntu2004
+    #      nodejs_version: "14"
+    #      ARCH: arm
     - job_name: Windows build (x86)
       appveyor_build_worker_image: Visual Studio 2019
       nodejs_version: "14"
@@ -327,6 +291,17 @@ for:
     artifacts:
       - path: releases/linux/*
 
+    # Publishing artifacts to GitHub Releases
+    # https://www.appveyor.com/docs/deployment/github
+    deploy:
+      - provider: GitHub
+        auth_token:
+          secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
+        draft: true
+        prerelease: false
+        on:
+          appveyor_repo_tag: true  # deploy on tag push only
+          nodejs_version: "14"
 
   # macOS
   -
@@ -408,6 +383,17 @@ for:
     artifacts:
       - path: releases/macos/*
 
+    # Publishing artifacts to GitHub Releases
+    # https://www.appveyor.com/docs/deployment/github
+    deploy:
+      - provider: GitHub
+        auth_token:
+          secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
+        draft: true
+        prerelease: false
+        on:
+          appveyor_repo_tag: true  # deploy on tag push only
+          nodejs_version: "14"
 
   # Windows
   -
@@ -515,3 +501,15 @@ for:
     # https://www.appveyor.com/docs/packaging-artifacts
     artifacts:
       - path: releases\windows\*
+
+    # Publishing artifacts to GitHub Releases
+    # https://www.appveyor.com/docs/deployment/github
+    deploy:
+      - provider: GitHub
+        auth_token:
+          secure: jqBCwY/hOwLqF2LEGxVwiKGJC+YaXDn43WYTfh4d27NSKbWkug09qMdd1EVNtX2/
+        draft: true
+        prerelease: false
+        on:
+          appveyor_repo_tag: true  # deploy on tag push only
+          nodejs_version: "14"
