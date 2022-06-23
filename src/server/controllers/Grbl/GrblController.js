@@ -22,6 +22,9 @@
  */
 
 import ensureArray from 'ensure-array';
+import {
+    ensureString,
+} from 'ensure-type';
 import * as parser from 'gcode-parser';
 import Toolpath from 'gcode-toolpath';
 import _ from 'lodash';
@@ -213,6 +216,7 @@ class GrblController {
 
         // Event Trigger
         this.event = new EventTrigger((event, trigger, commands) => {
+            console.log(this.sharedContext);
             log.debug(`EventTrigger: event="${event}", trigger="${trigger}", commands="${commands}"`);
             if (trigger === 'system') {
                 taskRunner.run(commands);
@@ -224,11 +228,10 @@ class GrblController {
         // Feeder
         this.feeder = new Feeder({
             dataFilter: (line, context) => {
-                // Remove comments that start with a semicolon `;`
-                let commentMatcher = /\s*;.*/g;
-                let comment = line.match(commentMatcher);
-                const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').trim();
+                const original = line;
+                const parts = original.split(/;(.*)/s);
+                line = ensureString(parts[0]).trim();
+                let commentString = ensureString(parts[1]).trim();
                 context = this.populateContext(context);
 
                 if (line[0] === '%') {
@@ -248,7 +251,6 @@ class GrblController {
                         setTimeout(() => {
                             this.workflow.resume();
                         }, 1500);
-                        //this.workflow.resume();
                         return 'G4 P0.5';
                     }
                     if (line === '%_GCODE_START') {
@@ -1517,6 +1519,7 @@ class GrblController {
             },
             'gcode': () => {
                 const [commands, context] = args;
+                console.log(commands);
                 const data = ensureArray(commands)
                     .join('\n')
                     .split(/\r?\n/)
@@ -1527,7 +1530,7 @@ class GrblController {
 
                         return line.trim().length > 0;
                     });
-
+                console.log(data);
                 this.feeder.feed(data, context);
 
                 if (!this.feeder.isPending()) {

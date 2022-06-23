@@ -31,6 +31,7 @@
     "electron-store": "~3.2.0",
     "electron-updater": "4.3.8",
     "ensure-array": "~1.0.0",
+    "ensure-type": "^1.4.2",
     "errorhandler": "~1.5.0",
     "escodegen": "~1.11.1",
     "esprima": "~4.0.1",
