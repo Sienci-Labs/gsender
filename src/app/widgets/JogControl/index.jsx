@@ -709,7 +709,7 @@ class AxesWidget extends PureComponent {
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
-            const { gamepad } = detail;
+            const { degrees } = detail;
             const { prevJog, prevDirection } = this.state;
             const value = detail.value;
             const stick = detail.stick;
@@ -722,8 +722,11 @@ class AxesWidget extends PureComponent {
                 return;
             }
 
-            const [leftStickX, leftStickY, rightStickX, rightStickY] = gamepad.axes;
+            // const [leftStickX, leftStickY, rightStickX, rightStickY] = gamepad.axes;
 
+            const { leftStick, rightStick } = degrees;
+
+            console.log({ leftStick, rightStick });
 
             // Y Positive Move
             // AXIS X(0) ________ -0.25 to 0.25
@@ -786,45 +789,43 @@ class AxesWidget extends PureComponent {
                 ''
             ];
 
-            const determineDirection = (xAxis, yAxis) => {
-                if (inRange(xAxis, -0.25, 0.25) && inRange(yAxis, -1, 0)) {
-                    return YPositive;
-                }
-
-                if (inRange(xAxis, -0.25, 0.25) && inRange(yAxis, 0, 1)) {
-                    return YNegative;
-                }
-
-                if (inRange(xAxis, 0, 1) && inRange(yAxis, -0.25, 0.25)) {
+            const computeDirection = (degrees) => {
+                if (inRange(degrees, 0, 30) || inRange(degrees, 330, 360)) {
                     return XPositive;
                 }
 
-                if (inRange(xAxis, -1, 0) && inRange(yAxis, -0.25, 0.25)) {
-                    return XNegative;
-                }
-
-                if (inRange(xAxis, -0.75, -0.25) && inRange(yAxis, -0.75, -0.25)) {
-                    return TopLeft;
-                }
-
-                if (inRange(xAxis, 0.25, 0.75) && inRange(yAxis, -0.75, -0.25)) {
+                if (inRange(degrees, 31, 59)) {
                     return TopRight;
                 }
 
-                if (inRange(xAxis, 0.25, 0.75) && inRange(yAxis, 0.25, 0.75)) {
-                    return BottomRight;
+                if (inRange(degrees, 60, 120)) {
+                    return YPositive;
                 }
 
-                if (inRange(xAxis, -0.75, -0.25) && inRange(yAxis, 0.25, 0.75)) {
+                if (inRange(degrees, 121, 149)) {
+                    return TopLeft;
+                }
+
+                if (inRange(degrees, 150, 210)) {
+                    return XNegative;
+                }
+
+                if (inRange(degrees, 211, 239)) {
                     return BottomLeft;
+                }
+
+                if (inRange(degrees, 240, 300)) {
+                    return YNegative;
+                }
+
+                if (inRange(degrees, 301, 329)) {
+                    return BottomRight;
                 }
 
                 return UNKNOWN_MOVE;
             };
 
-            const direction = stick === 0
-                ? determineDirection(leftStickX, leftStickY)
-                : determineDirection(rightStickX, rightStickY);
+            const direction = computeDirection(stick === 0 ? leftStick : rightStick);
 
             if (!value) {
                 this.handleShortcutStop();

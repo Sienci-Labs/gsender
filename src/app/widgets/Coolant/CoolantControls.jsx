@@ -62,7 +62,7 @@ const subscribeShuttleControl = () => {
         combokeys.on(eventName, callback);
     });
 
-    gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
+    gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: shuttleControlEvents }));
 };
 
 const unsubscribeShuttleControl = () => {
