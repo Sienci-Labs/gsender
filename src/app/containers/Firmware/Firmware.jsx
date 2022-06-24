@@ -205,11 +205,12 @@ class Firmware extends PureComponent {
                 }
             }));
         },
-        'sender:status': (currentMachineProfile) => {
-            this.setState(state => ({
-                currentMachineProfile: currentMachineProfile
-            }));
-        },
+        //BUGGY BLOCK HERE, DONT KNOW WHY THE MACHINE PROFILE IS BEING OVERRIDEN
+        // 'sender:status': (currentMachineProfile) => {
+        //     this.setState(state => ({
+        //         currentMachineProfile: currentMachineProfile
+        //     }));
+        // },
     };
 
     addControllerEvents() {
@@ -460,7 +461,7 @@ class Firmware extends PureComponent {
 
     render() {
         const { modalClose, canClick, eeprom, canSendSettings } = this.props;
-        const loadedSettings = GRBL_SETTINGS.GRBL_SETTINGS.map(item => ({ ...item, value: eeprom[item.setting] }));
+        const loadedSettings = GRBL_SETTINGS.GRBL_SETTINGS.map(item => ({ ...item, value: eeprom ? eeprom[item.setting] : undefined }));
         let message = this.defineMessageForCncDefaultsButton();
         const { currentMachineProfile } = this.state;
         let haveSettings = this.controllerSettingsLoaded();
@@ -480,10 +481,9 @@ class Firmware extends PureComponent {
                                 const isSameAsDefault = defaultValue === grbl.value;
                                 const labelMap = { '0': 'Disabled', '1': 'Enabled' };
                                 const defaultValueLabel = grbl.inputType === 'switch' ? labelMap[defaultValue] : defaultValue;
+                                const isSienciMachine = currentMachineProfile?.company?.includes('Sienci Labs');
 
-                                const highlighted = isSameAsDefault ? {} : { backgroundColor: '#f2f2c2' };
-
-                                //WRITE MIGRATE SCRIPT TO UPDATE USERS CURRENTLY SELECTED MACHINE PROFILE, AS THE PAYLOAD OF IT HAS CHANGED
+                                const highlighted = (!isSameAsDefault && isSienciMachine) ? { backgroundColor: '#f2f2c2' } : {};
 
                                 return (
                                     <div key={grbl.setting} className={styles.containerFluid} style={highlighted}>
