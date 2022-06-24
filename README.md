@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender_1.0.6_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.0.6/gSender-1.0.6-armv7l.AppImage)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.0/gSender-1.1.0-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.0/gSender-1.1.0-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.0/gSender-1.1.0.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.0/gSender_1.1.0_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.0/gSender-1.1.0-armv7l.AppImage)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -100,11 +100,12 @@ gSender is also designed in a way that it can be run locally on your computer br
 ## 🕣 Development History
 
 ### 1.1.0 (June 24th, 2022)
-* Fix for start g-code event not sending entire code block in some situations
+* Fix for start g-code event not sending entire code block in some situations and make it more consistent in all situations
 * Firmware now highlights settings that are different from default for Sienci machines
-* Support for edge/nightly channels
+* Support for edge/beta channels for those who want to opt into new features for testing
 * Improvements to controller movement using joystick
 * Brighter cut lines in visualizer
+* More sensible timeout on fetching updates
 * MK2 12X30 configuration now properly selectable
 * Added Mist, flood, and stop coolant keyboard shortcuts
 * Fixed issue with surfacing spiral pattern where center strip could be missed with some parameters
