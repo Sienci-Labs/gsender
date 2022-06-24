@@ -47,6 +47,8 @@ import {
     MODAL_CALIBRATE,
     MODAL_HELP
 } from 'app/containers/NavSidebar/constants';
+import machineProfiles from 'app/containers/Preferences/General/defaultMachineProfiles';
+
 
 import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../widgets/JogControl/constants';
 
@@ -78,34 +80,7 @@ const defaultState = {
                 ]
             }
         },
-        machineProfile: {
-            id: 5,
-            company: 'Sienci Labs',
-            name: 'LongMill',
-            type: '30x30',
-            mm: {
-                width: 792,
-                depth: 845,
-                height: 114.3
-            },
-            in: {
-                width: 31.18,
-                depth: 33.27,
-                height: 4.5
-            },
-            endstops: false,
-            spindle: false,
-            coolant: false,
-            laser: false,
-            limits: {
-                xmin: 0,
-                ymin: 0,
-                zmin: 0,
-                xmax: 792,
-                ymax: 114.3,
-                zmax: 845,
-            }
-        },
+        machineProfile: machineProfiles[4],
         probeProfile: {
             xyThickness: {
                 mm: 10,
