@@ -99,7 +99,12 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
-### 1.0.7 (May 13th, 2022)
+### 1.1.0 (June 24th, 2022)
+* Fix for start g-code event not sending entire code block in some situations
+* Firmware now highlights settings that are different from default for Sienci machines
+* Support for edge/nightly channels
+* Improvements to controller movement using joystick
+* Brighter cut lines in visualizer
 * MK2 12X30 configuration now properly selectable
 * Added Mist, flood, and stop coolant keyboard shortcuts
 * Fixed issue with surfacing spiral pattern where center strip could be missed with some parameters
