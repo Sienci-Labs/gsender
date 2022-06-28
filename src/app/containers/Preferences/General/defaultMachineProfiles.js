@@ -387,6 +387,46 @@ export default [
         'laser': false
     },
     {
+        'id': 44,
+        'company': 'YoraHome SilverBack',
+        'name': '',
+        'type': '',
+        'mm': {
+            'width': 609.6,
+            'depth': 609.6,
+            'height': 90.17
+        },
+        'in': {
+            'width': 24,
+            'depth': 24,
+            'height': 3.55
+        },
+        'endstops': true,
+        'spindle': true,
+        'coolant': false,
+        'laser': true
+    },
+{
+        'id': 45,
+        'company': 'YoraHome Mandrill',
+        'name': '',
+        'type': '',
+        'mm': {
+            'width': 304.8,
+            'depth': 355.6,
+            'height': 83
+        },
+        'in': {
+            'width': 12,
+            'depth': 14,
+            'height': 3.26
+        },
+        'endstops': true,
+        'spindle': true,
+        'coolant': false,
+        'laser': true
+    },
+    {
         'id': 47,
         'company': 'SainSmart',
         'name': '',
