@@ -388,7 +388,7 @@ export default [
     },
     {
         'id': 44,
-        'company': 'YoraHome SilverBack',
+        'company': 'YoraHome',
         'name': '',
         'type': '',
         'mm': {
@@ -406,26 +406,27 @@ export default [
         'coolant': false,
         'laser': true
     },
-{
+    {
         'id': 45,
-        'company': 'YoraHome Mandrill',
+        'company': 'Blue Carve',
         'name': '',
         'type': '',
         'mm': {
-            'width': 304.8,
-            'depth': 355.6,
-            'height': 83
+            'width': 750,
+            'depth': 750,
+            'height': 85
         },
         'in': {
-            'width': 12,
-            'depth': 14,
-            'height': 3.26
+            'width': 24,
+            'depth': 24,
+            'height': 3.55
         },
-        'endstops': true,
-        'spindle': true,
+        'endstops': false,
+        'spindle': false,
         'coolant': false,
-        'laser': true
+        'laser': false
     },
+
     {
         'id': 47,
         'company': 'SainSmart',
