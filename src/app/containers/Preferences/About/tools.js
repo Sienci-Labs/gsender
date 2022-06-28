@@ -29,6 +29,12 @@ export const team = [
         name: 'Aleks G.',
         title: 'Research and Design',
         isLastInList: true
+    },
+    {
+        id: 6,
+        name: 'Sophia B.',
+        title: 'Developer',
+        isLastInList: true
     }
 ];
 
