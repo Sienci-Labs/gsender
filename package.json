@@ -273,6 +273,7 @@
     "react": "^17.0.1",
     "react-beautiful-dnd": "^13.1.0",
     "react-bootstrap": "^1.5.2",
+    "react-color": "^2.19.3",
     "react-confirm-alert": "^2.7.0",
     "react-dom": "^17.0.1",
     "react-dropzone": "~4.2.13",

@@ -3,15 +3,18 @@ import Select from 'react-select';
 import map from 'lodash/map';
 
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
-import { DARK_THEME, LIGHT_THEME } from 'app/widgets/Visualizer/constants';
+import { DARK_THEME, LIGHT_THEME, CUST_DARK_THEME, CUST_LIGHT_THEME } from 'app/widgets/Visualizer/constants';
 
 import Fieldset from '../components/Fieldset';
+import ColorPicker from '../components/ColorPicker';
 
 import styles from '../index.styl';
 
 const themes = [
     DARK_THEME,
-    LIGHT_THEME
+    LIGHT_THEME,
+    CUST_DARK_THEME,
+    CUST_LIGHT_THEME
 ];
 
 const Theme = ({ state, actions }) => {
@@ -49,6 +52,7 @@ const Theme = ({ state, actions }) => {
                     />
                     <small>Colours used when visualizing a G-Code file.</small>
                 </div>
+                <ColorPicker state={state} actions={actions} />
             </Fieldset>
         </Tooltip>
     );

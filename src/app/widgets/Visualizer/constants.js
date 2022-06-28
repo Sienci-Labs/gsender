@@ -52,7 +52,6 @@ export const PRIMARY_COLOR = '#3E85C7'; // Light Blue
 export const BORDER_COLOR = '#9CA3AF';
 export const SECONDARY_COLOR = '#6F7376'; // Grey (for disabled look)
 
-
 export const DARK_THEME_VALUES = {
     backgroundColor: '#111827', //Navy Blue
     gridColor: '#77a9d7', // Turqoise / Light Blue
@@ -85,3 +84,5 @@ export const LIGHT_THEME_VALUES = {
 
 export const DARK_THEME = 'Dark';
 export const LIGHT_THEME = 'Light';
+export const CUST_DARK_THEME = 'Custom Dark';
+export const CUST_LIGHT_THEME = 'Custom Light';

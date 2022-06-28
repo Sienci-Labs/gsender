@@ -41,6 +41,7 @@ import store from '../../store';
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
+import { CUST_LIGHT_THEME, LIGHT_THEME } from '../../widgets/Visualizer/constants';
 
 
 class PreferencesPage extends PureComponent {
@@ -482,10 +483,33 @@ class PreferencesPage extends PureComponent {
                 this.setState({
                     visualizer: {
                         ...visualizer,
-                        theme: theme.value
+                        theme: theme.value,
                     }
                 });
                 pubsub.publish('theme:change', theme.value);
+            },
+            handleCustThemeChange: (theme) => {
+                const { visualizer } = this.state;
+                if (visualizer.theme === LIGHT_THEME || visualizer.theme === CUST_LIGHT_THEME) {
+                    this.visualizerConfig.set('lightBackground', this.visualizerConfig.get('tempLightBackground'));
+                } else {
+                    this.visualizerConfig.set('darkBackground', this.visualizerConfig.get('tempDarkBackground'));
+                }
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        theme: theme
+                    }
+                });
+                pubsub.publish('theme:change', theme);
+            },
+            handleChangeComplete: (color) => {
+                const { visualizer } = this.state;
+                if (visualizer.theme === LIGHT_THEME || visualizer.theme === CUST_LIGHT_THEME) {
+                    this.visualizerConfig.set('tempLightBackground', color.hex);
+                } else {
+                    this.visualizerConfig.set('tempDarkBackground', color.hex);
+                }
             },
             handleVisEnabledToggle: (liteMode = false) => {
                 const { visualizer } = this.state;

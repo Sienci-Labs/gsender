@@ -76,7 +76,9 @@ import {
     LIGHT_THEME,
     LIGHT_THEME_VALUES,
     DARK_THEME,
-    DARK_THEME_VALUES
+    DARK_THEME_VALUES,
+    CUST_DARK_THEME,
+    CUST_LIGHT_THEME
 } from './constants';
 import SecondaryVisualizer from './SecondaryVisualizer';
 
@@ -964,6 +966,38 @@ class VisualizerWidget extends PureComponent {
         }
         if (theme === DARK_THEME) {
             return DARK_THEME_VALUES;
+        }
+        if (theme === CUST_DARK_THEME) {
+            return {
+                backgroundColor: this.config.get('darkBackground'),
+                gridColor: DARK_THEME_VALUES.gridColor,
+                xAxisColor: DARK_THEME_VALUES.xAxisColor,
+                yAxisColor: DARK_THEME_VALUES.yAxisColor,
+                zAxisColor: DARK_THEME_VALUES.zAxisColor,
+                limitColor: DARK_THEME_VALUES.limitColor,
+                cuttingCoordinateLines: DARK_THEME_VALUES.cuttingCoordinateLines,
+                joggingCoordinateLines: DARK_THEME_VALUES.joggingCoordinateLines,
+                G0Color: DARK_THEME_VALUES.G0Color,
+                G1Color: DARK_THEME_VALUES.G1Color,
+                G2Color: DARK_THEME_VALUES.G2Color,
+                G3Color: DARK_THEME_VALUES.G3Color,
+            };
+        }
+        if (theme === CUST_LIGHT_THEME) {
+            return {
+                backgroundColor: this.config.get('lightBackground'),
+                gridColor: LIGHT_THEME_VALUES.gridColor,
+                xAxisColor: LIGHT_THEME_VALUES.xAxisColor,
+                yAxisColor: LIGHT_THEME_VALUES.yAxisColor,
+                zAxisColor: LIGHT_THEME_VALUES.zAxisColor,
+                limitColor: LIGHT_THEME_VALUES.limitColor,
+                cuttingCoordinateLines: LIGHT_THEME_VALUES.cuttingCoordinateLines,
+                joggingCoordinateLines: LIGHT_THEME_VALUES.joggingCoordinateLines,
+                G0Color: LIGHT_THEME_VALUES.G0Color,
+                G1Color: LIGHT_THEME_VALUES.G1Color,
+                G2Color: LIGHT_THEME_VALUES.G2Color,
+                G3Color: LIGHT_THEME_VALUES.G3Color,
+            };
         }
         return DARK_THEME_VALUES;
     }
