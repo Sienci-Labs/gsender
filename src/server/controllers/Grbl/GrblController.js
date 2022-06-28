@@ -166,6 +166,7 @@ class GrblController {
 
     // Homing information
     homingStarted = false;
+
     homingFlagSet = false;
 
 
