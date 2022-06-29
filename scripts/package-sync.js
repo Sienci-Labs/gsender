@@ -54,6 +54,7 @@ try {
                     return true;
                 }
             }
+            return false;
         });
         tempArray = finalRelease;
         return tempArray;
