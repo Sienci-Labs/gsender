@@ -21,7 +21,7 @@
  *
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SketchPicker } from 'react-color';
 import { LIGHT_THEME, CUST_DARK_THEME, CUST_LIGHT_THEME } from 'app/widgets/Visualizer/constants';
 import pubsub from 'pubsub-js';
@@ -36,6 +36,13 @@ const ColorPicker = ({ actions, theme, part }) => {
     pubsub.subscribe('part:change', () => {
         setColor(actions.visualizer.getCurrentBackground(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
     });
+
+    // clean the state in the unmount
+    useEffect(() => {
+        return () => {
+            setColor();
+        };
+    }, []);
 
     return (
         <div className={styles.addMargin}>
