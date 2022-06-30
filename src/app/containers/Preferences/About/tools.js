@@ -15,6 +15,16 @@ export const team = [
         title: 'Dev',
     },
     {
+        id: 6,
+        name: 'Sophia B.',
+        title: 'Dev',
+    },
+    {
+        id: 7,
+        name: 'Swagat S.',
+        title: 'Dev',
+    },
+    {
         id: 2,
         name: 'Justin W.',
         title: 'Dev',
@@ -29,15 +39,5 @@ export const team = [
         name: 'Aleks G.',
         title: 'Research and Design',
         isLastInList: true,
-    },
-    {
-        id: 6,
-        name: 'Sophia B.',
-        title: 'Dev',
-    },
-    {
-        id: 7,
-        name: 'Swagat S.',
-        title: 'Dev',
     },
 ];
