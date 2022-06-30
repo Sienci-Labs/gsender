@@ -39,28 +39,23 @@ try {
         '../src/app/containers/Preferences/About/releases.json'
     );
 
-    const removeLines = (data, deleteTill) => {
-        let tempArray = data.split('\n');
-        let finalRelease = '';
-        let count = 0;
-        const index = tempArray.indexOf(deleteTill);
-        tempArray.splice(0, index + 1);
-        tempArray.forEach((element, index) => {
-            if (element.includes('###')) {
-                count++;
-                if (count === 2) {
-                    finalRelease = tempArray;
-                    finalRelease.splice(index, tempArray.length);
-                    return true;
-                }
+    const getLatestPatchNotes = (data, notesStart) => {
+        const patchNotes = data.split(notesStart)[1];
+        let headerCount = 0;
+
+        let filteredNotes = patchNotes.split('\n').filter(line => {
+            if (line.includes('###')) {
+                headerCount++;
             }
-            return false;
-        });
-        tempArray = finalRelease;
-        return tempArray;
+            if (line.length < 2) {
+                return false;
+            }
+            return headerCount < 2;
+        }).map(line => line.trim());
+        return filteredNotes;
     };
     let readme = fs.readFileSync(path.resolve('README.md'), 'utf8');
-    const releases = removeLines(readme, '## 🕣 Development History');
+    const releases = getLatestPatchNotes(readme, '## 🕣 Development History');
     fs.writeFileSync(releaseTarget, JSON.stringify(releases));
 } catch (error) {
     console.log(error.message);
