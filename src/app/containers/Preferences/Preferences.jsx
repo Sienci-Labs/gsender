@@ -504,7 +504,58 @@ class PreferencesPage extends PureComponent {
                 const { visualizer } = this.state;
                 this.visualizerConfig.set('temp ' + visualizer.theme + ' ' + part, color.hex);
             },
-            getCurrentBackground: (part) => {
+            handlePartChange: () => {
+                pubsub.publish('part:change');
+            },
+            getDefaultColour: (theme, part) => {
+                let defaultColour;
+                let themeType = DARK_THEME_VALUES;
+                if (theme === CUST_LIGHT_THEME) {
+                    themeType = LIGHT_THEME_VALUES;
+                }
+                switch (part) {
+                case 'Background':
+                    defaultColour = themeType.backgroundColor;
+                    break;
+                case 'Grid':
+                    defaultColour = themeType.gridColor;
+                    break;
+                case 'X Axis':
+                    defaultColour = themeType.xAxisColor;
+                    break;
+                case 'Y Axis':
+                    defaultColour = themeType.yAxisColor;
+                    break;
+                case 'Z Axis':
+                    defaultColour = themeType.backgroundColor;
+                    break;
+                case 'Limit':
+                    defaultColour = themeType.backgroundColor;
+                    break;
+                case 'Cutting Coordinates Lines':
+                    defaultColour = themeType.backgroundColor;
+                    break;
+                case 'Jogging Coordinates Lines':
+                    defaultColour = themeType.backgroundColor;
+                    break;
+                case 'G0':
+                    defaultColour = themeType.backgroundColor;
+                    break;
+                case 'G1':
+                    defaultColour = themeType.backgroundColor;
+                    break;
+                case 'G2':
+                    defaultColour = themeType.backgroundColor;
+                    break;
+                case 'G3':
+                    defaultColour = themeType.backgroundColor;
+                    break;
+                default:
+                    defaultColour = '#000000';
+                }
+                return defaultColour;
+            },
+            getCurrentBackground: (part, defaultColour) => {
                 const { visualizer } = this.state;
                 if (visualizer.theme === LIGHT_THEME) {
                     return LIGHT_THEME_VALUES.backgroundColor;
@@ -513,41 +564,32 @@ class PreferencesPage extends PureComponent {
                 } else if (visualizer.theme === CUST_LIGHT_THEME) {
                     return this.visualizerConfig.get('Custom Light ' + part)
                         ? this.visualizerConfig.get('Custom Light ' + part)
-                        : LIGHT_THEME_VALUES.backgroundColor;
+                        : defaultColour;
                 } else {
                     return this.visualizerConfig.get('Custom Dark ' + part)
                         ? this.visualizerConfig.get('Custom Dark ' + part)
-                        : DARK_THEME_VALUES.backgroundColor;
+                        : defaultColour;
                 }
             },
-            resetCustomThemeColours: () => {
-                this.visualizerConfig.unset('Custom Dark Background');
-                this.visualizerConfig.unset('Custom Dark Grid');
-                this.visualizerConfig.unset('Custom Dark X Axis');
-                this.visualizerConfig.unset('Custom Dark Y Axis');
-                this.visualizerConfig.unset('Custom Dark Z Axis');
-                this.visualizerConfig.unset('Custom Dark Limit');
-                this.visualizerConfig.unset('Custom Dark Cutting Coordinate Lines');
-                this.visualizerConfig.unset('Custom Dark Jogging Coordinate Lines');
-                this.visualizerConfig.unset('Custom Dark G0');
-                this.visualizerConfig.unset('Custom Dark G1');
-                this.visualizerConfig.unset('Custom Dark G2');
-                this.visualizerConfig.unset('Custom Dark G3');
+            resetCustomThemeColours: (theme) => {
+                let themeColours = DARK_THEME_VALUES;
+                if (theme === CUST_LIGHT_THEME) {
+                    themeColours = LIGHT_THEME_VALUES;
+                }
+                this.visualizerConfig.set(theme + ' Background', themeColours.backgroundColor);
+                this.visualizerConfig.set(theme + ' Grid', themeColours.gridColor);
+                this.visualizerConfig.set(theme + ' X Axis', themeColours.xAxisColor);
+                this.visualizerConfig.set(theme + ' Y Axis', themeColours.yAxisColor);
+                this.visualizerConfig.set(theme + ' Z Axis', themeColours.zAxisColor);
+                this.visualizerConfig.set(theme + ' Limit', themeColours.limitColor);
+                this.visualizerConfig.set(theme + ' Cutting Coordinate Lines', themeColours.cuttingCoordinateLines);
+                this.visualizerConfig.set(theme + ' Jogging Coordinate Lines', themeColours.joggingCoordinateLines);
+                this.visualizerConfig.set(theme + ' G0', themeColours.G0Color);
+                this.visualizerConfig.set(theme + ' G1', themeColours.G1Color);
+                this.visualizerConfig.set(theme + ' G2', themeColours.G2Color);
+                this.visualizerConfig.set(theme + ' G3', themeColours.G3Color);
 
-                this.visualizerConfig.unset('Custom Light Background');
-                this.visualizerConfig.unset('Custom Light Grid');
-                this.visualizerConfig.unset('Custom Light X Axis');
-                this.visualizerConfig.unset('Custom Light Y Axis');
-                this.visualizerConfig.unset('Custom Light Z Axis');
-                this.visualizerConfig.unset('Custom Light Limit');
-                this.visualizerConfig.unset('Custom Light Cutting Coordinate Lines');
-                this.visualizerConfig.unset('Custom Light Jogging Coordinate Lines');
-                this.visualizerConfig.unset('Custom Light G0');
-                this.visualizerConfig.unset('Custom Light G1');
-                this.visualizerConfig.unset('Custom Light G2');
-                this.visualizerConfig.unset('Custom Light G3');
-
-                this.forceUpdate();
+                pubsub.publish('theme:change');
             },
             handleVisEnabledToggle: (liteMode = false) => {
                 const { visualizer } = this.state;

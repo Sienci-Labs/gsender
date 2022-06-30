@@ -28,12 +28,13 @@ import pubsub from 'pubsub-js';
 import styles from '../index.styl';
 
 const ColorPicker = ({ actions, theme, part }) => {
-    const [color, setColor] = useState(actions.visualizer.getCurrentBackground(part.value));
+    const [color, setColor] = useState(actions.visualizer.getCurrentBackground(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
+
     pubsub.subscribe('theme:change', () => {
-        setColor(actions.visualizer.getCurrentBackground(part.value));
+        setColor(actions.visualizer.getCurrentBackground(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
     });
     pubsub.subscribe('part:change', () => {
-        setColor(actions.visualizer.getCurrentBackground(part.value));
+        setColor(actions.visualizer.getCurrentBackground(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
     });
 
     return (
@@ -45,12 +46,12 @@ const ColorPicker = ({ actions, theme, part }) => {
                         disableAlpha={true}
                         color={color}
                         onChange={setColor}
-                        onChangeComplete={actions.visualizer.handleChangeComplete(color, part.value)}
+                        onChangeComplete={(color) => actions.visualizer.handleChangeComplete(color, part.value)}
                     />
                     <button
                         className={styles.saveColour}
                         type="button"
-                        onClick={function () {
+                        onClick={() => {
                             let newTheme;
                             if (theme === LIGHT_THEME || theme === CUST_LIGHT_THEME) {
                                 newTheme = CUST_LIGHT_THEME;
@@ -62,17 +63,15 @@ const ColorPicker = ({ actions, theme, part }) => {
                     >
                     Save
                     </button>
+                    <button
+                        className={styles.resetColour}
+                        type="button"
+                        onClick={() => actions.visualizer.resetCustomThemeColours(theme)}
+                    >
+                    Reset Colours
+                    </button>
                 </div>
             }
-            <div>
-                <button
-                    className={styles.saveColour}
-                    type="button"
-                    onClick={actions.visualizer.resetCustomThemeColours}
-                >
-                RESET COLOURS (dev)
-                </button>
-            </div>
         </div>
     );
 };
