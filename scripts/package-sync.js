@@ -43,7 +43,7 @@ try {
         const patchNotes = data.split(notesStart)[1];
         let headerCount = 0;
 
-        let filteredNotes = patchNotes.split('\n').filter(line => {
+        return patchNotes.split('\n').filter(line => {
             if (line.includes('###')) {
                 headerCount++;
             }
@@ -52,7 +52,6 @@ try {
             }
             return headerCount < 2;
         }).map(line => line.trim());
-        return filteredNotes;
     };
     let readme = fs.readFileSync(path.resolve('README.md'), 'utf8');
     const releases = getLatestPatchNotes(readme, '## 🕣 Development History');
