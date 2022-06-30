@@ -86,3 +86,16 @@ export const DARK_THEME = 'Dark';
 export const LIGHT_THEME = 'Light';
 export const CUST_DARK_THEME = 'Custom Dark';
 export const CUST_LIGHT_THEME = 'Custom Light';
+
+export const BACKGROUND_PART = 'Background';
+export const GRID_PART = 'Grid';
+export const XAXIS_PART = 'X Axis';
+export const YAXIS_PART = 'Y Axis';
+export const ZAXIS_PART = 'Z Axis';
+export const LIMIT_PART = 'Limit';
+export const CUTTING_PART = 'Cutting Coordinates Lines';
+export const JOGGING_PART = 'Jogging Coordinates Lines';
+export const G0_PART = 'G0';
+export const G1_PART = 'G1';
+export const G2_PART = 'G2';
+export const G3_PART = 'G3';

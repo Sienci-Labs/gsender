@@ -41,7 +41,7 @@ import store from '../../store';
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
-import { CUST_LIGHT_THEME, LIGHT_THEME } from '../../widgets/Visualizer/constants';
+import { CUST_LIGHT_THEME, DARK_THEME, DARK_THEME_VALUES, LIGHT_THEME, LIGHT_THEME_VALUES } from '../../widgets/Visualizer/constants';
 
 
 class PreferencesPage extends PureComponent {
@@ -488,13 +488,10 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('theme:change', theme.value);
             },
-            handleCustThemeChange: (theme) => {
+            handleCustThemeChange: (theme, part) => {
                 const { visualizer } = this.state;
-                if (visualizer.theme === LIGHT_THEME || visualizer.theme === CUST_LIGHT_THEME) {
-                    this.visualizerConfig.set('lightBackground', this.visualizerConfig.get('tempLightBackground'));
-                } else {
-                    this.visualizerConfig.set('darkBackground', this.visualizerConfig.get('tempDarkBackground'));
-                }
+                this.visualizerConfig.set(theme + ' ' + part,
+                    this.visualizerConfig.get('temp ' + theme + ' ' + part));
                 this.setState({
                     visualizer: {
                         ...visualizer,
@@ -503,13 +500,54 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('theme:change', theme);
             },
-            handleChangeComplete: (color) => {
+            handleChangeComplete: (color, part) => {
                 const { visualizer } = this.state;
-                if (visualizer.theme === LIGHT_THEME || visualizer.theme === CUST_LIGHT_THEME) {
-                    this.visualizerConfig.set('tempLightBackground', color.hex);
+                this.visualizerConfig.set('temp ' + visualizer.theme + ' ' + part, color.hex);
+            },
+            getCurrentBackground: (part) => {
+                const { visualizer } = this.state;
+                if (visualizer.theme === LIGHT_THEME) {
+                    return LIGHT_THEME_VALUES.backgroundColor;
+                } else if (visualizer.theme === DARK_THEME) {
+                    return DARK_THEME_VALUES.backgroundColor;
+                } else if (visualizer.theme === CUST_LIGHT_THEME) {
+                    return this.visualizerConfig.get('Custom Light ' + part)
+                        ? this.visualizerConfig.get('Custom Light ' + part)
+                        : LIGHT_THEME_VALUES.backgroundColor;
                 } else {
-                    this.visualizerConfig.set('tempDarkBackground', color.hex);
+                    return this.visualizerConfig.get('Custom Dark ' + part)
+                        ? this.visualizerConfig.get('Custom Dark ' + part)
+                        : DARK_THEME_VALUES.backgroundColor;
                 }
+            },
+            resetCustomThemeColours: () => {
+                this.visualizerConfig.unset('Custom Dark Background');
+                this.visualizerConfig.unset('Custom Dark Grid');
+                this.visualizerConfig.unset('Custom Dark X Axis');
+                this.visualizerConfig.unset('Custom Dark Y Axis');
+                this.visualizerConfig.unset('Custom Dark Z Axis');
+                this.visualizerConfig.unset('Custom Dark Limit');
+                this.visualizerConfig.unset('Custom Dark Cutting Coordinate Lines');
+                this.visualizerConfig.unset('Custom Dark Jogging Coordinate Lines');
+                this.visualizerConfig.unset('Custom Dark G0');
+                this.visualizerConfig.unset('Custom Dark G1');
+                this.visualizerConfig.unset('Custom Dark G2');
+                this.visualizerConfig.unset('Custom Dark G3');
+
+                this.visualizerConfig.unset('Custom Light Background');
+                this.visualizerConfig.unset('Custom Light Grid');
+                this.visualizerConfig.unset('Custom Light X Axis');
+                this.visualizerConfig.unset('Custom Light Y Axis');
+                this.visualizerConfig.unset('Custom Light Z Axis');
+                this.visualizerConfig.unset('Custom Light Limit');
+                this.visualizerConfig.unset('Custom Light Cutting Coordinate Lines');
+                this.visualizerConfig.unset('Custom Light Jogging Coordinate Lines');
+                this.visualizerConfig.unset('Custom Light G0');
+                this.visualizerConfig.unset('Custom Light G1');
+                this.visualizerConfig.unset('Custom Light G2');
+                this.visualizerConfig.unset('Custom Light G3');
+
+                this.forceUpdate();
             },
             handleVisEnabledToggle: (liteMode = false) => {
                 const { visualizer } = this.state;

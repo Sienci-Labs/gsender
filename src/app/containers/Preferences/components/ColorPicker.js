@@ -22,47 +22,55 @@
  */
 
 import React, { useState } from 'react';
-import { BlockPicker } from 'react-color';
+import { SketchPicker } from 'react-color';
 import { LIGHT_THEME, CUST_DARK_THEME, CUST_LIGHT_THEME } from 'app/widgets/Visualizer/constants';
+import pubsub from 'pubsub-js';
 import styles from '../index.styl';
 
-const ColorPicker = ({ state, actions }) => {
-    const [color, setColor] = useState('#000000');
-    const { theme } = state.visualizer;
+const ColorPicker = ({ actions, theme, part }) => {
+    const [color, setColor] = useState(actions.visualizer.getCurrentBackground(part.value));
+    pubsub.subscribe('theme:change', () => {
+        setColor(actions.visualizer.getCurrentBackground(part.value));
+    });
+    pubsub.subscribe('part:change', () => {
+        setColor(actions.visualizer.getCurrentBackground(part.value));
+    });
+
     return (
         <div className={styles.addMargin}>
-            <button
-                id="backbutton"
-                className={styles.addTool}
-                type="button"
-                onClick={function () {
-                    document.getElementById('picker').style.display = 'inline';
-                    document.getElementById('backbutton').style.display = 'none';
-                }}
-            >
-            Customize Background
-            </button>
-            <div id="picker" className={styles.addMargin} style={{ display: 'none' }}>
-                <BlockPicker
-                    id="colorpicker"
-                    color={color}
-                    onChange={setColor}
-                    onChangeComplete={actions.visualizer.handleChangeComplete}
-                />
+            {(theme === CUST_DARK_THEME || theme === CUST_LIGHT_THEME) &&
+                <div id="picker" className={styles.colourPicker}>
+                    <SketchPicker
+                        id="colorpicker"
+                        disableAlpha={true}
+                        color={color}
+                        onChange={setColor}
+                        onChangeComplete={actions.visualizer.handleChangeComplete(color, part.value)}
+                    />
+                    <button
+                        className={styles.saveColour}
+                        type="button"
+                        onClick={function () {
+                            let newTheme;
+                            if (theme === LIGHT_THEME || theme === CUST_LIGHT_THEME) {
+                                newTheme = CUST_LIGHT_THEME;
+                            } else {
+                                newTheme = CUST_DARK_THEME;
+                            }
+                            actions.visualizer.handleCustThemeChange(newTheme, part.value);
+                        }}
+                    >
+                    Save
+                    </button>
+                </div>
+            }
+            <div>
                 <button
-                    className={styles.addTool}
+                    className={styles.saveColour}
                     type="button"
-                    onClick={function () {
-                        let newTheme;
-                        if (theme === LIGHT_THEME || theme === CUST_LIGHT_THEME) {
-                            newTheme = CUST_LIGHT_THEME;
-                        } else {
-                            newTheme = CUST_DARK_THEME;
-                        }
-                        actions.visualizer.handleCustThemeChange(newTheme);
-                    }}
+                    onClick={actions.visualizer.resetCustomThemeColours}
                 >
-                Save
+                RESET COLOURS (dev)
                 </button>
             </div>
         </div>
