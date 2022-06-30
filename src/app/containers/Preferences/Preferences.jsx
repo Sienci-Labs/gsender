@@ -527,28 +527,28 @@ class PreferencesPage extends PureComponent {
                     defaultColour = themeType.yAxisColor;
                     break;
                 case 'Z Axis':
-                    defaultColour = themeType.backgroundColor;
+                    defaultColour = themeType.zAxisColor;
                     break;
                 case 'Limit':
-                    defaultColour = themeType.backgroundColor;
+                    defaultColour = themeType.limitColor;
                     break;
                 case 'Cutting Coordinates Lines':
-                    defaultColour = themeType.backgroundColor;
+                    defaultColour = themeType.cuttingCoordinateLines;
                     break;
                 case 'Jogging Coordinates Lines':
-                    defaultColour = themeType.backgroundColor;
+                    defaultColour = themeType.joggingCoordinateLines;
                     break;
                 case 'G0':
-                    defaultColour = themeType.backgroundColor;
+                    defaultColour = themeType.G0Color;
                     break;
                 case 'G1':
-                    defaultColour = themeType.backgroundColor;
+                    defaultColour = themeType.G1Color;
                     break;
                 case 'G2':
-                    defaultColour = themeType.backgroundColor;
+                    defaultColour = themeType.G2Color;
                     break;
                 case 'G3':
-                    defaultColour = themeType.backgroundColor;
+                    defaultColour = themeType.G3Color;
                     break;
                 default:
                     defaultColour = '#000000';
