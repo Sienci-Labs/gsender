@@ -1,26 +1,3 @@
-/*
- * Copyright (C) 2021 Sienci Labs Inc.
- *
- * This file is part of gSender.
- *
- * gSender is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, under version 3 of the License.
- *
- * gSender is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
- *
- * Contact for information regarding this program and its license
- * can be sent through gSender@sienci.com or mailed to the main office
- * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
- *
- */
-
 import isElectron from 'is-electron';
 import ensureArray from 'ensure-array';
 import debounce from 'lodash/debounce';
@@ -34,30 +11,39 @@ import { TOUCHPLATE_TYPE_STANDARD, TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_ZER
 import { MODAL_HELP } from 'app/containers/NavSidebar/constants';
 import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
-import series from '../lib/promise-series';
 import log from '../lib/log';
 import defaultState from './defaultState';
-import { JOGGING_CATEGORY, LOCATION_CATEGORY, METRIC_UNITS, SPINDLE_MODES } from '../constants';
+import { JOGGING_CATEGORY, LOCATION_CATEGORY, METRIC_UNITS } from '../constants';
 
 const store = new ImmutableStore(defaultState);
 
-const cnc = {
-    version: settings.version,
-    state: {}
-};
+let userData = null;
 
-const getConfig = async () => {
+// Check whether the code is running in Electron renderer process
+if (isElectron()) {
+    const electron = window.require('electron');
+    const path = window.require('path'); // Require the path module within Electron
+    const app = electron.remote.app;
+    userData = {
+        path: path.join(app.getPath('userData'), 'gsender-0.5.6.json')
+    };
+}
+
+const getConfig = () => {
     let content = '';
 
     // Check whether the code is running in Electron renderer process
     if (isElectron()) {
-        content = await window.api.getConfig();
+        const fs = window.require('fs'); // Require the fs module within Electron
+        if (fs.existsSync(userData.path)) {
+            content = fs.readFileSync(userData.path, 'utf8') || '{}';
+        }
     } else {
         content = localStorage.getItem('sienci') || '{}';
     }
 
     if (content === '{}') {
-        content = normalizeState().toString();
+        content = this.normalizeState().toString();
     }
 
     return content;
@@ -79,7 +65,8 @@ const persist = (data) => {
 
         // Check whether the code is running in Electron renderer process
         if (isElectron()) {
-            window.api.persistConfig('gsender-0.5.6.json', value);
+            const fs = window.require('fs'); // Use window.require to require fs module in Electron
+            fs.writeFileSync(userData.path, value);
         } else {
             localStorage.setItem('sienci', value);
         }
@@ -173,30 +160,34 @@ const normalizeState = (state) => {
     return state;
 };
 
+const cnc = {
+    version: settings.version,
+    state: {}
+};
+
+try {
+    const text = getConfig();
+    const data = JSON.parse(text);
+    cnc.version = get(data, 'version', settings.version);
+    cnc.state = get(data, 'state', {});
+} catch (e) {
+    // set(settings, 'error.corruptedWorkspaceSettings', true);
+    log.error(e);
+}
+
+store.state = normalizeState(merge({}, defaultState, cnc.state || {}));
+
+// Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
+store.on('change', debounce((state) => {
+    persist({ state: state });
+}, 100));
+
 //
 // Migration
 //
 const migrateStore = () => {
     if (!cnc.version) {
         return;
-    }
-    // 1.0.7 - Update default state for surfacing,
-    //       - Added spindle parameter to choose between m3 and m4
-    //       - Added missing spindleRPM property for default surfacing imperial state
-    if (semver.lt(cnc.version, '1.0.7')) {
-        const [M3] = SPINDLE_MODES;
-        const metricState = store.get('widgets.surfacing.defaultMetricState');
-        const imperialState = store.get('widgets.surfacing.defaultMetricState');
-        store.set('widgets.surfacing.defaultMetricState', { ...metricState, spindle: M3 });
-        store.set('widgets.surfacing.defaultImperialState', { ...imperialState, spindle: M3, spindleRPM: 669 });
-
-        const currentCommandKeys = store.get('commandKeys', []);
-        const defaultCommandKeys = get(defaultState, 'commandKeys');
-        // Splice the new binds into the location of the spindle binds
-        const spindleBindIndex = currentCommandKeys.map(cmd => cmd.id).indexOf(54) || 0;
-        const newCommands = defaultCommandKeys.filter(command => command.id === 72 || command.id === 71 || command.id === 73);
-        currentCommandKeys.splice(spindleBindIndex + 1, 0, ...newCommands);
-        store.replace('commandKeys', currentCommandKeys);
     }
 
     // 1.0.4 - need to add
@@ -299,35 +290,10 @@ const migrateStore = () => {
     }
 };
 
-// Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
-store.on('change', debounce((state) => {
-    persist({ state: state });
-}, 100));
-
 try {
-    series([
-        async () => {
-            const text = await getConfig();
-            const data = JSON.parse(text);
-            cnc.version = get(data, 'version', settings.version);
-            cnc.state = get(data, 'state', {});
-        }]).then(() => {
-        store.state = normalizeState(merge({}, defaultState, cnc.state || {}));
-        try {
-            migrateStore();
-        } catch (err) {
-            log.error(err);
-            if (isElectron()) {
-                window.api.logError(err);
-            }
-        }
-    });
-} catch (e) {
-    // set(settings, 'error.corruptedWorkspaceSettings', true);
-    if (isElectron()) {
-        window.api.logError(e);
-    }
-    log.error(e);
+    migrateStore();
+} catch (err) {
+    log.error(err);
 }
 
 store.getConfig = getConfig;

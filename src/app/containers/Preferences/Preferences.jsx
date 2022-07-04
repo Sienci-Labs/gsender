@@ -709,11 +709,11 @@ class PreferencesPage extends PureComponent {
                             {
                                 menu.map((menuItem, index) => (
                                     <div key={menuItem.id}>
-                                        { <menuItem.component
+                                        <menuItem.component
                                             actions={actions}
                                             state={state}
                                             active={index === selectedMenu}
-                                        /> }
+                                        />
                                     </div>
                                 ))
                             }

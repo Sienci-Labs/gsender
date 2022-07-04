@@ -23,7 +23,7 @@
 
 import React from 'react';
 import cx from 'classnames';
-import Image from 'app/components/Image';
+import { Image } from 'Components/Image';
 import { TOUCHPLATE_TYPE_STANDARD, TOUCHPLATE_TYPE_AUTOZERO } from 'app/lib/constants';
 import styles from './index.styl';
 import XProbe from './assets/Block-X.gif';

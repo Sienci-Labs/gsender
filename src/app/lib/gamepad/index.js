@@ -28,6 +28,33 @@ class Gamepad extends GamepadListener {
     unholdLisetner = () => {
         this.shouldHold = false;
     }
+
+    onAxis = (event) => {
+        const [leftStickX, leftStickY, rightStickX, rightStickY] = event.detail.gamepad.axes;
+
+        const cartesian2Polar = (x, y) => {
+            const radians = Math.atan2(y, x);
+            const degrees = Math.round((radians * (180 / Math.PI))) * -1;
+            return (degrees + 360) % 360; //https://stackoverflow.com/a/25725005
+        };
+
+        const leftStick = cartesian2Polar(leftStickX, leftStickY);
+        const rightStick = cartesian2Polar(rightStickX, rightStickY);
+
+        const dataOutput = {
+            ...event.detail,
+            degrees: {
+                leftStick,
+                rightStick,
+            }
+        };
+
+        const { index } = dataOutput;
+
+        this.emit('gamepad:axis', dataOutput);
+        this.emit(`gamepad:${index}:axis`, dataOutput);
+        this.emit(`gamepad:${index}:axis:${dataOutput.axis}`, dataOutput.detail);
+    }
 }
 const gamepadInstance = new Gamepad();
 gamepadInstance.start();

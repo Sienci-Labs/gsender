@@ -387,6 +387,47 @@ export default [
         'laser': false
     },
     {
+        'id': 44,
+        'company': 'YoraHome',
+        'name': '',
+        'type': '',
+        'mm': {
+            'width': 609.6,
+            'depth': 609.6,
+            'height': 90.17
+        },
+        'in': {
+            'width': 24,
+            'depth': 24,
+            'height': 3.55
+        },
+        'endstops': true,
+        'spindle': true,
+        'coolant': false,
+        'laser': true
+    },
+    {
+        'id': 45,
+        'company': 'Blue Carve',
+        'name': '',
+        'type': '',
+        'mm': {
+            'width': 750,
+            'depth': 750,
+            'height': 85
+        },
+        'in': {
+            'width': 24,
+            'depth': 24,
+            'height': 3.55
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false
+    },
+
+    {
         'id': 47,
         'company': 'SainSmart',
         'name': '',

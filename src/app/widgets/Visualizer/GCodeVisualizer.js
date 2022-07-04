@@ -71,7 +71,7 @@ class GCodeVisualizer {
                 color: defaultColor,
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.6,
+                opacity: 0.9,
             })
         );
 

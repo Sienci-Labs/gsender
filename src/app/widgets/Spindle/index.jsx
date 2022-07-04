@@ -314,9 +314,21 @@ class SpindleWidget extends PureComponent {
             laser
         });
         const { xOffset, yOffset } = laser;
-        return [
-            `G10 L20 P${this.getWCS()} X${xOffset} Y${yOffset}`
-        ];
+        let offsetQuery = [];
+        if (xOffset === 0 && yOffset !== 0) {
+            offsetQuery = [
+                `G10 L20 P${this.getWCS()} Y${yOffset}`
+            ];
+        } else if (xOffset !== 0 && yOffset === 0) {
+            offsetQuery = [
+                `G10 L20 P${this.getWCS()} X${xOffset}`
+            ];
+        } else if (xOffset !== 0 && yOffset !== 0) {
+            offsetQuery = [`G10 L20 P${this.getWCS()} X${xOffset} Y${yOffset}`];
+        } else {
+            offsetQuery = [''];
+        }
+        return offsetQuery;
     }
 
     getSpindleOffsetCode() {
@@ -324,12 +336,22 @@ class SpindleWidget extends PureComponent {
         this.setState({
             laser
         });
+        let offsetQuery = [];
         let { xOffset, yOffset } = laser;
         xOffset = Number(xOffset) * -1;
         yOffset = Number(yOffset) * -1;
-        return [
-            `G10 L20 P${this.getWCS()} X${xOffset} Y${yOffset}`
-        ];
+        if (xOffset === 0 && yOffset !== 0) {
+            offsetQuery = [
+                `G10 L20 P${this.getWCS()} Y${yOffset}`
+            ];
+        } else if (xOffset !== 0 && yOffset === 0) {
+            offsetQuery = [`G10 L20 P${this.getWCS()} X${xOffset}`];
+        } else if (xOffset !== 0 && yOffset !== 0) {
+            offsetQuery = [`G10 L20 P${this.getWCS()} X${xOffset} Y${yOffset}`];
+        } else {
+            offsetQuery = [''];
+        }
+        return offsetQuery;
     }
 
 
@@ -396,8 +418,7 @@ class SpindleWidget extends PureComponent {
 
         return (
             <Widget fullscreen={isFullscreen}>
-                <Widget.Header embedded={embedded}>
-                </Widget.Header>
+                <Widget.Header embedded={embedded} />
                 <Widget.Content
                     className={classNames(
                         styles['widget-content'],

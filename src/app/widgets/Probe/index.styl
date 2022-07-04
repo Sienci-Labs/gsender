@@ -31,7 +31,7 @@
 }
 
 .hidden {
-    visibility: hidden !important;
+    visibility: hidden;
 }
 
 .probe-command-description {
@@ -54,7 +54,7 @@
     display: flex;
     flex-direction: row;
     height: 100%;
-    align-items center;
+    align-items: center;
     justify-content: space-around;
 }
 .probe-options-col {
@@ -68,8 +68,8 @@
 }
 .probe-settings-col {
     display: flex;
-    flex-direction: column
-    width: min(50%, 15vh)
+    flex-direction: column;
+    width: min(50%, 15vh);
 }
 
 .row-spread {
@@ -80,12 +80,12 @@
 
 .probeStatus {
     width: 100%;
-    display flex;
-    flex-direction column;
-    justify-content center;
-    align-items center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     h5 {
-        text-align center;
+        text-align: center;
         font-weight: bold;
     }
     span {
@@ -100,7 +100,7 @@
 }
 
 .circuit-open, .mini-circuit-status {
-    background: #DC2626
+    background: #DC2626;
 }
 
 .circuit-closed {
@@ -130,19 +130,19 @@
 
 .left {
     width: 60%;
-    display flex
-    flex-direction column
-    justify-content space-between;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 .right {
     width: 40%;
-    display flex
-    flex-direction column
+    display: flex;
+    flex-direction: column;
 }
 
 .probe-timer {
     width: 100%;
-    text-align center;
+    text-align: center;
 }
 
 .img-hidden {
@@ -152,17 +152,17 @@
 .img-wrap {
     display: flex;
     width: 100%;
-    align-items center;
-    justify-content center;
+    align-items: center;
+    justify-content: center;
 
     > img {
         width: 15vh;
-        margin: 0 auto
+        margin: 0 auto;
     }
 }
 
 .height-override {
-    height: 100% !important;
+    height: 100%;
 }
 
 .probeDiameterWrapper {
@@ -173,7 +173,7 @@
     input {
         width: 100%;
         outline: none;
-        text-align center;
+        text-align: center;
         &:focus {
             outline: none;
         }
@@ -182,7 +182,7 @@
 
 .main-wrapper {
     width: 100%;
-    height: 100%
+    height: 100%;
     margin: auto;
     display: grid;
     grid-template-columns: 3fr 2fr;

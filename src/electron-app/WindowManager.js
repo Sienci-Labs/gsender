@@ -89,12 +89,13 @@ class WindowManager {
             show: false,
             webPreferences: {
                 nodeIntegration: true,
-                contextIsolation: true,
+                enableRemoteModule: true,
+                contextIsolation: false,
                 preload: path.join(__dirname, 'preload.js')
             }
         });
         const webContents = window.webContents;
-        window.removeMenu();
+        //window.removeMenu();
         window.webContents.once('did-finish-load', () => {
             window.setTitle(options.title);
         });

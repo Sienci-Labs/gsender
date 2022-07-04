@@ -21,15 +21,15 @@ pushd "$__dirname/../dist/gsender"
 echo "Cleaning up \"`pwd`/node_modules\""
 rm -rf node_modules
 echo "Installing packages..."
-yarn --production --ignore-engines
+npm install --production --ignore-engines
+npm dedupe
 popd
 
-#echo "Rebuild native modules using electron ${electron_version}"
-#npm run electron-rebuild -- \
-#    --version=${electron_version:1} \
-#    --module-dir=dist/gsender \
-#    --which-module=serialport
+echo "Rebuild native modules using electron ${electron_version}"
+npm run electron-rebuild -- \
+    --version=${electron_version:1} \
+    --module-dir=dist/gsender \
+    --which-module=serialport
 
-yarn electron-builder install-app-deps
 
 cross-env USE_HARD_LINKS=false yarn electron-builder -- "$@"

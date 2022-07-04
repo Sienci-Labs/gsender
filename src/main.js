@@ -40,6 +40,7 @@ import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import { loadConfig, persistConfig } from './electron-app/store';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 
+
 let windowManager = null;
 let powerSaverId = null;
 let appConfig = null;
@@ -79,7 +80,7 @@ const main = () => {
 
     // Load app config into variable
     const filePath = path.join(app.getPath('userData'), 'gsender-0.5.6.json');
-    appConfig = loadConfig(filePath);
+    //appConfig = loadConfig(filePath);
 
     app.whenReady().then(async () => {
         try {

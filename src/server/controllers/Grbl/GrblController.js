@@ -166,6 +166,7 @@ class GrblController {
 
     // Homing information
     homingStarted = false;
+
     homingFlagSet = false;
 
 
@@ -348,6 +349,7 @@ class GrblController {
                 line = ensureString(parts[0]).trim();
                 let commentString = ensureString(parts[1]).trim();
                 context = this.populateContext(context);
+                line = line.replace(/^\s*\([^\)]*\)/gm, '').trim(); // make sure lines that are only comments aren't sent
 
                 const { sent, received } = this.sender.state;
 
@@ -498,7 +500,6 @@ class GrblController {
                 this.homingStarted = false;
             }
 
-            // console.log(`runner on status ${res}`);
             this.actionMask.queryStatusReport = false;
 
             if (this.actionMask.replyStatusReport) {
@@ -833,7 +834,7 @@ class GrblController {
                     this.command('gcode:stop');
                 }
             }
-        }, 300);
+        }, 250);
 
         // Load file if it exists in CNC engine (AKA it was loaded before connection
     }
@@ -1151,7 +1152,6 @@ class GrblController {
     }
 
     consumeFeederCB() {
-        console.log('Feeder Complete');
         this.feederCB();
         this.feederCB = noop;
     }
@@ -1232,8 +1232,6 @@ class GrblController {
                 const [lineToStartFrom] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
-                console.log(`event enabled: ${startEventEnabled}`);
-
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
@@ -1315,7 +1313,6 @@ class GrblController {
                     this.command('gcode', modalGCode);
                 } else if (startEventEnabled) {
                     this.feederCB = () => {
-                        console.log('START LATER');
                         this.workflow.start();
 
                         // Feeder
@@ -1536,7 +1533,6 @@ class GrblController {
             },
             'gcode': () => {
                 const [commands, context] = args;
-                console.log(commands);
                 const data = ensureArray(commands)
                     .join('\n')
                     .split(/\r?\n/)
@@ -1547,7 +1543,7 @@ class GrblController {
 
                         return line.trim().length > 0;
                     });
-                console.log(data);
+
                 this.feeder.feed(data, context);
 
                 if (!this.feeder.isPending()) {

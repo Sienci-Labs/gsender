@@ -36,4 +36,5 @@ const WINDOW_API = {
     }
 };
 
-contextBridge.exposeInMainWorld('api', WINDOW_API);
+//contextBridge.exposeInMainWorld('api', WINDOW_API);
+window.ipcRenderer = require('electron').ipcRenderer;

@@ -29,8 +29,8 @@
   background: #111827;
   color: white;
   border-radius: 0.25rem;
-  justify-content space-between;
-  align-items center;
+  justify-content: space-between;
+  align-items: center;
   padding: 0.25rem 1rem;
   min-width: 325px;
   min-height: 50px;
@@ -56,11 +56,11 @@
   color: white;
   display: flex;
   flex-direction: row;
-  justify-content space-between;
+  justify-content: space-between;
   align-items: center;
   background: #060d14;
-  font-family $font-family-monospace;
-  padding: 1rem 0.5rem
+  font-family: $font-family-monospace;
+  padding: 1rem 0.5rem;
   width: 100%;
   margin: 0;
   border: 0;
@@ -72,21 +72,20 @@
   }
 
   i {
-    font-size: 1.2rem !important;
+    font-size: 1.2rem;
   }
 }
 
 
 .NavbarConnectionDropdownList {
+  background: #060d14;
   display: none;
-  width: 100%
+  left: 0;
   min-width: 250px;
   position: absolute;
-  z-index: 10;
   top: 47px;
-  left: 0;
-
-  background: #060d14;
+  width: 100%
+  z-index: 10;
 
   h5 {
     padding: 0 0.5rem;
@@ -102,7 +101,7 @@
 
 .NavbarPortListingInfo {
   display: flex;
-  flex-direction column;
+  flex-direction: column;
 }
 
 .NavbarPortListingPortLabel {
@@ -110,9 +109,9 @@
 }
 
 .NavbarPortListingPortManufacturer {
-  font-family $font-family-arial
+  font-family: $font-family-arial;
   font-size: 0.8rem;
-  text-align right
+  text-align: right;
   color: white;
 }
 
@@ -159,9 +158,9 @@
   background: #DC2626;
   box-sizing: border-box;
   display: flex;
-  flex-direction row;
-  align-items center;
-  justify-content center;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
   flex-grow: 1;
   opacity: 0;
   i {
@@ -205,7 +204,7 @@
 .noDevicesWarning {
   background: #374151;
   font-weight: bold;
-  text-align center;
+  text-align: center;
   padding: 1rem 0;
  }
 
@@ -220,13 +219,13 @@
   width: 100%;
   border-top: solid 1px #111827;
   display: flex;
-  align-items center;
+  align-items: center;
   background: $bgColor;
-  justify-content space-between;
+  justify-content: space-between;
   transition: background 250ms ease-in-out;
 
   i {
-    font-size: 1.25rem !important;
+    font-size: 1.25rem;
   }
 
   &:hover {
