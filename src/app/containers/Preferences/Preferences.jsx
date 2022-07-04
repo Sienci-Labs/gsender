@@ -555,19 +555,15 @@ class PreferencesPage extends PureComponent {
                 }
                 return defaultColour;
             },
-            getCurrentBackground: (part, defaultColour) => {
+            getCurrentColor: (part, defaultColour) => {
                 const { visualizer } = this.state;
                 if (visualizer.theme === LIGHT_THEME) {
                     return LIGHT_THEME_VALUES.backgroundColor;
                 } else if (visualizer.theme === DARK_THEME) {
                     return DARK_THEME_VALUES.backgroundColor;
-                } else if (visualizer.theme === CUST_LIGHT_THEME) {
-                    return this.visualizerConfig.get('Custom Light ' + part)
-                        ? this.visualizerConfig.get('Custom Light ' + part)
-                        : defaultColour;
                 } else {
-                    return this.visualizerConfig.get('Custom Dark ' + part)
-                        ? this.visualizerConfig.get('Custom Dark ' + part)
+                    return this.visualizerConfig.get(visualizer.theme + ' ' + part)
+                        ? this.visualizerConfig.get(visualizer.theme + ' ' + part)
                         : defaultColour;
                 }
             },

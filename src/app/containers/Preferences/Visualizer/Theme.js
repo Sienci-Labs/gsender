@@ -54,8 +54,8 @@ const Theme = ({ state, actions }) => {
     };
 
     return (
-        <Tooltip content="Toggle the main colour of the Visualizer" location="default">
-            <Fieldset legend="Theme">
+        <Fieldset legend="Theme">
+            <Tooltip content="Toggle the main colour of the Visualizer" location="default">
                 <div className={styles.addMargin}>
                     <Select
                         id="themeSelect"
@@ -75,6 +75,8 @@ const Theme = ({ state, actions }) => {
                     />
                     <small>Colours used when visualizing a G-Code file.</small>
                 </div>
+            </Tooltip>
+            <Tooltip content="Toggle the part of the Visualizer to customize" location="default">
                 {(theme === CUST_DARK_THEME || theme === CUST_LIGHT_THEME) &&
                     <div className={styles.addMargin}>
                         <Select
@@ -99,9 +101,9 @@ const Theme = ({ state, actions }) => {
                         <small>Choose which part to customize.</small>
                     </div>
                 }
-                <ColorPicker actions={actions} theme={theme} part={part}/>
-            </Fieldset>
-        </Tooltip>
+            </Tooltip>
+            <ColorPicker actions={actions} theme={theme} part={part}/>
+        </Fieldset>
     );
 };
 

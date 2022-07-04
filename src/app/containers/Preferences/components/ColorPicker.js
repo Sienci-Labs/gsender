@@ -28,13 +28,13 @@ import pubsub from 'pubsub-js';
 import styles from '../index.styl';
 
 const ColorPicker = ({ actions, theme, part }) => {
-    const [color, setColor] = useState(actions.visualizer.getCurrentBackground(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
+    const [color, setColor] = useState(actions.visualizer.getCurrentColor(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
 
     pubsub.subscribe('theme:change', () => {
-        setColor(actions.visualizer.getCurrentBackground(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
+        setColor(actions.visualizer.getCurrentColor(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
     });
     pubsub.subscribe('part:change', () => {
-        setColor(actions.visualizer.getCurrentBackground(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
+        setColor(actions.visualizer.getCurrentColor(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
     });
 
     // clean the state in the unmount

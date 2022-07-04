@@ -48,6 +48,7 @@ import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
 import _ from 'lodash';
 import store from 'app/store';
+import api from 'app/api';
 import { Toaster, TOASTER_DANGER, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
@@ -426,6 +427,11 @@ class Visualizer extends Component {
         });
     }
 
+    async uploadGCodeFile (gcode) {
+        const serializedFile = new File([gcode], 'surfacing.gcode');
+        await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
+    }
+
     rerenderGCode() {
         const { actions, state } = this.props;
         const { gcode } = state;
@@ -436,6 +442,9 @@ class Visualizer extends Component {
         }
         if (gcode.content) {
             actions.loadGCode('', gcode.content);
+        } else {
+            // reupload the file to update the colours
+            this.uploadGCodeFile(reduxStore.getState().file.content);
         }
     }
 
