@@ -161,6 +161,18 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('safeHeight:update', value);
             },
+            setCustomInPlaces: (e) => {
+                const value = Number(e.target.value);
+                this.setState({
+                    customInPlaces: value
+                });
+            },
+            setCustomMmPlaces: (e) => {
+                const value = Number(e.target.value);
+                this.setState({
+                    customMmPlaces: value
+                });
+            },
             setUnits: (units) => {
                 this.setState({
                     units: units
