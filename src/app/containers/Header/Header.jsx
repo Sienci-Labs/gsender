@@ -285,39 +285,16 @@ class Header extends PureComponent {
     }
 
     render() {
-        const { updateAvailable, connected } = this.state;
+        const { updateAvailable } = this.state;
         return (
-            <div className={styles.navBar}>
-                <div className={styles.primary}>
-                    <NavLogo updateAvailable={updateAvailable} onClick={() => this.toggleUpdateToast()} />
+            <div className={ styles.navBar }>
+                <div className={ styles.primary }>
+                    <NavLogo updateAvailable={ updateAvailable } onClick={ () => this.toggleUpdateToast() }/>
                     <NavbarConnection
-                        state={this.state}
-                        actions={this.actions}
+                        state={ this.state }
+                        actions={ this.actions }
                         widgetId="connection"
                     />
-                    <div>
-                        {
-                            /*<FunctionButton
-                            primary
-                            onClick={ () => {
-                                controller.disconnect();
-                            } }
-                        >
-                            Close Connection
-                        </FunctionButton>*/
-                        }
-                        {
-                            !connected &&
-                            <FunctionButton
-                                primary
-                                onClick={() => {
-                                    controller.reconnect();
-                                }}
-                            >
-                                Reconnect
-                            </FunctionButton>
-                        }
-                    </div>
                 </div>
                 <NavSidebar />
             </div>
