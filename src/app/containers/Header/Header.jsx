@@ -29,7 +29,6 @@ import api from 'app/api';
 import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
-import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import i18n from 'app/lib/i18n';
 import pubsub from 'pubsub-js';
 import NavbarConnection from 'app/widgets/NavbarConnection';

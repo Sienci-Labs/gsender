@@ -48,15 +48,6 @@ class NavbarConnectionWidget extends PureComponent {
 
     pubsubTokens = [];
 
-    // Public methods
-    collapse = () => {
-        this.setState({ minimized: true });
-    };
-
-    expand = () => {
-        this.setState({ minimized: false });
-    };
-
     config = new WidgetConfig(this.props.widgetId);
 
     state = this.getInitialState();
@@ -293,6 +284,9 @@ class NavbarConnectionWidget extends PureComponent {
     }
 
     refreshPorts() {
+        if (!controller.connected) {
+            controller.reconnect();
+        }
         this.startLoading();
         controller.listPorts();
     }
