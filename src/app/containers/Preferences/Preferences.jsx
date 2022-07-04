@@ -155,7 +155,7 @@ class PreferencesPage extends PureComponent {
         },
         general: {
             setSafeRetractHeight: (e) => {
-                const value = Number(e.target.value);
+                const value = Math.abs(Number(e.target.value));
                 this.setState({
                     safeRetractHeight: value
                 });
@@ -272,12 +272,12 @@ class PreferencesPage extends PureComponent {
             },
             changeRetractionDistance: (e) => {
                 const probeSettings = { ...this.state.probeSettings };
-                const value = Number(e.target.value).toFixed(3) * 1;
+                const value = Math.abs(Number(e.target.value).toFixed(3) * 1);
 
                 const { units } = this.state;
 
-                const metricValue = units === 'mm' ? value : convertToMetric(value);
-                const imperialValue = units === 'in' ? value : convertToImperial(value);
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
 
                 this.setState({
                     probeSettings: {
@@ -291,11 +291,11 @@ class PreferencesPage extends PureComponent {
             },
             changeNormalFeedrate: (e) => {
                 const probeSettings = { ...this.state.probeSettings };
-                const value = Number(e.target.value).toFixed(3) * 1;
+                const value = Math.abs(Number(e.target.value).toFixed(3) * 1);
                 const { units } = this.state;
 
-                const metricValue = units === 'mm' ? value : convertToMetric(value);
-                const imperialValue = units === 'in' ? value : convertToImperial(value);
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
 
                 this.setState({
                     probeSettings: {
@@ -309,11 +309,11 @@ class PreferencesPage extends PureComponent {
             },
             changeFastFeedrate: (e) => {
                 const probeSettings = { ...this.state.probeSettings };
-                const value = Number(e.target.value).toFixed(3) * 1;
+                const value = Math.abs(Number(e.target.value).toFixed(3) * 1);
                 const { units } = this.state;
 
-                const metricValue = units === 'mm' ? value : convertToMetric(value);
-                const imperialValue = units === 'in' ? value : convertToImperial(value);
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
 
                 this.setState({
                     probeSettings: {
@@ -326,12 +326,12 @@ class PreferencesPage extends PureComponent {
                 });
             },
             changeXYThickness: (e) => {
-                const value = Number(e.target.value);
+                const value = Math.abs(Number(e.target.value));
                 const probe = { ...this.state.probe };
                 const { units } = this.state;
 
-                const metricValue = units === 'mm' ? value : convertToMetric(value);
-                const imperialValue = units === 'in' ? value : convertToImperial(value);
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
 
                 this.setState({
                     probe: {
@@ -345,7 +345,7 @@ class PreferencesPage extends PureComponent {
                 pubsub.publish('probe:updated');
             },
             changeZThickness: (e) => {
-                const value = Number(e.target.value);
+                const value = Math.abs(Number(e.target.value));
                 const probe = { ...this.state.probe };
                 const { units } = this.state;
 
@@ -364,7 +364,7 @@ class PreferencesPage extends PureComponent {
                 pubsub.publish('probe:updated');
             },
             changePlateWidth: (e) => {
-                const value = Number(e.target.value);
+                const value = Math.abs(Number(e.target.value));
                 const probe = { ...this.state.probe };
 
                 const { units } = this.state;
@@ -383,7 +383,7 @@ class PreferencesPage extends PureComponent {
                 });
             },
             changePlateLength: (e) => {
-                const value = Number(e.target.value);
+                const value = Math.abs(Number(e.target.value));
                 const probe = { ...this.state.probe };
 
                 const { units } = this.state;
@@ -415,7 +415,7 @@ class PreferencesPage extends PureComponent {
         laser: {
             handleOffsetChange: (e, axis) => {
                 const { laser } = this.spindleConfig.get('laser');
-                const value = Number(e.target.value) || 0;
+                const value = Math.abs(Number(e.target.value)) || 0;
                 if (axis === 'X') {
                     this.spindleConfig.set('laser.xOffset', value);
                     this.setState({
@@ -435,7 +435,7 @@ class PreferencesPage extends PureComponent {
                 }
             },
             setPower: (val, type) => {
-                const amount = Number(val);
+                const amount = Math.abs(Number(val));
                 const { spindle, laser } = this.state;
 
                 if (!val || !type || amount < 0) {
@@ -451,7 +451,7 @@ class PreferencesPage extends PureComponent {
         },
         spindle: {
             setSpeed: (val, type) => {
-                const amount = Number(val);
+                const amount = Math.abs(Number(val));
                 const { spindle } = this.state;
 
                 if (!val || !type) {
