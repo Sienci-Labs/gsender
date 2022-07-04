@@ -68,6 +68,7 @@ class PreferencesPage extends PureComponent {
             autoReconnect: store.get('widgets.connection.autoReconnect', false),
             baudrate: store.get('widgets.connection.baudrate', 115200),
             safeRetractHeight: store.get('workspace.safeRetractHeight', 10),
+            customDecimalPlaces: store.get('workspace.customDecimalPlaces', 0),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -161,16 +162,10 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('safeHeight:update', value);
             },
-            setCustomInPlaces: (e) => {
+            setCustomDecimalPlaces: (e) => {
                 const value = Number(e.target.value);
                 this.setState({
-                    customInPlaces: value
-                });
-            },
-            setCustomMmPlaces: (e) => {
-                const value = Number(e.target.value);
-                this.setState({
-                    customMmPlaces: value
+                    customDecimalPlaces: value
                 });
             },
             setUnits: (units) => {
@@ -639,10 +634,11 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight, spindle } = this.state;
+        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight, customDecimalPlaces, spindle } = this.state;
 
         store.set('workspace.reverseWidgets', reverseWidgets);
         store.set('workspace.safeRetractHeight', safeRetractHeight);
+        store.set('workspace.customDecimalPlaces', customDecimalPlaces);
         store.set('widgets.connection.autoReconnect', autoReconnect);
         store.set('widgets.visualizer.theme', visualizer.theme);
         store.set('widgets.visualizer.disabled', visualizer.disabled);

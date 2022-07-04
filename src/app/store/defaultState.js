@@ -70,8 +70,7 @@ const defaultState = {
         units: METRIC_UNITS,
         reverseWidgets: false,
         safeRetractHeight: 0,
-        customMmPlaces: 3,
-        customInPlaces: 2,
+        customDecimalPlaces: 0,
         toolChangeOption: 'Ignore',
         toolChangeHooks: {
             preHook: '',
