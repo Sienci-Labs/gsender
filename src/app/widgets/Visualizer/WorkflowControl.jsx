@@ -95,7 +95,7 @@ class WorkflowControl extends PureComponent {
 
     handleClickUpload = () => {
         if (isElectron()) {
-            window.api.openUploadDialog();
+            window.ipcRenderer.send('open-upload-dialog');
         } else {
             this.fileInputEl.value = null;
             this.fileInputEl.click();
@@ -241,13 +241,13 @@ class WorkflowControl extends PureComponent {
 
     componentDidMount() {
         if (isElectron()) {
-            window.api.registerListener('loaded-recent-file', async (fileMetaData) => {
-                await this.loadRecentFile(fileMetaData);
+            window.ipcRenderer.on('loaded-recent-file', (msg, fileMetaData) => {
+                this.loadRecentFile(fileMetaData);
                 const recentFile = createRecentFile(fileMetaData);
                 addRecentFile(recentFile);
             });
-            window.api.registerListener('returned-upload-dialog-data', async (file) => {
-                await this.handleElectronFileUpload(file);
+            window.ipcRenderer.on('returned-upload-dialog-data', (msg, file) => {
+                this.handleElectronFileUpload(file);
             });
         }
         this.subscribe();
