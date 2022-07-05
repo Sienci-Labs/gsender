@@ -41,6 +41,7 @@ import store from '../../store';
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
+//import { GRBL } from '../../../server/controllers/Grbl/constants';
 
 
 class PreferencesPage extends PureComponent {
@@ -171,6 +172,9 @@ class PreferencesPage extends PureComponent {
                 this.setState({
                     customDecimalPlaces: value
                 });
+                // this.emit('controller:state', GRBL, this.state);
+                controller.command('statusreport');
+                //controller.command('reset');
             },
             setUnits: (units) => {
                 this.setState({
