@@ -163,7 +163,11 @@ class PreferencesPage extends PureComponent {
                 pubsub.publish('safeHeight:update', value);
             },
             setCustomDecimalPlaces: (e) => {
-                const value = Number(e.target.value);
+                let value = Math.abs(Number(e.target.value));
+                if (value < 0 || value > 5) {
+                    value = 0;
+                }
+                e.target.value = value;
                 this.setState({
                     customDecimalPlaces: value
                 });

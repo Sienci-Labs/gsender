@@ -10,7 +10,7 @@ const CustomDecimalPlaces = ({ state, actions }) => {
     return (
         <Fieldset legend="Custom Decimal Places">
             <Tooltip
-                content="Select 0 for default value and 1-5 to set custom places."
+                content="Select 0 for default value OR 1-5 to set custom places."
                 location="default"
             >
                 <Input

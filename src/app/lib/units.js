@@ -21,10 +21,11 @@
  *
  */
 
-import {
-    IMPERIAL_UNITS,
-    METRIC_UNITS
-} from '../constants';
+import { IMPERIAL_UNITS, METRIC_UNITS } from '../constants';
+import store from '../store';
+
+// This value is set by the user
+let customDecimalPlace = Number(store.get('workspace.customDecimalPlaces'));
 
 // Converts value from millimeters to inches
 export const mm2in = (val = 0) => val / 25.4;
@@ -35,13 +36,23 @@ export const in2mm = (val = 0) => val * 25.4;
 // Maps value to imperial units
 export const mapValueToImperialUnits = (val) => {
     val = Number(val) || 0;
-    return mm2in(val).toFixed(3) * 1;
+    console.log(customDecimalPlace);
+    if (customDecimalPlace === 0) {
+        return mm2in(val).toFixed(3) * 1;
+    } else {
+        return mm2in(val).toFixed(customDecimalPlace) * 1;
+    }
 };
 
 // Maps value to metric units
 export const mapValueToMetricUnits = (val) => {
     val = Number(val) || 0;
-    return val.toFixed(1) * 1;
+    console.log(customDecimalPlace);
+    if (customDecimalPlace === 0) {
+        return val.toFixed(1) * 1;
+    } else {
+        return val.toFixed(customDecimalPlace) * 1;
+    }
 };
 
 // Maps value to the specified units
@@ -60,13 +71,21 @@ export const mapValueToUnits = (val, units = METRIC_UNITS) => {
 // Maps position to imperial units
 export const mapPositionToImperialUnits = (pos) => {
     pos = Number(pos) || 0;
-    return mm2in(pos).toFixed(3);
+    if (customDecimalPlace === 0) {
+        return mm2in(pos).toFixed(3);
+    } else {
+        return mm2in(pos).toFixed(customDecimalPlace);
+    }
 };
 
 // Maps position to metric units
 export const mapPositionToMetricUnits = (pos) => {
     pos = Number(pos) || 0;
-    return pos.toFixed(2);
+    if (customDecimalPlace === 0) {
+        return pos.toFixed(2);
+    } else {
+        return pos.toFixed(customDecimalPlace);
+    }
 };
 
 // Maps position to the specified units
@@ -79,20 +98,36 @@ export const mapPositionToUnits = (pos, units = METRIC_UNITS) => {
     if (units === METRIC_UNITS) {
         return mapPositionToMetricUnits(pos);
     }
-    return Number(pos).toFixed(2) || 0;
+    if (customDecimalPlace === 0) {
+        return Number(pos).toFixed(2) || 0;
+    } else {
+        return Number(pos).toFixed(customDecimalPlace);
+    }
 };
 
 export const convertValueToImperialUnits = (pos) => {
     pos = Number(pos) || 0;
-    return mm2in(pos).toFixed(3);
+    if (customDecimalPlace === 0) {
+        return mm2in(pos).toFixed(3);
+    } else {
+        return mm2in(pos).toFixed(customDecimalPlace);
+    }
 };
 
 export const convertValueToMetricUnits = (pos) => {
     pos = Number(pos) || 0;
-    return in2mm(pos).toFixed(2);
+    if (customDecimalPlace === 0) {
+        return in2mm(pos).toFixed(2);
+    } else {
+        return in2mm(pos).toFixed(customDecimalPlace);
+    }
 };
 
-export const mapPositionToPreferredUnits = (pos, currentUnits, preferredUnits) => {
+export const mapPositionToPreferredUnits = (
+    pos,
+    currentUnits,
+    preferredUnits
+) => {
     if (currentUnits !== preferredUnits) {
         if (preferredUnits === IMPERIAL_UNITS) {
             return convertValueToImperialUnits(pos);
@@ -100,5 +135,9 @@ export const mapPositionToPreferredUnits = (pos, currentUnits, preferredUnits) =
             return convertValueToMetricUnits(pos);
         }
     }
-    return Number(pos).toFixed(3) || 0;
+    if (customDecimalPlace === 0) {
+        return Number(pos).toFixed(3) || 0;
+    } else {
+        return Number(pos).toFixed(customDecimalPlace);
+    }
 };
