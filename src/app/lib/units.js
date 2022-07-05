@@ -24,35 +24,47 @@
 import { IMPERIAL_UNITS, METRIC_UNITS } from '../constants';
 import store from '../store';
 
-// This value is set by the user
-let customDecimalPlace = Number(store.get('workspace.customDecimalPlaces'));
+//Function to set custom decimal places for VALUES
+const setDecimalPlacesValue = (defaultPlace, val, conversionType) => {
+    val = Number(val);
+    // This value is set by the user
+    let customDecimalPlace = Number(store.get('workspace.customDecimalPlaces'));
+    if (customDecimalPlace === 0) {
+        return conversionType(val).toFixed(defaultPlace);
+    } else {
+        return conversionType(val).toFixed(customDecimalPlace);
+    }
+};
+
+//Function to set custom decimal places for POSITIONS
+const setDecimalPlacesPosition = (defaultPlace, val) => {
+    val = Number(val);
+    // This value is set by the user
+    let customDecimalPlace = Number(store.get('workspace.customDecimalPlaces'));
+    if (customDecimalPlace === 0) {
+        return val.toFixed(defaultPlace);
+    } else {
+        return val.toFixed(customDecimalPlace);
+    }
+};
 
 // Converts value from millimeters to inches
 export const mm2in = (val = 0) => val / 25.4;
-
 // Converts values from inches to millimeters
 export const in2mm = (val = 0) => val * 25.4;
 
 // Maps value to imperial units
 export const mapValueToImperialUnits = (val) => {
     val = Number(val) || 0;
-    console.log(customDecimalPlace);
-    if (customDecimalPlace === 0) {
-        return mm2in(val).toFixed(3) * 1;
-    } else {
-        return mm2in(val).toFixed(customDecimalPlace) * 1;
-    }
+    let defaultDecimalPlace = 3;
+    return setDecimalPlacesValue(defaultDecimalPlace, val, mm2in);
 };
 
 // Maps value to metric units
 export const mapValueToMetricUnits = (val) => {
     val = Number(val) || 0;
-    console.log(customDecimalPlace);
-    if (customDecimalPlace === 0) {
-        return val.toFixed(1) * 1;
-    } else {
-        return val.toFixed(customDecimalPlace) * 1;
-    }
+    let defaultPlace = 1;
+    return setDecimalPlacesPosition(defaultPlace, val);
 };
 
 // Maps value to the specified units
@@ -71,21 +83,15 @@ export const mapValueToUnits = (val, units = METRIC_UNITS) => {
 // Maps position to imperial units
 export const mapPositionToImperialUnits = (pos) => {
     pos = Number(pos) || 0;
-    if (customDecimalPlace === 0) {
-        return mm2in(pos).toFixed(3);
-    } else {
-        return mm2in(pos).toFixed(customDecimalPlace);
-    }
+    let defaultDecimalPlace = 3;
+    return setDecimalPlacesValue(defaultDecimalPlace, pos, mm2in);
 };
 
 // Maps position to metric units
 export const mapPositionToMetricUnits = (pos) => {
     pos = Number(pos) || 0;
-    if (customDecimalPlace === 0) {
-        return pos.toFixed(2);
-    } else {
-        return pos.toFixed(customDecimalPlace);
-    }
+    let defaultPlace = 2;
+    return setDecimalPlacesPosition(defaultPlace, pos);
 };
 
 // Maps position to the specified units
@@ -98,29 +104,20 @@ export const mapPositionToUnits = (pos, units = METRIC_UNITS) => {
     if (units === METRIC_UNITS) {
         return mapPositionToMetricUnits(pos);
     }
-    if (customDecimalPlace === 0) {
-        return Number(pos).toFixed(2) || 0;
-    } else {
-        return Number(pos).toFixed(customDecimalPlace);
-    }
+    let defaultPlace = 2;
+    return setDecimalPlacesPosition(defaultPlace, pos);
 };
 
 export const convertValueToImperialUnits = (pos) => {
     pos = Number(pos) || 0;
-    if (customDecimalPlace === 0) {
-        return mm2in(pos).toFixed(3);
-    } else {
-        return mm2in(pos).toFixed(customDecimalPlace);
-    }
+    let defaultDecimalPlace = 3;
+    return setDecimalPlacesValue(defaultDecimalPlace, pos, mm2in);
 };
 
 export const convertValueToMetricUnits = (pos) => {
     pos = Number(pos) || 0;
-    if (customDecimalPlace === 0) {
-        return in2mm(pos).toFixed(2);
-    } else {
-        return in2mm(pos).toFixed(customDecimalPlace);
-    }
+    let defaultDecimalPlace = 3;
+    return setDecimalPlacesValue(defaultDecimalPlace, pos, in2mm);
 };
 
 export const mapPositionToPreferredUnits = (
@@ -135,9 +132,6 @@ export const mapPositionToPreferredUnits = (
             return convertValueToMetricUnits(pos);
         }
     }
-    if (customDecimalPlace === 0) {
-        return Number(pos).toFixed(3) || 0;
-    } else {
-        return Number(pos).toFixed(customDecimalPlace);
-    }
+    let defaultPlace = 3;
+    return setDecimalPlacesPosition(defaultPlace, pos);
 };
