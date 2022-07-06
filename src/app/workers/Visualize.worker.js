@@ -25,12 +25,11 @@ import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
 
 onmessage = function({ data }) {
-    const { content, visualizer } = data;
+    const { content, visualizer, isLaser = false } = data;
     const vertices = [];
     const colors = [];
     const frames = [];
     // Laser mode variables
-    const isLaser = true;
     const spindleSpeeds = new Set();
     let spindleSpeed = 0;
     let spindleOn = false;
