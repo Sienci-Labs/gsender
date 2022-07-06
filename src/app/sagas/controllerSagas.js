@@ -34,13 +34,9 @@ import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
-import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, LASER_MODE, SPINDLE_MODE } from 'app/constants';
+import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY } from 'app/constants';
+import { isLaserMode } from 'app/lib/laserMode';
 
-
-const isLaserMode = () => {
-    const mode = store.get('widgets.spindle.mode', SPINDLE_MODE);
-    return mode === LASER_MODE;
-};
 
 export function* initialize() {
     /* Health check - every 3 minutes */
