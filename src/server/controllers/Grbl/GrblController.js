@@ -1152,8 +1152,9 @@ class GrblController {
     }
 
     consumeFeederCB() {
-        this.feederCB();
-        this.feederCB = noop;
+        if (this.feederCB) {
+            this.feederCB();
+        }
     }
 
     command(cmd, ...args) {
@@ -1232,6 +1233,7 @@ class GrblController {
                 const [lineToStartFrom] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
+                console.log(startEventEnabled);
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
@@ -1313,13 +1315,13 @@ class GrblController {
                     this.command('gcode', modalGCode);
                 } else if (startEventEnabled) {
                     this.feederCB = () => {
-                        this.workflow.start();
-
                         // Feeder
                         this.feeder.reset();
-
+                        this.workflow.start();
                         // Sender
                         this.sender.next();
+                        this.feederCB = null;
+                        console.log(`CB: ${this.feederCB}`);
                     };
                     this.event.trigger('gcode:start');
                 } else {
