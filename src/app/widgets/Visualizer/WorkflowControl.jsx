@@ -38,7 +38,7 @@ import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import Input from 'app/containers/Preferences/components/Input';
-
+import { isLaserMode } from 'app/lib/laserMode';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import {
@@ -292,7 +292,7 @@ class WorkflowControl extends PureComponent {
             duration: TOASTER_UNTIL_CLOSE,
             msg: 'Generating outline for current file'
         });
-        controller.command('gcode:outline', gcode, 500);
+        controller.command('gcode:outline', gcode, 500, isLaserMode());
     }
 
     startFromLinePrompt = () => {
