@@ -172,9 +172,7 @@ class PreferencesPage extends PureComponent {
                 this.setState({
                     customDecimalPlaces: value
                 });
-                // this.emit('controller:state', GRBL, this.state);
-                controller.command('statusreport');
-                //controller.command('reset');
+                controller.command('checkStateUpdate');
             },
             setUnits: (units) => {
                 this.setState({
