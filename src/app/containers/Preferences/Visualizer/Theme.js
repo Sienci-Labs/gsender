@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 import map from 'lodash/map';
+import { useSelector } from 'react-redux';
 
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import { DARK_THEME, LIGHT_THEME, CUST_DARK_THEME, CUST_LIGHT_THEME,
@@ -40,6 +41,7 @@ const Theme = ({ state, actions }) => {
         value: BACKGROUND_PART,
         label: BACKGROUND_PART
     });
+    const fileLoaded = useSelector(store => store.file.fileLoaded);
 
     const themeRenderer = (option) => {
         const style = {
@@ -72,12 +74,13 @@ const Theme = ({ state, actions }) => {
                         searchable={false}
                         value={{ label: theme }}
                         valueRenderer={themeRenderer}
+                        isDisabled={fileLoaded}
                     />
                     <small>Colours used when visualizing a G-Code file.</small>
                 </div>
             </Tooltip>
             <Tooltip content="Toggle the part of the Visualizer to customize" location="default">
-                {(theme === CUST_DARK_THEME || theme === CUST_LIGHT_THEME) &&
+                {(theme === CUST_DARK_THEME || theme === CUST_LIGHT_THEME) && (
                     <div className={styles.addMargin}>
                         <Select
                             id="partSelect"
@@ -97,12 +100,17 @@ const Theme = ({ state, actions }) => {
                             searchable={false}
                             value={{ label: part.value }}
                             valueRenderer={themeRenderer}
+                            isDisabled={fileLoaded}
                         />
                         <small>Choose which part to customize.</small>
                     </div>
-                }
+                )}
             </Tooltip>
-            <ColorPicker actions={actions} theme={theme} part={part}/>
+            {
+                !fileLoaded
+                    ? <ColorPicker actions={actions} theme={theme} part={part} />
+                    : (<p className={styles.disabledMessage}>Unload file in the visualizer to edit the theme</p>)
+            }
         </Fieldset>
     );
 };
