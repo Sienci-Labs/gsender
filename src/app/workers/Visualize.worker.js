@@ -29,6 +29,21 @@ onmessage = function({ data }) {
     const vertices = [];
     const colors = [];
     const frames = [];
+    // Laser mode variables
+    const isLaser = true;
+    const spindleSpeeds = new Set();
+    let spindleSpeed = 0;
+    let spindleOn = false;
+
+    const updateSpindleStateFromLine = ({ words }) => {
+        const spindleMatches = words.filter((word) => word[0] === 'S');
+        const [spindleCommand, spindleValue] = spindleMatches[0] || [];
+        if (spindleCommand) {
+            spindleSpeeds.add(spindleValue);
+            spindleSpeed = spindleValue;
+            spindleOn = spindleValue > 0;
+        }
+    };
 
     const toolpath = new Toolpath({
         // @param {object} modal The modal object.
@@ -38,8 +53,11 @@ onmessage = function({ data }) {
             const { motion } = modal;
             const opacity = (motion === 'G0') ? 0.1 : 1;
             const color = [motion, opacity];
-            colors.push(color);
-            vertices.push(new THREE.Vector3(v2.x, v2.y, v2.z));
+            colors.push(color, color);
+            vertices.push(
+                new THREE.Vector3(v1.x, v1.y, v1.z),
+                new THREE.Vector3(v2.x, v2.y, v2.z)
+            );
         },
         // @param {object} modal The modal object.
         // @param {object} v1 A 3D vector of the start point.
@@ -88,17 +106,28 @@ onmessage = function({ data }) {
     });
 
     toolpath.loadFromStringSync(content, (line, index) => {
+        let spindleValues = {};
+        if (isLaser) {
+            updateSpindleStateFromLine(line);
+            //console.log(`Spindle: ${spindleOn} - ${line.line}`);
+            spindleValues = {
+                spindleOn,
+                spindleSpeed
+            };
+        }
         frames.push({
             data: line,
-            vertexIndex: vertices.length // remember current vertex index
+            vertexIndex: vertices.length, // remember current vertex index
+            ...spindleValues
         });
     });
-
 
     postMessage({
         vertices,
         colors,
         frames,
-        visualizer
+        visualizer,
+        spindleSpeeds,
+        isLaser
     });
 };
