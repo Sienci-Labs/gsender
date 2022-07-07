@@ -166,8 +166,6 @@ class GrblController {
 
     homingFlagSet = false;
 
-    testRunning = false;
-
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -1552,9 +1550,6 @@ class GrblController {
                 }
             },
             'gcode:test': () => {
-                // set flag so we know this is a test run
-                this.testRunning = true;
-
                 this.workflow.start();
                 this.feeder.reset();
                 this.command('gcode', '$c');
