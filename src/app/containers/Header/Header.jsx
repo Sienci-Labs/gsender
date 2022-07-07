@@ -23,6 +23,7 @@
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import without from 'lodash/without';
+import HeadlessIndicator from 'app/components/HeadlessIndicator';
 import Push from 'push.js';
 import isElectron from 'is-electron';
 import api from 'app/api';
@@ -197,6 +198,7 @@ class Header extends PureComponent {
     _isMounted = false;
 
     getInitialState() {
+        const showRemoteComponent = isElectron() && true; //TODO: Add hook to IPC main whether headless option passed
         let pushPermission = '';
         try {
             // Push.Permission.get() will throw an error if Push is not supported on this device
@@ -212,7 +214,8 @@ class Header extends PureComponent {
             currentVersion: settings.version,
             latestVersion: settings.version,
             updateAvailable: false,
-            connected: controller.connected
+            connected: controller.connected,
+            showRemoteComponent
         };
     }
 
@@ -284,6 +287,7 @@ class Header extends PureComponent {
     }
 
     render() {
+        const { updateAvailable, connected, showRemoteComponent } = this.state;
         const { updateAvailable } = this.state;
         return (
             <div className={ styles.navBar }>
@@ -294,7 +298,7 @@ class Header extends PureComponent {
                         actions={ this.actions }
                         widgetId="connection"
                     />
-                </div>
+                    {showRemoteComponent && <HeadlessIndicator />}
                 <NavSidebar />
             </div>
         );
