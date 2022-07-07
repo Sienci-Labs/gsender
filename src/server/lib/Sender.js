@@ -295,6 +295,7 @@ class Sender extends events.EventEmitter {
         }
 
         let lines = gcode.split('\n');
+        lines = lines.filter(line => (line.trim().length > 0));
 
         if (this.sp) {
             this.sp.clear();

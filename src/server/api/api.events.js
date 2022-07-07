@@ -206,6 +206,9 @@ export const update = (req, res) => {
         if (record.command !== undefined) {
             delete record.command;
         }
+        if (record.commands.length === 0) {
+            record.enabled = false;
+        }
 
         config.set(CONFIG_KEY, records);
 

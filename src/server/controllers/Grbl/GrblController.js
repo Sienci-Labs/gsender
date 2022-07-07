@@ -22,9 +22,6 @@
  */
 
 import ensureArray from 'ensure-array';
-import {
-    ensureString,
-} from 'ensure-type';
 import * as parser from 'gcode-parser';
 import Toolpath from 'gcode-toolpath';
 import _ from 'lodash';
@@ -153,7 +150,7 @@ class GrblController {
 
     // Feeder
     feeder = null;
-    feederCB = noop;
+    feederCB = null;
 
     // Sender
     sender = null;
@@ -230,10 +227,10 @@ class GrblController {
         // Feeder
         this.feeder = new Feeder({
             dataFilter: (line, context) => {
-                const original = line;
-                const parts = original.split(/;(.*)/s);
-                line = ensureString(parts[0]).trim();
-                let commentString = ensureString(parts[1]).trim();
+                let commentMatcher = /\s*;.*/g;
+                let comment = line.match(commentMatcher);
+                const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
+                line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
 
                 if (line[0] === '%') {
@@ -343,13 +340,15 @@ class GrblController {
             // Deduct the buffer size to prevent from buffer overrun
             bufferSize: (128 - 28), // The default buffer size is 128 bytes
             dataFilter: (line, context) => {
+                // Remove comments that start with a semicolon `;`
+                let commentMatcher = /\s*;.*/g;
+                let bracketCommentLine = /^\s*\([^\)]*\)/gm;
                 let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
-                const original = line;
-                const parts = original.split(/;(.*)/s);
-                line = ensureString(parts[0]).trim();
-                let commentString = ensureString(parts[1]).trim();
+                line = line.replace(bracketCommentLine, '').trim();
+                let comment = line.match(commentMatcher);
+                let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
+                line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
-                line = line.replace(/^\s*\([^\)]*\)/gm, '').trim(); // make sure lines that are only comments aren't sent
 
                 const { sent, received } = this.sender.state;
 
@@ -1152,8 +1151,9 @@ class GrblController {
     }
 
     consumeFeederCB() {
-        this.feederCB();
-        this.feederCB = noop;
+        if (this.feederCB) {
+            this.feederCB();
+        }
     }
 
     command(cmd, ...args) {
@@ -1232,6 +1232,7 @@ class GrblController {
                 const [lineToStartFrom] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
+                console.log(startEventEnabled);
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
@@ -1313,13 +1314,12 @@ class GrblController {
                     this.command('gcode', modalGCode);
                 } else if (startEventEnabled) {
                     this.feederCB = () => {
-                        this.workflow.start();
-
                         // Feeder
                         this.feeder.reset();
-
+                        this.workflow.start();
                         // Sender
                         this.sender.next();
+                        this.feederCB = null;
                     };
                     this.event.trigger('gcode:start');
                 } else {

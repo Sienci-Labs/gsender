@@ -63,8 +63,8 @@ class EventTrigger {
         events
             .filter(event => event && event.event === 'gcode:start')
             .forEach(options => {
-                const { enabled } = { ...options };
-                if (enabled) {
+                const { enabled, commands } = { ...options };
+                if (enabled && commands.length > 0) {
                     isEnabled = true;
                 }
             });
