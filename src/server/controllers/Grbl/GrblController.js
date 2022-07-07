@@ -150,7 +150,7 @@ class GrblController {
 
     // Feeder
     feeder = null;
-    feederCB = noop;
+    feederCB = null;
 
     // Sender
     sender = null;
@@ -1320,7 +1320,6 @@ class GrblController {
                         // Sender
                         this.sender.next();
                         this.feederCB = null;
-                        console.log(`CB: ${this.feederCB}`);
                     };
                     this.event.trigger('gcode:start');
                 } else {
