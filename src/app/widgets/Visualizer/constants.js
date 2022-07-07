@@ -52,7 +52,6 @@ export const PRIMARY_COLOR = '#3E85C7'; // Light Blue
 export const BORDER_COLOR = '#9CA3AF';
 export const SECONDARY_COLOR = '#6F7376'; // Grey (for disabled look)
 
-
 export const DARK_THEME_VALUES = {
     backgroundColor: '#111827', //Navy Blue
     gridColor: '#77a9d7', // Turqoise / Light Blue
@@ -78,10 +77,25 @@ export const LIGHT_THEME_VALUES = {
     cuttingCoordinateLines: '#000000',
     joggingCoordinateLines: '#0ef6ae', // Light Green
     G0Color: '#0ef6ae', // Light Green
-    G1Color: '#111827', // Light Blue
-    G2Color: '#111827', // Light Blue
-    G3Color: '#111827', // Light Blue
+    G1Color: '#111827', // Dark Blue
+    G2Color: '#111827', // Dark Blue
+    G3Color: '#111827', // Dark Blue
 };
 
 export const DARK_THEME = 'Dark';
 export const LIGHT_THEME = 'Light';
+export const CUST_DARK_THEME = 'Custom Dark';
+export const CUST_LIGHT_THEME = 'Custom Light';
+
+export const BACKGROUND_PART = 'Background';
+export const GRID_PART = 'Grid';
+export const XAXIS_PART = 'X Axis';
+export const YAXIS_PART = 'Y Axis';
+export const ZAXIS_PART = 'Z Axis';
+export const LIMIT_PART = 'Limit';
+export const CUTTING_PART = 'Cutting Coordinates Lines';
+export const JOGGING_PART = 'Jogging Coordinates Lines';
+export const G0_PART = 'G0';
+export const G1_PART = 'G1';
+export const G2_PART = 'G2';
+export const G3_PART = 'G3';

@@ -22,9 +22,12 @@
  */
 
 import React from 'react';
+import { Provider as ReduxProvider } from 'react-redux';
+import reduxStore from 'app/store/redux';
 
 import SettingWrapper from '../components/SettingWrapper';
 import GeneralArea from '../components/GeneralArea';
+
 
 import VisualizerOptions from './VisualizerOptions';
 import Theme from './Theme';
@@ -32,14 +35,16 @@ import Theme from './Theme';
 const VisualizerSettings = ({ active, state, actions }) => {
     return (
         <SettingWrapper title="Visualizer" show={active}>
-            <GeneralArea>
-                <GeneralArea.Half>
-                    <VisualizerOptions state={state} actions={actions} />
-                </GeneralArea.Half>
-                <GeneralArea.Half>
-                    <Theme state={state} actions={actions} />
-                </GeneralArea.Half>
-            </GeneralArea>
+            <ReduxProvider store={reduxStore}>
+                <GeneralArea>
+                    <GeneralArea.Half>
+                        <VisualizerOptions state={state} actions={actions} />
+                    </GeneralArea.Half>
+                    <GeneralArea.Half>
+                        <Theme state={state} actions={actions} />
+                    </GeneralArea.Half>
+                </GeneralArea>
+            </ReduxProvider>
         </SettingWrapper>
     );
 };
