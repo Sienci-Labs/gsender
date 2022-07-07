@@ -857,11 +857,7 @@ class VisualizerWidget extends PureComponent {
             this.actions.reset();
         },
         TEST_RUN: () => {
-            const gcode = this.state.gcode.content;
-            const lines = gcode.split('\n');
-            const testLines = ['$C', ...lines, '$C'];
-            controller.command('gcode', testLines);
-            this.actions.onRunClick();
+            controller.command('gcode:test');
         },
         START_JOB: () => {
             if (this.workflowControl) {
