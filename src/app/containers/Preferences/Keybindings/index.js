@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 
 import TabbedWidget from 'app/components/TabbedWidget';
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
-import store from '../../../store';
+import ReactToPrint from 'react-to-print';
+import ShortcutTable from './ShortcutTable';
 
 import KeyboardShortcuts from './Keybindings';
 import Joystick from './Joystick';
-//import { downloadShortcuts } from './helpers';
 
 import SettingWrapper from '../components/SettingWrapper';
 import styles from '../index.styl';
@@ -28,51 +27,21 @@ const tabs = [
 
 const Shortcuts = ({ active }) => {
     const [tab, setTab] = useState(0);
-    const [shortcuts, setShortcuts] = useState([
-        { },
-    ]);
-
-    useEffect(() => {
-        setShortcuts(store.get('commandKeys'));
-    }, []);
-
+    //const [display, setDisplay] = useState('none');
+    const componentRef = useRef();
     return (
         <SettingWrapper title="Shortcuts" show={active}>
             <TabbedWidget>
-                <div className={styles.shortcutWrapper}>
-                    <ReactHTMLTableToExcel
-                        id="test-table-xls-button"
-                        className="download-table-xls-button"
-                        table="table-to-xls"
-                        filename="shortcuts"
-                        sheet="shortcuts"
-                        buttonText="Download to print"
-                    />
-                    <table id="table-to-xls" style={{ display: 'none' }}>
-                        <thead>
-                            <tr>
-                                <th>Action</th>
-                                <th>Shortcut</th>
-                                <th>Category</th>
-                                <th>Active Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {shortcuts.map((shortcut) => {
-                                const { title, keys, category, isActive } =
-                                shortcut;
-                                return (
-                                    <tr key={title}>
-                                        <td>{title}</td>
-                                        <td>{keys}</td>
-                                        <td>{category}</td>
-                                        <td>{isActive}</td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+                <ReactToPrint
+                    trigger={() => {
+                        return <button>Print</button>;
+                    }}
+                    content={() => componentRef.current}
+                    documentTitle="Shortcuts"
+                    // onBeforePrint={() => setDisplay('block')}
+                    // onAfterPrint={() => setDisplay('none')}
+                />
+                <ShortcutTable forwardRef={componentRef} />
                 <TabbedWidget.Tabs
                     tabs={tabs}
                     activeTabIndex={tab}

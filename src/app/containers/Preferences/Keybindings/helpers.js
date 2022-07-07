@@ -22,7 +22,6 @@
  */
 
 import React, { Fragment } from 'react';
-import store from '../../../store';
 
 export const formatShortcut = (shortcut = [], isActive = true) => {
     const output = [];
@@ -39,31 +38,4 @@ export const formatShortcut = (shortcut = [], isActive = true) => {
     }
 
     return output;
-};
-
-export const downloadShortcuts = () => {
-    const shortcuts = store.get('commandKeys');
-
-    // console.log(shortcuts);
-
-    const printJob = JSON.stringify(shortcuts, null, 1);
-    const data = new Blob([printJob], {
-        type: 'text/html',
-    });
-
-    const today = new Date();
-    const filename = `Shortcuts-${today.toLocaleDateString()}-${today.toLocaleTimeString()}`;
-
-    // IE11 & Edge
-    if (navigator.msSaveBlob) {
-        navigator.msSaveBlob(data, filename);
-    } else {
-        // In FF link must be added to DOM to be clicked
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(data);
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
 };
