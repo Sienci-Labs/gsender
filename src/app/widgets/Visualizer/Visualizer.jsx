@@ -48,6 +48,7 @@ import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
 import _ from 'lodash';
 import store from 'app/store';
+import api from 'app/api';
 import { Toaster, TOASTER_DANGER, TOASTER_UNTIL_CLOSE } from '../../lib/toaster/ToasterLib';
 import controller from '../../lib/controller';
 import { getBoundingBox, loadSTL, loadTexture } from './helpers';
@@ -426,6 +427,11 @@ class Visualizer extends Component {
         });
     }
 
+    async uploadGCodeFile (gcode) {
+        const serializedFile = new File([gcode], 'surfacing.gcode');
+        await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
+    }
+
     rerenderGCode() {
         const { actions, state } = this.props;
         const { gcode } = state;
@@ -436,6 +442,9 @@ class Visualizer extends Component {
         }
         if (gcode.content) {
             actions.loadGCode('', gcode.content);
+        } else {
+            // reupload the file to update the colours
+            this.uploadGCodeFile(reduxStore.getState().file.content);
         }
     }
 
@@ -503,12 +512,146 @@ class Visualizer extends Component {
         }
     }
 
+    recolorGrids() {
+        const { currentTheme } = this.props.state;
+        const { gridColor } = currentTheme;
+        const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
+        const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
+
+        { // Imperial Coordinate System
+            _each(impGroup.getObjectByName('GridLine').children, (o) => {
+                o.material.color.set(gridColor);
+            });
+        }
+
+        { // Metric Coordinate System
+            _each(metGroup.getObjectByName('GridLine').children, (o) => {
+                o.material.color.set(gridColor);
+            });
+        }
+
+        this.recolorGridLabels(IMPERIAL_UNITS);
+        this.recolorGridLabels(METRIC_UNITS);
+        this.recolorGridNumbers(IMPERIAL_UNITS);
+        this.recolorGridNumbers(METRIC_UNITS);
+    }
+
+    recolorGridLabels(units) {
+        const { mm, in: inches } = this.machineProfile;
+        const inchesMax = Math.max(inches.width, inches.depth) + (IMPERIAL_GRID_SPACING * 10);
+        const mmMax = Math.max(mm.width, mm.depth) + (METRIC_GRID_SPACING * 10);
+
+        const axisLength = (units === IMPERIAL_UNITS) ? inchesMax : mmMax;
+        const height = (units === IMPERIAL_UNITS) ? inches.height : mm.height;
+
+        const { currentTheme } = this.props.state;
+        const { xAxisColor, yAxisColor, zAxisColor } = currentTheme;
+
+        const unitGroup = units === IMPERIAL_UNITS ?
+            this.group.getObjectByName('ImperialCoordinateSystem')
+            : this.group.getObjectByName('MetricCoordinateSystem');
+
+        unitGroup.remove(unitGroup.getObjectByName('xAxis'));
+        unitGroup.remove(unitGroup.getObjectByName('yAxis'));
+        unitGroup.remove(unitGroup.getObjectByName('zAxis'));
+
+        { // Axis Labels
+            const axisXLabel = new TextSprite({
+                x: axisLength + 10,
+                y: 0,
+                z: 0,
+                size: 20,
+                text: 'X',
+                color: xAxisColor
+            });
+            axisXLabel.name = 'xAxis';
+            const axisYLabel = new TextSprite({
+                x: 0,
+                y: axisLength + 10,
+                z: 0,
+                size: 20,
+                text: 'Y',
+                color: yAxisColor
+            });
+            axisYLabel.name = 'yAxis';
+            const axisZLabel = new TextSprite({
+                x: 0,
+                y: 0,
+                z: height + 10,
+                size: 20,
+                text: 'Z',
+                color: zAxisColor
+            });
+            axisZLabel.name = 'zAxis';
+
+            unitGroup.add(axisXLabel);
+            unitGroup.add(axisYLabel);
+            unitGroup.add(axisZLabel);
+        }
+    }
+
+    recolorGridNumbers(units) {
+        const { mm, in: inches } = this.machineProfile;
+
+        const inchesMax = Math.max(inches.width, inches.depth) + (IMPERIAL_GRID_SPACING * 10);
+        const mmMax = Math.max(mm.width, mm.depth) + (METRIC_GRID_SPACING * 10);
+
+        const imperialGridCount = Math.round(inchesMax / 3);
+        const metricGridCount = Math.round(mmMax / 9);
+
+        const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
+        const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
+        const textSize = (units === IMPERIAL_UNITS) ? (25.4 / 3) : (10 / 3);
+        const textOffset = (units === IMPERIAL_UNITS) ? (25.4 / 5) : (10 / 5);
+
+        const { currentTheme } = this.props.state;
+        const { xAxisColor, yAxisColor } = currentTheme;
+
+        const unitGroup = units === IMPERIAL_UNITS ?
+            this.group.getObjectByName('ImperialGridLineNumbers')
+            : this.group.getObjectByName('MetricGridLineNumbers');
+
+        for (let i = -gridCount; i <= gridCount; ++i) {
+            if (i !== 0) {
+                unitGroup.remove(unitGroup.getObjectByName('xtextLabel' + i));
+                const xtextLabel = new TextSprite({
+                    x: i * gridSpacing,
+                    y: textOffset,
+                    z: 0,
+                    size: textSize,
+                    text: (units === IMPERIAL_UNITS) ? i : i * 10,
+                    textAlign: 'center',
+                    textBaseline: 'bottom',
+                    color: xAxisColor,
+                    opacity: 0.5
+                });
+                xtextLabel.name = 'xtextLabel' + i;
+                unitGroup.add(xtextLabel);
+
+                unitGroup.remove(unitGroup.getObjectByName('ytextLabel' + i));
+                const ytextLabel = new TextSprite({
+                    x: -textOffset,
+                    y: i * gridSpacing,
+                    z: 0,
+                    size: textSize,
+                    text: (units === IMPERIAL_UNITS) ? i : i * 10,
+                    textAlign: 'right',
+                    textBaseline: 'middle',
+                    color: yAxisColor,
+                    opacity: 0.5
+                });
+                ytextLabel.name = 'ytextLabel' + i;
+                unitGroup.add(ytextLabel);
+            }
+        }
+    }
+
     recolorScene() {
         const { currentTheme } = this.props.state;
         const { backgroundColor } = currentTheme;
         // Handle Background color
         this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
-        this.redrawGrids();
+        this.recolorGrids();
         this.rerenderGCode();
     }
 
@@ -704,6 +847,7 @@ class Visualizer extends Component {
                 text: 'X',
                 color: xAxisColor
             });
+            axisXLabel.name = 'xAxis';
             const axisYLabel = new TextSprite({
                 x: 0,
                 y: axisLength + 10,
@@ -712,6 +856,7 @@ class Visualizer extends Component {
                 text: 'Y',
                 color: yAxisColor
             });
+            axisYLabel.name = 'yAxis';
             const axisZLabel = new TextSprite({
                 x: 0,
                 y: 0,
@@ -720,6 +865,7 @@ class Visualizer extends Component {
                 text: 'Z',
                 color: zAxisColor
             });
+            axisZLabel.name = 'zAxis';
 
             group.add(axisXLabel);
             group.add(axisYLabel);
@@ -761,6 +907,7 @@ class Visualizer extends Component {
                     color: xAxisColor,
                     opacity: 0.5
                 });
+                textLabel.name = 'xtextLabel' + i;
                 group.add(textLabel);
             }
         }
@@ -777,6 +924,7 @@ class Visualizer extends Component {
                     color: yAxisColor,
                     opacity: 0.5
                 });
+                textLabel.name = 'ytextLabel' + i;
                 group.add(textLabel);
             }
         }

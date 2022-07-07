@@ -41,6 +41,7 @@ import store from '../../store';
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
+import { CUST_LIGHT_THEME, DARK_THEME, DARK_THEME_VALUES, LIGHT_THEME, LIGHT_THEME_VALUES } from '../../widgets/Visualizer/constants';
 
 
 class PreferencesPage extends PureComponent {
@@ -482,10 +483,109 @@ class PreferencesPage extends PureComponent {
                 this.setState({
                     visualizer: {
                         ...visualizer,
-                        theme: theme.value
+                        theme: theme.value,
                     }
                 });
                 pubsub.publish('theme:change', theme.value);
+            },
+            handleCustThemeChange: (theme, part) => {
+                const { visualizer } = this.state;
+                this.visualizerConfig.set(theme + ' ' + part,
+                    this.visualizerConfig.get('temp ' + theme + ' ' + part));
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        theme: theme
+                    }
+                });
+                pubsub.publish('theme:change', theme);
+            },
+            handleChangeComplete: (color, part) => {
+                const { visualizer } = this.state;
+                this.visualizerConfig.set('temp ' + visualizer.theme + ' ' + part, color.hex);
+            },
+            handlePartChange: () => {
+                pubsub.publish('part:change');
+            },
+            getDefaultColour: (theme, part) => {
+                let defaultColour;
+                let themeType = DARK_THEME_VALUES;
+                if (theme === CUST_LIGHT_THEME) {
+                    themeType = LIGHT_THEME_VALUES;
+                }
+                switch (part) {
+                case 'Background':
+                    defaultColour = themeType.backgroundColor;
+                    break;
+                case 'Grid':
+                    defaultColour = themeType.gridColor;
+                    break;
+                case 'X Axis':
+                    defaultColour = themeType.xAxisColor;
+                    break;
+                case 'Y Axis':
+                    defaultColour = themeType.yAxisColor;
+                    break;
+                case 'Z Axis':
+                    defaultColour = themeType.zAxisColor;
+                    break;
+                case 'Limit':
+                    defaultColour = themeType.limitColor;
+                    break;
+                case 'Cutting Coordinates Lines':
+                    defaultColour = themeType.cuttingCoordinateLines;
+                    break;
+                case 'Jogging Coordinates Lines':
+                    defaultColour = themeType.joggingCoordinateLines;
+                    break;
+                case 'G0':
+                    defaultColour = themeType.G0Color;
+                    break;
+                case 'G1':
+                    defaultColour = themeType.G1Color;
+                    break;
+                case 'G2':
+                    defaultColour = themeType.G2Color;
+                    break;
+                case 'G3':
+                    defaultColour = themeType.G3Color;
+                    break;
+                default:
+                    defaultColour = '#000000';
+                }
+                return defaultColour;
+            },
+            getCurrentColor: (part, defaultColour) => {
+                const { visualizer } = this.state;
+                if (visualizer.theme === LIGHT_THEME) {
+                    return LIGHT_THEME_VALUES.backgroundColor;
+                } else if (visualizer.theme === DARK_THEME) {
+                    return DARK_THEME_VALUES.backgroundColor;
+                } else {
+                    return this.visualizerConfig.get(visualizer.theme + ' ' + part)
+                        ? this.visualizerConfig.get(visualizer.theme + ' ' + part)
+                        : defaultColour;
+                }
+            },
+            resetCustomThemeColours: (theme) => {
+                let themeColours = DARK_THEME_VALUES;
+                if (theme === CUST_LIGHT_THEME) {
+                    themeColours = LIGHT_THEME_VALUES;
+                }
+                this.visualizerConfig.set(theme + ' Background', themeColours.backgroundColor);
+                this.visualizerConfig.set(theme + ' Grid', themeColours.gridColor);
+                this.visualizerConfig.set(theme + ' X Axis', themeColours.xAxisColor);
+                this.visualizerConfig.set(theme + ' Y Axis', themeColours.yAxisColor);
+                this.visualizerConfig.set(theme + ' Z Axis', themeColours.zAxisColor);
+                this.visualizerConfig.set(theme + ' Limit', themeColours.limitColor);
+                this.visualizerConfig.set(theme + ' Cutting Coordinate Lines', themeColours.cuttingCoordinateLines);
+                this.visualizerConfig.set(theme + ' Jogging Coordinate Lines', themeColours.joggingCoordinateLines);
+                this.visualizerConfig.set(theme + ' G0', themeColours.G0Color);
+                this.visualizerConfig.set(theme + ' G1', themeColours.G1Color);
+                this.visualizerConfig.set(theme + ' G2', themeColours.G2Color);
+                this.visualizerConfig.set(theme + ' G3', themeColours.G3Color);
+
+                pubsub.publish('theme:change');
             },
             handleVisEnabledToggle: (liteMode = false) => {
                 const { visualizer } = this.state;
