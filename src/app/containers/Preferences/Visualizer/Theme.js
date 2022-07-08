@@ -9,7 +9,7 @@ import {
     BACKGROUND_PART, GRID_PART, XAXIS_PART, YAXIS_PART, ZAXIS_PART,
     LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART, G2_PART, G3_PART
 }
-    from 'app/widgets/Visualizer/constants';
+from 'app/widgets/Visualizer/constants';
 import Fieldset from '../components/Fieldset';
 import ColorPicker from '../components/ColorPicker';
 
