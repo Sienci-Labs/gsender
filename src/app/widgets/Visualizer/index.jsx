@@ -69,6 +69,7 @@ import {
     GRBL_ACTIVE_STATE_HOLD,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
+    GRBL_ACTIVE_STATE_CHECK,
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
@@ -1017,7 +1018,7 @@ class VisualizerWidget extends PureComponent {
             return false;
         }
         if (controllerType === GRBL) {
-            if (activeState !== GRBL_ACTIVE_STATE_RUN) {
+            if (activeState !== GRBL_ACTIVE_STATE_RUN && activeState !== GRBL_ACTIVE_STATE_CHECK) {
                 return false;
             }
         }
