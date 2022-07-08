@@ -22,17 +22,19 @@
  */
 
 import React from 'react';
-import styles from './index.styl';
+import styles from '../../index.styl';
+import ReconnectButton from './ReconnectButton';
 
-const ReconnectButton = ({ onClick }) => {
+const NotConnectedWarning = ({ onReconnectClick }) => {
     return (
-        <button onClick={onClick} className={styles.reconnectButton}>
-            <div className={styles.reconnectIcon}>
-                <i className="fas fa-plug" />
-            </div>
-            <div className={styles.reconnectButtonText}>Connect on last active port</div>
-        </button>
+        <div className={styles.notConnectedWrapper}>
+            <h1 className={styles.warningHeader}>You must be connected to change the GRBL EEPROM settings.</h1>
+            <p className={styles.warningExplanation}>
+                Connect to your last connected device using the button below or exit this window and connect to a different device.
+            </p>
+            <ReconnectButton onClick={onReconnectClick} />
+        </div>
     );
 };
 
-export default ReconnectButton;
+export default NotConnectedWarning;
