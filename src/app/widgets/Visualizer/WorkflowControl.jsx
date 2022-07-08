@@ -335,7 +335,7 @@ class WorkflowControl extends PureComponent {
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
         const canRun = this.canRun();
-        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
+        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && activeState !== GRBL_ACTIVE_STATE_CHECK && includes([WORKFLOW_STATE_RUNNING], workflowState);
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
