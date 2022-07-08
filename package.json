@@ -294,6 +294,7 @@
     "react-sortablejs": "~1.5.1",
     "react-switch": "^6.0.0",
     "react-tiny-virtual-list": "~2.2.0",
+    "react-to-print": "^2.14.7",
     "react-toggle": "~4.0.2",
     "recompose": "~0.30.0",
     "redux": "~4.0.1",
