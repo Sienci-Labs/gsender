@@ -10,11 +10,11 @@ const CustomDecimalPlaces = ({ state, actions }) => {
     return (
         <Fieldset legend="Custom Decimal Places">
             <Tooltip
-                content="Select 0 for default value OR 1-5 to set custom places."
+                content="Default Value = 0 (2 decimal places for mm and 3 for inches). Anything other than 0 sets both MM and Inches to the selected decimal places. Min = 1, Max = 5"
                 location="default"
             >
                 <Input
-                    label="10ˣ Places"
+                    label="Precision"
                     value={customDecimalPlaces}
                     onChange={(e) => actions.general.setCustomDecimalPlaces(e)}
                     additionalProps={{
