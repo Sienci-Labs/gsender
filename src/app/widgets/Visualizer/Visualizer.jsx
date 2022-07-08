@@ -1335,8 +1335,8 @@ class Visualizer extends Component {
 
         if (this.viewport && dX > 0 && dY > 0) {
             // The minimum viewport is 50x50mm
-            const width = Math.max(dX, 50);
-            const height = Math.max(dY, 50);
+            const width = Math.max(dX + 50, 100);
+            const height = Math.max(dY + 50, 100);
             const target = new THREE.Vector3(0, 0, bbox.max.z);
             this.viewport.set(width, height, target);
         }
