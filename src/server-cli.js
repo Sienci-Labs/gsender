@@ -63,14 +63,14 @@ const parseMountPoint = (val, acc) => {
 const parseController = (val) => {
     val = val ? (val + '').toLowerCase() : '';
 
-    if (['grbl', 'marlin', 'smoothie', 'tinyg', 'g2core'].includes(val)) {
+    if (['grbl'].includes(val)) {
         return val;
     } else {
         return '';
     }
 };
 
-const defaultHost = isElectron() ? '0.0.0.0' : '127.0.0.1';
+const defaultHost = isElectron() ? '127.0.0.1' : '0.0.0.0';
 const defaultPort = isElectron() ? 0 : 8000;
 
 program
@@ -84,8 +84,8 @@ program
     .option('-m, --mount <route-path>:<target>', 'Add a mount point for serving static files', parseMountPoint, [])
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
-    .option('--headless', 'Allow remote access to the server (default: false)')
-    .option('--controller <type>', 'Specify CNC controller: Grbl|Marlin|Smoothie|TinyG|g2core (default: \'\')', parseController, '');
+    .option('--headless', 'Allow remote access to the server (default: false)', false)
+    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, '');
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
 // This is not the case when running from a packaged Electron app. Here you have the first value appname and then args.

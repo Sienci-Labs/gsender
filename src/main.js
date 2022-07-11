@@ -31,18 +31,15 @@ import isOnline from 'is-online';
 import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
-//import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
-//import './sentryInit';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
-import { loadConfig, persistConfig } from './electron-app/store';
+import { persistConfig } from './electron-app/store';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 
 
 let windowManager = null;
-let powerSaverId = null;
 let appConfig = null;
 
 const main = () => {
@@ -78,9 +75,6 @@ const main = () => {
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
 
-    // Load app config into variable
-    const filePath = path.join(app.getPath('userData'), 'gsender-0.5.6.json');
-    //appConfig = loadConfig(filePath);
 
     app.whenReady().then(async () => {
         try {
@@ -126,7 +120,7 @@ const main = () => {
             const window = windowManager.openWindow(url, options, splashScreen);
 
             // Power saver - display sleep higher precedence over app suspension
-            powerSaverId = powerSaveBlocker.start('prevent-display-sleep');
+            powerSaveBlocker.start('prevent-display-sleep');
             powerMonitor.on('lock-screen', () => {
                 powerSaveBlocker.start('prevent-display-sleep');
             });
@@ -150,7 +144,7 @@ const main = () => {
 
             ipcMain.once('restart_app', async () => {
                 await autoUpdater.downloadUpdate();
-                autoUpdater.quitAndInstall(false, true);
+                autoUpdater.quitAndInstall(false, false);
             });
 
             ipcMain.on('load-recent-file', async (msg, recentFile) => {
@@ -165,20 +159,6 @@ const main = () => {
             /**
              * gSender config events - move electron store changes out of renderer process
              */
-            ipcMain.handle('get-app-path', (event) => {
-                return path.join(app.getPath('userData'), 'gsender-0.5.6.json');
-            });
-
-            ipcMain.handle('get-app-config', (event) => {
-                return appConfig;
-            });
-
-            ipcMain.on('persist-app-config', (event, filename, state) => {
-                const filePath = path.join(app.getPath('userData'), filename);
-                persistConfig(filePath, state);
-                appConfig = state;
-            });
-
             ipcMain.on('open-upload-dialog', async () => {
                 try {
                     let additionalOptions = {};

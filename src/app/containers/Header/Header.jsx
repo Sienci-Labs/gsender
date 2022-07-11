@@ -287,11 +287,10 @@ class Header extends PureComponent {
     }
 
     render() {
-        const { updateAvailable, connected, showRemoteComponent } = this.state;
-        const { updateAvailable } = this.state;
+        const { updateAvailable, showRemoteComponent } = this.state;
         return (
-            <div className={ styles.navBar }>
-                <div className={ styles.primary }>
+            <div className={styles.navBar}>
+                <div className={styles.primary}>
                     <NavLogo updateAvailable={ updateAvailable } onClick={ () => this.toggleUpdateToast() }/>
                     <NavbarConnection
                         state={ this.state }
@@ -299,6 +298,7 @@ class Header extends PureComponent {
                         widgetId="connection"
                     />
                     {showRemoteComponent && <HeadlessIndicator />}
+                </div>
                 <NavSidebar />
             </div>
         );
