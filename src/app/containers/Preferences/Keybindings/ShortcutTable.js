@@ -26,7 +26,6 @@ function ShortcutTable({ forwardRef }) {
                     </thead>
                     <tbody>
                         {shortcuts.map((shortcut) => {
-                            console.log(shortcut);
                             const { title, keys, category } = shortcut;
                             return keys ? (
                                 <tr key={title || '-'}>
