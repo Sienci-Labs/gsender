@@ -97,6 +97,8 @@ class SpindleWidget extends PureComponent {
 
     pubsubTokens = [];
 
+    isLaserOn = false;
+
     actions = {
         handleModeToggle: () => {
             const { mode } = this.state;
@@ -131,12 +133,14 @@ class SpindleWidget extends PureComponent {
             }
         },
         sendM5: () => {
+            this.isLaserOn = false;
             controller.command('gcode', 'M5 S0');
         },
         sendLaserM3: () => {
             const { laser } = this.state;
             const { power } = laser;
             const laserPower = laser.maxPower * (power / 100);
+            this.isLaserOn = true;
 
             controller.command('gcode', `G1F1 M3 S${laserPower}`);
         },
@@ -148,7 +152,11 @@ class SpindleWidget extends PureComponent {
         },
         handleLaserPowerChange: (e) => {
             const { laser } = this.state;
+            const { power, maxPower } = laser;
             const value = Number(e.target.value);
+            if (this.isLaserOn) {
+                controller.command('laserpower:change', power, maxPower);
+            }
             this.setState({
                 laser: {
                     ...laser,
