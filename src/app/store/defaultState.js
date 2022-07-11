@@ -67,6 +67,8 @@ const defaultState = {
         units: METRIC_UNITS,
         reverseWidgets: false,
         safeRetractHeight: 0,
+        jobsFinished: 0,
+        timeSpentRunning: 0,
         toolChangeOption: 'Ignore',
         toolChangeHooks: {
             preHook: '',
