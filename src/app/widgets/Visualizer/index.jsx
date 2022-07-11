@@ -69,6 +69,7 @@ import {
     GRBL_ACTIVE_STATE_HOLD,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
+    GRBL_ACTIVE_STATE_CHECK,
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
@@ -857,11 +858,7 @@ class VisualizerWidget extends PureComponent {
             this.actions.reset();
         },
         TEST_RUN: () => {
-            const gcode = this.state.gcode.content;
-            const lines = gcode.split('\n');
-            const testLines = ['$C', ...lines, '$C'];
-            controller.command('gcode', testLines);
-            this.actions.onRunClick();
+            controller.command('gcode:test');
         },
         START_JOB: () => {
             if (this.workflowControl) {
@@ -1021,7 +1018,7 @@ class VisualizerWidget extends PureComponent {
             return false;
         }
         if (controllerType === GRBL) {
-            if (activeState !== GRBL_ACTIVE_STATE_RUN) {
+            if (activeState !== GRBL_ACTIVE_STATE_RUN && activeState !== GRBL_ACTIVE_STATE_CHECK) {
                 return false;
             }
         }
