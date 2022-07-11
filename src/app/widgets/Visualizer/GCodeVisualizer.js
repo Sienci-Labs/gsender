@@ -202,6 +202,10 @@ class GCodeVisualizer {
         this.frameIndex = frameIndex;
     }
 
+    getCurrentLocation() {
+        return this.vertices[this.frames[this.frameIndex].vertexIndex] ? this.vertices[this.frames[this.frameIndex].vertexIndex] : this.vertices[this.frames[this.frameIndex].vertexIndex - 1];
+    }
+
     unload() {
         this.geometry.dispose();
         this.group.clear();

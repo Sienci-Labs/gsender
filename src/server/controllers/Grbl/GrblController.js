@@ -166,7 +166,6 @@ class GrblController {
 
     homingFlagSet = false;
 
-
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -1549,6 +1548,13 @@ class GrblController {
                 if (!this.feeder.isPending()) {
                     this.feeder.next();
                 }
+            },
+            'gcode:test': () => {
+                this.workflow.start();
+                this.feeder.reset();
+                this.command('gcode', '$c');
+                this.sender.next();
+                this.feederCB = null;
             },
             'gcode:safe': () => {
                 const [commands, prefUnits] = args;

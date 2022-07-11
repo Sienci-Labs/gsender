@@ -65,6 +65,7 @@ import {
     CAMERA_MODE_ROTATE
 } from './constants';
 import styles from './index.styl';
+import { GRBL_ACTIVE_STATE_CHECK } from '../../../server/controllers/Grbl/constants';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -317,7 +318,14 @@ class Visualizer extends Component {
         }
 
         { // Update position
+            const { state } = this.props;
+            const { activeState } = state;
             const { machinePosition, workPosition } = this.props;
+
+            let newPos = workPosition;
+            if (activeState === GRBL_ACTIVE_STATE_CHECK) {
+                newPos = this.visualizer.getCurrentLocation();
+            }
             let needUpdatePosition = false;
 
             // Machine position
@@ -331,9 +339,9 @@ class Visualizer extends Component {
 
             // Work position
             const { x: wpox0, y: wpoy0, z: wpoz0 } = this.workPosition;
-            const { x: wpox1, y: wpoy1, z: wpoz1 } = workPosition;
+            const { x: wpox1, y: wpoy1, z: wpoz1 } = newPos;
             if (wpox0 !== wpox1 || wpoy0 !== wpoy1 || wpoz0 !== wpoz1) {
-                this.workPosition = workPosition;
+                this.workPosition = newPos;
                 needUpdatePosition = true;
                 needUpdateScene = true;
             }
@@ -1335,8 +1343,8 @@ class Visualizer extends Component {
 
         if (this.viewport && dX > 0 && dY > 0) {
             // The minimum viewport is 50x50mm
-            const width = Math.max(dX, 50);
-            const height = Math.max(dY, 50);
+            const width = Math.max(dX + 50, 100);
+            const height = Math.max(dY + 50, 100);
             const target = new THREE.Vector3(0, 0, bbox.max.z);
             this.viewport.set(width, height, target);
         }
