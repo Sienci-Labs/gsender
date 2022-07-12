@@ -106,5 +106,5 @@ onmessage = ({ data }) => {
         return gCode;
     }
     const outlineGcode = getOutlineGcode(gcode);
-    postMessage(outlineGcode);
+    postMessage({ outlineGcode });
 };

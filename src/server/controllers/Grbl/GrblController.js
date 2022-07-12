@@ -1742,14 +1742,6 @@ class GrblController {
                 this.command('feeder:start');
                 this.runPostChangeHook();
             },
-            'gcode:outline': () => {
-                //const [gcode = '', concavity = 450] = args;
-                //const toRun = getOutlineGcode(gcode, concavity);
-                const [outlineGcode] = args;
-                log.debug('Running outline');
-                this.emit('outline:start');
-                this.command('gcode', outlineGcode);
-            }
         }[cmd];
 
         if (!handler) {

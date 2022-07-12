@@ -63,6 +63,7 @@ import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
 import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
 import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
+import { outlineResponse } from '../../workers/Outline.response';
 
 
 class WorkflowControl extends PureComponent {
@@ -287,7 +288,7 @@ class WorkflowControl extends PureComponent {
             msg: 'Generating outline for current file'
         });
         workerOutline.onmessage = ({ data }) => {
-            controller.command('gcode', outlineGcode, 500);
+            outlineResponse({ data });
         };
         workerOutline.postMessage({ gcode });
     }
