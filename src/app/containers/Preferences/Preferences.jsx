@@ -165,14 +165,16 @@ class PreferencesPage extends PureComponent {
             },
             setCustomDecimalPlaces: (e) => {
                 let value = Math.abs(Number(e.target.value));
-                if (value < 0 || value > 5) {
+                if (value < 0) {
                     value = 0;
+                } else if (value > 5) {
+                    value = 5;
                 }
                 e.target.value = value;
                 this.setState({
                     customDecimalPlaces: value
                 });
-                controller.command('statusreport');
+                controller.command('checkStateUpdate');
             },
             setUnits: (units) => {
                 this.setState({

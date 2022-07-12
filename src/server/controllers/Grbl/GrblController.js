@@ -1442,6 +1442,9 @@ class GrblController {
                 this.write('\x18'); // ^x
                 this.writeln('$X');
             },
+            'checkStateUpdate': () => {
+                this.emit('controller:state', GRBL, this.state);
+            },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             //   0: Set 100% of programmed rate.
