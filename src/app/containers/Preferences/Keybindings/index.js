@@ -37,7 +37,6 @@ const Shortcuts = ({ active }) => {
                         return <button>Print</button>;
                     }}
                     content={() => componentRef.current}
-                    documentTitle="Shortcuts"
                     // onBeforePrint={() => setDisplay('block')}
                     // onAfterPrint={() => setDisplay('none')}
                 />

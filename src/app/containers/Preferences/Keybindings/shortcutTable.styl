@@ -1,15 +1,15 @@
 .shortcutWrapper{
     z-index: -1;
     position: absolute;
-    max-height: 40rem;
+    max-height: 4rem;
+    overflow: hidden;
     .table {
-        padding: 2rem;
+        padding: 1rem;
         table{
             background-color:#FFFFE0;
             border:1px solid;
             color:#000;
             max-height: 21vh !important;
-            overflow: hidden;
         }
         th{
             background-color:#1f2937;
@@ -22,4 +22,10 @@
             border-bottom:1px dotted #BDB76B;
         }
     }
+}
+    @media print{    
+        .shortcutWrapper{
+            max-height: 40rem;
+            overflow: visible;
+        }
     }
