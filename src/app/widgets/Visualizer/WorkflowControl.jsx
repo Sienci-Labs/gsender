@@ -38,6 +38,7 @@ import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import Input from 'app/containers/Preferences/components/Input';
+import WorkerOutline from '../../workers/Outline.worker';
 
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
@@ -280,7 +281,7 @@ class WorkflowControl extends PureComponent {
     }
 
     runOutline = () => {
-        const workerOutline = new Worker('../../workers/Outline.worker.js');
+        const workerOutline = new WorkerOutline();
         const { gcode } = this.props;
         Toaster.pop({
             TYPE: TOASTER_INFO,
