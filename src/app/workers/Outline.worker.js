@@ -25,7 +25,8 @@ import Toolpath from 'gcode-toolpath';
 import ch from 'hull.js';
 import * as THREE from 'three';
 
-onmessage = (gcode) => {
+onmessage = ({ data }) => {
+    const { gcode } = data;
     // Generate an ordered pair - we don't care about Z index for outline purposes so it's removed
     function vertex(x, y) {
         return [x.toFixed(2), y.toFixed(2)];
