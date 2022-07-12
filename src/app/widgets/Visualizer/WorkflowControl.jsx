@@ -279,13 +279,17 @@ class WorkflowControl extends PureComponent {
     }
 
     runOutline = () => {
+        const workerOutline = new Worker('../../workers/Outline.worker.js');
         const { gcode } = this.props;
         Toaster.pop({
             TYPE: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE,
             msg: 'Generating outline for current file'
         });
-        controller.command('gcode:outline', gcode, 500);
+        workerOutline.postMessage(gcode);
+        workerOutline.onmessage = (outlineGcode) => {
+            controller.command('gcode:outline', outlineGcode, 500);
+        };
     }
 
     startFromLinePrompt = () => {
