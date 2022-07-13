@@ -1466,13 +1466,6 @@ class Visualizer extends Component {
         } else {
             pubsub.publish('softlimits:ok');
         }
-
-        console.log('limits:');
-        console.log(limits);
-        console.log('bboxMax:');
-        console.log(bboxMax);
-        console.log('bboxMin:');
-        console.log(bboxMin);
     }
 
     unload() {
