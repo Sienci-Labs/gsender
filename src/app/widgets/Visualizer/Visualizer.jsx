@@ -1441,17 +1441,57 @@ class Visualizer extends Component {
     }
 
     checkSoftLimits() {
+        /* get machine 0
+                0 is top right
+                1 is top left
+                2 bottom right
+                3 bottom left
+        */
+        let machineCorner = reduxStore.getState().controller.settings.settings.$23;
+        console.log(machineCorner);
+        let xMultiplier = 1;
+        let yMultiplier = 1;
+        switch (machineCorner) {
+        case 0:
+            xMultiplier = -1;
+            yMultiplier = -1;
+            break;
+        case 1:
+            xMultiplier = 1;
+            yMultiplier = -1;
+            break;
+        case 2:
+            xMultiplier = -1;
+            yMultiplier = 1;
+            break;
+        case 3:
+        default:
+            xMultiplier = 1;
+            yMultiplier = 1;
+            break;
+        }
+        this.calculateLimits(xMultiplier, yMultiplier);
+    }
+
+    calculateLimits(xMultiplier, yMultiplier) {
         // get soft limits
         let xMax = parseFloat(reduxStore.getState().controller.settings.settings.$130);
         let yMax = parseFloat(reduxStore.getState().controller.settings.settings.$131);
         let zMax = parseFloat(reduxStore.getState().controller.settings.settings.$132);
 
-        // get mpos 0,0 relative to workspace
-        let machine0 = reduxStore.getState().controller.mpos;
-        let limits = {
-            x: parseFloat(machine0.x) + xMax,
-            y: parseFloat(machine0.y) + yMax,
-            z: parseFloat(machine0.z) + zMax,
+        // get mpos
+        let machinepos = reduxStore.getState().controller.mpos;
+
+        let limitsMax = {
+            x: xMax * xMultiplier - parseFloat(machinepos.x),
+            y: yMax * yMultiplier - parseFloat(machinepos.y),
+            z: zMax - parseFloat(machinepos.z),
+        };
+
+        let limitsMin = {
+            x: parseFloat(machinepos.x) * -1,
+            y: parseFloat(machinepos.y) * -1,
+            z: parseFloat(machinepos.z),
         };
 
         // get bbox
@@ -1459,13 +1499,29 @@ class Visualizer extends Component {
         let bboxMax = reduxStore.getState().file.bbox.max;
 
         // check if machine will leave soft limits
-        if (limits.x < bboxMax.x || limits.x < bboxMin.x
-            || limits.y < bboxMax.y || limits.y < bboxMin.y
-            || (limits.z === null ? 0 > 1 : limits.z < bboxMax.z) || (limits.z === null ? 0 > 1 : limits.z < bboxMin.z)) {
+        if (bboxMax.x > limitsMax.x || bboxMin.x < limitsMin.x ||
+            bboxMax.y > limitsMax.y || bboxMin.y < limitsMin.y ||
+            (bboxMax.z === null ? false : bboxMax.z > limitsMax.z) || (bboxMin.z === null ? false : bboxMin.z < limitsMin.z)) {
             pubsub.publish('softlimits:warning');
         } else {
             pubsub.publish('softlimits:ok');
         }
+
+
+        console.log('machine0:');
+        console.log(machinepos);
+        // console.log('machine at wpos0:');
+        // console.log(machineAtWpos0);
+        console.log('limitsMax:');
+        console.log(limitsMax);
+        console.log('limitsMin:');
+        console.log(limitsMin);
+        // console.log('limits:');
+        // console.log(limits);
+        console.log('bboxMax:');
+        console.log(bboxMax);
+        console.log('bboxMin:');
+        console.log(bboxMin);
     }
 
     unload() {
