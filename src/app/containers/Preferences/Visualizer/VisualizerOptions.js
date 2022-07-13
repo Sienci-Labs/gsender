@@ -9,7 +9,7 @@ import Fieldset from '../components/Fieldset';
 import styles from '../index.styl';
 
 const VisualizerOptions = ({ state, actions }) => {
-    const { objects, disabled, disabledLite } = state.visualizer;
+    const { showSoftLimitsWarning, objects, disabled, disabledLite } = state.visualizer;
     const visualizerActions = actions.visualizer;
 
     return (
@@ -39,6 +39,10 @@ const VisualizerOptions = ({ state, actions }) => {
                     </Tooltip>
                     <ToggleSwitch checked={objects.cutPath.visible} onChange={() => visualizerActions.handleCutPathToggle()} size="md" />
                     <ToggleSwitch checked={objects.cutPath.visibleLite} onChange={() => visualizerActions.handleCutPathToggle(true)} size="md" />
+                    <Tooltip content="Show warning when current workspace 0 will cause the machine to cut outside of soft limits" location="default">
+                        <span>Show Soft Limits Warning</span>
+                    </Tooltip>
+                    <ToggleSwitch checked={showSoftLimitsWarning} onChange={() => visualizerActions.handleLimitsWarningToggle()} size="md" />
                 </div>
                 <small>Specify which visualizer features are enabled or disable in both regular mode and light-mode, in order to save computer resources</small>
             </div>

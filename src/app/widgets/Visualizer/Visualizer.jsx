@@ -66,6 +66,7 @@ import {
 } from './constants';
 import styles from './index.styl';
 import { GRBL_ACTIVE_STATE_CHECK } from '../../../server/controllers/Grbl/constants';
+import WidgetConfig from '../WidgetConfig';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -88,6 +89,8 @@ class Visualizer extends Component {
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
+
+    visualizerConfig = new WidgetConfig('visualizer');
 
     pubsubTokens = [];
 
@@ -121,6 +124,7 @@ class Visualizer extends Component {
 
     fileLoaded = false;
     machineConnected = false;
+    showSoftLimitsWarning = this.visualizerConfig.get('showSoftLimitsWarning');
 
     setRef = (node) => {
         this.node = node;
@@ -691,24 +695,25 @@ class Visualizer extends Component {
                     return;
                 }
             }),
+            pubsub.subscribe('softlimits:changevisibility', (msg, visibility) => {
+                console.log(visibility);
+                this.showSoftLimitsWarning = visibility;
+                if (this.showSoftLimitsWarning) {
+                    this.checkSoftLimits();
+                } else {
+                    pubsub.publish('softlimits:ok');
+                }
+            }),
             pubsub.subscribe('machine:connected', () => {
                 this.machineConnected = true;
-                // check if file is loaded, if not theres no point
-                if (this.fileLoaded) {
-                    this.checkSoftLimits();
-                }
+                this.checkSoftLimits();
             }),
             pubsub.subscribe('file:loaded', () => {
                 this.fileLoaded = true;
-                // check if machine is connected, if not theres no point
-                if (this.machineConnected) {
-                    this.checkSoftLimits();
-                }
+                this.checkSoftLimits();
             }),
-            pubsub.subscribe('zero:all', () => {
-                if (this.machineConnected && this.fileLoaded) {
-                    this.checkSoftLimits();
-                }
+            pubsub.subscribe('softlimits:check', () => {
+                this.checkSoftLimits();
             }),
             pubsub.subscribe('machine:disconnected', () => {
                 this.machineConnected = false;
@@ -718,11 +723,6 @@ class Visualizer extends Component {
                 this.fileLoaded = false;
                 pubsub.publish('softlimits:ok');
             }),
-            pubsub.subscribe('homing:finished', () => {
-                if (this.machineConnected && this.fileLoaded) {
-                    this.checkSoftLimits();
-                }
-            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -732,6 +732,12 @@ class Visualizer extends Component {
             pubsub.unsubscribe(token);
         });
         this.pubsubTokens = [];
+    }
+
+    checkSoftLimits() {
+        if (this.machineConnected && this.fileLoaded && this.showSoftLimitsWarning) {
+            this.calculateLimits();
+        }
     }
 
     // https://tylercipriani.com/blog/2014/07/12/crossbrowser-javascript-scrollbar-detection/
@@ -1440,7 +1446,7 @@ class Visualizer extends Component {
         this.fileLoaded = true;
     }
 
-    checkSoftLimits() {
+    calculateLimits() {
         /* get machine 0
                 0 is top right
                 1 is top left
@@ -1449,6 +1455,7 @@ class Visualizer extends Component {
         */
         let machineCorner = reduxStore.getState().controller.settings.settings.$23;
         console.log(machineCorner);
+
         let xMultiplier = 1;
         let yMultiplier = 1;
         switch (machineCorner) {
@@ -1470,28 +1477,34 @@ class Visualizer extends Component {
             yMultiplier = 1;
             break;
         }
-        this.calculateLimits(xMultiplier, yMultiplier);
-    }
 
-    calculateLimits(xMultiplier, yMultiplier) {
         // get soft limits
         let xMax = parseFloat(reduxStore.getState().controller.settings.settings.$130);
         let yMax = parseFloat(reduxStore.getState().controller.settings.settings.$131);
         let zMax = parseFloat(reduxStore.getState().controller.settings.settings.$132);
 
+        // get wpos
+        let wpos = reduxStore.getState().controller.wpos;
+
         // get mpos
         let machinepos = reduxStore.getState().controller.mpos;
 
+        let origin = {
+            x: machinepos.x - wpos.x * xMultiplier,
+            y: machinepos.y - wpos.y * yMultiplier,
+            z: machinepos.z - wpos.z
+        };
+
         let limitsMax = {
-            x: xMax * xMultiplier - parseFloat(machinepos.x),
-            y: yMax * yMultiplier - parseFloat(machinepos.y),
-            z: zMax - parseFloat(machinepos.z),
+            x: xMax * xMultiplier - parseFloat(origin.x),
+            y: yMax * yMultiplier - parseFloat(origin.y),
+            z: zMax - parseFloat(origin.z),
         };
 
         let limitsMin = {
-            x: parseFloat(machinepos.x) * -1,
-            y: parseFloat(machinepos.y) * -1,
-            z: parseFloat(machinepos.z),
+            x: parseFloat(origin.x) * -1,
+            y: parseFloat(origin.y) * -1,
+            z: parseFloat(origin.z),
         };
 
         // get bbox
@@ -1508,10 +1521,12 @@ class Visualizer extends Component {
         }
 
 
-        console.log('machine0:');
+        console.log('machinepos:');
         console.log(machinepos);
-        // console.log('machine at wpos0:');
-        // console.log(machineAtWpos0);
+        console.log('wpos:');
+        console.log(wpos);
+        console.log('origin: ');
+        console.log(origin);
         console.log('limitsMax:');
         console.log(limitsMax);
         console.log('limitsMin:');

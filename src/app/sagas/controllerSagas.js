@@ -304,7 +304,7 @@ export function* initialize() {
                 homingFlag: flag
             }
         });
-        pubsub.publish('homing:finished');
+        pubsub.publish('softlimits:check');
     });
 
     controller.addListener('toolchange:tool', (tool) => {
