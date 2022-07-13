@@ -122,6 +122,8 @@ export function* initialize() {
             type: connectionActions.CLOSE_CONNECTION,
             payload: { options }
         });
+
+        pubsub.publish('machine:disconnected');
     });
 
     controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts) => {
@@ -302,6 +304,7 @@ export function* initialize() {
                 homingFlag: flag
             }
         });
+        pubsub.publish('homing:finished');
     });
 
     controller.addListener('toolchange:tool', (tool) => {

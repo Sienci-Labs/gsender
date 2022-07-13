@@ -709,6 +709,19 @@ class Visualizer extends Component {
                 if (this.machineConnected && this.fileLoaded) {
                     this.checkSoftLimits();
                 }
+            }),
+            pubsub.subscribe('machine:disconnected', () => {
+                this.machineConnected = false;
+                pubsub.publish('softlimits:ok');
+            }),
+            pubsub.subscribe('gcode:unload', () => {
+                this.fileLoaded = false;
+                pubsub.publish('softlimits:ok');
+            }),
+            pubsub.subscribe('homing:finished', () => {
+                if (this.machineConnected && this.fileLoaded) {
+                    this.checkSoftLimits();
+                }
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -1453,6 +1466,13 @@ class Visualizer extends Component {
         } else {
             pubsub.publish('softlimits:ok');
         }
+
+        console.log('limits:');
+        console.log(limits);
+        console.log('bboxMax:');
+        console.log(bboxMax);
+        console.log('bboxMin:');
+        console.log(bboxMin);
     }
 
     unload() {
