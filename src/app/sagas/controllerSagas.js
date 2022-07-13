@@ -109,6 +109,8 @@ export function* initialize() {
             type: connectionActions.OPEN_CONNECTION,
             payload: { options }
         });
+
+        pubsub.publish('machine:connected');
     });
 
     controller.addListener('serialport:close', (options) => {

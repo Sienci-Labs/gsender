@@ -119,6 +119,9 @@ class Visualizer extends Component {
 
     node = null;
 
+    fileLoaded = false;
+    machineConnected = false;
+
     setRef = (node) => {
         this.node = node;
     };
@@ -686,6 +689,25 @@ class Visualizer extends Component {
                 if (isSecondaryVisualizer) {
                     this.load('', data);
                     return;
+                }
+            }),
+            pubsub.subscribe('machine:connected', () => {
+                this.machineConnected = true;
+                // check if file is loaded, if not theres no point
+                if (this.fileLoaded) {
+                    this.checkSoftLimits();
+                }
+            }),
+            pubsub.subscribe('file:loaded', () => {
+                this.fileLoaded = true;
+                // check if machine is connected, if not theres no point
+                if (this.machineConnected) {
+                    this.checkSoftLimits();
+                }
+            }),
+            pubsub.subscribe('zero:all', () => {
+                if (this.machineConnected && this.fileLoaded) {
+                    this.checkSoftLimits();
                 }
             })
         ];
@@ -1400,6 +1422,36 @@ class Visualizer extends Component {
             this.handleSceneRender(vizualization, callback);
         } else {
             setVisualizerReady();
+        }
+
+        this.fileLoaded = true;
+    }
+
+    checkSoftLimits() {
+        // get soft limits
+        let xMax = parseFloat(reduxStore.getState().controller.settings.settings.$130);
+        let yMax = parseFloat(reduxStore.getState().controller.settings.settings.$131);
+        let zMax = parseFloat(reduxStore.getState().controller.settings.settings.$132);
+
+        // get mpos 0,0 relative to workspace
+        let machine0 = reduxStore.getState().controller.mpos;
+        let limits = {
+            x: parseFloat(machine0.x) + xMax,
+            y: parseFloat(machine0.y) + yMax,
+            z: parseFloat(machine0.z) + zMax,
+        };
+
+        // get bbox
+        let bboxMin = reduxStore.getState().file.bbox.min;
+        let bboxMax = reduxStore.getState().file.bbox.max;
+
+        // check if machine will leave soft limits
+        if (limits.x < bboxMax.x || limits.x < bboxMin.x
+            || limits.y < bboxMax.y || limits.y < bboxMin.y
+            || (limits.z === null ? 0 > 1 : limits.z < bboxMax.z) || (limits.z === null ? 0 > 1 : limits.z < bboxMin.z)) {
+            pubsub.publish('softlimits:warning');
+        } else {
+            pubsub.publish('softlimits:ok');
         }
     }
 

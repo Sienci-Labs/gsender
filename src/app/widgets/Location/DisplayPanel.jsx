@@ -35,6 +35,7 @@ import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 //import DRO from 'app/widgets/Location/components/DRO';
 import store from 'app/store';
+import pubsub from 'pubsub-js';
 import { getHomingLocation, getMovementGCode } from 'app/widgets/Location/RapidPosition';
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
@@ -317,6 +318,7 @@ class DisplayPanel extends PureComponent {
                                 }[wcs] || 0;
 
                                 controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
+                                pubsub.publish('zero:all');
                             }}
                             disabled={!canClick}
                         >

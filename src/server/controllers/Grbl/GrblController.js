@@ -43,7 +43,7 @@ import translateExpression from '../../lib/translate-expression';
 import config from '../../services/configstore';
 import monitor from '../../services/monitor';
 import taskRunner from '../../services/taskrunner';
-import { getOutlineGcode } from '../../lib/outlineService';
+//import { getOutlineGcode } from '../../lib/outlineService';
 import store from '../../store';
 import {
     GLOBAL_OBJECTS as globalObjects,

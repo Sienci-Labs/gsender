@@ -17,6 +17,7 @@ import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
 import { MODAL_WATCH_DIRECTORY } from './constants';
 import styles from './index.styl';
+import SoftLimitsWarningArea from './SoftLimitsWarningArea';
 
 
 const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering, showVisualizer, visualizerRef, workflowRef, widgetContentRef }) => {
@@ -71,6 +72,7 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                         {
                             showUnlockButton && <UnlockButton />
                         }
+                        <SoftLimitsWarningArea/>
                         <MachineStatusArea
                             state={state}
                             actions={actions}
