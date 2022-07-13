@@ -35,12 +35,10 @@ import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
-import { persistConfig } from './electron-app/store';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 
 
 let windowManager = null;
-let appConfig = null;
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -96,7 +94,10 @@ const main = () => {
             });
 
             const res = await launchServer();
-            const { address, port, mountPoints } = { ...res };
+            const { address, port, mountPoints, headless } = { ...res };
+            if (headless) {
+                log.debug(`Started remote build at ${address}:${port}`);
+            }
             if (!(address && port)) {
                 log.error('Unable to start the server at ' + chalk.cyan(`http://${address}:${port}`));
                 return;

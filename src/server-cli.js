@@ -26,7 +26,9 @@
 import path from 'path';
 import isElectron from 'is-electron';
 import program from 'commander';
+import ip from 'ip';
 import pkg from './package.json';
+
 
 // Defaults to 'production'
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
@@ -100,6 +102,14 @@ export default () => new Promise((resolve, reject) => {
     // Change working directory to 'server' before require('./server')
     process.chdir(path.resolve(__dirname, 'server'));
 
+    if (program.headless) {
+        const localhost = ip.address();
+        program.host = localhost;
+        if (program.port === 0) {
+            program.port = 8000;
+        }
+    }
+
     require('./server').createServer({
         port: program.port,
         host: program.host,
@@ -116,7 +126,7 @@ export default () => new Promise((resolve, reject) => {
             reject(err);
             return;
         }
-
-        resolve(data);
+        console.log(data);
+        resolve({ ...data, headless: program.headless });
     });
 });
