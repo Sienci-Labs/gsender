@@ -39,6 +39,7 @@ import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 
 
 let windowManager = null;
+let hostInformation = {};
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -46,6 +47,7 @@ const main = () => {
     const shouldQuitImmediately = !gotSingleInstanceLock;
 
     let prevDirectory = '';
+    log.debug(autoUpdater.channel);
 
     if (shouldQuitImmediately) {
         app.quit();
@@ -95,12 +97,17 @@ const main = () => {
 
             const res = await launchServer();
             const { address, port, mountPoints, headless } = { ...res };
-            if (headless) {
-                log.debug(`Started remote build at ${address}:${port}`);
-            }
+            hostInformation = {
+                address,
+                port,
+                headless,
+            };
             if (!(address && port)) {
                 log.error('Unable to start the server at ' + chalk.cyan(`http://${address}:${port}`));
                 return;
+            }
+            if (headless) {
+                log.debug(`Started remote build at ${address}:${port}`);
             }
 
             const url = `http://${address}:${port}`;
@@ -155,6 +162,10 @@ const main = () => {
 
             ipcMain.on('log-error', (channel, err) => {
                 log.error(err.message);
+            });
+
+            ipcMain.handle('check-remote-status', (channel) => {
+                return hostInformation;
             });
 
             /**

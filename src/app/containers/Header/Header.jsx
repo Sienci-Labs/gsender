@@ -198,7 +198,6 @@ class Header extends PureComponent {
     _isMounted = false;
 
     getInitialState() {
-        const showRemoteComponent = isElectron() && true; //TODO: Add hook to IPC main whether headless option passed
         let pushPermission = '';
         try {
             // Push.Permission.get() will throw an error if Push is not supported on this device
@@ -215,7 +214,11 @@ class Header extends PureComponent {
             latestVersion: settings.version,
             updateAvailable: false,
             connected: controller.connected,
-            showRemoteComponent
+            hostInformation: {
+                address: '0.0.0.0',
+                port: 0,
+                headless: false
+            }
         };
     }
 
@@ -227,6 +230,14 @@ class Header extends PureComponent {
 
         if (isElectron()) {
             this.registerIPCListeners();
+            window.ipcRenderer.invoke('check-remote-status').then(result => {
+                console.log(result);
+                this.setState({
+                    hostInformation: {
+                        ...result
+                    }
+                });
+            });
         }
     }
 
@@ -287,7 +298,7 @@ class Header extends PureComponent {
     }
 
     render() {
-        const { updateAvailable, showRemoteComponent } = this.state;
+        const { updateAvailable, hostInformation } = this.state;
         return (
             <div className={styles.navBar}>
                 <div className={styles.primary}>
@@ -297,7 +308,7 @@ class Header extends PureComponent {
                         actions={ this.actions }
                         widgetId="connection"
                     />
-                    {showRemoteComponent && <HeadlessIndicator />}
+                    {hostInformation.headless && <HeadlessIndicator {...hostInformation} />}
                 </div>
                 <NavSidebar />
             </div>

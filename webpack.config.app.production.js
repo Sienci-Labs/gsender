@@ -236,7 +236,8 @@ module.exports = {
             preserve: false
         }),
         new HtmlWebpackPlugin({
-            chunksSortMode: 'dependency' // Sort chunks by dependency
+            chunksSortMode: 'dependency', // Sort chunks by dependency
+            title: 'gSender',
         })
     ],
     resolve: {

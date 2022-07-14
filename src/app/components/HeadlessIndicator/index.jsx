@@ -26,11 +26,11 @@ import RemoteAlert from 'app/components/HeadlessIndicator/RemoteAlert';
 import styles from './index.styl';
 
 
-const HeadlessIndicator = () => {
+const HeadlessIndicator = ({ address, port }) => {
     return (
         <div className={styles.wrapper}>
             <RemoteAlert />
-            <div>Remote: <span className={styles.ip}>http://192.168.0.10:8000</span></div>
+            <div>Remote: <span className={styles.ip}>http://{address}:{port}</span></div>
         </div>
     );
 };
