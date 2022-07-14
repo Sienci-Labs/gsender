@@ -318,7 +318,7 @@ class DisplayPanel extends PureComponent {
                                 }[wcs] || 0;
 
                                 controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
-                                pubsub.publish('softlimits:check');
+                                pubsub.publish('softlimits:check', 0);
                             }}
                             disabled={!canClick}
                         >

@@ -712,8 +712,14 @@ class Visualizer extends Component {
                 this.fileLoaded = true;
                 this.checkSoftLimits();
             }),
-            pubsub.subscribe('softlimits:check', () => {
-                this.checkSoftLimits();
+            pubsub.subscribe('softlimits:check', (msg, data) => {
+                // because setting the workspace 0 is a call to run gcode,
+                // there is no way for me to publish when it's
+                // confirmed to be finished. since it uses the feeder,
+                // it's slow, and the wpos is not changed to 0 when I run the check.
+                // therefore, I'm sending data with the publish so the function knows
+                // to manually set the wpos to 0.
+                this.checkSoftLimits(data);
             }),
             pubsub.subscribe('machine:disconnected', () => {
                 this.machineConnected = false;
@@ -734,9 +740,9 @@ class Visualizer extends Component {
         this.pubsubTokens = [];
     }
 
-    checkSoftLimits() {
+    checkSoftLimits(data) {
         if (this.machineConnected && this.fileLoaded && this.showSoftLimitsWarning) {
-            this.calculateLimits();
+            this.calculateLimits(data);
         }
     }
 
@@ -1446,7 +1452,7 @@ class Visualizer extends Component {
         this.fileLoaded = true;
     }
 
-    calculateLimits() {
+    calculateLimits(data) {
         /* get machine 0
                 0 is top right
                 1 is top left
@@ -1484,27 +1490,36 @@ class Visualizer extends Component {
         let zMax = parseFloat(reduxStore.getState().controller.settings.settings.$132);
 
         // get wpos
-        let wpos = reduxStore.getState().controller.wpos;
+        let wpos;
+        if (data !== 0) {
+            wpos = reduxStore.getState().controller.wpos;
+        } else {
+            wpos = {
+                x: 0,
+                y: 0,
+                z: reduxStore.getState().controller.wpos.z,
+            };
+        }
 
         // get mpos
         let machinepos = reduxStore.getState().controller.mpos;
 
         let origin = {
-            x: machinepos.x - wpos.x * xMultiplier,
-            y: machinepos.y - wpos.y * yMultiplier,
-            z: machinepos.z - wpos.z
+            x: parseFloat(machinepos.x) - parseFloat(wpos.x) * xMultiplier,
+            y: parseFloat(machinepos.y) - parseFloat(wpos.y) * yMultiplier,
+            z: parseFloat(machinepos.z) - parseFloat(wpos.z)
         };
 
         let limitsMax = {
-            x: xMax * xMultiplier - parseFloat(origin.x),
-            y: yMax * yMultiplier - parseFloat(origin.y),
-            z: zMax - parseFloat(origin.z),
+            x: xMax * xMultiplier - origin.x,
+            y: yMax * yMultiplier - origin.y,
+            z: zMax - origin.z,
         };
 
         let limitsMin = {
-            x: parseFloat(origin.x) * -1,
-            y: parseFloat(origin.y) * -1,
-            z: parseFloat(origin.z),
+            x: origin.x * -1,
+            y: origin.y * -1,
+            z: origin.z,
         };
 
         // get bbox
