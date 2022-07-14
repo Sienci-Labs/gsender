@@ -1283,6 +1283,7 @@ class GrblController {
         }
     }
 
+    // eslint-disable-next-line max-lines-per-function
     command(cmd, ...args) {
         const handler = {
             'flash:start': () => {
@@ -1608,68 +1609,66 @@ class GrblController {
                 //towards calculated direction
                 const pinState = this.store.controller.state.status.pinState;
                 switch (sensorPositon) {
-                    case 0:
-                        // sensor corner - top right
-                        if ('X' in pinState) {
-                            controller.command(
-                                'gcode',
-                                `GO Y-${tooltipMoveFactor}`
-                            );
-                        } else if ('Y' in pinState) {
-                            controller.command(
-                                'gcode',
-                                `GO X-${tooltipMoveFactor}`
-                            );
-                        }
-                        break;
-                    case 1:
-                        // sensor corner - top left
-                        if ('X' in pinState) {
-                            controller.command(
-                                'gcode',
-                                `GO Y-${tooltipMoveFactor}`
-                            );
-                        } else if ('Y' in pinState) {
-                            controller.command(
-                                'gcode',
-                                `GO X${tooltipMoveFactor}`
-                            );
-                        }
-                        break;
-                    case 2:
-                        // sensor corner - bottom right
-                        if ('X' in pinState) {
-                            controller.command(
-                                'gcode',
-                                `GO Y${tooltipMoveFactor}`
-                            );
-                        } else if ('Y' in pinState) {
-                            controller.command(
-                                'gcode',
-                                `GO X-${tooltipMoveFactor}`
-                            );
-                        }
-                        break;
-                    case 3:
-                        // sensor corner - bottom left
-                        if ('X' in pinState) {
-                            controller.command(
-                                'gcode',
-                                `GO Y${tooltipMoveFactor}`
-                            );
-                        } else if ('Y' in pinState) {
-                            controller.command(
-                                'gcode',
-                                `GO X${tooltipMoveFactor}`
-                            );
-                        }
-                        break;
-                    default:
-                        return true;
+                case 0:
+                    // sensor corner - top right
+                    if ('X' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO Y-${tooltipMoveFactor}`
+                        );
+                    } else if ('Y' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO X-${tooltipMoveFactor}`
+                        );
+                    }
+                    break;
+                case 1:
+                    // sensor corner - top left
+                    if ('X' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO Y-${tooltipMoveFactor}`
+                        );
+                    } else if ('Y' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO X${tooltipMoveFactor}`
+                        );
+                    }
+                    break;
+                case 2:
+                    // sensor corner - bottom right
+                    if ('X' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO Y${tooltipMoveFactor}`
+                        );
+                    } else if ('Y' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO X-${tooltipMoveFactor}`
+                        );
+                    }
+                    break;
+                case 3:
+                    // sensor corner - bottom left
+                    if ('X' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO Y${tooltipMoveFactor}`
+                        );
+                    } else if ('Y' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO X${tooltipMoveFactor}`
+                        );
+                    }
+                    break;
+                default:
+                    return true;
                 }
-
-                // //controller.command()
-                console.log(tooltipMoveFactor, sensorPositon, pinState);
+                return true;
             },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
