@@ -1460,9 +1460,9 @@ class GrblController {
                 switch (sensorPositon) {
                 case 0:
                     // sensor corner - top right
-                    if ('x' in pinState) {
+                    if ('X' in pinState) {
                         controller.command('gcode', `GO Y-${tooltipMoveFactor}`);
-                    } else if ('y' in pinState) {
+                    } else if ('Y' in pinState) {
                         controller.command(
                             'gcode',
                             `GO X-${tooltipMoveFactor}`
@@ -1471,34 +1471,34 @@ class GrblController {
                     break;
                 case 1:
                     // sensor corner - top left
-                    if ('x' in pinState) {
+                    if ('X' in pinState) {
                         controller.command(
                             'gcode',
                             `GO Y-${tooltipMoveFactor}`
                         );
-                    } else if ('y' in pinState) {
+                    } else if ('Y' in pinState) {
                         controller.command('gcode', `GO X${tooltipMoveFactor}`);
                     }
                     break;
                 case 2:
                     // sensor corner - bottom right
-                    if ('x' in pinState) {
+                    if ('X' in pinState) {
                         controller.command(
                             'gcode',
                             `GO Y${tooltipMoveFactor}`
                         );
-                    } else if ('y' in pinState) {
+                    } else if ('Y' in pinState) {
                         controller.command('gcode', `GO X-${tooltipMoveFactor}`);
                     }
                     break;
                 case 3:
                     // sensor corner - bottom left
-                    if ('x' in pinState) {
+                    if ('X' in pinState) {
                         controller.command(
                             'gcode',
                             `GO Y${tooltipMoveFactor}`
                         );
-                    } else if ('y' in pinState) {
+                    } else if ('Y' in pinState) {
                         controller.command('gcode', `GO X${tooltipMoveFactor}`);
                     }
                     break;
