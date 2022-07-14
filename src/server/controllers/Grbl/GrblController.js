@@ -26,6 +26,7 @@ import * as parser from 'gcode-parser';
 import Toolpath from 'gcode-toolpath';
 import _ from 'lodash';
 import map from 'lodash/map';
+import controller from 'app/lib/controller';
 import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
@@ -149,6 +150,7 @@ class GrblController {
 
     // Feeder
     feeder = null;
+
     feederCB = null;
 
     // Sender
@@ -1440,6 +1442,72 @@ class GrblController {
                 this.feeder.reset();
                 this.write('\x18'); // ^x
                 this.writeln('$X');
+
+                // Move tooltip by user defined moveFactor($27)
+                // Check current move factor
+                const tooltipMoveFactor =
+                    this.store.controller.settings.settings.$27;
+                // Check current x,y sensor position($23)
+                // 0 is top right
+                // 1 is top left
+                // 2 bottom right
+                // 3 bottom left
+                const sensorPositon =
+                    this.store.controller.settings.settings.$23;
+                // Check which switch was triggered and move $27setting units
+                //towards calculated direction
+                const pinState = this.store.controller.state.status.pinState;
+                switch (sensorPositon) {
+                case 0:
+                    // sensor corner - top right
+                    if ('x' in pinState) {
+                        controller.command('gcode', `GO Y-${tooltipMoveFactor}`);
+                    } else if ('y' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO X-${tooltipMoveFactor}`
+                        );
+                    }
+                    break;
+                case 1:
+                    // sensor corner - top left
+                    if ('x' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO Y-${tooltipMoveFactor}`
+                        );
+                    } else if ('y' in pinState) {
+                        controller.command('gcode', `GO X${tooltipMoveFactor}`);
+                    }
+                    break;
+                case 2:
+                    // sensor corner - bottom right
+                    if ('x' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO Y${tooltipMoveFactor}`
+                        );
+                    } else if ('y' in pinState) {
+                        controller.command('gcode', `GO X-${tooltipMoveFactor}`);
+                    }
+                    break;
+                case 3:
+                    // sensor corner - bottom left
+                    if ('x' in pinState) {
+                        controller.command(
+                            'gcode',
+                            `GO Y${tooltipMoveFactor}`
+                        );
+                    } else if ('y' in pinState) {
+                        controller.command('gcode', `GO X${tooltipMoveFactor}`);
+                    }
+                    break;
+                default:
+                    return true;
+                }
+
+                // //controller.command()
+                console.log(tooltipMoveFactor, sensorPositon, pinState);
             },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
