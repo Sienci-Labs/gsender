@@ -696,7 +696,6 @@ class Visualizer extends Component {
                 }
             }),
             pubsub.subscribe('softlimits:changevisibility', (msg, visibility) => {
-                console.log(visibility);
                 this.showSoftLimitsWarning = visibility;
                 if (this.showSoftLimitsWarning) {
                     this.checkSoftLimits();
@@ -1460,7 +1459,6 @@ class Visualizer extends Component {
                 3 bottom left
         */
         let machineCorner = reduxStore.getState().controller.settings.settings.$23;
-        console.log(machineCorner);
 
         let xMultiplier = 1;
         let yMultiplier = 1;
@@ -1534,24 +1532,6 @@ class Visualizer extends Component {
         } else {
             pubsub.publish('softlimits:ok');
         }
-
-
-        console.log('machinepos:');
-        console.log(machinepos);
-        console.log('wpos:');
-        console.log(wpos);
-        console.log('origin: ');
-        console.log(origin);
-        console.log('limitsMax:');
-        console.log(limitsMax);
-        console.log('limitsMin:');
-        console.log(limitsMin);
-        // console.log('limits:');
-        // console.log(limits);
-        console.log('bboxMax:');
-        console.log(bboxMax);
-        console.log('bboxMin:');
-        console.log(bboxMin);
     }
 
     unload() {
