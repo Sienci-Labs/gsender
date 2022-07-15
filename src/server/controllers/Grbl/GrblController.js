@@ -1597,14 +1597,14 @@ class GrblController {
                 // Move tooltip by user defined moveFactor($27)
                 // Check current move factor
                 const tooltipMoveFactor =
-                    this.settings.settings.$27;
+                    parseInt(this.settings.settings.$27, 10);
                 // Check current x,y sensor position($23)
                 // 0 is top right
                 // 1 is top left
                 // 2 bottom right
                 // 3 bottom left
                 const sensorPositon =
-                    this.settings.settings.$23;
+                    parseInt(this.settings.settings.$23, 10);
                 // Check which switch was triggered and move $27setting units
                 //towards calculated direction
                 const pinState = this.state.status.pinState;
@@ -1614,12 +1614,12 @@ class GrblController {
                     if ('X' in pinState) {
                         controller.command(
                             'gcode',
-                            `GO Y-${tooltipMoveFactor}`
+                            `G0 Y-${tooltipMoveFactor}`
                         );
                     } else if ('Y' in pinState) {
                         controller.command(
                             'gcode',
-                            `GO X-${tooltipMoveFactor}`
+                            `G0 X-${tooltipMoveFactor}`
                         );
                     }
                     break;
@@ -1628,12 +1628,12 @@ class GrblController {
                     if ('X' in pinState) {
                         controller.command(
                             'gcode',
-                            `GO Y-${tooltipMoveFactor}`
+                            `G0 Y-${tooltipMoveFactor}`
                         );
                     } else if ('Y' in pinState) {
                         controller.command(
                             'gcode',
-                            `GO X${tooltipMoveFactor}`
+                            `G0 X${tooltipMoveFactor}`
                         );
                     }
                     break;
@@ -1642,12 +1642,12 @@ class GrblController {
                     if ('X' in pinState) {
                         controller.command(
                             'gcode',
-                            `GO Y${tooltipMoveFactor}`
+                            `G0 Y${tooltipMoveFactor}`
                         );
                     } else if ('Y' in pinState) {
                         controller.command(
                             'gcode',
-                            `GO X-${tooltipMoveFactor}`
+                            `G0 X-${tooltipMoveFactor}`
                         );
                     }
                     break;
@@ -1656,12 +1656,12 @@ class GrblController {
                     if ('X' in pinState) {
                         controller.command(
                             'gcode',
-                            `GO Y${tooltipMoveFactor}`
+                            `G0 Y${tooltipMoveFactor}`
                         );
                     } else if ('Y' in pinState) {
                         controller.command(
                             'gcode',
-                            `GO X${tooltipMoveFactor}`
+                            `G0 X${tooltipMoveFactor}`
                         );
                     }
                     break;

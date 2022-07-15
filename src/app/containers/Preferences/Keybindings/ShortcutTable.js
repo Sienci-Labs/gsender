@@ -34,7 +34,7 @@ function ShortcutTable({ forwardRef }) {
                                     <td>{category || '-'}</td>
                                 </tr>
                             ) : (
-                                ''
+                                <></>
                             );
                         })}
                     </tbody>
