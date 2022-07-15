@@ -38,6 +38,7 @@ import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import Input from 'app/containers/Preferences/components/Input';
+import WorkerOutline from '../../workers/Outline.worker';
 
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
@@ -63,6 +64,7 @@ import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
 import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
 import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
+import { outlineResponse } from '../../workers/Outline.response';
 
 
 class WorkflowControl extends PureComponent {
@@ -279,17 +281,17 @@ class WorkflowControl extends PureComponent {
     }
 
     runOutline = () => {
-        const workerOutline = new Worker('../../workers/Outline.worker.js');
+        const workerOutline = new WorkerOutline();
         const { gcode } = this.props;
         Toaster.pop({
             TYPE: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE,
             msg: 'Generating outline for current file'
         });
-        workerOutline.postMessage(gcode);
-        workerOutline.onmessage = (outlineGcode) => {
-            controller.command('gcode:outline', outlineGcode, 500);
+        workerOutline.onmessage = ({ data }) => {
+            outlineResponse({ data });
         };
+        workerOutline.postMessage({ gcode });
     }
 
     startFromLinePrompt = () => {

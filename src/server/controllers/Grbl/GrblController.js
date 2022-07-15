@@ -43,7 +43,6 @@ import translateExpression from '../../lib/translate-expression';
 import config from '../../services/configstore';
 import monitor from '../../services/monitor';
 import taskRunner from '../../services/taskrunner';
-import { getOutlineGcode } from '../../lib/outlineService';
 import store from '../../store';
 import {
     GLOBAL_OBJECTS as globalObjects,
@@ -150,6 +149,7 @@ class GrblController {
 
     // Feeder
     feeder = null;
+
     feederCB = null;
 
     // Sender
@@ -1743,14 +1743,6 @@ class GrblController {
                 this.command('feeder:start');
                 this.runPostChangeHook();
             },
-            'gcode:outline': () => {
-                //const [gcode = '', concavity = 450] = args;
-                //const toRun = getOutlineGcode(gcode, concavity);
-                const [outlineGcode] = args;
-                log.debug('Running outline');
-                this.emit('outline:start');
-                this.command('gcode', outlineGcode);
-            }
         }[cmd];
 
         if (!handler) {
