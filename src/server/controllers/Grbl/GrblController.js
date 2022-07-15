@@ -1597,17 +1597,17 @@ class GrblController {
                 // Move tooltip by user defined moveFactor($27)
                 // Check current move factor
                 const tooltipMoveFactor =
-                    this.store.controller.settings.settings.$27;
+                    this.settings.settings.$27;
                 // Check current x,y sensor position($23)
                 // 0 is top right
                 // 1 is top left
                 // 2 bottom right
                 // 3 bottom left
                 const sensorPositon =
-                    this.store.controller.settings.settings.$23;
+                    this.settings.settings.$23;
                 // Check which switch was triggered and move $27setting units
                 //towards calculated direction
-                const pinState = this.store.controller.state.status.pinState;
+                const pinState = this.state.status.pinState;
                 switch (sensorPositon) {
                 case 0:
                     // sensor corner - top right
