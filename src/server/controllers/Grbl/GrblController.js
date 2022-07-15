@@ -1533,6 +1533,15 @@ class GrblController {
                 ];
                 this.command('gcode', commands);
             },
+            'laserpower:change': () => {
+                const [power = 0, maxS = 1000] = args;
+                const commands = [
+                    // https://github.com/gnea/grbl/wiki/Grbl-v1.1-Laser-Mode
+                    // The laser will only turn on when Grbl is in a G1, G2, or G3 motion mode.
+                    'S' + Math.round(ensurePositiveNumber(maxS * (power / 100)) * 100) / 100
+                ];
+                this.command('gcode', commands);
+            },
             'gcode': () => {
                 const [commands, context] = args;
                 const data = ensureArray(commands)
