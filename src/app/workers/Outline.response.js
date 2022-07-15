@@ -1,5 +1,5 @@
 import controller from '../lib/controller';
 
 export const outlineResponse = ({ data }) => {
-    controller.command('gcode', data.outlineGcode, 500);
+    controller.command('gcode', data.outlineGcode);
 };
