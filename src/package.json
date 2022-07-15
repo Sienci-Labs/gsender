@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.1.2",
+  "version": "1.2.0-beta",
   "productName": "gSender",
   "description": "CNC Milling Controller",
   "author": {
@@ -46,6 +46,7 @@
     "i18next": "~15.0.9",
     "i18next-fs-backend": "^1.1.4",
     "i18next-http-middleware": "^3.2.1",
+    "ip": "^1.1.8",
     "is-electron": "~2.2.0",
     "is-online": "^9.0.1",
     "jsonwebtoken": "~8.5.1",

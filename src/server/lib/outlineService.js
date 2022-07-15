@@ -36,12 +36,12 @@ function vertex(x, y) {
     ];
 }
 
-export function getOutlineGcode(gcode, concavity = 60) {
+export function getOutlineGcode(gcode, concavity = 60, isLaser = false) {
     const vertices = [];
     const toolpath = new Toolpath({
         addLine: ({ motion }, v1, v2) => {
             // We ignore G0 movements since they generally aren't cutting movements
-            if (motion === 'G1') {
+            if (motion === 'G1' || motion === 'G0') {
                 vertices.push(vertex(v2.x, v2.y));
             }
         },
@@ -89,22 +89,31 @@ export function getOutlineGcode(gcode, concavity = 60) {
     log.debug(`Generating hull with accuracy of ${concavity}`);
     const fileHull = ch(vertices, concavity);
 
-    const gCode = convertPointsToGCode(fileHull);
+    const gCode = convertPointsToGCode(fileHull, isLaser);
 
     return gCode;
 }
 
-function convertPointsToGCode(points) {
+function convertPointsToGCode(points, isLaser) {
     const gCode = [];
+    const movementModal = isLaser ? 'G1' : 'G0'; // G1 is necessary for laser outline since G0 won't enable it
     gCode.push('%X0=posx,Y0=posy,Z0=posz');
     gCode.push('%MM=modal.distance');
     gCode.push('G21 G91 G0 Z5');
+    // Laser outline requires some additional preamble for feedrate and enabling the laser
+    if (isLaser) {
+        gCode.push('G1F1000 M3 S1');
+    }
     points.forEach(point => {
         const [x, y] = point;
-        gCode.push(`G21 G90 G0 X${x} Y${y}`);
+        gCode.push(`G21 G90 ${movementModal} X${x} Y${y}`);
     });
+    if (isLaser) {
+        gCode.push('M5 S0');
+    }
     gCode.push('G0 X[X0] Y[Y0]');
     gCode.push('G21 G91 G0 Z-5');
+
     gCode.push('[MM]');
     return gCode;
 }

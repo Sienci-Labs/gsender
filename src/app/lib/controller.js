@@ -42,31 +42,31 @@ class Controller {
     listeners = {
         // Socket.IO Events
         // Fired upon a connection including a successful reconnection.
-        'connect': [],
+        connect: [],
         // Fired upon a connection error.
-        'connect_error': [],
+        connect_error: [],
         // Fired upon a connection timeout.
-        'connect_timeout': [],
+        connect_timeout: [],
         // Fired when an error occurs.
-        'error': [],
+        error: [],
         // Fired upon a disconnection.
-        'disconnect': [],
+        disconnect: [],
         // Fired upon a successful reconnection.
-        'reconnect': [],
+        reconnect: [],
         // Fired upon an attempt to reconnect.
-        'reconnect_attempt': [],
+        reconnect_attempt: [],
         // Fired upon an attempt to reconnect.
-        'reconnecting': [],
+        reconnecting: [],
         // Fired upon a reconnection attempt error.
-        'reconnect_error': [],
+        reconnect_error: [],
         // Fired when couldn't reconnect within reconnectionAttempts.
-        'reconnect_failed': [],
+        reconnect_failed: [],
         // Fired when gcode errors are found in files...
-        'gcode_error': [],
-        'gcode_error_checking_file': [],
+        gcode_error: [],
+        gcode_error_checking_file: [],
 
         // System ToolChange
-        'startup': [],
+        startup: [],
         'config:change': [],
         'task:start': [],
         'task:finish': [],
@@ -87,15 +87,15 @@ class Controller {
         'workflow:state': [],
         'controller:settings': [],
         'controller:state': [],
-        'message': [],
+        message: [],
         'toolchange:start': [],
         'toolchange:preHookComplete': [],
         'toolchange:tool': [],
-        'hPong': [],
+        hPong: [],
         'outline:start': [],
         'file:load': [],
         'file:unload': [],
-        'homing:flag': []
+        'homing:flag': [],
     };
 
     context = {
@@ -104,7 +104,7 @@ class Controller {
         ymin: 0,
         ymax: 0,
         zmin: 0,
-        zmax: 0
+        zmax: 0,
     };
 
     // User-defined baud rates and ports
@@ -123,7 +123,7 @@ class Controller {
     state = {};
 
     workflow = {
-        state: 'idle' // running|paused|idle
+        state: 'idle', // running|paused|idle
     };
 
     // Connection options
@@ -134,7 +134,9 @@ class Controller {
     // @param {object} io The socket.io-client module.
     constructor(io) {
         if (!io) {
-            throw new Error(`Expected the socket.io-client module, but got: ${io}`);
+            throw new Error(
+                `Expected the socket.io-client module, but got: ${io}`
+            );
         }
 
         this.io = io;
@@ -157,9 +159,9 @@ class Controller {
 
         options = {
             ...options,
-            'reconnection': true,
-            'reconnectionDelay': 500,
-            'reconnectionAttempts': 10
+            reconnection: true,
+            reconnectionDelay: 500,
+            reconnectionAttempts: 10,
         };
 
         this.host = host;
@@ -172,7 +174,6 @@ class Controller {
         this.socket.on('disconnect', () => {
             this.reconnect();
         });
-
 
         Object.keys(this.listeners).forEach((eventName) => {
             if (!this.socket) {
@@ -205,7 +206,7 @@ class Controller {
                 }
 
                 const listeners = ensureArray(this.listeners[eventName]);
-                listeners.forEach(listener => {
+                listeners.forEach((listener) => {
                     listener(...args);
                 });
             });
@@ -333,6 +334,8 @@ class Controller {
     //   controller.command('unlock')
     // - Reset
     //   controller.command('reset')
+    // - Check for State Update
+    //   controller.command('checkStateUpdate')
     // - Feed Override
     //   controller.command('feedOverride')
     // - Spindle Override
@@ -355,7 +358,11 @@ class Controller {
         if (!port) {
             return;
         }
-        this.socket && this.socket.emit.apply(this.socket, ['command', port, cmd].concat(args));
+        this.socket &&
+            this.socket.emit.apply(
+                this.socket,
+                ['command', port, cmd].concat(args)
+            );
     }
 
     // Writes data to the serial port.

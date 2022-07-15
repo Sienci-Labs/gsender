@@ -39,7 +39,7 @@ import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import Input from 'app/containers/Preferences/components/Input';
 import WorkerOutline from '../../workers/Outline.worker';
-
+import { isLaserMode } from 'app/lib/laserMode';
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import {
