@@ -102,6 +102,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 ### 1.1.2 (July 15th, 2022)
 * Fix for start button sometimes not working when "Start Event" block enabled but empty
 * Laser offsets applied more intelligently
+* Fixed styling regression in probe widget height
 * Infrastructure for edge version
 
 ### 1.1.1 (July 4th, 2022)
