@@ -82,15 +82,6 @@ class SpindleWidget extends PureComponent {
         }
     }
 
-    // Public methods
-    collapse = () => {
-        this.setState({ minimized: true });
-    };
-
-    expand = () => {
-        this.setState({ minimized: false });
-    };
-
     config = new WidgetConfig(this.props.widgetId);
 
     state = this.getInitialState();
@@ -308,23 +299,34 @@ class SpindleWidget extends PureComponent {
         return p;
     }
 
+    // Take into account the current wpos when setting offsets
+    calculateAdjustedOffsets(xOffset, yOffset) {
+        const { wpos } = this.props;
+        const { x, y } = wpos;
+        return [Number(x) + Number(xOffset), Number(y) + Number(yOffset)];
+    }
+
     getLaserOffsetCode() {
         const laser = this.config.get('laser');
+
+
         this.setState({
             laser
         });
         const { xOffset, yOffset } = laser;
+        const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset);
+
         let offsetQuery = [];
         if (xOffset === 0 && yOffset !== 0) {
             offsetQuery = [
-                `G10 L20 P${this.getWCS()} Y${yOffset}`
+                `G10 L20 P${this.getWCS()} Y${yOffsetAdjusted}`
             ];
         } else if (xOffset !== 0 && yOffset === 0) {
             offsetQuery = [
-                `G10 L20 P${this.getWCS()} X${xOffset}`
+                `G10 L20 P${this.getWCS()} X${xoffsetAdjusted}`
             ];
         } else if (xOffset !== 0 && yOffset !== 0) {
-            offsetQuery = [`G10 L20 P${this.getWCS()} X${xOffset} Y${yOffset}`];
+            offsetQuery = [`G10 L20 P${this.getWCS()} X${xoffsetAdjusted} Y${yOffsetAdjusted}`];
         } else {
             offsetQuery = [''];
         }
@@ -340,14 +342,15 @@ class SpindleWidget extends PureComponent {
         let { xOffset, yOffset } = laser;
         xOffset = Number(xOffset) * -1;
         yOffset = Number(yOffset) * -1;
+        const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset);
         if (xOffset === 0 && yOffset !== 0) {
             offsetQuery = [
-                `G10 L20 P${this.getWCS()} Y${yOffset}`
+                `G10 L20 P${this.getWCS()} Y${yOffsetAdjusted}`
             ];
         } else if (xOffset !== 0 && yOffset === 0) {
-            offsetQuery = [`G10 L20 P${this.getWCS()} X${xOffset}`];
+            offsetQuery = [`G10 L20 P${this.getWCS()} X${xoffsetAdjusted}`];
         } else if (xOffset !== 0 && yOffset !== 0) {
-            offsetQuery = [`G10 L20 P${this.getWCS()} X${xOffset} Y${yOffset}`];
+            offsetQuery = [`G10 L20 P${this.getWCS()} X${xoffsetAdjusted} Y${yOffsetAdjusted}`];
         } else {
             offsetQuery = [''];
         }
@@ -455,6 +458,7 @@ export default connect((store) => {
     const spindleMin = Number(get(settings, 'settings.$31', 1000));
     const spindleMax = Number(get(settings, 'settings.$30', 30000));
     const wcs = get(store, 'controller.modal.wcs');
+    const wpos = get(store, 'controller.wpos', {});
 
     return {
         workflow,
@@ -465,6 +469,7 @@ export default connect((store) => {
         settings,
         spindleMin,
         spindleMax,
-        wcs
+        wcs,
+        wpos
     };
 })(SpindleWidget);
