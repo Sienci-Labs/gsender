@@ -34,14 +34,29 @@ import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
-import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY } from 'app/constants';
+import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 
 
 export function* initialize() {
+    let currentState = GRBL_ACTIVE_STATE_IDLE;
+    let prevState = GRBL_ACTIVE_STATE_IDLE;
+
     /* Health check - every 3 minutes */
     setInterval(() => {
         controller.healthCheck();
     }, 1000 * 60 * 3);
+
+    const incrementJobCounter = () => {
+        let jobsFinished = store.get('workspace.jobsFinished');
+        jobsFinished++;
+        store.set('workspace.jobsFinished', jobsFinished);
+    };
+
+    const incrementTimeRun = (elapsedTime) => {
+        let timeSpentRunning = store.get('workspace.timeSpentRunning');
+        timeSpentRunning += elapsedTime;
+        store.set('workspace.timeSpentRunning', timeSpentRunning);
+    };
 
     controller.addListener('controller:settings', (type, settings) => {
         reduxStore.dispatch({
@@ -51,6 +66,11 @@ export function* initialize() {
     });
 
     controller.addListener('controller:state', (type, state) => {
+        // if state is the same, don't update the prev and current state
+        if (currentState !== state.status.activeState) {
+            prevState = currentState;
+            currentState = state.status.activeState;
+        }
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_STATE,
             payload: { type, state }
@@ -65,6 +85,15 @@ export function* initialize() {
     });
 
     controller.addListener('sender:status', (status) => {
+        // finished job
+        if (status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) {
+            incrementJobCounter();
+            incrementTimeRun(status.elapsedTime);
+        // cancelled job
+        } else if (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD) {
+            incrementTimeRun(status.elapsedTime);
+        }
+
         try {
             reduxStore.dispatch({
                 type: controllerActions.UPDATE_SENDER_STATUS,
