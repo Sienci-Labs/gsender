@@ -26,7 +26,6 @@ import * as parser from 'gcode-parser';
 import Toolpath from 'gcode-toolpath';
 import _ from 'lodash';
 import map from 'lodash/map';
-import controller from 'app/lib/controller';
 import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
@@ -1593,7 +1592,6 @@ class GrblController {
                 this.feeder.reset();
                 this.write('\x18'); // ^x
                 this.writeln('$X');
-
                 // Move tooltip by user defined moveFactor($27)
                 // Check current move factor
                 const tooltipMoveFactor =
@@ -1605,19 +1603,19 @@ class GrblController {
                 // 3 bottom left
                 const sensorPositon =
                     parseInt(this.settings.settings.$23, 10);
-                // Check which switch was triggered and move $27setting units
-                //towards calculated direction
+                // Check which switch was triggered and move $27setting units -
+                // - towards calculated direction
                 const pinState = this.state.status.pinState;
                 switch (sensorPositon) {
                 case 0:
                     // sensor corner - top right
                     if ('X' in pinState) {
-                        controller.command(
+                        this.controller.command(
                             'gcode',
                             `G0 Y-${tooltipMoveFactor}`
                         );
                     } else if ('Y' in pinState) {
-                        controller.command(
+                        this.controller.command(
                             'gcode',
                             `G0 X-${tooltipMoveFactor}`
                         );
@@ -1626,12 +1624,12 @@ class GrblController {
                 case 1:
                     // sensor corner - top left
                     if ('X' in pinState) {
-                        controller.command(
+                        this.command(
                             'gcode',
                             `G0 Y-${tooltipMoveFactor}`
                         );
                     } else if ('Y' in pinState) {
-                        controller.command(
+                        this.command(
                             'gcode',
                             `G0 X${tooltipMoveFactor}`
                         );
@@ -1640,12 +1638,12 @@ class GrblController {
                 case 2:
                     // sensor corner - bottom right
                     if ('X' in pinState) {
-                        controller.command(
+                        this.command(
                             'gcode',
                             `G0 Y${tooltipMoveFactor}`
                         );
                     } else if ('Y' in pinState) {
-                        controller.command(
+                        this.command(
                             'gcode',
                             `G0 X-${tooltipMoveFactor}`
                         );
@@ -1654,12 +1652,12 @@ class GrblController {
                 case 3:
                     // sensor corner - bottom left
                     if ('X' in pinState) {
-                        controller.command(
+                        this.command(
                             'gcode',
                             `G0 Y${tooltipMoveFactor}`
                         );
                     } else if ('Y' in pinState) {
-                        controller.command(
+                        this.command(
                             'gcode',
                             `G0 X${tooltipMoveFactor}`
                         );
