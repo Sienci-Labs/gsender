@@ -155,7 +155,7 @@ class SpindleWidget extends PureComponent {
             const { power, maxPower } = laser;
             const value = Number(e.target.value);
             if (this.isLaserOn) {
-                controller.command('laserpower:change', power, maxPower);
+                this.debounceLaserPower(power, maxPower);
             }
             this.setState({
                 laser: {
@@ -291,6 +291,10 @@ class SpindleWidget extends PureComponent {
     debouncedSpindleOverride = debounce((spindleSpeed) => {
         controller.command('spindleOverride', spindleSpeed);
     }, 250);
+
+    debounceLaserPower = debounce((power, maxPower) => {
+        controller.command('laserpower:change', power, maxPower);
+    }, 300);
 
     updateControllerSettings(max, min, mode) {
         reduxStore.dispatch({
