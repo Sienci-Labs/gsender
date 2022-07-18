@@ -23,6 +23,7 @@
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import without from 'lodash/without';
+import HeadlessIndicator from 'app/components/HeadlessIndicator';
 import Push from 'push.js';
 import isElectron from 'is-electron';
 import api from 'app/api';
@@ -212,7 +213,12 @@ class Header extends PureComponent {
             currentVersion: settings.version,
             latestVersion: settings.version,
             updateAvailable: false,
-            connected: controller.connected
+            connected: controller.connected,
+            hostInformation: {
+                address: '0.0.0.0',
+                port: 0,
+                headless: false
+            }
         };
     }
 
@@ -224,6 +230,14 @@ class Header extends PureComponent {
 
         if (isElectron()) {
             this.registerIPCListeners();
+            window.ipcRenderer.invoke('check-remote-status').then(result => {
+                console.log(result);
+                this.setState({
+                    hostInformation: {
+                        ...result
+                    }
+                });
+            });
         }
     }
 
@@ -284,16 +298,17 @@ class Header extends PureComponent {
     }
 
     render() {
-        const { updateAvailable } = this.state;
+        const { updateAvailable, hostInformation } = this.state;
         return (
-            <div className={ styles.navBar }>
-                <div className={ styles.primary }>
+            <div className={styles.navBar}>
+                <div className={styles.primary}>
                     <NavLogo updateAvailable={ updateAvailable } onClick={ () => this.toggleUpdateToast() }/>
                     <NavbarConnection
                         state={ this.state }
                         actions={ this.actions }
                         widgetId="connection"
                     />
+                    {hostInformation.headless && <HeadlessIndicator {...hostInformation} />}
                 </div>
                 <NavSidebar />
             </div>

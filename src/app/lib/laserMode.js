@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -20,45 +20,10 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import { LASER_MODE, SPINDLE_MODE } from 'app/constants';
+import store from '../store';
 
-import styled from 'styled-components';
-
-const TaskbarButton = styled.button`
-    display: inline-block;
-    margin: 4px;
-    padding: 2px 5px;
-    border: 0;
-    font-weight: normal;
-    line-height: 0;
-    text-align: center;
-    white-space: nowrap;
-    touch-action: manipulation;
-    cursor: pointer;
-    background-image: none;
-    background-color: inherit;
-
-    opacity: 0.6;
-    &:hover {
-        opacity: .8;
-    }
-
-    &[disabled] {
-        opacity: .3;
-        cursor: not-allowed;
-    }
-    &[disabled]:hover {
-        background-color: inherit;
-    }
-
-    &:hover {
-        background-color: #e6e6e6;
-        text-decoration: none;
-    }
-
-    &:focus,
-    &:active {
-        outline: 0;
-    }
-`;
-
-export default TaskbarButton;
+export const isLaserMode = () => {
+    const mode = store.get('widgets.spindle.mode', SPINDLE_MODE);
+    return mode === LASER_MODE;
+};

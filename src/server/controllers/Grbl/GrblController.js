@@ -1442,6 +1442,9 @@ class GrblController {
                 this.write('\x18'); // ^x
                 this.writeln('$X');
             },
+            'checkStateUpdate': () => {
+                this.emit('controller:state', GRBL, this.state);
+            },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             //   0: Set 100% of programmed rate.
@@ -1527,6 +1530,15 @@ class GrblController {
             'lasertest:off': () => {
                 const commands = [
                     'M5S0'
+                ];
+                this.command('gcode', commands);
+            },
+            'laserpower:change': () => {
+                const [power = 0, maxS = 1000] = args;
+                const commands = [
+                    // https://github.com/gnea/grbl/wiki/Grbl-v1.1-Laser-Mode
+                    // The laser will only turn on when Grbl is in a G1, G2, or G3 motion mode.
+                    'S' + Math.round(ensurePositiveNumber(maxS * (power / 100)) * 100) / 100
                 ];
                 this.command('gcode', commands);
             },
