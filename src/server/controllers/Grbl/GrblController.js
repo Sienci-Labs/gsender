@@ -1231,7 +1231,7 @@ class GrblController {
                 const [lineToStartFrom] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
-                console.log(startEventEnabled);
+                log.info(startEventEnabled);
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
