@@ -107,6 +107,10 @@ class GrblController {
             this.ready = false;
             if (err) {
                 log.error(`Unexpected error while reading/writing serial port "${this.options.port}":`, err);
+                this.emit('electron-error', {
+                    type: 'GRBL_ERROR',
+                    message: `Unexpected error while reading/writing serial port "${this.options.port}`,
+                });
             }
         }
     };
@@ -305,6 +309,10 @@ class GrblController {
         this.feeder.on('data', (line = '', context = {}) => {
             if (this.isClose()) {
                 log.error(`Serial port "${this.options.port}" is not accessible`);
+                this.emit('electron-error', {
+                    type: 'GRBL_ERROR',
+                    message: `Serial port "${this.options.port}" is not accessible`,
+                });
                 return;
             }
 
@@ -431,6 +439,10 @@ class GrblController {
         this.sender.on('data', (line = '', context = {}) => {
             if (this.isClose()) {
                 log.error(`Serial port "${this.options.port}" is not accessible`);
+                this.emit('electron-error', {
+                    type: 'GRBL_ERROR',
+                    message: `Serial port "${this.options.port}" is not accessible`,
+                });
                 return;
             }
 
@@ -557,6 +569,10 @@ class GrblController {
                 this.emit('serialport:read', res.raw);
                 if (!hold) {
                     log.error('The sender does not hold off during the paused state');
+                    this.emit('electron-error', {
+                        type: 'GRBL_ERROR',
+                        message: 'The sender does not hold off during the paused state',
+                    });
                 }
                 if (received + 1 >= sent) {
                     log.debug(`Stop sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
@@ -577,6 +593,10 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
             log.error(`Error occurred at ${Date.now()}`);
+            this.emit('electron-error', {
+                type: 'GRBL_ERROR',
+                message: `Error occurred at ${Date.now()}`,
+            });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { lines, received } = this.sender.state;
@@ -625,6 +645,10 @@ class GrblController {
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
+                this.emit('electron-error', {
+                    type: 'GRBL_ERROR',
+                    message: `ALARM:${code} (${alarm.message})`,
+                });
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
 
@@ -994,6 +1018,10 @@ class GrblController {
         // Assertion check
         if (this.isOpen()) {
             log.error(`Cannot open serial port "${port}"`);
+            this.emit('electron-error', {
+                type: 'GRBL_ERROR',
+                message: `Cannot open serial port "${port}`,
+            });
             return;
         }
 
@@ -1005,6 +1033,10 @@ class GrblController {
             if (err) {
                 log.error(`Error opening serial port "${port}":`, err);
                 this.emit('serialport:error', { err: err, port: port });
+                this.emit('electron-error', {
+                    type: 'GRBL_ERROR',
+                    message: `Error opening serial port "${port}"`,
+                });
                 callback(err); // notify error
                 return;
             }
@@ -1089,6 +1121,10 @@ class GrblController {
     addConnection(socket) {
         if (!socket) {
             log.error('The socket parameter is not specified');
+            this.emit('electron-error', {
+                type: 'GRBL_ERROR',
+                message: 'The socket parameter is not specified',
+            });
             return;
         }
 
@@ -1134,6 +1170,10 @@ class GrblController {
     removeConnection(socket) {
         if (!socket) {
             log.error('The socket parameter is not specified');
+            this.emit('electron-error', {
+                type: 'GRBL_ERROR',
+                message: 'The socket parameter is not specified',
+            });
             return;
         }
 
@@ -1563,6 +1603,10 @@ class GrblController {
 
                 if (!deviceUnits) {
                     log.error('Unable to determine device unit modal');
+                    this.emit('electron-error', {
+                        type: 'GRBL_ERROR',
+                        message: 'Unable to determine device unit modal',
+                    });
                     return;
                 }
                 // Force command in preferred units
@@ -1673,6 +1717,10 @@ class GrblController {
 
                 if (!macro) {
                     log.error(`Cannot find the macro: id=${id}`);
+                    this.emit('electron-error', {
+                        type: 'GRBL_ERROR',
+                        message: `Cannot find the macro: id=${id}`,
+                    });
                     return;
                 }
 
@@ -1693,6 +1741,10 @@ class GrblController {
 
                 if (!macro) {
                     log.error(`Cannot find the macro: id=${id}`);
+                    this.emit('electron-error', {
+                        type: 'GRBL_ERROR',
+                        message: `Cannot find the macro: id=${id}`,
+                    });
                     return;
                 }
 
@@ -1747,6 +1799,10 @@ class GrblController {
 
         if (!handler) {
             log.error(`Unknown command: ${cmd}`);
+            this.emit('electron-error', {
+                type: 'GRBL_ERROR',
+                message: `Unknown command: ${cmd}`,
+            });
             return;
         }
 
@@ -1757,6 +1813,10 @@ class GrblController {
         // Assertion check
         if (this.isClose()) {
             log.error(`Serial port "${this.options.port}" is not accessible`);
+            this.emit('electron-error', {
+                type: 'GRBL_ERROR',
+                message: `Serial port "${this.options.port}" is not accessible`,
+            });
             return;
         }
 

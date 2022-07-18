@@ -159,6 +159,10 @@ const main = () => {
             });
 
             ipcMain.on('log-error', (channel, err) => {
+                if ('type' in err) {
+                    log.transports.file.level = 'error';
+                    log.transports.file.resolvePath = () => path.join(__dirname, '/logs.txt');
+                }
                 log.error(err.message);
             });
 
@@ -193,8 +197,7 @@ const main = () => {
                                 { name: 'GCode Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
                                 { name: 'All Files', extensions: ['*'] }
                             ]
-                        },
-                    );
+                        },);
 
                     if (!file) {
                         return;
