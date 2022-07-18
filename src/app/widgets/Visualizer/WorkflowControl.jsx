@@ -292,7 +292,7 @@ class WorkflowControl extends PureComponent {
         workerOutline.onmessage = ({ data }) => {
             outlineResponse({ data }, machineProfile.laserOnOutline);
         };
-        workerOutline.postMessage({ gcode });
+        workerOutline.postMessage({ gcode, isLaser: machineProfile.laserOnOutline });
     }
 
     startFromLinePrompt = () => {
