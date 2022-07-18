@@ -1,8 +1,9 @@
 import { ensurePositiveNumber } from 'ensure-type';
+import { isLaserMode } from 'app/lib/laserMode';
 import controller from '../lib/controller';
 
 export const outlineResponse = ({ data }, isLaserOn) => {
-    if (isLaserOn) {
+    if (isLaserOn && isLaserMode()) {
         const power = 1, maxS = 1000;
         let turnOn = 'G1F1 M3 S' + ensurePositiveNumber(maxS * (power / 100));
         let turnOff = 'M5 S0';
