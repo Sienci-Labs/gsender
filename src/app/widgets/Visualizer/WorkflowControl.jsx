@@ -283,13 +283,14 @@ class WorkflowControl extends PureComponent {
     runOutline = () => {
         const workerOutline = new WorkerOutline();
         const { gcode } = this.props;
+        const machineProfile = store.get('workspace.machineProfile');
         Toaster.pop({
             TYPE: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE,
             msg: 'Generating outline for current file'
         });
         workerOutline.onmessage = ({ data }) => {
-            outlineResponse({ data });
+            outlineResponse({ data }, machineProfile.laserOnOutline);
         };
         workerOutline.postMessage({ gcode });
     }
