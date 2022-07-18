@@ -20,6 +20,8 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import log from './log';
+
 const path = require('path');
 const fs = require('fs').promises;
 const fsBase = require('fs');
@@ -34,7 +36,8 @@ const fileExistsAtPath = async (filePath) => {
     try {
         await fs.access(filePath);
         return true;
-    } catch (e) {
+    } catch (error) {
+        log.error(error);
         return false;
     }
 };
@@ -59,7 +62,8 @@ export const parseAndReturnGCode = async ({ filePath }) => {
             dir: fileDir,
             fullPath: filePath
         };
-    } catch (err) {
-        throw err;
+    } catch (error) {
+        log.error(error);
+        throw error;
     }
 };
