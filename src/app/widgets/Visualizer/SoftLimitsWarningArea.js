@@ -69,13 +69,11 @@ class ControlArea extends Component {
                 this.setState(() => {
                     return { $20: parseInt(reduxStore.getState().controller.settings.settings.$20, 10) };
                 });
-                console.log(this.state.$20);
             }),
             pubsub.subscribe('controller:settings', (msg, settings) => {
                 this.setState(() => {
                     return { $20: parseInt(settings.settings.$20, 10) };
                 });
-                console.log(this.state.$20);
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -89,7 +87,6 @@ class ControlArea extends Component {
     }
 
     render() {
-        console.log(this.state.$20);
         return (
             <div className={classnames(styles['control-area'])}>
                 {

@@ -1452,14 +1452,13 @@ class Visualizer extends Component {
     }
 
     calculateLimits(data) {
-        /* get machine 0
-                0 is top right
-                1 is top left
-                2 bottom right
-                3 bottom left
+        const { workPosition, machinePosition, machineCorner, softXMax, softYMax, softZMax } = this.props;
+        /* machineCorner:
+            0 is top right
+            1 is top left
+            2 bottom right
+            3 bottom left
         */
-        let machineCorner = reduxStore.getState().controller.settings.settings.$23;
-
         let xMultiplier = 1;
         let yMultiplier = 1;
         switch (machineCorner) {
@@ -1482,36 +1481,31 @@ class Visualizer extends Component {
             break;
         }
 
-        // get soft limits
-        let xMax = parseFloat(reduxStore.getState().controller.settings.settings.$130);
-        let yMax = parseFloat(reduxStore.getState().controller.settings.settings.$131);
-        let zMax = parseFloat(reduxStore.getState().controller.settings.settings.$132);
-
         // get wpos
         let wpos;
         if (data !== 0) {
-            wpos = reduxStore.getState().controller.wpos;
+            wpos = workPosition;
         } else {
             wpos = {
                 x: 0,
                 y: 0,
-                z: reduxStore.getState().controller.wpos.z,
+                z: workPosition.z,
             };
         }
 
         // get mpos
-        let machinepos = reduxStore.getState().controller.mpos;
+        let mpos = machinePosition;
 
         let origin = {
-            x: parseFloat(machinepos.x) - parseFloat(wpos.x) * xMultiplier,
-            y: parseFloat(machinepos.y) - parseFloat(wpos.y) * yMultiplier,
-            z: parseFloat(machinepos.z) - parseFloat(wpos.z)
+            x: parseFloat(mpos.x) - parseFloat(wpos.x) * xMultiplier,
+            y: parseFloat(mpos.y) - parseFloat(wpos.y) * yMultiplier,
+            z: parseFloat(mpos.z) - parseFloat(wpos.z)
         };
 
         let limitsMax = {
-            x: xMax * xMultiplier - origin.x,
-            y: yMax * yMultiplier - origin.y,
-            z: zMax - origin.z,
+            x: softXMax * xMultiplier - origin.x,
+            y: softYMax * yMultiplier - origin.y,
+            z: softZMax - origin.z,
         };
 
         let limitsMin = {
@@ -1521,8 +1515,9 @@ class Visualizer extends Component {
         };
 
         // get bbox
-        let bboxMin = reduxStore.getState().file.bbox.min;
-        let bboxMax = reduxStore.getState().file.bbox.max;
+        let bbox = reduxStore.getState().file.bbox;
+        let bboxMin = bbox.min;
+        let bboxMax = bbox.max;
 
         // check if machine will leave soft limits
         if (bboxMax.x > limitsMax.x || bboxMin.x < limitsMin.x ||
@@ -1755,11 +1750,20 @@ export default connect((store) => {
     const machinePosition = _get(store, 'controller.mpos');
     const workPosition = _get(store, 'controller.wpos');
     const receivedLines = _get(store, 'controller.sender.status.received', 0);
+    // soft limits
+    const softXMax = _get(store, 'controller.settings.settings.$130');
+    const softYMax = _get(store, 'controller.settings.settings.$131');
+    const softZMax = _get(store, 'controller.settings.settings.$132');
+    const machineCorner = _get(store, 'controller.settings.settings.$23');
     const { activeVisualizer } = store.visualizer;
     return {
         machinePosition,
         workPosition,
         receivedLines,
+        softXMax,
+        softYMax,
+        softZMax,
+        machineCorner,
         activeVisualizer
     };
 }, null, null, { forwardRef: true })(Visualizer);
