@@ -23,7 +23,6 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import reduxStore from 'app/store/redux';
 import classnames from 'classnames';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
@@ -65,16 +64,6 @@ class ControlArea extends Component {
                     return { showWarning: false };
                 });
             }),
-            pubsub.subscribe('machine:connected', () => {
-                this.setState(() => {
-                    return { $20: parseInt(reduxStore.getState().controller.settings.settings.$20, 10) };
-                });
-            }),
-            pubsub.subscribe('controller:settings', (msg, settings) => {
-                this.setState(() => {
-                    return { $20: parseInt(settings.settings.$20, 10) };
-                });
-            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -87,10 +76,11 @@ class ControlArea extends Component {
     }
 
     render() {
+        const { softLimitsEnabled } = this.props;
         return (
             <div className={classnames(styles['control-area'])}>
                 {
-                    this.state.showWarning && this.state.$20 === 1
+                    this.state.showWarning && softLimitsEnabled
                         ? (
                             <div className={styles['status-message']}>
                                 Warning: Cut will leave soft limits!
@@ -104,14 +94,8 @@ class ControlArea extends Component {
 }
 
 export default connect((store) => {
-    const $22 = get(store, 'controller.settings.settings.$22', '0');
-    const alarmCode = get(store, 'controller.state.status.alarmCode');
-    const activeState = get(store, 'controller.state.status.activeState');
-    const isConnected = get(store, 'connection.isConnected');
+    const softLimitsEnabled = get(store, 'controller.settings.settings.$20') === '1';
     return {
-        $22,
-        alarmCode,
-        activeState,
-        isConnected
+        softLimitsEnabled
     };
 })(ControlArea);
