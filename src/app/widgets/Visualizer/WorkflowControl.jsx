@@ -58,7 +58,7 @@ import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
-    VISUALIZER_PRIMARY,
+    VISUALIZER_PRIMARY, LASER_MODE,
 } from '../../constants';
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
@@ -284,6 +284,10 @@ class WorkflowControl extends PureComponent {
         const workerOutline = new WorkerOutline();
         const { gcode } = this.props;
         const machineProfile = store.get('workspace.machineProfile');
+        const spindleMode = store.get('widgets.spindle.mode');
+        // outline toggled on and currently in laser mode
+        const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
+
         Toaster.pop({
             TYPE: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE,
@@ -292,7 +296,7 @@ class WorkflowControl extends PureComponent {
         workerOutline.onmessage = ({ data }) => {
             outlineResponse({ data }, machineProfile.laserOnOutline);
         };
-        workerOutline.postMessage({ gcode, isLaser: machineProfile.laserOnOutline });
+        workerOutline.postMessage({ gcode, isLaser });
     }
 
     startFromLinePrompt = () => {

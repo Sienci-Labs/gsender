@@ -29,7 +29,7 @@ import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
 import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
@@ -314,14 +314,6 @@ export function* initialize() {
             msg: `'${data}' pause command found in file - press "Resume Job" to continue running.`,
             type: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE
-        });
-    });
-
-    controller.addListener('outline:start', () => {
-        Toaster.clear();
-        Toaster.pop({
-            type: TOASTER_SUCCESS,
-            msg: 'Running file outline'
         });
     });
 
