@@ -23,6 +23,7 @@
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import reduxStore from 'app/store/redux';
 import classnames from 'classnames';
 import get from 'lodash/get';
 import pubsub from 'pubsub-js';
@@ -37,7 +38,8 @@ class ControlArea extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            showWarning: false
+            showWarning: false,
+            $20: 0
         };
     }
 
@@ -63,6 +65,18 @@ class ControlArea extends Component {
                     return { showWarning: false };
                 });
             }),
+            pubsub.subscribe('machine:connected', () => {
+                this.setState(() => {
+                    return { $20: parseInt(reduxStore.getState().controller.settings.settings.$20, 10) };
+                });
+                console.log(this.state.$20);
+            }),
+            pubsub.subscribe('controller:settings', (msg, settings) => {
+                this.setState(() => {
+                    return { $20: parseInt(settings.settings.$20, 10) };
+                });
+                console.log(this.state.$20);
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -75,10 +89,11 @@ class ControlArea extends Component {
     }
 
     render() {
+        console.log(this.state.$20);
         return (
             <div className={classnames(styles['control-area'])}>
                 {
-                    this.state.showWarning //Show disconnected until machine connection process is finished, otherwise an empty div is shown
+                    this.state.showWarning && this.state.$20 === 1
                         ? (
                             <div className={styles['status-message']}>
                                 Warning: Cut will leave soft limits!

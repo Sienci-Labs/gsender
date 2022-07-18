@@ -48,6 +48,7 @@ export function* initialize() {
             type: controllerActions.UPDATE_CONTROLLER_SETTINGS,
             payload: { type, settings }
         });
+        pubsub.publish('controller:settings', settings);
     });
 
     controller.addListener('controller:state', (type, state) => {
