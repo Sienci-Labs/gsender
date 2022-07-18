@@ -1452,33 +1452,34 @@ class Visualizer extends Component {
     }
 
     calculateLimits(data) {
-        const { workPosition, machinePosition, machineCorner, softXMax, softYMax, softZMax } = this.props;
+        const { workPosition, machinePosition, softXMax, softYMax, softZMax, homingFlag, machineCorner } = this.props;
         /* machineCorner:
             0 is top right
             1 is top left
             2 bottom right
             3 bottom left
         */
-        let xMultiplier = 1;
-        let yMultiplier = 1;
-        switch (machineCorner) {
-        case 0:
-            xMultiplier = -1;
-            yMultiplier = -1;
-            break;
-        case 1:
-            xMultiplier = 1;
-            yMultiplier = -1;
-            break;
-        case 2:
-            xMultiplier = -1;
-            yMultiplier = 1;
-            break;
-        case 3:
-        default:
-            xMultiplier = 1;
-            yMultiplier = 1;
-            break;
+        let xMultiplier = -1;
+        let yMultiplier = -1;
+        if (homingFlag) {
+            switch (machineCorner) {
+            case 1:
+                xMultiplier = 1;
+                yMultiplier = -1;
+                break;
+            case 2:
+                xMultiplier = -1;
+                yMultiplier = 1;
+                break;
+            case 3:
+                xMultiplier = 1;
+                yMultiplier = 1;
+                break;
+            // case 0 and default are negative space, which is already assigned
+            case 0:
+            default:
+                break;
+            }
         }
 
         // get wpos
@@ -1754,6 +1755,7 @@ export default connect((store) => {
     const softXMax = _get(store, 'controller.settings.settings.$130');
     const softYMax = _get(store, 'controller.settings.settings.$131');
     const softZMax = _get(store, 'controller.settings.settings.$132');
+    const homingFlag = _get(store, 'controller.homingFlag');
     const machineCorner = _get(store, 'controller.settings.settings.$23');
     const { activeVisualizer } = store.visualizer;
     return {
@@ -1763,6 +1765,7 @@ export default connect((store) => {
         softXMax,
         softYMax,
         softZMax,
+        homingFlag,
         machineCorner,
         activeVisualizer
     };

@@ -744,7 +744,7 @@ class VisualizerWidget extends PureComponent {
             port: controller.port,
             units: store.get('workspace.units', METRIC_UNITS),
             theme: this.config.get('theme'),
-            showSoftLimitsWarning: this.config.get('showSoftLimitsWarning') ? this.config.get('showSoftLimitsWarning') : false,
+            showSoftLimitsWarning: this.config.get('showSoftLimitsWarning', false),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
