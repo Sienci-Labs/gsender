@@ -99,7 +99,7 @@ onmessage = ({ data }) => {
         gCode.push('G21 G91 G0 Z5');
         // Laser outline requires some additional preamble for feedrate and enabling the laser
         if (isLaser) {
-            gCode.push('G1F1000 M3 S1');
+            gCode.push('G1F3000 M3 S1');
         }
         points.forEach(point => {
             const [x, y] = point;
