@@ -20,29 +20,18 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import path from 'path';
-import babel from 'rollup-plugin-babel';
-import commonjs from 'rollup-plugin-commonjs';
-import resolve from 'rollup-plugin-node-resolve';
-import replace from 'rollup-plugin-replace';
 
-const NODE_ENV = process.env.NODE_ENV || 'development';
+import React from 'react';
+import cx from 'classnames';
+import styles from './index.styl';
 
-export default {
-    plugins: [
-        replace({
-            'process.env.NODE_ENV': JSON.stringify(NODE_ENV)
-        }),
-        babel({
-            exclude: 'node_modules/**'
-        }),
-        resolve(),
-        commonjs()
-    ],
-    input: path.resolve(__dirname, 'src/app/index.jsx'),
-    output: [
-        {
-            file: path.resolve(__dirname, 'output/gSender/bundle.js')
-        }
-    ]
+
+const RemoteAlert = () => {
+    return (
+        <div className={cx(styles.remoteAlert, styles.pulse)} >
+            <i className="fas fa-broadcast-tower" />
+        </div>
+    );
 };
+
+export default RemoteAlert;

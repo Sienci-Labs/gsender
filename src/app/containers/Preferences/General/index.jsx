@@ -30,6 +30,7 @@ import GeneralArea from '../components/GeneralArea';
 import Workspace from './Workspace';
 import Movement from './Movement';
 import Settings from './Settings';
+import CustomDecimalPlaces from './CustomDecimalPlaces';
 
 const General = ({ active, state, actions }) => {
     return (
@@ -45,6 +46,7 @@ const General = ({ active, state, actions }) => {
                 <GeneralArea.Half>
                     <MachineProfile state={state} />
                     <Movement state={state} actions={actions} />
+                    <CustomDecimalPlaces state={state} actions={actions}/>
                     <Settings />
                 </GeneralArea.Half>
 

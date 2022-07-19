@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-globals */
 import React from 'react';
 
 import store from 'app/store';
@@ -6,26 +5,36 @@ import defaultState from 'app/store/defaultState';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
+import api from 'app/api';
 
 import Fieldset from '../components/Fieldset';
 
 const Settings = () => {
     const inputRef = React.createRef();
 
-    const handleRestoreClick = () => {
+    const handleRestoreDefaultClick = () => {
         Confirm({
             title: 'Restore Settings',
             content: 'All your current settings will be removed. Are you sure you want to restore default settings on gSender?',
             confirmLabel: 'Restore Settings',
-            onConfirm: restoreDefaultSettings
+            onConfirm: restoreDefault
         });
     };
 
-    const restoreDefaultSettings = () => {
-        store.restoreState(defaultState);
+    const restoreDefault = async () => {
+        const res = await api.events.fetch();
+        const events = res.body.records;
+
+        await Promise.all(events.map((event) => api.events.delete(event.id)));
+
+        restoreSettings(defaultState);
+    };
+
+    const restoreSettings = (state) => {
+        store.restoreState(state);
 
         setTimeout(() => {
-            location.reload();
+            window.location.reload();
         }, 250);
     };
 
@@ -44,14 +53,16 @@ const Settings = () => {
         if (file) {
             const reader = new FileReader();
             reader.readAsText(file, 'UTF-8');
-            reader.onload = (event) => {
-                const settings = JSON.parse(event.target.result);
+            reader.onload = async (event) => {
+                const { settings, events = [] } = JSON.parse(event.target.result);
 
-                store.restoreState(settings);
+                await Promise.all(
+                    events.map((event) => (event.id
+                        ? api.events.update(event.id, event)
+                        : api.events.create(event)))
+                );
 
-                setTimeout(() => {
-                    location.reload();
-                }, 250);
+                restoreSettings(settings);
             };
             reader.onerror = () => {
                 Toaster.pop({
@@ -62,13 +73,15 @@ const Settings = () => {
         }
     };
 
-    const exportSettings = () => {
+    const exportSettings = async () => {
         const settings = store.get();
-        settings.commandKeys = settings.commandKeys.filter((key) => key.category !== 'Macros');
+        settings.commandKeys = settings.commandKeys.filter((key) => key.category !== 'Macros'); //Exclude macro shortcuts
         delete settings.session;
-        // console.log(settings);
 
-        const settingsJSON = JSON.stringify(settings, null, 1);
+        const res = await api.events.fetch();
+        const events = res.body.records;
+
+        const settingsJSON = JSON.stringify({ settings, events }, null, 1);
         const data = new Blob([settingsJSON], {
             type: 'application/json'
         });
@@ -92,7 +105,7 @@ const Settings = () => {
 
     return (
         <Fieldset legend="Settings">
-            <Button primary style={{ margin: 0 }} onClick={handleRestoreClick}>Restore Default gSender Settings</Button>
+            <Button primary style={{ margin: 0 }} onClick={handleRestoreDefaultClick}>Restore Default gSender Settings</Button>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
                 <Button

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -21,49 +21,51 @@
  *
  */
 
-@import "nib";
-
-.tree-node {
-    cursor: default;
-
-    .selected&,
-    .selected&:hover {
-        background: #deecfd;
-    }
-
-    &:hover {
-        background: #f2fdff;
-    }
-    &:disabled,
-    &[disabled] {
-        cursor: not-allowed;
-        opacity: .5;
-    }
+.wrapper {
+  display: flex;
+  flex-direction row;
+  margin-left: 2rem;
+  align-items center;
+  justify-content center;
+  gap: 0.5rem;
+  color: #4D4D4D;
 }
 
-.tree-node-column {
-    padding: 2px 4px;
-
-    &.no-padding {
-        padding: 0;
-    }
+@keyframes float {
+  0% {
+    box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+    transform: translatey(0px);
+  }
+  50% {
+    box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
+    transform: translatex(-2px);
+  }
+  100% {
+    box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+    transform: translatey(0px);
+  }
 }
 
-.tree-toggler {
-    display: inline-block;
-    width: 18px;
-    text-align: center;
-    cursor: pointer;
-    color: #666;
-    margin-left: -2px;
-    margin-right: 2px;
-
-    &:hover {
-        color: #333;
-        text-decoration: none;
-    }
+.pulse {
+  animation: float 2s infinite;
 }
 
-.no-data {
-    text-align: center;
+.remote-alert {
+  width: 2.5rem;
+  height: 2.5rem;
+  //background: linear-gradient(135deg, #3e85c7 0%, #73a7d9 100%)
+  background: #3e85c7;
+  border-radius: 50%;
+  display :flex
+  align-items center
+  justify-content center
+  color: #CCCCCC;
+  box-shadow: 0px 0px 1px 1px #0000001a;
 }
+
+.ip {
+  color: #FFFFFF
+}
+
+
+

@@ -16,9 +16,24 @@ const SpindleLaser = ({ active, state, actions }) => {
 
     const handleToggle = () => {
         const value = !machineProfile.spindle;
+        const laserOn = machineProfile.laserOnOutline;
         const updatedObj = {
             ...machineProfile,
-            spindle: value
+            spindle: value,
+            laserOnOutline: value === false ? false : laserOn
+        };
+
+        store.replace('workspace.machineProfile', updatedObj);
+        controller.command('machineprofile:load', updatedObj);
+
+        setMachineProfile(updatedObj);
+    };
+
+    const handleONToggle = () => {
+        const value = !machineProfile.laserOnOutline ? !machineProfile.laserOnOutline : false;
+        const updatedObj = {
+            ...machineProfile,
+            laserOnOutline: value
         };
 
         store.replace('workspace.machineProfile', updatedObj);
@@ -28,6 +43,8 @@ const SpindleLaser = ({ active, state, actions }) => {
     };
 
     const { spindle } = machineProfile;
+    const { laserOnOutline } = machineProfile;
+    console.log(machineProfile);
 
     return (
         <SettingWrapper title="Spindle/Laser" show={active}>
@@ -42,10 +59,18 @@ const SpindleLaser = ({ active, state, actions }) => {
                                 style={{ marginBottom: '1rem' }}
                             />
                         </TooltipCustom>
+                        <TooltipCustom content="Enable or Disable Laser ON during Outline" location="default">
+                            <ToggleSwitch
+                                label="Laser ON during Outline"
+                                disabled={!spindle}
+                                checked={laserOnOutline}
+                                onChange={handleONToggle}
+                                style={{ marginBottom: '1rem' }}
+                            />
+                        </TooltipCustom>
                     </Fieldset>
                     <Spindle state={state} actions={actions} />
                 </GeneralArea.Half>
-
                 <GeneralArea.Half>
                     <Laser state={state} actions={actions} />
                 </GeneralArea.Half>

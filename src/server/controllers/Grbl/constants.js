@@ -324,6 +324,15 @@ export const GRBL_ALARMS = [
     }
 ];
 
+export const GRBL_SETTINGS_INPUT_TYPES = {
+    NUMBER: 'number',
+    MASK: 'mask',
+    MASK_STATUS_REPORT: 'mask-status-report',
+    SWITCH: 'switch',
+};
+
+const { NUMBER, MASK, MASK_STATUS_REPORT, SWITCH } = GRBL_SETTINGS_INPUT_TYPES;
+
 // Settings
 // https://github.com/gnea/grbl/blob/master/doc/csv/setting_codes_en_US.csv
 export const GRBL_SETTINGS = [
@@ -333,7 +342,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'μs',
         description: 'Sets time length per step. Minimum 3usec.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 3,
         max: 12,
         step: 1
@@ -344,7 +353,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'ms',
         description: 'Sets a short hold delay when stopping to let dynamics settle before disabling steppers. Value 255 keeps motors enabled with no delay.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 25,
         max: 255,
         step: 5
@@ -355,7 +364,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'mask',
         description: 'Inverts the step signal. Set axis bit to invert (00000ZYX).',
-        inputType: 'mask2'
+        inputType: MASK
     },
     {
         setting: '$3',
@@ -363,7 +372,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'mask',
         description: 'Inverts the direction signal. Set axis bit to invert (00000ZYX).',
-        inputType: 'mask3'
+        inputType: MASK
     },
     {
         setting: '$4',
@@ -371,7 +380,7 @@ export const GRBL_SETTINGS = [
         category: 'Pins',
         units: 'boolean',
         description: 'Inverts the stepper driver enable pin signal.',
-        inputType: 'switch'
+        inputType: SWITCH
     },
     {
         setting: '$5',
@@ -379,7 +388,7 @@ export const GRBL_SETTINGS = [
         category: 'Pins',
         units: 'boolean',
         description: 'Inverts the all of the limit input pins.',
-        inputType: 'switch'
+        inputType: SWITCH
     },
     {
         setting: '$6',
@@ -387,7 +396,7 @@ export const GRBL_SETTINGS = [
         category: 'Pins',
         units: 'boolean',
         description: 'Inverts the probe input pin signal.',
-        inputType: 'switch'
+        inputType: SWITCH
     },
     {
         setting: '$10',
@@ -395,7 +404,7 @@ export const GRBL_SETTINGS = [
         category: 'GRBL',
         units: 'mask',
         description: 'Alters data included in status reports.',
-        inputType: 'mask10'
+        inputType: MASK_STATUS_REPORT
     },
     {
         setting: '$11',
@@ -403,7 +412,7 @@ export const GRBL_SETTINGS = [
         category: 'GRBL',
         units: 'mm',
         description: 'Sets how fast Grbl travels through consecutive motions. Lower value slows it down.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 0.001,
         max: 0.020,
         step: 0.001
@@ -414,7 +423,7 @@ export const GRBL_SETTINGS = [
         category: 'GRBL',
         units: 'mm',
         description: 'Sets the G2 and G3 arc tracing accuracy based on radial error. Beware: A very small value may effect performance.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 0.001,
         max: 0.003,
         step: 0.001
@@ -425,7 +434,7 @@ export const GRBL_SETTINGS = [
         category: 'GRBL',
         units: 'boolean',
         description: 'Enables inch units when returning any position and rate value that is not a settings value.',
-        inputType: 'switch'
+        inputType: SWITCH
     },
     {
         setting: '$20',
@@ -433,7 +442,7 @@ export const GRBL_SETTINGS = [
         category: 'Homing',
         units: 'boolean',
         description: 'Enables soft limits checks within machine travel and sets alarm when exceeded. Requires homing.',
-        inputType: 'switch'
+        inputType: SWITCH
     },
     {
         setting: '$21',
@@ -441,7 +450,7 @@ export const GRBL_SETTINGS = [
         category: 'Homing',
         units: 'boolean',
         description: 'Enables hard limits. Immediately halts motion and throws an alarm when switch is triggered.',
-        inputType: 'switch'
+        inputType: SWITCH
     },
     {
         setting: '$22',
@@ -449,7 +458,7 @@ export const GRBL_SETTINGS = [
         category: 'Homing',
         units: 'boolean',
         description: 'Enables homing cycle. Requires limit switches on all axes.',
-        inputType: 'switch'
+        inputType: SWITCH
     },
     {
         setting: '$23',
@@ -457,7 +466,7 @@ export const GRBL_SETTINGS = [
         category: 'Homing',
         units: 'mask',
         description: 'Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction.',
-        inputType: 'mask23'
+        inputType: MASK_STATUS_REPORT
     },
     {
         setting: '$24',
@@ -465,7 +474,7 @@ export const GRBL_SETTINGS = [
         category: 'Homing',
         units: 'mm/min',
         description: 'Feed rate to slowly engage limit switch to determine its location accurately.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 1,
         max: 30,
         step: 1
@@ -476,7 +485,7 @@ export const GRBL_SETTINGS = [
         category: 'Homing',
         units: 'mm/min',
         description: 'Seek rate to quickly find the limit switch before the slower locating phase.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 100,
         max: 1000,
         step: 100
@@ -487,7 +496,7 @@ export const GRBL_SETTINGS = [
         category: 'Homing',
         units: 'ms',
         description: 'Sets a short delay between phases of homing cycle to let a switch debounce.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 5,
         max: 255,
         step: 5
@@ -498,7 +507,7 @@ export const GRBL_SETTINGS = [
         category: 'Homing',
         units: 'mm',
         description: 'Retract distance after triggering switch to disengage it. Homing will fail if switch isn\'t cleared.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 0,
         max: 5,
         step: 0.5
@@ -509,7 +518,7 @@ export const GRBL_SETTINGS = [
         category: 'Spindle',
         units: 'rpm',
         description: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 100,
         max: 10000,
         step: 100
@@ -520,7 +529,7 @@ export const GRBL_SETTINGS = [
         category: 'Spindle',
         units: 'rpm',
         description: 'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 1,
         max: 100,
         step: 1
@@ -531,7 +540,7 @@ export const GRBL_SETTINGS = [
         category: 'Spindle',
         units: 'boolean',
         description: 'Converts spindle commands into laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed.',
-        inputType: 'switch'
+        inputType: SWITCH
     },
     {
         setting: '$100',
@@ -539,7 +548,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'step/mm',
         description: 'X-axis travel resolution in steps per millimeter.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 10,
         max: 500,
         step: 10
@@ -550,7 +559,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'step/mm',
         description: 'Y-axis travel resolution in steps per millimeter.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 10,
         max: 500,
         step: 10
@@ -561,7 +570,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'step/mm',
         description: 'Z-axis travel resolution in steps per millimeter.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 10,
         max: 500,
         step: 10
@@ -572,7 +581,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'mm/min',
         description: 'X-axis maximum rate. Used as G0 rapid rate.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 100,
         max: 1500,
         step: 100
@@ -583,7 +592,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'mm/min',
         description: 'Y-axis maximum rate. Used as G0 rapid rate.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 100,
         max: 1500,
         step: 100
@@ -594,7 +603,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'mm/min',
         description: 'Z-axis maximum rate. Used as G0 rapid rate.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 10,
         max: 1000,
         step: 10
@@ -605,7 +614,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'mm/sec^2',
         description: 'X-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 1,
         max: 15,
         step: 1
@@ -616,7 +625,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'mm/sec^2',
         description: 'Y-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 1,
         max: 15,
         step: 1
@@ -627,7 +636,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'mm/sec^2',
         description: 'Z-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 1,
         max: 15,
         step: 1
@@ -638,7 +647,7 @@ export const GRBL_SETTINGS = [
         category: 'Limits',
         units: 'mm',
         description: 'Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 1,
         max: 1500,
         step: 10
@@ -649,7 +658,7 @@ export const GRBL_SETTINGS = [
         category: 'Limits',
         units: 'mm',
         description: 'Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 1,
         max: 1500,
         step: 10
@@ -660,7 +669,7 @@ export const GRBL_SETTINGS = [
         category: 'Limits',
         units: 'mm',
         description: 'Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
-        inputType: 'number',
+        inputType: NUMBER,
         min: 1,
         max: 1500,
         step: 10

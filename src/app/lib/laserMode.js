@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -20,16 +20,10 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import { LASER_MODE, SPINDLE_MODE } from 'app/constants';
+import store from '../store';
 
-import React from 'react';
-import styles from './index.styl';
-
-const CategoryTag = ({ category }) => {
-    return (
-        <div className={styles[`category-tag-${category}`]}>
-            { category }
-        </div>
-    );
+export const isLaserMode = () => {
+    const mode = store.get('widgets.spindle.mode', SPINDLE_MODE);
+    return mode === LASER_MODE;
 };
-
-export default CategoryTag;

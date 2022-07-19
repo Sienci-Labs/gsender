@@ -41,31 +41,31 @@ class Controller {
     listeners = {
         // Socket.IO Events
         // Fired upon a connection including a successful reconnection.
-        'connect': [],
+        connect: [],
         // Fired upon a connection error.
-        'connect_error': [],
+        connect_error: [],
         // Fired upon a connection timeout.
-        'connect_timeout': [],
+        connect_timeout: [],
         // Fired when an error occurs.
-        'error': [],
+        error: [],
         // Fired upon a disconnection.
-        'disconnect': [],
+        disconnect: [],
         // Fired upon a successful reconnection.
-        'reconnect': [],
+        reconnect: [],
         // Fired upon an attempt to reconnect.
-        'reconnect_attempt': [],
+        reconnect_attempt: [],
         // Fired upon an attempt to reconnect.
-        'reconnecting': [],
+        reconnecting: [],
         // Fired upon a reconnection attempt error.
-        'reconnect_error': [],
+        reconnect_error: [],
         // Fired when couldn't reconnect within reconnectionAttempts.
-        'reconnect_failed': [],
+        reconnect_failed: [],
         // Fired when gcode errors are found in files...
-        'gcode_error': [],
-        'gcode_error_checking_file': [],
+        gcode_error: [],
+        gcode_error_checking_file: [],
 
         // System ToolChange
-        'startup': [],
+        startup: [],
         'config:change': [],
         'task:start': [],
         'task:finish': [],
@@ -86,11 +86,11 @@ class Controller {
         'workflow:state': [],
         'controller:settings': [],
         'controller:state': [],
-        'message': [],
+        message: [],
         'toolchange:start': [],
         'toolchange:preHookComplete': [],
         'toolchange:tool': [],
-        'hPong': [],
+        hPong: [],
         'outline:start': [],
         'file:load': [],
         'file:unload': [],
@@ -123,7 +123,7 @@ class Controller {
     state = {};
 
     workflow = {
-        state: 'idle' // running|paused|idle
+        state: 'idle', // running|paused|idle
     };
 
     // Connection options
@@ -161,9 +161,9 @@ class Controller {
 
         options = {
             ...options,
-            'reconnection': true,
-            'reconnectionDelay': 500,
-            'reconnectionAttempts': 10
+            reconnection: true,
+            reconnectionDelay: 500,
+            reconnectionAttempts: 10,
         };
 
         this.host = host;
@@ -339,6 +339,8 @@ class Controller {
     //   controller.command('unlock')
     // - Reset
     //   controller.command('reset')
+    // - Check for State Update
+    //   controller.command('checkStateUpdate')
     // - Feed Override
     //   controller.command('feedOverride')
     // - Spindle Override
