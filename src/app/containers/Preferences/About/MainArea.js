@@ -45,6 +45,7 @@ const MainArea = () => {
                                 </ReactMarkdown>
                             );
                         })}
+                        <p><a href="https://github.com/Sienci-Labs/gsender/releases/" target="_blank" rel="noreferrer">See all latest releases</a></p>
                         <br />
                     </div>
                 </div>
