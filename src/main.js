@@ -37,7 +37,6 @@ import pkg from './package.json';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 
-
 let windowManager = null;
 let hostInformation = {};
 
@@ -75,7 +74,6 @@ const main = () => {
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
 
-
     app.whenReady().then(async () => {
         try {
             windowManager = new WindowManager();
@@ -84,9 +82,11 @@ const main = () => {
                 width: 500,
                 height: 400,
                 show: false,
-                frame: false
+                frame: false,
             });
-            splashScreen.loadFile(path.join(__dirname, 'app/assets/Splashscreen.gif'));
+            splashScreen.loadFile(
+                path.join(__dirname, 'app/assets/Splashscreen.gif')
+            );
             splashScreen.webContents.on('did-finish-load', () => {
                 splashScreen.show();
             });
@@ -103,7 +103,10 @@ const main = () => {
                 headless,
             };
             if (!(address && port)) {
-                log.error('Unable to start the server at ' + chalk.cyan(`http://${address}:${port}`));
+                log.error(
+                    'Unable to start the server at ' +
+                        chalk.cyan(`http://${address}:${port}`)
+                );
                 return;
             }
             if (headless) {
@@ -119,7 +122,7 @@ const main = () => {
             const bounds = {
                 minWidth: 1024,
                 minHeight: 768,
-                ...store.get('bounds')
+                ...store.get('bounds'),
             };
             const options = {
                 ...bounds,
@@ -178,15 +181,16 @@ const main = () => {
                     if (prevDirectory) {
                         additionalOptions.defaultPath = prevDirectory;
                     }
-                    const file = await dialog.showOpenDialog(window,
-                        {
-                            properties: ['openFile'],
-                            filters: [
-                                { name: 'GCode Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
-                                { name: 'All Files', extensions: ['*'] }
-                            ]
-                        },
-                    );
+                    const file = await dialog.showOpenDialog(window, {
+                        properties: ['openFile'],
+                        filters: [
+                            {
+                                name: 'GCode Files',
+                                extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'],
+                            },
+                            { name: 'All Files', extensions: ['*'] },
+                        ],
+                    });
 
                     if (!file) {
                         return;
@@ -201,7 +205,8 @@ const main = () => {
                         return [dir, base];
                     };
 
-                    const [filePath, fileName] = getFileInformation(FULL_FILE_PATH);
+                    const [filePath, fileName] =
+                        getFileInformation(FULL_FILE_PATH);
 
                     prevDirectory = filePath; // set previous directory
 
@@ -212,7 +217,12 @@ const main = () => {
                         }
 
                         const { size } = fs.statSync(FULL_FILE_PATH);
-                        window.webContents.send('returned-upload-dialog-data', { data, size, name: fileName, path: FULL_FILE_PATH });
+                        window.webContents.send('returned-upload-dialog-data', {
+                            data,
+                            size,
+                            name: fileName,
+                            path: FULL_FILE_PATH,
+                        });
                     });
                 } catch (e) {
                     log.error(`Caught error in listener - ${e}`);
@@ -221,7 +231,7 @@ const main = () => {
         } catch (err) {
             log.error(err);
             await dialog.showMessageBox({
-                message: err
+                message: err,
             });
         }
         //Check for available updates at end to avoid try-catch failing to load events

@@ -67,6 +67,7 @@ import {
     determineMaxMovement,
     getAxisMaximumLocation,
 } from '../../lib/homing';
+import { generateGcode } from '../helper';
 
 // % commands
 const WAIT = '%wait';
@@ -1359,7 +1360,7 @@ class GrblController {
                 this.emit('file:unload');
                 this.event.trigger('file:unload');
             },
-            start: () => {
+            'start': () => {
                 log.warn(
                     `Warning: The "${cmd}" command is deprecated and will be removed in a future release.`
                 );
@@ -1476,7 +1477,7 @@ class GrblController {
                     this.sender.next();
                 }
             },
-            stop: () => {
+            'stop': () => {
                 log.warn(
                     `Warning: The "${cmd}" command is deprecated and will be removed in a future release.`
                 );
@@ -1510,7 +1511,7 @@ class GrblController {
                 // Moved this to end so it triggers AFTER the reset on force stop
                 this.event.trigger('gcode:stop');
             },
-            pause: () => {
+            'pause': () => {
                 log.warn(
                     `Warning: The "${cmd}" command is deprecated and will be removed in a future release.`
                 );
@@ -1523,7 +1524,7 @@ class GrblController {
                 await delay(100);
                 this.write('!');
             },
-            resume: () => {
+            'resume': () => {
                 log.warn(
                     `Warning: The "${cmd}" command is deprecated and will be removed in a future release.`
                 );
@@ -1551,20 +1552,20 @@ class GrblController {
             'feeder:stop': () => {
                 this.feeder.reset();
             },
-            feedhold: () => {
+            'feedhold': () => {
                 this.event.trigger('feedhold');
 
                 this.write('!');
             },
-            cyclestart: () => {
+            'cyclestart': () => {
                 this.event.trigger('cyclestart');
 
                 this.write('~');
             },
-            statusreport: () => {
+            'statusreport': () => {
                 this.write('?');
             },
-            homing: () => {
+            'homing': () => {
                 this.event.trigger('homing');
                 this.homingStarted = true; // Update homing cycle as having started
 
@@ -1572,15 +1573,15 @@ class GrblController {
                 this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
                 this.emit('controller:state', GRBL, this.state);
             },
-            sleep: () => {
+            'sleep': () => {
                 this.event.trigger('sleep');
 
                 this.writeln('$SLP');
             },
-            unlock: () => {
+            'unlock': () => {
                 this.writeln('$X');
             },
-            reset: () => {
+            'reset': () => {
                 this.workflow.stop();
 
                 this.feeder.reset();
@@ -1594,78 +1595,19 @@ class GrblController {
                 this.writeln('$X');
                 // Move tooltip by user defined moveFactor($27)
                 // Check current move factor
-                const tooltipMoveFactor =
-                    parseInt(this.settings.settings.$27, 10);
+                const tooltipMoveFactor = parseInt(
+                    this.settings.settings.$27,
+                    10
+                );
                 // Check current x,y sensor position($23)
-                // 0 is top right
-                // 1 is top left
-                // 2 bottom right
-                // 3 bottom left
-                const sensorPositon =
-                    parseInt(this.settings.settings.$23, 10);
+                const sensorPositon = parseInt(this.settings.settings.$23, 10);
                 // Check which switch was triggered and move $27setting units -
                 // - towards calculated direction
                 const pinState = this.state.status.pinState;
-                switch (sensorPositon) {
-                case 0:
-                    // sensor corner - top right
-                    if ('X' in pinState) {
-                        this.controller.command(
-                            'gcode',
-                            `G0 Y-${tooltipMoveFactor}`
-                        );
-                    } else if ('Y' in pinState) {
-                        this.controller.command(
-                            'gcode',
-                            `G0 X-${tooltipMoveFactor}`
-                        );
-                    }
-                    break;
-                case 1:
-                    // sensor corner - top left
-                    if ('X' in pinState) {
-                        this.command(
-                            'gcode',
-                            `G0 Y-${tooltipMoveFactor}`
-                        );
-                    } else if ('Y' in pinState) {
-                        this.command(
-                            'gcode',
-                            `G0 X${tooltipMoveFactor}`
-                        );
-                    }
-                    break;
-                case 2:
-                    // sensor corner - bottom right
-                    if ('X' in pinState) {
-                        this.command(
-                            'gcode',
-                            `G0 Y${tooltipMoveFactor}`
-                        );
-                    } else if ('Y' in pinState) {
-                        this.command(
-                            'gcode',
-                            `G0 X-${tooltipMoveFactor}`
-                        );
-                    }
-                    break;
-                case 3:
-                    // sensor corner - bottom left
-                    if ('X' in pinState) {
-                        this.command(
-                            'gcode',
-                            `G0 Y${tooltipMoveFactor}`
-                        );
-                    } else if ('Y' in pinState) {
-                        this.command(
-                            'gcode',
-                            `G0 X${tooltipMoveFactor}`
-                        );
-                    }
-                    break;
-                default:
-                    return true;
-                }
+                this.controller.command(
+                    'gcode',
+                    generateGcode(pinState, tooltipMoveFactor, sensorPositon)
+                );
                 return true;
             },
             'checkStateUpdate': () => {
@@ -1762,7 +1704,11 @@ class GrblController {
                 const commands = [
                     // https://github.com/gnea/grbl/wiki/Grbl-v1.1-Laser-Mode
                     // The laser will only turn on when Grbl is in a G1, G2, or G3 motion mode.
-                    'S' + Math.round(ensurePositiveNumber(maxS * (power / 100)) * 100) / 100
+                    'S' +
+                        Math.round(
+                            ensurePositiveNumber(maxS * (power / 100)) * 100
+                        ) /
+                            100,
                 ];
                 this.command('gcode', commands);
             },
@@ -1775,7 +1721,6 @@ class GrblController {
                         if (typeof line !== 'string') {
                             return false;
                         }
-
                         return line.trim().length > 0;
                     });
 
