@@ -42,7 +42,7 @@ import {
     MODAL_HELP
 } from './constants';
 import Preferences from '../Preferences/Preferences';
-import Firmware from '../Firmware/Firmware';
+import Firmware from '../Firmware';
 import Surfacing from '../Surfacing';
 import Calibration from '../Calibration';
 

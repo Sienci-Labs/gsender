@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -20,19 +20,10 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import { LASER_MODE, SPINDLE_MODE } from 'app/constants';
+import store from '../store';
 
-import React from 'react';
-import styles from './index.styl';
-
-const ReconnectButton = ({ onClick }) => {
-    return (
-        <button onClick={onClick} className={styles.reconnectButton}>
-            <div className={styles.reconnectIcon}>
-                <i className="fas fa-plug" />
-            </div>
-            <div className={styles.reconnectButtonText}>Connect on last active port</div>
-        </button>
-    );
+export const isLaserMode = () => {
+    const mode = store.get('widgets.spindle.mode', SPINDLE_MODE);
+    return mode === LASER_MODE;
 };
-
-export default ReconnectButton;

@@ -29,19 +29,35 @@ import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
 import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
-import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY } from 'app/constants';
+import { isLaserMode } from 'app/lib/laserMode';
+import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 
 
 export function* initialize() {
+    let currentState = GRBL_ACTIVE_STATE_IDLE;
+    let prevState = GRBL_ACTIVE_STATE_IDLE;
+
     /* Health check - every 3 minutes */
     setInterval(() => {
         controller.healthCheck();
     }, 1000 * 60 * 3);
+
+    const incrementJobCounter = () => {
+        let jobsFinished = store.get('workspace.jobsFinished');
+        jobsFinished++;
+        store.set('workspace.jobsFinished', jobsFinished);
+    };
+
+    const incrementTimeRun = (elapsedTime) => {
+        let timeSpentRunning = store.get('workspace.timeSpentRunning');
+        timeSpentRunning += elapsedTime;
+        store.set('workspace.timeSpentRunning', timeSpentRunning);
+    };
 
     controller.addListener('controller:settings', (type, settings) => {
         reduxStore.dispatch({
@@ -51,6 +67,11 @@ export function* initialize() {
     });
 
     controller.addListener('controller:state', (type, state) => {
+        // if state is the same, don't update the prev and current state
+        if (currentState !== state.status.activeState) {
+            prevState = currentState;
+            currentState = state.status.activeState;
+        }
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_STATE,
             payload: { type, state }
@@ -65,6 +86,15 @@ export function* initialize() {
     });
 
     controller.addListener('sender:status', (status) => {
+        // finished job
+        if (status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) {
+            incrementJobCounter();
+            incrementTimeRun(status.elapsedTime);
+        // cancelled job
+        } else if (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD) {
+            incrementTimeRun(status.elapsedTime);
+        }
+
         try {
             reduxStore.dispatch({
                 type: controllerActions.UPDATE_SENDER_STATUS,
@@ -165,6 +195,7 @@ export function* initialize() {
     });
 
     controller.addListener('file:load', (content, size, name, visualizer) => {
+        const isLaser = isLaserMode();
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch({
                 type: fileActions.UPDATE_FILE_RENDER_STATE,
@@ -232,7 +263,8 @@ export function* initialize() {
             visualizeWorker.onmessage = visualizeResponse;
             visualizeWorker.postMessage({
                 content,
-                visualizer
+                visualizer,
+                isLaser
             });
         } else {
             reduxStore.dispatch({
@@ -282,14 +314,6 @@ export function* initialize() {
             msg: `'${data}' pause command found in file - press "Resume Job" to continue running.`,
             type: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE
-        });
-    });
-
-    controller.addListener('outline:start', () => {
-        Toaster.clear();
-        Toaster.pop({
-            type: TOASTER_SUCCESS,
-            msg: 'Running file outline'
         });
     });
 

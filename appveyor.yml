@@ -4,14 +4,15 @@ version: "{build}-{branch}"
 branches:
   only:
     - master
+    - beta
     - /v\d+\.\d+\.\d+/
 
 environment:
   matrix:
-    - job_name: Linux build (arm)
-      appveyor_build_worker_image: Ubuntu2004
-      nodejs_version: "14"
-      ARCH: arm
+    #- job_name: Linux build (arm)
+    #  appveyor_build_worker_image: Ubuntu2004
+    #  nodejs_version: "14"
+    #  ARCH: arm
     - job_name: Windows build (x86)
       appveyor_build_worker_image: Visual Studio 2019
       nodejs_version: "14"
@@ -388,7 +389,7 @@ for:
             PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
             PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
             PRODUCT_NAME=gSender
-            yarn build:macos-arm64npm 
+            yarn build:macos-arm64npm
             ls -al output output/*
             mkdir -p releases/macos
             cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.arm64npm .dmg"

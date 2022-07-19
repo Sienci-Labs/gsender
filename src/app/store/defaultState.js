@@ -38,19 +38,22 @@ import {
     TOOLBAR_CATEGORY,
     SPIRAL_MOVEMENT,
     START_POSITION_BACK_LEFT,
-    SPINDLE_MODES
+    SPINDLE_MODES,
 } from 'app/constants';
 import {
     MODAL_PREFERENCES,
     MODAL_FIRMWARE,
     MODAL_SURFACING,
     MODAL_CALIBRATE,
-    MODAL_HELP
+    MODAL_HELP,
 } from 'app/containers/NavSidebar/constants';
 import machineProfiles from 'app/containers/Preferences/General/defaultMachineProfiles';
 
-
-import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../widgets/JogControl/constants';
+import {
+    SPEED_NORMAL,
+    SPEED_PRECISE,
+    SPEED_RAPID,
+} from '../widgets/JogControl/constants';
 
 const AXIS_X = 'x';
 const AXIS_Y = 'y';
@@ -61,38 +64,39 @@ const [M3] = SPINDLE_MODES;
 const defaultState = {
     session: {
         name: '',
-        token: ''
+        token: '',
     },
     workspace: {
         units: METRIC_UNITS,
         reverseWidgets: false,
         safeRetractHeight: 0,
+        customDecimalPlaces: 0,
+        jobsFinished: 0,
+        timeSpentRunning: 0,
         toolChangeOption: 'Ignore',
         toolChangeHooks: {
             preHook: '',
-            postHook: ''
+            postHook: '',
         },
         container: {
             primary: {
                 show: true,
-                widgets: [
-                    'location', 'axes', 'secondary'
-                ]
-            }
+                widgets: ['location', 'axes', 'secondary'],
+            },
         },
         machineProfile: machineProfiles[4],
         probeProfile: {
             xyThickness: {
                 mm: 10,
-                in: 0.393
+                in: 0.393,
             },
             zThickness: {
                 mm: 15,
-                in: 0.590
+                in: 0.59,
             },
             plateWidth: {
                 mm: 50,
-                in: 1.968
+                in: 1.968,
             },
             plateLength: {
                 mm: 50,

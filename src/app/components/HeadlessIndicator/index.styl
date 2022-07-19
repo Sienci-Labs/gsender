@@ -1,0 +1,71 @@
+/*
+ * Copyright (C) 2022 Sienci Labs Inc.
+ *
+ * This file is part of gSender.
+ *
+ * gSender is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, under version 3 of the License.
+ *
+ * gSender is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Contact for information regarding this program and its license
+ * can be sent through gSender@sienci.com or mailed to the main office
+ * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
+ *
+ */
+
+.wrapper {
+  display: flex;
+  flex-direction row;
+  margin-left: 2rem;
+  align-items center;
+  justify-content center;
+  gap: 0.5rem;
+  color: #4D4D4D;
+}
+
+@keyframes float {
+  0% {
+    box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+    transform: translatey(0px);
+  }
+  50% {
+    box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
+    transform: translatex(-2px);
+  }
+  100% {
+    box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+    transform: translatey(0px);
+  }
+}
+
+.pulse {
+  animation: float 2s infinite;
+}
+
+.remote-alert {
+  width: 2.5rem;
+  height: 2.5rem;
+  //background: linear-gradient(135deg, #3e85c7 0%, #73a7d9 100%)
+  background: #3e85c7;
+  border-radius: 50%;
+  display :flex
+  align-items center
+  justify-content center
+  color: #CCCCCC;
+  box-shadow: 0px 0px 1px 1px #0000001a;
+}
+
+.ip {
+  color: #FFFFFF
+}
+
+
+

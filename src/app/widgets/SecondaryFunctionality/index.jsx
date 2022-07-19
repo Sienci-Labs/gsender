@@ -125,6 +125,7 @@ class SecondaryFunctionality extends PureComponent {
 
     componentDidMount() {
         store.on('change', this.handleMachineProfileChange);
+        this.handleMachineProfileChange();
     }
 
     componentWillUnmount() {

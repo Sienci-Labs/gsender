@@ -64,7 +64,6 @@ const IconButton = styled(Button)`
     white-space: nowrap;
     touch-action: manipulation;
     cursor: pointer;
-    user-select: none;
     background-image: none;
     background-color: inherit;
 

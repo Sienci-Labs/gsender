@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -22,14 +22,16 @@
  */
 
 import React from 'react';
+import cx from 'classnames';
 import styles from './index.styl';
 
-const CategoryTag = ({ category }) => {
+
+const RemoteAlert = () => {
     return (
-        <div className={styles[`category-tag-${category}`]}>
-            { category }
+        <div className={cx(styles.remoteAlert, styles.pulse)} >
+            <i className="fas fa-broadcast-tower" />
         </div>
     );
 };
 
-export default CategoryTag;
+export default RemoteAlert;

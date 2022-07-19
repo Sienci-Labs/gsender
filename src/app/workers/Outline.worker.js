@@ -25,7 +25,8 @@ import Toolpath from 'gcode-toolpath';
 import ch from 'hull.js';
 import * as THREE from 'three';
 
-onmessage = (gcode) => {
+onmessage = ({ data }) => {
+    const { gcode, isLaser = false } = data;
     // Generate an ordered pair - we don't care about Z index for outline purposes so it's removed
     function vertex(x, y) {
         return [x.toFixed(2), y.toFixed(2)];
@@ -85,25 +86,35 @@ onmessage = (gcode) => {
         toolpath.loadFromStringSync(gcode);
         const fileHull = ch(vertices, concavity);
 
-        const gCode = convertPointsToGCode(fileHull);
+        const gCode = convertPointsToGCode(fileHull, isLaser);
 
         return gCode;
     };
 
-    function convertPointsToGCode(points) {
+    function convertPointsToGCode(points, isLaser=false) {
         const gCode = [];
+        const movementModal = isLaser ? 'G1' : 'G0'; // G1 is necessary for laser outline since G0 won't enable it
         gCode.push('%X0=posx,Y0=posy,Z0=posz');
         gCode.push('%MM=modal.distance');
         gCode.push('G21 G91 G0 Z5');
-        points.forEach((point) => {
+        // Laser outline requires some additional preamble for feedrate and enabling the laser
+        if (isLaser) {
+            gCode.push('G1F3000 M3 S1');
+        }
+        points.forEach(point => {
             const [x, y] = point;
-            gCode.push(`G21 G90 G0 X${x} Y${y}`);
+            gCode.push(`G21 G90 ${movementModal} X${x} Y${y}`);
         });
+        if (isLaser) {
+            gCode.push('M5 S0');
+        }
         gCode.push('G0 X[X0] Y[Y0]');
         gCode.push('G21 G91 G0 Z-5');
+
         gCode.push('[MM]');
         return gCode;
     }
+
     const outlineGcode = getOutlineGcode(gcode);
-    postMessage(outlineGcode);
+    postMessage({ outlineGcode });
 };
