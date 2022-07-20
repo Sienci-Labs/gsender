@@ -50,7 +50,7 @@ try {
             if (line.length < 2) {
                 return false;
             }
-            return headerCount < 2;
+            return headerCount < 4;
         }).map(line => line.trim());
     };
     let readme = fs.readFileSync(path.resolve('README.md'), 'utf8');
