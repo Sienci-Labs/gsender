@@ -36,8 +36,8 @@ const MainArea = () => {
 
             <div
                 className={classnames(styles.section, styles.last)} style={{ height: "60%",
-                    "max-height": "none",
-                    "margin-bottom": "1rem" }}
+                    maxHeight: "none",
+                    marginBottom: "1rem" }}
             >
                 <span style={{ fontSize: '1.6rem', position: 'relative', bottom: '6px' }}>Release Notes:</span>
                 <a
@@ -46,7 +46,7 @@ const MainArea = () => {
                 >See all latest patch notes <i className="fas fa-external-link-alt" />
                 </a>
                 <div
-                    className={styles.timeline} style={{ "min-height": "100%" }}
+                    className={styles.timeline} style={{ minHeight: "100%" }}
                 >
                     <div className={styles.timeline.content}>
                         {releases.map((element) => {
