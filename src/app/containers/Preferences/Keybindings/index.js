@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 
 import TabbedWidget from 'app/components/TabbedWidget';
 import ReactToPrint from 'react-to-print';
+import { Button } from 'react-bootstrap';
 import ShortcutTable from './ShortcutTable';
 
 import KeyboardShortcuts from './Keybindings';
@@ -34,7 +35,7 @@ const Shortcuts = ({ active }) => {
             <TabbedWidget>
                 <ReactToPrint
                     trigger={() => {
-                        return <button>Print</button>;
+                        return <Button>Print</Button>;
                     }}
                     content={() => componentRef.current}
                     // onBeforePrint={() => setDisplay('block')}
