@@ -42,7 +42,7 @@ const MainArea = () => {
                 <h3>Release Notes:</h3>
 
                 <div
-                    className={styles.timeline} style={{ "min-height": "90%" }}
+                    className={styles.timeline} style={{ "min-height": "88%" }}
                 >
                     <div className={styles.timeline.content}>
                         {releases.map((element) => {
@@ -52,9 +52,15 @@ const MainArea = () => {
                                 </ReactMarkdown>
                             );
                         })}
-                        <p><a href="https://github.com/Sienci-Labs/gsender/releases/" target="_blank" rel="noreferrer">See all latest releases</a></p>
                         <br />
                     </div>
+                </div>
+                <div style={{ margin: ".5rem", height: "10%" }}>
+                    <a
+                        href="https://github.com/Sienci-Labs/gsender/releases/" target="_blank" rel="noreferrer"
+                        style={{ marginLeft: ".5rem " }}
+                    >See all latest releases <i className="fas fa-external-link-alt" />
+                    </a>
                 </div>
             </div>
         </div>
