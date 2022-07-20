@@ -39,10 +39,14 @@ const MainArea = () => {
                     "max-height": "none",
                     "margin-bottom": "1rem" }}
             >
-                <h3>Release Notes:</h3>
-
+                <span style={{ fontSize: '1.6rem' }}>Release Notes:</span>
+                <a
+                    href="https://github.com/Sienci-Labs/gsender#-development-history" target="_blank" rel="noreferrer"
+                    style={{ float: "right" }}
+                >See all latest patch notes <i className="fas fa-external-link-alt" />
+                </a>
                 <div
-                    className={styles.timeline} style={{ "min-height": "88%" }}
+                    className={styles.timeline} style={{ "min-height": "100%" }}
                 >
                     <div className={styles.timeline.content}>
                         {releases.map((element) => {
@@ -54,13 +58,6 @@ const MainArea = () => {
                         })}
                         <br />
                     </div>
-                </div>
-                <div style={{ margin: ".5rem", height: "10%" }}>
-                    <a
-                        href="https://github.com/Sienci-Labs/gsender/releases/" target="_blank" rel="noreferrer"
-                        style={{ marginLeft: ".5rem " }}
-                    >See all latest releases <i className="fas fa-external-link-alt" />
-                    </a>
                 </div>
             </div>
         </div>
