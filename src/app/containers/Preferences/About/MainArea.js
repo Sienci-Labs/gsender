@@ -39,7 +39,7 @@ const MainArea = () => {
                     "max-height": "none",
                     "margin-bottom": "1rem" }}
             >
-                <span style={{ fontSize: '1.6rem' }}>Release Notes:</span>
+                <span style={{ fontSize: '1.6rem', position: 'relative', bottom: '6px' }}>Release Notes:</span>
                 <a
                     href="https://github.com/Sienci-Labs/gsender#-development-history" target="_blank" rel="noreferrer"
                     style={{ float: "right" }}
