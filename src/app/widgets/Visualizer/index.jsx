@@ -78,8 +78,7 @@ import {
     LIGHT_THEME_VALUES,
     DARK_THEME,
     DARK_THEME_VALUES,
-    CUST_DARK_THEME,
-    CUST_LIGHT_THEME
+    CUST_THEME
 } from './constants';
 import SecondaryVisualizer from './SecondaryVisualizer';
 
@@ -964,36 +963,20 @@ class VisualizerWidget extends PureComponent {
         if (theme === DARK_THEME) {
             return DARK_THEME_VALUES;
         }
-        if (theme === CUST_DARK_THEME) {
+        if (theme === CUST_THEME) {
             return {
-                backgroundColor: this.config.get('Custom Dark Background') ? this.config.get('Custom Dark Background') : DARK_THEME_VALUES.backgroundColor,
-                gridColor: this.config.get('Custom Dark Grid') ? this.config.get('Custom Dark Grid') : DARK_THEME_VALUES.gridColor,
-                xAxisColor: this.config.get('Custom Dark X Axis') ? this.config.get('Custom Dark X Axis') : DARK_THEME_VALUES.xAxisColor,
-                yAxisColor: this.config.get('Custom Dark Y Axis') ? this.config.get('Custom Dark Y Axis') : DARK_THEME_VALUES.yAxisColor,
-                zAxisColor: this.config.get('Custom Dark Z Axis') ? this.config.get('Custom Dark Z Axis') : DARK_THEME_VALUES.zAxisColor,
-                limitColor: this.config.get('Custom Dark Limit') ? this.config.get('Custom Dark Limit') : DARK_THEME_VALUES.limitColor,
-                cuttingCoordinateLines: this.config.get('Custom Dark Cutting Coordinate Lines') ? this.config.get('Custom Dark Cutting Coordinate Lines') : DARK_THEME_VALUES.cuttingCoordinateLines,
-                joggingCoordinateLines: this.config.get('Custom Dark Jogging Coordinate Lines') ? this.config.get('Custom Dark Jogging Coordinate Lines') : DARK_THEME_VALUES.joggingCoordinateLines,
-                G0Color: this.config.get('Custom Dark G0') ? this.config.get('Custom Dark G0') : DARK_THEME_VALUES.G0Color,
-                G1Color: this.config.get('Custom Dark G1') ? this.config.get('Custom Dark G1') : DARK_THEME_VALUES.G1Color,
-                G2Color: this.config.get('Custom Dark G2') ? this.config.get('Custom Dark G2') : DARK_THEME_VALUES.G2Color,
-                G3Color: this.config.get('Custom Dark G3') ? this.config.get('Custom Dark G3') : DARK_THEME_VALUES.G3Color,
-            };
-        }
-        if (theme === CUST_LIGHT_THEME) {
-            return {
-                backgroundColor: this.config.get('Custom Light Background') ? this.config.get('Custom Light Background') : LIGHT_THEME_VALUES.backgroundColor,
-                gridColor: this.config.get('Custom Light Grid') ? this.config.get('Custom Light Grid') : LIGHT_THEME_VALUES.gridColor,
-                xAxisColor: this.config.get('Custom Light X Axis') ? this.config.get('Custom Light X Axis') : LIGHT_THEME_VALUES.xAxisColor,
-                yAxisColor: this.config.get('Custom Light Y Axis') ? this.config.get('Custom Light Y Axis') : LIGHT_THEME_VALUES.yAxisColor,
-                zAxisColor: this.config.get('Custom Light Z Axis') ? this.config.get('Custom Light Z Axis') : LIGHT_THEME_VALUES.zAxisColor,
-                limitColor: this.config.get('Custom Light Limit') ? this.config.get('Custom Light Limit') : LIGHT_THEME_VALUES.limitColor,
-                cuttingCoordinateLines: this.config.get('Custom Light Cutting Coordinate Lines') ? this.config.get('Custom Light Cutting Coordinate Lines') : LIGHT_THEME_VALUES.cuttingCoordinateLines,
-                joggingCoordinateLines: this.config.get('Custom Light Jogging Coordinate Lines') ? this.config.get('Custom Light Jogging Coordinate Lines') : LIGHT_THEME_VALUES.joggingCoordinateLines,
-                G0Color: this.config.get('Custom Light G0') ? this.config.get('Custom Light G0') : LIGHT_THEME_VALUES.G0Color,
-                G1Color: this.config.get('Custom Light G1') ? this.config.get('Custom Light G1') : LIGHT_THEME_VALUES.G1Color,
-                G2Color: this.config.get('Custom Light G2') ? this.config.get('Custom Light G2') : LIGHT_THEME_VALUES.G2Color,
-                G3Color: this.config.get('Custom Light G3') ? this.config.get('Custom Light G3') : LIGHT_THEME_VALUES.G3Color,
+                backgroundColor: this.config.get('Custom Background') ? this.config.get('Custom Background') : DARK_THEME_VALUES.backgroundColor,
+                gridColor: this.config.get('Custom Grid') ? this.config.get('Custom Grid') : DARK_THEME_VALUES.gridColor,
+                xAxisColor: this.config.get('Custom X Axis') ? this.config.get('Custom X Axis') : DARK_THEME_VALUES.xAxisColor,
+                yAxisColor: this.config.get('Custom Y Axis') ? this.config.get('Custom Y Axis') : DARK_THEME_VALUES.yAxisColor,
+                zAxisColor: this.config.get('Custom Z Axis') ? this.config.get('Custom Z Axis') : DARK_THEME_VALUES.zAxisColor,
+                limitColor: this.config.get('Custom Limit') ? this.config.get('Custom Limit') : DARK_THEME_VALUES.limitColor,
+                cuttingCoordinateLines: this.config.get('Custom Cutting Coordinate Lines') ? this.config.get('Custom Cutting Coordinate Lines') : DARK_THEME_VALUES.cuttingCoordinateLines,
+                joggingCoordinateLines: this.config.get('Custom Jogging Coordinate Lines') ? this.config.get('Custom Jogging Coordinate Lines') : DARK_THEME_VALUES.joggingCoordinateLines,
+                G0Color: this.config.get('Custom G0') ? this.config.get('Custom G0') : DARK_THEME_VALUES.G0Color,
+                G1Color: this.config.get('Custom G1-3') ? this.config.get('Custom G1-3') : DARK_THEME_VALUES.G1Color,
+                G2Color: this.config.get('Custom G1-3') ? this.config.get('Custom G1-3') : DARK_THEME_VALUES.G2Color,
+                G3Color: this.config.get('Custom G1-3') ? this.config.get('Custom G1-3') : DARK_THEME_VALUES.G3Color,
             };
         }
         return DARK_THEME_VALUES;

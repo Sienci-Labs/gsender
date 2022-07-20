@@ -91,7 +91,7 @@ onmessage = ({ data }) => {
         return gCode;
     };
 
-    function convertPointsToGCode(points, isLaser=false) {
+    function convertPointsToGCode(points, isLaser = false) {
         const gCode = [];
         const movementModal = isLaser ? 'G1' : 'G0'; // G1 is necessary for laser outline since G0 won't enable it
         gCode.push('%X0=posx,Y0=posy,Z0=posz');
