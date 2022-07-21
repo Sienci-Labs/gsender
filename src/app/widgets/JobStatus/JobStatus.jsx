@@ -27,7 +27,7 @@ import React, { PureComponent } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
-
+import ToggleSwitch from 'app/components/ToggleSwitch';
 import IdleInfo from './components/IdleInfo';
 import Overrides from './components/Overrides';
 import styles from './index.styl';
@@ -57,10 +57,34 @@ class JobStatus extends PureComponent {
         return `${size} bytes`;
     };
 
+    state = {
+        isChecked: false,
+        toggleStatus: 'jobStatus',
+    }
+
+    handleOverrideToggle = () => {
+        if (this.state.toggleStatus === 'jobStatus') {
+            this.setState({
+                isChecked: true,
+                toggleStatus: 'overrides',
+            });
+        } else {
+            this.setState({
+                isChecked: false,
+                toggleStatus: 'jobStatus',
+            });
+        }
+    }
+
+    componentDidUpdate() {
+        if (!this.props.fileLoaded) {
+            this.setState({ isChecked: false,
+                toggleStatus: 'jobStatus', });
+        }
+    }
+
     render() {
         const { state, name, size, total, fileLoaded, path, filteredPath } = this.props;
-        const { isRunningJob } = state;
-
         return (
             <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <div className={styles['file-info']}>
@@ -72,6 +96,14 @@ class JobStatus extends PureComponent {
                                         <TooltipCustom content={`${name} (${this.fileSizeFormat(size)}, ${total} lines)`} style={{ wordWrap: 'break-word' }}>
                                             <span className={styles['file-text']}>{name}</span>{' '}<span>({this.fileSizeFormat(size)}, {total} lines)</span>
                                         </TooltipCustom>
+                                        <ToggleSwitch
+                                            label="Job status/Overrides"
+                                            onChange={() => this.handleOverrideToggle()}
+                                            className={styles.litetoggle}
+                                            checked={this.state.isChecked}
+                                            size="md"
+                                            onColor="#888"
+                                        />
                                     </div>
 
                                     {filteredPath && (
@@ -85,9 +117,9 @@ class JobStatus extends PureComponent {
                                     )}
                                 </>
                             )
-                            : <div className={styles['file-name']}><span className={styles['file-text']}>No File Loaded</span></div>}
+                            : (<div className={styles['file-name']}><span className={styles['file-text']}>No File Loaded</span></div>)}
                 </div>
-                {!isRunningJob
+                {!this.state.isChecked
                     ? <IdleInfo state={state} />
                     : <Overrides state={state} />
                 }
