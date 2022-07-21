@@ -579,7 +579,8 @@ class GrblController {
             log.error(`Error occurred at ${Date.now()}`);
             this.emit('error', {
                 type: 'GRBL_ERROR',
-                message: `Error occurred at ${Date.now()}. Error Code: ${code}`,
+                code: `${code}`,
+                errorStack: error,
             });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
