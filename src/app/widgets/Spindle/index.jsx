@@ -38,13 +38,9 @@ import controller from 'app/lib/controller';
 import WidgetConfig from '../WidgetConfig';
 import {
     GRBL,
-    GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
     LASER_MODE,
-    MARLIN,
-    SMOOTHIE,
     SPINDLE_MODE,
-    TINYG,
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
 import styles from './index.styl';
@@ -402,14 +398,13 @@ class SpindleWidget extends PureComponent {
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
+        if (!includes([GRBL], type)) {
             return false;
         }
 
         const activeState = get(state, 'status.activeState');
         const states = [
             GRBL_ACTIVE_STATE_IDLE,
-            GRBL_ACTIVE_STATE_HOLD
         ];
 
         return includes(states, activeState);
