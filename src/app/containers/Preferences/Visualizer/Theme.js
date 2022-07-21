@@ -16,7 +16,6 @@ import ColorPicker from '../components/ColorPicker';
 import ColorCircle from '../components/ColorCircle';
 
 import styles from '../index.styl';
-// import ThemeColorDisplay from '../components/ThemeColorDisplay';
 
 const themes = [
     DARK_THEME,

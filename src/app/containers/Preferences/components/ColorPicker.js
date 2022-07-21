@@ -25,7 +25,6 @@ import React, { useState } from 'react';
 import Modal from 'app/components/Modal';
 import { SketchPicker } from 'react-color';
 import styles from '../index.styl';
-//import ModalTemplate from '../../../components/ModalTemplate';
 
 const ColorPicker = ({ actions, part, isOpen, onClose, chooseColour }) => {
     const [color, setColor] = useState(actions.visualizer.getCurrentColor(part, actions.visualizer.getDefaultColour(part)));
