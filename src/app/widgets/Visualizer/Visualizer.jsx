@@ -66,6 +66,7 @@ import {
 } from './constants';
 import styles from './index.styl';
 import { GRBL_ACTIVE_STATE_CHECK } from '../../../server/controllers/Grbl/constants';
+import WidgetConfig from '../WidgetConfig';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -88,6 +89,8 @@ class Visualizer extends Component {
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
+
+    visualizerConfig = new WidgetConfig('visualizer');
 
     pubsubTokens = [];
 
@@ -118,6 +121,10 @@ class Visualizer extends Component {
     });
 
     node = null;
+
+    fileLoaded = false;
+    machineConnected = false;
+    showSoftLimitsWarning = this.visualizerConfig.get('showSoftLimitsWarning');
 
     setRef = (node) => {
         this.node = node;
@@ -687,7 +694,40 @@ class Visualizer extends Component {
                     this.load('', data);
                     return;
                 }
-            })
+            }),
+            pubsub.subscribe('softlimits:changevisibility', (msg, visibility) => {
+                this.showSoftLimitsWarning = visibility;
+                if (this.showSoftLimitsWarning) {
+                    this.checkSoftLimits();
+                } else {
+                    pubsub.publish('softlimits:ok');
+                }
+            }),
+            pubsub.subscribe('machine:connected', () => {
+                this.machineConnected = true;
+                this.checkSoftLimits();
+            }),
+            pubsub.subscribe('file:loaded', () => {
+                this.fileLoaded = true;
+                this.checkSoftLimits();
+            }),
+            pubsub.subscribe('softlimits:check', (msg, data) => {
+                // because setting the workspace 0 is a call to run gcode,
+                // there is no way for me to publish when it's
+                // confirmed to be finished. since it uses the feeder,
+                // it's slow, and the wpos is not changed to 0 when I run the check.
+                // therefore, I'm sending data with the publish so the function knows
+                // to manually set the wpos to 0.
+                this.checkSoftLimits(data);
+            }),
+            pubsub.subscribe('machine:disconnected', () => {
+                this.machineConnected = false;
+                pubsub.publish('softlimits:ok');
+            }),
+            pubsub.subscribe('gcode:unload', () => {
+                this.fileLoaded = false;
+                pubsub.publish('softlimits:ok');
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -697,6 +737,12 @@ class Visualizer extends Component {
             pubsub.unsubscribe(token);
         });
         this.pubsubTokens = [];
+    }
+
+    checkSoftLimits(data) {
+        if (this.machineConnected && this.fileLoaded && this.showSoftLimitsWarning) {
+            this.calculateLimits(data);
+        }
     }
 
     // https://tylercipriani.com/blog/2014/07/12/crossbrowser-javascript-scrollbar-detection/
@@ -1401,6 +1447,87 @@ class Visualizer extends Component {
         } else {
             setVisualizerReady();
         }
+
+        this.fileLoaded = true;
+    }
+
+    calculateLimits(data) {
+        const { workPosition, machinePosition, softXMax, softYMax, softZMax, homingFlag, machineCorner } = this.props;
+        /* machineCorner:
+            0 is top right
+            1 is top left
+            2 bottom right
+            3 bottom left
+        */
+        let xMultiplier = -1;
+        let yMultiplier = -1;
+        if (homingFlag) {
+            switch (machineCorner) {
+            case 1:
+                xMultiplier = 1;
+                yMultiplier = -1;
+                break;
+            case 2:
+                xMultiplier = -1;
+                yMultiplier = 1;
+                break;
+            case 3:
+                xMultiplier = 1;
+                yMultiplier = 1;
+                break;
+            // case 0 and default are negative space, which is already assigned
+            case 0:
+            default:
+                break;
+            }
+        }
+
+        // get wpos
+        let wpos;
+        if (data !== 0) {
+            wpos = workPosition;
+        } else {
+            wpos = {
+                x: 0,
+                y: 0,
+                z: workPosition.z,
+            };
+        }
+
+        // get mpos
+        let mpos = machinePosition;
+
+        let origin = {
+            x: parseFloat(mpos.x) - parseFloat(wpos.x) * xMultiplier,
+            y: parseFloat(mpos.y) - parseFloat(wpos.y) * yMultiplier,
+            z: parseFloat(mpos.z) - parseFloat(wpos.z)
+        };
+
+        let limitsMax = {
+            x: softXMax * xMultiplier - origin.x,
+            y: softYMax * yMultiplier - origin.y,
+            z: softZMax - origin.z,
+        };
+
+        let limitsMin = {
+            x: origin.x * -1,
+            y: origin.y * -1,
+            z: origin.z,
+        };
+
+        // get bbox
+        let bbox = reduxStore.getState().file.bbox;
+        let bboxMin = bbox.min;
+        let bboxMax = bbox.max;
+
+        // check if machine will leave soft limits
+        if (bboxMax.x > limitsMax.x || bboxMin.x < limitsMin.x ||
+            bboxMax.y > limitsMax.y || bboxMin.y < limitsMin.y ||
+            (bboxMax.z === null ? false : bboxMax.z > limitsMax.z) || (bboxMin.z === null ? false : bboxMin.z < limitsMin.z)) {
+            pubsub.publish('softlimits:warning');
+        } else {
+            pubsub.publish('softlimits:ok');
+        }
     }
 
     unload() {
@@ -1624,11 +1751,22 @@ export default connect((store) => {
     const machinePosition = _get(store, 'controller.mpos');
     const workPosition = _get(store, 'controller.wpos');
     const receivedLines = _get(store, 'controller.sender.status.received', 0);
+    // soft limits
+    const softXMax = _get(store, 'controller.settings.settings.$130');
+    const softYMax = _get(store, 'controller.settings.settings.$131');
+    const softZMax = _get(store, 'controller.settings.settings.$132');
+    const homingFlag = _get(store, 'controller.homingFlag');
+    const machineCorner = _get(store, 'controller.settings.settings.$23');
     const { activeVisualizer } = store.visualizer;
     return {
         machinePosition,
         workPosition,
         receivedLines,
+        softXMax,
+        softYMax,
+        softZMax,
+        homingFlag,
+        machineCorner,
         activeVisualizer
     };
 }, null, null, { forwardRef: true })(Visualizer);

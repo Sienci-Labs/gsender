@@ -139,6 +139,8 @@ export function* initialize() {
             type: connectionActions.OPEN_CONNECTION,
             payload: { options }
         });
+
+        pubsub.publish('machine:connected');
     });
 
     controller.addListener('serialport:close', (options) => {
@@ -150,6 +152,8 @@ export function* initialize() {
             type: connectionActions.CLOSE_CONNECTION,
             payload: { options }
         });
+
+        pubsub.publish('machine:disconnected');
     });
 
     controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts) => {
@@ -324,6 +328,7 @@ export function* initialize() {
                 homingFlag: flag
             }
         });
+        pubsub.publish('softlimits:check');
     });
 
     controller.addListener('toolchange:tool', (tool) => {
