@@ -577,10 +577,12 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
             log.error(`Error occurred at ${Date.now()}`);
+            const { received } = this.sender.state;
             this.emit('error', {
                 type: 'GRBL_ERROR',
                 code: `${code}`,
-                errorStack: error,
+                message: error.message,
+                lineNumber: received,
             });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
