@@ -95,7 +95,6 @@ class Controller {
         'file:load': [],
         'file:unload': [],
         'homing:flag': [],
-        'electron-error': [],
     };
 
     context = {
@@ -206,10 +205,6 @@ class Controller {
                     this.type = args[0];
                     this.state = { ...args[1] };
                 }
-                if (eventName === 'electron-error') {
-                    window.ipcRenderer.send('log-error', args[0]);
-                }
-
                 const listeners = ensureArray(this.listeners[eventName]);
                 listeners.forEach((listener) => {
                     listener(...args);

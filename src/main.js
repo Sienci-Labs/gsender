@@ -160,12 +160,11 @@ const main = () => {
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
 
-            ipcMain.on('log-error', (channel, err) => {
-                if ('type' in err) {
+            ipcMain.on('logError:electron', (channel, error) => {
+                if ('type' in error) {
                     log.transports.file.level = 'error';
-                    log.transports.file.resolvePath = () => path.join(__dirname, '/logs.txt');
                 }
-                log.error(err.message);
+                log.error(`${error.message} // Error Type: ${error.type}`);
             });
 
             ipcMain.handle('check-remote-status', (channel) => {
