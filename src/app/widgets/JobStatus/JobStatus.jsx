@@ -71,6 +71,7 @@ class JobStatus extends PureComponent {
                                     <div className={styles['file-name']}>
                                         <TooltipCustom content={`${name} (${this.fileSizeFormat(size)}, ${total} lines)`} style={{ wordWrap: 'break-word' }}>
                                             <span className={styles['file-text']}>{name}</span>{' '}<span>({this.fileSizeFormat(size)}, {total} lines)</span>
+                                            <span />
                                         </TooltipCustom>
                                     </div>
 
