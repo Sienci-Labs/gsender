@@ -28,7 +28,7 @@ import PropTypes from 'prop-types';
 
 import styles from './index.styl';
 
-const Switch = ({ label, checked, onChange, className, style, disabled }) => {
+const Switch = ({ label, checked, onChange, className, style, disabled, onColor }) => {
     return (
         <div className={classnames(styles['toggle-item'], className)} style={style}>
             {label && <span>{label}</span> }
@@ -38,7 +38,7 @@ const Switch = ({ label, checked, onChange, className, style, disabled }) => {
                 disabled={disabled}
                 checkedIcon={false}
                 uncheckedIcon={false}
-                onColor="#295d8d"
+                onColor={onColor || '#295d8d'}
                 height={24}
                 width={48}
             />
@@ -53,6 +53,7 @@ Switch.propTypes = {
     onChange: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object,
+    onColor: PropTypes.string,
 };
 
 Switch.defaultProps = {
