@@ -46,6 +46,7 @@ import {
     BACKGROUND_PART, GRID_PART, XAXIS_PART, YAXIS_PART, ZAXIS_PART,
     LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART
 } from '../../widgets/Visualizer/constants';
+import SafetySettings from './Safety';
 
 
 class PreferencesPage extends PureComponent {
@@ -106,6 +107,11 @@ class PreferencesPage extends PureComponent {
                     component: SpindleLaser
                 },
                 {
+                    id: 8,
+                    label: 'Safety',
+                    component: SafetySettings
+                },
+                {
                     id: 5,
                     label: 'Tool Change',
                     component: Events
@@ -146,7 +152,8 @@ class PreferencesPage extends PureComponent {
                 theme: this.visualizerConfig.get('theme'),
                 objects: this.visualizerConfig.get('objects'),
                 disabled: this.visualizerConfig.get('disabled'),
-                disabledLite: this.visualizerConfig.get('disabledLite')
+                disabledLite: this.visualizerConfig.get('disabledLite'),
+                showSoftLimitsWarning: this.visualizerConfig.get('showSoftLimitsWarning')
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
@@ -703,6 +710,18 @@ class PreferencesPage extends PureComponent {
                         }
                     });
                 }
+                pubsub.publish('visualizer:settings');
+            },
+            handleLimitsWarningToggle: () => {
+                const { visualizer } = this.state;
+                this.visualizerConfig.set('showSoftLimitsWarning', !this.state.visualizer.showSoftLimitsWarning);
+                pubsub.publish('softlimits:changevisibility', !this.state.visualizer.showSoftLimitsWarning);
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        showSoftLimitsWarning: !this.state.visualizer.showSoftLimitsWarning
+                    }
+                });
                 pubsub.publish('visualizer:settings');
             }
         }

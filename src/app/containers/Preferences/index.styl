@@ -36,6 +36,7 @@
 .preferencesContent {
   display: flex;
   flex-direction: row;
+  overflow-y: hidden;
   flex-grow: 1;
 }
 
@@ -92,6 +93,9 @@
 .preferencesOptions {
   width: 80%;
   background: #d1d5db;
+  div:last-child {
+    height: 94%;
+    }
 }
 
 .hidden {

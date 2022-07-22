@@ -1,6 +1,5 @@
 import React from 'react';
 import classNames from 'classnames';
-
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 

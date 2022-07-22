@@ -28,13 +28,13 @@ function ShortcutTable({ forwardRef }) {
                         {shortcuts.map((shortcut) => {
                             const { title, keys, category } = shortcut;
                             return keys ? (
-                                <tr key={title || '-'}>
+                                <tr key={title}>
                                     <td>{title || '-'}</td>
                                     <td>{keys || '-'}</td>
                                     <td>{category || '-'}</td>
                                 </tr>
                             ) : (
-                                ''
+                                null
                             );
                         })}
                     </tbody>
