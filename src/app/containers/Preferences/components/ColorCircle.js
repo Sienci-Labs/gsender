@@ -28,17 +28,27 @@ import styles from '../index.styl';
 const ColorCircle = ({ part, onClick, colour, index }) => {
     useEffect(() => {
         document.getElementById('colorButton' + index).style.backgroundColor = colour;
+        subscribe();
+        return function cleanup() {
+            unsubscribe();
+        };
     }, []);
 
-    pubsub.subscribe('colour:change', (msg, data) => {
-        const { currentPart, newColour } = data;
-        if (currentPart === part) {
-            document.getElementById('colorButton' + index).style.backgroundColor = newColour.hex ? newColour.hex : newColour;
-        }
-    });
+    const subscribe = () => {
+        pubsub.subscribe('colour:change', (msg, data) => {
+            const { currentPart, newColour } = data;
+            if (currentPart === part) {
+                document.getElementById('colorButton' + index).style.backgroundColor = newColour.hex ? newColour.hex : newColour;
+            }
+        });
+    };
+
+    const unsubscribe = () => {
+        pubsub.unsubscribe('colour:change');
+    };
 
     return (
-        <button id={'colorButton' + index} className={styles.colorButton} onClick={() => onClick(part)}/>
+        <button id={'colorButton' + index} className={styles.colorButton}/>
     );
 };
 

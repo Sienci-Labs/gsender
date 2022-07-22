@@ -133,10 +133,10 @@ const Theme = ({ state, actions }) => {
                                     return (
                                         <div key={i} className={styles.colorContainer}>
                                             <span className={styles.first}>{value === G1_PART ? 'G1-G3' : value}</span>
-                                            <div className={styles.dots}></div>
-                                            <div className={styles.colorDisplay}>
+                                            <div className={styles.dotsV2}></div>
+                                            <div role="button" className={styles.colorDisplay} onClick={() => openModal(value)} tabIndex={0}>
                                                 <span>{themeColours.get(value)}</span>
-                                                <ColorCircle part={value} onClick={openModal} colour={themeColours.get(value)} index={i}/>
+                                                <ColorCircle part={value} colour={themeColours.get(value)} index={i}/>
                                             </div>
                                         </div>
                                     );

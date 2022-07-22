@@ -577,9 +577,7 @@ class PreferencesPage extends PureComponent {
                 return defaultColour;
             },
             getCurrentColor: (part, defaultColour) => {
-                return this.visualizerConfig.get(CUST_THEME + ' ' + part)
-                    ? this.visualizerConfig.get(CUST_THEME + ' ' + part)
-                    : defaultColour;
+                return this.visualizerConfig.get(CUST_THEME + ' ' + part, defaultColour);
             },
             handleVisEnabledToggle: (liteMode = false) => {
                 const { visualizer } = this.state;
