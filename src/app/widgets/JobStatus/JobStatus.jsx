@@ -77,14 +77,14 @@ class JobStatus extends PureComponent {
     }
 
     componentDidUpdate() {
-        if (!this.props.fileLoaded) {
+        if (!this.props.fileLoaded || !this.props.connection.isConnected) {
             this.setState({ isChecked: false,
                 toggleStatus: 'jobStatus', });
         }
     }
 
     render() {
-        const { state, name, size, total, fileLoaded, path, filteredPath } = this.props;
+        const { state, name, size, total, fileLoaded, path, filteredPath, connection } = this.props;
         return (
             <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <div className={styles['file-info']}>
@@ -96,14 +96,18 @@ class JobStatus extends PureComponent {
                                         <TooltipCustom content={`${name} (${this.fileSizeFormat(size)}, ${total} lines)`} style={{ wordWrap: 'break-word' }}>
                                             <span className={styles['file-text']}>{name}</span>{' '}<span>({this.fileSizeFormat(size)}, {total} lines)</span>
                                         </TooltipCustom>
-                                        <ToggleSwitch
-                                            label="Job status/Overrides"
-                                            onChange={() => this.handleOverrideToggle()}
-                                            className={styles.litetoggle}
-                                            checked={this.state.isChecked}
-                                            size="md"
-                                            onColor="#888"
-                                        />
+                                        {connection.isConnected
+                                            ? (
+                                                <ToggleSwitch
+                                                    label="Job status/Overrides"
+                                                    onChange={() => this.handleOverrideToggle()}
+                                                    className={styles.litetoggle}
+                                                    checked={this.state.isChecked}
+                                                    size="md"
+                                                    onColor="#888"
+                                                />
+                                            ) : <span />
+                                        }
                                     </div>
 
                                     {filteredPath && (
@@ -133,8 +137,10 @@ export default connect((store) => {
     const path = get(file, 'path', '');
     const name = get(file, 'name', '');
     const filteredPath = path.replace(name, '');
+    const connection = get(store, 'connection');
     return {
         ...file,
-        filteredPath
+        filteredPath,
+        connection
     };
 })(JobStatus);
