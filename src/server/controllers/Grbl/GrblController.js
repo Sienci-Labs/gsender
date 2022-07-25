@@ -1455,9 +1455,9 @@ class GrblController {
             },
             'electronErrors:fetch': () => {
                 // log file operation goes here
-                const logs = 'this is a test log';
+                const logs = '';
                 //emmit an event to send log data to frontend
-                this.emit('electronErrors:errorList', logs);
+                this.emit('electronErrors:errorList', logs || 'No errors or alarms to display');
             },
             'checkStateUpdate': () => {
                 this.emit('controller:state', GRBL, this.state);

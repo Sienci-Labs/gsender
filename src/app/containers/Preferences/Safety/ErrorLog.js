@@ -10,7 +10,7 @@ const ErrorLog = ({ getErrors }) => {
     return (
         <div className={styles.errorWrapper}>
             <div className={styles.errorHeading}>
-                Errors and warnings summary
+                Errors and alarms summary
             </div>
             <div className={styles.errorBody}>
                 {error}
