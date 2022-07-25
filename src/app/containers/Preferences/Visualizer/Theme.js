@@ -130,9 +130,17 @@ const Theme = ({ state, actions }) => {
                         <Tooltip content="Click on the colour circles to change the colour for that component" location="default">
                             {
                                 parts.map((value, i) => {
+                                    let title = value;
+                                    if (title === G1_PART) {
+                                        title = 'G1-G3';
+                                    } else if (title === CUTTING_PART) {
+                                        title = 'Cutting Coord Lines';
+                                    } else if (title === JOGGING_PART) {
+                                        title = 'Jogging Coord Lines';
+                                    }
                                     return (
                                         <div key={i} className={styles.colorContainer}>
-                                            <span className={styles.first}>{value === G1_PART ? 'G1-G3' : value}</span>
+                                            <span className={styles.first}>{title}</span>
                                             <div className={styles.dotsV2}></div>
                                             <div role="button" className={styles.colorDisplay} onClick={() => openModal(value)} tabIndex={0}>
                                                 <span>{themeColours.get(value)}</span>
