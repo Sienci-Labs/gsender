@@ -266,8 +266,9 @@ class SpindleWidget extends PureComponent {
     enableSpindleMode() {
         const active = this.getSpindleActiveState();
         if (active) {
+            this.isSpindleOn = false;
             controller.command('gcode', 'M5');
-            this.setInactive();
+            //this.setInactive();
         }
         const spindleMin = this.config.get('spindleMin');
         const spindleMax = this.config.get('spindleMax');
@@ -377,11 +378,12 @@ class SpindleWidget extends PureComponent {
 
 
     enableLaserMode() {
-        const { active } = this.state;
+        const active = this.getSpindleActiveState();
         const laser = this.config.get('laser');
 
         const { minPower, maxPower } = laser;
         if (active) {
+            this.isLaserOn = false;
             controller.command('gcode', 'M5');
         }
         const commands = [
