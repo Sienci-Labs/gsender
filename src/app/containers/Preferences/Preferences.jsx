@@ -42,6 +42,7 @@ import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 import { CUST_LIGHT_THEME, DARK_THEME, DARK_THEME_VALUES, LIGHT_THEME, LIGHT_THEME_VALUES } from '../../widgets/Visualizer/constants';
+import StatsPage from './Stats';
 
 
 class PreferencesPage extends PureComponent {
@@ -110,6 +111,11 @@ class PreferencesPage extends PureComponent {
                     id: 6,
                     label: 'Start/Stop G-Code',
                     component: ProgramEvents,
+                },
+                {
+                    id: 9,
+                    label: 'Stats',
+                    component: StatsPage,
                 },
                 {
                     id: 7,

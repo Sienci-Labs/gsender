@@ -11,7 +11,7 @@ import styles from '../index.styl';
 const VisualizerOptions = ({ state, actions }) => {
     const { showSoftLimitsWarning, objects, disabled, disabledLite } = state.visualizer;
     const visualizerActions = actions.visualizer;
-    const $20 = parseInt(reduxStore.getState().controller.settings.settings.$20, 10);
+    const $20 = parseInt(reduxStore.getState().controller.settings.settings ? reduxStore.getState().controller.settings.settings.$20 : 0, 10);
 
     return (
         <Fieldset legend="Visualizer Options">

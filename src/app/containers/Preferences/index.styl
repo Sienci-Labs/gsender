@@ -482,3 +482,57 @@
   color: #b82e2e;
   font-weight: bold;
 }
+
+.dots {
+  overflow: hidden;
+}
+
+.dots:after {
+  content: '. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .';
+  color: #000;
+  white-space: nowrap;
+}
+
+.first {
+  margin-right: 0.5em;
+  white-space: nowrap;
+}
+
+.second {
+  margin-left: 0.5em;
+}
+
+.stats-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  min-width: 250px;
+  white-space: nowrap;
+}
+
+.tooltip {
+  max-height: 50px !important;
+  height: 50px !important;
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
+}
+
+.charts-title {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.indent-container {
+  margin-left: 10px;
+}
+
+.bold {
+  font-weight: bold;
+}
