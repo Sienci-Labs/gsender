@@ -53,35 +53,35 @@ const StatsList = ({ state, actions }) => {
             <div className={styles.addMargin}>
                 <div className={styles.statsContainer}>
                     <span className={[styles.first, styles.bold].join(' ')}>Total Runtime</span>
-                    <div className={styles.dots}></div>
+                    <div className={styles.dotsV2}></div>
                     <span className={[styles.second, styles.bold].join(' ')}>{timeSpentRunning}</span>
                 </div>
                 <div className={styles.indentContainer}>
                     <div className={styles.statsContainer}>
                         <span className={styles.first}>Longest Runtime</span>
-                        <div className={styles.dots}></div>
+                        <div className={styles.dotsV2}></div>
                         <span className={styles.second}>{longestTimeRun}</span>
                     </div>
                     <div className={styles.statsContainer}>
                         <span className={styles.first}>Average Runtime</span>
-                        <div className={styles.dots}></div>
+                        <div className={styles.dotsV2}></div>
                         <span className={styles.second}>{calculateAverageTimeRun()}</span>
                     </div>
                 </div>
                 <div className={styles.statsContainer}>
                     <span className={[styles.first, styles.bold].join(' ')}>Total Jobs Run</span>
-                    <div className={styles.dots}></div>
+                    <div className={styles.dotsV2}></div>
                     <span className={[styles.second, styles.bold].join(' ')}>{jobsFinished + jobsCancelled}</span>
                 </div>
                 <div className={styles.indentContainer}>
                     <div className={styles.statsContainer}>
                         <span className={styles.first}>Jobs Completed</span>
-                        <div className={styles.dots}></div>
+                        <div className={styles.dotsV2}></div>
                         <span className={styles.second}>{jobsFinished}</span>
                     </div>
                     <div className={styles.statsContainer}>
                         <span className={styles.first}>Jobs Cancelled</span>
-                        <div className={styles.dots}></div>
+                        <div className={styles.dotsV2}></div>
                         <span className={styles.second}>{jobsCancelled}</span>
                     </div>
                 </div>
