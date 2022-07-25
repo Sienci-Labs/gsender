@@ -36,6 +36,7 @@ import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
+import isElectron from 'is-electron';
 
 
 export function* initialize() {
@@ -338,6 +339,18 @@ export function* initialize() {
             msg: `Tool command found - <b>${tool}</b>`,
             duration: TOASTER_UNTIL_CLOSE
         });
+    });
+
+    controller.addListener('error', (error) => {
+        try {
+            if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
+                window.ipcRenderer.send('logError:electron', error);
+            } else {
+                console.log(error.message);
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
     });
 
     yield null;
