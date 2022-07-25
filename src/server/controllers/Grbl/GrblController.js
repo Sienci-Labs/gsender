@@ -1542,6 +1542,13 @@ class GrblController {
                 ];
                 this.command('gcode', commands);
             },
+            'spindlespeed:change': () => {
+                const [speed = 0] = args;
+                const commands = [
+                    'S' + speed
+                ];
+                this.command('gcode', commands);
+            },
             'gcode': () => {
                 const [commands, context] = args;
                 const data = ensureArray(commands)
