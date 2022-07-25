@@ -29,22 +29,27 @@ import Fieldset from '../components/Fieldset';
 const StatsList = ({ state, actions }) => {
     const jobsFinished = store.get('workspace.jobsFinished');
     const jobsCancelled = store.get('workspace.jobsCancelled');
+
+    // solution found here: https://stackoverflow.com/a/25279340
     const convertMillisecondsToTimeStamp = (milliseconds) => {
-        var date = new Date(null);
-        date.setSeconds(milliseconds / 1000); // specify value for SECONDS here
-        var result = date.toISOString().substring(11, 19);
+        let date = new Date(null);
+        date.setSeconds(milliseconds / 1000);
+        let result = date.toISOString().substring(11, 19);
         return result;
     };
+
     const timeSpentRunning = convertMillisecondsToTimeStamp(store.get('workspace.timeSpentRunning'));
     const longestTimeRun = convertMillisecondsToTimeStamp(store.get('workspace.longestTimeRun'));
     const jobTimes = store.get('workspace.jobTimes');
 
     const calculateAverageTimeRun = () => {
         let avgTime = 0;
-        for (let i = 0; i < jobTimes.length; i++) {
-            avgTime += jobTimes[i];
+        if (jobTimes.length > 0) {
+            for (let i = 0; i < jobTimes.length; i++) {
+                avgTime += jobTimes[i];
+            }
+            avgTime /= jobTimes.length;
         }
-        avgTime /= jobTimes.length;
         return convertMillisecondsToTimeStamp(avgTime);
     };
 
