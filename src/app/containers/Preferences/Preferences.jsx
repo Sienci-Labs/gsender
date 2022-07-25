@@ -43,6 +43,7 @@ import { METRIC_UNITS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 import { CUST_LIGHT_THEME, DARK_THEME, DARK_THEME_VALUES, LIGHT_THEME, LIGHT_THEME_VALUES } from '../../widgets/Visualizer/constants';
 import StatsPage from './Stats';
+import SafetySettings from './Safety';
 
 
 class PreferencesPage extends PureComponent {
@@ -101,6 +102,11 @@ class PreferencesPage extends PureComponent {
                     id: 1,
                     label: 'Spindle/Laser',
                     component: SpindleLaser
+                },
+                {
+                    id: 8,
+                    label: 'Safety',
+                    component: SafetySettings
                 },
                 {
                     id: 5,
