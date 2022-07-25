@@ -84,7 +84,6 @@
 
 .general-area {
   width: 100%;
-  height: 625px;
   display: flex;
   gap: 2rem;
   justify-content: space-between;
@@ -550,3 +549,32 @@
 
   line-height: 1.5 !important;
 }
+.errorWrapper{
+  width:100%
+  min-height: 20rem;
+  margin-top: 2rem;
+  .errorHeading{
+    height: 5%;
+    font-size: 1.7rem;
+    }
+  .errorBody{
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: white;
+    height: 95%;
+    min-height: 387px;
+    height: 387px !important;
+    overflow-y: scroll;
+        &::-webkit-scrollbar {
+    width: 7px;
+    }
+    &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px #13283c; 
+    border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+    }
+    }
+  }

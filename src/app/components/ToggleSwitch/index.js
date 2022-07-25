@@ -33,7 +33,7 @@ const Switch = ({ label, checked, onChange, className, style, disabled, onColor 
         <div className={classnames(styles['toggle-item'], className)} style={style}>
             {label && <span>{label}</span> }
             <ToggleSwitch
-                checked={checked}
+                checked={checked || false}
                 onChange={onChange}
                 disabled={disabled}
                 checkedIcon={false}

@@ -95,6 +95,7 @@ class Controller {
         'file:load': [],
         'file:unload': [],
         'homing:flag': [],
+        'electronErrors:errorList': []
     };
 
     context = {
