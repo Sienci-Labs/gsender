@@ -585,6 +585,13 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
             log.error(`Error occurred at ${Date.now()}`);
+            const { received } = this.sender.state;
+            this.emit('error', {
+                type: 'GRBL_ERROR',
+                code: `${code}`,
+                message: error.message,
+                lineNumber: received,
+            });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { lines, received } = this.sender.state;
@@ -633,6 +640,10 @@ class GrblController {
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
+                this.emit('error', {
+                    type: 'GRBL_ALARM',
+                    message: `ALARM:${code} (${alarm.message})`,
+                });
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
 
@@ -1239,7 +1250,7 @@ class GrblController {
                 const [lineToStartFrom] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
-                console.log(startEventEnabled);
+                log.info(startEventEnabled);
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
