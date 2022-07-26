@@ -105,6 +105,7 @@ class SpindleWidget extends PureComponent {
         },
         sendM3: () => {
             const { spindleSpeed, mode } = this.state;
+            this.isSpindleOn = true;
             if (mode === LASER_MODE || spindleSpeed === 0) {
                 controller.command('gcode', 'M3');
             } else {
@@ -113,6 +114,7 @@ class SpindleWidget extends PureComponent {
         },
         sendM4: () => {
             const { spindleSpeed, mode } = this.state;
+            this.isSpindleOn = true;
             if (mode === LASER_MODE || spindleSpeed === 0) {
                 controller.command('gcode', 'M4');
             } else {
@@ -121,6 +123,7 @@ class SpindleWidget extends PureComponent {
         },
         sendM5: () => {
             this.isLaserOn = false;
+            this.isSpindleOn = false;
             controller.command('gcode', 'M5 S0');
         },
         sendLaserM3: () => {
@@ -133,6 +136,9 @@ class SpindleWidget extends PureComponent {
         },
         handleSpindleSpeedChange: (e) => {
             const value = Number(e.target.value);
+            if (this.isSpindleOn) {
+                this.debounceSpindleSpeed(value);
+            }
             this.setState({
                 spindleSpeed: value
             });
@@ -260,8 +266,9 @@ class SpindleWidget extends PureComponent {
     enableSpindleMode() {
         const active = this.getSpindleActiveState();
         if (active) {
+            this.isSpindleOn = false;
             controller.command('gcode', 'M5');
-            this.setInactive();
+            //this.setInactive();
         }
         const spindleMin = this.config.get('spindleMin');
         const spindleMax = this.config.get('spindleMax');
@@ -281,6 +288,10 @@ class SpindleWidget extends PureComponent {
 
     debounceLaserPower = debounce((power, maxPower) => {
         controller.command('laserpower:change', power, maxPower);
+    }, 300);
+
+    debounceSpindleSpeed = debounce((speed) => {
+        controller.command('spindlespeed:change', speed);
     }, 300);
 
     updateControllerSettings(max, min, mode) {
@@ -367,11 +378,12 @@ class SpindleWidget extends PureComponent {
 
 
     enableLaserMode() {
-        const { active } = this.state;
+        const active = this.getSpindleActiveState();
         const laser = this.config.get('laser');
 
         const { minPower, maxPower } = laser;
         if (active) {
+            this.isLaserOn = false;
             controller.command('gcode', 'M5');
         }
         const commands = [
