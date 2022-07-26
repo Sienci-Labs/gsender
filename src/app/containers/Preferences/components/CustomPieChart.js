@@ -27,7 +27,7 @@ const CustomPieChart = ({ propsData }) => {
     };
 
     const makeTooltipContent = (entry) => {
-        return `Sector ${entry.title} has value ${entry.value}`;
+        return `Jobs ${entry.title}: ${entry.value}`;
     };
 
     return (
