@@ -46,6 +46,7 @@ import {
     BACKGROUND_PART, GRID_PART, XAXIS_PART, YAXIS_PART, ZAXIS_PART,
     LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART
 } from '../../widgets/Visualizer/constants';
+import StatsPage from './Stats';
 import SafetySettings from './Safety';
 
 
@@ -120,6 +121,11 @@ class PreferencesPage extends PureComponent {
                     id: 6,
                     label: 'Start/Stop G-Code',
                     component: ProgramEvents,
+                },
+                {
+                    id: 9,
+                    label: 'Stats',
+                    component: StatsPage,
                 },
                 {
                     id: 7,
