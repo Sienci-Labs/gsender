@@ -3,17 +3,21 @@ import PropTypes from 'prop-types';
 import styles from '../index.styl';
 
 const ErrorLog = ({ getErrors }) => {
-    const [error, setError] = useState('');
+    const [error, setError] = useState([]);
     useEffect(() => {
         setError(getErrors());
-    }, [getErrors]);
+    }, []);
     return (
         <div className={styles.errorWrapper}>
             <div className={styles.errorHeading}>
                 Errors and alarms summary
             </div>
             <div className={styles.errorBody}>
-                {error}
+                <ul>
+                    {error.map((item) => {
+                        return <li key={item}>{item}</li>;
+                    })}
+                </ul>
             </div>
         </div>
     );
