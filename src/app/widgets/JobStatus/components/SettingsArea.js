@@ -98,7 +98,7 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
                 <FeedControlButton value={1} onClick={handleFeedRateChange} hideOnSmallScreens>+</FeedControlButton>
                 <FeedControlButton value={10} onClick={handleFeedRateChange}>+ +</FeedControlButton>
                 <FeedControlButton value={0} onClick={handleFeedRateChange}><i className="fas fa-redo fa-flip-horizontal" /></FeedControlButton>
-                <span>{`${ovF}%`}</span>
+                <span>{`${ovF || 0}%`}</span>
             </div>
 
             {
@@ -111,7 +111,7 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
                         <FeedControlButton value={1} onClick={handleSpindleSpeedChange} hideOnSmallScreens>+</FeedControlButton>
                         <FeedControlButton value={10} onClick={handleSpindleSpeedChange}>+ +</FeedControlButton>
                         <FeedControlButton value={0} onClick={handleSpindleSpeedChange}><i className="fas fa-redo fa-flip-horizontal" /></FeedControlButton>
-                        <span>{`${ovS}%`}</span>
+                        <span>{`${ovS || 0}%`}</span>
                     </div>
                 )
             }

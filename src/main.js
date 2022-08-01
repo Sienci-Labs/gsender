@@ -163,8 +163,11 @@ const main = () => {
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
 
-            ipcMain.on('log-error', (channel, err) => {
-                log.error(err.message);
+            ipcMain.on('logError:electron', (channel, error) => {
+                if ('type' in error) {
+                    log.transports.file.level = 'error';
+                }
+                (error.type === 'GRBL_ERROR') ? log.error(`GRBL_ERROR: Error:${error.code} - ${error.message}. On Line - ${error.lineNumber}`) : log.error(`GRBL_ALARM: Alarm:${error.code} - ${error.message}`);
             });
 
             ipcMain.handle('check-remote-status', (channel) => {
@@ -181,16 +184,15 @@ const main = () => {
                     if (prevDirectory) {
                         additionalOptions.defaultPath = prevDirectory;
                     }
-                    const file = await dialog.showOpenDialog(window, {
-                        properties: ['openFile'],
-                        filters: [
-                            {
-                                name: 'GCode Files',
-                                extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'],
-                            },
-                            { name: 'All Files', extensions: ['*'] },
-                        ],
-                    });
+                    const file = await dialog.showOpenDialog(window,
+                        {
+                            properties: ['openFile'],
+                            filters: [
+                                { name: 'GCode Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
+                                { name: 'All Files', extensions: ['*'] }
+                            ]
+                        },);
+
 
                     if (!file) {
                         return;

@@ -22,35 +22,32 @@
  */
 
 import React from 'react';
-import JoggingPresets from './JoggingPresets';
-import MachineProfile from './MachineProfile';
+import { Provider as ReduxProvider } from 'react-redux';
+import reduxStore from 'app/store/redux';
+
 import SettingWrapper from '../components/SettingWrapper';
-import Connection from './Connection';
 import GeneralArea from '../components/GeneralArea';
-import Workspace from './Workspace';
-import Settings from './Settings';
-import CustomDecimalPlaces from './CustomDecimalPlaces';
 
-const General = ({ active, state, actions }) => {
+import VisualizerSafety from './VisualizerSafety';
+import Movement from './Movement';
+import WorkspaceSafety from './WorkspaceSafety';
+
+const SafetySettings = ({ active, state, actions }) => {
     return (
-        <SettingWrapper title="General" show={active}>
-            <GeneralArea>
-
-                <GeneralArea.Half>
-                    <Connection state={state} actions={actions} />
-                    <Workspace state={state} actions={actions} />
-                    <JoggingPresets />
-                </GeneralArea.Half>
-
-                <GeneralArea.Half>
-                    <MachineProfile state={state} />
-                    <CustomDecimalPlaces state={state} actions={actions}/>
-                    <Settings />
-                </GeneralArea.Half>
-
-            </GeneralArea>
+        <SettingWrapper title="Safety" show={active}>
+            <ReduxProvider store={reduxStore}>
+                <GeneralArea>
+                    <GeneralArea.Half>
+                        <WorkspaceSafety state={state} actions={actions} />
+                        <VisualizerSafety state={state} actions={actions} />
+                    </GeneralArea.Half>
+                    <GeneralArea.Half>
+                        <Movement state={state} actions={actions} />
+                    </GeneralArea.Half>
+                </GeneralArea>
+            </ReduxProvider>
         </SettingWrapper>
     );
 };
 
-export default General;
+export default SafetySettings;

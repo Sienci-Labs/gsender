@@ -138,6 +138,8 @@ class GrblController {
 
     queryTimer = null;
 
+    timePaused = null;
+
     actionMask = {
         queryParserState: {
             state: false, // wait for a message containing the current G-code parser modal state
@@ -544,16 +546,22 @@ class GrblController {
             } else {
                 this.sender.hold();
             }
+
+            this.timePaused = new Date().getTime();
         });
         this.workflow.on('resume', (...args) => {
             this.emit('workflow:state', this.workflow.state);
+
+            let pauseTime = new Date().getTime() - this.timePaused;
 
             // Reset feeder prior to resume program execution
             this.feeder.reset();
 
             // Resume program execution
             this.sender.unhold();
-            this.sender.next();
+
+            // subtract time paused
+            this.sender.next({ timePaused: pauseTime });
         });
 
         // Grbl
@@ -663,6 +671,13 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
             log.error(`Error occurred at ${Date.now()}`);
+            const { received } = this.sender.state;
+            this.emit('error', {
+                type: 'GRBL_ERROR',
+                code: `${code}`,
+                message: error.message,
+                lineNumber: received,
+            });
 
             if (
                 this.workflow.state === WORKFLOW_STATE_RUNNING ||
@@ -728,10 +743,12 @@ class GrblController {
 
             if (alarm) {
                 // Grbl v1.1
-                this.emit(
-                    'serialport:read',
-                    `ALARM:${code} (${alarm.message})`
-                );
+                this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
+                this.emit('error', {
+                    type: 'GRBL_ALARM',
+                    message: `ALARM:${code} (${alarm.message})`,
+                });
+
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
 
@@ -1370,7 +1387,7 @@ class GrblController {
                 const [lineToStartFrom] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
-                console.log(startEventEnabled);
+                log.info(startEventEnabled);
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
@@ -1474,7 +1491,8 @@ class GrblController {
                     this.feeder.reset();
 
                     // Sender
-                    this.sender.next();
+                    this.sender.setStartLine(0);
+                    this.sender.next({ startFromLine: true });
                 }
             },
             'stop': () => {
@@ -1709,6 +1727,13 @@ class GrblController {
                             ensurePositiveNumber(maxS * (power / 100)) * 100
                         ) /
                             100,
+                ];
+                this.command('gcode', commands);
+            },
+            'spindlespeed:change': () => {
+                const [speed = 0] = args;
+                const commands = [
+                    'S' + speed
                 ];
                 this.command('gcode', commands);
             },
