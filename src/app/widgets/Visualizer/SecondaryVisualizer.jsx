@@ -1,29 +1,30 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 
 import * as WebGL from 'app/lib/three/WebGL';
 import { SURFACING_VISUALIZER_CONTAINER_ID } from 'app/constants';
 
-import Visualizer from './Visualizer';
+import VisualizerWrapper from './VisualizerWrapper';
 import Loading from './Loading';
 import Rendering from './Rendering';
 
 const SecondaryVisualizer = ({ state, actions, surfacingData, showVisualizer, cameraPosition, visualizerRef, showLoading, showRendering }) => {
+    let visualizer = useRef();
     return (
         <div style={{ border: '1px solid black', height: '100%', width: '100%' }}>
             { showLoading && <Loading /> }
             { showRendering && <Rendering /> }
 
             {WebGL.isWebGLAvailable() && (
-                <Visualizer
-                    isSecondary
+                <VisualizerWrapper
                     show={showVisualizer}
                     cameraPosition={cameraPosition}
-                    ref={visualizerRef}
+                    ref={visualizer}
                     state={state}
                     actions={actions}
                     surfacingData={surfacingData}
                     containerID={SURFACING_VISUALIZER_CONTAINER_ID}
+                    isSecondary={true}
                 />
             )}
         </div>

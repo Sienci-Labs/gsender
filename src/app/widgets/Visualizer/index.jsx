@@ -557,15 +557,15 @@ class VisualizerWidget extends PureComponent {
             }
         },
         handleLiteModeToggle: () => {
-            const { liteMode, disabled, disabledLite } = this.state;
+            const { liteMode, gcode } = this.state;
             const newLiteModeValue = !liteMode;
-            const shouldRenderVisualization = newLiteModeValue ? !disabledLite : !disabled;
-            this.renderIfNecessary(shouldRenderVisualization);
 
             this.setState({
                 liteMode: newLiteModeValue,
                 minimizeRenders: newLiteModeValue
             });
+
+            pubsub.publish('litemode:change', gcode);
         },
         lineWarning: {
             onContinue: () => {
@@ -1128,6 +1128,7 @@ class VisualizerWidget extends PureComponent {
                     showVisualizer={showVisualizer}
                     visualizerRef={(ref) => {
                         this.visualizer = ref;
+                        console.log(ref);
                     }}
                     workflowRef={(ref) => {
                         this.workflowControl = ref;

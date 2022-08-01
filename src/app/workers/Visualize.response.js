@@ -21,3 +21,8 @@ export const shouldVisualize = () => {
     const isDisabled = (liteMode) ? store.get('widgets.visualizer.disabledLite') : store.get('widgets.visualizer.disabled');
     return !isDisabled;
 };
+
+export const isLiteMode = () => {
+    const liteMode = store.get('widgets.visualizer.liteMode', false);
+    return liteMode;
+};

@@ -71,7 +71,8 @@ class WorkflowControl extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
         actions: PropTypes.object,
-        invalidGcode: PropTypes.string
+        invalidGcode: PropTypes.string,
+        liteMode: PropTypes.bool
     };
 
     fileInputEl = null;
@@ -352,6 +353,7 @@ class WorkflowControl extends PureComponent {
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
 
         const { showModal, value } = this.state.startFromLine;
+        const { liteMode } = this.props;
 
         return (
             <div className={styles.workflowControl}>
@@ -566,11 +568,13 @@ class WorkflowControl extends PureComponent {
                         </Modal>
                     )
                 }
-
-                <CameraDisplay
-                    camera={camera}
-                    cameraPosition={cameraPosition}
-                />
+                {
+                    !liteMode ?
+                        <CameraDisplay
+                            camera={camera}
+                            cameraPosition={cameraPosition}
+                        /> : null
+                }
             </div>
         );
     }

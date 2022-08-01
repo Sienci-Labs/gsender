@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
@@ -11,7 +11,7 @@ import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
 import ValidationModal from './ValidationModal';
 import WarningModal from './WarningModal';
-import Visualizer from './Visualizer';
+import VisualizerWrapper from './VisualizerWrapper';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
@@ -29,6 +29,8 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
     const { handleLiteModeToggle, handleRun, reset } = actions;
 
     const containerID = 'visualizer_container';
+
+    let visualizer = useRef();
 
     return (
         <Widget className={styles.vizWidgetOverride}>
@@ -77,20 +79,22 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                             state={state}
                             actions={actions}
                         />
-                        <Visualizer
+                        <VisualizerWrapper
                             show={showVisualizer}
                             cameraPosition={cameraPosition}
-                            ref={visualizerRef}
+                            ref={visualizer}
                             state={state}
                             actions={actions}
                             containerID={containerID}
+                            liteMode={liteMode}
+                            isSecondary={false}
                         />
-
                         <WorkflowControl
                             ref={workflowRef}
                             state={state}
                             actions={actions}
                             invalidGcode={invalidLine.line}
+                            liteMode={liteMode}
                         />
 
 
