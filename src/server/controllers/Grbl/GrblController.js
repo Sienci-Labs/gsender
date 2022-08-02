@@ -126,6 +126,8 @@ class GrblController {
 
     queryTimer = null;
 
+    timePaused = null;
+
     actionMask = {
         queryParserState: {
             state: false, // wait for a message containing the current G-code parser modal state
@@ -474,16 +476,22 @@ class GrblController {
             } else {
                 this.sender.hold();
             }
+
+            this.timePaused = new Date().getTime();
         });
         this.workflow.on('resume', (...args) => {
             this.emit('workflow:state', this.workflow.state);
+
+            let pauseTime = new Date().getTime() - this.timePaused;
 
             // Reset feeder prior to resume program execution
             this.feeder.reset();
 
             // Resume program execution
             this.sender.unhold();
-            this.sender.next();
+
+            // subtract time paused
+            this.sender.next({ timePaused: pauseTime });
         });
 
         // Grbl
@@ -1339,7 +1347,8 @@ class GrblController {
                     this.feeder.reset();
 
                     // Sender
-                    this.sender.next();
+                    this.sender.setStartLine(0);
+                    this.sender.next({ startFromLine: true });
                 }
             },
             'stop': () => {
@@ -1564,6 +1573,13 @@ class GrblController {
                     // https://github.com/gnea/grbl/wiki/Grbl-v1.1-Laser-Mode
                     // The laser will only turn on when Grbl is in a G1, G2, or G3 motion mode.
                     'S' + Math.round(ensurePositiveNumber(maxS * (power / 100)) * 100) / 100
+                ];
+                this.command('gcode', commands);
+            },
+            'spindlespeed:change': () => {
+                const [speed = 0] = args;
+                const commands = [
+                    'S' + speed
                 ];
                 this.command('gcode', commands);
             },

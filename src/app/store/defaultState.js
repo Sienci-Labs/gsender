@@ -72,7 +72,10 @@ const defaultState = {
         safeRetractHeight: 0,
         customDecimalPlaces: 0,
         jobsFinished: 0,
+        jobsCancelled: 0,
         timeSpentRunning: 0,
+        longestTimeRun: 0,
+        jobTimes: [],
         toolChangeOption: 'Ignore',
         toolChangeHooks: {
             preHook: '',
