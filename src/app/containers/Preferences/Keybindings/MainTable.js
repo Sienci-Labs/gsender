@@ -66,7 +66,7 @@ export default class MainTable extends Component {
 
     renders = {
         renderShortcutCell: (row) => {
-            const { keys, isActive, keysName: title } = row;
+            const { keys, isActive, title } = row;
             const shortcut = [...keys][0] === '+' ? ['+'] : keys.split('+');
 
             const { onEdit, onDelete } = this.props;
@@ -156,7 +156,7 @@ export default class MainTable extends Component {
     columns = [
         { id: 'title', label: 'Action', maxWidth: 50 },
         { id: 'keys', label: 'Shortcut', minWidth: 250 },
-        { id: 'category', label: 'Category', minWidth: 148 },
+        { id: 'category', label: 'Category', minWidth: 148, align: 'center' },
         { id: 'isActive', label: 'Active', minWidth: 74 }
     ];
 
