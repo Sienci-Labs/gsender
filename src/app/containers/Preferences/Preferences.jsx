@@ -41,7 +41,13 @@ import store from '../../store';
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
-import { CUST_LIGHT_THEME, DARK_THEME, DARK_THEME_VALUES, LIGHT_THEME, LIGHT_THEME_VALUES } from '../../widgets/Visualizer/constants';
+import {
+    CUST_THEME, DARK_THEME_VALUES,
+    BACKGROUND_PART, GRID_PART, XAXIS_PART, YAXIS_PART, ZAXIS_PART,
+    LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART
+} from '../../widgets/Visualizer/constants';
+import StatsPage from './Stats';
+import SafetySettings from './Safety';
 
 
 class PreferencesPage extends PureComponent {
@@ -102,6 +108,11 @@ class PreferencesPage extends PureComponent {
                     component: SpindleLaser
                 },
                 {
+                    id: 8,
+                    label: 'Safety',
+                    component: SafetySettings
+                },
+                {
                     id: 5,
                     label: 'Tool Change',
                     component: Events
@@ -110,6 +121,11 @@ class PreferencesPage extends PureComponent {
                     id: 6,
                     label: 'Start/Stop G-Code',
                     component: ProgramEvents,
+                },
+                {
+                    id: 9,
+                    label: 'Stats',
+                    component: StatsPage,
                 },
                 {
                     id: 7,
@@ -503,17 +519,23 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('theme:change', theme.value);
             },
-            handleCustThemeChange: (theme, part) => {
-                const { visualizer } = this.state;
-                this.visualizerConfig.set(theme + ' ' + part,
-                    this.visualizerConfig.get('temp ' + theme + ' ' + part));
-                this.setState({
-                    visualizer: {
-                        ...visualizer,
-                        theme: theme
-                    }
+            handleCustThemeChange: (themeColours) => {
+                const parts = [
+                    BACKGROUND_PART,
+                    GRID_PART,
+                    XAXIS_PART,
+                    YAXIS_PART,
+                    ZAXIS_PART,
+                    LIMIT_PART,
+                    CUTTING_PART,
+                    JOGGING_PART,
+                    G0_PART,
+                    G1_PART
+                ];
+                parts.map((value) => {
+                    return this.visualizerConfig.set(CUST_THEME + ' ' + value, themeColours.get(value));
                 });
-                pubsub.publish('theme:change', theme);
+                pubsub.publish('theme:change', CUST_THEME);
             },
             handleChangeComplete: (color, part) => {
                 const { visualizer } = this.state;
@@ -522,12 +544,9 @@ class PreferencesPage extends PureComponent {
             handlePartChange: () => {
                 pubsub.publish('part:change');
             },
-            getDefaultColour: (theme, part) => {
+            getDefaultColour: (part) => {
                 let defaultColour;
                 let themeType = DARK_THEME_VALUES;
-                if (theme === CUST_LIGHT_THEME) {
-                    themeType = LIGHT_THEME_VALUES;
-                }
                 switch (part) {
                 case 'Background':
                     defaultColour = themeType.backgroundColor;
@@ -571,36 +590,7 @@ class PreferencesPage extends PureComponent {
                 return defaultColour;
             },
             getCurrentColor: (part, defaultColour) => {
-                const { visualizer } = this.state;
-                if (visualizer.theme === LIGHT_THEME) {
-                    return LIGHT_THEME_VALUES.backgroundColor;
-                } else if (visualizer.theme === DARK_THEME) {
-                    return DARK_THEME_VALUES.backgroundColor;
-                } else {
-                    return this.visualizerConfig.get(visualizer.theme + ' ' + part)
-                        ? this.visualizerConfig.get(visualizer.theme + ' ' + part)
-                        : defaultColour;
-                }
-            },
-            resetCustomThemeColours: (theme) => {
-                let themeColours = DARK_THEME_VALUES;
-                if (theme === CUST_LIGHT_THEME) {
-                    themeColours = LIGHT_THEME_VALUES;
-                }
-                this.visualizerConfig.set(theme + ' Background', themeColours.backgroundColor);
-                this.visualizerConfig.set(theme + ' Grid', themeColours.gridColor);
-                this.visualizerConfig.set(theme + ' X Axis', themeColours.xAxisColor);
-                this.visualizerConfig.set(theme + ' Y Axis', themeColours.yAxisColor);
-                this.visualizerConfig.set(theme + ' Z Axis', themeColours.zAxisColor);
-                this.visualizerConfig.set(theme + ' Limit', themeColours.limitColor);
-                this.visualizerConfig.set(theme + ' Cutting Coordinate Lines', themeColours.cuttingCoordinateLines);
-                this.visualizerConfig.set(theme + ' Jogging Coordinate Lines', themeColours.joggingCoordinateLines);
-                this.visualizerConfig.set(theme + ' G0', themeColours.G0Color);
-                this.visualizerConfig.set(theme + ' G1', themeColours.G1Color);
-                this.visualizerConfig.set(theme + ' G2', themeColours.G2Color);
-                this.visualizerConfig.set(theme + ' G3', themeColours.G3Color);
-
-                pubsub.publish('theme:change');
+                return this.visualizerConfig.get(CUST_THEME + ' ' + part, defaultColour);
             },
             handleVisEnabledToggle: (liteMode = false) => {
                 const { visualizer } = this.state;

@@ -33,7 +33,6 @@ const ensureArray = (...args) => {
 };
 
 const noop = () => {};
-
 class Controller {
     io = null;
 
@@ -42,31 +41,31 @@ class Controller {
     listeners = {
         // Socket.IO Events
         // Fired upon a connection including a successful reconnection.
-        connect: [],
+        'connect': [],
         // Fired upon a connection error.
-        connect_error: [],
+        'connect_error': [],
         // Fired upon a connection timeout.
-        connect_timeout: [],
+        'connect_timeout': [],
         // Fired when an error occurs.
-        error: [],
+        'error': [],
         // Fired upon a disconnection.
-        disconnect: [],
+        'disconnect': [],
         // Fired upon a successful reconnection.
-        reconnect: [],
+        'reconnect': [],
         // Fired upon an attempt to reconnect.
-        reconnect_attempt: [],
+        'reconnect_attempt': [],
         // Fired upon an attempt to reconnect.
-        reconnecting: [],
+        'reconnecting': [],
         // Fired upon a reconnection attempt error.
-        reconnect_error: [],
+        'reconnect_error': [],
         // Fired when couldn't reconnect within reconnectionAttempts.
-        reconnect_failed: [],
+        'reconnect_failed': [],
         // Fired when gcode errors are found in files...
-        gcode_error: [],
-        gcode_error_checking_file: [],
+        'gcode_error': [],
+        'gcode_error_checking_file': [],
 
         // System ToolChange
-        startup: [],
+        'startup': [],
         'config:change': [],
         'task:start': [],
         'task:finish': [],
@@ -87,11 +86,11 @@ class Controller {
         'workflow:state': [],
         'controller:settings': [],
         'controller:state': [],
-        message: [],
+        'message': [],
         'toolchange:start': [],
         'toolchange:preHookComplete': [],
         'toolchange:tool': [],
-        hPong: [],
+        'hPong': [],
         'outline:start': [],
         'file:load': [],
         'file:unload': [],
@@ -128,7 +127,9 @@ class Controller {
 
     // Connection options
     host = null;
+
     next = null;
+
     options = null;
 
     // @param {object} io The socket.io-client module.
@@ -204,7 +205,6 @@ class Controller {
                     this.type = args[0];
                     this.state = { ...args[1] };
                 }
-
                 const listeners = ensureArray(this.listeners[eventName]);
                 listeners.forEach((listener) => {
                     listener(...args);
