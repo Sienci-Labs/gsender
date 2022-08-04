@@ -151,7 +151,8 @@ class PreferencesPage extends PureComponent {
                 ...this.spindleConfig.get('laser')
             },
             spindle: {
-                ...this.spindleConfig.get()
+                ...this.spindleConfig.get(),
+                delay: this.spindleConfig.get('delay')
             },
             visualizer: {
                 minimizeRenders: this.visualizerConfig.get('minimizeRenders'),
@@ -495,6 +496,15 @@ class PreferencesPage extends PureComponent {
                 this.setState({ spindle: newSpindleValue });
 
                 pubsub.publish('spindle:updated', newSpindleValue);
+            },
+            handleDelayToggle: (hasDelay) => {
+                const { spindle } = this.state;
+                this.setState({
+                    spindle: {
+                        ...spindle,
+                        delay: hasDelay
+                    }
+                });
             }
         },
         visualizer: {
@@ -761,6 +771,7 @@ class PreferencesPage extends PureComponent {
         store.replace('workspace[probeProfile]', probe);
         store.set('widgets.spindle.spindleMax', spindle.spindleMax);
         store.set('widgets.spindle.spindleMin', spindle.spindleMin);
+        store.set('widgets.spindle.delay', spindle.delay);
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
