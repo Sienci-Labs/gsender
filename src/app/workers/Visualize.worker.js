@@ -51,20 +51,21 @@ onmessage = function({ data }) {
         // @param {object} v2 A 3D vector of the end point.
         addLine: (modal, v1, v2) => {
             const { motion } = modal;
-            const opacity = (motion === 'G0') ? 0.1 : 1;
-            const color = [motion, opacity];
-            colors.push(color, color);
-
-            const stroke = 'rgba(0,0,0,' + opacity + ')';
 
             if (!liteMode) {
+                const opacity = (motion === 'G0') ? 0.1 : 1;
+                const color = [motion, opacity];
+                colors.push(color, color);
                 vertices.push(
                     new THREE.Vector3(v1.x, v1.y, v1.z),
                     new THREE.Vector3(v2.x, v2.y, v2.z)
                 );
             } else {
+                const opacity = (motion === 'G0') ? '0F' : 'FF';
+                const color = [motion, opacity];
+                colors.push(color);
                 vertices.push(
-                    <line x1={v1.x} y1={v1.y} x2={v2.x} y2={v2.y} stroke={stroke} strokeWidth={10} fill="none"/>
+                    <line x1={v1.x} y1={v1.y} x2={v2.x} y2={v2.y} strokeWidth={10} fill="none"/>
                 );
             }
         },
@@ -96,9 +97,9 @@ onmessage = function({ data }) {
             );
             const divisions = 30;
             const points = arcCurve.getPoints(divisions);
-            const color = [motion, 1];
 
             if (!liteMode) {
+                const color = [motion, 1];
                 for (let i = 0; i < points.length; ++i) {
                     const point = points[i];
                     const z = ((v2.z - v1.z) / points.length) * i + v1.z;
@@ -113,6 +114,7 @@ onmessage = function({ data }) {
                     colors.push(color);
                 }
             } else {
+                const color = [motion, 'FF'];
                 for (let i = 1; i < points.length; ++i) {
                     const pointA = points[i - 1];
                     const pointB = points[i];
@@ -120,17 +122,18 @@ onmessage = function({ data }) {
 
                     if (plane === 'G17') { // XY-plane
                         vertices.push(
-                            <line x1={pointA.x} y1={pointA.y} x2={pointB.x} y2={pointB.y} stroke="black" strokeWidth={10} fill="none"/>
+                            <line x1={pointA.x} y1={pointA.y} x2={pointB.x} y2={pointB.y} strokeWidth={10} fill="none"/>
                         );
                     } else if (plane === 'G18') { // ZX-plane
                         vertices.push(
-                            <line x1={pointA.y} y1={z} x2={pointB.y} y2={z} stroke="black" strokeWidth={10} fill="none"/>
+                            <line x1={pointA.y} y1={z} x2={pointB.y} y2={z} strokeWidth={10} fill="none"/>
                         );
                     } else if (plane === 'G19') { // YZ-plane
                         vertices.push(
-                            <line x1={z} y1={pointA.x} x2={z} y2={pointB.x} stroke="black" strokeWidth={10} fill="none"/>
+                            <line x1={z} y1={pointA.x} x2={z} y2={pointB.x} strokeWidth={10} fill="none"/>
                         );
                     }
+                    colors.push(color);
                 }
             }
         }

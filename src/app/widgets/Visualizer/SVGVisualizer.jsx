@@ -26,6 +26,7 @@ import api from 'app/api';
 import { connect } from 'react-redux';
 import * as fileActions from 'app/actions/fileInfoActions';
 import _get from 'lodash/get';
+import store from 'app/store';
 import pubsub from 'pubsub-js';
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
@@ -61,6 +62,8 @@ class SVGVisualizer extends Component {
             z: 0
         }
     }
+
+    theme = store.get('widgets.visualizer');
 
     componentDidMount() {
         this.subscribe();
@@ -204,7 +207,9 @@ class SVGVisualizer extends Component {
     }
 
     handleSVGRender(vizualization) {
-        const { vertices } = vizualization;
+        const { vertices, colors } = vizualization;
+        const { currentTheme } = this.props.state;
+        const { G0Color, G1Color } = currentTheme;
         let svg = document.getElementById(!this.isSecondaryVisualizer ? 'svg' : 'svg2');
         if (svg) {
             vertices.map((vertice, i) => {
@@ -214,6 +219,12 @@ class SVGVisualizer extends Component {
                         node.setAttribute(prop, vertice.props[prop]);
                     }
                 }
+                // add stroke colour
+                const motion = colors[i][0];
+                const opacity = colors[i][1];
+                const stroke = motion === 'G0' ? G0Color + opacity : G1Color + opacity;
+                node.setAttribute('stroke', stroke);
+
                 return svg.appendChild(node);
             });
 
@@ -247,6 +258,8 @@ class SVGVisualizer extends Component {
     render() {
         const id = !this.isSecondaryVisualizer ? 'svg' : 'svg2';
         const viewBox = !this.isSecondaryVisualizer ? '0 0 500 500' : '0 0 470 470';
+        const { currentTheme } = this.props.state;
+        const { backgroundColor } = currentTheme;
         return (
             <div
                 style={{
@@ -259,6 +272,7 @@ class SVGVisualizer extends Component {
                     width="100%"
                     viewBox={viewBox}
                     className={styles.svgContainer}
+                    style={{ backgroundColor: backgroundColor }}
                 >
                     <g
                         id={id}
