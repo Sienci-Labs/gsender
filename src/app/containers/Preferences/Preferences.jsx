@@ -520,6 +520,7 @@ class PreferencesPage extends PureComponent {
                 pubsub.publish('theme:change', theme.value);
             },
             handleCustThemeChange: (themeColours) => {
+                const { visualizer } = this.state;
                 const parts = [
                     BACKGROUND_PART,
                     GRID_PART,
@@ -534,6 +535,12 @@ class PreferencesPage extends PureComponent {
                 ];
                 parts.map((value) => {
                     return this.visualizerConfig.set(CUST_THEME + ' ' + value, themeColours.get(value));
+                });
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        theme: CUST_THEME,
+                    }
                 });
                 pubsub.publish('theme:change', CUST_THEME);
             },
