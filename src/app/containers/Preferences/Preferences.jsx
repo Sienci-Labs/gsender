@@ -534,7 +534,11 @@ class PreferencesPage extends PureComponent {
                     G1_PART
                 ];
                 parts.map((value) => {
-                    return this.visualizerConfig.set(CUST_THEME + ' ' + value, themeColours.get(value));
+                    let label = value;
+                    if (value === G1_PART) {
+                        label = 'G1-3';
+                    }
+                    return this.visualizerConfig.set(CUST_THEME + ' ' + label, themeColours.get(value));
                 });
                 this.setState({
                     visualizer: {
@@ -586,10 +590,10 @@ class PreferencesPage extends PureComponent {
                     defaultColour = themeType.G1Color;
                     break;
                 case 'G2':
-                    defaultColour = themeType.G2Color;
+                    defaultColour = themeType.G1Color;
                     break;
                 case 'G3':
-                    defaultColour = themeType.G3Color;
+                    defaultColour = themeType.G1Color;
                     break;
                 default:
                     defaultColour = '#000000';
