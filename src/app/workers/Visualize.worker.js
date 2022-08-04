@@ -26,7 +26,7 @@ import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
 
 onmessage = function({ data }) {
-    const { content, visualizer, isLaser = false, liteMode = false } = data;
+    const { content, visualizer, isLaser = false, shouldRenderSVG = false } = data;
     let vertices = [];
     const colors = [];
     const frames = [];
@@ -52,7 +52,7 @@ onmessage = function({ data }) {
         addLine: (modal, v1, v2) => {
             const { motion } = modal;
 
-            if (!liteMode) {
+            if (!shouldRenderSVG) {
                 const opacity = (motion === 'G0') ? 0.1 : 1;
                 const color = [motion, opacity];
                 colors.push(color, color);
@@ -98,7 +98,7 @@ onmessage = function({ data }) {
             const divisions = 30;
             const points = arcCurve.getPoints(divisions);
 
-            if (!liteMode) {
+            if (!shouldRenderSVG) {
                 const color = [motion, 1];
                 for (let i = 0; i < points.length; ++i) {
                     const point = points[i];

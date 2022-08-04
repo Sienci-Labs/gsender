@@ -23,7 +23,7 @@
 
 import React, { Component } from 'react';
 import pubsub from 'pubsub-js';
-import { isLiteMode } from '../../workers/Visualize.response';
+import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 import SVGVisualizer from './SVGVisualizer';
 import Visualizer from './Visualizer';
 
@@ -57,6 +57,13 @@ class VisualizerWrapper extends Component {
                 };
             });
         });
+        pubsub.subscribe('visualizer:settings', () => {
+            this.setState(() => {
+                return {
+                    needRefresh: true
+                };
+            });
+        });
     }
 
     unsubscribe() {
@@ -65,11 +72,11 @@ class VisualizerWrapper extends Component {
 
     render() {
         const { state, show, cameraPosition, actions, containerID, isSecondary } = this.props;
-        let isLite = isLiteMode();
+        let renderSVG = shouldVisualizeSVG();
         return (
             <>
                 {
-                    !isLite &&
+                    !renderSVG &&
                         <Visualizer
                             show={show}
                             cameraPosition={cameraPosition}
@@ -83,7 +90,7 @@ class VisualizerWrapper extends Component {
                         />
                 }
                 {
-                    isLite &&
+                    renderSVG &&
                         <SVGVisualizer
                             show={show}
                             ref={(visualizerRef) => {

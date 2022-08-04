@@ -22,7 +22,8 @@ export const shouldVisualize = () => {
     return !isDisabled;
 };
 
-export const isLiteMode = () => {
+export const shouldVisualizeSVG = () => {
     const liteMode = store.get('widgets.visualizer.liteMode', false);
-    return liteMode;
+    const SVGEnabled = store.get('widgets.visualizer.SVGEnabled', false);
+    return liteMode && SVGEnabled;
 };

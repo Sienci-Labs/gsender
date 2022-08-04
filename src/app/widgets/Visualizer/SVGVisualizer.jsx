@@ -233,16 +233,8 @@ class SVGVisualizer extends Component {
     }
 
     load(vizualization) {
-        const { disabled, disabledLite, liteMode } = this.props.state;
-        const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
-
         this.unload();
-
-        if (shouldRenderVisualization) {
-            this.handleSVGRender(vizualization);
-        } else {
-            this.actions.setVisualizerReady();
-        }
+        this.handleSVGRender(vizualization);
     }
 
     unload() {

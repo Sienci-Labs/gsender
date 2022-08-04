@@ -159,6 +159,7 @@ class PreferencesPage extends PureComponent {
                 objects: this.visualizerConfig.get('objects'),
                 disabled: this.visualizerConfig.get('disabled'),
                 disabledLite: this.visualizerConfig.get('disabledLite'),
+                SVGEnabled: this.visualizerConfig.get('SVGEnabled', false),
                 showSoftLimitsWarning: this.visualizerConfig.get('showSoftLimitsWarning')
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
@@ -624,6 +625,17 @@ class PreferencesPage extends PureComponent {
                 }
                 pubsub.publish('visualizer:settings');
             },
+            handleSVGEnabledToggle: () => {
+                const { visualizer } = this.state;
+                const value = visualizer.SVGEnabled;
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        SVGEnabled: !value
+                    }
+                });
+                pubsub.publish('visualizer:settings');
+            },
             handleCutPathToggle: (liteMode = false) => {
                 const { visualizer } = this.state;
                 const { objects } = visualizer;
@@ -764,6 +776,7 @@ class PreferencesPage extends PureComponent {
         store.set('widgets.visualizer.theme', visualizer.theme);
         store.set('widgets.visualizer.disabled', visualizer.disabled);
         store.set('widgets.visualizer.disabledLite', visualizer.disabledLite);
+        store.set('widgets.visualizer.SVGEnabled', visualizer.SVGEnabled);
         store.set('widgets.visualizer.minimizeRenders', visualizer.minimizeRenders);
         store.set('workspace.units', units);
         store.replace('workspace[tools]', tools);

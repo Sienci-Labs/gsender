@@ -86,7 +86,6 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                             state={state}
                             actions={actions}
                             containerID={containerID}
-                            liteMode={liteMode}
                             isSecondary={false}
                         />
                         <WorkflowControl
@@ -94,7 +93,6 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                             state={state}
                             actions={actions}
                             invalidGcode={invalidLine.line}
-                            liteMode={liteMode}
                         />
 
 
