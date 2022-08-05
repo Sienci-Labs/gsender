@@ -29,6 +29,7 @@ class NumberInput extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
+            value: props.value,
             min: props.min,
             max: props.max,
             disabled: props.disabled,
@@ -98,28 +99,45 @@ class NumberInput extends PureComponent {
     }
 
     setValue(e) {
-        console.log(e);
         const { max, min } = this.state;
         const { changeHandler } = this.props;
         let value = e.target.value;
 
-        const regex = /[^0-9.]/g;
-
-        let dotOccurance = 0;
-        [...value].forEach(char => char === '.' && dotOccurance++);
         // Ignore non digit and non . values
         // eslint-disable-next-line no-restricted-globals
-        if (regex.test(value) || dotOccurance > 1) {
-            return;
-        }
+        if (this.checkForInvalidInput(value)) {
+            if (Number(value) >= max) {
+                value = max;
+            } else if (Number(value) <= min) {
+                value = min;
+            }
 
-        if (Number(value) > max) {
-            value = max;
-        } else if (Number(value) < min) {
-            value = min;
+            /*
+                force update for cases when value is the "same"
+                ex. user inputs 9000.01. this is over the max, so the value is set to 9000.
+                    if they do it again, the value will still be set as 9000, meaning the display will not update,
+                    and "9000.01" will still be displayed.
+                    therefore, we force update the display.
+            */
+            changeHandler(value);
+            let oldValue = value;
+            this.setState({
+                value: 1
+            });
+            this.setState({
+                value: oldValue
+            });
         }
+    }
 
-        changeHandler(value);
+    checkForInvalidInput(value) {
+        const regex = /[^0-9.]/g;
+        let dotOccurance = 0;
+        [...value].forEach(char => char === '.' && dotOccurance++);
+        if (!regex.test(value) && dotOccurance <= 1) {
+            return true;
+        }
+        return false;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -132,7 +150,7 @@ class NumberInput extends PureComponent {
     }
 
     render() {
-        const { value } = this.props;
+        const value = this.state.value;
         return (
             <div className={styles.inputWrapper}>
                 <button type="button" className={styles.stepButton} onClick={(e) => this.decrementValue(e)}>
@@ -142,7 +160,12 @@ class NumberInput extends PureComponent {
                     value={value}
                     type="text"
                     inputMode="decimal"
-                    externalOnChange={(e) => this.setValue(e)}
+                    externalOnChange={(e) => {
+                        // if it's a blank value, don't update
+                        if (e.target.value !== '') {
+                            this.setValue(e);
+                        }
+                    }}
                     onFocus={(e) => e.target.select()}
                     onClick={(e) => e.target.select()}
                 />
