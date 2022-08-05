@@ -13,6 +13,7 @@ import Spindle from './Spindle';
 
 const SpindleLaser = ({ active, state, actions }) => {
     const [machineProfile, setMachineProfile] = useState(store.get('workspace.machineProfile', {}));
+    const [delay, setDelay] = useState(store.get('widgets.spindle.delay', false));
 
     const handleToggle = () => {
         const value = !machineProfile.spindle;
@@ -42,9 +43,13 @@ const SpindleLaser = ({ active, state, actions }) => {
         setMachineProfile(updatedObj);
     };
 
-    const { spindle } = machineProfile;
-    const { laserOnOutline } = machineProfile;
-    console.log(machineProfile);
+    const handleSpindleDelayToggle = () => {
+        const spindleActions = actions.spindle;
+        spindleActions.handleDelayToggle(!delay);
+        setDelay(!delay);
+    };
+
+    const { spindle, laserOnOutline } = machineProfile;
 
     return (
         <SettingWrapper title="Spindle/Laser" show={active}>
@@ -65,6 +70,15 @@ const SpindleLaser = ({ active, state, actions }) => {
                                 disabled={!spindle}
                                 checked={laserOnOutline}
                                 onChange={handleONToggle}
+                                style={{ marginBottom: '1rem' }}
+                            />
+                        </TooltipCustom>
+                        <TooltipCustom content="Add delay after spindle ON" location="default">
+                            <ToggleSwitch
+                                label="Delay After Start"
+                                checked={delay}
+                                onChange={handleSpindleDelayToggle}
+                                size="small"
                                 style={{ marginBottom: '1rem' }}
                             />
                         </TooltipCustom>

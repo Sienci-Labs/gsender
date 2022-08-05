@@ -63,6 +63,7 @@ import './styles/app.styl';
 
 const renderPage = () => {
     const container = document.createElement('div');
+    document.title = `gSender ${settings.version}`;
     container.style.width = '100%';
     document.body.appendChild(container);
 
