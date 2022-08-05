@@ -163,6 +163,28 @@ export default [
         'eepromSettings': longMill30x30File,
     },
     {
+        'id': 6,
+        'company': 'Sienci Labs',
+        'name': 'LongMill MK2',
+        'type': '48x30',
+        'version': 'MK2',
+        'mm': {
+            'width': 1279.9,
+            'depth': 845,
+            'height': 114.3
+        },
+        'in': {
+            'width': 50.39,
+            'depth': 33.27,
+            'height': 4.5
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'eepromSettings': MK2LongMill48x30File,
+    },
+    {
         'id': 7,
         'company': 'Sienci Labs',
         'name': 'LongMill MK2',
