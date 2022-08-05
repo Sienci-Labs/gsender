@@ -36,13 +36,15 @@ import defaultProfiles from './defaultMachineProfiles';
 import Fieldset from '../components/Fieldset';
 import { convertToImperial, convertToMetric } from '../calculate';
 
+const getMachineProfileLabel = ({ name, type }) => `${name} ${type && type}`.trim();
+
 
 /**
  * Machine Profile Options Component
  */
 export default class MachineProfile extends Component {
     state = {
-        machineProfiles: defaultProfiles.sort((a, b) => a.company.localeCompare(b.company)),
+        machineProfiles: defaultProfiles.sort((a, b) => getMachineProfileLabel(a).localeCompare(getMachineProfileLabel(b))),
         machineProfile: store.get('workspace.machineProfile'),
         units: store.get('workspace.units')
     };
@@ -215,8 +217,8 @@ export default class MachineProfile extends Component {
 
     render() {
         const { machineProfile, machineProfiles, units } = this.state;
-        const { mm, in: inches, company, name, type } = machineProfile;
-        const label = `${company} ${name} ${' - ' && type}`;
+        const { mm, in: inches } = machineProfile;
+        const label = getMachineProfileLabel(machineProfile);
 
         const { width = 0, depth = 0, height = 0 } = units === 'mm' ? mm : inches;
 
@@ -229,7 +231,7 @@ export default class MachineProfile extends Component {
                             <Select
                                 className={styles['machine-options-select']}
                                 value={{ label: label }}
-                                options={machineProfiles.map(({ id, name, company, type }) => ({ key: id, value: id, label: `${company} ${name} ${' - ' && type}` }))}
+                                options={machineProfiles.map(({ id, name, type }) => ({ key: id, value: id, label: getMachineProfileLabel({ name, type }) }))}
                                 onChange={this.handleSelect}
                                 clearable={false}
                             />
