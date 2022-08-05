@@ -90,8 +90,8 @@ export default class MainTable extends Component {
                     {
                         hasShortcut || title
                             ? (
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-                                    {title ? <kbd>{title}</kbd> : output}
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', fontSize: '1rem' }}>
+                                    {title ? <kbd>{keys}</kbd> : output}
                                 </div>
                             )
                             : <div style={{ height: '24px' }} />
