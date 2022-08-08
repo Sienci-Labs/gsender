@@ -95,17 +95,16 @@ class JobStatus extends PureComponent {
                                     <div className={styles['file-name']}>
                                         <TooltipCustom content={`${name} (${this.fileSizeFormat(size)}, ${total} lines)`} style={{ wordWrap: 'break-word' }}>
                                             <span className={styles['file-text']}>{name}</span>{' '}<span>({this.fileSizeFormat(size)}, {total} lines)</span>
-                                            <span />
+                                            <span style={{ marginLeft: '2rem' }} />
                                         </TooltipCustom>
                                         {connection.isConnected
                                             ? (
                                                 <ToggleSwitch
-                                                    label="Job status/Overrides"
+                                                    label="Overrides"
                                                     onChange={() => this.handleOverrideToggle()}
                                                     className={styles.litetoggle}
                                                     checked={this.state.isChecked}
                                                     size="md"
-                                                    onColor="#888"
                                                 />
                                             ) : <span />
                                         }
@@ -124,9 +123,9 @@ class JobStatus extends PureComponent {
                             )
                             : (<div className={styles['file-name']}><span className={styles['file-text']}>No File Loaded</span></div>)}
                 </div>
-                {!this.state.isChecked
-                    ? <IdleInfo state={state} />
-                    : <Overrides state={state} />
+                {this.state.isChecked
+                    ? <Overrides state={state} />
+                    : <IdleInfo state={state} />
                 }
             </div>
         );
