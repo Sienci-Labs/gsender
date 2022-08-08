@@ -202,7 +202,10 @@ class WorkflowControl extends PureComponent {
     handleOnStop = () => {
         const { actions: { handleStop }, controllerState, senderStatus } = this.props;
         const { status } = controllerState;
-        localStorage.setItem('toggleStatus', false);
+        localStorage.setItem('jobOverrideToggle', JSON.stringify({
+            isChecked: false,
+            toggleStatus: 'jobStatus',
+        }));
         const { received } = senderStatus;
         handleStop();
         this.setState(prev => ({ runHasStarted: false, startFromLine: { ...prev.startFromLine, value: received } }));
@@ -221,6 +224,11 @@ class WorkflowControl extends PureComponent {
         const { activeState } = this.props;
 
         Toaster.clear();
+
+        localStorage.setItem('jobOverrideToggle', JSON.stringify({
+            isChecked: true,
+            toggleStatus: 'overrides',
+        }));
 
         if (activeState === GRBL_ACTIVE_STATE_CHECK) {
             this.setState({ testStarted: true, runHasStarted: true });
