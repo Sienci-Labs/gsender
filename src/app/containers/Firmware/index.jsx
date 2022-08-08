@@ -67,7 +67,7 @@ const Firmware = ({ modalClose }) => {
                 setting => JSON.stringify(setting).toLowerCase().includes(filterText.toLowerCase())
             ), [settings, filterText]
         );
-    const isDefault = useMemo(() => settings.every(item => eeprom[item.setting] === item.value), [settings]);
+    const isDefault = useMemo(() => settings.every(item => eeprom?.[item?.setting] === item?.value), [settings]);
     const canSendSettings = useMemo(() => isConnected && activeState === GRBL_ACTIVE_STATE_IDLE, [isConnected, activeState]);
     const machineProfile = store.get('workspace.machineProfile');
     const hasSettings = controllerSettingsLoaded();
