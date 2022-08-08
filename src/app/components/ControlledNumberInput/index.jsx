@@ -55,6 +55,8 @@ const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnC
         if (e.key === 'Escape') {
             setLocalValue(originalValue);
             inputRef.current.blur();
+        } else if (e.key === 'Enter') {
+            onChange(e);
         }
     };
 
@@ -65,6 +67,10 @@ const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnC
         }
     };
 
+    const localChange = (e) => {
+        setLocalValue(inputRef.current.value);
+    };
+
     return (
         <input
             type={type}
@@ -73,7 +79,7 @@ const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnC
             onFocus={onFocus}
             onBlur={onBlur}
             onKeyDown={onKeyDown}
-            onChange={onChange}
+            onChange={localChange}
             value={localValue}
             {...props}
         />
