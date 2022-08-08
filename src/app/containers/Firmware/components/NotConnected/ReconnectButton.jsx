@@ -22,14 +22,17 @@
  */
 
 import React from 'react';
-import styles from './index.styl';
+import styles from '../../index.styl';
 
-const CategoryTag = ({ category }) => {
+const ReconnectButton = ({ onClick }) => {
     return (
-        <div className={styles[`category-tag-${category}`]}>
-            { category }
-        </div>
+        <button type="button" onClick={onClick} className={styles.reconnectButton}>
+            <div className={styles.reconnectIcon}>
+                <i className="fas fa-plug" />
+            </div>
+            <div className={styles.reconnectButtonText}>Connect on last active port</div>
+        </button>
     );
 };
 
-export default CategoryTag;
+export default ReconnectButton;

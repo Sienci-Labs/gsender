@@ -34,7 +34,7 @@
   display: flex;
   background-color: #e5e7eb;
   width: 100%;
-  padding: 0.75rem;
+  padding: 1.25rem;
 }
 
 .grblContainer {
@@ -43,19 +43,19 @@
 }
 
 .settingsContainer {
-  width: 80%;
   flex-grow: 1
   display: flex;
   flex-direction: column;
-  overflow-y: scroll;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .buttonsContainer {
   display: flex;
   width: 20%;
   flex-direction: column;
-  justify-content: space-evenly;
-  padding: 1rem;
+  justify-content: space-between;
+  padding: 0 1rem;
 }
 
 .undoIcon {
@@ -72,7 +72,6 @@
   background-color: #D9DCE1;
   border-radius: .25rem;
   width: 100%;
-  max-width: 12rem;
   opacity: .6;
   font-size: 14px;
   padding: 5px;
@@ -89,7 +88,6 @@
   background-color: #D1D5DB;
   border-radius: .25rem;
   width: 100%;
-  max-width: 12rem;
   font-size: 14px;
   padding: 5px;
   margin: 2%;
@@ -184,7 +182,7 @@
 
 .table-row {
   display: grid;
-  grid-template-columns 1fr 8fr 4fr;
+  grid-template-columns 1fr 8fr 5fr;
   padding: 1rem 0;
 
   border-top: 1px solid lightgrey;
@@ -210,13 +208,10 @@
   margin-left: 1rem;
 }
 
-.buttonsTop {
-  align-content: space-around;
-}
-
 .buttonsMiddle {
-  width: 100%;
-  justify-content: space-evenly;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .not-connected-wrapper {
@@ -347,4 +342,34 @@
   i {
     font-size: 2rem !important;
   }
+}
+
+.settings-area-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 80%;
+  padding-right: 1rem;
+}
+
+.no-settings-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+
+  button {
+    max-width: 200px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+}
+
+.divider {
+  width: 2px;
+  background-color: lightgrey;
+  height: 100%;
+  margin: auto;
 }
