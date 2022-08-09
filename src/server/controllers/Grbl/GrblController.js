@@ -1634,7 +1634,7 @@ class GrblController {
                         axes.Z = calculateAxisValue({ direction: axes.Z, position: Math.abs(mpos.z), maxTravel: $132 });
                     }
                 } else {
-                    jogFeedrate = 1000;
+                    jogFeedrate = 1250;
                     Object.keys(axes).forEach((axis) => {
                         axes[axis] *= jogFeedrate;
                     });
