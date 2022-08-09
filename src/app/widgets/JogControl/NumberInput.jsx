@@ -120,13 +120,19 @@ class NumberInput extends PureComponent {
                     therefore, we force update the display.
             */
             changeHandler(value);
-            let oldValue = value;
-            this.setState({
-                value: 1
-            });
-            this.setState({
-                value: oldValue
-            });
+            if (this.state.value === value) {
+                this.setState({
+                    value: '',
+                }, () => {
+                    this.setState({
+                        value: value,
+                    });
+                });
+            } else {
+                this.setState({
+                    value: value,
+                });
+            }
         }
     }
 
