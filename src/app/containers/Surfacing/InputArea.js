@@ -40,15 +40,15 @@ const InputArea = ({ values, onChange, onSelect, units }) => {
 
                     <div className={styles.dimensions}>
                         <Input
-                            label="Length"
+                            label="X"
                             additionalProps={{
                                 type: 'number',
-                                id: 'length',
+                                id: 'width',
                                 min: 1,
                                 max: 50000,
                                 style: { paddingLeft: 5, paddingRight: 5, borderRadius: 4, ...inputStyles }
                             }}
-                            value={length}
+                            value={width}
                             onChange={onChange}
                             className={styles['dimension-input']}
                         />
@@ -56,15 +56,15 @@ const InputArea = ({ values, onChange, onSelect, units }) => {
                             x
                         </span>
                         <Input
-                            label="Width"
+                            label="Y"
                             additionalProps={{
                                 type: 'number',
-                                id: 'width',
+                                id: 'length',
                                 min: 1,
                                 max: 50000,
                                 style: { paddingLeft: 5, paddingRight: 5, ...inputStyles }
                             }}
-                            value={width}
+                            value={length}
                             onChange={onChange}
                             units={units}
                             className={styles['dimension-input']}
