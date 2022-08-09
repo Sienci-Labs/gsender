@@ -187,7 +187,8 @@ class WorkflowControl extends PureComponent {
         }
         const states = [
             GRBL_ACTIVE_STATE_IDLE,
-            GRBL_ACTIVE_STATE_HOLD
+            GRBL_ACTIVE_STATE_HOLD,
+            GRBL_ACTIVE_STATE_CHECK
         ];
 
         if (includes([GRBL_ACTIVE_STATE_CHECK], activeState) && !includes([WORKFLOW_STATE_PAUSED, WORKFLOW_STATE_IDLE], workflowState)) {
