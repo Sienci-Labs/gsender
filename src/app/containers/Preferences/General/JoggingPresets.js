@@ -65,9 +65,51 @@ export default class JoggingPresets extends Component {
         const units = store.get('workspace.units');
 
         const jogSpeeds = this.getJogSpeeds();
+        // force update
         this.setState({
             units,
-            jogSpeeds: { ...jogSpeeds }
+            jogSpeeds: {
+                rapid: {
+                    mm: {
+                        xyStep: '',
+                        zStep: '',
+                        feedrate: ''
+                    },
+                    in: {
+                        xyStep: '',
+                        zStep: '',
+                        feedrate: ''
+                    }
+                },
+                normal: {
+                    mm: {
+                        xyStep: '',
+                        zStep: '',
+                        feedrate: ''
+                    },
+                    in: {
+                        xyStep: '',
+                        zStep: '',
+                        feedrate: ''
+                    }
+                },
+                precise: {
+                    mm: {
+                        xyStep: '',
+                        zStep: '',
+                        feedrate: ''
+                    },
+                    in: {
+                        xyStep: '',
+                        zStep: '',
+                        feedrate: ''
+                    }
+                }
+            }
+        }, () => {
+            this.setState({
+                jogSpeeds: { ...jogSpeeds }
+            });
         });
     }
 
