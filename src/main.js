@@ -47,7 +47,6 @@ const main = () => {
     const shouldQuitImmediately = !gotSingleInstanceLock;
 
     let prevDirectory = '';
-    log.debug(autoUpdater.channel);
 
     if (shouldQuitImmediately) {
         app.quit();
