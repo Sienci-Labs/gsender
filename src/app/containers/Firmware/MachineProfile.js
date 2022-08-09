@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -29,12 +30,12 @@ import ensureArray from 'ensure-array';
 import controller from 'app/lib/controller';
 import UneditableInput from 'app/containers/Preferences/components/UneditableInput';
 import store from 'app/store';
-import TooltipCustom from '../../../components/TooltipCustom/ToolTip';
-import { Toaster, TOASTER_SUCCESS } from '../../../lib/toaster/ToasterLib';
-import styles from '../index.styl';
-import defaultProfiles from './defaultMachineProfiles';
-import Fieldset from '../components/Fieldset';
-import { convertToImperial, convertToMetric } from '../calculate';
+import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
+import Fieldset from 'app/containers/Preferences/components/Fieldset';
+import defaultProfiles from 'app/containers/Preferences/General/defaultMachineProfiles';
+import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import { convertToImperial, convertToMetric } from 'app/containers/Preferences/calculate';
+import styles from './index.styl';
 
 
 /**
@@ -221,47 +222,17 @@ export default class MachineProfile extends Component {
         const { width = 0, depth = 0, height = 0 } = units === 'mm' ? mm : inches;
 
         return (
-            <Fieldset legend="Machine Profile" className={styles['mb-0']}>
-                <div className={styles['machine-options-section']}>
-                    <div className={styles['general-area-item']}>
-                        <h4 className={styles['settings-subtitle']}>Presets</h4>
-                        <TooltipCustom content="gSender comes pre-loaded with many CNC machine presets" location="top">
-                            <Select
-                                className={styles['machine-options-select']}
-                                value={{ label: label }}
-                                options={machineProfiles.map(({ id, name, company, type }) => ({ key: id, value: id, label: `${company} ${name} ${' - ' && type}` }))}
-                                onChange={this.handleSelect}
-                                clearable={false}
-                            />
-                        </TooltipCustom>
-                    </div>
-
-                    <div className={styles['general-area-item']}>
-                        <h4 className={styles['settings-subtitle']}>Cutting Area from EEPROM</h4>
-                        <TooltipCustom content="Specify the width of your machine surface" location="default">
-                            <UneditableInput
-                                label="Width"
-                                units={units}
-                                value={width}
-                            />
-                        </TooltipCustom>
-                        <TooltipCustom content="Specify the depth of your machine surface" location="default">
-                            <UneditableInput
-                                label="Depth"
-                                units={units}
-                                value={depth}
-                            />
-                        </TooltipCustom>
-                        <TooltipCustom content="Specify the height of your machine surface" location="default">
-                            <UneditableInput
-                                label="Height"
-                                units={units}
-                                value={height}
-                            />
-                        </TooltipCustom>
-                    </div>
-                </div>
-            </Fieldset>
+            <div className={styles.machineProfileWrapper}>
+                <span className={styles.title}>Machine Profile:</span>
+                <TooltipCustom content="gSender comes pre-loaded with many CNC machine presets" location="top" sx={{ width: '50%' }}>
+                    <Select
+                        value={{ label: label }}
+                        options={machineProfiles.map(({ id, name, company, type }) => ({ key: id, value: id, label: `${company} ${name} ${' - ' && type}` }))}
+                        onChange={this.handleSelect}
+                        clearable={false}
+                    />
+                </TooltipCustom>
+            </div>
         );
     }
 }

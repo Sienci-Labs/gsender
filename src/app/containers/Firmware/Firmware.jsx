@@ -45,6 +45,7 @@ import * as GRBL_SETTINGS from '../../../server/controllers/Grbl/constants';
 import NotConnectedWarning from './NotConnectedWarning';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import ToolModalButton from '../../components/ToolModalButton/ToolModalButton';
+import MachineProfile from './MachineProfile';
 
 class Firmware extends PureComponent {
     static propTypes = {
@@ -475,6 +476,7 @@ class Firmware extends PureComponent {
                             {
                                 !haveSettings && <NotConnectedWarning handleConnect={() => this.actions.connectToLastDevice()} />
                             }
+                            <MachineProfile />
                             {haveSettings && loadedSettings.map((grbl) => {
                                 const [, defaultValue] = Object.entries(currentMachineProfile?.eepromSettings ?? {})
                                     .find(([key]) => key === grbl.setting) ?? [];
@@ -545,7 +547,7 @@ class Firmware extends PureComponent {
                                 ) : ''}
                                 <TooltipCustom content="Flash your Arduino board to GRBL default values" location="default">
                                     <ToolModalButton icon="fas fa-bolt" onClick={this.startFlashing} disabled={canClick}>
-                                    Flash GRBL
+                                        Flash GRBL
                                     </ToolModalButton>
                                 </TooltipCustom>
                                 {this.state.initiateRestoreDefaults ? (
@@ -574,7 +576,7 @@ class Firmware extends PureComponent {
                             <div className={styles.buttonsMiddle}>
                                 <TooltipCustom content="Import your settings file you saved previously" location="default">
                                     <ToolModalButton onClick={this.upload} icon="fas fa-file-import" disabled={!canSendSettings}>
-                                    Import Settings
+                                        Import Settings
                                     </ToolModalButton>
                                 </TooltipCustom>
                                 <TooltipCustom content="Save your current GRBL settings to your device" location="default">
@@ -583,7 +585,7 @@ class Firmware extends PureComponent {
                                         icon="fas fa-file-export"
                                         disabled={canClick}
                                     >
-                                    Export Settings
+                                        Export Settings
                                     </ToolModalButton>
                                 </TooltipCustom>
                                 <TooltipCustom content="Restore the settings for your current machine profile" location="default">
@@ -592,7 +594,7 @@ class Firmware extends PureComponent {
                                         icon="fas fa-undo"
                                         disabled={!canSendSettings}
                                     >
-                                    Restore Defaults
+                                        Restore Defaults
                                     </ToolModalButton>
                                 </TooltipCustom>
                             </div>
@@ -611,7 +613,7 @@ class Firmware extends PureComponent {
                                     className={this.state.newSettingsButtonDisabled ? `${styles.firmwareButtonDisabled}` : `${styles.applySettingsButton}`}
                                     disabled={!canSendSettings}
                                 >
-                                Apply New Settings
+                                    Apply New Settings
                                 </ToolModalButton>
                             </TooltipCustom>
                             <input
