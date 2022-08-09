@@ -35,7 +35,7 @@ const Input = ({ value, label, units, onChange, additionalProps, className }) =>
             <div className="input-group">
                 <ControlledNumberInput
                     {...additionalProps}
-                    value={value}
+                    value={Number(value).toString()}
                     externalOnChange={onChange}
                     className={classNames('form-control', styles.inputText)}
                     style={{ zIndex: '0', textAlign: 'center', color: '#3e85c7' }}
