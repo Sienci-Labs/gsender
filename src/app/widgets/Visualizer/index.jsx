@@ -1111,7 +1111,7 @@ class VisualizerWidget extends PureComponent {
                     showRendering={showRendering}
                     showVisualizer={showVisualizer}
                     visualizerRef={(ref) => {
-                        this.visualizer = ref;
+                        this.visualizer = ref?.visualizer;
                     }}
                     gcode={gcode}
                     surfacingData={surfacingData}
@@ -1127,8 +1127,7 @@ class VisualizerWidget extends PureComponent {
                     showRendering={showRendering}
                     showVisualizer={showVisualizer}
                     visualizerRef={(ref) => {
-                        this.visualizer = ref;
-                        console.log(ref);
+                        this.visualizer = ref?.visualizer;
                     }}
                     workflowRef={(ref) => {
                         this.workflowControl = ref;

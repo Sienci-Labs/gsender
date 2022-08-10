@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
@@ -29,8 +29,6 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
     const { handleLiteModeToggle, handleRun, reset } = actions;
 
     const containerID = 'visualizer_container';
-
-    let visualizer = useRef();
 
     return (
         <Widget className={styles.vizWidgetOverride}>
@@ -82,7 +80,7 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                         <VisualizerWrapper
                             show={showVisualizer}
                             cameraPosition={cameraPosition}
-                            ref={visualizer}
+                            ref={visualizerRef}
                             state={state}
                             actions={actions}
                             containerID={containerID}

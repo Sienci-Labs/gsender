@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import * as WebGL from 'app/lib/three/WebGL';
@@ -9,7 +9,6 @@ import Loading from './Loading';
 import Rendering from './Rendering';
 
 const SecondaryVisualizer = ({ state, actions, surfacingData, showVisualizer, cameraPosition, visualizerRef, showLoading, showRendering }) => {
-    let visualizer = useRef();
     return (
         <div style={{ border: '1px solid black', height: '100%', width: '100%' }}>
             { showLoading && <Loading /> }
@@ -19,7 +18,7 @@ const SecondaryVisualizer = ({ state, actions, surfacingData, showVisualizer, ca
                 <VisualizerWrapper
                     show={showVisualizer}
                     cameraPosition={cameraPosition}
-                    ref={visualizer}
+                    ref={visualizerRef}
                     state={state}
                     actions={actions}
                     surfacingData={surfacingData}
