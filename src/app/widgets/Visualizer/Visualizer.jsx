@@ -682,13 +682,11 @@ class Visualizer extends Component {
 
                 if (isPrimaryVisualizer) {
                     this.load('', data);
-                    this.fileLoaded = true;
                     return;
                 }
 
                 if (isSecondaryVisualizer) {
                     this.load('', data);
-                    this.fileLoaded = true;
                     return;
                 }
             })
@@ -1397,6 +1395,7 @@ class Visualizer extends Component {
         const { currentTheme, disabled, disabledLite, liteMode } = this.props.state;
         const { setVisualizerReady } = this.props.actions;
         this.visualizer = new GCodeVisualizer(currentTheme);
+        this.fileLoaded = true;
 
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
@@ -1408,6 +1407,7 @@ class Visualizer extends Component {
     }
 
     unload() {
+        this.fileLoaded = false;
         const visualizerObject = this.group.getObjectByName('Visualizer');
         if (visualizerObject) {
             this.group.remove(visualizerObject);
