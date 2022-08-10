@@ -119,6 +119,8 @@ class Visualizer extends Component {
 
     node = null;
 
+    fileLoaded = false;
+
     setRef = (node) => {
         this.node = node;
     };
@@ -323,7 +325,7 @@ class Visualizer extends Component {
             const { machinePosition, workPosition } = this.props;
 
             let newPos = workPosition;
-            if (activeState === GRBL_ACTIVE_STATE_CHECK) {
+            if (activeState === GRBL_ACTIVE_STATE_CHECK && this.fileLoaded) {
                 newPos = this.visualizer.getCurrentLocation();
             }
             let needUpdatePosition = false;
@@ -680,11 +682,13 @@ class Visualizer extends Component {
 
                 if (isPrimaryVisualizer) {
                     this.load('', data);
+                    this.fileLoaded = true;
                     return;
                 }
 
                 if (isSecondaryVisualizer) {
                     this.load('', data);
+                    this.fileLoaded = true;
                     return;
                 }
             })
