@@ -26,6 +26,7 @@ const Firmware = ({ modalClose }) => {
     const [filterText, setFilterText] = useState('');
     const [isFlashing, setIsFlashing] = useState(false);
     const [controller, setController] = useState(libController);
+    const [settingsToApply, setSettingsToApply] = useState(false);
 
     useEffect(() => {
         addControllerEvents(controllerEvents);
@@ -93,7 +94,9 @@ const Firmware = ({ modalClose }) => {
         setSettings,
         isDefault,
         controller,
-        canSendSettings
+        canSendSettings,
+        settingsToApply,
+        setSettingsToApply
     };
 
     return (

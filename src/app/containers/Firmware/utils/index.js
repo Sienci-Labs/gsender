@@ -105,13 +105,14 @@ export const convertValueToArray = (value, possibilities) => {
     return possibilities[index];
 };
 
-export const applyNewSettings = (settings, eeprom) => {
+export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
     const changedSettings = settings
         .filter(item => eeprom[item.setting] !== item.value) // Only retrieve settings that have been modified
         .map(item => `${item.setting}=${item.value}`); // Create array of set eeprom value strings (ex. "$0=1")
 
     controller.command('gcode', changedSettings);
     controller.command('gcode', '$$'); //Needed so next time wizard is opened changes are reflected
+    setSettingsToApply(false);
     Toaster.pop({
         msg: 'Firmware Settings Updated',
         type: TOASTER_SUCCESS

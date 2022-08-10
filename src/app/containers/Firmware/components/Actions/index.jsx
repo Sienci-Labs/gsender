@@ -16,7 +16,9 @@ const ActionArea = () => {
         setShouldRestoreDefault,
         isDefault,
         canSendSettings,
-        setSettings
+        setSettings,
+        settingsToApply,
+        setSettingsToApply
     } = useContext(FirmwareContext);
     const inputRef = useRef();
 
@@ -93,9 +95,9 @@ const ActionArea = () => {
                     <ToolModalButton
                         icon="fas fa-tasks"
                         style={{ margin: 0 }}
-                        disabled={isDefault || !canSendSettings}
-                        className={!isDefault && canSendSettings && styles.applySettingsButton}
-                        onClick={() => applyNewSettings(settings, eeprom)}
+                        disabled={isDefault || !canSendSettings || !settingsToApply}
+                        className={(isDefault || !settingsToApply) ? `${styles.firmwareButtonDisabled}` : `${styles.applySettingsButton}`}
+                        onClick={() => applyNewSettings(settings, eeprom, setSettingsToApply)}
                     >
                         Apply New Settings
                     </ToolModalButton>

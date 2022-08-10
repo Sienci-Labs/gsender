@@ -11,10 +11,11 @@ import { FirmwareContext } from '../../utils';
 
 
 const SettingsList = () => {
-    const { hasSettings, machineProfile, settings, setFilterText, setSettings } = useContext(FirmwareContext);
+    const { hasSettings, machineProfile, settings, setFilterText, setSettings, setSettingsToApply } = useContext(FirmwareContext);
 
 
     const handleSettingsChange = (index) => (value) => {
+        setSettingsToApply(true);
         setSettings(prev => {
             const updated = [...prev];
             updated[index].value = value;
