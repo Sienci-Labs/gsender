@@ -150,6 +150,7 @@ class NumberInput extends PureComponent {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.setState({
+            value: this.props.value,
             min: this.props.min,
             max: this.props.max,
             disabled: this.props.disabled,
