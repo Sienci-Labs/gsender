@@ -119,6 +119,8 @@ class Visualizer extends Component {
 
     node = null;
 
+    fileLoaded = false;
+
     setRef = (node) => {
         this.node = node;
     };
@@ -323,7 +325,7 @@ class Visualizer extends Component {
             const { machinePosition, workPosition } = this.props;
 
             let newPos = workPosition;
-            if (activeState === GRBL_ACTIVE_STATE_CHECK) {
+            if (activeState === GRBL_ACTIVE_STATE_CHECK && this.fileLoaded) {
                 newPos = this.visualizer.getCurrentLocation();
             }
             let needUpdatePosition = false;
@@ -1393,6 +1395,7 @@ class Visualizer extends Component {
         const { currentTheme, disabled, disabledLite, liteMode } = this.props.state;
         const { setVisualizerReady } = this.props.actions;
         this.visualizer = new GCodeVisualizer(currentTheme);
+        this.fileLoaded = true;
 
         const shouldRenderVisualization = liteMode ? !disabledLite : !disabled;
 
@@ -1404,6 +1407,7 @@ class Visualizer extends Component {
     }
 
     unload() {
+        this.fileLoaded = false;
         const visualizerObject = this.group.getObjectByName('Visualizer');
         if (visualizerObject) {
             this.group.remove(visualizerObject);
