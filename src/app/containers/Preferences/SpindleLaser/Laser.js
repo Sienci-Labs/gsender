@@ -30,7 +30,7 @@ const Laser = ({ state, actions }) => {
             <Fieldset legend="Laser Power">
                 <TooltipCustom content="Minimum laser amount" location="default">
                     <Input
-                        label="Minimum Power"
+                        label="Min Power"
                         units="PWM"
                         value={laser.minPower}
                         onChange={(e) => laserActions.setPower(e.target.value, 'minPower')}
@@ -39,7 +39,7 @@ const Laser = ({ state, actions }) => {
                 </TooltipCustom>
                 <TooltipCustom content="Maximum laser amount" location="default">
                     <Input
-                        label="Maximum Power"
+                        label="Max Power"
                         units="PWM"
                         value={laser.maxPower}
                         onChange={(e) => laserActions.setPower(e.target.value, 'maxPower')}
