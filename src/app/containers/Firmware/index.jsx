@@ -22,7 +22,7 @@ const Firmware = ({ modalClose }) => {
     const activeState = useSelector(store => get(store, 'controller.state.status.activeState'));
     const [initiateFlashing, setInitiateFlashing] = useState(false);
     const [shouldRestoreDefault, setShouldRestoreDefault] = useState(false);
-    const [settings, setSettings] = useState(GRBL_SETTINGS.map(item => ({ ...item, value: eeprom ? eeprom[item.setting] : undefined })));
+    const [settings, setSettings] = useState(GRBL_SETTINGS.map(item => ({ ...item, value: eeprom ? eeprom[item.setting] : 0 })));
     const [filterText, setFilterText] = useState('');
     const [isFlashing, setIsFlashing] = useState(false);
     const [controller, setController] = useState(libController);
@@ -39,6 +39,10 @@ const Firmware = ({ modalClose }) => {
     useEffect(() => {
         setController(libController);
     }, [libController]);
+
+    useEffect(() => {
+        setSettings(GRBL_SETTINGS.map(item => ({ ...item, value: eeprom ? eeprom[item.setting] : 0 })));
+    }, [eeprom]);
 
     const controllerEvents = {
         'message': () => {
