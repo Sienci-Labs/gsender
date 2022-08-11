@@ -62,6 +62,7 @@ import { METRIC_UNITS } from '../../../app/constants';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
+import { runOverride } from '../runOverride';
 
 // % commands
 const WAIT = '%wait';
@@ -122,7 +123,7 @@ class GrblController {
 
     settings = {};
 
-    toolChangeContext = {};
+    tooloverridePercentageContext = {};
 
     queryTimer = null;
 
@@ -207,7 +208,7 @@ class GrblController {
                                     [name]: value ? '1' : '0'
                                 }
                             };
-                            this.runner.settings = nextSettings; // enforce change
+                            this.runner.settings = nextSettings; // enforce overridePercentage
                         }
                     }
                 }
@@ -242,8 +243,8 @@ class GrblController {
                     }
                     if (line === PREHOOK_COMPLETE) {
                         log.debug('Finished Pre-hook');
-                        this.feeder.hold({ data: '%toolchange' });
-                        this.emit('toolchange:preHookComplete', commentString);
+                        this.feeder.hold({ data: '%tooloverridePercentage' });
+                        this.emit('tooloverridePercentage:preHookComplete', commentString);
                         return 'G4 P0.5';
                     }
                     if (line === POSTHOOK_COMPLETE) {
@@ -294,9 +295,9 @@ class GrblController {
                     this.updateSpindleModal(spindleCommand);
                 }
 
-                // // M6 Tool Change
+                // // M6 Tool overridePercentage
                 if (_.includes(words, 'M6')) {
-                    log.debug('M6 Tool Change');
+                    log.debug('M6 Tool overridePercentage');
                     this.feeder.hold({ data: 'M6', comment: commentString }); // Hold reason
                     line = line.replace('M6', '(M6)');
                 }
@@ -397,31 +398,31 @@ class GrblController {
                     this.updateSpindleModal(spindleCommand);
                 }
 
-                /* Emit event to UI for toolchange handler */
+                /* Emit event to UI for tooloverridePercentage handler */
                 if (_.includes(words, 'M6')) {
-                    log.debug(`M6 Tool Change: line=${sent + 1}, sent=${sent}, received=${received}`);
-                    const { toolChangeOption } = this.toolChangeContext;
+                    log.debug(`M6 Tool overridePercentage: line=${sent + 1}, sent=${sent}, received=${received}`);
+                    const { tooloverridePercentageOption } = this.tooloverridePercentageContext;
 
                     let tool = line.match(toolCommand);
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
-                    if (toolChangeOption === 'Pause' || toolChangeOption === 'Manual') {
+                    if (tooloverridePercentageOption === 'Pause' || tooloverridePercentageOption === 'Manual') {
                         if (tool) {
-                            this.emit('toolchange:tool', tool[0]);
+                            this.emit('tooloverridePercentage:tool', tool[0]);
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
-                        this.emit('gcode:toolChange', {
+                        this.emit('gcode:tooloverridePercentage', {
                             line: sent + 1,
                             block: line,
                             option: 'Manual'
                         }, commentString);
-                    } else if (toolChangeOption === 'Code') {
+                    } else if (tooloverridePercentageOption === 'Code') {
                         if (tool) {
                             commentString = `${tool[0]} - ${commentString}`;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
-                        this.emit('toolchange:start');
-                        this.runPreChangeHook(commentString);
+                        this.emit('tooloverridePercentage:start');
+                        this.runPreoverridePercentageHook(commentString);
                     }
 
                     line = '(M6)';
@@ -1035,9 +1036,9 @@ class GrblController {
                 inuse: true
             });
 
-            // Emit a change event to all connected sockets
+            // Emit a overridePercentage event to all connected sockets
             if (this.engine.io) {
-                this.engine.io.emit('serialport:change', {
+                this.engine.io.emit('serialport:overridePercentage', {
                     port: port,
                     inuse: true
                 });
@@ -1075,9 +1076,9 @@ class GrblController {
             inuse: false
         });
 
-        // Emit a change event to all connected sockets
+        // Emit a overridePercentage event to all connected sockets
         if (this.engine.io) {
-            this.engine.io.emit('serialport:change', {
+            this.engine.io.emit('serialport:overridePercentage', {
                 port: port,
                 inuse: false
             });
@@ -1475,13 +1476,9 @@ class GrblController {
             },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
-            //   0: Set 100% of programmed rate.
-            //  10: Increase 10%
-            // -10: Decrease 10%
-            //   1: Increase 1%
-            //  -1: Decrease 1%
             'feedOverride': () => {
                 const [value] = args;
+                const overridePercentage = 100 - value;
 
                 const currFeedOverride = this.runner.state.status.ov[0];
                 const nextFeedOverride = currFeedOverride + value;
@@ -1489,40 +1486,14 @@ class GrblController {
                 if (nextFeedOverride > 230 || nextFeedOverride < 0) {
                     return;
                 }
-
-                if (value === 0) {
-                    this.write('\x90');
-                } else if (value === 10) {
-                    this.write('\x91');
-                } else if (value === -10) {
-                    this.write('\x92');
-                } else if (value === 1) {
-                    this.write('\x93');
-                } else if (value === -1) {
-                    this.write('\x94');
-                }
+                runOverride(this, overridePercentage, 'feed');
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
-            //   0: Set 100% of programmed spindle speed
-            //  10: Increase 10%
-            // -10: Decrease 10%
-            //   1: Increase 1%
-            //  -1: Decrease 1%
             'spindleOverride': () => {
                 const [value] = args;
-
-                if (value === 0) {
-                    this.write('\x99');
-                } else if (value === 10) {
-                    this.write('\x9a');
-                } else if (value === -10) {
-                    this.write('\x9b');
-                } else if (value === 1) {
-                    this.write('\x9c');
-                } else if (value === -1) {
-                    this.write('\x9d');
-                }
+                const overridePercentage = 100 - value;
+                runOverride(this, overridePercentage, 'spindle');
             },
             // Rapid Overrides
             // @param {number} value A percentage value of 25, 50, or 100. A value of zero will reset to 100%.
@@ -1534,10 +1505,6 @@ class GrblController {
 
                 if (value === 0 || value === 100) {
                     this.write('\x95');
-                } else if (value === 50) {
-                    this.write('\x96');
-                } else if (value === 25) {
-                    this.write('\x97');
                 }
             },
             'lasertest:on': () => {
@@ -1561,7 +1528,7 @@ class GrblController {
                 ];
                 this.command('gcode', commands);
             },
-            'laserpower:change': () => {
+            'laserpower:overridePercentage': () => {
                 const [power = 0, maxS = 1000] = args;
                 const commands = [
                     // https://github.com/gnea/grbl/wiki/Grbl-v1.1-Laser-Mode
@@ -1570,7 +1537,7 @@ class GrblController {
                 ];
                 this.command('gcode', commands);
             },
-            'spindlespeed:change': () => {
+            'spindlespeed:overridePercentage': () => {
                 const [speed = 0] = args;
                 const commands = [
                     'S' + speed
@@ -1777,18 +1744,18 @@ class GrblController {
 
                 store.set('preferences', updated);
             },
-            'toolchange:context': () => {
+            'tooloverridePercentage:context': () => {
                 const [context] = args;
-                this.toolChangeContext = context;
+                this.tooloverridePercentageContext = context;
             },
-            'toolchange:pre': () => {
+            'tooloverridePercentage:pre': () => {
                 log.debug('Starting pre hook');
-                this.runPreChangeHook();
+                this.runPreoverridePercentageHook();
             },
-            'toolchange:post': () => {
+            'tooloverridePercentage:post': () => {
                 log.debug('starting post hook');
                 this.command('feeder:start');
-                this.runPostChangeHook();
+                this.runPostoverridePercentageHook();
             },
         }[cmd];
 
@@ -1842,8 +1809,8 @@ class GrblController {
     }
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
-    runPreChangeHook(comment = '') {
-        let { preHook } = this.toolChangeContext || '';
+    runPreoverridePercentageHook(comment = '') {
+        let { preHook } = this.tooloverridePercentageContext || '';
         preHook = `G4 P1\n${preHook}`;
         const block = this.convertGcodeToArray(preHook);
         block.push(`${PREHOOK_COMPLETE} ;${comment}`);
@@ -1851,8 +1818,8 @@ class GrblController {
         this.command('gcode', block);
     }
 
-    runPostChangeHook() {
-        let { postHook } = this.toolChangeContext || '';
+    runPostoverridePercentageHook() {
+        let { postHook } = this.tooloverridePercentageContext || '';
         postHook = `G4 P1\n${postHook}`;
         const block = this.convertGcodeToArray(postHook);
         block.push(POSTHOOK_COMPLETE);
