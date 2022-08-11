@@ -1478,7 +1478,7 @@ class GrblController {
             // @param {number} value The amount of percentage increase or decrease.
             'feedOverride': () => {
                 const [value] = args;
-                const overridePercentage = 100 - value;
+                const overridePercentage = value - 100;
 
                 const currFeedOverride = this.runner.state.status.ov[0];
                 const nextFeedOverride = currFeedOverride + value;
@@ -1492,7 +1492,7 @@ class GrblController {
             // @param {number} value The amount of percentage increase or decrease.
             'spindleOverride': () => {
                 const [value] = args;
-                const overridePercentage = 100 - value;
+                const overridePercentage = value - 100;
                 runOverride(this, overridePercentage, 'spindle');
             },
             // Rapid Overrides
