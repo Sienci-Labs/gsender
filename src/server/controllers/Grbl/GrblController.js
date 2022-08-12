@@ -1581,7 +1581,7 @@ class GrblController {
                 let [axes, feedrate = 1000, units = METRIC_UNITS] = args;
                 //const JOG_COMMAND_INTERVAL = 80;
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-                let { $20, $130, $131, $132, $23 } = this.settings.settings;
+                let { $20, $130, $131, $132, $23, $13 } = this.settings.settings;
 
                 let jogFeedrate;
                 if ($20 === '1') {
@@ -1613,10 +1613,16 @@ class GrblController {
                         }
                     };
 
-
                     let { mpos } = this.state.status;
                     Object.keys(mpos).forEach((axis) => {
-                        mpos[axis] = Number(mpos[axis]);
+                        const val = Number(mpos[axis]);
+
+                        // Need to convert to metric if machine is reporting in imperial and the UI is in a G21 metric state
+                        if ($13 === '1' && unitModal === 'G21') {
+                            mpos[axis] = Number((val * 25.4).toFixed(FIXED));
+                        } else {
+                            mpos[axis] = Number(mpos[axis]);
+                        }
                     });
 
                     if (this.homingFlagSet) {
