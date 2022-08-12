@@ -1550,6 +1550,13 @@ class GrblController {
                     this.feeder.next();
                 }
             },
+            'gcode:test': () => {
+                this.workflow.start();
+                this.feeder.reset();
+                this.command('gcode', '$c');
+                this.sender.next();
+                this.feederCB = null;
+            },
             'gcode:safe': () => {
                 const [commands, prefUnits] = args;
                 const deviceUnits = this.state.parserstate.modal.units;
