@@ -311,8 +311,8 @@ export default [
     },
     {
         'id': 23,
-        'company': 'OpenBuilds',
-        'name': '',
+        'company': '',
+        'name': 'OpenBuilds',
         'type': '',
         'mm': {
             'width': 270,
@@ -331,8 +331,8 @@ export default [
     },
     {
         'id': 33,
-        'company': 'Ooznest',
-        'name': '',
+        'company': '',
+        'name': 'Ooznest',
         'type': '',
         'mm': {
             'width': 300,
@@ -351,8 +351,8 @@ export default [
     },
     {
         'id': 34,
-        'company': 'Mill Right',
-        'name': '',
+        'company': '',
+        'name': 'Mill Right',
         'type': '',
         'mm': {
             'width': 260,
@@ -371,8 +371,8 @@ export default [
     },
     {
         'id': 41,
-        'company': 'CNC4newbie',
-        'name': '',
+        'company': '',
+        'name': 'CNC4newbie',
         'type': '',
         'mm': {
             'width': 400.05,
@@ -391,8 +391,8 @@ export default [
     },
     {
         'id': 43,
-        'company': 'BobsCNC',
-        'name': '',
+        'company': '',
+        'name': 'BobsCNC',
         'type': '',
         'mm': {
             'width': 457.2,
@@ -411,8 +411,8 @@ export default [
     },
     {
         'id': 44,
-        'company': 'YoraHome',
-        'name': '',
+        'company': '',
+        'name': 'YoraHome',
         'type': '',
         'mm': {
             'width': 609.6,
@@ -431,8 +431,8 @@ export default [
     },
     {
         'id': 45,
-        'company': 'Blue Carve',
-        'name': '',
+        'company': '',
+        'name': 'Blue Carve',
         'type': '',
         'mm': {
             'width': 750,
@@ -452,8 +452,8 @@ export default [
 
     {
         'id': 47,
-        'company': 'SainSmart',
-        'name': '',
+        'company': '',
+        'name': 'SainSmart',
         'type': '',
         'mm': {
             'width': 180,
@@ -473,8 +473,8 @@ export default [
     {
         'id': 50,
         'company': '',
-        'name': '',
-        'type': 'WhittleCNC',
+        'name': 'WhittleCNC',
+        'type': '',
         'mm': {
             'width': 228,
             'depth': 356,
@@ -492,8 +492,8 @@ export default [
     },
     {
         'id': 51,
-        'company': 'Evo-One',
-        'name': '',
+        'company': '',
+        'name': 'Evo-One',
         'type': '',
         'mm': {
             'width': 530,
@@ -512,8 +512,8 @@ export default [
     },
     {
         'id': 52,
-        'company': 'Generic CNC',
-        'name': '',
+        'company': '',
+        'name': 'Generic CNC',
         'type': '',
         'mm': {
             'width': 530,
