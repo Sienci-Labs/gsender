@@ -103,6 +103,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Added profiles for Longmill extension kits
 * Machine profile removed from preferences and placed in firmware tool
 * Fixed incorrect default values in some machine profiles
+* Test mode now restores WCS after the soft reset performed while exiting check mode.
 * Fixed issue with test mode that would occasionally have it start running the file after test was complete
 * Fixed issue with continuous jog when soft limits were enabled and report in inches EEPROM value was enabled
 * Firmware tool improvements - new convenient profile selection, setting search, performance improvments, highlighted changed values
