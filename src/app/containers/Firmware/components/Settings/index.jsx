@@ -40,15 +40,23 @@ const SettingsArea = () => {
 
     return hasSettings ? (
         <div className={styles.settingsAreaContainer}>
-            {machineProfile &&
-            <div className={styles.profileSelect}><span>Profile: </span><Select
-                className={styles.profileSelectDropdown}
-                value={{ label: label }}
-                options={machineProfiles.map(({ id, name, company, type }) => ({ key: id, value: id, label: `${company} ${name} ${' - ' && type}` }))}
-                onChange={handleSelect}
-                clearable={false}
-            />
-            </div>}
+            {
+                machineProfile && (
+                    <div className={styles.profileSelect}><span>Profile: </span>
+                        <Select
+                            className={styles.profileSelectDropdown}
+                            value={{ label: label }}
+                            options={
+                                machineProfiles
+                                    .sort((a, b) => getMachineProfileLabel(a).localeCompare(getMachineProfileLabel(b)))
+                                    .map(({ id, name, type }) => ({ key: id, value: id, label: getMachineProfileLabel({ name, type }) }))
+                            }
+                            onChange={handleSelect}
+                            clearable={false}
+                        />
+                    </div>
+                )
+            }
             <div style={{ width: '100%', height: '100%', overflow: 'auto' }}>
                 <SettingsList />
             </div>
