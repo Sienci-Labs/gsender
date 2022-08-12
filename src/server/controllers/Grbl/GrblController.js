@@ -638,8 +638,8 @@ class GrblController {
 
         this.runner.on('parserstate', (res) => {
             //finished searching gCode file for errors
-            if (this.sender.state.finishTime > 0 && this.runner.state.status.activeState === 'Check') {
-                this.command('gcode', '$c');
+            if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === 'Check') {
+                this.command('gcode', ['$C', '[global.state.testWCS]']);
                 this.workflow.stopTesting();
                 this.emit('gcode_error_checking_file', this.sender.state, 'finished');
                 return;
@@ -1551,11 +1551,13 @@ class GrblController {
                 }
             },
             'gcode:test': () => {
-                this.workflow.start();
-                this.feeder.reset();
-                this.command('gcode', '$c');
-                this.sender.next();
-                this.feederCB = null;
+                this.feederCB = () => {
+                    this.workflow.start();
+                    this.feeder.reset();
+                    this.sender.next();
+                    this.feederCB = null;
+                };
+                this.command('gcode', ['%global.state.testWCS=modal.wcs', '$C']);
             },
             'gcode:safe': () => {
                 const [commands, prefUnits] = args;
