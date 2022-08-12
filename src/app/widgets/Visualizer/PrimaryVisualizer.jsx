@@ -11,7 +11,7 @@ import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
 import ValidationModal from './ValidationModal';
 import WarningModal from './WarningModal';
-import Visualizer from './Visualizer';
+import VisualizerWrapper from './VisualizerWrapper';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
@@ -77,15 +77,15 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                             state={state}
                             actions={actions}
                         />
-                        <Visualizer
+                        <VisualizerWrapper
                             show={showVisualizer}
                             cameraPosition={cameraPosition}
                             ref={visualizerRef}
                             state={state}
                             actions={actions}
                             containerID={containerID}
+                            isSecondary={false}
                         />
-
                         <WorkflowControl
                             ref={workflowRef}
                             state={state}

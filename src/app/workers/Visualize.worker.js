@@ -21,12 +21,13 @@
  *
  */
 
+import React from 'react';
 import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
 
 onmessage = function({ data }) {
-    const { content, visualizer, isLaser = false } = data;
-    const vertices = [];
+    const { content, visualizer, isLaser = false, shouldRenderSVG = false } = data;
+    let vertices = [];
     const colors = [];
     const frames = [];
     // Laser mode variables
@@ -50,13 +51,23 @@ onmessage = function({ data }) {
         // @param {object} v2 A 3D vector of the end point.
         addLine: (modal, v1, v2) => {
             const { motion } = modal;
-            const opacity = (motion === 'G0') ? 0.1 : 1;
-            const color = [motion, opacity];
-            colors.push(color, color);
-            vertices.push(
-                new THREE.Vector3(v1.x, v1.y, v1.z),
-                new THREE.Vector3(v2.x, v2.y, v2.z)
-            );
+
+            if (!shouldRenderSVG) {
+                const opacity = (motion === 'G0') ? 0.1 : 1;
+                const color = [motion, opacity];
+                colors.push(color, color);
+                vertices.push(
+                    new THREE.Vector3(v1.x, v1.y, v1.z),
+                    new THREE.Vector3(v2.x, v2.y, v2.z)
+                );
+            } else {
+                const opacity = (motion === 'G0') ? '0F' : 'FF';
+                const color = [motion, opacity];
+                colors.push(color);
+                vertices.push(
+                    <line x1={v1.x} y1={v1.y} x2={v2.x} y2={v2.y} strokeWidth={10} fill="none"/>
+                );
+            }
         },
         // @param {object} modal The modal object.
         // @param {object} v1 A 3D vector of the start point.
@@ -86,20 +97,44 @@ onmessage = function({ data }) {
             );
             const divisions = 30;
             const points = arcCurve.getPoints(divisions);
-            const color = [motion, 1];
 
-            for (let i = 0; i < points.length; ++i) {
-                const point = points[i];
-                const z = ((v2.z - v1.z) / points.length) * i + v1.z;
+            if (!shouldRenderSVG) {
+                const color = [motion, 1];
+                for (let i = 0; i < points.length; ++i) {
+                    const point = points[i];
+                    const z = ((v2.z - v1.z) / points.length) * i + v1.z;
 
-                if (plane === 'G17') { // XY-plane
-                    vertices.push(new THREE.Vector3(point.x, point.y, z));
-                } else if (plane === 'G18') { // ZX-plane
-                    vertices.push(new THREE.Vector3(point.y, z, point.x));
-                } else if (plane === 'G19') { // YZ-plane
-                    vertices.push(new THREE.Vector3(z, point.x, point.y));
+                    if (plane === 'G17') { // XY-plane
+                        vertices.push(new THREE.Vector3(point.x, point.y, z));
+                    } else if (plane === 'G18') { // ZX-plane
+                        vertices.push(new THREE.Vector3(point.y, z, point.x));
+                    } else if (plane === 'G19') { // YZ-plane
+                        vertices.push(new THREE.Vector3(z, point.x, point.y));
+                    }
+                    colors.push(color);
                 }
-                colors.push(color);
+            } else {
+                const color = [motion, 'FF'];
+                for (let i = 1; i < points.length; ++i) {
+                    const pointA = points[i - 1];
+                    const pointB = points[i];
+                    const z = ((v2.z - v1.z) / points.length) * i + v1.z;
+
+                    if (plane === 'G17') { // XY-plane
+                        vertices.push(
+                            <line x1={pointA.x} y1={pointA.y} x2={pointB.x} y2={pointB.y} strokeWidth={10} fill="none"/>
+                        );
+                    } else if (plane === 'G18') { // ZX-plane
+                        vertices.push(
+                            <line x1={pointA.y} y1={z} x2={pointB.y} y2={z} strokeWidth={10} fill="none"/>
+                        );
+                    } else if (plane === 'G19') { // YZ-plane
+                        vertices.push(
+                            <line x1={z} y1={pointA.x} x2={z} y2={pointB.x} strokeWidth={10} fill="none"/>
+                        );
+                    }
+                    colors.push(color);
+                }
             }
         }
     });
@@ -121,6 +156,7 @@ onmessage = function({ data }) {
         });
     });
 
+    vertices = JSON.parse(JSON.stringify(vertices));
     postMessage({
         vertices,
         colors,

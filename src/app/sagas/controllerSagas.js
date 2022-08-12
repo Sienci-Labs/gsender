@@ -33,7 +33,7 @@ import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/Toas
 import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
-import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
+import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import isElectron from 'is-electron';
@@ -268,13 +268,15 @@ export function* initialize() {
             });
 
             const needsVisualization = shouldVisualize();
+            const shouldRenderSVG = shouldVisualizeSVG();
 
             if (needsVisualization) {
                 const visualizeWorker = new VisualizeWorker();
                 visualizeWorker.onmessage = visualizeResponse;
                 visualizeWorker.postMessage({
                     content,
-                    visualizer
+                    visualizer,
+                    shouldRenderSVG
                 });
             } else {
                 reduxStore.dispatch({
@@ -320,6 +322,7 @@ export function* initialize() {
         });
 
         const needsVisualization = shouldVisualize();
+        const shouldRenderSVG = shouldVisualizeSVG();
 
         if (needsVisualization) {
             const visualizeWorker = new VisualizeWorker();
@@ -327,7 +330,8 @@ export function* initialize() {
             visualizeWorker.postMessage({
                 content,
                 visualizer,
-                isLaser
+                isLaser,
+                shouldRenderSVG
             });
         } else {
             reduxStore.dispatch({
