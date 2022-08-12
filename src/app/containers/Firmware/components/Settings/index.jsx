@@ -1,25 +1,54 @@
 import React, { useContext } from 'react';
-
+import Select from 'react-select';
+import store from 'app/store';
+import controller from 'app/lib/controller';
 import SettingsList from './List';
 import SearchBar from './SearchBar';
 import { connectToLastDevice, FirmwareContext } from '../../utils';
+import machineProfiles from '../defaultMachineProfiles';
 import NotConnectedWarning from '../NotConnected/NotConnectedWarning';
 
 import styles from '../../index.styl';
 
-const SettingsArea = () => {
-    const { hasSettings, machineProfile } = useContext(FirmwareContext);
+const getMachineProfileLabel = ({ name, type }) => `${name} ${type && type}`.trim();
 
-    const machineName = (
-        <>
-            Machine Profile:{' '}
-            <strong>{`${machineProfile?.company} ${machineProfile?.name} ${machineProfile?.version}`}</strong>
-        </>
-    );
+
+const SettingsArea = () => {
+    const { hasSettings, machineProfile, setMachineProfile } = useContext(FirmwareContext);
+    const label = getMachineProfileLabel(machineProfile);
+
+    const handleSelect = ({ value = 0 }) => {
+        const foundProfile = machineProfiles.find(profile => profile.id === value);
+
+        if (foundProfile) {
+            const updatedObj = {
+                ...foundProfile,
+                limits: {
+                    xmin: 0,
+                    ymin: 0,
+                    zmin: 0,
+                    xmax: foundProfile.mm.width,
+                    ymax: foundProfile.mm.depth,
+                    zmax: foundProfile.mm.height,
+                }
+            };
+            store.replace('workspace.machineProfile', updatedObj);
+            setMachineProfile(updatedObj);
+            controller.command('machineprofile:load', updatedObj);
+        }
+    };
 
     return hasSettings ? (
         <div className={styles.settingsAreaContainer}>
-            {machineProfile && <p style={{ margin: 0 }}>{machineName}</p>}
+            {machineProfile &&
+            <div className={styles.profileSelect}><span>Profile: </span><Select
+                className={styles.profileSelectDropdown}
+                value={{ label: label }}
+                options={machineProfiles.map(({ id, name, company, type }) => ({ key: id, value: id, label: `${company} ${name} ${' - ' && type}` }))}
+                onChange={handleSelect}
+                clearable={false}
+            />
+            </div>}
             <div style={{ width: '100%', height: '100%', overflow: 'auto' }}>
                 <SettingsList />
             </div>

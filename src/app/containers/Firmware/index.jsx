@@ -27,6 +27,7 @@ const Firmware = ({ modalClose }) => {
     const [isFlashing, setIsFlashing] = useState(false);
     const [controller, setController] = useState(libController);
     const [settingsToApply, setSettingsToApply] = useState(false);
+    const [machineProfile, setMachineProfile] = useState(store.get('workspace.machineProfile'));
 
     useEffect(() => {
         addControllerEvents(controllerEvents);
@@ -74,7 +75,6 @@ const Firmware = ({ modalClose }) => {
         );
     const isDefault = useMemo(() => settings.every(item => eeprom?.[item?.setting] === item?.value), [settings]);
     const canSendSettings = useMemo(() => isConnected && activeState === GRBL_ACTIVE_STATE_IDLE, [isConnected, activeState]);
-    const machineProfile = store.get('workspace.machineProfile');
     const hasSettings = controllerSettingsLoaded();
     const data = controller.settings;
     const port = controller.port;
@@ -82,6 +82,7 @@ const Firmware = ({ modalClose }) => {
     const contextValue = {
         hasSettings,
         machineProfile,
+        setMachineProfile,
         isConnected,
         eeprom,
         activeState,

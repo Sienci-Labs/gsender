@@ -47,7 +47,7 @@ import {
     MODAL_CALIBRATE,
     MODAL_HELP
 } from 'app/containers/NavSidebar/constants';
-import machineProfiles from 'app/containers/Preferences/General/defaultMachineProfiles';
+import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 
 
 import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../widgets/JogControl/constants';
