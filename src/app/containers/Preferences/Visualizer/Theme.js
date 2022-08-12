@@ -16,8 +16,8 @@ import styles from '../index.styl';
 const themes = [
     DARK_THEME,
     LIGHT_THEME,
-    CUST_DARK_THEME,
-    CUST_LIGHT_THEME
+    /*CUST_DARK_THEME,
+    CUST_LIGHT_THEME*/
 ];
 
 const parts = [

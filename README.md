@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.2/gSender-1.1.2-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.2/gSender-1.1.2-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.2/gSender-1.1.2.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.2/gSender_1.1.2_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.2/gSender-1.1.2-armv7l.AppImage)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.3/gSender-1.1.3-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.3/gSender-1.1.3-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.3/gSender-1.1.3.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.3/gSender_1.1.3_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.3/gSender-1.1.3-armv7l.AppImage)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -98,6 +98,17 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### 1.1.3 (August 12th, 2022)
+* Added profiles for Longmill extension kits
+* Machine profile removed from preferences and placed in firmware tool
+* Fixed incorrect default values in some machine profiles
+* Fixed issue with test mode that would occasionally have it start running the file after test was complete
+* Fixed issue with continuous jog when soft limits were enabled and report in inches EEPROM value was enabled
+* Firmware tool improvements - new convenient profile selection, setting search, performance improvments, highlighted changed values
+* Improvements to value inputs - should no longer default to min value if there is too long a pause in typing
+* Surfacing labels changed to X/Y rather than length/width
+* Minor styling changes
 
 ### 1.1.2 (July 15th, 2022)
 * Fix for start button sometimes not working when "Start Event" block enabled but empty
