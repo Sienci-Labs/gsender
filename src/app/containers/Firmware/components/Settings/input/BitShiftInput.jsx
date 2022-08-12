@@ -17,6 +17,10 @@ const BitShiftInput = ({ value, onChange }) => {
         updateValues(bitShiftSettings);
     }, [bitShiftSettings]);
 
+    useEffect(() => {
+        initializeSettings();
+    }, [value]);
+
     const handleSwitch = (value, index) => {
         setBitShiftSettings(prev => {
             const newBitShiftSettings = [...prev];
