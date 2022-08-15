@@ -312,21 +312,18 @@ class ProbeWidget extends PureComponent {
             return;
         }
 
-        const { probeCommand, useTLO } = this.state;
+        const { probeCommand, useTLO, touchPlateHeight, probeDepth } = this.state;
         this.config.set('probeCommand', probeCommand);
         this.config.set('useTLO', useTLO);
-
-        let {
-            probeDepth,
-            probeFeedrate,
-            touchPlateHeight,
-            retractionDistance
-        } = this.state;
-
         this.config.set('probeDepth', probeDepth);
-        this.config.set('probeFeedrate', probeFeedrate);
         this.config.set('touchPlateHeight', touchPlateHeight);
-        this.config.set('retractionDistance', retractionDistance);
+
+        // get updated settings
+        this.setState({
+            probeFeedrate: this.config.get('probeFeedrate') || this.state.probeFeedrate,
+            probeFastFeedrate: this.config.get('probeFastFeedrate') || this.state.probeFastFeedrate,
+            retractionDistance: this.config.get('retractionDistance') || this.state.retractionDistance,
+        });
     }
 
     getInitialState() {
@@ -341,6 +338,9 @@ class ProbeWidget extends PureComponent {
         } else {
             toolDiameter = availableTools[0][units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'];
         }
+
+        console.log('initialstate');
+        console.log(this.config.get('probeFeedrate'));
 
         return {
             minimized: this.config.get('minimized', false),
@@ -1060,6 +1060,8 @@ class ProbeWidget extends PureComponent {
         const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
         const wcs = this.getWorkCoordinateSystem();
         const code = [];
+
+        console.log(probeFeedrate);
 
         // Handle auto and tip selection to avoid code generation
         if (toolDiameter === 'Auto') {
