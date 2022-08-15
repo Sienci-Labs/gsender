@@ -9,13 +9,9 @@ import styles from './index.styl';
 const BitShiftInput = ({ value, onChange }) => {
     const [bitShiftSettings, setBitShiftSettings] = useState([false, false, false]); //X, Y, Z
 
-    useEffect(() => {
-        initializeSettings();
-    }, []);
-
-    useEffect(() => {
+    /*useEffect(() => {
         updateValues(bitShiftSettings);
-    }, [bitShiftSettings]);
+    }, [bitShiftSettings]);*/
 
     useEffect(() => {
         initializeSettings();
@@ -25,6 +21,7 @@ const BitShiftInput = ({ value, onChange }) => {
         setBitShiftSettings(prev => {
             const newBitShiftSettings = [...prev];
             newBitShiftSettings[index] = value;
+            updateValues(newBitShiftSettings);
             return newBitShiftSettings;
         });
     };
@@ -57,8 +54,9 @@ const BitShiftInput = ({ value, onChange }) => {
         sum += x ? 1 : 0;
         sum += y ? 2 : 0;
         sum += z ? 4 : 0;
-
+        console.log(sum);
         onChange(sum.toString());
+        return bitShiftSettings;
     };
 
     const [X, Y, Z] = bitShiftSettings;

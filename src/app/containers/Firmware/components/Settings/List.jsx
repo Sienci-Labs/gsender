@@ -64,7 +64,7 @@ const SettingsList = () => {
                                                     max={grbl.max}
                                                     step={grbl.step}
                                                     units={grbl.units}
-                                                    onChange={() => handleSettingsChange(index)}
+                                                    onChange={handleSettingsChange(index)}
                                                     value={grbl.value}
                                                 />
                                             </div>
