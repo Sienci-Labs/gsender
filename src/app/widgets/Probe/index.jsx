@@ -339,9 +339,6 @@ class ProbeWidget extends PureComponent {
             toolDiameter = availableTools[0][units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter'];
         }
 
-        console.log('initialstate');
-        console.log(this.config.get('probeFeedrate'));
-
         return {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
@@ -1060,8 +1057,6 @@ class ProbeWidget extends PureComponent {
         const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
         const wcs = this.getWorkCoordinateSystem();
         const code = [];
-
-        console.log(probeFeedrate);
 
         // Handle auto and tip selection to avoid code generation
         if (toolDiameter === 'Auto') {
