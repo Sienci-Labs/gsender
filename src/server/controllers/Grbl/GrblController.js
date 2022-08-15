@@ -1479,25 +1479,25 @@ class GrblController {
                 const currFeedOverride = store.get('lastFeed');
                 store.set('lastFeed', value);
                 const Change = value - currFeedOverride;
-
-                console.log('Last feed: ' + currFeedOverride);
-                console.log('Change feed by: ' + Change);
-
-                runOverride(this, Change, 'feed');
+                if (value === 100) {
+                    this.write('\x90');
+                } else {
+                    runOverride(this, Change, 'feed');
+                }
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             'spindleOverride': () => {
                 console.log('inside spindle event');
                 const [value] = args;
-
                 const currFeedOverride = store.get('lastSpindle');
                 const Change = value - currFeedOverride;
                 store.set('lastSpindle', value);
-                console.log('Last Spindle: ' + currFeedOverride);
-                console.log('Change spindle speed by: ' + Change);
-
-                runOverride(this, Change, 'spindle');
+                if (value === 100) {
+                    this.write('\x99');
+                } else {
+                    runOverride(this, Change, 'spindle');
+                }
             },
             // Rapid Overrides
             // @param {number} value A percentage value of 25, 50, or 100. A value of zero will reset to 100%.

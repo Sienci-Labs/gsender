@@ -3,7 +3,7 @@ export const runOverride = (context, overridePercentage, type) => {
     case 'spindle':
         // if 100, set to default
         if (overridePercentage === 0) {
-            context.write('\0x99');
+            context.write('\x99');
         } else if (overridePercentage > 0) { // increase override
             // eslint-disable-next-line no-bitwise
             let quo = ~~(overridePercentage / 10);
@@ -11,14 +11,14 @@ export const runOverride = (context, overridePercentage, type) => {
             // run 1% increase
             for (let count = 0; count < rem; count++) {
                 setTimeout(() => {
-                    context.write('\0x9C');
-                }, 500);
+                    context.write('\x9C');
+                }, 50);
             }
             // run 10% increase
             for (let count = 0; count < quo; count++) {
                 setTimeout(() => {
-                    context.write('\0x9A');
-                }, 500);
+                    context.write('\x9A');
+                }, 50);
             }
         } else if (overridePercentage < 0) { // decrease override
             // eslint-disable-next-line no-bitwise
@@ -28,15 +28,15 @@ export const runOverride = (context, overridePercentage, type) => {
             // run decrease 1%
             for (let count = 0; count < rem; count++) {
                 setTimeout(() => {
-                    context.write('\0x9D');
-                }, 500);
+                    context.write('\x9D');
+                }, 50);
             }
 
             //run decrease 10%
             for (let count = 0; count < quo; count++) {
                 setTimeout(() => {
-                    context.write('\0x9B');
-                }, 500);
+                    context.write('\x9B');
+                }, 50);
             }
         }
         break;
@@ -44,7 +44,7 @@ export const runOverride = (context, overridePercentage, type) => {
     case 'feed':
         // if 100, set to default
         if (overridePercentage === 0) {
-            context.write('\0x90');
+            context.write('\x90');
         } else if (overridePercentage > 0) { // increase override
             // eslint-disable-next-line no-bitwise
             let quo = ~~(overridePercentage / 10);
@@ -52,14 +52,14 @@ export const runOverride = (context, overridePercentage, type) => {
             // run 1% increase
             for (let count = 0; count < rem; count++) {
                 setTimeout(() => {
-                    context.write('\0x93');
-                }, 500);
+                    context.write('\x93');
+                }, 50);
             }
             // run 10% increase
             for (let count = 0; count < quo; count++) {
                 setTimeout(() => {
-                    context.write('\0x91');
-                }, 500);
+                    context.write('\x91');
+                }, 50);
             }
         } else if (overridePercentage < 0) { // decrease override
             // eslint-disable-next-line no-bitwise
@@ -69,15 +69,15 @@ export const runOverride = (context, overridePercentage, type) => {
             // run decrease 1%
             for (let count = 0; count < rem; count++) {
                 setTimeout(() => {
-                    context.write('\0x94');
-                }, 500);
+                    context.write('\x94');
+                }, 50);
             }
 
             //run decrease 10%
             for (let count = 0; count < quo; count++) {
                 setTimeout(() => {
-                    context.write('\0x92');
-                }, 500);
+                    context.write('\x92');
+                }, 50);
             }
         }
         break;

@@ -57,7 +57,6 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
     const updateFeedRateChange = (e) => {
         const feedRate = Number(e.target.value) || 100;
         setOvF(feedRate);
-        console.log('Feeder: ' + feedRate);
         controller.command('feedOverride', feedRate);
     };
 
@@ -68,7 +67,6 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
     const updateSpindleSpeedChange = (e) => {
         const spindleSpeed = Number(e.target.value) || 100;
         setOvS(spindleSpeed);
-        console.log('Spindle: ' + spindleSpeed);
         controller.command('spindleOverride', spindleSpeed);
     };
 
@@ -93,7 +91,7 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
             <div className={styles.overrides}>
                 <span className={styles.overrideValue}>{feedrate} {unitString}</span>
                 <Slider
-                    min={0}
+                    min={5}
                     max={230}
                     label="Feed:"
                     value={ovF || 100}
@@ -112,7 +110,7 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
                     <div className={styles.overrides}>
                         <span className={styles.overrideValue}>{spindle} rpm</span>
                         <Slider
-                            min={0}
+                            min={5}
                             max={230}
                             label={`${spindleOverrideLabel}:`}
                             value={ovS || 100}
