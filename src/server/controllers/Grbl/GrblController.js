@@ -342,12 +342,13 @@ class GrblController {
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
-                let bracketCommentLine = /^\s*\([^\)]*\)/gm;
+                let bracketCommentLine = /\([^\)]*\)/gm;
                 let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
                 line = line.replace(bracketCommentLine, '').trim();
                 let comment = line.match(commentMatcher);
                 let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').trim();
+                line = line.replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;
