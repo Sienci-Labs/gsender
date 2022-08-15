@@ -947,7 +947,7 @@ class AxesWidget extends PureComponent {
             jog: {
                 xyStep: this.getInitialXYStep(),
                 zStep: this.getInitialZStep(),
-                feedrate: this.config.get('jog.feedrate'),
+                feedrate: this.getInitialFeedRate(),
                 rapid,
                 normal,
                 precise,
@@ -979,6 +979,13 @@ class AxesWidget extends PureComponent {
         const speeds = this.config.get('jog.normal');
 
         return (units === METRIC_UNITS) ? get(speeds, 'mm.zStep') : get(speeds, 'in.zStep');
+    }
+
+    getInitialFeedRate() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+        const speeds = this.config.get('jog.normal');
+
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.feedrate') : get(speeds, 'in.feedrate');
     }
 
     changeUnits(units) {
