@@ -1,10 +1,12 @@
+// Computes the correct gCode command for slider movements
+// @function runOverride
+// @param {context} context Parent function context
+// @param {number} overridePercentage The amount of percentage increase or decrease.
+// @param {string} type The type of override - spindle or feeder
 export const runOverride = (context, overridePercentage, type) => {
     switch (type) {
     case 'spindle':
-        // if 100, set to default
-        if (overridePercentage === 0) {
-            context.write('\x99');
-        } else if (overridePercentage > 0) { // increase override
+        if (overridePercentage > 0) { // increase override
             // eslint-disable-next-line no-bitwise
             let quo = ~~(overridePercentage / 10);
             let rem = overridePercentage % 10;
@@ -42,10 +44,7 @@ export const runOverride = (context, overridePercentage, type) => {
         break;
 
     case 'feed':
-        // if 100, set to default
-        if (overridePercentage === 0) {
-            context.write('\x90');
-        } else if (overridePercentage > 0) { // increase override
+        if (overridePercentage > 0) { // increase override
             // eslint-disable-next-line no-bitwise
             let quo = ~~(overridePercentage / 10);
             let rem = overridePercentage % 10;
