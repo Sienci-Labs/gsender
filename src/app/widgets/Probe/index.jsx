@@ -346,6 +346,7 @@ class ProbeWidget extends PureComponent {
             minimized: this.config.get('minimized', false),
             isFullscreen: false,
             canClick: true, // Defaults to true
+            toolChangeActive: false,
             port: controller.port,
             units,
             controller: {
@@ -1131,11 +1132,12 @@ class ProbeWidget extends PureComponent {
 
     canClick() {
         const { workflow, isConnected, type, state } = this.props;
+        const { toolChangeActive } = this.state;
 
         if (!isConnected) {
             return false;
         }
-        if (workflow.state !== WORKFLOW_STATE_IDLE) {
+        if (workflow.state !== WORKFLOW_STATE_IDLE && !toolChangeActive) {
             return false;
         }
         if (!includes([GRBL], type)) {
@@ -1187,6 +1189,21 @@ class ProbeWidget extends PureComponent {
             pubsub.subscribe('probe:test', (msg, value) => {
                 this.setState({
                     connectivityTest: value
+                });
+            }),
+            pubsub.subscribe('gcode:ManualToolChange', (msg, context) => {
+                this.setState({
+                    toolChangeActive: true
+                });
+            }),
+            pubsub.subscribe('gcode:resume', (msg) => {
+                this.setState({
+                    toolChangeActive: false
+                });
+            }),
+            pubsub.subscribe('gcode:stop', (msg) => {
+                this.setState({
+                    toolChangeActive: false
                 });
             })
 
