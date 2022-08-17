@@ -138,6 +138,7 @@ export function* initialize() {
 
         // We don't throw a modal on manual tool changes
         if (option === 'Manual') {
+            pubsub.publish('gcode:ManualToolChange');
             return;
         }
 
