@@ -230,7 +230,7 @@ class GrblController {
                 let commentMatcher = /\s*;.*/g;
                 let comment = line.match(commentMatcher);
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').trim();
+                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
 
                 if (line[0] === '%') {
@@ -347,8 +347,7 @@ class GrblController {
                 line = line.replace(bracketCommentLine, '').trim();
                 let comment = line.match(commentMatcher);
                 let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').trim();
-                line = line.replace('/uFEFF', '').trim();
+                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;
