@@ -197,6 +197,8 @@ class CNCEngine {
                 }
                 log.info(`Reconnecting to open controller on port ${port} with socket ID ${socket.id}`);
                 controller.addConnection(socket);
+                //Set the last known workspace offset to zero
+                //controller.command('gcode', `G10 L20 P${store.get('workspace')} X0 Y0`);
                 log.info(`Controller state: ${controller.isOpen()}`);
                 if (controller.isOpen()) {
                     log.info('Joining port room on socket');

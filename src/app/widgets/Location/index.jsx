@@ -631,26 +631,32 @@ class LocationWidget extends PureComponent {
             {
                 label: 'G54 (P1)',
                 value: 'G54',
+                command: 'P1'
             },
             {
                 label: 'G55 (P2)',
                 value: 'G55',
+                command: 'P2'
             },
             {
                 label: 'G56 (P3)',
                 value: 'G56',
+                command: 'P3'
             },
             {
                 label: 'G57 (P4)',
                 value: 'G57',
+                command: 'P4'
             },
             {
                 label: 'G58 (P5)',
                 value: 'G58',
+                command: 'P5'
             },
             {
                 label: 'G59 (P6)',
                 value: 'G59',
+                command: 'P6'
             },
         ];
 
@@ -681,6 +687,7 @@ class LocationWidget extends PureComponent {
                             className={styles.workspaceInput}
                             onChange={(selection) => {
                                 controller.command('gcode', selection.value);
+                                controller.command('save:workspace', selection.command);
                             }}
                             name="workspace"
                             options={gcodes}

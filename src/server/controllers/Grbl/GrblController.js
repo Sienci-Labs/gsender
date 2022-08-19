@@ -1790,6 +1790,10 @@ class GrblController {
                 this.command('feeder:start');
                 this.runPostChangeHook();
             },
+            'save:workspace': () => {
+                const [workspace] = args;
+                store.set('workspace', workspace);
+            }
         }[cmd];
 
         if (!handler) {
