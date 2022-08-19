@@ -2,16 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 
-import styles from './index.styl';
+import { Container } from './styled';
 
-const Actions = ({ handleGenerateGcode, handleLoadGcode, surfacing, canLoad }) => {
-    const canGenerateGcode = Object.keys(surfacing).every(key => surfacing[key]);
-
+const Actions = ({ handleGenerateGcode, handleLoadGcode, canLoad }) => {
     return (
-        <div className={styles.container}>
+        <Container>
             <ToolModalButton
                 icon="fas fa-code"
-                disabled={!canGenerateGcode}
                 style={{ margin: 0 }}
                 onClick={handleGenerateGcode}
             >
@@ -26,7 +23,7 @@ const Actions = ({ handleGenerateGcode, handleLoadGcode, surfacing, canLoad }) =
             >
                 Run on Main Visualizer
             </ToolModalButton>
-        </div>
+        </Container>
     );
 };
 
