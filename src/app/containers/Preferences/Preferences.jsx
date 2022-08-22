@@ -208,13 +208,14 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('widgets:reverse', reverseWidgetState);
             },
-            setShouldWCSzero: () => {
+            setShouldWCSzero: (updateState) => {
                 const shouldWCSzeroState = !this.state.shouldWCSzero;
                 console.log('setShouldWCSzero Action Called, new value : ' + shouldWCSzeroState);
+                updateState(shouldWCSzeroState);
                 this.setState({
                     shouldWCSzero: shouldWCSzeroState
                 });
-                pubsub.publish('shouldWCSzero:update');
+                pubsub.publish('shouldWCSzero:update', shouldWCSzeroState);
             },
             setAutoReconnect: () => {
                 const autoReconnect = !this.state.autoReconnect;

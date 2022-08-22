@@ -99,6 +99,7 @@ class LocationWidget extends PureComponent {
             pubsub.subscribe('shouldWCSzero:update', (event, value) => {
                 console.log('Inside pubsub subscribe: ' + value);
                 this.setState({ shouldWCSzero: value });
+                store.set('shouldWCSzero', value);
             }),
             pubsub.subscribe('keybindingsUpdated', () => {
                 this.updateShuttleControlEvents();

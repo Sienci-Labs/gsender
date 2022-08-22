@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
     IMPERIAL_UNITS,
@@ -8,12 +8,15 @@ import { RadioGroup, RadioButton } from 'app/components/Radio';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import Fieldset from '../components/Fieldset';
-
+import store from '../../../store';
 import styles from '../index.styl';
 
 const Workspace = ({ state, actions }) => {
-    const { units, reverseWidgets, shouldWCSzero } = state;
-
+    const { units, reverseWidgets } = state;
+    const [shouldWCSzero, setShouldWCSzero] = useState(store.get('shouldWCSzero'));
+    useEffect(() => {
+        setShouldWCSzero(store.get('shouldWCSzero'));
+    }, []);
     return (
         <Fieldset legend="Workspace">
             <div className={styles.addMargin}>
@@ -46,7 +49,7 @@ const Workspace = ({ state, actions }) => {
                     <ToggleSwitch
                         label="Reset Zero on reconnect"
                         checked={shouldWCSzero}
-                        onChange={() => actions.general.setShouldWCSzero()}
+                        onChange={() => actions.general.setShouldWCSzero(setShouldWCSzero)}
                         size="small"
                     />
                 </Tooltip>
