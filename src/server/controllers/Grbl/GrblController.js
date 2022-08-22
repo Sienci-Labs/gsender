@@ -62,7 +62,7 @@ import { METRIC_UNITS } from '../../../app/constants';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
-
+import { runOverride } from '../runOverride';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -233,7 +233,6 @@ class GrblController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').trim();
                 context = this.populateContext(context);
-
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
@@ -844,15 +843,12 @@ class GrblController {
                     this.actionTime.senderFinishTime = now;
                 } else if (timespan > toleranceTime) {
                     log.silly(`Finished sending G-code: timespan=${timespan}`);
-
                     this.actionTime.senderFinishTime = 0;
-
                     // Stop workflow
                     this.command('gcode:stop');
                 }
             }
         }, 250);
-
         // Load file if it exists in CNC engine (AKA it was loaded before connection
     }
 
@@ -1103,6 +1099,8 @@ class GrblController {
     loadFile(gcode, { name }) {
         log.debug(`Loading file '${name}' to controller`);
         this.command('gcode:load', name, gcode);
+        store.set('lastFeed', this.runner.state.status.ov[0]);
+        store.set('lastSpindle', this.runner.state.status.ov[2]);
     }
 
     addConnection(socket) {
@@ -1475,53 +1473,30 @@ class GrblController {
             },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
-            //   0: Set 100% of programmed rate.
-            //  10: Increase 10%
-            // -10: Decrease 10%
-            //   1: Increase 1%
-            //  -1: Decrease 1%
             'feedOverride': () => {
+                console.log('inside spindle event');
                 const [value] = args;
-
-                const currFeedOverride = this.runner.state.status.ov[0];
-                const nextFeedOverride = currFeedOverride + value;
-
-                if (nextFeedOverride > 230 || nextFeedOverride < 0) {
-                    return;
-                }
-
-                if (value === 0) {
+                const currFeedOverride = store.get('lastFeed');
+                store.set('lastFeed', value);
+                const Change = value - currFeedOverride;
+                if (value === 100) {
                     this.write('\x90');
-                } else if (value === 10) {
-                    this.write('\x91');
-                } else if (value === -10) {
-                    this.write('\x92');
-                } else if (value === 1) {
-                    this.write('\x93');
-                } else if (value === -1) {
-                    this.write('\x94');
+                } else {
+                    runOverride(this, Change, 'feed');
                 }
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
-            //   0: Set 100% of programmed spindle speed
-            //  10: Increase 10%
-            // -10: Decrease 10%
-            //   1: Increase 1%
-            //  -1: Decrease 1%
             'spindleOverride': () => {
+                console.log('inside spindle event');
                 const [value] = args;
-
-                if (value === 0) {
+                const currFeedOverride = store.get('lastSpindle');
+                const Change = value - currFeedOverride;
+                store.set('lastSpindle', value);
+                if (value === 100) {
                     this.write('\x99');
-                } else if (value === 10) {
-                    this.write('\x9a');
-                } else if (value === -10) {
-                    this.write('\x9b');
-                } else if (value === 1) {
-                    this.write('\x9c');
-                } else if (value === -1) {
-                    this.write('\x9d');
+                } else {
+                    runOverride(this, Change, 'spindle');
                 }
             },
             // Rapid Overrides
