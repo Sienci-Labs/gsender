@@ -96,6 +96,10 @@ class LocationWidget extends PureComponent {
                     },
                 } });
             }),
+            pubsub.subscribe('shouldWCSzero:update', (event, value) => {
+                console.log('Inside pubsub subscribe: ' + value);
+                this.setState({ shouldWCSzero: value });
+            }),
             pubsub.subscribe('keybindingsUpdated', () => {
                 this.updateShuttleControlEvents();
             }),
@@ -495,6 +499,7 @@ class LocationWidget extends PureComponent {
             canClick: true, // Defaults to true
             units: store.get('workspace.units', METRIC_UNITS),
             safeRetractHeight: store.get('workspace.safeRetractHeight'),
+            shouldWCSzero: store.get('workspace.shouldWCSzero'),
             workflow: {
                 state: controller.workflow.state
             },
@@ -604,7 +609,7 @@ class LocationWidget extends PureComponent {
 
     render() {
         const { widgetId, machinePosition, workPosition, wcs } = this.props;
-        const { minimized, isFullscreen } = this.state;
+        const { minimized, isFullscreen, shouldWCSzero } = this.state;
         const { units } = this.state;
         const canSendCommand = this.canSendCommand();
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
@@ -687,7 +692,10 @@ class LocationWidget extends PureComponent {
                             className={styles.workspaceInput}
                             onChange={(selection) => {
                                 controller.command('gcode', selection.value);
-                                controller.command('save:workspace', selection.command);
+                                console.log('shouldWCSzero : ' + shouldWCSzero);
+                                if (shouldWCSzero) {
+                                    controller.command('save:workspace', selection.command);
+                                }
                             }}
                             name="workspace"
                             options={gcodes}

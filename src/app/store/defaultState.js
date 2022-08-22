@@ -69,6 +69,7 @@ const defaultState = {
     workspace: {
         units: METRIC_UNITS,
         reverseWidgets: false,
+        shouldWCSzero: false,
         safeRetractHeight: 0,
         customDecimalPlaces: 0,
         jobsFinished: 0,

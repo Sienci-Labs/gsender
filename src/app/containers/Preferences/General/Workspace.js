@@ -12,7 +12,7 @@ import Fieldset from '../components/Fieldset';
 import styles from '../index.styl';
 
 const Workspace = ({ state, actions }) => {
-    const { units, reverseWidgets } = state;
+    const { units, reverseWidgets, shouldWCSzero } = state;
 
     return (
         <Fieldset legend="Workspace">
@@ -37,6 +37,16 @@ const Workspace = ({ state, actions }) => {
                         label="Reverse workspace layout"
                         checked={reverseWidgets}
                         onChange={() => actions.general.setReverseWidgets()}
+                        size="small"
+                    />
+                </Tooltip>
+            </div>
+            <div className={styles.addMargin}>
+                <Tooltip content="Resets Workspace Coordinate System to zero on reconnect" location="default">
+                    <ToggleSwitch
+                        label="Reset Zero on reconnect"
+                        checked={shouldWCSzero}
+                        onChange={() => actions.general.setShouldWCSzero()}
                         size="small"
                     />
                 </Tooltip>
