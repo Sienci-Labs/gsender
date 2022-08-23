@@ -31,6 +31,7 @@ import { modifierKeys } from './constants';
 
 
 import store from '../store';
+import shuttleEvents from './shuttleEvents';
 
 const STOP_CMD = 'STOP_JOG';
 const MACRO = 'MACRO';
@@ -159,6 +160,10 @@ class Combokeys extends events.EventEmitter {
 
         const newCommandKeysList = [...setCommandKeys];
 
+        // get callback for macros
+        const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+        const macroCallback = allShuttleControlEvents.find(element => element.name === 'MACRO');
+
         macros.forEach(macro => {
             const existingBind = setMacrosBinds.find(bind => bind.id === macro.id);
             if (!existingBind) {
@@ -170,7 +175,8 @@ class Combokeys extends events.EventEmitter {
                     payload: { macroID: macro.id },
                     preventDefault: false,
                     isActive: false,
-                    category: MACRO_CATEGORY
+                    category: MACRO_CATEGORY,
+                    callback: macroCallback
                 });
             }
         });

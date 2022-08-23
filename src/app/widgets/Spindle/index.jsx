@@ -112,10 +112,6 @@ class SpindleWidget extends PureComponent {
         },
     }
 
-    test() {
-        console.log('test complete!');
-    }
-
     config = new WidgetConfig(this.props.widgetId);
 
     state = this.getInitialState();
