@@ -36,6 +36,8 @@ import NavbarConnection from 'app/widgets/NavbarConnection';
 import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
+import useKeybinding from '../../lib/useKeybinding';
+import { GENERAL_CATEGORY, LOCATION_CATEGORY } from '../../constants';
 
 class Header extends PureComponent {
     static propTypes = {
@@ -104,10 +106,49 @@ class Header extends PureComponent {
         },
     };
 
-    actionHandlers = {
+    shuttleControlFunctions = {
         CONTROLLER_COMMAND: (event, { command }) => {
             // feedhold, cyclestart, homing, unlock, reset
             controller.command(command);
+        }
+    }
+
+    shuttleControlEvents = {
+        CONTROLLER_COMMAND_UNLOCK: {
+            title: 'Unlock',
+            keys: '$',
+            cmd: 'CONTROLLER_COMMAND_UNLOCK',
+            payload: {
+                command: 'unlock'
+            },
+            preventDefault: false,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
+        },
+        CONTROLLER_COMMAND_RESET: {
+            title: 'Soft Reset',
+            keys: '%',
+            cmd: 'CONTROLLER_COMMAND_RESET',
+            payload: {
+                command: 'reset'
+            },
+            preventDefault: false,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
+        },
+        CONTROLLER_COMMAND_HOMING: {
+            title: 'Homing',
+            keys: ['ctrl', 'alt', 'command', 'h'].join('+'),
+            cmd: 'CONTROLLER_COMMAND_HOMING',
+            payload: {
+                command: 'homing'
+            },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
         }
     };
 
@@ -224,9 +265,9 @@ class Header extends PureComponent {
 
     componentDidMount() {
         this._isMounted = true;
-
-        this.addActionHandlers();
+        this.addShuttleControlEvents();
         this.addControllerEvents();
+        useKeybinding(this.shuttleControlEvents);
 
         if (isElectron()) {
             this.registerIPCListeners();
@@ -244,22 +285,22 @@ class Header extends PureComponent {
     componentWillUnmount() {
         this._isMounted = false;
 
-        this.removeActionHandlers();
+        this.removeShuttleControlEvents();
         this.removeControllerEvents();
 
         this.runningTasks = [];
     }
 
-    addActionHandlers() {
-        Object.keys(this.actionHandlers).forEach(eventName => {
-            const callback = this.actionHandlers[eventName];
+    addShuttleControlEvents() {
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.on(eventName, callback);
         });
     }
 
-    removeActionHandlers() {
-        Object.keys(this.actionHandlers).forEach(eventName => {
-            const callback = this.actionHandlers[eventName];
+    removeShuttleControlEvents() {
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.removeListener(eventName, callback);
         });
     }

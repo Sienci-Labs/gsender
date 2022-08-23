@@ -58,7 +58,11 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     WORKFLOW_STATE_IDLE,
     //GRBL_ACTIVE_STATE_HOLD,
-    WORKFLOW_STATE_RUNNING
+    WORKFLOW_STATE_RUNNING,
+    JOGGING_CATEGORY,
+    AXIS_X,
+    AXIS_Y,
+    AXIS_Z
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -68,6 +72,7 @@ import {
     SPEED_PRECISE
 } from './constants';
 import styles from './index.styl';
+import useKeybinding from '../../lib/useKeybinding';
 
 class AxesWidget extends PureComponent {
     static propTypes = {
@@ -471,20 +476,7 @@ class AxesWidget extends PureComponent {
         }
     };
 
-    shuttleControlEvents = {
-        SELECT_AXIS: (event, { axis }) => {
-            const { canClick, jog } = this.state;
-
-            if (!canClick) {
-                return;
-            }
-
-            if (jog.axis === axis) {
-                this.actions.selectAxis(); // deselect axis
-            } else {
-                this.actions.selectAxis(axis);
-            }
-        },
+    shuttleControlFunctions = {
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
             if (event) {
                 preventDefault(event);
@@ -492,27 +484,10 @@ class AxesWidget extends PureComponent {
 
             this.handleShortcutJog({ axis, direction });
         },
-        STOP_JOG: (event, payload) => {
-            if (event) {
-                preventDefault(event);
-            }
-
-            this.handleShortcutStop(payload);
-        },
         SET_JOG_PRESET: (event, { key }) => {
             if (!key) {
                 return;
             }
-            this.actions.setSelectedSpeed(key);
-            this.actions.setJogFromPreset(key);
-        },
-        CYCLE_JOG_PRESETS: () => {
-            const { selectedSpeed } = this.state;
-
-            const presets = [SPEED_RAPID, SPEED_NORMAL, SPEED_PRECISE];
-            const nextIndex = presets.findIndex(preset => preset === selectedSpeed) + 1;
-            const key = presets[nextIndex] ? presets[nextIndex] : presets[0];
-
             this.actions.setSelectedSpeed(key);
             this.actions.setJogFromPreset(key);
         },
@@ -596,6 +571,225 @@ class AxesWidget extends PureComponent {
                     precise: newJogSpeeds[2],
                 }
             }));
+        }
+    }
+
+    shuttleControlEvents = {
+        JOG_X_P: {
+            title: 'Jog: X+',
+            keys: 'shift+right',
+            cmd: 'JOG_X_P',
+            payload: {
+                axis: { [AXIS_X]: 1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: (event, { axis = null, direction = 1, factor = 1 }) => {
+                this.shuttleControlFunctions.JOG(event, { axis, direction, factor });
+            }
+        },
+        JOG_X_M: {
+            title: 'Jog: X-',
+            keys: 'shift+left',
+            cmd: 'JOG_X_M',
+            payload: {
+                axis: { [AXIS_X]: -1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG,
+        },
+        JOG_Y_P: {
+            title: 'Jog: Y+',
+            keys: 'shift+up',
+            cmd: 'JOG_Y_P',
+            payload: {
+                axis: { [AXIS_Y]: 1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG,
+        },
+        JOG_Y_M: {
+            title: 'Jog: Y-',
+            keys: 'shift+down',
+            cmd: 'JOG_Y_M',
+            payload: {
+                axis: { [AXIS_Y]: -1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG,
+        },
+        JOG_Z_P: {
+            title: 'Jog: Z+',
+            keys: 'shift+pageup',
+            cmd: 'JOG_Z_P',
+            payload: {
+                axis: { [AXIS_Z]: 1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG,
+        },
+        JOG_Z_M: {
+            title: 'Jog: Z-',
+            keys: 'shift+pagedown',
+            cmd: 'JOG_Z_M',
+            payload: {
+                axis: { [AXIS_Z]: -1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG,
+        },
+        JOG_X_P_Y_M: {
+            title: 'Jog: X+ Y-',
+            keys: '',
+            cmd: 'JOG_X_P_Y_M',
+            payload: {
+                axis: { [AXIS_X]: 1, [AXIS_Y]: -1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG,
+        },
+        JOG_X_M_Y_P: {
+            title: 'Jog: X- Y+',
+            keys: '',
+            cmd: 'JOG_X_M_Y_P',
+            payload: {
+                axis: { [AXIS_X]: -1, [AXIS_Y]: 1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG,
+        },
+        JOG_X_Y_P: {
+            title: 'Jog: X+ Y+',
+            keys: '',
+            cmd: 'JOG_X_Y_P',
+            payload: {
+                axis: { [AXIS_X]: 1, [AXIS_Y]: 1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG,
+        },
+        JOG_X_Y_M: {
+            title: 'Jog: X- Y-',
+            keys: '',
+            cmd: 'JOG_X_Y_M',
+            payload: {
+                axis: { [AXIS_X]: -1, [AXIS_Y]: -1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG,
+        },
+        STOP_JOG: {
+            title: 'Stop Jog',
+            keys: '',
+            cmd: 'STOP_JOG',
+            payload: { force: true },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: (event, payload) => {
+                if (event) {
+                    preventDefault(event);
+                }
+
+                this.handleShortcutStop(payload);
+            },
+        },
+        SET_R_JOG_PRESET: {
+            title: 'Select Rapid Jog Preset',
+            keys: ['shift', 'v'].join('+'),
+            cmd: 'SET_R_JOG_PRESET',
+            payload: {
+                key: SPEED_RAPID
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.SET_JOG_PRESET,
+        },
+        SET_N_JOG_PRESET: {
+            title: 'Select Normal Jog Preset',
+            keys: ['shift', 'c'].join('+'),
+            cmd: 'SET_N_JOG_PRESET',
+            payload: {
+                key: SPEED_NORMAL
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.SET_JOG_PRESET,
+        },
+        SET_P_JOG_PRESET: {
+            title: 'Select Precise Jog Preset',
+            keys: ['shift', 'x'].join('+'),
+            cmd: 'SET_P_JOG_PRESET',
+            payload: {
+                key: SPEED_PRECISE
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.SET_JOG_PRESET,
+        },
+        CYCLE_JOG_PRESETS: {
+            title: 'Cycle Through Jog Presets',
+            keys: ['shift', 'z'].join('+'),
+            cmd: 'CYCLE_JOG_PRESETS',
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: () => {
+                const { selectedSpeed } = this.state;
+
+                const presets = [SPEED_RAPID, SPEED_NORMAL, SPEED_PRECISE];
+                const nextIndex = presets.findIndex(preset => preset === selectedSpeed) + 1;
+                const key = presets[nextIndex] ? presets[nextIndex] : presets[0];
+
+                this.actions.setSelectedSpeed(key);
+                this.actions.setJogFromPreset(key);
+            },
+        },
+        JOG_SPEED_I: {
+            title: 'Increase Jog Speed',
+            keys: '=',
+            cmd: 'JOG_SPEED_I',
+            payload: {
+                speed: 'increase'
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG_SPEED
+        },
+        JOG_SPEED_D: {
+            title: 'Decrease Jog Speed',
+            keys: '-',
+            cmd: 'JOG_SPEED_D',
+            payload: {
+                speed: 'decrease'
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG_SPEED
         }
     };
 
@@ -704,6 +898,7 @@ class AxesWidget extends PureComponent {
     componentDidMount() {
         store.on('change', this.updateJogPresets);
         this.addShuttleControlEvents();
+        useKeybinding(this.shuttleControlEvents);
         this.subscribe();
 
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
@@ -1005,7 +1200,7 @@ class AxesWidget extends PureComponent {
 
     addShuttleControlEvents() {
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.on(eventName, callback);
         });
 
@@ -1023,7 +1218,7 @@ class AxesWidget extends PureComponent {
 
     removeShuttleControlEvents() {
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.removeListener(eventName, callback);
         });
 

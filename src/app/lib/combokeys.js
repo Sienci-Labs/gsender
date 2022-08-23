@@ -90,8 +90,20 @@ class Combokeys extends events.EventEmitter {
                 this.emit(cmd, event, payload);
             };
 
+            const jogCmds = [
+                'JOG_X_P',
+                'JOG_X_M',
+                'JOG_Y_P',
+                'JOG_Y_M',
+                'JOG_Z_P',
+                'JOG_Z_M',
+                'JOG_X_P_Y_M',
+                'JOG_X_M_Y_P',
+                'JOG_X_Y_P',
+                'JOG_X_Y_M'
+            ];
             //Add keyup listeners for jogging events
-            if (cmd === 'JOG') {
+            if (jogCmds.includes(cmd)) {
                 const callback = (event) => {
                     log.debug(`combokeys: keys=${keys} cmd=${STOP_CMD} payload=${JSON.stringify(payload)}`);
                     if (!!o.preventDefault) {
