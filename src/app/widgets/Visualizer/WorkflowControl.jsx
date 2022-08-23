@@ -65,13 +65,15 @@ import RecentFileButton from './RecentFileButton';
 import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
 import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
 import { outlineResponse } from '../../workers/Outline.response';
+import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
         actions: PropTypes.object,
-        invalidGcode: PropTypes.string
+        invalidGcode: PropTypes.string,
+        liteMode: PropTypes.bool
     };
 
     fileInputEl = null;
@@ -202,7 +204,10 @@ class WorkflowControl extends PureComponent {
     handleOnStop = () => {
         const { actions: { handleStop }, controllerState, senderStatus } = this.props;
         const { status } = controllerState;
-
+        localStorage.setItem('jobOverrideToggle', JSON.stringify({
+            isChecked: false,
+            toggleStatus: 'jobStatus',
+        }));
         const { received } = senderStatus;
         handleStop();
         this.setState(prev => ({ runHasStarted: false, startFromLine: { ...prev.startFromLine, value: received } }));
@@ -221,6 +226,11 @@ class WorkflowControl extends PureComponent {
         const { activeState } = this.props;
 
         Toaster.clear();
+
+        localStorage.setItem('jobOverrideToggle', JSON.stringify({
+            isChecked: true,
+            toggleStatus: 'overrides',
+        }));
 
         if (activeState === GRBL_ACTIVE_STATE_CHECK) {
             this.setState({ testStarted: true, runHasStarted: true });
@@ -352,6 +362,7 @@ class WorkflowControl extends PureComponent {
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
 
         const { showModal, value } = this.state.startFromLine;
+        const renderSVG = shouldVisualizeSVG();
 
         return (
             <div className={styles.workflowControl}>
@@ -566,11 +577,13 @@ class WorkflowControl extends PureComponent {
                         </Modal>
                     )
                 }
-
-                <CameraDisplay
-                    camera={camera}
-                    cameraPosition={cameraPosition}
-                />
+                {
+                    !renderSVG ?
+                        <CameraDisplay
+                            camera={camera}
+                            cameraPosition={cameraPosition}
+                        /> : null
+                }
             </div>
         );
     }

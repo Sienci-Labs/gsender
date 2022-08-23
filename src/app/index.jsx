@@ -64,6 +64,7 @@ import { removeOldKeybindings } from './lib/useKeybinding';
 
 const renderPage = () => {
     const container = document.createElement('div');
+    document.title = `gSender ${settings.version}`;
     container.style.width = '100%';
     document.body.appendChild(container);
 

@@ -151,7 +151,8 @@ class PreferencesPage extends PureComponent {
                 ...this.spindleConfig.get('laser')
             },
             spindle: {
-                ...this.spindleConfig.get()
+                ...this.spindleConfig.get(),
+                delay: this.spindleConfig.get('delay')
             },
             visualizer: {
                 minimizeRenders: this.visualizerConfig.get('minimizeRenders'),
@@ -159,7 +160,8 @@ class PreferencesPage extends PureComponent {
                 objects: this.visualizerConfig.get('objects'),
                 disabled: this.visualizerConfig.get('disabled'),
                 disabledLite: this.visualizerConfig.get('disabledLite'),
-                showSoftLimitsWarning: this.visualizerConfig.get('showSoftLimitsWarning', false)
+                showSoftLimitsWarning: this.visualizerConfig.get('showSoftLimitsWarning', false),
+                SVGEnabled: this.visualizerConfig.get('SVGEnabled', false),
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
@@ -495,6 +497,15 @@ class PreferencesPage extends PureComponent {
                 this.setState({ spindle: newSpindleValue });
 
                 pubsub.publish('spindle:updated', newSpindleValue);
+            },
+            handleDelayToggle: (hasDelay) => {
+                const { spindle } = this.state;
+                this.setState({
+                    spindle: {
+                        ...spindle,
+                        delay: hasDelay
+                    }
+                });
             }
         },
         visualizer: {
@@ -520,6 +531,7 @@ class PreferencesPage extends PureComponent {
                 pubsub.publish('theme:change', theme.value);
             },
             handleCustThemeChange: (themeColours) => {
+                const { visualizer } = this.state;
                 const parts = [
                     BACKGROUND_PART,
                     GRID_PART,
@@ -533,7 +545,17 @@ class PreferencesPage extends PureComponent {
                     G1_PART
                 ];
                 parts.map((value) => {
-                    return this.visualizerConfig.set(CUST_THEME + ' ' + value, themeColours.get(value));
+                    let label = value;
+                    if (value === G1_PART) {
+                        label = 'G1-3';
+                    }
+                    return this.visualizerConfig.set(CUST_THEME + ' ' + label, themeColours.get(value));
+                });
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        theme: CUST_THEME,
+                    }
                 });
                 pubsub.publish('theme:change', CUST_THEME);
             },
@@ -579,10 +601,10 @@ class PreferencesPage extends PureComponent {
                     defaultColour = themeType.G1Color;
                     break;
                 case 'G2':
-                    defaultColour = themeType.G2Color;
+                    defaultColour = themeType.G1Color;
                     break;
                 case 'G3':
-                    defaultColour = themeType.G3Color;
+                    defaultColour = themeType.G1Color;
                     break;
                 default:
                     defaultColour = '#000000';
@@ -611,6 +633,17 @@ class PreferencesPage extends PureComponent {
                         }
                     });
                 }
+                pubsub.publish('visualizer:settings');
+            },
+            handleSVGEnabledToggle: () => {
+                const { visualizer } = this.state;
+                const value = visualizer.SVGEnabled;
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        SVGEnabled: !value
+                    }
+                });
                 pubsub.publish('visualizer:settings');
             },
             handleCutPathToggle: (liteMode = false) => {
@@ -753,6 +786,7 @@ class PreferencesPage extends PureComponent {
         store.set('widgets.visualizer.theme', visualizer.theme);
         store.set('widgets.visualizer.disabled', visualizer.disabled);
         store.set('widgets.visualizer.disabledLite', visualizer.disabledLite);
+        store.set('widgets.visualizer.SVGEnabled', visualizer.SVGEnabled);
         store.set('widgets.visualizer.minimizeRenders', visualizer.minimizeRenders);
         store.set('workspace.units', units);
         store.replace('workspace[tools]', tools);
@@ -761,6 +795,7 @@ class PreferencesPage extends PureComponent {
         store.replace('workspace[probeProfile]', probe);
         store.set('widgets.spindle.spindleMax', spindle.spindleMax);
         store.set('widgets.spindle.spindleMin', spindle.spindleMin);
+        store.set('widgets.spindle.delay', spindle.delay);
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);

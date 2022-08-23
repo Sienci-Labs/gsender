@@ -28,6 +28,7 @@ import longMill12x30File from '../../Firmware/eepromFiles/Sienci Long Mill12X30.
 import longMill30x30File from '../../Firmware/eepromFiles/Sienci Long Mill30X30.json';
 import MK2LongMill12x30File from '../../Firmware/eepromFiles/MK2_12x30.json';
 import MK2LongMill30x30File from '../../Firmware/eepromFiles/MK2_30x30.json';
+import MK2LongMill48x30File from '../../Firmware/eepromFiles/MK2_48x30.json';
 
 export default [
     {
@@ -169,6 +170,28 @@ export default [
         'eepromSettings': longMill30x30File,
     },
     {
+        'id': 6,
+        'company': 'Sienci Labs',
+        'name': 'LongMill MK2',
+        'type': '48x30',
+        'version': 'MK2',
+        'mm': {
+            'width': 1279.9,
+            'depth': 845,
+            'height': 114.3
+        },
+        'in': {
+            'width': 50.39,
+            'depth': 33.27,
+            'height': 4.5
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'eepromSettings': MK2LongMill48x30File,
+    },
+    {
         'id': 7,
         'company': 'Sienci Labs',
         'name': 'LongMill MK2',
@@ -299,8 +322,8 @@ export default [
     },
     {
         'id': 23,
-        'company': 'OpenBuilds',
-        'name': '',
+        'company': '',
+        'name': 'OpenBuilds',
         'type': '',
         'mm': {
             'width': 270,
@@ -320,8 +343,8 @@ export default [
     },
     {
         'id': 33,
-        'company': 'Ooznest',
-        'name': '',
+        'company': '',
+        'name': 'Ooznest',
         'type': '',
         'mm': {
             'width': 300,
@@ -341,8 +364,8 @@ export default [
     },
     {
         'id': 34,
-        'company': 'Mill Right',
-        'name': '',
+        'company': '',
+        'name': 'Mill Right',
         'type': '',
         'mm': {
             'width': 260,
@@ -362,8 +385,8 @@ export default [
     },
     {
         'id': 41,
-        'company': 'CNC4newbie',
-        'name': '',
+        'company': '',
+        'name': 'CNC4newbie',
         'type': '',
         'mm': {
             'width': 400.05,
@@ -383,8 +406,8 @@ export default [
     },
     {
         'id': 43,
-        'company': 'BobsCNC',
-        'name': '',
+        'company': '',
+        'name': 'BobsCNC',
         'type': '',
         'mm': {
             'width': 457.2,
@@ -404,8 +427,8 @@ export default [
     },
     {
         'id': 44,
-        'company': 'YoraHome',
-        'name': '',
+        'company': '',
+        'name': 'YoraHome',
         'type': '',
         'mm': {
             'width': 609.6,
@@ -425,8 +448,8 @@ export default [
     },
     {
         'id': 45,
-        'company': 'Blue Carve',
-        'name': '',
+        'company': '',
+        'name': 'Blue Carve',
         'type': '',
         'mm': {
             'width': 750,
@@ -447,8 +470,8 @@ export default [
 
     {
         'id': 47,
-        'company': 'SainSmart',
-        'name': '',
+        'company': '',
+        'name': 'SainSmart',
         'type': '',
         'mm': {
             'width': 180,
@@ -489,8 +512,8 @@ export default [
     },
     {
         'id': 51,
-        'company': 'Evo-One',
-        'name': '',
+        'company': '',
+        'name': 'Evo-One',
         'type': '',
         'mm': {
             'width': 530,
@@ -510,8 +533,8 @@ export default [
     },
     {
         'id': 52,
-        'company': 'Generic CNC',
-        'name': '',
+        'company': '',
+        'name': 'Generic CNC',
         'type': '',
         'mm': {
             'width': 530,

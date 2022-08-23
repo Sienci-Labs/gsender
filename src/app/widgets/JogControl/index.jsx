@@ -410,9 +410,7 @@ class AxesWidget extends PureComponent {
         },
         handleXYStepChange: (value) => {
             const { jog } = this.state;
-            if (Number.isNaN(value)) {
-                value = this.props.value;
-            }
+            // any input that gets to this point is valid, so set it
             this.setState({
                 jog: {
                     ...jog,
@@ -424,9 +422,7 @@ class AxesWidget extends PureComponent {
         },
         handleZStepChange: (value) => {
             const { jog } = this.state;
-            if (Number.isNaN(value)) {
-                value = this.props.value;
-            }
+            // any input that gets to this point is valid, so set it
             this.setState({
                 jog: {
                     ...jog,
@@ -438,9 +434,7 @@ class AxesWidget extends PureComponent {
         },
         handleFeedrateChange: (value) => {
             const { jog } = this.state;
-            if (Number.isNaN(value)) {
-                value = this.props.value;
-            }
+            // any input that gets to this point is valid, so set it
             this.setState({
                 jog: {
                     ...jog,

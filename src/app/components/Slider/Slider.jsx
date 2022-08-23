@@ -22,42 +22,22 @@
  */
 
 import React from 'react';
-import classnames from 'classnames';
-import ToggleSwitch from 'react-switch';
-import PropTypes from 'prop-types';
+import styles from './slider.styl';
 
-import styles from './index.styl';
-
-const Switch = ({ label, checked, onChange, className, style, disabled, onColor }) => {
+const Slider = ({ step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, label = '', unitString = 'unit' }) => {
     return (
-        <div className={classnames(styles['toggle-item'], className)} style={style}>
-            {label && <span>{label}</span> }
-            <ToggleSwitch
-                checked={checked || false}
+        <div className={styles.sliderWrapper}>
+            <span style={{ width: '13%' }}>{label + ' '}</span>
+            <input
+                style={{ width: '70%' }}
+                type="range" min={min} max={max}
+                value={value} onMouseUp={onMouseUp} className={styles.slider}
                 onChange={onChange}
-                disabled={disabled}
-                checkedIcon={false}
-                uncheckedIcon={false}
-                onColor={onColor || '#295d8d'}
-                height={24}
-                width={48}
+                step={step}
             />
+            <span style={{ width: '17%' }}>{ value } { unitString }</span>
         </div>
     );
 };
 
-Switch.propTypes = {
-    label: PropTypes.string,
-    checked: PropTypes.bool,
-    disabled: PropTypes.bool,
-    onChange: PropTypes.func,
-    className: PropTypes.string,
-    style: PropTypes.object,
-    onColor: PropTypes.string,
-};
-
-Switch.defaultProps = {
-    disabled: false,
-};
-
-export default Switch;
+export default Slider;

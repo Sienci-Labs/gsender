@@ -13,7 +13,7 @@ const SettingsArea = () => {
     const machineName = (
         <>
             Machine Profile:{' '}
-            <strong>{`${machineProfile?.company} ${machineProfile?.name} ${machineProfile?.version}`}</strong>
+            <strong>{`${machineProfile?.name} ${machineProfile?.type}`}</strong>
         </>
     );
 
