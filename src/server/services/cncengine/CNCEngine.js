@@ -110,10 +110,14 @@ class CNCEngine {
             setTimeout(() => {
                 if (store.get('workspace').shouldReset) {
                     controller.command('gcode', `G10 L20 ${store.get('workspace').workspace} X0 Y0`);
-                    console.debug('wcs reset to zero - HELPER');
+                    console.debug('wcs reset to zero');
                 }
             }, 500);
         };
+
+        wcsResetZero();
+        console.log('WCS reset t zero on start');
+
         // Fallback to an empty string if the controller is not valid
         if (!isValidController(controller)) {
             controller = '';
@@ -213,10 +217,8 @@ class CNCEngine {
                 if (controller.isOpen()) {
                     log.info('Joining port room on socket');
                     socket.join(port);
-                    if (store.get('workspace').shouldReset) {
-                        wcsResetZero();
-                        console.log('wcs reset to zero - CNC Engine');
-                    }
+                    wcsResetZero();
+                    console.log('wcs reset to zero - CNC Engine - reconnect');
                 } else {
                     log.info('Controller no longer open');
                 }
@@ -334,7 +336,6 @@ class CNCEngine {
 
                     // Join the room
                     socket.join(port);
-
                     callback(null);
                 });
             });

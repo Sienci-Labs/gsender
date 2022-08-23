@@ -1059,7 +1059,7 @@ class GrblController {
             callback(); // register controller
 
             log.debug(`Connected to serial port "${port}"`);
-
+            this.wcsResetZero();
             this.workflow.stop();
 
             // Clear action values
@@ -1474,9 +1474,7 @@ class GrblController {
                 this.workflow.stop();
                 this.feeder.reset();
                 this.write('\x18'); // ^x
-                if (store.get('workspace').shouldReset) {
-                    this.wcsResetZero();
-                }
+                this.wcsResetZero();
             },
             'reset:limit': () => {
                 this.workflow.stop();
