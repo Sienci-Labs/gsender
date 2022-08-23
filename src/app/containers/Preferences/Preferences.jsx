@@ -210,11 +210,11 @@ class PreferencesPage extends PureComponent {
             },
             setShouldWCSzero: (updateState) => {
                 const shouldWCSzeroState = !this.state.shouldWCSzero;
-                console.log('setShouldWCSzero Action Called, new value : ' + shouldWCSzeroState);
                 updateState(shouldWCSzeroState);
                 this.setState({
                     shouldWCSzero: shouldWCSzeroState
                 });
+                console.log('Step1: In preference, setShouldWCSZero');
                 pubsub.publish('shouldWCSzero:update', shouldWCSzeroState);
             },
             setAutoReconnect: () => {

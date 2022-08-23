@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -82,6 +83,16 @@ class GrblController {
 
     // Connection
     connection = null;
+
+    //This function sets WCS to zero
+     wcsResetZero = () => {
+         setTimeout(() => {
+             if (store.get('workspace').shouldReset) {
+                 this.command('gcode', `G10 L20 ${store.get('workspace').workspace} X0 Y0`);
+                 console.log('Final step(4): wcs reset to zero');
+             }
+         }, 500);
+     };
 
     connectionEventListener = {
         data: (data) => {
@@ -863,6 +874,8 @@ class GrblController {
 
         await delay(50);
         this.event.trigger('controller:ready');
+        //Set the default workspace on app load with auto 'WCS reset to zero on reconnect' off.
+        store.set('workspace', { workspace: 'P1', shouldReset: false, });
     }
 
     populateContext(context = {}) {
@@ -1459,10 +1472,11 @@ class GrblController {
             },
             'reset': () => {
                 this.workflow.stop();
-
                 this.feeder.reset();
-
                 this.write('\x18'); // ^x
+                if (store.get('workspace').shouldReset) {
+                    this.wcsResetZero();
+                }
             },
             'reset:limit': () => {
                 this.workflow.stop();
@@ -1791,8 +1805,17 @@ class GrblController {
                 this.runPostChangeHook();
             },
             'save:workspace': () => {
+                console.log('Step 3 in backend: received');
                 const [workspace] = args;
-                store.set('workspace', workspace);
+                let shouldReset = true;
+                let { $22 } = this.settings.settings;
+                console.log(`step 3 in backend: values - $22=${$22} shouldReset=${shouldReset} workspace=${workspace}`);
+                //If homming enabled($22 is on), do not reset WCS to 0.
+                if ($22 === '1') {
+                    console.log('homming cycle is on, WCS wont reset to 0');
+                    shouldReset = false;
+                }
+                store.set('workspace', { workspace: workspace, shouldReset: shouldReset, });
             }
         }[cmd];
 

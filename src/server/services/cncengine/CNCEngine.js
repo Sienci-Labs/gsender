@@ -101,9 +101,19 @@ class CNCEngine {
         }
     });
 
+
     // @param {object} server The HTTP server instance.
     // @param {string} controller Specify CNC controller.
     start(server, controller = '') {
+        //This function sets WCS to zero
+        const wcsResetZero = () => {
+            setTimeout(() => {
+                if (store.get('workspace').shouldReset) {
+                    controller.command('gcode', `G10 L20 ${store.get('workspace').workspace} X0 Y0`);
+                    console.debug('wcs reset to zero - HELPER');
+                }
+            }, 500);
+        };
         // Fallback to an empty string if the controller is not valid
         if (!isValidController(controller)) {
             controller = '';
@@ -176,7 +186,6 @@ class CNCEngine {
             socket.on('disconnect', () => {
                 log.debug(`Disconnected from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`);
                 //Set the last known workspace offset to zero
-                //controller.command('gcode', `G10 L20 ${store.get('workspace')} X0 Y0`);
                 const controllers = store.get('controllers', {});
                 Object.keys(controllers).forEach(port => {
                     const controller = controllers[port];
@@ -204,6 +213,10 @@ class CNCEngine {
                 if (controller.isOpen()) {
                     log.info('Joining port room on socket');
                     socket.join(port);
+                    if (store.get('workspace').shouldReset) {
+                        wcsResetZero();
+                        console.log('wcs reset to zero - CNC Engine');
+                    }
                 } else {
                     log.info('Controller no longer open');
                 }

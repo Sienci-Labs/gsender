@@ -97,9 +97,9 @@ class LocationWidget extends PureComponent {
                 } });
             }),
             pubsub.subscribe('shouldWCSzero:update', (event, value) => {
-                console.log('Inside pubsub subscribe: ' + value);
                 this.setState({ shouldWCSzero: value });
                 store.set('shouldWCSzero', value);
+                console.log('step 2: Pub subscription: value - ' + store.get('shouldWCSzero'));
             }),
             pubsub.subscribe('keybindingsUpdated', () => {
                 this.updateShuttleControlEvents();
@@ -693,9 +693,9 @@ class LocationWidget extends PureComponent {
                             className={styles.workspaceInput}
                             onChange={(selection) => {
                                 controller.command('gcode', selection.value);
-                                console.log('shouldWCSzero : ' + shouldWCSzero);
                                 if (shouldWCSzero) {
                                     controller.command('save:workspace', selection.command);
+                                    console.log('Step 3: shouldWCSzero sent: ' + shouldWCSzero);
                                 }
                             }}
                             name="workspace"
