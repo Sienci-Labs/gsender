@@ -217,13 +217,18 @@ export function* initialize() {
                 state: RENDER_LOADING
             }
         });
+        const xMaxAccel = reduxStore.getState().controller.settings.settings.$120;
+        const yMaxAccel = reduxStore.getState().controller.settings.settings.$121;
+        const zMaxAccel = reduxStore.getState().controller.settings.settings.$122;
+        const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
 
         const estimateWorker = new EstimateWorker();
         estimateWorker.onmessage = estimateResponseHandler;
         estimateWorker.postMessage({
             content,
             name,
-            size
+            size,
+            accelArray
         });
 
         const needsVisualization = shouldVisualize();
