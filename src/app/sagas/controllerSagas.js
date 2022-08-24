@@ -24,6 +24,7 @@ import React from 'react';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
+import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
@@ -217,9 +218,9 @@ export function* initialize() {
                 state: RENDER_LOADING
             }
         });
-        const xMaxAccel = reduxStore.getState().controller.settings.settings.$120;
-        const yMaxAccel = reduxStore.getState().controller.settings.settings.$121;
-        const zMaxAccel = reduxStore.getState().controller.settings.settings.$122;
+        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 0);
+        const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 0);
+        const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 0);
         const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
 
         const estimateWorker = new EstimateWorker();
