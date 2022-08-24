@@ -1,20 +1,16 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 
-// import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import defaultState from 'app/store/defaultState';
 import { METRIC_UNITS } from 'app/constants';
-// import { RadioGroup, RadioButton } from 'app/components/Radio';
 
 import Input from './Input';
 import MachinePosition from '../MachinePosition';
-// import styles from '../../index.styl';
+
 import inputStyles from './input.styl';
 import MultiInputBlock from './MultiInputBlock';
 import { InputLabelStyled, InputWrapperStyled } from './styled';
 import { SurfacingContext } from '../Surfacing/Context';
-
-// const [M3, M4] = SPINDLE_MODES;
 
 const InputArea = () => {
     const { widgets } = defaultState;
@@ -38,22 +34,9 @@ const InputArea = () => {
     return (
         <div>
             <MultiInputBlock
-                label="X and Y"
-                divider="x"
+                label="X & Y"
+                divider="&"
                 firstComponent={(
-                    <Input
-                        additionalProps={{
-                            type: 'number',
-                            id: 'length',
-                            min: 1,
-                            max: 50000,
-                            style: { borderRadius: 4 }
-                        }}
-                        value={length}
-                        onChange={onChange}
-                    />
-                )}
-                secondComponent={(
                     <Input
                         additionalProps={{
                             type: 'number',
@@ -64,14 +47,27 @@ const InputArea = () => {
                         }}
                         value={width}
                         onChange={onChange}
+                    />
+                )}
+                secondComponent={(
+                    <Input
+                        additionalProps={{
+                            type: 'number',
+                            id: 'length',
+                            min: 1,
+                            max: 50000,
+                            style: { borderRadius: 4 }
+                        }}
+                        value={length}
+                        onChange={onChange}
                         units={units}
                     />
                 )}
             />
 
             <MultiInputBlock
-                label="Cut Depth and Max"
-                divider="|"
+                label="Cut Depth & Max"
+                divider="&"
                 firstComponent={(
                     <Input
                         additionalProps={{ type: 'number', id: 'skimDepth', min: 0.001, max: 500, style: { borderRadius: 4, ...inputStyles } }}
@@ -110,21 +106,21 @@ const InputArea = () => {
             />
 
             <Input
-                label="Stepover"
-                units="%"
-                additionalProps={{ type: 'number', id: 'stepover', min: 1, max: 100, style: { ...inputStyles } }}
-                value={stepover}
-                onChange={(e) => onChange({ ...e, shouldConvert: false })}
-                tooltip={{ content: `Default Value: ${defaultValues.stepover}` }}
-            />
-
-            <Input
                 label="Feedrate"
                 units={`${units}/min`}
                 additionalProps={{ type: 'number', id: 'feedrate', min: 1, max: 1000000, style: { ...inputStyles } }}
                 value={feedrate}
                 onChange={onChange}
                 tooltip={{ content: `Default Value: ${defaultValues.feedrate}` }}
+            />
+
+            <Input
+                label="Stepover"
+                units="%"
+                additionalProps={{ type: 'number', id: 'stepover', min: 1, max: 100, style: { ...inputStyles } }}
+                value={stepover}
+                onChange={(e) => onChange({ ...e, shouldConvert: false })}
+                tooltip={{ content: `Default Value: ${defaultValues.stepover}` }}
             />
 
             {/* <Tooltip content={`Default Value: ${defaultValues.spindle}`}>
@@ -148,7 +144,7 @@ const InputArea = () => {
                 </InputWrapperStyled>
             </Tooltip> */}
 
-            <InputWrapperStyled hasTwoColumns style={{ marginTop: '2rem' }}>
+            <InputWrapperStyled hasTwoColumns style={{ marginTop: '1.5rem' }}>
                 <InputLabelStyled>Start Position</InputLabelStyled>
 
                 <MachinePosition />
