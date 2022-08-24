@@ -327,7 +327,7 @@ const defaultState = {
                 type: SPIRAL_MOVEMENT,
                 startPosition: START_POSITION_BACK_LEFT,
                 spindle: M3,
-                startFromCenter: false,
+                cutDirectionFlipped: false,
             },
             defaultImperialState: {
                 bitDiameter: 1,
