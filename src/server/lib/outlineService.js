@@ -68,7 +68,6 @@ export function getOutlineGcode(gcode, concavity = 60) {
             );
             const divisions = 30;
             const points = arcCurve.getPoints(divisions);
-            vertices.push(vertex(v1.x, v1.y));
 
             for (let i = 0; i < points.length; ++i) {
                 const point = points[i];
