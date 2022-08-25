@@ -65,7 +65,7 @@ export const startFlash = (port) => {
         type: TOASTER_INFO,
         duration: 15000
     });
-    const imageType = this.actions.getMachineProfileVersion();
+    const imageType = getMachineProfileVersion();
     controller.command('flash:start', port, imageType);
 };
 
