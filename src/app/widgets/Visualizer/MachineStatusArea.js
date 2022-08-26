@@ -30,6 +30,7 @@ import controller from 'app/lib/controller';
 import AlarmDescriptionIcon from 'app/widgets/Visualizer/AlarmDescriptionIcon';
 import styles from './machine-status-area.styl';
 import UnlockAlarmButton from './UnlockAlarmButton';
+import store from '../../store';
 
 /**
  * Control Area component displaying machine status
@@ -93,18 +94,18 @@ class ControlArea extends Component {
                     return (
                         <div className={styles['machine-status-wrapper']}>
                             <div className={styles['machine-Jog']}>
-                             Checking G-code File
+                                Checking G-code File
                             </div>
                         </div>
                     );
                 } {
-                    return activeState //Show disconnected until machine connection process is finished, otherwise an empty div is shown
+                    return activeState && store.get('grblExists')
                         ? (
                             <div className={styles[`machine-${activeState}`]}>
                                 { message[activeState] }
                             </div>
                         )
-                        : <div className={styles['machine-Disconnected']}>Disconnected</div>;
+                        : <div className={styles['machine-Disconnected']}>Invalid firmware response</div>;
                 }
             } else {
                 return <div className={styles['machine-Disconnected']}>Disconnected</div>;

@@ -38,7 +38,8 @@ import log from 'app/lib/log';
 import Timer from '../../workers/timers/Timer.worker';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
-import { Toaster, TOASTER_DANGER } from '../../lib/toaster/ToasterLib';
+import { Toaster, TOASTER_WARNING } from '../../lib/toaster/ToasterLib';
+import store from '../../store';
 
 class NavbarConnectionWidget extends PureComponent {
     static propTypes = {
@@ -392,11 +393,13 @@ class NavbarConnectionWidget extends PureComponent {
         this.trackFirmwareLoadWorker.postMessage('');
         this.trackFirmwareLoadWorker.onmessage = (data) => {
             if (!this.isControllerReady() && isConnected) {
-                actions.handleClosePort();
+                store.set('grblExists', false);
                 Toaster.pop({
-                    type: TOASTER_DANGER,
-                    msg: 'Unable to fetch firmware details in time',
+                    type: TOASTER_WARNING,
+                    msg: 'Firmware did not respond, retrying..',
                 });
+            } else if (this.isControllerReady()) {
+                store.set('grblExists', true);
             }
         };
         return (

@@ -47,7 +47,7 @@ class NavbarConnection extends PureComponent {
         if (connected && isControllerReady) {
             return 'Connected';
         } else if (connected && !isControllerReady) {
-            return 'Loading firmware...';
+            return 'Connecting...';
         } else if (alertMessage) {
             return alertMessage;
         } else if (connecting || !isControllerReady && isConnected) {
