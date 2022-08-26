@@ -103,10 +103,11 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Fixed firmware tool control for setting $23
 * Flashing again available without connecting to device
 * Improvements to continuous jogging (thanks @cotepat)
-* Laser/spindle settings now properly persist
+* Fixed issue with some settings not properly persisting
 * Outline tool improvements - moved to worker thread, G0 movements included, tweaks to accuracy
 * More accurate file length estimates when connected - virtualizer now uses EEPROM acceleration values
 * Probe function now available in manual tool change
+* Better datafilter for invalid UTF8/UTF16 characters
 
 ### 1.1.3 (August 12th, 2022)
 * Added profiles for Longmill extension kits
