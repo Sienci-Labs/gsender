@@ -197,13 +197,6 @@ class SVGVisualizer extends Component {
 
         // center the svg
         svg.setAttribute('transform', 'translate(' + xtrans + ',' + ytrans + ') scale(1,-1)');
-
-        reduxStore.dispatch({
-            type: fileActions.UPDATE_FILE_RENDER_STATE,
-            payload: {
-                state: RENDER_RENDERED
-            }
-        });
     }
 
     handleSVGRender(vizualization) {
@@ -229,6 +222,12 @@ class SVGVisualizer extends Component {
             });
 
             this.updateSVG();
+            reduxStore.dispatch({
+                type: fileActions.UPDATE_FILE_RENDER_STATE,
+                payload: {
+                    state: RENDER_RENDERED
+                }
+            });
         }
     }
 
