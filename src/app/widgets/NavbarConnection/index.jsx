@@ -178,7 +178,6 @@ class NavbarConnectionWidget extends PureComponent {
         } = this.state;
         const { isConnected, type } = this.props;
         const wasConnected = prevProps.isConnected;
-
         if (!wasConnected && isConnected) {
             this.setConnectedState();
         }
@@ -237,7 +236,9 @@ class NavbarConnectionWidget extends PureComponent {
             autoReconnect: this.config.get('autoReconnect'),
             hasReconnected: false,
             alertMessage: '',
-            showUnrecognized: false
+            showUnrecognized: false,
+            controllerReady: false,
+
         };
     }
 
@@ -355,6 +356,24 @@ class NavbarConnectionWidget extends PureComponent {
         this.pubsubTokens = [];
     }
 
+    isControllerReady() {
+        const { type, workflow, port, isConnected } = this.props;
+        console.log(workflow.state + ' = workflow');
+        if (!port) {
+            console.log('no port');
+            return false;
+        }
+        if (!type) {
+            console.log('no type');
+            return false;
+        }
+        if (!isConnected) {
+            console.log('Machine not connected');
+            return false;
+        }
+        return workflow.state === 'idle';
+    }
+
     render() {
         const { ports, unrecognizedPorts } = this.props;
         const state = {
@@ -362,13 +381,14 @@ class NavbarConnectionWidget extends PureComponent {
             ports,
             unrecognizedPorts,
             controllerType: GRBL,
+            isControllerReady: this.isControllerReady(),
         };
         const actions = {
             ...this.actions
         };
 
         return (
-            <NavbarConnection actions={actions} state={state} />
+            <NavbarConnection actions={actions} state={state} connected={state.connected && state.isControllerReady} />
         );
     }
 }
@@ -379,6 +399,7 @@ export default connect((store) => {
     const isConnected = get(store, 'connection.isConnected');
     const type = get(store, 'controller.type');
     const port = get(store, 'connection.port');
+    const workflow = controller.workflow;
     const connectedBaudrate = get(store, 'connection.baudrate');
     return {
         ports,
@@ -386,6 +407,7 @@ export default connect((store) => {
         type,
         port,
         connectedBaudrate,
-        unrecognizedPorts
+        unrecognizedPorts,
+        workflow,
     };
 })(NavbarConnectionWidget);

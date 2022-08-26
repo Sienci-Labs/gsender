@@ -32,7 +32,8 @@ import styles from './Index.styl';
 class NavbarConnection extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
+        connected: PropTypes.bool
     };
 
     isPortInUse = (port) => {
@@ -78,9 +79,8 @@ class NavbarConnection extends PureComponent {
     }
 
     render() {
-        const { state, actions } = this.props;
-        const { ports, connecting, connected, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
-
+        const { state, actions, connected } = this.props;
+        const { ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
         const iconState = this.getIconState(connected, connecting, alertMessage);
 
         return (
@@ -105,7 +105,7 @@ class NavbarConnection extends PureComponent {
                     connected && (
                         <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
                             <i className="fa fa-unlink" />
-                        Disconnect
+                            Disconnect
                         </button>
 
                     )
