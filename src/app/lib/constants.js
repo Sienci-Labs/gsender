@@ -36,3 +36,6 @@ export const TOUCHPLATE_TYPE_ZERO = 'Z Probe';
 
 export const PROBE_TYPE_AUTO = 'Auto';
 export const PROBE_TYPE_TIP = 'Tip';
+
+export const END_MILL = 'End Mill';
+export const DRILL = 'Drill';
