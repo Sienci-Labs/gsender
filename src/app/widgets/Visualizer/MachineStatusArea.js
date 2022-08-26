@@ -98,15 +98,16 @@ class ControlArea extends Component {
                             </div>
                         </div>
                     );
-                } {
-                    return activeState && store.get('grblExists')
-                        ? (
-                            <div className={styles[`machine-${activeState}`]}>
-                                { message[activeState] }
-                            </div>
-                        )
-                        : <div className={styles['machine-Disconnected']}>Invalid firmware response</div>;
+                } else if (activeState && store.get('grblExists')) {
+                    return (
+                        <div className={styles[`machine-${activeState}`]}>
+                            { message[activeState] }
+                        </div>
+                    );
+                } else if (activeState && !store.get('grblExists')) {
+                    return <div className={styles['machine-Disconnected']}>Invalid firmware response</div>;
                 }
+                return <div className={styles['machine-Disconnected']}>Disconnected</div>;
             } else {
                 return <div className={styles['machine-Disconnected']}>Disconnected</div>;
             }

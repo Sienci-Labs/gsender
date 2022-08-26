@@ -390,6 +390,7 @@ class NavbarConnectionWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
+        store.set('grblExists', true);
         this.trackFirmwareLoadWorker.postMessage('');
         this.trackFirmwareLoadWorker.onmessage = (data) => {
             if (!this.isControllerReady() && isConnected) {

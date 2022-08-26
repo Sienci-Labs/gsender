@@ -133,7 +133,6 @@ const defaultState = {
             }
         ],
         recentFiles: [],
-        grblExists: true,
         gamepad: {
             deadZone: 0.5,
             precision: 3,
