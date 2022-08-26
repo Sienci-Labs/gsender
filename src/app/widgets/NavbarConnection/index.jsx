@@ -26,7 +26,7 @@ import reverse from 'lodash/reverse';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import { connect } from 'react-redux';
-import { GRBL } from 'app/constants';
+import { GRBL, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_RUN } from 'app/constants';
 import includes from 'lodash/includes';
 //import map from 'lodash/map';
 import PropTypes from 'prop-types';
@@ -357,21 +357,22 @@ class NavbarConnectionWidget extends PureComponent {
     }
 
     isControllerReady() {
-        const { type, workflow, port, isConnected } = this.props;
-        console.log(workflow.state + ' = workflow');
+        const { type, port, isConnected, state } = this.props;
         if (!port) {
-            console.log('no port');
             return false;
         }
         if (!type) {
-            console.log('no type');
             return false;
         }
         if (!isConnected) {
-            console.log('Machine not connected');
             return false;
         }
-        return workflow.state === 'idle';
+        const activeState = get(state, 'status.activeState');
+        const states = [
+            GRBL_ACTIVE_STATE_IDLE,
+            GRBL_ACTIVE_STATE_RUN
+        ];
+        return includes(states, activeState);
     }
 
     render() {
@@ -388,7 +389,7 @@ class NavbarConnectionWidget extends PureComponent {
         };
 
         return (
-            <NavbarConnection actions={actions} state={state} connected={state.connected && state.isControllerReady} />
+            <NavbarConnection actions={actions} state={state} />
         );
     }
 }
@@ -399,8 +400,8 @@ export default connect((store) => {
     const isConnected = get(store, 'connection.isConnected');
     const type = get(store, 'controller.type');
     const port = get(store, 'connection.port');
-    const workflow = controller.workflow;
     const connectedBaudrate = get(store, 'connection.baudrate');
+    const state = get(store, 'controller.state');
     return {
         ports,
         isConnected,
@@ -408,6 +409,6 @@ export default connect((store) => {
         port,
         connectedBaudrate,
         unrecognizedPorts,
-        workflow,
+        state
     };
 })(NavbarConnectionWidget);

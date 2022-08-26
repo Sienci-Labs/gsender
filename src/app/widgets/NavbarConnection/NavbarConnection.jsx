@@ -43,20 +43,24 @@ class NavbarConnection extends PureComponent {
         return !!(o.inuse);
     };
 
-    getConnectionStatusText = (connected, connecting, alertMessage) => {
-        if (connected) {
+    getConnectionStatusText = (isConnected, connected, connecting, alertMessage, isControllerReady) => {
+        if (connected && isControllerReady) {
             return 'Connected';
+        } else if (connected && !isControllerReady) {
+            return 'Loading firmware...';
         } else if (alertMessage) {
             return alertMessage;
-        } else if (connecting) {
+        } else if (connecting || !isControllerReady && isConnected) {
             return 'Connecting...';
         }
         return 'Connect to Machine ▼';
     };
 
-    renderConnectionStatusIcon = (connected, connecting, alertMessage) => {
-        if (connected) {
+    renderConnectionStatusIcon = (isConnected, connected, connecting, alertMessage, isControllerReady) => {
+        if (connected && isControllerReady) {
             return 'fa-check';
+        } else if (connected && !isControllerReady) {
+            return 'fa-spinner';
         } else if (alertMessage) {
             return 'fa-times';
         } else if (connecting) {
@@ -65,36 +69,36 @@ class NavbarConnection extends PureComponent {
         return 'fa-plug';
     };
 
-    getIconState(connected, connecting, alertMessage) {
-        if (connected) {
+    getIconState(isConnected, connected, connecting, alertMessage, isControllerReady) {
+        if (connected && isControllerReady) {
             return 'icon-connected';
-        }
-        if (alertMessage) {
+        } else if (connected && !isControllerReady) {
+            return 'icon-connecting';
+        } else if (alertMessage) {
             return 'icon-error';
-        }
-        if (connecting) {
+        } else if (connecting || !isControllerReady && isConnected) {
             return 'icon-connecting';
         }
         return 'icon-disconnected';
     }
 
     render() {
-        const { state, actions, connected } = this.props;
-        const { ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
-        const iconState = this.getIconState(connected, connecting, alertMessage);
+        const { state, actions } = this.props;
+        const { isConnected, connected, isControllerReady, ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
+        const iconState = this.getIconState(isConnected, connected, connecting, alertMessage, isControllerReady);
 
         return (
             <div className={styles.NavbarConnection} onMouseEnter={actions.handleRefreshPorts} onMouseLeave={actions.hideUnrecognizedDevices}>
                 <div className={`${styles.NavbarConnectionIcon} ${styles[iconState]}`}>
-                    <i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />
+                    <i className={`fa ${this.renderConnectionStatusIcon(isConnected, connected, connecting, alertMessage, isControllerReady)}`} />
                 </div>
                 <div>
                     <div className="dropdown-label" id="connection-selection-list">
-                        {this.getConnectionStatusText(connected, connecting, alertMessage)}
+                        {this.getConnectionStatusText(isConnected, connected, connecting, alertMessage, isControllerReady)}
                     </div>
                 </div>
                 {
-                    connected && (
+                    connected && isControllerReady && (
                         <div className={styles.ConnectionInfo}>
                             <div className={styles.portLabel}>{port}</div>
                             <div>{controllerType}</div>
@@ -102,7 +106,7 @@ class NavbarConnection extends PureComponent {
                     )
                 }
                 {
-                    connected && (
+                    connected && isControllerReady && (
                         <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
                             <i className="fa fa-unlink" />
                             Disconnect
