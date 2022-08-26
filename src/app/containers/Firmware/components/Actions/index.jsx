@@ -61,7 +61,7 @@ const ActionArea = () => {
             <div className={styles.buttonsContainer}>
                 <div>
                     <Tooltip content="Flash your Arduino board to GRBL default values" location="default">
-                        <ToolModalButton icon="fas fa-bolt" onClick={() => setInitiateFlashing(true)} disabled={!canSendSettings}>
+                        <ToolModalButton icon="fas fa-bolt" onClick={() => setInitiateFlashing(true)}>
                             Flash GRBL
                         </ToolModalButton>
                     </Tooltip>
