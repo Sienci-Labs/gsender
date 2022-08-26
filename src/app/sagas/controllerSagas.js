@@ -218,9 +218,9 @@ export function* initialize() {
                 state: RENDER_LOADING
             }
         });
-        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 0);
-        const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 0);
-        const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 0);
+        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
+        const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
+        const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
         const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
 
         const estimateWorker = new EstimateWorker();
