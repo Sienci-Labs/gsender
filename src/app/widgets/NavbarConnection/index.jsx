@@ -35,7 +35,7 @@ import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
-import TrackFirmwareLoadWorker from '../../workers/firmware/TrackFirmwareFetchTime.worker';
+import Timer from '../../workers/timers/Timer.worker';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
 import { Toaster, TOASTER_DANGER } from '../../lib/toaster/ToasterLib';
@@ -47,7 +47,7 @@ class NavbarConnectionWidget extends PureComponent {
         enableWizardFunction: PropTypes.func
     };
 
-    trackFirmwareLoadWorker = new TrackFirmwareLoadWorker();
+    trackFirmwareLoadWorker = new Timer();
 
     pubsubTokens = [];
 
@@ -378,7 +378,7 @@ class NavbarConnectionWidget extends PureComponent {
     }
 
     render() {
-        const { ports, unrecognizedPorts } = this.props;
+        const { ports, unrecognizedPorts, isConnected } = this.props;
         const state = {
             ...this.state,
             ports,
@@ -391,7 +391,7 @@ class NavbarConnectionWidget extends PureComponent {
         };
         this.trackFirmwareLoadWorker.postMessage('');
         this.trackFirmwareLoadWorker.onmessage = (data) => {
-            if (!this.isControllerReady()) {
+            if (!this.isControllerReady() && isConnected) {
                 actions.handleClosePort();
                 Toaster.pop({
                     type: TOASTER_DANGER,
