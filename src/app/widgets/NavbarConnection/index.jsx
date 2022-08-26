@@ -1,25 +1,25 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
- *
- * This file is part of gSender.
- *
- * gSender is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, under version 3 of the License.
- *
- * gSender is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
- *
- * Contact for information regarding this program and its license
- * can be sent through gSender@sienci.com or mailed to the main office
- * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
- *
- */
+* Copyright (C) 2021 Sienci Labs Inc.
+*
+* This file is part of gSender.
+*
+* gSender is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, under version 3 of the License.
+*
+* gSender is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+*
+* Contact for information regarding this program and its license
+* can be sent through gSender@sienci.com or mailed to the main office
+* of Sienci Labs Inc. in Waterloo, Ontario, Canada.
+*
+*/
 
 import get from 'lodash/get';
 import reverse from 'lodash/reverse';
@@ -35,9 +35,10 @@ import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
+import TrackFirmwareLoadWorker from '../../workers/firmware/TrackFirmwareFetchTime.worker';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
-
+import { Toaster, TOASTER_DANGER } from '../../lib/toaster/ToasterLib';
 
 class NavbarConnectionWidget extends PureComponent {
     static propTypes = {
@@ -45,6 +46,8 @@ class NavbarConnectionWidget extends PureComponent {
         disableWizardFunction: PropTypes.func,
         enableWizardFunction: PropTypes.func
     };
+
+    trackFirmwareLoadWorker = new TrackFirmwareLoadWorker();
 
     pubsubTokens = [];
 
@@ -237,8 +240,7 @@ class NavbarConnectionWidget extends PureComponent {
             hasReconnected: false,
             alertMessage: '',
             showUnrecognized: false,
-            controllerReady: false,
-
+            firmwareTimedout: false,
         };
     }
 
@@ -387,7 +389,16 @@ class NavbarConnectionWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-
+        this.trackFirmwareLoadWorker.postMessage('');
+        this.trackFirmwareLoadWorker.onmessage = (data) => {
+            if (!this.isControllerReady()) {
+                actions.handleClosePort();
+                Toaster.pop({
+                    type: TOASTER_DANGER,
+                    msg: 'Unable to fetch firmware details in time',
+                });
+            }
+        };
         return (
             <NavbarConnection actions={actions} state={state} />
         );
