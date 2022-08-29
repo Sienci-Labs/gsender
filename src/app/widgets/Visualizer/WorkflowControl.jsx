@@ -308,8 +308,7 @@ class WorkflowControl extends PureComponent {
 
     handleStartFromLine = () => {
         this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
-        const zMax = reduxStore.getState().file.bbox.max.z;
-        controller.command('gcode:start', this.state.startFromLine.value, zMax !== null ? zMax : 0);
+        controller.command('gcode:start', this.state.startFromLine.value, this.props.zMax);
 
         Toaster.pop({
             msg: 'Running Start From Specific Line Command',
@@ -590,6 +589,7 @@ export default connect((store) => {
     const port = get(store, 'connection.port');
     const gcode = get(store, 'file.content');
     const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
+    const zMax = get(store, 'file.bbox.max.z', 0);
     return {
         fileLoaded,
         isConnected,
@@ -601,6 +601,7 @@ export default connect((store) => {
         port,
         lineTotal,
         gcode,
-        fileCompletion
+        fileCompletion,
+        zMax
     };
 }, null, null, { forwardRef: true })(WorkflowControl);
