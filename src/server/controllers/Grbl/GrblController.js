@@ -1604,14 +1604,16 @@ class GrblController {
                     //we are moving in the negative direction we need to subtract the max travel
                     //by it to reach the maximum amount in that direction
                     const calculateAxisValue = ({ direction, position, maxTravel }) => {
+                        const OFFSET = 1;
+
                         if (position === 0) {
                             return ((maxTravel) * direction).toFixed(FIXED);
                         }
 
                         if (direction === 1) {
-                            return Number((position * direction)).toFixed(FIXED);
+                            return Number(position - OFFSET).toFixed(FIXED);
                         } else {
-                            return Number(-1 * (maxTravel - position)).toFixed(FIXED);
+                            return Number(-1 * (maxTravel - position - OFFSET)).toFixed(FIXED);
                         }
                     };
 
@@ -1638,15 +1640,15 @@ class GrblController {
                         }
                     } else {
                         if (axes.X) {
-                            axes.X = calculateAxisValue({ direction: axes.X, position: Math.abs(mpos.x), maxTravel: $130 });
+                            axes.X = calculateAxisValue({ direction: Math.sign(axes.X), position: Math.abs(mpos.x), maxTravel: $130 });
                         }
                         if (axes.Y) {
-                            axes.Y = calculateAxisValue({ direction: axes.Y, position: Math.abs(mpos.y), maxTravel: $131 });
+                            axes.Y = calculateAxisValue({ direction: Math.sign(axes.Y), position: Math.abs(mpos.y), maxTravel: $131 });
                         }
                     }
 
                     if (axes.Z) {
-                        axes.Z = calculateAxisValue({ direction: axes.Z, position: Math.abs(mpos.z), maxTravel: $132 });
+                        axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: Math.abs(mpos.z), maxTravel: $132 });
                     }
                 } else {
                     jogFeedrate = 1250;
