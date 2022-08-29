@@ -1229,7 +1229,7 @@ class GrblController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                const [lineToStartFrom] = args;
+                const [lineToStartFrom, zMax] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
                 console.log(startEventEnabled);
@@ -1298,7 +1298,7 @@ class GrblController {
                     }
 
                     // Move up and then to cut start position
-                    modalGCode.push('G0 G90 G21 Z10');
+                    modalGCode.push(`G0 G90 G21 Z${zMax + 10}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file

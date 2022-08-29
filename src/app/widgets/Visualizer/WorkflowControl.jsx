@@ -308,8 +308,8 @@ class WorkflowControl extends PureComponent {
 
     handleStartFromLine = () => {
         this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
-
-        controller.command('gcode:start', this.state.startFromLine.value);
+        const zMax = reduxStore.getState().file.bbox.max.z;
+        controller.command('gcode:start', this.state.startFromLine.value, zMax !== null ? zMax : 0);
 
         Toaster.pop({
             msg: 'Running Start From Specific Line Command',
