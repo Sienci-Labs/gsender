@@ -318,7 +318,7 @@ const defaultState = {
             defaultMetricState: {
                 bitDiameter: 22,
                 stepover: 40,
-                feedrate: 1500,
+                feedrate: 2500,
                 length: 0,
                 width: 0,
                 skimDepth: 1,
@@ -332,7 +332,7 @@ const defaultState = {
             defaultImperialState: {
                 bitDiameter: 1,
                 stepover: 40,
-                feedrate: 1500,
+                feedrate: 2500,
                 length: 0,
                 width: 0,
                 skimDepth: 0.04,
