@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
-import { inRange, throttle } from 'lodash';
+import { inRange } from 'lodash';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import { SET_CURRENT_VISUALIZER } from 'app/actions/visualizerActions';
@@ -35,19 +35,30 @@ const Surfacing = ({ onClose, showTitle }) => {
 
     const [currentTab, setCurrentTab] = useState(0);
 
-    const runGenerate = throttle(async () => {
+    const runGenerate = async () => {
         setCurrentTab(0);
 
         const generator = new Generator({ surfacing, units, controller });
 
-        const gcode = generator.handleGenerate();
+        const gcode = generator.generate();
 
         const serializedFile = new File([gcode], 'surfacing.gcode');
 
         await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
 
         setGcode(gcode);
-    }, 5000);
+    };
+
+    /**
+     * Function to load generated gcode to main visualizer
+     */
+    const loadGcode = () => {
+        const name = 'gSender_Surfacing';
+        const { size } = new File([gcode], name);
+
+        pubsub.publish('gcode:surfacing', { gcode, name, size });
+        onClose();
+    };
 
     const handleChange = ({ target, shouldConvert = true }) => {
         const { id, value, min, max } = target;
@@ -69,17 +80,6 @@ const Surfacing = ({ onClose, showTitle }) => {
 
     const handleSelect = ({ type, value }) => {
         setSurfacing(prev => ({ ...prev, [type]: value }));
-    };
-
-    /**
-     * Function to load generated gcode to main visualizer
-     */
-    const loadGcode = () => {
-        const name = 'gSender_Surfacing';
-        const { size } = new File([gcode], name);
-
-        pubsub.publish('gcode:surfacing', { gcode, name, size });
-        onClose();
     };
 
     /**
@@ -189,10 +189,14 @@ const Surfacing = ({ onClose, showTitle }) => {
     ];
     const contextValue = {
         surfacing,
+        gcode,
+        units,
+        canLoad,
         setSurfacing,
         onChange: handleChange,
         onSelect: handleSelect,
-        units
+        runGenerate,
+        loadGcode
     };
 
     return (
@@ -218,12 +222,7 @@ const Surfacing = ({ onClose, showTitle }) => {
                         <TabArea tabs={tabs} currentTab={currentTab} onTabChange={(index) => setCurrentTab(index)} />
                     </div>
 
-                    <ActionArea
-                        handleCancel={onClose}
-                        handleGenerateGcode={runGenerate}
-                        handleLoadGcode={loadGcode}
-                        canLoad={canLoad}
-                    />
+                    <ActionArea />
                 </div>
             </SurfacingContext.Provider>
         </ReduxProvider>

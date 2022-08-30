@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
+
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 
 import { Container } from './styled';
+import { SurfacingContext } from '../Surfacing/Context';
 
-const Actions = ({ handleGenerateGcode, handleLoadGcode, canLoad }) => {
+const Actions = () => {
+    const { canLoad, runGenerate, loadGcode } = useContext(SurfacingContext);
+
     return (
         <Container>
             <ToolModalButton
                 icon="fas fa-code"
                 style={{ margin: 0 }}
-                onClick={handleGenerateGcode}
+                onClick={runGenerate}
             >
                 Generate G-code
             </ToolModalButton>
@@ -19,7 +23,7 @@ const Actions = ({ handleGenerateGcode, handleLoadGcode, canLoad }) => {
                 icon="fas fa-play"
                 disabled={!canLoad}
                 style={{ margin: 0 }}
-                onClick={handleLoadGcode}
+                onClick={loadGcode}
             >
                 Run on Main Visualizer
             </ToolModalButton>
