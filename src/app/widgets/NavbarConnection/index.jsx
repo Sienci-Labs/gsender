@@ -26,7 +26,7 @@ import reverse from 'lodash/reverse';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import { connect } from 'react-redux';
-import { GRBL, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_RUN } from 'app/constants';
+import { GRBL } from 'app/constants';
 import includes from 'lodash/includes';
 //import map from 'lodash/map';
 import PropTypes from 'prop-types';
@@ -39,7 +39,6 @@ import Timer from '../../workers/timers/Timer.worker';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
 import { Toaster, TOASTER_WARNING } from '../../lib/toaster/ToasterLib';
-import store from '../../store';
 
 class NavbarConnectionWidget extends PureComponent {
     static propTypes = {
@@ -241,7 +240,7 @@ class NavbarConnectionWidget extends PureComponent {
             hasReconnected: false,
             alertMessage: '',
             showUnrecognized: false,
-            firmwareTimedout: false,
+            grblExists: false,
         };
     }
 
@@ -318,6 +317,23 @@ class NavbarConnectionWidget extends PureComponent {
                 return;
             }
         });
+
+        const { isConnected } = this.props;
+        console.log(`Before timeout ${!this.state.grblExists} and ${isConnected}`);
+        //check if GRBL does not exists, alert user with toast
+        setTimeout(() => {
+            check();
+        }, 5000);
+
+        const check = () => {
+            console.log(`inside CHECK ${!this.state.grblExists} and ${isConnected}`);
+            if (!this.state.grblExists && isConnected) {
+                Toaster.pop({
+                    type: TOASTER_WARNING,
+                    msg: 'Firmware did not respond in time, please retry.',
+                });
+            }
+        };
     }
 
     closePort(port = this.state.port) {
@@ -348,6 +364,11 @@ class NavbarConnectionWidget extends PureComponent {
                     baudrate: value
                 });
             }),
+            pubsub.subscribe('grblExists:update', (msg, value) => {
+                this.setState({
+                    grblExists: value
+                });
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -359,50 +380,18 @@ class NavbarConnectionWidget extends PureComponent {
         this.pubsubTokens = [];
     }
 
-    isControllerReady() {
-        const { type, port, isConnected, state } = this.props;
-        if (!port) {
-            return false;
-        }
-        if (!type) {
-            return false;
-        }
-        if (!isConnected) {
-            return false;
-        }
-        const activeState = get(state, 'status.activeState');
-        const states = [
-            GRBL_ACTIVE_STATE_IDLE,
-            GRBL_ACTIVE_STATE_RUN
-        ];
-        return includes(states, activeState);
-    }
-
     render() {
-        const { ports, unrecognizedPorts, isConnected } = this.props;
+        const { ports, unrecognizedPorts } = this.props;
         const state = {
             ...this.state,
             ports,
             unrecognizedPorts,
             controllerType: GRBL,
-            isControllerReady: this.isControllerReady(),
         };
         const actions = {
             ...this.actions
         };
-        store.set('grblExists', true);
-        this.trackFirmwareLoadWorker.postMessage('');
-        this.trackFirmwareLoadWorker.onmessage = (data) => {
-            if (!this.isControllerReady() && isConnected) {
-                store.set('grblExists', false);
-                Toaster.pop({
-                    type: TOASTER_WARNING,
-                    msg: 'Firmware did not respond, retrying..',
-                });
-            } else if (this.isControllerReady()) {
-                store.set('grblExists', true);
-            }
-        };
+
         return (
             <NavbarConnection actions={actions} state={state} />
         );

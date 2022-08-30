@@ -150,6 +150,7 @@ class GrblController {
 
     // Feeder
     feeder = null;
+
     feederCB = null;
 
     // Sender
@@ -842,7 +843,7 @@ class GrblController {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
         this.writeln('$$');
-
+        this.emit('grbl:ready');
         await delay(50);
         this.event.trigger('controller:ready');
     }
@@ -1028,7 +1029,6 @@ class GrblController {
             callback(); // register controller
 
             log.debug(`Connected to serial port "${port}"`);
-
             this.workflow.stop();
 
             // Clear action values

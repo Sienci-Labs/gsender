@@ -312,6 +312,10 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('grbl:ready', () => {
+        pubsub.publish('grblExists:update', true);
+    });
+
     yield null;
 }
 

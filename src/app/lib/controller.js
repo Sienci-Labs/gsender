@@ -95,7 +95,8 @@ class Controller {
         'outline:start': [],
         'file:load': [],
         'file:unload': [],
-        'homing:flag': []
+        'homing:flag': [],
+        'grbl:ready': [],
     };
 
     context = {
@@ -128,7 +129,9 @@ class Controller {
 
     // Connection options
     host = null;
+
     next = null;
+
     options = null;
 
     // @param {object} io The socket.io-client module.
