@@ -140,88 +140,96 @@ class SVGVisualizer extends Component {
     }
 
     updateSVG() {
-        let svg = document.getElementById(!this.isSecondaryVisualizer ? 'svg' : 'svg2');
-        const reduxBBox = this.props.bbox;
-        let bbox = JSON.parse(JSON.stringify(reduxBBox)); // make shallow copy
-        // convert from inches to mm
-        const { content } = this.props;
-        if (content.includes('G20')) {
-            bbox.max.x *= 25.4;
-            bbox.max.y *= 25.4;
-            bbox.min.x *= 25.4;
-            bbox.min.y *= 25.4;
-            bbox.delta.x *= 25.4;
-            bbox.delta.y *= 25.4;
-        }
+        let group = document.getElementById(!this.isSecondaryVisualizer ? 'g' : 'g2');
+        if (group) {
+            const reduxBBox = this.props.bbox;
+            let bbox = JSON.parse(JSON.stringify(reduxBBox)); // make shallow copy
+            // convert from inches to mm
+            const { content } = this.props;
+            if (content.includes('G20')) {
+                bbox.max.x *= 25.4;
+                bbox.max.y *= 25.4;
+                bbox.min.x *= 25.4;
+                bbox.min.y *= 25.4;
+                bbox.delta.x *= 25.4;
+                bbox.delta.y *= 25.4;
+            }
 
-        // we are flipping the y values so the image isnt upside down,
-        // therefore the yMultiplier is * -1 what it normally would be
-        let xMultiplier = 1;
-        let yMultiplier = -1;
-        let xVal = bbox.min.x;
-        let yVal = bbox.min.y;
-        // top right
-        if (bbox.min.x >= 0 && bbox.min.y >= 0 && bbox.max.x > 0 && bbox.max.y > 0) {
-            xMultiplier = 1;
-            xVal = bbox.max.x;
-            yMultiplier = -1;
-            yVal = bbox.max.y;
-        } else if (bbox.min.x < 0 && bbox.min.y >= 0 && bbox.max.x <= 0 && bbox.max.y > 0) {
-            // top left
-            xMultiplier = 1;
-            xVal = bbox.min.x;
-            yMultiplier = -1;
-            yVal = bbox.max.y;
-        } else if (bbox.min.x >= 0 && bbox.min.y < 0 && bbox.max.x > 0 && bbox.max.y <= 0) {
-            // bottom right
-            xMultiplier = 1;
-            xVal = bbox.max.x;
-            yMultiplier = -1;
-            yVal = bbox.min.y;
-        } else if (bbox.min.x < 0 && bbox.min.y < 0 && bbox.max.x <= 0 && bbox.max.y <= 0) {
-            // bottom left
-            xMultiplier = 1;
-            xVal = bbox.min.x;
-            yMultiplier = -1;
-            yVal = bbox.min.y;
-        } else if (bbox.min.x < 0 && bbox.min.y < 0 && bbox.max.x > 0 && bbox.max.y > 0) {
-            // center
-            xMultiplier = 1;
-            xVal = 0;
-            yMultiplier = -1;
-            yVal = 0;
-        }
-        const middle = !this.isSecondaryVisualizer ? 250 : 235;
-        const xtrans = middle - (xVal * xMultiplier / 2);
-        const ytrans = middle - (yVal * yMultiplier / 2);
+            // we are flipping the y values so the image isnt upside down,
+            // therefore the yMultiplier is * -1 what it normally would be
+            let xMultiplier = 1;
+            let yMultiplier = -1;
+            let xVal = bbox.min.x;
+            let yVal = bbox.min.y;
+            // top right
+            if (bbox.min.x >= 0 && bbox.min.y >= 0 && bbox.max.x > 0 && bbox.max.y > 0) {
+                xMultiplier = 1;
+                xVal = bbox.max.x;
+                yMultiplier = -1;
+                yVal = bbox.max.y;
+            } else if (bbox.min.x < 0 && bbox.min.y >= 0 && bbox.max.x <= 0 && bbox.max.y > 0) {
+                // top left
+                xMultiplier = 1;
+                xVal = bbox.min.x;
+                yMultiplier = -1;
+                yVal = bbox.max.y;
+            } else if (bbox.min.x >= 0 && bbox.min.y < 0 && bbox.max.x > 0 && bbox.max.y <= 0) {
+                // bottom right
+                xMultiplier = 1;
+                xVal = bbox.max.x;
+                yMultiplier = -1;
+                yVal = bbox.min.y;
+            } else if (bbox.min.x < 0 && bbox.min.y < 0 && bbox.max.x <= 0 && bbox.max.y <= 0) {
+                // bottom left
+                xMultiplier = 1;
+                xVal = bbox.min.x;
+                yMultiplier = -1;
+                yVal = bbox.min.y;
+            } else if (bbox.min.x < 0 && bbox.min.y < 0 && bbox.max.x > 0 && bbox.max.y > 0) {
+                // center
+                xMultiplier = 1;
+                xVal = 0;
+                yMultiplier = -1;
+                yVal = 0;
+            }
+            const middle = !this.isSecondaryVisualizer ? 250 : 235;
+            const xtrans = middle - (xVal * xMultiplier / 2);
+            const ytrans = middle - (yVal * yMultiplier / 2);
 
-        // center the svg
-        svg.setAttribute('transform', 'translate(' + xtrans + ',' + ytrans + ') scale(1,-1)');
+            // center the svg
+            group.setAttribute('transform', 'translate(' + xtrans + ',' + ytrans + ') scale(1,-1)');
+        }
     }
 
     handleSVGRender(vizualization) {
-        const { vertices, colors } = vizualization;
+        const { paths } = vizualization;
         const { currentTheme } = this.props.state;
         const { G0Color, G1Color } = currentTheme;
+
         let svg = document.getElementById(!this.isSecondaryVisualizer ? 'svg' : 'svg2');
         if (svg) {
-            vertices.map((vertice, i) => {
-                const node = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                for (let prop in vertice.props) {
-                    if (Object.prototype.hasOwnProperty.call(vertice.props, prop)) {
-                        node.setAttribute(prop, vertice.props[prop]);
-                    }
-                }
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.setAttribute('id', !this.isSecondaryVisualizer ? 'g' : 'g2');
+            paths.map((element, i) => {
+                const node = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const path = element.path;
+                const fill = element.fill;
+
+                node.setAttribute('d', path);
+                node.setAttribute('fill', fill);
                 // add stroke colour
-                const motion = colors[i][0];
-                const opacity = colors[i][1];
+                const motion = element.motion;
+                const opacity = (motion === 'G0') ? '0F' : 'FF';
                 const stroke = motion === 'G0' ? G0Color + opacity : G1Color + opacity;
                 node.setAttribute('stroke', stroke);
 
-                return svg.appendChild(node);
+                return group.appendChild(node);
             });
 
+            svg.appendChild(group);
+
             this.updateSVG();
+
             reduxStore.dispatch({
                 type: fileActions.UPDATE_FILE_RENDER_STATE,
                 payload: {
@@ -259,15 +267,13 @@ class SVGVisualizer extends Component {
                 className={styles.visualizerContainer}
             >
                 <svg
+                    id={id}
                     height="100%"
                     width="100%"
                     viewBox={viewBox}
                     className={styles.svgContainer}
                     style={{ backgroundColor: backgroundColor }}
                 >
-                    <g
-                        id={id}
-                    />
                 </svg>
             </div>
         );
