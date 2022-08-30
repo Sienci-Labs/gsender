@@ -317,23 +317,6 @@ class NavbarConnectionWidget extends PureComponent {
                 return;
             }
         });
-
-        const { isConnected } = this.props;
-        console.log(`Before timeout ${!this.state.grblExists} and ${isConnected}`);
-        //check if GRBL does not exists, alert user with toast
-        setTimeout(() => {
-            check();
-        }, 5000);
-
-        const check = () => {
-            console.log(`inside CHECK ${!this.state.grblExists} and ${isConnected}`);
-            if (!this.state.grblExists && isConnected) {
-                Toaster.pop({
-                    type: TOASTER_WARNING,
-                    msg: 'Firmware did not respond in time, please retry.',
-                });
-            }
-        };
     }
 
     closePort(port = this.state.port) {
@@ -368,6 +351,20 @@ class NavbarConnectionWidget extends PureComponent {
                 this.setState({
                     grblExists: value
                 });
+                const { isConnected } = this.props;
+                //check if GRBL does not exists, alert user with toast
+                setTimeout(() => {
+                    check();
+                }, 5000);
+
+                const check = () => {
+                    if (!this.state.grblExists && isConnected) {
+                        Toaster.pop({
+                            type: TOASTER_WARNING,
+                            msg: 'Firmware did not respond in time, please retry.',
+                        });
+                    }
+                };
             }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
