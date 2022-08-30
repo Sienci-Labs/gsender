@@ -1,8 +1,14 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
     height: 547px;
+    gap: 0.5rem;
+`;
+
+export const GcodeContainer = styled.div`
+    overflow-y: scroll;
     background-color: white;
     border: 1px solid #eee;
 `;
