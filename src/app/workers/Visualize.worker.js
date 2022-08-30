@@ -21,7 +21,6 @@
  *
  */
 
-import React from 'react';
 import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
 
@@ -56,7 +55,9 @@ onmessage = function({ data }) {
         }
         paths.push({
             motion: motion,
-            path: <path d={verticesStr} strokeWidth={10} fill="none"/>
+            path: verticesStr,
+            strokeWidth: 10,
+            fill: 'none'
         });
     };
 

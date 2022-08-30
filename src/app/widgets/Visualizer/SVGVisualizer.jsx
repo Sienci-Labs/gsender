@@ -211,13 +211,12 @@ class SVGVisualizer extends Component {
             const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
             group.setAttribute('id', !this.isSecondaryVisualizer ? 'g' : 'g2');
             paths.map((element, i) => {
-                const path = element.path;
                 const node = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                for (let prop in path.props) {
-                    if (Object.prototype.hasOwnProperty.call(path.props, prop)) {
-                        node.setAttribute(prop, path.props[prop]);
-                    }
-                }
+                const path = element.path;
+                const fill = element.fill;
+
+                node.setAttribute('d', path);
+                node.setAttribute('fill', fill);
                 // add stroke colour
                 const motion = element.motion;
                 const opacity = (motion === 'G0') ? '0F' : 'FF';
