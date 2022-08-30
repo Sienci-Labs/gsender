@@ -43,7 +43,7 @@ const InputArea = () => {
                             id: 'width',
                             min: 1,
                             max: 50000,
-                            style: { paddingLeft: 5, paddingRight: 5 }
+                            style: { borderRadius: 4 }
                         }}
                         value={width}
                         onChange={onChange}
