@@ -267,6 +267,8 @@ class CNCEngine {
                 if (typeof callback !== 'function') {
                     callback = noop;
                 }
+                const shouldWCSzero = options.shouldWCSzero || false;
+                console.log('\x1b[36m%s\x1b[35m', `CNCENGINE: shouldWCSzero - ${shouldWCSzero}`);
 
                 log.debug(`socket.open("${port}", ${JSON.stringify(options)}): id=${socket.id}`);
 
@@ -323,7 +325,7 @@ class CNCEngine {
                     // Join the room
                     socket.join(port);
                     callback(null);
-                });
+                }, shouldWCSzero);
             });
 
             // Close serial port

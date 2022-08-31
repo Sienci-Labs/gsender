@@ -212,7 +212,6 @@ class PreferencesPage extends PureComponent {
                 const shouldWCSzeroState = !store.get('shouldWCSzero');
                 updateState(shouldWCSzeroState);
                 store.set('shouldWCSzero', shouldWCSzeroState);
-                controller.command('shouldWCSzero:update', shouldWCSzeroState);
                 pubsub.publish('shouldWCSzero:update', shouldWCSzeroState);
             },
             setAutoReconnect: () => {

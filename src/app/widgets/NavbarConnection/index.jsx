@@ -37,6 +37,7 @@ import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
+import store from '../../store';
 
 
 class NavbarConnectionWidget extends PureComponent {
@@ -301,7 +302,8 @@ class NavbarConnectionWidget extends PureComponent {
         controller.openPort(port, {
             controllerType: GRBL,
             baudrate: baudrate,
-            rtscts: this.state.connection.serial.rtscts
+            rtscts: this.state.connection.serial.rtscts,
+            shouldWCSzero: store.get('shouldWCSzero'),
         }, (err) => {
             if (err) {
                 this.setState(state => ({

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+// import get from 'lodash/get';
 
 import {
     IMPERIAL_UNITS,
@@ -11,11 +12,14 @@ import Fieldset from '../components/Fieldset';
 import store from '../../../store';
 import styles from '../index.styl';
 
+
 const Workspace = ({ state, actions }) => {
     const { units, reverseWidgets } = state;
     const [shouldWCSzero, setShouldWCSzero] = useState(store.get('shouldWCSzero'));
+    const [$22, set$22] = useState(false);
     useEffect(() => {
         setShouldWCSzero(store.get('shouldWCSzero'));
+        set$22(false);
     }, []);
     return (
         <Fieldset legend="Workspace">
@@ -44,16 +48,18 @@ const Workspace = ({ state, actions }) => {
                     />
                 </Tooltip>
             </div>
-            <div className={styles.addMargin}>
-                <Tooltip content="Resets Workspace Coordinate System to zero on reconnect" location="default">
-                    <ToggleSwitch
-                        label="Reset Zero on reconnect"
-                        checked={shouldWCSzero}
-                        onChange={() => actions.general.setShouldWCSzero(setShouldWCSzero)}
-                        size="small"
-                    />
-                </Tooltip>
-            </div>
+            { !$22 ? (
+                <div className={styles.addMargin}>
+                    <Tooltip content="Resets Workspace Coordinate System to zero on reconnect" location="default">
+                        <ToggleSwitch
+                            label="Reset Zero on reconnect"
+                            checked={shouldWCSzero}
+                            onChange={() => actions.general.setShouldWCSzero(setShouldWCSzero)}
+                            size="small"
+                        />
+                    </Tooltip>
+                </div>
+            ) : ''}
         </Fieldset>
     );
 };

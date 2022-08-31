@@ -479,8 +479,6 @@ class LocationWidget extends PureComponent {
             axes,
             jog
         } = this.state;
-        controller.command('shouldWCSzero:update', store.get('shouldWCSzero'));
-        console.log(store);
         this.config.set('minimized', minimized);
         this.config.set('axes', axes);
         this.config.set('jog.keypad', jog.keypad);
