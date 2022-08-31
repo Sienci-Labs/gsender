@@ -138,6 +138,7 @@ class GrblController {
          let { $22 } = this.settings.settings;
          let workspace = store.get('workspace');
          workspace = typeof workspace !== 'undefined' ? workspace : 'P1';
+         console.log('\x1b[36m%s\x1b[35m', `VARIABLES : WCS - ${workspace}, $22 - ${$22}, shouldReset - ${this.shouldWCSzero}`);
          // eslint-disable-next-line eqeqeq
          if ($22 == 0 && this.shouldWCSzero) {
              this.command('gcode', `G10 L20 ${workspace} X0 Y0`);
@@ -832,6 +833,7 @@ class GrblController {
                 this.emit('Grbl:settings', this.settings); // Backward compatibility
                 console.log('SETTINGS POPULATED: ' + this.settingsPopulated);
                 if (this.settingsPopulated) {
+                    console.log('wcs reset zero called.......');
                     this.wcsResetZero();
                 }
                 this.settingsPopulated = false;
