@@ -84,16 +84,6 @@ class GrblController {
     // Connection
     connection = null;
 
-    //This function sets WCS to zero
-     wcsResetZero = () => {
-         setTimeout(() => {
-             if (store.get('workspace').shouldReset) {
-                 this.command('gcode', `G10 L20 ${store.get('workspace').workspace} X0 Y0`);
-                 console.log('Final step(4): wcs reset to zero');
-             }
-         }, 500);
-     };
-
     connectionEventListener = {
         data: (data) => {
             log.silly(`< ${data}`);
@@ -138,6 +128,21 @@ class GrblController {
     queryTimer = null;
 
     timePaused = null;
+
+    //This function sets WCS to zero
+     wcsResetZero = () => {
+         let { $22 } = this.settings.settings;
+         let workspace = store.get('workspace');
+         let shouldWCSzero = store.get('shouldWCSzero');
+         workspace = typeof workspace !== 'undefined' ? workspace : 'P1';
+         console.log('\x1b[36m%s\x1b[35m', `INSIDE SET WCS ZERO: !$22- ${$22}, shouldWCSzero- ${shouldWCSzero}`);
+         setTimeout(() => {
+             if ($22 === 0 && shouldWCSzero) {
+                 this.command('gcode', `G10 L20 ${workspace} X0 Y0`);
+                 console.log('\x1b[36m%s\x1b[35m', `SUCESS: ${workspace} WCS RESET TO ZERO`);
+             }
+         }, 500);
+     };
 
     actionMask = {
         queryParserState: {
@@ -874,8 +879,6 @@ class GrblController {
 
         await delay(50);
         this.event.trigger('controller:ready');
-        //Set the default workspace on app load with auto 'WCS reset to zero on reconnect' off.
-        store.set('workspace', { workspace: 'P1', shouldReset: false, });
     }
 
     populateContext(context = {}) {
@@ -1059,7 +1062,11 @@ class GrblController {
             callback(); // register controller
 
             log.debug(`Connected to serial port "${port}"`);
-            this.wcsResetZero();
+            console.log('\x1b[36m%s\x1b[35m', 'WCS RESET CALLED AFTER MACHINE CONNECTED');
+            setTimeout(() => {
+                console.log('\x1b[36m%s\x1b[35m', `SETTINGS ARE: ${JSON.stringify(this.settings.settings)}`);
+                this.wcsResetZero();
+            }, 1000);
             this.workflow.stop();
 
             // Clear action values
@@ -1474,7 +1481,10 @@ class GrblController {
                 this.workflow.stop();
                 this.feeder.reset();
                 this.write('\x18'); // ^x
-                this.wcsResetZero();
+                console.log('\x1b[36m%s\x1b[35m', 'WCS RESET CALLED ON RESET EVENT');
+                setTimeout(() => {
+                    this.wcsResetZero();
+                }, 500);
             },
             'reset:limit': () => {
                 this.workflow.stop();
@@ -1640,7 +1650,6 @@ class GrblController {
                 //const JOG_COMMAND_INTERVAL = 80;
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23 } = this.settings.settings;
-
                 let jogFeedrate;
                 if ($20 === '1') {
                     $130 = Number($130);
@@ -1803,17 +1812,13 @@ class GrblController {
                 this.runPostChangeHook();
             },
             'save:workspace': () => {
-                console.log('Step 3 in backend: received');
                 const [workspace] = args;
-                let shouldReset = true;
-                let { $22 } = this.settings.settings;
-                console.log(`step 3 in backend: values - $22=${$22} shouldReset=${shouldReset} workspace=${workspace}`);
-                //If homming enabled($22 is on), do not reset WCS to 0.
-                if ($22 === '1') {
-                    console.log('homming cycle is on, WCS wont reset to 0');
-                    shouldReset = false;
-                }
-                store.set('workspace', { workspace: workspace, shouldReset: shouldReset, });
+                console.log('\x1b[36m%s\x1b[33m', 'SAVE:WORKSPACE called, workspace saved: ' + workspace);
+                store.set('workspace', workspace);
+            },
+            'shouldWCSzero:update': () => {
+                const [shouldWCSzero] = args;
+                store.set('shouldWCSzero', shouldWCSzero);
             }
         }[cmd];
 

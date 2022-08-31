@@ -209,12 +209,10 @@ class PreferencesPage extends PureComponent {
                 pubsub.publish('widgets:reverse', reverseWidgetState);
             },
             setShouldWCSzero: (updateState) => {
-                const shouldWCSzeroState = !this.state.shouldWCSzero;
+                const shouldWCSzeroState = !store.get('shouldWCSzero');
                 updateState(shouldWCSzeroState);
-                this.setState({
-                    shouldWCSzero: shouldWCSzeroState
-                });
-                console.log('Step1: In preference, setShouldWCSZero');
+                store.set('shouldWCSzero', shouldWCSzeroState);
+                controller.command('shouldWCSzero:update', shouldWCSzeroState);
                 pubsub.publish('shouldWCSzero:update', shouldWCSzeroState);
             },
             setAutoReconnect: () => {

@@ -99,7 +99,6 @@ class LocationWidget extends PureComponent {
             pubsub.subscribe('shouldWCSzero:update', (event, value) => {
                 this.setState({ shouldWCSzero: value });
                 store.set('shouldWCSzero', value);
-                console.log('step 2: Pub subscription: value - ' + store.get('shouldWCSzero'));
             }),
             pubsub.subscribe('keybindingsUpdated', () => {
                 this.updateShuttleControlEvents();
@@ -465,7 +464,6 @@ class LocationWidget extends PureComponent {
     componentDidMount() {
         this.subscribe();
         this.addShuttleControlEvents();
-
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }
 
@@ -481,7 +479,8 @@ class LocationWidget extends PureComponent {
             axes,
             jog
         } = this.state;
-
+        controller.command('shouldWCSzero:update', store.get('shouldWCSzero'));
+        console.log(store);
         this.config.set('minimized', minimized);
         this.config.set('axes', axes);
         this.config.set('jog.keypad', jog.keypad);
@@ -500,7 +499,6 @@ class LocationWidget extends PureComponent {
             canClick: true, // Defaults to true
             units: store.get('workspace.units', METRIC_UNITS),
             safeRetractHeight: store.get('workspace.safeRetractHeight'),
-            shouldWCSzero: store.get('workspace.shouldWCSzero'),
             workflow: {
                 state: controller.workflow.state
             },
@@ -610,7 +608,8 @@ class LocationWidget extends PureComponent {
 
     render() {
         const { widgetId, machinePosition, workPosition, wcs } = this.props;
-        const { minimized, isFullscreen, shouldWCSzero } = this.state;
+        const { minimized, isFullscreen } = this.state;
+        const shouldWCSzero = store.get('shouldWCSzero');
         const { units } = this.state;
         const canSendCommand = this.canSendCommand();
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
@@ -693,9 +692,9 @@ class LocationWidget extends PureComponent {
                             className={styles.workspaceInput}
                             onChange={(selection) => {
                                 controller.command('gcode', selection.value);
+                                console.log(shouldWCSzero);
                                 if (shouldWCSzero) {
                                     controller.command('save:workspace', selection.command);
-                                    console.log('Step 3: shouldWCSzero sent: ' + shouldWCSzero);
                                 }
                             }}
                             name="workspace"

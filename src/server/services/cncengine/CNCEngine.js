@@ -105,19 +105,6 @@ class CNCEngine {
     // @param {object} server The HTTP server instance.
     // @param {string} controller Specify CNC controller.
     start(server, controller = '') {
-        //This function sets WCS to zero
-        const wcsResetZero = () => {
-            setTimeout(() => {
-                if (store.get('workspace').shouldReset) {
-                    controller.command('gcode', `G10 L20 ${store.get('workspace').workspace} X0 Y0`);
-                    console.debug('wcs reset to zero');
-                }
-            }, 500);
-        };
-
-        wcsResetZero();
-        console.log('WCS reset t zero on start');
-
         // Fallback to an empty string if the controller is not valid
         if (!isValidController(controller)) {
             controller = '';
@@ -211,13 +198,12 @@ class CNCEngine {
                 }
                 log.info(`Reconnecting to open controller on port ${port} with socket ID ${socket.id}`);
                 controller.addConnection(socket);
-                //Set the last known workspace offset to zero
-                //controller.command('gcode', `G10 L20 ${store.get('workspace')} X0 Y0`);
+
                 log.info(`Controller state: ${controller.isOpen()}`);
                 if (controller.isOpen()) {
                     log.info('Joining port room on socket');
                     socket.join(port);
-                    wcsResetZero();
+                    //Set the last known workspace offset to zero
                     console.log('wcs reset to zero - CNC Engine - reconnect');
                 } else {
                     log.info('Controller no longer open');
