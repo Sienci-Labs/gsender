@@ -131,20 +131,34 @@ class GrblController {
 
     shouldWCSzero = false;
 
-    settingsPopulated = true;
+    settingsPopulated = false;
+
+    // Check settings for existence of specific key
+    settingsPopulatedCheck(key) {
+        const settingsKey = `settings.${key}`;
+        const value = _.get(this.settings, settingsKey, undefined);
+        log.debug(`${settingsKey}=${value}`);
+        console.log(this.settings);
+        return !!value;
+    }
 
     //This function sets WCS to zero
-     wcsResetZero = () => {
-         let { $22 } = this.settings.settings;
-         let workspace = store.get('workspace');
-         workspace = typeof workspace !== 'undefined' ? workspace : 'P1';
-         // eslint-disable-next-line eqeqeq
-         if ($22 == 0 && this.shouldWCSzero) {
-             this.command('gcode', `G10 L20 ${workspace} X0 Y0`);
-             console.log('\x1b[36m%s\x1b[35m', `SUCCESS: ${workspace} WCS RESET TO ZERO`);
-             store.set('workspace', 'P1');
-         }
-     };
+    handleWCSZero = () => {
+        // Always use lodash get to better handles cases where sub keys don't exist.
+        let { $22 } = _.get(this.settings, 'settings.$22');
+        // TODO:  Why do you need this?  P1 is default space on connection
+        let workspace = store.get('workspace');
+        workspace = typeof workspace !== 'undefined' ? workspace : 'P1';
+        // TODO:  You need to not just disable linting rules you disagree with - check the type and use the right equality
+        // eslint-disable-next-line eqeqeq
+        if ($22 == 0 && this.shouldWCSzero) {
+            this.command('gcode', `G10 L20 ${workspace} X0 Y0`);
+            console.log('\x1b[36m%s\x1b[35m', `SUCCESS: ${workspace} WCS RESET TO ZERO`);
+            store.set('workspace', 'P1');
+        } else {
+            log.debug('Failed branch inside WCS Zero');
+        }
+    };
 
     actionMask = {
         queryParserState: {
@@ -831,10 +845,16 @@ class GrblController {
                 this.emit('controller:settings', GRBL, this.settings);
                 this.emit('Grbl:settings', this.settings); // Backward compatibility
                 console.log('SETTINGS POPULATED: ' + this.settingsPopulated);
-                if (this.settingsPopulated) {
-                    this.wcsResetZero();
+                // NB - changed this to check if settings ! validated and poll until we do populate.
+                if (!this.settingsPopulated) {
+                    const settingsExist = this.settingsPopulatedCheck('$22');
+                    if (settingsExist) {
+                        this.handleWCSZero();
+                        this.settingsPopulated = true;
+                    } else {
+                        log.debug('Settings not populated');
+                    }
                 }
-                this.settingsPopulated = false;
             }
 
             // Grbl state
@@ -1034,7 +1054,8 @@ class GrblController {
     open(callback = noop, shouldWCSzero) {
         const { port, baudrate } = this.options;
         this.shouldWCSzero = shouldWCSzero;
-        this.settingsPopulated = true;
+        // Assume the settings aren't populated on connect
+        this.settingsPopulated = false;
         // Assertion check
         if (this.isOpen()) {
             log.error(`Cannot open serial port "${port}"`);
@@ -1487,7 +1508,7 @@ class GrblController {
                 this.feeder.reset();
                 this.write('\x18'); // ^x
                 setTimeout(() => {
-                    this.wcsResetZero();
+                    this.handleWCSZero();
                 }, 500);
             },
             'reset:limit': () => {
