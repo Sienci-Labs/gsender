@@ -690,7 +690,6 @@ class LocationWidget extends PureComponent {
                             className={styles.workspaceInput}
                             onChange={(selection) => {
                                 controller.command('gcode', selection.value);
-                                console.log(shouldWCSzero);
                                 if (shouldWCSzero) {
                                     controller.command('save:workspace', selection.command);
                                 }

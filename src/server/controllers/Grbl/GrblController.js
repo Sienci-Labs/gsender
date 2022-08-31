@@ -131,16 +131,18 @@ class GrblController {
 
     shouldWCSzero = false;
 
+    settingsPopulated = true;
+
     //This function sets WCS to zero
      wcsResetZero = () => {
          let { $22 } = this.settings.settings;
          let workspace = store.get('workspace');
          workspace = typeof workspace !== 'undefined' ? workspace : 'P1';
-         console.log('\x1b[36m%s\x1b[35m', `INSIDE SET WCS ZERO: $22- ${$22}, shouldWCSzero- ${this.shouldWCSzero}`);
          // eslint-disable-next-line eqeqeq
          if ($22 == 0 && this.shouldWCSzero) {
              this.command('gcode', `G10 L20 ${workspace} X0 Y0`);
-             console.log('\x1b[36m%s\x1b[35m', `SUCESS: ${workspace} WCS RESET TO ZERO`);
+             console.log('\x1b[36m%s\x1b[35m', `SUCCESS: ${workspace} WCS RESET TO ZERO`);
+             store.set('workspace', 'P1');
          }
      };
 
@@ -828,6 +830,11 @@ class GrblController {
                 this.settings = this.runner.settings;
                 this.emit('controller:settings', GRBL, this.settings);
                 this.emit('Grbl:settings', this.settings); // Backward compatibility
+                console.log('SETTINGS POPULATED: ' + this.settingsPopulated);
+                if (this.settingsPopulated) {
+                    this.wcsResetZero();
+                }
+                this.settingsPopulated = false;
             }
 
             // Grbl state
@@ -878,11 +885,6 @@ class GrblController {
         this.writeln('$$');
 
         await delay(50);
-
-        setTimeout(() => {
-            console.log('\x1b[36m%s\x1b[35m', 'WCS RESET CALLED AFTER CONTROLLER READY');
-            this.wcsResetZero();
-        }, 500);
 
         this.event.trigger('controller:ready');
     }
@@ -1032,6 +1034,7 @@ class GrblController {
     open(callback = noop, shouldWCSzero) {
         const { port, baudrate } = this.options;
         this.shouldWCSzero = shouldWCSzero;
+        this.settingsPopulated = true;
         // Assertion check
         if (this.isOpen()) {
             log.error(`Cannot open serial port "${port}"`);
@@ -1483,7 +1486,6 @@ class GrblController {
                 this.workflow.stop();
                 this.feeder.reset();
                 this.write('\x18'); // ^x
-                console.log('\x1b[36m%s\x1b[35m', 'WCS RESET CALLED ON RESET EVENT');
                 setTimeout(() => {
                     this.wcsResetZero();
                 }, 500);
@@ -1815,7 +1817,6 @@ class GrblController {
             },
             'save:workspace': () => {
                 const [workspace] = args;
-                console.log('\x1b[36m%s\x1b[33m', 'SAVE:WORKSPACE called, workspace saved: ' + workspace);
                 store.set('workspace', workspace);
             },
 
