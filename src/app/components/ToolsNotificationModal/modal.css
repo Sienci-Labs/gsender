@@ -72,8 +72,6 @@
   .modal-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 14px;
   }
 
   .modal-footer {
@@ -88,13 +86,14 @@
   }
 
   .modal-title {
-    margin: 0;
-    font-size: 2rem;
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-left: 1rem;
   }
 
   .modal-body {
     height: 45%;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     padding: 4%;
     border-top: 1px solid #eee;
   }
@@ -131,33 +130,34 @@
   }
 
   .footer-text {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     text-align: center;
   }
 
   .footer-textTwo {
     margin-top: 0%;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
   }
 
-  .redButton {
+  .button-no {
     border-radius: .25rem;
     width: 100%;
     max-width: 12rem;
     font-size: 14px;
     padding: 5px;
     margin: 2%;
-    color: #DD380D;
+    color: #3E85C7;
     --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-    border: solid #DD380D 1px;
+    border: solid #3E85C7 1px;
     text-decoration: none;
     display: inline-block;
     cursor: pointer;
     text-align: center;
   }
 
-  .redButton:hover {
+  .button-no:hover {
     transition: 200ms ease-in-out;
     background-color: #E5E7EB;
     border-radius: .25rem;

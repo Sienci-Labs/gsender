@@ -40,7 +40,7 @@ const ToolsNotificationModal = (props) => {
             <div className={`modalFirmware ${props.show ? 'show' : ''}`} onClick={props.onClose}>
                 <div className="modal-content" onClick={e => e.stopPropagation()}>
                     <div className="modal-header">
-                        <div className="fas fa-exclamation-triangle" style={{ fontSize: 55, color: 'red', textAlign: 'center', margin: 2 }} />
+                        <div className="fas fa-exclamation-triangle" style={{ fontSize: '1.3rem', color: 'red', textAlign: 'center', marginLeft: '0.6rem' }} />
                         <h4 className="modal-title">{props.title}</h4>
                     </div>
                     <div className="modal-body">{props.children}</div>
@@ -48,7 +48,7 @@ const ToolsNotificationModal = (props) => {
                         <h1 className="footer-text">{props.footer}</h1>
                         <h1 className="footer-textTwo">{props.footerTwo}</h1>
                         <div className="buttonContainer">
-                            <button onClick={props.onClose} className="redButton">No</button>
+                            <button onClick={props.onClose} className="button-no">No</button>
                             <button className="button" onClick={props.yesFunction}>Yes</button>
                         </div>
                     </div>
