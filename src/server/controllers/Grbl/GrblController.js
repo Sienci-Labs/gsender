@@ -135,7 +135,7 @@ class GrblController {
 
     // Check settings for existence of specific key
     settingsPopulatedCheck(key) {
-        const settingsKey = `settings.${key}`;
+        const settingsKey = `settings.${key}`; // _.get(this.settings, 'settings.$22');
         const value = _.get(this.settings, settingsKey, undefined);
         log.debug(`${settingsKey}=${value}`);
         console.log(this.settings);
@@ -145,13 +145,9 @@ class GrblController {
     //This function sets WCS to zero
     handleWCSZero = () => {
         // Always use lodash get to better handles cases where sub keys don't exist.
-        let { $22 } = _.get(this.settings, 'settings.$22');
-        // TODO:  Why do you need this?  P1 is default space on connection
-        let workspace = store.get('workspace');
-        workspace = typeof workspace !== 'undefined' ? workspace : 'P1';
-        // TODO:  You need to not just disable linting rules you disagree with - check the type and use the right equality
-        // eslint-disable-next-line eqeqeq
-        if ($22 == 0 && this.shouldWCSzero) {
+        let $22 = _.get(this.settings, 'settings.$22');
+        let workspace = store.get('workspace', 'P1');
+        if (Number($22) === 0 && this.shouldWCSzero) {
             this.command('gcode', `G10 L20 ${workspace} X0 Y0`);
             console.log('\x1b[36m%s\x1b[35m', `SUCCESS: ${workspace} WCS RESET TO ZERO`);
             store.set('workspace', 'P1');
@@ -844,7 +840,6 @@ class GrblController {
                 this.settings = this.runner.settings;
                 this.emit('controller:settings', GRBL, this.settings);
                 this.emit('Grbl:settings', this.settings); // Backward compatibility
-                console.log('SETTINGS POPULATED: ' + this.settingsPopulated);
                 // NB - changed this to check if settings ! validated and poll until we do populate.
                 if (!this.settingsPopulated) {
                     const settingsExist = this.settingsPopulatedCheck('$22');

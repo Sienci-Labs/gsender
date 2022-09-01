@@ -176,7 +176,6 @@ class CNCEngine {
             });
             socket.on('disconnect', () => {
                 log.debug(`Disconnected from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`);
-                //Set the last known workspace offset to zero
                 const controllers = store.get('controllers', {});
                 Object.keys(controllers).forEach(port => {
                     const controller = controllers[port];
@@ -203,8 +202,6 @@ class CNCEngine {
                 if (controller.isOpen()) {
                     log.info('Joining port room on socket');
                     socket.join(port);
-                    //Set the last known workspace offset to zero
-                    console.log('wcs reset to zero - CNC Engine - reconnect');
                 } else {
                     log.info('Controller no longer open');
                 }
@@ -268,7 +265,6 @@ class CNCEngine {
                     callback = noop;
                 }
                 const shouldWCSzero = options.shouldWCSzero || false;
-                console.log('\x1b[36m%s\x1b[35m', `CNCENGINE: shouldWCSzero - ${shouldWCSzero}`);
 
                 log.debug(`socket.open("${port}", ${JSON.stringify(options)}): id=${socket.id}`);
 
