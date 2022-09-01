@@ -40,8 +40,10 @@ class App extends PureComponent {
 
     render() {
         const { location } = this.props;
+        // TODO: Refactor this to handle conditional branches/look into alternatives
         const accepted = ([
             '/workspace',
+            '/widget'
         ].indexOf(location.pathname) >= 0);
 
         if (!accepted) {

@@ -30,7 +30,6 @@ import React from 'react';
 import reduxStore from 'app/store/redux';
 import ReactDOM from 'react-dom';
 import {
-    BrowserRouter,
     HashRouter as Router,
     Route,
     Switch
@@ -81,22 +80,12 @@ const renderPage = () => {
                 gutterWidth={0}
                 layout="floats"
             >
-                {
-                    !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ?
-                        <BrowserRouter>
-                            <Switch>
-                                <Route path="/widget/:id" component={PopUpWidget} />
-                                <Route path="/" component={App} />
-                            </Switch>
-                        </BrowserRouter>
-                        :
-                        <Router>
-                            <Switch>
-                                <Route path="/widget/:id" component={PopUpWidget} />
-                                <Route path="/" component={App} />
-                            </Switch>
-                        </Router>
-                }
+                <Router>
+                    <Switch>
+                        <Route path="/widget/:id" component={PopUpWidget} />
+                        <Route path="/" component={App} />
+                    </Switch>
+                </Router>
             </GridSystemProvider>
         </ReduxProvider>,
         container

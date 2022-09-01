@@ -225,9 +225,12 @@ const main = () => {
                 const childOptions = {
                     ...bounds,
                     title: 'gSender Pop Out Window'
-                }
+                };
                 log.debug(route);
-                windowManager.openWindow(url + route, childOptions, splashScreen);
+                // Hash router URL should look like '{url}/#/widget/:id'
+                const address = `${url}/#${route}`;
+                log.debug(address);
+                windowManager.openWindow(address, childOptions, splashScreen);
             });
         } catch (err) {
             log.error(err);
