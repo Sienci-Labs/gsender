@@ -30,8 +30,10 @@ import React from 'react';
 import reduxStore from 'app/store/redux';
 import ReactDOM from 'react-dom';
 import {
+    BrowserRouter,
     HashRouter as Router,
-    Route
+    Route,
+    Switch
 } from 'react-router-dom';
 import i18next from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -58,6 +60,7 @@ import { Button } from './components/Buttons';
 import ModalTemplate from './components/ModalTemplate';
 import Modal from './components/Modal';
 import Space from './components/Space';
+import PopUpWidget from './containers/PopUpWidget';
 import './styles/vendor.styl';
 import './styles/app.styl';
 
@@ -78,11 +81,22 @@ const renderPage = () => {
                 gutterWidth={0}
                 layout="floats"
             >
-                <Router>
-                    <div>
-                        <Route path="/" component={App} />
-                    </div>
-                </Router>
+                {
+                    !process.env.NODE_ENV || process.env.NODE_ENV === 'development' ?
+                        <BrowserRouter>
+                            <Switch>
+                                <Route path="/widget/:id" component={PopUpWidget} />
+                                <Route path="/" component={App} />
+                            </Switch>
+                        </BrowserRouter>
+                        :
+                        <Router>
+                            <Switch>
+                                <Route path="/widget/:id" component={PopUpWidget} />
+                                <Route path="/" component={App} />
+                            </Switch>
+                        </Router>
+                }
             </GridSystemProvider>
         </ReduxProvider>,
         container

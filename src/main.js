@@ -123,6 +123,7 @@ const main = () => {
             const options = {
                 ...bounds,
                 title: `gSender ${pkg.version}`,
+                //nativeWindowOpen: true
             };
             const window = windowManager.openWindow(url, options, splashScreen);
 
@@ -218,6 +219,15 @@ const main = () => {
                 } catch (e) {
                     log.error(`Caught error in listener - ${e}`);
                 }
+            });
+
+            ipcMain.on('open-new-window', (msg, route) => {
+                const childOptions = {
+                    ...bounds,
+                    title: 'gSender Pop Out Window'
+                }
+                log.debug(route);
+                windowManager.openWindow(url + route, childOptions, splashScreen);
             });
         } catch (err) {
             log.error(err);

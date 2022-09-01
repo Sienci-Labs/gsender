@@ -29,9 +29,11 @@ import uuid from 'uuid';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
+import isElectron from 'is-electron';
 import WidgetConfig from '../WidgetConfig';
 import Console from './Console';
 import styles from './index.styl';
+import PopOutButton from '../../components/PopOutButton';
 
 // The buffer starts with 254 bytes free. The terminating <LF> or <CR> counts as a byte.
 const TERMINAL_COLS = 50;
@@ -223,6 +225,10 @@ class ConsoleWidget extends PureComponent {
                     )}
                     style={{ width: '100%' }}
                 >
+                    {
+                        isElectron() &&
+                        <PopOutButton id="1fdv7f42tbgj"/>
+                    }
                     <Console
                         ref={node => {
                             if (node) {
