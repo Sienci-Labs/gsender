@@ -117,10 +117,10 @@ const InputArea = () => {
             <Input
                 label="Stepover"
                 units="%"
-                additionalProps={{ type: 'number', id: 'stepover', min: 1, max: 100, style: { ...inputStyles } }}
+                additionalProps={{ type: 'number', id: 'stepover', min: 1, max: 80, style: { ...inputStyles } }}
                 value={stepover}
                 onChange={(e) => onChange({ ...e, shouldConvert: false })}
-                tooltip={{ content: `Default Value: ${defaultValues.stepover}` }}
+                tooltip={{ content: `Default Value: ${defaultValues.stepover} | Max Value: 80` }}
             />
 
             {/* <Tooltip content={`Default Value: ${defaultValues.spindle}`}>
