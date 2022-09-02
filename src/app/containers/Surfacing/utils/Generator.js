@@ -501,9 +501,13 @@ export default class Generator {
         }
 
         const remainderXFactor = cutDirectionFlipped ? 1 : -1;
+        const remainderYFactor = cutDirectionFlipped ? -1 : 1;
         const remainder = [
             '(Covering Remaining Area)',
-            `G1 X${toFixedValue(Math.abs(halfOfWidth) * remainderXFactor)}`,
+            `G1 X${toFixedValue(Math.abs(halfOfWidth - stepoverAmount) * remainderXFactor)}`,
+            `G1 Y${toFixedValue(Math.abs(halfOfLength - stepoverAmount) * remainderYFactor)}`,
+            `G1 X${toFixedValue(Math.abs(halfOfWidth - stepoverAmount) * remainderXFactor * -1)}`,
+            `G1 Y${toFixedValue(Math.abs(stepoverAmount) * remainderXFactor * -1)}`,
             '(End of Covering Remaining Area)',
             ''
         ];
