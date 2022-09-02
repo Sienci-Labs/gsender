@@ -137,7 +137,7 @@ class PreferencesPage extends PureComponent {
             tool: {
                 metricDiameter: 0,
                 imperialDiameter: 0,
-                type: 'end mill'
+                type: 'End Mill'
             },
             probe: store.get('workspace[probeProfile]'),
             probeSettings: {
@@ -258,7 +258,7 @@ class PreferencesPage extends PureComponent {
                 });
             },
             setToolType: (e) => {
-                const type = e.target.value;
+                const type = e.value;
                 const tool = this.state.tool;
                 this.setState({
                     tool: {
