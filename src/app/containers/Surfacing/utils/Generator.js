@@ -92,9 +92,12 @@ export default class Generator {
             startPosition,
             type,
             cutDirectionFlipped,
+            skimDepth,
         } = this.surfacing;
 
-        const stepoverAmount = this.toFixedValue(bitDiameter * (stepover / 100));
+        const stepoverPercentage = stepover > 80 ? 80 / 100 : stepover / 100;
+
+        const stepoverAmount = this.toFixedValue(bitDiameter * stepoverPercentage);
 
         const DEFAULT_FACTOR = { x: 1, y: -1 };
 
@@ -125,10 +128,16 @@ export default class Generator {
 
         const gcodeArr = executeSurfacing(options);
 
+        let initialZValue = (depth - skimDepth) * -1;
+
+        if (count === 1) {
+            initialZValue = 0;
+        }
+
         return [
             `(*** Layer ${count} ***)`,
             '(Initialize Layer)',
-            'G0 X0 Y0 Z0',
+            `G0 X0 Y0 Z${initialZValue}`,
             '(End of Initialize Layer)',
             '',
             ...gcodeArr,
@@ -149,7 +158,8 @@ export default class Generator {
         const depth = skimDepth;
         const EXTRA_LENGTH = units === METRIC_UNITS ? 1 : convertToImperial(1);
         const EXTRA_RAMP_HEIGHT = units === METRIC_UNITS ? 0.5 : convertToImperial(0.5);
-        const RAMP_HEIGHT = z - EXTRA_RAMP_HEIGHT;
+        const EXTRA_RAMP_COAST = units === METRIC_UNITS ? 5 : convertToImperial(5);
+        const RAMP_HEIGHT = (Math.abs(depth) * -1) - EXTRA_RAMP_HEIGHT;
 
         const rampingLength = Number(((depth + EXTRA_LENGTH) / getTanFromDegrees(degrees)).toFixed(2));
 
@@ -162,10 +172,11 @@ export default class Generator {
         rampingArr.push(
             '(Ramping into Material)',
             'G91',
-            `G0 ${axis}${rampingLength * factor}`,
+            `G0 ${axis}${(rampingLength + EXTRA_RAMP_COAST) * factor}`,
             `G0 Z${EXTRA_RAMP_HEIGHT}`,
             `G1 ${axis}${(rampingLength * factor) * -1} Z${RAMP_HEIGHT}`, //Negate and return to starting position
-            'G90', //Set back to absolute positioning
+            `G1 ${axis}${(EXTRA_RAMP_COAST * factor) * -1}`,
+            'G90',
             '(End of Ramping into Material)',
             ''
         );
@@ -173,11 +184,19 @@ export default class Generator {
         return rampingArr;
     }
 
+
     drawInitialPerimeter = (x, y, z, direction, shouldZeroAxisZ = true, startPosition) => {
         const enterMaterial = this.rampIntoMaterial(z, direction);
 
         const mainPerimeterArea = startPosition === START_POSITION_CENTER
-            ? [`G1 Y${Math.abs(y) * -1}`, `G1 X${Math.abs(x)}`, `G1 Y${Math.abs(y)}`, `G1 X${Math.abs(x) * -1}`]
+            ? [
+                'G91',
+                `G1 Y${Math.abs(y) * -1}`,
+                `G1 X${Math.abs(x)}`,
+                `G1 Y${Math.abs(y)}`,
+                `G1 X${Math.abs(x) * -1}`,
+                'G90'
+            ]
             : [`G1 Y${y}`, `G1 X${x}`, 'G1 Y0', 'G1 X0'];
 
         return [
@@ -238,7 +257,7 @@ export default class Generator {
         const workspaceUnits = store.get('workspace.units');
         const Z_VALUE = workspaceUnits === METRIC_UNITS ? '3' : '0.12';
 
-        return Z_VALUE;
+        return Number(Z_VALUE);
     }
 
     returnToZero = () => {
@@ -253,24 +272,6 @@ export default class Generator {
         ];
     }
 
-    determineGap = (diameter = 23.8, stepover = 0.83) => {
-        const equation =
-            diameter * (Math.sqrt(2) * stepover - 0.5 - (1 / Math.sqrt(2)));
-
-        return equation > 0;
-    }
-
-    coverMissingArea = (axis, amount, factor) => {
-        return [
-            '(Cover Missing Area)',
-            'G91',
-            `G1 ${axis}${amount * factor}`,
-            `G1 ${axis}${amount * factor * -1}`,
-            'G90',
-            '(End of Cover Missing Area)'
-        ];
-    }
-
     generateSpiral = (options) => {
         const {
             drawInitialPerimeter,
@@ -278,9 +279,7 @@ export default class Generator {
             drawSpiral,
             returnToZero,
             rampIntoMaterial,
-            determineGap,
             toFixedValue,
-            coverMissingArea
         } = this;
         const { depth, length, width, axisFactors, stepoverAmount, cutDirectionFlipped, startPosition } = options;
         const { x: xFactor, y: yFactor } = axisFactors;
@@ -290,7 +289,8 @@ export default class Generator {
         const y = toFixedValue(length * yFactor);
         const z = toFixedValue(depth * -1);
 
-        const hasGap = determineGap(this.surfacing.diameter, this.surfacing.stepover / 100);
+        const halfOfLength = toFixedValue(length / 2);
+        const halfOfWidth = toFixedValue(width / 2);
 
         const startPos = {
             x: cutDirectionFlipped ? 0 : toFixedValue(stepoverAmount),
@@ -333,12 +333,22 @@ export default class Generator {
             };
         }
 
-        function exitCondition (startPos, endPos) {
-            return endPos.x < startPos.x || endPos.y < startPos.y;
-        }
+        function exitCondition (startPos, endPos, prevStartPos, prevEndPos) {
+            if (startIsInCenter) {
+                if (length < width) {
+                    const y1 = toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount)));
+                    const y2 = toFixedValue(Math.abs(halfOfLength - (endPos.y - (stepoverAmount * 2))));
 
-        function centerExitCondition(startPos) {
-            return cutDirectionFlipped ? startPos.y >= (length / 2) : startPos.x >= (width / 2);
+                    return y1 - y2 < 0;
+                } else {
+                    const x1 = toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount)));
+                    const x2 = toFixedValue(Math.abs(halfOfWidth - (endPos.x - (stepoverAmount * 2))));
+
+                    return x1 - x2 < 0;
+                }
+            }
+
+            return endPos.x < startPos.x || endPos.y < startPos.y;
         }
 
         function processGcode (startPos, endPos, prevStartPos, prevEndPos, xFactor, yFactor) {
@@ -349,56 +359,21 @@ export default class Generator {
             const xValueEnd = toFixedValue((startPos.x + stepoverAmount) * xFactor);
             const yValueEnd = toFixedValue(startPos.y * yFactor);
 
-            // console.log({ startPos, endPos });
-
-            // const halfOfLength = toFixedValue(length / 2);
-            // const halfOfWidth = toFixedValue(width / 2);
-
-            // if (startIsInCenter) {
-            //     if (cutDirectionFlipped) {
-            //         arr.push(
-            //             `G1 X${(halfOfWidth - startPos.x) * -1}`,
-            //             `G1 Y${halfOfLength - endPos.y}`,
-            //             `G1 X${halfOfWidth - startPos.x}`,
-            //             `G1 Y${(halfOfLength - startPos.y) * -1}`,
-            //         );
-            //     } else {
-            //         arr.push(
-            //             `G1 X${startPos.x}`,
-            //             `G1 Y-${startPos.y}`,
-            //             `G1 X-${startPos.x}`,
-            //             `G1 Y${startPos.y}`,
-            //         );
-            //     }
-
-            //     arr.push('');
-
-            //     return arr;
-            // }
-
             if (startIsInCenter) {
                 if (cutDirectionFlipped) {
                     arr.push(
-                        `G1 X${startPos.x * -1}`,
-                        `G1 Y${startPos.y}`,
-                        `G1 X${startPos.x}`,
-                        `G1 Y${startPos.y * -1}`,
+                        `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y))}`,
+                        `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x))) * -1}`,
+                        `G1 Y${toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount))) * -1}`,
+                        `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount)))}`,
                     );
-
-                    if (hasGap) {
-                        arr.push(...coverMissingArea('X', stepoverAmount, 1));
-                    }
                 } else {
                     arr.push(
-                        `G1 X${startPos.x}`,
-                        `G1 Y${startPos.y * -1}`,
-                        `G1 X${startPos.x * -1}`,
-                        `G1 Y${startPos.y}`,
+                        `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y)) * -1}`,
+                        `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x)))}`,
+                        `G1 Y${toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount)))}`,
+                        `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount))) * -1}`,
                     );
-
-                    if (hasGap) {
-                        arr.push(...coverMissingArea('Y', stepoverAmount, 1));
-                    }
                 }
 
                 arr.push('');
@@ -407,23 +382,6 @@ export default class Generator {
             }
 
             if (cutDirectionFlipped) {
-                // if (endPos.x >= startPos.x + stepoverAmount) {
-                //     arr.push(
-                //         `G1 X${xValueStart}`,
-                //         `G1 Y${yValueStart}`,
-                //         `G1 X${xValueEnd}`,
-                //     );
-
-                //     if (endPos.y >= (startPos.y + stepoverAmount)) {
-                //         arr.push(
-                //             `G1 Y${yValueEnd}`,
-                //         );
-
-                //         if (hasGap) {
-                //             arr.push(...coverMissingArea('Y', stepoverAmount, yFactor * -1));
-                //         }
-                //     }
-                // }
                 if (endPos.x >= startPos.x) {
                     arr.push(
                         `G1 X${xValueStart}`,
@@ -450,10 +408,6 @@ export default class Generator {
                         arr.push(
                             `G1 Y${yValueEnd}`,
                         );
-
-                        if (hasGap) {
-                            arr.push(...coverMissingArea('Y', stepoverAmount, yFactor * -1));
-                        }
                     }
                 }
             } else {
@@ -483,10 +437,6 @@ export default class Generator {
                         arr.push(
                             `G1 X${xValueEnd}`,
                         );
-
-                        if (hasGap) {
-                            arr.push(...coverMissingArea('X', stepoverAmount, xFactor * -1));
-                        }
                     }
                 }
             }
@@ -505,7 +455,7 @@ export default class Generator {
             endPos,
             options,
             processGcode,
-            startIsInCenter ? centerExitCondition : exitCondition,
+            exitCondition,
             getNewStartPos,
             getNewEndPos
         );
@@ -518,43 +468,45 @@ export default class Generator {
 
         const mainSpiralArea = [];
 
-        mainSpiralArea.push(
-            startIsInCenter
-                ? [
-                    ...rampIntoMaterial(z, direction),
-                    ...spirals,
-                ]
-                : spirals,
-        );
+        const startFromCenterPerimeter = drawInitialPerimeter(width, length, z, direction, true, startPosition);
 
-        const remainderXFactor = cutDirectionFlipped ? -1 : 1;
-        const remainderYFactor = cutDirectionFlipped ? 1 : -1;
-
-        // const remainder = cutDirectionFlipped
-        //     ? [
-        //         // '(Covering Remaining Area)',
-        //         // `G1 X${toFixedValue(((width / 2) - stepoverAmount) * remainderFactor)}`,
-        //         // `G1 Y${toFixedValue(length / 2)}`,
-        //         // `G1 X${toFixedValue(((width / 2) - (stepoverAmount * 2)) * remainderFactor)}`,
-        //         // `G1 X${toFixedValue(((width / 2)) * remainderFactor)}`,
-        //         // `G1 Y-${toFixedValue(length / 2)}`,
-        //         // `G1 X${toFixedValue(((width / 2) - stepoverAmount) * remainderFactor)}`,
-        //         // '(End of Covering Remaining Area)'
-        //     ]
-        //     : [
-        //         '(Covering Remaining Area)',
-        //         `G1 X${toFixedValue(Math.abs((position.x)) * remainderFactor)}`,
-        //         `G1 Y${position.y - stepoverAmount}`,
-        //         '(End of Covering Remaining Area)'
-        //     ];
-        const remainder = [
-            '(Covering Remaining Area)',
-            `G1 X${toFixedValue(Math.abs(position.x) * remainderXFactor)}`,
-            `G1 Y${(Math.abs(position.y) * remainderYFactor) + stepoverAmount}`,
-            '(End of Covering Remaining Area)'
+        const startFromCenterPerimeterPosition = [
+            '(Entering Perimeter Start Position)',
+            `G0 X${halfOfWidth * -1} Y${halfOfLength}`,
+            '(End of Entering Perimeter Start Position)',
+            ''
         ];
 
-        console.log(remainder);
+        const startFromCenterStartPosition = [
+            '(Entering Start Position)',
+            `G91 G0 Z${this.getSafeZValue()} G90`,
+            `G0 X${position.x} Y${position.y}`,
+            `G91 G0 Z${(this.getSafeZValue() * -1)} G90`,
+            ...rampIntoMaterial(z, direction),
+            '(End of Entering Start Position)',
+            ''
+        ];
+
+        if (startIsInCenter) {
+            mainSpiralArea.push(
+                ...startFromCenterPerimeterPosition,
+                ...startFromCenterPerimeter,
+                ...startFromCenterStartPosition,
+                ...spirals.reverse(),
+            );
+        } else {
+            mainSpiralArea.push(
+                ...spirals,
+            );
+        }
+
+        const remainderXFactor = cutDirectionFlipped ? 1 : -1;
+        const remainder = [
+            '(Covering Remaining Area)',
+            `G1 X${toFixedValue(Math.abs(halfOfWidth) * remainderXFactor)}`,
+            '(End of Covering Remaining Area)',
+            ''
+        ];
 
         /**
          * 1. Draw initial surfacing area perimeter
@@ -565,7 +517,7 @@ export default class Generator {
         const gcodeArr = startIsInCenter
             ? [
                 ...mainSpiralArea.flat(),
-                // ...remainder,
+                ...remainder,
                 ...returnToStart,
             ]
             : [
@@ -585,7 +537,7 @@ export default class Generator {
 
         arr.push(...processGcode(startPos, endPos, prevStartPos, prevEndPos, xFactor, yFactor));
 
-        if (exitCondition(startPos, endPos)) {
+        if (exitCondition(startPos, endPos, prevStartPos, prevEndPos)) {
             return arr;
         }
 
@@ -612,7 +564,7 @@ export default class Generator {
 
         const endPos = {
             x: cutDirectionFlipped ? toFixedValue(stepoverAmount * 2) : 0,
-            y: cutDirectionFlipped ? 0 : this.toFixedValue(stepoverAmount * 2),
+            y: cutDirectionFlipped ? 0 : toFixedValue(stepoverAmount * 2),
         };
 
 
@@ -673,7 +625,7 @@ export default class Generator {
                         endPos.y - halfOfLength <= halfOfLength
                     ) {
                         arr.push(
-                            `G1 Y${halfOfLength * -1}`,
+                            `G1 Y${toFixedValue(halfOfLength) * -1}`,
                             ''
                         );
                         return arr;
@@ -681,19 +633,19 @@ export default class Generator {
 
                     if (startPos.y - halfOfLength <= halfOfLength) {
                         arr.push(
-                            `G1 Y${halfOfLength * -1}`,
+                            `G1 Y${toFixedValue(halfOfLength) * -1}`,
                         );
                     }
 
                     if (startPos.x - halfOfWidth <= halfOfWidth) {
                         arr.push(
-                            `G1 X${(halfOfWidth * -1) + startPos.x}`,
+                            `G1 X${toFixedValue((halfOfWidth * -1) + startPos.x)}`,
                         );
                     }
 
                     if (endPos.y - halfOfLength <= halfOfLength) {
                         arr.push(
-                            `G1 Y${halfOfLength}`,
+                            `G1 Y${toFixedValue(halfOfLength)}`,
                         );
                     }
 
@@ -705,15 +657,15 @@ export default class Generator {
                 } else {
                     if (startPos.y - halfOfLength <= halfOfLength) {
                         arr.push(
-                            `G1 Y${halfOfLength - startPos.y}`,
-                            `G1 X${halfOfWidth}`,
+                            `G1 Y${toFixedValue(halfOfLength - startPos.y)}`,
+                            `G1 X${toFixedValue(halfOfWidth)}`,
                         );
                     }
 
                     if (endPos.y - halfOfLength <= halfOfLength) {
                         arr.push(
-                            `G1 Y${halfOfLength - endPos.y}`,
-                            `G1 X${halfOfWidth * -1}`,
+                            `G1 Y${toFixedValue(halfOfLength - endPos.y)}`,
+                            `G1 X${toFixedValue(halfOfWidth) * -1}`,
                         );
                     }
                 }
@@ -726,7 +678,7 @@ export default class Generator {
             if (cutDirectionFlipped) {
                 if (startPos.x <= width) {
                     arr.push(
-                        `G1 X${startPos.x * xFactor}`,
+                        `G1 X${toFixedValue(startPos.x * xFactor)}`,
                         `G1 Y${toFixedValue(startPos.y * yFactor)}`,
                     );
                 }
@@ -741,7 +693,7 @@ export default class Generator {
                 if (startPos.y <= length) {
                     arr.push(
                         `G1 Y${toFixedValue(startPos.y * yFactor)}`,
-                        `G1 X${startPos.x * xFactor}`,
+                        `G1 X${toFixedValue(startPos.x * xFactor)}`,
                     );
                 }
 
@@ -768,6 +720,19 @@ export default class Generator {
             '(End of Entering Start Area)',
         ];
 
+        const startFromCenterPerimeter = [
+            '(Drawing Perimeter)',
+            `G0 X${toFixedValue((width / 2) * -1)}`,
+            `G0 Y${toFixedValue(length / 2)}`,
+
+            `G1 Y${toFixedValue(length / 2) * -1}`,
+            `G1 X${toFixedValue(width / 2)}`,
+            `G1 Y${toFixedValue(length / 2)}`,
+            `G1 X${toFixedValue(width / 2) * -1}`,
+            '(End of Drawing Perimeter)',
+            '',
+        ];
+
         /**
          * 1. Draw initial surfacing area perimeter and do not zero z axis
          * 2. Begin drawing zig zag recursively
@@ -777,16 +742,8 @@ export default class Generator {
             ? [
                 ...startArea,
                 ...rampIntoMaterial(z, direction),
+                ...startFromCenterPerimeter,
                 ...spirals,
-                ...[
-                    `G0 X${toFixedValue(width / 2)}`,
-                    `G0 Y${toFixedValue(length / 2)}`,
-
-                    `G1 Y${toFixedValue(length / 2) * -1}`,
-                    `G1 X${toFixedValue(width / 2) * -1}`,
-                    `G1 Y${toFixedValue(length / 2)}`,
-                    `G1 X${toFixedValue(width / 2)}`
-                ],
                 ...returnToStart,
             ]
             : [
