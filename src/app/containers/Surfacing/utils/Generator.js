@@ -322,8 +322,8 @@ export default class Generator {
         function getNewEndPos(endPos) {
             if (startIsInCenter) {
                 return {
-                    x: toFixedValue(endPos.x - stepoverAmount * 2),
-                    y: toFixedValue(endPos.y - stepoverAmount * 2),
+                    x: toFixedValue(endPos.x - stepoverAmount),
+                    y: toFixedValue(endPos.y - stepoverAmount),
                 };
             }
 
