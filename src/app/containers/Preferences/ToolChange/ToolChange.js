@@ -12,11 +12,27 @@ import Fieldset from '../components/Fieldset';
 
 import styles from '../index.styl';
 
-const options = [
+/*const options = [
     'Ignore',
     'Manual',
-    'Code'
+    'Semi-Auto',
+    'Automatic'
 ];
+*/
+export const TOOLCHANGE_OPTIONS = {
+    IGNORE: {
+        label: 'Ignore'
+    },
+    MANUAL: {
+        label: 'Manual'
+    },
+    SEMI: {
+        label: 'Semi-Automatic'
+    },
+    AUTO: {
+        label: 'Automatic'
+    }
+};
 
 const ToolChange = () => {
     // State
@@ -66,9 +82,9 @@ const ToolChange = () => {
                     menuContainerStyle={{ zIndex: 5 }}
                     name="toolchangeoption"
                     onChange={handleToolChange}
-                    options={map(options, (value) => ({
-                        value: value,
-                        label: value
+                    options={map(TOOLCHANGE_OPTIONS, (option) => ({
+                        value: option.label,
+                        label: option.label
                     }))}
                     value={{ label: toolChangeOption }}
                 />
