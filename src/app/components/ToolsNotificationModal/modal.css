@@ -93,6 +93,35 @@
     padding: 1rem;
   }
 
+  .progressBar{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    transition: opacity 500ms;
+    z-index: 1;
+  }
+
+  .flashMessage{
+    position: relative;
+    z-index: 1;
+    color: white;
+    bottom: 45%;
+    left: 47%;
+  }
+
+  .css-eglki6-MuiLinearProgress-root{
+    top: 50%;
+  }
+
+  .css-8atqhb{
+    width: 50% !important;
+    margin: auto;
+    height: 100%;
+  }
+
   .button {
     border: 1px solid #9ca3af;
     color: #D1D5DB;
@@ -133,6 +162,23 @@
     margin-top: 0%;
     font-size: 1.2rem;
     font-weight: 600;
+  }
+
+  .port{
+    display: flex;
+    padding: 1rem;
+    width: 100%;
+  }
+
+  .profile{
+    display: flex;
+    padding: 1rem;
+    width: 100%;
+  }
+
+  .optionsWrapper .css-2b097c-container{
+    width: 75%;
+    margin-left: 1rem;
   }
 
   .button-no {

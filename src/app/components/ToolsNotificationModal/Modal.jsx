@@ -25,31 +25,75 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { useState } from 'react';
 import { CSSTransition } from 'react-transition-group';
-
+import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
+import Select from 'react-select';
 import './modal.css';
+import store from '../../store';
+
 
 const ToolsNotificationModal = (props) => {
+    const { onClose, show, title, children, footer, footerTwo, yesFunction, showOptions } = props;
+    const getMachineProfileLabel = ({ name, type }) => `${name} ${type && type}`.trim();
+
+    const [port, setPort] = useState('');
+    const [profile, setProfile] = useState('');
+
     return (
         <CSSTransition
             in={props.show}
             unmountOnExit
             timeout={{ enter: 0, exit: 300 }}
         >
-            <div className={`modalFirmware ${props.show ? 'show' : ''}`} onClick={props.onClose}>
+            <div className={`modalFirmware ${show ? 'show' : ''}`} onClick={onClose}>
                 <div className="modal-content" onClick={e => e.stopPropagation()}>
                     <div className="modal-header">
                         <div className="fas fa-exclamation-triangle" style={{ fontSize: '1.3rem', color: 'red', textAlign: 'center', marginLeft: '0.6rem' }} />
-                        <h4 className="modal-title">{props.title}</h4>
+                        <h4 className="modal-title">{title}</h4>
                     </div>
-                    <div className="modal-body">{props.children}</div>
+                    <div className="modal-body">{children}</div>
+                    {showOptions ? (
+                        <div className="optionsWrapper">
+                            <div className="port">
+                                <span style={{ width: '14%', lineHeight: '2.5rem' }}>Port: </span>
+                                <Select
+                                    options={store.get('ports').map((element) => {
+                                        return { value: element.port, label: element.port };
+                                    })}
+                                    clearable={false}
+                                    onChange={(e) => {
+                                        setPort(e.value);
+                                    }}
+                                />
+                            </div>
+                            <div className="profile">
+                                <span style={{ width: '14%', lineHeight: '2.5rem' }}>Profile: </span>
+                                <Select
+                                    options={
+                                        machineProfiles
+                                            .sort((a, b) => getMachineProfileLabel(a).localeCompare(getMachineProfileLabel(b)))
+                                            .map(({ id, name, type }) => ({ key: id, value: id, label: getMachineProfileLabel({ name, type }) }))
+                                    }
+                                    onChange={(e) => {
+                                        setProfile(e.value);
+                                    }}
+                                    clearable={false}
+                                />
+                            </div>
+                        </div>
+                    ) : ''}
                     <div className="modal-footer">
-                        <h1 className="footer-text">{props.footer}</h1>
-                        <h1 className="footer-textTwo">{props.footerTwo}</h1>
+                        <h1 className="footer-text">{footer}</h1>
+                        <h1 className="footer-textTwo">{footerTwo}</h1>
                         <div className="buttonContainer">
-                            <button onClick={props.onClose} className="button-no">No</button>
-                            <button className="button" onClick={props.yesFunction}>Yes</button>
+                            <button onClick={onClose} className="button-no">No</button>
+                            <button
+                                className="button" onClick={() => {
+                                    yesFunction(port, profile);
+                                }}
+                            >Yes
+                            </button>
                         </div>
                     </div>
                 </div>
