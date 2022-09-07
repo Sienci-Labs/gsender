@@ -445,6 +445,7 @@ class PreferencesPage extends PureComponent {
 
                 const newLaserValue = { ...laser, [type]: amount };
 
+                this.spindleConfig.set(`laser.${type}`, amount);
                 this.setState({ spindle: { ...spindle, laser: newLaserValue } });
 
                 pubsub.publish('laser:updated', newLaserValue);
