@@ -122,8 +122,7 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `gSender ${pkg.version}`,
-                //nativeWindowOpen: true
+                title: `gSender ${pkg.version}`
             };
             const window = windowManager.openWindow(url, options, splashScreen);
 
@@ -223,14 +222,41 @@ const main = () => {
 
             ipcMain.on('open-new-window', (msg, route) => {
                 const childOptions = {
-                    ...bounds,
-                    title: 'gSender Pop Out Window'
+                    minWidth: 1024,
+                    minHeight: 768,
+                    title: 'gSender Pop Out Window',
                 };
-                log.debug(route);
                 // Hash router URL should look like '{url}/#/widget/:id'
                 const address = `${url}/#${route}`;
-                log.debug(address);
-                windowManager.openWindow(address, childOptions, splashScreen);
+                // const childSplashScreen = windowManager.createSplashScreen({
+                //     width: 500,
+                //     height: 400,
+                //     show: false,
+                //     frame: false
+                // });
+                // childSplashScreen.loadFile(path.join(__dirname, 'app/assets/Splashscreen.gif'));
+                // childSplashScreen.webContents.on('did-finish-load', () => {
+                //     childSplashScreen.show();
+                // });
+    
+                // childSplashScreen.on('show', () => {
+                //     childSplashScreen.focus();
+                // });
+
+                const window2 = windowManager.openWindow(address, childOptions, splashScreen);
+                ipcMain.on('get-state', (event, widget) => {
+                    window.webContents.send('get-state-' + widget);
+                });
+                ipcMain.on('recieve-state', (event, msg) => {
+                    const { widget, state } = msg;
+                    window2.webContents.send('recieve-state-' + widget, state);
+                });
+                ipcMain.on('get-port', (event) => {
+                    window.webContents.send('get-port-main');
+                })
+                ipcMain.on('recieve-port-main', (event, port) => {
+                    window2.webContents.send('recieve-port', port);
+                })
             });
         } catch (err) {
             log.error(err);

@@ -23,6 +23,10 @@
 
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import isElectron from 'is-electron';
+//import reduxStore from 'app/store/redux';
+//import api from 'app/api';
+import controller from 'app/lib/controller';
 import AxesWidget from 'app/widgets/JogControl';
 import ConsoleWidget from 'app/widgets/Console';
 import JobStatusWidget from 'app/widgets/JobStatus';
@@ -50,6 +54,31 @@ const getWidgetByName = (name) => {
 class WidgetWrapper extends PureComponent {
     widget = null;
 
+    state = null;
+    actions = null;
+    name = this.props.widgetId.split(':')[0];
+
+    componentDidMount() {
+        if (isElectron()) {
+            this.registerIPCListeners();
+            // ask main window for state for component we are about to render
+            window.ipcRenderer.send('get-state', this.name);
+            window.ipcRenderer.send('get-port');
+        }
+    }
+
+    registerIPCListeners () {
+        // recieve state of console from main window
+        window.ipcRenderer.on('recieve-state-' + this.name, (event, state) => {
+            this.setState(() => {
+                return { ...state };
+            });
+        });
+        window.ipcRenderer.on('recieve-port', (event, port) => {
+            controller.port = port;
+        });
+    }
+
     render() {
         const { widgetId } = this.props;
 
@@ -58,8 +87,7 @@ class WidgetWrapper extends PureComponent {
         }
 
         // e.g. "webcam" or "webcam:d8e6352f-80a9-475f-a4f5-3e9197a48a23"
-        const name = widgetId.split(':')[0];
-        const Widget = getWidgetByName(name);
+        const Widget = getWidgetByName(this.name);
 
         if (!Widget) {
             return null;
@@ -67,6 +95,7 @@ class WidgetWrapper extends PureComponent {
 
         return (
             <Widget
+                state={this.state}
                 {...this.props}
             />
         );

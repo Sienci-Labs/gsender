@@ -24,15 +24,18 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import log from 'electron-log';
-// import classNames from 'classnames';
-// import Sortable from 'react-sortablejs';
+//import log from 'electron-log';
 import store from 'app/store';
-import Widget from './Workspace/Widget';
-// import styles from './Workspace/widgets.styl';
-// import logger from '../../server/lib/logger';
+import chainedFunction from 'chained-function';
+import uuid from 'uuid';
+import { Button } from 'app/components/Buttons';
+import Modal from 'app/components/Modal';
+import i18n from 'app/lib/i18n';
+// import log from 'app/lib/log';
+import portal from 'app/lib/portal';
+import api from 'app/api';
+import WidgetWrapper from './Workspace/Widget';
 
-// const log = logger();
 
 class PopUpWidget extends Component {
     static propTypes = {
@@ -40,65 +43,106 @@ class PopUpWidget extends Component {
         route: PropTypes.string.isRequired
     };
 
-    state = {
-        widgets: store.get('workspace.container.primary.widgets')
+    state = { activeWidgets: [] };
+
+    forkWidget = (widgetId) => () => {
+        portal(({ onClose }) => (
+            <Modal size="xs" onClose={onClose}>
+                <Modal.Header>
+                    <Modal.Title>
+                        {i18n._('Fork Widget')}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {i18n._('Are you sure you want to fork this widget?')}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        onClick={onClose}
+                    >
+                        {i18n._('Cancel')}
+                    </Button>
+                    <Button
+                        btnStyle="primary"
+                        onClick={chainedFunction(
+                            () => {
+                                const name = widgetId.split(':')[0];
+                                if (!name) {
+                                    api.log.printLog(`Failed to fork widget: widgetId=${widgetId}`, 'popupwidget', 72, 'error');
+                                    return;
+                                }
+
+                                // Use the same widget settings in a new widget
+                                const forkedWidgetId = `${name}:${uuid.v4()}`;
+                                const defaultSettings = store.get(`widgets["${name}"]`);
+                                const clonedSettings = store.get(`widgets["${widgetId}"]`, defaultSettings);
+                                store.set(`widgets["${forkedWidgetId}"]`, clonedSettings);
+
+                                const widgets = [...this.state.widgets, forkedWidgetId];
+                                this.setState({ widgets: widgets });
+
+                                this.props.onForkWidget(widgetId);
+                            },
+                            onClose
+                        )}
+                    >
+                        {i18n._('OK')}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        ));
+    };
+
+    removeWidget = (widgetId) => () => {
+        portal(({ onClose }) => (
+            <Modal size="xs" onClose={onClose}>
+                <Modal.Header>
+                    <Modal.Title>
+                        {i18n._('Remove Widget')}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {i18n._('Are you sure you want to remove this widget?')}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        onClick={onClose}
+                    >
+                        {i18n._('Cancel')}
+                    </Button>
+                    <Button
+                        btnStyle="primary"
+                        onClick={chainedFunction(
+                            () => {
+                                const widgets = this.state.widgets.filter(n => n !== widgetId);
+                                this.setState({ widgets: widgets });
+
+                                if (widgetId.match(/\w+:[\w\-]+/)) {
+                                    // Remove forked widget settings
+                                    store.unset(`widgets["${widgetId}"]`);
+                                }
+
+                                this.props.onRemoveWidget(widgetId);
+                            },
+                            onClose
+                        )}
+                    >
+                        {i18n._('OK')}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        ));
     };
 
     render() {
-        //const { className } = this.props;
-        const widgets = this.state.widgets;
-        //const id = this.props.location.pathname.replace('/widget/', '');
-        let route = 'console';
-        // switch (id) {
-        // case '1':
-        //     route = 'console';
-        //     break;
-        // default:
-        //     route = '';
-        // }
-        let widget = null;
-        widgets.forEach(widgetId => {
-            let name = widgetId.split(':')[0];
-            if (name.includes(route)) {
-                widget = (
-                    <div data-widget-id={widgetId} key={widgetId}>
-                        <Widget
-                            widgetId={widgetId}
-                            onFork={this.forkWidget(widgetId)}
-                            onRemove={this.removeWidget(widgetId)}
-                        />
-                    </div>
-                );
-            }
-        });
-        log.debug(route);
-        log.debug(widget);
+        const id = this.props.location.pathname.replace('/widget/', '');
 
         return (
-            // <Sortable
-            //     className={classNames(className, styles.widgets)}
-            //     options={{
-            //         animation: 150,
-            //         delay: 0, // Touch and hold delay
-            //         group: {
-            //             name: 'primary',
-            //             pull: true,
-            //             put: ['secondary']
-            //         },
-            //         handle: '.sortable-handle', // Drag handle selector within list items
-            //         filter: '.sortable-filter', // Selectors that do not lead to dragging
-            //         chosenClass: 'sortable-chosen', // Class name for the chosen item
-            //         ghostClass: 'sortable-ghost', // Class name for the drop placeholder
-            //         dataIdAttr: 'data-widget-id',
-            //         // onStart: this.props.onDragStart,
-            //         // onEnd: this.props.onDragEnd
-            //     }}
-            //     // onChange={(order) => {
-            //     //     this.setState({ widgets: ensureArray(order) });
-            //     // }}
-            // >
-            { widget }
-            // </Sortable>
+            <WidgetWrapper
+                widgetId={id}
+                onFork={this.forkWidget(id)}
+                onRemove={this.removeWidget(id)}
+            />
         );
     }
 }

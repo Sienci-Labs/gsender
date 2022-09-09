@@ -254,6 +254,10 @@ class WorkflowControl extends PureComponent {
             window.ipcRenderer.on('returned-upload-dialog-data', (msg, file) => {
                 this.handleElectronFileUpload(file);
             });
+            window.ipcRenderer.on('get-port-main', (msg) => {
+                const port = reduxStore.getState().connection.port;
+                window.ipcRenderer.send('recieve-port-main', port);
+            });
         }
         this.subscribe();
     }

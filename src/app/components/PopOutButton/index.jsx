@@ -45,17 +45,15 @@
  */
 
 import React from 'react';
-import log from 'electron-log';
 
 const PopOutButton = ({ id }) => {
     const openWindow = () => {
-        log.debug(id);
         const route = '/widget/' + id;
         window.ipcRenderer.send('open-new-window', route);
     };
     return (
         <button onClick={openWindow}>
-            <img src="./outline_open_in_new_black_24dp.png" alt=""/>
+            {/* <img src="./outline_open_in_new_black_24dp.png" alt=""/> */}
         </button>
     );
 };

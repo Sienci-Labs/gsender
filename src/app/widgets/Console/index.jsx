@@ -26,6 +26,7 @@ import color from 'cli-color';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import uuid from 'uuid';
+import api from 'app/api';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
@@ -63,6 +64,8 @@ class ConsoleWidget extends PureComponent {
     config = new WidgetConfig(this.props.widgetId);
 
     state = this.getInitialState();
+
+    hasSetState = false;
 
     actions = {
         toggleFullscreen: () => {
@@ -147,6 +150,9 @@ class ConsoleWidget extends PureComponent {
 
     componentDidMount() {
         this.addControllerEvents();
+        if (isElectron()) {
+            this.registerIPCListeners();
+        }
     }
 
     componentWillUnmount() {
@@ -159,6 +165,14 @@ class ConsoleWidget extends PureComponent {
         } = this.state;
 
         this.config.set('minimized', minimized);
+
+        api.log.printLog(this.state, 'indexconsole', 172, 'debug');
+
+        if (isElectron() && !this.hasSetState && this.props.state) {
+            this.hasSetState = true;
+            this.setState(this.props.state);
+            api.log.printLog('set state', 'indexconsole', 172, 'debug');
+        }
     }
 
     getInitialState() {
@@ -178,6 +192,12 @@ class ConsoleWidget extends PureComponent {
         };
     }
 
+    registerIPCListeners () {
+        // send state of this console to the new window
+        window.ipcRenderer.on('get-state-console', (event) => {
+            window.ipcRenderer.send('recieve-state', { widget: 'console', state: this.state });
+        });
+    }
 
     addControllerEvents() {
         Object.keys(this.controllerEvents).forEach(eventName => {
@@ -227,7 +247,7 @@ class ConsoleWidget extends PureComponent {
                 >
                     {
                         isElectron() &&
-                        <PopOutButton id="1fdv7f42tbgj"/>
+                        <PopOutButton id={widgetId}/>
                     }
                     <Console
                         ref={node => {
