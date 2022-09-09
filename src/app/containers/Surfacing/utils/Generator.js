@@ -254,9 +254,9 @@ export default class Generator {
 
     getSafeZValue() {
         const workspaceUnits = store.get('workspace.units');
-        const Z_VALUE = workspaceUnits === METRIC_UNITS ? '3' : '0.12';
+        const zVal = workspaceUnits === METRIC_UNITS ? 3 : 0.12;
 
-        return Number(Z_VALUE);
+        return zVal;
     }
 
     returnToZero = () => {
@@ -306,7 +306,7 @@ export default class Generator {
             factor: axisFactors.y,
         };
 
-        if (width >= length || cutDirectionFlipped) {
+        if (width >= length) {
             direction.axis = 'X';
             direction.factor = axisFactors.x;
         }
@@ -353,18 +353,25 @@ export default class Generator {
         function processGcode (startPos, endPos, prevStartPos, prevEndPos, xFactor, yFactor) {
             const arr = [];
 
-            const xValueStart = toFixedValue(endPos.x * xFactor);
-            const yValueStart = toFixedValue(endPos.y * yFactor);
-            const xValueEnd = toFixedValue((startPos.x + stepoverAmount) * xFactor);
-            const yValueEnd = toFixedValue(startPos.y * yFactor);
-
             if (startIsInCenter) {
                 if (cutDirectionFlipped) {
+                    if (Math.abs(halfOfLength - endPos.y) === Math.abs(halfOfLength - (endPos.y - stepoverAmount))) {
+                        arr.push(
+                            `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y))}`,
+                            `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x))) * -1}`,
+                        );
+                    } else {
+                        arr.push(
+                            `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y))}`,
+                            `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x))) * -1}`,
+                            `G1 Y${toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount))) * -1}`,
+                            `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount)))}`,
+                        );
+                    }
+                } else if (Math.abs(halfOfLength - endPos.y) === Math.abs(halfOfLength - (endPos.y - stepoverAmount))) {
                     arr.push(
-                        `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y))}`,
-                        `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x))) * -1}`,
-                        `G1 Y${toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount))) * -1}`,
-                        `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount)))}`,
+                        `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y)) * -1}`,
+                        `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x)))}`,
                     );
                 } else {
                     arr.push(
@@ -379,6 +386,11 @@ export default class Generator {
 
                 return arr;
             }
+
+            const xValueStart = toFixedValue(endPos.x * xFactor);
+            const yValueStart = toFixedValue(endPos.y * yFactor);
+            const xValueEnd = toFixedValue((startPos.x + stepoverAmount) * xFactor);
+            const yValueEnd = toFixedValue(startPos.y * yFactor);
 
             if (cutDirectionFlipped) {
                 if (endPos.x >= startPos.x) {
@@ -410,7 +422,7 @@ export default class Generator {
                     }
                 }
             } else {
-                if (endPos.y >= (startPos.y)) {
+                if (endPos.y >= startPos.y) {
                     arr.push(
                         `G1 Y${yValueStart}`,
                     );
@@ -424,7 +436,7 @@ export default class Generator {
                 }
 
 
-                if (endPos.x >= (startPos.x)) {
+                if (endPos.x >= startPos.x) {
                     if (length > width) {
                         arr.push(
                             `G1 X${xValueStart}`,
@@ -725,7 +737,7 @@ export default class Generator {
 
         const startArea = [
             '(Entering Start Area)',
-            `G0 X${toFixedValue(width / 2) * -1} Y${toFixedValue(cutDirectionFlipped ? (length / 2) : (length / 2 - stepoverAmount))}`,
+            `G0 X${toFixedValue(width / 2) * -1} Y${toFixedValue(length / 2)}`,
             '(End of Entering Start Area)',
         ];
 
