@@ -128,18 +128,18 @@ export default class Generator {
 
         const gcodeArr = executeSurfacing(options);
 
-        let initialZValue = (depth - skimDepth) * -1;
-
-        if (count === 1) {
-            initialZValue = 0;
-        }
+        const safeHeight = this.getSafeZValue();
+        const zValue = safeHeight - (depth - skimDepth);
+        const startPosGcode = count === 1 ? [] : [
+            '(Move to Starting Height)',
+            `G0 Z${zValue}`,
+            '(End of Move to Starting Height)',
+            ''
+        ];
 
         return [
             `(*** Layer ${count} ***)`,
-            '(Initialize Layer)',
-            `G0 X0 Y0 Z${initialZValue}`,
-            '(End of Initialize Layer)',
-            '',
+            ...startPosGcode,
             ...gcodeArr,
             `(*** End of Layer ${count} ***)`,
             '\n',
@@ -157,11 +157,11 @@ export default class Generator {
         const units = store.get('workspace.units');
         const depth = skimDepth;
         const EXTRA_LENGTH = units === METRIC_UNITS ? 1 : convertToImperial(1);
-        const EXTRA_RAMP_HEIGHT = units === METRIC_UNITS ? 0.5 : convertToImperial(0.5);
+        const safeHeight = this.getSafeZValue();
         const EXTRA_RAMP_COAST = units === METRIC_UNITS ? 5 : convertToImperial(5);
-        const RAMP_HEIGHT = (Math.abs(depth) * -1) - EXTRA_RAMP_HEIGHT;
+        const RAMP_HEIGHT = (Math.abs(depth) * -1) - safeHeight;
 
-        const rampingLength = Number(((depth + EXTRA_LENGTH) / getTanFromDegrees(degrees)).toFixed(2));
+        const rampingLength = Number(((depth + safeHeight + EXTRA_LENGTH) / getTanFromDegrees(degrees)).toFixed(2));
 
         function getTanFromDegrees(degrees) {
             return Math.tan(degrees * Math.PI / 180);
@@ -172,10 +172,9 @@ export default class Generator {
         rampingArr.push(
             '(Ramping into Material)',
             'G91',
-            `G0 ${axis}${(rampingLength + EXTRA_RAMP_COAST) * factor}`,
-            `G0 Z${EXTRA_RAMP_HEIGHT}`,
-            `G1 ${axis}${(rampingLength * factor) * -1} Z${RAMP_HEIGHT}`, //Negate and return to starting position
-            `G1 ${axis}${(EXTRA_RAMP_COAST * factor) * -1}`,
+            `G1 ${axis}${(rampingLength * factor)} Z${RAMP_HEIGHT}`,
+            `G1 ${axis}${(EXTRA_RAMP_COAST * factor)}`,
+            `G0 ${axis}${(rampingLength + EXTRA_RAMP_COAST) * factor * -1}`,
             'G90',
             '(End of Ramping into Material)',
             ''
@@ -468,7 +467,7 @@ export default class Generator {
 
         const mainSpiralArea = [];
 
-        const startFromCenterPerimeter = drawInitialPerimeter(width, length, z, direction, true, startPosition);
+        const startFromCenterPerimeter = drawInitialPerimeter(width, length, z, direction, false, startPosition);
 
         const startFromCenterPerimeterPosition = [
             '(Entering Perimeter Start Position)',
@@ -477,12 +476,17 @@ export default class Generator {
             ''
         ];
 
+        const safeHeight = this.getSafeZValue();
+        const zValue = safeHeight - (depth - this.surfacing.skimDepth);
+
+        //Used to check if where ramp should enter from for center position, depends on if the cut direction is flipped too
+        const spiralEndsInXPos = spirals[spirals.length - 2].includes('X');
+
         const startFromCenterStartPosition = [
             '(Entering Start Position)',
-            `G91 G0 Z${this.getSafeZValue()} G90`,
+            `G0 Z${zValue} ; Start Pos - (Curr Depth - Cut Depth)`,
             `G0 X${position.x} Y${position.y}`,
-            `G91 G0 Z${(this.getSafeZValue() * -1)} G90`,
-            ...rampIntoMaterial(z, direction),
+            ...rampIntoMaterial(z, { ...direction, factor: spiralEndsInXPos && !cutDirectionFlipped ? -1 : 1 }),
             '(End of Entering Start Position)',
             ''
         ];
