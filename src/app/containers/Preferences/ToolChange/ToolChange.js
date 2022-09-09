@@ -18,16 +18,20 @@ import styles from '../index.styl';
 */
 export const TOOLCHANGE_OPTIONS = {
     IGNORE: {
-        label: 'Ignore'
+        label: 'Ignore',
+        description: 'This is place holder text that will eventually properly describe the behaviour of this particular strategy and the steps the user will need to take.'
     },
     MANUAL: {
-        label: 'Manual'
+        label: 'Manual',
+        description: 'This is place holder text that will eventually properly describe the behaviour of this particular strategy and the steps the user will need to take.'
     },
     SEMI: {
-        label: 'Semi-Automatic'
+        label: 'Semi-Automatic',
+        description: 'This is place holder text that will eventually properly describe the behaviour of this particular strategy and the steps the user will need to take.'
     },
     AUTO: {
-        label: 'Automatic'
+        label: 'Automatic',
+        description: 'This is place holder text that will eventually properly describe the behaviour of this particular strategy and the steps the user will need to take.'
     }
 };
 
