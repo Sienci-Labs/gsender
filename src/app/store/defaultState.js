@@ -332,7 +332,7 @@ const defaultState = {
             defaultImperialState: {
                 bitDiameter: 1,
                 stepover: 40,
-                feedrate: 2500,
+                feedrate: 98.43,
                 length: 0,
                 width: 0,
                 skimDepth: 0.04,
