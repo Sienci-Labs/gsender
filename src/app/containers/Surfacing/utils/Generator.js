@@ -129,7 +129,7 @@ export default class Generator {
         const gcodeArr = executeSurfacing(options);
 
         const safeHeight = this.getSafeZValue();
-        const zValue = safeHeight - (depth - skimDepth);
+        const zValue = this.toFixedValue(safeHeight - (depth - skimDepth));
         const startPosGcode = count === 1 ? [] : [
             '(Move to Starting Height)',
             `G0 Z${zValue}`,
