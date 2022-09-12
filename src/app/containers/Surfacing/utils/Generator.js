@@ -174,7 +174,7 @@ export default class Generator {
             'G91',
             `G1 ${axis}${(rampingLength * factor)} Z${RAMP_HEIGHT}`,
             `G1 ${axis}${(EXTRA_RAMP_COAST * factor)}`,
-            `G0 ${axis}${(rampingLength + EXTRA_RAMP_COAST) * factor * -1}`,
+            `G1 ${axis}${(rampingLength + EXTRA_RAMP_COAST) * factor * -1}`,
             'G90',
             '(End of Ramping into Material)',
             ''
@@ -489,7 +489,7 @@ export default class Generator {
         ];
 
         const safeHeight = this.getSafeZValue();
-        const zValue = safeHeight - (depth - this.surfacing.skimDepth);
+        const zValue = toFixedValue(safeHeight - (depth - this.surfacing.skimDepth));
 
         //Used to check if where ramp should enter from for center position, depends on if the cut direction is flipped too
         const spiralEndsInXPos = spirals[spirals.length - 2].includes('X');
