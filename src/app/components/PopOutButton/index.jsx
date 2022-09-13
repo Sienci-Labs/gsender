@@ -45,6 +45,9 @@
  */
 
 import React from 'react';
+import Icon from '@mdi/react';
+import { mdiOpenInNew } from '@mdi/js';
+import styles from './index.styl';
 
 const PopOutButton = ({ id }) => {
     const openWindow = () => {
@@ -52,9 +55,7 @@ const PopOutButton = ({ id }) => {
         window.ipcRenderer.send('open-new-window', route);
     };
     return (
-        <button onClick={openWindow}>
-            {/* <img src="./outline_open_in_new_black_24dp.png" alt=""/> */}
-        </button>
+        <Icon path={mdiOpenInNew} onClick={openWindow} className={styles.icon} color="white"/>
     );
 };
 

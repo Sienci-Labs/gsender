@@ -24,8 +24,6 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import isElectron from 'is-electron';
-//import reduxStore from 'app/store/redux';
-//import api from 'app/api';
 import controller from 'app/lib/controller';
 import AxesWidget from 'app/widgets/JogControl';
 import ConsoleWidget from 'app/widgets/Console';
@@ -63,6 +61,7 @@ class WidgetWrapper extends PureComponent {
             this.registerIPCListeners();
             // ask main window for state for component we are about to render
             window.ipcRenderer.send('get-state', this.name);
+            // ask main window for the controller port
             window.ipcRenderer.send('get-port');
         }
     }
@@ -74,8 +73,12 @@ class WidgetWrapper extends PureComponent {
                 return { ...state };
             });
         });
+        // recieve the controller port from main window
         window.ipcRenderer.on('recieve-port', (event, port) => {
+            // set port
             controller.port = port;
+            // add client
+            controller.addClient(port);
         });
     }
 
@@ -96,6 +99,7 @@ class WidgetWrapper extends PureComponent {
         return (
             <Widget
                 state={this.state}
+                isMainWindow={false}
                 {...this.props}
             />
         );

@@ -83,7 +83,7 @@ class WindowManager {
         });
     }
 
-    openWindow(url, options, splashScreen) {
+    openWindow(url, options, splashScreen, shouldMaximize = true) {
         const window = new BrowserWindow({
             ...options,
             show: false,
@@ -115,13 +115,17 @@ class WindowManager {
 
         if (splashScreen) {
             webContents.once('dom-ready', () => {
-                window.maximize();
+                if (shouldMaximize) {
+                    window.maximize();
+                }
                 window.show();
                 splashScreen.close();
                 splashScreen.destroy();
             });
         } else {
-            window.maximize();
+            if (shouldMaximize) {
+                window.maximize();
+            }
             window.show();
         }
 

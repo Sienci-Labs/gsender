@@ -30,7 +30,6 @@ import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { debounce } from 'lodash';
 
-import api from 'app/api';
 import store from 'app/store';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import controller from 'app/lib/controller';
@@ -220,7 +219,6 @@ class TerminalWrapper extends PureComponent {
     }
 
     writeln(data) {
-        api.log.printLog('here', 'terminal', 223, 'debug');
         this.term.write('\r');
         this.term.write(data);
         this.term.prompt();

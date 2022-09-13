@@ -22,7 +22,7 @@
  */
 
 import '@babel/polyfill';
-import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor } from 'electron';
+import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -221,29 +221,24 @@ const main = () => {
             });
 
             ipcMain.on('open-new-window', (msg, route) => {
+                const factor = screen.getPrimaryDisplay().scaleFactor;
                 const childOptions = {
-                    minWidth: 1024,
-                    minHeight: 768,
-                    title: 'gSender Pop Out Window',
+                    width: 550 / factor,
+                    height: 460 / factor,
+                    useContentSize: true,
+                    title: 'gSender',
+                    parent: window
                 };
                 // Hash router URL should look like '{url}/#/widget/:id'
                 const address = `${url}/#${route}`;
-                // const childSplashScreen = windowManager.createSplashScreen({
-                //     width: 500,
-                //     height: 400,
-                //     show: false,
-                //     frame: false
-                // });
-                // childSplashScreen.loadFile(path.join(__dirname, 'app/assets/Splashscreen.gif'));
-                // childSplashScreen.webContents.on('did-finish-load', () => {
-                //     childSplashScreen.show();
-                // });
-    
-                // childSplashScreen.on('show', () => {
-                //     childSplashScreen.focus();
-                // });
 
-                const window2 = windowManager.openWindow(address, childOptions, splashScreen);
+                const window2 = windowManager.openWindow(address, childOptions, splashScreen, false);
+
+                window2.on('close', (e) => {
+                    e.preventDefault();
+                    window2.hide();
+                });
+                
                 ipcMain.on('get-state', (event, widget) => {
                     window.webContents.send('get-state-' + widget);
                 });
@@ -253,10 +248,10 @@ const main = () => {
                 });
                 ipcMain.on('get-port', (event) => {
                     window.webContents.send('get-port-main');
-                })
+                });
                 ipcMain.on('recieve-port-main', (event, port) => {
                     window2.webContents.send('recieve-port', port);
-                })
+                });
             });
         } catch (err) {
             log.error(err);

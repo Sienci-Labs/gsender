@@ -24,14 +24,12 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-//import log from 'electron-log';
 import store from 'app/store';
 import chainedFunction from 'chained-function';
 import uuid from 'uuid';
 import { Button } from 'app/components/Buttons';
 import Modal from 'app/components/Modal';
 import i18n from 'app/lib/i18n';
-// import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import api from 'app/api';
 import WidgetWrapper from './Workspace/Widget';

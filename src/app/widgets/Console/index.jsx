@@ -26,7 +26,6 @@ import color from 'cli-color';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import uuid from 'uuid';
-import api from 'app/api';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
@@ -166,12 +165,9 @@ class ConsoleWidget extends PureComponent {
 
         this.config.set('minimized', minimized);
 
-        api.log.printLog(this.state, 'indexconsole', 172, 'debug');
-
         if (isElectron() && !this.hasSetState && this.props.state) {
             this.hasSetState = true;
             this.setState(this.props.state);
-            api.log.printLog('set state', 'indexconsole', 172, 'debug');
         }
     }
 
@@ -245,10 +241,6 @@ class ConsoleWidget extends PureComponent {
                     )}
                     style={{ width: '100%' }}
                 >
-                    {
-                        isElectron() &&
-                        <PopOutButton id={widgetId}/>
-                    }
                     <Console
                         ref={node => {
                             if (node) {
@@ -259,6 +251,10 @@ class ConsoleWidget extends PureComponent {
                         actions={actions}
                         active={active}
                     />
+                    {
+                        isElectron() && this.props.isMainWindow &&
+                        <PopOutButton id={widgetId}/>
+                    }
                 </Widget.Content>
             </Widget>
         );
