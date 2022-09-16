@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
-import { inRange } from 'lodash';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import { SET_CURRENT_VISUALIZER } from 'app/actions/visualizerActions';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
-import { METRIC_UNITS, IMPERIAL_UNITS, VISUALIZER_PRIMARY, VISUALIZER_SECONDARY } from 'app/constants';
+import { METRIC_UNITS, VISUALIZER_PRIMARY, VISUALIZER_SECONDARY } from 'app/constants';
 import api from 'app/api';
 
 import Visualizer from '../Visualizer';
@@ -16,11 +15,10 @@ import InputArea from '../InputArea';
 import ActionArea from '../ActionArea';
 import styles from '../../index.styl';
 import Generator from '../../utils/Generator';
+// import { convertValuesToImperial } from '../../utils';
 import GcodeViewer from '../GcodeViewer';
 import TabArea from '../TabArea';
 import { SurfacingContext } from './Context';
-
-const convertTo = (type, val) => (type === METRIC_UNITS ? Math.round(val * 25.4) : Number((val / 25.4).toFixed(2)));
 
 /**
  * @component Surfacing
@@ -28,10 +26,10 @@ const convertTo = (type, val) => (type === METRIC_UNITS ? Math.round(val * 25.4)
  * @prop {Function} onClose - Function to close the current modal
  */
 const Surfacing = ({ onClose, showTitle }) => {
-    const [surfacing, setSurfacing] = useState(store.get('widgets.surfacing.defaultMetricState'));
+    const [surfacing, setSurfacing] = useState(store.get('widgets.surfacing'));
 
     const [gcode, setGcode] = useState('');
-    const [units, setUnits] = useState(METRIC_UNITS);
+    const [units] = useState(store.get('workspace.units') || METRIC_UNITS);
 
     const [currentTab, setCurrentTab] = useState(0);
 
@@ -61,19 +59,9 @@ const Surfacing = ({ onClose, showTitle }) => {
     };
 
     const handleChange = ({ target, shouldConvert = true }) => {
-        const { id, value, min, max } = target;
+        const { id, value } = target;
 
-        const minimum = Number(units === METRIC_UNITS ? min : convertTo(IMPERIAL_UNITS, min));
-        const maxiumum = Number(units === METRIC_UNITS ? max : convertTo(IMPERIAL_UNITS, max));
         const val = Math.abs(Number(value));
-
-        if (shouldConvert && !inRange(val, minimum, maxiumum + 1)) {
-            return;
-        }
-
-        if (!shouldConvert && !inRange(val, Number(min), Number(max) + 1)) {
-            return;
-        }
 
         setSurfacing(prev => ({ ...prev, [id]: val }));
     };
@@ -83,46 +71,23 @@ const Surfacing = ({ onClose, showTitle }) => {
     };
 
     /**
-     * Grab the set machine profile and workspace units on component mount
+     * Prepare secondary surfacing visualizer and unmount the main one to improve performance
+     * (Having two three.js scenes makes the app choppy even or higher spec machines)
      */
     useEffect(() => {
-        const machineProfile = store.get('workspace.machineProfile');
-        const workspaceUnits = store.get('workspace.units');
-        const { defaultMetricState, defaultImperialState } = store.get('widgets.surfacing');
-
-        if (workspaceUnits) {
-            setUnits(workspaceUnits);
-        }
-
-        if (machineProfile) {
-            if (workspaceUnits === METRIC_UNITS) {
-                if ((!defaultMetricState.length && !defaultMetricState.width)) {
-                    setSurfacing(prev => ({
-                        ...prev,
-                        ...defaultMetricState,
-                        length: machineProfile.mm.depth,
-                        width: machineProfile.mm.width
-                    }));
-                } else {
-                    setSurfacing(prev => ({ ...prev, ...defaultMetricState }));
-                }
-            }
-
-            if (workspaceUnits === IMPERIAL_UNITS) {
-                if ((!defaultImperialState.length && !defaultImperialState.width)) {
-                    setSurfacing(prev => ({
-                        ...prev,
-                        ...defaultImperialState,
-                        length: machineProfile.in.depth,
-                        width: machineProfile.in.width
-                    }));
-                } else {
-                    setSurfacing(prev => ({ ...prev, ...defaultImperialState }));
-                }
-            }
-        }
-
         reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
+
+        if (surfacing.length === 0 && surfacing.width === 0) {
+            const machineProfile = store.get('workspace.machineProfile');
+
+            if (machineProfile) {
+                setSurfacing(prev => ({
+                    ...prev,
+                    length: units === METRIC_UNITS ? machineProfile.mm.depth : machineProfile.in.depth,
+                    width: units === METRIC_UNITS ? machineProfile.mm.width : machineProfile.in.width
+                }));
+            }
+        }
 
         return () => {
             reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_PRIMARY });
@@ -130,37 +95,7 @@ const Surfacing = ({ onClose, showTitle }) => {
     }, []);
 
     useEffect(() => {
-        const workspaceUnits = store.get('workspace.units');
-
-        if (workspaceUnits === METRIC_UNITS) {
-            const imperialValues = {
-                length: convertTo(IMPERIAL_UNITS, surfacing.length),
-                width: convertTo(IMPERIAL_UNITS, surfacing.width),
-                bitDiameter: convertTo(IMPERIAL_UNITS, surfacing.bitDiameter),
-                spindleRPM: convertTo(IMPERIAL_UNITS, surfacing.spindleRPM),
-                skimDepth: convertTo(IMPERIAL_UNITS, surfacing.skimDepth),
-                maxDepth: convertTo(IMPERIAL_UNITS, surfacing.maxDepth),
-                feedrate: convertTo(IMPERIAL_UNITS, surfacing.feedrate)
-            };
-
-            store.set('widgets.surfacing.defaultMetricState', surfacing);
-            store.set('widgets.surfacing.defaultImperialState', { ...surfacing, ...imperialValues });
-        }
-
-        if (workspaceUnits === IMPERIAL_UNITS) {
-            const metricValues = {
-                length: convertTo(METRIC_UNITS, surfacing.length),
-                width: convertTo(METRIC_UNITS, surfacing.width),
-                bitDiameter: convertTo(METRIC_UNITS, surfacing.bitDiameter),
-                spindleRPM: convertTo(METRIC_UNITS, surfacing.spindleRPM),
-                skimDepth: convertTo(METRIC_UNITS, surfacing.skimDepth),
-                maxDepth: convertTo(METRIC_UNITS, surfacing.maxDepth),
-                feedrate: convertTo(METRIC_UNITS, surfacing.feedrate)
-            };
-
-            store.set('widgets.surfacing.defaultImperialState', surfacing);
-            store.set('widgets.surfacing.defaultMetricState', { ...surfacing, ...metricValues });
-        }
+        store.replace('widgets.surfacing', surfacing);
     }, [surfacing]);
 
     useEffect(() => {
@@ -169,7 +104,6 @@ const Surfacing = ({ onClose, showTitle }) => {
             runGenerate();
         }
     }, [currentTab]);
-
 
     const canLoad = !!gcode; //For accessing the gcode line viewer
     const tabs = [
