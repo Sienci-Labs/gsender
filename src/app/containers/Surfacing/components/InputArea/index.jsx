@@ -1,20 +1,21 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
+import get from 'lodash/get';
 
 import defaultState from 'app/store/defaultState';
 import { METRIC_UNITS } from 'app/constants';
 
 import Input from './Input';
 import MachinePosition from '../MachinePosition';
-
 import inputStyles from './input.styl';
 import MultiInputBlock from './MultiInputBlock';
 import { InputLabelStyled, InputWrapperStyled } from './styled';
 import { SurfacingContext } from '../Surfacing/Context';
+import { convertValuesToImperial } from '../../utils';
+
+const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
 
 const InputArea = () => {
-    const { widgets } = defaultState;
-
     const { surfacing, units, onChange } = useContext(SurfacingContext);
 
     const {
@@ -26,10 +27,11 @@ const InputArea = () => {
         skimDepth,
         spindleRPM,
         maxDepth,
-        // spindle
     } = surfacing;
 
-    const defaultValues = units === METRIC_UNITS ? widgets.surfacing.defaultMetricState : widgets.surfacing.defaultImperialState;
+    const defaultValues = units === METRIC_UNITS
+        ? defaultSurfacingState
+        : convertValuesToImperial(defaultSurfacingState);
 
     return (
         <div>
@@ -56,7 +58,6 @@ const InputArea = () => {
                             id: 'length',
                             min: 1,
                             max: 50000,
-                            style: { borderRadius: 4 }
                         }}
                         value={length}
                         onChange={onChange}
@@ -98,8 +99,7 @@ const InputArea = () => {
 
             <Input
                 label="Spindle RPM"
-                units={units}
-                additionalProps={{ type: 'number', id: 'spindleRPM', min: 1, max: 200000, style: { ...inputStyles } }}
+                additionalProps={{ type: 'number', id: 'spindleRPM', min: 1, max: 200000, style: { borderRadius: 4, ...inputStyles } }}
                 value={spindleRPM}
                 onChange={onChange}
                 tooltip={{ content: `Default Value: ${defaultValues.spindleRPM}` }}
@@ -122,27 +122,6 @@ const InputArea = () => {
                 onChange={(e) => onChange({ ...e, shouldConvert: false })}
                 tooltip={{ content: `Default Value: ${defaultValues.stepover} | Max Value: 80` }}
             />
-
-            {/* <Tooltip content={`Default Value: ${defaultValues.spindle}`}>
-                <InputWrapperStyled hasTwoColumns>
-                    <InputLabelStyled>Spindle</InputLabelStyled>
-
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                        <RadioGroup
-                            name="spindle"
-                            value={spindle}
-                            depth={2}
-                            onChange={(value) => onSelect({ value, type: 'spindle' })}
-                            size="small"
-                        >
-                            <div>
-                                <RadioButton className={styles.prefferedradio} label="M3" value={M3} />
-                                <RadioButton className={styles.prefferedradio} label="M4" value={M4} />
-                            </div>
-                        </RadioGroup>
-                    </div>
-                </InputWrapperStyled>
-            </Tooltip> */}
 
             <InputWrapperStyled hasTwoColumns style={{ marginTop: '1.5rem' }}>
                 <InputLabelStyled>Start Position</InputLabelStyled>
