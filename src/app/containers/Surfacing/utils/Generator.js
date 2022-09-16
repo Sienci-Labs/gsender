@@ -319,13 +319,6 @@ export default class Generator {
         }
 
         function getNewEndPos(endPos) {
-            if (startIsInCenter) {
-                return {
-                    x: toFixedValue(endPos.x - stepoverAmount),
-                    y: toFixedValue(endPos.y - stepoverAmount),
-                };
-            }
-
             return {
                 x: toFixedValue(endPos.x - stepoverAmount),
                 y: toFixedValue(endPos.y - stepoverAmount),
@@ -333,19 +326,21 @@ export default class Generator {
         }
 
         function exitCondition (startPos, endPos, prevStartPos, prevEndPos) {
-            if (startIsInCenter) {
-                if (length < width) {
-                    const y1 = toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount)));
-                    const y2 = toFixedValue(Math.abs(halfOfLength - (endPos.y - (stepoverAmount * 2))));
+            // if (startIsInCenter) {
+            //     console.log({ startPos, endPos });
 
-                    return y1 - y2 < 0;
-                } else {
-                    const x1 = toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount)));
-                    const x2 = toFixedValue(Math.abs(halfOfWidth - (endPos.x - (stepoverAmount * 2))));
+            //     if (length < width) {
+            //         const y1 = toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount)));
+            //         const y2 = toFixedValue(Math.abs(halfOfLength - (endPos.y - (stepoverAmount * 2))));
 
-                    return x1 - x2 < 0;
-                }
-            }
+            //         return y1 - y2 < 0;
+            //     } else {
+            //         const x1 = toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount)));
+            //         const x2 = toFixedValue(Math.abs(halfOfWidth - (endPos.x - (stepoverAmount * 2))));
+
+            //         return x1 - x2 < 0;
+            //     }
+            // }
 
             return endPos.x < startPos.x || endPos.y < startPos.y;
         }
@@ -353,44 +348,44 @@ export default class Generator {
         function processGcode (startPos, endPos, prevStartPos, prevEndPos, xFactor, yFactor) {
             const arr = [];
 
-            if (startIsInCenter) {
-                if (cutDirectionFlipped) {
-                    if (Math.abs(halfOfLength - endPos.y) === Math.abs(halfOfLength - (endPos.y - stepoverAmount))) {
-                        arr.push(
-                            `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y))}`,
-                            `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x))) * -1}`,
-                        );
-                    } else {
-                        arr.push(
-                            `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y))}`,
-                            `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x))) * -1}`,
-                            `G1 Y${toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount))) * -1}`,
-                            `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount)))}`,
-                        );
-                    }
-                } else if (Math.abs(halfOfLength - endPos.y) === Math.abs(halfOfLength - (endPos.y - stepoverAmount))) {
-                    arr.push(
-                        `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y)) * -1}`,
-                        `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x)))}`,
-                    );
-                } else {
-                    arr.push(
-                        `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y)) * -1}`,
-                        `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x)))}`,
-                        `G1 Y${toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount)))}`,
-                        `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount))) * -1}`,
-                    );
-                }
+            // if (startIsInCenter) {
+            //     if (cutDirectionFlipped) {
+            //         if (Math.abs(halfOfLength - endPos.y) === Math.abs(halfOfLength - (endPos.y - stepoverAmount))) {
+            //             arr.push(
+            //                 `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y))}`,
+            //                 `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x))) * -1}`,
+            //             );
+            //         } else {
+            //             arr.push(
+            //                 `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y))}`,
+            //                 `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x))) * -1}`,
+            //                 `G1 Y${toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount))) * -1}`,
+            //                 `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount)))}`,
+            //             );
+            //         }
+            //     } else if (Math.abs(halfOfLength - endPos.y) === Math.abs(halfOfLength - (endPos.y - stepoverAmount))) {
+            //         arr.push(
+            //             `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y)) * -1}`,
+            //             `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x)))}`,
+            //         );
+            //     } else {
+            //         arr.push(
+            //             `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y)) * -1}`,
+            //             `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x)))}`,
+            //             `G1 Y${toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount)))}`,
+            //             `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount))) * -1}`,
+            //         );
+            //     }
 
-                arr.push('');
+            //     arr.push('');
 
-                return arr;
-            }
+            //     return arr;
+            // }
 
-            const xValueStart = toFixedValue(endPos.x * xFactor);
-            const yValueStart = toFixedValue(endPos.y * yFactor);
-            const xValueEnd = toFixedValue((startPos.x + stepoverAmount) * xFactor);
-            const yValueEnd = toFixedValue(startPos.y * yFactor);
+            const xValueStart = startIsInCenter ? toFixedValue((halfOfWidth - endPos.x) * xFactor) : toFixedValue(endPos.x * xFactor);
+            const yValueStart = startIsInCenter ? toFixedValue((halfOfLength - endPos.y) * yFactor) : toFixedValue(endPos.y * yFactor);
+            const xValueEnd = startIsInCenter ? toFixedValue((halfOfWidth - (startPos.x + stepoverAmount)) * xFactor) : toFixedValue((startPos.x + stepoverAmount) * xFactor);
+            const yValueEnd = startIsInCenter ? toFixedValue((halfOfLength - startPos.y) * yFactor) : toFixedValue(startPos.y * yFactor);
 
             if (cutDirectionFlipped) {
                 if (endPos.x >= startPos.x) {
@@ -518,16 +513,25 @@ export default class Generator {
 
         const remainderXFactor = cutDirectionFlipped ? 1 : -1;
         const remainderYFactor = cutDirectionFlipped ? -1 : 1;
-        const remainder = [
-            '',
-            '(Cover Remaining Area)',
-            `G1 X${toFixedValue(Math.abs(halfOfWidth - stepoverAmount) * remainderXFactor)}`,
-            `G1 Y${toFixedValue(Math.abs(halfOfLength - stepoverAmount) * remainderYFactor)}`,
-            `G1 X${toFixedValue(Math.abs(halfOfWidth - stepoverAmount) * remainderXFactor * -1)}`,
-            `G1 Y${toFixedValue(Math.abs(halfOfLength) * remainderXFactor * -1)}`,
-            '(End of Cover Remaining Area)',
-            ''
-        ];
+        const remainder = cutDirectionFlipped
+            ? [
+                '',
+                '(Cover Remaining Area)',
+                `G1 Y${toFixedValue(Math.abs(halfOfLength - stepoverAmount) * remainderYFactor)}`,
+                `G1 X${toFixedValue(Math.abs(halfOfWidth - stepoverAmount) * remainderXFactor * -1)}`,
+                `G1 X${toFixedValue(Math.abs(halfOfWidth - stepoverAmount) * remainderXFactor)}`,
+                `G1 Y${toFixedValue(Math.abs(halfOfLength) * remainderXFactor * -1)}`,
+                '(End of Cover Remaining Area)',
+                ''
+            ]
+            : [
+                '',
+                '(Cover Remaining Area)',
+                `G1 X${toFixedValue(Math.abs(halfOfWidth - stepoverAmount) * remainderXFactor * -1)}`,
+                `G1 Y${toFixedValue(Math.abs(halfOfLength) * -remainderYFactor)}`,
+                '(End of Cover Remaining Area)',
+                ''
+            ];
 
         /**
          * 1. Draw initial surfacing area perimeter
