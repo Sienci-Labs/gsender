@@ -292,6 +292,27 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('sender:M0M1', (opts) => {
+        const { data, comment = '' } = opts;
+
+        const content = (comment.length > 0)
+            ? <div><p>A pause command ({data}) was found - click resume to continue.</p><p>Comment: <b>{comment}</b></p></div>
+            : `A pause command (${data}) was found - click resume to continue.`;
+
+        Confirm({
+            title: 'M0/M1 Pause',
+            content,
+            confirmLabel: 'Resume',
+            cancelLabel: 'Stop',
+            onConfirm: () => {
+                controller.command('gcode:resume');
+            },
+            onClose: () => {
+                controller.command('gcode:stop');
+            }
+        });
+    });
+
     controller.addListener('outline:start', () => {
         Toaster.clear();
         Toaster.pop({
