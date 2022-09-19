@@ -21,69 +21,16 @@
  *
  */
 
-import React, { useState } from 'react';
-import Stepper from './components/Stepper';
-import Instructions from './components/Instructions';
-import styles from './index.styl';
+import React from 'react';
+import { WizardProvider } from 'app/components/Wizard/context';
+import Wizard from 'app/components/Wizard/Wizard';
 
-const wizard = {
-    steps: [
-        {
-            title: 'Change bit',
-            substeps: [
-                {
-                    content: 'Turn off router or verify that spindle is off.'
-                },
-                {
-                    content: 'Change bit to requested tool.'
-                }
-            ]
-        },
-        {
-            title: 'Setup probe',
-            substeps: [
-                {
-                    content: 'Setup touchplate and attach continuity collets.'
-                },
-                {
-                    content: 'Jog router into position above the touch plate using the jog controls'
-                }
-            ]
-        },
-        {
-            title: 'Probe new tool length',
-            substeps: [
-                {
-                    content: 'Probe tool length'
-                }
-            ]
-        },
-        {
-            title: 'Resume Program',
-            substeps: [
-                {
-                    content: 'Start next cutting operation'
-                }
-            ]
-        }
-    ]
-};
-
-const Wizard = () => {
-    const [currentStep] = useState(0);
+const WizardWrapper = () => {
     return (
-        <div className={styles.wizardWrapper}>
-            <div className={styles.wizardTitle}>
-                <h1>{wizard.title}</h1>
-            </div>
-            <div className={styles.wizardContent}>
-                <div className={styles.instructionWrapper}>
-                    <Instructions steps={wizard.steps} />
-                </div>
-                <Stepper steps={wizard.steps} currentStep={currentStep} />
-            </div>
-        </div>
+        <WizardProvider>
+            <Wizard />
+        </WizardProvider>
     );
 };
 
-export default Wizard;
+export default WizardWrapper;

@@ -1,22 +1,27 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useWizardContext } from 'app/components/Wizard/context';
+//import PropTypes from 'prop-types';
 import Step from './Step';
 import styles from '../index.styl';
 
-const Stepper = ({ steps = [], currentStep = 0 }) => {
+const Stepper = () => {
+    const { steps, activeStep } = useWizardContext();
     return (
         <div className={styles.stepperWrapper}>
-            <h2>Progress</h2>
             {
-                steps.map((step, index) => <Step step={step} key={index} index={index + 1}/>)
+                steps.map((step, index) => <Step
+                    step={step}
+                    key={index}
+                    index={index}
+                    active={activeStep === index}
+                    complete={activeStep > index}
+                    activeStep={activeStep}
+                />)
             }
         </div>
     );
 };
 
-Stepper.propTypes = {
-    steps: PropTypes.array,
-    currentStep: PropTypes.number
-};
+Stepper.propTypes = {};
 
 export default Stepper;

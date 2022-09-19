@@ -36,15 +36,30 @@ export const WizardProvider = ({ children }) => {
     const [title, setTitle] = useState('Wizard');
     const [steps, setSteps] = useState([]);
     const [visible, setVisible] = useState(false);
+    const [stepCount, setStepCount] = useState(0);
 
     // Memoized API for context, can be fetched separate to data context
     const api = useMemo(() => ({
-        setSteps: (steps) => setSteps(steps),
+        setWizardSteps: (steps) => setSteps(steps),
         setTitle: (title) => setTitle(title),
         setVisible: (b) => setVisible(b),
+        getStepTitle: (index) => {
+            const step = steps[index];
+            if (!step) {
+                return '';
+            }
+            return step.title;
+        },
+        getSubsteps: (index) => {
+            const step = steps[index];
+            if (!step) {
+                return [];
+            }
+            return step.substeps;
+        },
         incrementStep: () => {
-            const maxStepIndex = steps.length - 1;
-            if (activeStep <= maxStepIndex) {
+            const maxStepIndex = stepCount - 1;
+            if (activeStep < maxStepIndex) {
                 setActiveStep(activeStep + 1);
             }
         },
@@ -54,13 +69,27 @@ export const WizardProvider = ({ children }) => {
                 setActiveStep(decrementedStep);
             }
         },
-        completeSubStep: (index) => {
-
+        completeSubStep: (index) => {},
+        load: (instructions, title) => {
+            if (!instructions || !instructions.steps) {
+                return;
+            }
+            instructions.steps.forEach(step => {
+                step.substeps.forEach(substep => {
+                    substep.completed = false;
+                });
+            });
+            // Sets up steps, and restores default state for new wizard
+            setSteps([...instructions.steps]);
+            setStepCount(instructions.steps.length);
+            setTitle(title);
+            setActiveStep(0);
+            setVisible(true);
         }
-    }), [setActiveStep, setSteps, setTitle, setVisible]);
+    }), [setActiveStep, setSteps, setTitle, setVisible, steps, stepCount, activeStep]);
 
     return (
-        <WizardContext.Provider value={{ steps, activeStep, title, visible }}>
+        <WizardContext.Provider value={{ steps, activeStep, title, visible, stepCount }}>
             <WizardAPI.Provider value={api}>
                 {children}
             </WizardAPI.Provider>
@@ -92,26 +121,4 @@ export const useWizardAPI = () => {
         throw new Error('Context unavailable - make sure this is being used within the Wizard API context provider');
     }
     return context;
-};
-
-
-/**
- * Loads and populates a new instruction set for the wizard and sets it visible.
- * @param instructions Schema for current wizard instruction steps and substeps.
- */
-export const loadWizard = (instructions, title) => {
-    const { setSteps, setActiveStep, setTitle, setVisible } = useWizardAPI();
-    // Set each substep to incomplete
-    instructions.steps.forEach(step => {
-        step.substeps.forEach(substep => {
-            substep.completed = false;
-        });
-    });
-    console.log(instructions);
-
-    // Sets up steps, and restores default state for new wizard
-    setSteps(instructions.steps);
-    setTitle(title);
-    setActiveStep(0);
-    setVisible(true);
 };

@@ -22,27 +22,16 @@
  */
 
 import React from 'react';
-import { useWizardAPI, useWizardContext } from 'app/components/Wizard/context';
-import Controls from './Controls';
-import styles from '../index.styl';
+import { useWizardAPI } from 'app/components/Wizard/context';
 
-const Instructions = () => {
-    const { activeStep } = useWizardContext();
-    const { getSubsteps, getStepTitle } = useWizardAPI();
-    const steps = getSubsteps(activeStep);
+const Controls = () => {
+    const { incrementStep, decrementStep } = useWizardAPI();
     return (
-        <>
-            <div>
-                <h2 className={styles.instructionTitle}>{getStepTitle(activeStep)}</h2>
-                <ul>
-                    {
-                        steps.map(step => <li>{step.content}</li>)
-                    }
-                </ul>
-            </div>
-            <Controls />
-        </>
+        <div>
+            <button onClick={decrementStep}>Previous</button>
+            <button onClick={incrementStep}>Next</button>
+        </div>
     );
 };
 
-export default Instructions;
+export default Controls;

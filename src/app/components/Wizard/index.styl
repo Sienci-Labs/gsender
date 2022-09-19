@@ -52,6 +52,9 @@
 .instructionWrapper {
   width: 60%;
   padding: 10px;
+  display flex;
+  flex-direction column;
+  justify-content space-between;
 }
 
 
@@ -60,15 +63,82 @@
   flex-direction row;
   padding: 1rem;
   gap: 1rem;
+  border: solid 1px #e5e7eb;
+  align-items  center;
+  &-active {
+    @extends .step;
+    background: #FFFFFF;
+    border: solid 1px #9ca3af;
+  }
 }
 
 .stepIndex {
-  background: #3e85c7;
+  background: none;
+  border: solid 1px #e5e7eb;
   border-radius 9999px;
   display flex;
   align-items center;
   justify-content center;
-  color: white;
-  width: 2rem;
-  height: 2rem;
+  align-content center
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #9ca3af;
+  font-weight: bold;
+  font-size: 1.1rem;
+
+  &-complete {
+    @extends .stepIndex;
+    color: #059669;
+    border: solid 1px #059669;
+  }
+
+  &-active {
+    @extends .stepIndex;
+    color: #ffffff;
+    border: solid 1px #3e85c7;
+    background: #3e85c7;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.instructionTitle {
+  padding: 0;
+  margin: 0;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+}
+
+.stepText {
+  display: flex;
+  flex-direction column;
+}
+
+.stepTitle {
+  color: #059669;
+  font-weight: bold;
+
+  &-active {
+    @extends .stepTitle;
+    color: #3e85c7;
+  }
+
+  &-future {
+    @extends .stepTitle;
+    color: #4b5563;
+  }
+}
+
+.stepperDescription {
+  color: #9ca3af;
+  font-weight: bold;
+  font-size: 1.2rem;
+
+  &-active {
+    color: #295d8d;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
 }
