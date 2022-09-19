@@ -30,16 +30,42 @@ const wizard = {
     title: 'Toolchange - Manual',
     steps: [
         {
-            title: 'Change bit'
+            title: 'Change bit',
+            substeps: [
+                {
+                    content: 'Turn off router or verify that spindle is off.'
+                },
+                {
+                    content: 'Change bit to requested tool.'
+                }
+            ]
         },
         {
-            title: 'Setup probe'
+            title: 'Setup probe',
+            substeps: [
+                {
+                    content: 'Setup touchplate and attach continuity collets.'
+                },
+                {
+                    content: 'Jog router into position above the touch plate using the jog controls'
+                }
+            ]
         },
         {
-            title: 'Probe new tool length'
+            title: 'Probe new tool length',
+            substeps: [
+                {
+                    content: 'Probe tool length'
+                }
+            ]
         },
         {
-            title: 'Resume Program'
+            title: 'Resume Program',
+            substeps: [
+                {
+                    content: 'Start next cutting operation'
+                }
+            ]
         }
     ]
 };
