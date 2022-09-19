@@ -27,7 +27,6 @@ import Instructions from './components/Instructions';
 import styles from './index.styl';
 
 const wizard = {
-    title: 'Toolchange - Manual',
     steps: [
         {
             title: 'Change bit',
@@ -79,7 +78,7 @@ const Wizard = () => {
             </div>
             <div className={styles.wizardContent}>
                 <div className={styles.instructionWrapper}>
-                    <Instructions />
+                    <Instructions steps={wizard.steps} />
                 </div>
                 <Stepper steps={wizard.steps} currentStep={currentStep} />
             </div>

@@ -24,7 +24,8 @@
 import React from 'react';
 //import styles from '../index.styl';
 
-const Instructions = () => {
+const Instructions = ({ steps }) => {
+    //const { substeps } = steps;
     return (
         <div>This is an explanation of the current step</div>
     );
