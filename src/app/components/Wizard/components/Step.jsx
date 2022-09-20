@@ -24,7 +24,7 @@
 import React from 'react';
 import styles from '../index.styl';
 
-const Step = ({ step, index = 1, active, complete, activeStep }) => {
+const Step = ({ step, index = 1, active, complete }) => {
     const getTitleClass = () => {
         if (active) {
             return 'stepTitle-active';

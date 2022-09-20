@@ -23,13 +23,21 @@
 
 import React from 'react';
 import { useWizardAPI } from 'app/components/Wizard/context';
+import StepButton from 'app/components/Wizard/components/StepButton';
+import styles from '../index.styl';
 
 const Controls = () => {
     const { incrementStep, decrementStep } = useWizardAPI();
     return (
-        <div>
-            <button onClick={decrementStep}>Previous</button>
-            <button onClick={incrementStep}>Next</button>
+        <div className={styles.controls}>
+            <StepButton inverted onClick={decrementStep}>
+                <i className="fas fa-arrow-left" />
+                Back
+            </StepButton>
+            <StepButton onClick={incrementStep}>
+                Next
+                <i className="fas fa-arrow-right" />
+            </StepButton>
         </div>
     );
 };

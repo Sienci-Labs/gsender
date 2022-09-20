@@ -22,26 +22,17 @@
  */
 
 import React from 'react';
-import { useWizardAPI, useWizardContext } from 'app/components/Wizard/context';
-import Substep from 'app/components/Wizard/components/Substep';
-import Controls from './Controls';
 import styles from '../index.styl';
 
-const Instructions = () => {
-    const { activeStep } = useWizardContext();
-    const { getSubsteps, getStepTitle } = useWizardAPI();
-    const steps = getSubsteps(activeStep);
+const StepButton = ({ children, inverted = false, ...props }) => {
     return (
-        <>
-            <div className={styles.substeps}>
-                <h2 className={styles.instructionTitle}>{getStepTitle(activeStep)}</h2>
-                {
-                    steps.map((step, index) => <Substep step={step} key={index} />)
-                }
-            </div>
-            <Controls />
-        </>
+        <button
+            className={inverted ? styles.stepButtonInverted : styles.stepButton}
+            {...props}
+        >
+            {children}
+        </button>
     );
 };
 
-export default Instructions;
+export default StepButton;

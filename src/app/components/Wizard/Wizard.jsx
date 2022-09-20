@@ -31,40 +31,55 @@ import cx from 'classnames';
 const wizard = {
     steps: [
         {
-            title: 'Change bit',
+            title: 'Change Bit',
             substeps: [
                 {
-                    content: 'Turn off router or verify that spindle is off.'
+                    title: 'Safety First',
+                    description: 'PH COPY - Turn off router or verify that spindle is off.',
+                    cb: () => {
+                        console.log('Router CB');
+                    }
                 },
                 {
-                    content: 'Change bit to requested tool.'
+                    title: 'Change Bit',
+                    description: 'PH COPY - Change bit to requested tool.'
                 }
             ]
         },
         {
-            title: 'Setup probe',
+            title: 'Setup Probe',
             substeps: [
                 {
-                    content: 'Setup touchplate and attach continuity collets.'
+                    title: 'Touchplate Setup',
+                    description: 'PH COPY - Setup touchplate and attach continuity collets.'
                 },
                 {
-                    content: 'Jog router into position above the touch plate using the jog controls'
+                    title: 'Position Router',
+                    description: 'PH COPY - Jog router into position above the touch plate using the jog controls'
                 }
             ]
         },
         {
-            title: 'Probe new tool length',
+            title: 'Probe Tool',
             substeps: [
                 {
-                    content: 'Probe tool length'
+                    title: 'Probe',
+                    description: 'PH COPY - Probe tool length',
+                    cb: () => {
+                        console.log('Probe CB');
+                    }
                 }
             ]
         },
         {
-            title: 'Resume Program',
+            title: 'Resume Path',
             substeps: [
                 {
-                    content: 'Start next cutting operation'
+                    title: 'Resume Program',
+                    description: 'PH COPY - Start next cutting operation',
+                    cb: () => {
+                        console.log('Resume CB');
+                    }
                 }
             ]
         }
@@ -80,7 +95,7 @@ const Wizard = () => {
     return (
         <div className={cx(styles.wizardWrapper, { [styles.hidden]: !visible })}>
             <div className={styles.wizardTitle}>
-                <h1>{title}</h1>
+                <h1><i className="fas fa-hat-wizard" /> {title}</h1>
             </div>
             <div className={styles.wizardContent}>
                 <div className={styles.instructionWrapper}>
