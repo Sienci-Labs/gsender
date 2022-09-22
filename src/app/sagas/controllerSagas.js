@@ -25,6 +25,7 @@ import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import pubsub from 'pubsub-js';
+import api from 'app/api';
 import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
@@ -172,6 +173,16 @@ export function* initialize() {
     });
 
     controller.addListener('serialport:open', (options) => {
+        // if (isElectron()) {
+        let parentWindow = window.getParentWindow();
+        // api.log.printLog('hi', 'controllersagas', 178, 'debug');
+        api.log.printLog(parentWindow, 'controllersagas', 179, 'debug');
+        // if (!parentWindow) {
+        api.log.printLog('reconnect main', 'controllersagas', 180, 'debug');
+        window.ipcRenderer.send('reconnect-main', options);
+        // }
+        // }
+
         const machineProfile = store.get('workspace.machineProfile');
         const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
         // Reset homing run flag to prevent rapid position without running homing

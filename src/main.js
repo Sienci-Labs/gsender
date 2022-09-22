@@ -220,6 +220,7 @@ const main = () => {
                 }
             });
 
+            let window2;
             ipcMain.on('open-new-window', (msg, route) => {
                 const factor = screen.getPrimaryDisplay().scaleFactor;
                 const childOptions = {
@@ -232,7 +233,7 @@ const main = () => {
                 // Hash router URL should look like '{url}/#/widget/:id'
                 const address = `${url}/#${route}`;
 
-                const window2 = windowManager.openWindow(address, childOptions, splashScreen, false);
+                window2 = windowManager.openWindow(address, childOptions, splashScreen, false);
 
                 window2.on('close', (e) => {
                     e.preventDefault();
@@ -251,6 +252,11 @@ const main = () => {
                 });
                 ipcMain.on('recieve-port-main', (event, port) => {
                     window2.webContents.send('recieve-port', port);
+                });
+                ipcMain.on('reconnect-main', (event, options) => {
+                    log.debug('reconnecting');
+                    log.debug(options.port);
+                    window2.webContents.send('reconnect', options);
                 });
             });
         } catch (err) {

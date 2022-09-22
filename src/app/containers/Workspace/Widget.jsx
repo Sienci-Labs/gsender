@@ -55,6 +55,7 @@ class WidgetWrapper extends PureComponent {
     state = null;
     actions = null;
     name = this.props.widgetId.split(':')[0];
+    key = 0;
 
     componentDidMount() {
         if (isElectron()) {
@@ -80,6 +81,19 @@ class WidgetWrapper extends PureComponent {
             // add client
             controller.addClient(port);
         });
+        window.ipcRenderer.on('reconnect', (event, options) => {
+            const { port, type } = options;
+            // set port
+            controller.port = port;
+            controller.type = type;
+            // add client
+            controller.addClient(port);
+
+            this.setState(() => {
+                return { port: port, ...this.state };
+            });
+            this.key = this.key + 1;
+        });
     }
 
     render() {
@@ -101,6 +115,7 @@ class WidgetWrapper extends PureComponent {
                 state={this.state}
                 isMainWindow={false}
                 {...this.props}
+                key={this.key}
             />
         );
     }
