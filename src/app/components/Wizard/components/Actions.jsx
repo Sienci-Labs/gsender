@@ -22,24 +22,11 @@
  */
 
 import React from 'react';
-import SubstepCompletionIndicator from 'app/components/Wizard/components/SubstepCompletionIndicator';
-import Actions from './Actions';
-import styles from '../index.styl';
 
-const Substep = ({ step, index }) => {
+const Actions = ({ actions = [] }) => {
     return (
-        <div className={styles.substepWrapper}>
-            <SubstepCompletionIndicator completed={step.completed} />
-            <div className={styles.substep}>
-                <span className={styles.substepTitle}>{step.title}</span>
-                <span className={styles.substepDescription}>{step.description}</span>
-                <div>
-                    <Actions actions={step.actions} index={index} />
-                </div>
-            </div>
-        </div>
-
+        <div>actions</div>
     );
 };
 
-export default Substep;
+export default Actions;

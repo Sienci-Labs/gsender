@@ -4,17 +4,19 @@
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  width: 90%;
-  height: 400px;
+  width: 80%;
+  height: 500px;
   border-radius: 10px 10px 10px 10px;
   display: flex;
   flex-direction column;
   overflow hidden;
+  z-index: 20000;
 }
 
 .wizardContent {
   display flex;
   flex-direction row;
+  height: calc(100% - 40px);
   gap: 1rem;
   justify-items stretch;
   align-items stretch;
@@ -38,7 +40,7 @@
 .stepperWrapper {
   width: 30%;
   background-color: #e5e7eb;
-  border-left: solid 1px #9ca3af;
+  border-right: solid 1px #9ca3af;
   padding: 10px;
   display flex;
   flex-direction column;
@@ -53,9 +55,11 @@
 .instructionWrapper {
   width: 70%;
   padding: 10px;
+  height: 100%;
   display flex;
   flex-direction column;
   justify-content space-between;
+  overflow: scroll;
 }
 
 
@@ -216,5 +220,33 @@ button-mixin($color) {
     color: #3e85c7;
     border: solid 1px #3e85c7;
     background: none;
+  }
+}
+
+.substepWrapper {
+  display: flex;
+  flex-direction row;
+  align-items center;
+}
+
+.substepIndicator {
+  border-radius: 5px;
+  background: #FFFFFF;
+  border: solid 1px #dc2626;
+  color: #FFFFFF;
+  display: flex;
+  align-items center;
+  justify-content center;
+  padding: 5px;
+  i {
+    padding: none !important;
+    margin: none !important;
+  }
+
+  &-complete {
+    @extends .substepIndicator;
+    background: #059669;
+    border: solid 1px #059669;
+    color: #FFFFFF;
   }
 }

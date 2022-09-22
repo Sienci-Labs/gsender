@@ -36,9 +36,9 @@ const wizard = {
                 {
                     title: 'Safety First',
                     description: 'PH COPY - Turn off router or verify that spindle is off.',
-                    cb: () => {
+                    actions: [() => {
                         console.log('Router CB');
-                    }
+                    }]
                 },
                 {
                     title: 'Change Bit',
@@ -98,10 +98,10 @@ const Wizard = () => {
                 <h1><i className="fas fa-hat-wizard" /> {title}</h1>
             </div>
             <div className={styles.wizardContent}>
+                <Stepper />
                 <div className={styles.instructionWrapper}>
                     <Instructions />
                 </div>
-                <Stepper />
             </div>
         </div>
     );
