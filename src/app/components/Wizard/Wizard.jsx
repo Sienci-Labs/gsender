@@ -101,9 +101,7 @@ const Wizard = () => {
             </div>
             <div className={cx(styles.wizardContent, { [styles.hidden]: minimized })}>
                 <Stepper />
-                <div className={styles.instructionWrapper}>
-                    <Instructions />
-                </div>
+                <Instructions />
             </div>
         </div>
     );

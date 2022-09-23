@@ -33,11 +33,13 @@ const WizardAPI = createContext({});
  */
 export const WizardProvider = ({ children }) => {
     const [activeStep, setActiveStep] = useState(0);
+    const [activeSubstep, setActiveSubstep] = useState(0);
     const [title, setTitle] = useState('Wizard');
     const [steps, setSteps] = useState([]);
     const [visible, setVisible] = useState(false);
     const [stepCount, setStepCount] = useState(0);
     const [minimized, setMinimized] = useState(false);
+
 
     // Memoized API for context, can be fetched separate to data context
     const api = useMemo(() => ({
@@ -71,10 +73,16 @@ export const WizardProvider = ({ children }) => {
             }
         },
         toggleMinimized: (state) => {
-            console.log(state);
             setMinimized(!state);
         },
-        completeSubStep: (index) => {},
+        completeSubStep: (index) => {
+            const steps = [...steps];
+            const numberOfSubSteps = steps[activeStep].substeps.length;
+            steps[activeStep].substeps[index].completed = true;
+            setSteps(steps);
+            if ()
+
+        },
         load: (instructions, title) => {
             if (!instructions || !instructions.steps) {
                 return;
@@ -91,10 +99,10 @@ export const WizardProvider = ({ children }) => {
             setActiveStep(0);
             setVisible(true);
         }
-    }), [setActiveStep, setSteps, setTitle, setVisible, steps, stepCount, activeStep, setMinimized]);
+    }), [setActiveStep, setSteps, setTitle, setVisible, steps, stepCount, activeStep, activeSubstep, setMinimized, setActiveSubstep]);
 
     return (
-        <WizardContext.Provider value={{ steps, activeStep, title, visible, stepCount, minimized }}>
+        <WizardContext.Provider value={{ steps, activeStep, activeSubstep, title, visible, stepCount, minimized }}>
             <WizardAPI.Provider value={api}>
                 {children}
             </WizardAPI.Provider>

@@ -32,35 +32,24 @@ const Instructions = () => {
     //const {  } = useWizardAPI();
 
     return (
-        <>
-        {
-            steps.map(step => {
-                return (
-                    <div className={styles.substeps}>
-                        <h2 className={styles.instructionTitle}>{step.title}</h2>
-                        {
-                            step.substeps.map((step, index) => <Substep step={step} key={index} index={index} />)
-                        }
-                    </div>
-                );
-            })
-        }
-            <Controls />
-        </>
-    );
-
-    //const steps = getSubsteps(activeStep);
-    /*return (
-        <>
-            <div className={styles.substeps}>
-                <h2 className={styles.instructionTitle}>{getStepTitle(activeStep)}</h2>
+        <div className={styles.instructionWrapper}>
+            <div className={styles.stepWrapper}>
                 {
-                    steps.map((step, index) => <Substep step={step} key={index} index={index} />)
+                    steps.map(step => {
+                        return (
+                            <div className={styles.substeps}>
+                                <h2 className={styles.instructionTitle}>{step.title}</h2>
+                                {
+                                    step.substeps.map((step, index) => <Substep step={step} key={index} index={index} />)
+                                }
+                            </div>
+                        );
+                    })
                 }
             </div>
             <Controls />
-        </>
-    );*/
+        </div>
+    );
 };
 
 export default Instructions;

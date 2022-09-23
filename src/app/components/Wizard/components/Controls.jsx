@@ -35,7 +35,7 @@ const Controls = () => {
                 Back
             </StepButton>
             <StepButton onClick={incrementStep}>
-                Next
+                Complete
                 <i className="fas fa-arrow-right" />
             </StepButton>
         </div>
