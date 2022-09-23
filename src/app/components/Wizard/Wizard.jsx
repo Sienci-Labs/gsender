@@ -27,6 +27,7 @@ import Instructions from 'app/components/Wizard/components/Instructions';
 import Stepper from 'app/components/Wizard/components/Stepper';
 import { useWizardContext, useWizardAPI } from 'app/components/Wizard/context';
 import cx from 'classnames';
+import MinMaxButton from 'app/components/Wizard/components/MinMaxButton';
 
 const wizard = {
     steps: [
@@ -87,17 +88,18 @@ const wizard = {
 };
 
 const Wizard = () => {
-    const { title, visible } = useWizardContext();
+    const { title, visible, minimized, activeStep, steps } = useWizardContext();
     const { load } = useWizardAPI();
     useEffect(() => {
         load(wizard, 'Toolchange: Manual');
     }, []);
     return (
-        <div className={cx(styles.wizardWrapper, { [styles.hidden]: !visible })}>
+        <div className={cx(styles.wizardWrapper, { [styles.hidden]: !visible, [styles.minimizedWrapper]: minimized })}>
             <div className={styles.wizardTitle}>
-                <h1><i className="fas fa-hat-wizard" /> {title}</h1>
+                <h1><i className="fas fa-hat-wizard" /> {title} - Step {activeStep + 1} of {steps.length}</h1>
+                <MinMaxButton />
             </div>
-            <div className={styles.wizardContent}>
+            <div className={cx(styles.wizardContent, { [styles.hidden]: minimized })}>
                 <Stepper />
                 <div className={styles.instructionWrapper}>
                     <Instructions />
