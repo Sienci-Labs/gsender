@@ -149,9 +149,9 @@ class ConsoleWidget extends PureComponent {
 
     componentDidMount() {
         this.addControllerEvents();
-        if (isElectron()) {
-            this.registerIPCListeners();
-        }
+        // if (isElectron()) {
+        //     this.registerIPCListeners();
+        // }
     }
 
     componentWillUnmount() {
@@ -188,12 +188,12 @@ class ConsoleWidget extends PureComponent {
         };
     }
 
-    registerIPCListeners () {
-        // send state of this console to the new window
-        window.ipcRenderer.on('get-state-console', (event) => {
-            window.ipcRenderer.send('recieve-state', { widget: 'console', state: this.state });
-        });
-    }
+    // registerIPCListeners () {
+    //     // send state of this console to the new window
+    //     window.ipcRenderer.on('get-state-console', (event) => {
+    //         window.ipcRenderer.send('recieve-state', { widget: 'console', state: this.state });
+    //     });
+    // }
 
     addControllerEvents() {
         Object.keys(this.controllerEvents).forEach(eventName => {
@@ -253,7 +253,7 @@ class ConsoleWidget extends PureComponent {
                     />
                     {
                         isElectron() && this.props.isMainWindow &&
-                        <PopOutButton id={widgetId}/>
+                        <PopOutButton id={widgetId} state={state}/>
                     }
                 </Widget.Content>
             </Widget>

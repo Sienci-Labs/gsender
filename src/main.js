@@ -220,8 +220,8 @@ const main = () => {
                 }
             });
 
-            let window2;
-            ipcMain.on('open-new-window', (msg, route) => {
+            ipcMain.on('open-new-window', (msg, data) => {
+                const { route, port, state } = data;
                 const factor = screen.getPrimaryDisplay().scaleFactor;
                 const childOptions = {
                     width: 550 / factor,
@@ -232,32 +232,45 @@ const main = () => {
                 };
                 // Hash router URL should look like '{url}/#/widget/:id'
                 const address = `${url}/#${route}`;
+                const shouldMaximize = false;
+                const isChild = true;
 
-                window2 = windowManager.openWindow(address, childOptions, splashScreen, false);
+                windowManager.openWindow(address, childOptions, null, shouldMaximize, isChild, data);
 
-                window2.on('close', (e) => {
-                    e.preventDefault();
-                    window2.hide();
-                });
+                // window2.once('dom-ready', () => {
+                //     log.debug('going to send info**********');
+                //     window2.webContents.send('recieve-state', state);
+                //     window2.webContents.send('recieve-port', port);
+                // });
                 
-                ipcMain.on('get-state', (event, widget) => {
-                    window.webContents.send('get-state-' + widget);
-                });
-                ipcMain.on('recieve-state', (event, msg) => {
-                    const { widget, state } = msg;
-                    window2.webContents.send('recieve-state-' + widget, state);
-                });
-                ipcMain.on('get-port', (event) => {
-                    window.webContents.send('get-port-main');
-                });
-                ipcMain.on('recieve-port-main', (event, port) => {
-                    window2.webContents.send('recieve-port', port);
-                });
-                ipcMain.on('reconnect-main', (event, options) => {
+
+                // ipcMain.on('get-state', (event, widget) => {
+                //     window.webContents.send('get-state-' + widget);
+                // });
+    
+                // ipcMain.on('recieve-state', (event, msg) => {
+                //     const { widget, state } = msg;
+                //     log.debug(event);
+                //     window2.webContents.send('recieve-state-' + widget, state);
+                // });
+    
+                // ipcMain.on('get-port', (event) => {
+                //     window.webContents.send('get-port-main');
+                // });
+    
+                // ipcMain.on('recieve-port-main', (event, port) => {
+                //     window2.webContents.send('recieve-port', port);
+                // });
+            });
+
+            ipcMain.on('reconnect-main', (event, options) => {
+                if (!event.sender.browserWindowOptions.parent) {
                     log.debug('reconnecting');
                     log.debug(options.port);
-                    window2.webContents.send('reconnect', options);
-                });
+                    windowManager.childWindows.forEach(window => {
+                        window.webContents.send('reconnect', options);
+                    });
+                }
             });
         } catch (err) {
             log.error(err);

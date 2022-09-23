@@ -23,10 +23,13 @@
 
 /* eslint import/no-unresolved: 0 */
 import { app, BrowserWindow, shell } from 'electron';
+import log from 'electron-log';
 import path from 'path';
 
 class WindowManager {
     windows = [];
+
+    childWindows = [];
 
     title = '';
 
@@ -83,7 +86,7 @@ class WindowManager {
         });
     }
 
-    openWindow(url, options, splashScreen, shouldMaximize = true) {
+    openWindow(url, options, splashScreen, shouldMaximize = true, isChild = false, data = null) {
         const window = new BrowserWindow({
             ...options,
             show: false,
@@ -98,6 +101,14 @@ class WindowManager {
         //window.removeMenu();
         window.webContents.once('did-finish-load', () => {
             window.setTitle(options.title);
+            if (isChild) {
+                log.debug('going to send now*****************');
+                // const { state, port } = data;
+                // log.debug(port);
+                window.webContents.send('recieve-data', data);
+                // window.webContents.send('recieve-port', port);
+                // window.webContents.send('recieve-state', state);
+            }
         });
 
         window.on('closed', (event) => {
@@ -136,7 +147,16 @@ class WindowManager {
             window.loadURL(url);
         });
 
-        this.windows.push(window);
+        if (isChild) {
+            window.on('close', (e) => {
+                e.preventDefault();
+                window.hide();
+            });
+            window.key = this.childWindows.length;
+            this.childWindows.push(window);
+        } else {
+            this.windows.push(window);
+        }
 
         return window;
     }

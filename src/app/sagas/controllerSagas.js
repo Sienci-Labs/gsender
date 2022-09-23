@@ -173,15 +173,10 @@ export function* initialize() {
     });
 
     controller.addListener('serialport:open', (options) => {
-        // if (isElectron()) {
-        let parentWindow = window.getParentWindow();
-        // api.log.printLog('hi', 'controllersagas', 178, 'debug');
-        api.log.printLog(parentWindow, 'controllersagas', 179, 'debug');
-        // if (!parentWindow) {
-        api.log.printLog('reconnect main', 'controllersagas', 180, 'debug');
-        window.ipcRenderer.send('reconnect-main', options);
-        // }
-        // }
+        if (isElectron()) {
+            api.log.printLog('reconnect main', 'controllersagas', 180, 'debug');
+            window.ipcRenderer.send('reconnect-main', options);
+        }
 
         const machineProfile = store.get('workspace.machineProfile');
         const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
