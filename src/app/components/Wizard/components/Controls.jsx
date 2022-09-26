@@ -27,14 +27,18 @@ import StepButton from 'app/components/Wizard/components/StepButton';
 import styles from '../index.styl';
 
 const Controls = () => {
-    const { completeSubStep, decrementStep } = useWizardAPI();
+    const { completeSubStep, decrementStep, scrollToActiveStep } = useWizardAPI();
     return (
         <div className={styles.controls}>
             <StepButton inverted onClick={decrementStep}>
                 <i className="fas fa-arrow-left" />
                 Back
             </StepButton>
-            <StepButton onClick={completeSubStep}>
+            <StepButton onClick={() => {
+                completeSubStep();
+                scrollToActiveStep();
+            }}
+            >
                 Complete
                 <i className="fas fa-arrow-right" />
             </StepButton>

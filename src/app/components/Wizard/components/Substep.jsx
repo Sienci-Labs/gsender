@@ -32,7 +32,7 @@ const Substep = ({ step, index, stepIndex }) => {
     return (
         <div className={styles.substepWrapper}>
             <SubstepCompletionIndicator completed={isSubstepCompleted(stepIndex, index)} />
-            <div className={styles.substep}>
+            <div className={styles.substep} id={`step-${stepIndex}-${index}`}>
                 <span className={styles.substepTitle}>{step.title}</span>
                 <span className={styles.substepDescription}>{step.description}</span>
                 <div>

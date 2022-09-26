@@ -76,6 +76,10 @@ export const WizardProvider = ({ children }) => {
             setMinimized(!state);
         },
         completeSubStep: () => {
+            const maxStepIndex = stepCount - 1;
+            if (activeStep > maxStepIndex) {
+                return;
+            }
             const step = steps[activeStep];
             const numberOfSubSteps = step.substeps.length;
             const nextStep = activeSubstep + 1;
@@ -91,10 +95,7 @@ export const WizardProvider = ({ children }) => {
             if (activeStep > stepIndex) {
                 return true;
             }
-            if (activeSubstep > substepIndex && stepIndex === activeStep) {
-                return true;
-            }
-            return false;
+            return activeSubstep > substepIndex && stepIndex === activeStep;
         },
         load: (instructions, title) => {
             if (!instructions || !instructions.steps) {
@@ -106,6 +107,15 @@ export const WizardProvider = ({ children }) => {
             setTitle(title);
             setActiveStep(0);
             setVisible(true);
+        },
+        scrollToActiveStep: () => {
+            if (activeStep > steps.length) {
+                return;
+            }
+            const element = document.getElementById(`step-${activeStep}-${activeSubstep}`);
+            element.scrollIntoView({
+                behavior: 'smooth'
+            });
         }
     }), [setActiveStep, setSteps, setTitle, setVisible, steps, stepCount, activeStep, activeSubstep, setMinimized, setActiveSubstep]);
 
