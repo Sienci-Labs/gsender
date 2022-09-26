@@ -95,7 +95,8 @@ class Controller {
         'outline:start': [],
         'file:load': [],
         'file:unload': [],
-        'homing:flag': []
+        'homing:flag': [],
+        'sender:M0M1': []
     };
 
     context = {
