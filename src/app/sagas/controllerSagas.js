@@ -303,12 +303,9 @@ export function* initialize() {
             title: 'M0/M1 Pause',
             content,
             confirmLabel: 'Resume',
-            cancelLabel: 'Stop',
+            cancelLabel: 'Close Window',
             onConfirm: () => {
                 controller.command('gcode:resume');
-            },
-            onClose: () => {
-                controller.command('gcode:stop');
             }
         });
     });
