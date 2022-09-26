@@ -86,7 +86,7 @@ class WindowManager {
         });
     }
 
-    openWindow(url, options, splashScreen, shouldMaximize = true, isChild = false, data = null) {
+    openWindow(url, options, splashScreen, shouldMaximize = true, isChild = false /*, data = null*/) {
         const window = new BrowserWindow({
             ...options,
             show: false,
@@ -101,14 +101,6 @@ class WindowManager {
         //window.removeMenu();
         window.webContents.once('did-finish-load', () => {
             window.setTitle(options.title);
-            if (isChild) {
-                log.debug('going to send now*****************');
-                // const { state, port } = data;
-                // log.debug(port);
-                window.webContents.send('recieve-data', data);
-                // window.webContents.send('recieve-port', port);
-                // window.webContents.send('recieve-state', state);
-            }
         });
 
         window.on('closed', (event) => {

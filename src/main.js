@@ -220,8 +220,7 @@ const main = () => {
                 }
             });
 
-            ipcMain.on('open-new-window', (msg, data) => {
-                const { route, port, state } = data;
+            ipcMain.on('open-new-window', (msg, route) => {
                 const factor = screen.getPrimaryDisplay().scaleFactor;
                 const childOptions = {
                     width: 550 / factor,
@@ -235,42 +234,26 @@ const main = () => {
                 const shouldMaximize = false;
                 const isChild = true;
 
-                windowManager.openWindow(address, childOptions, null, shouldMaximize, isChild, data);
-
-                // window2.once('dom-ready', () => {
-                //     log.debug('going to send info**********');
-                //     window2.webContents.send('recieve-state', state);
-                //     window2.webContents.send('recieve-port', port);
-                // });
-                
-
-                // ipcMain.on('get-state', (event, widget) => {
-                //     window.webContents.send('get-state-' + widget);
-                // });
-    
-                // ipcMain.on('recieve-state', (event, msg) => {
-                //     const { widget, state } = msg;
-                //     log.debug(event);
-                //     window2.webContents.send('recieve-state-' + widget, state);
-                // });
-    
-                // ipcMain.on('get-port', (event) => {
-                //     window.webContents.send('get-port-main');
-                // });
-    
-                // ipcMain.on('recieve-port-main', (event, port) => {
-                //     window2.webContents.send('recieve-port', port);
-                // });
+                windowManager.openWindow(address, childOptions, null, shouldMaximize, isChild);
             });
 
             ipcMain.on('reconnect-main', (event, options) => {
-                if (!event.sender.browserWindowOptions.parent) {
-                    log.debug('reconnecting');
-                    log.debug(options.port);
+                if (!event.sender.browserWindowOptions.parent && windowManager.childWindows.length > 0) {
                     windowManager.childWindows.forEach(window => {
                         window.webContents.send('reconnect', options);
                     });
                 }
+            });
+
+            ipcMain.on('get-data', (event, widget) => {
+                window.webContents.send('get-data-' + widget);
+            });
+
+            ipcMain.on('recieve-data', (event, msg) => {
+                const { widget, data } = msg;
+                windowManager.childWindows.forEach(window => {
+                    window.webContents.send('recieve-data-' + widget, data);
+                });
             });
         } catch (err) {
             log.error(err);

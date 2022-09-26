@@ -66,6 +66,8 @@ class ConsoleWidget extends PureComponent {
 
     hasSetState = false;
 
+    name = this.props.widgetId.split(':')[0];
+
     actions = {
         toggleFullscreen: () => {
             this.setState(state => ({
@@ -149,9 +151,9 @@ class ConsoleWidget extends PureComponent {
 
     componentDidMount() {
         this.addControllerEvents();
-        // if (isElectron()) {
-        //     this.registerIPCListeners();
-        // }
+        if (isElectron()) {
+            this.registerIPCListeners();
+        }
     }
 
     componentWillUnmount() {
@@ -188,12 +190,13 @@ class ConsoleWidget extends PureComponent {
         };
     }
 
-    // registerIPCListeners () {
-    //     // send state of this console to the new window
-    //     window.ipcRenderer.on('get-state-console', (event) => {
-    //         window.ipcRenderer.send('recieve-state', { widget: 'console', state: this.state });
-    //     });
-    // }
+    registerIPCListeners () {
+        // send state of this console to the new window
+        window.ipcRenderer.on('get-data-' + this.name, (event) => {
+            const data = { state: this.state, port: controller.port };
+            window.ipcRenderer.send('recieve-data', { widget: this.name, data: data });
+        });
+    }
 
     addControllerEvents() {
         Object.keys(this.controllerEvents).forEach(eventName => {

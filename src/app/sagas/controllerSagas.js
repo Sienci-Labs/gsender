@@ -25,7 +25,6 @@ import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import pubsub from 'pubsub-js';
-import api from 'app/api';
 import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
@@ -174,7 +173,6 @@ export function* initialize() {
 
     controller.addListener('serialport:open', (options) => {
         if (isElectron()) {
-            api.log.printLog('reconnect main', 'controllersagas', 180, 'debug');
             window.ipcRenderer.send('reconnect-main', options);
         }
 

@@ -47,14 +47,12 @@
 import React from 'react';
 import Icon from '@mdi/react';
 import { mdiOpenInNew } from '@mdi/js';
-import controller from 'app/lib/controller';
 import styles from './index.styl';
 
-const PopOutButton = ({ id, state }) => {
+const PopOutButton = ({ id }) => {
     const openWindow = () => {
         const route = '/widget/' + id;
-        const port = controller.port;
-        window.ipcRenderer.send('open-new-window', { route: route, port: port, state: state });
+        window.ipcRenderer.send('open-new-window', route);
     };
     return (
         <Icon path={mdiOpenInNew} onClick={openWindow} className={styles.icon} color="white"/>

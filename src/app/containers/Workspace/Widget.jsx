@@ -34,7 +34,6 @@ import ProbeWidget from 'app/widgets/Probe';
 import SpindleWidget from 'app/widgets/Spindle';
 import VisualizerWidget from 'app/widgets/Visualizer';
 import SecondaryFunctionality from 'app/widgets/SecondaryFunctionality';
-import api from 'app/api';
 
 const getWidgetByName = (name) => {
     return {
@@ -61,37 +60,20 @@ class WidgetWrapper extends PureComponent {
     componentDidMount() {
         if (isElectron()) {
             this.registerIPCListeners();
-            // // ask main window for state for component we are about to render
-            // window.ipcRenderer.send('get-state', this.name);
-            // // ask main window for the controller port
-            // window.ipcRenderer.send('get-port');
+            // ask main window for data for component we are about to render
+            window.ipcRenderer.send('get-data', this.name);
         }
     }
 
     registerIPCListeners () {
-        // recieve state of console from main window
-        // window.ipcRenderer.on('recieve-state', (event, state) => {
-        //     api.log.printLog(state, 'widget', 74, 'debug');
-        //     this.setState(() => {
-        //         return { ...state };
-        //     });
-        // });
-        // // recieve the controller port from main window
-        // window.ipcRenderer.on('recieve-port', (event, port) => {
-        //     api.log.printLog(port, 'widget', 81, 'debug');
-        //     // set port
-        //     controller.port = port;
-        //     // add client
-        //     controller.addClient(port);
-        // });
-        window.ipcRenderer.on('recieve-data', (event, data) => {
+        // recieve state of console and controller port from main window
+        window.ipcRenderer.on('recieve-data-' + this.name, (event, data) => {
             const { port, state } = data;
-            api.log.printLog('in recieve-data', 'widget', 81, 'debug');
             // set port
             controller.port = port;
             // add client
             controller.addClient(port);
-
+            // set state
             this.setState(() => {
                 return { ...state };
             });
@@ -107,7 +89,6 @@ class WidgetWrapper extends PureComponent {
             this.setState(() => {
                 return { port: port, ...this.state };
             });
-            this.key = this.key + 1;
         });
     }
 
