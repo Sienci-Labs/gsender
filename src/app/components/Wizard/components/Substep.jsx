@@ -23,13 +23,15 @@
 
 import React from 'react';
 import SubstepCompletionIndicator from 'app/components/Wizard/components/SubstepCompletionIndicator';
+import { useWizardAPI } from 'app/components/Wizard/context';
 import Actions from './Actions';
 import styles from '../index.styl';
 
-const Substep = ({ step, index }) => {
+const Substep = ({ step, index, stepIndex }) => {
+    const { isSubstepCompleted } = useWizardAPI();
     return (
         <div className={styles.substepWrapper}>
-            <SubstepCompletionIndicator completed={step.completed} />
+            <SubstepCompletionIndicator completed={isSubstepCompleted(stepIndex, index)} />
             <div className={styles.substep}>
                 <span className={styles.substepTitle}>{step.title}</span>
                 <span className={styles.substepDescription}>{step.description}</span>

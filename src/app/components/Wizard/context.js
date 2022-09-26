@@ -75,23 +75,31 @@ export const WizardProvider = ({ children }) => {
         toggleMinimized: (state) => {
             setMinimized(!state);
         },
-        completeSubStep: (index) => {
-            const steps = [...steps];
-            const numberOfSubSteps = steps[activeStep].substeps.length;
-            steps[activeStep].substeps[index].completed = true;
-            setSteps(steps);
-            if ()
-
+        completeSubStep: () => {
+            const step = steps[activeStep];
+            const numberOfSubSteps = step.substeps.length;
+            const nextStep = activeSubstep + 1;
+            // Completed all substeps, move to next step
+            if (nextStep >= numberOfSubSteps) {
+                setActiveStep(activeStep + 1);
+                setActiveSubstep(0);
+                return;
+            }
+            setActiveSubstep(nextStep);
+        },
+        isSubstepCompleted: (stepIndex, substepIndex) => {
+            if (activeStep > stepIndex) {
+                return true;
+            }
+            if (activeSubstep > substepIndex && stepIndex === activeStep) {
+                return true;
+            }
+            return false;
         },
         load: (instructions, title) => {
             if (!instructions || !instructions.steps) {
                 return;
             }
-            instructions.steps.forEach(step => {
-                step.substeps.forEach(substep => {
-                    substep.completed = false;
-                });
-            });
             // Sets up steps, and restores default state for new wizard
             setSteps([...instructions.steps]);
             setStepCount(instructions.steps.length);
