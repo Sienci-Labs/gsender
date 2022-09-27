@@ -55,7 +55,6 @@ class WidgetWrapper extends PureComponent {
     state = null;
     actions = null;
     name = this.props.widgetId.split(':')[0];
-    key = 0;
 
     componentDidMount() {
         if (isElectron()) {
@@ -111,7 +110,7 @@ class WidgetWrapper extends PureComponent {
                 state={this.state}
                 isMainWindow={false}
                 {...this.props}
-                key={this.key}
+                active={true}
             />
         );
     }
