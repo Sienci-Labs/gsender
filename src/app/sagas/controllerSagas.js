@@ -312,8 +312,8 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('grbl:ready', () => {
-        pubsub.publish('grblExists:update', true);
+    controller.addListener('grbl:iSready', (status) => {
+        pubsub.publish('grblExists:update', status);
     });
 
     yield null;

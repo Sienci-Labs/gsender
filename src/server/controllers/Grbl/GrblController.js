@@ -843,9 +843,15 @@ class GrblController {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
         this.writeln('$$');
-        this.emit('grbl:ready');
         await delay(50);
         this.event.trigger('controller:ready');
+
+        //check if controller is ready and send the status
+        let status = false;
+        if (this.controller.state) {
+            status = true;
+        }
+        this.emit('grbl:iSready', status);
     }
 
     populateContext(context = {}) {

@@ -96,7 +96,7 @@ class Controller {
         'file:load': [],
         'file:unload': [],
         'homing:flag': [],
-        'grbl:ready': [],
+        'grbl:iSready': [],
     };
 
     context = {
