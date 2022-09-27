@@ -80,7 +80,7 @@ const Notifications = () => {
                             <LinearProgress />
                         </Box>
                         <div className="flashMessage">
-                            Flashing port {portSelected}
+                            <span>Flashing port {portSelected}</span>
                         </div>
                     </div>
                 )}

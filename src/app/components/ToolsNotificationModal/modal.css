@@ -105,11 +105,17 @@
   }
 
   .flashMessage{
+    margin: auto;
+    width: 50% !important;
     position: relative;
     z-index: 1;
     color: white;
     bottom: 45%;
-    left: 47%;
+  }
+
+  .flashMessage span{
+    display: table;
+    margin: 0 auto !important;
   }
 
   .css-eglki6-MuiLinearProgress-root{
