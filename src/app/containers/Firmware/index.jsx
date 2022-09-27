@@ -96,6 +96,7 @@ const Firmware = ({ modalClose }) => {
         setFilterText,
         filterText,
         isFlashing,
+        setIsFlashing,
         setSettings,
         isDefault,
         controller,
@@ -113,15 +114,10 @@ const Firmware = ({ modalClose }) => {
                     </div>
                     <div className={styles.firmwareContainer}>
                         <SettingsArea />
-
-                        {
-                            hasSettings && (
-                                <>
-                                    <div className={styles.divider} />
-                                    <ActionArea />
-                                </>
-                            )
-                        }
+                        <>
+                            <div className={styles.divider} />
+                            <ActionArea />
+                        </>
                     </div>
                 </div>
             </FirmwareContext.Provider>

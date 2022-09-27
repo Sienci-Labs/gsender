@@ -108,6 +108,8 @@ class Visualizer extends Component {
 
     group = new THREE.Group();
 
+    didZoom = false;
+
     pivotPoint = new PivotPoint3({ x: 0, y: 0, z: 0 }, (x, y, z) => { // relative position
         _each(this.group.children, (o) => {
             o.translateX(x);
@@ -217,6 +219,10 @@ class Visualizer extends Component {
     componentDidUpdate(prevProps) {
         let forceUpdate = false;
         let needUpdateScene = false;
+        // this variable determines whether the camera should reset or not
+        // it resets on the first render, and persists for the rest
+        // it is used for the secondary visualizer in surfacing
+        const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
         const prevState = prevProps.state;
         const state = this.props.state;
 
@@ -225,7 +231,8 @@ class Visualizer extends Component {
         //this.resizeRenderer();
 
         // Enable or disable 3D view
-        if ((prevProps.show !== this.props.show) && (this.props.show === true)) {
+        // shouldZoom is called here because the zoom level is indicated by the viewport
+        if ((prevProps.show !== this.props.show) && (this.props.show === true) && shouldZoom) {
             this.viewport.update();
 
             // Set forceUpdate to true when enabling or disabling 3D view
@@ -250,7 +257,7 @@ class Visualizer extends Component {
                 this.camera.setZoom(1.3);
                 this.camera.setFov(PERSPECTIVE_FOV);
             }
-            if (this.viewport) {
+            if (this.viewport && shouldZoom) {
                 this.viewport.update();
             }
             needUpdateScene = true;
@@ -1308,6 +1315,8 @@ class Visualizer extends Component {
     }
 
     handleSceneRender(vizualization, callback) {
+        const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
+
         if (!this.visualizer) {
             return;
         }
@@ -1333,7 +1342,7 @@ class Visualizer extends Component {
         this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
 
-        if (this.viewport && dX > 0 && dY > 0) {
+        if (this.viewport && dX > 0 && dY > 0 && shouldZoom) {
             // The minimum viewport is 50x50mm
             const width = Math.max(dX, 50);
             const height = Math.max(dY, 50);
@@ -1344,29 +1353,33 @@ class Visualizer extends Component {
         // Update the scene
         this.updateScene();
 
-        switch (this.props.cameraPosition) {
-        case 'top':
-            this.toTopView();
-            break;
+        // only set the camera if it's the first render
+        if (shouldZoom) {
+            switch (this.props.cameraPosition) {
+            case 'top':
+                this.toTopView();
+                break;
 
-        case '3d':
-            this.to3DView();
-            break;
+            case '3d':
+                this.to3DView();
+                break;
 
-        case 'front':
-            this.toFrontView();
-            break;
+            case 'front':
+                this.toFrontView();
+                break;
 
-        case 'left':
-            this.toLeftSideView();
-            break;
+            case 'left':
+                this.toLeftSideView();
+                break;
 
-        case 'right':
-            this.toRightSideView();
-            break;
+            case 'right':
+                this.toRightSideView();
+                break;
 
-        default:
-            this.toFrontView();
+            default:
+                this.toFrontView();
+            }
+            this.didZoom = true;
         }
 
         reduxStore.dispatch({
@@ -1397,6 +1410,8 @@ class Visualizer extends Component {
 
     unload() {
         const visualizerObject = this.group.getObjectByName('Visualizer');
+        const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
+
         if (visualizerObject) {
             this.group.remove(visualizerObject);
         }
@@ -1411,11 +1426,11 @@ class Visualizer extends Component {
             this.pivotPoint.set(0, 0, 0);
         }
 
-        if (this.controls) {
+        if (this.controls && shouldZoom) {
             this.controls.reset();
         }
 
-        if (this.viewport) {
+        if (this.viewport && shouldZoom) {
             this.viewport.reset();
         }
         // Update the scene

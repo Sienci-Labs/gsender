@@ -97,6 +97,7 @@ class Controller {
         'file:unload': [],
         'homing:flag': [],
         'grbl:iSready': [],
+        'sender:M0M1': []
     };
 
     context = {

@@ -38,6 +38,7 @@ import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import Input from 'app/containers/Preferences/components/Input';
+import WorkerOutline from '../../workers/Outline.worker';
 
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
@@ -58,11 +59,13 @@ import {
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
     VISUALIZER_PRIMARY,
+    //LASER_MODE
 } from '../../constants';
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
 import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
 import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
+import { outlineResponse } from '../../workers/Outline.response';
 
 
 class WorkflowControl extends PureComponent {
@@ -280,13 +283,22 @@ class WorkflowControl extends PureComponent {
     }
 
     runOutline = () => {
+        const workerOutline = new WorkerOutline();
         const { gcode } = this.props;
+        //const machineProfile = store.get('workspace.machineProfile');
+        //const spindleMode = store.get('widgets.spindle.mode');
+        // outline toggled on and currently in laser mode
+        //const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
+
         Toaster.pop({
             TYPE: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE,
             msg: 'Generating outline for current file'
         });
-        controller.command('gcode:outline', gcode, 500);
+        workerOutline.onmessage = ({ data }) => {
+            outlineResponse({ data });
+        };
+        workerOutline.postMessage({ gcode, isLaser: false });
     }
 
     startFromLinePrompt = () => {
@@ -296,8 +308,7 @@ class WorkflowControl extends PureComponent {
 
     handleStartFromLine = () => {
         this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
-
-        controller.command('gcode:start', this.state.startFromLine.value);
+        controller.command('gcode:start', this.state.startFromLine.value, this.props.zMax);
 
         Toaster.pop({
             msg: 'Running Start From Specific Line Command',
@@ -578,6 +589,7 @@ export default connect((store) => {
     const port = get(store, 'connection.port');
     const gcode = get(store, 'file.content');
     const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
+    const zMax = get(store, 'file.bbox.max.z', 0);
     return {
         fileLoaded,
         isConnected,
@@ -589,6 +601,7 @@ export default connect((store) => {
         port,
         lineTotal,
         gcode,
-        fileCompletion
+        fileCompletion,
+        zMax
     };
 }, null, null, { forwardRef: true })(WorkflowControl);

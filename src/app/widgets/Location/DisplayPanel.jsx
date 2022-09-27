@@ -214,7 +214,12 @@ class DisplayPanel extends PureComponent {
                             const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                             if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
                                 if (homingEnabled) {
-                                    commands.push(`G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`);
+                                    // get current Z
+                                    const currentZ = machinePosition.z;
+                                    // only move Z if it is less than Z0-SafeHeight
+                                    if (currentZ < -safeRetractHeight) {
+                                        commands.push(`G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`);
+                                    }
                                 } else {
                                     commands.push('G91');
                                     commands.push(`G0 Z${safeRetractHeight}`); // Retract Z when moving across workspace
@@ -411,12 +416,14 @@ export default connect((store) => {
     const workflowState = get(store, 'controller.workflow.state');
     const activeState = get(store, 'controller.state.status.activeState');
     const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
+    const machinePosition = get(store, 'controller.mpos');
     return {
         homingEnabled,
         canHome,
         homingDirection,
         homingFlag,
         homingRun,
-        pullOff
+        pullOff,
+        machinePosition
     };
 })(DisplayPanel);

@@ -68,6 +68,7 @@ import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocati
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
 const POSTHOOK_COMPLETE = '%post_complete';
+const PAUSE_START = '%pause_start';
 
 const log = logger('controller:Grbl');
 const noop = _.noop;
@@ -253,6 +254,12 @@ class GrblController {
                         }, 1500);
                         return 'G4 P0.5';
                     }
+                    if (line === PAUSE_START) {
+                        log.debug('Found M0/M1, pausing program');
+                        this.feeder.hold({ data: '%m0m1_pause', comment: commentString });
+                        this.emit('sender:M0M1', { data: 'M0/M1', comment: commentString });
+                        return 'G4 P0.5';
+                    }
                     if (line === '%_GCODE_START') {
                         const { sent } = this.sender.state;
                         this.event.trigger('gcode:start');
@@ -380,13 +387,13 @@ class GrblController {
                         // Workaround for Carbide files - prevent M0 early from pausing program
                         if (sent > 10) {
                             this.workflow.pause({ data: 'M0', comment: commentString });
-                            this.emit('workflow:pause', { data: 'M0' });
+                            this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
                         }
                         line = line.replace('M0', '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1', comment: commentString });
-                        this.emit('workflow:pause', { data: 'M1' });
+                        this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
                         line = line.replace('M1', '(M1)');
                     }
                 }
@@ -1231,7 +1238,7 @@ class GrblController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                const [lineToStartFrom] = args;
+                const [lineToStartFrom, zMax] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
                 console.log(startEventEnabled);
@@ -1300,7 +1307,7 @@ class GrblController {
                     }
 
                     // Move up and then to cut start position
-                    modalGCode.push('G0 G90 G21 Z10');
+                    modalGCode.push(`G0 G90 G21 Z${zMax + 10}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
@@ -1606,14 +1613,16 @@ class GrblController {
                     //we are moving in the negative direction we need to subtract the max travel
                     //by it to reach the maximum amount in that direction
                     const calculateAxisValue = ({ direction, position, maxTravel }) => {
+                        const OFFSET = 1;
+
                         if (position === 0) {
                             return ((maxTravel) * direction).toFixed(FIXED);
                         }
 
                         if (direction === 1) {
-                            return Number((position * direction)).toFixed(FIXED);
+                            return Number(position - OFFSET).toFixed(FIXED);
                         } else {
-                            return Number(-1 * (maxTravel - position)).toFixed(FIXED);
+                            return Number(-1 * (maxTravel - position - OFFSET)).toFixed(FIXED);
                         }
                     };
 
@@ -1640,15 +1649,15 @@ class GrblController {
                         }
                     } else {
                         if (axes.X) {
-                            axes.X = calculateAxisValue({ direction: axes.X, position: Math.abs(mpos.x), maxTravel: $130 });
+                            axes.X = calculateAxisValue({ direction: Math.sign(axes.X), position: Math.abs(mpos.x), maxTravel: $130 });
                         }
                         if (axes.Y) {
-                            axes.Y = calculateAxisValue({ direction: axes.Y, position: Math.abs(mpos.y), maxTravel: $131 });
+                            axes.Y = calculateAxisValue({ direction: Math.sign(axes.Y), position: Math.abs(mpos.y), maxTravel: $131 });
                         }
                     }
 
                     if (axes.Z) {
-                        axes.Z = calculateAxisValue({ direction: axes.Z, position: Math.abs(mpos.z), maxTravel: $132 });
+                        axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: Math.abs(mpos.z), maxTravel: $132 });
                     }
                 } else {
                     jogFeedrate = 1250;

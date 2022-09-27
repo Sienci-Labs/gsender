@@ -13,14 +13,14 @@ const Notifications = () => {
         shouldRestoreDefault,
         setShouldRestoreDefault,
         setInitiateFlashing,
-        setCurrentlyFlashing,
+        setIsFlashing,
         setSettings,
     } = useContext(FirmwareContext);
 
     const beginFlashing = () => {
         startFlash(port);
         setInitiateFlashing(false);
-        setCurrentlyFlashing(true);
+        setIsFlashing(true);
     };
 
     const message = getResetToDefaultMessage(machineProfile);

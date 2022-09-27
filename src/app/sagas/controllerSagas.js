@@ -24,6 +24,7 @@ import React from 'react';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
+import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
@@ -217,13 +218,18 @@ export function* initialize() {
                 state: RENDER_LOADING
             }
         });
+        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
+        const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
+        const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
+        const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
 
         const estimateWorker = new EstimateWorker();
         estimateWorker.onmessage = estimateResponseHandler;
         estimateWorker.postMessage({
             content,
             name,
-            size
+            size,
+            accelArray
         });
 
         const needsVisualization = shouldVisualize();
@@ -283,6 +289,24 @@ export function* initialize() {
             msg: `'${data}' pause command found in file - press "Resume Job" to continue running.`,
             type: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE
+        });
+    });
+
+    controller.addListener('sender:M0M1', (opts) => {
+        const { data, comment = '' } = opts;
+
+        const content = (comment.length > 0)
+            ? <div><p>A pause command ({data}) was found - click resume to continue.</p><p>Comment: <b>{comment}</b></p></div>
+            : `A pause command (${data}) was found - click resume to continue.`;
+
+        Confirm({
+            title: 'M0/M1 Pause',
+            content,
+            confirmLabel: 'Resume',
+            cancelLabel: 'Close Window',
+            onConfirm: () => {
+                controller.command('gcode:resume');
+            }
         });
     });
 

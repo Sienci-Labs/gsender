@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
 
@@ -7,9 +7,13 @@ import Input from '../components/Input';
 
 const Spindle = ({ state, actions }) => {
     const { spindle } = state;
-    const { spindleMin, spindleMax } = spindle;
     const spindleActions = actions.spindle;
-
+    const [spindleMin, setSpindleMin] = useState(spindle.spindleMin);
+    const [spindleMax, setSpindleMax] = useState(spindle.spindleMax);
+    useEffect(() => {
+        setSpindleMin(spindle.spindleMin);
+        setSpindleMax(spindle.spindleMax);
+    }, []);
     return (
         <>
             <Fieldset legend="Spindle Speed">
