@@ -25,20 +25,21 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 import Select from 'react-select';
 import './modal.css';
-import store from '../../store';
-
+import controller from 'app/lib/controller';
+import { FirmwareContext } from '../../containers/Firmware/utils';
 
 const ToolsNotificationModal = (props) => {
+    const { machineProfile } = useContext(FirmwareContext);
+
     const { onClose, show, title, children, footer, footerTwo, yesFunction, showOptions } = props;
     const getMachineProfileLabel = ({ name, type }) => `${name} ${type && type}`.trim();
-
-    const [port, setPort] = useState('');
-    const [profile, setProfile] = useState('');
+    const [port, setPort] = useState(controller.port);
+    const [profile, setProfile] = useState(getMachineProfileLabel(machineProfile));
 
     return (
         <CSSTransition
@@ -58,7 +59,8 @@ const ToolsNotificationModal = (props) => {
                             <div className="port">
                                 <span style={{ width: '14%', lineHeight: '2.5rem' }}>Port: </span>
                                 <Select
-                                    options={store.get('ports').map((element) => {
+                                    defaultValue={{ value: port, label: port }}
+                                    options={controller.ports.map((element) => {
                                         return { value: element.port, label: element.port };
                                     })}
                                     clearable={false}
@@ -75,6 +77,7 @@ const ToolsNotificationModal = (props) => {
                                             .sort((a, b) => getMachineProfileLabel(a).localeCompare(getMachineProfileLabel(b)))
                                             .map(({ id, name, type }) => ({ key: id, value: id, label: getMachineProfileLabel({ name, type }) }))
                                     }
+                                    defaultValue={{ value: profile, label: profile }}
                                     onChange={(e) => {
                                         setProfile(e.value);
                                     }}

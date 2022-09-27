@@ -37,7 +37,6 @@ import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
-import store from '../../store';
 
 
 class NavbarConnectionWidget extends PureComponent {
@@ -367,7 +366,6 @@ class NavbarConnectionWidget extends PureComponent {
         const actions = {
             ...this.actions
         };
-        store.set('ports', ports);
 
         return (
             <NavbarConnection actions={actions} state={state} />
