@@ -33,17 +33,16 @@ import './modal.css';
 import controller from 'app/lib/controller';
 import { FirmwareContext } from '../../containers/Firmware/utils';
 
-const ToolsNotificationModal = (props) => {
+const ToolsNotificationModal = ({ onClose, show, title, children, footer, footerTwo, yesFunction, showOptions }) => {
     const { machineProfile } = useContext(FirmwareContext);
-
-    const { onClose, show, title, children, footer, footerTwo, yesFunction, showOptions } = props;
     const getMachineProfileLabel = ({ name, type }) => `${name} ${type && type}`.trim();
     const [port, setPort] = useState(controller.port);
-    const [profile, setProfile] = useState(getMachineProfileLabel(machineProfile));
+    const [profile, setProfile] = useState(machineProfile);
+    const machineLabel = getMachineProfileLabel(profile);
 
     return (
         <CSSTransition
-            in={props.show}
+            in={show}
             unmountOnExit
             timeout={{ enter: 0, exit: 300 }}
         >
@@ -75,9 +74,9 @@ const ToolsNotificationModal = (props) => {
                                     options={
                                         machineProfiles
                                             .sort((a, b) => getMachineProfileLabel(a).localeCompare(getMachineProfileLabel(b)))
-                                            .map(({ id, name, type }) => ({ key: id, value: id, label: getMachineProfileLabel({ name, type }) }))
+                                            .map((defaultProfile) => ({ key: defaultProfile.id, value: defaultProfile, label: getMachineProfileLabel({ name: defaultProfile.name, type: defaultProfile.type }) }))
                                     }
-                                    defaultValue={{ value: profile, label: profile }}
+                                    defaultValue={{ value: profile, label: machineLabel }}
                                     onChange={(e) => {
                                         setProfile(e.value);
                                     }}
