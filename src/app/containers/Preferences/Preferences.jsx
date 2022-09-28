@@ -23,8 +23,10 @@
 
 import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
+import get from 'lodash/get';
 import controller from 'app/lib/controller';
 import Events from 'app/containers/Preferences/ToolChange';
 import ProgramEvents from 'app/containers/Preferences/Events';
@@ -39,7 +41,7 @@ import VisualizerSettings from './Visualizer';
 import About from './About';
 import store from '../../store';
 import styles from './index.styl';
-import { METRIC_UNITS } from '../../constants';
+import { METRIC_UNITS, WORKFLOW_STATE_RUNNING } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 import { CUST_LIGHT_THEME, DARK_THEME, DARK_THEME_VALUES, LIGHT_THEME, LIGHT_THEME_VALUES } from '../../widgets/Visualizer/constants';
 
@@ -52,6 +54,9 @@ class PreferencesPage extends PureComponent {
     spindleConfig = new WidgetConfig('spindle');
 
     state = this.getInitialState();
+
+    // this makes sure a toast won't pop up upon opening preferences while there's a job/test run/outline
+    shouldShowToast = this.props.workflow?.state !== WORKFLOW_STATE_RUNNING && this.props.feederStatus?.queue === 0;
 
     showToast = _.throttle(() => {
         Toaster.pop({
@@ -717,14 +722,42 @@ class PreferencesPage extends PureComponent {
         }
     }
 
+    // make sure the toast doesn't show when the state/feeder status/sender status is updating
+    controllerEvents = {
+        'controller:state': (type, state) => {
+            this.shouldShowToast = false;
+        },
+        'feeder:status': (status) => {
+            this.shouldShowToast = false;
+        },
+        'sender:status': (status) => {
+            this.shouldShowToast = false;
+        }
+    }
+
+    addControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.addListener(eventName, callback);
+        });
+    }
+
+    removeControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.removeListener(eventName, callback);
+        });
+    }
+
     componentDidMount() {
         controller.command('settings:updated', this.state);
-
+        this.addControllerEvents();
         gamepad.holdListener();
     }
 
     componentWillUnmount() {
         gamepad.unholdLisetner();
+        this.removeControllerEvents();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -755,7 +788,11 @@ class PreferencesPage extends PureComponent {
             return;
         }
 
-        this.showToast();
+        if (this.shouldShowToast) {
+            this.showToast();
+        } else {
+            this.shouldShowToast = true;
+        }
     }
 
     toolSortCompare(a, b) {
@@ -826,4 +863,8 @@ class PreferencesPage extends PureComponent {
     }
 }
 
-export default PreferencesPage;
+export default connect((store) => {
+    const workflow = get(store, 'controller.workflow');
+    const feederStatus = get(store, 'controller.feeder.status');
+    return { workflow, feederStatus };
+})(PreferencesPage);
