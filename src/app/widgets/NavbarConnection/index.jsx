@@ -38,6 +38,7 @@ import log from 'app/lib/log';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
 import store from '../../store';
+import Preferences from '../../containers/Preferences/Preferences';
 
 
 class NavbarConnectionWidget extends PureComponent {
@@ -89,6 +90,8 @@ class NavbarConnectionWidget extends PureComponent {
                 port: selectedPort.port
             }), () => {
                 const { port, baudrate } = this.state;
+                let preference = new Preferences();
+                preference.actions.general.saveLastWorkspace('P1');
                 this.openPort(port, { baudrate: baudrate });
             });
         },
@@ -238,7 +241,8 @@ class NavbarConnectionWidget extends PureComponent {
             autoReconnect: this.config.get('autoReconnect'),
             hasReconnected: false,
             alertMessage: '',
-            showUnrecognized: false
+            showUnrecognized: false,
+            lastWcs: 'P1',
         };
     }
 
@@ -304,6 +308,7 @@ class NavbarConnectionWidget extends PureComponent {
             baudrate: baudrate,
             rtscts: this.state.connection.serial.rtscts,
             shouldWCSzero: store.get('shouldWCSzero'),
+            lastWcs: this.state.lastWcs,
         }, (err) => {
             if (err) {
                 this.setState(state => ({
@@ -346,6 +351,11 @@ class NavbarConnectionWidget extends PureComponent {
                     baudrate: value
                 });
             }),
+            pubsub.subscribe('lastWcs:update', (msg, value) => {
+                this.setState({
+                    lastWcs: value
+                });
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }

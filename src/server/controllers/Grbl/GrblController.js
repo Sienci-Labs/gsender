@@ -131,6 +131,8 @@ class GrblController {
 
     shouldWCSzero = false;
 
+    lastWcs = 'P1';
+
     settingsPopulated = false;
 
     // Check settings for existence of specific key
@@ -138,7 +140,6 @@ class GrblController {
         const settingsKey = `settings.${key}`; // _.get(this.settings, 'settings.$22');
         const value = _.get(this.settings, settingsKey, undefined);
         log.debug(`${settingsKey}=${value}`);
-        console.log(this.settings);
         return !!value;
     }
 
@@ -146,11 +147,8 @@ class GrblController {
     handleWCSZero = () => {
         // Always use lodash get to better handles cases where sub keys don't exist.
         let $22 = _.get(this.settings, 'settings.$22');
-        let workspace = store.get('workspace', 'P1');
         if (Number($22) === 0 && this.shouldWCSzero) {
-            this.command('gcode', `G10 L20 ${workspace} X0 Y0`);
-            console.log('\x1b[36m%s\x1b[35m', `SUCCESS: ${workspace} WCS RESET TO ZERO`);
-            store.set('workspace', 'P1');
+            this.command('gcode', `G10 L20 ${this.lastWcs} X0 Y0 Z0`);
         } else {
             log.debug('Failed branch inside WCS Zero');
         }
@@ -1046,9 +1044,10 @@ class GrblController {
         };
     }
 
-    open(callback = noop, shouldWCSzero) {
+    open(callback = noop, shouldWCSzero, lastWcs) {
         const { port, baudrate } = this.options;
         this.shouldWCSzero = shouldWCSzero;
+        this.lastWcs = lastWcs;
         // Assume the settings aren't populated on connect
         this.settingsPopulated = false;
         // Assertion check
@@ -1831,11 +1830,6 @@ class GrblController {
                 this.command('feeder:start');
                 this.runPostChangeHook();
             },
-            'save:workspace': () => {
-                const [workspace] = args;
-                store.set('workspace', workspace);
-            },
-
         }[cmd];
 
         if (!handler) {

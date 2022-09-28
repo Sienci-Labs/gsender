@@ -214,6 +214,9 @@ class PreferencesPage extends PureComponent {
                 store.set('shouldWCSzero', shouldWCSzeroState);
                 pubsub.publish('shouldWCSzero:update', shouldWCSzeroState);
             },
+            saveLastWorkspace: (wcs) => {
+                pubsub.publish('lastWcs:update', wcs);
+            },
             setAutoReconnect: () => {
                 const autoReconnect = !this.state.autoReconnect;
                 this.setState({
