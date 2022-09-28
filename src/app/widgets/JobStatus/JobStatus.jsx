@@ -58,37 +58,30 @@ class JobStatus extends PureComponent {
     };
 
     state = {
+        isChecked: false,
+        toggleStatus: 'jobStatus',
     }
 
     handleOverrideToggle = () => {
         console.log(this.state);
         if (this.state.toggleStatus === 'jobStatus') {
-            localStorage.setItem('jobOverrideToggle', JSON.stringify({
+            this.setState({
                 isChecked: true,
                 toggleStatus: 'overrides',
-            }));
+            });
         } else {
-            localStorage.setItem('jobOverrideToggle', JSON.stringify({
+            this.setState({
                 isChecked: false,
                 toggleStatus: 'jobStatus',
-            }));
+            });
         }
-        this.setState(JSON.parse(localStorage.getItem('jobOverrideToggle')));
     }
 
     componentDidUpdate() {
         if (!this.props.fileLoaded || !this.props.connection.isConnected) {
-            localStorage.setItem('jobOverrideToggle', JSON.stringify({ isChecked: false,
-                toggleStatus: 'jobStatus', }));
+            this.setState({ isChecked: false,
+                toggleStatus: 'jobStatus', });
         }
-        this.setState(JSON.parse(localStorage.getItem('jobOverrideToggle')));
-    }
-
-    componentDidMount() {
-        localStorage.setItem('jobOverrideToggle', JSON.stringify({
-            isChecked: false,
-            toggleStatus: 'jobStatus',
-        }));
     }
 
     render() {
