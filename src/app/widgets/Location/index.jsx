@@ -43,7 +43,6 @@ import WidgetConfig from 'app/widgets/WidgetConfig';
 import Location from './Location';
 import Settings from './Settings';
 import ShuttleControl from './ShuttleControl';
-import Preferences from '../../containers/Preferences/Preferences';
 import {
     // Units
     IMPERIAL_UNITS,
@@ -149,8 +148,6 @@ class LocationWidget extends PureComponent {
 
         return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
     }
-
-    preference = new Preferences();
 
     actions = {
         toggleFullscreen: () => {
@@ -610,7 +607,6 @@ class LocationWidget extends PureComponent {
     render() {
         const { widgetId, machinePosition, workPosition, wcs } = this.props;
         const { minimized, isFullscreen } = this.state;
-        const shouldWCSzero = store.get('shouldWCSzero');
         const { units } = this.state;
         const canSendCommand = this.canSendCommand();
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
@@ -693,9 +689,6 @@ class LocationWidget extends PureComponent {
                             className={styles.workspaceInput}
                             onChange={(selection) => {
                                 controller.command('gcode', selection.value);
-                                if (shouldWCSzero) {
-                                    this.preference.actions.general.saveLastWorkspace(selection.command);
-                                }
                             }}
                             name="workspace"
                             options={gcodes}

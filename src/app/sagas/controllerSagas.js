@@ -37,6 +37,7 @@ import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/work
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import isElectron from 'is-electron';
+import Preferences from '../containers/Preferences/Preferences';
 
 
 export function* initialize() {
@@ -127,11 +128,46 @@ export function* initialize() {
     });
 
     controller.addListener('controller:state', (type, state) => {
+        const gcodes = [
+            {
+                label: 'G54 (P1)',
+                value: 'G54',
+                command: 'P1'
+            },
+            {
+                label: 'G55 (P2)',
+                value: 'G55',
+                command: 'P2'
+            },
+            {
+                label: 'G56 (P3)',
+                value: 'G56',
+                command: 'P3'
+            },
+            {
+                label: 'G57 (P4)',
+                value: 'G57',
+                command: 'P4'
+            },
+            {
+                label: 'G58 (P5)',
+                value: 'G58',
+                command: 'P5'
+            },
+            {
+                label: 'G59 (P6)',
+                value: 'G59',
+                command: 'P6'
+            },
+        ];
         // if state is the same, don't update the prev and current state
         if (currentState !== state.status.activeState) {
             prevState = currentState;
             currentState = state.status.activeState;
         }
+        //Watch out for wcs changes.
+        const preference = new Preferences();
+        preference.actions.general.saveLastWorkspace(gcodes.filter(obj => obj.value === state.parserstate.modal.wcs)[0].command);
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_STATE,
             payload: { type, state }
