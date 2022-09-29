@@ -22,9 +22,11 @@
  */
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
+import get from 'lodash/get';
 import without from 'lodash/without';
 import Push from 'push.js';
 import isElectron from 'is-electron';
+import reduxStore from 'app/store/redux';
 import api from 'app/api';
 import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
@@ -35,6 +37,7 @@ import NavbarConnection from 'app/widgets/NavbarConnection';
 import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
+import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE } from '../../constants';
 
 class Header extends PureComponent {
     static propTypes = {
@@ -105,8 +108,12 @@ class Header extends PureComponent {
 
     actionHandlers = {
         CONTROLLER_COMMAND: (event, { command }) => {
+            const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
             // feedhold, cyclestart, homing, unlock, reset
-            controller.command(command);
+            if (((command === 'unlock' || command === 'homing') && activeState === GRBL_ACTIVE_STATE_ALARM) ||
+                (command !== 'unlock' && activeState === GRBL_ACTIVE_STATE_IDLE)) {
+                controller.command(command);
+            }
         }
     };
 

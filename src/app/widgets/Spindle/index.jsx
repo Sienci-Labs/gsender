@@ -68,17 +68,29 @@ class SpindleWidget extends PureComponent {
             this.actions.handleModeToggle();
         },
         CW_LASER_ON: () => {
-            this.state.mode === LASER_MODE
-                ? this.actions.sendLaserM3()
-                : this.actions.sendM3();
+            const { state } = this.props;
+            const activeState = get(state, 'status.activeState');
+            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+                this.state.mode === LASER_MODE
+                    ? this.actions.sendLaserM3()
+                    : this.actions.sendM3();
+            }
         },
         CCW_LASER_TEST: () => {
-            this.state.mode === LASER_MODE
-                ? this.actions.runLaserTest()
-                : this.actions.sendM4();
+            const { state } = this.props;
+            const activeState = get(state, 'status.activeState');
+            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+                this.state.mode === LASER_MODE
+                    ? this.actions.runLaserTest()
+                    : this.actions.sendM4();
+            }
         },
         STOP_LASER_OFF: () => {
-            this.actions.sendM5();
+            const { state } = this.props;
+            const activeState = get(state, 'status.activeState');
+            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+                this.actions.sendM5();
+            }
         }
     }
 

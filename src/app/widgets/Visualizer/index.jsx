@@ -67,6 +67,7 @@ import {
     RENDER_RENDERING,
     RENDER_LOADING,
     GRBL_ACTIVE_STATE_HOLD,
+    GRBL_ACTIVE_STATE_IDLE,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
 } from '../../constants';
@@ -847,32 +848,43 @@ class VisualizerWidget extends PureComponent {
 
     shuttleControlEvents = {
         LOAD_FILE: () => {
-            if (this.workflowControl) {
+            const { activeState } = this.props;
+            if (this.workflowControl && activeState === GRBL_ACTIVE_STATE_IDLE) {
                 this.workflowControl.handleClickUpload();
             }
         },
         UNLOAD_FILE: () => {
-            this.actions.closeModal();
-            this.actions.unloadGCode();
-            this.actions.reset();
+            const { activeState } = this.props;
+            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+                this.actions.closeModal();
+                this.actions.unloadGCode();
+                this.actions.reset();
+            }
         },
         TEST_RUN: () => {
-            const gcode = this.state.gcode.content;
-            const lines = gcode.split('\n');
-            const testLines = ['$C', ...lines, '$C'];
-            controller.command('gcode', testLines);
-            this.actions.onRunClick();
+            if (this.workflowControl.canRun()) {
+                const gcode = this.state.gcode.content;
+                const lines = gcode.split('\n');
+                const testLines = ['$C', ...lines, '$C'];
+                controller.command('gcode', testLines);
+                this.actions.onRunClick();
+            }
         },
         START_JOB: () => {
-            if (this.workflowControl) {
+            console.log(this.workflowControl.canRun());
+            if (this.workflowControl && this.workflowControl.canRun()) {
                 this.workflowControl.startRun();
             }
         },
         PAUSE_JOB: () => {
-            this.actions.handlePause();
+            const { activeState } = this.props;
+            if (activeState === GRBL_ACTIVE_STATE_RUN) {
+                this.actions.handlePause();
+            }
         },
         STOP_JOB: () => {
-            if (this.workflowControl) {
+            const { activeState } = this.props;
+            if (this.workflowControl && (activeState === GRBL_ACTIVE_STATE_RUN || activeState === GRBL_ACTIVE_STATE_HOLD)) {
                 this.workflowControl.handleOnStop();
             }
         },
@@ -921,7 +933,10 @@ class VisualizerWidget extends PureComponent {
             document.execCommand('undo');
         },
         MACRO: (_, { macroID }) => {
-            controller.command('macro:run', macroID, controller.context);
+            const { activeState } = this.props;
+            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+                controller.command('macro:run', macroID, controller.context);
+            }
         },
         TOGGLE_SHORTCUTS: () => {
             const shortcuts = store.get('commandKeys', []);
