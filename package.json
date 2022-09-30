@@ -167,7 +167,7 @@
     "@trendmicro/react-iframe": "~0.3.1",
     "@trendmicro/react-interpolate": "~0.5.5",
     "@trendmicro/react-loader": "~0.6.1",
-    "@trendmicro/react-modal": "~2.2.2",
+    "@trendmicro/react-modal": "~3.1.0",
     "@trendmicro/react-navs": "~0.11.6",
     "@trendmicro/react-notifications": "~1.0.1",
     "@trendmicro/react-paginations": "~0.6.1",
