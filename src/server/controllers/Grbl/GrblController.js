@@ -60,7 +60,6 @@ import {
     GRBL_SETTINGS, GRBL_ACTIVE_STATE_HOME
 } from './constants';
 import { METRIC_UNITS } from '../../../app/constants';
-import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 
@@ -150,6 +149,7 @@ class GrblController {
 
     // Feeder
     feeder = null;
+
     feederCB = null;
 
     // Sender
@@ -1158,24 +1158,6 @@ class GrblController {
 
     command(cmd, ...args) {
         const handler = {
-            'flash:start': () => {
-                let [port, type] = args;
-                if (!port) {
-                    this.emit('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
-                    return;
-                }
-                this.close(() => {
-                    FlashingFirmware(port, type);
-                });
-            },
-            'flashing:success': () => {
-                let [data] = args;
-                this.emit('message', data);
-            },
-            'flashing:failed': () => {
-                let [error] = args;
-                this.emit('task:error', error);
-            },
             'firmware:recievedProfiles': () => {
                 let [files] = args;
                 this.emit('task:finish', files);

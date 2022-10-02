@@ -33,6 +33,7 @@ import logger from '../../lib/logger';
 import store from '../../store';
 import config from '../configstore';
 import taskRunner from '../taskrunner';
+import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import {
     GrblController
 } from '../../controllers';
@@ -366,6 +367,14 @@ class CNCEngine {
                 }
 
                 controller.command.apply(controller, [cmd].concat(args));
+            });
+
+            socket.on('flash:start', (flashPort, imageType) => {
+                if (!flashPort) {
+                    log.error('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
+                    return;
+                }
+                FlashingFirmware(flashPort, imageType, socket);
             });
 
             socket.on('write', (port, data, context = {}) => {

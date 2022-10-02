@@ -128,7 +128,9 @@ class Controller {
 
     // Connection options
     host = null;
+
     next = null;
+
     options = null;
 
     // @param {object} io The socket.io-client module.
@@ -291,6 +293,13 @@ class Controller {
             callback = noop;
         }
         this.socket && this.socket.emit('close', port, callback);
+    }
+
+    //Sends an event to start flashing
+    //@param {string} flashPort The port to be flashed
+    //@param {string} imageType The type of image to be flashed to the port
+    flashFirmware(flashPort, imageType) {
+        this.socket && this.socket.emit('flash:start', flashPort, imageType);
     }
 
     // Retrieves a list of available serial ports with metadata.

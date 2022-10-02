@@ -31,6 +31,8 @@ import machineProfiles from 'app/containers/Firmware/components/defaultMachinePr
 import Select from 'react-select';
 import './modal.css';
 import controller from 'app/lib/controller';
+import reduxStore from 'app/store/redux';
+import _get from 'lodash/get';
 import { FirmwareContext } from '../../containers/Firmware/utils';
 
 const ToolsNotificationModal = ({ onClose, show, title, children, footer, footerTwo, yesFunction, showOptions }) => {
@@ -39,6 +41,8 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
     const [port, setPort] = useState(controller.port);
     const [profile, setProfile] = useState(machineProfile);
     const machineLabel = getMachineProfileLabel(profile);
+
+    const portList = _get(reduxStore.getState(), 'connection.ports');
 
     return (
         <CSSTransition
@@ -58,11 +62,19 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
                             <div className="port">
                                 <span style={{ width: '14%', lineHeight: '2.5rem' }}>Port: </span>
                                 <Select
-                                    defaultValue={{ value: port, label: port }}
-                                    options={controller.ports.map((element) => {
+                                    placeholder="select"
+                                    styles={{
+                                        placeholder: (base) => ({
+                                            ...base,
+                                            fontSize: '1em',
+                                            color: '#D3D3D3',
+                                            fontWeight: 400,
+                                        }),
+                                    }}
+                                    defaultValue={port.value ? { value: port, label: port } : ''}
+                                    options={portList.map((element) => {
                                         return { value: element.port, label: element.port };
                                     })}
-                                    clearable={false}
                                     onChange={(e) => {
                                         setPort(e.value);
                                     }}
