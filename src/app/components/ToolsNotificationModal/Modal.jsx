@@ -31,6 +31,7 @@ import machineProfiles from 'app/containers/Firmware/components/defaultMachinePr
 import Select from 'react-select';
 import './modal.css';
 import controller from 'app/lib/controller';
+import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import _get from 'lodash/get';
 import { FirmwareContext } from '../../containers/Firmware/utils';
@@ -39,10 +40,43 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
     const { machineProfile } = useContext(FirmwareContext);
     const getMachineProfileLabel = ({ name, type }) => `${name} ${type && type}`.trim();
     const [port, setPort] = useState(controller.port);
-    const [profile, setProfile] = useState(machineProfile);
-    const machineLabel = getMachineProfileLabel(profile);
+    const [profileId, setProfileId] = useState(0);
 
-    const portList = _get(reduxStore.getState(), 'connection.ports');
+    const [portList, setPortList] = useState(_get(reduxStore.getState(), 'connection.ports'));
+
+    //Refresh port and clear state variables if machine disconnected
+    const refreshPorts = () => {
+        controller.listPorts();
+        setPortList(_get(reduxStore.getState(), 'connection.ports') || []);
+        if (port !== '' && portList.findIndex((p) => {
+            return p.port === port;
+        }) === -1) {
+            setPort('');
+            setProfileId(-1);
+        }
+    };
+
+    const handleYes = () => {
+        refreshPorts();
+        const foundProfile = machineProfiles.find(machineProfile => machineProfile.id === profileId);
+
+        if (foundProfile) {
+            const updatedObj = {
+                ...foundProfile,
+                limits: {
+                    xmin: 0,
+                    ymin: 0,
+                    zmin: 0,
+                    xmax: foundProfile.mm.width,
+                    ymax: foundProfile.mm.depth,
+                    zmax: foundProfile.mm.height,
+                }
+            };
+            store.replace('workspace.machineProfile', updatedObj);
+            controller.command('machineprofile:load', updatedObj);
+        }
+        yesFunction(port, machineProfile);
+    };
 
     return (
         <CSSTransition
@@ -51,15 +85,23 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
             timeout={{ enter: 0, exit: 300 }}
         >
             <div className={`modalFirmware ${show ? 'show' : ''}`} onClick={onClose}>
-                <div className="modal-content" onClick={e => e.stopPropagation()}>
+                <div
+                    className="modal-content" onClick={e => e.stopPropagation()}
+                >
                     <div className="modal-header">
                         <div className="fas fa-exclamation-triangle" style={{ fontSize: '1.3rem', color: 'red', textAlign: 'center', marginLeft: '0.6rem' }} />
                         <h4 className="modal-title">{title}</h4>
                     </div>
                     <div className="modal-body">{children}</div>
                     {showOptions ? (
-                        <div className="optionsWrapper">
-                            <div className="port">
+                        <div
+                            className="optionsWrapper"
+                        >
+                            <div
+                                className="port"
+                                onMouseEnter={refreshPorts}
+                                onMouseLeave={refreshPorts}
+                            >
                                 <span style={{ width: '14%', lineHeight: '2.5rem' }}>Port: </span>
                                 <Select
                                     placeholder="select"
@@ -71,7 +113,7 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
                                             fontWeight: 400,
                                         }),
                                     }}
-                                    defaultValue={port.value ? { value: port, label: port } : ''}
+                                    value={port ? { value: port, label: port } : ''}
                                     options={portList.map((element) => {
                                         return { value: element.port, label: element.port };
                                     })}
@@ -86,11 +128,11 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
                                     options={
                                         machineProfiles
                                             .sort((a, b) => getMachineProfileLabel(a).localeCompare(getMachineProfileLabel(b)))
-                                            .map((defaultProfile) => ({ key: defaultProfile.id, value: defaultProfile, label: getMachineProfileLabel({ name: defaultProfile.name, type: defaultProfile.type }) }))
+                                            .map(({ id, name, type }) => ({ key: id, value: id, label: getMachineProfileLabel({ name, type }) }))
                                     }
-                                    defaultValue={{ value: profile, label: machineLabel }}
+                                    defaultValue={{ value: machineProfile, label: getMachineProfileLabel(machineProfile) }}
                                     onChange={(e) => {
-                                        setProfile(e.value);
+                                        setProfileId(e.value);
                                     }}
                                     clearable={false}
                                 />
@@ -103,9 +145,9 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
                         <div className="buttonContainer">
                             <button onClick={onClose} className="button-no">No</button>
                             <button
-                                className="button" onClick={() => {
-                                    yesFunction(port, profile);
-                                }}
+                                className="button" onClick={handleYes}
+                                onMouseEnter={refreshPorts}
+                                onMouseLeave={refreshPorts}
                             >Yes
                             </button>
                         </div>
