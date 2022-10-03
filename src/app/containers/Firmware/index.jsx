@@ -46,11 +46,11 @@ const Firmware = ({ modalClose }) => {
     }, [eeprom]);
 
     const controllerEvents = {
-        'message': () => {
+        'message': (message) => {
             setIsFlashing(false);
             modalClose();
             Toaster.pop({
-                msg: `Flashing completed successfully on port: ${port}! Please reconnect your machine`,
+                msg: `Flashing completed successfully on port: ${JSON.stringify(message)}! Please reconnect your machine`,
                 type: TOASTER_INFO,
             });
         },

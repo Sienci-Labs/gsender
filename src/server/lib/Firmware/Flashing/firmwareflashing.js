@@ -50,7 +50,7 @@ const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
                 socket.emit('task:error', error);
                 log.debug(`${error} Error flashing board`);
             } else {
-                socket.emit('message', 'Flash successful');
+                socket.emit('message', flashPort);
                 log.debug('Flash successful');
             }
         });

@@ -61,7 +61,7 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
         const foundProfile = machineProfiles.find(machineProfile => machineProfile.id === profileId);
 
         if (foundProfile) {
-            const updatedObj = {
+            const newProfile = {
                 ...foundProfile,
                 limits: {
                     xmin: 0,
@@ -72,8 +72,8 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
                     zmax: foundProfile.mm.height,
                 }
             };
-            store.replace('workspace.machineProfile', updatedObj);
-            controller.command('machineprofile:load', updatedObj);
+            store.replace('workspace.machineProfile', newProfile);
+            controller.command('machineprofile:load', newProfile);
         }
         yesFunction(port, machineProfile);
     };

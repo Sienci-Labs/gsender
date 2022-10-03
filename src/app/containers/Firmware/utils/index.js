@@ -76,6 +76,7 @@ export const restoreDefaultSettings = (machineProfile) => {
     values.push('$$');
 
     controller.command('gcode', values);
+
     Toaster.pop({
         msg: ('Default Settings Restored'),
         type: TOASTER_INFO,
