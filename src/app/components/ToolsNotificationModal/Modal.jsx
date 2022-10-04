@@ -40,7 +40,7 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
     const { machineProfile } = useContext(FirmwareContext);
     const getMachineProfileLabel = ({ name, type }) => `${name} ${type && type}`.trim();
     const [port, setPort] = useState(controller.port);
-    const [profileId, setProfileId] = useState(machineProfile);
+    const [profileId, setProfileId] = useState(machineProfile.id);
 
     const [portList, setPortList] = useState(_get(reduxStore.getState(), 'connection.ports'));
 

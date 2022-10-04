@@ -16,8 +16,6 @@ const getMachineProfileLabel = ({ name, type }) => `${name} ${type && type}`.tri
 const SettingsArea = () => {
     const { hasSettings, machineProfile, setMachineProfile } = useContext(FirmwareContext);
     const label = getMachineProfileLabel(machineProfile);
-    console.log(machineProfile);
-    console.log(store.get('workspace.machineProfile'));
     const handleSelect = ({ value = 0 }) => {
         const foundProfile = machineProfiles.find(profile => profile.id === value);
 
