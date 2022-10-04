@@ -22,17 +22,31 @@
  */
 
 import React from 'react';
-import styles from '../../index.styl';
+import Tooltip from 'app/components/TooltipCustom/ToolTip';
+import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
+import PropType from 'prop-types';
 
-const ReconnectButton = ({ onClick }) => {
+const ReconnectButton = ({ onClick, disabled = false }) => {
     return (
-        <button type="button" onClick={onClick} className={styles.reconnectButton}>
-            <div className={styles.reconnectIcon}>
-                <i className="fas fa-plug" />
-            </div>
-            <div className={styles.reconnectButtonText}>Connect on last active port</div>
-        </button>
+        <Tooltip
+            content="Connects to the last active machine"
+            location="default"
+            wrapperStyle={{ width: '20rem' }}
+        >
+            <ToolModalButton
+                icon="fas fa-plug"
+                onClick={onClick}
+                disabled={disabled}
+            >
+                Connect on last active port
+            </ToolModalButton>
+        </Tooltip>
     );
+};
+
+ReconnectButton.propTypes = {
+    onClick: PropType.func.isRequired,
+    disabled: PropType.bool
 };
 
 export default ReconnectButton;
