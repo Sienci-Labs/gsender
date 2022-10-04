@@ -38,7 +38,7 @@ const Actions = ({ actions = [] }) => {
                     actions.map((action, index) => {
                         return (
                             <>
-                                <ToolModalButton onClick={action.cb} icon="fas fa-code">
+                                <ToolModalButton key={index} onClick={action.cb} icon="fas fa-code">
                                     {action.label}
                                 </ToolModalButton>
                                 {

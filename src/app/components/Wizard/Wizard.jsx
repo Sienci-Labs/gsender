@@ -42,7 +42,18 @@ const wizard = {
                         {
                             label: 'Save Positions and Modals',
                             cb: () => {
-                                controller.command([]);
+                                controller.command('gcode', [
+                                    '%wait',
+                                    '%global.toolchange.XPOS=posx',
+                                    '%global.toolchange.YPOS=posy',
+                                    '%global.toolchange.ZPOS=posz',
+                                    '%global.toolchange.UNITS=modal.units',
+                                    '%global.toolchange.SPINDLE=modal.spindle',
+                                    '%global.toolchange.DISTANCE=modal.distance',
+                                    'M5',
+                                    'G91 G21 G0Z5',
+                                    '([JSON.stringify(global.toolchange)])',
+                                ]);
                             }
                         }
                     ]
