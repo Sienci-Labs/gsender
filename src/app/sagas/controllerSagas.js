@@ -39,6 +39,8 @@ import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY } from 'app/const
 
 
 export function* initialize() {
+    let visualizeWorker = null;
+    let estimateWorker = null;
     /* Health check - every 3 minutes */
     setInterval(() => {
         controller.healthCheck();
@@ -178,7 +180,7 @@ export function* initialize() {
             const needsVisualization = shouldVisualize();
 
             if (needsVisualization) {
-                const visualizeWorker = new VisualizeWorker();
+                visualizeWorker = new VisualizeWorker();
                 visualizeWorker.onmessage = visualizeResponse;
                 visualizeWorker.postMessage({
                     content,
@@ -223,7 +225,7 @@ export function* initialize() {
         const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
         const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
 
-        const estimateWorker = new EstimateWorker();
+        estimateWorker = new EstimateWorker();
         estimateWorker.onmessage = estimateResponseHandler;
         estimateWorker.postMessage({
             content,
@@ -235,7 +237,7 @@ export function* initialize() {
         const needsVisualization = shouldVisualize();
 
         if (needsVisualization) {
-            const visualizeWorker = new VisualizeWorker();
+            visualizeWorker = new VisualizeWorker();
             visualizeWorker.onmessage = visualizeResponse;
             visualizeWorker.postMessage({
                 content,
@@ -264,6 +266,14 @@ export function* initialize() {
             type: fileActions.UNLOAD_FILE_INFO,
             payload: {}
         });
+    });
+
+    pubsub.subscribe('file:load', (msg, data) => {
+        visualizeWorker.terminate();
+    });
+
+    pubsub.subscribe('estimate:done', (msg, data) => {
+        estimateWorker.terminate();
     });
 
     controller.addListener('toolchange:preHookComplete', (comment = '') => {
