@@ -54,7 +54,7 @@
 
 .stepperWrapper {
   width: 30%;
-  background-color: #e5e7eb;
+  background-color: #f7f8f9;
   border-right: solid 1px #9ca3af;
   padding: 10px;
   display flex;
@@ -63,7 +63,7 @@
   h2 {
     padding: 0;
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
 }
 
@@ -72,6 +72,7 @@
   padding: 10px;
   display grid;
   grid-template-rows 5fr 1fr;
+  grid-gap 1rem;
 }
 
 
@@ -80,7 +81,7 @@
   flex-direction row;
   padding: 1rem;
   gap: 1rem;
-  border: solid 1px #e5e7eb;
+  border: solid 1px #f7f8f9;
   align-items  center;
   &-active {
     @extends .step;
@@ -183,12 +184,15 @@
 }
 
 .substepTitle {
-  color: #4b5563;
+  color: #9ca3af;
+  margin-bottom: 0.5rem;
   font-weight: bold;
+  font-size: 1.2rem;
 }
 
 .substepDescription {
-  color: #9ca3af;
+  color: #000000;
+  font-size: 1.1rem;
 }
 
 
@@ -234,7 +238,7 @@ button-mixin($color) {
 
 .stepButton {
   button-mixin(#059669);
-  &-inverted {
+  &-inverted {1q2
     button-mixin(#3e85c7);
     color: #3e85c7;
     border: solid 1px #3e85c7;
@@ -246,13 +250,16 @@ button-mixin($color) {
   display: flex;
   flex-direction row;
   align-items center;
+  box-sizing border-box;
+  padding: 10px;
+  border-radius: 5px;
+  transition: 200ms ease-in-out;
 }
 
 .substepIndicator {
   border-radius: 5px;
-  background: #FFFFFF;
-  border: solid 1px #dc2626;
-  color: #FFFFFF;
+  background: none
+  color: #77a9d7;
   display: flex;
   align-items center;
   justify-content center;
@@ -260,13 +267,16 @@ button-mixin($color) {
   i {
     padding: none !important;
     margin: none !important;
+    font-size: 2.5rem!important;
   }
 
   &-complete {
     @extends .substepIndicator;
-    background: #059669;
-    border: solid 1px #059669;
-    color: #FFFFFF;
+    color: #059669;
+  }
+  &-pending{
+    @extends .substepIndicator;
+    color: #d97706;
   }
 }
 
@@ -278,4 +288,45 @@ button-mixin($color) {
   i {
     font-size: 1rem;
   }
+}
+
+
+.substepComplete {
+  opacity: 1;
+  border-left: solid 3px #036949
+  background: rgba(#036949, 0.1);
+}
+
+.substepActive {
+  opacity: 1;
+  border-left: solid 3px #3e85c7;
+  background: rgba(#3e85c7, 0.1);
+}
+
+.substepPending {
+  opacity: 0.25;
+  //border-left: solid 3px #d97706;
+  background: rgba(#d97706, 0.1)
+}
+
+
+.actionRow {
+  display: flex;
+  flex-direction row;
+  margin-top: 1rem;
+  gap: 0.5rem;
+  align-items center;
+}
+
+.orSpan {
+
+}
+
+.subHeading {
+  padding: 0;
+  margin: 0;
+  font-size: 1rem;
+  color: #4b5563;
+  font-weight: bold;
+  margin-top: 1rem;
 }

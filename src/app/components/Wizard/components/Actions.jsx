@@ -22,10 +22,34 @@
  */
 
 import React from 'react';
+import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
+import styles from '../index.styl';
+
 
 const Actions = ({ actions = [] }) => {
     return (
-        <div>actions</div>
+        <>
+            {
+                actions.length > 0 && <h2 className={styles.subHeading}>Run GCode:</h2>
+            }
+            <div className={styles.actionRow}>
+
+                {
+                    actions.map((action, index) => {
+                        return (
+                            <>
+                                <ToolModalButton onClick={action.cb} icon="fas fa-code">
+                                    {action.label}
+                                </ToolModalButton>
+                                {
+                                    (index !== actions.length - 1) && <span className={styles.orSpan}>OR</span>
+                                }
+                            </>
+                        );
+                    })
+                }
+            </div>
+        </>
     );
 };
 

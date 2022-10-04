@@ -22,21 +22,30 @@
  */
 
 import React from 'react';
+import cx from 'classnames';
 import SubstepCompletionIndicator from 'app/components/Wizard/components/SubstepCompletionIndicator';
-import { useWizardAPI } from 'app/components/Wizard/context';
+import { useWizardContext } from 'app/components/Wizard/context';
 import Actions from './Actions';
 import styles from '../index.styl';
 
 const Substep = ({ step, index, stepIndex }) => {
-    const { isSubstepCompleted } = useWizardAPI();
+    const { activeSubstep, activeStep } = useWizardContext();
+
+    // State calculation
+    const stepComplete = stepIndex < activeStep || ((activeStep === stepIndex) && activeSubstep > index);
+    const futureStep = stepIndex > activeStep || ((activeStep === stepIndex) && activeSubstep < index);
+    const stepIsActive = stepIndex === activeStep && index === activeSubstep;
+
     return (
-        <div className={styles.substepWrapper}>
-            <SubstepCompletionIndicator completed={isSubstepCompleted(stepIndex, index)} />
+        <div className={cx(styles.substepWrapper, { [styles.substepComplete]: stepComplete, [styles.substepActive]: stepIsActive, [styles.substepPending]: futureStep })}>
+            <SubstepCompletionIndicator completed={stepComplete} future={futureStep} active={stepIsActive} />
             <div className={styles.substep} id={`step-${stepIndex}-${index}`}>
                 <span className={styles.substepTitle}>{step.title}</span>
-                <span className={styles.substepDescription}>{step.description}</span>
-                <div>
-                    <Actions actions={step.actions} index={index} />
+                <div className={cx({ [styles.hidden]: futureStep })}>
+                    <span className={styles.substepDescription}>{step.description}</span>
+                    <div>
+                        <Actions actions={step.actions} index={index} />
+                    </div>
                 </div>
             </div>
         </div>

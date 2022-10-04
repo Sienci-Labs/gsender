@@ -24,6 +24,7 @@
 import React, { useEffect } from 'react';
 import styles from 'app/components/Wizard/index.styl';
 import Instructions from 'app/components/Wizard/components/Instructions';
+import controller from 'app/lib/controller';
 import Stepper from 'app/components/Wizard/components/Stepper';
 import { useWizardContext, useWizardAPI } from 'app/components/Wizard/context';
 import cx from 'classnames';
@@ -36,10 +37,15 @@ const wizard = {
             substeps: [
                 {
                     title: 'Safety First',
-                    description: 'PH COPY - Turn off router or verify that spindle is off.',
-                    actions: [() => {
-                        console.log('Router CB');
-                    }]
+                    description: 'PH COPY - Turn off router or verify that spindle is off.  Save current modals and position',
+                    actions: [
+                        {
+                            label: 'Save Positions and Modals',
+                            cb: () => {
+                                controller.command([]);
+                            }
+                        }
+                    ]
                 },
                 {
                     title: 'Change Bit',
@@ -66,9 +72,20 @@ const wizard = {
                 {
                     title: 'Probe',
                     description: 'PH COPY - Probe tool length',
-                    cb: () => {
-                        console.log('Probe CB');
-                    }
+                    actions: [
+                        {
+                            label: 'Probe Z',
+                            cb: () => {
+                                console.log('Probe Z');
+                            }
+                        },
+                        {
+                            label: 'Set Z0 at Location',
+                            cb: () => {
+                                console.log('Set Z Zero');
+                            }
+                        },
+                    ]
                 }
             ]
         },
@@ -78,9 +95,6 @@ const wizard = {
                 {
                     title: 'Resume Program',
                     description: 'PH COPY - Start next cutting operation',
-                    cb: () => {
-                        console.log('Resume CB');
-                    }
                 }
             ]
         }
