@@ -101,6 +101,13 @@ export const WizardProvider = ({ children }) => {
             if (!instructions || !instructions.steps) {
                 return;
             }
+            instructions.steps.forEach((step) => {
+                step.substeps.forEach(substep => {
+                    if (substep.actions) {
+                        substep.actionTaken = false;
+                    }
+                });
+            });
             // Sets up steps, and restores default state for new wizard
             setSteps([...instructions.steps]);
             setStepCount(instructions.steps.length);
@@ -116,6 +123,24 @@ export const WizardProvider = ({ children }) => {
             element.scrollIntoView({
                 behavior: 'smooth'
             });
+        },
+        markActionAsComplete: (stepIndex, substepIndex) => {
+            const nextSteps = [...steps];
+            nextSteps[stepIndex].substeps[substepIndex].actionTaken = true;
+            console.log(nextSteps[stepIndex]);
+            setSteps(nextSteps);
+        },
+        hasIncompleteActions: () => {
+            const step = steps[activeStep];
+            if (!step) {
+                return false;
+            }
+            const substep = step.substeps[activeSubstep];
+            if (!substep || !substep.actions) {
+                return false;
+            }
+
+            return substep.actions.length > 0 && substep.actionTaken === false;
         }
     }), [setActiveStep, setSteps, setTitle, setVisible, steps, stepCount, activeStep, activeSubstep, setMinimized, setActiveSubstep]);
 

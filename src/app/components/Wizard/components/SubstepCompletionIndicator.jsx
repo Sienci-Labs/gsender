@@ -28,9 +28,9 @@ import styles from '../index.styl';
 const SubstepCompletionIndicator = ({ completed = false, future = false, active = false }) => {
     return (
         <div className={cx(styles.substepIndicator, { [styles.substepIndicatorComplete]: completed, [styles.substepIndicatorPending]: future })}>
-            {completed && <i className="far fa-fw fa-check-circle" />}
-            {future && <i className="fas fa-fw fa-ellipsis-h" />}
-            {active && <i className="fas fa-fw fa-circle-notch" />}
+            {completed && <i className="fas fa-fw fa-clipboard-check" />}
+            {future && <i className="far fa-fw fa-clipboard" />}
+            {active && <i className="fas fa-fw fa-clipboard-list" />}
         </div>
     );
 };

@@ -23,10 +23,12 @@
 
 import React from 'react';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
+import { useWizardAPI } from 'app/components/Wizard/context';
 import styles from '../index.styl';
 
 
-const Actions = ({ actions = [] }) => {
+const Actions = ({ actions = [], stepIndex, substepIndex }) => {
+    const { markActionAsComplete, completeSubStep, scrollToActiveStep } = useWizardAPI();
     return (
         <>
             {
@@ -36,9 +38,15 @@ const Actions = ({ actions = [] }) => {
 
                 {
                     actions.map((action, index) => {
+                        const cbWithCompletion = () => {
+                            markActionAsComplete(stepIndex, substepIndex);
+                            action.cb();
+                            completeSubStep();
+                            scrollToActiveStep();
+                        };
                         return (
                             <>
-                                <ToolModalButton key={index} onClick={action.cb} icon="fas fa-code">
+                                <ToolModalButton key={index} onClick={cbWithCompletion} icon="fas fa-code">
                                     {action.label}
                                 </ToolModalButton>
                                 {

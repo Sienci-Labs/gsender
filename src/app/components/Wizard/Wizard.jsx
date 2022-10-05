@@ -50,6 +50,7 @@ const wizard = {
                                     '%global.toolchange.UNITS=modal.units',
                                     '%global.toolchange.SPINDLE=modal.spindle',
                                     '%global.toolchange.DISTANCE=modal.distance',
+                                    '%global.toolchange.FEEDRATE=modal.feedrate',
                                     'M5',
                                     'G91 G21 G0Z5',
                                     '([JSON.stringify(global.toolchange)])',
