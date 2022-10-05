@@ -23,6 +23,7 @@
 
 import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
 import reduxStore from 'app/store/redux';
+import pubsub from 'pubsub-js';
 
 export const estimateResponseHandler = ({ data }) => {
     const reduxPayload = {
@@ -39,4 +40,5 @@ export const estimateResponseHandler = ({ data }) => {
             value: false
         }
     });
+    pubsub.publish('estimate:done');
 };

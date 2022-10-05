@@ -79,7 +79,9 @@ class WorkflowControl extends PureComponent {
 
     state = this.getInitialState();
 
-    pubsubTokens = []
+    pubsubTokens = [];
+
+    workerOutline = null;
 
     getInitialState() {
         return {
@@ -283,7 +285,7 @@ class WorkflowControl extends PureComponent {
     }
 
     runOutline = () => {
-        const workerOutline = new WorkerOutline();
+        this.workerOutline = new WorkerOutline();
         const { gcode } = this.props;
         //const machineProfile = store.get('workspace.machineProfile');
         //const spindleMode = store.get('widgets.spindle.mode');
@@ -295,10 +297,10 @@ class WorkflowControl extends PureComponent {
             duration: TOASTER_UNTIL_CLOSE,
             msg: 'Generating outline for current file'
         });
-        workerOutline.onmessage = ({ data }) => {
+        this.workerOutline.onmessage = ({ data }) => {
             outlineResponse({ data });
         };
-        workerOutline.postMessage({ gcode, isLaser: false });
+        this.workerOutline.postMessage({ gcode, isLaser: false });
     }
 
     startFromLinePrompt = () => {
@@ -326,6 +328,9 @@ class WorkflowControl extends PureComponent {
                     type: TOASTER_WARNING
                 });
             }),
+            pubsub.subscribe('outline:done', () => {
+                this.workerOutline.terminate();
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
