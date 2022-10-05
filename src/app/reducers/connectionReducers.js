@@ -22,7 +22,7 @@
  */
 
 import { createReducer } from 'redux-action';
-import { CLOSE_CONNECTION, LIST_PORTS, OPEN_CONNECTION } from 'app/actions/connectionActions';
+import { CLOSE_CONNECTION, LIST_PORTS, OPEN_CONNECTION, SAVE_LAST_WCS } from 'app/actions/connectionActions';
 
 const initialState = {
     isConnected: false,
@@ -30,7 +30,8 @@ const initialState = {
     baudrate: '',
     ports: [],
     unrecognizedPorts: [],
-    err: ''
+    err: '',
+    lastWcs: 'P1',
 };
 
 const reducer = createReducer(initialState, {
@@ -57,6 +58,12 @@ const reducer = createReducer(initialState, {
         return {
             ports: recognizedPorts,
             unrecognizedPorts
+        };
+    },
+    [SAVE_LAST_WCS]: (payload, reducerState) => {
+        const { lastWCS } = payload;
+        return {
+            lastWcs: lastWCS
         };
     }
 });

@@ -37,8 +37,7 @@ import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/work
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import isElectron from 'is-electron';
-import Preferences from '../containers/Preferences/Preferences';
-
+import get from 'lodash.get';
 
 export function* initialize() {
     let currentState = GRBL_ACTIVE_STATE_IDLE;
@@ -166,8 +165,13 @@ export function* initialize() {
             currentState = state.status.activeState;
         }
         //Watch out for wcs changes.
-        const preference = new Preferences();
-        preference.actions.general.saveLastWorkspace(gcodes.filter(obj => obj.value === state.parserstate.modal.wcs)[0].command);
+        reduxStore.dispatch({
+            type: connectionActions.SAVE_LAST_WCS,
+            payload: { lastWCS: gcodes.filter(obj => obj.value === state.parserstate.modal.wcs)[0].command }
+        });
+
+        console.log(get(reduxStore.getState(), 'connection.lastWcs'));
+
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_STATE,
             payload: { type, state }

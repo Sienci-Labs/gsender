@@ -28,6 +28,8 @@ import uniq from 'lodash/uniq';
 import { connect } from 'react-redux';
 import { GRBL } from 'app/constants';
 import includes from 'lodash/includes';
+import reduxStore from 'app/store/redux';
+import * as connectionActions from 'app/actions/connectionActions';
 //import map from 'lodash/map';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
@@ -38,8 +40,6 @@ import log from 'app/lib/log';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
 import store from '../../store';
-import Preferences from '../../containers/Preferences/Preferences';
-
 
 class NavbarConnectionWidget extends PureComponent {
     static propTypes = {
@@ -90,9 +90,11 @@ class NavbarConnectionWidget extends PureComponent {
                 port: selectedPort.port
             }), () => {
                 const { port, baudrate } = this.state;
-                let preference = new Preferences();
-                preference.actions.general.saveLastWorkspace('P1');
                 this.openPort(port, { baudrate: baudrate });
+                reduxStore.dispatch({
+                    type: connectionActions.SAVE_LAST_WCS,
+                    payload: { lastWCS: 'P1' }
+                });
             });
         },
         toggleAutoReconnect: (event) => {
@@ -242,7 +244,6 @@ class NavbarConnectionWidget extends PureComponent {
             hasReconnected: false,
             alertMessage: '',
             showUnrecognized: false,
-            lastWcs: 'P1',
         };
     }
 
@@ -308,7 +309,7 @@ class NavbarConnectionWidget extends PureComponent {
             baudrate: baudrate,
             rtscts: this.state.connection.serial.rtscts,
             shouldWCSzero: store.get('shouldWCSzero'),
-            lastWcs: this.state.lastWcs,
+            lastWcs: get(reduxStore.getState(), 'connection.lastWcs')
         }, (err) => {
             if (err) {
                 this.setState(state => ({
@@ -351,11 +352,6 @@ class NavbarConnectionWidget extends PureComponent {
                     baudrate: value
                 });
             }),
-            pubsub.subscribe('lastWcs:update', (msg, value) => {
-                this.setState({
-                    lastWcs: value
-                });
-            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }

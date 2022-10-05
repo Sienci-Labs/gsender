@@ -28,12 +28,15 @@ export const {
     OPEN_CONNECTION,
     CLOSE_CONNECTION,
     LIST_PORTS,
+    SAVE_LAST_WCS,
 } = constants('connection', [
     'OPEN_CONNECTION',
     'CLOSE_CONNECTION',
-    'LIST_PORTS'
+    'LIST_PORTS',
+    'SAVE_LAST_WCS',
 ]);
 
 export const openConnection = createAction(OPEN_CONNECTION);
 export const closeConnection = createAction(CLOSE_CONNECTION);
 export const listPorts = createAction(LIST_PORTS);
+export const saveLastWcs = createAction(SAVE_LAST_WCS);
