@@ -188,6 +188,33 @@
   border-top: 1px solid lightgrey;
 }
 
+.table-header {
+  display: grid;
+  grid-template-columns 1fr 8fr 5fr;
+
+  grid-gap: 1px;
+  background-color: lightgrey;
+  border-bottom: 1px solid black;
+}
+
+.table-header > div {
+  padding: 10px;
+  text-align: center;
+  background-color: white;
+}
+
+.tableColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tableColumnEEPROM {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
 .itemText {
   font-weight: bold;
   width: 100%;

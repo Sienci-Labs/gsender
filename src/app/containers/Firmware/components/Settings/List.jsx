@@ -25,6 +25,20 @@ const SettingsList = () => {
 
     return (
         <div className={styles.settingsContainer}>
+            <div className={styles.tableHeader}>
+                <div className={[styles['non-default-value'], styles.tableColumnEEPROM].join(' ')}>
+                    <Tooltip content="When using the Setting number in the console, make sure to include the $ symbol in front. Ex: $120">
+                        <i className="fas fa-info-circle" style={{ paddingLeft: '5px' }} />
+                    </Tooltip>
+                    <text style={{ paddingLeft: '25px', paddingRight: '5px' }}>Setting</text>
+                </div>
+                <div className={styles.tableColumn}>
+                    <text>Description</text>
+                </div>
+                <div className={styles.tableColumn}>
+                    <text>Value</text>
+                </div>
+            </div>
             {
                 hasSettings && (
                     <>
@@ -48,7 +62,7 @@ const SettingsList = () => {
                                             }
                                             <div className={styles.settingsInformation}>
                                                 <div className={styles.keyRow}>
-                                                    {grbl.setting}
+                                                    {grbl.setting.replace('$', '')}
                                                     <CategoryTag category={grbl.category} />
                                                 </div>
                                                 <div className={styles.settingsDescription}>
