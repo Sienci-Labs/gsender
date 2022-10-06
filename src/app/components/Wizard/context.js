@@ -87,9 +87,16 @@ export const WizardProvider = ({ children }) => {
             if (nextStep >= numberOfSubSteps) {
                 setActiveStep(activeStep + 1);
                 setActiveSubstep(0);
+                if (activeStep >= maxStepIndex) {
+                    setVisible(false);
+                }
                 return;
             }
             setActiveSubstep(nextStep);
+            // close window on everything done.
+            if (activeStep >= maxStepIndex) {
+                setVisible(false);
+            }
         },
         isSubstepCompleted: (stepIndex, substepIndex) => {
             if (activeStep > stepIndex) {
@@ -127,7 +134,6 @@ export const WizardProvider = ({ children }) => {
         markActionAsComplete: (stepIndex, substepIndex) => {
             const nextSteps = [...steps];
             nextSteps[stepIndex].substeps[substepIndex].actionTaken = true;
-            console.log(nextSteps[stepIndex]);
             setSteps(nextSteps);
         },
         hasIncompleteActions: () => {
@@ -141,11 +147,6 @@ export const WizardProvider = ({ children }) => {
             }
 
             return substep.actions.length > 0 && substep.actionTaken === false;
-        },
-        isLastStep: () => {
-            const stepCount = steps.length;
-            const lastStepSubstepCount = steps[stepCount - 1].substeps.length;
-            return (activeStep === stepCount) &&
         }
     }), [setActiveStep, setSteps, setTitle, setVisible, steps, stepCount, activeStep, activeSubstep, setMinimized, setActiveSubstep]);
 
