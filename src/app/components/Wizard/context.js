@@ -141,6 +141,11 @@ export const WizardProvider = ({ children }) => {
             }
 
             return substep.actions.length > 0 && substep.actionTaken === false;
+        },
+        isLastStep: () => {
+            const stepCount = steps.length;
+            const lastStepSubstepCount = steps[stepCount - 1].substeps.length;
+            return (activeStep === stepCount) &&
         }
     }), [setActiveStep, setSteps, setTitle, setVisible, steps, stepCount, activeStep, activeSubstep, setMinimized, setActiveSubstep]);
 
