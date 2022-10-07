@@ -223,9 +223,9 @@ class TerminalWrapper extends PureComponent {
 
     writeln(data) {
         this.term.write('\r');
-        if (data.toLowerCase().includes('error')) {
+        if (data.includes('error:')) {
             this.term.write(color.xterm(RED)(data));
-        } else if (data.toLowerCase().includes('alarm')) {
+        } else if (data.includes('ALARM:')) {
             this.term.write(color.xterm(ALARM_RED)(data));
         } else {
             this.term.write(data);
