@@ -677,8 +677,21 @@ class Visualizer extends Component {
                 const isPrimaryVisualizer = !isSecondary && activeVisualizer === VISUALIZER_PRIMARY;
                 const isSecondaryVisualizer = isSecondary && activeVisualizer === VISUALIZER_SECONDARY;
 
+                const callback = ({ bbox }) => {
+                    // Set gcode bounding box
+                    controller.context = {
+                        ...controller.context,
+                        xmin: bbox.min.x,
+                        xmax: bbox.max.x,
+                        ymin: bbox.min.y,
+                        ymax: bbox.max.y,
+                        zmin: bbox.min.z,
+                        zmax: bbox.max.z
+                    };
+                };
+
                 if (isPrimaryVisualizer) {
-                    this.load('', data);
+                    this.load('', data, callback);
                     return;
                 }
 
