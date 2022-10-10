@@ -46,7 +46,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                         };
                         return (
                             <>
-                                <ToolModalButton key={index} onClick={cbWithCompletion} icon="fas fa-code">
+                                <ToolModalButton key={`action-${index}`} onClick={cbWithCompletion} icon="fas fa-code">
                                     {action.label}
                                 </ToolModalButton>
                                 {

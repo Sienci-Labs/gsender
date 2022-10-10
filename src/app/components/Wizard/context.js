@@ -26,6 +26,7 @@ import React, { createContext, useContext, useState, useMemo } from 'react';
 const WizardContext = createContext({});
 const WizardAPI = createContext({});
 
+
 /**
  * Wizard Context Provider
  * @param children child elements
@@ -158,7 +159,6 @@ export const WizardProvider = ({ children }) => {
         </WizardContext.Provider>
     );
 };
-
 
 /**
  * Fetches and returns current context for Wizard tool.  Throws error if not inside provider scope.
