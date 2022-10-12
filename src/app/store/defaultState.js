@@ -303,6 +303,10 @@ const defaultState = {
                 mm: 4,
                 in: 0.15
             },
+            zProbeDistance: {
+                mm: 30,
+                in: 1.5
+            },
             touchPlateHeight: 10,
             probeType: 'Auto',
         },

@@ -22,14 +22,18 @@
  */
 
 import cx from 'classnames';
-import color from 'cli-color';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import uuid from 'uuid';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
+
 import isElectron from 'is-electron';
+
+import color from 'cli-color';
+import { GREY } from './variables';
+
 import WidgetConfig from '../WidgetConfig';
 import Console from './Console';
 import styles from './index.styl';
@@ -131,7 +135,7 @@ class ConsoleWidget extends PureComponent {
             });
 
             if (source) {
-                this.terminal.writeln(color.blackBright(source) + color.white(this.terminal.prompt + data));
+                this.terminal.writeln(color.blackBright(source) + color.xterm(GREY)(this.terminal.prompt + data));
             } else {
                 this.terminal.writeln(color.white(this.terminal.prompt + data));
             }

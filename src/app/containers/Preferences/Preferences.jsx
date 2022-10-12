@@ -137,7 +137,7 @@ class PreferencesPage extends PureComponent {
             tool: {
                 metricDiameter: 0,
                 imperialDiameter: 0,
-                type: 'end mill'
+                type: 'End Mill'
             },
             probe: store.get('workspace[probeProfile]'),
             probeSettings: {
@@ -145,7 +145,8 @@ class PreferencesPage extends PureComponent {
                 normalFeedrate: this.probeConfig.get('probeFeedrate', {}),
                 fastFeedrate: this.probeConfig.get('probeFastFeedrate', {}),
                 probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
-                connectivityTest: this.probeConfig.get('connectivityTest', true)
+                connectivityTest: this.probeConfig.get('connectivityTest', true),
+                zProbeDistance: this.probeConfig.get('zProbeDistance', {})
             },
             laser: {
                 ...this.spindleConfig.get('laser')
@@ -258,7 +259,7 @@ class PreferencesPage extends PureComponent {
                 });
             },
             setToolType: (e) => {
-                const type = e.target.value;
+                const type = e.value;
                 const tool = this.state.tool;
                 this.setState({
                     tool: {
@@ -444,6 +445,25 @@ class PreferencesPage extends PureComponent {
                     }
                 });
                 pubsub.publish('probe:test', value);
+            },
+            changeZProbeDistance: (e) => {
+                const probeSettings = { ...this.state.probeSettings };
+                const value = Math.abs(Number(e.target.value).toFixed(3) * 1);
+
+                const { units } = this.state;
+
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
+
+                this.setState({
+                    probeSettings: {
+                        ...probeSettings,
+                        zProbeDistance: {
+                            mm: metricValue,
+                            in: imperialValue,
+                        }
+                    }
+                });
             }
         },
         laser: {
@@ -800,6 +820,7 @@ class PreferencesPage extends PureComponent {
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
         this.probeConfig.set('connectivityTest', probeSettings.connectivityTest);
+        this.probeConfig.set('zProbeDistance', probeSettings.zProbeDistance);
 
         controller.command('settings:updated', this.state);
 
