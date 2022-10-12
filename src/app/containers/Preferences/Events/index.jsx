@@ -251,7 +251,7 @@ const Events = ({ active }) => {
     }, []);
 
     return (
-        <SettingWrapper title="Start/Stop G-Code" show={active}>
+        <SettingWrapper title="Program Events" show={active}>
             <GeneralArea>
                 <div className={styles.flexColumn} style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between' }}>
                     <div className={styles.flexRowEvent} style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-around' }}>
