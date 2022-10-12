@@ -48,7 +48,7 @@ class GCodeVisualizer {
 
     render({ vertices, colors, frames }) {
         const { cuttingCoordinateLines, G0Color, G1Color, G2Color, G3Color } = this.theme;
-        this.vertices = vertices;
+        this.vertices = new THREE.Float32BufferAttribute(vertices, 3);
         this.frames = frames;
         const defaultColor = new THREE.Color(cuttingCoordinateLines);
 
@@ -63,7 +63,7 @@ class GCodeVisualizer {
 
         //this.geometry.setFromPoints(this.vertices);
         const colorArray = this.getColorTypedArray(colors, motionColor);
-        this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.vertices, 3));
+        this.geometry.setAttribute('position', this.vertices);
         this.geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 4));
 
         const workpiece = new THREE.Line(
