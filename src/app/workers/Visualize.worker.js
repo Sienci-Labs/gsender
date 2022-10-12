@@ -93,8 +93,6 @@ onmessage = function({ data }) {
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);
-    console.log(tVertices);
-    console.log(tVertices.byteLength);
 
     postMessage({
         vertices: tVertices,
