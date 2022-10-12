@@ -37,13 +37,20 @@ import styles from '../index.styl';
 const Events = ({ active }) => {
     const [programStartEvent, setProgramStartEvent] = useState(null);
     const [programEndEvent, setProgramEndEvent] = useState(null);
+    const [programPauseEvent, setProgramPauseEvent] = useState(null);
+    const [programResumeEvent, setProgramResumeEvent] = useState(null);
     const [programStartCode, setProgramStartCode] = useState('');
     const [programEndCode, setProgramEndCode] = useState('');
+    const [programPauseCode, setProgramPauseCode] = useState('');
+    const [programResumeCode, setProgramResumeCode] = useState('');
     const [startEnabled, setStartEnabled] = useState(true);
     const [endEnabled, setEndEnabled] = useState(true);
+    const [pauseEnabled, setPauseEnabled] = useState(true);
 
     const changeStartCodeValue = (e) => setProgramStartCode(e.target.value);
     const changeEndCodeValue = (e) => setProgramEndCode(e.target.value);
+    const changePauseCodeValue = (e) => setProgramPauseCode(e.target.value);
+    const changeResumeCodeValue = (e) => setProgramResumeCode(e.target.value);
 
     const toggleStartEvent = async () => {
         try {
@@ -74,6 +81,27 @@ const Events = ({ active }) => {
         } catch (e) {
             Toaster.pop({
                 msg: 'Unable to update Program End event',
+                type: TOASTER_DANGER
+            });
+        }
+    };
+
+    const togglePauseEvent = async () => {
+        try {
+            if (programPauseEvent || programResumeEvent) {
+                programPauseEvent.enabled = !programPauseEvent.enabled;
+                programResumeEvent.enabled = !programResumeEvent.enabled;
+                await api.events.update(programPauseEvent.id, {
+                    enabled: programPauseEvent.enabled
+                });
+                await api.events.update(programResumeEvent.id, {
+                    enabled: programResumeEvent.enabled
+                });
+                setPauseEnabled(programPauseEvent.enabled);
+            }
+        } catch (e) {
+            Toaster.pop({
+                msg: 'Unable to update Program Pause event',
                 type: TOASTER_DANGER
             });
         }
@@ -137,18 +165,83 @@ const Events = ({ active }) => {
         }
     };
 
+    const updateProgramPauseEvent = async () => {
+        try {
+            if (programPauseEvent) {
+                await api.events.update(programPauseEvent.id, {
+                    commands: programPauseCode
+                });
+            } else {
+                const res = await api.events.create({
+                    event: 'gcode:pause',
+                    trigger: 'gcode',
+                    commands: programPauseCode
+                });
+                const { id } = res.body;
+                setProgramPauseEvent({
+                    id
+                });
+            }
+            Toaster.pop({
+                msg: 'Updated Program Pause event',
+                type: TOASTER_SUCCESS
+            });
+        } catch (e) {
+            Toaster.pop({
+                msg: 'Unable to update Program Pause event',
+                type: TOASTER_DANGER
+            });
+        }
+    };
+
+    const updateProgramResumeEvent = async () => {
+        try {
+            if (programResumeEvent) {
+                await api.events.update(programResumeEvent.id, {
+                    commands: programResumeCode
+                });
+            } else {
+                const res = await api.events.create({
+                    event: 'gcode:resume',
+                    trigger: 'gcode',
+                    commands: programResumeCode
+                });
+                const { id } = res.body;
+                setProgramResumeEvent({
+                    id
+                });
+            }
+            Toaster.pop({
+                msg: 'Updated Program Resume event',
+                type: TOASTER_SUCCESS
+            });
+        } catch (e) {
+            Toaster.pop({
+                msg: 'Unable to update Program Resume event',
+                type: TOASTER_DANGER
+            });
+        }
+    };
+
     useEffect(async () => {
         try {
             const response = await api.events.fetch();
             const { records } = response.body;
             const startEvent = records.filter((record) => record.event === 'gcode:start')[0];
             const endEvent = records.filter((record) => record.event === 'gcode:stop')[0];
+            const pauseEvent = records.filter((record) => record.event === 'gcode:pause')[0];
+            const resumeEvent = records.filter((record) => record.event === 'gcode:resume')[0];
             startEvent && setProgramStartEvent(startEvent);
             startEvent && setProgramStartCode(startEvent.commands);
             startEvent && setStartEnabled(startEvent.enabled);
             endEvent && setProgramEndEvent(endEvent);
             endEvent && setProgramEndCode(endEvent.commands);
             endEvent && setEndEnabled(endEvent.enabled);
+            pauseEvent && setProgramPauseEvent(pauseEvent);
+            pauseEvent && setProgramPauseCode(pauseEvent.commands);
+            pauseEvent && setPauseEnabled(pauseEvent.enabled);
+            resumeEvent && setProgramResumeEvent(resumeEvent);
+            resumeEvent && setProgramResumeCode(resumeEvent.commands);
         } catch (e) {
             Toaster.pop({
                 msg: 'Unable to fetch program event records',
@@ -161,38 +254,74 @@ const Events = ({ active }) => {
         <SettingWrapper title="Start/Stop G-Code" show={active}>
             <GeneralArea>
                 <div className={styles.flexColumn} style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between' }}>
-                    <Fieldset legend="Program Start" className={styles.paddingBottom}>
-                        <div className={styles.toggleContainer}>
-                            <ToggleSwitch checked={startEnabled} onChange={toggleStartEvent} label="Enabled" />
-                        </div>
-                        <textarea
-                            rows="10"
-                            className="form-control"
-                            style={{ resize: 'none' }}
-                            name="onStart"
-                            value={programStartCode}
-                            onChange={changeStartCodeValue}
-                        />
-                        <FunctionButton primary onClick={updateProgramStartEvent} style={{ marginBottom: '0.5rem' }}>
-                            Update Start Event
-                        </FunctionButton>
-                    </Fieldset>
-                    <Fieldset legend="Program Stop" className={styles.paddingBottom}>
-                        <div className={styles.toggleContainer}>
-                            <ToggleSwitch checked={endEnabled} onChange={toggleEndEvent} label="Enabled" />
-                        </div>
-                        <textarea
-                            rows="9"
-                            className="form-control"
-                            style={{ resize: 'none' }}
-                            name="onStop"
-                            value={programEndCode}
-                            onChange={changeEndCodeValue}
-                        />
-                        <FunctionButton primary onClick={updateProgramEndEvent} style={{ marginBottom: '0.5rem' }}>
-                            Update Stop Event
-                        </FunctionButton>
-                    </Fieldset>
+                    <div className={styles.flexRowEvent} style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-around' }}>
+                        <Fieldset legend="Program Start" className={styles.paddingBottom}>
+                            <div className={styles.toggleContainer}>
+                                <ToggleSwitch checked={startEnabled} onChange={toggleStartEvent} label="Enabled" />
+                            </div>
+                            <textarea
+                                rows="10"
+                                className="form-control"
+                                style={{ resize: 'none' }}
+                                name="onStart"
+                                value={programStartCode}
+                                onChange={changeStartCodeValue}
+                            />
+                            <FunctionButton primary onClick={updateProgramStartEvent} style={{ marginBottom: '0.5rem' }}>
+                                Update Start Event
+                            </FunctionButton>
+                        </Fieldset>
+                        <Fieldset legend="Program Stop" className={styles.paddingBottom}>
+                            <div className={styles.toggleContainer}>
+                                <ToggleSwitch checked={endEnabled} onChange={toggleEndEvent} label="Enabled" />
+                            </div>
+                            <textarea
+                                rows="10"
+                                className="form-control"
+                                style={{ resize: 'none' }}
+                                name="onStop"
+                                value={programEndCode}
+                                onChange={changeEndCodeValue}
+                            />
+                            <FunctionButton primary onClick={updateProgramEndEvent} style={{ marginBottom: '0.5rem' }}>
+                                Update Stop Event
+                            </FunctionButton>
+                        </Fieldset>
+                    </div>
+                    <div className={styles.flexRowEvent} style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-around' }}>
+                        <Fieldset legend="Program Pause" className={styles.paddingBottom}>
+                            <div className={styles.toggleContainer}>
+                                <ToggleSwitch checked={pauseEnabled} onChange={togglePauseEvent} label="Enabled" />
+                            </div>
+                            <textarea
+                                rows="9"
+                                className="form-control"
+                                style={{ resize: 'none' }}
+                                name="onPause"
+                                value={programPauseCode}
+                                onChange={changePauseCodeValue}
+                            />
+                            <FunctionButton primary onClick={updateProgramPauseEvent} style={{ marginBottom: '0.5rem' }}>
+                                Update Pause Event
+                            </FunctionButton>
+                        </Fieldset>
+                        <Fieldset legend="Program Resume" className={styles.paddingBottom}>
+                            <div className={styles.toggleContainer}>
+                                <ToggleSwitch checked={pauseEnabled} onChange={togglePauseEvent} label="Enabled" />
+                            </div>
+                            <textarea
+                                rows="9"
+                                className="form-control"
+                                style={{ resize: 'none' }}
+                                name="onPause"
+                                value={programResumeCode}
+                                onChange={changeResumeCodeValue}
+                            />
+                            <FunctionButton primary onClick={updateProgramResumeEvent} style={{ marginBottom: '0.5rem' }}>
+                                Update Resume Event
+                            </FunctionButton>
+                        </Fieldset>
+                    </div>
                 </div>
             </GeneralArea>
         </SettingWrapper>
