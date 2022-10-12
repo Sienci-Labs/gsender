@@ -93,7 +93,7 @@ class GCodeVisualizer {
             const color = motionColor[motion] || motionColor.default;
             colorArray.push(...color.toArray(), opacity);
         });
-        this.colors = colorArray;
+        this.colors = new Float32Array(colorArray);
         return new Float32Array(colorArray);
     }
 
@@ -103,7 +103,6 @@ class GCodeVisualizer {
             return;
         }
         const { cuttingCoordinateLine } = this.theme;
-        //const defaultColor = new THREE.Color('#f9a13b');
         const defaultColor = new THREE.Color(cuttingCoordinateLine);
 
         frameIndex = Math.min(frameIndex, this.frames.length - 1);
