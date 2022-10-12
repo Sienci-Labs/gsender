@@ -61,8 +61,9 @@ class GCodeVisualizer {
             'default': defaultColor
         };
 
-        this.geometry.setFromPoints(this.vertices);
+        //this.geometry.setFromPoints(this.vertices);
         const colorArray = this.getColorTypedArray(colors, motionColor);
+        this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(this.vertices, 3));
         this.geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 4));
 
         const workpiece = new THREE.Line(
