@@ -89,7 +89,7 @@ class EventTrigger {
         let isEnabled = false;
         const events = config.get('events', []);
         events
-            .filter(event => event && event.event === 'gcode:pause')
+            .filter(event => event && event.event === 'gcode:resume')
             .forEach(options => {
                 const { enabled, commands } = { ...options };
                 if (enabled && commands.length > 0) {

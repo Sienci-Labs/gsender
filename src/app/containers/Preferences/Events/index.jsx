@@ -46,6 +46,7 @@ const Events = ({ active }) => {
     const [startEnabled, setStartEnabled] = useState(true);
     const [endEnabled, setEndEnabled] = useState(true);
     const [pauseEnabled, setPauseEnabled] = useState(true);
+    const [resumeEnabled, setResumeEnabled] = useState(true);
 
     const changeStartCodeValue = (e) => setProgramStartCode(e.target.value);
     const changeEndCodeValue = (e) => setProgramEndCode(e.target.value);
@@ -88,20 +89,32 @@ const Events = ({ active }) => {
 
     const togglePauseEvent = async () => {
         try {
-            if (programPauseEvent || programResumeEvent) {
+            if (programPauseEvent) {
                 programPauseEvent.enabled = !programPauseEvent.enabled;
-                programResumeEvent.enabled = !programResumeEvent.enabled;
                 await api.events.update(programPauseEvent.id, {
                     enabled: programPauseEvent.enabled
-                });
-                await api.events.update(programResumeEvent.id, {
-                    enabled: programResumeEvent.enabled
                 });
                 setPauseEnabled(programPauseEvent.enabled);
             }
         } catch (e) {
             Toaster.pop({
                 msg: 'Unable to update Program Pause event',
+                type: TOASTER_DANGER
+            });
+        }
+    };
+    const toggleResumeEvent = async () => {
+        try {
+            if (programResumeEvent) {
+                programResumeEvent.enabled = !programResumeEvent.enabled;
+                await api.events.update(programResumeEvent.id, {
+                    enabled: programResumeEvent.enabled
+                });
+                setResumeEnabled(programResumeEvent.enabled);
+            }
+        } catch (e) {
+            Toaster.pop({
+                msg: 'Unable to update Program Resume event',
                 type: TOASTER_DANGER
             });
         }
@@ -242,6 +255,7 @@ const Events = ({ active }) => {
             pauseEvent && setPauseEnabled(pauseEvent.enabled);
             resumeEvent && setProgramResumeEvent(resumeEvent);
             resumeEvent && setProgramResumeCode(resumeEvent.commands);
+            resumeEvent && setResumeEnabled(resumeEvent.enabled);
         } catch (e) {
             Toaster.pop({
                 msg: 'Unable to fetch program event records',
@@ -307,13 +321,13 @@ const Events = ({ active }) => {
                         </Fieldset>
                         <Fieldset legend="Program Resume" className={styles.paddingBottom}>
                             <div className={styles.toggleContainer}>
-                                <ToggleSwitch checked={pauseEnabled} onChange={togglePauseEvent} label="Enabled" />
+                                <ToggleSwitch checked={resumeEnabled} onChange={toggleResumeEvent} label="Enabled" />
                             </div>
                             <textarea
                                 rows="9"
                                 className="form-control"
                                 style={{ resize: 'none' }}
-                                name="onPause"
+                                name="onResume"
                                 value={programResumeCode}
                                 onChange={changeResumeCodeValue}
                             />
