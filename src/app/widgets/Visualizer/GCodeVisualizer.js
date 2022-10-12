@@ -74,7 +74,6 @@ class GCodeVisualizer {
                 opacity: 0.9,
             })
         );
-
         this.group.add(workpiece);
 
         log.debug({
@@ -110,8 +109,8 @@ class GCodeVisualizer {
         frameIndex = Math.min(frameIndex, this.frames.length - 1);
         frameIndex = Math.max(frameIndex, 0);
 
-        const v1 = this.frames[this.frameIndex].vertexIndex;
-        const v2 = this.frames[frameIndex].vertexIndex;
+        const v1 = this.frames[this.frameIndex];
+        const v2 = this.frames[frameIndex];
 
         if (v1 < v2) {
             const workpiece = this.group.children[0];
@@ -147,7 +146,6 @@ class GCodeVisualizer {
         this.geometry = new THREE.BufferGeometry();
         this.vertices = [];
         this.colors = [];
-
         this.frames = [];
         this.frameIndex = 0;
     }

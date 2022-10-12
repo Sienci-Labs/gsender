@@ -87,18 +87,16 @@ onmessage = function({ data }) {
         }
     });
 
-    toolpath.loadFromStringSync(content, (line, index) => {
-        frames.push({
-            data: line,
-            vertexIndex: vertices.length // remember current vertex index
-        });
+    toolpath.loadFromStringSync(content, () => {
+        frames.push(vertices.length);
     });
 
+    let tFrames = new Uint32Array(frames);
 
     postMessage({
         vertices,
         colors,
-        frames,
+        frames: tFrames,
         visualizer
     });
 };
