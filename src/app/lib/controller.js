@@ -96,6 +96,7 @@ class Controller {
         'file:load': [],
         'file:unload': [],
         'homing:flag': [],
+        'grbl:iSready': [],
         'sender:M0M1': []
     };
 
@@ -129,7 +130,9 @@ class Controller {
 
     // Connection options
     host = null;
+
     next = null;
+
     options = null;
 
     // @param {object} io The socket.io-client module.

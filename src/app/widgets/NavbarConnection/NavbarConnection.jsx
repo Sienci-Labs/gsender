@@ -32,7 +32,8 @@ import styles from './Index.styl';
 class NavbarConnection extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
+        connected: PropTypes.bool
     };
 
     isPortInUse = (port) => {
@@ -42,7 +43,7 @@ class NavbarConnection extends PureComponent {
         return !!(o.inuse);
     };
 
-    getConnectionStatusText = (connected, connecting, alertMessage) => {
+    getConnectionStatusText = (connected, connecting, alertMessage,) => {
         if (connected) {
             return 'Connected';
         } else if (alertMessage) {
@@ -67,11 +68,9 @@ class NavbarConnection extends PureComponent {
     getIconState(connected, connecting, alertMessage) {
         if (connected) {
             return 'icon-connected';
-        }
-        if (alertMessage) {
+        } else if (alertMessage) {
             return 'icon-error';
-        }
-        if (connecting) {
+        } else if (connecting) {
             return 'icon-connecting';
         }
         return 'icon-disconnected';
@@ -79,8 +78,7 @@ class NavbarConnection extends PureComponent {
 
     render() {
         const { state, actions } = this.props;
-        const { ports, connecting, connected, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
-
+        const { connected, ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
         const iconState = this.getIconState(connected, connecting, alertMessage);
 
         return (
@@ -105,7 +103,7 @@ class NavbarConnection extends PureComponent {
                     connected && (
                         <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
                             <i className="fa fa-unlink" />
-                        Disconnect
+                            Disconnect
                         </button>
 
                     )
