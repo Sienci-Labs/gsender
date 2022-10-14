@@ -435,7 +435,7 @@ class ProbeWidget extends PureComponent {
         code = [
             this.gcode(`; ${axis}-Probe`),
             // save initial position
-            this.gcode('%X0=posx,Y0=posy,Z0=posz'),
+            this.gcode('%X0=mposx,Y0=mposy,Z0=mposz'),
             // Fast probe for initial touch
             this.gcode(probeCommand, {
                 [axis]: probeDistance,
@@ -491,7 +491,10 @@ class ProbeWidget extends PureComponent {
         ]);
 
         // return to original position
-        code = code.concat(this.gcode('G0 X[X0] Y[Y0] Z[Z0]'));
+        code = code.concat([
+            gcode('G0 Z[Z0]'),
+            gcode('G0 X[X0] Y[Y0]')
+        ]);
 
         code = code.concat([
             this.gcode('G90')
@@ -524,7 +527,7 @@ class ProbeWidget extends PureComponent {
         }
 
         // save initial position
-        code = code.concat(gcode('%X0=posx,Y0=posy,Z0=posz'));
+        code = code.concat(gcode('%X0=mposx,Y0=mposy,Z0=mposz'));
 
         // Add Z Probe code if we're doing 3 axis probing
         if (axes.z) {
@@ -636,7 +639,10 @@ class ProbeWidget extends PureComponent {
         ]);
 
         // return to original position
-        code = code.concat(gcode('G0 X[X0] Y[Y0] Z[Z0]'));
+        code = code.concat([
+            gcode('G0 Z[Z0]'),
+            gcode('G0 X[X0] Y[Y0]')
+        ]);
 
         // Make sure we're in the correct mode at end of probe
         code = code.concat([
