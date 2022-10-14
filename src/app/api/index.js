@@ -703,6 +703,27 @@ file.upload = (file, port, visualizer) => new Promise((resolve, reject) => {
         });
 });
 
+//
+// Log
+//
+const log = {};
+
+log.printLog = (msg, file, lineNumber, level) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/log')
+        .send({ msg: msg })
+        .send({ file: file })
+        .send({ lineNumber: lineNumber })
+        .send({ level: level })
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 export default {
     getLatestVersion,
 
@@ -735,4 +756,7 @@ export default {
 
     // Files
     file,
+
+    // Log
+    log
 };

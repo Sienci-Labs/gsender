@@ -31,7 +31,8 @@ import reduxStore from 'app/store/redux';
 import ReactDOM from 'react-dom';
 import {
     HashRouter as Router,
-    Route
+    Route,
+    Switch
 } from 'react-router-dom';
 import i18next from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -58,6 +59,7 @@ import { Button } from './components/Buttons';
 import ModalTemplate from './components/ModalTemplate';
 import Modal from './components/Modal';
 import Space from './components/Space';
+import PopUpWidget from './containers/PopUpWidget';
 import './styles/vendor.styl';
 import './styles/app.styl';
 
@@ -79,9 +81,10 @@ const renderPage = () => {
                 layout="floats"
             >
                 <Router>
-                    <div>
+                    <Switch>
+                        <Route path="/widget/:id" component={PopUpWidget} />
                         <Route path="/" component={App} />
-                    </div>
+                    </Switch>
                 </Router>
             </GridSystemProvider>
         </ReduxProvider>,

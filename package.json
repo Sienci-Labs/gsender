@@ -156,6 +156,8 @@
     "@fortawesome/fontawesome-free": "^5.15.2",
     "@fortawesome/fontawesome-free-brands": "^5.0.13",
     "@fortawesome/free-regular-svg-icons": "^5.15.2",
+    "@mdi/js": "^7.0.96",
+    "@mdi/react": "^1.6.1",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.9.2",
     "@mui/styled-engine-sc": "^5.8.0",

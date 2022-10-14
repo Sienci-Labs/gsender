@@ -300,6 +300,12 @@ class Controller {
         this.socket && this.socket.emit('list', callback);
     }
 
+    // Adds client to the connection
+    // @param {string} port The path of the serial port you want to close. For example, `dev/tty.XXX` on Mac and Linux, or `COM1` on Windows.
+    addClient(port) {
+        this.socket && this.socket.emit('addclient', port);
+    }
+
     // Executes a command on the server.
     // @param {string} cmd The command string
     // @example Example Usage

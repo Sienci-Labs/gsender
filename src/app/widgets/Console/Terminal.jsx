@@ -128,6 +128,7 @@ class TerminalWrapper extends PureComponent {
 
         const xtermElement = el.querySelector('.xterm');
         xtermElement.style.paddingLeft = '3px';
+        xtermElement.style.height = '100%';
 
         const viewportElement = el.querySelector('.xterm-viewport');
         this.verticalScrollbar = new PerfectScrollbar(viewportElement);
@@ -294,7 +295,7 @@ class TerminalWrapper extends PureComponent {
         const { terminalInputIndex } = this.state;
 
         return (
-            <div style={{ display: 'grid', width: '100%', gridTemplateRows: '11fr 1fr' }}>
+            <div style={{ display: 'grid', width: '100%', gridTemplateRows: '11fr 35px' }}>
                 <div
                     ref={node => {
                         this.terminalContainer = node;

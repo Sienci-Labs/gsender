@@ -172,6 +172,10 @@ export function* initialize() {
     });
 
     controller.addListener('serialport:open', (options) => {
+        if (isElectron()) {
+            window.ipcRenderer.send('reconnect-main', options);
+        }
+
         const machineProfile = store.get('workspace.machineProfile');
         const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
         // Reset homing run flag to prevent rapid position without running homing

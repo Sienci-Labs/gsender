@@ -21,32 +21,15 @@
  *
  */
 
-import * as version from './api.version';
-import * as state from './api.state';
-import * as gcode from './api.gcode';
-import * as controllers from './api.controllers';
-import * as watch from './api.watch';
-import * as commands from './api.commands';
-import * as events from './api.events';
-import * as machines from './api.machines';
-import * as macros from './api.macros';
-import * as mdi from './api.mdi';
-import * as users from './api.users';
-import * as files from './api.file';
-import * as logs from './api.log';
+.icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 30px;
+    width: 30px;
+    z-index: 1000;
+}
 
-export {
-    version,
-    state,
-    gcode,
-    controllers,
-    watch,
-    commands,
-    events,
-    machines,
-    macros,
-    mdi,
-    users,
-    files,
-    logs
-};
+.icon:hover {
+    cursor: pointer;
+}
