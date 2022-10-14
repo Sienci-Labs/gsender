@@ -35,11 +35,11 @@ const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
     }
     //Close the controller for AvrgirlArduino to take over the port
     const controller = store.get('controllers["' + flashPort + '"]');
-    if (controller) {
-        controller.close();
-    }
 
     try {
+        if (controller) {
+            controller.close();
+        }
         let avrgirl = new AvrgirlArduino({
             board: 'uno',
             port: flashPort,
@@ -55,7 +55,9 @@ const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
             }
         });
     } catch (error) {
-        log.debug(`${error} Error flashing board`);
+        const message = 'Error flashing board';
+        log.debug(`${error} ${message}`);
+        socket.emit('task:error', message);
     }
 };
 

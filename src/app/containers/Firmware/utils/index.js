@@ -64,7 +64,7 @@ export const startFlash = (port, profile) => {
     Toaster.pop({
         msg: `Flashing started on port: ${port} `,
         type: TOASTER_INFO,
-        duration: 15000
+        duration: 10000
     });
     const imageType = getMachineProfileVersion(profile);
     controller.flashFirmware(port, imageType);

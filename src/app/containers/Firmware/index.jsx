@@ -50,14 +50,14 @@ const Firmware = ({ modalClose }) => {
             setIsFlashing(false);
             modalClose();
             Toaster.pop({
-                msg: `Flashing completed successfully on port: ${JSON.stringify(message)}! Please reconnect your machine`,
+                msg: `Flashing completed successfully on port: ${JSON.stringify(message)}  Please reconnect your machine`,
                 type: TOASTER_INFO,
             });
         },
         'task:error': (error) => {
             setIsFlashing(false);
             Toaster.pop({
-                msg: error,
+                msg: JSON.stringify(error).replaceAll('"', ''),
                 type: TOASTER_UNTIL_CLOSE,
                 duration: 10000
             });

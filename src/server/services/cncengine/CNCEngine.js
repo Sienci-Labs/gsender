@@ -193,7 +193,9 @@ class CNCEngine {
             socket.on('reconnect', (port) => {
                 let controller = store.get(`controllers["${port}"]`);
                 if (!controller) {
-                    log.info(`No controller found on port ${port} to reconnect to`);
+                    const message = `No controller found on port ${port} to reconnect to`;
+                    log.info(message);
+                    this.io.emit('task:error', message);
                     return;
                 }
                 log.info(`Reconnecting to open controller on port ${port} with socket ID ${socket.id}`);
