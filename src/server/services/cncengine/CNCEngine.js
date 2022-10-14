@@ -376,6 +376,12 @@ class CNCEngine {
                     log.error('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
                     return;
                 }
+                //Close the controller for AvrgirlArduino to take over the port
+                const controller = store.get('controllers["' + flashPort + '"]');
+                if (controller) {
+                    controller.close();
+                    store.unset(`controllers[${JSON.stringify(flashPort)}]`);
+                }
                 FlashingFirmware(flashPort, imageType, socket);
             });
 

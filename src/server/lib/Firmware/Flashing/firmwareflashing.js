@@ -25,7 +25,6 @@ import AvrgirlArduino from 'avrgirl-arduino';
 import mk1Image from '!file-loader!./mk1_20220214.hex';
 import mk2Image from '!file-loader!./mk2_20220214.hex';
 import logger from '../../logger';
-import store from '../../../store';
 
 const log = logger('FlashLib: ');
 const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
@@ -33,13 +32,8 @@ const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
         log.error('No port specified');
         return;
     }
-    //Close the controller for AvrgirlArduino to take over the port
-    const controller = store.get('controllers["' + flashPort + '"]');
 
     try {
-        if (controller) {
-            controller.close();
-        }
         let avrgirl = new AvrgirlArduino({
             board: 'uno',
             port: flashPort,

@@ -57,7 +57,7 @@ const Firmware = ({ modalClose }) => {
         'task:error': (error) => {
             setIsFlashing(false);
             Toaster.pop({
-                msg: JSON.stringify(error).replaceAll('"', ''),
+                msg: JSON.stringify(error !== {} ? error : 'Process failed.').replaceAll('"', ''),
                 type: TOASTER_UNTIL_CLOSE,
                 duration: 10000
             });
