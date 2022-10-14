@@ -225,6 +225,8 @@ const main = () => {
                 const childOptions = {
                     width: 550 / factor,
                     height: 460 / factor,
+                    minWidth: 550 / factor,
+                    minHeight: 460 / factor,
                     useContentSize: true,
                     title: 'gSender',
                     parent: window
