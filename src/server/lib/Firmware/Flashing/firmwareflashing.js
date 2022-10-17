@@ -49,7 +49,7 @@ const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
             }
         });
     } catch (error) {
-        const message = 'Error flashing board';
+        const message = 'An error occurred while flashing';
         log.debug(`${error} ${message}`);
         socket.emit('task:error', message);
     }

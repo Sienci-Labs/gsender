@@ -379,10 +379,13 @@ class CNCEngine {
                 //Close the controller for AvrgirlArduino to take over the port
                 const controller = store.get('controllers["' + flashPort + '"]');
                 if (controller) {
-                    controller.close();
-                    store.unset(`controllers[${JSON.stringify(flashPort)}]`);
+                    controller.close(
+                        FlashingFirmware(flashPort, imageType, socket)
+                    );
+                } else {
+                    FlashingFirmware(flashPort, imageType, socket);
                 }
-                FlashingFirmware(flashPort, imageType, socket);
+                store.unset(`controllers[${JSON.stringify(flashPort)}]`);
             });
 
             socket.on('write', (port, data, context = {}) => {
