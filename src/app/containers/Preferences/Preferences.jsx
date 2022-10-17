@@ -161,8 +161,8 @@ class PreferencesPage extends PureComponent {
                 objects: this.visualizerConfig.get('objects'),
                 disabled: this.visualizerConfig.get('disabled'),
                 disabledLite: this.visualizerConfig.get('disabledLite'),
+                showSoftLimitsWarning: this.visualizerConfig.get('showSoftLimitsWarning', false),
                 SVGEnabled: this.visualizerConfig.get('SVGEnabled', false),
-                showSoftLimitsWarning: this.visualizerConfig.get('showSoftLimitsWarning')
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),

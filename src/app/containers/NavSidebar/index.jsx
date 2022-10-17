@@ -28,7 +28,7 @@ import get from 'lodash/get';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
-import { GRBL, WORKFLOW_STATE_RUNNING } from 'app/constants';
+import { GRBL, WORKFLOW_STATE_RUNNING, TOOLBAR_CATEGORY } from 'app/constants';
 import store from 'app/store';
 import HelpModal from 'app/containers/Help';
 import NavSidebarLink from './NavSideBarLink';
@@ -39,12 +39,13 @@ import {
     MODAL_FIRMWARE,
     MODAL_SURFACING,
     MODAL_CALIBRATE,
-    MODAL_HELP
+    MODAL_HELP,
 } from './constants';
 import Preferences from '../Preferences/Preferences';
 import Firmware from '../Firmware';
 import Surfacing from '../Surfacing';
 import Calibration from '../Calibration';
+import useKeybinding from '../../lib/useKeybinding';
 
 
 class NavSidebar extends PureComponent {
@@ -62,7 +63,7 @@ class NavSidebar extends PureComponent {
         });
     }
 
-    shuttleControlEvents = {
+    shuttleControlFunctions = {
         OPEN_TOOLBAR: (_, { toolbar, shouldConnect, shouldOpenHelpPage }) => {
             if (shouldConnect) {
                 const connection = store.get('widgets.connection');
@@ -80,18 +81,91 @@ class NavSidebar extends PureComponent {
         }
     }
 
+    shuttleControlEvents = {
+        OPEN_TOOLBAR_CONN: {
+            title: 'Connect',
+            keys: 'f1',
+            cmd: 'OPEN_TOOLBAR_CONN',
+            payload: { shouldConnect: true },
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: this.shuttleControlFunctions.OPEN_TOOLBAR
+        },
+        OPEN_TOOLBAR_SURF: {
+            title: 'Surfacing',
+            keys: 'f2',
+            cmd: 'OPEN_TOOLBAR_SURF',
+            payload: { toolbar: MODAL_SURFACING },
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: this.shuttleControlFunctions.OPEN_TOOLBAR
+        },
+        OPEN_TOOLBAR_MAP: {
+            title: 'Heightmap',
+            keys: 'f3',
+            cmd: 'OPEN_TOOLBAR_MAP',
+            payload: { toolbar: null },
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: this.shuttleControlFunctions.OPEN_TOOLBAR
+        },
+        OPEN_TOOLBAR_CALI: {
+            title: 'Calibrate',
+            keys: 'f4',
+            cmd: 'OPEN_TOOLBAR_CALI',
+            payload: { toolbar: MODAL_CALIBRATE },
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: this.shuttleControlFunctions.OPEN_TOOLBAR
+        },
+        OPEN_TOOLBAR_FIRM: {
+            title: 'Firmware',
+            keys: 'f5',
+            cmd: 'OPEN_TOOLBAR_FIRM',
+            payload: { toolbar: MODAL_FIRMWARE },
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: this.shuttleControlFunctions.OPEN_TOOLBAR
+        },
+        OPEN_TOOLBAR_HELP: {
+            title: 'Help',
+            keys: 'f6',
+            cmd: 'OPEN_TOOLBAR_HELP',
+            payload: { toolbar: MODAL_HELP },
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: this.shuttleControlFunctions.OPEN_TOOLBAR
+        },
+        OPEN_TOOLBAR_SETT: {
+            title: 'Settings',
+            keys: 'f7',
+            cmd: 'OPEN_TOOLBAR_SETT',
+            payload: { toolbar: MODAL_PREFERENCES },
+            preventDefault: false,
+            isActive: true,
+            category: TOOLBAR_CATEGORY,
+            callback: this.shuttleControlFunctions.OPEN_TOOLBAR
+        },
+    }
+
     addShuttleControlEvents() {
         combokeys.reload();
 
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.on(eventName, callback);
         });
     }
 
     removeShuttleControlEvents() {
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.removeListener(eventName, callback);
         });
     }
@@ -117,6 +191,7 @@ class NavSidebar extends PureComponent {
 
     componentDidMount() {
         this.addShuttleControlEvents();
+        useKeybinding(this.shuttleControlEvents);
 
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }

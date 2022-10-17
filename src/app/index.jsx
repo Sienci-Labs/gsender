@@ -62,6 +62,7 @@ import Space from './components/Space';
 import PopUpWidget from './containers/PopUpWidget';
 import './styles/vendor.styl';
 import './styles/app.styl';
+import { removeOldKeybindings } from './lib/useKeybinding';
 
 const renderPage = () => {
     const container = document.createElement('div');
@@ -239,6 +240,8 @@ series([
     }
 
     renderPage();
+
+    removeOldKeybindings();
 }).catch(err => {
     log.error(err);
 });

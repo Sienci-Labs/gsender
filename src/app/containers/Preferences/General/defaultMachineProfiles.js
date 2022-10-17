@@ -51,6 +51,7 @@ export default [
         'spindle': false,
         'coolant': false,
         'laser': false,
+        'laserOnOutline': false,
         'eepromSettings': millOneFile,
     },
     {
@@ -73,6 +74,7 @@ export default [
         'spindle': false,
         'coolant': false,
         'laser': false,
+        'laserOnOutline': false,
         'eepromSettings': millOneFile,
     },
     {
@@ -95,6 +97,7 @@ export default [
         'spindle': false,
         'coolant': false,
         'laser': false,
+        'laserOnOutline': false,
         'eepromSettings': millOneV3File,
     },
     {
@@ -117,6 +120,7 @@ export default [
         'spindle': false,
         'coolant': false,
         'laser': false,
+        'laserOnOutline': false,
         'eepromSettings': longMill12x12File,
     },
     {
@@ -139,6 +143,7 @@ export default [
         'spindle': false,
         'coolant': false,
         'laser': false,
+        'laserOnOutline': false,
         'eepromSettings': longMill12x30File,
     },
     {
@@ -161,6 +166,7 @@ export default [
         'spindle': false,
         'coolant': false,
         'laser': false,
+        'laserOnOutline': false,
         'eepromSettings': longMill30x30File,
     },
     {
@@ -205,6 +211,7 @@ export default [
         'spindle': false,
         'coolant': false,
         'laser': false,
+        'laserOnOutline': false,
         'eepromSettings': MK2LongMill30x30File,
     },
     {
@@ -227,6 +234,7 @@ export default [
         'spindle': false,
         'coolant': false,
         'laser': false,
+        'laserOnOutline': false,
         'eepromSettings': MK2LongMill12x30File,
     },
     {
@@ -267,7 +275,8 @@ export default [
         'endstops': true,
         'spindle': true,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 19,
@@ -287,7 +296,8 @@ export default [
         'endstops': true,
         'spindle': true,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 22,
@@ -307,7 +317,8 @@ export default [
         'endstops': true,
         'spindle': false,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 23,
@@ -327,7 +338,8 @@ export default [
         'endstops': true,
         'spindle': false,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 33,
@@ -347,7 +359,8 @@ export default [
         'endstops': true,
         'spindle': false,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 34,
@@ -367,7 +380,8 @@ export default [
         'endstops': false,
         'spindle': false,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 41,
@@ -387,7 +401,8 @@ export default [
         'endstops': false,
         'spindle': false,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 43,
@@ -407,7 +422,8 @@ export default [
         'endstops': true,
         'spindle': false,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 44,
@@ -427,7 +443,8 @@ export default [
         'endstops': true,
         'spindle': true,
         'coolant': false,
-        'laser': true
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 45,
@@ -447,7 +464,8 @@ export default [
         'endstops': false,
         'spindle': false,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
 
     {
@@ -468,7 +486,8 @@ export default [
         'endstops': false,
         'spindle': false,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 50,
@@ -488,7 +507,8 @@ export default [
         'endstops': false,
         'spindle': false,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 51,
@@ -508,7 +528,8 @@ export default [
         'endstops': false,
         'spindle': false,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
     {
         'id': 52,
@@ -528,6 +549,7 @@ export default [
         'endstops': false,
         'spindle': false,
         'coolant': false,
-        'laser': false
+        'laser': false,
+        'laserOnOutline': false,
     },
 ];
