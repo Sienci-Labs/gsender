@@ -492,8 +492,8 @@ class ProbeWidget extends PureComponent {
 
         // return to original position
         code = code.concat([
-            gcode('G0 Z[Z0]'),
-            gcode('G0 X[X0] Y[Y0]')
+            this.gcode('G0 Z[Z0]'),
+            this.gcode('G0 X[X0] Y[Y0]')
         ]);
 
         code = code.concat([
