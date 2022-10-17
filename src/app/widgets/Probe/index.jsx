@@ -434,6 +434,8 @@ class ProbeWidget extends PureComponent {
         let code;
         code = [
             this.gcode(`; ${axis}-Probe`),
+            // save initial position
+            this.gcode('%X0=mposx,Y0=mposy,Z0=mposz'),
             // Fast probe for initial touch
             this.gcode(probeCommand, {
                 [axis]: probeDistance,
@@ -488,16 +490,11 @@ class ProbeWidget extends PureComponent {
             })
         ]);
 
-        // Go up on Z if X or Y
-        if (axis !== 'Z') {
-            const { touchPlateHeight, units } = this.state;
-            const touchplateThickness = (units === METRIC_UNITS) ? touchPlateHeight : mm2in(touchPlateHeight);
-            code = code.concat([
-                this.gcode('G0', {
-                    Z: -1 * ((retractDistance * 4) - touchplateThickness)
-                })
-            ]);
-        }
+        // return to original position
+        code = code.concat([
+            gcode('G0 Z[Z0]'),
+            gcode('G0 X[X0] Y[Y0]')
+        ]);
 
         code = code.concat([
             this.gcode('G90')
@@ -528,6 +525,9 @@ class ProbeWidget extends PureComponent {
         if (this.props.$13 === '1') {
             prependUnits = 'G20';
         }
+
+        // save initial position
+        code = code.concat(gcode('%X0=mposx,Y0=mposy,Z0=mposz'));
 
         // Add Z Probe code if we're doing 3 axis probing
         if (axes.z) {
@@ -638,14 +638,10 @@ class ProbeWidget extends PureComponent {
             }),
         ]);
 
-        // Go up on Z if X or Y
+        // return to original position
         code = code.concat([
-            this.gcode('G0', {
-                Z: ((retractDistance * 3) + zThickness)
-            }),
-            this.gcode('G0', {
-                Y: -1 * ((XYRetract * 3) - xyThickness)
-            })
+            gcode('G0 Z[Z0]'),
+            gcode('G0 X[X0] Y[Y0]')
         ]);
 
         // Make sure we're in the correct mode at end of probe
