@@ -871,7 +871,6 @@ class VisualizerWidget extends PureComponent {
             }
         },
         START_JOB: () => {
-            console.log(this.workflowControl.canRun());
             if (this.workflowControl && this.workflowControl.canRun()) {
                 this.workflowControl.startRun();
             }

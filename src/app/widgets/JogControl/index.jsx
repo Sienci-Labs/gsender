@@ -742,7 +742,6 @@ class AxesWidget extends PureComponent {
 
             const { leftStick, rightStick } = degrees;
 
-            console.log({ leftStick, rightStick });
 
             // Y Positive Move
             // AXIS X(0) ________ -0.25 to 0.25
