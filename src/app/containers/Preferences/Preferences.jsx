@@ -421,7 +421,7 @@ class PreferencesPage extends PureComponent {
         laser: {
             handleOffsetChange: (e, axis) => {
                 const { laser } = this.spindleConfig.get('laser');
-                const value = Math.abs(Number(e.target.value)) || 0;
+                const value = Number(e.target.value) || 0;
                 if (axis === 'X') {
                     this.spindleConfig.set('laser.xOffset', value);
                     this.setState({
