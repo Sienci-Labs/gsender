@@ -380,12 +380,12 @@ class CNCEngine {
                 const controller = store.get('controllers["' + flashPort + '"]');
                 if (controller) {
                     controller.close(
-                        FlashingFirmware(flashPort, imageType, socket)
+                        () => FlashingFirmware(flashPort, imageType, socket)
                     );
+                    store.unset(`controllers[${JSON.stringify(flashPort)}]`);
                 } else {
                     FlashingFirmware(flashPort, imageType, socket);
                 }
-                store.unset(`controllers[${JSON.stringify(flashPort)}]`);
             });
 
             socket.on('write', (port, data, context = {}) => {
