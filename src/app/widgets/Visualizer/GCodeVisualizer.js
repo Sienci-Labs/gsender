@@ -113,14 +113,14 @@ class GCodeVisualizer {
 
         const v1 = this.frames[this.frameIndex];
         const v2 = this.frames[frameIndex];
-        console.log(`Frame: ${frameIndex}, V1: ${v1}, V2: ${v2}`);
+
         if (v1 < v2) {
             const workpiece = this.group.children[0];
             const offsetIndex = v1 * 4;
             const colorAttr = workpiece.geometry.getAttribute('color');
             const defaultColorArray = [...defaultColor.toArray(), 0.3];
             const colorArray = Array.from({ length: (v2 - v1) }, () => defaultColorArray).flat();
-            console.log(`Offset index: ${offsetIndex}`);
+
             colorAttr.set([...colorArray], offsetIndex);
             // only update the range we've updated;
             colorAttr.updateRange.count = colorArray.length;
@@ -130,7 +130,7 @@ class GCodeVisualizer {
 
         // Restore the path to its original colors
         if (v2 < v1) {
-            console.log('In restore');
+
             const workpiece = this.group.children[0];
             for (let i = v2; i < v1; ++i) {
                 const offsetIndex = i * 4; // Account for RGB buffer
