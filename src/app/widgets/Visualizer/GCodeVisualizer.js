@@ -130,7 +130,6 @@ class GCodeVisualizer {
 
         // Restore the path to its original colors
         if (v2 < v1) {
-
             const workpiece = this.group.children[0];
             for (let i = v2; i < v1; ++i) {
                 const offsetIndex = i * 4; // Account for RGB buffer
