@@ -35,7 +35,6 @@ import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
-import Timer from '../../workers/timers/Timer.worker';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
 import { Toaster, TOASTER_WARNING } from '../../lib/toaster/ToasterLib';
@@ -47,7 +46,6 @@ class NavbarConnectionWidget extends PureComponent {
         enableWizardFunction: PropTypes.func
     };
 
-    trackFirmwareLoadWorker = new Timer();
 
     pubsubTokens = [];
 
