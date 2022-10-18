@@ -42,7 +42,7 @@ const getConfig = () => {
         content = localStorage.getItem('sienci') || '{}';
     }
 
-    if (content === '{}') {
+    if (content === '{}' && this) {
         content = this.normalizeState().toString();
     }
 

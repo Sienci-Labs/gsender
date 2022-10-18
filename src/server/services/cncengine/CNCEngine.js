@@ -33,6 +33,7 @@ import logger from '../../lib/logger';
 import store from '../../store';
 import config from '../configstore';
 import taskRunner from '../taskrunner';
+import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import {
     GrblController
 } from '../../controllers';
@@ -192,7 +193,9 @@ class CNCEngine {
             socket.on('reconnect', (port) => {
                 let controller = store.get(`controllers["${port}"]`);
                 if (!controller) {
-                    log.info(`No controller found on port ${port} to reconnect to`);
+                    const message = `No controller found on port ${port} to reconnect to`;
+                    log.info(message);
+                    this.io.emit('task:error', message);
                     return;
                 }
                 log.info(`Reconnecting to open controller on port ${port} with socket ID ${socket.id}`);
@@ -366,6 +369,23 @@ class CNCEngine {
                 }
 
                 controller.command.apply(controller, [cmd].concat(args));
+            });
+
+            socket.on('flash:start', (flashPort, imageType) => {
+                if (!flashPort) {
+                    log.error('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
+                    return;
+                }
+                //Close the controller for AvrgirlArduino to take over the port
+                const controller = store.get('controllers["' + flashPort + '"]');
+                if (controller) {
+                    controller.close(
+                        () => FlashingFirmware(flashPort, imageType, socket)
+                    );
+                    store.unset(`controllers[${JSON.stringify(flashPort)}]`);
+                } else {
+                    FlashingFirmware(flashPort, imageType, socket);
+                }
             });
 
             socket.on('write', (port, data, context = {}) => {

@@ -5,7 +5,7 @@ import download from 'downloadjs';
 import controller from 'app/lib/controller';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import { Toaster, TOASTER_SUCCESS, TOASTER_INFO, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
-import store from 'app/store';
+// import store from 'app/store';
 import { GRBL } from 'app/constants';
 
 import defaultGRBLSettings from '../eepromFiles/DefaultGrblSettings.json';
@@ -46,12 +46,13 @@ export const getResetToDefaultMessage = ({ name, type } = {}) => {
     return message;
 };
 
-export const getMachineProfileVersion = () => {
-    const machineProfile = store.get('workspace.machineProfile');
-    return get(machineProfile, 'version', 'MK1');
+export const getMachineProfileVersion = (profile) => {
+    //const machineProfile = store.get('workspace.machineProfile');
+    // return get(machineProfile, 'version', 'MK1');
+    return get(profile, 'version', 'MK1');
 };
 
-export const startFlash = (port) => {
+export const startFlash = (port, profile) => {
     if (!port) {
         Toaster.pop({
             msg: 'No port specified - please connect to the device to determine what is being flashed',
@@ -63,10 +64,10 @@ export const startFlash = (port) => {
     Toaster.pop({
         msg: `Flashing started on port: ${port} `,
         type: TOASTER_INFO,
-        duration: 15000
+        duration: 10000
     });
-    const imageType = getMachineProfileVersion();
-    controller.command('flash:start', port, imageType);
+    const imageType = getMachineProfileVersion(profile);
+    controller.flashFirmware(port, imageType);
 };
 
 export const restoreDefaultSettings = (machineProfile) => {
@@ -75,6 +76,7 @@ export const restoreDefaultSettings = (machineProfile) => {
     values.push('$$');
 
     controller.command('gcode', values);
+
     Toaster.pop({
         msg: ('Default Settings Restored'),
         type: TOASTER_INFO,

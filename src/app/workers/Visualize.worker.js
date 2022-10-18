@@ -39,7 +39,7 @@ onmessage = function({ data }) {
             const opacity = (motion === 'G0') ? 0.1 : 1;
             const color = [motion, opacity];
             colors.push(color);
-            vertices.push(new THREE.Vector3(v2.x, v2.y, v2.z));
+            vertices.push(v2.x, v2.y, v2.z);
         },
         // @param {object} modal The modal object.
         // @param {object} v1 A 3D vector of the start point.
@@ -76,29 +76,29 @@ onmessage = function({ data }) {
                 const z = ((v2.z - v1.z) / points.length) * i + v1.z;
 
                 if (plane === 'G17') { // XY-plane
-                    vertices.push(new THREE.Vector3(point.x, point.y, z));
+                    vertices.push(point.x, point.y, z);
                 } else if (plane === 'G18') { // ZX-plane
-                    vertices.push(new THREE.Vector3(point.y, z, point.x));
+                    vertices.push(point.y, z, point.x);
                 } else if (plane === 'G19') { // YZ-plane
-                    vertices.push(new THREE.Vector3(z, point.x, point.y));
+                    vertices.push(z, point.x, point.y);
                 }
                 colors.push(color);
             }
         }
     });
 
-    toolpath.loadFromStringSync(content, (line, index) => {
-        frames.push({
-            data: line,
-            vertexIndex: vertices.length // remember current vertex index
-        });
+    toolpath.loadFromStringSync(content, () => {
+        // Divided by 3 since we store XYZ as separate values
+        frames.push(vertices.length / 3);
     });
 
+    let tFrames = new Uint32Array(frames);
+    let tVertices = new Float32Array(vertices);
 
     postMessage({
-        vertices,
+        vertices: tVertices,
         colors,
-        frames,
+        frames: tFrames,
         visualizer
     });
 };

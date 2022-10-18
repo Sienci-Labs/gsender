@@ -79,7 +79,9 @@ class WorkflowControl extends PureComponent {
 
     state = this.getInitialState();
 
-    pubsubTokens = []
+    pubsubTokens = [];
+
+    workerOutline = null;
 
     getInitialState() {
         return {
@@ -282,7 +284,7 @@ class WorkflowControl extends PureComponent {
     }
 
     runOutline = () => {
-        const workerOutline = new WorkerOutline();
+        this.workerOutline = new WorkerOutline();
         const { gcode } = this.props;
         //const machineProfile = store.get('workspace.machineProfile');
         //const spindleMode = store.get('widgets.spindle.mode');
@@ -294,10 +296,10 @@ class WorkflowControl extends PureComponent {
             duration: TOASTER_UNTIL_CLOSE,
             msg: 'Generating outline for current file'
         });
-        workerOutline.onmessage = ({ data }) => {
+        this.workerOutline.onmessage = ({ data }) => {
             outlineResponse({ data });
         };
-        workerOutline.postMessage({ gcode, isLaser: false });
+        this.workerOutline.postMessage({ gcode, isLaser: false });
     }
 
     startFromLinePrompt = () => {
@@ -307,8 +309,7 @@ class WorkflowControl extends PureComponent {
 
     handleStartFromLine = () => {
         this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
-
-        controller.command('gcode:start', this.state.startFromLine.value);
+        controller.command('gcode:start', this.state.startFromLine.value, this.props.zMax);
 
         Toaster.pop({
             msg: 'Running Start From Specific Line Command',
@@ -326,6 +327,9 @@ class WorkflowControl extends PureComponent {
                     type: TOASTER_WARNING
                 });
             }),
+            pubsub.subscribe('outline:done', () => {
+                this.workerOutline.terminate();
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -588,6 +592,7 @@ export default connect((store) => {
     const port = get(store, 'connection.port');
     const gcode = get(store, 'file.content');
     const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
+    const zMax = get(store, 'file.bbox.max.z', 0);
     return {
         fileLoaded,
         isConnected,
@@ -599,6 +604,7 @@ export default connect((store) => {
         port,
         lineTotal,
         gcode,
-        fileCompletion
+        fileCompletion,
+        zMax
     };
 }, null, null, { forwardRef: true })(WorkflowControl);

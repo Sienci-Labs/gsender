@@ -40,6 +40,8 @@ import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY } from 'app/const
 
 
 export function* initialize() {
+    let visualizeWorker = null;
+    let estimateWorker = null;
     /* Health check - every 3 minutes */
     setInterval(() => {
         controller.healthCheck();
@@ -206,7 +208,7 @@ export function* initialize() {
             const needsVisualization = shouldVisualize();
 
             if (needsVisualization) {
-                const visualizeWorker = new VisualizeWorker();
+                visualizeWorker = new VisualizeWorker();
                 visualizeWorker.onmessage = visualizeResponse;
                 visualizeWorker.postMessage({
                     content,
@@ -251,7 +253,7 @@ export function* initialize() {
         const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
         const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
 
-        const estimateWorker = new EstimateWorker();
+        estimateWorker = new EstimateWorker();
         estimateWorker.onmessage = estimateResponseHandler;
         estimateWorker.postMessage({
             content,
@@ -263,7 +265,7 @@ export function* initialize() {
         const needsVisualization = shouldVisualize();
 
         if (needsVisualization) {
-            const visualizeWorker = new VisualizeWorker();
+            visualizeWorker = new VisualizeWorker();
             visualizeWorker.onmessage = visualizeResponse;
             visualizeWorker.postMessage({
                 content,
@@ -294,6 +296,14 @@ export function* initialize() {
         });
     });
 
+    pubsub.subscribe('file:load', (msg, data) => {
+        visualizeWorker.terminate();
+    });
+
+    pubsub.subscribe('estimate:done', (msg, data) => {
+        estimateWorker.terminate();
+    });
+
     controller.addListener('toolchange:preHookComplete', (comment = '') => {
         const onConfirmhandler = () => {
             controller.command('toolchange:post');
@@ -317,6 +327,24 @@ export function* initialize() {
             msg: `'${data}' pause command found in file - press "Resume Job" to continue running.`,
             type: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE
+        });
+    });
+
+    controller.addListener('sender:M0M1', (opts) => {
+        const { data, comment = '' } = opts;
+
+        const content = (comment.length > 0)
+            ? <div><p>A pause command ({data}) was found - click resume to continue.</p><p>Comment: <b>{comment}</b></p></div>
+            : `A pause command (${data}) was found - click resume to continue.`;
+
+        Confirm({
+            title: 'M0/M1 Pause',
+            content,
+            confirmLabel: 'Resume',
+            cancelLabel: 'Close Window',
+            onConfirm: () => {
+                controller.command('gcode:resume');
+            }
         });
     });
 
@@ -344,6 +372,10 @@ export function* initialize() {
             msg: `Tool command found - <b>${tool}</b>`,
             duration: TOASTER_UNTIL_CLOSE
         });
+    });
+
+    controller.addListener('grbl:iSready', (status) => {
+        pubsub.publish('grblExists:update', status);
     });
 
     yield null;

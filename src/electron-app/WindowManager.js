@@ -76,7 +76,6 @@ class WindowManager {
                     this.width = width;
                     this.height = height;
                 }
-                return;
             }
 
             app.quit();
@@ -95,7 +94,7 @@ class WindowManager {
             }
         });
         const webContents = window.webContents;
-        window.removeMenu();
+        //window.removeMenu();
         window.webContents.once('did-finish-load', () => {
             window.setTitle(options.title);
         });

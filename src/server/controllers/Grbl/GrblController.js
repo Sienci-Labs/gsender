@@ -60,7 +60,6 @@ import {
     GRBL_SETTINGS, GRBL_ACTIVE_STATE_HOME
 } from './constants';
 import { METRIC_UNITS } from '../../../app/constants';
-import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 
@@ -68,6 +67,7 @@ import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocati
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
 const POSTHOOK_COMPLETE = '%post_complete';
+const PAUSE_START = '%pause_start';
 
 const log = logger('controller:Grbl');
 const noop = _.noop;
@@ -150,6 +150,7 @@ class GrblController {
 
     // Feeder
     feeder = null;
+
     feederCB = null;
 
     // Sender
@@ -250,6 +251,12 @@ class GrblController {
                         setTimeout(() => {
                             this.workflow.resume();
                         }, 1500);
+                        return 'G4 P0.5';
+                    }
+                    if (line === PAUSE_START) {
+                        log.debug('Found M0/M1, pausing program');
+                        this.feeder.hold({ data: '%m0m1_pause', comment: commentString });
+                        this.emit('sender:M0M1', { data: 'M0/M1', comment: commentString });
                         return 'G4 P0.5';
                     }
                     if (line === '%_GCODE_START') {
@@ -379,13 +386,13 @@ class GrblController {
                         // Workaround for Carbide files - prevent M0 early from pausing program
                         if (sent > 10) {
                             this.workflow.pause({ data: 'M0', comment: commentString });
-                            this.emit('workflow:pause', { data: 'M0' });
+                            this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
                         }
                         line = line.replace('M0', '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1', comment: commentString });
-                        this.emit('workflow:pause', { data: 'M1' });
+                        this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
                         line = line.replace('M1', '(M1)');
                     }
                 }
@@ -835,9 +842,11 @@ class GrblController {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
         this.writeln('$$');
-
         await delay(50);
         this.event.trigger('controller:ready');
+
+        //check if controller is ready and send the status
+        this.emit('grbl:iSready', this.ready);
     }
 
     populateContext(context = {}) {
@@ -1021,7 +1030,6 @@ class GrblController {
             callback(); // register controller
 
             log.debug(`Connected to serial port "${port}"`);
-
             this.workflow.stop();
 
             // Clear action values
@@ -1151,24 +1159,6 @@ class GrblController {
 
     command(cmd, ...args) {
         const handler = {
-            'flash:start': () => {
-                let [port, type] = args;
-                if (!port) {
-                    this.emit('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
-                    return;
-                }
-                this.close(() => {
-                    FlashingFirmware(port, type);
-                });
-            },
-            'flashing:success': () => {
-                let [data] = args;
-                this.emit('message', data);
-            },
-            'flashing:failed': () => {
-                let [error] = args;
-                this.emit('task:error', error);
-            },
             'firmware:recievedProfiles': () => {
                 let [files] = args;
                 this.emit('task:finish', files);
@@ -1222,10 +1212,9 @@ class GrblController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                const [lineToStartFrom] = args;
+                const [lineToStartFrom, zMax] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
-                console.log(startEventEnabled);
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
@@ -1291,7 +1280,7 @@ class GrblController {
                     }
 
                     // Move up and then to cut start position
-                    modalGCode.push('G0 G90 G21 Z10');
+                    modalGCode.push(`G0 G90 G21 Z${zMax + 10}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file

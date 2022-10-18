@@ -99,6 +99,24 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.1.5 (October 19th, 2022)
+- Probe code should always return to exact starting location instead of approximating it.
+- Fix for auto-probe code movements being too small when "$13 report as inches" EEPROM value enabled
+- Go To buttons only use safe height if below that position when limit switches enabled to avoid moving downwards.
+- Fixed values in some machine profiles.
+- Start from line should account for maximum file Z height when moving into position.
+- Added machine state guards to some keyboard shortcuts.
+- UI Modals now more difficult to close accidentally.
+- Comments on M0/M1 now emitted to UI.
+- Laser offsets allow negative values again
+- Improvements to visualizer memory usage and parsing speed
+- Improvements to firmware flashing UX
+- Bounding Box variables once again available to macros
+- Mac version now exits completely
+- Higher UI clarity when connecting to board with invalid/unrecognizable firmware
+- Styling changes in Firmware Tool
+- Fixed erroneous "Settings Changed" toast when opening or sitting in preferences window
+
 ### 1.1.4 (August 26th, 2022)
 * Fixed firmware tool control for setting $23
 * Flashing again available without connecting to device

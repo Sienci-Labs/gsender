@@ -23,6 +23,7 @@
 
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
+import reduxStore from 'app/store/redux';
 import get from 'lodash/get';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import controller from 'app/lib/controller';
@@ -44,13 +45,28 @@ const sendM9 = () => {
 
 const shuttleControlEvents = {
     MIST_COOLANT: () => {
-        sendM7();
+        const isConnected = get(reduxStore.getState(), 'connection.isConnected');
+        const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+        const canClick = isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+        if (canClick) {
+            sendM7();
+        }
     },
     FLOOD_COOLANT: () => {
-        sendM8();
+        const isConnected = get(reduxStore.getState(), 'connection.isConnected');
+        const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+        const canClick = isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+        if (canClick) {
+            sendM8();
+        }
     },
     STOP_COOLANT: () => {
-        sendM9();
+        const isConnected = get(reduxStore.getState(), 'connection.isConnected');
+        const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+        const canClick = isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+        if (canClick) {
+            sendM9();
+        }
     }
 };
 

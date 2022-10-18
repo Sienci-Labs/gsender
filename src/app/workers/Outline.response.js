@@ -1,3 +1,4 @@
+import pubsub from 'pubsub-js';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import controller from '../lib/controller';
 
@@ -8,4 +9,5 @@ export const outlineResponse = ({ data }) => {
         type: TOASTER_SUCCESS,
         msg: 'Running file outline'
     });
+    pubsub.publish('outline:done');
 };
