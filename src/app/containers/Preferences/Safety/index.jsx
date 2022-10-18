@@ -48,7 +48,7 @@ const SafetySettings = ({ active, state, actions }) => {
                         <Movement state={state} actions={actions} />
                     </GeneralArea.Half>
                 </GeneralArea>
-                {isElectron() ? <ErrorLog getErrors={electronLogHelper} /> : <span />}
+                {!isElectron() ? <ErrorLog getErrors={electronLogHelper} /> : <span />}
             </ReduxProvider>
         </SettingWrapper>
     );
