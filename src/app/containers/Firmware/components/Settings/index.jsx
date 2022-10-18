@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import Select from 'react-select';
 import store from 'app/store';
 import controller from 'app/lib/controller';
+import WidgetConfig from 'app/widgets/WidgetConfig';
 import SettingsList from './List';
 import SearchBar from './SearchBar';
 import { connectToLastDevice, FirmwareContext } from '../../utils';
@@ -16,6 +17,8 @@ const getMachineProfileLabel = ({ name, type }) => `${name} ${type && type}`.tri
 const SettingsArea = () => {
     const { hasSettings, machineProfile, setMachineProfile } = useContext(FirmwareContext);
     const label = getMachineProfileLabel(machineProfile);
+    const connectionConfig = new WidgetConfig('connection');
+    const port = connectionConfig.get('port');
 
     const handleSelect = ({ value = 0 }) => {
         const foundProfile = machineProfiles.find(profile => profile.id === value);
@@ -70,7 +73,7 @@ const SettingsArea = () => {
                 )
             }
             {
-                !hasSettings && <NotConnectedWarning onReconnectClick={() => connectToLastDevice()} />
+                !hasSettings && <NotConnectedWarning onReconnectClick={() => connectToLastDevice()} disabled={!port} />
             }
         </div>
     );
