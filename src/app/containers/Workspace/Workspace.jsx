@@ -602,6 +602,7 @@ class Workspace extends PureComponent {
                         </div>
                     </Dropzone>
                 </div>
+                <UpdateAvailableAlert restartHandler={this.action.sendRestartCommand} />
             </ScreenAwake>
         );
     }

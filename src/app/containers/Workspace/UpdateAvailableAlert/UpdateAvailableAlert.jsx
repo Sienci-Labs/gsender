@@ -25,6 +25,8 @@ import React, { PureComponent } from 'react';
 import cx from 'classnames';
 import pubsub from 'pubsub-js';
 import styles from './index.styl';
+import OS from '../util';
+import api from '../../../api';
 
 
 class UpdateAvailableAlert extends PureComponent {
@@ -33,6 +35,8 @@ class UpdateAvailableAlert extends PureComponent {
         this.state = {
             shown: false,
             buttonActive: true,
+            updateLink: '',
+            allOSUpdates: [],
         };
     }
 
@@ -41,7 +45,10 @@ class UpdateAvailableAlert extends PureComponent {
             this.setState({
                 shown: false
             });
-        }
+        },
+        getAllUpdates: async () => {
+            await api.getLatestVersionAllOS();
+        },
     }
 
     pubsubTokens = [];
@@ -67,6 +74,9 @@ class UpdateAvailableAlert extends PureComponent {
 
     componentDidMount() {
         this.subscribe();
+        this.setState({
+            allOSUpdates: this.actions.getAllUpdates()
+        });
     }
 
     componentWillUnmount() {
@@ -74,9 +84,41 @@ class UpdateAvailableAlert extends PureComponent {
     }
 
     render() {
-        const { shown, buttonActive } = this.state;
+        const { shown, buttonActive, allOSUpdates } = this.state;
         const { restartHandler } = this.props;
         const actions = { ...this.actions };
+
+        const handleUpdateClick = () => {
+            if (OS === 'Windows OS') {
+                this.setState({
+                    buttonActive: false
+                });
+                restartHandler();
+            } else if (OS === 'MacOS') {
+                this.setState({
+                    updateLink: () => {
+                        return allOSUpdates.map((update) => {
+                            if (update.name.includes('.dmg')) {
+                                return update.browser_download_url;
+                            }
+                            return '';
+                        });
+                    }
+                });
+            } else if (OS === 'Linux OS') { //TODO - verify correct OS value for Raspberry Pi
+                this.setState({
+                    updateLink: () => {
+                        return allOSUpdates.map((update) => {
+                            if (update.name.includes('armv7l.AppImage')) {
+                                return update.browser_download_url;
+                            }
+                            return '';
+                        });
+                    }
+                });
+            }
+        };
+
         return (
             <div className={cx(styles.updateWrapper, { [styles.hideModal]: !shown })}>
                 <div className={styles.updateIcon}>
@@ -86,19 +128,18 @@ class UpdateAvailableAlert extends PureComponent {
                     <div>
                         Update available to download.  Download and restart now?
                     </div>
-                    <button
-                        onClick={() => {
-                            this.setState({
-                                buttonActive: false
-                            });
-                            restartHandler();
-                        }}
-                        className={styles.restartButton}
-                    >
-                        {
-                            buttonActive ? 'Download and install' : 'Downloading...'
-                        }
-                    </button>
+                    {OS === 'Windows OS' ? (
+                        <button
+                            onClick={handleUpdateClick}
+                            className={styles.restartButton}
+                        >
+                            {
+                                buttonActive ? 'Download and install' : 'Downloading...'
+                            }
+                        </button>
+                    )
+                        : (<a href={this.state.updateLink}> Download and install </a>)
+                    }
                 </div>
                 <div className={styles.closeModal}>
                     <button onClick={actions.hideModal}>
