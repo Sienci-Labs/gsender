@@ -88,7 +88,8 @@ onmessage = function({ data }) {
     });
 
     toolpath.loadFromStringSync(content, () => {
-        frames.push(vertices.length);
+        // Divided by 3 since we store XYZ as separate values
+        frames.push(vertices.length / 3);
     });
 
     let tFrames = new Uint32Array(frames);

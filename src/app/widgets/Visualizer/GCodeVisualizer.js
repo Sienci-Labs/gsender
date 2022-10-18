@@ -32,6 +32,7 @@ class GCodeVisualizer {
         this.theme = theme;
         this.vertices = [];
         this.colors = [];
+        this.framesLength = 0;
 
         // Example
         // [
@@ -94,6 +95,7 @@ class GCodeVisualizer {
             const color = motionColor[motion] || motionColor.default;
             colorArray.push(...color.toArray(), opacity);
         });
+
         this.colors = new Float32Array(colorArray);
         return new Float32Array(colorArray);
     }
@@ -111,13 +113,14 @@ class GCodeVisualizer {
 
         const v1 = this.frames[this.frameIndex];
         const v2 = this.frames[frameIndex];
-
+        console.log(`Frame: ${frameIndex}, V1: ${v1}, V2: ${v2}`);
         if (v1 < v2) {
             const workpiece = this.group.children[0];
             const offsetIndex = v1 * 4;
             const colorAttr = workpiece.geometry.getAttribute('color');
             const defaultColorArray = [...defaultColor.toArray(), 0.3];
             const colorArray = Array.from({ length: (v2 - v1) }, () => defaultColorArray).flat();
+            console.log(`Offset index: ${offsetIndex}`);
             colorAttr.set([...colorArray], offsetIndex);
             // only update the range we've updated;
             colorAttr.updateRange.count = colorArray.length;
@@ -127,6 +130,7 @@ class GCodeVisualizer {
 
         // Restore the path to its original colors
         if (v2 < v1) {
+            console.log('In restore');
             const workpiece = this.group.children[0];
             for (let i = v2; i < v1; ++i) {
                 const offsetIndex = i * 4; // Account for RGB buffer
@@ -144,10 +148,11 @@ class GCodeVisualizer {
 
         this.group = new THREE.Object3D();
         this.geometry = new THREE.BufferGeometry();
-        this.vertices = [];
-        this.colors = [];
-        this.frames = [];
+        this.vertices = null;
+        this.colors = null;
+        this.frames = null;
         this.frameIndex = 0;
+        this.framesLength = 0;
     }
 }
 
