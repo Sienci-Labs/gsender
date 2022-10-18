@@ -1476,6 +1476,7 @@ class GrblController {
                     });
                 } catch (error) {
                     log.error(error);
+                    this.emit(['Error reading files']);
                 }
 
                 //emmit an event to send log data to frontend
