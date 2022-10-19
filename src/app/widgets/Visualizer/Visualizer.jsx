@@ -330,7 +330,7 @@ class Visualizer extends Component {
             const { machinePosition, workPosition } = this.props;
 
             let newPos = workPosition;
-            if (activeState === GRBL_ACTIVE_STATE_CHECK) {
+            if (activeState === GRBL_ACTIVE_STATE_CHECK && this.fileLoaded) {
                 newPos = this.visualizer.getCurrentLocation();
             }
             let needUpdatePosition = false;
@@ -1531,6 +1531,7 @@ class Visualizer extends Component {
     }
 
     unload() {
+        this.fileLoaded = false;
         const visualizerObject = this.group.getObjectByName('Visualizer');
         if (visualizerObject) {
             this.group.remove(visualizerObject);

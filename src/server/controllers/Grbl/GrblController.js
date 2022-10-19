@@ -655,7 +655,7 @@ class GrblController {
 
         this.runner.on('parserstate', (res) => {
             //finished searching gCode file for errors
-            if (this.sender.state.finishTime > 0 && this.runner.state.status.activeState === 'Check') {
+            if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === 'Check') {
                 this.command('gcode', '$c');
                 this.workflow.stopTesting();
                 this.emit('gcode_error_checking_file', this.sender.state, 'finished');
