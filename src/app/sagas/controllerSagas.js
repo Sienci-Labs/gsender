@@ -28,6 +28,8 @@ import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
 import manualToolChange from 'app/wizards/manualToolchange';
+import semiautoToolChange from 'app/wizards/semiautoToolchange';
+import automaticToolChange from 'app/wizards/automaticToolchange';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
@@ -149,13 +151,13 @@ export function* initialize() {
             pubsub.publish('wizard:load', {
                 ...payload,
                 title: 'Semi-Automatic Toolchange',
-                instructions: manualToolChange
+                instructions: semiautoToolChange
             });
         } else if (option === 'Automatic') {
             pubsub.publish('wizard:load', {
                 ...payload,
                 title: 'Automatic Toolchange',
-                instructions: manualToolChange
+                instructions: automaticToolChange
             });
         } else {
             return;
