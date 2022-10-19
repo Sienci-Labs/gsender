@@ -1,7 +1,6 @@
 .box {
-  width: 91%;
-  height: 125px;
-  margin: auto;
+  width: 75px;
+  height: 75px;
   border: 5px solid black;
   position: relative;
 }
@@ -14,6 +13,13 @@
         margin-left: 0 !important;
         margin-right: 0 !important;
     }
+}
+
+.radio-center {
+    @extend .radio;
+    position: absolute !important;
+    top: 35%;
+    left: 40%;
 }
 
 .radio-top-left {
@@ -60,8 +66,8 @@
 .surfacing-type {
     fill: black;
     padding: 1rem;
-    width: 100%;
-    height: 100%;
+    width: 75px;
+    height: 75px;
     border: 3px solid black;
     border-radius: 10px;
     transition: all 400ms ease-in-out;

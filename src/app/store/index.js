@@ -190,6 +190,13 @@ const migrateStore = () => {
         return;
     }
 
+    if (semver.lt(cnc.version, '1.1.5')) {
+        const currSurfacingState = store.get('widgets.surfacing');
+        const defaultSurfacingState = get(defaultState, 'widgets.surfacing', currSurfacingState);
+
+        store.replace('widgets.surfacing', defaultSurfacingState);
+    }
+
     // 1.0.4 - need to add
     if (semver.lt(cnc.version, '1.0.4')) {
         const currSpindleVal = store.get('widgets.spindle', {});
