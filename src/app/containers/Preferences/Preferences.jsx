@@ -44,6 +44,7 @@ import styles from './index.styl';
 import { METRIC_UNITS, WORKFLOW_STATE_RUNNING } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 import { CUST_LIGHT_THEME, DARK_THEME, DARK_THEME_VALUES, LIGHT_THEME, LIGHT_THEME_VALUES } from '../../widgets/Visualizer/constants';
+import { convertValuesToMetric, convertValuesToImperial } from '../Surfacing/utils';
 
 
 class PreferencesPage extends PureComponent {
@@ -787,6 +788,19 @@ class PreferencesPage extends PureComponent {
         if (prevState.selectedMenu !== this.state.selectedMenu) {
             return;
         }
+
+        if (units !== prevState.units) {
+            const surfacingValues = store.get('widgets.surfacing');
+
+            if (units === 'mm') {
+                store.replace('widgets.surfacing', convertValuesToMetric(surfacingValues));
+            }
+
+            if (units === 'in') {
+                store.replace('widgets.surfacing', convertValuesToImperial(surfacingValues));
+            }
+        }
+
 
         if (this.shouldShowToast) {
             this.showToast();
