@@ -490,11 +490,16 @@ class ProbeWidget extends PureComponent {
             })
         ]);
 
-        // return to original position
-        code = code.concat([
-            this.gcode('G0 Z[Z0]'),
-            this.gcode('G0 X[X0] Y[Y0]')
-        ]);
+        // Go up on Z if X or Y
+        if (axis !== 'Z') {
+            const { touchPlateHeight, units } = this.state;
+            const touchplateThickness = (units === METRIC_UNITS) ? touchPlateHeight : mm2in(touchPlateHeight);
+            code = code.concat([
+                this.gcode('G0', {
+                    Z: -1 * ((retractDistance * 4) - touchplateThickness)
+                })
+            ]);
+        }
 
         code = code.concat([
             this.gcode('G90')
@@ -640,8 +645,8 @@ class ProbeWidget extends PureComponent {
 
         // return to original position
         code = code.concat([
-            gcode('G0 Z[Z0]'),
-            gcode('G0 X[X0] Y[Y0]')
+            gcode('G90 G53 G0 Z[Z0]'),
+            gcode('G90 G53 G0 X[X0] Y[Y0]')
         ]);
 
         // Make sure we're in the correct mode at end of probe
