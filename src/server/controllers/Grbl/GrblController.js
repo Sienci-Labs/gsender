@@ -1462,26 +1462,6 @@ class GrblController {
                 this.write('\x18'); // ^x
                 this.writeln('$X');
             },
-            'electronErrors:fetch': () => {
-                // log file operation goes here
-                let logs = '';
-                const fs = require('fs');
-
-                try {
-                    fs.readFile('main.log', (err, data) => {
-                        if (err) {
-                            console.error(err);
-                        }
-                        logs = data.toString().replace(/\r\n/g, '\n').split('\n');
-                    });
-                } catch (error) {
-                    log.error(error);
-                    this.emit(['Error reading files']);
-                }
-
-                //emmit an event to send log data to frontend
-                this.emit('electronErrors:errorList', logs || ['No errors or alarms to display']);
-            },
             'checkStateUpdate': () => {
                 this.emit('controller:state', GRBL, this.state);
             },

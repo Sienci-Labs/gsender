@@ -28,12 +28,12 @@ import PropTypes from 'prop-types';
 
 import styles from './index.styl';
 
-const Switch = ({ label, checked, onChange, className, style, disabled, onColor }) => {
+const Switch = ({ label, checked = false, onChange, className, style, disabled, onColor }) => {
     return (
         <div className={classnames(styles['toggle-item'], className)} style={style}>
             {label && <span>{label}</span> }
             <ToggleSwitch
-                checked={checked || false}
+                checked={checked}
                 onChange={onChange}
                 disabled={disabled}
                 checkedIcon={false}

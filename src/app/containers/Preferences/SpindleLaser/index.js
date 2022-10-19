@@ -44,7 +44,6 @@ const SpindleLaser = ({ active, state, actions }) => {
 
     const { spindle } = machineProfile;
     const { laserOnOutline } = machineProfile;
-    console.log(machineProfile);
 
     return (
         <SettingWrapper title="Spindle/Laser" show={active}>
