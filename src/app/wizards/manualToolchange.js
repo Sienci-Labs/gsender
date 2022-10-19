@@ -21,6 +21,7 @@
  *
  */
 import controller from 'app/lib/controller';
+import store from 'app/store';
 
 const wizard = {
     steps: [
@@ -34,8 +35,13 @@ const wizard = {
                         {
                             label: 'Save Positions and Modals',
                             cb: () => {
+                                const probeProfile = store.get('workspace.probeProfile');
+                                const { zThickness } = probeProfile;
                                 controller.command('gcode', [
                                     '%wait',
+                                    `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
+                                    '%global.toolchange.PROBE_DISTANCE=80',
+                                    '%global.toolchange.PROBE_FEEDRATE=200',
                                     '%global.toolchange.XPOS=posx',
                                     '%global.toolchange.YPOS=posy',
                                     '%global.toolchange.ZPOS=posz',
@@ -80,13 +86,23 @@ const wizard = {
                         {
                             label: 'Probe Z',
                             cb: () => {
-                                console.log('Probe Z');
+                                controller.command('gcode', [
+                                    '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
+                                    'G91',
+                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
+                                    'G0 Z5',
+                                    'G38.2 Z-10 F40',
+                                    'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]'
+                                ]);
                             }
                         },
                         {
                             label: 'Set Z0 at Location',
                             cb: () => {
-                                console.log('Set Z Zero');
+                                controller.command('gcode', [
+                                    '(Setting Z 0)',
+                                    'G10 L20 P0 Z0'
+                                ]);
                             }
                         },
                     ]
@@ -98,7 +114,22 @@ const wizard = {
             substeps: [
                 {
                     title: 'Resume Program',
-                    description: 'PH COPY - Start next cutting operation',
+                    description: 'PH COPY - Move router back to initial position, restore modals, turn it on, resume cutting.',
+                    actions: [
+                        {
+                            label: 'Prepare for Resume',
+                            cb: () => {
+                                controller.command('gcode', [
+                                    '(Returning to initial position)',
+                                    'G91 G21 G0 Z15',
+                                    'G90 G21 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
+                                    'G90 G21 G0 Z[global.toolchange.ZPOS]',
+                                    '(Restore initial modals)',
+                                    '[global.toolchange.SPINDLE] [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]'
+                                ]);
+                            }
+                        }
+                    ]
                 }
             ]
         }
