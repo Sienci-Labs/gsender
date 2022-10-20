@@ -86,11 +86,12 @@ onmessage = function({ data }) {
             }
         }
     });
-
+    const start = Date.now();
     toolpath.loadFromStringSync(content, () => {
         // Divided by 3 since we store XYZ as separate values
         frames.push(vertices.length / 3);
     });
+    console.log(`Duration: ${Date.now() - start}`);
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);
