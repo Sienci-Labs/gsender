@@ -19,6 +19,11 @@ const noop = () => {};
 
 class GCodeVirtualizer extends EventEmitter {
     motionMode = 'G0';
+
+    totalLines = 0;
+
+    collate = false;
+
     modal = {
         // Motion Mode
         // G0, G1, G2, G3, G80
@@ -80,6 +85,24 @@ class GCodeVirtualizer extends EventEmitter {
         x: 0,
         y: 0,
         z: 0
+    }
+
+    vmState = {
+        tools: null,
+        spindle: null,
+        feedrates: null,
+        bbox: {
+            min: {
+                x: 0,
+                y: 0,
+                z: 0
+            },
+            max: {
+                x: 0,
+                y: 0,
+                z: 0
+            }
+        }
     }
 
     handlers = {
@@ -586,16 +609,27 @@ class GCodeVirtualizer extends EventEmitter {
             }
         },
         'T': (tool) => {
+            console.log('Tool found', tool);
             if (tool !== undefined) {
                 this.setModal({ tool: tool });
+                if (this.collate) {
+                    this.vmState.tools.add(`T${tool}`);
+                    console.log(this.vmState.tools);
+                }
             }
         }
     };
 
     constructor(options) {
         super();
-        const { addLine = noop, addCurve = noop, callback = noop } = options;
-        this.fn = { addLine, addCurve, callback }
+        const { addLine = noop, addCurve = noop, callback = noop, collate = false } = options;
+        this.fn = { addLine, addCurve, callback };
+        if (collate) {
+            this.vmState.feedrates = new Set();
+            this.vmState.tools = new Set();
+            this.vmState.spindle = new Set();
+            this.collate = true;
+        }
     }
 
     partitionWordsByGroup(words = []) {
@@ -677,21 +711,6 @@ class GCodeVirtualizer extends EventEmitter {
                 args = code;
             } else if (letter === 'X' || letter === 'Y' || letter === 'Z' || letter === 'A' || letter === 'B' || letter === 'C' || letter === 'I' || letter === 'J' || letter === 'K') {
                 // Use previous motion command if the line does not start with G-code or M-code.
-                // @example
-                //   G0 Z0.25
-                //   X-0.5 Y0.
-                //   Z0.1
-                //   G01 Z0. F5.
-                //   G2 X0.5 Y0. I0. J-0.5
-                //   X0. Y-0.5 I-0.5 J0.
-                //   X-0.5 Y0. I0. J0.5
-                // @example
-                //   G01
-                //   M03 S0
-                //   X5.2 Y0.2 M03 S0
-                //   X5.3 Y0.1 M03 S1000
-                //   X5.4 Y0 M03 S0
-                //   X5.5 Y0 M03 S0
                 cmd = this.motionMode;
                 args = this.fromPairs(words);
             }
@@ -705,7 +724,17 @@ class GCodeVirtualizer extends EventEmitter {
                 func(args);
             }
         }
+        this.totalLines += 1;
         this.fn.callback();
+    }
+
+    generateFileStats() {
+        console.log(this.vmState.tools);
+        return {
+            fileModal: this.modal.units,
+            total: this.totalLines,
+            toolSet: this.vmState.tools
+        };
     }
 
     offsetG92 = (pos) => {

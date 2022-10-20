@@ -643,8 +643,6 @@ class VisualizerWidget extends PureComponent {
             type: UPDATE_FILE_INFO,
             payload: reduxPayload
         });
-        //pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
-        //pubsub.publish('gcode:bbox', bbox);
     }
 
     processGCode = (gcode, name, size) => {

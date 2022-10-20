@@ -79,7 +79,8 @@ onmessage = function({ data }) {
         callback: () => {
             // Divided by 3 since we store XYZ as separate values
             frames.push(vertices.length / 3);
-        }
+        },
+        collate: true
     });
 
     const lines = content
@@ -94,16 +95,19 @@ onmessage = function({ data }) {
     }
     console.log(`Duration: ${Date.now() - start}`);
 
+    const info = vm.generateFileStats();
+    console.log(JSON.stringify(info));
+
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);
 
-    console.log(tFrames.length);
 
     postMessage({
         vertices: tVertices,
         colors,
         frames: tFrames,
-        visualizer
+        visualizer,
+        info
     });
 };
