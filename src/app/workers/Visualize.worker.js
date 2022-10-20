@@ -21,8 +21,7 @@
  *
  */
 
-import Toolpath from 'gcode-toolpath';
-import * as THREE from 'three';
+import GCodeVirtualizer from 'app/lib/GCodeVirtualizer';
 
 onmessage = function({ data }) {
     const { content, visualizer } = data;
@@ -30,67 +29,24 @@ onmessage = function({ data }) {
     const colors = [];
     const frames = [];
 
-    const toolpath = new Toolpath({
-        // @param {object} modal The modal object.
-        // @param {object} v1 A 3D vector of the start point.
-        // @param {object} v2 A 3D vector of the end point.
-        addLine: (modal, v1, v2) => {
-            const { motion } = modal;
-            const opacity = (motion === 'G0') ? 0.1 : 1;
-            const color = [motion, opacity];
-            colors.push(color);
-            vertices.push(v2.x, v2.y, v2.z);
-        },
-        // @param {object} modal The modal object.
-        // @param {object} v1 A 3D vector of the start point.
-        // @param {object} v2 A 3D vector of the end point.
-        // @param {object} v0 A 3D vector of the fixed point.
-        addArcCurve: (modal, v1, v2, v0) => {
-            const { motion, plane } = modal;
-            const isClockwise = (motion === 'G2');
-            const radius = Math.sqrt(
-                ((v1.x - v0.x) ** 2) + ((v1.y - v0.y) ** 2)
-            );
-            let startAngle = Math.atan2(v1.y - v0.y, v1.x - v0.x);
-            let endAngle = Math.atan2(v2.y - v0.y, v2.x - v0.x);
+    const vm = new GCodeVirtualizer();
+    // handlers for vectors
+    vm.on('addLine', () => {});
 
-            // Draw full circle if startAngle and endAngle are both zero
-            if (startAngle === endAngle) {
-                endAngle += (2 * Math.PI);
-            }
+    vm.on('addCurve', () => {});
 
-            const arcCurve = new THREE.ArcCurve(
-                v0.x, // aX
-                v0.y, // aY
-                radius, // aRadius
-                startAngle, // aStartAngle
-                endAngle, // aEndAngle
-                isClockwise // isClockwise
-            );
-            const divisions = 30;
-            const points = arcCurve.getPoints(divisions);
-            const color = [motion, 1];
+    const lines = content
+        .split(/\r?\n/)
+        .filter(element => element)
+        .reverse();
 
-            for (let i = 0; i < points.length; ++i) {
-                const point = points[i];
-                const z = ((v2.z - v1.z) / points.length) * i + v1.z;
+    const start = Date.now();
+    while (lines.length) {
+        let line = lines.pop();
+        vm.virtualize(line);
+    }
+    console.log(`Duration: ${Date.now() - start}`);
 
-                if (plane === 'G17') { // XY-plane
-                    vertices.push(point.x, point.y, z);
-                } else if (plane === 'G18') { // ZX-plane
-                    vertices.push(point.y, z, point.x);
-                } else if (plane === 'G19') { // YZ-plane
-                    vertices.push(z, point.x, point.y);
-                }
-                colors.push(color);
-            }
-        }
-    });
-
-    toolpath.loadFromStringSync(content, () => {
-        // Divided by 3 since we store XYZ as separate values
-        frames.push(vertices.length / 3);
-    });
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);
