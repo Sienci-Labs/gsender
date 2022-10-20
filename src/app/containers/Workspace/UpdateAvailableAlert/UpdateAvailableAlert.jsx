@@ -107,15 +107,6 @@ class UpdateAvailableAlert extends PureComponent {
             });
         }
 
-        const getUpdateForWindows = () => {
-            if (getOperatingSystem === 'MacOS') {
-                this.setState({
-                    buttonActive: false
-                });
-                restartHandler();
-            }
-        };
-
         return (
             <div className={cx(styles.updateWrapper, { [styles.hideModal]: !shown })}>
                 <div className={styles.updateIcon}>
@@ -127,7 +118,12 @@ class UpdateAvailableAlert extends PureComponent {
                     </div>
                     { currentOS === 'Windows OS' ? (
                         <button
-                            onClick={getUpdateForWindows}
+                            onClick={() => {
+                                this.setState({
+                                    buttonActive: false
+                                });
+                                restartHandler();
+                            }}
                             className={styles.restartButton}
                         >
                             {
