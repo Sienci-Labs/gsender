@@ -22,7 +22,7 @@
  */
 
 import '@babel/polyfill';
-import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor } from 'electron';
+import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -47,7 +47,6 @@ const main = () => {
     const shouldQuitImmediately = !gotSingleInstanceLock;
 
     let prevDirectory = '';
-    log.debug(autoUpdater.channel);
 
     if (shouldQuitImmediately) {
         app.quit();
@@ -123,7 +122,7 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `gSender ${pkg.version}`,
+                title: `gSender ${pkg.version}`
             };
             const window = windowManager.openWindow(url, options, splashScreen);
 
@@ -219,6 +218,44 @@ const main = () => {
                 } catch (e) {
                     log.error(`Caught error in listener - ${e}`);
                 }
+            });
+
+            ipcMain.on('open-new-window', (msg, route) => {
+                const factor = screen.getPrimaryDisplay().scaleFactor;
+                const childOptions = {
+                    width: 550 / factor,
+                    height: 460 / factor,
+                    minWidth: 550 / factor,
+                    minHeight: 460 / factor,
+                    useContentSize: true,
+                    title: 'gSender',
+                    parent: window
+                };
+                // Hash router URL should look like '{url}/#/widget/:id'
+                const address = `${url}/#${route}`;
+                const shouldMaximize = false;
+                const isChild = true;
+
+                windowManager.openWindow(address, childOptions, null, shouldMaximize, isChild);
+            });
+
+            ipcMain.on('reconnect-main', (event, options) => {
+                if (!event.sender.browserWindowOptions.parent && windowManager.childWindows.length > 0) {
+                    windowManager.childWindows.forEach(window => {
+                        window.webContents.send('reconnect', options);
+                    });
+                }
+            });
+
+            ipcMain.on('get-data', (event, widget) => {
+                window.webContents.send('get-data-' + widget);
+            });
+
+            ipcMain.on('recieve-data', (event, msg) => {
+                const { widget, data } = msg;
+                windowManager.childWindows.forEach(window => {
+                    window.webContents.send('recieve-data-' + widget, data);
+                });
             });
         } catch (err) {
             log.error(err);

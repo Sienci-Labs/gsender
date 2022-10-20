@@ -102,7 +102,7 @@ class GCodeVisualizer {
     }
 
     render({ vertices, colors, frames, spindleSpeeds, isLaser = false }) {
-        const { cuttingCoordinateLines, G0Color, G1Color, G2Color, G3Color } = this.theme;
+        const { cuttingCoordinateLines, G0Color, G1Color } = this.theme;
         this.vertices = vertices;
         this.frames = frames;
         this.spindleSpeeds = spindleSpeeds;
@@ -113,8 +113,8 @@ class GCodeVisualizer {
         const motionColor = {
             'G0': new THREE.Color(G0Color),
             'G1': new THREE.Color(G1Color),
-            'G2': new THREE.Color(G2Color),
-            'G3': new THREE.Color(G3Color),
+            'G2': new THREE.Color(G1Color),
+            'G3': new THREE.Color(G1Color),
             'default': defaultColor
         };
 

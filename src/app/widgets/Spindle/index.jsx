@@ -40,6 +40,7 @@ import {
     GRBL,
     GRBL_ACTIVE_STATE_IDLE,
     LASER_MODE,
+    SPINDLE_LASER_CATEGORY,
     SPINDLE_MODE,
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
@@ -48,6 +49,7 @@ import SpindleControls from './components/SpindleControls';
 import LaserControls from './components/LaserControls';
 import ModalToggle from './components/ModalToggle';
 import ActiveIndicator from './components/ActiveIndicator';
+import useKeybinding from '../../lib/useKeybinding';
 
 
 class SpindleWidget extends PureComponent {
@@ -60,22 +62,54 @@ class SpindleWidget extends PureComponent {
     };
 
     shuttleControlEvents = {
-        TOGGLE_SPINDLE_LASER_MODE: () => {
-            this.actions.handleModeToggle();
+        TOGGLE_SPINDLE_LASER_MODE: {
+            title: 'Toggle Mode',
+            keys: '',
+            cmd: 'TOGGLE_SPINDLE_LASER_MODE',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                this.actions.handleModeToggle();
+            }
         },
-        CW_LASER_ON: () => {
-            this.state.mode === LASER_MODE
-                ? this.actions.sendLaserM3()
-                : this.actions.sendM3();
+        CW_LASER_ON: {
+            title: 'CW / Laser On',
+            keys: '',
+            cmd: 'CW_LASER_ON',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                this.state.mode === LASER_MODE
+                    ? this.actions.sendLaserM3()
+                    : this.actions.sendM3();
+            }
         },
-        CCW_LASER_TEST: () => {
-            this.state.mode === LASER_MODE
-                ? this.actions.runLaserTest()
-                : this.actions.sendM4();
+        CCW_LASER_TEST: {
+            title: 'CCW / Laser Test',
+            keys: '',
+            cmd: 'CCW_LASER_TEST',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                this.state.mode === LASER_MODE
+                    ? this.actions.runLaserTest()
+                    : this.actions.sendM4();
+            }
         },
-        STOP_LASER_OFF: () => {
-            this.actions.sendM5();
-        }
+        STOP_LASER_OFF: {
+            title: 'Stop / Laser Off',
+            keys: '',
+            cmd: 'STOP_LASER_OFF',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                this.actions.sendM5();
+            }
+        },
     }
 
     config = new WidgetConfig(this.props.widgetId);
@@ -207,14 +241,14 @@ class SpindleWidget extends PureComponent {
         combokeys.reload();
 
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.on(eventName, callback);
         });
     }
 
     removeShuttleControlEvents() {
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.removeListener(eventName, callback);
         });
     }
@@ -222,6 +256,7 @@ class SpindleWidget extends PureComponent {
     componentDidMount() {
         this.subscribe();
         this.addShuttleControlEvents();
+        useKeybinding(this.shuttleControlEvents);
 
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }

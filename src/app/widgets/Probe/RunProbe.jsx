@@ -33,6 +33,8 @@ import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import styles from './index.styl';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
+import { PROBING_CATEGORY } from '../../constants';
+import useKeybinding from '../../lib/useKeybinding';
 
 class RunProbe extends PureComponent {
     static propTypes = {
@@ -45,22 +47,38 @@ class RunProbe extends PureComponent {
     testInterval = null;
 
     shuttleControlEvents = {
-        START_PROBE: () => {
-            this.startProbe();
+        START_PROBE: {
+            title: 'Start Probing',
+            keys: '',
+            cmd: 'START_PROBE',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                this.startProbe();
+            },
         },
-        CONFIRM_PROBE: () => {
-            if (this.state.connectionMade) {
-                return;
+        CONFIRM_PROBE: {
+            title: 'Confirm Probe',
+            keys: '',
+            cmd: 'CONFIRM_PROBE',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                if (this.state.connectionMade) {
+                    return;
+                }
+                Toaster.pop({
+                    msg: 'Probe Confirmed Manually',
+                    type: TOASTER_INFO,
+                    duration: 5000,
+                    icon: 'fa-satellite-dish'
+                });
+                this.setState({
+                    connectionMade: true,
+                });
             }
-            Toaster.pop({
-                msg: 'Probe Confirmed Manually',
-                type: TOASTER_INFO,
-                duration: 5000,
-                icon: 'fa-satellite-dish'
-            });
-            this.setState({
-                connectionMade: true,
-            });
         }
     }
 
@@ -130,6 +148,7 @@ class RunProbe extends PureComponent {
         const { connectivityTest } = state;
         this.startConnectivityTest(actions.returnProbeConnectivity, connectivityTest);
         this.addShuttleControlEvents();
+        useKeybinding(this.shuttleControlEvents);
 
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }
@@ -143,14 +162,14 @@ class RunProbe extends PureComponent {
         combokeys.reload();
 
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.on(eventName, callback);
         });
     }
 
     removeShuttleControlEvents() {
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.removeListener(eventName, callback);
         });
     }

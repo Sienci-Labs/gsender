@@ -37,6 +37,9 @@ import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
 import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
+import color from 'cli-color';
+import { RED, ALARM_RED } from './variables';
+
 import History from './History';
 import styles from './index.styl';
 
@@ -125,6 +128,7 @@ class TerminalWrapper extends PureComponent {
 
         const xtermElement = el.querySelector('.xterm');
         xtermElement.style.paddingLeft = '3px';
+        xtermElement.style.height = '100%';
 
         const viewportElement = el.querySelector('.xterm-viewport');
         this.verticalScrollbar = new PerfectScrollbar(viewportElement);
@@ -220,7 +224,13 @@ class TerminalWrapper extends PureComponent {
 
     writeln(data) {
         this.term.write('\r');
-        this.term.write(data);
+        if (data.includes('error:')) {
+            this.term.write(color.xterm(RED)(data));
+        } else if (data.includes('ALARM:')) {
+            this.term.write(color.xterm(ALARM_RED)(data));
+        } else {
+            this.term.write(data);
+        }
         this.term.prompt();
     }
 
@@ -285,7 +295,7 @@ class TerminalWrapper extends PureComponent {
         const { terminalInputIndex } = this.state;
 
         return (
-            <div style={{ display: 'grid', width: '100%', gridTemplateRows: '11fr 1fr' }}>
+            <div style={{ display: 'grid', width: '100%', gridTemplateRows: '11fr 35px' }}>
                 <div
                     ref={node => {
                         this.terminalContainer = node;

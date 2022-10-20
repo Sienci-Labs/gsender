@@ -33,10 +33,10 @@ const SpeedControl = ({ state, actions }) => {
 
     const xyMin = (units === METRIC_UNITS) ? 0.01 : 0.001;
     const zMin = (units === METRIC_UNITS) ? 0.01 : 0.001;
-    const xyMax = (units === METRIC_UNITS) ? 1000 : 20;
-    const zMax = (units === METRIC_UNITS) ? 60 : 5;
+    const xyMax = (units === METRIC_UNITS) ? 9000 : 354;
+    const zMax = (units === METRIC_UNITS) ? 9000 : 354;
     const speedMin = (units === METRIC_UNITS) ? 50 : 2;
-    const speedMax = (units === METRIC_UNITS) ? 50000 : 2000;
+    const speedMax = (units === METRIC_UNITS) ? 90000 : 3543;
     const decimals = (units === METRIC_UNITS) ? 2 : 3;
 
     return (

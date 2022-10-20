@@ -24,7 +24,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
-import Table from 'app/components/Table';
+import Table from '@mui/material/Table';
+import TableHead from '@mui/material/TableHead';
+import TableBody from '@mui/material/TableBody';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import { styled } from '@mui/material/styles';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 
 import {
@@ -58,8 +65,8 @@ export default class MainTable extends Component {
     }
 
     renders = {
-        renderShortcutCell: (_, row) => {
-            const { keys, isActive, keysName } = row;
+        renderShortcutCell: (row) => {
+            const { keys, isActive, title } = row;
             const shortcut = [...keys][0] === '+' ? ['+'] : keys.split('+');
 
             const { onEdit, onDelete } = this.props;
@@ -81,10 +88,10 @@ export default class MainTable extends Component {
             return (
                 <div className={styles.shortcutComboColumn}>
                     {
-                        hasShortcut || keysName
+                        hasShortcut || title
                             ? (
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-                                    {keysName ? <kbd>{keysName}</kbd> : output}
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', fontSize: '1rem' }}>
+                                    {title ? <kbd>{keys}</kbd> : output}
                                 </div>
                             )
                             : <div style={{ height: '24px' }} />
@@ -112,7 +119,7 @@ export default class MainTable extends Component {
                 </div>
             );
         },
-        renderToggleCell: (_, row) => {
+        renderToggleCell: (row) => {
             const { onShortcutToggle } = this.props;
             return (
                 <ToggleSwitch
@@ -123,7 +130,7 @@ export default class MainTable extends Component {
                 />
             );
         },
-        renderCategoryCell: (_, row) => {
+        renderCategoryCell: (row) => {
             const categories = {
                 [CARVING_CATEGORY]: 'categoryGreen',
                 [OVERRIDES_CATEGORY]: 'categoryBlue',
@@ -147,23 +154,68 @@ export default class MainTable extends Component {
     }
 
     columns = [
-        { dataKey: 'title', title: 'Action', sortable: true, width: '25%' },
-        { dataKey: 'keys', title: 'Shortcut', sortable: true, width: '45%', render: this.renders.renderShortcutCell },
-        { dataKey: 'category', title: 'Category', sortable: true, width: '20%', render: this.renders.renderCategoryCell },
-        { dataKey: 'isActive', title: 'Active', width: '10%', render: this.renders.renderToggleCell }
+        { id: 'title', label: 'Action', maxWidth: 50 },
+        { id: 'keys', label: 'Shortcut', minWidth: 250 },
+        { id: 'category', label: 'Category', minWidth: 148, align: 'center' },
+        { id: 'isActive', label: 'Active', minWidth: 74 }
     ];
 
     render() {
         const columns = this.columns;
         const { data } = this.props;
 
+        const StyledTableCell = styled(TableCell)(({ theme }) => ({
+            [`&.${tableCellClasses.head}`]: {
+                backgroundColor: '#e5e5e5',
+                color: theme.palette.common.black,
+                fontSize: '1.1rem'
+            },
+        }));
+
+        const StyledTableRow = styled(TableRow)(({ theme }) => ({
+            '&:nth-of-type(odd)': {
+                backgroundColor: theme.palette.action.hover,
+            },
+            // hide last border
+            '&:last-child td, &:last-child th': {
+                border: 0,
+            },
+        }));
+
         return (
-            <Table
-                rowKey="id"
-                columns={columns}
-                data={data}
-                width={743}
-            />
+            <TableContainer component={Paper} sx={{ height: '100% !important' }}>
+                <Table sx={{ minWidth: 743 }} stickyHeader aria-label="sticky table">
+                    <TableHead>
+                        <StyledTableRow>
+                            {columns.map((column, index) => (
+                                <StyledTableCell
+                                    key={index}
+                                    align={column.align}
+                                    style={{ minWidth: column.minWidth }}
+                                    sx={{ fontSize: '1rem' }}
+                                >
+                                    {column.label}
+                                </StyledTableCell>
+                            ))}
+                        </StyledTableRow>
+                    </TableHead>
+                    <TableBody>
+                        {data.map((row, index) => (
+                            <StyledTableRow
+                                key={index}
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                            >
+                                <StyledTableCell component="th" scope="row">
+                                    {row.title}
+                                </StyledTableCell>
+                                <StyledTableCell>{ this.renders.renderShortcutCell(row) }</StyledTableCell>
+                                <StyledTableCell>{ this.renders.renderCategoryCell(row) }</StyledTableCell>
+                                <StyledTableCell>{ this.renders.renderToggleCell(row) }</StyledTableCell>
+                            </StyledTableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         );
     }
 }

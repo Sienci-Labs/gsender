@@ -210,6 +210,7 @@ class SecondaryFunctionality extends PureComponent {
                                         widgetId={tab.widgetId}
                                         embedded
                                         active={active}
+                                        isMainWindow={true}
                                     />
                                 </TabbedWidget.ChildComponent>
                             );

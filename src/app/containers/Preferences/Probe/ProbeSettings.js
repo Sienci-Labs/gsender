@@ -69,6 +69,15 @@ const ProbeSettings = ({ state, probeActions, values, type }) => {
                                 units={`${units}`}
                             />
                         </Tooltip>
+                        <Tooltip content="Maximum distance for Z probe" location="default">
+                            <Input
+                                label="Z Probe Distance"
+                                value={values.zProbeDistance}
+                                onChange={probeActions.changeZProbeDistance}
+                                additionalProps={{ type: 'number', id: 'zProbeDistance' }}
+                                units={`${units}`}
+                            />
+                        </Tooltip>
                     </>
                 )
             }

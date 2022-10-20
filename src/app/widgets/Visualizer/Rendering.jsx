@@ -31,7 +31,9 @@ export default () => (
             <i className="fa fa-cube fa-spin" />
         </div>
         <div className={styles.loaderText}>
-            {i18n._('3D rendering')}
+            {
+                i18n._('Rendering')
+            }
         </div>
     </div>
 );
