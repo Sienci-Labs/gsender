@@ -1,4 +1,4 @@
-function getOperatingSystem(window) {
+const getOperatingSystem = (window) => {
     let operatingSystem = 'unknown';
 
     if (window.navigator.appVersion.indexOf('Win') !== -1) {
@@ -10,10 +10,7 @@ function getOperatingSystem(window) {
     } else if (window.navigator.appVersion.indexOf('Linux') !== -1) {
         operatingSystem = 'Linux OS';
     }
-
     return operatingSystem;
-}
-
-export const OS = (window) => {
-    return getOperatingSystem(window);
 };
+
+export { getOperatingSystem };

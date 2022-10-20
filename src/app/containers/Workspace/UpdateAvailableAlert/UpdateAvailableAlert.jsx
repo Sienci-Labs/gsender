@@ -25,7 +25,7 @@ import React, { PureComponent } from 'react';
 import cx from 'classnames';
 import pubsub from 'pubsub-js';
 import styles from './index.styl';
-import OS from '../util';
+import { getOperatingSystem } from '../util';
 import api from '../../../api';
 
 
@@ -35,7 +35,6 @@ class UpdateAvailableAlert extends PureComponent {
         this.state = {
             shown: false,
             buttonActive: true,
-            updateLink: '',
             allOSUpdates: [],
         };
     }
@@ -46,13 +45,16 @@ class UpdateAvailableAlert extends PureComponent {
                 shown: false
             });
         },
-        getAllUpdates: async () => {
-            await api.getLatestVersionAllOS();
+        getAllUpdates: () => {
+            Promise.all([api.getLatestVersionAllOS()]).then((data) => {
+                this.setState({
+                    allOSUpdates: data[0]
+                });
+            });
         },
     }
 
     pubsubTokens = [];
-
 
     subscribe () {
         const tokens = [
@@ -74,9 +76,7 @@ class UpdateAvailableAlert extends PureComponent {
 
     componentDidMount() {
         this.subscribe();
-        this.setState({
-            allOSUpdates: this.actions.getAllUpdates()
-        });
+        this.actions.getAllUpdates();
     }
 
     componentWillUnmount() {
@@ -87,35 +87,32 @@ class UpdateAvailableAlert extends PureComponent {
         const { shown, buttonActive, allOSUpdates } = this.state;
         const { restartHandler } = this.props;
         const actions = { ...this.actions };
+        const currentOS = getOperatingSystem(window);
 
-        const handleUpdateClick = () => {
-            if (OS === 'Windows OS') {
+        let updateLink = '';
+
+        if (currentOS === 'MacOS') {
+            allOSUpdates.map((update) => {
+                if (update.name.includes('.dmg')) {
+                    updateLink = update.browser_download_url;
+                }
+                return '';
+            });
+        } else if (getOperatingSystem === 'Linux OS') { //TODO - verify correct OS value for Raspberry Pi
+            allOSUpdates.map((update) => {
+                if (update.name.includes('armv7l.AppImage')) {
+                    updateLink = update.browser_download_url;
+                }
+                return '';
+            });
+        }
+
+        const getUpdateForWindows = () => {
+            if (getOperatingSystem === 'MacOS') {
                 this.setState({
                     buttonActive: false
                 });
                 restartHandler();
-            } else if (OS === 'MacOS') {
-                this.setState({
-                    updateLink: () => {
-                        return allOSUpdates.map((update) => {
-                            if (update.name.includes('.dmg')) {
-                                return update.browser_download_url;
-                            }
-                            return '';
-                        });
-                    }
-                });
-            } else if (OS === 'Linux OS') { //TODO - verify correct OS value for Raspberry Pi
-                this.setState({
-                    updateLink: () => {
-                        return allOSUpdates.map((update) => {
-                            if (update.name.includes('armv7l.AppImage')) {
-                                return update.browser_download_url;
-                            }
-                            return '';
-                        });
-                    }
-                });
             }
         };
 
@@ -126,20 +123,18 @@ class UpdateAvailableAlert extends PureComponent {
                 </div>
                 <div className={styles.updateContent}>
                     <div>
-                        Update available to download.  Download and restart now?
+                        { currentOS === 'Windows OS' ? 'Update available to download. Download and restart now?' : 'A new version of gSender is available.'}
                     </div>
-                    {OS === 'Windows OS' ? (
+                    { currentOS === 'Windows OS' ? (
                         <button
-                            onClick={handleUpdateClick}
+                            onClick={getUpdateForWindows}
                             className={styles.restartButton}
                         >
                             {
                                 buttonActive ? 'Download and install' : 'Downloading...'
                             }
                         </button>
-                    )
-                        : (<a href={this.state.updateLink}> Download and install </a>)
-                    }
+                    ) : <a href={updateLink}> Click here to download </a>}
                 </div>
                 <div className={styles.closeModal}>
                     <button onClick={actions.hideModal}>

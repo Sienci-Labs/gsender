@@ -88,11 +88,11 @@ const getLatestVersion = () => new Promise((resolve, reject) => {
 //Fetch latest app version for all OS from github
 //
 const getLatestVersionAllOS = () => new Promise((resolve, reject) => {
-    axios.get('https://api.github.com/repos/Sienci-Labs/gsender/releases').then((req, res) => {
-        console.log(res.body[0].assets);
-        return res.body[0].assets;
+    axios.get('https://api.github.com/repos/Sienci-Labs/gsender/releases').then((res) => {
+        resolve(res.data[0].assets);
     }).catch((error) => {
         console.log(error);
+        return [];
     });
 });
 
