@@ -39,25 +39,25 @@ class UpdateAvailableAlert extends PureComponent {
     actions = {
         hideModal: () => {
             this.setState({
-                shown: false
+                shown: false,
             });
         },
-    }
+    };
 
     pubsubTokens = [];
 
-    subscribe () {
+    subscribe() {
         const tokens = [
             pubsub.subscribe('showUpdateToast', (msg, info) => {
                 this.setState({
-                    shown: true
+                    shown: true,
                 });
             }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
 
-    unsubscribe () {
+    unsubscribe() {
         this.pubsubTokens.forEach((token) => {
             pubsub.unsubscribe(token);
         });
@@ -78,41 +78,51 @@ class UpdateAvailableAlert extends PureComponent {
         const actions = { ...this.actions };
         const currentOS = getOperatingSystem(window);
 
-        let updateLink = 'https://github.com/Sienci-Labs/gsender/releases/latest';
+        let updateLink =
+            'https://github.com/Sienci-Labs/gsender/releases/latest';
 
         return (
-            <div className={cx(styles.updateWrapper, { [styles.hideModal]: !shown })}>
+            <div
+                className={cx(styles.updateWrapper, {
+                    [styles.hideModal]: shown,
+                })}
+            >
                 <div className={styles.updateIcon}>
                     <i className="fas fa-download" />
                 </div>
                 <div className={styles.updateContent}>
                     <div>
-                        { currentOS === 'Windows OS' ? 'Update available to download. Download and restart now?' : 'A new version of gSender is available.'}
+                        {currentOS === 'Windows OS'
+                            ? 'Update available to download. Download and restart now?'
+                            : 'A new version of gSender is available.'}
                     </div>
-                    { currentOS === 'Windows OS' ? (
+                    {currentOS === 'Windows OS' ? (
                         <button
                             onClick={() => {
                                 this.setState({
-                                    buttonActive: false
+                                    buttonActive: false,
                                 });
                                 restartHandler();
                             }}
                             className={styles.restartButton}
                         >
-                            {
-                                buttonActive ? 'Download and install' : 'Downloading...'
-                            }
+                            {buttonActive
+                                ? 'Download and install'
+                                : 'Downloading...'}
                         </button>
                     ) : (
                         <button
-                            className={styles.restartButton}
                             onClick={() => {
                                 this.setState({
-                                    buttonActive: false
+                                    buttonActive: false,
                                 });
                                 window.open(updateLink, '_blank');
                             }}
-                        > Checkout the latest release
+                            className={styles.restartButton}
+                        >
+                            {buttonActive
+                                ? 'Checkout the latest release'
+                                : 'Redirecting...'}
                         </button>
                     )}
                 </div>
@@ -121,7 +131,6 @@ class UpdateAvailableAlert extends PureComponent {
                         <i className="fas fa-times" />
                     </button>
                 </div>
-
             </div>
         );
     }
