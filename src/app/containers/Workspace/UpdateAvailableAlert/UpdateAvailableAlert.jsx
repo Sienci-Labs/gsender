@@ -98,7 +98,7 @@ class UpdateAvailableAlert extends PureComponent {
                 }
                 return '';
             });
-        } else if (getOperatingSystem === 'Linux OS') { //TODO - verify correct OS value for Raspberry Pi
+        } else if (currentOS === 'Linux OS') { //TODO - verify correct OS value for Raspberry Pi
             allOSUpdates.map((update) => {
                 if (update.name.includes('armv7l.AppImage')) {
                     updateLink = update.browser_download_url;
