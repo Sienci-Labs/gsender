@@ -509,7 +509,9 @@ class ProbeWidget extends PureComponent {
 
     generateMultiAxisCommands(axes, xyThickness, zThickness, params) {
         let code = [];
-        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
+        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units, modal } = params;
+        const unitModal = `G${modal}`;
+        console.log(unitModal);
         const workspace = this.mapWCSToPValue(wcs);
         const XYRetract = -retractDistance;
         let XYProbeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC.X : this.PROBE_DISTANCE_IMPERIAL.X;
@@ -528,7 +530,7 @@ class ProbeWidget extends PureComponent {
 
         let prependUnits = '';
         if (this.props.$13 === '1') {
-            prependUnits = 'G20';
+            prependUnits = 'G20 ';
         }
 
         // save initial position
@@ -550,12 +552,12 @@ class ProbeWidget extends PureComponent {
                     Z: ZProbeDistance,
                     F: normalFeedrate
                 }),
-                gcode(`${prependUnits} G10`, {
+                gcode(`${prependUnits}G10`, {
                     L: 20,
                     P: workspace,
                     Z: zThickness
                 }),
-                gcode('G91'),
+                gcode(`${unitModal} G91`),
                 gcode('G0', {
                     Z: retractDistance
                 }),
@@ -602,11 +604,12 @@ class ProbeWidget extends PureComponent {
                 P: this.DWELL_TIME
             }),
             gcode('G91'),
-            gcode(`${prependUnits} G10`, {
+            gcode(`${prependUnits}G10`, {
                 L: 20,
                 P: workspace,
                 X: toolCompensatedThickness
             }),
+            gcode(`${unitModal} G91`),
             // Move for Y Touch - toward front + to right
             gcode('G0', {
                 X: -(2 * retractDistance)
@@ -632,12 +635,12 @@ class ProbeWidget extends PureComponent {
             gcode('G4', {
                 P: this.DWELL_TIME
             }),
-            gcode('G91'),
             gcode(`${prependUnits} G10`, {
                 L: 20,
                 P: workspace,
                 Y: toolCompensatedThickness
             }),
+            gcode(`${unitModal} G91`),
             gcode('G0', {
                 Y: XYRetract
             }),

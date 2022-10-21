@@ -896,20 +896,20 @@ class GrblController {
             zmax: Number(context.zmax) || 0,
 
             // Machine position
-            mposx: Number(mposx) || 0,
-            mposy: Number(mposy) || 0,
-            mposz: Number(mposz) || 0,
-            mposa: Number(mposa) || 0,
-            mposb: Number(mposb) || 0,
-            mposc: Number(mposc) || 0,
+            mposx: Number(mposx).toFixed(4) || 0,
+            mposy: Number(mposy).toFixed(4) || 0,
+            mposz: Number(mposz).toFixed(4) || 0,
+            mposa: Number(mposa).toFixed(4) || 0,
+            mposb: Number(mposb).toFixed(4) || 0,
+            mposc: Number(mposc).toFixed(4) || 0,
 
             // Work position
-            posx: Number(posx) || 0,
-            posy: Number(posy) || 0,
-            posz: Number(posz) || 0,
-            posa: Number(posa) || 0,
-            posb: Number(posb) || 0,
-            posc: Number(posc) || 0,
+            posx: Number(posx).toFixed(4) || 0,
+            posy: Number(posy).toFixed(4) || 0,
+            posz: Number(posz).toFixed(4) || 0,
+            posa: Number(posa).toFixed(4) || 0,
+            posb: Number(posb).toFixed(4) || 0,
+            posc: Number(posc).toFixed(4) || 0,
 
             // Modal group
             modal: {
