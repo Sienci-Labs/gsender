@@ -81,7 +81,7 @@ class UpdateAvailableAlert extends PureComponent {
         let updateLink = 'https://github.com/Sienci-Labs/gsender/releases/latest';
 
         return (
-            <div className={cx(styles.updateWrapper, { [styles.hideModal]: shown })}>
+            <div className={cx(styles.updateWrapper, { [styles.hideModal]: !shown })}>
                 <div className={styles.updateIcon}>
                     <i className="fas fa-download" />
                 </div>
