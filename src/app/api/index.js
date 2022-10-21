@@ -24,7 +24,7 @@
 import ensureArray from 'ensure-array';
 import superagent from 'superagent';
 import superagentUse from 'superagent-use';
-import axios from 'axios';
+// import axios from 'axios';
 import store from '../store';
 
 const bearer = (request) => {
@@ -87,14 +87,14 @@ const getLatestVersion = () => new Promise((resolve, reject) => {
 //
 //Fetch latest app version for all OS from github
 //
-const getLatestVersionAllOS = () => new Promise((resolve, reject) => {
-    axios.get('https://api.github.com/repos/Sienci-Labs/gsender/releases').then((res) => {
-        resolve(res.data[0].assets);
-    }).catch((error) => {
-        console.log(error);
-        return [];
-    });
-});
+// const getLatestVersionAllOS = () => new Promise((resolve, reject) => {
+//     axios.get('https://api.github.com/repos/Sienci-Labs/gsender/releases').then((res) => {
+//         resolve(res.data[0].assets);
+//     }).catch((error) => {
+//         console.log(error);
+//         return [];
+//     });
+// });
 
 //
 // State
@@ -718,7 +718,7 @@ file.upload = (file, port, visualizer) => new Promise((resolve, reject) => {
 
 export default {
     getLatestVersion,
-    getLatestVersionAllOS,
+    // getLatestVersionAllOS,
 
     // State
     getState,

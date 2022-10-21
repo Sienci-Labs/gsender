@@ -26,8 +26,6 @@ import cx from 'classnames';
 import pubsub from 'pubsub-js';
 import styles from './index.styl';
 import { getOperatingSystem } from '../util';
-import api from '../../../api';
-
 
 class UpdateAvailableAlert extends PureComponent {
     constructor(props) {
@@ -35,7 +33,6 @@ class UpdateAvailableAlert extends PureComponent {
         this.state = {
             shown: false,
             buttonActive: true,
-            allOSUpdates: [],
         };
     }
 
@@ -43,13 +40,6 @@ class UpdateAvailableAlert extends PureComponent {
         hideModal: () => {
             this.setState({
                 shown: false
-            });
-        },
-        getAllUpdates: () => {
-            Promise.all([api.getLatestVersionAllOS()]).then((data) => {
-                this.setState({
-                    allOSUpdates: data[0]
-                });
             });
         },
     }
@@ -76,7 +66,6 @@ class UpdateAvailableAlert extends PureComponent {
 
     componentDidMount() {
         this.subscribe();
-        this.actions.getAllUpdates();
     }
 
     componentWillUnmount() {
@@ -84,31 +73,15 @@ class UpdateAvailableAlert extends PureComponent {
     }
 
     render() {
-        const { shown, buttonActive, allOSUpdates } = this.state;
+        const { shown, buttonActive } = this.state;
         const { restartHandler } = this.props;
         const actions = { ...this.actions };
         const currentOS = getOperatingSystem(window);
 
-        let updateLink = '';
-
-        if (currentOS === 'MacOS') {
-            allOSUpdates.map((update) => {
-                if (update.name.includes('.dmg')) {
-                    updateLink = update.browser_download_url;
-                }
-                return '';
-            });
-        } else if (currentOS === 'Linux OS') { //TODO - verify correct OS value for Raspberry Pi
-            allOSUpdates.map((update) => {
-                if (update.name.includes('armv7l.AppImage')) {
-                    updateLink = update.browser_download_url;
-                }
-                return '';
-            });
-        }
+        let updateLink = 'https://github.com/Sienci-Labs/gsender/releases/latest';
 
         return (
-            <div className={cx(styles.updateWrapper, { [styles.hideModal]: !shown })}>
+            <div className={cx(styles.updateWrapper, { [styles.hideModal]: shown })}>
                 <div className={styles.updateIcon}>
                     <i className="fas fa-download" />
                 </div>
@@ -130,7 +103,18 @@ class UpdateAvailableAlert extends PureComponent {
                                 buttonActive ? 'Download and install' : 'Downloading...'
                             }
                         </button>
-                    ) : <a href={updateLink}> Click here to download </a>}
+                    ) : (
+                        <button
+                            className={styles.restartButton}
+                            onClick={() => {
+                                this.setState({
+                                    buttonActive: false
+                                });
+                                window.open(updateLink, '_blank');
+                            }}
+                        > Checkout the latest release
+                        </button>
+                    )}
                 </div>
                 <div className={styles.closeModal}>
                     <button onClick={actions.hideModal}>

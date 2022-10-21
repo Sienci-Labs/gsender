@@ -5,8 +5,6 @@ const getOperatingSystem = (window) => {
         operatingSystem = 'Windows OS';
     } else if (window.navigator.appVersion.indexOf('Mac') !== -1) {
         operatingSystem = 'MacOS';
-    } else if (window.navigator.appVersion.indexOf('X11') !== -1) {
-        operatingSystem = 'UNIX OS';
     } else if (window.navigator.appVersion.indexOf('Linux') !== -1) {
         operatingSystem = 'Linux OS';
     }
