@@ -487,11 +487,11 @@ class ProbeWidget extends PureComponent {
 
         // Go up on Z if X or Y
         if (axis !== 'Z') {
-            const { touchPlateHeight, units } = this.state;
-            const touchplateThickness = (units === METRIC_UNITS) ? touchPlateHeight : mm2in(touchPlateHeight);
+            //const { touchPlateHeight, units } = this.state;
+            //const touchplateThickness = (units === METRIC_UNITS) ? touchPlateHeight : mm2in(touchPlateHeight);
             code = code.concat([
-                this.gcode(`${unitModal} G0`, {
-                    Z: -1 * ((retractDistance * 4) - touchplateThickness)
+                this.gcode('G21 G91 G0', {
+                    Z: 13
                 })
             ]);
         }
