@@ -511,18 +511,14 @@ class AxesWidget extends PureComponent {
             }
         },
         CYCLE_JOG_PRESETS: () => {
-            const { state } = this.props;
-            const activeState = get(state, 'status.activeState');
-            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
-                const { selectedSpeed } = this.state;
+            const { selectedSpeed } = this.state;
 
-                const presets = [SPEED_RAPID, SPEED_NORMAL, SPEED_PRECISE];
-                const nextIndex = presets.findIndex(preset => preset === selectedSpeed) + 1;
-                const key = presets[nextIndex] ? presets[nextIndex] : presets[0];
+            const presets = [SPEED_RAPID, SPEED_NORMAL, SPEED_PRECISE];
+            const nextIndex = presets.findIndex(preset => preset === selectedSpeed) + 1;
+            const key = presets[nextIndex] ? presets[nextIndex] : presets[0];
 
-                this.actions.setSelectedSpeed(key);
-                this.actions.setJogFromPreset(key);
-            }
+            this.actions.setSelectedSpeed(key);
+            this.actions.setJogFromPreset(key);
         },
         JOG_SPEED: (_, { speed }) => {
             const getStep = ({ value, increment = false }) => {
