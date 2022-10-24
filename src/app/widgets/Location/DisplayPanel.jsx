@@ -184,10 +184,10 @@ class DisplayPanel extends PureComponent {
                                 if (homingEnabled) {
                                     // get current Z
                                     const currentZ = Number(machinePosition['z']);
-                                    console.log(currentZ);
+                                    const retractHeight = (Math.abs(safeRetractHeight) * -1);
                                     // only move Z if it is less than Z0-SafeHeight
-                                    if (currentZ < -safeRetractHeight) {
-                                        commands.push(`G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`);
+                                    if (currentZ < retractHeight) {
+                                        commands.push(`G53 G0 Z${retractHeight}`);
                                     }
                                 } else {
                                     commands.push('G91');
