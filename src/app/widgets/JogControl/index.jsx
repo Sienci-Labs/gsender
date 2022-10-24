@@ -497,15 +497,11 @@ class AxesWidget extends PureComponent {
             }
         },
         STOP_JOG: (event, payload) => {
-            const { state } = this.props;
-            const activeState = get(state, 'status.activeState');
-            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
-                if (event) {
-                    preventDefault(event);
-                }
-
-                this.handleShortcutStop(payload);
+            if (event) {
+                preventDefault(event);
             }
+
+            this.handleShortcutStop(payload);
         },
         SET_JOG_PRESET: (event, { key }) => {
             const { state } = this.props;
