@@ -149,10 +149,12 @@ class DisplayPanel extends PureComponent {
 
     renderAxis = (axis) => {
         const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units, homingEnabled } = this.props;
-        const mpos = machinePosition[axis] || '0.000';
+        let mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';
         const axisLabel = axis.toUpperCase();
         const showPositionInput = canClick && this.state.positionInput[axis];
+
+        mpos = Number(mpos).toFixed(3);
 
         //Function to zero out given axis
         const handleAxisButtonClick = () => {
@@ -169,40 +171,6 @@ class DisplayPanel extends PureComponent {
 
             controller.command('gcode', `G10 L20 P${p} ${axisLabel}0`);
         };
-
-        /*const gotoHandler = () => {
-            const commands = [];
-            const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-            if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
-                if (homingEnabled) {
-                    commands.push(`G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`);
-                } else {
-                    commands.push('G91');
-                    commands.push(`G0 Z${safeRetractHeight}`); // Retract Z when moving across workspace
-                }
-            }
-            commands.push(`G90 G0 ${axisLabel}0`); //Move to Work Position Zero
-            // We go down if homing not enabled
-            if (safeRetractHeight !== 0 && axisLabel !== 'Z' && !homingEnabled) {
-                commands.push(`G91 G0 Z${safeRetractHeight * -1}`);
-                commands.push('G90');
-            }
-            controller.command('gcode:safe', commands, modal);
-        };
-
-        const droHandler = (value) => actions.handleManualMovement(value, axis);
-
-        return (
-            <DRO
-                label={axisLabel}
-                zeroHandler={handleAxisButtonClick}
-                mpos={mpos}
-                wpos={wpos}
-                gotoHandler={gotoHandler}
-                droHandler={droHandler}
-                canClick={canClick}
-            />
-        );*/
 
         return (
             <tr>
