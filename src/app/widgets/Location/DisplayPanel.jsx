@@ -154,7 +154,7 @@ class DisplayPanel extends PureComponent {
         const axisLabel = axis.toUpperCase();
         const showPositionInput = canClick && this.state.positionInput[axis];
 
-        mpos = Number(mpos).toFixed(3);
+        //mpos = Number(mpos).toFixed(3);
 
         //Function to zero out given axis
         const handleAxisButtonClick = () => {
@@ -183,7 +183,8 @@ class DisplayPanel extends PureComponent {
                             if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
                                 if (homingEnabled) {
                                     // get current Z
-                                    const currentZ = machinePosition.z;
+                                    const currentZ = Number(machinePosition['z']);
+                                    console.log(currentZ);
                                     // only move Z if it is less than Z0-SafeHeight
                                     if (currentZ < -safeRetractHeight) {
                                         commands.push(`G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`);
@@ -384,7 +385,7 @@ export default connect((store) => {
     const workflowState = get(store, 'controller.workflow.state');
     const activeState = get(store, 'controller.state.status.activeState');
     const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
-    const machinePosition = get(store, 'controller.mpos');
+    const mpos = get(store, 'controller.mpos');
     return {
         homingEnabled,
         canHome,
@@ -392,6 +393,6 @@ export default connect((store) => {
         homingFlag,
         homingRun,
         pullOff,
-        machinePosition
+        mpos
     };
 })(DisplayPanel);
