@@ -47,37 +47,6 @@ class Header extends PureComponent {
     state = this.getInitialState();
 
     actions = {
-        requestPushPermission: () => {
-            const onGranted = () => {
-                this.setState({ pushPermission: Push.Permission.GRANTED });
-            };
-            const onDenied = () => {
-                this.setState({ pushPermission: Push.Permission.DENIED });
-            };
-            // Note that if "Permission.DEFAULT" is returned, no callback is executed
-            const permission = Push.Permission.request(onGranted, onDenied);
-            if (permission === Push.Permission.DEFAULT) {
-                this.setState({ pushPermission: Push.Permission.DEFAULT });
-            }
-        },
-        checkForUpdates: async () => {
-            try {
-                const res = await api.getState();
-                const { checkForUpdates } = res.body;
-
-                if (checkForUpdates) {
-                    const res = await api.getLatestVersion();
-                    const { time, version } = res.body;
-
-                    this._isMounted && this.setState({
-                        latestVersion: version,
-                        latestTime: time
-                    });
-                }
-            } catch (res) {
-                // Ignore error
-            }
-        },
         fetchCommands: async () => {
             try {
                 const res = await api.commands.fetch({ paging: false });
@@ -293,12 +262,12 @@ class Header extends PureComponent {
     render() {
         const { updateAvailable } = this.state;
         return (
-            <div className={ styles.navBar }>
-                <div className={ styles.primary }>
-                    <NavLogo updateAvailable={ updateAvailable } onClick={ () => this.toggleUpdateToast() }/>
+            <div className={styles.navBar}>
+                <div className={styles.primary}>
+                    <NavLogo updateAvailable={updateAvailable} onClick={() => this.toggleUpdateToast()}/>
                     <NavbarConnection
-                        state={ this.state }
-                        actions={ this.actions }
+                        state={this.state}
+                        actions={this.actions}
                         widgetId="connection"
                     />
                 </div>
