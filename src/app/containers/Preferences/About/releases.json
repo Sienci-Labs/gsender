@@ -1,1 +1,1 @@
-["### 1.1.6 (October 24th)","- Fix for XYZ probe profile when $13 enabled","- Fix for machine position overflowing bounds","- Fix for jog keybinds no longer cancelling on release"]
+["### 1.1.7 (October 26th, 2022)","- Fix for XYZ probe profile when $13 enabled","- Fix for machine position overflowing bounds","- Fix for some keybinds no longer recognizing when they were released"]
