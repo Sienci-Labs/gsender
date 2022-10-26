@@ -48,6 +48,7 @@ import {
 } from '../../widgets/Visualizer/constants';
 import StatsPage from './Stats';
 import SafetySettings from './Safety';
+import generateSupportFile from '../../lib/diagnostics';
 
 
 class PreferencesPage extends PureComponent {
@@ -862,6 +863,7 @@ class PreferencesPage extends PureComponent {
 
         return (
             <Modal onClose={modalClose}>
+                { generateSupportFile() }
                 <div className={styles.preferencesContainer}>
                     <div className={styles.preferencesContent}>
                         <div className={styles.preferencesMenu}>

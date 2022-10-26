@@ -150,6 +150,7 @@
   "dependencies": {
     "@babel/polyfill": "~7.4.3",
     "@babel/runtime": "~7.4.3",
+    "@david.kucsai/react-pdf-table": "^0.4.1",
     "@electron/remote": "^2.0.8",
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
@@ -162,6 +163,7 @@
     "@mui/material": "^5.9.2",
     "@mui/styled-engine-sc": "^5.8.0",
     "@octokit/core": "^3.6.0",
+    "@react-pdf/renderer": "^3.0.0",
     "@sentry/webpack-plugin": "^1.14.2",
     "@trendmicro/react-anchor": "~0.5.6",
     "@trendmicro/react-breadcrumbs": "~0.5.5",

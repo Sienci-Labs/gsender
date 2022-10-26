@@ -42,6 +42,7 @@ import { RED, ALARM_RED } from './variables';
 
 import History from './History';
 import styles from './index.styl';
+import { addError, addAlarm } from '../../lib/diagnostics';
 
 const LINES_TO_COPY = 50;
 class TerminalWrapper extends PureComponent {
@@ -226,8 +227,10 @@ class TerminalWrapper extends PureComponent {
         this.term.write('\r');
         if (data.includes('error:')) {
             this.term.write(color.xterm(RED)(data));
+            addError(data);
         } else if (data.includes('ALARM:')) {
             this.term.write(color.xterm(ALARM_RED)(data));
+            addAlarm(data);
         } else {
             this.term.write(data);
         }
