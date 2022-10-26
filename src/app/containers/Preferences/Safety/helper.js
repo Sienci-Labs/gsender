@@ -22,7 +22,7 @@ const getAllErrors = () => {
                         .split('\n');
                     let tempContent = [];
                     content.forEach(record => {
-                        if (record.includes('error') || record.includes('alarm')) {
+                        if (record.toLowerCase().includes('error') || record.toLowerCase().includes('alarm')) {
                             tempContent.push(record);
                         }
                     });

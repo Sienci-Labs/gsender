@@ -561,21 +561,38 @@
   .errorBody{
     margin-top: 1rem;
     padding: 1rem;
-    background-color: white;
-    height: 95%;
+    background-color: #1f2937;
     min-height: 387px;
     height: 387px !important;
     overflow-y: auto;
-        &::-webkit-scrollbar {
+
+    .verticalTimeline{
+      height: auto !important;
+      h5{
+        font-weight: 800;
+      }
+      }
+
+      .noErrors{
+        width: 100%;
+        height: 30rem !important;
+        margin: auto;
+        color: white;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 30rem;
+      }
+
+    &::-webkit-scrollbar {
     width: 7px;
     }
     &::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px #13283c; 
+    -webkit-box-shadow: inset 0 0 7px #ffffff; 
     border-radius: 10px;
     }
     &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+    -webkit-box-shadow: inset 0 0 6px #1f2937; 
     }
     }
   }

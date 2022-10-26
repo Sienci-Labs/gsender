@@ -413,7 +413,7 @@ export function* initialize() {
 
     controller.addListener('error', (error) => {
         try {
-            if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
+            if (!isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
                 window.ipcRenderer.send('logError:electron', error);
             } else {
                 console.log(error.message);

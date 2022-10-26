@@ -710,6 +710,8 @@ class GrblController {
                 // Initialize controller
                 this.initController();
             }
+            const testAlarm = 'ALARM: Probe fail';
+            this.runner.parse(testAlarm);
         });
 
         this.runner.on('others', (res) => {
