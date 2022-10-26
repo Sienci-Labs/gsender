@@ -103,8 +103,6 @@ const generateSupportFile = () => {
     const mode = getMode();
     const connection = getConnection();
 
-    console.log(history);
-
     let eepromData = [];
     Object.entries(eeprom).forEach(entry => {
         const [key, value] = entry;
