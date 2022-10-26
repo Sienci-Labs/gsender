@@ -68,6 +68,11 @@ const defaultState = {
         reverseWidgets: false,
         safeRetractHeight: 0,
         toolChangeOption: 'Ignore',
+        toolChangePosition: {
+            x: 0,
+            y: 0,
+            z: 0
+        },
         toolChangeHooks: {
             preHook: '',
             postHook: ''
@@ -327,20 +332,6 @@ const defaultState = {
             startPosition: START_POSITION_BACK_LEFT,
             spindle: M3,
             cutDirectionFlipped: false,
-            // defaultImperialState: {
-            //     bitDiameter: 1,
-            //     stepover: 40,
-            //     feedrate: 98.43,
-            //     length: 0,
-            //     width: 0,
-            //     skimDepth: 0.04,
-            //     maxDepth: 0.04,
-            //     spindleRPM: 669,
-            //     type: SPIRAL_MOVEMENT,
-            //     startPosition: START_POSITION_BACK_LEFT,
-            //     spindle: M3,
-            //     startFromCenter: false,
-            // },
         },
         visualizer: {
             minimized: false,

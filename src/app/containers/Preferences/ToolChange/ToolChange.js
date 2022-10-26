@@ -3,6 +3,7 @@ import Select from 'react-select';
 import map from 'lodash/map';
 import store from 'app/store';
 import controller from 'app/lib/controller';
+import Input from '../components/Input';
 
 
 import Fieldset from '../components/Fieldset';
@@ -38,8 +39,13 @@ export const TOOLCHANGE_OPTIONS = {
 const ToolChange = () => {
     // State
     const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
+    const [toolChangePosition, setToolChangePosition] = useState(store.get('workspace.toolChangePosition'));
     // Handlers
     const handleToolChange = (selection) => setToolChangeOption(selection.value);
+
+    const handlePositionChange = (axis, value) => {
+        store.set(`workspace.toolChangePosition.${axis}`, value);
+    }
 
     useEffect(() => {
         store.set('workspace.toolChangeOption', toolChangeOption);
@@ -67,6 +73,30 @@ const ToolChange = () => {
                     value={{ label: toolChangeOption }}
                 />
             </div>
+            {
+                toolChangeOption === 'Automatic' && (
+                    <div>
+                        <Input
+                            label="Tool Length Sensor X position"
+                            units=""
+                            value=""
+                            onChange={(e) => true}
+                        />
+                        <Input
+                            label="Tool Length Sensor Y position"
+                            units=""
+                            value=""
+                            onChange={(e) => true}
+                        />
+                        <Input
+                            label="Tool Length Sensor Z position"
+                            units=""
+                            value=""
+                            onChange={(e) => true}
+                        />
+                    </div>
+                )
+            }
         </Fieldset>
     );
 };
