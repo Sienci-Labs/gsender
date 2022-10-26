@@ -61,11 +61,6 @@ const getOS = () => {
     return os;
 };
 
-const getTerminalHistory = () => {
-    const history = store.get('workspace.terminal.inputHistory', []);
-    return history;
-};
-
 const getGCodeFile = () => {
     const gcode = get(reduxStore.getState(), 'file.content', '');
     return gcode;
@@ -103,10 +98,12 @@ const generateSupportFile = () => {
     const version = getGSenderVersion();
     const grblInfo = getGRBLInformation();
     const os = getOS();
-    const history = getTerminalHistory();
+    const history = grblInfo.terminalHistory;
     const gcode = getGCodeFile();
     const mode = getMode();
     const connection = getConnection();
+
+    console.log(history);
 
     let eepromData = [];
     Object.entries(eeprom).forEach(entry => {

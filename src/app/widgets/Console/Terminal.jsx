@@ -26,11 +26,13 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
+import reduxStore from 'app/store/redux';
+import get from 'lodash/get';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { debounce } from 'lodash';
 
-import store from 'app/store';
+//import store from 'app/store';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import controller from 'app/lib/controller';
 import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
@@ -43,6 +45,7 @@ import { RED, ALARM_RED } from './variables';
 import History from './History';
 import styles from './index.styl';
 import { addError, addAlarm } from '../../lib/diagnostics';
+import { UPDATE_TERMINAL_HISTORY } from '../../actions/controllerActions';
 
 const LINES_TO_COPY = 50;
 class TerminalWrapper extends PureComponent {
@@ -66,8 +69,8 @@ class TerminalWrapper extends PureComponent {
     };
 
     state = {
-        terminalInputHistory: store.get('workspace.terminal.inputHistory', []),
-        terminalInputIndex: store.get('workspace.terminal.inputHistory')?.length
+        terminalInputHistory: get(reduxStore.getState(), 'controller.terminalHistory', []),
+        terminalInputIndex: get(reduxStore.getState(), 'controller.terminalHistory')?.length
     }
 
     prompt = ' ';
@@ -246,6 +249,10 @@ class TerminalWrapper extends PureComponent {
 
         controller.writeln(command);
 
+        this.inputRef.current.value = '';
+    }
+
+    updateTerminalHistory = (line) => {
         const { terminalInputHistory = [] } = this.state;
 
         const newTerminalInputHistory = [...terminalInputHistory];
@@ -254,11 +261,12 @@ class TerminalWrapper extends PureComponent {
             newTerminalInputHistory.shift();
         }
 
-        store.replace('workspace.terminal.inputHistory', [...newTerminalInputHistory, command]);
+        reduxStore.dispatch({
+            type: UPDATE_TERMINAL_HISTORY,
+            payload: [...newTerminalInputHistory, line]
+        });
 
-        this.setState({ terminalInputHistory: [...newTerminalInputHistory, command], terminalInputIndex: newTerminalInputHistory.length + 1 });
-
-        this.inputRef.current.value = '';
+        this.setState({ terminalInputHistory: [...newTerminalInputHistory, line], terminalInputIndex: newTerminalInputHistory.length + 1 });
     }
 
     handleCopyLines = async () => {
