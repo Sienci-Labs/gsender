@@ -22,7 +22,9 @@ const ErrorLog = () => {
     return (
         <div className={styles.errorWrapper}>
             <div className={styles.errorHeading}>
-                Recent errors and alarms
+                { logs[0] !== 'Nothing to display' ? `Errors and Alarms (${logs.length})`
+                    : 'Errors and Alarms (0)'
+                }
             </div>
             <div className={styles.errorBody}>
                 { logs[0] !== 'Nothing to display'
@@ -33,33 +35,39 @@ const ErrorLog = () => {
                                     return log.toLowerCase().includes('alarm')
                                         ? (
                                             <VerticalTimelineElement
-                                                className="vertical-timeline-element--work"
+                                                className={`vertical-timeline-element--work ${styles.marginUpdate}`}
                                                 contentStyle={{ height: 'auto', borderTop: `5px solid ${colorCodes.ALARM}` }}
-                                                contentArrowStyle={{ top: '50%' }}
-                                                date="Oct 20 2022"
-                                                iconStyle={{ top: '41%', background: colorCodes.ALARM, color: '#fff' }}
+                                                contentArrowStyle={{ top: '42%' }}
+                                                iconStyle={{ top: '31%', background: colorCodes.ALARM, color: '#fff' }}
+                                                dateClassName={styles.inbuiltDate}
                                                 icon={<BsAlarm />}
                                                 key={index}
                                             >
-                                                <h5 className="vertical-timeline-element-title">Alarm</h5>
-                                                <p>
-                                                    Reason: {log}
+                                                <span className={styles.errorTag}>Alarm</span>
+                                                <span className={styles.errorDate}>
+                                                    Occured on {log.split('[error] GRBL_ALARM:')[0].slice(1, 20).replace(' ', ' at ') || ''}
+                                                </span>
+                                                <p className={styles.errorReason}>
+                                                    Reason: {log.split('[error] GRBL_ALARM:')[1]}
                                                 </p>
                                             </VerticalTimelineElement>
                                         )
                                         : (
                                             <VerticalTimelineElement
-                                                className="vertical-timeline-element--work"
+                                                className={`vertical-timeline-element--work ${styles.marginUpdate}`}
                                                 contentStyle={{ height: 'auto', borderTop: `5px solid ${colorCodes.ERROR}` }}
-                                                contentArrowStyle={{ top: '50%' }}
-                                                date="Oct 22 2022"
-                                                iconStyle={{ top: '41%', background: colorCodes.ERROR, color: '#fff' }}
+                                                contentArrowStyle={{ top: '42%' }}
+                                                iconStyle={{ top: '31%', background: colorCodes.ERROR, color: '#fff' }}
+                                                dateClassName={styles.inbuiltDate}
                                                 icon={<VscError />}
                                                 key={index}
                                             >
-                                                <h5 className="vertical-timeline-element-subtitle">Error</h5>
-                                                <p>
-                                                    Reason: {log}
+                                                <span className={styles.errorTag}>Error</span>
+                                                <span className={styles.errorDate}>
+                                                    Occured on {log.split('[error] GRBL_ERROR:')[0].slice(1, 20).replace(' ', ' at ') || ''}
+                                                </span>
+                                                <p className={styles.errorReason}>
+                                                    Reason: {log.split('[error] GRBL_ERROR:')[1]}
                                                 </p>
                                             </VerticalTimelineElement>
                                         );

@@ -26,7 +26,10 @@ const getAllErrors = () => {
                             tempContent.push(record);
                         }
                     });
-                    content = tempContent;
+                    if (tempContent.length > 50) {
+                        tempContent = tempContent.slice(0, 50);
+                    }
+                    content = tempContent.reverse();
                 }
             }
         } catch (error) {

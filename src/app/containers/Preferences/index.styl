@@ -561,26 +561,51 @@
   .errorBody{
     margin-top: 1rem;
     padding: 1rem;
-    background-color: #1f2937;
+    background-color: #e5e7eb;
     min-height: 387px;
     height: 387px !important;
     overflow-y: auto;
 
     .verticalTimeline{
       height: auto !important;
+      padding: 0;
+      &::before{
+      min-height: 24rem;  
+      }
       h5{
         font-weight: 800;
       }
+      .errorTag{
+        font-weight: 800;
+        font-size: 1.2rem;
       }
+      .errorReason{
+        
+      }
+      .errorDate{
+        float: right;
+        font-size: 0.88rem;
+        color: #898686;
+      }
+      .inbuiltDate{
+        display: none !important;
+      }
+      .marginUpdate{
+        margin: 1rem 0 !important;
+        p{
+          margin: .6em 0 0;
+        }
+      }
+    }
 
       .noErrors{
         width: 100%;
-        height: 30rem !important;
+        height: 25rem !important;
         margin: auto;
-        color: white;
+        color: black;
         text-align: center;
         vertical-align: middle;
-        line-height: 30rem;
+        line-height: 25rem;
       }
 
     &::-webkit-scrollbar {
@@ -596,7 +621,6 @@
     }
     }
   }
-
 
 .stats-container {
   display: flex;
@@ -632,4 +656,3 @@
 .bold {
   font-weight: bold;
 }
-
