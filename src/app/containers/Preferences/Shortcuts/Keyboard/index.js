@@ -32,8 +32,8 @@ import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
-import Table from './MainTable';
-import EditArea from './EditArea';
+import Table from '../MainTable';
+import EditArea from '../EditArea';
 
 import styles from './index.styl';
 
