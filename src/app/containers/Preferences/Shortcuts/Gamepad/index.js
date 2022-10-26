@@ -4,14 +4,14 @@ import store from 'app/store';
 import { Toaster, TOASTER_SUCCESS, TOASTER_SHORT } from 'app/lib/toaster/ToasterLib';
 import Button from 'app/components/FunctionButton/FunctionButton';
 
-import styles from './index.styl';
+import styles from '../index.styl';
 
-import { Profile } from './Profile';
-import ProfileList from './ProfileList';
-import AddActionModal from './AddActionModal';
-import AddProfileModal from './AddProfileModal';
+import { Profile } from '../Profile';
+import ProfileList from '../ProfileList';
+import AddActionModal from '../AddActionModal';
+import AddProfileModal from '../AddProfileModal';
 
-const Joystick = () => {
+const Gamepad = () => {
     const [profiles, setProfiles] = useState(store.get('workspace.gamepad.profiles'));
     const [currentProfile, setCurrentProfile] = useState(null);
     const [showAddAction, setShowAddAction] = useState(false);
@@ -109,4 +109,4 @@ const Joystick = () => {
     );
 };
 
-export default Joystick;
+export default Gamepad;
