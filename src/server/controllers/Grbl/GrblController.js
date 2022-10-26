@@ -1159,8 +1159,9 @@ class GrblController {
     }
 
     consumeFeederCB() {
-        if (this.feederCB) {
+        if (this.feederCB && typeof this.feederCB === 'function') {
             this.feederCB();
+            this.feederCB = null;
         }
     }
 

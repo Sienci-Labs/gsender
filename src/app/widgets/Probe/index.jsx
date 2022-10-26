@@ -504,8 +504,8 @@ class ProbeWidget extends PureComponent {
 
     generateMultiAxisCommands(axes, xyThickness, zThickness, params) {
         let code = [];
-        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units, modal } = params;
-        const unitModal = `G${modal}`;
+        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
+        //const unitModal = `G${modal}`;
         const workspace = this.mapWCSToPValue(wcs);
         const XYRetract = -retractDistance;
         let XYProbeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC.X : this.PROBE_DISTANCE_IMPERIAL.X;
@@ -521,10 +521,6 @@ class ProbeWidget extends PureComponent {
         const zPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
         let xyMovement = toolDiameter + 20; // 20mm + width of the tool
         const xyPositionAdjust = (units === METRIC_UNITS) ? xyMovement : mm2in(xyMovement).toFixed(3);
-
-        // save initial position
-        code = code.concat(gcode('%X0=mposx,Y0=mposy,Z0=mposz'));
-
         // Add Z Probe code if we're doing 3 axis probing
         if (axes.z) {
             code = code.concat([
@@ -546,7 +542,7 @@ class ProbeWidget extends PureComponent {
                     P: workspace,
                     Z: zThickness
                 }),
-                gcode(`${unitModal} G91`),
+                gcode('G91'),
                 gcode('G0', {
                     Z: retractDistance
                 }),
@@ -598,7 +594,6 @@ class ProbeWidget extends PureComponent {
                 P: workspace,
                 X: toolCompensatedThickness
             }),
-            gcode(`${unitModal} G91`),
             // Move for Y Touch - toward front + to right
             gcode('G0', {
                 X: -(2 * retractDistance)
@@ -624,21 +619,25 @@ class ProbeWidget extends PureComponent {
             gcode('G4', {
                 P: this.DWELL_TIME
             }),
+            gcode('G91'),
             gcode('G10', {
                 L: 20,
                 P: workspace,
                 Y: toolCompensatedThickness
             }),
-            gcode(`${unitModal} G91`),
             gcode('G0', {
                 Y: XYRetract
             }),
         ]);
 
-        // return to original position
+        // Go up on Z if X or Y
         code = code.concat([
-            gcode('G90 G53 G0 Z[Z0]'),
-            gcode('G90 G53 G0 X[X0] Y[Y0]')
+            this.gcode('G0', {
+                Z: ((retractDistance * 3) + zThickness)
+            }),
+            this.gcode('G0', {
+                Y: -1 * ((XYRetract * 3) - xyThickness)
+            })
         ]);
 
         // Make sure we're in the correct mode at end of probe
