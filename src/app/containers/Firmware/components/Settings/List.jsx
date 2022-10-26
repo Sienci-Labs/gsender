@@ -30,13 +30,13 @@ const SettingsList = () => {
                     <Tooltip content="When using the Setting number in the console, make sure to include the $ symbol in front. Ex: $120">
                         <i className="fas fa-info-circle" style={{ paddingLeft: '5px' }} />
                     </Tooltip>
-                    <text style={{ paddingLeft: '25px', paddingRight: '5px' }}>Setting</text>
+                    <span style={{ paddingLeft: '25px', paddingRight: '5px' }}>Setting</span>
                 </div>
                 <div className={styles.tableColumn}>
-                    <text>Description</text>
+                    <span>Description</span>
                 </div>
                 <div className={styles.tableColumn}>
-                    <text>Value</text>
+                    <span>Value</span>
                 </div>
             </div>
             {

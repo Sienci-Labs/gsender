@@ -486,26 +486,18 @@ class AxesWidget extends PureComponent {
             }
         },
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
-            const { state } = this.props;
-            const activeState = get(state, 'status.activeState');
-            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
-                if (event) {
-                    preventDefault(event);
-                }
-
-                this.handleShortcutJog({ axis, direction });
+            if (event) {
+                preventDefault(event);
             }
+
+            this.handleShortcutJog({ axis, direction });
         },
         STOP_JOG: (event, payload) => {
-            const { state } = this.props;
-            const activeState = get(state, 'status.activeState');
-            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
-                if (event) {
-                    preventDefault(event);
-                }
-
-                this.handleShortcutStop(payload);
+            if (event) {
+                preventDefault(event);
             }
+
+            this.handleShortcutStop(payload);
         },
         SET_JOG_PRESET: (event, { key }) => {
             const { state } = this.props;
@@ -519,18 +511,14 @@ class AxesWidget extends PureComponent {
             }
         },
         CYCLE_JOG_PRESETS: () => {
-            const { state } = this.props;
-            const activeState = get(state, 'status.activeState');
-            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
-                const { selectedSpeed } = this.state;
+            const { selectedSpeed } = this.state;
 
-                const presets = [SPEED_RAPID, SPEED_NORMAL, SPEED_PRECISE];
-                const nextIndex = presets.findIndex(preset => preset === selectedSpeed) + 1;
-                const key = presets[nextIndex] ? presets[nextIndex] : presets[0];
+            const presets = [SPEED_RAPID, SPEED_NORMAL, SPEED_PRECISE];
+            const nextIndex = presets.findIndex(preset => preset === selectedSpeed) + 1;
+            const key = presets[nextIndex] ? presets[nextIndex] : presets[0];
 
-                this.actions.setSelectedSpeed(key);
-                this.actions.setJogFromPreset(key);
-            }
+            this.actions.setSelectedSpeed(key);
+            this.actions.setJogFromPreset(key);
         },
         JOG_SPEED: (_, { speed }) => {
             const getStep = ({ value, increment = false }) => {

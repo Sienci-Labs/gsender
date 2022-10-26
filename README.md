@@ -99,6 +99,11 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+### 1.1.7 (October 26th, 2022)
+- Fix for XYZ probe profile when $13 enabled
+- Fix for machine position overflowing bounds
+- Fix for some keybinds no longer recognizing when they were released
+
 ### 1.1.6 (October 19th, 2022)
 - Improved surfacing tool - pattern now ramps in to support more surfacing bit types, cut direction is reversible, able to start from center, can copy gcode to clipboard for saving.
 - Major improvements to visualizer memory usage and parsing speed

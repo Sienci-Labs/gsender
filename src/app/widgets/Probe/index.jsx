@@ -407,6 +407,7 @@ class ProbeWidget extends PureComponent {
         return [
             this.gcode('; Initial Probe setup'),
             this.gcode('; Set initial zero for specified axes'),
+            this.gcode('%UNITS=modal.units'),
             this.gcode('G10', {
                 L: 20,
                 P: this.mapWCSToPValue(wcs),
@@ -419,23 +420,18 @@ class ProbeWidget extends PureComponent {
     }
 
     generateSingleAxisCommands(axis, thickness, params) {
-        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
+        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units, modal } = params;
         const workspace = this.mapWCSToPValue(wcs);
         let probeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC[axis] : this.PROBE_DISTANCE_IMPERIAL[axis];
         probeDistance = (isSafe) ? -probeDistance : probeDistance;
         probeDistance = (axis === 'Z') ? (-1 * Math.abs(probeDistance)) : probeDistance;
         retractDistance = (axis === 'Z') ? retractDistance : retractDistance * -1;
 
-        let prependUnits = '';
-        if (this.props.$13 === '1') {
-            prependUnits = 'G20';
-        }
+        const unitModal = `G${modal}`;
 
         let code;
         code = [
             this.gcode(`; ${axis}-Probe`),
-            // save initial position
-            this.gcode('%X0=mposx,Y0=mposy,Z0=mposz'),
             // Fast probe for initial touch
             this.gcode(probeCommand, {
                 [axis]: probeDistance,
@@ -461,7 +457,7 @@ class ProbeWidget extends PureComponent {
         if (axis === 'Z') {
             code = code.concat([
                 // Absolute, set Zero for this axis
-                this.gcode(`${prependUnits} G10`, {
+                this.gcode('G10', {
                     L: 20,
                     P: workspace,
                     [axis]: thickness
@@ -470,11 +466,11 @@ class ProbeWidget extends PureComponent {
         } else {
             const toolDiameter = this.state.toolDiameter;
             const toolRadius = (toolDiameter / 2);
-            const toolCompensatedThickness = ((-1 * toolRadius) - thickness);
+            const toolCompensatedThickness = ((-1 * toolRadius) - thickness).toFixed(3);
             code = code.concat([
                 this.gcode('G91'),
                 // Absolute, set Zero for this axis
-                this.gcode(`${prependUnits} G10`, {
+                this.gcode('G10', {
                     L: 20,
                     P: workspace,
                     [axis]: toolCompensatedThickness
@@ -484,7 +480,7 @@ class ProbeWidget extends PureComponent {
 
         // Final retraction
         code = code.concat([
-            this.gcode('G91'),
+            this.gcode(`G91 ${unitModal}`),
             this.gcode('G0', {
                 [axis]: (retractDistance)
             })
@@ -502,7 +498,7 @@ class ProbeWidget extends PureComponent {
         }
 
         code = code.concat([
-            this.gcode('G90')
+            this.gcode(`${unitModal} G90`)
         ]);
         return code;
     }
@@ -510,6 +506,7 @@ class ProbeWidget extends PureComponent {
     generateMultiAxisCommands(axes, xyThickness, zThickness, params) {
         let code = [];
         let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
+        //const unitModal = `G${modal}`;
         const workspace = this.mapWCSToPValue(wcs);
         const XYRetract = -retractDistance;
         let XYProbeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC.X : this.PROBE_DISTANCE_IMPERIAL.X;
@@ -525,15 +522,6 @@ class ProbeWidget extends PureComponent {
         const zPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
         let xyMovement = toolDiameter + 20; // 20mm + width of the tool
         const xyPositionAdjust = (units === METRIC_UNITS) ? xyMovement : mm2in(xyMovement).toFixed(3);
-
-        let prependUnits = '';
-        if (this.props.$13 === '1') {
-            prependUnits = 'G20';
-        }
-
-        // save initial position
-        code = code.concat(gcode('%X0=mposx,Y0=mposy,Z0=mposz'));
-
         // Add Z Probe code if we're doing 3 axis probing
         if (axes.z) {
             code = code.concat([
@@ -550,7 +538,7 @@ class ProbeWidget extends PureComponent {
                     Z: ZProbeDistance,
                     F: normalFeedrate
                 }),
-                gcode(`${prependUnits} G10`, {
+                gcode('G10', {
                     L: 20,
                     P: workspace,
                     Z: zThickness
@@ -602,7 +590,7 @@ class ProbeWidget extends PureComponent {
                 P: this.DWELL_TIME
             }),
             gcode('G91'),
-            gcode(`${prependUnits} G10`, {
+            gcode('G10', {
                 L: 20,
                 P: workspace,
                 X: toolCompensatedThickness
@@ -633,7 +621,7 @@ class ProbeWidget extends PureComponent {
                 P: this.DWELL_TIME
             }),
             gcode('G91'),
-            gcode(`${prependUnits} G10`, {
+            gcode('G10', {
                 L: 20,
                 P: workspace,
                 Y: toolCompensatedThickness
@@ -643,15 +631,19 @@ class ProbeWidget extends PureComponent {
             }),
         ]);
 
-        // return to original position
+        // Go up on Z if X or Y
         code = code.concat([
-            gcode('G90 G53 G0 Z[Z0]'),
-            gcode('G90 G53 G0 X[X0] Y[Y0]')
+            this.gcode('G0', {
+                Z: ((retractDistance * 3) + zThickness)
+            }),
+            this.gcode('G0', {
+                Y: -1 * ((XYRetract * 3) - xyThickness)
+            })
         ]);
 
         // Make sure we're in the correct mode at end of probe
         code = code.concat([
-            this.gcode('G90')
+            this.gcode('G90 [UNITS]')
         ]);
         return code;
     }

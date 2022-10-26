@@ -372,6 +372,7 @@ class CNCEngine {
             });
 
             socket.on('flash:start', (flashPort, imageType) => {
+                log.debug('flash-start called');
                 if (!flashPort) {
                     log.error('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
                     return;

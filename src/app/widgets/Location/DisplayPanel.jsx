@@ -149,10 +149,12 @@ class DisplayPanel extends PureComponent {
 
     renderAxis = (axis) => {
         const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units, homingEnabled } = this.props;
-        const mpos = machinePosition[axis] || '0.000';
+        let mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';
         const axisLabel = axis.toUpperCase();
         const showPositionInput = canClick && this.state.positionInput[axis];
+
+        //mpos = Number(mpos).toFixed(3);
 
         //Function to zero out given axis
         const handleAxisButtonClick = () => {
@@ -170,40 +172,6 @@ class DisplayPanel extends PureComponent {
             controller.command('gcode', `G10 L20 P${p} ${axisLabel}0`);
         };
 
-        /*const gotoHandler = () => {
-            const commands = [];
-            const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-            if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
-                if (homingEnabled) {
-                    commands.push(`G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`);
-                } else {
-                    commands.push('G91');
-                    commands.push(`G0 Z${safeRetractHeight}`); // Retract Z when moving across workspace
-                }
-            }
-            commands.push(`G90 G0 ${axisLabel}0`); //Move to Work Position Zero
-            // We go down if homing not enabled
-            if (safeRetractHeight !== 0 && axisLabel !== 'Z' && !homingEnabled) {
-                commands.push(`G91 G0 Z${safeRetractHeight * -1}`);
-                commands.push('G90');
-            }
-            controller.command('gcode:safe', commands, modal);
-        };
-
-        const droHandler = (value) => actions.handleManualMovement(value, axis);
-
-        return (
-            <DRO
-                label={axisLabel}
-                zeroHandler={handleAxisButtonClick}
-                mpos={mpos}
-                wpos={wpos}
-                gotoHandler={gotoHandler}
-                droHandler={droHandler}
-                canClick={canClick}
-            />
-        );*/
-
         return (
             <tr>
                 <td className={styles.coordinate}>
@@ -215,10 +183,11 @@ class DisplayPanel extends PureComponent {
                             if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
                                 if (homingEnabled) {
                                     // get current Z
-                                    const currentZ = machinePosition.z;
+                                    const currentZ = Number(machinePosition['z']);
+                                    const retractHeight = (Math.abs(safeRetractHeight) * -1);
                                     // only move Z if it is less than Z0-SafeHeight
-                                    if (currentZ < -safeRetractHeight) {
-                                        commands.push(`G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`);
+                                    if (currentZ < retractHeight) {
+                                        commands.push(`G53 G0 Z${retractHeight}`);
                                     }
                                 } else {
                                     commands.push('G91');
@@ -416,7 +385,7 @@ export default connect((store) => {
     const workflowState = get(store, 'controller.workflow.state');
     const activeState = get(store, 'controller.state.status.activeState');
     const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
-    const machinePosition = get(store, 'controller.mpos');
+    const mpos = get(store, 'controller.mpos');
     return {
         homingEnabled,
         canHome,
@@ -424,6 +393,6 @@ export default connect((store) => {
         homingFlag,
         homingRun,
         pullOff,
-        machinePosition
+        mpos
     };
 })(DisplayPanel);
