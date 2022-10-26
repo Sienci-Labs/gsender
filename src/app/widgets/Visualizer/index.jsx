@@ -848,21 +848,23 @@ class VisualizerWidget extends PureComponent {
 
     shuttleControlEvents = {
         LOAD_FILE: () => {
-            const { activeState } = this.props;
-            if (this.workflowControl && activeState === GRBL_ACTIVE_STATE_IDLE) {
-                this.workflowControl.handleClickUpload();
+            const { activeState, isConnected } = this.props;
+            if (isConnected && activeState !== GRBL_ACTIVE_STATE_IDLE) {
+                return;
             }
+            this.workflowControl.handleClickUpload();
         },
         UNLOAD_FILE: () => {
-            const { activeState } = this.props;
-            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
-                this.actions.closeModal();
-                this.actions.unloadGCode();
-                this.actions.reset();
+            const { activeState, isConnected } = this.props;
+            if (isConnected && activeState !== GRBL_ACTIVE_STATE_IDLE) {
+                return;
             }
+            this.actions.closeModal();
+            this.actions.unloadGCode();
+            this.actions.reset();
         },
         TEST_RUN: () => {
-            if (this.workflowControl.canRun()) {
+            if (this.workflowControl && this.workflowControl.canRun()) {
                 const gcode = this.state.gcode.content;
                 const lines = gcode.split('\n');
                 const testLines = ['$C', ...lines, '$C'];
@@ -876,14 +878,10 @@ class VisualizerWidget extends PureComponent {
             }
         },
         PAUSE_JOB: () => {
-            const { activeState } = this.props;
-            if (activeState === GRBL_ACTIVE_STATE_RUN) {
-                this.actions.handlePause();
-            }
+            this.actions.handlePause();
         },
         STOP_JOB: () => {
-            const { activeState } = this.props;
-            if (this.workflowControl && (activeState === GRBL_ACTIVE_STATE_RUN || activeState === GRBL_ACTIVE_STATE_HOLD)) {
+            if (this.workflowControl) {
                 this.workflowControl.handleOnStop();
             }
         },

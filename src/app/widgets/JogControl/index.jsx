@@ -500,12 +500,12 @@ class AxesWidget extends PureComponent {
             this.handleShortcutStop(payload);
         },
         SET_JOG_PRESET: (event, { key }) => {
+            if (!key) {
+                return;
+            }
             const { state } = this.props;
             const activeState = get(state, 'status.activeState');
             if (activeState === GRBL_ACTIVE_STATE_IDLE) {
-                if (!key) {
-                    return;
-                }
                 this.actions.setSelectedSpeed(key);
                 this.actions.setJogFromPreset(key);
             }
