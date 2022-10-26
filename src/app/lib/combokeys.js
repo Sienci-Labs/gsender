@@ -162,24 +162,6 @@ class Combokeys extends events.EventEmitter {
                 });
             }
         });
-        /*
-        if (!commandKeys.find(command => command.category === MACRO_CATEGORY)) {
-            for (let i = lastID; i < macros.length + lastID; i++) {
-                const currentMacroIndex = i - lastID;
-                const currentMacro = macros[currentMacroIndex];
-
-                newCommandKeysList.push({
-                    id: currentMacro.id,
-                    keys: '',
-                    title: currentMacro.name,
-                    cmd: MACRO,
-                    payload: { macroID: currentMacro.id },
-                    preventDefault: false,
-                    isActive: false,
-                    category: MACRO_CATEGORY
-                });
-            }
-        }*/
 
         store.set('commandKeys', newCommandKeysList);
 
