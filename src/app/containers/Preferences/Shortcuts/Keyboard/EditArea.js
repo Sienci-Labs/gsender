@@ -26,8 +26,8 @@ import PropTypes from 'prop-types';
 
 import { Button, ButtonGroup } from 'app/components/Buttons';
 
-import { formatShortcut } from './helpers';
-import styles from './edit-area.styl';
+import { formatShortcut } from '../helpers';
+import styles from '../edit-area.styl';
 
 const triggerKeys = ['Meta', 'Alt', 'Shift', 'Control'];
 
@@ -38,6 +38,7 @@ const triggerKeys = ['Meta', 'Alt', 'Shift', 'Control'];
  * @param {Function} switchPages Function to switch pages within parent Keybindings component
  * @param {Function} edit Function to edit currently selected shortcut
  */
+
 export default class EditArea extends Component {
     static propTypes = {
         shortcut: PropTypes.object,

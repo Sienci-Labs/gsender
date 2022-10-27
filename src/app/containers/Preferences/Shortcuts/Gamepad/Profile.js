@@ -4,15 +4,15 @@ import store from 'app/store';
 import PropTypes from 'prop-types';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
-import styles from './index.styl';
-import ProfileItem from './ProfileItem';
-import MainTable from './MainTable';
-import ProfileShortcutModal from './ProfileShortcutModal';
+import styles from '../index.styl';
+import ProfileItem from '../ProfileItem';
+import MainTable from '../MainTable';
+import ProfileShortcutModal from '../ProfileShortcutModal';
 
-const Profile = ({ currentProfile, onUpdateProfiles }) => {
+const Profile = ({ data, onUpdateProfiles }) => {
     Profile.propTypes = { currentProfile: PropTypes.object, onUpdateProfiles: PropTypes.func };
 
-    const { profileName, icon, shortcuts } = currentProfile;
+    const { profileName, icon, shortcuts } = data;
 
     const [currentShortcut, setCurrentShortcut] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -27,7 +27,7 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (currentProfile.id === profile.id ? ({ ...profile, profileName: name }) : currentProfile));
+            profiles.map(profile => (data.id === profile.id ? ({ ...profile, profileName: name }) : data));
 
         onUpdateProfiles(updatedProfiles);
 
@@ -44,7 +44,7 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (currentProfile.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : currentProfile));
+            profiles.map(profile => (data.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : data));
 
         onUpdateProfiles(updatedProfiles);
 
@@ -61,7 +61,7 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (currentProfile.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : currentProfile));
+            profiles.map(profile => (data.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : data));
 
         onUpdateProfiles(updatedProfiles);
     };
@@ -94,7 +94,7 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
 
             {showModal && (
                 <ProfileShortcutModal
-                    profile={currentProfile}
+                    profile={data}
                     shortcut={currentShortcut}
                     onClose={() => setShowModal(false)}
                     onUpdateProfiles={onUpdateProfiles}

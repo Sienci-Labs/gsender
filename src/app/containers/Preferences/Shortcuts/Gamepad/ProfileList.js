@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from 'app/components/FunctionButton/FunctionButton';
 
-import styles from './index.styl';
+import styles from '../index.styl';
 
 import { ProfileItem } from './Profile';
 
