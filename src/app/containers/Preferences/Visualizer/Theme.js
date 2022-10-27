@@ -6,8 +6,7 @@ import { useSelector } from 'react-redux';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import { DARK_THEME, LIGHT_THEME, CUST_DARK_THEME, CUST_LIGHT_THEME,
     BACKGROUND_PART, GRID_PART, XAXIS_PART, YAXIS_PART, ZAXIS_PART,
-    LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART, G2_PART, G3_PART }
-    from 'app/widgets/Visualizer/constants';
+    LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART, G2_PART, G3_PART } from 'app/widgets/Visualizer/constants';
 import Fieldset from '../components/Fieldset';
 import ColorPicker from '../components/ColorPicker';
 
