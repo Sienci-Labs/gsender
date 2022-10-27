@@ -23,6 +23,7 @@
 
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
+import reduxStore from 'app/store/redux';
 import get from 'lodash/get';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import controller from 'app/lib/controller';
@@ -52,7 +53,12 @@ const shuttleControlEvents = {
         isActive: true,
         category: COOLANT_CATEGORY,
         callback: () => {
-            sendM7();
+            const isConnected = get(reduxStore.getState(), 'connection.isConnected');
+            const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+            const canClick = isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+            if (canClick) {
+                sendM7();
+            }
         },
     },
     FLOOD_COOLANT: {
@@ -63,7 +69,12 @@ const shuttleControlEvents = {
         isActive: true,
         category: COOLANT_CATEGORY,
         callback: () => {
-            sendM8();
+            const isConnected = get(reduxStore.getState(), 'connection.isConnected');
+            const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+            const canClick = isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+            if (canClick) {
+                sendM8();
+            }
         },
     },
     STOP_COOLANT: {
@@ -74,6 +85,18 @@ const shuttleControlEvents = {
         isActive: true,
         category: COOLANT_CATEGORY,
         callback: () => {
+            const isConnected = get(reduxStore.getState(), 'connection.isConnected');
+            const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+            const canClick = isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+            if (canClick) {
+                sendM9();
+            }
+        }
+    STOP_COOLANT: () => {
+        const isConnected = get(reduxStore.getState(), 'connection.isConnected');
+        const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+        const canClick = isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+        if (canClick) {
             sendM9();
         }
     }
@@ -83,14 +106,14 @@ const subscribeShuttleControl = () => {
     combokeys.reload();
 
     Object.keys(shuttleControlEvents).forEach(eventName => {
-        const callback = shuttleControlEvents[eventName].callback;
+        const callback = shuttleControlEvents[eventName];
         combokeys.on(eventName, callback);
     });
 };
 
 const unsubscribeShuttleControl = () => {
     Object.keys(shuttleControlEvents).forEach(eventName => {
-        const callback = shuttleControlEvents[eventName].callback;
+        const callback = shuttleControlEvents[eventName];
         combokeys.removeListener(eventName, callback);
     });
 };

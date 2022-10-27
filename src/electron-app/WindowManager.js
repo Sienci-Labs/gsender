@@ -79,7 +79,6 @@ class WindowManager {
                     this.width = width;
                     this.height = height;
                 }
-                return;
             }
 
             app.quit();

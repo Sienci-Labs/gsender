@@ -466,7 +466,7 @@ export const GRBL_SETTINGS = [
         category: 'Homing',
         units: 'mask',
         description: 'Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction.',
-        inputType: MASK_STATUS_REPORT
+        inputType: MASK
     },
     {
         setting: '$24',

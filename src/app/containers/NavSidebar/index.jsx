@@ -65,18 +65,22 @@ class NavSidebar extends PureComponent {
 
     shuttleControlFunctions = {
         OPEN_TOOLBAR: (_, { toolbar, shouldConnect, shouldOpenHelpPage }) => {
-            if (shouldConnect) {
-                const connection = store.get('widgets.connection');
-                const { port, baudrate } = connection;
+            const { workflow } = this.props;
+            const isDisabled = workflow?.state === WORKFLOW_STATE_RUNNING;
+            if (!isDisabled) {
+                if (shouldConnect) {
+                    const connection = store.get('widgets.connection');
+                    const { port, baudrate } = connection;
 
-                if (port && baudrate) {
-                    this.reconnectToLastDevice(port, baudrate, GRBL);
+                    if (port && baudrate) {
+                        this.reconnectToLastDevice(port, baudrate, GRBL);
+                    }
+                    return;
                 }
-                return;
-            }
 
-            if (toolbar) {
-                this.actions.openModal(toolbar);
+                if (toolbar) {
+                    this.actions.openModal(toolbar);
+                }
             }
         }
     }

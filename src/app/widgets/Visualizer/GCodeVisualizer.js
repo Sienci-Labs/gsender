@@ -32,6 +32,7 @@ class GCodeVisualizer {
         this.theme = theme;
         this.vertices = [];
         this.colors = [];
+        this.framesLength = 0;
         this.spindleSpeeds = null;
         this.isLaser = false;
         this.frames = []; // Example
@@ -102,8 +103,8 @@ class GCodeVisualizer {
     }
 
     render({ vertices, colors, frames, spindleSpeeds, isLaser = false }) {
-        const { cuttingCoordinateLines, G0Color, G1Color } = this.theme;
-        this.vertices = vertices;
+        const { cuttingCoordinateLines, G0Color, G1Color, G2Color, G3Color } = this.theme;
+        this.vertices = new THREE.Float32BufferAttribute(vertices, 3);
         this.frames = frames;
         this.spindleSpeeds = spindleSpeeds;
         this.isLaser = isLaser;
@@ -118,10 +119,10 @@ class GCodeVisualizer {
             'default': defaultColor
         };
 
-        this.geometry.setFromPoints(this.vertices);
+        //this.geometry.setFromPoints(this.vertices);
         const colorArray = this.getColorTypedArray(colors, motionColor);
+        this.geometry.setAttribute('position', this.vertices);
         this.geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 4));
-        this.geometry = this.geometry.toNonIndexed();
 
         const workpiece = new THREE.Line(
             this.geometry,
@@ -132,7 +133,6 @@ class GCodeVisualizer {
                 opacity: 0.9,
             })
         );
-
         this.group.add(workpiece);
 
         log.debug({
@@ -146,7 +146,7 @@ class GCodeVisualizer {
 
     /* Turns our array of Three colors into a float typed array we can set as a bufferAttribute */
     getColorTypedArray(colors, motionColor) {
-        let colorArray = [];
+        const colorArray = [];
         colors.forEach(colorTag => {
             const [motion, opacity] = colorTag;
             const color = motionColor[motion] || motionColor.default;
@@ -158,7 +158,8 @@ class GCodeVisualizer {
             this.updateLaserModeColors();
         }
 
-        return new Float32Array(this.colors);
+        this.colors = new Float32Array(colorArray);
+        return new Float32Array(colorArray);
     }
 
 
@@ -167,14 +168,13 @@ class GCodeVisualizer {
             return;
         }
         const { cuttingCoordinateLine } = this.theme;
-        //const defaultColor = new THREE.Color('#f9a13b');
         const defaultColor = new THREE.Color(cuttingCoordinateLine);
 
         frameIndex = Math.min(frameIndex, this.frames.length - 1);
         frameIndex = Math.max(frameIndex, 0);
 
-        const v1 = this.frames[this.frameIndex].vertexIndex;
-        const v2 = this.frames[frameIndex].vertexIndex;
+        const v1 = this.frames[this.frameIndex];
+        const v2 = this.frames[frameIndex];
 
         if (v1 < v2) {
             const workpiece = this.group.children[0];
@@ -182,6 +182,7 @@ class GCodeVisualizer {
             const colorAttr = workpiece.geometry.getAttribute('color');
             const defaultColorArray = [...defaultColor.toArray(), 0.3];
             const colorArray = Array.from({ length: (v2 - v1) }, () => defaultColorArray).flat();
+
             colorAttr.set([...colorArray], offsetIndex);
             // only update the range we've updated;
             colorAttr.updateRange.count = colorArray.length;
@@ -212,11 +213,11 @@ class GCodeVisualizer {
 
         this.group = new THREE.Object3D();
         this.geometry = new THREE.BufferGeometry();
-        this.vertices = [];
-        this.colors = [];
-
-        this.frames = [];
+        this.vertices = null;
+        this.colors = null;
+        this.frames = null;
         this.frameIndex = 0;
+        this.framesLength = 0;
     }
 }
 

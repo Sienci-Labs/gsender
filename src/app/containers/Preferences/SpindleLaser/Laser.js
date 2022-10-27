@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
 
@@ -9,7 +9,12 @@ const Laser = ({ state, actions }) => {
     const { units, spindle: { laser } } = state;
     const { xOffset, yOffset } = laser;
     const laserActions = actions.laser;
-
+    const [minLaser, setMinLaser] = useState(laser.minPower);
+    const [maxLaser, setMaxLaser] = useState(laser.maxPower);
+    useEffect(() => {
+        setMinLaser(laser.minPower);
+        setMaxLaser(laser.maxPower);
+    }, []);
     return (
         <>
             <Fieldset legend="Laser Axes Offset">
@@ -30,18 +35,18 @@ const Laser = ({ state, actions }) => {
             <Fieldset legend="Laser Power">
                 <TooltipCustom content="Minimum laser amount" location="default">
                     <Input
-                        label="Minimum Power"
+                        label="Min Power"
                         units="PWM"
-                        value={laser.minPower}
+                        value={minLaser}
                         onChange={(e) => laserActions.setPower(e.target.value, 'minPower')}
                         additionalProps={{ type: 'number' }}
                     />
                 </TooltipCustom>
                 <TooltipCustom content="Maximum laser amount" location="default">
                     <Input
-                        label="Maximum Power"
+                        label="Max Power"
                         units="PWM"
-                        value={laser.maxPower}
+                        value={maxLaser}
                         onChange={(e) => laserActions.setPower(e.target.value, 'maxPower')}
                         additionalProps={{ type: 'number' }}
                     />

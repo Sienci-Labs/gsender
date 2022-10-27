@@ -271,15 +271,11 @@ class SpindleWidget extends PureComponent {
             minimized,
             spindleSpeed,
             mode,
-            spindleMax,
-            spindleMin,
             laser
         } = this.state;
 
         this.config.set('laser.duration', laser.duration);
         this.config.set('laser.power', laser.power);
-        this.config.set('spindleMax', spindleMax);
-        this.config.set('spindleMin', spindleMin);
         this.config.set('mode', mode);
         this.config.set('minimized', minimized);
         this.config.set('speed', spindleSpeed);
@@ -293,8 +289,8 @@ class SpindleWidget extends PureComponent {
             mode: this.config.get('mode'),
             spindleSpeed: this.config.get('speed', 1000),
             laser: this.config.get('laser'),
-            spindleMax: this.props.spindleMax,
-            spindleMin: this.props.spindleMin
+            spindleMax: this.config.get('spindleMax'),
+            spindleMin: this.config.get('spindleMin')
         };
     }
 

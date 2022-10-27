@@ -23,7 +23,6 @@
 
 import React from 'react';
 import JoggingPresets from './JoggingPresets';
-import MachineProfile from './MachineProfile';
 import SettingWrapper from '../components/SettingWrapper';
 import Connection from './Connection';
 import GeneralArea from '../components/GeneralArea';
@@ -43,7 +42,7 @@ const General = ({ active, state, actions }) => {
                 </GeneralArea.Half>
 
                 <GeneralArea.Half>
-                    <MachineProfile state={state} />
+                    <Movement state={state} actions={actions} />
                     <CustomDecimalPlaces state={state} actions={actions}/>
                     <Settings />
                 </GeneralArea.Half>

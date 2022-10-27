@@ -46,17 +46,6 @@
     opacity: 1;
   }
 
-  .modal-content {
-    border-top: 5px solid red;
-    position: absolute;
-    width: 539px;
-    left: 30%;
-    top: 50%;
-    height: 328px;
-    background-color: #fff;
-    transition: all 0.3s ease-in-out;
-  }
-
   .modalFirmware.enter-done .modal-content {
     transform: translateY(0);
   }
@@ -72,8 +61,27 @@
   .modal-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 14px;
+  }
+
+  .modal-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-left: 1rem;
+  }
+
+  .modal-body {
+    font-size: 1.2rem;
+    padding: 1rem;
+    border-top: 1px solid #eee;
+  }
+
+  .modal-content {
+    border-top: 5px solid red;
+    width: 30%;
+    top: 58%;
+    margin: auto;
+    background-color: #fff;
+    transition: all 0.3s ease-in-out;
   }
 
   .modal-footer {
@@ -82,21 +90,42 @@
     justify-content: center;
     align-items: center;
     background-color: #e5e7eb;
-    ;
-    height: 52%;
-    margin-top: -10%;
+    padding: 1rem;
   }
 
-  .modal-title {
-    margin: 0;
-    font-size: 2rem;
+  .progressBar{
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    transition: opacity 500ms;
+    z-index: 1;
   }
 
-  .modal-body {
-    height: 45%;
-    font-size: 1.5rem;
-    padding: 4%;
-    border-top: 1px solid #eee;
+  .flashMessage{
+    margin: auto;
+    width: 50% !important;
+    position: relative;
+    z-index: 1;
+    color: white;
+    bottom: 45%;
+  }
+
+  .flashMessage span{
+    display: table;
+    margin: 0 auto !important;
+  }
+
+  .css-eglki6-MuiLinearProgress-root{
+    top: 50%;
+  }
+
+  .css-8atqhb{
+    width: 50% !important;
+    margin: auto;
+    height: 100%;
   }
 
   .button {
@@ -131,33 +160,51 @@
   }
 
   .footer-text {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     text-align: center;
   }
 
   .footer-textTwo {
     margin-top: 0%;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
   }
 
-  .redButton {
+  .port{
+    display: flex;
+    padding: 1rem;
+    width: 100%;
+  }
+
+  .profile{
+    display: flex;
+    padding: 1rem;
+    width: 100%;
+  }
+
+  .optionsWrapper .css-2b097c-container{
+    width: 75%;
+    margin-left: 1rem;
+  }
+
+  .button-no {
     border-radius: .25rem;
     width: 100%;
     max-width: 12rem;
     font-size: 14px;
     padding: 5px;
     margin: 2%;
-    color: #DD380D;
+    color: #3E85C7;
     --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-    border: solid #DD380D 1px;
+    border: solid #3E85C7 1px;
     text-decoration: none;
     display: inline-block;
     cursor: pointer;
     text-align: center;
   }
 
-  .redButton:hover {
+  .button-no:hover {
     transition: 200ms ease-in-out;
     background-color: #E5E7EB;
     border-radius: .25rem;

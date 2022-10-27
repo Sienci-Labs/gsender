@@ -67,6 +67,7 @@ import {
     RENDER_RENDERING,
     RENDER_LOADING,
     GRBL_ACTIVE_STATE_HOLD,
+    GRBL_ACTIVE_STATE_IDLE,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
     GRBL_ACTIVE_STATE_CHECK,
@@ -1196,7 +1197,10 @@ class VisualizerWidget extends PureComponent {
             }
         },
         MACRO: (_, { macroID }) => {
-            controller.command('macro:run', macroID, controller.context);
+            const { activeState } = this.props;
+            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+                controller.command('macro:run', macroID, controller.context);
+            }
         },
     }
 
@@ -1413,7 +1417,7 @@ export default connect((store) => {
     const yMaxFeed = Number(get(settings.settings, '$111', 1500));
     const zMaxFeed = Number(get(settings.settings, '$112', 1500));
     const xMaxAccel = Number(get(settings.settings, '$120', 1800000));
-    const yMaxAccel = Number(get(settings.settings, '$112', 1800000));
+    const yMaxAccel = Number(get(settings.settings, '$121', 1800000));
     const zMaxAccel = Number(get(settings.settings, '$122', 1800000));
     const workflow = get(store, 'controller.workflow');
     const renderState = get(store, 'file.renderState');

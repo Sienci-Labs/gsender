@@ -33,6 +33,7 @@ const ensureArray = (...args) => {
 };
 
 const noop = () => {};
+
 class Controller {
     io = null;
 
@@ -95,6 +96,8 @@ class Controller {
         'file:load': [],
         'file:unload': [],
         'homing:flag': [],
+        'grbl:iSready': [],
+        'sender:M0M1': []
     };
 
     context = {
@@ -103,7 +106,7 @@ class Controller {
         ymin: 0,
         ymax: 0,
         zmin: 0,
-        zmax: 0,
+        zmax: 0
     };
 
     // User-defined baud rates and ports
@@ -122,22 +125,18 @@ class Controller {
     state = {};
 
     workflow = {
-        state: 'idle', // running|paused|idle
+        state: 'idle' // running|paused|idle
     };
 
     // Connection options
     host = null;
-
     next = null;
-
     options = null;
 
     // @param {object} io The socket.io-client module.
     constructor(io) {
         if (!io) {
-            throw new Error(
-                `Expected the socket.io-client module, but got: ${io}`
-            );
+            throw new Error(`Expected the socket.io-client module, but got: ${io}`);
         }
 
         this.io = io;
@@ -160,9 +159,9 @@ class Controller {
 
         options = {
             ...options,
-            reconnection: true,
-            reconnectionDelay: 500,
-            reconnectionAttempts: 10,
+            'reconnection': true,
+            'reconnectionDelay': 500,
+            'reconnectionAttempts': 10
         };
 
         this.host = host;
@@ -175,6 +174,7 @@ class Controller {
         this.socket.on('disconnect', () => {
             this.reconnect();
         });
+
 
         Object.keys(this.listeners).forEach((eventName) => {
             if (!this.socket) {
@@ -205,8 +205,9 @@ class Controller {
                     this.type = args[0];
                     this.state = { ...args[1] };
                 }
+
                 const listeners = ensureArray(this.listeners[eventName]);
-                listeners.forEach((listener) => {
+                listeners.forEach(listener => {
                     listener(...args);
                 });
             });
@@ -294,6 +295,13 @@ class Controller {
         this.socket && this.socket.emit('close', port, callback);
     }
 
+    //Sends an event to start flashing
+    //@param {string} flashPort The port to be flashed
+    //@param {string} imageType The type of image to be flashed to the port
+    flashFirmware(flashPort, imageType) {
+        this.socket && this.socket.emit('flash:start', flashPort, imageType);
+    }
+
     // Retrieves a list of available serial ports with metadata.
     // @param {function} [callback] Called once completed.
     listPorts(callback) {
@@ -364,11 +372,7 @@ class Controller {
         if (!port) {
             return;
         }
-        this.socket &&
-            this.socket.emit.apply(
-                this.socket,
-                ['command', port, cmd].concat(args)
-            );
+        this.socket && this.socket.emit.apply(this.socket, ['command', port, cmd].concat(args));
     }
 
     // Writes data to the serial port.

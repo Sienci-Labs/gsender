@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Provider as ReduxProvider } from 'react-redux';
 
-import reduxStore from 'app/store/redux';
 import Modal from 'app/components/ToolModal/ToolModal';
-import Surfacing from './Surfacing';
+
+import Surfacing from './components/Surfacing';
 
 /**
  * @component Surfacing
@@ -14,9 +13,7 @@ import Surfacing from './Surfacing';
 const SurfacingModal = ({ modalClose }) => {
     return (
         <Modal title="Surfacing Tool" onClose={modalClose} size="lg">
-            <ReduxProvider store={reduxStore}>
-                <Surfacing onClose={modalClose} />
-            </ReduxProvider>
+            <Surfacing onClose={modalClose} />
         </Modal>
     );
 };

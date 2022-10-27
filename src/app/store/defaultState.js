@@ -37,7 +37,7 @@ const [M3] = SPINDLE_MODES;
 const defaultState = {
     session: {
         name: '',
-        token: '',
+        token: ''
     },
     workspace: {
         units: METRIC_UNITS,
@@ -52,27 +52,29 @@ const defaultState = {
         toolChangeOption: 'Ignore',
         toolChangeHooks: {
             preHook: '',
-            postHook: '',
+            postHook: ''
         },
         container: {
             primary: {
                 show: true,
-                widgets: ['location', 'axes', 'secondary'],
-            },
+                widgets: [
+                    'location', 'axes', 'secondary'
+                ]
+            }
         },
         machineProfile: machineProfiles[4],
         probeProfile: {
             xyThickness: {
                 mm: 10,
-                in: 0.393,
+                in: 0.393
             },
             zThickness: {
                 mm: 15,
-                in: 0.59,
+                in: 0.590
             },
             plateWidth: {
                 mm: 50,
-                in: 1.968,
+                in: 1.968
             },
             plateLength: {
                 mm: 50,
@@ -299,32 +301,32 @@ const defaultState = {
             }
         },
         surfacing: {
-            defaultMetricState: {
-                bitDiameter: 22,
-                stepover: 40,
-                feedrate: 1500,
-                length: 0,
-                width: 0,
-                skimDepth: 1,
-                maxDepth: 1,
-                spindleRPM: 17000,
-                type: SPIRAL_MOVEMENT,
-                startPosition: START_POSITION_BACK_LEFT,
-                spindle: M3,
-            },
-            defaultImperialState: {
-                bitDiameter: 1,
-                stepover: 40,
-                feedrate: 1500,
-                length: 0,
-                width: 0,
-                skimDepth: 0.04,
-                maxDepth: 0.04,
-                spindleRPM: 669,
-                type: SPIRAL_MOVEMENT,
-                startPosition: START_POSITION_BACK_LEFT,
-                spindle: M3,
-            },
+            bitDiameter: 22,
+            stepover: 40,
+            feedrate: 2500,
+            length: 0,
+            width: 0,
+            skimDepth: 1,
+            maxDepth: 1,
+            spindleRPM: 17000,
+            type: SPIRAL_MOVEMENT,
+            startPosition: START_POSITION_BACK_LEFT,
+            spindle: M3,
+            cutDirectionFlipped: false,
+            // defaultImperialState: {
+            //     bitDiameter: 1,
+            //     stepover: 40,
+            //     feedrate: 98.43,
+            //     length: 0,
+            //     width: 0,
+            //     skimDepth: 0.04,
+            //     maxDepth: 0.04,
+            //     spindleRPM: 669,
+            //     type: SPIRAL_MOVEMENT,
+            //     startPosition: START_POSITION_BACK_LEFT,
+            //     spindle: M3,
+            //     startFromCenter: false,
+            // },
         },
         visualizer: {
             minimized: false,

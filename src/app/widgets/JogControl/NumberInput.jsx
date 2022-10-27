@@ -105,7 +105,7 @@ class NumberInput extends PureComponent {
 
         // Ignore non digit and non . values
         // eslint-disable-next-line no-restricted-globals
-        if (this.checkForInvalidInput(value)) {
+        if (!this.checkForInvalidInput(value)) {
             if (Number(value) >= max) {
                 value = max;
             } else if (Number(value) <= min) {
@@ -119,6 +119,7 @@ class NumberInput extends PureComponent {
                     and "9000.01" will still be displayed.
                     therefore, we force update the display.
             */
+            value = Number(value);
             changeHandler(value);
             if (this.state.value === value) {
                 this.setState({
@@ -136,11 +137,12 @@ class NumberInput extends PureComponent {
         }
     }
 
+    // returns true when invalid
     checkForInvalidInput(value) {
         const regex = /[^0-9.]/g;
         let dotOccurance = 0;
         [...value].forEach(char => char === '.' && dotOccurance++);
-        if (!regex.test(value) && dotOccurance <= 1) {
+        if (regex.test(value) || dotOccurance > 1) {
             return true;
         }
         return false;
@@ -148,6 +150,7 @@ class NumberInput extends PureComponent {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.setState({
+            value: this.props.value,
             min: this.props.min,
             max: this.props.max,
             disabled: this.props.disabled,

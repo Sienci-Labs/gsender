@@ -13,8 +13,7 @@ const TabArea = ({ tabs, currentTab, onTabChange }) => {
                 activeTabIndex={currentTab}
                 onClick={onTabChange}
                 style={{ backgroundColor: '#e5e7eb' }}
-            >
-            </TabbedWidget.Tabs>
+            />
             <TabbedWidget.Content>
                 <div style={{ width: '100%', height: '100%', position: 'relative' }} id={SURFACING_VISUALIZER_CONTAINER_ID}>
                     {

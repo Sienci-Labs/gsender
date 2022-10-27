@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.2/gSender-1.1.2-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.2/gSender-1.1.2-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.2/gSender-1.1.2.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.2/gSender_1.1.2_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.2/gSender-1.1.2-armv7l.AppImage)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.6/gSender-1.1.6-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.6/gSender-1.1.6-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.6/gSender-1.1.6.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.6/gSender_1.1.6_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.6/gSender-1.1.6-armv7l.AppImage)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -98,6 +98,52 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+### 1.1.7 (October 26th, 2022)
+- Fix for XYZ probe profile when $13 enabled
+- Fix for machine position overflowing bounds
+- Fix for some keybinds no longer recognizing when they were released
+
+### 1.1.6 (October 19th, 2022)
+- Improved surfacing tool - pattern now ramps in to support more surfacing bit types, cut direction is reversible, able to start from center, can copy gcode to clipboard for saving.
+- Major improvements to visualizer memory usage and parsing speed
+- Start from line should account for maximum file Z height when moving into position to account for situations where Z0 is set at the spoilboard.
+- Probe code should always return to exact starting location instead of approximating it.
+- Improvements to firmware flashing UX - can now select profile and port inside tool.
+- Fix for auto-probe code movements being too small when "$13 report as inches" EEPROM value enabled
+- Go To buttons only use safe height if below that position when limit switches enabled to avoid moving downwards.
+- Fixed values in some machine profiles.
+- Added machine state guards to some keyboard shortcuts.
+- UI Modals now more difficult to close accidentally.
+- Bracket Comments on M0/M1 now emitted to UI.
+- Laser offsets preferences allow negative values again
+- Bounding Box variables once again available to macros
+- Mac version now exits completely on close.
+- Higher UI clarity when connecting to board with invalid/unrecognizable firmware
+- Styling changes in Firmware Tool
+- Fixed overflow when OS had screen zoom above 100%.
+
+### 1.1.4 (August 26th, 2022)
+* Fixed firmware tool control for setting $23
+* Flashing again available without connecting to device
+* Improvements to continuous jogging (thanks @cotepat)
+* Fixed issue with some settings not properly persisting
+* Outline tool improvements - moved to worker thread, G0 movements included, tweaks to accuracy
+* More accurate file length estimates when connected - virtualizer now uses EEPROM acceleration values
+* Probe function now available in manual tool change
+* Better datafilter for invalid UTF8/UTF16 characters
+
+### 1.1.3 (August 12th, 2022)
+* Added profiles for Longmill extension kits
+* Machine profile removed from preferences and placed in firmware tool
+* Fixed incorrect default values in some machine profiles
+* Test mode now restores WCS after the soft reset performed while exiting check mode.
+* Fixed issue with test mode that would occasionally have it start running the file after test was complete
+* Fixed issue with continuous jog when soft limits were enabled and report in inches EEPROM value was enabled
+* Firmware tool improvements - new convenient profile selection, setting search, performance improvments, highlighted changed values
+* Improvements to value inputs - should no longer default to min value if there is too long a pause in typing
+* Surfacing labels changed to X/Y rather than length/width
+* Minor styling changes
 
 ### 1.1.2 (July 15th, 2022)
 * Fix for start button sometimes not working when "Start Event" block enabled but empty

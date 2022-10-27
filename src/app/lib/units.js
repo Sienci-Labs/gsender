@@ -49,9 +49,10 @@ const setDecimalPlacesPosition = (defaultPlace, val) => {
 };
 
 // Converts value from millimeters to inches
-export const mm2in = (val = 0) => val / 25.4;
+export const mm2in = (val = 0) => (val / 25.4);
+
 // Converts values from inches to millimeters
-export const in2mm = (val = 0) => val * 25.4;
+export const in2mm = (val = 0) => (val * 25.4);
 
 // Maps value to imperial units
 export const mapValueToImperialUnits = (val) => {
@@ -63,7 +64,7 @@ export const mapValueToImperialUnits = (val) => {
 // Maps value to metric units
 export const mapValueToMetricUnits = (val) => {
     val = Number(val) || 0;
-    let defaultPlace = 1;
+    let defaultPlace = 2;
     return setDecimalPlacesPosition(defaultPlace, val);
 };
 

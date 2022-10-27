@@ -408,7 +408,9 @@ class LocationWidget extends PureComponent {
             pubsub.publish('jogSpeeds', newSpeeds);
         },
         ZERO_AXIS: (event, { axis }) => {
-            if (!axis) {
+            const { state } = this.props;
+            const activeState = get(state, 'status.activeState');
+            if (!axis || activeState !== GRBL_ACTIVE_STATE_IDLE) {
                 return;
             }
 
@@ -432,7 +434,9 @@ class LocationWidget extends PureComponent {
             controller.command('gcode', `G10 L20 P${p} ${axis}0`);
         },
         GO_TO_AXIS_ZERO: (_, { axisList }) => {
-            if (!axisList || axisList.length === 0) {
+            const { state } = this.props;
+            const activeState = get(state, 'status.activeState');
+            if (!axisList || axisList.length === 0 || activeState !== GRBL_ACTIVE_STATE_IDLE) {
                 return;
             }
 
@@ -444,6 +448,15 @@ class LocationWidget extends PureComponent {
 
             controller.command('gcode', 'G90');
             controller.command('gcode', `G0 ${commandStr}`);
+        },
+        JOG_LEVER_SWITCH: (event, { key = '' }) => {
+            if (key === '-') {
+                this.actions.stepBackward();
+            } else if (key === '+') {
+                this.actions.stepForward();
+            } else {
+                this.actions.stepNext();
+            }
         },
     }
 

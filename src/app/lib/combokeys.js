@@ -180,6 +180,7 @@ class Combokeys extends events.EventEmitter {
                 });
             }
         });
+
         store.set('commandKeys', newCommandKeysList);
 
         return newCommandKeysList;

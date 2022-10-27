@@ -22,10 +22,12 @@ const Firmware = ({ modalClose }) => {
     const activeState = useSelector(store => get(store, 'controller.state.status.activeState'));
     const [initiateFlashing, setInitiateFlashing] = useState(false);
     const [shouldRestoreDefault, setShouldRestoreDefault] = useState(false);
-    const [settings, setSettings] = useState(GRBL_SETTINGS.map(item => ({ ...item, value: eeprom ? eeprom[item.setting] : undefined })));
+    const [settings, setSettings] = useState(GRBL_SETTINGS.map(item => ({ ...item, value: eeprom ? eeprom[item.setting] : 0 })));
     const [filterText, setFilterText] = useState('');
     const [isFlashing, setIsFlashing] = useState(false);
     const [controller, setController] = useState(libController);
+    const [settingsToApply, setSettingsToApply] = useState(false);
+    const [machineProfile, setMachineProfile] = useState(store.get('workspace.machineProfile'));
 
     useEffect(() => {
         addControllerEvents(controllerEvents);
@@ -39,19 +41,23 @@ const Firmware = ({ modalClose }) => {
         setController(libController);
     }, [libController]);
 
+    useEffect(() => {
+        setSettings(GRBL_SETTINGS.map(item => ({ ...item, value: eeprom ? eeprom[item.setting] : 0 })));
+    }, [eeprom]);
+
     const controllerEvents = {
-        'message': () => {
+        'message': (message) => {
             setIsFlashing(false);
             modalClose();
             Toaster.pop({
-                msg: `Flashing completed successfully on port: ${port}! Please reconnect your machine`,
+                msg: `Flashing completed successfully on port: ${JSON.stringify(message)}  Please reconnect your machine`,
                 type: TOASTER_INFO,
             });
         },
         'task:error': (error) => {
             setIsFlashing(false);
             Toaster.pop({
-                msg: error,
+                msg: JSON.stringify(error !== {} ? error : 'Process failed.').replaceAll('"', ''),
                 type: TOASTER_UNTIL_CLOSE,
                 duration: 10000
             });
@@ -67,10 +73,8 @@ const Firmware = ({ modalClose }) => {
                 setting => JSON.stringify(setting).toLowerCase().includes(filterText.toLowerCase())
             ), [settings, filterText]
         );
-
     const isDefault = useMemo(() => settings.every(item => eeprom?.[item?.setting] === item?.value), [settings]);
     const canSendSettings = useMemo(() => isConnected && activeState === GRBL_ACTIVE_STATE_IDLE, [isConnected, activeState]);
-    const machineProfile = store.get('workspace.machineProfile');
     const hasSettings = controllerSettingsLoaded();
     const data = controller.settings;
     const port = controller.port;
@@ -78,6 +82,7 @@ const Firmware = ({ modalClose }) => {
     const contextValue = {
         hasSettings,
         machineProfile,
+        setMachineProfile,
         isConnected,
         eeprom,
         activeState,
@@ -91,10 +96,13 @@ const Firmware = ({ modalClose }) => {
         setFilterText,
         filterText,
         isFlashing,
+        setIsFlashing,
         setSettings,
         isDefault,
         controller,
-        canSendSettings
+        canSendSettings,
+        settingsToApply,
+        setSettingsToApply
     };
 
     return (
@@ -106,15 +114,10 @@ const Firmware = ({ modalClose }) => {
                     </div>
                     <div className={styles.firmwareContainer}>
                         <SettingsArea />
-
-                        {
-                            hasSettings && (
-                                <>
-                                    <div className={styles.divider} />
-                                    <ActionArea />
-                                </>
-                            )
-                        }
+                        <>
+                            <div className={styles.divider} />
+                            <ActionArea />
+                        </>
                     </div>
                 </div>
             </FirmwareContext.Provider>

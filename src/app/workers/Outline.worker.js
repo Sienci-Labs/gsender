@@ -36,8 +36,7 @@ onmessage = ({ data }) => {
         const vertices = [];
         const toolpath = new Toolpath({
             addLine: ({ motion }, v1, v2) => {
-                // We ignore G0 movements since they generally aren't cutting movements
-                if (motion === 'G1') {
+                if (motion === 'G1' || motion === 'G0') {
                     vertices.push(vertex(v2.x, v2.y));
                 }
             },
