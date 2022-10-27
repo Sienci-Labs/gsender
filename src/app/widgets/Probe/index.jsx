@@ -506,7 +506,6 @@ class ProbeWidget extends PureComponent {
     generateMultiAxisCommands(axes, xyThickness, zThickness, params) {
         let code = [];
         let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
-        //const unitModal = `G${modal}`;
         const workspace = this.mapWCSToPValue(wcs);
         const XYRetract = -retractDistance;
         let XYProbeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC.X : this.PROBE_DISTANCE_IMPERIAL.X;
@@ -514,7 +513,6 @@ class ProbeWidget extends PureComponent {
         ZProbeDistance *= -1;
         XYProbeDistance = (isSafe) ? -XYProbeDistance : XYProbeDistance;
         const gcode = this.gcode;
-
 
         // Calculate tool offset using radius and block thickness to origin
         const toolDiameter = this.state.toolDiameter;
@@ -590,12 +588,12 @@ class ProbeWidget extends PureComponent {
             gcode('G4', {
                 P: this.DWELL_TIME
             }),
+            gcode('G91'),
             gcode('G10', {
                 L: 20,
                 P: workspace,
                 X: toolCompensatedThickness
             }),
-            gcode('G91'),
             // Move for Y Touch - toward front + to right
             gcode('G0', {
                 X: -(2 * retractDistance)
@@ -621,12 +619,12 @@ class ProbeWidget extends PureComponent {
             gcode('G4', {
                 P: this.DWELL_TIME
             }),
+            gcode('G91'),
             gcode('G10', {
                 L: 20,
                 P: workspace,
                 Y: toolCompensatedThickness
             }),
-            gcode('G91'),
             gcode('G0', {
                 Y: XYRetract
             }),
@@ -644,7 +642,7 @@ class ProbeWidget extends PureComponent {
 
         // Make sure we're in the correct mode at end of probe
         code = code.concat([
-            this.gcode('G90 [UNITS]')
+            this.gcode('G90')
         ]);
         return code;
     }
