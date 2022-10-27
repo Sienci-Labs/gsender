@@ -49,7 +49,8 @@ import {
     LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART
 } from '../../widgets/Visualizer/constants';
 import StatsPage from './Stats';
-import SafetySettings from './Safety';from '../../widgets/Visualizer/constants';
+import SafetySettings from './Safety';
+//from '../../widgets/Visualizer/constants';
 import { convertValuesToMetric, convertValuesToImperial } from '../Surfacing/utils';
 
 

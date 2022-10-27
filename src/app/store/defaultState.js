@@ -30,7 +30,7 @@ import {
     START_POSITION_BACK_LEFT,
     SPINDLE_MODES,
 } from 'app/constants';
-import machineProfiles from 'app/containers/Preferences/General/defaultMachineProfiles';
+import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 
 const [M3] = SPINDLE_MODES;
 

@@ -30,7 +30,6 @@ import store from 'app/store';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
-
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import api from 'app/api';
@@ -38,6 +37,7 @@ import pubsub from 'pubsub-js';
 import i18n from 'app/lib/i18n';
 import Modal from 'app/components/Modal';
 import Input from 'app/containers/Preferences/components/Input';
+import WorkerOutline from '../../workers/Outline.worker';
 
 import CameraDisplay from './CameraDisplay/CameraDisplay';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
@@ -297,10 +297,10 @@ class WorkflowControl extends PureComponent {
             duration: TOASTER_UNTIL_CLOSE,
             msg: 'Generating outline for current file'
         });
-        workerOutline.onmessage = ({ data }) => {
+        this.workerOutline.onmessage = ({ data }) => {
             outlineResponse({ data }, machineProfile.laserOnOutline);
         };
-        workerOutline.postMessage({ gcode, isLaser });
+        this.workerOutline.postMessage({ gcode, isLaser });
     }
 
     startFromLinePrompt = () => {

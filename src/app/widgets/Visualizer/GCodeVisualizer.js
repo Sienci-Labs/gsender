@@ -61,49 +61,10 @@ class GCodeVisualizer {
                 this.colors.splice(offsetIndex, 8, ...color, ...color);
             }
         }
-
-        /* for (let i = 0; i < this.frames.length; ++i) {
-            const { spindleOn } = this.frames[i];
-            if (spindleOn) {
-                let v1 = this.frames[i].vertexIndex;
-                console.log(`Starting spindle at frame ${i}, vertexindex ${v1}`);
-                while (i < (this.frames.length - 1) && this.frames[i].spindleOn) {
-                    ++i;
-                }
-                let v2 = this.frames[i].vertexIndex;
-                console.log(`Stopping spindle at frame ${i}, vertexindex ${v2}`);
-                for (let j = v1; j < v2; ++j) {
-                    const offsetIndex = j * 4; // Account for RGBA buffer
-                    let opacity = calculateOpacity(this.frames[j].spindleSpeed || 0);
-                    console.log(opacity);
-                    console.log(j);
-                    console.log(this.frames[j]);
-                    this.colors.splice(offsetIndex, 4, ...fillColor.toArray(), opacity);
-                }
-            }
-        }*/
-        /*for (let i = 1; i < this.frames.length; i++) {
-    const { spindleOn, spindleSpeed, vertexIndex } = this.frames[i];
-    let v1, v2;
-
-    if (spindleOn) {
-        v1 = vertexIndex;
-        // Look ahead to find next point where spindle is off
-        while (i < this.frames.length && this.frames[i].spindleOn) {
-            i++;
-        }
-        v2 = this.frames[i].vertexIndex;
-        for (let j = v1; j < v2; j++) {
-
-        }
-    } else {
-
-    }
-}*/
     }
 
     render({ vertices, colors, frames, spindleSpeeds, isLaser = false }) {
-        const { cuttingCoordinateLines, G0Color, G1Color, G2Color, G3Color } = this.theme;
+        const { cuttingCoordinateLines, G0Color, G1Color } = this.theme;
         this.vertices = new THREE.Float32BufferAttribute(vertices, 3);
         this.frames = frames;
         this.spindleSpeeds = spindleSpeeds;

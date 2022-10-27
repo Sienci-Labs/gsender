@@ -28,6 +28,7 @@ onmessage = function({ data }) {
     const { content, visualizer, isLaser = false, shouldRenderSVG = false } = data;
     let vertices = [];
     let SVGVertices = [];
+    let spindleChanges = [];
     let paths = [];
     let currentMotion = '';
     const colors = [];
@@ -188,9 +189,6 @@ onmessage = function({ data }) {
         }
     });
 
-    toolpath.loadFromStringSync(content, () => {
-        // Divided by 3 since we store XYZ as separate values
-        frames.push(vertices.length / 3);
 
     toolpath.loadFromStringSync(content, (line, index) => {
         let spindleValues = {};
@@ -202,7 +200,8 @@ onmessage = function({ data }) {
                 spindleSpeed
             };
         }
-        frames.push(vertices.length / 6);
+        frames.push(vertices.length / 3);
+        spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
     });
 
     let tFrames = new Uint32Array(frames);

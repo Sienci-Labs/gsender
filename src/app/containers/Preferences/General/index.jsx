@@ -28,6 +28,7 @@ import Connection from './Connection';
 import GeneralArea from '../components/GeneralArea';
 import Workspace from './Workspace';
 import Settings from './Settings';
+import Movement from './Movement';
 import CustomDecimalPlaces from './CustomDecimalPlaces';
 
 const General = ({ active, state, actions }) => {

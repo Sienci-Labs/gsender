@@ -318,9 +318,6 @@ class Header extends PureComponent {
         return (
             <div className={styles.navBar}>
                 <div className={styles.primary}>
-                    <NavLogo updateAvailable={ updateAvailable } onClick={ () => this.toggleUpdateToast() }/>
-            <div className={styles.navBar}>
-                <div className={styles.primary}>
                     <NavLogo updateAvailable={updateAvailable} onClick={() => this.toggleUpdateToast()}/>
                     <NavbarConnection
                         state={this.state}
