@@ -43,9 +43,15 @@ const ToolChange = () => {
     // Handlers
     const handleToolChange = (selection) => setToolChangeOption(selection.value);
 
-    const handlePositionChange = (axis, value) => {
-        store.set(`workspace.toolChangePosition.${axis}`, value);
-    }
+    const handlePositionChange = (event, axis) => {
+        const value = event.target.value;
+        const newPosition = {
+            ...toolChangePosition,
+            [axis]: Number(value)
+        };
+        setToolChangePosition(newPosition);
+        store.replace('workspace.toolChangePosition', newPosition);
+    };
 
     useEffect(() => {
         store.set('workspace.toolChangeOption', toolChangeOption);
@@ -79,20 +85,20 @@ const ToolChange = () => {
                         <Input
                             label="Tool Length Sensor X position"
                             units=""
-                            value=""
-                            onChange={(e) => true}
+                            value={toolChangePosition.x}
+                            onChange={(e) => handlePositionChange(e, 'x')}
                         />
                         <Input
                             label="Tool Length Sensor Y position"
                             units=""
-                            value=""
-                            onChange={(e) => true}
+                            value={toolChangePosition.y}
+                            onChange={(e) => handlePositionChange(e, 'y')}
                         />
                         <Input
                             label="Tool Length Sensor Z position"
                             units=""
-                            value=""
-                            onChange={(e) => true}
+                            value={toolChangePosition.z}
+                            onChange={(e) => handlePositionChange(e, 'z')}
                         />
                     </div>
                 )
