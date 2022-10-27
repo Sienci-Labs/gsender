@@ -407,7 +407,7 @@ class ProbeWidget extends PureComponent {
         return [
             this.gcode('; Initial Probe setup'),
             this.gcode('; Set initial zero for specified axes'),
-            this.gcode(`%ACTIVE_UNITS=modal.units,PREF_UNITS=G${modal}`),
+            this.gcode('%UNITS=modal.units'),
             this.gcode('G10', {
                 L: 20,
                 P: this.mapWCSToPValue(wcs),
@@ -505,7 +505,7 @@ class ProbeWidget extends PureComponent {
 
     generateMultiAxisCommands(axes, xyThickness, zThickness, params) {
         let code = [];
-        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units, $13 } = params;
+        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
         //const unitModal = `G${modal}`;
         const workspace = this.mapWCSToPValue(wcs);
         const XYRetract = -retractDistance;
@@ -515,7 +515,6 @@ class ProbeWidget extends PureComponent {
         XYProbeDistance = (isSafe) ? -XYProbeDistance : XYProbeDistance;
         const gcode = this.gcode;
 
-        const unitPrepend = $13 === '1' ? 'G20' : '[PREF_UNIT]';
 
         // Calculate tool offset using radius and block thickness to origin
         const toolDiameter = this.state.toolDiameter;
@@ -591,12 +590,12 @@ class ProbeWidget extends PureComponent {
             gcode('G4', {
                 P: this.DWELL_TIME
             }),
-            gcode(`${unitPrepend} G10`, {
+            gcode('G10', {
                 L: 20,
                 P: workspace,
                 X: toolCompensatedThickness
             }),
-            gcode('[PREF_UNIT] G91'),
+            gcode('G91'),
             // Move for Y Touch - toward front + to right
             gcode('G0', {
                 X: -(2 * retractDistance)
@@ -622,12 +621,12 @@ class ProbeWidget extends PureComponent {
             gcode('G4', {
                 P: this.DWELL_TIME
             }),
-            gcode(`${unitPrepend} G10`, {
+            gcode('G10', {
                 L: 20,
                 P: workspace,
                 Y: toolCompensatedThickness
             }),
-            gcode('[PREF_UNIT] G91'),
+            gcode('G91'),
             gcode('G0', {
                 Y: XYRetract
             }),
