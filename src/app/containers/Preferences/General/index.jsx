@@ -28,7 +28,6 @@ import Connection from './Connection';
 import GeneralArea from '../components/GeneralArea';
 import Workspace from './Workspace';
 import Settings from './Settings';
-import Movement from './Movement';
 import CustomDecimalPlaces from './CustomDecimalPlaces';
 
 const General = ({ active, state, actions }) => {
@@ -43,7 +42,6 @@ const General = ({ active, state, actions }) => {
                 </GeneralArea.Half>
 
                 <GeneralArea.Half>
-                    <Movement state={state} actions={actions} />
                     <CustomDecimalPlaces state={state} actions={actions}/>
                     <Settings />
                 </GeneralArea.Half>
