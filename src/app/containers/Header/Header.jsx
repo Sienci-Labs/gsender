@@ -23,6 +23,7 @@
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import without from 'lodash/without';
+import _ from 'lodash';
 import HeadlessIndicator from 'app/components/HeadlessIndicator';
 import Push from 'push.js';
 import isElectron from 'is-electron';
@@ -265,8 +266,10 @@ class Header extends PureComponent {
 
     componentDidMount() {
         this._isMounted = true;
+        this.updateScreenSize();
         this.addShuttleControlEvents();
         this.addControllerEvents();
+        this.addResizeEventListener();
         useKeybinding(this.shuttleControlEvents);
 
         if (isElectron()) {
@@ -287,6 +290,7 @@ class Header extends PureComponent {
 
         this.removeShuttleControlEvents();
         this.removeControllerEvents();
+        this.removeResizeEventListener();
 
         this.runningTasks = [];
     }
@@ -319,6 +323,16 @@ class Header extends PureComponent {
         });
     }
 
+    addResizeEventListener() {
+        this.onResizeThrottled = _.throttle(this.updateScreenSize, 25);
+        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+    }
+
+    removeResizeEventListener() {
+        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        this.onResizeThrottled = null;
+    }
+
     toggleUpdateToast() {
         pubsub.publish('showUpdateToast');
     }
@@ -338,21 +352,30 @@ class Header extends PureComponent {
         });
     }
 
+    updateScreenSize = () => {
+        let isMobile = window.visualViewport.width < 700;
+        this.setState({
+            mobile: isMobile
+        });
+    };
+
     render() {
-        const { updateAvailable, hostInformation } = this.state;
+        const { updateAvailable, hostInformation, mobile } = this.state;
         return (
-            <div className={styles.navBar}>
-                <div className={styles.primary}>
-                    <NavLogo updateAvailable={ updateAvailable } onClick={ () => this.toggleUpdateToast() }/>
-                    <NavbarConnection
-                        state={ this.state }
-                        actions={ this.actions }
-                        widgetId="connection"
-                    />
-                    {hostInformation.headless && <HeadlessIndicator {...hostInformation} />}
+            <>
+                <div className={styles.navBar}>
+                    <div className={styles.primary}>
+                        <NavLogo updateAvailable={ updateAvailable } onClick={ () => this.toggleUpdateToast() }/>
+                        <NavbarConnection
+                            state={ this.state }
+                            actions={ this.actions }
+                            widgetId="connection"
+                        />
+                        {hostInformation.headless && <HeadlessIndicator {...hostInformation} />}
+                    </div>
+                    { !mobile && <NavSidebar /> }
                 </div>
-                <NavSidebar />
-            </div>
+            </>
         );
     }
 }
