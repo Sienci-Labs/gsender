@@ -347,6 +347,7 @@ class Workspace extends PureComponent {
                 .then((res) => {
                     const { name = '', gcode = '' } = { ...res.body };
                     pubsub.publish('gcode:load', { name, gcode });
+                    log.error('Failed to upload G-code file');
                 })
                 .catch((res) => {
                     log.error('Failed to upload G-code file');

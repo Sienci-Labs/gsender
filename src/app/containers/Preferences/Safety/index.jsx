@@ -24,9 +24,11 @@
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import reduxStore from 'app/store/redux';
+import isElectron from 'is-electron';
 
 import SettingWrapper from '../components/SettingWrapper';
 import GeneralArea from '../components/GeneralArea';
+import ErrorLog from './ErrorLogs/ErrorLog';
 
 import VisualizerSafety from './VisualizerSafety';
 import Movement from './Movement';
@@ -45,6 +47,7 @@ const SafetySettings = ({ active, state, actions }) => {
                         <Movement state={state} actions={actions} />
                     </GeneralArea.Half>
                 </GeneralArea>
+                {isElectron() ? <ErrorLog /> : <span />}
             </ReduxProvider>
         </SettingWrapper>
     );

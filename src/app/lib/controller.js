@@ -96,6 +96,7 @@ class Controller {
         'file:load': [],
         'file:unload': [],
         'homing:flag': [],
+        'electronErrors:errorList': [],
         'grbl:iSready': [],
         'sender:M0M1': []
     };

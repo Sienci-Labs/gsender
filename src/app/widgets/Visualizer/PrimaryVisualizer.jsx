@@ -69,7 +69,7 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
 
                 {WebGL.isWebGLAvailable() && (
                     <div className={styles.visualizerWrapper}>
-                        <SoftLimitsWarningArea/>
+                        <SoftLimitsWarningArea />
                         {
                             showUnlockButton && <UnlockButton />
                         }

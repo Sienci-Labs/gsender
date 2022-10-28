@@ -84,7 +84,6 @@
 
 .general-area {
   width: 100%;
-  height: 625px;
   display: flex;
   gap: 2rem;
   justify-content: space-between;
@@ -550,6 +549,78 @@
 
   line-height: 1.5 !important;
 }
+
+.errorWrapper{
+  width:100%
+  min-height: 20rem;
+  margin-top: 2rem;
+  .errorHeading{
+    height: 5%;
+    font-size: 1.7rem;
+    }
+  .errorBody{
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #e5e7eb;
+    min-height: 387px;
+    height: 387px !important;
+    overflow-y: auto;
+
+    .verticalTimeline{
+      height: auto !important;
+      padding: 0;
+      &::before{
+      min-height: 24rem;  
+      }
+      h5{
+        font-weight: 800;
+      }
+      .errorTag{
+        font-weight: 800;
+        font-size: 1.2rem;
+      }
+      .errorReason{
+        
+      }
+      .errorDate{
+        float: right;
+        font-size: 0.88rem;
+        color: #898686;
+      }
+      .inbuiltDate{
+        display: none !important;
+      }
+      .marginUpdate{
+        margin: 1rem 0 !important;
+        p{
+          margin: .6em 0 0;
+        }
+      }
+    }
+
+      .noErrors{
+        width: 100%;
+        height: 25rem !important;
+        margin: auto;
+        color: black;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 25rem;
+      }
+
+    &::-webkit-scrollbar {
+    width: 7px;
+    }
+    &::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 7px #ffffff; 
+    border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px #1f2937; 
+    }
+    }
+  }
 
 .stats-container {
   display: flex;

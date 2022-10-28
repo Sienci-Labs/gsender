@@ -363,6 +363,10 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('electronErrors:errorList', (errorList) => {
+        store.set('electron-error-list', errorList);
+    });
+
     // Need this to handle unload when machine not connected since controller event isn't sent
     pubsub.subscribe('gcode:unload', () => {
         reduxStore.dispatch({
