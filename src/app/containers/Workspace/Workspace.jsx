@@ -319,7 +319,6 @@ class Workspace extends PureComponent {
     };
 
     updateScreenSize = () => {
-        console.log(window.visualViewport.width);
         let isMobile = window.visualViewport.width < 700;
         this.setState({
             mobile: isMobile
