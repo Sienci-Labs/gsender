@@ -11,10 +11,11 @@ import { FirmwareContext } from '../../utils';
 
 
 const SettingsList = () => {
-    const { hasSettings, machineProfile, settings, setFilterText, setSettings } = useContext(FirmwareContext);
+    const { hasSettings, machineProfile, settings, setFilterText, setSettings, setSettingsToApply } = useContext(FirmwareContext);
 
 
     const handleSettingsChange = (index) => (value) => {
+        setSettingsToApply(true);
         setSettings(prev => {
             const updated = [...prev];
             updated[index].value = value;
@@ -24,6 +25,20 @@ const SettingsList = () => {
 
     return (
         <div className={styles.settingsContainer}>
+            <div className={styles.tableHeader}>
+                <div className={[styles['non-default-value'], styles.tableColumnEEPROM].join(' ')}>
+                    <Tooltip content="When using the Setting number in the console, make sure to include the $ symbol in front. Ex: $120">
+                        <i className="fas fa-info-circle" style={{ paddingLeft: '5px' }} />
+                    </Tooltip>
+                    <span style={{ paddingLeft: '25px', paddingRight: '5px' }}>Setting</span>
+                </div>
+                <div className={styles.tableColumn}>
+                    <span>Description</span>
+                </div>
+                <div className={styles.tableColumn}>
+                    <span>Value</span>
+                </div>
+            </div>
             {
                 hasSettings && (
                     <>
@@ -47,7 +62,7 @@ const SettingsList = () => {
                                             }
                                             <div className={styles.settingsInformation}>
                                                 <div className={styles.keyRow}>
-                                                    {grbl.setting}
+                                                    {grbl.setting.replace('$', '')}
                                                     <CategoryTag category={grbl.category} />
                                                 </div>
                                                 <div className={styles.settingsDescription}>

@@ -24,12 +24,13 @@ import React from 'react';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
+import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
@@ -40,6 +41,8 @@ import isElectron from 'is-electron';
 
 
 export function* initialize() {
+    let visualizeWorker = null;
+    let estimateWorker = null;
     let currentState = GRBL_ACTIVE_STATE_IDLE;
     let prevState = GRBL_ACTIVE_STATE_IDLE;
     let areStatsInitialized = false;
@@ -235,6 +238,7 @@ export function* initialize() {
 
         // We don't throw a modal on manual tool changes
         if (option === 'Manual') {
+            pubsub.publish('gcode:ManualToolChange');
             return;
         }
 
@@ -275,7 +279,7 @@ export function* initialize() {
             const shouldRenderSVG = shouldVisualizeSVG();
 
             if (needsVisualization) {
-                const visualizeWorker = new VisualizeWorker();
+                visualizeWorker = new VisualizeWorker();
                 visualizeWorker.onmessage = visualizeResponse;
                 visualizeWorker.postMessage({
                     content,
@@ -316,20 +320,25 @@ export function* initialize() {
                 state: RENDER_LOADING
             }
         });
+        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
+        const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
+        const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
+        const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
 
-        const estimateWorker = new EstimateWorker();
+        estimateWorker = new EstimateWorker();
         estimateWorker.onmessage = estimateResponseHandler;
         estimateWorker.postMessage({
             content,
             name,
-            size
+            size,
+            accelArray
         });
 
         const needsVisualization = shouldVisualize();
         const shouldRenderSVG = shouldVisualizeSVG();
 
         if (needsVisualization) {
-            const visualizeWorker = new VisualizeWorker();
+            visualizeWorker = new VisualizeWorker();
             visualizeWorker.onmessage = visualizeResponse;
             visualizeWorker.postMessage({
                 content,
@@ -362,6 +371,14 @@ export function* initialize() {
         });
     });
 
+    pubsub.subscribe('file:load', (msg, data) => {
+        visualizeWorker.terminate();
+    });
+
+    pubsub.subscribe('estimate:done', (msg, data) => {
+        estimateWorker.terminate();
+    });
+
     controller.addListener('toolchange:preHookComplete', (comment = '') => {
         const onConfirmhandler = () => {
             controller.command('toolchange:post');
@@ -388,6 +405,32 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('sender:M0M1', (opts) => {
+        const { data, comment = '' } = opts;
+
+        const content = (comment.length > 0)
+            ? <div><p>A pause command ({data}) was found - click resume to continue.</p><p>Comment: <b>{comment}</b></p></div>
+            : `A pause command (${data}) was found - click resume to continue.`;
+
+        Confirm({
+            title: 'M0/M1 Pause',
+            content,
+            confirmLabel: 'Resume',
+            cancelLabel: 'Close Window',
+            onConfirm: () => {
+                controller.command('gcode:resume');
+            }
+        });
+    });
+
+    controller.addListener('outline:start', () => {
+        Toaster.clear();
+        Toaster.pop({
+            type: TOASTER_SUCCESS,
+            msg: 'Running file outline'
+        });
+    });
+
     controller.addListener('homing:flag', (flag) => {
         reduxStore.dispatch({
             type: controllerActions.UPDATE_HOMING_FLAG,
@@ -405,6 +448,10 @@ export function* initialize() {
             msg: `Tool command found - <b>${tool}</b>`,
             duration: TOASTER_UNTIL_CLOSE
         });
+    });
+
+    controller.addListener('grbl:iSready', (status) => {
+        pubsub.publish('grblExists:update', status);
     });
 
     controller.addListener('error', (error) => {

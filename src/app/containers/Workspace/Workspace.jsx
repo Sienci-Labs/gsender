@@ -60,6 +60,7 @@ import RotatePrompt from './RotatePrompt';
 
 const WAIT = '%wait';
 const TOOLCHANGE = '%toolchange';
+const M0M1_PAUSE = '%m0m1_pause';
 
 const startWaiting = () => {
     // Adds the 'wait' class to <html>
@@ -221,7 +222,7 @@ class Workspace extends PureComponent {
                 return;
             }
 
-            if (data === TOOLCHANGE) {
+            if (data === TOOLCHANGE || data === M0M1_PAUSE) {
                 return;
             }
 
@@ -236,7 +237,7 @@ class Workspace extends PureComponent {
             }[data] || data;
 
             const commentString = comment || '';
-            const content = (comment.length > 0)
+            const content = (commentString.length > 0)
                 ? <div><p>Press Resume to continue operation.</p><p>Line contained following comment: <b>{commentString}</b></p></div>
                 : 'Press Resume to continue operation.';
 

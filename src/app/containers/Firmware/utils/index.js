@@ -5,7 +5,7 @@ import download from 'downloadjs';
 import controller from 'app/lib/controller';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import { Toaster, TOASTER_SUCCESS, TOASTER_INFO, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
-import store from 'app/store';
+// import store from 'app/store';
 import { GRBL } from 'app/constants';
 
 import defaultGRBLSettings from '../eepromFiles/DefaultGrblSettings.json';
@@ -46,12 +46,13 @@ export const getResetToDefaultMessage = ({ name, type } = {}) => {
     return message;
 };
 
-export const getMachineProfileVersion = () => {
-    const machineProfile = store.get('workspace.machineProfile');
-    return get(machineProfile, 'version', 'MK1');
+export const getMachineProfileVersion = (profile) => {
+    //const machineProfile = store.get('workspace.machineProfile');
+    // return get(machineProfile, 'version', 'MK1');
+    return get(profile, 'version', 'MK1');
 };
 
-export const startFlash = (port) => {
+export const startFlash = (port, profile) => {
     if (!port) {
         Toaster.pop({
             msg: 'No port specified - please connect to the device to determine what is being flashed',
@@ -63,10 +64,10 @@ export const startFlash = (port) => {
     Toaster.pop({
         msg: `Flashing started on port: ${port} `,
         type: TOASTER_INFO,
-        duration: 15000
+        duration: 10000
     });
-    const imageType = this.actions.getMachineProfileVersion();
-    controller.command('flash:start', port, imageType);
+    const imageType = getMachineProfileVersion(profile);
+    controller.flashFirmware(port, imageType);
 };
 
 export const restoreDefaultSettings = (machineProfile) => {
@@ -75,6 +76,7 @@ export const restoreDefaultSettings = (machineProfile) => {
     values.push('$$');
 
     controller.command('gcode', values);
+
     Toaster.pop({
         msg: ('Default Settings Restored'),
         type: TOASTER_INFO,
@@ -105,13 +107,14 @@ export const convertValueToArray = (value, possibilities) => {
     return possibilities[index];
 };
 
-export const applyNewSettings = (settings, eeprom) => {
+export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
     const changedSettings = settings
         .filter(item => eeprom[item.setting] !== item.value) // Only retrieve settings that have been modified
         .map(item => `${item.setting}=${item.value}`); // Create array of set eeprom value strings (ex. "$0=1")
 
     controller.command('gcode', changedSettings);
     controller.command('gcode', '$$'); //Needed so next time wizard is opened changes are reflected
+    setSettingsToApply(false);
     Toaster.pop({
         msg: 'Firmware Settings Updated',
         type: TOASTER_SUCCESS

@@ -42,4 +42,5 @@ export const estimateResponseHandler = ({ data }) => {
     });
 
     pubsub.publish('file:loaded');
+    pubsub.publish('estimate:done');
 };

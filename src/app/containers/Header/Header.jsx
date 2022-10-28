@@ -22,11 +22,13 @@
  */
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
+import get from 'lodash/get';
 import without from 'lodash/without';
 import _ from 'lodash';
 import HeadlessIndicator from 'app/components/HeadlessIndicator';
 import Push from 'push.js';
 import isElectron from 'is-electron';
+import reduxStore from 'app/store/redux';
 import api from 'app/api';
 import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
@@ -38,7 +40,7 @@ import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
 import useKeybinding from '../../lib/useKeybinding';
-import { GENERAL_CATEGORY, LOCATION_CATEGORY } from '../../constants';
+import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE, GENERAL_CATEGORY, LOCATION_CATEGORY } from '../../constants';
 
 class Header extends PureComponent {
     static propTypes = {
@@ -48,37 +50,6 @@ class Header extends PureComponent {
     state = this.getInitialState();
 
     actions = {
-        requestPushPermission: () => {
-            const onGranted = () => {
-                this.setState({ pushPermission: Push.Permission.GRANTED });
-            };
-            const onDenied = () => {
-                this.setState({ pushPermission: Push.Permission.DENIED });
-            };
-            // Note that if "Permission.DEFAULT" is returned, no callback is executed
-            const permission = Push.Permission.request(onGranted, onDenied);
-            if (permission === Push.Permission.DEFAULT) {
-                this.setState({ pushPermission: Push.Permission.DEFAULT });
-            }
-        },
-        checkForUpdates: async () => {
-            try {
-                const res = await api.getState();
-                const { checkForUpdates } = res.body;
-
-                if (checkForUpdates) {
-                    const res = await api.getLatestVersion();
-                    const { time, version } = res.body;
-
-                    this._isMounted && this.setState({
-                        latestVersion: version,
-                        latestTime: time
-                    });
-                }
-            } catch (res) {
-                // Ignore error
-            }
-        },
         fetchCommands: async () => {
             try {
                 const res = await api.commands.fetch({ paging: false });
@@ -109,8 +80,12 @@ class Header extends PureComponent {
 
     shuttleControlFunctions = {
         CONTROLLER_COMMAND: (event, { command }) => {
+            const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
             // feedhold, cyclestart, homing, unlock, reset
-            controller.command(command);
+            if (((command === 'unlock' || command === 'homing') && activeState === GRBL_ACTIVE_STATE_ALARM) ||
+                (command !== 'unlock' && activeState === GRBL_ACTIVE_STATE_IDLE)) {
+                controller.command(command);
+            }
         }
     }
 

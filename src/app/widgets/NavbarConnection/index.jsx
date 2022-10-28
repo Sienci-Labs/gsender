@@ -1,25 +1,25 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
- *
- * This file is part of gSender.
- *
- * gSender is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, under version 3 of the License.
- *
- * gSender is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with gSender.  If not, see <https://www.gnu.org/licenses/>.
- *
- * Contact for information regarding this program and its license
- * can be sent through gSender@sienci.com or mailed to the main office
- * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
- *
- */
+* Copyright (C) 2021 Sienci Labs Inc.
+*
+* This file is part of gSender.
+*
+* gSender is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, under version 3 of the License.
+*
+* gSender is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with gSender.  If not, see <https://www.gnu.org/licenses/>.
+*
+* Contact for information regarding this program and its license
+* can be sent through gSender@sienci.com or mailed to the main office
+* of Sienci Labs Inc. in Waterloo, Ontario, Canada.
+*
+*/
 
 import get from 'lodash/get';
 import reverse from 'lodash/reverse';
@@ -37,7 +37,7 @@ import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
-
+import { Toaster, TOASTER_WARNING } from '../../lib/toaster/ToasterLib';
 
 class NavbarConnectionWidget extends PureComponent {
     static propTypes = {
@@ -45,6 +45,7 @@ class NavbarConnectionWidget extends PureComponent {
         disableWizardFunction: PropTypes.func,
         enableWizardFunction: PropTypes.func
     };
+
 
     pubsubTokens = [];
 
@@ -178,7 +179,6 @@ class NavbarConnectionWidget extends PureComponent {
         } = this.state;
         const { isConnected, type } = this.props;
         const wasConnected = prevProps.isConnected;
-
         if (!wasConnected && isConnected) {
             this.setConnectedState();
         }
@@ -237,7 +237,8 @@ class NavbarConnectionWidget extends PureComponent {
             autoReconnect: this.config.get('autoReconnect'),
             hasReconnected: false,
             alertMessage: '',
-            showUnrecognized: false
+            showUnrecognized: false,
+            grblExists: false,
         };
     }
 
@@ -344,6 +345,25 @@ class NavbarConnectionWidget extends PureComponent {
                     baudrate: value
                 });
             }),
+            pubsub.subscribe('grblExists:update', (msg, value) => {
+                this.setState({
+                    grblExists: value
+                });
+                const { isConnected } = this.props;
+                //check if GRBL does not exists, alert user with toast
+                setTimeout(() => {
+                    check();
+                }, 5000);
+
+                const check = () => {
+                    if (!this.state.grblExists && isConnected) {
+                        Toaster.pop({
+                            type: TOASTER_WARNING,
+                            msg: 'Firmware did not respond in time, please retry.',
+                        });
+                    }
+                };
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -380,12 +400,14 @@ export default connect((store) => {
     const type = get(store, 'controller.type');
     const port = get(store, 'connection.port');
     const connectedBaudrate = get(store, 'connection.baudrate');
+    const state = get(store, 'controller.state');
     return {
         ports,
         isConnected,
         type,
         port,
         connectedBaudrate,
-        unrecognizedPorts
+        unrecognizedPorts,
+        state
     };
 })(NavbarConnectionWidget);

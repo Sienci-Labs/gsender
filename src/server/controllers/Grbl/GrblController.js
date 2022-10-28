@@ -59,7 +59,6 @@ import {
     GRBL_SETTINGS, GRBL_ACTIVE_STATE_HOME
 } from './constants';
 import { METRIC_UNITS } from '../../../app/constants';
-import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { runOverride } from '../runOverride';
@@ -67,6 +66,7 @@ import { runOverride } from '../runOverride';
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
 const POSTHOOK_COMPLETE = '%post_complete';
+const PAUSE_START = '%pause_start';
 
 const log = logger('controller:Grbl');
 const noop = _.noop;
@@ -231,7 +231,7 @@ class GrblController {
                 let commentMatcher = /\s*;.*/g;
                 let comment = line.match(commentMatcher);
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').trim();
+                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
                 if (line[0] === '%') {
                     // %wait
@@ -250,6 +250,12 @@ class GrblController {
                         setTimeout(() => {
                             this.workflow.resume();
                         }, 1500);
+                        return 'G4 P0.5';
+                    }
+                    if (line === PAUSE_START) {
+                        log.debug('Found M0/M1, pausing program');
+                        this.feeder.hold({ data: '%m0m1_pause', comment: commentString });
+                        this.emit('sender:M0M1', { data: 'M0/M1', comment: commentString });
                         return 'G4 P0.5';
                     }
                     if (line === '%_GCODE_START') {
@@ -342,12 +348,12 @@ class GrblController {
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
-                let bracketCommentLine = /^\s*\([^\)]*\)/gm;
+                let bracketCommentLine = /\([^\)]*\)/gm;
                 let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
                 line = line.replace(bracketCommentLine, '').trim();
                 let comment = line.match(commentMatcher);
                 let commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').trim();
+                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
 
                 const { sent, received } = this.sender.state;
@@ -379,13 +385,13 @@ class GrblController {
                         // Workaround for Carbide files - prevent M0 early from pausing program
                         if (sent > 10) {
                             this.workflow.pause({ data: 'M0', comment: commentString });
-                            this.emit('workflow:pause', { data: 'M0' });
+                            this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
                         }
                         line = line.replace('M0', '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1', comment: commentString });
-                        this.emit('workflow:pause', { data: 'M1' });
+                        this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
                         line = line.replace('M1', '(M1)');
                     }
                 }
@@ -656,7 +662,7 @@ class GrblController {
         this.runner.on('parserstate', (res) => {
             //finished searching gCode file for errors
             if (this.sender.state.finishTime > 0 && this.sender.state.sent > 0 && this.runner.state.status.activeState === 'Check') {
-                this.command('gcode', '$c');
+                this.command('gcode', ['$C', '[global.state.testWCS]']);
                 this.workflow.stopTesting();
                 this.emit('gcode_error_checking_file', this.sender.state, 'finished');
                 return;
@@ -856,9 +862,11 @@ class GrblController {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
         this.writeln('$$');
-
         await delay(50);
         this.event.trigger('controller:ready');
+
+        //check if controller is ready and send the status
+        this.emit('grbl:iSready', this.ready);
     }
 
     populateContext(context = {}) {
@@ -901,20 +909,20 @@ class GrblController {
             zmax: Number(context.zmax) || 0,
 
             // Machine position
-            mposx: Number(mposx) || 0,
-            mposy: Number(mposy) || 0,
-            mposz: Number(mposz) || 0,
-            mposa: Number(mposa) || 0,
-            mposb: Number(mposb) || 0,
-            mposc: Number(mposc) || 0,
+            mposx: Number(mposx).toFixed(3) || 0,
+            mposy: Number(mposy).toFixed(3) || 0,
+            mposz: Number(mposz).toFixed(3) || 0,
+            mposa: Number(mposa).toFixed(3) || 0,
+            mposb: Number(mposb).toFixed(3) || 0,
+            mposc: Number(mposc).toFixed(3) || 0,
 
             // Work position
-            posx: Number(posx) || 0,
-            posy: Number(posy) || 0,
-            posz: Number(posz) || 0,
-            posa: Number(posa) || 0,
-            posb: Number(posb) || 0,
-            posc: Number(posc) || 0,
+            posx: Number(posx).toFixed(3) || 0,
+            posy: Number(posy).toFixed(3) || 0,
+            posz: Number(posz).toFixed(3) || 0,
+            posa: Number(posa).toFixed(3) || 0,
+            posb: Number(posb).toFixed(3) || 0,
+            posc: Number(posc).toFixed(3) || 0,
 
             // Modal group
             modal: {
@@ -1042,7 +1050,6 @@ class GrblController {
             callback(); // register controller
 
             log.debug(`Connected to serial port "${port}"`);
-
             this.workflow.stop();
 
             // Clear action values
@@ -1167,31 +1174,14 @@ class GrblController {
     }
 
     consumeFeederCB() {
-        if (this.feederCB) {
+        if (this.feederCB && typeof this.feederCB === 'function') {
             this.feederCB();
+            this.feederCB = null;
         }
     }
 
     command(cmd, ...args) {
         const handler = {
-            'flash:start': () => {
-                let [port, type] = args;
-                if (!port) {
-                    this.emit('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
-                    return;
-                }
-                this.close(() => {
-                    FlashingFirmware(port, type);
-                });
-            },
-            'flashing:success': () => {
-                let [data] = args;
-                this.emit('message', data);
-            },
-            'flashing:failed': () => {
-                let [error] = args;
-                this.emit('task:error', error);
-            },
             'firmware:recievedProfiles': () => {
                 let [files] = args;
                 this.emit('task:finish', files);
@@ -1253,7 +1243,7 @@ class GrblController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                const [lineToStartFrom] = args;
+                const [lineToStartFrom, zMax] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
                 log.info(startEventEnabled);
@@ -1322,7 +1312,7 @@ class GrblController {
                     }
 
                     // Move up and then to cut start position
-                    modalGCode.push('G0 G90 G21 Z10');
+                    modalGCode.push(`G0 G90 G21 Z${zMax + 10}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
@@ -1572,11 +1562,13 @@ class GrblController {
                 }
             },
             'gcode:test': () => {
-                this.workflow.start();
-                this.feeder.reset();
-                this.command('gcode', '$c');
-                this.sender.next();
-                this.feederCB = null;
+                this.feederCB = () => {
+                    this.workflow.start();
+                    this.feeder.reset();
+                    this.sender.next();
+                    this.feederCB = null;
+                };
+                this.command('gcode', ['%global.state.testWCS=modal.wcs', '$C']);
             },
             'gcode:safe': () => {
                 const [commands, prefUnits] = args;
@@ -1602,7 +1594,7 @@ class GrblController {
                 let [axes, feedrate = 1000, units = METRIC_UNITS] = args;
                 //const JOG_COMMAND_INTERVAL = 80;
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-                let { $20, $130, $131, $132, $23 } = this.settings.settings;
+                let { $20, $130, $131, $132, $23, $13 } = this.settings.settings;
 
                 let jogFeedrate;
                 if ($20 === '1') {
@@ -1623,21 +1615,29 @@ class GrblController {
                     //we are moving in the negative direction we need to subtract the max travel
                     //by it to reach the maximum amount in that direction
                     const calculateAxisValue = ({ direction, position, maxTravel }) => {
+                        const OFFSET = 1;
+
                         if (position === 0) {
                             return ((maxTravel) * direction).toFixed(FIXED);
                         }
 
                         if (direction === 1) {
-                            return Number((position * direction)).toFixed(FIXED);
+                            return Number(position - OFFSET).toFixed(FIXED);
                         } else {
-                            return Number(-1 * (maxTravel - position)).toFixed(FIXED);
+                            return Number(-1 * (maxTravel - position - OFFSET)).toFixed(FIXED);
                         }
                     };
 
-
                     let { mpos } = this.state.status;
                     Object.keys(mpos).forEach((axis) => {
-                        mpos[axis] = Number(mpos[axis]);
+                        const val = Number(mpos[axis]);
+
+                        // Need to convert to metric if machine is reporting in imperial and the UI is in a G21 metric state
+                        if ($13 === '1' && unitModal === 'G21') {
+                            mpos[axis] = Number((val * 25.4).toFixed(FIXED));
+                        } else {
+                            mpos[axis] = Number(mpos[axis]);
+                        }
                     });
 
                     if (this.homingFlagSet) {
@@ -1651,18 +1651,18 @@ class GrblController {
                         }
                     } else {
                         if (axes.X) {
-                            axes.X = calculateAxisValue({ direction: axes.X, position: Math.abs(mpos.x), maxTravel: $130 });
+                            axes.X = calculateAxisValue({ direction: Math.sign(axes.X), position: Math.abs(mpos.x), maxTravel: $130 });
                         }
                         if (axes.Y) {
-                            axes.Y = calculateAxisValue({ direction: axes.Y, position: Math.abs(mpos.y), maxTravel: $131 });
+                            axes.Y = calculateAxisValue({ direction: Math.sign(axes.Y), position: Math.abs(mpos.y), maxTravel: $131 });
                         }
                     }
 
                     if (axes.Z) {
-                        axes.Z = calculateAxisValue({ direction: axes.Z, position: Math.abs(mpos.z), maxTravel: $132 });
+                        axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: Math.abs(mpos.z), maxTravel: $132 });
                     }
                 } else {
-                    jogFeedrate = 1000;
+                    jogFeedrate = 1250;
                     Object.keys(axes).forEach((axis) => {
                         axes[axis] *= jogFeedrate;
                     });

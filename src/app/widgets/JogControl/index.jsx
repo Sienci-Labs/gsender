@@ -482,8 +482,12 @@ class AxesWidget extends PureComponent {
             if (!key) {
                 return;
             }
-            this.actions.setSelectedSpeed(key);
-            this.actions.setJogFromPreset(key);
+            const { state } = this.props;
+            const activeState = get(state, 'status.activeState');
+            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+                this.actions.setSelectedSpeed(key);
+                this.actions.setJogFromPreset(key);
+            }
         },
         JOG_SPEED: (_, { speed }) => {
             const getStep = ({ value, increment = false }) => {
@@ -915,7 +919,6 @@ class AxesWidget extends PureComponent {
 
             const { leftStick, rightStick } = degrees;
 
-            console.log({ leftStick, rightStick });
 
             // Y Positive Move
             // AXIS X(0) ________ -0.25 to 0.25
@@ -1136,7 +1139,7 @@ class AxesWidget extends PureComponent {
             jog: {
                 xyStep: this.getInitialXYStep(),
                 zStep: this.getInitialZStep(),
-                feedrate: this.config.get('jog.feedrate'),
+                feedrate: this.getInitialFeedRate(),
                 rapid,
                 normal,
                 precise,
@@ -1168,6 +1171,13 @@ class AxesWidget extends PureComponent {
         const speeds = this.config.get('jog.normal');
 
         return (units === METRIC_UNITS) ? get(speeds, 'mm.zStep') : get(speeds, 'in.zStep');
+    }
+
+    getInitialFeedRate() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+        const speeds = this.config.get('jog.normal');
+
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.feedrate') : get(speeds, 'in.feedrate');
     }
 
     changeUnits(units) {

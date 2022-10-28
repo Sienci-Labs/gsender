@@ -16,7 +16,9 @@ const ActionArea = () => {
         setShouldRestoreDefault,
         isDefault,
         canSendSettings,
-        setSettings
+        setSettings,
+        settingsToApply,
+        setSettingsToApply
     } = useContext(FirmwareContext);
     const inputRef = useRef();
 
@@ -59,7 +61,7 @@ const ActionArea = () => {
             <div className={styles.buttonsContainer}>
                 <div>
                     <Tooltip content="Flash your Arduino board to GRBL default values" location="default">
-                        <ToolModalButton icon="fas fa-bolt" onClick={() => setInitiateFlashing(true)} disabled={!canSendSettings}>
+                        <ToolModalButton icon="fas fa-bolt" onClick={() => setInitiateFlashing(true)}>
                             Flash GRBL
                         </ToolModalButton>
                     </Tooltip>
@@ -67,7 +69,7 @@ const ActionArea = () => {
 
                 <div className={styles.buttonsMiddle}>
                     <Tooltip content="Import your GRBL settings file" location="default">
-                        <ToolModalButton icon="fas fa-file-import" onClick={() => inputRef.current?.click()}>
+                        <ToolModalButton icon="fas fa-file-import" onClick={() => inputRef.current?.click()} disabled={!canSendSettings}>
                             Import Settings
                         </ToolModalButton>
                     </Tooltip>
@@ -75,6 +77,7 @@ const ActionArea = () => {
                         <ToolModalButton
                             icon="fas fa-file-export"
                             onClick={exportSettings}
+                            disabled={!canSendSettings}
                         >
                             Export Settings
                         </ToolModalButton>
@@ -83,6 +86,7 @@ const ActionArea = () => {
                         <ToolModalButton
                             icon="fas fa-undo"
                             onClick={() => setShouldRestoreDefault(true)}
+                            disabled={!canSendSettings}
                         >
                             Restore Defaults
                         </ToolModalButton>
@@ -93,9 +97,9 @@ const ActionArea = () => {
                     <ToolModalButton
                         icon="fas fa-tasks"
                         style={{ margin: 0 }}
-                        disabled={isDefault || !canSendSettings}
-                        className={!isDefault && canSendSettings && styles.applySettingsButton}
-                        onClick={() => applyNewSettings(settings, eeprom)}
+                        disabled={isDefault || !canSendSettings || !settingsToApply}
+                        className={(isDefault || !settingsToApply) ? `${styles.firmwareButtonDisabled}` : `${styles.applySettingsButton}`}
+                        onClick={() => applyNewSettings(settings, eeprom, setSettingsToApply)}
                     >
                         Apply New Settings
                     </ToolModalButton>

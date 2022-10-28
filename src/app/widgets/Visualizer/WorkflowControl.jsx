@@ -30,7 +30,6 @@ import store from 'app/store';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
-
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import api from 'app/api';
@@ -80,7 +79,9 @@ class WorkflowControl extends PureComponent {
 
     state = this.getInitialState();
 
-    pubsubTokens = []
+    pubsubTokens = [];
+
+    workerOutline = null;
 
     getInitialState() {
         return {
@@ -191,7 +192,8 @@ class WorkflowControl extends PureComponent {
         }
         const states = [
             GRBL_ACTIVE_STATE_IDLE,
-            GRBL_ACTIVE_STATE_HOLD
+            GRBL_ACTIVE_STATE_HOLD,
+            GRBL_ACTIVE_STATE_CHECK
         ];
 
         if (includes([GRBL_ACTIVE_STATE_CHECK], activeState) && !includes([WORKFLOW_STATE_PAUSED, WORKFLOW_STATE_IDLE], workflowState)) {
@@ -204,10 +206,7 @@ class WorkflowControl extends PureComponent {
     handleOnStop = () => {
         const { actions: { handleStop }, controllerState, senderStatus } = this.props;
         const { status } = controllerState;
-        localStorage.setItem('jobOverrideToggle', JSON.stringify({
-            isChecked: false,
-            toggleStatus: 'jobStatus',
-        }));
+
         const { received } = senderStatus;
         handleStop();
         this.setState(prev => ({ runHasStarted: false, startFromLine: { ...prev.startFromLine, value: received } }));
@@ -226,11 +225,6 @@ class WorkflowControl extends PureComponent {
         const { activeState } = this.props;
 
         Toaster.clear();
-
-        localStorage.setItem('jobOverrideToggle', JSON.stringify({
-            isChecked: true,
-            toggleStatus: 'overrides',
-        }));
 
         if (activeState === GRBL_ACTIVE_STATE_CHECK) {
             this.setState({ testStarted: true, runHasStarted: true });
@@ -254,10 +248,6 @@ class WorkflowControl extends PureComponent {
             window.ipcRenderer.on('returned-upload-dialog-data', (msg, file) => {
                 this.handleElectronFileUpload(file);
             });
-            // window.ipcRenderer.on('get-port-main', (msg) => {
-            //     const port = reduxStore.getState().connection.port;
-            //     window.ipcRenderer.send('recieve-port-main', port);
-            // });
         }
         this.subscribe();
     }
@@ -295,7 +285,7 @@ class WorkflowControl extends PureComponent {
     }
 
     runOutline = () => {
-        const workerOutline = new WorkerOutline();
+        this.workerOutline = new WorkerOutline();
         const { gcode } = this.props;
         const machineProfile = store.get('workspace.machineProfile');
         const spindleMode = store.get('widgets.spindle.mode');
@@ -307,10 +297,10 @@ class WorkflowControl extends PureComponent {
             duration: TOASTER_UNTIL_CLOSE,
             msg: 'Generating outline for current file'
         });
-        workerOutline.onmessage = ({ data }) => {
+        this.workerOutline.onmessage = ({ data }) => {
             outlineResponse({ data }, machineProfile.laserOnOutline);
         };
-        workerOutline.postMessage({ gcode, isLaser });
+        this.workerOutline.postMessage({ gcode, isLaser });
     }
 
     startFromLinePrompt = () => {
@@ -320,8 +310,7 @@ class WorkflowControl extends PureComponent {
 
     handleStartFromLine = () => {
         this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
-
-        controller.command('gcode:start', this.state.startFromLine.value);
+        controller.command('gcode:start', this.state.startFromLine.value, this.props.zMax);
 
         Toaster.pop({
             msg: 'Running Start From Specific Line Command',
@@ -339,6 +328,9 @@ class WorkflowControl extends PureComponent {
                     type: TOASTER_WARNING
                 });
             }),
+            pubsub.subscribe('outline:done', () => {
+                this.workerOutline.terminate();
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -605,6 +597,7 @@ export default connect((store) => {
     const port = get(store, 'connection.port');
     const gcode = get(store, 'file.content');
     const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
+    const zMax = get(store, 'file.bbox.max.z', 0);
     return {
         fileLoaded,
         isConnected,
@@ -616,6 +609,7 @@ export default connect((store) => {
         port,
         lineTotal,
         gcode,
-        fileCompletion
+        fileCompletion,
+        zMax
     };
 }, null, null, { forwardRef: true })(WorkflowControl);

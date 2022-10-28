@@ -23,14 +23,14 @@
 
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
+import reduxStore from 'app/store/redux';
 import get from 'lodash/get';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import controller from 'app/lib/controller';
 import combokeys from 'app/lib/combokeys';
 import gamepad, { runAction } from 'app/lib/gamepad';
-import { GRBL_ACTIVE_STATE_IDLE, COOLANT_CATEGORY } from 'app/constants';
+import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import styles from './index.styl';
-import useKeybinding from '../../lib/useKeybinding';
 
 
 const sendM7 = () => {
@@ -44,36 +44,27 @@ const sendM9 = () => {
 };
 
 const shuttleControlEvents = {
-    MIST_COOLANT: {
-        title: 'Mist Coolant',
-        keys: '',
-        cmd: 'MIST_COOLANT',
-        preventDefault: false,
-        isActive: true,
-        category: COOLANT_CATEGORY,
-        callback: () => {
+    MIST_COOLANT: () => {
+        const isConnected = get(reduxStore.getState(), 'connection.isConnected');
+        const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+        const canClick = isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+        if (canClick) {
             sendM7();
-        },
+        }
     },
-    FLOOD_COOLANT: {
-        title: 'Flood Coolant',
-        keys: '',
-        cmd: 'FLOOD_COOLANT',
-        preventDefault: false,
-        isActive: true,
-        category: COOLANT_CATEGORY,
-        callback: () => {
+    FLOOD_COOLANT: () => {
+        const isConnected = get(reduxStore.getState(), 'connection.isConnected');
+        const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+        const canClick = isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+        if (canClick) {
             sendM8();
-        },
+        }
     },
-    STOP_COOLANT: {
-        title: 'Stop Coolant',
-        keys: '',
-        cmd: 'STOP_COOLANT',
-        preventDefault: false,
-        isActive: true,
-        category: COOLANT_CATEGORY,
-        callback: () => {
+    STOP_COOLANT: () => {
+        const isConnected = get(reduxStore.getState(), 'connection.isConnected');
+        const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+        const canClick = isConnected && activeState === GRBL_ACTIVE_STATE_IDLE;
+        if (canClick) {
             sendM9();
         }
     }
@@ -83,14 +74,16 @@ const subscribeShuttleControl = () => {
     combokeys.reload();
 
     Object.keys(shuttleControlEvents).forEach(eventName => {
-        const callback = shuttleControlEvents[eventName].callback;
+        const callback = shuttleControlEvents[eventName];
         combokeys.on(eventName, callback);
     });
+
+    gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: shuttleControlEvents }));
 };
 
 const unsubscribeShuttleControl = () => {
     Object.keys(shuttleControlEvents).forEach(eventName => {
-        const callback = shuttleControlEvents[eventName].callback;
+        const callback = shuttleControlEvents[eventName];
         combokeys.removeListener(eventName, callback);
     });
 };
@@ -98,8 +91,6 @@ const unsubscribeShuttleControl = () => {
 const CoolantControls = ({ canClick }) => {
     useEffect(() => {
         subscribeShuttleControl();
-        useKeybinding(shuttleControlEvents);
-        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: shuttleControlEvents }));
         return function cleanup() {
             unsubscribeShuttleControl();
         };
