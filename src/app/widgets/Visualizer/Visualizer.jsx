@@ -789,6 +789,13 @@ class Visualizer extends Component {
         const { containerID, isSecondary } = this.props;
         const container = document.getElementById(containerID);
 
+        // when changing screen size to mobile,
+        // this function runs as the visualizer is getting removed,
+        // resulting in a null container
+        if (!container) {
+            return 0;
+        }
+
         const clientHeight = isSecondary ? container.clientHeight - 2 : container.clientHeight - 30;
 
         return clientHeight;
