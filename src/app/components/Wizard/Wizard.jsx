@@ -45,7 +45,7 @@ const Wizard = () => {
     );
 
     return (
-        <div className={cx(styles.wizardWrapper, { [styles.hidden]: !visible, [styles.minimizedWrapper]: minimized })}>
+        <div className={cx({ [styles.hidden]: !visible, [styles.minimizedWrapper]: minimized, [styles.wizardWrapper]: !minimized })}>
             <div className={styles.wizardTitle}>
                 <h1><i className="fas fa-hat-wizard" /> {title} - Step {activeStep + 1} of {steps.length}</h1>
                 <MinMaxButton />
