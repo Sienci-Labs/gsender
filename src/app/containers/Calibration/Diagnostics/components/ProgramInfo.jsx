@@ -27,20 +27,26 @@ import { get } from 'lodash';
 import { connect } from 'react-redux';
 import cx from 'classnames';
 import styles from '../index.styl';
+import pkg from '../../../../../package.json';
 
-const ProgramInfo = ({ type, settings }) => {
-    const version = store.get('version');
+const ProgramInfo = ({ type, settings, connection }) => {
     const machineProfile = store.get('workspace.machineProfile', {});
     const { company, name, type: machineType } = machineProfile;
+    const units = store.get('workspace.units');
+    const { port, baudrate } = connection;
 
     return (
         <div className={cx(styles.card)}>
             <h2>Your Machine</h2>
-            <b>gSender {version}</b>
+            <b>gSender {pkg.version}</b>
             <div><b>{type}</b> - {settings.version}</div>
             <h3>Selected Profile</h3>
             <b>{company} {name}</b>
             <div><i>{machineType}</i></div>
+            <div><b>Preferred units: </b>{units}</div>
+            <h3>Connection Info</h3>
+            <div><b>Port: </b>{port}</div>
+            <div><b>Baudrate: </b>{baudrate}</div>
         </div>
     );
 };
@@ -48,8 +54,10 @@ const ProgramInfo = ({ type, settings }) => {
 export default connect((store) => {
     const type = get(store, 'controller.type', 'Grbl');
     const settings = get(store, 'controller.settings', {});
+    const connection = get(store, 'connection', {});
     return {
         type,
-        settings
+        settings,
+        connection
     };
 })(ProgramInfo);
