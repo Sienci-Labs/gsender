@@ -32,8 +32,8 @@ class GCodeVisualizer {
         this.theme = theme;
         this.vertices = [];
         this.colors = [];
-        this.framesLength = 0;
         this.spindleSpeeds = null;
+        this.spindleChanges = null;
         this.isLaser = false;
         this.frames = []; // Example
         this.frameIndex = 0;
@@ -50,8 +50,8 @@ class GCodeVisualizer {
         const calculateOpacity = (speed) => ((maxSpindleValue === 0) ? 1 : (speed / maxSpindleValue));
 
         for (let i = 0; i < this.frames.length; i++) {
-            const { spindleOn, spindleSpeed } = this.frames[i];
-            const offsetIndex = (this.frames[i].vertexIndex * 4);
+            const { spindleOn, spindleSpeed } = this.spindleChanges[i];
+            const offsetIndex = (this.frames[i] * 4);
             if (spindleOn) {
                 let opacity = calculateOpacity(spindleSpeed);
                 const color = [...defaultColor.toArray(), opacity];
@@ -63,12 +63,13 @@ class GCodeVisualizer {
         }
     }
 
-    render({ vertices, colors, frames, spindleSpeeds, isLaser = false }) {
+    render({ vertices, colors, frames, spindleSpeeds, isLaser = false, spindleChanges }) {
         const { cuttingCoordinateLines, G0Color, G1Color } = this.theme;
         this.vertices = new THREE.Float32BufferAttribute(vertices, 3);
         this.frames = frames;
         this.spindleSpeeds = spindleSpeeds;
         this.isLaser = isLaser;
+        this.spindleChanges = spindleChanges;
         const defaultColor = new THREE.Color(cuttingCoordinateLines);
 
         // Get line colors for current theme
@@ -107,6 +108,7 @@ class GCodeVisualizer {
 
     /* Turns our array of Three colors into a float typed array we can set as a bufferAttribute */
     getColorTypedArray(colors, motionColor) {
+        console.log(colors);
         const colorArray = [];
         colors.forEach(colorTag => {
             const [motion, opacity] = colorTag;
@@ -119,7 +121,6 @@ class GCodeVisualizer {
             this.updateLaserModeColors();
         }
 
-        this.colors = new Float32Array(colorArray);
         return new Float32Array(colorArray);
     }
 
