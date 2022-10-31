@@ -22,11 +22,22 @@
  */
 
 import React from 'react';
+import cx from 'classnames';
+import generateSupportFile from 'app/lib/diagnostics';
+import styles from '../index.styl';
 
-const FirmwareOptions = () => {
+
+const DiagnosticFile = () => {
     return (
-        <div>Firmware</div>
+        <div className={cx(styles.card)}>
+            <h2>Diagnostic File</h2>
+            {
+                //<button onClick={() => generateSupportFile()}>Generate Diagnostic File</button>
+            }
+            { generateSupportFile() }
+            <div className={styles.small}>This creates a shareable PDF file with information on your gSender setup, your machine, and the currently loaded file if applicable</div>
+        </div>
     );
 };
 
-export default FirmwareOptions;
+export default DiagnosticFile;

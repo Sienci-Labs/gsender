@@ -21,7 +21,6 @@
  *
  */
 import React from 'react';
-import FirmwareInfo from 'app/containers/Calibration/Diagnostics/components/FirmwareInfo';
 import FirmwareOptions from 'app/containers/Calibration/Diagnostics/components/FirmwareOptions';
 import ProgramInfo from 'app/containers/Calibration/Diagnostics/components/ProgramInfo';
 import PinStatus from 'app/containers/Calibration/Diagnostics/components/PinStatus';
@@ -35,7 +34,6 @@ const DiagnosticTool = () => {
                 <ProgramInfo />
                 <PinStatus />
                 <FirmwareOptions />
-                <FirmwareInfo />
             </div>
         </div>
     );

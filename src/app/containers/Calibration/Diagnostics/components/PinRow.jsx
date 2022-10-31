@@ -22,11 +22,20 @@
  */
 
 import React from 'react';
+import cx from 'classnames';
+import styles from '../index.styl';
 
-const FirmwareInfo = () => {
+const PinRow = ({ label, value = false }) => {
     return (
-        <div>Firmware</div>
+        <div className={styles.pinRow}>
+            <div className={styles.pinLabel}>{label}</div>
+            <div className={cx(styles.pinIndicator, value ? styles.pinActive : styles.pinInactive)}>
+                {
+                    value ? 'High' : 'Low'
+                }
+            </div>
+        </div>
     );
 };
 
-export default FirmwareInfo;
+export default PinRow;

@@ -25,4 +25,73 @@
   display: grid;
   grid-template-columns 1fr 1fr;
   grid-gap 1rem;
+  justify-items stretch;
+  width: 900px;
+}
+
+.card {
+  background: #f2f2f2;
+  padding: 1rem;
+  border-radius: 3px;
+  box-shadow: 0 0 20px 8px #d0d0d0;
+  border-top: solid 5px #3e85c7;
+
+  h2 {
+    margin: 0;
+    padding: 0;
+    color: #3e85c7;
+    margin-bottom: 1rem;
+    border-bottom: solid 1px #295d8d;
+    line-height: 3rem;
+  }
+  h3 {
+    margin: 1rem 0;
+    padding: 0;
+    color: #3e85c7;
+    border-bottom: solid 1px #295d8d;
+    font-size: 1.2rem;
+  }
+}
+
+.pins {
+  display: flex;
+  flex-direction column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.pinLabel {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.pinRow {
+  display flex;
+  flex-direction row;
+  justify-content space-between;
+  width: 100%;
+  align-items center;
+}
+
+.pinIndicator {
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.pinActive {
+  background: alpha(#0ef6ae, 0.1);
+  border: solid 1px #036949;
+  color: #059669;
+}
+
+.pinInactive {
+  background: alpha(#e66767, 0.1);
+  border: solid 1px #9b1919;
+  color: #dc2626;
+}
+
+.small {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-top: 1rem;
 }

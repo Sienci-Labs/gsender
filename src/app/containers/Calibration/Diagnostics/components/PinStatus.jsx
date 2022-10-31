@@ -1,9 +1,30 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { get } from 'lodash';
+import cx from 'classnames';
+import styles from '../index.styl';
+import PinRow from './PinRow';
 
-const PinStatus = () => {
+const PinStatus = ({ pins }) => {
     return (
-        <div>Pins</div>
+        <div className={cx(styles.pins, styles.card)}>
+            <h2>Pins</h2>
+            <PinRow label="X" value={pins.X} />
+            <PinRow label="Y" value={pins.Y} />
+            <PinRow label="Z" value={pins.Z} />
+            <PinRow label="Probe" value={pins.P} />
+            <PinRow label="Door" value={pins.D} />
+            <PinRow label="Hold" value={pins.H} />
+            <PinRow label="Soft-Reset" value={pins.R} />
+            <PinRow label="Cycle-Start" value={pins.S} />
+        </div>
     );
 };
 
-export default PinStatus;
+export default connect((store) => {
+    const pins = get(store, 'controller.state.status.pinState', {});
+
+    return {
+        pins
+    };
+})(PinStatus);

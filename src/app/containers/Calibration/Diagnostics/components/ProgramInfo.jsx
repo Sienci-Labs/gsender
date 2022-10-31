@@ -22,11 +22,34 @@
  */
 
 import React from 'react';
+import store from 'app/store';
+import { get } from 'lodash';
+import { connect } from 'react-redux';
+import cx from 'classnames';
+import styles from '../index.styl';
 
-const ProgramInfo = () => {
+const ProgramInfo = ({ type, settings }) => {
+    const version = store.get('version');
+    const machineProfile = store.get('workspace.machineProfile', {});
+    const { company, name, type: machineType } = machineProfile;
+
     return (
-        <div>Program Info</div>
+        <div className={cx(styles.card)}>
+            <h2>Your Machine</h2>
+            <b>gSender {version}</b>
+            <div><b>{type}</b> - {settings.version}</div>
+            <h3>Selected Profile</h3>
+            <b>{company} {name}</b>
+            <div><i>{machineType}</i></div>
+        </div>
     );
 };
 
-export default ProgramInfo;
+export default connect((store) => {
+    const type = get(store, 'controller.type', 'Grbl');
+    const settings = get(store, 'controller.settings', {});
+    return {
+        type,
+        settings
+    };
+})(ProgramInfo);
