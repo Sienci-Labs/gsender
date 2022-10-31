@@ -26,7 +26,7 @@ import store from 'app/store';
 const wizard = {
     steps: [
         {
-            title: 'Setup',
+            title: 'Initial Setup',
             substeps: [
                 {
                     title: 'Safety First',
@@ -49,7 +49,7 @@ const wizard = {
                                     `%global.toolchange.PROBE_POS_X=${position.x}`,
                                     `%global.toolchange.PROBE_POS_Y=${position.y}`,
                                     `%global.toolchange.PROBE_POS_Z=${position.z}`,
-                                    'global.toolchange.Z_SAFE_HEIGHT=-10',
+                                    '%global.toolchange.Z_SAFE_HEIGHT=-10',
                                     '%global.toolchange.UNITS=modal.units',
                                     '%global.toolchange.SPINDLE=modal.spindle',
                                     '%global.toolchange.DISTANCE=modal.distance',
