@@ -54,7 +54,7 @@ const BitShiftInput = ({ value, onChange }) => {
         sum += x ? 1 : 0;
         sum += y ? 2 : 0;
         sum += z ? 4 : 0;
-        console.log(sum);
+
         onChange(sum.toString());
         return bitShiftSettings;
     };

@@ -25,6 +25,7 @@ import React from 'react';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 
+import { Tooltip } from '@trendmicro/react-tooltip';
 import styles from './Overrides.styl';
 import GaugeChart from '../GaugeChart';
 
@@ -76,6 +77,21 @@ const ProgressArea = ({ state }) => {
         return `${elapsedMinute < 10 ? `0${elapsedMinute}` : elapsedMinute}m ${formattedSeconds < 10 ? `0${formattedSeconds}` : formattedSeconds}s`;
     };
 
+    const getLocalTime = (givenTime) => {
+        if (startTime === 0 || !givenTime || givenTime < 0) {
+            return '-';
+        }
+
+        const elapsedMilliSeconds = (moment(moment(givenTime)).diff(moment.unix(0), 'ms'));
+
+        let dateNow = new Date();
+        const dateNowTime = dateNow.getTime();
+        dateNow.setTime(dateNowTime + elapsedMilliSeconds);
+
+        const formattedTime = dateNow.toLocaleTimeString('en-US');
+        return formattedTime;
+    };
+
     // eslint-disable-next-line no-restricted-globals
     const percentageValue = isNaN(((received / total) * 100).toFixed(0)) ? 0 : ((received / total) * 100).toFixed(0);
 
@@ -91,7 +107,12 @@ const ProgressArea = ({ state }) => {
                     </div>
                     <GaugeChart color="#3e85c7" value={percentageValue} />
                     <div className={styles.progressItem}>
-                        <span className={styles.progressItemTime}>{outputFormattedTime(remainingTime)}</span>
+                        <Tooltip
+                            content={getLocalTime(remainingTime).toString()}
+                            hideOnClick
+                        >
+                            <span className={styles.progressItemTime}>{outputFormattedTime(remainingTime)}</span>
+                        </Tooltip>
                         <span>Remaining</span>
                         <span style={{ color: 'black' }}>{total - received} Lines</span>
                     </div>

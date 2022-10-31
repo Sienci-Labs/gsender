@@ -23,10 +23,13 @@
 
 /* eslint import/no-unresolved: 0 */
 import { app, BrowserWindow, shell } from 'electron';
+import log from 'electron-log';
 import path from 'path';
 
 class WindowManager {
     windows = [];
+
+    childWindows = [];
 
     title = '';
 
@@ -76,14 +79,13 @@ class WindowManager {
                     this.width = width;
                     this.height = height;
                 }
-                return;
             }
 
             app.quit();
         });
     }
 
-    openWindow(url, options, splashScreen) {
+    openWindow(url, options, splashScreen, shouldMaximize = true, isChild = false /*, data = null*/) {
         const window = new BrowserWindow({
             ...options,
             show: false,
@@ -95,7 +97,7 @@ class WindowManager {
             }
         });
         const webContents = window.webContents;
-        window.removeMenu();
+        //window.removeMenu();
         window.webContents.once('did-finish-load', () => {
             window.setTitle(options.title);
         });
@@ -115,13 +117,17 @@ class WindowManager {
 
         if (splashScreen) {
             webContents.once('dom-ready', () => {
-                window.maximize();
+                if (shouldMaximize) {
+                    window.maximize();
+                }
                 window.show();
                 splashScreen.close();
                 splashScreen.destroy();
             });
         } else {
-            window.maximize();
+            if (shouldMaximize) {
+                window.maximize();
+            }
             window.show();
         }
 
@@ -132,7 +138,16 @@ class WindowManager {
             window.loadURL(url);
         });
 
-        this.windows.push(window);
+        if (isChild) {
+            window.on('close', (e) => {
+                e.preventDefault();
+                window.hide();
+            });
+            window.key = this.childWindows.length;
+            this.childWindows.push(window);
+        } else {
+            this.windows.push(window);
+        }
 
         return window;
     }

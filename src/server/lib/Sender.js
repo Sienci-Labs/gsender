@@ -264,6 +264,8 @@ class Sender extends events.EventEmitter {
             startTime: this.state.startTime,
             finishTime: this.state.finishTime,
             elapsedTime: this.state.elapsedTime,
+            timePaused: this.state.timePaused,
+            timeRunning: this.state.timeRunning,
             remainingTime: this.state.remainingTime
         };
     }
@@ -274,6 +276,7 @@ class Sender extends events.EventEmitter {
         }
         this.state.hold = true;
         this.state.holdReason = reason;
+        // this.state.timePaused = new Date().getTime();
         this.emit('hold');
         this.emit('change');
     }
@@ -284,6 +287,7 @@ class Sender extends events.EventEmitter {
         }
         this.state.hold = false;
         this.state.holdReason = null;
+        // this.state.timePaused = new Date().getTime() - this.state.timePaused;
         this.emit('unhold');
         this.emit('change');
     }
@@ -312,6 +316,8 @@ class Sender extends events.EventEmitter {
         this.state.startTime = 0;
         this.state.finishTime = 0;
         this.state.elapsedTime = 0;
+        this.state.timePaused = 0;
+        this.state.timeRunning = 0;
         this.state.remainingTime = 0;
 
         this.emit('load', name, gcode, context);
@@ -336,6 +342,8 @@ class Sender extends events.EventEmitter {
         this.state.startTime = 0;
         this.state.finishTime = 0;
         this.state.elapsedTime = 0;
+        this.state.timePaused = 0;
+        this.state.timeRunning = 0;
         this.state.remainingTime = 0;
 
         this.emit('unload');
@@ -367,7 +375,7 @@ class Sender extends events.EventEmitter {
     // Tells the sender to send more data.
     // @return {boolean} Returns true on success, false otherwise.
     next(options = {}) {
-        const { startFromLine } = options;
+        const { startFromLine, timePaused } = options;
 
         if (!this.state.gcode) {
             return false;
@@ -380,6 +388,8 @@ class Sender extends events.EventEmitter {
             this.state.finishTime = 0;
             this.state.elapsedTime = 0;
             this.state.remainingTime = 0;
+            this.state.timePaused = 0;
+            this.state.timeRunning = 0;
             this.emit('start', this.state.startTime);
             this.emit('change');
         };
@@ -390,12 +400,21 @@ class Sender extends events.EventEmitter {
             handleStart();
         }
 
+        if (timePaused) {
+            this.state.timePaused += timePaused - 1000; // subtracted one second here to account for the time it takes for the sender to hold/unhold
+        }
+
         if (this.sp) {
             this.sp.process();
         }
 
         // Elapsed Time
         this.state.elapsedTime = now - this.state.startTime;
+        this.state.timeRunning = this.state.elapsedTime;
+        // subtract time paused
+        if (this.state.timePaused > 0) {
+            this.state.timeRunning -= this.state.timePaused;
+        }
 
         // Make a 1 second delay before estimating the remaining time
         if (this.state.elapsedTime >= 1000 && this.state.received > 0) {

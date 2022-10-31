@@ -4,6 +4,7 @@ version: "{build}-{branch}"
 branches:
   only:
     - master
+    - beta
     - /v\d+\.\d+\.\d+/
 
 environment:
@@ -383,15 +384,15 @@ for:
           fi
       - sh: |
           # arm64
-          if [[ "$ARCH" == "arm64npm " ]]; then
+          if [[ "$ARCH" == "arm64" ]]; then
             GIT_COMMIT_LOG=`git log -1 --format='%ci %H %s'`
             PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
             PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
             PRODUCT_NAME=gSender
-            yarn build:macos-arm64npm
+            yarn build:macos-arm64
             ls -al output output/*
             mkdir -p releases/macos
-            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.arm64npm .dmg"
+            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.arm64.dmg"
             ls -al releases/macos/*
             if [[ "$CI_BRANCH" == "master" && -z "$CI_TAG" ]]; then
               yarn github-release delete \
@@ -399,15 +400,15 @@ for:
                 --repo=sender \
                 --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
-                "*-macos.arm64npm .dmg";
+                "*-macos.arm64.dmg";
               yarn github-release upload \
                 --owner=Sienci \
                 --repo=sender \
                 --tag="${CI_BRANCH}" \
                 --release-name="${CI_BRANCH}" \
                 --body="${GIT_COMMIT_LOG}" \
-                "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.arm64npm .dmg";
-              #rm -f "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.arm64npm .dmg";
+                "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.arm64.dmg";
+              #rm -f "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.arm64.dmg";
             fi
           fi
     test: off

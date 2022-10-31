@@ -30,7 +30,6 @@ import store from 'app/store';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
-
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import api from 'app/api';
@@ -58,28 +57,31 @@ import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
-    VISUALIZER_PRIMARY,
-    //LASER_MODE
+    VISUALIZER_PRIMARY, LASER_MODE,
 } from '../../constants';
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
 import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
 import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
 import { outlineResponse } from '../../workers/Outline.response';
+import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
         actions: PropTypes.object,
-        invalidGcode: PropTypes.string
+        invalidGcode: PropTypes.string,
+        liteMode: PropTypes.bool
     };
 
     fileInputEl = null;
 
     state = this.getInitialState();
 
-    pubsubTokens = []
+    pubsubTokens = [];
+
+    workerOutline = null;
 
     getInitialState() {
         return {
@@ -283,22 +285,22 @@ class WorkflowControl extends PureComponent {
     }
 
     runOutline = () => {
-        const workerOutline = new WorkerOutline();
+        this.workerOutline = new WorkerOutline();
         const { gcode } = this.props;
-        //const machineProfile = store.get('workspace.machineProfile');
-        //const spindleMode = store.get('widgets.spindle.mode');
+        const machineProfile = store.get('workspace.machineProfile');
+        const spindleMode = store.get('widgets.spindle.mode');
         // outline toggled on and currently in laser mode
-        //const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
+        const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
 
         Toaster.pop({
             TYPE: TOASTER_INFO,
             duration: TOASTER_UNTIL_CLOSE,
             msg: 'Generating outline for current file'
         });
-        workerOutline.onmessage = ({ data }) => {
-            outlineResponse({ data });
+        this.workerOutline.onmessage = ({ data }) => {
+            outlineResponse({ data }, machineProfile.laserOnOutline);
         };
-        workerOutline.postMessage({ gcode, isLaser: false });
+        this.workerOutline.postMessage({ gcode, isLaser });
     }
 
     startFromLinePrompt = () => {
@@ -308,8 +310,7 @@ class WorkflowControl extends PureComponent {
 
     handleStartFromLine = () => {
         this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
-
-        controller.command('gcode:start', this.state.startFromLine.value);
+        controller.command('gcode:start', this.state.startFromLine.value, this.props.zMax);
 
         Toaster.pop({
             msg: 'Running Start From Specific Line Command',
@@ -327,6 +328,9 @@ class WorkflowControl extends PureComponent {
                     type: TOASTER_WARNING
                 });
             }),
+            pubsub.subscribe('outline:done', () => {
+                this.workerOutline.terminate();
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -348,12 +352,13 @@ class WorkflowControl extends PureComponent {
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
         const canRun = this.canRun();
-        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
+        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && activeState !== GRBL_ACTIVE_STATE_CHECK && includes([WORKFLOW_STATE_RUNNING], workflowState);
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
 
         const { showModal, value } = this.state.startFromLine;
+        const renderSVG = shouldVisualizeSVG();
 
         return (
             <div className={styles.workflowControl}>
@@ -568,11 +573,13 @@ class WorkflowControl extends PureComponent {
                         </Modal>
                     )
                 }
-
-                <CameraDisplay
-                    camera={camera}
-                    cameraPosition={cameraPosition}
-                />
+                {
+                    !renderSVG ?
+                        <CameraDisplay
+                            camera={camera}
+                            cameraPosition={cameraPosition}
+                        /> : null
+                }
             </div>
         );
     }
@@ -590,6 +597,7 @@ export default connect((store) => {
     const port = get(store, 'connection.port');
     const gcode = get(store, 'file.content');
     const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
+    const zMax = get(store, 'file.bbox.max.z', 0);
     return {
         fileLoaded,
         isConnected,
@@ -601,6 +609,7 @@ export default connect((store) => {
         port,
         lineTotal,
         gcode,
-        fileCompletion
+        fileCompletion,
+        zMax
     };
 }, null, null, { forwardRef: true })(WorkflowControl);

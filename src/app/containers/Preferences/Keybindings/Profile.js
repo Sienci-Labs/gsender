@@ -6,7 +6,7 @@ import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
 import styles from './index.styl';
 import ProfileItem from './ProfileItem';
-import MainTable from './MainTable';
+import Table from './MainTable';
 import ProfileShortcutModal from './ProfileShortcutModal';
 
 const Profile = ({ currentProfile, onUpdateProfiles }) => {
@@ -68,7 +68,7 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
 
     return (
         <>
-            <div style={{ overflowY: 'hidden' }}>
+            <div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 13fr', alignItems: 'center', margin: '0 0 0.5rem' }}>
                     <i className={classnames(icon, styles.profileItemIcon)} />
                     <input
@@ -79,8 +79,8 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
                         onBlur={handleEditName}
                     />
                 </div>
-                <div style={{ overflowY: 'auto', height: '90%', backgroundColor: 'white' }}>
-                    <MainTable
+                <div className={styles['table-wrapper-controller']}>
+                    <Table
                         onEdit={(shortcut) => {
                             setShowModal(true);
                             setCurrentShortcut(shortcut);

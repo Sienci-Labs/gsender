@@ -22,16 +22,22 @@
  */
 
 import cx from 'classnames';
-import color from 'cli-color';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import uuid from 'uuid';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
+
+import isElectron from 'is-electron';
+
+import color from 'cli-color';
+import { GREY } from './variables';
+
 import WidgetConfig from '../WidgetConfig';
 import Console from './Console';
 import styles from './index.styl';
+import PopOutButton from '../../components/PopOutButton';
 
 // The buffer starts with 254 bytes free. The terminating <LF> or <CR> counts as a byte.
 const TERMINAL_COLS = 50;
@@ -61,6 +67,10 @@ class ConsoleWidget extends PureComponent {
     config = new WidgetConfig(this.props.widgetId);
 
     state = this.getInitialState();
+
+    hasSetState = false;
+
+    name = this.props.widgetId.split(':')[0];
 
     actions = {
         toggleFullscreen: () => {
@@ -125,7 +135,7 @@ class ConsoleWidget extends PureComponent {
             });
 
             if (source) {
-                this.terminal.writeln(color.blackBright(source) + color.white(this.terminal.prompt + data));
+                this.terminal.writeln(color.blackBright(source) + color.xterm(GREY)(this.terminal.prompt + data));
             } else {
                 this.terminal.writeln(color.white(this.terminal.prompt + data));
             }
@@ -145,6 +155,9 @@ class ConsoleWidget extends PureComponent {
 
     componentDidMount() {
         this.addControllerEvents();
+        if (isElectron()) {
+            this.registerIPCListeners();
+        }
     }
 
     componentWillUnmount() {
@@ -157,6 +170,11 @@ class ConsoleWidget extends PureComponent {
         } = this.state;
 
         this.config.set('minimized', minimized);
+
+        if (isElectron() && !this.hasSetState && this.props.state) {
+            this.hasSetState = true;
+            this.setState(this.props.state);
+        }
     }
 
     getInitialState() {
@@ -176,6 +194,13 @@ class ConsoleWidget extends PureComponent {
         };
     }
 
+    registerIPCListeners () {
+        // send state of this console to the new window
+        window.ipcRenderer.on('get-data-' + this.name, (event) => {
+            const data = { state: this.state, port: controller.port };
+            window.ipcRenderer.send('recieve-data', { widget: this.name, data: data });
+        });
+    }
 
     addControllerEvents() {
         Object.keys(this.controllerEvents).forEach(eventName => {
@@ -192,7 +217,7 @@ class ConsoleWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId, embedded, active } = this.props;
+        const { widgetId, embedded, active, isMainWindow } = this.props;
         const { minimized, isFullscreen } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
         const state = {
@@ -204,19 +229,23 @@ class ConsoleWidget extends PureComponent {
 
         return (
             <Widget fullscreen={isFullscreen}>
-                <Widget.Header embedded={embedded}>
-                    <Widget.Title>
-                        {isForkedWidget &&
-                        <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
-                        }
-                        {i18n._('Console')}
-                    </Widget.Title>
-                    <Widget.Controls>
-                    </Widget.Controls>
-                </Widget.Header>
+                {
+                    isMainWindow &&
+                    <Widget.Header embedded={embedded}>
+                        <Widget.Title>
+                            {isForkedWidget &&
+                            <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
+                            }
+                            {i18n._('Console')}
+                        </Widget.Title>
+                        <Widget.Controls>
+                        </Widget.Controls>
+                    </Widget.Header>
+                }
                 <Widget.Content
                     className={cx(
                         styles.widgetContent,
+                        { [styles.popOut]: !isMainWindow },
                         styles.terminalContent,
                         { [styles.hidden]: minimized },
                         { [styles.fullscreen]: isFullscreen }
@@ -233,6 +262,10 @@ class ConsoleWidget extends PureComponent {
                         actions={actions}
                         active={active}
                     />
+                    {
+                        isElectron() && this.props.isMainWindow &&
+                        <PopOutButton id={widgetId} state={state}/>
+                    }
                 </Widget.Content>
             </Widget>
         );

@@ -55,10 +55,12 @@ import {
 import UpdateAvailableAlert from './UpdateAvailableAlert/UpdateAvailableAlert';
 import Toaster from '../../lib/toaster/Toaster';
 import ConfirmationDialog from '../../components/ConfirmationDialog/ConfirmationDialog';
+import RotatePrompt from './RotatePrompt';
 
 
 const WAIT = '%wait';
 const TOOLCHANGE = '%toolchange';
+const M0M1_PAUSE = '%m0m1_pause';
 
 const startWaiting = () => {
     // Adds the 'wait' class to <html>
@@ -90,7 +92,10 @@ class Workspace extends PureComponent {
         showPrimaryContainer: store.get('workspace.container.primary.show'),
         inactiveCount: _.size(widgetManager.getInactiveWidgets()),
         reverseWidgets: store.get('workspace.reverseWidgets'),
-        lastHealthUpdate: null
+        lastHealthUpdate: null,
+        mobile: false,
+        tablet: false,
+        shouldShowRotate: true
     };
 
     pubsubTokens = [];
@@ -110,6 +115,11 @@ class Workspace extends PureComponent {
                     name: MODAL_NONE,
                     params: {}
                 }
+            }));
+        },
+        closePrompt: () => {
+            this.setState(state => ({
+                shouldShowRotate: false
             }));
         },
         updateModalParams: (params = {}) => {
@@ -212,7 +222,7 @@ class Workspace extends PureComponent {
                 return;
             }
 
-            if (data === TOOLCHANGE) {
+            if (data === TOOLCHANGE || data === M0M1_PAUSE) {
                 return;
             }
 
@@ -227,7 +237,7 @@ class Workspace extends PureComponent {
             }[data] || data;
 
             const commentString = comment || '';
-            const content = (comment.length > 0)
+            const content = (commentString.length > 0)
                 ? <div><p>Press Resume to continue operation.</p><p>Line contained following comment: <b>{commentString}</b></p></div>
                 : 'Press Resume to continue operation.';
 
@@ -284,8 +294,8 @@ class Workspace extends PureComponent {
         const { showPrimaryContainer } = this.state;
 
         // Calculate VH based on current window height
-        let vh = window.innerHeight * 0.01;
-        let vw = window.innerWidth * 0.01;
+        let vh = window.visualViewport.height * 0.01;
+        let vw = window.visualViewport.width * 0.01;
         //Update styling with new VH value for CSS calculations
         document.documentElement.style.setProperty('--vh', `${vh}px`);
         document.documentElement.style.setProperty('--vw', `${vw}px`);
@@ -307,6 +317,17 @@ class Workspace extends PureComponent {
         // defaultContainer.style.right = secondaryToggler.offsetWidth + 'px';
         // Publish a 'resize' event
         pubsub.publish('resize'); // Also see "widgets/Visualizer"
+    };
+
+    updateScreenSize = () => {
+        let isMobile = window.visualViewport.width < 700;
+        this.setState({
+            mobile: isMobile
+        });
+        let isTablet = window.visualViewport.width < 1000 && window.visualViewport.width >= 700;
+        this.setState({
+            tablet: isTablet
+        });
     };
 
     onDrop = (files) => {
@@ -346,6 +367,7 @@ class Workspace extends PureComponent {
                 .then((res) => {
                     const { name = '', gcode = '' } = { ...res.body };
                     pubsub.publish('gcode:load', { name, gcode });
+                    log.error('Failed to upload G-code file');
                 })
                 .catch((res) => {
                     log.error('Failed to upload G-code file');
@@ -418,6 +440,7 @@ class Workspace extends PureComponent {
     };
 
     componentDidMount() {
+        this.updateScreenSize();
         this.addControllerEvents();
         this.addResizeEventListener();
         this.subscribe();
@@ -455,12 +478,15 @@ class Workspace extends PureComponent {
     }
 
     addResizeEventListener() {
-        this.onResizeThrottled = _.throttle(this.resizeDefaultContainer, 25);
-        window.addEventListener('resize', this.onResizeThrottled);
+        this.onResizeThrottled = _.throttle(() => {
+            this.updateScreenSize();
+            this.resizeDefaultContainer();
+        }, 25);
+        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
     }
 
     removeResizeEventListener() {
-        window.removeEventListener('resize', this.onResizeThrottled);
+        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
         this.onResizeThrottled = null;
     }
 
@@ -492,12 +518,16 @@ class Workspace extends PureComponent {
             isDraggingFile,
             isDraggingWidget,
             showPrimaryContainer,
-            reverseWidgets
+            reverseWidgets,
+            mobile,
+            tablet,
+            shouldShowRotate
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
         return (
             <ScreenAwake>
                 <div style={style} className={classNames(className, styles.workspace)}>
+                    {tablet && shouldShowRotate && <RotatePrompt onClose={this.action.closePrompt} /> }
                     {modal.name === MODAL_FEEDER_PAUSED && (
                         <FeederPaused
                             title={modal.params.title}
@@ -572,11 +602,14 @@ class Workspace extends PureComponent {
                             <Header />
                             <ConfirmationDialog />
                             <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
-                                <DefaultWidgets
-                                    ref={node => {
-                                        this.defaultContainer = node;
-                                    }}
-                                />
+                                {
+                                    !mobile &&
+                                        <DefaultWidgets
+                                            ref={node => {
+                                                this.defaultContainer = node;
+                                            }}
+                                        />
+                                }
                                 <div
                                     ref={node => {
                                         this.primaryContainer = node;

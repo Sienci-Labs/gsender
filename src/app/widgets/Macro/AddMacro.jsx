@@ -75,6 +75,7 @@ class AddMacro extends PureComponent {
                 onClose={actions.closeModal}
                 title="Add New Macro"
                 disableOverlay
+                disableOverlayClick
             >
                 <div style={modalContainerStyle}>
                     <div style={modalBodyStyle}>

@@ -62,6 +62,11 @@ import {
     // Workflow
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_IDLE,
+    LOCATION_CATEGORY,
+    JOGGING_CATEGORY,
+    AXIS_X,
+    AXIS_Y,
+    AXIS_Z,
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -75,6 +80,7 @@ import {
     FEEDRATE_MIN
 } from './constants';
 import styles from './index.styl';
+import useKeybinding from '../../lib/useKeybinding';
 
 class LocationWidget extends PureComponent {
     static propTypes = {
@@ -346,10 +352,7 @@ class LocationWidget extends PureComponent {
         return workflow.state === WORKFLOW_STATE_IDLE;
     }
 
-    shuttleControlEvents = {
-        GO_TO_ZERO: () => {
-            controller.command('gcode', 'G0 X0 Y0 Z0'); //Move to Work Position Zero
-        },
+    shuttleControlFunctions = {
         JOG_SPEED: (event, { speed }) => {
             const { speeds } = this.state.jog;
             const newSpeeds = speeds;
@@ -405,7 +408,9 @@ class LocationWidget extends PureComponent {
             pubsub.publish('jogSpeeds', newSpeeds);
         },
         ZERO_AXIS: (event, { axis }) => {
-            if (!axis) {
+            const { state } = this.props;
+            const activeState = get(state, 'status.activeState');
+            if (!axis || activeState !== GRBL_ACTIVE_STATE_IDLE) {
                 return;
             }
 
@@ -429,7 +434,9 @@ class LocationWidget extends PureComponent {
             controller.command('gcode', `G10 L20 P${p} ${axis}0`);
         },
         GO_TO_AXIS_ZERO: (_, { axisList }) => {
-            if (!axisList || axisList.length === 0) {
+            const { state } = this.props;
+            const activeState = get(state, 'status.activeState');
+            if (!axisList || axisList.length === 0 || activeState !== GRBL_ACTIVE_STATE_IDLE) {
                 return;
             }
 
@@ -451,6 +458,113 @@ class LocationWidget extends PureComponent {
                 this.actions.stepNext();
             }
         },
+    }
+
+    shuttleControlEvents = {
+        JOG_SPEED_I: {
+            title: 'Increase Jog Speed',
+            keys: '=',
+            cmd: 'JOG_SPEED_I',
+            payload: {
+                speed: 'increase'
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG_SPEED
+        },
+        JOG_SPEED_D: {
+            title: 'Decrease Jog Speed',
+            keys: '-',
+            cmd: 'JOG_SPEED_D',
+            payload: {
+                speed: 'decrease'
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG_SPEED
+        },
+        ZERO_X_AXIS: {
+            title: 'Zero X Axis',
+            keys: ['shift', 'w'].join('+'),
+            cmd: 'ZERO_X_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_X },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        ZERO_Y_AXIS: {
+            title: 'Zero Y Axis',
+            keys: ['shift', 'e'].join('+'),
+            cmd: 'ZERO_Y_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_Y },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        ZERO_Z_AXIS: {
+            title: 'Zero Z Axis',
+            keys: ['shift', 'r'].join('+'),
+            cmd: 'ZERO_Z_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_Z },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        ZERO_ALL_AXIS: {
+            title: 'Zero All',
+            keys: ['shift', 'q'].join('+'),
+            cmd: 'ZERO_ALL_AXIS',
+            payload: { axis: 'all' },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        GO_TO_X_AXIS_ZERO: {
+            title: 'Go to X Zero',
+            keys: ['shift', 's'].join('+'),
+            cmd: 'GO_TO_X_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_X] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
+        },
+        GO_TO_Y_AXIS_ZERO: {
+            title: 'Go to Y Zero',
+            keys: ['shift', 'd'].join('+'),
+            cmd: 'GO_TO_Y_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_Y] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
+        },
+        GO_TO_Z_AXIS_ZERO: {
+            title: 'Go to Z Zero',
+            keys: ['shift', 'f'].join('+'),
+            cmd: 'GO_TO_Z_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_Z] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
+        },
+        GO_TO_XY_AXIS_ZERO: {
+            title: 'Go to XY Zero',
+            keys: ['shift', 'a'].join('+'),
+            cmd: 'GO_TO_XY_AXIS_ZERO',
+            payload: { axisList: [AXIS_X, AXIS_Y] },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
+        },
     };
 
 
@@ -460,6 +574,7 @@ class LocationWidget extends PureComponent {
     componentDidMount() {
         this.subscribe();
         this.addShuttleControlEvents();
+        useKeybinding(this.shuttleControlEvents);
 
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }
@@ -546,7 +661,7 @@ class LocationWidget extends PureComponent {
         combokeys.reload();
 
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.on(eventName, callback);
         });
 
@@ -564,7 +679,7 @@ class LocationWidget extends PureComponent {
 
     removeShuttleControlEvents() {
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.removeListener(eventName, callback);
         });
 

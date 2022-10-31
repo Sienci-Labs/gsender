@@ -95,7 +95,10 @@ class Controller {
         'outline:start': [],
         'file:load': [],
         'file:unload': [],
-        'homing:flag': []
+        'homing:flag': [],
+        'electronErrors:errorList': [],
+        'grbl:iSready': [],
+        'sender:M0M1': []
     };
 
     context = {
@@ -293,10 +296,23 @@ class Controller {
         this.socket && this.socket.emit('close', port, callback);
     }
 
+    //Sends an event to start flashing
+    //@param {string} flashPort The port to be flashed
+    //@param {string} imageType The type of image to be flashed to the port
+    flashFirmware(flashPort, imageType) {
+        this.socket && this.socket.emit('flash:start', flashPort, imageType);
+    }
+
     // Retrieves a list of available serial ports with metadata.
     // @param {function} [callback] Called once completed.
     listPorts(callback) {
         this.socket && this.socket.emit('list', callback);
+    }
+
+    // Adds client to the connection
+    // @param {string} port The path of the serial port you want to close. For example, `dev/tty.XXX` on Mac and Linux, or `COM1` on Windows.
+    addClient(port) {
+        this.socket && this.socket.emit('addclient', port);
     }
 
     // Executes a command on the server.
@@ -333,6 +349,8 @@ class Controller {
     //   controller.command('unlock')
     // - Reset
     //   controller.command('reset')
+    // - Check for State Update
+    //   controller.command('checkStateUpdate')
     // - Feed Override
     //   controller.command('feedOverride')
     // - Spindle Override

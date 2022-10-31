@@ -30,7 +30,7 @@ import styles from './index.styl';
 import { LARGE, MEDIUM, SMALL } from './sizings';
 
 
-const ToolModal = ({ onClose, title, style, className, size, children }) => {
+const ToolModal = ({ onClose, title, style, className, size, children, disableOverlayClick = false, ...rest }) => {
     let sizingStyles;
 
     switch (size?.toLowerCase()) {
@@ -61,6 +61,8 @@ const ToolModal = ({ onClose, title, style, className, size, children }) => {
             style={{ ...style, ...sizingStyles }}
             className={className}
             size={size}
+            disableOverlayClick={disableOverlayClick}
+            {...rest}
         >
             <div className={styles.toolModal}>
                 <div className={styles.header}>

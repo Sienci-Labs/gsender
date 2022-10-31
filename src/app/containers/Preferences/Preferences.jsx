@@ -23,8 +23,10 @@
 
 import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
+import { connect } from 'react-redux';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
+import get from 'lodash/get';
 import controller from 'app/lib/controller';
 import Events from 'app/containers/Preferences/ToolChange';
 import ProgramEvents from 'app/containers/Preferences/Events';
@@ -39,9 +41,17 @@ import VisualizerSettings from './Visualizer';
 import About from './About';
 import store from '../../store';
 import styles from './index.styl';
-import { METRIC_UNITS } from '../../constants';
+import { METRIC_UNITS, WORKFLOW_STATE_RUNNING } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
-import { CUST_LIGHT_THEME, DARK_THEME, DARK_THEME_VALUES, LIGHT_THEME, LIGHT_THEME_VALUES } from '../../widgets/Visualizer/constants';
+import {
+    CUST_THEME, DARK_THEME_VALUES,
+    BACKGROUND_PART, GRID_PART, XAXIS_PART, YAXIS_PART, ZAXIS_PART,
+    LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART
+} from '../../widgets/Visualizer/constants';
+import StatsPage from './Stats';
+import SafetySettings from './Safety';
+//from '../../widgets/Visualizer/constants';
+import { convertValuesToMetric, convertValuesToImperial } from '../Surfacing/utils';
 
 
 class PreferencesPage extends PureComponent {
@@ -52,6 +62,9 @@ class PreferencesPage extends PureComponent {
     spindleConfig = new WidgetConfig('spindle');
 
     state = this.getInitialState();
+
+    // this makes sure a toast won't pop up upon opening preferences while there's a job/test run/outline
+    shouldShowToast = this.props.workflow?.state !== WORKFLOW_STATE_RUNNING && this.props.feederStatus?.queue === 0;
 
     showToast = _.throttle(() => {
         Toaster.pop({
@@ -69,6 +82,7 @@ class PreferencesPage extends PureComponent {
             autoReconnect: store.get('widgets.connection.autoReconnect', false),
             baudrate: store.get('widgets.connection.baudrate', 115200),
             safeRetractHeight: store.get('workspace.safeRetractHeight', 10),
+            customDecimalPlaces: store.get('workspace.customDecimalPlaces', 0),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -101,6 +115,11 @@ class PreferencesPage extends PureComponent {
                     component: SpindleLaser
                 },
                 {
+                    id: 8,
+                    label: 'Safety',
+                    component: SafetySettings
+                },
+                {
                     id: 5,
                     label: 'Tool Change',
                     component: Events
@@ -109,6 +128,11 @@ class PreferencesPage extends PureComponent {
                     id: 6,
                     label: 'Start/Stop G-Code',
                     component: ProgramEvents,
+                },
+                {
+                    id: 9,
+                    label: 'Stats',
+                    component: StatsPage,
                 },
                 {
                     id: 7,
@@ -120,7 +144,7 @@ class PreferencesPage extends PureComponent {
             tool: {
                 metricDiameter: 0,
                 imperialDiameter: 0,
-                type: 'end mill'
+                type: 'End Mill'
             },
             probe: store.get('workspace[probeProfile]'),
             probeSettings: {
@@ -128,20 +152,24 @@ class PreferencesPage extends PureComponent {
                 normalFeedrate: this.probeConfig.get('probeFeedrate', {}),
                 fastFeedrate: this.probeConfig.get('probeFastFeedrate', {}),
                 probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
-                connectivityTest: this.probeConfig.get('connectivityTest', true)
+                connectivityTest: this.probeConfig.get('connectivityTest', true),
+                zProbeDistance: this.probeConfig.get('zProbeDistance', {})
             },
             laser: {
                 ...this.spindleConfig.get('laser')
             },
             spindle: {
-                ...this.spindleConfig.get()
+                ...this.spindleConfig.get(),
+                delay: this.spindleConfig.get('delay')
             },
             visualizer: {
                 minimizeRenders: this.visualizerConfig.get('minimizeRenders'),
                 theme: this.visualizerConfig.get('theme'),
                 objects: this.visualizerConfig.get('objects'),
                 disabled: this.visualizerConfig.get('disabled'),
-                disabledLite: this.visualizerConfig.get('disabledLite')
+                disabledLite: this.visualizerConfig.get('disabledLite'),
+                showSoftLimitsWarning: this.visualizerConfig.get('showSoftLimitsWarning', false),
+                SVGEnabled: this.visualizerConfig.get('SVGEnabled', false),
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
@@ -161,6 +189,19 @@ class PreferencesPage extends PureComponent {
                     safeRetractHeight: value
                 });
                 pubsub.publish('safeHeight:update', value);
+            },
+            setCustomDecimalPlaces: (e) => {
+                let value = Math.abs(Number(e.target.value));
+                if (value < 0) {
+                    value = 0;
+                } else if (value > 5) {
+                    value = 5;
+                }
+                e.target.value = value;
+                this.setState({
+                    customDecimalPlaces: value
+                });
+                controller.command('checkStateUpdate');
             },
             setUnits: (units) => {
                 this.setState({
@@ -225,7 +266,7 @@ class PreferencesPage extends PureComponent {
                 });
             },
             setToolType: (e) => {
-                const type = e.target.value;
+                const type = e.value;
                 const tool = this.state.tool;
                 this.setState({
                     tool: {
@@ -411,12 +452,31 @@ class PreferencesPage extends PureComponent {
                     }
                 });
                 pubsub.publish('probe:test', value);
+            },
+            changeZProbeDistance: (e) => {
+                const probeSettings = { ...this.state.probeSettings };
+                const value = Math.abs(Number(e.target.value).toFixed(3) * 1);
+
+                const { units } = this.state;
+
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
+
+                this.setState({
+                    probeSettings: {
+                        ...probeSettings,
+                        zProbeDistance: {
+                            mm: metricValue,
+                            in: imperialValue,
+                        }
+                    }
+                });
             }
         },
         laser: {
             handleOffsetChange: (e, axis) => {
                 const { laser } = this.spindleConfig.get('laser');
-                const value = Math.abs(Number(e.target.value)) || 0;
+                const value = Number(e.target.value) || 0;
                 if (axis === 'X') {
                     this.spindleConfig.set('laser.xOffset', value);
                     this.setState({
@@ -465,6 +525,15 @@ class PreferencesPage extends PureComponent {
                 this.setState({ spindle: newSpindleValue });
 
                 pubsub.publish('spindle:updated', newSpindleValue);
+            },
+            handleDelayToggle: (hasDelay) => {
+                const { spindle } = this.state;
+                this.setState({
+                    spindle: {
+                        ...spindle,
+                        delay: hasDelay
+                    }
+                });
             }
         },
         visualizer: {
@@ -489,17 +558,34 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('theme:change', theme.value);
             },
-            handleCustThemeChange: (theme, part) => {
+            handleCustThemeChange: (themeColours) => {
                 const { visualizer } = this.state;
-                this.visualizerConfig.set(theme + ' ' + part,
-                    this.visualizerConfig.get('temp ' + theme + ' ' + part));
+                const parts = [
+                    BACKGROUND_PART,
+                    GRID_PART,
+                    XAXIS_PART,
+                    YAXIS_PART,
+                    ZAXIS_PART,
+                    LIMIT_PART,
+                    CUTTING_PART,
+                    JOGGING_PART,
+                    G0_PART,
+                    G1_PART
+                ];
+                parts.map((value) => {
+                    let label = value;
+                    if (value === G1_PART) {
+                        label = 'G1-3';
+                    }
+                    return this.visualizerConfig.set(CUST_THEME + ' ' + label, themeColours.get(value));
+                });
                 this.setState({
                     visualizer: {
                         ...visualizer,
-                        theme: theme
+                        theme: CUST_THEME,
                     }
                 });
-                pubsub.publish('theme:change', theme);
+                pubsub.publish('theme:change', CUST_THEME);
             },
             handleChangeComplete: (color, part) => {
                 const { visualizer } = this.state;
@@ -508,12 +594,9 @@ class PreferencesPage extends PureComponent {
             handlePartChange: () => {
                 pubsub.publish('part:change');
             },
-            getDefaultColour: (theme, part) => {
+            getDefaultColour: (part) => {
                 let defaultColour;
                 let themeType = DARK_THEME_VALUES;
-                if (theme === CUST_LIGHT_THEME) {
-                    themeType = LIGHT_THEME_VALUES;
-                }
                 switch (part) {
                 case 'Background':
                     defaultColour = themeType.backgroundColor;
@@ -546,10 +629,10 @@ class PreferencesPage extends PureComponent {
                     defaultColour = themeType.G1Color;
                     break;
                 case 'G2':
-                    defaultColour = themeType.G2Color;
+                    defaultColour = themeType.G1Color;
                     break;
                 case 'G3':
-                    defaultColour = themeType.G3Color;
+                    defaultColour = themeType.G1Color;
                     break;
                 default:
                     defaultColour = '#000000';
@@ -557,36 +640,7 @@ class PreferencesPage extends PureComponent {
                 return defaultColour;
             },
             getCurrentColor: (part, defaultColour) => {
-                const { visualizer } = this.state;
-                if (visualizer.theme === LIGHT_THEME) {
-                    return LIGHT_THEME_VALUES.backgroundColor;
-                } else if (visualizer.theme === DARK_THEME) {
-                    return DARK_THEME_VALUES.backgroundColor;
-                } else {
-                    return this.visualizerConfig.get(visualizer.theme + ' ' + part)
-                        ? this.visualizerConfig.get(visualizer.theme + ' ' + part)
-                        : defaultColour;
-                }
-            },
-            resetCustomThemeColours: (theme) => {
-                let themeColours = DARK_THEME_VALUES;
-                if (theme === CUST_LIGHT_THEME) {
-                    themeColours = LIGHT_THEME_VALUES;
-                }
-                this.visualizerConfig.set(theme + ' Background', themeColours.backgroundColor);
-                this.visualizerConfig.set(theme + ' Grid', themeColours.gridColor);
-                this.visualizerConfig.set(theme + ' X Axis', themeColours.xAxisColor);
-                this.visualizerConfig.set(theme + ' Y Axis', themeColours.yAxisColor);
-                this.visualizerConfig.set(theme + ' Z Axis', themeColours.zAxisColor);
-                this.visualizerConfig.set(theme + ' Limit', themeColours.limitColor);
-                this.visualizerConfig.set(theme + ' Cutting Coordinate Lines', themeColours.cuttingCoordinateLines);
-                this.visualizerConfig.set(theme + ' Jogging Coordinate Lines', themeColours.joggingCoordinateLines);
-                this.visualizerConfig.set(theme + ' G0', themeColours.G0Color);
-                this.visualizerConfig.set(theme + ' G1', themeColours.G1Color);
-                this.visualizerConfig.set(theme + ' G2', themeColours.G2Color);
-                this.visualizerConfig.set(theme + ' G3', themeColours.G3Color);
-
-                pubsub.publish('theme:change');
+                return this.visualizerConfig.get(CUST_THEME + ' ' + part, defaultColour);
             },
             handleVisEnabledToggle: (liteMode = false) => {
                 const { visualizer } = this.state;
@@ -607,6 +661,17 @@ class PreferencesPage extends PureComponent {
                         }
                     });
                 }
+                pubsub.publish('visualizer:settings');
+            },
+            handleSVGEnabledToggle: () => {
+                const { visualizer } = this.state;
+                const value = visualizer.SVGEnabled;
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        SVGEnabled: !value
+                    }
+                });
                 pubsub.publish('visualizer:settings');
             },
             handleCutPathToggle: (liteMode = false) => {
@@ -713,29 +778,71 @@ class PreferencesPage extends PureComponent {
                     });
                 }
                 pubsub.publish('visualizer:settings');
+            },
+            handleLimitsWarningToggle: () => {
+                const { visualizer } = this.state;
+                this.visualizerConfig.set('showSoftLimitsWarning', !this.state.visualizer.showSoftLimitsWarning);
+                pubsub.publish('softlimits:changevisibility', !this.state.visualizer.showSoftLimitsWarning);
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        showSoftLimitsWarning: !this.state.visualizer.showSoftLimitsWarning
+                    }
+                });
+                pubsub.publish('visualizer:settings');
             }
         }
     }
 
+    // make sure the toast doesn't show when the state/feeder status/sender status is updating
+    controllerEvents = {
+        'controller:state': (type, state) => {
+            this.shouldShowToast = false;
+        },
+        'feeder:status': (status) => {
+            this.shouldShowToast = false;
+        },
+        'sender:status': (status) => {
+            this.shouldShowToast = false;
+        }
+    }
+
+    addControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.addListener(eventName, callback);
+        });
+    }
+
+    removeControllerEvents() {
+        Object.keys(this.controllerEvents).forEach(eventName => {
+            const callback = this.controllerEvents[eventName];
+            controller.removeListener(eventName, callback);
+        });
+    }
+
     componentDidMount() {
         controller.command('settings:updated', this.state);
-
+        this.addControllerEvents();
         gamepad.holdListener();
     }
 
     componentWillUnmount() {
         gamepad.unholdLisetner();
+        this.removeControllerEvents();
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight, spindle } = this.state;
+        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight, customDecimalPlaces, spindle } = this.state;
 
         store.set('workspace.reverseWidgets', reverseWidgets);
         store.set('workspace.safeRetractHeight', safeRetractHeight);
+        store.set('workspace.customDecimalPlaces', customDecimalPlaces);
         store.set('widgets.connection.autoReconnect', autoReconnect);
         store.set('widgets.visualizer.theme', visualizer.theme);
         store.set('widgets.visualizer.disabled', visualizer.disabled);
         store.set('widgets.visualizer.disabledLite', visualizer.disabledLite);
+        store.set('widgets.visualizer.SVGEnabled', visualizer.SVGEnabled);
         store.set('widgets.visualizer.minimizeRenders', visualizer.minimizeRenders);
         store.set('workspace.units', units);
         store.replace('workspace[tools]', tools);
@@ -744,10 +851,12 @@ class PreferencesPage extends PureComponent {
         store.replace('workspace[probeProfile]', probe);
         store.set('widgets.spindle.spindleMax', spindle.spindleMax);
         store.set('widgets.spindle.spindleMin', spindle.spindleMin);
+        store.set('widgets.spindle.delay', spindle.delay);
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
         this.probeConfig.set('connectivityTest', probeSettings.connectivityTest);
+        this.probeConfig.set('zProbeDistance', probeSettings.zProbeDistance);
 
         controller.command('settings:updated', this.state);
 
@@ -755,7 +864,24 @@ class PreferencesPage extends PureComponent {
             return;
         }
 
-        this.showToast();
+        if (units !== prevState.units) {
+            const surfacingValues = store.get('widgets.surfacing');
+
+            if (units === 'mm') {
+                store.replace('widgets.surfacing', convertValuesToMetric(surfacingValues));
+            }
+
+            if (units === 'in') {
+                store.replace('widgets.surfacing', convertValuesToImperial(surfacingValues));
+            }
+        }
+
+
+        if (this.shouldShowToast) {
+            this.showToast();
+        } else {
+            this.shouldShowToast = true;
+        }
     }
 
     toolSortCompare(a, b) {
@@ -826,4 +952,8 @@ class PreferencesPage extends PureComponent {
     }
 }
 
-export default PreferencesPage;
+export default connect((store) => {
+    const workflow = get(store, 'controller.workflow');
+    const feederStatus = get(store, 'controller.feeder.status');
+    return { workflow, feederStatus };
+})(PreferencesPage);

@@ -65,6 +65,8 @@ import {
     CAMERA_MODE_ROTATE
 } from './constants';
 import styles from './index.styl';
+import { GRBL_ACTIVE_STATE_CHECK } from '../../../server/controllers/Grbl/constants';
+import WidgetConfig from '../WidgetConfig';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -88,6 +90,8 @@ class Visualizer extends Component {
         isSecondary: PropTypes.bool,
     };
 
+    visualizerConfig = new WidgetConfig('visualizer');
+
     pubsubTokens = [];
 
     isAgitated = false;
@@ -108,6 +112,8 @@ class Visualizer extends Component {
 
     group = new THREE.Group();
 
+    didZoom = false;
+
     pivotPoint = new PivotPoint3({ x: 0, y: 0, z: 0 }, (x, y, z) => { // relative position
         _each(this.group.children, (o) => {
             o.translateX(x);
@@ -117,6 +123,10 @@ class Visualizer extends Component {
     });
 
     node = null;
+
+    fileLoaded = false;
+    machineConnected = false;
+    showSoftLimitsWarning = this.visualizerConfig.get('showSoftLimitsWarning');
 
     setRef = (node) => {
         this.node = node;
@@ -217,6 +227,10 @@ class Visualizer extends Component {
     componentDidUpdate(prevProps) {
         let forceUpdate = false;
         let needUpdateScene = false;
+        // this variable determines whether the camera should reset or not
+        // it resets on the first render, and persists for the rest
+        // it is used for the secondary visualizer in surfacing
+        const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
         const prevState = prevProps.state;
         const state = this.props.state;
 
@@ -225,7 +239,8 @@ class Visualizer extends Component {
         //this.resizeRenderer();
 
         // Enable or disable 3D view
-        if ((prevProps.show !== this.props.show) && (this.props.show === true)) {
+        // shouldZoom is called here because the zoom level is indicated by the viewport
+        if ((prevProps.show !== this.props.show) && (this.props.show === true) && shouldZoom) {
             this.viewport.update();
 
             // Set forceUpdate to true when enabling or disabling 3D view
@@ -250,7 +265,7 @@ class Visualizer extends Component {
                 this.camera.setZoom(1.3);
                 this.camera.setFov(PERSPECTIVE_FOV);
             }
-            if (this.viewport) {
+            if (this.viewport && shouldZoom) {
                 this.viewport.update();
             }
             needUpdateScene = true;
@@ -317,7 +332,14 @@ class Visualizer extends Component {
         }
 
         { // Update position
+            const { state } = this.props;
+            const { activeState } = state;
             const { machinePosition, workPosition } = this.props;
+
+            let newPos = workPosition;
+            if (activeState === GRBL_ACTIVE_STATE_CHECK && this.fileLoaded) {
+                newPos = this.visualizer.getCurrentLocation();
+            }
             let needUpdatePosition = false;
 
             // Machine position
@@ -331,9 +353,9 @@ class Visualizer extends Component {
 
             // Work position
             const { x: wpox0, y: wpoy0, z: wpoz0 } = this.workPosition;
-            const { x: wpox1, y: wpoy1, z: wpoz1 } = workPosition;
+            const { x: wpox1, y: wpoy1, z: wpoz1 } = newPos;
             if (wpox0 !== wpox1 || wpoy0 !== wpoy1 || wpoz0 !== wpoz1) {
-                this.workPosition = workPosition;
+                this.workPosition = newPos;
                 needUpdatePosition = true;
                 needUpdateScene = true;
             }
@@ -670,8 +692,21 @@ class Visualizer extends Component {
                 const isPrimaryVisualizer = !isSecondary && activeVisualizer === VISUALIZER_PRIMARY;
                 const isSecondaryVisualizer = isSecondary && activeVisualizer === VISUALIZER_SECONDARY;
 
+                const callback = ({ bbox }) => {
+                    // Set gcode bounding box
+                    controller.context = {
+                        ...controller.context,
+                        xmin: bbox.min.x,
+                        xmax: bbox.max.x,
+                        ymin: bbox.min.y,
+                        ymax: bbox.max.y,
+                        zmin: bbox.min.z,
+                        zmax: bbox.max.z
+                    };
+                };
+
                 if (isPrimaryVisualizer) {
-                    this.load('', data);
+                    this.load('', data, callback);
                     return;
                 }
 
@@ -679,7 +714,40 @@ class Visualizer extends Component {
                     this.load('', data);
                     return;
                 }
-            })
+            }),
+            pubsub.subscribe('softlimits:changevisibility', (msg, visibility) => {
+                this.showSoftLimitsWarning = visibility;
+                if (this.showSoftLimitsWarning) {
+                    this.checkSoftLimits();
+                } else {
+                    pubsub.publish('softlimits:ok');
+                }
+            }),
+            pubsub.subscribe('machine:connected', () => {
+                this.machineConnected = true;
+                this.checkSoftLimits();
+            }),
+            pubsub.subscribe('file:loaded', () => {
+                this.fileLoaded = true;
+                this.checkSoftLimits();
+            }),
+            pubsub.subscribe('softlimits:check', (msg, data) => {
+                // because setting the workspace 0 is a call to run gcode,
+                // there is no way for me to publish when it's
+                // confirmed to be finished. since it uses the feeder,
+                // it's slow, and the wpos is not changed to 0 when I run the check.
+                // therefore, I'm sending data with the publish so the function knows
+                // to manually set the wpos to 0.
+                this.checkSoftLimits(data);
+            }),
+            pubsub.subscribe('machine:disconnected', () => {
+                this.machineConnected = false;
+                pubsub.publish('softlimits:ok');
+            }),
+            pubsub.subscribe('gcode:unload', () => {
+                this.fileLoaded = false;
+                pubsub.publish('softlimits:ok');
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -689,6 +757,12 @@ class Visualizer extends Component {
             pubsub.unsubscribe(token);
         });
         this.pubsubTokens = [];
+    }
+
+    checkSoftLimits(data) {
+        if (this.machineConnected && this.fileLoaded && this.showSoftLimitsWarning) {
+            this.calculateLimits(data);
+        }
     }
 
     // https://tylercipriani.com/blog/2014/07/12/crossbrowser-javascript-scrollbar-detection/
@@ -714,6 +788,13 @@ class Visualizer extends Component {
     getVisibleHeight() {
         const { containerID, isSecondary } = this.props;
         const container = document.getElementById(containerID);
+
+        // when changing screen size to mobile,
+        // this function runs as the visualizer is getting removed,
+        // resulting in a null container
+        if (!container) {
+            return 0;
+        }
 
         const clientHeight = isSecondary ? container.clientHeight - 2 : container.clientHeight - 30;
 
@@ -1308,6 +1389,8 @@ class Visualizer extends Component {
     }
 
     handleSceneRender(vizualization, callback) {
+        const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
+
         if (!this.visualizer) {
             return;
         }
@@ -1333,10 +1416,10 @@ class Visualizer extends Component {
         this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
 
-        if (this.viewport && dX > 0 && dY > 0) {
+        if (this.viewport && dX > 0 && dY > 0 && shouldZoom) {
             // The minimum viewport is 50x50mm
-            const width = Math.max(dX, 50);
-            const height = Math.max(dY, 50);
+            const width = Math.max(dX + 50, 100);
+            const height = Math.max(dY + 50, 100);
             const target = new THREE.Vector3(0, 0, bbox.max.z);
             this.viewport.set(width, height, target);
         }
@@ -1344,29 +1427,33 @@ class Visualizer extends Component {
         // Update the scene
         this.updateScene();
 
-        switch (this.props.cameraPosition) {
-        case 'top':
-            this.toTopView();
-            break;
+        // only set the camera if it's the first render
+        if (shouldZoom) {
+            switch (this.props.cameraPosition) {
+            case 'top':
+                this.toTopView();
+                break;
 
-        case '3d':
-            this.to3DView();
-            break;
+            case '3d':
+                this.to3DView();
+                break;
 
-        case 'front':
-            this.toFrontView();
-            break;
+            case 'front':
+                this.toFrontView();
+                break;
 
-        case 'left':
-            this.toLeftSideView();
-            break;
+            case 'left':
+                this.toLeftSideView();
+                break;
 
-        case 'right':
-            this.toRightSideView();
-            break;
+            case 'right':
+                this.toRightSideView();
+                break;
 
-        default:
-            this.toFrontView();
+            default:
+                this.toFrontView();
+            }
+            this.didZoom = true;
         }
 
         reduxStore.dispatch({
@@ -1393,10 +1480,94 @@ class Visualizer extends Component {
         } else {
             setVisualizerReady();
         }
+
+        this.fileLoaded = true;
+    }
+
+    calculateLimits(data) {
+        const { workPosition, machinePosition, softXMax, softYMax, softZMax, homingFlag, machineCorner } = this.props;
+        /* machineCorner:
+            0 is top right
+            1 is top left
+            2 bottom right
+            3 bottom left
+        */
+        let xMultiplier = -1;
+        let yMultiplier = -1;
+        if (homingFlag) {
+            switch (machineCorner) {
+            case 1:
+                xMultiplier = 1;
+                yMultiplier = -1;
+                break;
+            case 2:
+                xMultiplier = -1;
+                yMultiplier = 1;
+                break;
+            case 3:
+                xMultiplier = 1;
+                yMultiplier = 1;
+                break;
+            // case 0 and default are negative space, which is already assigned
+            case 0:
+            default:
+                break;
+            }
+        }
+
+        // get wpos
+        let wpos;
+        if (data !== 0) {
+            wpos = workPosition;
+        } else {
+            wpos = {
+                x: 0,
+                y: 0,
+                z: workPosition.z,
+            };
+        }
+
+        // get mpos
+        let mpos = machinePosition;
+
+        let origin = {
+            x: parseFloat(mpos.x) - parseFloat(wpos.x) * xMultiplier,
+            y: parseFloat(mpos.y) - parseFloat(wpos.y) * yMultiplier,
+            z: parseFloat(mpos.z) - parseFloat(wpos.z)
+        };
+
+        let limitsMax = {
+            x: softXMax * xMultiplier - origin.x,
+            y: softYMax * yMultiplier - origin.y,
+            z: softZMax - origin.z,
+        };
+
+        let limitsMin = {
+            x: origin.x * -1,
+            y: origin.y * -1,
+            z: origin.z,
+        };
+
+        // get bbox
+        let bbox = reduxStore.getState().file.bbox;
+        let bboxMin = bbox.min;
+        let bboxMax = bbox.max;
+
+        // check if machine will leave soft limits
+        if (bboxMax.x > limitsMax.x || bboxMin.x < limitsMin.x ||
+            bboxMax.y > limitsMax.y || bboxMin.y < limitsMin.y ||
+            (bboxMax.z === null ? false : bboxMax.z > limitsMax.z) || (bboxMin.z === null ? false : bboxMin.z < limitsMin.z)) {
+            pubsub.publish('softlimits:warning');
+        } else {
+            pubsub.publish('softlimits:ok');
+        }
     }
 
     unload() {
+        this.fileLoaded = false;
         const visualizerObject = this.group.getObjectByName('Visualizer');
+        const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
+
         if (visualizerObject) {
             this.group.remove(visualizerObject);
         }
@@ -1411,11 +1582,11 @@ class Visualizer extends Component {
             this.pivotPoint.set(0, 0, 0);
         }
 
-        if (this.controls) {
+        if (this.controls && shouldZoom) {
             this.controls.reset();
         }
 
-        if (this.viewport) {
+        if (this.viewport && shouldZoom) {
             this.viewport.reset();
         }
         // Update the scene
@@ -1616,11 +1787,22 @@ export default connect((store) => {
     const machinePosition = _get(store, 'controller.mpos');
     const workPosition = _get(store, 'controller.wpos');
     const receivedLines = _get(store, 'controller.sender.status.received', 0);
+    // soft limits
+    const softXMax = _get(store, 'controller.settings.settings.$130');
+    const softYMax = _get(store, 'controller.settings.settings.$131');
+    const softZMax = _get(store, 'controller.settings.settings.$132');
+    const homingFlag = _get(store, 'controller.homingFlag');
+    const machineCorner = _get(store, 'controller.settings.settings.$23');
     const { activeVisualizer } = store.visualizer;
     return {
         machinePosition,
         workPosition,
         receivedLines,
+        softXMax,
+        softYMax,
+        softZMax,
+        homingFlag,
+        machineCorner,
         activeVisualizer
     };
 }, null, null, { forwardRef: true })(Visualizer);

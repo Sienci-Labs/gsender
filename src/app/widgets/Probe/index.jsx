@@ -79,13 +79,13 @@ class ProbeWidget extends PureComponent {
     PROBE_DISTANCE_METRIC = {
         X: 50,
         Y: 50,
-        Z: 30
+        Z: this.state.zProbeDistance ? this.state.zProbeDistance.mm : 30
     };
 
     PROBE_DISTANCE_IMPERIAL = {
         X: 2,
         Y: 2,
-        Z: 1.2
+        Z: this.state.zProbeDistance ? this.state.zProbeDistance.in : 1.2
     };
 
 
@@ -362,6 +362,7 @@ class ProbeWidget extends PureComponent {
             probeFastFeedrate: this.config.get('probeFastFeedrate') || {},
             touchPlateHeight: this.config.get('touchPlateHeight') || {},
             retractionDistance: this.config.get('retractionDistance') || {},
+            zProbeDistance: this.config.get('zProbeDistance') || {},
             touchplate: store.get('workspace[probeProfile]', {}),
             availableTools,
             toolDiameter,
@@ -407,6 +408,7 @@ class ProbeWidget extends PureComponent {
         return [
             this.gcode('; Initial Probe setup'),
             this.gcode('; Set initial zero for specified axes'),
+            this.gcode('%UNITS=modal.units'),
             this.gcode('G10', {
                 L: 20,
                 P: this.mapWCSToPValue(wcs),
@@ -419,12 +421,14 @@ class ProbeWidget extends PureComponent {
     }
 
     generateSingleAxisCommands(axis, thickness, params) {
-        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
+        let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units, modal } = params;
         const workspace = this.mapWCSToPValue(wcs);
         let probeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC[axis] : this.PROBE_DISTANCE_IMPERIAL[axis];
         probeDistance = (isSafe) ? -probeDistance : probeDistance;
         probeDistance = (axis === 'Z') ? (-1 * Math.abs(probeDistance)) : probeDistance;
         retractDistance = (axis === 'Z') ? retractDistance : retractDistance * -1;
+
+        const unitModal = `G${modal}`;
 
         let code;
         code = [
@@ -463,7 +467,7 @@ class ProbeWidget extends PureComponent {
         } else {
             const toolDiameter = this.state.toolDiameter;
             const toolRadius = (toolDiameter / 2);
-            const toolCompensatedThickness = ((-1 * toolRadius) - thickness);
+            const toolCompensatedThickness = ((-1 * toolRadius) - thickness).toFixed(3);
             code = code.concat([
                 this.gcode('G91'),
                 // Absolute, set Zero for this axis
@@ -477,7 +481,7 @@ class ProbeWidget extends PureComponent {
 
         // Final retraction
         code = code.concat([
-            this.gcode('G91'),
+            this.gcode(`G91 ${unitModal}`),
             this.gcode('G0', {
                 [axis]: (retractDistance)
             })
@@ -495,7 +499,7 @@ class ProbeWidget extends PureComponent {
         }
 
         code = code.concat([
-            this.gcode('G90')
+            this.gcode(`${unitModal} G90`)
         ]);
         return code;
     }
@@ -649,6 +653,11 @@ class ProbeWidget extends PureComponent {
         const wcs = this.getWorkCoordinateSystem();
         const p = `P${this.mapWCSToPValue(wcs)}`;
 
+        let prependUnits = '';
+        if (this.props.$13 === '1') {
+            prependUnits = 'G20';
+        }
+
         if (axes.x && axes.y && axes.z) {
             code.push(
                 '; Probe XYZ Auto Endmill',
@@ -670,7 +679,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} X[posx/2]`,
+                `${prependUnits} G10 L20 ${p} X[posx/2]`,
                 'G21 G90 G0 X0',
                 'G21 G91 G0 Y-13',
                 'G38.2 Y-30 F250',
@@ -683,7 +692,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} Y[posy/2]`,
+                `${prependUnits} G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 X0 Y0',
                 'G4 P0.15',
                 `G10 L20 ${p} X22.5 Y22.5`,
@@ -707,7 +716,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} X[posx/2]`,
+                `${prependUnits} G10 L20 ${p} X[posx/2]`,
                 'G21 G90 G0 X0',
                 'G21 G91 G0 Y-13',
                 'G38.2 Y-30 F150',
@@ -720,7 +729,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} Y[posy/2]`,
+                `${prependUnits} G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 X0 Y0',
                 'G4 P0.15',
                 `G10 L20 ${p} X22.5 Y22.5`,
@@ -754,7 +763,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} X[posx/2]`,
+                `${prependUnits} G10 L20 ${p} X[posx/2]`,
                 'G21 G90 G0 X0',
                 'G4 P0.15',
                 `G10 L20 ${p} X22.5`,
@@ -776,7 +785,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} Y[posy/2]`,
+                `${prependUnits} G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 Y0',
                 'G4 P0.15',
                 `G10 L20 ${p} Y22.5`,
@@ -807,14 +816,14 @@ class ProbeWidget extends PureComponent {
                 `G10 L20 ${p} Z5`,
                 'G21 G91 G0 Z2',
                 'G21 G91 G0 X13',
-                'G38.2 X30 F250',
+                'G38.2 X20 F250',
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
                 `G10 L20 ${p} X19.325`,
                 'G21 G90 G0 X0',
                 'G21 G91 G0 Y13',
-                'G38.2 Y30 F250',
+                'G38.2 Y20 F250',
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
@@ -832,14 +841,14 @@ class ProbeWidget extends PureComponent {
                 'G38.2 Z-25 F200',
                 'G21 G91 G0 Z2',
                 'G21 G91 G0 X13',
-                'G38.2 X30 F250',
+                'G38.2 X20 F250',
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
                 `G10 L20 ${p} X19.325`,
                 'G21 G90 G0 X0',
                 'G21 G91 G0 Y13',
-                'G38.2 Y30 F250',
+                'G38.2 Y20 F250',
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
@@ -869,7 +878,7 @@ class ProbeWidget extends PureComponent {
                 'G38.2 Z-25 F200',
                 'G21 G91 G0 Z2',
                 'G21 G91 G0 Y13',
-                'G38.2 Y30 F250',
+                'G38.2 Y20 F250',
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
@@ -885,7 +894,7 @@ class ProbeWidget extends PureComponent {
                 'G38.2 Z-25 F200',
                 'G21 G91 G0 Z2',
                 'G21 G91 G0 X13',
-                'G38.2 X30 F250',
+                'G38.2 X20 F250',
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
@@ -904,6 +913,11 @@ class ProbeWidget extends PureComponent {
 
         const wcs = this.getWorkCoordinateSystem();
         const p = `P${this.mapWCSToPValue(wcs)}`;
+
+        let prependUnits = '';
+        if (this.props.$13 === '1') {
+            prependUnits = 'G20';
+        }
 
         if (axes.x && axes.y && axes.z) {
             code.push(
@@ -926,7 +940,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} X[posx/2]`,
+                `${prependUnits} G10 L20 ${p} X[posx/2]`,
                 'G21 G90 G0 X0',
                 'G21 G91 G0 Y-3',
                 'G38.2 Y-15 F150',
@@ -939,7 +953,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} Y[posy/2]`,
+                `${prependUnits} G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 X0 Y0',
                 'G4 P0.15',
                 `G10 L20 ${p} X22.5 Y22.5`,
@@ -963,7 +977,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} X[posx/2]`,
+                `${prependUnits} G10 L20 ${p} X[posx/2]`,
                 'G21 G90 G0 X0',
                 'G21 G91 G0 Y-3',
                 'G38.2 Y-15 F150',
@@ -976,7 +990,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} Y[posy/2]`,
+                `${prependUnits} G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 X0 Y0',
                 'G4 P0.15',
                 `G10 L20 ${p} X22.5 Y22.5`,
@@ -1011,7 +1025,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 X-2',
                 'G38.2 X5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} X[posx/2]`,
+                `${prependUnits} G10 L20 ${p} X[posx/2]`,
                 'G21 G90 G0 X0',
                 'G4 P0.15',
                 `G10 L20 ${p} X22.5`,
@@ -1033,7 +1047,7 @@ class ProbeWidget extends PureComponent {
                 'G21 G91 G0 Y-2',
                 'G38.2 Y5 F75',
                 'G4 P0.15',
-                `G10 L20 ${p} Y[posy/2]`,
+                `${prependUnits} G10 L20 ${p} Y[posy/2]`,
                 'G21 G90 G0 Y0',
                 'G4 P0.15',
                 `G10 L20 ${p} Y22.5`,
@@ -1163,6 +1177,25 @@ class ProbeWidget extends PureComponent {
                 this.actions.handleProbeCommandChange(0);
             }
         }
+
+        this.setState({
+            probeAxis: this.config.get('probeAxis', 'Z'),
+            probeCommand: this.config.get('probeCommand', 'G38.2'),
+            useTLO: this.config.get('useTLO'),
+            probeDepth: this.config.get('probeDepth') || {},
+            probeFeedrate: this.config.get('probeFeedrate') || {},
+            probeFastFeedrate: this.config.get('probeFastFeedrate') || {},
+            touchPlateHeight: this.config.get('touchPlateHeight') || {},
+            retractionDistance: this.config.get('retractionDistance') || {},
+            zProbeDistance: this.config.get('zProbeDistance') || {},
+            connectivityTest: this.config.get('connectivityTest'),
+        }, () => {
+            const { zProbeDistance } = this.state;
+            if (zProbeDistance) {
+                this.PROBE_DISTANCE_METRIC.Z = zProbeDistance.mm;
+                this.PROBE_DISTANCE_IMPERIAL.Z = zProbeDistance.in;
+            }
+        });
     }
 
     subscribe() {
@@ -1322,10 +1355,12 @@ export default connect((store) => {
     const type = get(store, 'controller.type');
     const workflow = get(store, 'controller.workflow');
     const isConnected = get(store, 'connection.isConnected');
+    const $13 = get(store, 'controller.settings.settings.$13', '0');
     return {
         state,
         type,
         workflow,
-        isConnected
+        isConnected,
+        $13
     };
 })(ProbeWidget);

@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 import * as WebGL from 'app/lib/three/WebGL';
-import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD, WORKFLOW_STATE_IDLE } from 'app/constants';
+import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD, WORKFLOW_STATE_IDLE, GRBL_ACTIVE_STATE_DOOR } from 'app/constants';
 import Widget from 'app/components/Widget';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import UnlockButton from 'app/widgets/Visualizer/UnlockButton';
@@ -11,19 +11,21 @@ import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
 import ValidationModal from './ValidationModal';
 import WarningModal from './WarningModal';
-import Visualizer from './Visualizer';
+import VisualizerWrapper from './VisualizerWrapper';
 import Loading from './Loading';
 import Rendering from './Rendering';
 import WatchDirectory from './WatchDirectory';
 import { MODAL_WATCH_DIRECTORY } from './constants';
 import styles from './index.styl';
+import SoftLimitsWarningArea from './SoftLimitsWarningArea';
 
 
 const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering, showVisualizer, visualizerRef, workflowRef, widgetContentRef }) => {
     const { liteMode, modal, cameraPosition, invalidLine, invalidGcode, alarmCode, activeState, workflow, isConnected } = state;
     const isHomingAlarm = activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode === 'Homing'; // We are alarmed and
     const holdWithoutWorkflowPause = activeState === GRBL_ACTIVE_STATE_HOLD && workflow.state === WORKFLOW_STATE_IDLE;
-    const showUnlockButton = isConnected && (isHomingAlarm || holdWithoutWorkflowPause);
+    const doorOpen = activeState === GRBL_ACTIVE_STATE_DOOR;
+    const showUnlockButton = isConnected && (doorOpen || isHomingAlarm || holdWithoutWorkflowPause);
     const { handleLiteModeToggle, handleRun, reset } = actions;
 
     const containerID = 'visualizer_container';
@@ -67,6 +69,7 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
 
                 {WebGL.isWebGLAvailable() && (
                     <div className={styles.visualizerWrapper}>
+                        <SoftLimitsWarningArea />
                         {
                             showUnlockButton && <UnlockButton />
                         }
@@ -74,15 +77,15 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                             state={state}
                             actions={actions}
                         />
-                        <Visualizer
+                        <VisualizerWrapper
                             show={showVisualizer}
                             cameraPosition={cameraPosition}
                             ref={visualizerRef}
                             state={state}
                             actions={actions}
                             containerID={containerID}
+                            isSecondary={false}
                         />
-
                         <WorkflowControl
                             ref={workflowRef}
                             state={state}

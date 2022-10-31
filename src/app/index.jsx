@@ -31,7 +31,8 @@ import reduxStore from 'app/store/redux';
 import ReactDOM from 'react-dom';
 import {
     HashRouter as Router,
-    Route
+    Route,
+    Switch
 } from 'react-router-dom';
 import i18next from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
@@ -58,11 +59,14 @@ import { Button } from './components/Buttons';
 import ModalTemplate from './components/ModalTemplate';
 import Modal from './components/Modal';
 import Space from './components/Space';
+import PopUpWidget from './containers/PopUpWidget';
 import './styles/vendor.styl';
 import './styles/app.styl';
+import { removeOldKeybindings } from './lib/useKeybinding';
 
 const renderPage = () => {
     const container = document.createElement('div');
+    document.title = `gSender ${settings.version}`;
     container.style.width = '100%';
     document.body.appendChild(container);
 
@@ -78,9 +82,10 @@ const renderPage = () => {
                 layout="floats"
             >
                 <Router>
-                    <div>
+                    <Switch>
+                        <Route path="/widget/:id" component={PopUpWidget} />
                         <Route path="/" component={App} />
-                    </div>
+                    </Switch>
                 </Router>
             </GridSystemProvider>
         </ReduxProvider>,
@@ -235,6 +240,8 @@ series([
     }
 
     renderPage();
+
+    removeOldKeybindings();
 }).catch(err => {
     log.error(err);
 });

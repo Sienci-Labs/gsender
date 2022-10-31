@@ -27,7 +27,7 @@ import React, { PureComponent } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
-
+import ToggleSwitch from 'app/components/ToggleSwitch';
 import IdleInfo from './components/IdleInfo';
 import Overrides from './components/Overrides';
 import styles from './index.styl';
@@ -57,10 +57,42 @@ class JobStatus extends PureComponent {
         return `${size} bytes`;
     };
 
-    render() {
-        const { state, name, size, total, fileLoaded, path, filteredPath } = this.props;
-        const { isRunningJob } = state;
+    state = {
+    }
 
+    handleOverrideToggle = () => {
+        console.log(this.state);
+        if (this.state.toggleStatus === 'jobStatus') {
+            localStorage.setItem('jobOverrideToggle', JSON.stringify({
+                isChecked: true,
+                toggleStatus: 'overrides',
+            }));
+        } else {
+            localStorage.setItem('jobOverrideToggle', JSON.stringify({
+                isChecked: false,
+                toggleStatus: 'jobStatus',
+            }));
+        }
+        this.setState(JSON.parse(localStorage.getItem('jobOverrideToggle')));
+    }
+
+    componentDidUpdate() {
+        if (!this.props.fileLoaded || !this.props.connection.isConnected) {
+            localStorage.setItem('jobOverrideToggle', JSON.stringify({ isChecked: false,
+                toggleStatus: 'jobStatus', }));
+        }
+        this.setState(JSON.parse(localStorage.getItem('jobOverrideToggle')));
+    }
+
+    componentDidMount() {
+        localStorage.setItem('jobOverrideToggle', JSON.stringify({
+            isChecked: false,
+            toggleStatus: 'jobStatus',
+        }));
+    }
+
+    render() {
+        const { state, name, size, total, fileLoaded, path, filteredPath, connection } = this.props;
         return (
             <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <div className={styles['file-info']}>
@@ -71,7 +103,19 @@ class JobStatus extends PureComponent {
                                     <div className={styles['file-name']}>
                                         <TooltipCustom content={`${name} (${this.fileSizeFormat(size)}, ${total} lines)`} style={{ wordWrap: 'break-word' }}>
                                             <span className={styles['file-text']}>{name}</span>{' '}<span>({this.fileSizeFormat(size)}, {total} lines)</span>
+                                            <span style={{ marginLeft: '2rem' }} />
                                         </TooltipCustom>
+                                        {connection.isConnected
+                                            ? (
+                                                <ToggleSwitch
+                                                    label="Overrides"
+                                                    onChange={() => this.handleOverrideToggle()}
+                                                    className={styles.litetoggle}
+                                                    checked={this.state.isChecked}
+                                                    size="md"
+                                                />
+                                            ) : <span />
+                                        }
                                     </div>
 
                                     {filteredPath && (
@@ -85,11 +129,11 @@ class JobStatus extends PureComponent {
                                     )}
                                 </>
                             )
-                            : <div className={styles['file-name']}><span className={styles['file-text']}>No File Loaded</span></div>}
+                            : (<div className={styles['file-name']}><span className={styles['file-text']}>No File Loaded</span></div>)}
                 </div>
-                {!isRunningJob
-                    ? <IdleInfo state={state} />
-                    : <Overrides state={state} />
+                {this.state.isChecked
+                    ? <Overrides state={state} />
+                    : <IdleInfo state={state} />
                 }
             </div>
         );
@@ -101,8 +145,10 @@ export default connect((store) => {
     const path = get(file, 'path', '');
     const name = get(file, 'name', '');
     const filteredPath = path.replace(name, '');
+    const connection = get(store, 'connection');
     return {
         ...file,
-        filteredPath
+        filteredPath,
+        connection
     };
 })(JobStatus);

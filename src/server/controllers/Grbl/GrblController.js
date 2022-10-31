@@ -43,7 +43,6 @@ import translateExpression from '../../lib/translate-expression';
 import config from '../../services/configstore';
 import monitor from '../../services/monitor';
 import taskRunner from '../../services/taskrunner';
-import { getOutlineGcode } from '../../lib/outlineService';
 import store from '../../store';
 import {
     GLOBAL_OBJECTS as globalObjects,
@@ -60,14 +59,14 @@ import {
     GRBL_SETTINGS, GRBL_ACTIVE_STATE_HOME
 } from './constants';
 import { METRIC_UNITS } from '../../../app/constants';
-import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
-
+import { runOverride } from '../runOverride';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
 const POSTHOOK_COMPLETE = '%post_complete';
+const PAUSE_START = '%pause_start';
 
 const log = logger('controller:Grbl');
 const noop = _.noop;
@@ -127,6 +126,8 @@ class GrblController {
 
     queryTimer = null;
 
+    timePaused = null;
+
     actionMask = {
         queryParserState: {
             state: false, // wait for a message containing the current G-code parser modal state
@@ -150,6 +151,7 @@ class GrblController {
 
     // Feeder
     feeder = null;
+
     feederCB = null;
 
     // Sender
@@ -165,7 +167,6 @@ class GrblController {
     homingStarted = false;
 
     homingFlagSet = false;
-
 
     constructor(engine, options) {
         if (!engine) {
@@ -232,7 +233,6 @@ class GrblController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
-
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
@@ -250,6 +250,12 @@ class GrblController {
                         setTimeout(() => {
                             this.workflow.resume();
                         }, 1500);
+                        return 'G4 P0.5';
+                    }
+                    if (line === PAUSE_START) {
+                        log.debug('Found M0/M1, pausing program');
+                        this.feeder.hold({ data: '%m0m1_pause', comment: commentString });
+                        this.emit('sender:M0M1', { data: 'M0/M1', comment: commentString });
                         return 'G4 P0.5';
                     }
                     if (line === '%_GCODE_START') {
@@ -379,13 +385,13 @@ class GrblController {
                         // Workaround for Carbide files - prevent M0 early from pausing program
                         if (sent > 10) {
                             this.workflow.pause({ data: 'M0', comment: commentString });
-                            this.emit('workflow:pause', { data: 'M0' });
+                            this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
                         }
                         line = line.replace('M0', '(M0)');
                     } else if (programMode === 'M1') {
                         log.debug(`M1 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         this.workflow.pause({ data: 'M1', comment: commentString });
-                        this.emit('workflow:pause', { data: 'M1' });
+                        this.command('gcode', `${WAIT}\n${PAUSE_START} ;${commentString}`);
                         line = line.replace('M1', '(M1)');
                     }
                 }
@@ -475,16 +481,22 @@ class GrblController {
             } else {
                 this.sender.hold();
             }
+
+            this.timePaused = new Date().getTime();
         });
         this.workflow.on('resume', (...args) => {
             this.emit('workflow:state', this.workflow.state);
+
+            let pauseTime = new Date().getTime() - this.timePaused;
 
             // Reset feeder prior to resume program execution
             this.feeder.reset();
 
             // Resume program execution
             this.sender.unhold();
-            this.sender.next();
+
+            // subtract time paused
+            this.sender.next({ timePaused: pauseTime });
         });
 
         // Grbl
@@ -578,6 +590,13 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
             log.error(`Error occurred at ${Date.now()}`);
+            const { received } = this.sender.state;
+            this.emit('error', {
+                type: 'GRBL_ERROR',
+                code: `${code}`,
+                message: error.message,
+                lineNumber: received,
+            });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { lines, received } = this.sender.state;
@@ -626,6 +645,10 @@ class GrblController {
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
+                this.emit('error', {
+                    type: 'GRBL_ALARM',
+                    message: `ALARM:${code} (${alarm.message})`,
+                });
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
 
@@ -826,15 +849,12 @@ class GrblController {
                     this.actionTime.senderFinishTime = now;
                 } else if (timespan > toleranceTime) {
                     log.silly(`Finished sending G-code: timespan=${timespan}`);
-
                     this.actionTime.senderFinishTime = 0;
-
                     // Stop workflow
                     this.command('gcode:stop');
                 }
             }
         }, 250);
-
         // Load file if it exists in CNC engine (AKA it was loaded before connection
     }
 
@@ -842,9 +862,11 @@ class GrblController {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
         this.writeln('$$');
-
         await delay(50);
         this.event.trigger('controller:ready');
+
+        //check if controller is ready and send the status
+        this.emit('grbl:iSready', this.ready);
     }
 
     populateContext(context = {}) {
@@ -887,20 +909,20 @@ class GrblController {
             zmax: Number(context.zmax) || 0,
 
             // Machine position
-            mposx: Number(mposx) || 0,
-            mposy: Number(mposy) || 0,
-            mposz: Number(mposz) || 0,
-            mposa: Number(mposa) || 0,
-            mposb: Number(mposb) || 0,
-            mposc: Number(mposc) || 0,
+            mposx: Number(mposx).toFixed(3) || 0,
+            mposy: Number(mposy).toFixed(3) || 0,
+            mposz: Number(mposz).toFixed(3) || 0,
+            mposa: Number(mposa).toFixed(3) || 0,
+            mposb: Number(mposb).toFixed(3) || 0,
+            mposc: Number(mposc).toFixed(3) || 0,
 
             // Work position
-            posx: Number(posx) || 0,
-            posy: Number(posy) || 0,
-            posz: Number(posz) || 0,
-            posa: Number(posa) || 0,
-            posb: Number(posb) || 0,
-            posc: Number(posc) || 0,
+            posx: Number(posx).toFixed(3) || 0,
+            posy: Number(posy).toFixed(3) || 0,
+            posz: Number(posz).toFixed(3) || 0,
+            posa: Number(posa).toFixed(3) || 0,
+            posb: Number(posb).toFixed(3) || 0,
+            posc: Number(posc).toFixed(3) || 0,
 
             // Modal group
             modal: {
@@ -1028,7 +1050,6 @@ class GrblController {
             callback(); // register controller
 
             log.debug(`Connected to serial port "${port}"`);
-
             this.workflow.stop();
 
             // Clear action values
@@ -1085,6 +1106,8 @@ class GrblController {
     loadFile(gcode, { name }) {
         log.debug(`Loading file '${name}' to controller`);
         this.command('gcode:load', name, gcode);
+        store.set('lastFeed', this.runner.state.status.ov[0]);
+        store.set('lastSpindle', this.runner.state.status.ov[2]);
     }
 
     addConnection(socket) {
@@ -1151,31 +1174,14 @@ class GrblController {
     }
 
     consumeFeederCB() {
-        if (this.feederCB) {
+        if (this.feederCB && typeof this.feederCB === 'function') {
             this.feederCB();
+            this.feederCB = null;
         }
     }
 
     command(cmd, ...args) {
         const handler = {
-            'flash:start': () => {
-                let [port, type] = args;
-                if (!port) {
-                    this.emit('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
-                    return;
-                }
-                this.close(() => {
-                    FlashingFirmware(port, type);
-                });
-            },
-            'flashing:success': () => {
-                let [data] = args;
-                this.emit('message', data);
-            },
-            'flashing:failed': () => {
-                let [error] = args;
-                this.emit('task:error', error);
-            },
             'firmware:recievedProfiles': () => {
                 let [files] = args;
                 this.emit('task:finish', files);
@@ -1201,6 +1207,14 @@ class GrblController {
                 // be no queued motions, as long as no more commands were sent after the G4.
                 // This is the fastest way to do it without having to check the status reports.
                 const dwell = '%wait ; Wait for the planner to empty';
+
+                // add delay to spindle startup if enabled
+                const preferences = store.get('preferences') || { spindle: { delay: false } };
+                const delay = preferences.spindle.delay;
+                if (delay) {
+                    gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
+                }
+
                 const ok = this.sender.load(name, gcode + '\n' + dwell, context);
                 if (!ok) {
                     callback(new Error(`Invalid G-code: name=${name}`));
@@ -1229,10 +1243,10 @@ class GrblController {
                 this.command('gcode:start');
             },
             'gcode:start': () => {
-                const [lineToStartFrom] = args;
+                const [lineToStartFrom, zMax] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
-                console.log(startEventEnabled);
+                log.info(startEventEnabled);
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
@@ -1298,7 +1312,7 @@ class GrblController {
                     }
 
                     // Move up and then to cut start position
-                    modalGCode.push('G0 G90 G21 Z10');
+                    modalGCode.push(`G0 G90 G21 Z${zMax + 10}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
                     // Set modals based on what's parsed so far in the file
@@ -1329,7 +1343,8 @@ class GrblController {
                     this.feeder.reset();
 
                     // Sender
-                    this.sender.next();
+                    this.sender.setStartLine(0);
+                    this.sender.next({ startFromLine: true });
                 }
             },
             'stop': () => {
@@ -1443,55 +1458,35 @@ class GrblController {
                 this.write('\x18'); // ^x
                 this.writeln('$X');
             },
+            'checkStateUpdate': () => {
+                this.emit('controller:state', GRBL, this.state);
+            },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
-            //   0: Set 100% of programmed rate.
-            //  10: Increase 10%
-            // -10: Decrease 10%
-            //   1: Increase 1%
-            //  -1: Decrease 1%
             'feedOverride': () => {
+                console.log('inside spindle event');
                 const [value] = args;
-
-                const currFeedOverride = this.runner.state.status.ov[0];
-                const nextFeedOverride = currFeedOverride + value;
-
-                if (nextFeedOverride > 230 || nextFeedOverride < 0) {
-                    return;
-                }
-
-                if (value === 0) {
+                const currFeedOverride = store.get('lastFeed');
+                store.set('lastFeed', value);
+                const Change = value - currFeedOverride;
+                if (value === 100) {
                     this.write('\x90');
-                } else if (value === 10) {
-                    this.write('\x91');
-                } else if (value === -10) {
-                    this.write('\x92');
-                } else if (value === 1) {
-                    this.write('\x93');
-                } else if (value === -1) {
-                    this.write('\x94');
+                } else {
+                    runOverride(this, Change, 'feed');
                 }
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
-            //   0: Set 100% of programmed spindle speed
-            //  10: Increase 10%
-            // -10: Decrease 10%
-            //   1: Increase 1%
-            //  -1: Decrease 1%
             'spindleOverride': () => {
+                console.log('inside spindle event');
                 const [value] = args;
-
-                if (value === 0) {
+                const currFeedOverride = store.get('lastSpindle');
+                const Change = value - currFeedOverride;
+                store.set('lastSpindle', value);
+                if (value === 100) {
                     this.write('\x99');
-                } else if (value === 10) {
-                    this.write('\x9a');
-                } else if (value === -10) {
-                    this.write('\x9b');
-                } else if (value === 1) {
-                    this.write('\x9c');
-                } else if (value === -1) {
-                    this.write('\x9d');
+                } else {
+                    runOverride(this, Change, 'spindle');
                 }
             },
             // Rapid Overrides
@@ -1528,6 +1523,22 @@ class GrblController {
             'lasertest:off': () => {
                 const commands = [
                     'M5S0'
+                ];
+                this.command('gcode', commands);
+            },
+            'laserpower:change': () => {
+                const [power = 0, maxS = 1000] = args;
+                const commands = [
+                    // https://github.com/gnea/grbl/wiki/Grbl-v1.1-Laser-Mode
+                    // The laser will only turn on when Grbl is in a G1, G2, or G3 motion mode.
+                    'S' + Math.round(ensurePositiveNumber(maxS * (power / 100)) * 100) / 100
+                ];
+                this.command('gcode', commands);
+            },
+            'spindlespeed:change': () => {
+                const [speed = 0] = args;
+                const commands = [
+                    'S' + speed
                 ];
                 this.command('gcode', commands);
             },
@@ -1754,13 +1765,6 @@ class GrblController {
                 this.command('feeder:start');
                 this.runPostChangeHook();
             },
-            'gcode:outline': () => {
-                const [gcode = '', concavity = 450] = args;
-                const toRun = getOutlineGcode(gcode, concavity);
-                log.debug('Running outline');
-                this.emit('outline:start');
-                this.command('gcode', toRun);
-            }
         }[cmd];
 
         if (!handler) {
