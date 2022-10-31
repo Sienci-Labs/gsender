@@ -26,7 +26,7 @@ import store from 'app/store';
 const wizard = {
     steps: [
         {
-            title: 'Change Bit',
+            title: 'Setup',
             substeps: [
                 {
                     title: 'Safety First',
@@ -36,6 +36,7 @@ const wizard = {
                             label: 'Save Positions and Modals',
                             cb: () => {
                                 const probeProfile = store.get('workspace.probeProfile');
+                                const position = store.get('workspace.toolChangePosition');
                                 const { zThickness } = probeProfile;
                                 controller.command('gcode', [
                                     '%wait',
@@ -45,6 +46,10 @@ const wizard = {
                                     '%global.toolchange.XPOS=posx',
                                     '%global.toolchange.YPOS=posy',
                                     '%global.toolchange.ZPOS=posz',
+                                    `%global.toolchange.PROBE_POS_X=${position.x}`,
+                                    `%global.toolchange.PROBE_POS_Y=${position.y}`,
+                                    `%global.toolchange.PROBE_POS_Z=${position.z}`,
+                                    'global.toolchange.Z_SAFE_HEIGHT=-10',
                                     '%global.toolchange.UNITS=modal.units',
                                     '%global.toolchange.SPINDLE=modal.spindle',
                                     '%global.toolchange.DISTANCE=modal.distance',
@@ -59,53 +64,83 @@ const wizard = {
                     ]
                 },
                 {
-                    title: 'Change Bit',
-                    description: 'PH COPY - Change bit to requested tool.'
-                }
+                    title: 'Touchplate Setup',
+                    description: 'PH COPY - Verify your probe is setup correctly and all collets are attached.'
+                },
             ]
         },
         {
             title: 'Setup Probe',
             substeps: [
                 {
-                    title: 'Touchplate Setup',
-                    description: 'PH COPY - Setup touchplate and attach continuity collets.'
-                },
-                {
-                    title: 'Position Router',
-                    description: 'PH COPY - Jog router into position above the touch plate using the jog controls'
-                }
-            ]
-        },
-        {
-            title: 'Probe Tool',
-            substeps: [
-                {
-                    title: 'Probe',
-                    description: 'PH COPY - Probe tool length',
+                    title: 'Probe Initial Tool Length or confirm',
+                    description: 'PH COPY - If you haven\'t probed your initial tool length, do so now by pressing \'Probe Tool Length\'.  Otherwise, continue.',
                     actions: [
                         {
-                            label: 'Probe Z',
+                            label: 'Probe Initial Tool Length',
                             cb: () => {
                                 controller.command('gcode', [
-                                    '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
-                                    'G91',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                                    '(This is 10 above configured location)',
+                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z + 10]',
+                                    'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z5',
                                     'G38.2 Z-10 F40',
-                                    'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]'
+                                    'G4 P0.3',
+                                    '%global.toolchange.TOOL_OFFSET=posz',
+                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
+                                    'G91',
+                                    'G0 Z5',
+                                    'G90',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]'
                                 ]);
                             }
                         },
                         {
-                            label: 'Set Z0 at Location',
+                            label: 'Tool Length Already Set',
                             cb: () => {
                                 controller.command('gcode', [
-                                    '(Setting Z 0)',
-                                    'G10 L20 P0 Z0'
+                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
+                                    '(If the above is not valid, re-run Probe Initial Tool Length action)'
                                 ]);
                             }
-                        },
+                        }
+                    ]
+                },
+                {
+                    title: 'Change Tool',
+                    description: 'PH COPY - Change the tool to the requested bit.'
+                },
+            ]
+        },
+        {
+            title: 'Probe New Tool',
+            substeps: [
+                {
+                    title: 'Probe',
+                    description: 'PH COPY - Probe new tool length.  This will move back to the configured probe position.',
+                    actions: [
+                        {
+                            label: 'Probe New Tool Length',
+                            cb: () => {
+                                controller.command('gcode', [
+                                    '(Moving back to configured location)',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                                    '(This is 10 above configured location)',
+                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z + 10]',
+                                    'G91 G21',
+                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
+                                    'G0 Z5',
+                                    'G38.2 Z-10 F40',
+                                    'G4 P0.3',
+                                    'G10 L20 Z[global.toolchange.TOOL_OFFSET]',
+                                    '(Set Z to Tool offset)'
+                                ]);
+                            }
+                        }
                     ]
                 }
             ]
@@ -122,7 +157,7 @@ const wizard = {
                             cb: () => {
                                 controller.command('gcode', [
                                     '(Returning to initial position)',
-                                    'G91 G21 G0 Z15',
+                                    'G91 G21 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
                                     'G90 G21 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
                                     'G90 G21 G0 Z[global.toolchange.ZPOS]',
                                     '(Restore initial modals)',

@@ -23,7 +23,7 @@ if (isElectron()) {
     const path = window.require('path'); // Require the path module within Electron
     const app = electron.remote.app;
     userData = {
-        path: path.join(app.getPath('userData'), 'gsender-0.5.6.json')
+        path: path.join(app.getPath('userData'), 'gsender-edge.json')
     };
 }
 
