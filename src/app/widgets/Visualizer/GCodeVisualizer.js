@@ -165,7 +165,11 @@ class GCodeVisualizer {
     }
 
     getCurrentLocation() {
-        return this.vertices[this.frames[this.frameIndex].vertexIndex] ? this.vertices[this.frames[this.frameIndex].vertexIndex] : this.vertices[this.frames[this.frameIndex].vertexIndex - 1];
+        return [
+            this.vertices.array[this.frames[this.frameIndex]],
+            this.vertices.array[this.frames[this.frameIndex]] + 1,
+            this.vertices.array[this.frames[this.frameIndex]] + 2
+        ];
     }
 
     unload() {
