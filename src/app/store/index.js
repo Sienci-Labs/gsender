@@ -7,13 +7,11 @@ import set from 'lodash/set';
 import merge from 'lodash/merge';
 import uniq from 'lodash/uniq';
 import semver from 'semver';
-import { TOUCHPLATE_TYPE_STANDARD, TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
-import { MODAL_HELP } from 'app/containers/NavSidebar/constants';
 import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
 import log from '../lib/log';
 import defaultState from './defaultState';
-import { JOGGING_CATEGORY, LOCATION_CATEGORY, METRIC_UNITS } from '../constants';
+import { METRIC_UNITS } from '../constants';
 
 const store = new ImmutableStore(defaultState);
 
@@ -202,98 +200,6 @@ const migrateStore = () => {
         const currSpindleVal = store.get('widgets.spindle', {});
 
         store.replace('widgets.spindle', { currSpindleVal, laser: { ...currSpindleVal.laser, minPower: 1, maxPower: 100 } });
-    }
-
-    //  1.0.1 - changes to go to axis zero naming and payload
-    //        - update default touchplate type if its none of the 3 options
-    //        - update payload for opening help modal
-    if (semver.lt(cnc.version, '1.0.1')) {
-        const currentCommandKeys = store.get('commandKeys', []);
-        const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
-        const defaultCommandKeys = get(defaultState, 'commandKeys');
-
-        const updateCommands = (commands) => {
-            return commands.map(command => {
-                if (command.title === 'Help') {
-                    return { ...command, payload: { toolbar: MODAL_HELP } };
-                }
-
-                if (command.category !== LOCATION_CATEGORY) {
-                    return command;
-                }
-
-                const foundDefaultCommand = defaultCommandKeys.find(defaultCommand => defaultCommand.id === command.id);
-
-                return foundDefaultCommand ? { ...command, title: foundDefaultCommand.title, payload: foundDefaultCommand.payload } : command;
-            });
-        };
-        const updatedCommandKeys = updateCommands(currentCommandKeys);
-
-        const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
-            const updatedProfileShortcuts = updateCommands(profile.shortcuts);
-            return { ...profile, shortcuts: updatedProfileShortcuts };
-        });
-
-        store.replace('commandKeys', updatedCommandKeys);
-        store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
-
-        const currentTouchplateType = store.get('workspace.probeProfile.touchplateType');
-        if (![TOUCHPLATE_TYPE_STANDARD, TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_ZERO].includes(currentTouchplateType)) {
-            store.replace('workspace.probeProfile.touchplateType', TOUCHPLATE_TYPE_STANDARD);
-        }
-    }
-
-    //  0.7.4 - changes to keyboard and gamepad profile shortcut payload shape for machine jogging
-    if (semver.lt(cnc.version, '0.7.4')) {
-        const currentCommands = store.get('commandKeys', []);
-        const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
-        const defaultCommands = get(defaultState, 'commandKeys');
-
-        const updateCommands = (commands) => {
-            return commands.map(command => {
-                if (command.category !== JOGGING_CATEGORY) {
-                    return command;
-                }
-
-                const foundDefaultCommand = defaultCommands.find(defaultCommand => defaultCommand.id === command.id);
-
-                return foundDefaultCommand ? { ...command, payload: foundDefaultCommand.payload } : command;
-            });
-        };
-
-        const updatedCommands = updateCommands(currentCommands);
-
-        const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
-            const updatedProfileShortcuts = updateCommands(profile.shortcuts);
-            return { ...profile, shortcuts: updatedProfileShortcuts };
-        });
-
-        store.replace('commandKeys', updatedCommands);
-        store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
-    }
-
-    // 0.6.8 -- duplicate keybinding fix
-    if (semver.lt(cnc.version, '0.6.8')) {
-        const setCommands = store.get('commandKeys');
-        const defaultCommands = get(defaultState, 'commandKeys');
-
-        /**
-         * Return an array of keybindings matching the title
-         * @param title - string title of the keybind
-         * @returns {array}
-         */
-        const getCommandsWithName = (title) => {
-            return setCommands.filter(command => command.title === title);
-        };
-
-        defaultCommands.forEach((command) => {
-            const currentBinding = getCommandsWithName(command.title)[0]; // first element in array should be original bind
-            if (currentBinding) {
-                command.keys = currentBinding.keys;
-            }
-        });
-        store.unset('commandKeys');
-        store.set('commandKeys', defaultCommands);
     }
 };
 

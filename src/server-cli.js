@@ -26,7 +26,9 @@
 import path from 'path';
 import isElectron from 'is-electron';
 import program from 'commander';
+import ip from 'ip';
 import pkg from './package.json';
+
 
 // Defaults to 'production'
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
@@ -63,7 +65,7 @@ const parseMountPoint = (val, acc) => {
 const parseController = (val) => {
     val = val ? (val + '').toLowerCase() : '';
 
-    if (['grbl', 'marlin', 'smoothie', 'tinyg', 'g2core'].includes(val)) {
+    if (['grbl'].includes(val)) {
         return val;
     } else {
         return '';
@@ -84,8 +86,8 @@ program
     .option('-m, --mount <route-path>:<target>', 'Add a mount point for serving static files', parseMountPoint, [])
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
-    .option('--allow-remote-access', 'Allow remote access to the server (default: false)')
-    .option('--controller <type>', 'Specify CNC controller: Grbl|Marlin|Smoothie|TinyG|g2core (default: \'\')', parseController, '');
+    .option('--headless', 'Allow remote access to the server (default: false)', false)
+    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, '');
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
 // This is not the case when running from a packaged Electron app. Here you have the first value appname and then args.
@@ -100,6 +102,14 @@ export default () => new Promise((resolve, reject) => {
     // Change working directory to 'server' before require('./server')
     process.chdir(path.resolve(__dirname, 'server'));
 
+    if (program.headless) {
+        const localhost = ip.address();
+        program.host = localhost;
+        if (program.port === 0) {
+            program.port = 8000;
+        }
+    }
+
     require('./server').createServer({
         port: program.port,
         host: program.host,
@@ -109,14 +119,14 @@ export default () => new Promise((resolve, reject) => {
         mountPoints: program.mount,
         watchDirectory: program.watchDirectory,
         accessTokenLifetime: program.accessTokenLifetime,
-        allowRemoteAccess: !!program.allowRemoteAccess,
+        allowRemoteAccess: !!program.headless,
         controller: program.controller
     }, (err, data) => {
         if (err) {
             reject(err);
             return;
         }
-
-        resolve(data);
+        console.log(data);
+        resolve({ ...data, headless: program.headless });
     });
 });

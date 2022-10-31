@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Sienci Labs Inc.
+ * Copyright (C) 2021 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -20,29 +20,24 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import path from 'path';
-import babel from 'rollup-plugin-babel';
-import commonjs from 'rollup-plugin-commonjs';
-import resolve from 'rollup-plugin-node-resolve';
-import replace from 'rollup-plugin-replace';
 
-const NODE_ENV = process.env.NODE_ENV || 'development';
+import React from 'react';
+import styles from './slider.styl';
 
-export default {
-    plugins: [
-        replace({
-            'process.env.NODE_ENV': JSON.stringify(NODE_ENV)
-        }),
-        babel({
-            exclude: 'node_modules/**'
-        }),
-        resolve(),
-        commonjs()
-    ],
-    input: path.resolve(__dirname, 'src/app/index.jsx'),
-    output: [
-        {
-            file: path.resolve(__dirname, 'output/gSender/bundle.js')
-        }
-    ]
+const Slider = ({ step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, label = '', unitString = 'unit' }) => {
+    return (
+        <div className={styles.sliderWrapper}>
+            <span style={{ width: '13%' }}>{label + ' '}</span>
+            <input
+                style={{ width: '70%' }}
+                type="range" min={min} max={max}
+                value={value} onMouseUp={onMouseUp} className={styles.slider}
+                onChange={onChange}
+                step={step}
+            />
+            <span style={{ width: '17%' }}>{ value } { unitString }</span>
+        </div>
+    );
 };
+
+export default Slider;

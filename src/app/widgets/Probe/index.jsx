@@ -79,13 +79,13 @@ class ProbeWidget extends PureComponent {
     PROBE_DISTANCE_METRIC = {
         X: 50,
         Y: 50,
-        Z: 30
+        Z: this.state.zProbeDistance ? this.state.zProbeDistance.mm : 30
     };
 
     PROBE_DISTANCE_IMPERIAL = {
         X: 2,
         Y: 2,
-        Z: 1.2
+        Z: this.state.zProbeDistance ? this.state.zProbeDistance.in : 1.2
     };
 
 
@@ -362,6 +362,7 @@ class ProbeWidget extends PureComponent {
             probeFastFeedrate: this.config.get('probeFastFeedrate') || {},
             touchPlateHeight: this.config.get('touchPlateHeight') || {},
             retractionDistance: this.config.get('retractionDistance') || {},
+            zProbeDistance: this.config.get('zProbeDistance') || {},
             touchplate: store.get('workspace[probeProfile]', {}),
             availableTools,
             toolDiameter,
@@ -506,7 +507,6 @@ class ProbeWidget extends PureComponent {
     generateMultiAxisCommands(axes, xyThickness, zThickness, params) {
         let code = [];
         let { wcs, isSafe, probeCommand, retractDistance, normalFeedrate, quickFeedrate, units } = params;
-        //const unitModal = `G${modal}`;
         const workspace = this.mapWCSToPValue(wcs);
         const XYRetract = -retractDistance;
         let XYProbeDistance = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC.X : this.PROBE_DISTANCE_IMPERIAL.X;
@@ -643,7 +643,7 @@ class ProbeWidget extends PureComponent {
 
         // Make sure we're in the correct mode at end of probe
         code = code.concat([
-            this.gcode('G90 [UNITS]')
+            this.gcode('G90')
         ]);
         return code;
     }
@@ -1177,6 +1177,25 @@ class ProbeWidget extends PureComponent {
                 this.actions.handleProbeCommandChange(0);
             }
         }
+
+        this.setState({
+            probeAxis: this.config.get('probeAxis', 'Z'),
+            probeCommand: this.config.get('probeCommand', 'G38.2'),
+            useTLO: this.config.get('useTLO'),
+            probeDepth: this.config.get('probeDepth') || {},
+            probeFeedrate: this.config.get('probeFeedrate') || {},
+            probeFastFeedrate: this.config.get('probeFastFeedrate') || {},
+            touchPlateHeight: this.config.get('touchPlateHeight') || {},
+            retractionDistance: this.config.get('retractionDistance') || {},
+            zProbeDistance: this.config.get('zProbeDistance') || {},
+            connectivityTest: this.config.get('connectivityTest'),
+        }, () => {
+            const { zProbeDistance } = this.state;
+            if (zProbeDistance) {
+                this.PROBE_DISTANCE_METRIC.Z = zProbeDistance.mm;
+                this.PROBE_DISTANCE_IMPERIAL.Z = zProbeDistance.in;
+            }
+        });
     }
 
     subscribe() {

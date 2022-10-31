@@ -32,33 +32,52 @@ class GCodeVisualizer {
         this.theme = theme;
         this.vertices = [];
         this.colors = [];
-        this.framesLength = 0;
-
-        // Example
-        // [
-        //   {
-        //     code: 'G1 X1',
-        //     vertexIndex: 2
-        //   }
-        // ]
+        this.spindleSpeeds = null;
+        this.spindleChanges = null;
+        this.isLaser = false;
         this.frames = []; // Example
         this.frameIndex = 0;
 
         return this;
     }
 
-    render({ vertices, colors, frames }) {
-        const { cuttingCoordinateLines, G0Color, G1Color, G2Color, G3Color } = this.theme;
+    updateLaserModeColors() {
+        const { /*G1Color, */backgroundColor } = this.theme;
+        const defaultColor = new THREE.Color(255, 0, 0);
+        const fillColor = new THREE.Color(backgroundColor);
+        const maxSpindleValue = Math.max(...[...this.spindleSpeeds]);
+
+        const calculateOpacity = (speed) => ((maxSpindleValue === 0) ? 1 : (speed / maxSpindleValue));
+
+        for (let i = 0; i < this.frames.length; i++) {
+            const { spindleOn, spindleSpeed } = this.spindleChanges[i];
+            const offsetIndex = (this.frames[i] * 4);
+            if (spindleOn) {
+                let opacity = calculateOpacity(spindleSpeed);
+                const color = [...defaultColor.toArray(), opacity];
+                this.colors.splice(offsetIndex, 8, ...color, ...color);
+            } else {
+                const color = [...fillColor.toArray(), 0.05];
+                this.colors.splice(offsetIndex, 8, ...color, ...color);
+            }
+        }
+    }
+
+    render({ vertices, colors, frames, spindleSpeeds, isLaser = false, spindleChanges }) {
+        const { cuttingCoordinateLines, G0Color, G1Color } = this.theme;
         this.vertices = new THREE.Float32BufferAttribute(vertices, 3);
         this.frames = frames;
+        this.spindleSpeeds = spindleSpeeds;
+        this.isLaser = isLaser;
+        this.spindleChanges = spindleChanges;
         const defaultColor = new THREE.Color(cuttingCoordinateLines);
 
         // Get line colors for current theme
         const motionColor = {
             'G0': new THREE.Color(G0Color),
             'G1': new THREE.Color(G1Color),
-            'G2': new THREE.Color(G2Color),
-            'G3': new THREE.Color(G3Color),
+            'G2': new THREE.Color(G1Color),
+            'G3': new THREE.Color(G1Color),
             'default': defaultColor
         };
 
@@ -69,7 +88,7 @@ class GCodeVisualizer {
 
         const workpiece = new THREE.Line(
             this.geometry,
-            new THREE.PointsMaterial({
+            new THREE.LineBasicMaterial({
                 color: defaultColor,
                 vertexColors: true,
                 transparent: true,
@@ -89,14 +108,19 @@ class GCodeVisualizer {
 
     /* Turns our array of Three colors into a float typed array we can set as a bufferAttribute */
     getColorTypedArray(colors, motionColor) {
+        console.log(colors);
         const colorArray = [];
         colors.forEach(colorTag => {
             const [motion, opacity] = colorTag;
             const color = motionColor[motion] || motionColor.default;
             colorArray.push(...color.toArray(), opacity);
         });
+        this.colors = colorArray;
 
-        this.colors = new Float32Array(colorArray);
+        if (this.isLaser && this.spindleSpeeds.size > 0) {
+            this.updateLaserModeColors();
+        }
+
         return new Float32Array(colorArray);
     }
 
@@ -139,6 +163,10 @@ class GCodeVisualizer {
         }
 
         this.frameIndex = frameIndex;
+    }
+
+    getCurrentLocation() {
+        return this.vertices[this.frames[this.frameIndex].vertexIndex] ? this.vertices[this.frames[this.frameIndex].vertexIndex] : this.vertices[this.frames[this.frameIndex].vertexIndex - 1];
     }
 
     unload() {

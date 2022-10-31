@@ -209,6 +209,17 @@ class CNCEngine {
                 }
             });
 
+            socket.on('addclient', (port) => {
+                let controller = store.get(`controllers["${port}"]`);
+                if (!controller) {
+                    log.info(`No controller found on port ${port} to reconnect to`);
+                    return;
+                }
+                log.info(`Adding new client to controller on port ${port} with socket ID ${socket.id}`);
+                controller.addConnection(socket);
+                log.info(`Controller state: ${controller.isOpen()}`);
+            });
+
             // List the available serial ports
             socket.on('list', () => {
                 log.debug(`socket.list(): id=${socket.id}`);

@@ -30,6 +30,9 @@
     height: 9rem;
 }
 
+.litetoggle {
+    transform: scale(.8);
+}
 
 .processing-loader {
     width: 100%;
@@ -111,14 +114,13 @@
         display: flex;
         justify-content: space-between;
         gap: 1rem;
+        width: 100%
     }
 
     &-name {
         wrapping();
-
         width: 100%;
-        max-width: 32vw;
-
+        display: flex;
         & div {
             wrapping();
             width: min-content;

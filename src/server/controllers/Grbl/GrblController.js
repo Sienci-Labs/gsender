@@ -43,7 +43,6 @@ import translateExpression from '../../lib/translate-expression';
 import config from '../../services/configstore';
 import monitor from '../../services/monitor';
 import taskRunner from '../../services/taskrunner';
-import { getOutlineGcode } from '../../lib/outlineService';
 import store from '../../store';
 import {
     GLOBAL_OBJECTS as globalObjects,
@@ -62,7 +61,7 @@ import {
 import { METRIC_UNITS } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
-
+import { runOverride } from '../runOverride';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -127,6 +126,8 @@ class GrblController {
 
     queryTimer = null;
 
+    timePaused = null;
+
     actionMask = {
         queryParserState: {
             state: false, // wait for a message containing the current G-code parser modal state
@@ -166,7 +167,6 @@ class GrblController {
     homingStarted = false;
 
     homingFlagSet = false;
-
 
     constructor(engine, options) {
         if (!engine) {
@@ -233,7 +233,6 @@ class GrblController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
-
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
@@ -475,16 +474,22 @@ class GrblController {
             } else {
                 this.sender.hold();
             }
+
+            this.timePaused = new Date().getTime();
         });
         this.workflow.on('resume', (...args) => {
             this.emit('workflow:state', this.workflow.state);
+
+            let pauseTime = new Date().getTime() - this.timePaused;
 
             // Reset feeder prior to resume program execution
             this.feeder.reset();
 
             // Resume program execution
             this.sender.unhold();
-            this.sender.next();
+
+            // subtract time paused
+            this.sender.next({ timePaused: pauseTime });
         });
 
         // Grbl
@@ -578,6 +583,13 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
             log.error(`Error occurred at ${Date.now()}`);
+            const { received } = this.sender.state;
+            this.emit('error', {
+                type: 'GRBL_ERROR',
+                code: `${code}`,
+                message: error.message,
+                lineNumber: received,
+            });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
                 const { lines, received } = this.sender.state;
@@ -626,6 +638,10 @@ class GrblController {
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
+                this.emit('error', {
+                    type: 'GRBL_ALARM',
+                    message: `ALARM:${code} (${alarm.message})`,
+                });
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
 
@@ -826,15 +842,12 @@ class GrblController {
                     this.actionTime.senderFinishTime = now;
                 } else if (timespan > toleranceTime) {
                     log.silly(`Finished sending G-code: timespan=${timespan}`);
-
                     this.actionTime.senderFinishTime = 0;
-
                     // Stop workflow
                     this.command('gcode:stop');
                 }
             }
         }, 250);
-
         // Load file if it exists in CNC engine (AKA it was loaded before connection
     }
 
@@ -1086,6 +1099,8 @@ class GrblController {
     loadFile(gcode, { name }) {
         log.debug(`Loading file '${name}' to controller`);
         this.command('gcode:load', name, gcode);
+        store.set('lastFeed', this.runner.state.status.ov[0]);
+        store.set('lastSpindle', this.runner.state.status.ov[2]);
     }
 
     addConnection(socket) {
@@ -1185,6 +1200,14 @@ class GrblController {
                 // be no queued motions, as long as no more commands were sent after the G4.
                 // This is the fastest way to do it without having to check the status reports.
                 const dwell = '%wait ; Wait for the planner to empty';
+
+                // add delay to spindle startup if enabled
+                const preferences = store.get('preferences') || { spindle: { delay: false } };
+                const delay = preferences.spindle.delay;
+                if (delay) {
+                    gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
+                }
+
                 const ok = this.sender.load(name, gcode + '\n' + dwell, context);
                 if (!ok) {
                     callback(new Error(`Invalid G-code: name=${name}`));
@@ -1216,6 +1239,7 @@ class GrblController {
                 const [lineToStartFrom, zMax] = args;
                 const totalLines = this.sender.state.total;
                 const startEventEnabled = this.event.hasEnabledStartEvent();
+                log.info(startEventEnabled);
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
                     const { lines = [] } = this.sender.state;
@@ -1312,7 +1336,8 @@ class GrblController {
                     this.feeder.reset();
 
                     // Sender
-                    this.sender.next();
+                    this.sender.setStartLine(0);
+                    this.sender.next({ startFromLine: true });
                 }
             },
             'stop': () => {
@@ -1426,55 +1451,35 @@ class GrblController {
                 this.write('\x18'); // ^x
                 this.writeln('$X');
             },
+            'checkStateUpdate': () => {
+                this.emit('controller:state', GRBL, this.state);
+            },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
-            //   0: Set 100% of programmed rate.
-            //  10: Increase 10%
-            // -10: Decrease 10%
-            //   1: Increase 1%
-            //  -1: Decrease 1%
             'feedOverride': () => {
+                console.log('inside spindle event');
                 const [value] = args;
-
-                const currFeedOverride = this.runner.state.status.ov[0];
-                const nextFeedOverride = currFeedOverride + value;
-
-                if (nextFeedOverride > 230 || nextFeedOverride < 0) {
-                    return;
-                }
-
-                if (value === 0) {
+                const currFeedOverride = store.get('lastFeed');
+                store.set('lastFeed', value);
+                const Change = value - currFeedOverride;
+                if (value === 100) {
                     this.write('\x90');
-                } else if (value === 10) {
-                    this.write('\x91');
-                } else if (value === -10) {
-                    this.write('\x92');
-                } else if (value === 1) {
-                    this.write('\x93');
-                } else if (value === -1) {
-                    this.write('\x94');
+                } else {
+                    runOverride(this, Change, 'feed');
                 }
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
-            //   0: Set 100% of programmed spindle speed
-            //  10: Increase 10%
-            // -10: Decrease 10%
-            //   1: Increase 1%
-            //  -1: Decrease 1%
             'spindleOverride': () => {
+                console.log('inside spindle event');
                 const [value] = args;
-
-                if (value === 0) {
+                const currFeedOverride = store.get('lastSpindle');
+                const Change = value - currFeedOverride;
+                store.set('lastSpindle', value);
+                if (value === 100) {
                     this.write('\x99');
-                } else if (value === 10) {
-                    this.write('\x9a');
-                } else if (value === -10) {
-                    this.write('\x9b');
-                } else if (value === 1) {
-                    this.write('\x9c');
-                } else if (value === -1) {
-                    this.write('\x9d');
+                } else {
+                    runOverride(this, Change, 'spindle');
                 }
             },
             // Rapid Overrides
@@ -1511,6 +1516,22 @@ class GrblController {
             'lasertest:off': () => {
                 const commands = [
                     'M5S0'
+                ];
+                this.command('gcode', commands);
+            },
+            'laserpower:change': () => {
+                const [power = 0, maxS = 1000] = args;
+                const commands = [
+                    // https://github.com/gnea/grbl/wiki/Grbl-v1.1-Laser-Mode
+                    // The laser will only turn on when Grbl is in a G1, G2, or G3 motion mode.
+                    'S' + Math.round(ensurePositiveNumber(maxS * (power / 100)) * 100) / 100
+                ];
+                this.command('gcode', commands);
+            },
+            'spindlespeed:change': () => {
+                const [speed = 0] = args;
+                const commands = [
+                    'S' + speed
                 ];
                 this.command('gcode', commands);
             },
@@ -1737,13 +1758,6 @@ class GrblController {
                 this.command('feeder:start');
                 this.runPostChangeHook();
             },
-            'gcode:outline': () => {
-                const [gcode = '', concavity = 450] = args;
-                const toRun = getOutlineGcode(gcode, concavity);
-                log.debug('Running outline');
-                this.emit('outline:start');
-                this.command('gcode', toRun);
-            }
         }[cmd];
 
         if (!handler) {

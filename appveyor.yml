@@ -4,6 +4,7 @@ version: "{build}-{branch}"
 branches:
   only:
     - master
+    - beta
     - /v\d+\.\d+\.\d+/
 
 environment:

@@ -31,7 +31,8 @@ import {
     UPDATE_FEEDER_STATUS, UPDATE_SENDER_STATUS, UPDATE_WORKFLOW_STATE,
     UPDATE_HOMING_FLAG,
     RESET_HOMING,
-    UPDATE_PARTIAL_CONTROLLER_SETTINGS
+    UPDATE_PARTIAL_CONTROLLER_SETTINGS,
+    UPDATE_TERMINAL_HISTORY
 } from '../actions/controllerActions';
 import { in2mm, mm2in } from '../lib/units';
 import { WORKFLOW_STATE_IDLE } from '../constants';
@@ -58,7 +59,8 @@ const initialState = {
     },
     tool: {
         context: null
-    }
+    },
+    terminalHistory: []
 };
 
 /**
@@ -216,6 +218,11 @@ const reducer = createReducer(initialState, {
         return {
             homingFlag: false,
             homingRun: false
+        };
+    },
+    [UPDATE_TERMINAL_HISTORY]: (payload, reducerState) => {
+        return {
+            terminalHistory: payload
         };
     }
 });

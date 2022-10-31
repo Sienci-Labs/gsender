@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 import TabbedWidget from 'app/components/TabbedWidget';
+import ReactToPrint from 'react-to-print';
+import { Button } from 'react-bootstrap';
+import ShortcutTable from './ShortcutTable';
 
 import KeyboardShortcuts from './Keybindings';
 import Joystick from './Joystick';
@@ -25,29 +28,39 @@ const tabs = [
 
 const Shortcuts = ({ active }) => {
     const [tab, setTab] = useState(0);
-
+    //const [display, setDisplay] = useState('none');
+    const componentRef = useRef();
     return (
         <SettingWrapper title="Shortcuts" show={active}>
             <TabbedWidget>
+                <ReactToPrint
+                    trigger={() => {
+                        return <Button>Print</Button>;
+                    }}
+                    content={() => componentRef.current}
+                    // onBeforePrint={() => setDisplay('block')}
+                    // onAfterPrint={() => setDisplay('none')}
+                />
+                <ShortcutTable forwardRef={componentRef} />
                 <TabbedWidget.Tabs
                     tabs={tabs}
                     activeTabIndex={tab}
                     onClick={(index) => setTab(index)}
                     className={styles.tabs}
-                >
-                </TabbedWidget.Tabs>
+                />
                 <TabbedWidget.Content>
                     <div className={styles.container}>
-                        {
-                            tabs.map((t, index) => {
-                                const active = index === tab;
-                                return (
-                                    <TabbedWidget.ChildComponent key={t.id} active={active}>
-                                        {active && t.component}
-                                    </TabbedWidget.ChildComponent>
-                                );
-                            })
-                        }
+                        {tabs.map((t, index) => {
+                            const active = index === tab;
+                            return (
+                                <TabbedWidget.ChildComponent
+                                    key={t.id}
+                                    active={active}
+                                >
+                                    {active && t.component}
+                                </TabbedWidget.ChildComponent>
+                            );
+                        })}
                     </div>
                 </TabbedWidget.Content>
             </TabbedWidget>
