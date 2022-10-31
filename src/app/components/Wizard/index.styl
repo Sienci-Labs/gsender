@@ -4,7 +4,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  width: 80%;
+  min-width: 80%;
   height: 500px;
   border-radius: 5px;
   display: flex;
@@ -15,10 +15,11 @@
 
 .minimizedWrapper {
   position: absolute;
+  background: white;
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  width: 25%;
+  width: 40%;
   height: auto;
   border-radius: 5px;
   box-shadow: 0px 20px 20px -17px rgba(255, 159, 16, 0.73);
@@ -28,7 +29,6 @@
   display flex;
   flex-direction row;
   height: calc(100% - 40px);
-  gap: 1rem;
   justify-items stretch;
   align-items stretch;
   justify-content stretch
@@ -100,16 +100,18 @@
 .stepIndex {
   background: none;
   border: solid 1px #9ca3af;
-  border-radius 9999px;
   display flex;
+  color: #9ca3af;
+  font-weight: bold;
+  font-size: 1.1rem;
   align-items center;
   justify-content center;
   align-content center
   width: 2.5rem;
   height: 2.5rem;
-  color: #9ca3af;
-  font-weight: bold;
-  font-size: 1.1rem;
+  border-radius: 75px;
+  display: inline-flex;
+  flex: 0 0 auto;
 
   &-complete {
     @extends .stepIndex;
@@ -205,6 +207,7 @@
   align-content center
   justify-content space-around;
   gap: 2rem;
+  height: 7vh;
 }
 
 
@@ -216,7 +219,7 @@
   min-width: 12rem;
 
   i {
-    margin: 0 10px !important;
+    margin: 0 8px !important;
   }
 }
 
@@ -304,6 +307,7 @@ button-mixin($color) {
   opacity: 1;
   border-left: solid 3px #3e85c7;
   background: rgba(#3e85c7, 0.1);
+  overflow: hidden;
 }
 
 .substepPending {
@@ -320,6 +324,9 @@ button-mixin($color) {
   gap: 0.5rem;
   align-items center;
   width: 100%;
+  span{
+    margin-bottom: 1rem;
+  }
 }
 
 .orSpan {
@@ -334,3 +341,13 @@ button-mixin($color) {
   font-weight: bold;
   margin-top: 1rem;
 }
+
+@media (max-width: 1068px) {
+    .actionRow{
+      display: block !important;
+      text-align: center;
+      button{
+        margin-top: 1rem;
+      }
+    }
+  }
