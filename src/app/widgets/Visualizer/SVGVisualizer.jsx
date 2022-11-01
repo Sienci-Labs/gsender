@@ -161,8 +161,8 @@ class SVGVisualizer extends Component {
             let yLength = bbox.delta.y;
 
             // calculation for the middle of the svg
-            let middleX = (bbox.min.x + bbox.max.x) / 2;
-            let middleY = (bbox.min.y + bbox.max.y) / 2;
+            let xMiddle = (bbox.min.x + bbox.max.x) / 2;
+            let yMiddle = (bbox.min.y + bbox.max.y) / 2;
 
             /*
                 i'm setting the viewbox coordinates so the svg is alrdy in the middle.
@@ -171,8 +171,8 @@ class SVGVisualizer extends Component {
                     - x: the middle of the svg - half the width of the viewbox
                     - y: the middle of the svg + half the width of the viewbox
             */
-            const xZero = middleX - ((Math.abs(xLength) + Math.abs(xLength) / 2) / 2);
-            const yZero = (middleY + ((Math.abs(yLength) + Math.abs(yLength) / 2) / 2)) * -1; // y is inversed because the svg starts off upside down
+            const xZero = xMiddle - ((Math.abs(xLength) + Math.abs(xLength) / 2) / 2);
+            const yZero = (yMiddle + ((Math.abs(yLength) + Math.abs(yLength) / 2) / 2)) * -1; // y is inversed because the svg starts off upside down
 
             // set the top left corner of the viewbox as the coordinates we calculated,
             // and set its size as the svg size plus a little extra
