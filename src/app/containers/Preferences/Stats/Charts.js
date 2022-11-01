@@ -25,15 +25,15 @@ import React from 'react';
 import store from 'app/store';
 import styles from '../index.styl';
 import Fieldset from '../components/Fieldset';
-import CustomPieChart from '../components/CustomPieChart';
+//import CustomPieChart from '../components/CustomPieChart';
 
 const Charts = ({ state, actions }) => {
     const jobsFinished = parseInt(store.get('workspace.jobsFinished'), 10);
     const jobsCancelled = parseInt(store.get('workspace.jobsCancelled'), 10);
-    const data = [
+    /*const data = [
         { title: 'Cancelled', value: jobsCancelled, color: '#C13C37' },
         { title: 'Completed', value: jobsFinished, color: '#E38627' },
-    ];
+    ];*/
 
     return (
         <Fieldset legend="Charts">
@@ -42,7 +42,7 @@ const Charts = ({ state, actions }) => {
                 {
                     jobsFinished === 0 && jobsCancelled === 0 ?
                         <span>No jobs run</span>
-                        : <CustomPieChart propsData={data} />
+                        : <span>Hiding this for crash</span>
                 }
             </div>
         </Fieldset>
