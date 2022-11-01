@@ -165,11 +165,12 @@ class GCodeVisualizer {
     }
 
     getCurrentLocation() {
-        return [
-            this.vertices.array[this.frames[this.frameIndex]],
-            this.vertices.array[this.frames[this.frameIndex]] + 1,
-            this.vertices.array[this.frames[this.frameIndex]] + 2
-        ];
+        const offset = this.frames[this.frameIndex] * 3; // Reconvert back to offset
+        return {
+            x: this.vertices.array[offset],
+            y: this.vertices.array[offset + 1],
+            z: this.vertices.array[offset + 2]
+        };
     }
 
     unload() {
