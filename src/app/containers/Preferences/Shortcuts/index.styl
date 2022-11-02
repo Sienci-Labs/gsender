@@ -240,3 +240,48 @@ $primary = #3e85c7;
     outline: none;
   }
 }
+
+card() {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  background-color: #16b1c9;
+  width: 100%;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 0.75rem;
+  background-color: #16b1c9;
+  padding: 1.5rem;
+  height: 100%;
+  color: white;
+
+  i {
+    font-size: 3rem !important;
+  }
+}
+
+.availability, .available, .unavailable {
+  card();
+
+  &.available {
+    card();
+    background-color: #4BB543;
+  }
+
+  &.unavailable {
+    card();
+    background-color: #FF3D3D;
+  }
+}
+
+.custom-profile-name {
+  margin: 0 !important;
+
+  &-hidden {
+    margin: 0 !important;
+    opacity: 0;
+    cursor: none;
+  }
+}
