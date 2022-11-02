@@ -33,7 +33,7 @@ import ProgramEvents from 'app/containers/Preferences/Events';
 import gamepad from 'app/lib/gamepad';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import General from './General';
-import Shortcuts from './Keybindings';
+import Shortcuts from './Shortcuts';
 import ProbeSettings from './Probe';
 import SpindleLaser from './SpindleLaser';
 import WidgetConfig from '../../widgets/WidgetConfig';
