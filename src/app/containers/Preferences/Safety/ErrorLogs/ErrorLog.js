@@ -48,7 +48,7 @@ const ErrorLog = () => {
                                                     Occured on {log.split('[error] GRBL_ALARM:')[0].slice(1, 20).replace(' ', ' at ') || ''}
                                                 </span>
                                                 <p className={styles.errorReason}>
-                                                    Reason: {log.split('[error] GRBL_ALARM:')[1]}
+                                                    {log.split('[error] GRBL_ALARM:')[1]}
                                                 </p>
                                             </VerticalTimelineElement>
                                         )
@@ -67,7 +67,8 @@ const ErrorLog = () => {
                                                     Occured on {log.split('[error] GRBL_ERROR:')[0].slice(1, 20).replace(' ', ' at ') || ''}
                                                 </span>
                                                 <p className={styles.errorReason}>
-                                                    Reason: {log.split('[error] GRBL_ERROR:')[1]}
+                                                    {log.split('[error] GRBL_ERROR:')[1].split('Line')[0]} <br />
+                                                    Line {log.split('[error] GRBL_ERROR:')[1].split('Line')[1]}
                                                 </p>
                                             </VerticalTimelineElement>
                                         );

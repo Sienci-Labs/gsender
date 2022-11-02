@@ -594,7 +594,7 @@ class GrblController {
             this.emit('error', {
                 type: 'GRBL_ERROR',
                 code: `${code}`,
-                message: error.message,
+                description: error.description,
                 line: lines[received] || '',
                 lineNumber: received + 1,
             });
@@ -648,7 +648,8 @@ class GrblController {
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
                 this.emit('error', {
                     type: 'GRBL_ALARM',
-                    message: `ALARM:${code} (${alarm.message})`,
+                    code: code,
+                    description: alarm.description,
                 });
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
