@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 import TabbedWidget from 'app/components/TabbedWidget';
 
-import KeyboardShortcuts from './Keybindings';
-import Joystick from './Joystick';
+import KeyboardShortcuts from './Keyboard';
+import Gamepad from './Gamepad';
 
 import SettingWrapper from '../components/SettingWrapper';
 import styles from '../index.styl';
@@ -11,15 +11,15 @@ import styles from '../index.styl';
 const tabs = [
     {
         id: 0,
-        label: 'Keyboard Shortcuts',
+        label: 'Keyboard',
         widgetId: 'keyboard-shortcuts',
         component: <KeyboardShortcuts />,
     },
     {
         id: 1,
-        label: 'Joystick Shortcuts',
-        widgetId: 'joystick-shortcuts',
-        component: <Joystick />,
+        label: 'Gamepad',
+        widgetId: 'gamepad-shortcuts',
+        component: <Gamepad />,
     },
 ];
 
@@ -34,8 +34,7 @@ const Shortcuts = ({ active }) => {
                     activeTabIndex={tab}
                     onClick={(index) => setTab(index)}
                     className={styles.tabs}
-                >
-                </TabbedWidget.Tabs>
+                />
                 <TabbedWidget.Content>
                     <div className={styles.container}>
                         {
