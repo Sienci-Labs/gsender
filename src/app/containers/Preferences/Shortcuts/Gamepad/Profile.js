@@ -7,7 +7,7 @@ import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import styles from '../index.styl';
 import ProfileItem from '../ProfileItem';
 import MainTable from '../MainTable';
-import ProfileShortcutModal from '../ProfileShortcutModal';
+import ProfileShortcutModal from './ProfileShortcutModal';
 
 const Profile = ({ data, onUpdateProfiles }) => {
     Profile.propTypes = { currentProfile: PropTypes.object, onUpdateProfiles: PropTypes.func };
