@@ -12,19 +12,25 @@ import Button from 'app/components/FunctionButton/FunctionButton';
 import Input from '../components/Input';
 
 import styles from './index.styl';
+import { PROFILE_AVAILABILITY_TYPES } from './utils';
+
+const { DEFAULT, AVAILABLE, UNAVAILABLE } = PROFILE_AVAILABILITY_TYPES;
 
 const AddProfileModal = ({ onClose, onAdd }) => {
     const [gamepadInfo, setGamepadInfo] = useState(null);
-    const [isAvailable, setIsAvailable] = useState(0);
-    const [profileName, setProfileName] = useState('');
+    const [availabilityType, setAvailabilityType] = useState(DEFAULT);
+    const [customProfileName, setCustomProfileName] = useState('');
 
     useEffect(() => {
         gamepad.start();
 
         const gamepadListener = ({ detail }) => {
-            const { gamepad: currentGamepad } = detail;
+            const { gamepad } = detail;
 
-            setGamepadInfo(currentGamepad);
+            const isAvailable = checkIfIsAvailable(gamepad);
+
+            setAvailabilityType(isAvailable);
+            setGamepadInfo(gamepad);
         };
 
         gamepad.on('gamepad:button', gamepadListener);
@@ -34,17 +40,13 @@ const AddProfileModal = ({ onClose, onAdd }) => {
         };
     }, []);
 
-    useEffect(() => {
+    const checkIfIsAvailable = (gamepad) => {
         const { profiles = [] } = store.get('workspace.gamepad');
 
-        if (!gamepadInfo) {
-            return;
-        }
+        const profileAlreadyExists = profiles.find(profile => profile.id === gamepad.id);
 
-        const profileAlreadyExists = profiles.find(profile => profile.id === gamepadInfo.id);
-
-        setIsAvailable(profileAlreadyExists ? 1 : 2);
-    }, [gamepadInfo]);
+        return profileAlreadyExists ? UNAVAILABLE : AVAILABLE;
+    };
 
     const handleAddProfile = () => {
         const { profiles = [] } = store.get('workspace.gamepad');
@@ -54,7 +56,7 @@ const AddProfileModal = ({ onClose, onAdd }) => {
             {
                 id: gamepadInfo.id,
                 active: true,
-                profileName: profileName || gamepadInfo.id,
+                profileName: customProfileName || gamepadInfo.id,
                 shortcuts: commandKeys.map((keyData) => ({ ...keyData, keys: '', command: keyData.cmd })),
                 icon: 'fas fa-gamepad'
             },
@@ -73,45 +75,31 @@ const AddProfileModal = ({ onClose, onAdd }) => {
         onClose();
     };
 
-    const Availability = ({ isAvailable }) => {
-        Availability.propTypes = { isAvailable: PropTypes.bool };
+    const Availability = ({ type }) => {
+        const output = {
+            [DEFAULT]: (
+                <div className={styles.availability}>
+                    <i className="fas fa-info-circle" />
+                    <p style={{ textAlign: 'center' }}>Connect your device and press any button on it</p>
+                </div>
+            ),
+            [AVAILABLE]: (
+                <div className={styles.available}>
+                    <i className={classnames('fas fa-check-circle')} />
+                    <p style={{ margin: 0 }}>Profile Is Available</p>
+                    <small>Device ID: {gamepadInfo?.id}</small>
+                </div>
+            ),
+            [UNAVAILABLE]: (
+                <div className={styles.unavailable}>
+                    <i className={classnames('fas fa-times-circle')} />
+                    <p style={{ margin: 0 }}>Profile Already Exists</p>
+                    <small>Device ID: {gamepadInfo?.id}</small>
+                </div>
+            ),
+        }[type];
 
-        const availability = () => {
-            switch (isAvailable) {
-            case 1: {
-                return (
-                    <>
-                        <i className={classnames('fas fa-times-circle', styles.isNotAvailable)} />
-                        <p>Profile Already Exists</p>
-                    </>
-                );
-            }
-
-            case 2: {
-                return (
-                    <>
-                        <i className={classnames('fas fa-check-circle', styles.isAvailable)} />
-                        <p>Profile Is Available</p>
-                    </>
-                );
-            }
-
-            default: {
-                return (
-                    <>
-                        <i className="fas fa-clock is-available" />
-                        <p />
-                    </>
-                );
-            }
-            }
-        };
-
-        return (
-            <div className={styles.profileAvailable}>
-                {availability()}
-            </div>
-        );
+        return output;
     };
 
     return (
@@ -120,39 +108,31 @@ const AddProfileModal = ({ onClose, onAdd }) => {
             size="small"
             title="Add Gamepad/Joystick Profile"
         >
-            <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
+            <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%' }}>
+                <Availability type={availabilityType} info={gamepadInfo} />
 
-                <h5 style={{ textAlign: 'center' }}>Connect your device and press any button on it</h5>
+                <Input
+                    onChange={(e) => setCustomProfileName(e.target.value)}
+                    additionalProps={{ placeholder: 'Custom Profile Name...', disabled: availabilityType === UNAVAILABLE }}
+                    className={availabilityType === AVAILABLE ? styles.customProfileName : styles.customProfileNameHidden}
+                />
 
-                {
-                    gamepadInfo && (
-                        <>
-                            <div className={styles.newProfileInfo}>
-                                <Availability isAvailable={isAvailable} />
-
-                                <div className={styles.profileAvailable}>
-                                    <i className="fas fa-gamepad" />
-                                    <p>{gamepadInfo.id}</p>
-                                </div>
-
-                            </div>
-
-                            <div>
-                                <Input
-                                    // label="Profile Name"
-                                    value={profileName}
-                                    onChange={(e) => setProfileName(e.target.value)}
-                                    additionalProps={{ placeholder: 'New Profile Name...', disabled: isAvailable !== 2 }}
-                                />
-                            </div>
-                        </>
-                    )
-                }
-
-                <Button primary disabled={!gamepadInfo} onClick={handleAddProfile}>Add New Profile</Button>
+                <Button
+                    primary
+                    disabled={availabilityType === UNAVAILABLE}
+                    onClick={handleAddProfile}
+                    style={{ margin: 0 }}
+                >
+                    Add New Profile
+                </Button>
             </div>
         </ToolModal>
     );
+};
+
+AddProfileModal.propTypes = {
+    onAdd: PropTypes.func,
+    onClose: PropTypes.func
 };
 
 export default AddProfileModal;
