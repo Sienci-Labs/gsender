@@ -590,12 +590,13 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
             log.error(`Error occurred at ${Date.now()}`);
-            const { received } = this.sender.state;
+            const { lines, received } = this.sender.state;
             this.emit('error', {
                 type: 'GRBL_ERROR',
                 code: `${code}`,
                 message: error.message,
-                lineNumber: received,
+                line: lines[received] || '',
+                lineNumber: received + 1,
             });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
@@ -607,7 +608,7 @@ class GrblController {
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        const msg = `Error ${code} on line ${received} - ${error.message}`;
+                        const msg = `Error ${code} on line ${received + 1} - ${error.message}`;
                         this.emit('gcode_error', msg);
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                     }

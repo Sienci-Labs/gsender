@@ -23,7 +23,7 @@
 
 import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
-import { svSE } from '@mui/material/locale';
+// import { svSE } from '@mui/material/locale';
 
 onmessage = function({ data }) {
     const { content, visualizer, isLaser = false, shouldRenderSVG = false } = data;
