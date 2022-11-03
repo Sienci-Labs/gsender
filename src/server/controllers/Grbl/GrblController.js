@@ -61,7 +61,7 @@ import {
 import { METRIC_UNITS } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
-import { runOverride } from '../runOverride';
+import { calcOverrides } from '../runOverride';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -1465,24 +1465,24 @@ class GrblController {
             // @param {number} value The amount of percentage increase or decrease.
             'feedOverride': () => {
                 const [value] = args;
-                const [feed] = this.state.status.ov;
-                const diff = value - feed;
+                const [feedOV] = this.state.status.ov;
+                const diff = value - feedOV;
                 if (value === 100) {
                     this.write('\x90');
                 } else {
-                    runOverride(this, diff, 'feed');
+                    calcOverrides(this, diff, 'feed');
                 }
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             'spindleOverride': () => {
                 const [value] = args;
-                const [feed] = this.state.status.ov;
-                const diff = value - feed;
+                const [, spindleOV] = this.state.status.ov;
+                const diff = value - spindleOV;
                 if (value === 100) {
                     this.write('\x99');
                 } else {
-                    runOverride(this, diff, 'spindle');
+                    calcOverrides(this, diff, 'spindle');
                 }
             },
             // Rapid Overrides
