@@ -24,9 +24,11 @@
 import React from 'react';
 import isEmpty from 'lodash/isEmpty';
 import get from 'lodash/get';
-import /*ReactPDF,*/ { PDFDownloadLink, Page, View, Text, Document, StyleSheet } from '@react-pdf/renderer';
+import { pdf, Page, View, Text, Document, StyleSheet } from '@react-pdf/renderer';
+import { saveAs } from 'file-saver';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
+import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import pkg from '../../package.json';
 import { LASER_MODE } from '../constants';
 
@@ -415,7 +417,7 @@ const generateSupportFile = () => {
                     {
                         recentAlarms.length > 0 ?
                             recentAlarms.map((value, i) => (
-                                <View style={styles.lineWrapper}>
+                                <View style={styles.lineWrapper} key={i}>
                                     <Text style={styles.text}>
                                         {value.time + '\n'}
                                         <Text style={[styles.error, { color: 'red' }]}>
@@ -437,7 +439,7 @@ const generateSupportFile = () => {
                     {
                         recentErrors.length > 0 ?
                             recentErrors.map((value, i) => (
-                                <View style={styles.lineWrapper}>
+                                <View style={styles.lineWrapper} key={i}>
                                     <Text style={styles.text}>
                                         {value.time + '\n'}
                                         <Text style={[styles.error, { color: 'red' }]}>
@@ -719,14 +721,18 @@ const generateSupportFile = () => {
         );
     };
 
+    const submitForm = async (event) => {
+        event.preventDefault(); // prevent page reload
+        const blob = await pdf(<SupportFile />).toBlob();
+        const date = new Date();
+        const currentDate = date.toLocaleDateString().replaceAll('/', '-');
+        const currentTime = date.toLocaleTimeString('it-IT').replaceAll(':', '-');
+
+        saveAs(blob, 'diagnostics_' + currentDate + '_' + currentTime + '.pdf');
+    };
+
     return (
-        <PDFDownloadLink document={<SupportFile />} fileName="example.pdf">
-            {
-                ({ blob, url, loading, error }) => {
-                    return loading ? 'Loading document...' : 'Download now!';
-                }
-            }
-        </PDFDownloadLink>
+        <FunctionButton primary onClick={submitForm}>Download Now!</FunctionButton>
     );
 };
 

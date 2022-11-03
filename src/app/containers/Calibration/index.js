@@ -60,7 +60,7 @@ const Calibration = ({ modalClose }) => {
                                 tabs.map((t, index) => {
                                     const active = index === tab;
                                     return (
-                                        <TabbedWidget.ChildComponent key={t.id} active={active}>
+                                        <TabbedWidget.ChildComponent key={index} active={active}>
                                             {active && t.component}
                                         </TabbedWidget.ChildComponent>
                                     );
