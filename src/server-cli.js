@@ -86,8 +86,9 @@ program
     .option('-m, --mount <route-path>:<target>', 'Add a mount point for serving static files', parseMountPoint, [])
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
-    .option('--headless', 'Allow remote access to the server (default: false)', false)
-    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, '');
+    .option('--allow-remote-access', 'Allow remote access to the server (default: false)')
+    .option('--headless', 'Enable Headless mode', false)
+    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, 'Grbl');
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
 // This is not the case when running from a packaged Electron app. Here you have the first value appname and then args.
@@ -119,7 +120,8 @@ export default () => new Promise((resolve, reject) => {
         mountPoints: program.mount,
         watchDirectory: program.watchDirectory,
         accessTokenLifetime: program.accessTokenLifetime,
-        allowRemoteAccess: !!program.headless,
+        allowRemoteAccess: !!program.allowRemoteAccess,
+        headless: !!program.headless,
         controller: program.controller
     }, (err, data) => {
         if (err) {
