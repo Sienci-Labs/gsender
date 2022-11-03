@@ -86,8 +86,8 @@ program
     .option('-m, --mount <route-path>:<target>', 'Add a mount point for serving static files', parseMountPoint, [])
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
-    .option('--allow-remote-access', 'Allow remote access to the server (default: false)')
-    .option('--headless', 'Enable Headless mode', false)
+    .option('--allow-remote-access', 'Allow remote access to the server (default: false)', false)
+    .option('--headless', 'Enable Headless mode, exposing the internal server on your local network')
     .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, 'Grbl');
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
@@ -114,6 +114,7 @@ export default () => new Promise((resolve, reject) => {
     require('./server').createServer({
         port: program.port,
         host: program.host,
+        headless: !!program.headless,
         backlog: program.backlog,
         configFile: program.config,
         verbosity: program.verbose,
@@ -121,7 +122,6 @@ export default () => new Promise((resolve, reject) => {
         watchDirectory: program.watchDirectory,
         accessTokenLifetime: program.accessTokenLifetime,
         allowRemoteAccess: !!program.allowRemoteAccess,
-        headless: !!program.headless,
         controller: program.controller
     }, (err, data) => {
         if (err) {

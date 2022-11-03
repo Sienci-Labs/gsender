@@ -167,6 +167,7 @@ const main = () => {
             });
 
             ipcMain.handle('check-remote-status', (channel) => {
+                log.debug(hostInformation);
                 return hostInformation;
             });
 
