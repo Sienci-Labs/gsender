@@ -23,7 +23,7 @@
 
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { find } from 'lodash';
+import _, { find } from 'lodash';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
 import PortListing from './PortListing';
 import styles from './Index.styl';
@@ -34,6 +34,36 @@ class NavbarConnection extends PureComponent {
         state: PropTypes.object,
         actions: PropTypes.object,
         connected: PropTypes.bool
+    };
+
+    state = {
+        mobile: false
+    }
+
+    componentDidMount() {
+        this.addResizeEventListener();
+        this.updateScreenSize();
+    }
+
+    componentWillUnmount() {
+        this.removeResizeEventListener();
+    }
+
+    addResizeEventListener() {
+        this.onResizeThrottled = _.throttle(this.updateScreenSize, 25);
+        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+    }
+
+    removeResizeEventListener() {
+        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        this.onResizeThrottled = null;
+    }
+
+    updateScreenSize = () => {
+        const isMobile = window.visualViewport.width / window.visualViewport.height <= 0.5625;
+        this.setState({
+            mobile: isMobile
+        });
     };
 
     isPortInUse = (port) => {
@@ -80,9 +110,10 @@ class NavbarConnection extends PureComponent {
         const { state, actions } = this.props;
         const { connected, ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
         const iconState = this.getIconState(connected, connecting, alertMessage);
+        const isMobile = window.visualViewport.width / window.visualViewport.height <= 0.5625;
 
         return (
-            <div className={styles.NavbarConnection} onMouseEnter={actions.handleRefreshPorts} onMouseLeave={actions.hideUnrecognizedDevices}>
+            <div className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection} onMouseEnter={actions.handleRefreshPorts} onMouseLeave={actions.hideUnrecognizedDevices}>
                 <div className={`${styles.NavbarConnectionIcon} ${styles[iconState]}`}>
                     <i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />
                 </div>
