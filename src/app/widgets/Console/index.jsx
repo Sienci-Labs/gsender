@@ -108,6 +108,9 @@ class ConsoleWidget extends PureComponent {
                 this.terminal.refitTerminal();
                 this.terminal.writeln(color.white.bold(`gSender - [${controller.type}]`));
                 this.terminal.writeln(color.white(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: color.yellowBright(port), baudrate: color.blueBright(baudrate) })));
+
+                this.terminal.updateTerminalHistory(`gSender - [${controller.type}]`);
+                this.terminal.updateTerminalHistory(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: port, baudrate: baudrate }));
             }
         },
         'serialport:close': (options) => {
@@ -139,6 +142,7 @@ class ConsoleWidget extends PureComponent {
             } else {
                 this.terminal.writeln(color.white(this.terminal.prompt + data));
             }
+            this.terminal.updateTerminalHistory(this.terminal.prompt + data);
         },
         'serialport:read': (data) => {
             if (!this.terminal) {
@@ -146,6 +150,7 @@ class ConsoleWidget extends PureComponent {
             }
 
             this.terminal.writeln(data);
+            this.terminal.updateTerminalHistory(data);
         }
     };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -21,34 +21,21 @@
  *
  */
 
-import PropTypes from 'prop-types';
 import React from 'react';
+import cx from 'classnames';
 import styles from '../index.styl';
 
-import { PRIMARY_COLOR, SECONDARY_COLOR } from '../constants';
-
-const PositionLabel = ({ value, small }) => {
-    value = String(value);
+const PinRow = ({ label, value = false }) => {
     return (
-        <div
-            style={{ fontSize: small ? '14px' : '1.75rem',
-                padding: '0px 5px',
-                textAlign: 'center',
-                color: small ? SECONDARY_COLOR : PRIMARY_COLOR,
-                fontWeight: small ? '400' : 'bold' }}
-            className={styles.axesPositionLabel}
-        >
-            <span>{value}</span>
+        <div className={styles.pinRow}>
+            <div className={styles.pinLabel}>{label}</div>
+            <div className={cx(styles.pinIndicator, value ? styles.pinActive : styles.pinInactive)}>
+                {
+                    value ? 'High' : 'Low'
+                }
+            </div>
         </div>
     );
 };
 
-PositionLabel.propTypes = {
-    value: PropTypes.oneOfType([
-        PropTypes.number,
-        PropTypes.string
-    ]),
-    small: PropTypes.bool,
-};
-
-export default PositionLabel;
+export default PinRow;

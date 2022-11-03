@@ -148,6 +148,16 @@ class DisplayPanel extends PureComponent {
         }));
     };
 
+    //Only rounds values with more than 3 decimal places which begin with 9
+    customMathRound(num) {
+        let radix = num % 1.0;
+        if ((radix > 0.899 && radix < 1.0) && (Number(num.split('.')[1].slice(0, 2)) > 97)) {
+            return Math.ceil(num).toFixed(Number(num.split('.')[1].length));
+        } else {
+            return num;
+        }
+    }
+
     renderAxis = (axis) => {
         const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units, homingEnabled } = this.props;
         let mpos = machinePosition[axis] || '0.000';
@@ -207,8 +217,8 @@ class DisplayPanel extends PureComponent {
                     <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick} />
                 </td>
                 <td className={styles.machinePosition}>
-                    <MachinePositionInput value={wpos} handleManualMovement={(value) => actions.handleManualMovement(value, axis)} />
-                    {!showPositionInput && <PositionLabel value={mpos} small />}
+                    <MachinePositionInput value={this.customMathRound(wpos)} handleManualMovement={(value) => actions.handleManualMovement(value, axis)} />
+                    {!showPositionInput && <PositionLabel value={this.customMathRound(mpos)} small />}
                 </td>
             </tr>
         );

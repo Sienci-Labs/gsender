@@ -24,6 +24,7 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import _ from 'lodash';
+import pubsub from 'pubsub-js';
 import store from 'app/store';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
@@ -47,6 +48,15 @@ export default class JoggingPresets extends Component {
         });
     }, 5000, { trailing: false });
 
+    componentDidMount() {
+        pubsub.subscribe('units:change', (msg, units) => {
+            this.updateState(units);
+        });
+    }
+
+    componentWillUnmount() {
+        pubsub.unsubscribe('units:change');
+    }
 
     getJogSpeeds() {
         const jog = store.get('widgets.axes.jog', {});
@@ -61,8 +71,8 @@ export default class JoggingPresets extends Component {
         });
     }
 
-    updateState = () => {
-        const units = store.get('workspace.units');
+    updateState = (unit) => {
+        const units = unit || store.get('workspace.units');
 
         const jogSpeeds = this.getJogSpeeds();
         // force update

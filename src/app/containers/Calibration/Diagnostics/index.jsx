@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -20,35 +20,23 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
-import PropTypes from 'prop-types';
 import React from 'react';
-import styles from '../index.styl';
+import FirmwareOptions from 'app/containers/Calibration/Diagnostics/components/FirmwareOptions';
+import ProgramInfo from 'app/containers/Calibration/Diagnostics/components/ProgramInfo';
+import PinStatus from 'app/containers/Calibration/Diagnostics/components/PinStatus';
 
-import { PRIMARY_COLOR, SECONDARY_COLOR } from '../constants';
+import styles from './index.styl';
 
-const PositionLabel = ({ value, small }) => {
-    value = String(value);
+const DiagnosticTool = () => {
     return (
-        <div
-            style={{ fontSize: small ? '14px' : '1.75rem',
-                padding: '0px 5px',
-                textAlign: 'center',
-                color: small ? SECONDARY_COLOR : PRIMARY_COLOR,
-                fontWeight: small ? '400' : 'bold' }}
-            className={styles.axesPositionLabel}
-        >
-            <span>{value}</span>
+        <div>
+            <div className={styles.diagnosticWrapper}>
+                <ProgramInfo />
+                <PinStatus />
+                <FirmwareOptions />
+            </div>
         </div>
     );
 };
 
-PositionLabel.propTypes = {
-    value: PropTypes.oneOfType([
-        PropTypes.number,
-        PropTypes.string
-    ]),
-    small: PropTypes.bool,
-};
-
-export default PositionLabel;
+export default DiagnosticTool;
