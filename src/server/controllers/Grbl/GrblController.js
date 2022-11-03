@@ -1108,8 +1108,6 @@ class GrblController {
     loadFile(gcode, { name }) {
         log.debug(`Loading file '${name}' to controller`);
         this.command('gcode:load', name, gcode);
-        store.set('lastFeed', this.runner.state.status.ov[0]);
-        store.set('lastSpindle', this.runner.state.status.ov[2]);
     }
 
     addConnection(socket) {
@@ -1466,29 +1464,25 @@ class GrblController {
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             'feedOverride': () => {
-                console.log('inside spindle event');
                 const [value] = args;
-                const currFeedOverride = store.get('lastFeed');
-                store.set('lastFeed', value);
-                const Change = value - currFeedOverride;
+                const [feed] = this.state.status.ov;
+                const diff = value - feed;
                 if (value === 100) {
                     this.write('\x90');
                 } else {
-                    runOverride(this, Change, 'feed');
+                    runOverride(this, diff, 'feed');
                 }
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             'spindleOverride': () => {
-                console.log('inside spindle event');
                 const [value] = args;
-                const currFeedOverride = store.get('lastSpindle');
-                const Change = value - currFeedOverride;
-                store.set('lastSpindle', value);
+                const [feed] = this.state.status.ov;
+                const diff = value - feed;
                 if (value === 100) {
                     this.write('\x99');
                 } else {
-                    runOverride(this, Change, 'spindle');
+                    runOverride(this, diff, 'spindle');
                 }
             },
             // Rapid Overrides
