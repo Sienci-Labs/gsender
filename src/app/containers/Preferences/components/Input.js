@@ -56,7 +56,7 @@ Input.propTypes = {
     ]),
     additionalProps: PropTypes.object,
     className: PropTypes.string,
-    isNumber: PropTypes.number
+    isNumber: PropTypes.bool
 };
 
 Input.defaultProps = {
