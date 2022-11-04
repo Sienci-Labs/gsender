@@ -37,10 +37,10 @@ const Instructions = () => {
                 {
                     steps.map((step, stepIndex) => {
                         return (
-                            <div className={styles.substeps} key={stepIndex}>
+                            <div className={styles.substeps} key={`substepwrapper-${stepIndex}`}>
                                 <h2 className={styles.instructionTitle}>{step.title}</h2>
                                 {
-                                    step.substeps.map((step, index) => <Substep step={step} key={index} index={index} stepIndex={stepIndex} />)
+                                    step.substeps.map((step, index) => <Substep step={step} key={`substep-${index}`} index={index} stepIndex={stepIndex} />)
                                 }
                             </div>
                         );

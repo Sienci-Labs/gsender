@@ -250,7 +250,6 @@ class Header extends PureComponent {
         if (isElectron()) {
             this.registerIPCListeners();
             window.ipcRenderer.invoke('check-remote-status').then(result => {
-                console.log(result);
                 this.setState({
                     hostInformation: {
                         ...result

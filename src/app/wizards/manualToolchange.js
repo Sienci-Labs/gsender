@@ -22,6 +22,28 @@
  */
 import controller from 'app/lib/controller';
 import store from 'app/store';
+import reduxStore from 'app/store/redux';
+import { get } from 'lodash';
+
+
+const getToolString = () => {
+    const state = reduxStore.getState();
+    const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
+    if (tool === '0') {
+        return 'no T command parsed';
+    }
+    return `last T command was T${tool}`;
+};
+
+const getUnitModal = () => {
+    const state = reduxStore.getState();
+    const $13 = get(state, 'controller.settings.settings.$13', '0');
+    console.log($13);
+    if ($13 === '1') {
+        return 'G20';
+    }
+    return 'G21';
+};
 
 const wizard = {
     steps: [
@@ -60,7 +82,7 @@ const wizard = {
                 },
                 {
                     title: 'Change Bit',
-                    description: 'PH COPY - Change bit to requested tool.'
+                    description: () => `PH COPY - Change tool to requested bit - ${getToolString()}`
                 }
             ]
         },
@@ -87,22 +109,26 @@ const wizard = {
                         {
                             label: 'Probe Z',
                             cb: () => {
+                                const prefUnit = getUnitModal();
                                 controller.command('gcode', [
                                     '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
                                     'G91',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z5',
                                     'G38.2 Z-10 F40',
-                                    'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]'
+                                    `${prefUnit} G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]`,
+                                    'G21'
                                 ]);
                             }
                         },
                         {
                             label: 'Set Z0 at Location',
                             cb: () => {
+                                const prefUnit = getUnitModal();
                                 controller.command('gcode', [
                                     '(Setting Z 0)',
-                                    'G10 L20 P0 Z0'
+                                    `${prefUnit} G10 L20 P0 Z0`,
+                                    'G21'
                                 ]);
                             }
                         },
@@ -115,16 +141,18 @@ const wizard = {
             substeps: [
                 {
                     title: 'Resume Program',
-                    description: 'PH COPY - Move router back to initial position, restore modals, turn it on, resume cutting.',
+                    description: 'PH COPY - Detach and remove your touchplate from the work area.  The following will restore modals, and move back to initial position.  Remember to turn on your router before resuming.',
                     actions: [
                         {
                             label: 'Prepare for Resume',
                             cb: () => {
+                                const prefUnit = getUnitModal();
+                                console.log(prefUnit);
                                 controller.command('gcode', [
                                     '(Returning to initial position)',
                                     'G91 G21 G0 Z15',
-                                    'G90 G21 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
-                                    'G90 G21 G0 Z[global.toolchange.ZPOS]',
+                                    `G90 ${prefUnit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
+                                    `G90 ${prefUnit} G0 Z[global.toolchange.ZPOS]`,
                                     '(Restore initial modals)',
                                     '[global.toolchange.SPINDLE] [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]'
                                 ]);

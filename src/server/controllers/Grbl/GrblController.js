@@ -422,7 +422,7 @@ class GrblController {
                         }, commentString);
                     }
 
-                    line = '(M6)';
+                    line = line.replace('M6', '(M6)');
                 }
 
                 return line;

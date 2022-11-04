@@ -102,7 +102,8 @@ function consolidateModals(state) {
         spindle: '',
         units: '',
         wcs: '',
-        distance: ''
+        distance: '',
+        tool: ''
     };
 
     const modal = _get(state, 'parserstate.modal');

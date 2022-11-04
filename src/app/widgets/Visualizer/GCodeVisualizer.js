@@ -108,7 +108,6 @@ class GCodeVisualizer {
 
     /* Turns our array of Three colors into a float typed array we can set as a bufferAttribute */
     getColorTypedArray(colors, motionColor) {
-        console.log(colors);
         const colorArray = [];
         colors.forEach(colorTag => {
             const [motion, opacity] = colorTag;

@@ -42,7 +42,11 @@ const Substep = ({ step, index, stepIndex }) => {
             <div className={styles.substep} id={`step-${stepIndex}-${index}`}>
                 <span className={styles.substepTitle}>{step.title}</span>
                 <div className={cx({ [styles.hidden]: futureStep })}>
-                    <span className={styles.substepDescription}>{step.description}</span>
+                    <span className={styles.substepDescription}>
+                        {
+                            typeof step.description === 'function' ? step.description() : step.description
+                        }
+                    </span>
                     <div>
                         <Actions actions={step.actions} index={index} stepIndex={stepIndex} substepIndex={index} />
                     </div>
