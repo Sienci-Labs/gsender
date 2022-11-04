@@ -49,7 +49,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
         onUpdateProfiles(updatedProfiles);
 
         Toaster.pop({
-            msg: 'Removed Joystick Action Shortcut',
+            msg: 'Removed Gamepad Action Shortcut',
             type: TOASTER_SUCCESS,
             duration: 2000
         });

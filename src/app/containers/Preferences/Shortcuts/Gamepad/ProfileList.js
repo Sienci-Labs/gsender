@@ -25,7 +25,7 @@ const ProfileList = ({ profiles, onClick, onDelete, onAdd }) => {
 
             <Button primary onClick={onAdd}>
                 <i className="fas fa-plus" />
-                <span>Add New Joystick Profile</span>
+                <span>Add New Gamepad Profile</span>
             </Button>
         </>
     );

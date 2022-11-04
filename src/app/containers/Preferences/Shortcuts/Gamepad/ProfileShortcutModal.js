@@ -95,7 +95,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
         onClose();
 
         Toaster.pop({
-            msg: 'Updated Joystick Action Shortcut',
+            msg: 'Updated Gamepad Action Shortcut',
             type: TOASTER_SUCCESS,
             duration: 2000
         });
@@ -118,9 +118,9 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
     };
 
     return (
-        <Modal onClose={onClose} size="small" title="Joystick Profile Action">
+        <Modal onClose={onClose} size="small" title="Gamepad Profile Action">
             <div className={styles.profileActionWrapper}>
-                <h5 style={{ marginTop: 0, textAlign: 'center' }}>Press Any Button on Your Gamepad/Joystick</h5>
+                <h5 style={{ marginTop: 0, textAlign: 'center' }}>Press Any Button on Your Gamepad</h5>
 
                 <div>
                     <div style={{ display: 'grid', justifyItems: 'center', gap: '1rem', alignItems: 'center', gridTemplateRows: '1fr 1fr' }}>

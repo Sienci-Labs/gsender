@@ -30,7 +30,7 @@ const Gamepad = () => {
         store.replace('workspace.gamepad.profiles', filteredProfiles);
 
         Toaster.pop({
-            msg: 'Removed Joystick Profile',
+            msg: 'Removed Gamepad Profile',
             type: TOASTER_SUCCESS,
             duration: TOASTER_SHORT
         });
