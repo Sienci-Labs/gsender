@@ -1,6 +1,7 @@
 import { GamepadListener } from 'gamepad.js';
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import throttle from 'lodash/throttle';
 
 const STOP_JOG_CMD = 'STOP_JOG';
 
@@ -117,7 +118,7 @@ export const runAction = ({ event, shuttleControlEvents }) => {
     }
 };
 
-gamepadInstance.on('gamepad:connected', ({ detail }) => {
+gamepadInstance.on('gamepad:connected', throttle(({ detail }) => {
     const { gamepad } = detail;
 
     const profiles = store.get('workspace.gamepad.profiles');
@@ -125,14 +126,14 @@ gamepadInstance.on('gamepad:connected', ({ detail }) => {
     const foundGamepad = profiles.find(profile => profile.id === gamepad.id);
 
     Toaster.pop({
-        msg: foundGamepad ? `${foundGamepad.profileName} Connected` : 'New joystick connected, add it as a profile in your preferences',
+        msg: foundGamepad ? `${foundGamepad.profileName} Connected` : 'New gamepad connected, add it as a profile in your preferences',
         type: TOASTER_INFO,
     });
-});
+}, 250, { leading: false }));
 
 gamepadInstance.on('gamepad:disconnected', () => {
     Toaster.pop({
-        msg: 'Joystick Disconnected',
+        msg: 'Gamepad Disconnected',
         type: TOASTER_INFO,
         duration: 2000,
     });
