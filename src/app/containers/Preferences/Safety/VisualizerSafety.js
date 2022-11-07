@@ -15,7 +15,7 @@ const VisualizerSafety = ({ state, actions }) => {
     return (
         <Fieldset legend="Visualizer">
             <div className={styles.addMargin}>
-                <Tooltip content="Show warning when current workspace 0 will cause the machine to cut outside of soft limits" location="default">
+                <Tooltip content="Show warning when WCS Zero would exceed configured Soft Limits on current toolpath.  Soft limits ($20) must be enabled." location="default">
                     <ToggleSwitch
                         label="Show Soft Limits Warning"
                         checked={showSoftLimitsWarning}
