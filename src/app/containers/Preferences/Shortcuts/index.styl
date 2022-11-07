@@ -173,8 +173,8 @@ $primary = #3e85c7;
 }
 
 .active-indicator {
-  width: 2rem;
-  height: 2rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 9999px;
   background: #9CA3AF;
   border: solid 1px #6B7280;
@@ -183,6 +183,9 @@ $primary = #3e85c7;
   justify-content center;
   justify-items center
   color: #FFFFFF;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 .active-indicator-on {
@@ -223,7 +226,10 @@ $primary = #3e85c7;
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+
+  input {
+    margin: 0;
+  }
 }
 
 .profile-name {
