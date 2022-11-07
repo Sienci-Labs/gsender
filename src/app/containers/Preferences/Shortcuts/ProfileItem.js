@@ -1,9 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+
 import styles from './index.styl';
 
 const ProfileItem = ({ title, icon, id, onClick, onDelete }) => {
+    const handleDelete = (e) => {
+        e.stopPropagation(); //Prevents bubbling that will fire the parent div's onclick first
+
+        Confirm({
+            content: 'Are you sure you want to delete this gamepad profile?',
+            title: 'Delete Gamepad Profile',
+            onConfirm: () => onDelete(id)
+        });
+    };
+
     return (
         <div
             tabIndex={-1}
@@ -18,10 +31,7 @@ const ProfileItem = ({ title, icon, id, onClick, onDelete }) => {
             <i
                 tabIndex={-1}
                 role="button"
-                onClick={(e) => {
-                    e.stopPropagation(); //Prevents bubbling that will fire the parent div's onclick first
-                    onDelete(id);
-                }}
+                onClick={handleDelete}
                 onKeyDown={null}
                 className={classnames('fas fa-times', styles.profileItemDelete)}
             />
