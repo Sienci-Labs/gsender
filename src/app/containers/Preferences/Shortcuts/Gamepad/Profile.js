@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import classnames from 'classnames';
-import store from 'app/store';
 import PropTypes from 'prop-types';
+
+import store from 'app/store';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
 import styles from '../index.styl';
@@ -27,7 +28,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (data.id === profile.id ? ({ ...profile, profileName: name }) : data));
+            profiles.map(profile => (data.id === profile.id ? ({ ...profile, profileName: name }) : profile));
 
         onUpdateProfiles(updatedProfiles);
 
