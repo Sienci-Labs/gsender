@@ -22,6 +22,27 @@
  */
 import controller from 'app/lib/controller';
 import store from 'app/store';
+import reduxStore from 'app/store/redux';
+import { get } from 'lodash';
+
+
+const getToolString = () => {
+    const state = reduxStore.getState();
+    const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
+    if (tool === '0') {
+        return 'No T command parsed';
+    }
+    return `Last T command was T${tool}`;
+};
+
+const getUnitModal = () => {
+    const state = reduxStore.getState();
+    const $13 = get(state, 'controller.settings.settings.$13', '0');
+    if ($13 === '1') {
+        return 'G20';
+    }
+    return 'G21';
+};
 
 const wizard = {
     steps: [
@@ -55,6 +76,7 @@ const wizard = {
                                     '%global.toolchange.DISTANCE=modal.distance',
                                     '%global.toolchange.FEEDRATE=modal.feedrate',
                                     'M5',
+                                    '%wait',
                                     'G91 G21 G0Z5',
                                     '(Toolchange variables:)',
                                     '([JSON.stringify(global.toolchange)])',
@@ -111,7 +133,7 @@ const wizard = {
                 },
                 {
                     title: 'Change Tool',
-                    description: 'PH COPY - Change the tool to the requested bit.'
+                    description: () => `PH COPY - Change the tool to the requested bit - ${getToolString()}`
                 },
             ]
         },
@@ -125,6 +147,7 @@ const wizard = {
                         {
                             label: 'Probe New Tool Length',
                             cb: () => {
+                                const unit = getUnitModal();
                                 controller.command('gcode', [
                                     '(Moving back to configured location)',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
@@ -136,8 +159,11 @@ const wizard = {
                                     'G0 Z5',
                                     'G38.2 Z-10 F40',
                                     'G4 P0.3',
-                                    'G10 L20 Z[global.toolchange.TOOL_OFFSET]',
-                                    '(Set Z to Tool offset)'
+                                    '(Set Z to Tool offset and wait)',
+                                    `${unit} G10 L20 Z[global.toolchange.TOOL_OFFSET]`,
+                                    '(Set Z to Tool offset and wait)',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G21 G91',
                                 ]);
                             }
                         }
@@ -155,11 +181,12 @@ const wizard = {
                         {
                             label: 'Prepare for Resume',
                             cb: () => {
+                                const unit = getUnitModal();
                                 controller.command('gcode', [
                                     '(Returning to initial position)',
-                                    'G91 G21 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                                    'G90 G21 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
-                                    'G90 G21 G0 Z[global.toolchange.ZPOS]',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    `G90 ${unit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
+                                    `G90 ${unit} G0 Z[global.toolchange.ZPOS]`,
                                     '(Restore initial modals)',
                                     '[global.toolchange.SPINDLE] [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]'
                                 ]);

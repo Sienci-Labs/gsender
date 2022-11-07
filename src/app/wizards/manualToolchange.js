@@ -38,7 +38,6 @@ const getToolString = () => {
 const getUnitModal = () => {
     const state = reduxStore.getState();
     const $13 = get(state, 'controller.settings.settings.$13', '0');
-    console.log($13);
     if ($13 === '1') {
         return 'G20';
     }

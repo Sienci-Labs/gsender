@@ -22,11 +22,32 @@
  */
 import controller from 'app/lib/controller';
 import store from 'app/store';
+import reduxStore from 'app/store/redux';
+import { get } from 'lodash';
+
+
+const getToolString = () => {
+    const state = reduxStore.getState();
+    const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
+    if (tool === '0') {
+        return 'No T command parsed';
+    }
+    return `Last T command was T${tool}`;
+};
+
+const getUnitModal = () => {
+    const state = reduxStore.getState();
+    const $13 = get(state, 'controller.settings.settings.$13', '0');
+    if ($13 === '1') {
+        return 'G20';
+    }
+    return 'G21';
+};
 
 const wizard = {
     steps: [
         {
-            title: 'Change Bit',
+            title: 'Initial Setup',
             substeps: [
                 {
                     title: 'Safety First',
@@ -50,6 +71,7 @@ const wizard = {
                                     '%global.toolchange.DISTANCE=modal.distance',
                                     '%global.toolchange.FEEDRATE=modal.feedrate',
                                     'M5',
+                                    '%wait',
                                     'G91 G21 G0Z5',
                                     '(Toolchange variables:)',
                                     '([JSON.stringify(global.toolchange)])',
@@ -59,53 +81,80 @@ const wizard = {
                     ]
                 },
                 {
-                    title: 'Change Bit',
-                    description: 'PH COPY - Change bit to requested tool.'
-                }
+                    title: 'Position above touchplate',
+                    description: 'PH COPY - Jog the router into position, about 10mm above the touchplate.'
+                },
             ]
         },
         {
             title: 'Setup Probe',
             substeps: [
                 {
-                    title: 'Touchplate Setup',
-                    description: 'PH COPY - Setup touchplate and attach continuity collets.'
-                },
-                {
-                    title: 'Position Router',
-                    description: 'PH COPY - Jog router into position above the touch plate using the jog controls'
-                }
-            ]
-        },
-        {
-            title: 'Probe Tool',
-            substeps: [
-                {
-                    title: 'Probe',
-                    description: 'PH COPY - Probe tool length',
+                    title: 'Probe Initial Tool Length or confirm',
+                    description: 'PH COPY - If you haven\'t probed your initial tool length, do so now by pressing \'Probe Tool Length\'.  Otherwise, continue.',
                     actions: [
                         {
-                            label: 'Probe Z',
+                            label: 'Probe Initial Tool Length',
                             cb: () => {
                                 controller.command('gcode', [
-                                    '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
-                                    'G91',
+                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                                    '(This is 10 above configured location)',
+                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z + 10]',
+                                    'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z5',
                                     'G38.2 Z-10 F40',
-                                    'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]'
+                                    'G4 P0.3',
+                                    '%global.toolchange.TOOL_OFFSET=posz',
+                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
+                                    'G91 G21 G0 Z10',
+                                    'G90'
                                 ]);
                             }
                         },
                         {
-                            label: 'Set Z0 at Location',
+                            label: 'Tool Length Already Set',
                             cb: () => {
                                 controller.command('gcode', [
-                                    '(Setting Z 0)',
-                                    'G10 L20 P0 Z0'
+                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
+                                    '(If the above is not valid, re-run Probe Initial Tool Length action)'
                                 ]);
                             }
-                        },
+                        }
+                    ]
+                },
+
+            ]
+        },
+        {
+            title: 'Change and Probe New Tool',
+            substeps: [
+                {
+                    title: 'Change Tool',
+                    description: () => `PH COPY - Change tool to requested bit - ${getToolString()}.`,
+                },
+                {
+                    title: 'Probe',
+                    description: 'PH COPY - Move back about 10mm above touchplate and re-probe.',
+                    actions: [
+                        {
+                            label: 'Probe New Tool Length',
+                            cb: () => {
+                                const unit = getUnitModal();
+                                controller.command('gcode', [
+                                    'G91 G21',
+                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
+                                    'G0 Z5',
+                                    'G38.2 Z-10 F40',
+                                    'G4 P0.3',
+                                    '(Set Z to Tool offset and wait)',
+                                    `${unit} G10 L20 Z[global.toolchange.TOOL_OFFSET]`,
+                                    '(Set Z to Tool offset and wait)',
+                                    'G21 G91 Z10',
+                                ]);
+                            }
+                        }
                     ]
                 }
             ]
@@ -120,11 +169,12 @@ const wizard = {
                         {
                             label: 'Prepare for Resume',
                             cb: () => {
+                                const unit = getUnitModal();
                                 controller.command('gcode', [
                                     '(Returning to initial position)',
-                                    'G91 G21 G0 Z15',
-                                    'G90 G21 G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]',
-                                    'G90 G21 G0 Z[global.toolchange.ZPOS]',
+                                    'G21 G91 Z10',
+                                    `G90 ${unit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
+                                    `G90 ${unit} G0 Z[global.toolchange.ZPOS]`,
                                     '(Restore initial modals)',
                                     '[global.toolchange.SPINDLE] [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]'
                                 ]);
