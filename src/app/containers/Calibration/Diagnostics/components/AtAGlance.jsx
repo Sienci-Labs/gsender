@@ -21,24 +21,18 @@
  *
  */
 import React from 'react';
-import FirmwareOptions from 'app/containers/Calibration/Diagnostics/components/FirmwareOptions';
-import ProgramInfo from 'app/containers/Calibration/Diagnostics/components/ProgramInfo';
-import PinStatus from 'app/containers/Calibration/Diagnostics/components/PinStatus';
-import AtAGlance from 'app/containers/Calibration/Diagnostics/components/AtAGlance';
-import styles from './index.styl';
+import StatusRow from './StatusRow';
+import styles from '../index.styl';
 
-
-const DiagnosticTool = () => {
+const AtAGlance = () => {
     return (
-        <div>
-            <div className={styles.diagnosticWrapper}>
-                <ProgramInfo />
-                <PinStatus />
-                <FirmwareOptions />
-                <AtAGlance />
-            </div>
+        <div className={styles.card}>
+            <StatusRow label="Homing" value="Enabled" />
+            <StatusRow label="Soft Limits" value="Enabled" />
+            <StatusRow label="Home Location" value="Enabled" />
+            <StatusRow label="Report Inches" value="Enabled" />
         </div>
     );
 };
 
-export default DiagnosticTool;
+export default AtAGlance;

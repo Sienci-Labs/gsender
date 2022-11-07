@@ -129,6 +129,6 @@ export default () => new Promise((resolve, reject) => {
             return;
         }
         console.log(data);
-        resolve({ ...data, headless: program.headless });
+        resolve({ ...data, headless: !!program.headless, remote: !!program.allowRemoteAccess });
     });
 });

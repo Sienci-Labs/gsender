@@ -20,25 +20,24 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+
 import React from 'react';
-import FirmwareOptions from 'app/containers/Calibration/Diagnostics/components/FirmwareOptions';
-import ProgramInfo from 'app/containers/Calibration/Diagnostics/components/ProgramInfo';
-import PinStatus from 'app/containers/Calibration/Diagnostics/components/PinStatus';
-import AtAGlance from 'app/containers/Calibration/Diagnostics/components/AtAGlance';
-import styles from './index.styl';
+import cx from 'classnames';
+import styles from '../index.styl';
 
-
-const DiagnosticTool = () => {
+const StatusRow = ({ label, value }) => {
     return (
-        <div>
-            <div className={styles.diagnosticWrapper}>
-                <ProgramInfo />
-                <PinStatus />
-                <FirmwareOptions />
-                <AtAGlance />
-            </div>
+        <div className={cx(styles.pinRow, styles.separator)}>
+            <span className={styles.statusLabel}>
+                { label }
+            </span>
+            <span className={styles.statusValue}>
+                {
+                    value
+                }
+            </span>
         </div>
     );
 };
 
-export default DiagnosticTool;
+export default StatusRow;
