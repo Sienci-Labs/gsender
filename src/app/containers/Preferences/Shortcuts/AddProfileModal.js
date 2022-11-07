@@ -12,9 +12,9 @@ import Button from 'app/components/FunctionButton/FunctionButton';
 import Input from '../components/Input';
 
 import styles from './index.styl';
-import { PROFILE_AVAILABILITY_TYPES } from './utils';
+import { AVAILABILITY_TYPES } from './utils';
 
-const { DEFAULT, AVAILABLE, UNAVAILABLE } = PROFILE_AVAILABILITY_TYPES;
+const { DEFAULT, AVAILABLE, UNAVAILABLE } = AVAILABILITY_TYPES;
 
 const AddProfileModal = ({ onClose, onAdd }) => {
     const [gamepadInfo, setGamepadInfo] = useState(null);
