@@ -146,7 +146,6 @@ const wizard = {
                             label: 'Prepare for Resume',
                             cb: () => {
                                 const prefUnit = getUnitModal();
-                                console.log(prefUnit);
                                 controller.command('gcode', [
                                     '(Returning to initial position)',
                                     'G91 G21 G0 Z15',
