@@ -590,13 +590,33 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
             log.error(`Error occurred at ${Date.now()}`);
-            const { lines, received } = this.sender.state;
+            console.log('ERROR IS ', error);
+            const { lines, received, name } = this.sender.state;
+            const isFileError = lines.length !== 0;
+            //Check error origin
+            let errorOrigin = '';
+            let line = '';
+
+            if (store.get('lastRunType').includes('macro')) {
+                errorOrigin = 'Macro';
+                line = lines[received] || '';
+                store.set('lastRunType', null);
+            } else if (isFileError) {
+                errorOrigin = name;
+                line = lines[received] || '';
+            } else if (store.get('inAppConsoleInput') !== null) {
+                line = store.get('inAppConsoleInput') || '';
+                store.set('inAppConsoleInput', null);
+                errorOrigin = 'Console';
+            }
+
             this.emit('error', {
                 type: 'GRBL_ERROR',
                 code: `${code}`,
                 description: error.description,
-                line: lines[received] || '',
-                lineNumber: received + 1,
+                line: line,
+                lineNumber: isFileError ? received + 1 : '',
+                origin: errorOrigin
             });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
@@ -1466,7 +1486,6 @@ class GrblController {
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             'feedOverride': () => {
-                console.log('inside spindle event');
                 const [value] = args;
                 const currFeedOverride = store.get('lastFeed');
                 store.set('lastFeed', value);
@@ -1480,7 +1499,6 @@ class GrblController {
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             'spindleOverride': () => {
-                console.log('inside spindle event');
                 const [value] = args;
                 const currFeedOverride = store.get('lastSpindle');
                 const Change = value - currFeedOverride;

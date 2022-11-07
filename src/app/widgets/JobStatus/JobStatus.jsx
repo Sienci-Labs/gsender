@@ -61,7 +61,6 @@ class JobStatus extends PureComponent {
     }
 
     handleOverrideToggle = () => {
-        console.log(this.state);
         if (this.state.toggleStatus === 'jobStatus') {
             localStorage.setItem('jobOverrideToggle', JSON.stringify({
                 isChecked: true,
