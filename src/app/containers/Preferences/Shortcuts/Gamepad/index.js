@@ -6,7 +6,7 @@ import Button from 'app/components/FunctionButton/FunctionButton';
 
 import styles from '../index.styl';
 
-import { Profile } from './Profile';
+import Profile from './Profile';
 import ProfileList from './ProfileList';
 import ProfileModal from './ProfileModal';
 

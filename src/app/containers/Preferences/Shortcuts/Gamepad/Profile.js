@@ -6,13 +6,10 @@ import store from 'app/store';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
 import styles from '../index.styl';
-import ProfileItem from './ProfileItem';
 import ShortcutsTable from '../ShortcutsTable';
 import ProfileShortcutModal from './ProfileShortcutModal';
 
 const Profile = ({ data, onUpdateProfiles }) => {
-    Profile.propTypes = { currentProfile: PropTypes.object, onUpdateProfiles: PropTypes.func };
-
     const { profileName, icon, shortcuts } = data;
 
     const [currentShortcut, setCurrentShortcut] = useState(null);
@@ -105,4 +102,9 @@ const Profile = ({ data, onUpdateProfiles }) => {
     );
 };
 
-export { Profile, ProfileItem };
+Profile.propTypes = {
+    data: PropTypes.object,
+    onUpdateProfiles: PropTypes.func
+};
+
+export default Profile;
