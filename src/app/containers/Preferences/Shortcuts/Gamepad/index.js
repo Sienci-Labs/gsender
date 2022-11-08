@@ -8,13 +8,11 @@ import styles from '../index.styl';
 
 import { Profile } from './Profile';
 import ProfileList from './ProfileList';
-import AddActionModal from './AddActionModal';
 import AddProfileModal from './AddProfileModal';
 
 const Gamepad = () => {
     const [profiles, setProfiles] = useState(store.get('workspace.gamepad.profiles'));
     const [currentProfileID, setCurrentProfileID] = useState(null);
-    const [showAddAction, setShowAddAction] = useState(false);
     const [showAddProfile, setShowAddProfile] = useState(false);
 
     const handleProfileClick = (id) => {
@@ -92,9 +90,6 @@ const Gamepad = () => {
                     )
             }
 
-            {
-                showAddAction && <AddActionModal onClose={() => setShowAddAction(false)} />
-            }
             {
                 showAddProfile && <AddProfileModal onClose={() => setShowAddProfile(false)} onAdd={(newProfiles) => setProfiles(newProfiles)} />
             }
