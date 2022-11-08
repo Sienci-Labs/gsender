@@ -21,7 +21,7 @@
  *
  */
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 import Table from 'app/components/Table';
@@ -45,24 +45,15 @@ import { formatShortcut } from './helpers';
 import styles from './edit-area.styl';
 
 /**
- * Keybindings Table Component
- * @param {Function} onEdit Function to handle keybinding item edit
- * @param {Array} data List of eybind objects
+ * Shortcuts Table Component
+ * @prop {Function} onEdit Function to edit shortcuts
+ * @prop {Array} data List of shortcut objects
  */
-export default class MainTable extends Component {
-    static propTypes = {
-        onEdit: PropTypes.func,
-        onDelete: PropTypes.func,
-        onShortcutToggle: PropTypes.func,
-        data: PropTypes.array,
-    }
-
-    renders = {
+const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, data }) => {
+    const renders = {
         renderShortcutCell: (_, row) => {
             const { keys, isActive, keysName } = row;
             const shortcut = [...keys][0] === '+' ? ['+'] : keys.split('+');
-
-            const { onEdit, onDelete } = this.props;
 
             const hasShortcut = !!shortcut[0];
 
@@ -113,7 +104,6 @@ export default class MainTable extends Component {
             );
         },
         renderToggleCell: (_, row) => {
-            const { onShortcutToggle } = this.props;
             return (
                 <ToggleSwitch
                     checked={row.isActive}
@@ -144,26 +134,30 @@ export default class MainTable extends Component {
                 <div className={styles[category]}>{row.category}</div>
             );
         }
-    }
+    };
 
-    columns = [
+    const columns = [
         { dataKey: 'title', title: 'Action', sortable: true, width: '25%' },
-        { dataKey: 'keys', title: 'Shortcut', sortable: true, width: '45%', render: this.renders.renderShortcutCell },
-        { dataKey: 'category', title: 'Category', sortable: true, width: '20%', render: this.renders.renderCategoryCell },
-        { dataKey: 'isActive', title: 'Active', width: '10%', render: this.renders.renderToggleCell }
+        { dataKey: 'keys', title: 'Shortcut', sortable: true, width: '45%', render: renders.renderShortcutCell },
+        { dataKey: 'category', title: 'Category', sortable: true, width: '20%', render: renders.renderCategoryCell },
+        { dataKey: 'isActive', title: 'Active', width: '10%', render: renders.renderToggleCell }
     ];
 
-    render() {
-        const columns = this.columns;
-        const { data } = this.props;
+    return (
+        <Table
+            rowKey="id"
+            columns={columns}
+            data={data}
+            width={743}
+        />
+    );
+};
 
-        return (
-            <Table
-                rowKey="id"
-                columns={columns}
-                data={data}
-                width={743}
-            />
-        );
-    }
-}
+ShortcutsTable.propTypes = {
+    onEdit: PropTypes.func,
+    onDelete: PropTypes.func,
+    onShortcutToggle: PropTypes.func,
+    data: PropTypes.array,
+};
+
+export default ShortcutsTable;
