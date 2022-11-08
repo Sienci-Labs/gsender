@@ -166,7 +166,7 @@ const main = () => {
                 if ('type' in error) {
                     log.transports.file.level = 'error';
                 }
-                (error.type === 'GRBL_ERROR') ? log.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : log.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
+                (error.type === 'GRBL_ERROR') ? grblLog.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
             });
 
             ipcMain.handle('check-remote-status', (channel) => {
