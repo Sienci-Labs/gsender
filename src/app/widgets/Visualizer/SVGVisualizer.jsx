@@ -141,7 +141,8 @@ class SVGVisualizer extends Component {
 
     updateSVG() {
         let group = document.getElementById(!this.isSecondaryVisualizer ? 'g' : 'g2');
-        if (group) {
+        let svg = document.getElementById(!this.isSecondaryVisualizer ? 'svg' : 'svg2');
+        if (group && svg) {
             const reduxBBox = this.props.bbox;
             let bbox = JSON.parse(JSON.stringify(reduxBBox)); // make shallow copy
             // convert from inches to mm
@@ -155,49 +156,28 @@ class SVGVisualizer extends Component {
                 bbox.delta.y *= 25.4;
             }
 
-            // we are flipping the y values so the image isnt upside down,
-            // therefore the yMultiplier is * -1 what it normally would be
-            let xMultiplier = 1;
-            let yMultiplier = -1;
-            let xVal = bbox.min.x;
-            let yVal = bbox.min.y;
-            // top right
-            if (bbox.min.x >= 0 && bbox.min.y >= 0 && bbox.max.x > 0 && bbox.max.y > 0) {
-                xMultiplier = 1;
-                xVal = bbox.max.x;
-                yMultiplier = -1;
-                yVal = bbox.max.y;
-            } else if (bbox.min.x < 0 && bbox.min.y >= 0 && bbox.max.x <= 0 && bbox.max.y > 0) {
-                // top left
-                xMultiplier = 1;
-                xVal = bbox.min.x;
-                yMultiplier = -1;
-                yVal = bbox.max.y;
-            } else if (bbox.min.x >= 0 && bbox.min.y < 0 && bbox.max.x > 0 && bbox.max.y <= 0) {
-                // bottom right
-                xMultiplier = 1;
-                xVal = bbox.max.x;
-                yMultiplier = -1;
-                yVal = bbox.min.y;
-            } else if (bbox.min.x < 0 && bbox.min.y < 0 && bbox.max.x <= 0 && bbox.max.y <= 0) {
-                // bottom left
-                xMultiplier = 1;
-                xVal = bbox.min.x;
-                yMultiplier = -1;
-                yVal = bbox.min.y;
-            } else if (bbox.min.x < 0 && bbox.min.y < 0 && bbox.max.x > 0 && bbox.max.y > 0) {
-                // center
-                xMultiplier = 1;
-                xVal = 0;
-                yMultiplier = -1;
-                yVal = 0;
-            }
-            const middle = !this.isSecondaryVisualizer ? 250 : 235;
-            const xtrans = middle - (xVal * xMultiplier / 2);
-            const ytrans = middle - (yVal * yMultiplier / 2);
+            // represents the unit length of the svg in each dimension
+            let xLength = bbox.delta.x;
+            let yLength = bbox.delta.y;
 
-            // center the svg
-            group.setAttribute('transform', 'translate(' + xtrans + ',' + ytrans + ') scale(1,-1)');
+            // calculation for the middle of the svg
+            let xMiddle = (bbox.min.x + bbox.max.x) / 2;
+            let yMiddle = (bbox.min.y + bbox.max.y) / 2;
+
+            /*
+                i'm setting the viewbox coordinates so the svg is alrdy in the middle.
+                the first x and y values you give it represent the top left corner of the viewbox.
+                therefore, the top left corner when the svg is in the middle should be:
+                    - x: the middle of the svg - half the width of the viewbox
+                    - y: the middle of the svg + half the width of the viewbox
+            */
+            const xZero = xMiddle - ((Math.abs(xLength) + Math.abs(xLength) / 2) / 2);
+            const yZero = (yMiddle + ((Math.abs(yLength) + Math.abs(yLength) / 2) / 2)) * -1; // y is inversed because the svg starts off upside down
+
+            // set the top left corner of the viewbox as the coordinates we calculated,
+            // and set its size as the svg size plus a little extra
+            svg.setAttribute('viewBox', xZero + ' ' + yZero + ' ' + (Math.abs(xLength) + Math.abs(xLength) / 2) + ' ' + (Math.abs(yLength) + Math.abs(yLength) / 2));
+            group.setAttribute('transform', 'translate(0,0) scale(1,-1)');
         }
     }
 

@@ -61,7 +61,7 @@ import {
 import { METRIC_UNITS } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
-import { runOverride } from '../runOverride';
+import { calcOverrides } from '../runOverride';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -1128,8 +1128,6 @@ class GrblController {
     loadFile(gcode, { name }) {
         log.debug(`Loading file '${name}' to controller`);
         this.command('gcode:load', name, gcode);
-        store.set('lastFeed', this.runner.state.status.ov[0]);
-        store.set('lastSpindle', this.runner.state.status.ov[2]);
     }
 
     addConnection(socket) {
@@ -1487,26 +1485,24 @@ class GrblController {
             // @param {number} value The amount of percentage increase or decrease.
             'feedOverride': () => {
                 const [value] = args;
-                const currFeedOverride = store.get('lastFeed');
-                store.set('lastFeed', value);
-                const Change = value - currFeedOverride;
+                const [feedOV] = this.state.status.ov;
+                const diff = value - feedOV;
                 if (value === 100) {
                     this.write('\x90');
                 } else {
-                    runOverride(this, Change, 'feed');
+                    calcOverrides(this, diff, 'feed');
                 }
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             'spindleOverride': () => {
                 const [value] = args;
-                const currFeedOverride = store.get('lastSpindle');
-                const Change = value - currFeedOverride;
-                store.set('lastSpindle', value);
+                const [, spindleOV] = this.state.status.ov;
+                const diff = value - spindleOV;
                 if (value === 100) {
                     this.write('\x99');
                 } else {
-                    runOverride(this, Change, 'spindle');
+                    calcOverrides(this, diff, 'spindle');
                 }
             },
             // Rapid Overrides

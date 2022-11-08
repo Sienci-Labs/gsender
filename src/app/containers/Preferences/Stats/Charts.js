@@ -28,8 +28,9 @@ import Fieldset from '../components/Fieldset';
 import CustomPieChart from '../components/CustomPieChart';
 
 const Charts = ({ state, actions }) => {
-    const jobsFinished = parseInt(store.get('workspace.jobsFinished'), 10);
-    const jobsCancelled = parseInt(store.get('workspace.jobsCancelled'), 10);
+    const jobsFinished = store.get('workspace.jobsFinished', 0);
+    const jobsCancelled = store.get('workspace.jobsCancelled', 0);
+    console.log(`${jobsFinished} - ${jobsCancelled}`);
     const data = [
         { title: 'Cancelled', value: jobsCancelled, color: '#C13C37' },
         { title: 'Completed', value: jobsFinished, color: '#E38627' },

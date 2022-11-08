@@ -40,6 +40,7 @@ import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 
 let windowManager = null;
 let hostInformation = {};
+let grblLog = log.create('GRBL');
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -73,6 +74,8 @@ const main = () => {
     // Create the user data directory if it does not exist
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
+
+    grblLog.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs/grbl.log');
 
 
     app.whenReady().then(async () => {
