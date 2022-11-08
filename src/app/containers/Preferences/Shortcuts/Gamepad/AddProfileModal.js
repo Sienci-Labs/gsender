@@ -9,10 +9,10 @@ import { Toaster, TOASTER_SUCCESS, TOASTER_SHORT } from 'app/lib/toaster/Toaster
 import ToolModal from 'app/components/ToolModal/ToolModal';
 import Button from 'app/components/FunctionButton/FunctionButton';
 
-import Input from '../components/Input';
+import Input from '../../components/Input';
 
-import styles from './index.styl';
-import { AVAILABILITY_TYPES } from './utils';
+import styles from '../index.styl';
+import { AVAILABILITY_TYPES } from '../utils';
 
 const { DEFAULT, AVAILABLE, UNAVAILABLE } = AVAILABILITY_TYPES;
 

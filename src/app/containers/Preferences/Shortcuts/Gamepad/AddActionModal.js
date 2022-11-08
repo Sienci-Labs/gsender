@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import store from 'app/store';
 import ToolModal from 'app/components/ToolModal/ToolModal';
 import Button from 'app/components/FunctionButton/FunctionButton';
-import styles from './index.styl';
+import styles from '../index.styl';
 
 const AddActionModal = ({ onClose }) => {
     const [commands, setCommands] = useState([]);

@@ -4,7 +4,7 @@ import classnames from 'classnames';
 
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
-import styles from './index.styl';
+import styles from '../index.styl';
 
 const ProfileItem = ({ title, icon, id, onClick, onDelete }) => {
     const handleDelete = (e) => {

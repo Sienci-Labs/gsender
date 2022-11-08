@@ -8,8 +8,8 @@ import styles from '../index.styl';
 
 import { Profile } from './Profile';
 import ProfileList from './ProfileList';
-import AddActionModal from '../AddActionModal';
-import AddProfileModal from '../AddProfileModal';
+import AddActionModal from './AddActionModal';
+import AddProfileModal from './AddProfileModal';
 
 const Gamepad = () => {
     const [profiles, setProfiles] = useState(store.get('workspace.gamepad.profiles'));

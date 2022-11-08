@@ -6,7 +6,7 @@ import store from 'app/store';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
 import styles from '../index.styl';
-import ProfileItem from '../ProfileItem';
+import ProfileItem from './ProfileItem';
 import ShortcutsTable from '../ShortcutsTable';
 import ProfileShortcutModal from './ProfileShortcutModal';
 
