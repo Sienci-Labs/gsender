@@ -68,7 +68,7 @@ const ErrorLog = () => {
                                                 </span>
                                                 <p className={styles.errorReason}>
                                                     {log.split('[error] GRBL_ERROR:')[1].split('Line')[0]} <br />
-                                                    Line {log.split('[error] GRBL_ERROR:')[1].split('Line')[1].split('Origin')[0]} <br />
+                                                    {log.includes('Feeder') ? '' : ('Line ' + log.split('[error] GRBL_ERROR:')[1].split('Line')[1].split('Origin')[0])} <br />
                                                 </p>
                                             </VerticalTimelineElement>
                                         );

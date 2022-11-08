@@ -589,25 +589,25 @@ class GrblController {
         this.runner.on('error', (res) => {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
+
             log.error(`Error occurred at ${Date.now()}`);
-            console.log('ERROR IS ', error);
+
             const { lines, received, name } = this.sender.state;
             const isFileError = lines.length !== 0;
             //Check error origin
             let errorOrigin = '';
             let line = '';
 
-            if (store.get('lastRunType').includes('macro')) {
-                errorOrigin = 'Macro';
-                line = lines[received] || '';
-                store.set('lastRunType', null);
-            } else if (isFileError) {
+            if (isFileError) {
                 errorOrigin = name;
                 line = lines[received] || '';
             } else if (store.get('inAppConsoleInput') !== null) {
                 line = store.get('inAppConsoleInput') || '';
                 store.set('inAppConsoleInput', null);
                 errorOrigin = 'Console';
+            } else {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
             }
 
             this.emit('error', {

@@ -36,7 +36,7 @@ const CustomPieChart = ({ propsData }) => {
                 label={({ dataEntry }) => Math.round(dataEntry.percentage) + '%'}
                 labelStyle={defaultLabelStyle}
                 data={data}
-                radius={PieChart.defaultProps.radius - 6}
+                radius={6}
                 segmentsStyle={{ transition: 'stroke .3s', cursor: 'pointer' }}
                 segmentsShift={(index) => (index === selected ? 6 : 1)}
                 onClick={(event, index) => {

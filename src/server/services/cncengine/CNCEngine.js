@@ -372,7 +372,6 @@ class CNCEngine {
 
             socket.on('command', (port, cmd, ...args) => {
                 log.debug(`socket.command("${port}", "${cmd}"): id=${socket.id}`);
-                store.set('lastRunType', cmd);
                 const controller = store.get(`controllers["${port}"]`);
                 if (!controller || controller.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);
