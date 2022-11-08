@@ -42,11 +42,8 @@ ProfileItem.propTypes = {
     title: PropTypes.string,
     icon: PropTypes.string,
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    active: PropTypes.bool,
     onClick: PropTypes.func,
     onDelete: PropTypes.func,
-    showActiveStatus: PropTypes.bool,
-    showDeleteButton: PropTypes.bool,
 };
 
 export default ProfileItem;
