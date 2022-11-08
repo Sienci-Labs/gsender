@@ -16,7 +16,7 @@ import { AVAILABILITY_TYPES } from '../utils';
 
 const { DEFAULT, AVAILABLE, UNAVAILABLE } = AVAILABILITY_TYPES;
 
-const AddProfileModal = ({ onClose, onAdd }) => {
+const ProfileModal = ({ onClose, onAdd }) => {
     const [gamepadInfo, setGamepadInfo] = useState(null);
     const [availabilityType, setAvailabilityType] = useState(DEFAULT);
     const [customProfileName, setCustomProfileName] = useState('');
@@ -131,9 +131,9 @@ const AddProfileModal = ({ onClose, onAdd }) => {
     );
 };
 
-AddProfileModal.propTypes = {
+ProfileModal.propTypes = {
     onAdd: PropTypes.func,
     onClose: PropTypes.func
 };
 
-export default AddProfileModal;
+export default ProfileModal;

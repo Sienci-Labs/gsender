@@ -8,7 +8,7 @@ import styles from '../index.styl';
 
 import { Profile } from './Profile';
 import ProfileList from './ProfileList';
-import AddProfileModal from './AddProfileModal';
+import ProfileModal from './ProfileModal';
 
 const Gamepad = () => {
     const [profiles, setProfiles] = useState(store.get('workspace.gamepad.profiles'));
@@ -91,7 +91,7 @@ const Gamepad = () => {
             }
 
             {
-                showAddProfile && <AddProfileModal onClose={() => setShowAddProfile(false)} onAdd={(newProfiles) => setProfiles(newProfiles)} />
+                showAddProfile && <ProfileModal onClose={() => setShowAddProfile(false)} onAdd={(newProfiles) => setProfiles(newProfiles)} />
             }
         </div>
     );
