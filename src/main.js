@@ -22,6 +22,7 @@
  */
 
 import '@babel/polyfill';
+import os from 'os';
 import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
@@ -46,6 +47,10 @@ const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
     const gotSingleInstanceLock = app.requestSingleInstanceLock();
     const shouldQuitImmediately = !gotSingleInstanceLock;
+    const networkInterfaces = os.networkInterfaces();
+
+    log.debug(networkInterfaces);
+
 
     let prevDirectory = '';
 
@@ -99,7 +104,7 @@ const main = () => {
             });
 
             const res = await launchServer();
-            const { address, port, mountPoints, headless, remote } = { ...res };
+            const { address, port, headless } = { ...res };
             hostInformation = {
                 address,
                 port,
@@ -112,7 +117,6 @@ const main = () => {
             if (headless) {
                 log.debug(`Started remote build at ${address}:${port}`);
             }
-            log.debug(`Headles: ${headless}, remote ${remote}, mountpoints: ${mountPoints}`);
 
             const url = `http://${address}:${port}`;
             // The bounds is a rectangle object with the following properties:

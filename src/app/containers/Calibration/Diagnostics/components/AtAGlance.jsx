@@ -23,6 +23,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
+import { getHomingLocation, FRONT_RIGHT, FRONT_LEFT, BACK_LEFT } from 'app/widgets/Location/RapidPosition';
 import StatusRow from './StatusRow';
 import styles from '../index.styl';
 
@@ -44,11 +45,22 @@ export default connect((store) => {
     const $20 = get(settings, '$20', '0');
     const $22 = get(settings, '$22', '0');
 
-    const getHomingLocation = (mask) => {
-        return false;
+    const homingString = (mask) => {
+        let location = '';
+        const placement = getHomingLocation(mask);
+        if (placement === FRONT_LEFT) {
+            location = 'Front Left';
+        } else if (placement === FRONT_RIGHT) {
+            location = 'Front Right';
+        } else if (placement === BACK_LEFT) {
+            location = 'Back Left';
+        } else {
+            location = 'Back Right';
+        }
+        return `${mask} (${location}`;
     };
 
-    const homingLocation = getHomingLocation($23);
+    const homingLocation = homingString($23);
     return {
         homing: $22 === '1' ? 'Enabled' : 'Disabled',
         reportInches: $13 === '1' ? 'Enabled' : 'Disabled',

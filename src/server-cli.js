@@ -102,19 +102,23 @@ if (normalizedArgv.length > 1) {
 export default () => new Promise((resolve, reject) => {
     // Change working directory to 'server' before require('./server')
     process.chdir(path.resolve(__dirname, 'server'));
+    let port = program.port, host = program.host;
+    let headless = !!program.headless;
 
     if (program.headless) {
-        const localhost = ip.address('private');
-        program.host = localhost;
-        if (program.port === 0) {
-            program.port = 8000;
+        if (port === 0) {
+            port = 8000;
+        }
+
+        if (host === '127.0.0.1') {
+            host = ip.address();
         }
     }
 
     require('./server').createServer({
-        port: program.port,
-        host: program.host,
-        headless: !!program.headless,
+        port: port,
+        host: host,
+        headless: headless,
         backlog: program.backlog,
         configFile: program.config,
         verbosity: program.verbose,
@@ -129,6 +133,6 @@ export default () => new Promise((resolve, reject) => {
             return;
         }
         console.log(data);
-        resolve({ ...data, headless: !!program.headless, remote: !!program.allowRemoteAccess });
+        resolve({ ...data, headless, remote: !!program.allowRemoteAccess });
     });
 });
