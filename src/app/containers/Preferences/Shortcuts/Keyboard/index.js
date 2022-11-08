@@ -33,7 +33,7 @@ import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import { updateShortcutsList, holdShortcutsListener, unholdShortcutsListener } from 'app/actions/preferencesActions';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
-import Table from '../MainTable';
+import ShortcutsTable from '../ShortcutsTable';
 import EditArea from './EditArea';
 
 import styles from '../index.styl';
@@ -154,7 +154,7 @@ const Keyboard = () => {
     return (
         <div>
             <div className={styles['table-wrapper']}>
-                <Table
+                <ShortcutsTable
                     data={shortcutsList}
                     onEdit={handleEdit}
                     onDelete={handleDelete}

@@ -7,7 +7,7 @@ import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
 import styles from '../index.styl';
 import ProfileItem from '../ProfileItem';
-import MainTable from '../MainTable';
+import ShortcutsTable from '../ShortcutsTable';
 import ProfileShortcutModal from './ProfileShortcutModal';
 
 const Profile = ({ data, onUpdateProfiles }) => {
@@ -81,7 +81,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
                     />
                 </div>
                 <div style={{ overflowY: 'auto', height: '90%', backgroundColor: 'white' }}>
-                    <MainTable
+                    <ShortcutsTable
                         onEdit={(shortcut) => {
                             setShowModal(true);
                             setCurrentShortcut(shortcut);
