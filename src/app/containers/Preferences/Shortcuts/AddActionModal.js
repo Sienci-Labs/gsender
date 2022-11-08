@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
+import PropTypes from 'prop-types';
 
 import store from 'app/store';
 import ToolModal from 'app/components/ToolModal/ToolModal';
@@ -8,7 +9,6 @@ import styles from './index.styl';
 
 const AddActionModal = ({ onClose }) => {
     const [commands, setCommands] = useState([]);
-    // const [shortcut, setShortcut] = useState(null);
 
     useEffect(() => {
         const commands = store.get('commandKeys');
@@ -29,5 +29,7 @@ const AddActionModal = ({ onClose }) => {
         </ToolModal>
     );
 };
+
+AddActionModal.propTypes = { onClose: PropTypes.func };
 
 export default AddActionModal;
