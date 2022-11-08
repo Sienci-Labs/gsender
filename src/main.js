@@ -74,8 +74,9 @@ const main = () => {
     // Create the user data directory if it does not exist
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
+    log.debug(app.getPath('logs'));
 
-    grblLog.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs/grbl.log');
+    grblLog.transports.file.resolvePath = () => path.join(app.getPath('logs'), 'grbl.log');
 
 
     app.whenReady().then(async () => {
@@ -98,7 +99,7 @@ const main = () => {
             });
 
             const res = await launchServer();
-            const { address, port, mountPoints, headless } = { ...res };
+            const { address, port, mountPoints, headless, remote } = { ...res };
             hostInformation = {
                 address,
                 port,
@@ -111,6 +112,7 @@ const main = () => {
             if (headless) {
                 log.debug(`Started remote build at ${address}:${port}`);
             }
+            log.debug(`Headles: ${headless}, remote ${remote}, mountpoints: ${mountPoints}`);
 
             const url = `http://${address}:${port}`;
             // The bounds is a rectangle object with the following properties:

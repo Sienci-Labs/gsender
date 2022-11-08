@@ -21,18 +21,38 @@
  *
  */
 import React from 'react';
+import { connect } from 'react-redux';
+import { get } from 'lodash';
 import StatusRow from './StatusRow';
 import styles from '../index.styl';
 
-const AtAGlance = () => {
+const AtAGlance = ({ homing, softLimits, homingLocation, reportInches }) => {
     return (
         <div className={styles.card}>
-            <StatusRow label="Homing" value="Enabled" />
-            <StatusRow label="Soft Limits" value="Enabled" />
-            <StatusRow label="Home Location" value="Enabled" />
-            <StatusRow label="Report Inches" value="Enabled" />
+            <StatusRow label="Homing" value={homing} />
+            <StatusRow label="Soft Limits" value={softLimits} />
+            <StatusRow label="Home Location" value={homingLocation} />
+            <StatusRow label="Report Inches" value={reportInches} />
         </div>
     );
 };
 
-export default AtAGlance;
+export default connect((store) => {
+    const settings = get(store, 'controller.settings.settings', {});
+    const $13 = get(settings, '$13', '0');
+    const $23 = get(settings, '$23', '0');
+    const $20 = get(settings, '$20', '0');
+    const $22 = get(settings, '$22', '0');
+
+    const getHomingLocation = (mask) => {
+        return false;
+    };
+
+    const homingLocation = getHomingLocation($23);
+    return {
+        homing: $22 === '1' ? 'Enabled' : 'Disabled',
+        reportInches: $13 === '1' ? 'Enabled' : 'Disabled',
+        softLimits: $20 === '1' ? 'Enabled' : 'Disabled',
+        homingLocation
+    };
+})(AtAGlance);
