@@ -53,4 +53,4 @@ const getGRBLLog = (logPath) => {
     return content;
 };
 
-export { getAllErrors };
+export { getGRBLLog };
