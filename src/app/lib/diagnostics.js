@@ -406,12 +406,10 @@ const generateSupportFile = () => {
                     {
                         logs.length > 0 ?
                             logs.map((log, i) => {
-                                const split = log.split('[error] GRBL_ALARM:');
-                                const time = split[0].slice(1, 20).replace(' ', ' at ');
-                                const msg = split[1];
-
                                 if (log.toLowerCase().includes('alarm') && log.includes('[error] GRBL_ALARM:')) {
-                                    console.log(log);
+                                    const split = log.split('[error] GRBL_ALARM:');
+                                    const time = split[0].slice(1, 20).replace(' ', ' at ');
+                                    const msg = split[1];
                                     return (
                                         <View style={styles.lineWrapper} key={i}>
                                             <Text style={styles.text}>
@@ -438,14 +436,13 @@ const generateSupportFile = () => {
                     {
                         logs.length > 0 ?
                             logs.map((log, i) => {
-                                const split = log.split('[error] GRBL_ERROR:');
-                                const content = split[1].split('Line');
-
-                                const time = split[0].slice(1, 20).replace(' ', ' at ');
-                                const msg = content[0];
-                                const line = content[1];
-
                                 if (log.toLowerCase().includes('error') && log.includes('[error] GRBL_ERROR:')) {
+                                    const split = log.split('[error] GRBL_ERROR:');
+                                    const content = split[1].split('Line');
+
+                                    const time = split[0].slice(1, 20).replace(' ', ' at ');
+                                    const msg = content[0];
+                                    const line = content[1].split('Origin')[0];
                                     return (
                                         <View style={styles.lineWrapper} key={i}>
                                             <Text style={styles.text}>
