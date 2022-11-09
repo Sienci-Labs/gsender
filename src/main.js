@@ -36,6 +36,7 @@ import launchServer from './server-cli';
 import pkg from './package.json';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
+import { getGRBLLog } from './electron-app/grblLogs';
 
 
 let windowManager = null;
@@ -168,6 +169,11 @@ const main = () => {
                     log.transports.file.level = 'error';
                 }
                 (error.type === 'GRBL_ERROR') ? grblLog.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
+            });
+
+            ipcMain.handle('grblLog:fetch', (channel) => {
+                const logPath = path.join(app.getPath('userData'), 'logs/grbl.log');
+                return getGRBLLog(logPath);
             });
 
             ipcMain.handle('check-remote-status', (channel) => {
