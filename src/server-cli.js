@@ -26,7 +26,7 @@
 import path from 'path';
 import isElectron from 'is-electron';
 import program from 'commander';
-import ip from 'ip';
+import ip from 'quick-local-ip';
 import pkg from './package.json';
 
 
@@ -87,7 +87,7 @@ program
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
     .option('--allow-remote-access', 'Allow remote access to the server (default: false)', false)
-    .option('--lolweb', 'Enable Headless mode, exposing the internal server on your local network', false)
+    .option('--remote', 'Enable Headless mode, exposing the internal server on your local network', false)
     .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, 'Grbl');
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
@@ -103,15 +103,15 @@ export default () => new Promise((resolve, reject) => {
     // Change working directory to 'server' before require('./server')
     process.chdir(path.resolve(__dirname, 'server'));
     let port = program.port, host = program.host;
-    let headless = !!program.lolweb;
+    let headless = !!program.remote;
 
-    if (program.lolweb) {
+    if (headless) {
         if (port === 0) {
             port = 8000;
         }
 
         if (host === '127.0.0.1') {
-            host = ip.address();
+            host = ip.getLocalIP4();
         }
     }
 
@@ -132,6 +132,6 @@ export default () => new Promise((resolve, reject) => {
             return;
         }
         console.log(data);
-        resolve({ ...data, headless, remote: !!program.allowRemoteAccess });
+        resolve({ ...data, headless });
     });
 });

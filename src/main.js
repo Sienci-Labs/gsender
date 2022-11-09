@@ -99,7 +99,7 @@ const main = () => {
             });
 
             const res = await launchServer();
-            const { address, port, headless } = { ...res };
+            const { address, port, headless, requestedHost } = { ...res };
             hostInformation = {
                 address,
                 port,
@@ -110,7 +110,7 @@ const main = () => {
                 return;
             }
             if (headless) {
-                log.debug(`Started remote build at ${address}:${port}`);
+                log.debug(`Started remote build at ${address}:${port} - ${requestedHost}`);
             }
 
             const url = `http://${address}:${port}`;
