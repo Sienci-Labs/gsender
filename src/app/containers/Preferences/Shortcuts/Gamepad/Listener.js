@@ -1,6 +1,8 @@
 import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import classnames from 'classnames';
 
+import Tooltip from 'app/components/TooltipCustom/ToolTip';
+
 import styles from '../index.styl';
 
 const queue = [];
@@ -31,11 +33,12 @@ const Listener = forwardRef((props, ref) => {
     };
 
     return (
-        <div style={{ backgroundColor: 'black' }}>
-            <div className={classnames(styles.activeIndicator, { [styles.activeIndicatorOn]: detectedButtonPress })}>
-                <i className={classnames('fas fa-gamepad', { [styles.activePulse]: detectedButtonPress })} />
-            </div>
-        </div>
+        <Tooltip
+            content="Button press indicator, animates when a button is pressed on your gamepad"
+            wrapperClassName={classnames(styles.activeIndicator, { [styles.activeIndicatorOn]: detectedButtonPress })}
+        >
+            <i className={classnames('fas fa-gamepad', { [styles.activePulse]: detectedButtonPress })} />
+        </Tooltip>
     );
 });
 
