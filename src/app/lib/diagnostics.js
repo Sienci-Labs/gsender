@@ -31,9 +31,7 @@ import reduxStore from 'app/store/redux';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import pkg from '../../package.json';
 import { LASER_MODE } from '../constants';
-
-let recentAlarms = [];
-let recentErrors = [];
+import { getAllErrors } from '../containers/Preferences/Safety/helper';
 
 const getEEPROMValues = () => {
     const eeprom = get(reduxStore.getState(), 'controller.settings.settings', {});
@@ -83,21 +81,10 @@ const getFileInfo = () => {
     return fileInfo;
 };
 
-export function addError(data) {
-    const time = new Date().toISOString();
-    recentErrors.push({
-        time: time,
-        data: data
-    });
-}
-
-export function addAlarm(data) {
-    const time = new Date().toISOString();
-    recentAlarms.push({
-        time: time,
-        data: data
-    });
-}
+const getErrorsAndAlarms = () => {
+    const logs = getAllErrors();
+    return logs;
+};
 
 const generateSupportFile = () => {
     const eeprom = getEEPROMValues();
@@ -110,6 +97,8 @@ const generateSupportFile = () => {
     const mode = getMode();
     const connection = getConnection();
     const fileInfo = getFileInfo();
+    const logs = getErrorsAndAlarms();
+    console.log(logs);
 
     let eepromData = [];
     Object.entries(eeprom).forEach(entry => {
@@ -415,17 +404,27 @@ const generateSupportFile = () => {
                 </Text>
                 <View style={styles.container}>
                     {
-                        recentAlarms.length > 0 ?
-                            recentAlarms.map((value, i) => (
-                                <View style={styles.lineWrapper} key={i}>
-                                    <Text style={styles.text}>
-                                        {value.time + '\n'}
-                                        <Text style={[styles.error, { color: 'red' }]}>
-                                            {'    ' + value.data + '\n'}
-                                        </Text>
-                                    </Text>
-                                </View>
-                            ))
+                        logs.length > 0 ?
+                            logs.map((log, i) => {
+                                const split = log.split('[error] GRBL_ALARM:');
+                                const time = split[0].slice(1, 20).replace(' ', ' at ');
+                                const msg = split[1];
+
+                                if (log.toLowerCase().includes('alarm') && log.includes('[error] GRBL_ALARM:')) {
+                                    console.log(log);
+                                    return (
+                                        <View style={styles.lineWrapper} key={i}>
+                                            <Text style={styles.text}>
+                                                {time + '\n'}
+                                                <Text style={[styles.error, { color: 'red' }]}>
+                                                    {'    ' + msg + '\n'}
+                                                </Text>
+                                            </Text>
+                                        </View>
+                                    );
+                                }
+                                return null;
+                            })
                             :
                             <Text style={styles.text}>
                                 None
@@ -437,17 +436,30 @@ const generateSupportFile = () => {
                 </Text>
                 <View style={styles.container}>
                     {
-                        recentErrors.length > 0 ?
-                            recentErrors.map((value, i) => (
-                                <View style={styles.lineWrapper} key={i}>
-                                    <Text style={styles.text}>
-                                        {value.time + '\n'}
-                                        <Text style={[styles.error, { color: 'red' }]}>
-                                            {'    ' + value.data + '\n'}
-                                        </Text>
-                                    </Text>
-                                </View>
-                            ))
+                        logs.length > 0 ?
+                            logs.map((log, i) => {
+                                const split = log.split('[error] GRBL_ERROR:');
+                                const content = split[1].split('Line');
+
+                                const time = split[0].slice(1, 20).replace(' ', ' at ');
+                                const msg = content[0];
+                                const line = content[1];
+
+                                if (log.toLowerCase().includes('error') && log.includes('[error] GRBL_ERROR:')) {
+                                    return (
+                                        <View style={styles.lineWrapper} key={i}>
+                                            <Text style={styles.text}>
+                                                {time + '\n'}
+                                                <Text style={[styles.error, { color: 'red' }]}>
+                                                    {'    ' + msg + '\n'}
+                                                </Text>
+                                                {'    On Line ' + line + '\n'}
+                                            </Text>
+                                        </View>
+                                    );
+                                }
+                                return null;
+                            })
                             :
                             <Text style={styles.text}>
                                 None

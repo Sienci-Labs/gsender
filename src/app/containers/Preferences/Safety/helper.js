@@ -10,7 +10,7 @@ const getAllErrors = () => {
         const app = electron.remote.app;
         try {
             userData = {
-                path: path.join(app.getPath('userData'), 'logs/main.log'),
+                path: path.join(app.getPath('logs').replace('Electron', 'gSender'), '/main.log'),
             };
             const fs = window.require('fs'); // Require the fs module within Electron
             if (fs.existsSync(userData.path)) {
