@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 
@@ -12,7 +12,7 @@ import ProfileShortcutModal from './ProfileShortcutModal';
 const Profile = ({ data, onUpdateProfiles }) => {
     const { profileName, icon, shortcuts } = data;
 
-    const [currentShortcut, setCurrentShortcut] = useState(null);
+    const [currentShortcutID, setCurrentShortcutID] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
     const [name, setName] = useState(profileName);
@@ -37,12 +37,15 @@ const Profile = ({ data, onUpdateProfiles }) => {
     };
 
     const handleDelete = (currShortcut) => {
-        const updatedShortcuts = shortcuts.map((shortcut) => (shortcut.id === currShortcut.id ? { ...shortcut, keys: '', keysName: '', isActive: false } : shortcut));
+        const updatedShortcuts = shortcuts.map((shortcut) => (shortcut.id === currShortcut.id
+            ? { ...shortcut, keys: '', keysName: '', isActive: false }
+            : shortcut
+        ));
 
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (data.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : data));
+            profiles.map(profile => (data.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
 
         onUpdateProfiles(updatedProfiles);
 
@@ -59,10 +62,17 @@ const Profile = ({ data, onUpdateProfiles }) => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (data.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : data));
+            profiles.map(profile => (data.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
 
         onUpdateProfiles(updatedProfiles);
     };
+
+    const handleEdit = (shortcut) => {
+        setShowModal(true);
+        setCurrentShortcutID(shortcut.id);
+    };
+
+    const currentShortcut = useMemo(() => shortcuts.find(shortcut => shortcut.id === currentShortcutID), [shortcuts, currentShortcutID]);
 
     return (
         <>
@@ -79,10 +89,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
                 </div>
                 <div style={{ overflowY: 'auto', height: '90%', backgroundColor: 'white' }}>
                     <ShortcutsTable
-                        onEdit={(shortcut) => {
-                            setShowModal(true);
-                            setCurrentShortcut(shortcut);
-                        }}
+                        onEdit={handleEdit}
                         onDelete={handleDelete}
                         onShortcutToggle={handleShortcutToggle}
                         data={shortcuts}
