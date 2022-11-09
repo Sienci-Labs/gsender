@@ -68,7 +68,7 @@ const Settings = () => {
         delete settings.session;
         // console.log(settings);
 
-        const settingsJSON = JSON.stringify(settings, null, 1);
+        const settingsJSON = JSON.stringify(settings, null, 3);
         const data = new Blob([settingsJSON], {
             type: 'application/json'
         });
