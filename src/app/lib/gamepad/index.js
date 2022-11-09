@@ -129,7 +129,7 @@ gamepadInstance.on('gamepad:connected', throttle(({ detail }) => {
         msg: foundGamepad ? `${foundGamepad.profileName} Connected` : 'New gamepad connected, add it as a profile in your preferences',
         type: TOASTER_INFO,
     });
-}, 250, { leading: false }));
+}, 250, { leading: true, trailing: false }));
 
 gamepadInstance.on('gamepad:disconnected', () => {
     Toaster.pop({
