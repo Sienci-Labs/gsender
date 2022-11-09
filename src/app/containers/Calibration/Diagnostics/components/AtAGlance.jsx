@@ -57,7 +57,7 @@ export default connect((store) => {
         } else {
             location = 'Back Right';
         }
-        return `${mask} (${location}`;
+        return `${mask} (${location})`;
     };
 
     const homingLocation = homingString($23);

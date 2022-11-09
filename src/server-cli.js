@@ -87,7 +87,7 @@ program
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
     .option('--allow-remote-access', 'Allow remote access to the server (default: false)', false)
-    .option('--headless', 'Enable Headless mode, exposing the internal server on your local network', false)
+    .option('--lolweb', 'Enable Headless mode, exposing the internal server on your local network', false)
     .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, 'Grbl');
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
@@ -103,9 +103,9 @@ export default () => new Promise((resolve, reject) => {
     // Change working directory to 'server' before require('./server')
     process.chdir(path.resolve(__dirname, 'server'));
     let port = program.port, host = program.host;
-    let headless = !!program.headless;
+    let headless = !!program.lolweb;
 
-    if (program.headless) {
+    if (program.lolweb) {
         if (port === 0) {
             port = 8000;
         }
@@ -118,7 +118,6 @@ export default () => new Promise((resolve, reject) => {
     require('./server').createServer({
         port: port,
         host: host,
-        headless: headless,
         backlog: program.backlog,
         configFile: program.config,
         verbosity: program.verbose,

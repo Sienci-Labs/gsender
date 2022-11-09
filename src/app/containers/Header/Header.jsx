@@ -25,7 +25,7 @@ import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import without from 'lodash/without';
 import _ from 'lodash';
-import HeadlessIndicator from 'app/components/HeadlessIndicator';
+//import HeadlessIndicator from 'app/components/HeadlessIndicator';
 import Push from 'push.js';
 import isElectron from 'is-electron';
 import reduxStore from 'app/store/redux';
@@ -249,14 +249,14 @@ class Header extends PureComponent {
 
         if (isElectron()) {
             this.registerIPCListeners();
-            window.ipcRenderer.invoke('check-remote-status').then(result => {
+            /*window.ipcRenderer.invoke('check-remote-status').then(result => {
                 console.log(result);
                 this.setState({
                     hostInformation: {
                         ...result
                     }
                 });
-            });
+            });*/
         }
     }
 
@@ -335,7 +335,7 @@ class Header extends PureComponent {
     };
 
     render() {
-        const { updateAvailable, hostInformation, mobile } = this.state;
+        const { updateAvailable, /*hostInformation,*/ mobile } = this.state;
         return (
             <>
                 <div className={styles.navBar}>
@@ -346,7 +346,9 @@ class Header extends PureComponent {
                             actions={ this.actions }
                             widgetId="connection"
                         />
-                        {hostInformation.headless && <HeadlessIndicator {...hostInformation} />}
+                        {
+                            //hostInformation.headless && <HeadlessIndicator {...hostInformation} />
+                        }
                     </div>
                     { !mobile && <NavSidebar /> }
                 </div>

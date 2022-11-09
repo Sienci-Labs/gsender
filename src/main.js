@@ -22,7 +22,6 @@
  */
 
 import '@babel/polyfill';
-import os from 'os';
 import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
@@ -47,10 +46,6 @@ const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
     const gotSingleInstanceLock = app.requestSingleInstanceLock();
     const shouldQuitImmediately = !gotSingleInstanceLock;
-    const networkInterfaces = os.networkInterfaces();
-
-    log.debug(networkInterfaces);
-
 
     let prevDirectory = '';
 
