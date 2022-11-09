@@ -86,6 +86,8 @@ class LocationWidget extends PureComponent {
 
     pubsubTokens = [];
 
+    workspaceSelectRef = React.createRef();
+
     subscribe() {
         const tokens = [
             pubsub.subscribe('jogSpeeds', (msg, speeds) => {
@@ -689,9 +691,11 @@ class LocationWidget extends PureComponent {
                             className={styles.workspaceInput}
                             onChange={(selection) => {
                                 controller.command('gcode', selection.value);
+                                this.workspaceSelectRef.current.blur();
                             }}
                             name="workspace"
                             options={gcodes}
+                            ref={this.workspaceSelectRef}
                         />
                     </Widget.Controls>
                 </Widget.Header>
