@@ -30,7 +30,6 @@ import CustomPieChart from '../components/CustomPieChart';
 const Charts = ({ state, actions }) => {
     const jobsFinished = store.get('workspace.jobsFinished', 0);
     const jobsCancelled = store.get('workspace.jobsCancelled', 0);
-    console.log(`${jobsFinished} - ${jobsCancelled}`);
     const data = [
         { title: 'Cancelled', value: jobsCancelled, color: '#C13C37' },
         { title: 'Completed', value: jobsFinished, color: '#E38627' },

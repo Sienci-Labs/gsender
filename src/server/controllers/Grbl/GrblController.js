@@ -589,14 +589,34 @@ class GrblController {
         this.runner.on('error', (res) => {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
+
             log.error(`Error occurred at ${Date.now()}`);
-            const { lines, received } = this.sender.state;
+
+            const { lines, received, name } = this.sender.state;
+            const isFileError = lines.length !== 0;
+            //Check error origin
+            let errorOrigin = '';
+            let line = '';
+
+            if (isFileError) {
+                errorOrigin = name;
+                line = lines[received] || '';
+            } else if (store.get('inAppConsoleInput') !== null) {
+                line = store.get('inAppConsoleInput') || '';
+                store.set('inAppConsoleInput', null);
+                errorOrigin = 'Console';
+            } else {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
+            }
+
             this.emit('error', {
                 type: 'GRBL_ERROR',
                 code: `${code}`,
                 description: error.description,
-                line: lines[received] || '',
-                lineNumber: received + 1,
+                line: line,
+                lineNumber: isFileError ? received + 1 : '',
+                origin: errorOrigin
             });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
