@@ -50,7 +50,7 @@ const Gamepad = () => {
         handleUpdateProfiles(updatedProfiles);
     };
 
-    const currentProfile = useMemo(() => profiles.find(profile => profile.id === currentProfileID), [currentProfileID]);
+    const currentProfile = useMemo(() => profiles.find(profile => profile.id === currentProfileID), [currentProfileID, profiles]);
 
     const allShortcutsEnabled = currentProfile?.shortcuts?.every(shortcut => shortcut.isActive);
 
