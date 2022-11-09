@@ -81,11 +81,6 @@ const getFileInfo = () => {
     return fileInfo;
 };
 
-const getErrorsAndAlarms = () => {
-    const logs = getAllErrors();
-    return logs;
-};
-
 const generateSupportFile = () => {
     const eeprom = getEEPROMValues();
     const machineProfile = getMachineProfile();
@@ -97,8 +92,7 @@ const generateSupportFile = () => {
     const mode = getMode();
     const connection = getConnection();
     const fileInfo = getFileInfo();
-    const logs = getErrorsAndAlarms();
-    console.log(logs);
+    const logs = getAllErrors();
 
     let eepromData = [];
     Object.entries(eeprom).forEach(entry => {
