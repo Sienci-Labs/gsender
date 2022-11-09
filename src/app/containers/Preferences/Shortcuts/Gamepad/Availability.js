@@ -45,6 +45,7 @@ const Availability = ({ type, shortcutTitle, shortcut, listenerRef }) => {
             <div className={styles.unavailable}>
                 <i className={classnames('fas fa-times-circle')} />
                 <p style={{ margin: 0 }}>Shortcut Already Exists on an Action</p>
+                <ButtonsPressed shortcut={shortcut} />
             </div>
         ),
         [IS_THE_SAME]: (
