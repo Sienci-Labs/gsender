@@ -58,7 +58,16 @@ const Availability = ({ type, shortcutTitle, shortcut, listenerRef }) => {
 
     return (
         <div style={{ position: 'relative', height: '100%' }}>
-            <span style={{ position: 'absolute', top: 10, left: 10, backgroundColor: 'rgba(255, 255, 255, 0.7)', padding: 10 }}>
+            <span
+                style={{
+                    position: 'absolute',
+                    top: 10,
+                    left: 10,
+                    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                    padding: 10,
+                    borderRadius: 5
+                }}
+            >
                 {shortcutTitle}
             </span>
             <Listener ref={listenerRef} />
