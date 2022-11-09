@@ -112,7 +112,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
                     value={shortcutName}
                     onChange={(e) => setShortcutName(e.target.value)}
                     additionalProps={{
-                        placeholder: 'Add Custom Shortcut Name...',
+                        placeholder: 'Enter a Custom Shortcut Name Here...',
                         disabled: !gamepadShortcut || availability !== AVAILABLE
                     }}
                     isNumber={false}
