@@ -75,9 +75,8 @@ const main = () => {
     // Create the user data directory if it does not exist
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
-    log.debug(app.getPath('logs'));
 
-    grblLog.transports.file.resolvePath = () => path.join(app.getPath('logs'), 'grbl.log');
+    grblLog.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs/grbl.log');
 
 
     app.whenReady().then(async () => {
