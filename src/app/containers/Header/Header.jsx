@@ -250,7 +250,6 @@ class Header extends PureComponent {
         if (isElectron()) {
             this.registerIPCListeners();
             window.ipcRenderer.invoke('check-remote-status').then(result => {
-                console.log(result);
                 this.setState({
                     hostInformation: {
                         ...result
@@ -346,7 +345,9 @@ class Header extends PureComponent {
                             actions={ this.actions }
                             widgetId="connection"
                         />
-                        {hostInformation.headless && <HeadlessIndicator {...hostInformation} />}
+                        {
+                            hostInformation.headless && <HeadlessIndicator {...hostInformation} />
+                        }
                     </div>
                     { !mobile && <NavSidebar /> }
                 </div>

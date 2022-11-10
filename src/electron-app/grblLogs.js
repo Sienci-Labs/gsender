@@ -20,25 +20,34 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import React from 'react';
-import FirmwareOptions from 'app/containers/Calibration/Diagnostics/components/FirmwareOptions';
-import ProgramInfo from 'app/containers/Calibration/Diagnostics/components/ProgramInfo';
-import PinStatus from 'app/containers/Calibration/Diagnostics/components/PinStatus';
-import AtAGlance from 'app/containers/Calibration/Diagnostics/components/AtAGlance';
-import styles from './index.styl';
 
+const fs = require('fs').promises;
 
-const DiagnosticTool = () => {
-    return (
-        <div>
-            <div className={styles.diagnosticWrapper}>
-                <ProgramInfo />
-                <PinStatus />
-                <FirmwareOptions />
-                <AtAGlance />
-            </div>
-        </div>
-    );
+const getGRBLLog = async (logPath) => {
+    let content = '';
+    try {
+        content = await fs.readFile(logPath, 'utf-8');
+        console.log(content);
+        if (content) {
+            content = content
+                .toString()
+                .split(/\r?\n/);
+            let tempContent = [];
+            content.forEach(record => {
+                if (record.toLowerCase().includes('error') || record.toLowerCase().includes('alarm')) {
+                    tempContent.push(record);
+                }
+            });
+            if (tempContent.length > 50) {
+                tempContent = tempContent.slice(0, 50);
+            }
+            content = tempContent.reverse();
+        }
+    } catch (error) {
+        console.log(error);
+    }
+
+    return content;
 };
 
-export default DiagnosticTool;
+export { getGRBLLog };

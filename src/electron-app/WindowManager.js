@@ -23,7 +23,6 @@
 
 /* eslint import/no-unresolved: 0 */
 import { app, BrowserWindow, shell } from 'electron';
-import log from 'electron-log';
 import path from 'path';
 
 class WindowManager {

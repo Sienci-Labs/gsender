@@ -61,7 +61,6 @@ class JobStatus extends PureComponent {
     }
 
     handleOverrideToggle = () => {
-        console.log(this.state);
         if (this.state.toggleStatus === 'jobStatus') {
             localStorage.setItem('jobOverrideToggle', JSON.stringify({
                 isChecked: true,
@@ -81,7 +80,12 @@ class JobStatus extends PureComponent {
             localStorage.setItem('jobOverrideToggle', JSON.stringify({ isChecked: false,
                 toggleStatus: 'jobStatus', }));
         }
-        this.setState(JSON.parse(localStorage.getItem('jobOverrideToggle')));
+
+        if (this.props.activeState === 'Run') {
+            this.setState({ isChecked: true, toggleStatus: 'overrides' });
+        } else if (!this.props.fileLoaded) {
+            this.setState({ isChecked: false, toggleStatus: 'jobStatus' });
+        }
     }
 
     componentDidMount() {
@@ -146,9 +150,11 @@ export default connect((store) => {
     const name = get(file, 'name', '');
     const filteredPath = path.replace(name, '');
     const connection = get(store, 'connection');
+    const activeState = get(store, 'controller.state.status.activeState', 'Idle');
     return {
         ...file,
         filteredPath,
-        connection
+        connection,
+        activeState
     };
 })(JobStatus);

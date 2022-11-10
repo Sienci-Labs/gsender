@@ -20,7 +20,7 @@ $primary = #3e85c7;
 
 .profile-item {
   width: 100%;
-  height: 150px;
+  height: 100%;
   display: grid;
   grid-template-rows: 1fr 1fr;
   justify-items: center;
@@ -110,7 +110,7 @@ $primary = #3e85c7;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     grid-template-rows: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 2rem;
+    gap: 1rem;
     justify-items: center;
     align-items: center;
     overflow-y: auto;
@@ -164,7 +164,7 @@ $primary = #3e85c7;
 
 .new-profile-info {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr 1fr;
   column-gap: 3rem;
   justify-items: center;
 }
@@ -177,8 +177,8 @@ $primary = #3e85c7;
 }
 
 .active-indicator {
-  width: 2rem;
-  height: 2rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 9999px;
   background: #9CA3AF;
   border: solid 1px #6B7280;
@@ -187,6 +187,9 @@ $primary = #3e85c7;
   justify-content center;
   justify-items center
   color: #FFFFFF;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 
 .active-indicator-on {
@@ -223,11 +226,11 @@ $primary = #3e85c7;
 }
 
 .profile-action-wrapper {
-  padding: 1rem;
-  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  height: 100%;
 }
 
 .profile-name {
@@ -235,12 +238,58 @@ $primary = #3e85c7;
   height: 2.5rem;
   background-color: transparent;
   border: transparent;
+  padding-left: 0.5rem;
 
   transition: 250ms ease-in-out;
 
-  &:focus-visible {
+  &:focus-visible, &:hover {
     background-color: white;
     border: 1px solid #ccc;
     outline: none;
+  }
+}
+
+card() {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  background-color: #16b1c9;
+  width: 100%;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 0.75rem;
+  background-color: #16b1c9;
+  padding: 1.5rem;
+  height: 100%;
+  color: white;
+
+  i {
+    font-size: 3rem !important;
+  }
+}
+
+.availability, .available, .unavailable {
+  card();
+
+  &.available {
+    card();
+    background-color: #4BB543;
+  }
+
+  &.unavailable {
+    card();
+    background-color: rgba(220,38,38,0.9);
+  }
+}
+
+.custom-profile-name {
+  margin: 0 !important;
+
+  &-hidden {
+    margin: 0 !important;
+    opacity: 0;
+    cursor: none;
   }
 }

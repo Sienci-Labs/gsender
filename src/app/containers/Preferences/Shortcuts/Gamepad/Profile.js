@@ -1,20 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import classnames from 'classnames';
-import store from 'app/store';
 import PropTypes from 'prop-types';
+
+import store from 'app/store';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
-import styles from './index.styl';
-import ProfileItem from './ProfileItem';
-import Table from './MainTable';
+import styles from '../index.styl';
+import ShortcutsTable from '../ShortcutsTable';
 import ProfileShortcutModal from './ProfileShortcutModal';
 
-const Profile = ({ currentProfile, onUpdateProfiles }) => {
-    Profile.propTypes = { currentProfile: PropTypes.object, onUpdateProfiles: PropTypes.func };
+const Profile = ({ data, onUpdateProfiles }) => {
+    const { profileName, icon, shortcuts } = data;
 
-    const { profileName, icon, shortcuts } = currentProfile;
-
-    const [currentShortcut, setCurrentShortcut] = useState(null);
+    const [currentShortcutID, setCurrentShortcutID] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
     const [name, setName] = useState(profileName);
@@ -27,7 +25,7 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (currentProfile.id === profile.id ? ({ ...profile, profileName: name }) : currentProfile));
+            profiles.map(profile => (data.id === profile.id ? ({ ...profile, profileName: name }) : profile));
 
         onUpdateProfiles(updatedProfiles);
 
@@ -39,17 +37,20 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
     };
 
     const handleDelete = (currShortcut) => {
-        const updatedShortcuts = shortcuts.map((shortcut) => (shortcut.id === currShortcut.id ? { ...shortcut, keys: '', keysName: '', isActive: false } : shortcut));
+        const updatedShortcuts = shortcuts.map((shortcut) => (shortcut.id === currShortcut.id
+            ? { ...shortcut, keys: '', keysName: '', isActive: false }
+            : shortcut
+        ));
 
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (currentProfile.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : currentProfile));
+            profiles.map(profile => (data.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
 
         onUpdateProfiles(updatedProfiles);
 
         Toaster.pop({
-            msg: 'Removed Joystick Action Shortcut',
+            msg: 'Removed Gamepad Action Shortcut',
             type: TOASTER_SUCCESS,
             duration: 2000
         });
@@ -61,10 +62,17 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (currentProfile.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : currentProfile));
+            profiles.map(profile => (data.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
 
         onUpdateProfiles(updatedProfiles);
     };
+
+    const handleEdit = (shortcut) => {
+        setShowModal(true);
+        setCurrentShortcutID(shortcut.id);
+    };
+
+    const currentShortcut = useMemo(() => shortcuts.find(shortcut => shortcut.id === currentShortcutID), [shortcuts, currentShortcutID]);
 
     return (
         <>
@@ -79,12 +87,9 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
                         onBlur={handleEditName}
                     />
                 </div>
-                <div className={styles['table-wrapper-controller']}>
-                    <Table
-                        onEdit={(shortcut) => {
-                            setShowModal(true);
-                            setCurrentShortcut(shortcut);
-                        }}
+                <div style={{ overflowY: 'auto', height: '435px', backgroundColor: 'white' }}>
+                    <ShortcutsTable
+                        onEdit={handleEdit}
                         onDelete={handleDelete}
                         onShortcutToggle={handleShortcutToggle}
                         data={shortcuts}
@@ -94,7 +99,7 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
 
             {showModal && (
                 <ProfileShortcutModal
-                    profile={currentProfile}
+                    profile={data}
                     shortcut={currentShortcut}
                     onClose={() => setShowModal(false)}
                     onUpdateProfiles={onUpdateProfiles}
@@ -104,4 +109,9 @@ const Profile = ({ currentProfile, onUpdateProfiles }) => {
     );
 };
 
-export { Profile, ProfileItem };
+Profile.propTypes = {
+    data: PropTypes.object,
+    onUpdateProfiles: PropTypes.func
+};
+
+export default Profile;

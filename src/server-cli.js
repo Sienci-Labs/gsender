@@ -26,7 +26,7 @@
 import path from 'path';
 import isElectron from 'is-electron';
 import program from 'commander';
-import ip from 'ip';
+import ip from 'quick-local-ip';
 import pkg from './package.json';
 
 
@@ -86,8 +86,9 @@ program
     .option('-m, --mount <route-path>:<target>', 'Add a mount point for serving static files', parseMountPoint, [])
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
-    .option('--headless', 'Allow remote access to the server (default: false)', false)
-    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, '');
+    .option('--allow-remote-access', 'Allow remote access to the server (default: false)', false)
+    .option('--remote', 'Enable Headless mode, exposing the internal server on your local network', false)
+    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, 'Grbl');
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
 // This is not the case when running from a packaged Electron app. Here you have the first value appname and then args.
@@ -101,25 +102,29 @@ if (normalizedArgv.length > 1) {
 export default () => new Promise((resolve, reject) => {
     // Change working directory to 'server' before require('./server')
     process.chdir(path.resolve(__dirname, 'server'));
+    let port = program.port, host = program.host;
+    let headless = !!program.remote;
 
-    if (program.headless) {
-        const localhost = ip.address();
-        program.host = localhost;
-        if (program.port === 0) {
-            program.port = 8000;
+    if (headless) {
+        if (port === 0) {
+            port = 8000;
+        }
+
+        if (host === '127.0.0.1') {
+            host = ip.getLocalIP4();
         }
     }
 
     require('./server').createServer({
-        port: program.port,
-        host: program.host,
+        port: port,
+        host: host,
         backlog: program.backlog,
         configFile: program.config,
         verbosity: program.verbose,
         mountPoints: program.mount,
         watchDirectory: program.watchDirectory,
         accessTokenLifetime: program.accessTokenLifetime,
-        allowRemoteAccess: !!program.headless,
+        allowRemoteAccess: !!program.allowRemoteAccess,
         controller: program.controller
     }, (err, data) => {
         if (err) {
@@ -127,6 +132,6 @@ export default () => new Promise((resolve, reject) => {
             return;
         }
         console.log(data);
-        resolve({ ...data, headless: program.headless });
+        resolve({ ...data, headless });
     });
 });

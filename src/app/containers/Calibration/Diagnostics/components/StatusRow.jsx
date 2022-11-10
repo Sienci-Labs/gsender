@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -21,19 +21,23 @@
  *
  */
 
-import { combineReducers } from 'redux';
-import controller from './controllerReducers';
-import connection from './connectionReducers';
-import file from './fileInfoReducers';
-import visualizer from './visualizerReducers';
-import preferences from './preferencesReducer';
+import React from 'react';
+import cx from 'classnames';
+import styles from '../index.styl';
 
-const consolidatedReducer = combineReducers({
-    controller,
-    connection,
-    file,
-    visualizer,
-    preferences
-});
+const StatusRow = ({ label, value }) => {
+    return (
+        <div className={cx(styles.pinRow, styles.separator)}>
+            <span className={styles.statusLabel}>
+                { label }
+            </span>
+            <span className={styles.statusValue}>
+                {
+                    value
+                }
+            </span>
+        </div>
+    );
+};
 
-export default consolidatedReducer;
+export default StatusRow;

@@ -33,7 +33,7 @@ const ProgramInfo = ({ type, settings, connection }) => {
     const machineProfile = store.get('workspace.machineProfile', {});
     const { company, name, type: machineType } = machineProfile;
     const units = store.get('workspace.units');
-    const { port, baudrate } = connection;
+    const { port = 'Disconnected', baudrate = 'None' } = connection;
 
     return (
         <div className={cx(styles.card)}>

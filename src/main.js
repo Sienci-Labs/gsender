@@ -36,10 +36,13 @@ import launchServer from './server-cli';
 import pkg from './package.json';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
+import { getGRBLLog } from './electron-app/grblLogs';
 
 
 let windowManager = null;
 let hostInformation = {};
+let grblLog = log.create('grbl');
+let logPath;
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -73,6 +76,9 @@ const main = () => {
     // Create the user data directory if it does not exist
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
+    // Extra logging
+    logPath = path.join(app.getPath('userData'), 'logs/grbl.log');
+    grblLog.transports.file.resolvePath = () => logPath;
 
 
     app.whenReady().then(async () => {
@@ -95,7 +101,7 @@ const main = () => {
             });
 
             const res = await launchServer();
-            const { address, port, mountPoints, headless } = { ...res };
+            const { address, port, headless, requestedHost } = { ...res };
             hostInformation = {
                 address,
                 port,
@@ -106,7 +112,7 @@ const main = () => {
                 return;
             }
             if (headless) {
-                log.debug(`Started remote build at ${address}:${port}`);
+                log.debug(`Started remote build at ${address}:${port} - ${requestedHost}`);
             }
 
             const url = `http://${address}:${port}`;
@@ -163,10 +169,18 @@ const main = () => {
                 if ('type' in error) {
                     log.transports.file.level = 'error';
                 }
-                (error.type === 'GRBL_ERROR') ? log.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}"`) : log.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
+                (error.type === 'GRBL_ERROR') ? grblLog.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
+            });
+
+            ipcMain.handle('grblLog:fetch', async (channel) => {
+                log.debug(logPath);
+                const data = await getGRBLLog(logPath);
+                log.debug(`*${data}`);
+                return data;
             });
 
             ipcMain.handle('check-remote-status', (channel) => {
+                log.debug(hostInformation);
                 return hostInformation;
             });
 
