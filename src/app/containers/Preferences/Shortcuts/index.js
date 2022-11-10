@@ -5,8 +5,8 @@ import ReactToPrint from 'react-to-print';
 import { Button } from 'react-bootstrap';
 import ShortcutTable from './ShortcutTable';
 
-import KeyboardShortcuts from './Keybindings';
-import Joystick from './Joystick';
+import KeyboardShortcuts from './Keyboard';
+import Gamepad from './Gamepad';
 
 import SettingWrapper from '../components/SettingWrapper';
 import styles from '../index.styl';
@@ -14,21 +14,20 @@ import styles from '../index.styl';
 const tabs = [
     {
         id: 0,
-        label: 'Keyboard Shortcuts',
+        label: 'Keyboard',
         widgetId: 'keyboard-shortcuts',
         component: <KeyboardShortcuts />,
     },
     {
         id: 1,
-        label: 'Joystick Shortcuts',
-        widgetId: 'joystick-shortcuts',
-        component: <Joystick />,
+        label: 'Gamepad',
+        widgetId: 'gamepad-shortcuts',
+        component: <Gamepad />,
     },
 ];
 
 const Shortcuts = ({ active }) => {
     const [tab, setTab] = useState(0);
-    //const [display, setDisplay] = useState('none');
     const componentRef = useRef();
     return (
         <SettingWrapper title="Shortcuts" show={active}>
@@ -38,8 +37,6 @@ const Shortcuts = ({ active }) => {
                         return <Button>Print</Button>;
                     }}
                     content={() => componentRef.current}
-                    // onBeforePrint={() => setDisplay('block')}
-                    // onAfterPrint={() => setDisplay('none')}
                 />
                 <ShortcutTable forwardRef={componentRef} />
                 <TabbedWidget.Tabs
