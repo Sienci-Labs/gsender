@@ -125,8 +125,8 @@ export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
         });
 
     // switch commands so $20 comes first
-    // check that the indexes have been set for both and that they are both being enabled, otherwise there's no need to switch
-    if (index2021 >= 0 && index22 < 200 && changedSettings[index22].includes('=1') && changedSettings[index2021].includes('=1')) {
+    // check that the indexes have been set for both, otherwise there's no need to switch
+    if (index2021 >= 0 && index22 < 200) {
         const setting22 = changedSettings[index22];
         changedSettings[index22] = changedSettings[index2021];
         changedSettings[index2021] = setting22;
