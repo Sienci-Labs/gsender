@@ -173,9 +173,7 @@ const main = () => {
             });
 
             ipcMain.handle('grblLog:fetch', async (channel) => {
-                log.debug(logPath);
                 const data = await getGRBLLog(logPath);
-                log.debug(`*${data}`);
                 return data;
             });
 
@@ -280,6 +278,9 @@ const main = () => {
         //Check for available updates at end to avoid try-catch failing to load events
         const internetConnectivity = await isOnline();
         if (internetConnectivity) {
+            if (pkg.version.includes('EDGE') || pkg.version.includes('BETA')) {
+                autoUpdater.allowPrerelease = true;
+            }
             autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
             // There may be situations where something is blocking the update check outside of internet connectivity
             // This sets a 5 second timeout on the await.
