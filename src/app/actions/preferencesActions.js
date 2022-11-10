@@ -6,8 +6,9 @@ export const {
     HOLD_SHORTCUTS,
     UNHOLD_SHORTCUTS
 } = constants('connection', [
-    'SET_CURRENT_VISUALIZER',
-    'SET_LASER_MODE'
+    'SET_SHORTCUTS_LIST',
+    'HOLD_SHORTCUTS',
+    'UNHOLD_SHORTCUTS',
 ]);
 
 export const updateShortcutsList = createAction(SET_SHORTCUTS_LIST);
