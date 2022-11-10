@@ -140,16 +140,14 @@ const Keyboard = () => {
     const disableAllShortcuts = () => {
         const disabledShortcuts = shortcutsList.map(keybinding => ({ ...keybinding, isActive: false }));
 
-        store.set('commandKeys', disabledShortcuts);
-
-        setShowEditModal(false);
+        store.replace('commandKeys', disabledShortcuts);
         dispatch(updateShortcutsList(disabledShortcuts));
 
         showToast('Shortcuts Disabled');
     };
 
     const allShortcutsEnabled = useMemo(() => shortcutsList.every(shortcut => shortcut.isActive), [shortcutsList]);
-    const allShortcutsDisabled = !allShortcutsEnabled;
+    const allShortcutsDisabled = useMemo(() => shortcutsList.every(shortcut => !shortcut.isActive), [shortcutsList]);
 
     return (
         <div>

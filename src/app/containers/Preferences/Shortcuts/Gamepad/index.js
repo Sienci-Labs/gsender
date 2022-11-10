@@ -40,12 +40,12 @@ const Gamepad = () => {
     };
 
     const handleShortcutsToggle = (toggle) => {
-        const updatedShortcuts = currentProfileID.shortcuts.map((shortcut) => ({ ...shortcut, isActive: toggle }));
+        const updatedShortcuts = currentProfile.shortcuts.map((shortcut) => ({ ...shortcut, isActive: toggle }));
 
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (currentProfileID.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : currentProfileID));
+            profiles.map(profile => (currentProfile.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
 
         handleUpdateProfiles(updatedProfiles);
     };
@@ -53,6 +53,7 @@ const Gamepad = () => {
     const currentProfile = useMemo(() => profiles.find(profile => profile.id === currentProfileID), [currentProfileID, profiles]);
 
     const allShortcutsEnabled = currentProfile?.shortcuts?.every(shortcut => shortcut.isActive);
+    const allShortcutsDisabled = currentProfile?.shortcuts?.every(shortcut => !shortcut.isActive);
 
     return (
         <div className={styles.container}>
@@ -68,7 +69,7 @@ const Gamepad = () => {
                                         <i className="fas fa-toggle-on" />
                                         <span>Enable All Shortcuts</span>
                                     </Button>
-                                    <Button primary onClick={() => handleShortcutsToggle(false)} disabled={!allShortcutsEnabled}>
+                                    <Button primary onClick={() => handleShortcutsToggle(false)} disabled={allShortcutsDisabled}>
                                         <i className="fas fa-toggle-on" />
                                         <span>Disable All Shortcuts</span>
                                     </Button>
