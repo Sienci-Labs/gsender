@@ -92,7 +92,10 @@ const generateSupportFile = () => {
     const mode = getMode();
     const connection = getConnection();
     const fileInfo = getFileInfo();
-    const logs = getAllErrors();
+    let logs = [];
+    logs = getAllErrors().then((data) => {
+        logs = data;
+    });
 
     let eepromData = [];
     Object.entries(eeprom).forEach(entry => {
