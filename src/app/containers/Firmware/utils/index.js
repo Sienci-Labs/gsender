@@ -108,9 +108,29 @@ export const convertValueToArray = (value, possibilities) => {
 };
 
 export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
-    const changedSettings = settings
+    let index22 = 200; // index of $22 - default is 200 because we have less eeprom values than that, so it will never be set to this value
+    let index2021 = -1; // index of $20 or $21, whichever comes first
+    let changedSettings = settings
         .filter(item => eeprom[item.setting] !== item.value) // Only retrieve settings that have been modified
-        .map(item => `${item.setting}=${item.value}`); // Create array of set eeprom value strings (ex. "$0=1")
+        .map((item, i) => { // Create array of set eeprom value strings (ex. "$0=1")
+            if (item.setting === '$22') { // always find where $22 is
+                index22 = i;
+            } else if ((item.setting === '$20' || item.setting === '$21') && i < index22 && index2021 === -1) {
+                // if $20 or $21 come before $22,
+                // and this is the first occurence of $20 or $21,
+                // we are going to have to switch it with $20, so save the index.
+                index2021 = i;
+            }
+            return `${item.setting}=${item.value}`;
+        });
+
+    // switch commands so $20 comes first
+    // check that the indexes have been set for both, otherwise there's no need to switch
+    if (index2021 >= 0 && index22 < 200) {
+        const setting22 = changedSettings[index22];
+        changedSettings[index22] = changedSettings[index2021];
+        changedSettings[index2021] = setting22;
+    }
 
     controller.command('gcode', changedSettings);
     controller.command('gcode', '$$'); //Needed so next time wizard is opened changes are reflected
