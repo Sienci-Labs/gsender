@@ -8,7 +8,7 @@ import { getAllErrors } from '../helper';
 import styles from '../../index.styl';
 
 const ErrorLog = () => {
-    const [logs, setLogs] = useState(getAllErrors() || []);
+    const [logs, setLogs] = useState([]);
 
     const colorCodes = {
         ALARM: '#d75f5f',
@@ -16,18 +16,20 @@ const ErrorLog = () => {
     };
 
     useEffect(() => {
-        setLogs(getAllErrors() || ['Nothing to display']);
+        const fetchLogs = async () => {
+            const data = await getAllErrors();
+            setLogs(data);
+        };
+        fetchLogs();
     }, []);
 
     return (
         <div className={styles.errorWrapper}>
             <div className={styles.errorHeading}>
-                { logs[0] !== 'Nothing to display' ? `Errors and Alarms (${logs.length})`
-                    : 'Errors and Alarms (0)'
-                }
+                { `Errors and Alarms (${logs.length})`}
             </div>
             <div className={styles.errorBody}>
-                { logs[0] !== 'Nothing to display'
+                { logs.length !== 0
                     ? (
                         <VerticalTimeline layout="1-column-left" className={styles.verticalTimeline}>
                             {

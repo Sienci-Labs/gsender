@@ -1,14 +1,14 @@
 import isElectron from 'is-electron';
 
-const getAllErrors = () => {
-    let content = '';
-    // Check whether the code is running in Electron renderer process
-    if (isElectron()) {
-        window.ipcRenderer.invoke('grblLog:fetch').then(data => {
-            return data;
-        });
+const getAllErrors = async () => {
+    if (!isElectron()) {
+        return [];
     }
-    return content;
+
+    const log = await window.ipcRenderer.invoke('grblLog:fetch');
+    console.log(log);
+
+    return log;
 };
 
 export { getAllErrors };

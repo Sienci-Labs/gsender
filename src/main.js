@@ -41,7 +41,8 @@ import { getGRBLLog } from './electron-app/grblLogs';
 
 let windowManager = null;
 let hostInformation = {};
-let grblLog = log.create('GRBL');
+let grblLog = log.create('grbl');
+let logPath;
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -75,8 +76,9 @@ const main = () => {
     // Create the user data directory if it does not exist
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
-
-    grblLog.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs/grbl.log');
+    // Extra logging
+    logPath = path.join(app.getPath('userData'), 'logs/grbl.log');
+    grblLog.transports.file.resolvePath = () => logPath;
 
 
     app.whenReady().then(async () => {
@@ -170,9 +172,11 @@ const main = () => {
                 (error.type === 'GRBL_ERROR') ? grblLog.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
             });
 
-            ipcMain.handle('grblLog:fetch', (channel) => {
-                const logPath = path.join(app.getPath('userData'), 'logs/grbl.log');
-                return getGRBLLog(logPath);
+            ipcMain.handle('grblLog:fetch', async (channel) => {
+                log.debug(logPath);
+                const data = await getGRBLLog(logPath);
+                log.debug(`*${data}`);
+                return data;
             });
 
             ipcMain.handle('check-remote-status', (channel) => {

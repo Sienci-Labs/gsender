@@ -21,30 +21,27 @@
  *
  */
 
-const fsBase = require('fs');
+const fs = require('fs').promises;
 
-const getGRBLLog = (logPath) => {
+const getGRBLLog = async (logPath) => {
     let content = '';
-    // Check whether the code is running in Electron renderer process
     try {
-        if (fsBase.existsSync(logPath)) {
-            content = fsBase.readFileSync(logPath, 'utf8') || '';
-            if (content) {
-                content = content
-                    .toString()
-                    .replace(/\r\n/g, '\n')
-                    .split('\n');
-                let tempContent = [];
-                content.forEach(record => {
-                    if (record.toLowerCase().includes('error') || record.toLowerCase().includes('alarm')) {
-                        tempContent.push(record);
-                    }
-                });
-                if (tempContent.length > 50) {
-                    tempContent = tempContent.slice(0, 50);
+        content = await fs.readFile(logPath, 'utf-8');
+        console.log(content);
+        if (content) {
+            content = content
+                .toString()
+                .split(/\r?\n/);
+            let tempContent = [];
+            content.forEach(record => {
+                if (record.toLowerCase().includes('error') || record.toLowerCase().includes('alarm')) {
+                    tempContent.push(record);
                 }
-                content = tempContent.reverse();
+            });
+            if (tempContent.length > 50) {
+                tempContent = tempContent.slice(0, 50);
             }
+            content = tempContent.reverse();
         }
     } catch (error) {
         console.log(error);
