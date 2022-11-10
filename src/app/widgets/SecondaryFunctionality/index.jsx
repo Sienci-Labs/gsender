@@ -125,6 +125,7 @@ class SecondaryFunctionality extends PureComponent {
 
     componentDidMount() {
         store.on('change', this.handleMachineProfileChange);
+        this.handleMachineProfileChange();
     }
 
     componentWillUnmount() {
@@ -209,6 +210,7 @@ class SecondaryFunctionality extends PureComponent {
                                         widgetId={tab.widgetId}
                                         embedded
                                         active={active}
+                                        isMainWindow={true}
                                     />
                                 </TabbedWidget.ChildComponent>
                             );

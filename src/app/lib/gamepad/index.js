@@ -1,7 +1,10 @@
 import { GamepadListener } from 'gamepad.js';
+import throttle from 'lodash/throttle';
+
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-import throttle from 'lodash/throttle';
+
+import shuttleEvents from '../shuttleEvents';
 
 const STOP_JOG_CMD = 'STOP_JOG';
 
@@ -111,8 +114,8 @@ export const runAction = ({ event, shuttleControlEvents }) => {
         return;
     }
 
-    const runEvent = shuttleControlEvents[action.cmd];
-
+    const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+    const runEvent = allShuttleControlEvents.find(element => element.cmd === action.cmd).callback;
     if (runEvent) {
         runEvent(null, action.payload);
     }

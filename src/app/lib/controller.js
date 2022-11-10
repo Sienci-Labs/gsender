@@ -96,6 +96,7 @@ class Controller {
         'file:load': [],
         'file:unload': [],
         'homing:flag': [],
+        'electronErrors:errorList': [],
         'grbl:iSready': [],
         'sender:M0M1': []
     };
@@ -130,9 +131,7 @@ class Controller {
 
     // Connection options
     host = null;
-
     next = null;
-
     options = null;
 
     // @param {object} io The socket.io-client module.
@@ -310,6 +309,12 @@ class Controller {
         this.socket && this.socket.emit('list', callback);
     }
 
+    // Adds client to the connection
+    // @param {string} port The path of the serial port you want to close. For example, `dev/tty.XXX` on Mac and Linux, or `COM1` on Windows.
+    addClient(port) {
+        this.socket && this.socket.emit('addclient', port);
+    }
+
     // Executes a command on the server.
     // @param {string} cmd The command string
     // @example Example Usage
@@ -344,6 +349,8 @@ class Controller {
     //   controller.command('unlock')
     // - Reset
     //   controller.command('reset')
+    // - Check for State Update
+    //   controller.command('checkStateUpdate')
     // - Feed Override
     //   controller.command('feedOverride')
     // - Spindle Override

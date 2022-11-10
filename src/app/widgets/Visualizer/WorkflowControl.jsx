@@ -30,7 +30,6 @@ import store from 'app/store';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
-
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import api from 'app/api';
@@ -58,21 +57,22 @@ import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
-    VISUALIZER_PRIMARY,
-    //LASER_MODE
+    VISUALIZER_PRIMARY, LASER_MODE,
 } from '../../constants';
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
 import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './ClientRecentFiles';
 import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
 import { outlineResponse } from '../../workers/Outline.response';
+import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
         state: PropTypes.object,
         actions: PropTypes.object,
-        invalidGcode: PropTypes.string
+        invalidGcode: PropTypes.string,
+        liteMode: PropTypes.bool
     };
 
     fileInputEl = null;
@@ -287,10 +287,10 @@ class WorkflowControl extends PureComponent {
     runOutline = () => {
         this.workerOutline = new WorkerOutline();
         const { gcode } = this.props;
-        //const machineProfile = store.get('workspace.machineProfile');
-        //const spindleMode = store.get('widgets.spindle.mode');
+        const machineProfile = store.get('workspace.machineProfile');
+        const spindleMode = store.get('widgets.spindle.mode');
         // outline toggled on and currently in laser mode
-        //const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
+        const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
 
         Toaster.pop({
             TYPE: TOASTER_INFO,
@@ -298,9 +298,9 @@ class WorkflowControl extends PureComponent {
             msg: 'Generating outline for current file'
         });
         this.workerOutline.onmessage = ({ data }) => {
-            outlineResponse({ data });
+            outlineResponse({ data }, machineProfile.laserOnOutline);
         };
-        this.workerOutline.postMessage({ gcode, isLaser: false });
+        this.workerOutline.postMessage({ gcode, isLaser });
     }
 
     startFromLinePrompt = () => {
@@ -352,12 +352,13 @@ class WorkflowControl extends PureComponent {
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
         const canRun = this.canRun();
-        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && includes([WORKFLOW_STATE_RUNNING], workflowState) || (isReady && includes([GRBL_ACTIVE_STATE_CHECK], activeState) && includes([WORKFLOW_STATE_RUNNING], workflowState));
+        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && activeState !== GRBL_ACTIVE_STATE_CHECK && includes([WORKFLOW_STATE_RUNNING], workflowState);
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
 
         const { showModal, value } = this.state.startFromLine;
+        const renderSVG = shouldVisualizeSVG();
 
         return (
             <div className={styles.workflowControl}>
@@ -572,11 +573,13 @@ class WorkflowControl extends PureComponent {
                         </Modal>
                     )
                 }
-
-                <CameraDisplay
-                    camera={camera}
-                    cameraPosition={cameraPosition}
-                />
+                {
+                    !renderSVG ?
+                        <CameraDisplay
+                            camera={camera}
+                            cameraPosition={cameraPosition}
+                        /> : null
+                }
             </div>
         );
     }

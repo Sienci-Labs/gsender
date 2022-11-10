@@ -25,7 +25,7 @@ import React, { PureComponent } from 'react';
 import cx from 'classnames';
 import pubsub from 'pubsub-js';
 import styles from './index.styl';
-
+import { getOperatingSystem } from '../util';
 
 class UpdateAvailableAlert extends PureComponent {
     constructor(props) {
@@ -41,11 +41,10 @@ class UpdateAvailableAlert extends PureComponent {
             this.setState({
                 shown: false
             });
-        }
+        },
     }
 
     pubsubTokens = [];
-
 
     subscribe () {
         const tokens = [
@@ -77,6 +76,10 @@ class UpdateAvailableAlert extends PureComponent {
         const { shown, buttonActive } = this.state;
         const { restartHandler } = this.props;
         const actions = { ...this.actions };
+        const currentOS = getOperatingSystem(window);
+
+        let updateLink = 'https://github.com/Sienci-Labs/gsender/releases/latest';
+
         return (
             <div className={cx(styles.updateWrapper, { [styles.hideModal]: !shown })}>
                 <div className={styles.updateIcon}>
@@ -84,21 +87,36 @@ class UpdateAvailableAlert extends PureComponent {
                 </div>
                 <div className={styles.updateContent}>
                     <div>
-                        Update available to download.  Download and restart now?
+                        { currentOS === 'Windows OS' ? 'Update available to download. Download and restart now?' : 'A new version of gSender is available.'}
                     </div>
-                    <button
-                        onClick={() => {
-                            this.setState({
-                                buttonActive: false
-                            });
-                            restartHandler();
-                        }}
-                        className={styles.restartButton}
-                    >
-                        {
-                            buttonActive ? 'Download and install' : 'Downloading...'
-                        }
-                    </button>
+                    { currentOS === 'Windows OS' ? (
+                        <button
+                            onClick={() => {
+                                this.setState({
+                                    buttonActive: false
+                                });
+                                restartHandler();
+                            }}
+                            className={styles.restartButton}
+                        >
+                            {
+                                buttonActive ? 'Download and install' : 'Downloading...'
+                            }
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => {
+                                this.setState({
+                                    buttonActive: false
+                                });
+                                window.open(updateLink, '_blank');
+                            }}
+                            className={styles.restartButton}
+                        > {
+                                buttonActive ? 'Checkout the latest release' : 'Redirecting...'
+                            }
+                        </button>
+                    )}
                 </div>
                 <div className={styles.closeModal}>
                     <button onClick={actions.hideModal}>

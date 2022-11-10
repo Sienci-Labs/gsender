@@ -352,6 +352,9 @@ const appMain = () => {
             storage
         });
         app.post(urljoin(settings.route, 'api/file'), upload.single('gcode'), api.files.uploadFile);
+
+        // Log
+        app.post(urljoin(settings.route, 'api/log'), api.logs.printLog);
     }
 
     // page

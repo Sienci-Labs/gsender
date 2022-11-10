@@ -34,7 +34,6 @@ const TaskbarButton = styled.button`
     white-space: nowrap;
     touch-action: manipulation;
     cursor: pointer;
-    user-select: none;
     background-image: none;
     background-color: inherit;
 

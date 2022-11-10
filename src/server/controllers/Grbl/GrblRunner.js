@@ -34,11 +34,13 @@ import GrblLineParserResultParameters from './GrblLineParserResultParameters';
 import GrblLineParserResultFeedback from './GrblLineParserResultFeedback';
 import GrblLineParserResultSettings from './GrblLineParserResultSettings';
 import GrblLineParserResultStartup from './GrblLineParserResultStartup';
+import logger from '../../lib/logger';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_ALARM
 } from './constants';
 
+const log = logger('controller:Grbl');
 
 class GrblRunner extends events.EventEmitter {
     state = {
@@ -90,6 +92,7 @@ class GrblRunner extends events.EventEmitter {
     parse(data) {
         data = ('' + data).replace(/\s+$/, '');
         if (!data) {
+            log.warn('Empty result parsed from GrlbLineParser');
             return;
         }
 
@@ -148,6 +151,7 @@ class GrblRunner extends events.EventEmitter {
             // https://nodejs.org/api/events.html#events_error_events
             // As a best practice, listeners should always be added for the 'error' events.
             this.emit('error', payload);
+            log.error('Error found in GrblLineParserResultError');
             return;
         }
         if (type === GrblLineParserResultAlarm) {
@@ -163,6 +167,7 @@ class GrblRunner extends events.EventEmitter {
                 this.state = nextState; // enforce change
             }
             this.emit('alarm', payload);
+            log.warn('An Alarm was activated in Grbl Line Parser');
             return;
         }
         if (type === GrblLineParserResultParserState) {

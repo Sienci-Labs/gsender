@@ -22,7 +22,7 @@
  */
 
 import '@babel/polyfill';
-import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor } from 'electron';
+import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -31,19 +31,16 @@ import isOnline from 'is-online';
 import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
-//import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
-//import './sentryInit';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
-import { loadConfig, persistConfig } from './electron-app/store';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 
 
 let windowManager = null;
-let powerSaverId = null;
-let appConfig = null;
+let hostInformation = {};
+let grblLog = log.create('GRBL');
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
@@ -78,9 +75,8 @@ const main = () => {
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
 
-    // Load app config into variable
-    const filePath = path.join(app.getPath('userData'), 'gsender-0.5.6.json');
-    //appConfig = loadConfig(filePath);
+    grblLog.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs/grbl.log');
+
 
     app.whenReady().then(async () => {
         try {
@@ -102,10 +98,18 @@ const main = () => {
             });
 
             const res = await launchServer();
-            const { address, port, mountPoints } = { ...res };
+            const { address, port, mountPoints, headless } = { ...res };
+            hostInformation = {
+                address,
+                port,
+                headless,
+            };
             if (!(address && port)) {
                 log.error('Unable to start the server at ' + chalk.cyan(`http://${address}:${port}`));
                 return;
+            }
+            if (headless) {
+                log.debug(`Started remote build at ${address}:${port}`);
             }
 
             const url = `http://${address}:${port}`;
@@ -121,12 +125,12 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `gSender ${pkg.version}`,
+                title: `gSender ${pkg.version}`
             };
             const window = windowManager.openWindow(url, options, splashScreen);
 
             // Power saver - display sleep higher precedence over app suspension
-            powerSaverId = powerSaveBlocker.start('prevent-display-sleep');
+            powerSaveBlocker.start('prevent-display-sleep');
             powerMonitor.on('lock-screen', () => {
                 powerSaveBlocker.start('prevent-display-sleep');
             });
@@ -150,7 +154,7 @@ const main = () => {
 
             ipcMain.once('restart_app', async () => {
                 await autoUpdater.downloadUpdate();
-                autoUpdater.quitAndInstall(false, true);
+                autoUpdater.quitAndInstall(false, false);
             });
 
             ipcMain.on('load-recent-file', async (msg, recentFile) => {
@@ -158,27 +162,20 @@ const main = () => {
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
 
-            ipcMain.on('log-error', (channel, err) => {
-                log.error(err.message);
+            ipcMain.on('logError:electron', (channel, error) => {
+                if ('type' in error) {
+                    log.transports.file.level = 'error';
+                }
+                (error.type === 'GRBL_ERROR') ? grblLog.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}"`) : grblLog.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
+            });
+
+            ipcMain.handle('check-remote-status', (channel) => {
+                return hostInformation;
             });
 
             /**
              * gSender config events - move electron store changes out of renderer process
              */
-            ipcMain.handle('get-app-path', (event) => {
-                return path.join(app.getPath('userData'), 'gsender-0.5.6.json');
-            });
-
-            ipcMain.handle('get-app-config', (event) => {
-                return appConfig;
-            });
-
-            ipcMain.on('persist-app-config', (event, filename, state) => {
-                const filePath = path.join(app.getPath('userData'), filename);
-                persistConfig(filePath, state);
-                appConfig = state;
-            });
-
             ipcMain.on('open-upload-dialog', async () => {
                 try {
                     let additionalOptions = {};
@@ -193,8 +190,7 @@ const main = () => {
                                 { name: 'GCode Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
                                 { name: 'All Files', extensions: ['*'] }
                             ]
-                        },
-                    );
+                        },);
 
                     if (!file) {
                         return;
@@ -225,6 +221,44 @@ const main = () => {
                 } catch (e) {
                     log.error(`Caught error in listener - ${e}`);
                 }
+            });
+
+            ipcMain.on('open-new-window', (msg, route) => {
+                const factor = screen.getPrimaryDisplay().scaleFactor;
+                const childOptions = {
+                    width: 550 / factor,
+                    height: 460 / factor,
+                    minWidth: 550 / factor,
+                    minHeight: 460 / factor,
+                    useContentSize: true,
+                    title: 'gSender',
+                    parent: window
+                };
+                // Hash router URL should look like '{url}/#/widget/:id'
+                const address = `${url}/#${route}`;
+                const shouldMaximize = false;
+                const isChild = true;
+
+                windowManager.openWindow(address, childOptions, null, shouldMaximize, isChild);
+            });
+
+            ipcMain.on('reconnect-main', (event, options) => {
+                if (!event.sender.browserWindowOptions.parent && windowManager.childWindows.length > 0) {
+                    windowManager.childWindows.forEach(window => {
+                        window.webContents.send('reconnect', options);
+                    });
+                }
+            });
+
+            ipcMain.on('get-data', (event, widget) => {
+                window.webContents.send('get-data-' + widget);
+            });
+
+            ipcMain.on('recieve-data', (event, msg) => {
+                const { widget, data } = msg;
+                windowManager.childWindows.forEach(window => {
+                    window.webContents.send('recieve-data-' + widget, data);
+                });
             });
         } catch (err) {
             log.error(err);

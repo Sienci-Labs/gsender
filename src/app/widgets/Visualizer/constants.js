@@ -84,8 +84,7 @@ export const LIGHT_THEME_VALUES = {
 
 export const DARK_THEME = 'Dark';
 export const LIGHT_THEME = 'Light';
-export const CUST_DARK_THEME = 'Custom Dark';
-export const CUST_LIGHT_THEME = 'Custom Light';
+export const CUST_THEME = 'Custom';
 
 export const BACKGROUND_PART = 'Background';
 export const GRID_PART = 'Grid';

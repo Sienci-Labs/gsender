@@ -151,7 +151,7 @@ const Events = ({ active }) => {
             endEvent && setEndEnabled(endEvent.enabled);
         } catch (e) {
             Toaster.pop({
-                msg: 'Unable to fetch program event records',
+                msg: 'Unable to fetch Start/Stop event records',
                 type: TOASTER_DANGER
             });
         }

@@ -9,12 +9,6 @@
     "{{pageLength}} per page": "{{pageLength}} per page",
     "Command succeeded": "Command succeeded",
     "Command failed ({{err}})": "Command failed ({{err}})",
-    "Cycle Start": "Cycle Start",
-    "Feedhold": "Feedhold",
-    "Homing": "Homing",
-    "Sleep": "Sleep",
-    "Unlock": "Unlock",
-    "Reset": "Reset",
     "Authentication failed.": "Authentication failed.",
     "Error": "Error",
     "Sign in to {{name}}": "Sign in to {{name}}",
@@ -303,7 +297,6 @@
     "File folder": "File folder",
     "{{extname}} File": "{{extname}} File",
     "File": "File",
-    "3D rendering": "3D rendering",
     "Top View": "Top View",
     "Front View": "Front View",
     "Right Side View": "Right Side View",
@@ -332,5 +325,7 @@
     "Server Connection Lost": "Server Connection Lost",
     "It looks like the server connection has been lost - attempt to reconnect?": "It looks like the server connection has been lost - attempt to reconnect?",
     "Attempt Reconnect": "Attempt Reconnect",
-    "Click \"Resume\" to continue execution.": "Click \"Resume\" to continue execution."
+    "Click \"Resume\" to continue execution.": "Click \"Resume\" to continue execution.",
+    "Rendering": "Rendering",
+    "Please turn your device to landscape for the best experience, or click to continue.": "Please turn your device to landscape for the best experience, or click to continue."
 }

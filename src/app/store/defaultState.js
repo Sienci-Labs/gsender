@@ -28,7 +28,7 @@ import {
     SPINDLE_MODE,
     SPIRAL_MOVEMENT,
     START_POSITION_BACK_LEFT,
-    SPINDLE_MODES
+    SPINDLE_MODES,
 } from 'app/constants';
 import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 
@@ -46,6 +46,12 @@ const defaultState = {
         units: METRIC_UNITS,
         reverseWidgets: false,
         safeRetractHeight: 0,
+        customDecimalPlaces: 0,
+        jobsFinished: 0,
+        jobsCancelled: 0,
+        timeSpentRunning: 0,
+        longestTimeRun: 0,
+        jobTimes: [],
         toolChangeOption: 'Ignore',
         toolChangeHooks: {
             preHook: '',
@@ -274,6 +280,10 @@ const defaultState = {
             retractionDistance: {
                 mm: 4,
                 in: 0.15
+            },
+            zProbeDistance: {
+                mm: 30,
+                in: 1.5
             },
             touchPlateHeight: 10,
             probeType: 'Auto',

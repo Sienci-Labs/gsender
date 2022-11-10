@@ -34,17 +34,93 @@ import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app
 import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
-import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
-import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY } from 'app/constants';
+import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
+import { isLaserMode } from 'app/lib/laserMode';
+import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
+import isElectron from 'is-electron';
 
 
 export function* initialize() {
     let visualizeWorker = null;
     let estimateWorker = null;
+    let currentState = GRBL_ACTIVE_STATE_IDLE;
+    let prevState = GRBL_ACTIVE_STATE_IDLE;
+    let areStatsInitialized = false;
+
     /* Health check - every 3 minutes */
     setInterval(() => {
         controller.healthCheck();
     }, 1000 * 60 * 3);
+
+    const incrementJobCounter = () => {
+        let jobsFinished = store.get('workspace.jobsFinished');
+        jobsFinished++;
+        store.set('workspace.jobsFinished', jobsFinished);
+    };
+
+    const addToCancelledCounter = (isAdd) => {
+        let jobsCancelled = store.get('workspace.jobsCancelled');
+        if (isAdd) {
+            jobsCancelled++;
+        } else {
+            jobsCancelled--;
+        }
+        store.set('workspace.jobsCancelled', jobsCancelled);
+    };
+
+    const incrementTimeRun = (elapsedTime) => {
+        // add elapsed time to total time run
+        let timeSpentRunning = store.get('workspace.timeSpentRunning');
+        timeSpentRunning += elapsedTime;
+        store.set('workspace.timeSpentRunning', timeSpentRunning);
+
+        // also add it to last element in array of job times
+        let jobTimes = store.get('workspace.jobTimes');
+        jobTimes[jobTimes.length - 1] += elapsedTime;
+        store.set('workspace.jobTimes', jobTimes);
+
+        // compare last element to the longest time
+        compareLongestTime(jobTimes[jobTimes.length - 1]);
+    };
+
+    const compareLongestTime = (time) => {
+        let longestTimeRun = store.get('workspace.longestTimeRun');
+        if (time > longestTimeRun) {
+            store.set('workspace.longestTimeRun', time);
+        }
+    };
+
+    const onJobStart = () => {
+        // increment cancelled jobs
+        addToCancelledCounter(true);
+
+        // add another index to array of job times
+        let jobTimes = store.get('workspace.jobTimes');
+        jobTimes.push(0);
+        store.set('workspace.jobTimes', jobTimes);
+    };
+
+    const onJobStop = (elapsedTime) => {
+        if (!areStatsInitialized) {
+            onJobStart();
+            areStatsInitialized = true;
+        }
+        incrementTimeRun(elapsedTime);
+    };
+
+    const onJobEnd = (elapsedTime) => {
+        if (!areStatsInitialized) {
+            onJobStart();
+            areStatsInitialized = true;
+        }
+        // decrement cancelled jobs
+        addToCancelledCounter(false);
+        incrementJobCounter();
+        onJobStop(elapsedTime);
+
+        // reset to false since it's the end of the job
+        areStatsInitialized = false;
+    };
 
     controller.addListener('controller:settings', (type, settings) => {
         reduxStore.dispatch({
@@ -54,6 +130,11 @@ export function* initialize() {
     });
 
     controller.addListener('controller:state', (type, state) => {
+        // if state is the same, don't update the prev and current state
+        if (currentState !== state.status.activeState) {
+            prevState = currentState;
+            currentState = state.status.activeState;
+        }
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_STATE,
             payload: { type, state }
@@ -68,6 +149,14 @@ export function* initialize() {
     });
 
     controller.addListener('sender:status', (status) => {
+        // finished job
+        if (status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) {
+            onJobEnd(status.timeRunning);
+        // cancelled job
+        } else if (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD) {
+            onJobStop(status.timeRunning);
+        }
+
         try {
             reduxStore.dispatch({
                 type: controllerActions.UPDATE_SENDER_STATUS,
@@ -86,6 +175,10 @@ export function* initialize() {
     });
 
     controller.addListener('serialport:open', (options) => {
+        if (isElectron()) {
+            window.ipcRenderer.send('reconnect-main', options);
+        }
+
         const machineProfile = store.get('workspace.machineProfile');
         const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
         // Reset homing run flag to prevent rapid position without running homing
@@ -112,6 +205,8 @@ export function* initialize() {
             type: connectionActions.OPEN_CONNECTION,
             payload: { options }
         });
+
+        pubsub.publish('machine:connected');
     });
 
     controller.addListener('serialport:close', (options) => {
@@ -123,6 +218,8 @@ export function* initialize() {
             type: connectionActions.CLOSE_CONNECTION,
             payload: { options }
         });
+
+        pubsub.publish('machine:disconnected');
     });
 
     controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts) => {
@@ -169,6 +266,7 @@ export function* initialize() {
     });
 
     controller.addListener('file:load', (content, size, name, visualizer) => {
+        const isLaser = isLaserMode();
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch({
                 type: fileActions.UPDATE_FILE_RENDER_STATE,
@@ -178,13 +276,15 @@ export function* initialize() {
             });
 
             const needsVisualization = shouldVisualize();
+            const shouldRenderSVG = shouldVisualizeSVG();
 
             if (needsVisualization) {
                 visualizeWorker = new VisualizeWorker();
                 visualizeWorker.onmessage = visualizeResponse;
                 visualizeWorker.postMessage({
                     content,
-                    visualizer
+                    visualizer,
+                    shouldRenderSVG
                 });
             } else {
                 reduxStore.dispatch({
@@ -235,13 +335,16 @@ export function* initialize() {
         });
 
         const needsVisualization = shouldVisualize();
+        const shouldRenderSVG = shouldVisualizeSVG();
 
         if (needsVisualization) {
             visualizeWorker = new VisualizeWorker();
             visualizeWorker.onmessage = visualizeResponse;
             visualizeWorker.postMessage({
                 content,
-                visualizer
+                visualizer,
+                isLaser,
+                shouldRenderSVG
             });
         } else {
             reduxStore.dispatch({
@@ -258,6 +361,10 @@ export function* initialize() {
             type: fileActions.UNLOAD_FILE_INFO,
             payload: {}
         });
+    });
+
+    controller.addListener('electronErrors:errorList', (errorList) => {
+        store.set('electron-error-list', errorList);
     });
 
     // Need this to handle unload when machine not connected since controller event isn't sent
@@ -335,6 +442,7 @@ export function* initialize() {
                 homingFlag: flag
             }
         });
+        pubsub.publish('softlimits:check');
     });
 
     controller.addListener('toolchange:tool', (tool) => {
@@ -348,6 +456,18 @@ export function* initialize() {
 
     controller.addListener('grbl:iSready', (status) => {
         pubsub.publish('grblExists:update', status);
+    });
+
+    controller.addListener('error', (error) => {
+        try {
+            if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
+                window.ipcRenderer.send('logError:electron', error);
+            } else {
+                console.log(error.message);
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
     });
 
     yield null;

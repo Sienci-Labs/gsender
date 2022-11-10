@@ -76,7 +76,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
 
     return (
         <>
-            <div style={{ overflowY: 'hidden' }}>
+            <div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 13fr', alignItems: 'center', margin: '0 0 0.5rem' }}>
                     <i className={classnames(icon, styles.profileItemIcon)} />
                     <input
@@ -87,7 +87,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
                         onBlur={handleEditName}
                     />
                 </div>
-                <div style={{ overflowY: 'auto', height: '90%', backgroundColor: 'white' }}>
+                <div style={{ overflowY: 'auto', height: '435px', backgroundColor: 'white' }}>
                     <ShortcutsTable
                         onEdit={handleEdit}
                         onDelete={handleDelete}

@@ -24,6 +24,7 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import _ from 'lodash';
+import pubsub from 'pubsub-js';
 import store from 'app/store';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
@@ -47,6 +48,15 @@ export default class JoggingPresets extends Component {
         });
     }, 5000, { trailing: false });
 
+    componentDidMount() {
+        pubsub.subscribe('units:change', (msg, units) => {
+            this.updateState(units);
+        });
+    }
+
+    componentWillUnmount() {
+        pubsub.unsubscribe('units:change');
+    }
 
     getJogSpeeds() {
         const jog = store.get('widgets.axes.jog', {});
@@ -61,8 +71,8 @@ export default class JoggingPresets extends Component {
         });
     }
 
-    updateState = () => {
-        const units = store.get('workspace.units');
+    updateState = (unit) => {
+        const units = unit || store.get('workspace.units');
 
         const jogSpeeds = this.getJogSpeeds();
         // force update
@@ -114,29 +124,35 @@ export default class JoggingPresets extends Component {
     }
 
     handleXYChange = (e) => {
+        // if empty input, do nothing
+        if (e.target.value === '') {
+            return;
+        }
+
         let value = Number(e.target.value);
         const { units, selectedPreset, jogSpeeds } = this.state;
 
         const currentPreset = jogSpeeds[selectedPreset];
 
-        if (!value) {
-            return;
-        }
+        const maxMM = 9000;
+        const minMM = 0.01;
+        const maxIN = 354;
+        const minIN = 0.001;
 
         if (units === 'mm') {
-            if (value > 1000) {
-                value = 1000;
+            if (value >= maxMM) {
+                value = maxMM;
+            } else if (value <= minMM) {
+                value = minMM;
             }
         }
 
         if (units === 'in') {
-            if (value > 40) {
-                value = 40;
+            if (value >= maxIN) {
+                value = maxIN;
+            } else if (value <= minIN) {
+                value = minIN;
             }
-        }
-
-        if (value <= 0) {
-            value = 1;
         }
 
         const metricValue = units === 'mm' ? value : convertToMetric(value);
@@ -163,25 +179,34 @@ export default class JoggingPresets extends Component {
     }
 
     handleZChange = (e) => {
+        if (e.target.value === '') {
+            return;
+        }
+
         let value = Number(e.target.value);
         const { units, selectedPreset, jogSpeeds } = this.state;
 
         const currentPreset = jogSpeeds[selectedPreset];
 
+        const maxMM = 9000;
+        const minMM = 0.01;
+        const maxIN = 354;
+        const minIN = 0.001;
+
         if (units === 'mm') {
-            if (value > 100) {
-                value = 100;
+            if (value >= maxMM) {
+                value = maxMM;
+            } else if (value <= minMM) {
+                value = minMM;
             }
         }
 
         if (units === 'in') {
-            if (value > 4) {
-                value = 4;
+            if (value >= maxIN) {
+                value = maxIN;
+            } else if (value <= minIN) {
+                value = minIN;
             }
-        }
-
-        if (value <= 0) {
-            value = 1;
         }
 
         const metricValue = units === 'mm' ? value : convertToMetric(value);
@@ -208,24 +233,33 @@ export default class JoggingPresets extends Component {
     }
 
     handleSpeedChange = (e) => {
+        if (e.target.value === '') {
+            return;
+        }
+
         let value = Number(e.target.value);
         const { units, selectedPreset, jogSpeeds } = this.state;
         const currentPreset = jogSpeeds[selectedPreset];
 
+        const maxMM = 90000;
+        const minMM = 50;
+        const maxIN = 3543;
+        const minIN = 2;
+
         if (units === 'mm') {
-            if (value >= 50000.1) {
-                return;
+            if (value >= maxMM) {
+                value = maxMM;
+            } else if (value <= minMM) {
+                value = minMM;
             }
         }
 
         if (units === 'in') {
-            if (value >= 2000.1) {
-                return;
+            if (value >= maxIN) {
+                value = maxIN;
+            } else if (value <= minIN) {
+                value = minIN;
             }
-        }
-
-        if (value <= 0) {
-            return;
         }
 
         const metricValue = units === 'mm' ? value : convertToMetric(value);

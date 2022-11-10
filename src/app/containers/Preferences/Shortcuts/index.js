@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 import TabbedWidget from 'app/components/TabbedWidget';
+import ReactToPrint from 'react-to-print';
+import { Button } from 'react-bootstrap';
+import ShortcutTable from './ShortcutTable';
 
 import KeyboardShortcuts from './Keyboard';
 import Gamepad from './Gamepad';
@@ -25,10 +28,17 @@ const tabs = [
 
 const Shortcuts = ({ active }) => {
     const [tab, setTab] = useState(0);
-
+    const componentRef = useRef();
     return (
         <SettingWrapper title="Shortcuts" show={active}>
             <TabbedWidget>
+                <ReactToPrint
+                    trigger={() => {
+                        return <Button>Print</Button>;
+                    }}
+                    content={() => componentRef.current}
+                />
+                <ShortcutTable forwardRef={componentRef} />
                 <TabbedWidget.Tabs
                     tabs={tabs}
                     activeTabIndex={tab}
@@ -37,16 +47,17 @@ const Shortcuts = ({ active }) => {
                 />
                 <TabbedWidget.Content>
                     <div className={styles.container}>
-                        {
-                            tabs.map((t, index) => {
-                                const active = index === tab;
-                                return (
-                                    <TabbedWidget.ChildComponent key={t.id} active={active}>
-                                        {active && t.component}
-                                    </TabbedWidget.ChildComponent>
-                                );
-                            })
-                        }
+                        {tabs.map((t, index) => {
+                            const active = index === tab;
+                            return (
+                                <TabbedWidget.ChildComponent
+                                    key={t.id}
+                                    active={active}
+                                >
+                                    {active && t.component}
+                                </TabbedWidget.ChildComponent>
+                            );
+                        })}
                     </div>
                 </TabbedWidget.Content>
             </TabbedWidget>
