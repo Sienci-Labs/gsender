@@ -22,7 +22,7 @@
  */
 
 import '@babel/polyfill';
-import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen } from 'electron';
+import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -83,6 +83,7 @@ const main = () => {
 
     app.whenReady().then(async () => {
         try {
+            session.defaultSession.clearCache();
             windowManager = new WindowManager();
             // Create and show splash before server starts
             const splashScreen = windowManager.createSplashScreen({
