@@ -125,7 +125,9 @@ class Visualizer extends Component {
     node = null;
 
     fileLoaded = false;
+
     machineConnected = false;
+
     showSoftLimitsWarning = this.visualizerConfig.get('showSoftLimitsWarning');
 
     setRef = (node) => {
@@ -569,8 +571,8 @@ class Visualizer extends Component {
         const { currentTheme } = this.props.state;
         const { xAxisColor, yAxisColor, zAxisColor } = currentTheme;
 
-        const unitGroup = units === IMPERIAL_UNITS ?
-            this.group.getObjectByName('ImperialCoordinateSystem')
+        const unitGroup = units === IMPERIAL_UNITS
+            ? this.group.getObjectByName('ImperialCoordinateSystem')
             : this.group.getObjectByName('MetricCoordinateSystem');
 
         unitGroup.remove(unitGroup.getObjectByName('xAxis'));
@@ -629,8 +631,8 @@ class Visualizer extends Component {
         const { currentTheme } = this.props.state;
         const { xAxisColor, yAxisColor } = currentTheme;
 
-        const unitGroup = units === IMPERIAL_UNITS ?
-            this.group.getObjectByName('ImperialGridLineNumbers')
+        const unitGroup = units === IMPERIAL_UNITS
+            ? this.group.getObjectByName('ImperialGridLineNumbers')
             : this.group.getObjectByName('MetricGridLineNumbers');
 
         for (let i = -gridCount; i <= gridCount; ++i) {
@@ -1492,10 +1494,14 @@ class Visualizer extends Component {
             2 bottom right
             3 bottom left
         */
-        let xMultiplier = -1;
-        let yMultiplier = -1;
+        let xMultiplier = 1;
+        let yMultiplier = 1;
         if (homingFlag) {
             switch (machineCorner) {
+            case 0:
+                xMultiplier = -1;
+                yMultiplier = -1;
+                break;
             case 1:
                 xMultiplier = 1;
                 yMultiplier = -1;
@@ -1508,8 +1514,6 @@ class Visualizer extends Component {
                 xMultiplier = 1;
                 yMultiplier = 1;
                 break;
-            // case 0 and default are negative space, which is already assigned
-            case 0:
             default:
                 break;
             }
@@ -1533,30 +1537,29 @@ class Visualizer extends Component {
         let origin = {
             x: parseFloat(mpos.x) - parseFloat(wpos.x) * xMultiplier,
             y: parseFloat(mpos.y) - parseFloat(wpos.y) * yMultiplier,
-            z: parseFloat(mpos.z) - parseFloat(wpos.z)
+            z: parseFloat(mpos.z) - parseFloat(wpos.z) * -1,
         };
-
         let limitsMax = {
             x: softXMax * xMultiplier - origin.x,
             y: softYMax * yMultiplier - origin.y,
             z: softZMax - origin.z,
         };
 
-        let limitsMin = {
-            x: origin.x * -1,
-            y: origin.y * -1,
-            z: origin.z,
-        };
+        // let limitsMin = {
+        //     x: origin.x === 0 ? origin.x : origin.x * -1,
+        //     y: origin.y === 0 ? origin.y : origin.y * -1,
+        //     z: origin.z,
+        // };
 
         // get bbox
         let bbox = reduxStore.getState().file.bbox;
-        let bboxMin = bbox.min;
+        // let bboxMin = bbox.min;
         let bboxMax = bbox.max;
 
         // check if machine will leave soft limits
-        if (bboxMax.x > limitsMax.x || bboxMin.x < limitsMin.x ||
-            bboxMax.y > limitsMax.y || bboxMin.y < limitsMin.y ||
-            (bboxMax.z === null ? false : bboxMax.z > limitsMax.z) || (bboxMin.z === null ? false : bboxMin.z < limitsMin.z)) {
+        if (bboxMax.x > limitsMax.x ||
+            bboxMax.y > limitsMax.y ||
+            bboxMax.z > limitsMax.z) {
             pubsub.publish('softlimits:warning');
         } else {
             pubsub.publish('softlimits:ok');
