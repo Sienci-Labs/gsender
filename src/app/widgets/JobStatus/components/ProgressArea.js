@@ -92,6 +92,10 @@ const ProgressArea = ({ state }) => {
         return formattedTime;
     };
 
+    const updateTime = () => {
+        return getLocalTime(remainingTime).toString();
+    };
+
     // eslint-disable-next-line no-restricted-globals
     const percentageValue = isNaN(((received / total) * 100).toFixed(0)) ? 0 : ((received / total) * 100).toFixed(0);
 
@@ -108,7 +112,7 @@ const ProgressArea = ({ state }) => {
                     <GaugeChart color="#3e85c7" value={percentageValue} />
                     <div className={styles.progressItem}>
                         <Tooltip
-                            content={getLocalTime(remainingTime).toString()}
+                            content={updateTime}
                             hideOnClick
                         >
                             <span className={styles.progressItemTime}>{outputFormattedTime(remainingTime)}</span>
