@@ -36,8 +36,14 @@ class NavbarConnection extends PureComponent {
         connected: PropTypes.bool
     };
 
+    constructor() {
+        super();
+        this.displayDropdown = this.displayDropdown.bind(this);
+    }
+
     state = {
-        mobile: false
+        mobile: false,
+        isActive: false
     }
 
     componentDidMount() {
@@ -106,14 +112,22 @@ class NavbarConnection extends PureComponent {
         return 'icon-disconnected';
     }
 
+    displayDropdown() {
+        const { mobile, isActive } = this.state;
+        if (mobile) {
+            this.setState({ isActive: !isActive });
+        }
+    }
+
     render() {
         const { state, actions } = this.props;
         const { connected, ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
+        const { isActive } = this.state;
         const iconState = this.getIconState(connected, connecting, alertMessage);
         const isMobile = window.visualViewport.width / window.visualViewport.height <= 0.5625;
 
         return (
-            <div className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection} onMouseEnter={actions.handleRefreshPorts} onMouseLeave={actions.hideUnrecognizedDevices}>
+            <div className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection} role="button" tabIndex={0} onClick={this.displayDropdown} onMouseEnter={actions.handleRefreshPorts} onMouseLeave={actions.hideUnrecognizedDevices} onTouchEnd={actions.handleRefreshPorts}>
                 <div className={`${styles.NavbarConnectionIcon} ${styles[iconState]}`}>
                     <i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />
                 </div>
@@ -139,7 +153,7 @@ class NavbarConnection extends PureComponent {
 
                     )
                 }
-                <div className={styles.NavbarConnectionDropdownList}>
+                <div style={isMobile ? { display: isActive ? 'block' : 'none' } : null} className={styles.NavbarConnectionDropdownList}>
                     {
                         !connected && <h5>Recognized Devices</h5>
                     }
