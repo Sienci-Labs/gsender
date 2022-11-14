@@ -909,7 +909,7 @@ class AxesWidget extends PureComponent {
 
             const gamepadProfiles = store.get('workspace.gamepad.profiles', []);
 
-            const hasProfile = gamepadProfiles.find(profile => profile.id === detail.gamepad.id);
+            const hasProfile = gamepadProfiles.find(profile => profile.id.includes(detail.gamepad.id));
 
             if (!hasProfile) {
                 return;

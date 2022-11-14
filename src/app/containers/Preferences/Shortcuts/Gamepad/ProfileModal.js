@@ -43,7 +43,7 @@ const ProfileModal = ({ onClose, onAdd }) => {
     const checkIfIsAvailable = (gamepad) => {
         const { profiles = [] } = store.get('workspace.gamepad');
 
-        const profileAlreadyExists = profiles.find(profile => profile.id === gamepad.id);
+        const profileAlreadyExists = profiles.find(profile => profile.id.includes(gamepad.id));
 
         return profileAlreadyExists ? UNAVAILABLE : AVAILABLE;
     };
@@ -54,7 +54,7 @@ const ProfileModal = ({ onClose, onAdd }) => {
 
         const newProfiles = [
             {
-                id: gamepadInfo.id,
+                id: [gamepadInfo.id],
                 active: true,
                 profileName: customProfileName || gamepadInfo.id,
                 shortcuts: commandKeys.map((keyData) => ({ ...keyData, keys: '', command: keyData.cmd })),
@@ -113,14 +113,14 @@ const ProfileModal = ({ onClose, onAdd }) => {
 
                 <Input
                     onChange={(e) => setCustomProfileName(e.target.value)}
-                    additionalProps={{ placeholder: 'Enter a Custom Profile Name Here...', disabled: availabilityType === UNAVAILABLE }}
+                    additionalProps={{ placeholder: 'Enter a Custom Profile Name Here...', disabled: availabilityType !== AVAILABLE }}
                     className={availabilityType === AVAILABLE ? styles.customProfileName : styles.customProfileNameHidden}
                     isNumber={false}
                 />
 
                 <Button
                     primary
-                    disabled={availabilityType === UNAVAILABLE}
+                    disabled={availabilityType !== AVAILABLE}
                     onClick={handleAddProfile}
                     style={{ margin: 0 }}
                 >

@@ -36,7 +36,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
         const { gamepad: currentGamepad } = detail;
         const { id, buttons } = currentGamepad;
 
-        if (profile.id !== id) {
+        if (!profile.id.includes(id)) {
             return;
         }
 
@@ -50,7 +50,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
         }
 
         const profiles = store.get('workspace.gamepad.profiles', []);
-        const currentProfile = profiles.find(profile => profile.id === id);
+        const currentProfile = profiles.find(profile => profile.id.includes(id));
 
         const comboKeys = shortcutComboBuilder(clickedButtons.map(shortcut => shortcut.buttonIndex));
 
@@ -85,7 +85,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const cleanedProfiles =
-            profiles.map(currentProfile => (currentProfile.id === profile.id ? ({ ...profile, shortcuts: newShortcutsArr }) : currentProfile));
+            profiles.map(currentProfile => (currentProfile.id.includes(profile.id) ? ({ ...profile, shortcuts: newShortcutsArr }) : currentProfile));
 
         onUpdateProfiles(cleanedProfiles);
 

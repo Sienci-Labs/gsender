@@ -16,11 +16,11 @@ const Gamepad = () => {
     const [showAddProfile, setShowAddProfile] = useState(false);
 
     const handleProfileClick = (id) => {
-        setCurrentProfileID(id);
+        setCurrentProfileID(id[0]); //Can just grab one of the ids in the array for computing the profile information below
     };
 
     const handleProfileDelete = (id) => {
-        const filteredProfiles = profiles.filter(profile => profile.id !== id);
+        const filteredProfiles = profiles.filter(profile => !profile.id.includes(id));
 
         setProfiles(filteredProfiles);
         setCurrentProfileID(null);
@@ -45,12 +45,12 @@ const Gamepad = () => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (currentProfile.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
+            profiles.map(profile => (profile.id.includes(currentProfile.id) ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
 
         handleUpdateProfiles(updatedProfiles);
     };
 
-    const currentProfile = useMemo(() => profiles.find(profile => profile.id === currentProfileID), [currentProfileID, profiles]);
+    const currentProfile = useMemo(() => profiles.find(profile => profile.id.includes(currentProfileID)), [currentProfileID, profiles]);
 
     const allShortcutsEnabled = currentProfile?.shortcuts?.every(shortcut => shortcut.isActive);
     const allShortcutsDisabled = currentProfile?.shortcuts?.every(shortcut => !shortcut.isActive);

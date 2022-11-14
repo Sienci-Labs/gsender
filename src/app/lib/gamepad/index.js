@@ -79,7 +79,7 @@ export const onGamepadButtonClick = ({ detail }) => {
     const gamepadID = gamepad.id;
 
     const profiles = store.get('workspace.gamepad.profiles', []);
-    const currentProfile = profiles.find(profile => profile.id === gamepadID);
+    const currentProfile = profiles.find(profile => profile.id.includes(gamepadID));
 
     if (!currentProfile) {
         return null;
@@ -126,7 +126,7 @@ gamepadInstance.on('gamepad:connected', throttle(({ detail }) => {
 
     const profiles = store.get('workspace.gamepad.profiles');
 
-    const foundGamepad = profiles.find(profile => profile.id === gamepad.id);
+    const foundGamepad = profiles.find(profile => profile.id.includes(gamepad.id));
 
     Toaster.pop({
         msg: foundGamepad ? `${foundGamepad.profileName} Connected` : 'New gamepad connected, add it as a profile in your preferences',
