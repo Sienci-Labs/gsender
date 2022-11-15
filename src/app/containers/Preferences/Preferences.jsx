@@ -44,7 +44,7 @@ import styles from './index.styl';
 import { METRIC_UNITS, WORKFLOW_STATE_RUNNING } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 import {
-    CUST_THEME, DARK_THEME_VALUES,
+    DARK_THEME_VALUES,
     BACKGROUND_PART, GRID_PART, XAXIS_PART, YAXIS_PART, ZAXIS_PART,
     LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART
 } from '../../widgets/Visualizer/constants';
@@ -558,7 +558,7 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('theme:change', theme.value);
             },
-            handleCustThemeChange: (themeColours) => {
+            handleCustThemeChange: (themeColours, theme) => {
                 const { visualizer } = this.state;
                 const parts = [
                     BACKGROUND_PART,
@@ -577,15 +577,15 @@ class PreferencesPage extends PureComponent {
                     if (value === G1_PART) {
                         label = 'G1-3';
                     }
-                    return this.visualizerConfig.set(CUST_THEME + ' ' + label, themeColours.get(value));
+                    return this.visualizerConfig.set(theme + ' ' + label, themeColours.get(value));
                 });
                 this.setState({
                     visualizer: {
                         ...visualizer,
-                        theme: CUST_THEME,
+                        theme: theme,
                     }
                 });
-                pubsub.publish('theme:change', CUST_THEME);
+                pubsub.publish('theme:change', theme);
             },
             handleChangeComplete: (color, part) => {
                 const { visualizer } = this.state;
@@ -639,8 +639,8 @@ class PreferencesPage extends PureComponent {
                 }
                 return defaultColour;
             },
-            getCurrentColor: (part, defaultColour) => {
-                return this.visualizerConfig.get(CUST_THEME + ' ' + part, defaultColour);
+            getCurrentColor: (theme, part, defaultColour) => {
+                return this.visualizerConfig.get(theme + ' ' + part, defaultColour);
             },
             handleVisEnabledToggle: (liteMode = false) => {
                 const { visualizer } = this.state;

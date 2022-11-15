@@ -85,6 +85,18 @@ export const LIGHT_THEME_VALUES = {
 export const DARK_THEME = 'Dark';
 export const LIGHT_THEME = 'Light';
 export const CUST_THEME = 'Custom';
+export const LASER_THEME = 'Laser';
+
+export const ALL_THEMES = [
+    DARK_THEME,
+    LIGHT_THEME,
+    CUST_THEME,
+    LASER_THEME
+];
+export const CUSTOMIZABLE_THEMES = [
+    CUST_THEME,
+    LASER_THEME
+];
 
 export const BACKGROUND_PART = 'Background';
 export const GRID_PART = 'Grid';
