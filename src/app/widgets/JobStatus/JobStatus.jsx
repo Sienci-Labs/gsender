@@ -135,7 +135,7 @@ class JobStatus extends PureComponent {
                             )
                             : (<div className={styles['file-name']}><span className={styles['file-text']}>No File Loaded</span></div>)}
                 </div>
-                {this.state.isChecked
+                {this.state.isChecked && state.senderStatus
                     ? <Overrides state={state} />
                     : <IdleInfo state={state} />
                 }
