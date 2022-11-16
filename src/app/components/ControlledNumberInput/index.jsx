@@ -53,6 +53,7 @@ const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnC
             inputRef.current.blur();
         } else if (e.key === 'Enter') {
             onChange(e);
+            inputRef.current.blur();
         }
     };
 
