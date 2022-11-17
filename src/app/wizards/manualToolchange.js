@@ -127,7 +127,7 @@ const wizard = {
                                 controller.command('gcode', [
                                     '(Setting Z 0)',
                                     `${prefUnit} G10 L20 P0 Z0`,
-                                    'G21'
+                                    'G21'sx
                                 ]);
                             }
                         },

@@ -61,7 +61,7 @@ const wizard = {
                                 const { zThickness } = probeProfile;
                                 controller.command('gcode', [
                                     '%wait',
-                                    `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
+                                    `%global.toolchange.PROBE_THICKNESS_MM=${zThickness.mm}`,
                                     '%global.toolchange.PROBE_DISTANCE=80',
                                     '%global.toolchange.PROBE_FEEDRATE=200',
                                     '%global.toolchange.XPOS=posx',
@@ -147,11 +147,10 @@ const wizard = {
                         {
                             label: 'Probe New Tool Length',
                             cb: () => {
-                                const unit = getUnitModal();
                                 controller.command('gcode', [
                                     '(Moving back to configured location)',
-                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                                    'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
+                                    'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G90 G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
                                     '(This is 10 above configured location)',
                                     'G53 G0 Z[global.toolchange.PROBE_POS_Z + 10]',
                                     'G91 G21',
@@ -160,7 +159,7 @@ const wizard = {
                                     'G38.2 Z-10 F40',
                                     'G4 P0.3',
                                     '(Set Z to Tool offset and wait)',
-                                    `${unit} G10 L20 Z[global.toolchange.TOOL_OFFSET]`,
+                                    'G10 L20 Z[global.toolchange.TOOL_OFFSET]',
                                     '(Set Z to Tool offset and wait)',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
                                     'G21 G91',

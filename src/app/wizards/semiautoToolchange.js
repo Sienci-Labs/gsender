@@ -138,7 +138,6 @@ const wizard = {
                         {
                             label: 'Probe New Tool Length',
                             cb: () => {
-                                const unit = getUnitModal();
                                 controller.command('gcode', [
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
@@ -146,7 +145,7 @@ const wizard = {
                                     'G38.2 Z-10 F40',
                                     'G4 P0.3',
                                     '(Set Z to Tool offset and wait)',
-                                    `${unit} G10 L20 Z[global.toolchange.TOOL_OFFSET]`,
+                                    'G10 L20 Z[global.toolchange.TOOL_OFFSET]',
                                     '(Set Z to Tool offset and wait)',
                                     'G21 G91 Z10',
                                 ]);
