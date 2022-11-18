@@ -33,10 +33,19 @@ const CustomPieChart = ({ propsData }) => {
     return (
         <div data-tip="" data-for="chart">
             <PieChart
-                label={({ dataEntry }) => Math.round(dataEntry.percentage) + '%'}
+                label={({ dataEntry }) => {
+                    const rounded = Math.round(dataEntry.percentage * 100) / 100;
+                    if (rounded === 100) {
+                        return rounded + '% ';
+                    } else if (rounded === 0) {
+                        return '';
+                    } else {
+                        return rounded + '%';
+                    }
+                }}
                 labelStyle={defaultLabelStyle}
                 data={data}
-                radius={45}
+                radius={40}
                 segmentsStyle={{ transition: 'stroke .3s', cursor: 'pointer' }}
                 segmentsShift={(index) => (index === selected ? 6 : 1)}
                 onClick={(event, index) => {
