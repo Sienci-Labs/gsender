@@ -254,7 +254,6 @@ class GrblController {
                     }
                     if (line === PAUSE_START) {
                         log.debug('Found M0/M1, pausing program');
-                        this.feeder.hold({ data: '%m0m1_pause', comment: commentString });
                         this.emit('sender:M0M1', { data: 'M0/M1', comment: commentString });
                         return 'G4 P0.5';
                     }
