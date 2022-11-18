@@ -31,6 +31,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
 import reduxStore from 'app/store/redux';
+import { UPDATE_JOB_OVERRIDES } from 'app/actions/visualizerActions';
 import controller from 'app/lib/controller';
 import api from 'app/api';
 import pubsub from 'pubsub-js';
@@ -209,6 +210,7 @@ class WorkflowControl extends PureComponent {
 
         const { received } = senderStatus;
         handleStop();
+        reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         this.setState(prev => ({ runHasStarted: false, startFromLine: { ...prev.startFromLine, value: received } }));
         if (status.activeState === 'Check') {
             controller.command('gcode', '$C');
@@ -234,6 +236,7 @@ class WorkflowControl extends PureComponent {
         }
         this.setState({ fileLoaded: true });
         this.setState({ runHasStarted: true });
+        reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: { isChecked: true, toggleStatus: 'overrides' } });
         const { actions } = this.props;
         actions.onRunClick();
     }
@@ -574,11 +577,13 @@ class WorkflowControl extends PureComponent {
                     )
                 }
                 {
-                    !renderSVG ?
-                        <CameraDisplay
-                            camera={camera}
-                            cameraPosition={cameraPosition}
-                        /> : null
+                    !renderSVG
+                        ? (
+                            <CameraDisplay
+                                camera={camera}
+                                cameraPosition={cameraPosition}
+                            />
+                        ) : null
                 }
             </div>
         );
