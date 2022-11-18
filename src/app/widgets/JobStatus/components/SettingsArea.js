@@ -89,7 +89,7 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
     return (
         <div className={styles['settings-area']}>
             <div className={styles.overrides}>
-                <span className={styles.overrideValue}>{feedrate} {unitString}</span>
+                <span className={styles.overrideValue}>{Math.round(feedrate * 100) / 100} {unitString}</span>
                 <Slider
                     min={5}
                     max={230}
