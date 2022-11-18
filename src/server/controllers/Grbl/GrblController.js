@@ -1344,6 +1344,9 @@ class GrblController {
                     // Fast forward sender to line
                     this.sender.setStartLine(lineToStartFrom);
 
+                    if (startEventEnabled) {
+                        this.event.trigger('gcode:start');
+                    }
                     this.command('gcode', modalGCode);
                 } else if (startEventEnabled) {
                     this.feederCB = () => {
