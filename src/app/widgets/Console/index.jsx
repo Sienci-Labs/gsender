@@ -150,7 +150,6 @@ class ConsoleWidget extends PureComponent {
             }
 
             this.terminal.writeln(data);
-            this.terminal.updateTerminalHistory(data);
         }
     };
 
