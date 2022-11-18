@@ -117,6 +117,7 @@ class JobStatus extends PureComponent {
                                                     className={styles.litetoggle}
                                                     checked={this.state.isChecked}
                                                     size="md"
+                                                    style={{ 'min-width': '10rem' }}
                                                 />
                                             ) : <span />
                                         }
