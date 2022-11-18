@@ -327,7 +327,7 @@ class Header extends PureComponent {
     }
 
     updateScreenSize = () => {
-        let isMobile = window.visualViewport.width < 700;
+        const isMobile = window.visualViewport.width / window.visualViewport.height <= 0.5625;
         this.setState({
             mobile: isMobile
         });
