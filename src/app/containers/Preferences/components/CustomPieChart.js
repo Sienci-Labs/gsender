@@ -35,7 +35,6 @@ const CustomPieChart = ({ propsData }) => {
             <PieChart
                 label={({ dataEntry }) => {
                     const rounded = Math.round(dataEntry.percentage * 100) / 100;
-                    console.log(rounded);
                     if (rounded === 100) {
                         return rounded + '% ';
                     } else if (rounded === 0) {
