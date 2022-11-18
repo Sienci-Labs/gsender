@@ -1404,21 +1404,32 @@ class GrblController {
                 this.command('gcode:pause');
             },
             'gcode:pause': async () => {
-                this.event.trigger('gcode:pause');
-
-                this.workflow.pause();
-                await delay(100);
-                this.write('!');
+                if (this.event.hasEnabledPauseEvent()) {
+                    this.workflow.pause();
+                    this.event.trigger('gcode:pause');
+                } else {
+                    this.workflow.pause();
+                    await delay(100);
+                    this.write('!');
+                }
             },
             'resume': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:resume');
             },
             'gcode:resume': async () => {
-                this.write('~');
-                await delay(1000);
-                this.workflow.resume();
-                this.event.trigger('gcode:resume');
+                if (this.event.hasEnabledResumeEvent()) {
+                    this.feederCB = () => {
+                        this.write('~');
+                        this.workflow.resume();
+                        this.feederCB = null;
+                    };
+                    this.event.trigger('gcode:resume');
+                } else {
+                    this.write('~');
+                    await delay(1000);
+                    this.workflow.resume();
+                }
             },
             'feeder:feed': () => {
                 const [commands, context = {}] = args;

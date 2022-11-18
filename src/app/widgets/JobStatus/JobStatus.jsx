@@ -117,6 +117,7 @@ class JobStatus extends PureComponent {
                                                     className={styles.litetoggle}
                                                     checked={this.state.isChecked}
                                                     size="md"
+                                                    style={{ 'min-width': '10rem' }}
                                                 />
                                             ) : <span />
                                         }
@@ -135,7 +136,7 @@ class JobStatus extends PureComponent {
                             )
                             : (<div className={styles['file-name']}><span className={styles['file-text']}>No File Loaded</span></div>)}
                 </div>
-                {this.state.isChecked
+                {this.state.isChecked && state.senderStatus
                     ? <Overrides state={state} />
                     : <IdleInfo state={state} />
                 }

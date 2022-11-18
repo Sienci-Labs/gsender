@@ -32,10 +32,13 @@ const StatsList = ({ state, actions }) => {
 
     // solution found here: https://stackoverflow.com/a/25279340
     const convertMillisecondsToTimeStamp = (milliseconds) => {
-        let date = new Date(null);
-        date.setSeconds(milliseconds / 1000);
-        let result = date.toISOString().substring(11, 19);
-        return result;
+        if (milliseconds) {
+            let date = new Date(null);
+            date.setSeconds(milliseconds / 1000);
+            let result = date.toISOString().substring(11, 19);
+            return result;
+        }
+        return null;
     };
 
     const timeSpentRunning = convertMillisecondsToTimeStamp(store.get('workspace.timeSpentRunning'));
