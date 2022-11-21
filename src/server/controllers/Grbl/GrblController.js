@@ -1331,6 +1331,7 @@ class GrblController {
                     }
 
                     // Move up and then to cut start position
+                    modalGCode.push(this.event.getStartEventCode());
                     modalGCode.push(`G0 G90 G21 Z${zMax + 10}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
@@ -1341,12 +1342,11 @@ class GrblController {
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
 
+                    console.log(modalGCode);
+
                     // Fast forward sender to line
                     this.sender.setStartLine(lineToStartFrom);
 
-                    if (startEventEnabled) {
-                        this.event.trigger('gcode:start');
-                    }
                     this.command('gcode', modalGCode);
                 } else if (startEventEnabled) {
                     this.feederCB = () => {
