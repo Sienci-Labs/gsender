@@ -1204,7 +1204,7 @@ class Visualizer extends Component {
 
             // add tool
             this.laserPointer = new LaserPointer({
-                color: cuttingCoordinateLines,
+                color: currentTheme.get(CUTTING_PART),
                 diameter: 4
             });
             this.laserPointer.name = 'LaserPointer';
