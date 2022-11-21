@@ -108,26 +108,25 @@ const wizard = {
                         {
                             label: 'Probe Z',
                             cb: () => {
-                                const prefUnit = getUnitModal();
                                 controller.command('gcode', [
                                     '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
                                     'G91',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z5',
                                     'G38.2 Z-10 F40',
-                                    `${prefUnit} G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]`,
-                                    'G21'
+                                    '%wait',
+                                    'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]',
+                                    'G0 G21 Z10'
                                 ]);
                             }
                         },
                         {
                             label: 'Set Z0 at Location',
                             cb: () => {
-                                const prefUnit = getUnitModal();
                                 controller.command('gcode', [
                                     '(Setting Z 0)',
-                                    `${prefUnit} G10 L20 P0 Z0`,
-                                    'G21'sx
+                                    'G10 L20 P0 Z0',
+                                    'G21'
                                 ]);
                             }
                         },

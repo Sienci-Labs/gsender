@@ -45,7 +45,7 @@ import { RED, ALARM_RED } from './variables';
 import History from './History';
 import styles from './index.styl';
 import { addError, addAlarm } from '../../lib/diagnostics';
-import { UPDATE_TERMINAL_HISTORY } from '../../actions/controllerActions';
+//import { UPDATE_TERMINAL_HISTORY } from '../../actions/controllerActions';
 
 const LINES_TO_COPY = 50;
 class TerminalWrapper extends PureComponent {
@@ -261,10 +261,10 @@ class TerminalWrapper extends PureComponent {
             newTerminalInputHistory.shift();
         }
 
-        reduxStore.dispatch({
+        /*reduxStore.dispatch({
             type: UPDATE_TERMINAL_HISTORY,
-            payload: [...newTerminalInputHistory, line]
-        });
+            payload: { line }
+        });*/
 
         this.setState({ terminalInputHistory: [...newTerminalInputHistory, line], terminalInputIndex: newTerminalInputHistory.length + 1 });
     }

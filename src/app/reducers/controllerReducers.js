@@ -222,8 +222,14 @@ const reducer = createReducer(initialState, {
         };
     },
     [UPDATE_TERMINAL_HISTORY]: (payload, reducerState) => {
+        const { terminalHistory } = reducerState;
+
+        terminalHistory.push(payload.line);
+        if (terminalHistory.length > 50) {
+            terminalHistory.shift();
+        }
         return {
-            terminalHistory: payload
+            terminalHistory
         };
     }
 });

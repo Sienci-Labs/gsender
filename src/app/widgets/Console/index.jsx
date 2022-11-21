@@ -142,6 +142,7 @@ class ConsoleWidget extends PureComponent {
             } else {
                 this.terminal.writeln(color.white(this.terminal.prompt + data));
             }
+
             this.terminal.updateTerminalHistory(this.terminal.prompt + data);
         },
         'serialport:read': (data) => {
