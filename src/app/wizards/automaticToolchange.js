@@ -115,7 +115,7 @@ const wizard = {
                                     '(TLO set: [global.toolchange.TOOL_OFFSET])',
                                     'G91',
                                     'G0 Z5',
-                                    'G90',
+                                    'G90 G21',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]'
                                 ]);
                             }
@@ -161,7 +161,7 @@ const wizard = {
                                     '(Set Z to Tool offset and wait)',
                                     'G10 L20 Z[global.toolchange.TOOL_OFFSET]',
                                     '(Set Z to Tool offset and wait)',
-                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+                                    'G53 G21 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
                                     'G21 G91',
                                 ]);
                             }
