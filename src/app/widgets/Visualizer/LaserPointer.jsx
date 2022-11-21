@@ -31,7 +31,7 @@ class LaserPointer {
         const radius = Number(diameter / 2) || 1;
 
         // line
-        const geometryC = new THREE.CylinderGeometry(1, 1, 30, 32);
+        const geometryC = new THREE.CylinderGeometry(0.8, 0.8, 30, 32);
         const materialC = new THREE.MeshBasicMaterial({
             color: 0x80388B,
             opacity: 0.6,
