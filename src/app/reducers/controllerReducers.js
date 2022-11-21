@@ -24,6 +24,7 @@ import { createReducer } from 'redux-action';
 import { ensurePositiveNumber } from 'ensure-type';
 import _get from 'lodash/get';
 import _mapValues from 'lodash/mapValues';
+import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
 import {
     TOOL_CHANGE,
     UPDATE_CONTROLLER_SETTINGS,
@@ -221,8 +222,12 @@ const reducer = createReducer(initialState, {
         };
     },
     [UPDATE_TERMINAL_HISTORY]: (payload, reducerState) => {
+        const newHistory = [...reducerState.terminalHistory, payload];
+        if (reducerState.terminalHistory === MAX_TERMINAL_INPUT_ARRAY_SIZE) {
+            newHistory.shift();
+        }
         return {
-            terminalHistory: payload
+            terminalHistory: newHistory
         };
     }
 });
