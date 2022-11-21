@@ -68,7 +68,7 @@ class TerminalWrapper extends PureComponent {
     };
 
     state = {
-        terminalInputHistory: store.get('workspace.terminal.inputHistory', []), // to store user commands in the terminal
+        terminalInputHistory: store.get('workspace.terminal.inputHistory', []), // to store user input from the terminal
         terminalInputIndex: store.get('workspace.terminal.inputHistory')?.length
     }
 
