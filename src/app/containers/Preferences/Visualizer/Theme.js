@@ -5,9 +5,8 @@ import { useSelector } from 'react-redux';
 
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import {
-    CUSTOMIZABLE_THEMES, ALL_THEMES,
-    BACKGROUND_PART, GRID_PART, XAXIS_PART, YAXIS_PART, ZAXIS_PART,
-    LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART
+    CUSTOMIZABLE_THEMES, ALL_THEMES, PARTS_LIST,
+    G1_PART, CUTTING_PART, JOGGING_PART
 }
 from 'app/widgets/Visualizer/constants';
 import pubsub from 'pubsub-js';
@@ -17,40 +16,16 @@ import ColorCircle from '../components/ColorCircle';
 
 import styles from '../index.styl';
 
-const parts = [
-    BACKGROUND_PART,
-    GRID_PART,
-    XAXIS_PART,
-    YAXIS_PART,
-    ZAXIS_PART,
-    LIMIT_PART,
-    CUTTING_PART,
-    JOGGING_PART,
-    G0_PART,
-    G1_PART
-];
-
 const Theme = ({ state, actions }) => {
     const { theme } = state.visualizer;
     const [isOpen, setIsOpen] = useState(false);
-    const [currentPart, setCurrentPart] = useState(BACKGROUND_PART);
+    const [currentPart, setCurrentPart] = useState(PARTS_LIST[0]);
     const fileLoaded = useSelector(store => store.file.fileLoaded);
 
     const getThemeColours = (theme) => {
-        return (
-            new Map([
-                [BACKGROUND_PART, actions.visualizer.getCurrentColor(theme, BACKGROUND_PART, actions.visualizer.getDefaultColour(BACKGROUND_PART))],
-                [GRID_PART, actions.visualizer.getCurrentColor(theme, GRID_PART, actions.visualizer.getDefaultColour(GRID_PART))],
-                [XAXIS_PART, actions.visualizer.getCurrentColor(theme, XAXIS_PART, actions.visualizer.getDefaultColour(XAXIS_PART))],
-                [YAXIS_PART, actions.visualizer.getCurrentColor(theme, YAXIS_PART, actions.visualizer.getDefaultColour(YAXIS_PART))],
-                [ZAXIS_PART, actions.visualizer.getCurrentColor(theme, ZAXIS_PART, actions.visualizer.getDefaultColour(ZAXIS_PART))],
-                [LIMIT_PART, actions.visualizer.getCurrentColor(theme, LIMIT_PART, actions.visualizer.getDefaultColour(LIMIT_PART))],
-                [CUTTING_PART, actions.visualizer.getCurrentColor(theme, CUTTING_PART, actions.visualizer.getDefaultColour(CUTTING_PART))],
-                [JOGGING_PART, actions.visualizer.getCurrentColor(theme, JOGGING_PART, actions.visualizer.getDefaultColour(JOGGING_PART))],
-                [G0_PART, actions.visualizer.getCurrentColor(theme, G0_PART, actions.visualizer.getDefaultColour(G0_PART))],
-                [G1_PART, actions.visualizer.getCurrentColor(theme, G1_PART, actions.visualizer.getDefaultColour(G1_PART))],
-            ])
-        );
+        let colourMap = new Map();
+        PARTS_LIST.map(part => colourMap.set(part, actions.visualizer.getCurrentColor(theme, part, actions.visualizer.getDefaultColour(part))));
+        return colourMap;
     };
 
     const [themeColours, setThemeColours] = useState(getThemeColours(theme));
@@ -132,7 +107,7 @@ const Theme = ({ state, actions }) => {
                         </Tooltip>
                         <Tooltip content="Click on the colour circles to change the colour for that component" location="default">
                             {
-                                parts.map((value, i) => {
+                                PARTS_LIST.map((value, i) => {
                                     let title = value;
                                     if (title === G1_PART) {
                                         title = 'G1-G3';
