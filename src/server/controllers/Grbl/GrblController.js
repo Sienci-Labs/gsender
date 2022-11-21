@@ -1342,8 +1342,6 @@ class GrblController {
                     modalGCode.push('G4 P1');
                     modalGCode.push('%_GCODE_START');
 
-                    console.log(modalGCode);
-
                     // Fast forward sender to line
                     this.sender.setStartLine(lineToStartFrom);
 
