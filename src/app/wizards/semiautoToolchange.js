@@ -100,8 +100,9 @@ const wizard = {
                                     '(This is 10 above configured location)',
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z5',
-                                    'G38.2 Z-10 F40',
+                                    '%wait',
+                                    'G0 Z10',
+                                    'G38.2 Z-15 F40',
                                     'G4 P0.3',
                                     '%global.toolchange.TOOL_OFFSET=posz',
                                     '(TLO set: [global.toolchange.TOOL_OFFSET])',
@@ -138,14 +139,15 @@ const wizard = {
                         {
                             label: 'Probe New Tool Length',
                             cb: () => {
+                                const modal = getUnitModal();
                                 controller.command('gcode', [
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z5',
-                                    'G38.2 Z-10 F40',
+                                    'G0 Z10',
+                                    'G38.2 Z-15 F40',
                                     'G4 P0.3',
                                     '(Set Z to Tool offset and wait)',
-                                    'G10 L20 Z[global.toolchange.TOOL_OFFSET]',
+                                    `${modal} G10 L20 Z[global.toolchange.TOOL_OFFSET]`,
                                     '(Set Z to Tool offset and wait)',
                                     'G21 G91 Z10',
                                 ]);
