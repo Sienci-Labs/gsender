@@ -1274,6 +1274,8 @@ class Visualizer extends Component {
 
     // from https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html
     renderBloom() {
+        const { state } = this.props;
+        const { currentTheme } = state;
         let materials = {};
         const darkMaterial = new THREE.MeshBasicMaterial({ color: 'black' });
         const bloomLayer = new THREE.Layers();
@@ -1283,7 +1285,7 @@ class Visualizer extends Component {
         this.scene.traverse(darkenNonBloomed);
         this.bloomComposer.render();
         this.scene.traverse(restoreMaterial);
-        this.renderer.setClearColor(new THREE.Color(this.props.state.currentTheme.backgroundColor), 1);
+        this.renderer.setClearColor(new THREE.Color(currentTheme.get(BACKGROUND_PART)), 1);
 
         function darkenNonBloomed(obj) {
             if (bloomLayer.test(obj.layers) === false) {
