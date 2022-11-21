@@ -43,6 +43,10 @@ import {
     VISUALIZER_SECONDARY
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/CombinedCamera';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import TrackballControls from 'app/lib/three/TrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
@@ -56,6 +60,7 @@ import Viewport from './Viewport';
 import CoordinateAxes from './CoordinateAxes';
 import Cuboid from './Cuboid';
 import CuttingPointer from './CuttingPointer';
+import LaserPointer from './LaserPointer';
 import GridLine from './GridLine';
 import PivotPoint3 from './PivotPoint3';
 import TextSprite from './TextSprite';
@@ -67,6 +72,7 @@ import {
 import styles from './index.styl';
 import { GRBL_ACTIVE_STATE_CHECK } from '../../../server/controllers/Grbl/constants';
 import WidgetConfig from '../WidgetConfig';
+import { isLaserMode } from '../../lib/laserMode';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -164,6 +170,7 @@ class Visualizer extends Component {
         this.unload();
 
         this.updateCuttingToolPosition();
+        this.updateLaserPointerPosition();
         this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
 
@@ -203,9 +210,12 @@ class Visualizer extends Component {
         this.renderer = null;
         this.scene = null;
         this.camera = null;
+        this.bloomComposer = null;
+        this.finalComposer = null;
         this.controls = null;
         this.viewport = null;
         this.cuttingTool = null;
+        this.laserPointer = null;
         this.cuttingPointer = null;
         this.limits = null;
         this.visualizer = null;
@@ -324,9 +334,11 @@ class Visualizer extends Component {
         }
 
         // Whether to show cutting tool or cutting pointer
-        if (this.cuttingTool && this.cuttingPointer) {
+        if (this.cuttingTool && this.laserPointer && this.cuttingPointer) {
             const { liteMode } = state;
-            this.cuttingTool.visible = liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible;
+            const isLaser = isLaserMode();
+            this.cuttingTool.visible = !isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
+            this.laserPointer.visible = isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
             this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
             needUpdateScene = true;
         }
@@ -362,6 +374,7 @@ class Visualizer extends Component {
 
             if (needUpdatePosition) {
                 this.updateCuttingToolPosition();
+                this.updateLaserPointerPosition();
                 this.updateCuttingPointerPosition();
                 this.updateLimitsPosition();
             }
@@ -1154,13 +1167,30 @@ class Visualizer extends Component {
 
                 this.cuttingTool = object;
                 this.cuttingTool.name = 'CuttingTool';
-                this.cuttingTool.visible = state.liteMode ? objects.cuttingTool.visibleLite : objects.cuttingTool.visible;
+                this.cuttingTool.visible = !isLaserMode() && (state.liteMode ? objects.cuttingTool.visibleLite : objects.cuttingTool.visible);
 
                 this.group.add(this.cuttingTool);
 
                 // Update the scene
                 this.updateScene();
             });
+        }
+
+        { // Laser Tool
+            this.setupScene();
+
+            // add tool
+            this.laserPointer = new LaserPointer({
+                color: cuttingCoordinateLines,
+                diameter: 4
+            });
+            this.laserPointer.name = 'LaserPointer';
+            this.laserPointer.visible = isLaserMode() && ((state.liteMode) ? objects.cuttingTool.visibleLite : objects.cuttingTool.visible);
+
+            this.group.add(this.laserPointer);
+
+            // Update the scene
+            this.updateScene();
         }
 
         { // Cutting Pointer
@@ -1185,6 +1215,73 @@ class Visualizer extends Component {
         this.scene.add(this.group);
     }
 
+    // from https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html
+    setupScene() {
+        const renderScene = new RenderPass(this.scene, this.camera);
+
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1, 0.1, 0);
+        this.bloomComposer = new EffectComposer(this.renderer);
+        this.bloomComposer.renderToScreen = false;
+        this.bloomComposer.addPass(renderScene);
+        this.bloomComposer.addPass(bloomPass);
+
+        const finalPass = new ShaderPass(
+            new THREE.ShaderMaterial({
+                uniforms: {
+                    baseTexture: { value: null },
+                    bloomTexture: { value: this.bloomComposer.renderTarget2.texture },
+                },
+                vertexShader:
+                    `varying vec2 vUv;
+                    void main() {
+                        vUv = uv;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+                    }`,
+                fragmentShader:
+                    `uniform sampler2D baseTexture;
+                    uniform sampler2D bloomTexture;
+                    varying vec2 vUv;
+                    void main() {
+                        gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
+                    }`,
+                defines: {}
+            }), 'baseTexture'
+        );
+        finalPass.needsSwap = true;
+
+        this.finalComposer = new EffectComposer(this.renderer);
+        this.finalComposer.addPass(renderScene);
+        this.finalComposer.addPass(finalPass);
+    }
+
+    // from https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html
+    renderBloom() {
+        let materials = {};
+        const darkMaterial = new THREE.MeshBasicMaterial({ color: 'black' });
+        const bloomLayer = new THREE.Layers();
+        bloomLayer.set(1);
+
+        this.renderer.setClearColor(0x000000);
+        this.scene.traverse(darkenNonBloomed);
+        this.bloomComposer.render();
+        this.scene.traverse(restoreMaterial);
+        this.renderer.setClearColor(new THREE.Color(this.props.state.currentTheme.backgroundColor), 1);
+
+        function darkenNonBloomed(obj) {
+            if (bloomLayer.test(obj.layers) === false) {
+                materials[obj.uuid] = obj.material;
+                obj.material = darkMaterial;
+            }
+        }
+
+        function restoreMaterial(obj) {
+            if (materials[obj.uuid]) {
+                obj.material = materials[obj.uuid];
+                delete materials[obj.uuid];
+            }
+        }
+    }
+
     // @param [options] The options object.
     // @param [options.forceUpdate] Force rendering
     updateScene(options) {
@@ -1193,6 +1290,8 @@ class Visualizer extends Component {
 
         if (this.renderer && needUpdateScene) {
             this.renderer.render(this.scene, this.camera);
+            this.renderBloom();
+            this.finalComposer.render();
         }
     }
 
@@ -1336,6 +1435,21 @@ class Visualizer extends Component {
         this.cuttingTool.position.set(x0, y0, z0);
     }
 
+    // Update cutting tool position
+    updateLaserPointerPosition() {
+        if (!this.laserPointer) {
+            return;
+        }
+
+        const pivotPoint = this.pivotPoint.get();
+        const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
+        const x0 = wpox - pivotPoint.x;
+        const y0 = wpoy - pivotPoint.y;
+        const z0 = wpoz - pivotPoint.z;
+
+        this.laserPointer.position.set(x0, y0, z0);
+    }
+
     // Update cutting pointer position
     updateCuttingPointerPosition() {
         if (!this.cuttingPointer) {
@@ -1413,6 +1527,7 @@ class Visualizer extends Component {
 
         // Update position
         this.updateCuttingToolPosition();
+        this.updateLaserPointerPosition();
         this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
 
