@@ -25,10 +25,10 @@ function ShortcutTable({ forwardRef }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {shortcuts.map((shortcut) => {
+                        {shortcuts.map((shortcut, i) => {
                             const { title, keys, category } = shortcut;
                             return keys ? (
-                                <tr key={title}>
+                                <tr key={`${title}-${i}`}>
                                     <td>{title || '-'}</td>
                                     <td>{keys || '-'}</td>
                                     <td>{category || '-'}</td>
