@@ -66,8 +66,15 @@ import PivotPoint3 from './PivotPoint3';
 import TextSprite from './TextSprite';
 import GCodeVisualizer from './GCodeVisualizer';
 import {
+    BACKGROUND_PART,
     CAMERA_MODE_PAN,
-    CAMERA_MODE_ROTATE
+    CAMERA_MODE_ROTATE,
+    CUTTING_PART,
+    GRID_PART,
+    LIMIT_PART,
+    XAXIS_PART,
+    YAXIS_PART,
+    ZAXIS_PART
 } from './constants';
 import styles from './index.styl';
 import { GRBL_ACTIVE_STATE_CHECK } from '../../../server/controllers/Grbl/constants';
@@ -549,19 +556,18 @@ class Visualizer extends Component {
 
     recolorGrids() {
         const { currentTheme } = this.props.state;
-        const { gridColor } = currentTheme;
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
 
         { // Imperial Coordinate System
             _each(impGroup.getObjectByName('GridLine').children, (o) => {
-                o.material.color.set(gridColor);
+                o.material.color.set(currentTheme.get(GRID_PART));
             });
         }
 
         { // Metric Coordinate System
             _each(metGroup.getObjectByName('GridLine').children, (o) => {
-                o.material.color.set(gridColor);
+                o.material.color.set(currentTheme.get(GRID_PART));
             });
         }
 
@@ -580,7 +586,6 @@ class Visualizer extends Component {
         const height = (units === IMPERIAL_UNITS) ? inches.height : mm.height;
 
         const { currentTheme } = this.props.state;
-        const { xAxisColor, yAxisColor, zAxisColor } = currentTheme;
 
         const unitGroup = units === IMPERIAL_UNITS ?
             this.group.getObjectByName('ImperialCoordinateSystem')
@@ -597,7 +602,7 @@ class Visualizer extends Component {
                 z: 0,
                 size: 20,
                 text: 'X',
-                color: xAxisColor
+                color: currentTheme.get(XAXIS_PART)
             });
             axisXLabel.name = 'xAxis';
             const axisYLabel = new TextSprite({
@@ -606,7 +611,7 @@ class Visualizer extends Component {
                 z: 0,
                 size: 20,
                 text: 'Y',
-                color: yAxisColor
+                color: currentTheme.get(YAXIS_PART)
             });
             axisYLabel.name = 'yAxis';
             const axisZLabel = new TextSprite({
@@ -615,7 +620,7 @@ class Visualizer extends Component {
                 z: height + 10,
                 size: 20,
                 text: 'Z',
-                color: zAxisColor
+                color: currentTheme.get(ZAXIS_PART)
             });
             axisZLabel.name = 'zAxis';
 
@@ -640,7 +645,6 @@ class Visualizer extends Component {
         const textOffset = (units === IMPERIAL_UNITS) ? (25.4 / 5) : (10 / 5);
 
         const { currentTheme } = this.props.state;
-        const { xAxisColor, yAxisColor } = currentTheme;
 
         const unitGroup = units === IMPERIAL_UNITS ?
             this.group.getObjectByName('ImperialGridLineNumbers')
@@ -657,7 +661,7 @@ class Visualizer extends Component {
                     text: (units === IMPERIAL_UNITS) ? i : i * 10,
                     textAlign: 'center',
                     textBaseline: 'bottom',
-                    color: xAxisColor,
+                    color: currentTheme.get(XAXIS_PART),
                     opacity: 0.5
                 });
                 xtextLabel.name = 'xtextLabel' + i;
@@ -672,7 +676,7 @@ class Visualizer extends Component {
                     text: (units === IMPERIAL_UNITS) ? i : i * 10,
                     textAlign: 'right',
                     textBaseline: 'middle',
-                    color: yAxisColor,
+                    color: currentTheme.get(YAXIS_PART),
                     opacity: 0.5
                 });
                 ytextLabel.name = 'ytextLabel' + i;
@@ -681,12 +685,32 @@ class Visualizer extends Component {
         }
     }
 
+    recolorCuttingPointer() {
+        const pointerObject = this.group.getObjectByName('CuttingPointer');
+        if (pointerObject) {
+            this.group.remove(pointerObject);
+            this.createCuttingPointer();
+        }
+    }
+
+    createCuttingPointer() {
+        const { state } = this.props;
+        const { objects, currentTheme } = state;
+        this.cuttingPointer = new CuttingPointer({
+            color: currentTheme.get(CUTTING_PART),
+            diameter: 2
+        });
+        this.cuttingPointer.name = 'CuttingPointer';
+        this.cuttingPointer.visible = (state.liteMode) ? !objects.cuttingTool.visibleLite : !objects.cuttingTool.visible;
+        this.group.add(this.cuttingPointer);
+    }
+
     recolorScene() {
         const { currentTheme } = this.props.state;
-        const { backgroundColor } = currentTheme;
         // Handle Background color
-        this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
+        this.renderer.setClearColor(new THREE.Color(currentTheme.get(BACKGROUND_PART)), 1);
         this.recolorGrids();
+        this.recolorCuttingPointer();
         this.rerenderGCode();
     }
 
@@ -861,12 +885,11 @@ class Visualizer extends Component {
 
     createLimits(xmin, xmax, ymin, ymax, zmin, zmax) {
         const { currentTheme } = this.props.state;
-        const { limitColor } = currentTheme;
 
         const dx = Math.abs(xmax - xmin) || Number.MIN_VALUE;
         const dy = Math.abs(ymax - ymin) || Number.MIN_VALUE;
         const dz = Math.abs(zmax - zmin) || Number.MIN_VALUE;
-        const color = limitColor;
+        const color = currentTheme.get(LIMIT_PART);
         const opacity = 0.5;
         const transparent = true;
         const dashed = true;
@@ -906,7 +929,6 @@ class Visualizer extends Component {
         const group = new THREE.Group();
 
         const { currentTheme } = this.props.state;
-        const { gridColor, xAxisColor, yAxisColor, zAxisColor } = currentTheme;
 
         { // Coordinate Grid
             const gridLine = new GridLine(
@@ -914,8 +936,8 @@ class Visualizer extends Component {
                 gridSpacing,
                 gridCount * gridSpacing,
                 gridSpacing,
-                gridColor, // center line
-                gridColor // grid
+                currentTheme.get(GRID_PART), // center line
+                currentTheme.get(GRID_PART) // grid
             );
             _each(gridLine.children, (o) => {
                 o.material.opacity = 0.15;
@@ -939,7 +961,7 @@ class Visualizer extends Component {
                 z: 0,
                 size: 20,
                 text: 'X',
-                color: xAxisColor
+                color: currentTheme.get(XAXIS_PART)
             });
             axisXLabel.name = 'xAxis';
             const axisYLabel = new TextSprite({
@@ -948,7 +970,7 @@ class Visualizer extends Component {
                 z: 0,
                 size: 20,
                 text: 'Y',
-                color: yAxisColor
+                color: currentTheme.get(YAXIS_PART)
             });
             axisYLabel.name = 'yAxis';
             const axisZLabel = new TextSprite({
@@ -957,7 +979,7 @@ class Visualizer extends Component {
                 z: height + 10,
                 size: 20,
                 text: 'Z',
-                color: zAxisColor
+                color: currentTheme.get(ZAXIS_PART)
             });
             axisZLabel.name = 'zAxis';
 
@@ -986,7 +1008,6 @@ class Visualizer extends Component {
         const group = new THREE.Group();
 
         const { currentTheme } = this.props.state;
-        const { xAxisColor, yAxisColor } = currentTheme;
 
         for (let i = -gridCount; i <= gridCount; ++i) {
             if (i !== 0) {
@@ -998,7 +1019,7 @@ class Visualizer extends Component {
                     text: (units === IMPERIAL_UNITS) ? i : i * 10,
                     textAlign: 'center',
                     textBaseline: 'bottom',
-                    color: xAxisColor,
+                    color: currentTheme.get(XAXIS_PART),
                     opacity: 0.5
                 });
                 textLabel.name = 'xtextLabel' + i;
@@ -1015,7 +1036,7 @@ class Visualizer extends Component {
                     text: (units === IMPERIAL_UNITS) ? i : i * 10,
                     textAlign: 'right',
                     textBaseline: 'middle',
-                    color: yAxisColor,
+                    color: currentTheme.get(YAXIS_PART),
                     opacity: 0.5
                 });
                 textLabel.name = 'ytextLabel' + i;
@@ -1040,7 +1061,6 @@ class Visualizer extends Component {
         const width = this.getVisibleWidth();
         const height = this.getVisibleHeight();
 
-        const { backgroundColor, cuttingCoordinateLines } = currentTheme;
 
         // WebGLRenderer
         this.renderer = new THREE.WebGLRenderer({
@@ -1050,7 +1070,7 @@ class Visualizer extends Component {
         });
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
+        this.renderer.setClearColor(new THREE.Color(currentTheme.get(BACKGROUND_PART)), 1);
         this.renderer.setSize(width, height);
         this.renderer.clear();
 
@@ -1139,6 +1159,9 @@ class Visualizer extends Component {
             ]).then(result => {
                 const [geometry, texture] = result;
 
+                console.log(geometry);
+                console.log(texture);
+
                 // Rotate the geometry 90 degrees about the X axis.
                 geometry.rotateX(-Math.PI / 2);
 
@@ -1194,13 +1217,7 @@ class Visualizer extends Component {
         }
 
         { // Cutting Pointer
-            this.cuttingPointer = new CuttingPointer({
-                color: cuttingCoordinateLines,
-                diameter: 2
-            });
-            this.cuttingPointer.name = 'CuttingPointer';
-            this.cuttingPointer.visible = (state.liteMode) ? !objects.cuttingTool.visibleLite : !objects.cuttingTool.visible;
-            this.group.add(this.cuttingPointer);
+            this.createCuttingPointer();
         }
 
 
