@@ -58,6 +58,7 @@ const wizard = {
                             cb: () => {
                                 const probeProfile = store.get('workspace.probeProfile');
                                 const { zThickness } = probeProfile;
+
                                 controller.command('gcode', [
                                     '%wait',
                                     `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
