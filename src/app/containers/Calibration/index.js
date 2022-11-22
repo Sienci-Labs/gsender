@@ -18,6 +18,18 @@ const Calibration = ({ modalClose }) => {
 
     const tabs = [
         {
+            id: 3,
+            label: 'Diagnostics',
+            widgetId: 'diagnostics',
+            component: <Diagnostics onClose={modalClose} />,
+        },
+        {
+            id: 2,
+            label: 'Surfacing Wasteboard',
+            widgetId: 'calibration-surfacing',
+            component: <Surfacing onClose={modalClose} />,
+        },
+        {
             id: 0,
             label: 'XY Squaring',
             widgetId: 'calibration-alignment',
@@ -28,18 +40,6 @@ const Calibration = ({ modalClose }) => {
             label: 'Movement Tuning',
             widgetId: 'calibration-axis-tuning',
             component: <AxisTuning onClose={modalClose} />,
-        },
-        {
-            id: 2,
-            label: 'Surfacing Wasteboard',
-            widgetId: 'calibration-surfacing',
-            component: <Surfacing onClose={modalClose} />,
-        },
-        {
-            id: 2,
-            label: 'Diagnostics',
-            widgetId: 'diagnostics',
-            component: <Diagnostics onClose={modalClose} />,
         },
     ];
 
