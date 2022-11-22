@@ -339,14 +339,14 @@ class Header extends PureComponent {
             <>
                 <div className={styles.navBar}>
                     <div className={styles.primary}>
-                        <NavLogo updateAvailable={ updateAvailable } onClick={ () => this.toggleUpdateToast() }/>
+                        <NavLogo updateAvailable={updateAvailable} onClick={() => this.toggleUpdateToast()} />
                         <NavbarConnection
-                            state={ this.state }
-                            actions={ this.actions }
+                            state={this.state}
+                            actions={this.actions}
                             widgetId="connection"
                         />
                         {
-                            hostInformation.headless && <HeadlessIndicator {...hostInformation} />
+                            !isElectron() ? <HeadlessIndicator {...hostInformation} /> : ''
                         }
                     </div>
                     { !mobile && <NavSidebar /> }

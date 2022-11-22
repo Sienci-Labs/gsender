@@ -70,6 +70,7 @@ class ModalWrapper extends PureComponent {
         return (
             <Modal
                 {...props}
+                style={{ borderRadius: '10px', overflow: 'hidden' }}
                 onClose={chainedFunction(onClose, this.unblockScrolling)}
             />
         );
