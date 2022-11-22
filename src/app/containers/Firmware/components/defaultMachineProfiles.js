@@ -33,28 +33,6 @@ import MK1LongMill48x30File from '../eepromFiles/MK1_48x30.json';
 
 export default [
     {
-        'id': 1,
-        'company': 'Sienci Labs',
-        'name': 'LongMill MK2',
-        'type': '48x30',
-        'version': 'MK2',
-        'mm': {
-            'width': 1279.9,
-            'depth': 845,
-            'height': 114.3
-        },
-        'in': {
-            'width': 50.39,
-            'depth': 33.27,
-            'height': 4.5
-        },
-        'endstops': false,
-        'spindle': false,
-        'coolant': false,
-        'laser': false,
-        'eepromSettings': MK2LongMill48x30File,
-    },
-    {
         'id': 0,
         'company': 'Sienci Labs',
         'name': 'LongMill MK2',
@@ -76,6 +54,28 @@ export default [
         'laser': false,
         'laserOnOutline': false,
         'eepromSettings': MK2LongMill30x30File,
+    },
+    {
+        'id': 1,
+        'company': 'Sienci Labs',
+        'name': 'LongMill MK2',
+        'type': '48x30',
+        'version': 'MK2',
+        'mm': {
+            'width': 1279.9,
+            'depth': 845,
+            'height': 114.3
+        },
+        'in': {
+            'width': 50.39,
+            'depth': 33.27,
+            'height': 4.5
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'eepromSettings': MK2LongMill48x30File,
     },
     {
         'id': 2,
