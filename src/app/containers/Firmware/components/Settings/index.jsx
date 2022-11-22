@@ -52,7 +52,7 @@ const SettingsArea = () => {
                                 value={{ label: label }}
                                 options={
                                     machineProfiles
-                                        .sort((a, b) => getMachineProfileLabel(a).localeCompare(getMachineProfileLabel(b)))
+                                        .sort((a, b) => a.id - b.id)
                                         .map(({ id, name, type }) => ({ key: id, value: id, label: getMachineProfileLabel({ name, type }) }))
                                 }
                                 onChange={handleSelect}

@@ -33,7 +33,7 @@ import MK1LongMill48x30File from '../eepromFiles/MK1_48x30.json';
 
 export default [
     {
-        'id': 0,
+        'id': 1,
         'company': 'Sienci Labs',
         'name': 'LongMill MK2',
         'type': '48x30',
@@ -55,7 +55,7 @@ export default [
         'eepromSettings': MK2LongMill48x30File,
     },
     {
-        'id': 1,
+        'id': 0,
         'company': 'Sienci Labs',
         'name': 'LongMill MK2',
         'type': '30x30',
@@ -101,7 +101,7 @@ export default [
         'eepromSettings': MK2LongMill12x30File,
     },
     {
-        'id': 3,
+        'id': 7,
         'company': 'Sienci Labs',
         'name': 'Mill One',
         'type': 'V1',
@@ -124,7 +124,7 @@ export default [
         'eepromSettings': millOneFile,
     },
     {
-        'id': 4,
+        'id': 8,
         'company': 'Sienci Labs',
         'name': 'Mill One',
         'type': 'V2',
@@ -147,7 +147,7 @@ export default [
         'eepromSettings': millOneFile,
     },
     {
-        'id': 5,
+        'id': 9,
         'company': 'Sienci Labs',
         'name': 'Mill One',
         'type': 'V3',
@@ -170,7 +170,7 @@ export default [
         'eepromSettings': millOneV3File,
     },
     {
-        'id': 6,
+        'id': 3,
         'company': 'Sienci Labs',
         'name': 'LongMill MK1',
         'type': '12x12',
@@ -193,7 +193,7 @@ export default [
         'eepromSettings': longMill12x12File,
     },
     {
-        'id': 7,
+        'id': 4,
         'company': 'Sienci Labs',
         'name': 'LongMill MK1',
         'type': '12x30',
@@ -216,7 +216,7 @@ export default [
         'eepromSettings': longMill12x30File,
     },
     {
-        'id': 8,
+        'id': 5,
         'company': 'Sienci Labs',
         'name': 'LongMill MK1',
         'type': '30x30',
@@ -239,7 +239,7 @@ export default [
         'eepromSettings': longMill30x30File,
     },
     {
-        'id': 9,
+        'id': 6,
         'company': 'Sienci Labs',
         'name': 'LongMill MK1',
         'type': '48x30',
