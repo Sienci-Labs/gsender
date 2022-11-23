@@ -152,7 +152,7 @@ const HeadlessIndicator = ({ address, port }) => {
                             onChange={updateHeadlessStatus}
                         />
                         {
-                            !port
+                            port
                                 ? (
                                     <span
                                         className={styles.copyAddress} onClick={copyToClipboard}
