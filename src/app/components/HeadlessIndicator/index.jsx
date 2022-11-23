@@ -28,6 +28,7 @@ import Select from 'react-select';
 import { Toaster, TOASTER_SUCCESS, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
 import Tooltip from '../TooltipCustom/ToolTip';
 import HeadlessConfig from './HeadlessConfig';
+import store from '../../store';
 import styles from './index.styl';
 
 
@@ -64,6 +65,7 @@ const HeadlessIndicator = ({ address, port }) => {
     const updateRemotePreferences = () => {
     //Validations
         //Port
+        //Only values between 1025 and 65535
         if (currentPort.value < 1025 || currentPort.value > 65535) {
             Toaster.pop({
                 msg: 'Invalid port',
@@ -72,14 +74,10 @@ const HeadlessIndicator = ({ address, port }) => {
             return;
         }
         //IP
-        // Example of invalid IP address
         // 210.110 – must have 4 octets
-        // 255 – must have 4 octets
-        // y.y.y.y – the only digit has allowed
-        // 255.0.0.y – the only digit has allowed
-        // 666.10.10.20 – digit must between [0-255]
-        // 4444.11.11.11 – digit must between [0-255]
-        // 33.3333.33.3 – digit must between [0-255]
+        // y.y.y.y – format allowed
+        // 255.0.0.y – format allowed
+        // 666.10.10.20 – digits must be between [0-255]
         if (!/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(currentIp.value)) {
             Toaster.pop({
                 msg: 'Invalid IP Address',
@@ -95,7 +93,12 @@ const HeadlessIndicator = ({ address, port }) => {
             setCurrentIp('');
             setCurrentPort(0);
         }
-        //TODO - Backend logic and update remote widget
+
+        //Save port and IP in .sender_rc
+        store.set('remotePort', currentPort);
+        store.set('remoteIp', currentIp);
+
+        //TODO - Backend logic
 
 
         Toaster.pop({
