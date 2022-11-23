@@ -21,7 +21,7 @@ export const controllerSettingsLoaded = () => {
 };
 
 
-export const connectToLastDevice = () => {
+export const connectToLastDevice = (callback) => {
     const connectionConfig = new WidgetConfig('connection');
 
     const port = connectionConfig.get('port');
@@ -34,6 +34,7 @@ export const connectToLastDevice = () => {
         if (err) {
             return;
         }
+        callback && callback();
     });
 };
 
