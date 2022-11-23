@@ -22,9 +22,9 @@
  */
 
 import { EventEmitter } from 'events';
-import SerialPort from 'serialport';
+import { SerialPort, ReadlineParser } from 'serialport';
 
-const Readline = SerialPort.parsers.Readline;
+const Readline = ReadlineParser;
 
 // Validation
 
@@ -157,7 +157,8 @@ class SerialConnection extends EventEmitter {
 
         const { path, ...rest } = this.settings;
 
-        this.port = new SerialPort(path, {
+        this.port = new SerialPort({
+            path,
             ...rest,
             autoOpen: false
         });

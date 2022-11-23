@@ -325,7 +325,7 @@
     "rollup": "^2.72.0",
     "rollup-plugin-jsx": "^1.0.3",
     "semver": "~6.0.0",
-    "serialport": "^9.2.8",
+    "serialport": "^10.5.0",
     "serve-favicon": "~2.5.0",
     "serve-static": "~1.13.2",
     "session-file-store": "~1.2.0",
