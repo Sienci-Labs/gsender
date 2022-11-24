@@ -21,15 +21,6 @@
  *
  */
 
-.wrapper {
-  display: flex;
-  flex-direction row;
-  margin-left: 2rem;
-  align-items center;
-  justify-content center;
-  gap: 0.5rem;
-  color: #4D4D4D;
-}
 
 @keyframes float {
   0% {
@@ -46,6 +37,15 @@
   }
 }
 
+.headlessWrapper {
+  display: flex;
+  flex-direction row;
+  margin-left: 2rem;
+  align-items center;
+  justify-content center;
+  gap: 0.5rem;
+  color: #4D4D4D;
+}
 .pulse {
   animation: float 2s infinite;
 }
@@ -73,6 +73,10 @@
   &:hover{
     text-decoration: underline;
   }
+}
+
+.restartLabel{
+    color: #f9a13b;
 }
 
 .config-content-wrapper{
@@ -151,6 +155,26 @@
         }  
       }
     }
+  }
+
+  .confirmationWrapper{
+    .warning{
+      padding: 3rem;
+    }
+    .footer{
+      padding: 1rem;
+      border-top: 1px solid #CBCBCA;
+      .buttonWrapper{
+        display: flex;
+        width: 50%;
+        margin: auto;
+        button{
+          width: 50%;
+          margin: 1rem;
+        }  
+      }
+    }
+  
   }
 
 

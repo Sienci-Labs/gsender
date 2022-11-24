@@ -27,17 +27,18 @@ import Button from '@mui/material/Button';
 import Select from 'react-select';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import Tooltip from '../TooltipCustom/ToolTip';
-import HeadlessConfig from './HeadlessConfig';
+import DialogBox from './DialogBox';
 import styles from './index.styl';
-
 
 const HeadlessIndicator = ({ address, port }) => {
     const defaultHeadlessSettings = { ip: { value: '', label: '' }, port: 8000, headlessStatus: false };
     const defaultErrorMessage = { ipError: '', portError: '' };
     const [showConfig, setShowConfig] = useState(false);
+    const [showConfirmation, setShowConfirmation] = useState(false);
     const [headlessSettings, setHeadlessSettings] = useState(defaultHeadlessSettings); //TODO - set IP and PORT on app load
     const [settingErrors, setSettingErrors] = useState(defaultErrorMessage);
     const [ipList, setIpList] = useState([{ value: '', label: '' }]);
+    const [shouldRestart, setShouldRestart] = useState(false);//controls if app should restart when user hits OK
 
     const handleShowConfig = () => {
         setShowConfig(true);
@@ -67,9 +68,12 @@ const HeadlessIndicator = ({ address, port }) => {
             setSettingErrors(defaultErrorMessage);
             return;
         }
-
         //Save new setting
         setHeadlessSettings({ ...headlessSettings, [name]: value });
+        //TODO - compare settings in .sender_rc and new inputs to decide if app should restart
+        // if(){
+        //     setShouldRestart(true);
+        // }
     };
     const copyToClipboard = () => {
         navigator.clipboard.writeText(`${address}:${port}`);
@@ -79,14 +83,6 @@ const HeadlessIndicator = ({ address, port }) => {
         });
     };
     const validateInputs = () => {
-        if (!headlessSettings.headlessStatus) {
-            //TODO - if user changed from toggle ON to OFF, send a restart command with new settings
-
-
-            setShowConfig(false);
-            //Else don't do anything when user hits OK button
-            return true;
-        }
         const errors = defaultErrorMessage;
         let hasError = false;
         //Port
@@ -122,10 +118,25 @@ const HeadlessIndicator = ({ address, port }) => {
 
 
         setShowConfig(false);
-        //TODO - pop a confirmation box only if settings changed
 
+        //pop a confirmation box only if settings changed
+        if (shouldRestart) {
+            setShowConfirmation(true);
+        }
 
-        //TODO- Restart app here with new changes or don't do anything if no changes made
+        //TODO - IMPORTANT - delete both lines before pushing to production
+        setShouldRestart(true);
+        setShowConfirmation(true);
+    };
+
+    const handleAppRestart = (action) => {
+        if (action === 'cancel') {
+            setShowConfirmation(false);
+            return;
+        }
+        //TODO - App restart logic goes here
+
+        setShouldRestart(false);
     };
 
     //refresh IP list on reload
@@ -134,7 +145,7 @@ const HeadlessIndicator = ({ address, port }) => {
     }, []);
 
     return (
-        <div className={styles.wrapper}>
+        <div className={styles.headlessWrapper}>
             <Tooltip content="Remote mode" placement="bottom" enterDelay={0}>
                 <div
                     className={styles.remoteAlert}
@@ -164,7 +175,11 @@ const HeadlessIndicator = ({ address, port }) => {
                 )
                 : ''
             }
-            <HeadlessConfig
+            {
+                shouldRestart ? <div className={styles.restartLabel}>App restart pending</div> : ''
+            }
+            {/* Headless config dialog */}
+            <DialogBox
                 show={showConfig}
                 title="Remote Mode Configuration"
                 onClose={() => {
@@ -233,7 +248,27 @@ const HeadlessIndicator = ({ address, port }) => {
                         </div>
                     </div>
                 </div>
-            </HeadlessConfig>
+            </DialogBox>
+            {/* Restart confirmation dialog */}
+            <DialogBox
+                show={showConfirmation}
+                title="Save changes?"
+                onClose={() => {
+                    setShowConfirmation(false);
+                }}
+            >
+                <div className={styles.confirmationWrapper}>
+                    <div className={styles.warning}>
+                        <b>Note:</b> You are about to restart the app with new settings. Please make sure you save all the changes before you proceed.
+                    </div>
+                    <div className={styles.footer}>
+                        <div className={styles.buttonWrapper}>
+                            <Button variant="contained" color="error" onClick={() => handleAppRestart('cancel')}>Cancel</Button>
+                            <Button variant="contained" onClick={() => handleAppRestart('ok')}>Ok</Button>
+                        </div>
+                    </div>
+                </div>
+            </DialogBox>
         </div>
     );
 };

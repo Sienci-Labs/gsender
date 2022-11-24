@@ -3,7 +3,7 @@ import Modal from 'app/components/ToolModal/ToolModal';
 import PropType from 'prop-types';
 
 
-const HeadlessConfig = ({ title = '', show = false, children, onClose }) => {
+const DialogBox = ({ title = '', show = false, children, onClose }) => {
     return (
         <Modal
             title={title}
@@ -17,11 +17,11 @@ const HeadlessConfig = ({ title = '', show = false, children, onClose }) => {
     );
 };
 
-HeadlessConfig.propType = {
+DialogBox.propType = {
     title: PropType.string.isRequired,
     show: PropType.bool.isRequired,
     children: PropType.children,
     onClose: PropType.func.isRequired,
 };
 
-export default HeadlessConfig;
+export default DialogBox;
