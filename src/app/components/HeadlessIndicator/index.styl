@@ -64,17 +64,24 @@
   &:hover{
     cursor: pointer;
     transform: scale(1.05);
-    background: #099669 !important;
+    background: #06B881 !important;
     }
 }
 
 .ip {
-  color: #FFFFFF
+  color: #06B881;
+  &:hover{
+    text-decoration: underline;
+  }
 }
 
 .config-content-wrapper{
     height: 100%;
     margin: auto;
+    .invalidInput{
+    border: 1px solid red !important;
+    border-radius: 5px !important;
+    }
     .toggleWrapper{
       padding: 1rem;
       .copyAddress{
@@ -108,6 +115,15 @@
           }
         }
         .inputs{
+          min-width: 60%;
+          .warningText{
+          color: red; 
+          margin-left: .5rem;
+          line-height: 2.5;
+          }
+          .ipInput{
+            display: flex;
+          }
           .portInput{
             margin-top: 1.5rem;
             height: 2.75rem;
@@ -115,6 +131,7 @@
               height: 2.75rem;
               border: 1px solid #cac9c9;
               padding: 10px;
+              width: 15rem;
             }
           }
         }
