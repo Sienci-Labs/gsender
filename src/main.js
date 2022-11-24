@@ -24,6 +24,7 @@
 import '@babel/polyfill';
 import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
+import remoteMain from '@electron/remote/main';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
@@ -48,6 +49,9 @@ const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
     const gotSingleInstanceLock = app.requestSingleInstanceLock();
     const shouldQuitImmediately = !gotSingleInstanceLock;
+
+    // Initialize remote main
+    remoteMain.initialize();
 
     let prevDirectory = '';
 
