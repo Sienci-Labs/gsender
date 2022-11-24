@@ -87,7 +87,7 @@ class SVGVisualizer extends Component {
         }
     }
 
-    componentWillUnMount() {
+    componentWillUnmount() {
         this.unsubscribe();
     }
 
@@ -117,7 +117,7 @@ class SVGVisualizer extends Component {
 
     unsubscribe() {
         this.pubsubTokens.forEach((token) => {
-            this.pubsub.unsubscribe(token);
+            pubsub.unsubscribe(token);
         });
         this.pubsubTokens = [];
     }
@@ -253,8 +253,7 @@ class SVGVisualizer extends Component {
                     viewBox={viewBox}
                     className={styles.svgContainer}
                     style={{ backgroundColor: backgroundColor }}
-                >
-                </svg>
+                />
             </div>
         );
     }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import uniqueId from 'lodash/uniqueId';
 
 import TabbedWidget from 'app/components/TabbedWidget';
 import ToolModal from 'app/components/ToolModal/ToolModal';
@@ -51,8 +52,7 @@ const Calibration = ({ modalClose }) => {
                     activeTabIndex={tab}
                     onClick={(index) => setTab(index)}
                     className={styles.tabs}
-                >
-                </TabbedWidget.Tabs>
+                />
                 <TabbedWidget.Content>
                     <ReduxProvider store={reduxStore}>
                         <div className={styles.container}>
@@ -60,7 +60,7 @@ const Calibration = ({ modalClose }) => {
                                 tabs.map((t, index) => {
                                     const active = index === tab;
                                     return (
-                                        <TabbedWidget.ChildComponent key={index} active={active}>
+                                        <TabbedWidget.ChildComponent key={uniqueId()} active={active}>
                                             {active && t.component}
                                         </TabbedWidget.ChildComponent>
                                     );

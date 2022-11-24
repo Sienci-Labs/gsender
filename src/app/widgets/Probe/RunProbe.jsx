@@ -179,8 +179,8 @@ class RunProbe extends PureComponent {
         const { state } = this.props;
         const { canClick, touchplate } = state;
         const { touchplateType } = touchplate;
-        const probeCommands = actions.generateProbeCommands();
-        console.log(probeCommands.join('\n'));
+        // const probeCommands = actions.generateProbeCommands();
+        // console.log(probeCommands.join('\n'));
         const probeCommand = state.availableProbeCommands[state.selectedProbeCommand];
 
         const probeActive = actions.returnProbeConnectivity();
@@ -199,7 +199,7 @@ class RunProbe extends PureComponent {
                                 <p>Ensure tool is positioned as shown.</p>
                                 <p>
                                     To confirm a reliable circuit, touch your plate to the tool and look for the signal to be robustly detected
-                                     (indicated by a green light) before returning the probe to the probing position.
+                                    (indicated by a green light) before returning the probe to the probing position.
                                 </p>
                                 <p>Probing cannot be run without confirming the circuit.</p>
                                 <p>Consider holding your touch plate in place during probing to get a more consistent measurement.</p>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 import map from 'lodash/map';
+import uniqueId from 'lodash/uniqueId';
 import { useSelector } from 'react-redux';
 
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
@@ -91,7 +92,7 @@ const Theme = ({ state, actions }) => {
                     </div>
                 </Tooltip>
             </Fieldset>
-            { CUSTOMIZABLE_THEMES.includes(theme) && !fileLoaded &&
+            { CUSTOMIZABLE_THEMES.includes(theme) && !fileLoaded && (
                 <Fieldset legend="Colours">
                     <div className={styles.addMargin}>
                         <Tooltip content="Save your changes" location="default">
@@ -102,7 +103,7 @@ const Theme = ({ state, actions }) => {
                                     actions.visualizer.handleCustThemeChange(themeColours, theme);
                                 }}
                             >
-                            Save
+                                Save
                             </button>
                         </Tooltip>
                         <Tooltip content="Click on the colour circles to change the colour for that component" location="default">
@@ -117,12 +118,18 @@ const Theme = ({ state, actions }) => {
                                         title = 'Jogging Coord Lines';
                                     }
                                     return (
-                                        <div key={theme + i} className={styles.colorContainer}>
+                                        <div key={theme + uniqueId()} className={styles.colorContainer}>
                                             <span className={styles.first}>{title}</span>
-                                            <div className={styles.dotsV2}></div>
-                                            <div role="button" className={styles.colorDisplay} onClick={() => openModal(value)} tabIndex={0}>
+                                            <div className={styles.dotsV2} />
+                                            <div
+                                                role="button"
+                                                className={styles.colorDisplay}
+                                                onClick={() => openModal(value)}
+                                                onKeyDown={() => openModal(value)}
+                                                tabIndex={0}
+                                            >
                                                 <span>{themeColours.get(value)}</span>
-                                                <ColorCircle part={value} colour={themeColours.get(value)} index={i}/>
+                                                <ColorCircle part={value} colour={themeColours.get(value)} index={i} />
                                             </div>
                                         </div>
                                     );
@@ -130,9 +137,16 @@ const Theme = ({ state, actions }) => {
                             }
                         </Tooltip>
                     </div>
-                    <ColorPicker actions={actions} theme={theme} part={currentPart} isOpen={isOpen} onClose={closeModal} chooseColour={chooseColour} />
+                    <ColorPicker
+                        actions={actions}
+                        theme={theme}
+                        part={currentPart}
+                        isOpen={isOpen}
+                        onClose={closeModal}
+                        chooseColour={chooseColour}
+                    />
                 </Fieldset>
-            }
+            )}
             {
                 fileLoaded && (<p className={styles.disabledMessage}>Unload file in the visualizer to edit the theme</p>)
             }

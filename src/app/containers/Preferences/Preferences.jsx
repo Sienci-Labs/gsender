@@ -777,7 +777,19 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight, customDecimalPlaces, spindle } = this.state;
+        const {
+            tools,
+            tool,
+            probe,
+            probeSettings,
+            units,
+            reverseWidgets,
+            autoReconnect,
+            visualizer,
+            safeRetractHeight,
+            customDecimalPlaces,
+            spindle
+        } = this.state;
 
         store.set('workspace.reverseWidgets', reverseWidgets);
         store.set('workspace.safeRetractHeight', safeRetractHeight);

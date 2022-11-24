@@ -92,18 +92,23 @@ class JobStatusWidget extends PureComponent {
         const { senderStatus } = this.props;
 
         if (senderStatus && prevSenderStatus && prevSenderStatus.finishTime !== senderStatus.finishTime && senderStatus.finishTime > 0) {
-            this.config.set('lastFile', senderStatus.name);
-            this.config.set('lastFileSize', senderStatus.size);
-            this.config.set('lastFileRunLength', senderStatus.elapsedTime);
-            this.setState({
-                lastFileRan: senderStatus.name,
-                lastFileSize: senderStatus.size,
-                lastFileRunLength: senderStatus.elapsedTime,
-            });
+            this.updateLastFileDetails();
         }
 
         this.config.set('minimized', minimized);
         this.config.set('speed', spindleSpeed);
+    }
+
+    updateLastFileDetails() {
+        const { senderStatus } = this.props;
+        this.config.set('lastFile', senderStatus.name);
+        this.config.set('lastFileSize', senderStatus.size);
+        this.config.set('lastFileRunLength', senderStatus.elapsedTime);
+        this.setState({
+            lastFileRan: senderStatus.name,
+            lastFileSize: senderStatus.size,
+            lastFileRunLength: senderStatus.elapsedTime,
+        });
     }
 
     getSpindleOverrideLabel() {

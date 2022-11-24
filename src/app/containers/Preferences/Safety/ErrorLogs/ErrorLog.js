@@ -4,6 +4,7 @@ import { VerticalTimeline, VerticalTimelineElement } from 'react-vertical-timeli
 import 'react-vertical-timeline-component/style.min.css';
 import { VscError } from 'react-icons/vsc';
 import { BsAlarm } from 'react-icons/bs';
+import uniqueID from 'lodash/uniqueId';
 import { getAllErrors } from '../helper';
 import styles from '../../index.styl';
 
@@ -43,7 +44,7 @@ const ErrorLog = () => {
                                                 iconStyle={{ top: '31%', background: colorCodes.ALARM, color: '#fff' }}
                                                 dateClassName={styles.inbuiltDate}
                                                 icon={<BsAlarm />}
-                                                key={index}
+                                                key={uniqueID()}
                                             >
                                                 <span className={styles.errorTag}>Alarm</span>
                                                 <span className={styles.errorDate}>
@@ -62,7 +63,7 @@ const ErrorLog = () => {
                                                 iconStyle={{ top: '31%', background: colorCodes.ERROR, color: '#fff' }}
                                                 dateClassName={styles.inbuiltDate}
                                                 icon={<VscError />}
-                                                key={index}
+                                                key={uniqueID()}
                                             >
                                                 <span className={styles.errorTag}>Error{log.split('[error] GRBL_ERROR:')[1].split('Origin')[1]}</span>
                                                 <span className={styles.errorDate}>

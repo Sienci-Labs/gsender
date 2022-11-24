@@ -22,6 +22,7 @@
  */
 
 import React from 'react';
+import uniqueId from 'lodash/uniqueId';
 import styles from '../../index.styl';
 import Tool from './Tool';
 import AddTool from './AddTool';
@@ -40,7 +41,7 @@ const ToolSettings = ({ active, state, actions }) => {
                         {
                             tools.map((tool, index) => (
                                 <Tool
-                                    key={`tool-${index}`}
+                                    key={`tool-${uniqueId()}`}
                                     {...tool}
                                     onDelete={() => toolActions.deleteTool(index)}
                                 />

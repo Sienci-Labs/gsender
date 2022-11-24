@@ -157,14 +157,10 @@ export function* initialize() {
             onJobStop(status.timeRunning);
         }
 
-        try {
-            reduxStore.dispatch({
-                type: controllerActions.UPDATE_SENDER_STATUS,
-                payload: { status },
-            });
-        } catch (e) {
-            console.log(e);
-        }
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_SENDER_STATUS,
+            payload: { status },
+        });
     });
 
     controller.addListener('workflow:state', (state) => {
@@ -388,9 +384,15 @@ export function* initialize() {
             controller.command('toolchange:post');
         };
 
-        const content = (comment.length > 0)
-            ? <div><p>A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.</p><p>Comment: <b>{comment}</b></p></div>
-            : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
+        const content = (comment.length > 0) ? (
+            <div>
+                <p>
+                    A toolchange command (M6) was found - click confirm to verify
+                    the tool has been changed and run your post-toolchange code.
+                </p>
+                <p>Comment: <b>{comment}</b></p>
+            </div>
+        ) : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
 
         Confirm({
             title: 'Confirm Toolchange',
@@ -449,7 +451,7 @@ export function* initialize() {
         Toaster.clear();
         Toaster.pop({
             type: TOASTER_INFO,
-            msg: `Tool command found - <b>${tool}</b>`,
+            msg: `Tool command found - ${tool}`,
             duration: TOASTER_UNTIL_CLOSE
         });
     });
@@ -459,14 +461,8 @@ export function* initialize() {
     });
 
     controller.addListener('error', (error) => {
-        try {
-            if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
-                window.ipcRenderer.send('logError:electron', error);
-            } else {
-                console.log(error.message);
-            }
-        } catch (error) {
-            console.log(error.message);
+        if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
+            window.ipcRenderer.send('logError:electron', error);
         }
     });
 

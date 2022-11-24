@@ -46,6 +46,7 @@ const RecentFileButton = () => {
             aria-label="Recent Files"
             className={styles.recentFilesButton}
             onClick={toggle}
+            onKeyDown={toggle}
             tabIndex={0}
         >
             <i className="fas fa-chevron-right" />

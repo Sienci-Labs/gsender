@@ -44,8 +44,7 @@ const ColorPicker = ({ actions, theme, part, isOpen, onClose, chooseColour }) =>
     };
 
     return (
-        isOpen && (
-            onOpen() &&
+        isOpen && onOpen() && (
             <Modal
                 size="xs"
                 onClose={onCloseModal}
@@ -71,14 +70,14 @@ const ColorPicker = ({ actions, theme, part, isOpen, onClose, chooseColour }) =>
                                 onClose(color);
                             }}
                         >
-                        Choose Colour
+                            Choose Colour
                         </button>
                         <button
                             className={styles.resetColour}
                             type="button"
                             onClick={() => setColor(actions.visualizer.getDefaultColour(part))}
                         >
-                        Reset to Default
+                            Reset to Default
                         </button>
                     </div>
                 </div>
