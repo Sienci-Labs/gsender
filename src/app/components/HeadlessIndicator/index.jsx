@@ -25,7 +25,7 @@ import React, { useState, useEffect } from 'react';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import Select from 'react-select';
-import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_SUCCESS, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import _ from 'lodash';
 import actions from './apiActions';
 import Tooltip from '../TooltipCustom/ToolTip';
@@ -52,10 +52,6 @@ const HeadlessIndicator = ({ address, port }) => {
         if (event.keyCode === 13) {
             setHeadlessSettings({ ...headlessSettings, ip: { value: event.target.value, label: event.target.value } });
             setSettingErrors({ ...settingErrors, ipError: '' });
-            //compare settings in .sender_rc and new inputs to decide if app should restart
-            if (!_.isEqual(oldSettings, headlessSettings)) {
-                setShouldRestart(true);
-            }
             event.target.blur();
         }
     };
@@ -77,11 +73,6 @@ const HeadlessIndicator = ({ address, port }) => {
         }
         //Save new setting
         setHeadlessSettings({ ...headlessSettings, [name]: value });
-        //compare settings in .sender_rc and new inputs to decide if app should restart
-        console.log(oldSettings, headlessSettings);
-        if (!_.isEqual(oldSettings, headlessSettings)) {
-            setShouldRestart(true);
-        }
     };
     const copyToClipboard = () => {
         navigator.clipboard.writeText(`${address}:${port}`);
@@ -113,7 +104,7 @@ const HeadlessIndicator = ({ address, port }) => {
     };
     const updateRemotePreferences = () => {
         //Validations
-        if (validateInputs()) {
+        if (!headlessSettings.headlessStatus && validateInputs()) {
             return;
         }
         //Update settings logic
@@ -125,18 +116,27 @@ const HeadlessIndicator = ({ address, port }) => {
         setShowConfig(false);
 
         //pop a confirmation box only if settings changed
-        if (shouldRestart) {
+        if (!_.isEqual(oldSettings, headlessSettings)) {
             setShowConfirmation(true);
+            setShouldRestart(true);
+        } else {
+            Toaster.pop({
+                msg: 'No settings were changed.',
+                type: TOASTER_INFO,
+            });
         }
     };
 
     const handleAppRestart = (action) => {
         if (action === 'cancel') {
             setShowConfirmation(false);
+            setShouldRestart(false);
+            setHeadlessSettings(oldSettings);
             return;
         }
         //Save port and IP in .sender_rc (even if empty)
         actions.saveSettings(headlessSettings);
+        setOldSettings(headlessSettings);
         //TODO - App restart logic goes here
 
         setShouldRestart(false);
