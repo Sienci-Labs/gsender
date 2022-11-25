@@ -37,6 +37,7 @@ import {
 } from 'app/constants';
 import controller from '../../lib/controller';
 import styles from './index.styl';
+import { BACKGROUND_PART, G0_PART, G1_PART } from './constants';
 
 class SVGVisualizer extends Component {
     static propTypes = {
@@ -117,7 +118,7 @@ class SVGVisualizer extends Component {
 
     unsubscribe() {
         this.pubsubTokens.forEach((token) => {
-            this.pubsub.unsubscribe(token);
+            pubsub.unsubscribe(token);
         });
         this.pubsubTokens = [];
     }
@@ -184,7 +185,6 @@ class SVGVisualizer extends Component {
     handleSVGRender(vizualization) {
         const { paths } = vizualization;
         const { currentTheme } = this.props.state;
-        const { G0Color, G1Color } = currentTheme;
 
         let svg = document.getElementById(!this.isSecondaryVisualizer ? 'svg' : 'svg2');
         if (svg) {
@@ -200,7 +200,7 @@ class SVGVisualizer extends Component {
                 // add stroke colour
                 const motion = element.motion;
                 const opacity = (motion === 'G0') ? '0F' : 'FF';
-                const stroke = motion === 'G0' ? G0Color + opacity : G1Color + opacity;
+                const stroke = motion === 'G0' ? currentTheme.get(G0_PART) + opacity : currentTheme.get(G1_PART) + opacity;
                 node.setAttribute('stroke', stroke);
 
                 return group.appendChild(node);
@@ -238,7 +238,6 @@ class SVGVisualizer extends Component {
         const id = !this.isSecondaryVisualizer ? 'svg' : 'svg2';
         const viewBox = !this.isSecondaryVisualizer ? '0 0 500 500' : '0 0 470 470';
         const { currentTheme } = this.props.state;
-        const { backgroundColor } = currentTheme;
         return (
             <div
                 style={{
@@ -252,9 +251,8 @@ class SVGVisualizer extends Component {
                     width="100%"
                     viewBox={viewBox}
                     className={styles.svgContainer}
-                    style={{ backgroundColor: backgroundColor }}
-                >
-                </svg>
+                    style={{ backgroundColor: currentTheme.get(BACKGROUND_PART) }}
+                />
             </div>
         );
     }
