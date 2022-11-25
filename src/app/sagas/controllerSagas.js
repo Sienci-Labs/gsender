@@ -227,12 +227,22 @@ export function* initialize() {
         // create a pop up so the user can connect to the last active port
         // and resume from the last line
         if (received) {
-            const content = <div><p>{'To continue from the last line (' + received + '), reconnect your device and press Resume.'}</p></div>;
+            const content = (
+                <div>
+                    <p>
+                        {
+                            'The machine connection has been disrupted. To attempt to reconnect to the last active port and continue from the last line ('
+                            + received
+                            + '), press Resume.'
+                        }
+                    </p>
+                </div>
+            );
 
             Confirm({
                 title: 'Port Disconnected',
                 content,
-                confirmLabel: 'Resume (Line ' + received + ')',
+                confirmLabel: 'Resume',
                 cancelLabel: 'Close',
                 onConfirm: () => {
                     connectToLastDevice(() => controller.command('gcode:start', received));
