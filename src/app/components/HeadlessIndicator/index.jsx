@@ -248,7 +248,7 @@ const HeadlessIndicator = ({ address, port }) => {
                         </div>
                     </div>
                     <div className={styles.warningWrapper}>
-                        <b>Warning: </b> Clicking &ldquo;OK&ldquo; will restart the app with new settings.<br />
+                        <b>Warning: </b> Clicking &ldquo;OK&ldquo; will save new settings and will need you to restart the app.
                         Please make sure to save all your tasks before your proceed.
                     </div>
                     <div className={styles.footer}>
