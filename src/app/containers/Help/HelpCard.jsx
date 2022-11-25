@@ -27,7 +27,14 @@ import styles from './index.styl';
 const HelpCard = ({ title, text, link, icon, linkText }) => {
     return (
         <div className={styles.cardBase}>
-            <a href={link} target="_blank" className={styles.overLink}> </a>
+            <a
+                href={link}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.overLink}
+            >
+                {' '}
+            </a>
             <div className={styles.externalIcon}>
                 <i className="fas fa-external-link-alt" />
             </div>
@@ -38,7 +45,14 @@ const HelpCard = ({ title, text, link, icon, linkText }) => {
             <div className={styles.cardText}>
                 { text }
             </div>
-            <a className={styles.cardLink} target="_blank" href={link}>{ linkText }</a>
+            <a
+                className={styles.cardLink}
+                target="_blank"
+                rel="noreferrer"
+                href={link}
+            >
+                { linkText }
+            </a>
         </div>
     );
 };

@@ -36,10 +36,10 @@ const StatsPage = ({ active, state, actions }) => {
             <ReduxProvider store={reduxStore}>
                 <GeneralArea>
                     <GeneralArea.Half>
-                        <StatsList actions={actions} state={state}/>
+                        <StatsList actions={actions} state={state} />
                     </GeneralArea.Half>
                     <GeneralArea.Half>
-                        <Charts actions={actions} state={state}/>
+                        <Charts actions={actions} state={state} />
                     </GeneralArea.Half>
                 </GeneralArea>
             </ReduxProvider>

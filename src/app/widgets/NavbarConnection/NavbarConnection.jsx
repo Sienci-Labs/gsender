@@ -127,7 +127,16 @@ class NavbarConnection extends PureComponent {
         const isMobile = window.visualViewport.width / window.visualViewport.height <= 0.5625;
 
         return (
-            <div className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection} role="button" tabIndex={0} onClick={this.displayDropdown} onMouseEnter={actions.handleRefreshPorts} onMouseLeave={actions.hideUnrecognizedDevices} onTouchEnd={actions.handleRefreshPorts}>
+            <div
+                className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection}
+                role="button"
+                tabIndex={0}
+                onClick={this.displayDropdown}
+                onKeyDown={this.displayDropdown}
+                onMouseEnter={actions.handleRefreshPorts}
+                onMouseLeave={actions.hideUnrecognizedDevices}
+                onTouchEnd={actions.handleRefreshPorts}
+            >
                 <div className={`${styles.NavbarConnectionIcon} ${styles[iconState]}`}>
                     <i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />
                 </div>
@@ -178,7 +187,8 @@ class NavbarConnection extends PureComponent {
                         )
                     }
                     {
-                        !connected && !connecting && (unrecognizedPorts.length > 0) && <UnrecognizedDevices ports={unrecognizedPorts} onClick={actions.toggleShowUnrecognized} />
+                        !connected && !connecting && (unrecognizedPorts.length > 0) &&
+                            <UnrecognizedDevices ports={unrecognizedPorts} onClick={actions.toggleShowUnrecognized} />
                     }
                     {
                         !connected && !connecting && showUnrecognized && unrecognizedPorts.map(

@@ -35,7 +35,10 @@ const DiagnosticFile = () => {
                 //<button onClick={() => generateSupportFile()}>Generate Diagnostic File</button>
             }
             { generateSupportFile() }
-            <div className={styles.small}>Get easier help from our customer support or community with a generated PDF of your CNC information like machine type, operating system, CNC firmware, g-code file, recent errors, and more.</div>
+            <div className={styles.small}>
+                Get easier help from our customer support or community with a generated PDF of your CNC information like machine type,
+                operating system, CNC firmware, g-code file, recent errors, and more.
+            </div>
         </div>
     );
 };

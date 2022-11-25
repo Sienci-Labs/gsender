@@ -141,15 +141,11 @@ class WorkflowControl extends PureComponent {
             addRecentFile(recentFile);
         }
 
-        try {
-            await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
-            reduxStore.dispatch({
-                type: UPDATE_FILE_INFO,
-                payload: { path: file.path },
-            });
-        } catch (e) {
-            console.log(e);
-        }
+        await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
+        reduxStore.dispatch({
+            type: UPDATE_FILE_INFO,
+            payload: { path: file.path },
+        });
     };
 
     loadRecentFile = async (fileMetadata) => {
@@ -162,15 +158,11 @@ class WorkflowControl extends PureComponent {
         }
         const { result, name } = fileMetadata;
         const serializedFile = new File([result], name);
-        try {
-            await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
-            reduxStore.dispatch({
-                type: UPDATE_FILE_INFO,
-                payload: { path: fileMetadata.fullPath },
-            });
-        } catch (e) {
-            console.log(e);
-        }
+        await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
+        reduxStore.dispatch({
+            type: UPDATE_FILE_INFO,
+            payload: { path: fileMetadata.fullPath },
+        });
     }
 
     canRun() {
@@ -263,16 +255,24 @@ class WorkflowControl extends PureComponent {
         const { gcode: { content: currentGcode } } = currentState;
 
         if ((prevActiveState === GRBL_ACTIVE_STATE_CHECK && currentActiveState !== GRBL_ACTIVE_STATE_CHECK) || prevGcode !== currentGcode) {
-            this.setState({ runHasStarted: false });
+            this.updateRunHasStarted();
         }
         if (prevProps.fileCompletion === 0 && fileCompletion !== 0) {
-            this.setState({
-                startFromLine: {
-                    showModal: false,
-                    value: 1,
-                }
-            });
+            this.updateStartFromLine();
         }
+    }
+
+    updateRunHasStarted() {
+        this.setState({ runHasStarted: false });
+    }
+
+    updateStartFromLine() {
+        this.setState({
+            startFromLine: {
+                showModal: false,
+                value: 1,
+            }
+        });
     }
 
     componentWillUnmount() {
@@ -355,7 +355,8 @@ class WorkflowControl extends PureComponent {
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
         const canRun = this.canRun();
-        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && activeState !== GRBL_ACTIVE_STATE_CHECK && includes([WORKFLOW_STATE_RUNNING], workflowState);
+        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && activeState !== GRBL_ACTIVE_STATE_CHECK &&
+            includes([WORKFLOW_STATE_RUNNING], workflowState);
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
@@ -545,7 +546,14 @@ class WorkflowControl extends PureComponent {
                                             <Input
                                                 label="Start at this line in gcode file:"
                                                 value={value}
-                                                onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) && this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: Math.ceil(Number(e.target.value)) } }))}
+                                                onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) &&
+                                                    this.setState(prev => ({
+                                                        startFromLine: {
+                                                            ...prev.startFromLine,
+                                                            value: Math.ceil(Number(e.target.value))
+                                                        }
+                                                    }))
+                                                }
                                                 additionalProps={{ type: 'number' }}
                                             />
                                             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>

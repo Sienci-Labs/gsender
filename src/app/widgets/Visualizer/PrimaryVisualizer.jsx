@@ -80,7 +80,7 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                         actions={actions}
                     />
                     {
-                        WebGL.isWebGLAvailable() ?
+                        WebGL.isWebGLAvailable() ? (
                             <VisualizerWrapper
                                 show={showVisualizer}
                                 cameraPosition={cameraPosition}
@@ -90,11 +90,12 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                                 containerID={containerID}
                                 isSecondary={false}
                             />
-                            :
+                        ) : (
                             <div className={styles.visualizerMsgContainer}>
-                                <Icon path={mdiEmoticonSadOutline} size={4}/>
+                                <Icon path={mdiEmoticonSadOutline} size={4} />
                                 <span style={{ fontSize: '16px' }}>{'It looks like you don\'t support WebGL'}</span>
                             </div>
+                        )
                     }
                     <WorkflowControl
                         ref={workflowRef}

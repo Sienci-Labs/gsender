@@ -138,7 +138,9 @@ class Visualizer extends Component {
     node = null;
 
     fileLoaded = false;
+
     machineConnected = false;
+
     showSoftLimitsWarning = this.visualizerConfig.get('showSoftLimitsWarning');
 
     setRef = (node) => {
@@ -587,8 +589,8 @@ class Visualizer extends Component {
 
         const { currentTheme } = this.props.state;
 
-        const unitGroup = units === IMPERIAL_UNITS ?
-            this.group.getObjectByName('ImperialCoordinateSystem')
+        const unitGroup = units === IMPERIAL_UNITS
+            ? this.group.getObjectByName('ImperialCoordinateSystem')
             : this.group.getObjectByName('MetricCoordinateSystem');
 
         unitGroup.remove(unitGroup.getObjectByName('xAxis'));
@@ -646,8 +648,8 @@ class Visualizer extends Component {
 
         const { currentTheme } = this.props.state;
 
-        const unitGroup = units === IMPERIAL_UNITS ?
-            this.group.getObjectByName('ImperialGridLineNumbers')
+        const unitGroup = units === IMPERIAL_UNITS
+            ? this.group.getObjectByName('ImperialGridLineNumbers')
             : this.group.getObjectByName('MetricGridLineNumbers');
 
         for (let i = -gridCount; i <= gridCount; ++i) {
@@ -1158,9 +1160,6 @@ class Visualizer extends Component {
                 loadTexture('assets/textures/brushed-steel-texture.jpg').then(texture => texture),
             ]).then(result => {
                 const [geometry, texture] = result;
-
-                console.log(geometry);
-                console.log(texture);
 
                 // Rotate the geometry 90 degrees about the X axis.
                 geometry.rotateX(-Math.PI / 2);

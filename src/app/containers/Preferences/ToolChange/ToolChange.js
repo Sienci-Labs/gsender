@@ -77,7 +77,7 @@ const ToolChange = () => {
                 toolChangeOption === 'Code' && (
                     <div>
                         <div className={styles.spreadRow}>
-                            <MacroVariableDropdown textarea={preHookRef} label="Before change code"/>
+                            <MacroVariableDropdown textarea={preHookRef} label="Before change code" />
                         </div>
                         <textarea
                             rows="9"
@@ -90,7 +90,7 @@ const ToolChange = () => {
                         />
                         <br />
                         <div className={styles.spreadRow}>
-                            <MacroVariableDropdown textarea={postHookRef} label="After change code"/>
+                            <MacroVariableDropdown textarea={postHookRef} label="After change code" />
                         </div>
                         <textarea
                             rows="9"

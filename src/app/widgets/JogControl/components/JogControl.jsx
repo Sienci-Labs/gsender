@@ -38,6 +38,7 @@ const JogControl = ({ timeout = 600, disabled = false, jog, continuousJog, stopC
 
     return (
         <button
+            type="button"
             className={cx(styles.btnKeypad, className)}
             disabled={disabled}
             {...bind}

@@ -194,8 +194,14 @@ const Alignment = ({ onClose }) => {
         <ReduxProvider store={reduxStore}>
             {
                 isFullyComplete
-                    ? <Result triangle={triangle} jogValues={jogValues} onBack={onBack} onClose={onClose} />
-                    : (
+                    ? (
+                        <Result
+                            triangle={triangle}
+                            jogValues={jogValues}
+                            onBack={onBack}
+                            onClose={onClose}
+                        />
+                    ) : (
                         <>
                             <div className={styles.alignmentContainer}>
                                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -245,7 +251,8 @@ const Alignment = ({ onClose }) => {
                                                 <>
                                                     <img src={introImage} alt="Introduction Diagram" style={{ width: '75%', margin: 'auto' }} />
                                                     <p style={{ width: '100%', fontWeight: 'bold' }}>
-                                                        Since many CNCs run on two independent rails in the Y-axis, misalignment between these rails can cause your cutting to become skewed.
+                                                        Since many CNCs run on two independent rails in the Y-axis,
+                                                        misalignment between these rails can cause your cutting to become skewed.
                                                     </p>
                                                 </>
                                             )

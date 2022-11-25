@@ -88,7 +88,7 @@ class SVGVisualizer extends Component {
         }
     }
 
-    componentWillUnMount() {
+    componentWillUnmount() {
         this.unsubscribe();
     }
 

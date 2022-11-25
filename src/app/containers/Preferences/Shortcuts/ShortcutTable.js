@@ -1,3 +1,4 @@
+import uniqueId from 'lodash/uniqueId';
 import React, { useEffect, useState } from 'react';
 import store from '../../../store';
 import styles from './shortcutTable.styl';
@@ -28,7 +29,7 @@ function ShortcutTable({ forwardRef }) {
                         {shortcuts.map((shortcut, i) => {
                             const { title, keys, category } = shortcut;
                             return keys ? (
-                                <tr key={`${title}-${i}`}>
+                                <tr key={`${title}-${uniqueId()}`}>
                                     <td>{title || '-'}</td>
                                     <td>{keys || '-'}</td>
                                     <td>{category || '-'}</td>

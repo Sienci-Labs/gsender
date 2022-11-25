@@ -384,7 +384,9 @@ export default class Generator {
 
             const xValueStart = startIsInCenter ? toFixedValue((halfOfWidth - endPos.x) * xFactor) : toFixedValue(endPos.x * xFactor);
             const yValueStart = startIsInCenter ? toFixedValue((halfOfLength - endPos.y) * yFactor) : toFixedValue(endPos.y * yFactor);
-            const xValueEnd = startIsInCenter ? toFixedValue((halfOfWidth - (startPos.x + stepoverAmount)) * xFactor) : toFixedValue((startPos.x + stepoverAmount) * xFactor);
+            const xValueEnd = startIsInCenter
+                ? toFixedValue((halfOfWidth - (startPos.x + stepoverAmount)) * xFactor)
+                : toFixedValue((startPos.x + stepoverAmount) * xFactor);
             const yValueEnd = startIsInCenter ? toFixedValue((halfOfLength - startPos.y) * yFactor) : toFixedValue(startPos.y * yFactor);
 
             if (cutDirectionFlipped) {
