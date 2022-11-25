@@ -66,9 +66,7 @@ class SerialConnection extends EventEmitter {
             this.emit('data', data);
         },
         open: () => {
-            this.port.set({ dtr: false }, () => {
-                console.log(this.port);
-            });
+            this.port.set({ dtr: false });
             this.emit('open');
         },
         close: (err) => {
