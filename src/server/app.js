@@ -318,6 +318,10 @@ const appMain = () => {
         app.put(urljoin(settings.route, 'api/machines/:id'), api.machines.update);
         app.delete(urljoin(settings.route, 'api/machines/:id'), api.machines.__delete);
 
+        //Headless mode / Remote mode
+        app.put(urljoin(settings.route, '/api/remote'), api.remote.update);
+        app.get(urljoin(settings.route, 'api/remote'), api.remote.fetch);
+
         // Macros
         app.get(urljoin(settings.route, 'api/macros'), api.macros.fetch);
         app.post(urljoin(settings.route, 'api/macros'), api.macros.create);

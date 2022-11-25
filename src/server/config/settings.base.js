@@ -23,7 +23,6 @@
 
 import path from 'path';
 import pkg from '../../package.json';
-import store from '../../app/store';
 import { languages } from '../../../build.config';
 
 const RC_FILE = '.sender_rc';
@@ -38,8 +37,6 @@ export default {
     rcfile: path.resolve(getUserHome(), RC_FILE),
     verbosity: 0,
     version: pkg.version,
-    port: store.get('remotePort'),
-    ip: store.get('remoteIp'),
 
     // The secret key is loaded from the config file (defaults to "~/.cncrc")
     // @see "src/app/index.js"

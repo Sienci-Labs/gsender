@@ -26,6 +26,8 @@ import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import Select from 'react-select';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import _ from 'lodash';
+import actions from './apiActions';
 import Tooltip from '../TooltipCustom/ToolTip';
 import DialogBox from './DialogBox';
 import styles from './index.styl';
@@ -35,7 +37,8 @@ const HeadlessIndicator = ({ address, port }) => {
     const defaultErrorMessage = { ipError: '', portError: '' };
     const [showConfig, setShowConfig] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
-    const [headlessSettings, setHeadlessSettings] = useState(defaultHeadlessSettings); //TODO - set IP and PORT on app load
+    const [headlessSettings, setHeadlessSettings] = useState(defaultHeadlessSettings);
+    const [oldSettings, setOldSettings] = useState(defaultHeadlessSettings);
     const [settingErrors, setSettingErrors] = useState(defaultErrorMessage);
     const [ipList, setIpList] = useState([{ value: '', label: '' }]);
     const [shouldRestart, setShouldRestart] = useState(false);//controls if app should restart when user hits OK
@@ -49,6 +52,10 @@ const HeadlessIndicator = ({ address, port }) => {
         if (event.keyCode === 13) {
             setHeadlessSettings({ ...headlessSettings, ip: { value: event.target.value, label: event.target.value } });
             setSettingErrors({ ...settingErrors, ipError: '' });
+            //compare settings in .sender_rc and new inputs to decide if app should restart
+            if (!_.isEqual(oldSettings, headlessSettings)) {
+                setShouldRestart(true);
+            }
             event.target.blur();
         }
     };
@@ -70,10 +77,11 @@ const HeadlessIndicator = ({ address, port }) => {
         }
         //Save new setting
         setHeadlessSettings({ ...headlessSettings, [name]: value });
-        //TODO - compare settings in .sender_rc and new inputs to decide if app should restart
-        // if(){
-        //     setShouldRestart(true);
-        // }
+        //compare settings in .sender_rc and new inputs to decide if app should restart
+        console.log(oldSettings, headlessSettings);
+        if (!_.isEqual(oldSettings, headlessSettings)) {
+            setShouldRestart(true);
+        }
     };
     const copyToClipboard = () => {
         navigator.clipboard.writeText(`${address}:${port}`);
@@ -114,19 +122,12 @@ const HeadlessIndicator = ({ address, port }) => {
             setHeadlessSettings(defaultHeadlessSettings);
         }
 
-        //TODO - Save port and IP in .sender_rc (even if empty)
-
-
         setShowConfig(false);
 
         //pop a confirmation box only if settings changed
         if (shouldRestart) {
             setShowConfirmation(true);
         }
-
-        //TODO - IMPORTANT - delete both lines before pushing to production
-        setShouldRestart(true);
-        setShowConfirmation(true);
     };
 
     const handleAppRestart = (action) => {
@@ -134,13 +135,18 @@ const HeadlessIndicator = ({ address, port }) => {
             setShowConfirmation(false);
             return;
         }
+        //Save port and IP in .sender_rc (even if empty)
+        actions.saveSettings(headlessSettings);
         //TODO - App restart logic goes here
 
         setShouldRestart(false);
+        setShowConfirmation(false);
     };
 
     //refresh IP list on reload
     useEffect(() => {
+        actions.fetchSettings(setHeadlessSettings);
+        setOldSettings(headlessSettings);
         setIpList([{ value: '', label: '' }]);//TODO - fetch real data
     }, []);
 

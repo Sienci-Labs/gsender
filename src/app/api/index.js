@@ -391,6 +391,37 @@ events.update = (id, options) => new Promise((resolve, reject) => {
 });
 
 //
+// Headless Mode / Remote Mode
+//
+const remoteSetting = {};
+
+remoteSetting.fetch = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/remote')
+        .query(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+remoteSetting.update = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .put('/api/remote')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+//
 // Macros
 //
 const macros = {};
@@ -765,6 +796,7 @@ export default {
     events,
     machines,
     macros,
+    remoteSetting,
     mdi,
     users,
 
