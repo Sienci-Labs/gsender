@@ -1331,6 +1331,7 @@ class GrblController {
                     }
 
                     // Move up and then to cut start position
+                    modalGCode.push(this.event.getStartEventCode());
                     modalGCode.push(`G0 G90 G21 Z${zMax + 10}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
