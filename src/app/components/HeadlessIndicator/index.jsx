@@ -82,6 +82,9 @@ const HeadlessIndicator = ({ address, port }) => {
         });
     };
     const validateInputs = () => {
+        if (!headlessSettings.headlessStatus) {
+            return false;
+        }
         const errors = defaultErrorMessage;
         let hasError = false;
         //Port
@@ -104,7 +107,7 @@ const HeadlessIndicator = ({ address, port }) => {
     };
     const updateRemotePreferences = () => {
         //Validations
-        if (!headlessSettings.headlessStatus && validateInputs()) {
+        if (validateInputs()) {
             return;
         }
         //Update settings logic
@@ -120,6 +123,7 @@ const HeadlessIndicator = ({ address, port }) => {
             setShowConfirmation(true);
             setShouldRestart(true);
         } else {
+            setHeadlessSettings(oldSettings);
             Toaster.pop({
                 msg: 'No settings were changed.',
                 type: TOASTER_INFO,
@@ -130,8 +134,7 @@ const HeadlessIndicator = ({ address, port }) => {
     const handleAppRestart = (action) => {
         if (action === 'cancel') {
             setShowConfirmation(false);
-            setShouldRestart(false);
-            setHeadlessSettings(oldSettings);
+            setShouldRestart(true);
             return;
         }
         //Save port and IP in .sender_rc (even if empty)
@@ -155,7 +158,7 @@ const HeadlessIndicator = ({ address, port }) => {
             <Tooltip content="Remote mode" placement="bottom" enterDelay={0}>
                 <div
                     className={styles.remoteAlert}
-                    style={port ? '' : { background: '#747474' }}
+                    style={port ? { background: '#06B881' } : { background: '#747474' }}
                     role="button"
                     tabIndex={-3}
                     onClick={handleShowConfig}
