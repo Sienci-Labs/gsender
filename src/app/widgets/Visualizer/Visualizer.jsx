@@ -252,6 +252,7 @@ class Visualizer extends Component {
         const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
         const prevState = prevProps.state;
         const state = this.props.state;
+        const isConnected = this.props.isConnected;
 
         // Update the visualizer size whenever the machine is running,
         // to fill the empty area between it and the job status widget when necessary
@@ -344,12 +345,19 @@ class Visualizer extends Component {
 
         // Whether to show cutting tool or cutting pointer
         if (this.cuttingTool && this.laserPointer && this.cuttingPointer) {
-            const { liteMode } = state;
-            const isLaser = isLaserMode();
-            this.cuttingTool.visible = !isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
-            this.laserPointer.visible = isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
-            this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
-            needUpdateScene = true;
+            // if connected, set visibility
+            if (isConnected) {
+                const { liteMode } = state;
+                const isLaser = isLaserMode();
+                this.cuttingTool.visible = !isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
+                this.laserPointer.visible = isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
+                this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
+                needUpdateScene = true;
+            } else { // if not, don't show
+                this.cuttingTool.visible = false;
+                this.laserPointer.visible = false;
+                this.cuttingPointer.visible = false;
+            }
         }
 
         { // Update position
@@ -697,13 +705,13 @@ class Visualizer extends Component {
 
     createCuttingPointer() {
         const { state } = this.props;
-        const { objects, currentTheme } = state;
+        const { currentTheme } = state;
         this.cuttingPointer = new CuttingPointer({
             color: currentTheme.get(CUTTING_PART),
             diameter: 2
         });
         this.cuttingPointer.name = 'CuttingPointer';
-        this.cuttingPointer.visible = (state.liteMode) ? !objects.cuttingTool.visibleLite : !objects.cuttingTool.visible;
+        this.cuttingPointer.visible = false;
         this.group.add(this.cuttingPointer);
     }
 
@@ -1189,7 +1197,7 @@ class Visualizer extends Component {
 
                 this.cuttingTool = object;
                 this.cuttingTool.name = 'CuttingTool';
-                this.cuttingTool.visible = !isLaserMode() && (state.liteMode ? objects.cuttingTool.visibleLite : objects.cuttingTool.visible);
+                this.cuttingTool.visible = false;
 
                 this.group.add(this.cuttingTool);
 
@@ -1207,7 +1215,7 @@ class Visualizer extends Component {
                 diameter: 4
             });
             this.laserPointer.name = 'LaserPointer';
-            this.laserPointer.visible = isLaserMode() && ((state.liteMode) ? objects.cuttingTool.visibleLite : objects.cuttingTool.visible);
+            this.laserPointer.visible = false;
 
             this.group.add(this.laserPointer);
 
@@ -1928,6 +1936,7 @@ export default connect((store) => {
     const homingFlag = _get(store, 'controller.homingFlag');
     const machineCorner = _get(store, 'controller.settings.settings.$23');
     const { activeVisualizer } = store.visualizer;
+    const isConnected = _get(store, 'connection.isConnected');
     return {
         machinePosition,
         workPosition,
@@ -1937,6 +1946,7 @@ export default connect((store) => {
         softZMax,
         homingFlag,
         machineCorner,
-        activeVisualizer
+        activeVisualizer,
+        isConnected
     };
 }, null, null, { forwardRef: true })(Visualizer);
