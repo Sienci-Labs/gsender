@@ -1180,6 +1180,8 @@ class Visualizer extends Component {
                         map: texture,
                         opacity: 0.6,
                         transparent: false,
+                        emissive: 0xffffff,
+                        emissiveIntensity: 0.4,
                         color: '#caf0f8'
                     });
                 }
