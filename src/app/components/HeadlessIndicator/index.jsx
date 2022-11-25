@@ -261,7 +261,7 @@ const HeadlessIndicator = ({ address, port }) => {
             {/* Restart confirmation dialog */}
             <DialogBox
                 show={showConfirmation}
-                title="Save changes?"
+                title="Restart app?"
                 onClose={() => {
                     setShowConfirmation(false);
                 }}
