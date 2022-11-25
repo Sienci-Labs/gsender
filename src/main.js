@@ -24,7 +24,6 @@
 import '@babel/polyfill';
 import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
-import remoteMain from '@electron/remote/main';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
@@ -40,6 +39,7 @@ import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 import { getGRBLLog } from './electron-app/grblLogs';
 
 
+
 let windowManager = null;
 let hostInformation = {};
 let grblLog = log.create('grbl');
@@ -51,7 +51,7 @@ const main = () => {
     const shouldQuitImmediately = !gotSingleInstanceLock;
 
     // Initialize remote main
-    remoteMain.initialize();
+    require('@electron/remote/main').initialize();
 
     let prevDirectory = '';
 

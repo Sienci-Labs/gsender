@@ -4,7 +4,6 @@ import debounce from 'lodash/debounce';
 import difference from 'lodash/difference';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import { app } from '@electron/remote';
 import merge from 'lodash/merge';
 import uniq from 'lodash/uniq';
 import semver from 'semver';
@@ -20,7 +19,9 @@ let userData = null;
 
 // Check whether the code is running in Electron renderer process
 if (isElectron()) {
+    const { app } = window.require('@electron/remote');
     const path = window.require('path'); // Require the path module within Electron
+
     userData = {
         path: path.join(app.getPath('userData'), 'preferences.json')
     };

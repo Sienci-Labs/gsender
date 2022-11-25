@@ -80,6 +80,9 @@
     "productName": "gSender Edge",
     "buildDependenciesFromSource": true,
     "generateUpdatesFilesForAllChannels": true,
+    "extraResources": [
+      "./node_modules/@electron/remote/**"
+    ],
     "directories": {
       "buildResources": "electron-build",
       "output": "output",
