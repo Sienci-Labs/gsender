@@ -104,44 +104,47 @@
     .connectionWrapper{
      padding: 1rem;
      .inputWrapper{
-      display: flex;
       margin-top: 1rem;
-        .titles{
-          .titleIp{
-            line-height: 2.8rem;
-            margin-right: 1rem
-          }
-          .titlePort{
-            line-height: 3.8rem;
-            margin-right: 1rem
-            margin-top: 1rem;
-          }
+      .titleIp{
+        line-height: 2.8rem;
+        margin-right: 2.6rem
+      }
+      .titlePort{
+        line-height: 3.8rem;
+        margin-right: 1rem
+        margin-top: 1rem;
+      }
+      .warningText{
+      color: red; 
+      font-size: 1rem;
+      margin-left: .5rem;
+      line-height: 2.5;
+      }
+      .hints{
+        font-size: .9rem;
+        color: gray;
+        margin-left: 4rem;
         }
-        .inputs{
-          min-width: 60%;
-          .warningText{
-          color: red; 
-          margin-left: .5rem;
-          line-height: 2.5;
-          }
-          .ipInput{
-            display: flex;
-          }
-          .portInput{
-            margin-top: 1.5rem;
-            height: 2.75rem;
-            input{
-              height: 2.75rem;
-              border: 1px solid #cac9c9;
-              padding: 10px;
-              width: 15rem;
-            }
-          }
+      .ipInput{
+        display: flex;
+      }
+      .portInput{
+        margin-top: 1.5rem;
+        input{
+          height: 2.75rem;
+          border: 1px solid #cac9c9;
+          padding: 10px;
+          width: 15rem;
         }
+      }
       }
     }
     .warningWrapper{
      padding: 1rem;
+    }
+    .changes{
+      padding: 1rem;  
+      text-align: center;
     }
     .footer{
       padding: 2rem;

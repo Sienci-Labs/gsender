@@ -6,7 +6,7 @@ import {
 const CONFIG_KEY = 'remoteSettings';
 
 const getRemoteSettings = () => {
-    const headlessSettings = config.get(CONFIG_KEY, { ip: { value: '', label: '' }, port: 8000, headlessStatus: false });
+    const headlessSettings = config.get(CONFIG_KEY, { ip: '', port: 8000, headlessStatus: false });
     return headlessSettings;
 };
 

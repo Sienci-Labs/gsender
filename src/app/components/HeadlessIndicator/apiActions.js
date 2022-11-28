@@ -1,12 +1,12 @@
 import api from 'app/api';
 
 const actions = {
-    fetchSettings: async (setHeadlessSettings) => {
+    fetchSettings: async (setHeadlessSettings, setOldSettings) => {
         try {
             let res = await api.remoteSetting.fetch();
             const remote = res.body;
             setHeadlessSettings(remote);
-            console.log(remote);
+            setOldSettings(remote);
         } catch (error) {
             console.log(error);
         }
