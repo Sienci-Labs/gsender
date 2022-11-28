@@ -19,11 +19,11 @@ let userData = null;
 
 // Check whether the code is running in Electron renderer process
 if (isElectron()) {
-    const electron = window.require('electron');
+    const { app } = window.require('@electron/remote');
     const path = window.require('path'); // Require the path module within Electron
-    const app = electron.remote.app;
+
     userData = {
-        path: path.join(app.getPath('userData'), 'gsender-edge.json')
+        path: path.join(app.getPath('userData'), 'preferences.json')
     };
 }
 

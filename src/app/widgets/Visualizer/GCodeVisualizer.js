@@ -24,6 +24,7 @@
 // import colornames from 'colornames';
 import * as THREE from 'three';
 import log from 'app/lib/log';
+import { BACKGROUND_PART, CUTTING_PART, G0_PART, G1_PART, G2_PART, G3_PART, LASER_PART } from './constants';
 
 class GCodeVisualizer {
     constructor(theme) {
@@ -42,9 +43,8 @@ class GCodeVisualizer {
     }
 
     updateLaserModeColors() {
-        const { /*G1Color, */backgroundColor } = this.theme;
-        const defaultColor = new THREE.Color(255, 0, 0);
-        const fillColor = new THREE.Color(backgroundColor);
+        const defaultColor = new THREE.Color(this.theme.get(LASER_PART));
+        const fillColor = new THREE.Color(this.theme.get(BACKGROUND_PART));
         const maxSpindleValue = Math.max(...[...this.spindleSpeeds]);
 
         const calculateOpacity = (speed) => ((maxSpindleValue === 0) ? 1 : (speed / maxSpindleValue));
@@ -64,20 +64,19 @@ class GCodeVisualizer {
     }
 
     render({ vertices, colors, frames, spindleSpeeds, isLaser = false, spindleChanges }) {
-        const { cuttingCoordinateLines, G0Color, G1Color } = this.theme;
         this.vertices = new THREE.Float32BufferAttribute(vertices, 3);
         this.frames = frames;
         this.spindleSpeeds = spindleSpeeds;
         this.isLaser = isLaser;
         this.spindleChanges = spindleChanges;
-        const defaultColor = new THREE.Color(cuttingCoordinateLines);
+        const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
 
         // Get line colors for current theme
         const motionColor = {
-            'G0': new THREE.Color(G0Color),
-            'G1': new THREE.Color(G1Color),
-            'G2': new THREE.Color(G1Color),
-            'G3': new THREE.Color(G1Color),
+            'G0': new THREE.Color(this.theme.get(G0_PART)),
+            'G1': new THREE.Color(this.theme.get(G1_PART)),
+            'G2': new THREE.Color(this.theme.get(G2_PART)),
+            'G3': new THREE.Color(this.theme.get(G3_PART)),
             'default': defaultColor
         };
 
@@ -128,8 +127,7 @@ class GCodeVisualizer {
         if (this.frames.length === 0) {
             return;
         }
-        const { cuttingCoordinateLine } = this.theme;
-        const defaultColor = new THREE.Color(cuttingCoordinateLine);
+        const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
 
         frameIndex = Math.min(frameIndex, this.frames.length - 1);
         frameIndex = Math.max(frameIndex, 0);
@@ -165,7 +163,12 @@ class GCodeVisualizer {
     }
 
     getCurrentLocation() {
-        return this.vertices[this.frames[this.frameIndex].vertexIndex] ? this.vertices[this.frames[this.frameIndex].vertexIndex] : this.vertices[this.frames[this.frameIndex].vertexIndex - 1];
+        const offset = this.frames[this.frameIndex] * 3; // Reconvert back to offset
+        return {
+            x: this.vertices.array[offset],
+            y: this.vertices.array[offset + 1],
+            z: this.vertices.array[offset + 2]
+        };
     }
 
     unload() {

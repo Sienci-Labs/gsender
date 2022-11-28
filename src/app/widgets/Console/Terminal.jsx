@@ -27,12 +27,12 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
 import reduxStore from 'app/store/redux';
-import get from 'lodash/get';
+// import get from 'lodash/get';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { debounce } from 'lodash';
 
-//import store from 'app/store';
+import store from 'app/store';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import controller from 'app/lib/controller';
 import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
@@ -45,7 +45,7 @@ import { RED, ALARM_RED } from './variables';
 import History from './History';
 import styles from './index.styl';
 import { addError, addAlarm } from '../../lib/diagnostics';
-//import { UPDATE_TERMINAL_HISTORY } from '../../actions/controllerActions';
+import { UPDATE_TERMINAL_HISTORY } from '../../actions/controllerActions';
 
 const LINES_TO_COPY = 50;
 class TerminalWrapper extends PureComponent {
@@ -69,8 +69,8 @@ class TerminalWrapper extends PureComponent {
     };
 
     state = {
-        terminalInputHistory: get(reduxStore.getState(), 'controller.terminalHistory', []),
-        terminalInputIndex: get(reduxStore.getState(), 'controller.terminalHistory')?.length
+        terminalInputHistory: store.get('workspace.terminal.inputHistory', []), // to store user input from the terminal
+        terminalInputIndex: store.get('workspace.terminal.inputHistory')?.length
     }
 
     prompt = ' ';
@@ -230,10 +230,8 @@ class TerminalWrapper extends PureComponent {
         this.term.write('\r');
         if (data.includes('error:')) {
             this.term.write(color.xterm(RED)(data));
-            addError(data);
         } else if (data.includes('ALARM:')) {
             this.term.write(color.xterm(ALARM_RED)(data));
-            addAlarm(data);
         } else {
             this.term.write(data);
         }
@@ -249,10 +247,7 @@ class TerminalWrapper extends PureComponent {
 
         controller.writeln(command);
 
-        this.inputRef.current.value = '';
-    }
-
-    updateTerminalHistory = (line) => {
+        // update input history
         const { terminalInputHistory = [] } = this.state;
 
         const newTerminalInputHistory = [...terminalInputHistory];
@@ -261,12 +256,20 @@ class TerminalWrapper extends PureComponent {
             newTerminalInputHistory.shift();
         }
 
-        /*reduxStore.dispatch({
-            type: UPDATE_TERMINAL_HISTORY,
-            payload: { line }
-        });*/
+        store.replace('workspace.terminal.inputHistory', [...newTerminalInputHistory, command]);
 
-        this.setState({ terminalInputHistory: [...newTerminalInputHistory, line], terminalInputIndex: newTerminalInputHistory.length + 1 });
+        this.setState({ terminalInputHistory: [...newTerminalInputHistory, command], terminalInputIndex: newTerminalInputHistory.length + 1 });
+
+        this.inputRef.current.value = '';
+    }
+
+    // updates the terminal history stored in redux for the current session
+    // includes every line written to the terminal
+    updateTerminalHistory = (line) => {
+        reduxStore.dispatch({
+            type: UPDATE_TERMINAL_HISTORY,
+            payload: line
+        });
     }
 
     handleCopyLines = async () => {

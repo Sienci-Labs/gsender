@@ -25,24 +25,24 @@ import React from 'react';
 import store from 'app/store';
 import styles from '../index.styl';
 import Fieldset from '../components/Fieldset';
-//import CustomPieChart from '../components/CustomPieChart';
+import CustomPieChart from '../components/CustomPieChart';
 
 const Charts = ({ state, actions }) => {
-    const jobsFinished = parseInt(store.get('workspace.jobsFinished'), 10);
-    const jobsCancelled = parseInt(store.get('workspace.jobsCancelled'), 10);
-    /*const data = [
+    const jobsFinished = store.get('workspace.jobsFinished', 0);
+    const jobsCancelled = store.get('workspace.jobsCancelled', 0);
+    const data = [
         { title: 'Cancelled', value: jobsCancelled, color: '#C13C37' },
         { title: 'Completed', value: jobsFinished, color: '#E38627' },
-    ];*/
+    ];
 
     return (
         <Fieldset legend="Charts">
             <div className={[styles.addMargin, styles.chartsContainer].join(' ')}>
                 <span className={styles.chartsTitle}>Jobs Run</span>
                 {
-                    jobsFinished === 0 && jobsCancelled === 0 ?
-                        <span>No jobs run</span>
-                        : <span>Hiding this for crash</span>
+                    jobsFinished === 0 && jobsCancelled === 0
+                        ? <span>No jobs run</span>
+                        : <CustomPieChart propsData={data} />
                 }
             </div>
         </Fieldset>

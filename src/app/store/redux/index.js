@@ -22,6 +22,8 @@
  */
 
 import { createStore, applyMiddleware, compose } from 'redux';
+import { batchedSubscribe } from 'redux-batched-subscribe';
+import debounce from 'lodash/debounce';
 import { END } from 'redux-saga';
 import thunk from 'redux-thunk';
 import { createLogger } from 'redux-logger';
@@ -41,8 +43,9 @@ const configureStore = (preloadedState) => {
             applyMiddleware(thunk, sagaMiddleware, createLogger({ collapsed: true })),
         );
     }
+    const debounceNotify = debounce(notify => notify());
 
-    const store = createStore(mainReducer, preloadedState, enhancer);
+    const store = createStore(mainReducer, preloadedState, compose(enhancer, batchedSubscribe(debounceNotify)));
     store.close = () => store.dispatch(END);
     store.runSaga = sagaMiddleware.run;
     return store;

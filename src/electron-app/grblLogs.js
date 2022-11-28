@@ -21,19 +21,33 @@
  *
  */
 
-const fs = require('fs');
+const fs = require('fs').promises;
 
-export const persistConfig = (path, state) => {
-    fs.writeFileSync(path, state);
-};
-
-
-export const loadConfig = (path) => {
+const getGRBLLog = async (logPath) => {
     let content = '';
-    if (fs.existsSync(path)) {
-        content = fs.readFileSync(path, 'utf8') || '{}';
-    } else {
-        return '{}';
+    try {
+        content = await fs.readFile(logPath, 'utf-8');
+        console.log(content);
+        if (content) {
+            content = content
+                .toString()
+                .split(/\r?\n/);
+            let tempContent = [];
+            content.forEach(record => {
+                if (record.toLowerCase().includes('error') || record.toLowerCase().includes('alarm')) {
+                    tempContent.push(record);
+                }
+            });
+            if (tempContent.length > 50) {
+                tempContent = tempContent.slice(0, 50);
+            }
+            content = tempContent.reverse();
+        }
+    } catch (error) {
+        console.log(error);
     }
+
     return content;
 };
+
+export { getGRBLLog };

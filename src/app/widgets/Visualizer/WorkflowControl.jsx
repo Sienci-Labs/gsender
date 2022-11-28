@@ -31,6 +31,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
 import reduxStore from 'app/store/redux';
+import { UPDATE_JOB_OVERRIDES } from 'app/actions/visualizerActions';
 import controller from 'app/lib/controller';
 import api from 'app/api';
 import pubsub from 'pubsub-js';
@@ -140,15 +141,11 @@ class WorkflowControl extends PureComponent {
             addRecentFile(recentFile);
         }
 
-        try {
-            await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
-            reduxStore.dispatch({
-                type: UPDATE_FILE_INFO,
-                payload: { path: file.path },
-            });
-        } catch (e) {
-            console.log(e);
-        }
+        await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
+        reduxStore.dispatch({
+            type: UPDATE_FILE_INFO,
+            payload: { path: file.path },
+        });
     };
 
     loadRecentFile = async (fileMetadata) => {
@@ -161,15 +158,11 @@ class WorkflowControl extends PureComponent {
         }
         const { result, name } = fileMetadata;
         const serializedFile = new File([result], name);
-        try {
-            await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
-            reduxStore.dispatch({
-                type: UPDATE_FILE_INFO,
-                payload: { path: fileMetadata.fullPath },
-            });
-        } catch (e) {
-            console.log(e);
-        }
+        await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
+        reduxStore.dispatch({
+            type: UPDATE_FILE_INFO,
+            payload: { path: fileMetadata.fullPath },
+        });
     }
 
     canRun() {
@@ -209,6 +202,7 @@ class WorkflowControl extends PureComponent {
 
         const { received } = senderStatus;
         handleStop();
+        reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         this.setState(prev => ({ runHasStarted: false, startFromLine: { ...prev.startFromLine, value: received } }));
         if (status.activeState === 'Check') {
             controller.command('gcode', '$C');
@@ -234,6 +228,7 @@ class WorkflowControl extends PureComponent {
         }
         this.setState({ fileLoaded: true });
         this.setState({ runHasStarted: true });
+        reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: { isChecked: true, toggleStatus: 'overrides' } });
         const { actions } = this.props;
         actions.onRunClick();
     }
@@ -259,16 +254,24 @@ class WorkflowControl extends PureComponent {
         const { gcode: { content: currentGcode } } = currentState;
 
         if ((prevActiveState === GRBL_ACTIVE_STATE_CHECK && currentActiveState !== GRBL_ACTIVE_STATE_CHECK) || prevGcode !== currentGcode) {
-            this.setState({ runHasStarted: false });
+            this.updateRunHasStarted();
         }
         if (prevProps.fileCompletion === 0 && fileCompletion !== 0) {
-            this.setState({
-                startFromLine: {
-                    showModal: false,
-                    value: 1,
-                }
-            });
+            this.updateStartFromLine();
         }
+    }
+
+    updateRunHasStarted() {
+        this.setState({ runHasStarted: false });
+    }
+
+    updateStartFromLine() {
+        this.setState({
+            startFromLine: {
+                showModal: false,
+                value: 1,
+            }
+        });
     }
 
     componentWillUnmount() {
@@ -351,7 +354,8 @@ class WorkflowControl extends PureComponent {
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
         const canRun = this.canRun();
-        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && activeState !== GRBL_ACTIVE_STATE_CHECK && includes([WORKFLOW_STATE_RUNNING], workflowState);
+        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && activeState !== GRBL_ACTIVE_STATE_CHECK &&
+            includes([WORKFLOW_STATE_RUNNING], workflowState);
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
@@ -540,7 +544,14 @@ class WorkflowControl extends PureComponent {
                                             <Input
                                                 label="Start at this line in gcode file:"
                                                 value={value}
-                                                onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) && this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: Math.ceil(Number(e.target.value)) } }))}
+                                                onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) &&
+                                                    this.setState(prev => ({
+                                                        startFromLine: {
+                                                            ...prev.startFromLine,
+                                                            value: Math.ceil(Number(e.target.value))
+                                                        }
+                                                    }))
+                                                }
                                                 additionalProps={{ type: 'number' }}
                                             />
                                             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -572,11 +583,13 @@ class WorkflowControl extends PureComponent {
                     )
                 }
                 {
-                    !renderSVG ?
-                        <CameraDisplay
-                            camera={camera}
-                            cameraPosition={cameraPosition}
-                        /> : null
+                    !renderSVG
+                        ? (
+                            <CameraDisplay
+                                camera={camera}
+                                cameraPosition={cameraPosition}
+                            />
+                        ) : null
                 }
             </div>
         );

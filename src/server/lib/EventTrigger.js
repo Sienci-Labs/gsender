@@ -70,6 +70,48 @@ class EventTrigger {
             });
         return isEnabled;
     }
+
+    getStartEventCode() {
+        let code = '';
+        const events = config.get('events', []);
+        events
+            .filter(event => event && event.event === 'gcode:start')
+            .forEach(options => {
+                const { enabled, commands } = { ...options };
+                if (enabled && commands.length > 0) {
+                    code = commands;
+                }
+            });
+        return code;
+    }
+
+    hasEnabledPauseEvent() {
+        let isEnabled = false;
+        const events = config.get('events', []);
+        events
+            .filter(event => event && event.event === 'gcode:pause')
+            .forEach(options => {
+                const { enabled, commands } = { ...options };
+                if (enabled && commands.length > 0) {
+                    isEnabled = true;
+                }
+            });
+        return isEnabled;
+    }
+
+    hasEnabledResumeEvent() {
+        let isEnabled = false;
+        const events = config.get('events', []);
+        events
+            .filter(event => event && event.event === 'gcode:resume')
+            .forEach(options => {
+                const { enabled, commands } = { ...options };
+                if (enabled && commands.length > 0) {
+                    isEnabled = true;
+                }
+            });
+        return isEnabled;
+    }
 }
 
 export default EventTrigger;

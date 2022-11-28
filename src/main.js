@@ -22,7 +22,7 @@
  */
 
 import '@babel/polyfill';
-import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen } from 'electron';
+import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -36,15 +36,22 @@ import launchServer from './server-cli';
 import pkg from './package.json';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
+import { getGRBLLog } from './electron-app/grblLogs';
+
 
 
 let windowManager = null;
 let hostInformation = {};
+let grblLog = log.create('grbl');
+let logPath;
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
     const gotSingleInstanceLock = app.requestSingleInstanceLock();
     const shouldQuitImmediately = !gotSingleInstanceLock;
+
+    // Initialize remote main
+    require('@electron/remote/main').initialize();
 
     let prevDirectory = '';
 
@@ -73,10 +80,14 @@ const main = () => {
     // Create the user data directory if it does not exist
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
+    // Extra logging
+    logPath = path.join(app.getPath('userData'), 'logs/grbl.log');
+    grblLog.transports.file.resolvePath = () => logPath;
 
 
     app.whenReady().then(async () => {
         try {
+            session.defaultSession.clearCache();
             windowManager = new WindowManager();
             // Create and show splash before server starts
             const splashScreen = windowManager.createSplashScreen({
@@ -95,7 +106,7 @@ const main = () => {
             });
 
             const res = await launchServer();
-            const { address, port, mountPoints, headless } = { ...res };
+            const { address, port, headless, requestedHost } = { ...res };
             hostInformation = {
                 address,
                 port,
@@ -106,7 +117,7 @@ const main = () => {
                 return;
             }
             if (headless) {
-                log.debug(`Started remote build at ${address}:${port}`);
+                log.debug(`Started remote build at ${address}:${port} - ${requestedHost}`);
             }
 
             const url = `http://${address}:${port}`;
@@ -163,10 +174,16 @@ const main = () => {
                 if ('type' in error) {
                     log.transports.file.level = 'error';
                 }
-                (error.type === 'GRBL_ERROR') ? log.error(`GRBL_ERROR: Error:${error.code} - ${error.message}. On Line - ${error.lineNumber}`) : log.error(`GRBL_ALARM: ${error.message}`);
+                (error.type === 'GRBL_ERROR') ? grblLog.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
+            });
+
+            ipcMain.handle('grblLog:fetch', async (channel) => {
+                const data = await getGRBLLog(logPath);
+                return data;
             });
 
             ipcMain.handle('check-remote-status', (channel) => {
+                log.debug(hostInformation);
                 return hostInformation;
             });
 
@@ -266,6 +283,9 @@ const main = () => {
         //Check for available updates at end to avoid try-catch failing to load events
         const internetConnectivity = await isOnline();
         if (internetConnectivity) {
+            if (pkg.version.includes('EDGE') || pkg.version.includes('BETA')) {
+                autoUpdater.allowPrerelease = true;
+            }
             autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
             // There may be situations where something is blocking the update check outside of internet connectivity
             // This sets a 5 second timeout on the await.

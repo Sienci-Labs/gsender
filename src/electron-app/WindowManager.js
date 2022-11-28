@@ -23,8 +23,9 @@
 
 /* eslint import/no-unresolved: 0 */
 import { app, BrowserWindow, shell } from 'electron';
-import log from 'electron-log';
 import path from 'path';
+
+const remoteMain = require('@electron/remote/main');
 
 class WindowManager {
     windows = [];
@@ -97,6 +98,8 @@ class WindowManager {
             }
         });
         const webContents = window.webContents;
+        // Enable remote API
+        remoteMain.enable(window.webContents);
         //window.removeMenu();
         window.webContents.once('did-finish-load', () => {
             window.setTitle(options.title);

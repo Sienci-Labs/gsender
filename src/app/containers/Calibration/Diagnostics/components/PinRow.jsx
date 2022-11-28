@@ -31,7 +31,7 @@ const PinRow = ({ label, value = false }) => {
             <div className={styles.pinLabel}>{label}</div>
             <div className={cx(styles.pinIndicator, value ? styles.pinActive : styles.pinInactive)}>
                 {
-                    value ? 'High' : 'Low'
+                    value ? 'On' : 'Off'
                 }
             </div>
         </div>

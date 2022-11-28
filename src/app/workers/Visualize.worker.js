@@ -81,7 +81,7 @@ onmessage = function({ data }) {
             addLine: (modal, v1, v2) => {
                 const { motion } = modal;
 
-                const opacity = (motion === 'G0') ? 0.1 : 1;
+                const opacity = (motion === 'G0') ? 0.5 : 1;
                 const color = [motion, opacity];
                 colors.push(color, color);
                 vertices.push(

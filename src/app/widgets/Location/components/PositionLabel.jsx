@@ -38,9 +38,7 @@ const PositionLabel = ({ value, small }) => {
                 fontWeight: small ? '400' : 'bold' }}
             className={styles.axesPositionLabel}
         >
-            <span>{value.split('.')[0]}</span>
-            <span>.</span>
-            <span>{value.split('.')[1]}</span>
+            <span>{value}</span>
         </div>
     );
 };

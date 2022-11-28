@@ -71,7 +71,7 @@ const AddTool = ({ actions, state }) => {
                     onClick={toolActions.addTool}
                     disabled={tool.imperialDiameter === 0 || tool.metricDiameter === 0}
                 >
-                Add Tool
+                    Add Tool
                 </button>
             </TooltipCustom>
         </div>

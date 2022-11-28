@@ -1,40 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
 import store from 'app/store';
 import { Toaster, TOASTER_SUCCESS, TOASTER_SHORT } from 'app/lib/toaster/ToasterLib';
 import Button from 'app/components/FunctionButton/FunctionButton';
 
-import styles from './index.styl';
+import styles from '../index.styl';
 
-import { Profile } from './Profile';
+import Profile from './Profile';
 import ProfileList from './ProfileList';
-import AddActionModal from './AddActionModal';
-import AddProfileModal from './AddProfileModal';
+import ProfileModal from './ProfileModal';
 
-const Joystick = () => {
+const Gamepad = () => {
     const [profiles, setProfiles] = useState(store.get('workspace.gamepad.profiles'));
-    const [currentProfile, setCurrentProfile] = useState(null);
-    const [showAddAction, setShowAddAction] = useState(false);
+    const [currentProfileID, setCurrentProfileID] = useState(null);
     const [showAddProfile, setShowAddProfile] = useState(false);
 
-    const handleClick = (id) => {
-        const profile = profiles.find((profile) => profile.id === id);
-
-        if (profile) {
-            setCurrentProfile(profile);
-        }
+    const handleProfileClick = (id) => {
+        setCurrentProfileID(id);
     };
 
-    const handleDelete = (id) => {
+    const handleProfileDelete = (id) => {
         const filteredProfiles = profiles.filter(profile => profile.id !== id);
 
         setProfiles(filteredProfiles);
-        setCurrentProfile(null);
+        setCurrentProfileID(null);
 
         store.replace('workspace.gamepad.profiles', filteredProfiles);
 
         Toaster.pop({
-            msg: 'Removed Joystick Profile',
+            msg: 'Removed Gamepad Profile',
             type: TOASTER_SUCCESS,
             duration: TOASTER_SHORT
         });
@@ -43,10 +37,6 @@ const Joystick = () => {
     const handleUpdateProfiles = (updatedProfiles) => {
         setProfiles(updatedProfiles);
         store.replace('workspace.gamepad.profiles', updatedProfiles);
-
-        const updatedCurrentProfile = updatedProfiles.find(profile => profile.id === currentProfile.id);
-
-        setCurrentProfile(updatedCurrentProfile);
     };
 
     const handleShortcutsToggle = (toggle) => {
@@ -55,10 +45,12 @@ const Joystick = () => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (currentProfile.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : currentProfile));
+            profiles.map(profile => (currentProfile.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
 
         handleUpdateProfiles(updatedProfiles);
     };
+
+    const currentProfile = useMemo(() => profiles.find(profile => profile.id === currentProfileID), [currentProfileID, profiles]);
 
     const allShortcutsEnabled = currentProfile?.shortcuts?.every(shortcut => shortcut.isActive);
     const allShortcutsDisabled = currentProfile?.shortcuts?.every(shortcut => !shortcut.isActive);
@@ -66,10 +58,10 @@ const Joystick = () => {
     return (
         <div className={styles.container}>
             {
-                currentProfile
+                currentProfileID
                     ? (
                         <>
-                            <Profile currentProfile={currentProfile} onUpdateProfiles={handleUpdateProfiles} />
+                            <Profile data={currentProfile} onUpdateProfiles={handleUpdateProfiles} />
 
                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                 <div style={{ display: 'flex', gap: '1rem' }}>
@@ -82,7 +74,7 @@ const Joystick = () => {
                                         <span>Disable All Shortcuts</span>
                                     </Button>
                                 </div>
-                                <Button primary onClick={() => setCurrentProfile(null)}>
+                                <Button primary onClick={() => setCurrentProfileID(null)}>
                                     <i className="fas fa-arrow-left" />
                                     <span>Back to Profiles List</span>
                                 </Button>
@@ -92,21 +84,18 @@ const Joystick = () => {
                     : (
                         <ProfileList
                             profiles={profiles}
-                            onClick={handleClick}
-                            onDelete={handleDelete}
+                            onClick={handleProfileClick}
+                            onDelete={handleProfileDelete}
                             onAdd={() => setShowAddProfile(true)}
                         />
                     )
             }
 
             {
-                showAddAction && <AddActionModal onClose={() => setShowAddAction(false)} />
-            }
-            {
-                showAddProfile && <AddProfileModal onClose={() => setShowAddProfile(false)} onAdd={(newProfiles) => setProfiles(newProfiles)} />
+                showAddProfile && <ProfileModal onClose={() => setShowAddProfile(false)} onAdd={(newProfiles) => setProfiles(newProfiles)} />
             }
         </div>
     );
 };
 
-export default Joystick;
+export default Gamepad;

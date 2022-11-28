@@ -178,9 +178,13 @@ class ConsoleWidget extends PureComponent {
         this.config.set('minimized', minimized);
 
         if (isElectron() && !this.hasSetState && this.props.state) {
-            this.hasSetState = true;
-            this.setState(this.props.state);
+            this.setHasSetState();
         }
+    }
+
+    setHasSetState() {
+        this.hasSetState = true;
+        this.setState(this.props.state);
     }
 
     getInitialState() {
@@ -236,17 +240,17 @@ class ConsoleWidget extends PureComponent {
         return (
             <Widget fullscreen={isFullscreen}>
                 {
-                    isMainWindow &&
-                    <Widget.Header embedded={embedded}>
-                        <Widget.Title>
-                            {isForkedWidget &&
-                            <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
-                            }
-                            {i18n._('Console')}
-                        </Widget.Title>
-                        <Widget.Controls>
-                        </Widget.Controls>
-                    </Widget.Header>
+                    isMainWindow && (
+                        <Widget.Header embedded={embedded}>
+                            <Widget.Title>
+                                {isForkedWidget &&
+                                <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
+                                }
+                                {i18n._('Console')}
+                            </Widget.Title>
+                            <Widget.Controls />
+                        </Widget.Header>
+                    )
                 }
                 <Widget.Content
                     className={cx(
@@ -270,7 +274,7 @@ class ConsoleWidget extends PureComponent {
                     />
                     {
                         isElectron() && this.props.isMainWindow &&
-                        <PopOutButton id={widgetId} state={state}/>
+                        <PopOutButton id={widgetId} state={state} />
                     }
                 </Widget.Content>
             </Widget>

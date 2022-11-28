@@ -131,7 +131,9 @@ class Controller {
 
     // Connection options
     host = null;
+
     next = null;
+
     options = null;
 
     // @param {object} io The socket.io-client module.

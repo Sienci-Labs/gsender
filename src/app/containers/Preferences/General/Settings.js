@@ -81,7 +81,7 @@ const Settings = () => {
         const res = await api.events.fetch();
         const events = res.body.records;
 
-        const settingsJSON = JSON.stringify({ settings, events }, null, 1);
+        const settingsJSON = JSON.stringify({ settings, events }, null, 3);
         const data = new Blob([settingsJSON], {
             type: 'application/json'
         });

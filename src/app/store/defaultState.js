@@ -32,6 +32,9 @@ import {
 } from 'app/constants';
 import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 
+import { profiles } from './gamepad';
+import { shortcuts } from './shortcuts';
+
 const [M3] = SPINDLE_MODES;
 
 const defaultState = {
@@ -67,7 +70,7 @@ const defaultState = {
                 ]
             }
         },
-        machineProfile: machineProfiles[4],
+        machineProfile: machineProfiles[0],
         probeProfile: {
             xyThickness: {
                 mm: 10,
@@ -123,7 +126,7 @@ const defaultState = {
         gamepad: {
             deadZone: 0.5,
             precision: 3,
-            profiles: [],
+            profiles,
         },
         terminal: {
             inputHistory: [],
@@ -359,23 +362,7 @@ const defaultState = {
             showLineWarnings: false,
         }
     },
-    /**
-     * Command Keys Available (default):
-     *  Start Job                   ~
-     *  Pause Job                   !
-     *  Stop Job                    @
-     *  Zero All                    $
-     *  Go to Zero                  %
-     *  Feed Hold                   ^
-     *  Cycle Start                 &
-     *  Homing                      ctrl + alt + command + h
-     *  Unlock                      ctrl + alt + command + u
-     *  Reset                       ctrl + alt + command + r
-     *  Change Jog Speeds           shift + (+ or -)
-     *  Jog X                       shift + (left or right) * arrows *
-     *  Jog Y                       shift + (up or down)    * arrows *
-     *  Jog Z                       shift + (pageup or pagedown)
-     */
+    commandKeys: shortcuts
 };
 
 export default defaultState;

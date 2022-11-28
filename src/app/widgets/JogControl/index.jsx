@@ -1308,8 +1308,7 @@ class AxesWidget extends PureComponent {
                         }
                         {i18n._('Jog Control')}
                     </Widget.Title>
-                    <Widget.Controls>
-                    </Widget.Controls>
+                    <Widget.Controls />
                 </Widget.Header>
                 <Widget.Content
                     className={cx(

@@ -24,8 +24,9 @@ import React from 'react';
 import FirmwareOptions from 'app/containers/Calibration/Diagnostics/components/FirmwareOptions';
 import ProgramInfo from 'app/containers/Calibration/Diagnostics/components/ProgramInfo';
 import PinStatus from 'app/containers/Calibration/Diagnostics/components/PinStatus';
-
+import AtAGlance from 'app/containers/Calibration/Diagnostics/components/AtAGlance';
 import styles from './index.styl';
+
 
 const DiagnosticTool = () => {
     return (
@@ -34,6 +35,7 @@ const DiagnosticTool = () => {
                 <ProgramInfo />
                 <PinStatus />
                 <FirmwareOptions />
+                <AtAGlance />
             </div>
         </div>
     );

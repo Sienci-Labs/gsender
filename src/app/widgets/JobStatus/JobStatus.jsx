@@ -25,6 +25,8 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import get from 'lodash/get';
+import reduxStore from 'app/store/redux';
+import { UPDATE_JOB_OVERRIDES } from 'app/actions/visualizerActions';
 import { connect } from 'react-redux';
 import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
 import ToggleSwitch from 'app/components/ToggleSwitch';
@@ -57,12 +59,8 @@ class JobStatus extends PureComponent {
         return `${size} bytes`;
     };
 
-    state = {
-    }
-
     handleOverrideToggle = () => {
-        console.log(this.state);
-        if (this.state.toggleStatus === 'jobStatus') {
+        if (get(reduxStore.getState(), 'visualizer.jobOverrides.toggleStatus') === 'jobStatus') {
             localStorage.setItem('jobOverrideToggle', JSON.stringify({
                 isChecked: true,
                 toggleStatus: 'overrides',
@@ -73,7 +71,7 @@ class JobStatus extends PureComponent {
                 toggleStatus: 'jobStatus',
             }));
         }
-        this.setState(JSON.parse(localStorage.getItem('jobOverrideToggle')));
+        reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: JSON.parse(localStorage.getItem('jobOverrideToggle')) });
     }
 
     componentDidUpdate() {
@@ -81,7 +79,6 @@ class JobStatus extends PureComponent {
             localStorage.setItem('jobOverrideToggle', JSON.stringify({ isChecked: false,
                 toggleStatus: 'jobStatus', }));
         }
-        this.setState(JSON.parse(localStorage.getItem('jobOverrideToggle')));
     }
 
     componentDidMount() {
@@ -111,8 +108,9 @@ class JobStatus extends PureComponent {
                                                     label="Overrides"
                                                     onChange={() => this.handleOverrideToggle()}
                                                     className={styles.litetoggle}
-                                                    checked={this.state.isChecked}
+                                                    checked={get(reduxStore.getState(), 'visualizer.jobOverrides.isChecked')}
                                                     size="md"
+                                                    style={{ minWidth: '10rem' }}
                                                 />
                                             ) : <span />
                                         }
@@ -131,7 +129,7 @@ class JobStatus extends PureComponent {
                             )
                             : (<div className={styles['file-name']}><span className={styles['file-text']}>No File Loaded</span></div>)}
                 </div>
-                {this.state.isChecked
+                {get(reduxStore.getState(), 'visualizer.jobOverrides.isChecked') && state.senderStatus
                     ? <Overrides state={state} />
                     : <IdleInfo state={state} />
                 }
@@ -146,9 +144,11 @@ export default connect((store) => {
     const name = get(file, 'name', '');
     const filteredPath = path.replace(name, '');
     const connection = get(store, 'connection');
+    const activeState = get(store, 'controller.state.status.activeState', 'Idle');
     return {
         ...file,
         filteredPath,
-        connection
+        connection,
+        activeState
     };
 })(JobStatus);

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import throttle from 'lodash/throttle';
+import uniqueId from 'lodash/uniqueId';
 
 import Button from 'app/components/FunctionButton/FunctionButton';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
@@ -22,7 +23,7 @@ const GcodeViewer = ({ gcode }) => {
         <Container>
             <GcodeContainer>
                 {
-                    gcode.split('\n').map((line, i) => <Line key={`${i}-${line}`} number={i + 1} text={line} />)
+                    gcode.split('\n').map((line, i) => <Line key={`${uniqueId()}-${line}`} number={i + 1} text={line} />)
                 }
             </GcodeContainer>
             <Button style={{ margin: 0 }} onClick={handleCopy}>

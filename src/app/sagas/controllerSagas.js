@@ -41,6 +41,7 @@ import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/work
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import isElectron from 'is-electron';
+import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 
 
 export function* initialize() {
@@ -160,14 +161,10 @@ export function* initialize() {
             onJobStop(status.timeRunning);
         }
 
-        try {
-            reduxStore.dispatch({
-                type: controllerActions.UPDATE_SENDER_STATUS,
-                payload: { status },
-            });
-        } catch (e) {
-            console.log(e);
-        }
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_SENDER_STATUS,
+            payload: { status },
+        });
     });
 
     controller.addListener('workflow:state', (state) => {
@@ -212,7 +209,7 @@ export function* initialize() {
         pubsub.publish('machine:connected');
     });
 
-    controller.addListener('serialport:close', (options) => {
+    controller.addListener('serialport:close', (options, received) => {
         // Reset homing run flag to prevent rapid position without running homing
         reduxStore.dispatch({
             type: controllerActions.RESET_HOMING,
@@ -223,6 +220,34 @@ export function* initialize() {
         });
 
         pubsub.publish('machine:disconnected');
+
+        // if the connection was closed unexpectedly (not by the user),
+        // the number of lines sent will be defined.
+        // create a pop up so the user can connect to the last active port
+        // and resume from the last line
+        if (received) {
+            const content = (
+                <div>
+                    <p>
+                        {
+                            'The machine connection has been disrupted. To attempt to reconnect to the last active port and continue from the last line ('
+                            + received
+                            + '), press Resume.'
+                        }
+                    </p>
+                </div>
+            );
+
+            Confirm({
+                title: 'Port Disconnected',
+                content,
+                confirmLabel: 'Resume',
+                cancelLabel: 'Close',
+                onConfirm: () => {
+                    connectToLastDevice(() => controller.command('gcode:start', received));
+                }
+            });
+        }
     });
 
     controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts) => {
@@ -418,9 +443,15 @@ export function* initialize() {
             controller.command('toolchange:post');
         };
 
-        const content = (comment.length > 0)
-            ? <div><p>A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.</p><p>Comment: <b>{comment}</b></p></div>
-            : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
+        const content = (comment.length > 0) ? (
+            <div>
+                <p>
+                    A toolchange command (M6) was found - click confirm to verify
+                    the tool has been changed and run your post-toolchange code.
+                </p>
+                <p>Comment: <b>{comment}</b></p>
+            </div>
+        ) : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
 
         Confirm({
             title: 'Confirm Toolchange',
@@ -479,7 +510,7 @@ export function* initialize() {
         Toaster.clear();
         Toaster.pop({
             type: TOASTER_INFO,
-            msg: `Tool command found - <b>${tool}</b>`,
+            msg: `Tool command found - ${tool}`,
             duration: TOASTER_UNTIL_CLOSE
         });
     });
@@ -489,14 +520,8 @@ export function* initialize() {
     });
 
     controller.addListener('error', (error) => {
-        try {
-            if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
-                window.ipcRenderer.send('logError:electron', error);
-            } else {
-                console.log(error.message);
-            }
-        } catch (error) {
-            console.log(error.message);
+        if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
+            window.ipcRenderer.send('logError:electron', error);
         }
     });
 

@@ -61,7 +61,7 @@ import {
 import { METRIC_UNITS } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
-import { runOverride } from '../runOverride';
+import { calcOverrides } from '../runOverride';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -90,6 +90,7 @@ class GrblController {
         },
         close: (err) => {
             this.ready = false;
+            const received = this.sender?.state?.received;
             if (err) {
                 log.warn(`Disconnected from serial port "${this.options.port}":`, err);
             }
@@ -101,7 +102,7 @@ class GrblController {
 
                 // Destroy controller
                 this.destroy();
-            });
+            }, received);
         },
         error: (err) => {
             this.ready = false;
@@ -254,7 +255,6 @@ class GrblController {
                     }
                     if (line === PAUSE_START) {
                         log.debug('Found M0/M1, pausing program');
-                        this.feeder.hold({ data: '%m0m1_pause', comment: commentString });
                         this.emit('sender:M0M1', { data: 'M0/M1', comment: commentString });
                         return 'G4 P0.5';
                     }
@@ -582,13 +582,34 @@ class GrblController {
         this.runner.on('error', (res) => {
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
+
             log.error(`Error occurred at ${Date.now()}`);
-            const { received } = this.sender.state;
+
+            const { lines, received, name } = this.sender.state;
+            const isFileError = lines.length !== 0;
+            //Check error origin
+            let errorOrigin = '';
+            let line = '';
+
+            if (isFileError) {
+                errorOrigin = name;
+                line = lines[received] || '';
+            } else if (store.get('inAppConsoleInput') !== null) {
+                line = store.get('inAppConsoleInput') || '';
+                store.set('inAppConsoleInput', null);
+                errorOrigin = 'Console';
+            } else {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
+            }
+
             this.emit('error', {
                 type: 'GRBL_ERROR',
                 code: `${code}`,
-                message: error.message,
-                lineNumber: received,
+                description: error.description,
+                line: line,
+                lineNumber: isFileError ? received + 1 : '',
+                origin: errorOrigin
             });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
@@ -600,7 +621,7 @@ class GrblController {
 
                 if (error) {
                     if (preferences.showLineWarnings === false) {
-                        const msg = `Error ${code} on line ${received} - ${error.message}`;
+                        const msg = `Error ${code} on line ${received + 1} - ${error.message}`;
                         this.emit('gcode_error', msg);
                         this.workflow.pause({ err: `error:${code} (${error.message})` });
                     }
@@ -640,7 +661,8 @@ class GrblController {
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
                 this.emit('error', {
                     type: 'GRBL_ALARM',
-                    message: `ALARM:${code} (${alarm.message})`,
+                    code: code,
+                    description: alarm.description,
                 });
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
@@ -1050,7 +1072,7 @@ class GrblController {
         });
     }
 
-    close(callback) {
+    close(callback, received) {
         const { port } = this.options;
 
         // Assertion check
@@ -1068,8 +1090,8 @@ class GrblController {
 
         this.emit('serialport:close', {
             port: port,
-            inuse: false
-        });
+            inuse: false,
+        }, received);
 
         // Emit a change event to all connected sockets
         if (this.engine.io) {
@@ -1099,8 +1121,6 @@ class GrblController {
     loadFile(gcode, { name }) {
         log.debug(`Loading file '${name}' to controller`);
         this.command('gcode:load', name, gcode);
-        store.set('lastFeed', this.runner.state.status.ov[0]);
-        store.set('lastSpindle', this.runner.state.status.ov[2]);
     }
 
     addConnection(socket) {
@@ -1305,6 +1325,7 @@ class GrblController {
                     }
 
                     // Move up and then to cut start position
+                    modalGCode.push(this.event.getStartEventCode());
                     modalGCode.push(`G0 G90 G21 Z${zMax + 10}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
@@ -1377,21 +1398,32 @@ class GrblController {
                 this.command('gcode:pause');
             },
             'gcode:pause': async () => {
-                this.event.trigger('gcode:pause');
-
-                this.workflow.pause();
-                await delay(100);
-                this.write('!');
+                if (this.event.hasEnabledPauseEvent()) {
+                    this.workflow.pause();
+                    this.event.trigger('gcode:pause');
+                } else {
+                    this.workflow.pause();
+                    await delay(100);
+                    this.write('!');
+                }
             },
             'resume': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:resume');
             },
             'gcode:resume': async () => {
-                this.write('~');
-                await delay(1000);
-                this.workflow.resume();
-                this.event.trigger('gcode:resume');
+                if (this.event.hasEnabledResumeEvent()) {
+                    this.feederCB = () => {
+                        this.write('~');
+                        this.workflow.resume();
+                        this.feederCB = null;
+                    };
+                    this.event.trigger('gcode:resume');
+                } else {
+                    this.write('~');
+                    await delay(1000);
+                    this.workflow.resume();
+                }
             },
             'feeder:feed': () => {
                 const [commands, context = {}] = args;
@@ -1457,29 +1489,25 @@ class GrblController {
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             'feedOverride': () => {
-                console.log('inside spindle event');
                 const [value] = args;
-                const currFeedOverride = store.get('lastFeed');
-                store.set('lastFeed', value);
-                const Change = value - currFeedOverride;
+                const [feedOV] = this.state.status.ov;
+                const diff = value - feedOV;
                 if (value === 100) {
                     this.write('\x90');
                 } else {
-                    runOverride(this, Change, 'feed');
+                    calcOverrides(this, diff, 'feed');
                 }
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             'spindleOverride': () => {
-                console.log('inside spindle event');
                 const [value] = args;
-                const currFeedOverride = store.get('lastSpindle');
-                const Change = value - currFeedOverride;
-                store.set('lastSpindle', value);
+                const [, spindleOV] = this.state.status.ov;
+                const diff = value - spindleOV;
                 if (value === 100) {
                     this.write('\x99');
                 } else {
-                    runOverride(this, Change, 'spindle');
+                    calcOverrides(this, diff, 'spindle');
                 }
             },
             // Rapid Overrides

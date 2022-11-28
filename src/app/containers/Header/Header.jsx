@@ -312,12 +312,6 @@ class Header extends PureComponent {
     }
 
     registerIPCListeners () {
-        window.ipcRenderer.on('message', (event, msg) => {
-            console.log(msg);
-        });
-        window.ipcRenderer.on('updated_error', (event, err) => {
-            console.log(err);
-        });
         window.ipcRenderer.on('update_available', (info) => {
             this.setState({
                 updateAvailable: true
@@ -327,7 +321,7 @@ class Header extends PureComponent {
     }
 
     updateScreenSize = () => {
-        let isMobile = window.visualViewport.width < 700;
+        const isMobile = window.visualViewport.width / window.visualViewport.height <= 0.5625;
         this.setState({
             mobile: isMobile
         });
@@ -339,13 +333,15 @@ class Header extends PureComponent {
             <>
                 <div className={styles.navBar}>
                     <div className={styles.primary}>
-                        <NavLogo updateAvailable={ updateAvailable } onClick={ () => this.toggleUpdateToast() }/>
+                        <NavLogo updateAvailable={updateAvailable} onClick={() => this.toggleUpdateToast()} />
                         <NavbarConnection
-                            state={ this.state }
-                            actions={ this.actions }
+                            state={this.state}
+                            actions={this.actions}
                             widgetId="connection"
                         />
-                        {hostInformation.headless && <HeadlessIndicator {...hostInformation} />}
+                        {
+                            hostInformation.headless && <HeadlessIndicator {...hostInformation} />
+                        }
                     </div>
                     { !mobile && <NavSidebar /> }
                 </div>

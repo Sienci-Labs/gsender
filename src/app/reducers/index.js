@@ -26,12 +26,14 @@ import controller from './controllerReducers';
 import connection from './connectionReducers';
 import file from './fileInfoReducers';
 import visualizer from './visualizerReducers';
+import preferences from './preferencesReducer';
 
 const consolidatedReducer = combineReducers({
     controller,
     connection,
     file,
-    visualizer
+    visualizer,
+    preferences
 });
 
 export default consolidatedReducer;

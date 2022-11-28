@@ -52,39 +52,18 @@ export const PRIMARY_COLOR = '#3E85C7'; // Light Blue
 export const BORDER_COLOR = '#9CA3AF';
 export const SECONDARY_COLOR = '#6F7376'; // Grey (for disabled look)
 
-export const DARK_THEME_VALUES = {
-    backgroundColor: '#111827', //Navy Blue
-    gridColor: '#77a9d7', // Turqoise / Light Blue
-    xAxisColor: '#df3b3b', //Indian Red
-    yAxisColor: '#06b881', //Light Green
-    zAxisColor: '#295d8d', //Light Green
-    limitColor: '#5191cc', //Indian Red
-    cuttingCoordinateLines: '#fff', //White
-    joggingCoordinateLines: '#0ef6ae', // Light Green
-    G0Color: '#0ef6ae', // Light Green
-    G1Color: '#3e85c7', // Light Blue
-    G2Color: '#3e85c7', // Light Blue
-    G3Color: '#3e85c7', // Light Blue
-};
-
-export const LIGHT_THEME_VALUES = {
-    backgroundColor: '#e5e7eb', //Navy Blue
-    gridColor: '#000000', // Turqoise / Light Blue
-    xAxisColor: '#df3b3b', //Indian Red
-    yAxisColor: '#06b881', //Light Green
-    zAxisColor: '#295d8d', //Light Green
-    limitColor: '#5191cc', //Indian Red
-    cuttingCoordinateLines: '#000000',
-    joggingCoordinateLines: '#0ef6ae', // Light Green
-    G0Color: '#0ef6ae', // Light Green
-    G1Color: '#111827', // Dark Blue
-    G2Color: '#111827', // Dark Blue
-    G3Color: '#111827', // Dark Blue
-};
-
 export const DARK_THEME = 'Dark';
 export const LIGHT_THEME = 'Light';
 export const CUST_THEME = 'Custom';
+
+export const ALL_THEMES = [
+    DARK_THEME,
+    LIGHT_THEME,
+    CUST_THEME,
+];
+export const CUSTOMIZABLE_THEMES = [
+    CUST_THEME,
+];
 
 export const BACKGROUND_PART = 'Background';
 export const GRID_PART = 'Grid';
@@ -98,3 +77,50 @@ export const G0_PART = 'G0';
 export const G1_PART = 'G1';
 export const G2_PART = 'G2';
 export const G3_PART = 'G3';
+export const LASER_PART = 'Laser';
+
+export const PARTS_LIST = [
+    BACKGROUND_PART,
+    GRID_PART,
+    XAXIS_PART,
+    YAXIS_PART,
+    ZAXIS_PART,
+    LIMIT_PART,
+    CUTTING_PART,
+    JOGGING_PART,
+    G0_PART,
+    G1_PART,
+    LASER_PART
+];
+
+export const DARK_THEME_VALUES = new Map([
+    [BACKGROUND_PART, '#111827'], //Navy Blue
+    [GRID_PART, '#77a9d7'], // Turqoise / Light Blue
+    [XAXIS_PART, '#df3b3b'], //Indian Red
+    [YAXIS_PART, '#06b881'], //Light Green
+    [ZAXIS_PART, '#295d8d'], //Light Green
+    [LIMIT_PART, '#5191cc'], //Indian Red
+    [CUTTING_PART, '#fff'], //White
+    [JOGGING_PART, '#0ef6ae'], // Light Green
+    [G0_PART, '#0ef6ae'], // Light Green
+    [G1_PART, '#3e85c7'], // Light Blue
+    [G2_PART, '#3e85c7'], // Light Blue
+    [G3_PART, '#3e85c7'], // Light Blue
+    [LASER_PART, '#FF0000'], // Red
+]);
+
+export const LIGHT_THEME_VALUES = new Map([
+    [BACKGROUND_PART, '#e5e7eb'], //Navy Blue
+    [GRID_PART, '#000000'], // Turqoise / Light Blue
+    [XAXIS_PART, '#df3b3b'], //Indian Red
+    [YAXIS_PART, '#06b881'], //Light Green
+    [ZAXIS_PART, '#295d8d'], //Light Green
+    [LIMIT_PART, '#5191cc'], //Indian Red
+    [CUTTING_PART, '#000000'],
+    [JOGGING_PART, '#0ef6ae'], // Light Green
+    [G0_PART, '#0ef6ae'], // Light Green
+    [G1_PART, '#111827'], // Dark Blue
+    [G2_PART, '#111827'], // Dark Blue
+    [G3_PART, '#111827'], // Dark Blue
+    [LASER_PART, '#FF0000'] // Red
+]);

@@ -24,7 +24,7 @@
 import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
 import partition from 'lodash/partition';
-import SerialPort from 'serialport';
+import { SerialPort } from 'serialport';
 import socketIO from 'socket.io';
 //import socketioJwt from 'socketio-jwt';
 import EventTrigger from '../../lib/EventTrigger';
@@ -372,7 +372,6 @@ class CNCEngine {
 
             socket.on('command', (port, cmd, ...args) => {
                 log.debug(`socket.command("${port}", "${cmd}"): id=${socket.id}`);
-
                 const controller = store.get(`controllers["${port}"]`);
                 if (!controller || controller.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);
@@ -414,7 +413,7 @@ class CNCEngine {
 
             socket.on('writeln', (port, data, context = {}) => {
                 log.debug(`socket.writeln("${port}", "${data}", ${JSON.stringify(context)}): id=${socket.id}`);
-
+                store.set('inAppConsoleInput', data);
                 const controller = store.get(`controllers["${port}"]`);
                 if (!controller || controller.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);
