@@ -38,6 +38,7 @@ import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/work
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import isElectron from 'is-electron';
+import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 
 
 export function* initialize() {
@@ -205,7 +206,7 @@ export function* initialize() {
         pubsub.publish('machine:connected');
     });
 
-    controller.addListener('serialport:close', (options) => {
+    controller.addListener('serialport:close', (options, received) => {
         // Reset homing run flag to prevent rapid position without running homing
         reduxStore.dispatch({
             type: controllerActions.RESET_HOMING,
@@ -216,6 +217,34 @@ export function* initialize() {
         });
 
         pubsub.publish('machine:disconnected');
+
+        // if the connection was closed unexpectedly (not by the user),
+        // the number of lines sent will be defined.
+        // create a pop up so the user can connect to the last active port
+        // and resume from the last line
+        if (received) {
+            const content = (
+                <div>
+                    <p>
+                        {
+                            'The machine connection has been disrupted. To attempt to reconnect to the last active port and continue from the last line ('
+                            + received
+                            + '), press Resume.'
+                        }
+                    </p>
+                </div>
+            );
+
+            Confirm({
+                title: 'Port Disconnected',
+                content,
+                confirmLabel: 'Resume',
+                cancelLabel: 'Close',
+                onConfirm: () => {
+                    connectToLastDevice(() => controller.command('gcode:start', received));
+                }
+            });
+        }
     });
 
     controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts) => {
