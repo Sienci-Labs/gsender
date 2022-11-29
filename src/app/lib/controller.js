@@ -98,7 +98,8 @@ class Controller {
         'homing:flag': [],
         'electronErrors:errorList': [],
         'grbl:iSready': [],
-        'sender:M0M1': []
+        'sender:M0M1': [],
+        'ip:list': [],
     };
 
     context = {
@@ -131,7 +132,9 @@ class Controller {
 
     // Connection options
     host = null;
+
     next = null;
+
     options = null;
 
     // @param {object} io The socket.io-client module.
@@ -313,6 +316,12 @@ class Controller {
     // @param {string} port The path of the serial port you want to close. For example, `dev/tty.XXX` on Mac and Linux, or `COM1` on Windows.
     addClient(port) {
         this.socket && this.socket.emit('addclient', port);
+    }
+
+    //Send an event to get list of available IP addresses in the computer
+    // @param {function} [callback] Called once completed.
+    listAllIps(callback) {
+        this.socket && this.socket.emit('listAllIps', callback);
     }
 
     // Executes a command on the server.

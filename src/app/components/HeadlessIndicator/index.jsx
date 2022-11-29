@@ -22,6 +22,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import reduxStore from 'app/store/redux';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import Select from 'react-select';
@@ -31,6 +32,7 @@ import actions from './apiActions';
 import Tooltip from '../TooltipCustom/ToolTip';
 import DialogBox from './DialogBox';
 import styles from './index.styl';
+import controller from '../../lib/controller';
 
 const HeadlessIndicator = ({ address, port }) => {
     const defaultHeadlessSettings = { ip: '', port: 8000, headlessStatus: false };
@@ -55,13 +57,13 @@ const HeadlessIndicator = ({ address, port }) => {
         let hasError = false;
 
         switch (name) {
-        default:
-        case 'ip':
-            //IP
+        //IP
         // 210.110 – must have 4 octets
         // y.y.y.y – format allowed
         // 255.0.0.y – format allowed
         // 666.10.10.20 – digits must be between [0-255]
+        default:
+        case 'ip':
             if (!/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(value)) {
                 errors.ipError = 'Invalid IP Address';
                 errors.ipHint = 'Ip addresses should consist of 4 sets of numbers between 0 and 255 following the pattern X.X.X.X';
@@ -97,7 +99,8 @@ const HeadlessIndicator = ({ address, port }) => {
     const handleInputChanges = (event) => {
         //handle select
         if (!event.target) {
-            setHeadlessSettings({ ...headlessSettings, ip: event.target.value });
+            setHeadlessSettings({ ...headlessSettings, ip: event.value });
+            validateInputs({ name: 'ip', value: event.value });
             return;
         }
         const { name, value } = event.target;
@@ -164,11 +167,17 @@ const HeadlessIndicator = ({ address, port }) => {
     //refresh IP list on reload
     useEffect(() => {
         actions.fetchSettings(setHeadlessSettings, setOldSettings);
-        setIpList([{ value: '', label: '' }]);//TODO - fetch real data
     }, []);
     useEffect(() => {
-        console.log(headlessSettings);
-    }, [headlessSettings]);
+        controller.listAllIps();
+        const ipList = _.get(reduxStore.getState(), 'preferences.ipList');
+        let formattedIpList = [];
+
+        ipList.forEach((ip) => {
+            formattedIpList.push({ value: ip, label: ip });
+        });
+        setIpList(formattedIpList);
+    }, [headlessSettings, _.get(reduxStore.getState(), 'preferences.ipList')]);
 
     return (
         <div className={styles.headlessWrapper}>

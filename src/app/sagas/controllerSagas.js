@@ -29,6 +29,7 @@ import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
+import * as preferenceActions from 'app/actions/preferencesActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import EstimateWorker from 'app/workers/Estimate.worker';
@@ -365,6 +366,13 @@ export function* initialize() {
 
     controller.addListener('electronErrors:errorList', (errorList) => {
         store.set('electron-error-list', errorList);
+    });
+
+    controller.addListener('ip:list', (ipList) => {
+        reduxStore.dispatch({
+            type: preferenceActions.SET_IP_LIST,
+            payload: ipList,
+        });
     });
 
     // Need this to handle unload when machine not connected since controller event isn't sent
