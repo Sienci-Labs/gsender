@@ -28,6 +28,7 @@ import Button from '@mui/material/Button';
 import Select from 'react-select';
 import _ from 'lodash';
 import { Toaster, TOASTER_SUCCESS, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import { app } from 'electron';
 import actions from './apiActions';
 import Tooltip from '../TooltipCustom/ToolTip';
 import DialogBox from './DialogBox';
@@ -158,7 +159,9 @@ const HeadlessIndicator = ({ address, port }) => {
         //Save port and IP in .sender_rc (even if empty)
         actions.saveSettings(headlessSettings);
         setOldSettings(headlessSettings);
-        //TODO - App restart logic goes here
+
+        //App restart logic goes here
+        app.relaunch({ args: `--remote --port ${headlessSettings.port} --host ${headlessSettings.ip}` });
 
         setShouldRestart(false);
         setShowConfirmation(false);
