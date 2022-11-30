@@ -310,6 +310,7 @@ const appMain = () => {
         app.get(urljoin(settings.route, 'api/events/:id'), api.events.read);
         app.put(urljoin(settings.route, 'api/events/:id'), api.events.update);
         app.delete(urljoin(settings.route, 'api/events/:id'), api.events.__delete);
+        app.delete(urljoin(settings.route, 'api/events'), api.events.clearAll);
 
         // Machines
         app.get(urljoin(settings.route, 'api/machines'), api.machines.fetch);

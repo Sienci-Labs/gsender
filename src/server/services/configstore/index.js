@@ -85,6 +85,19 @@ class ConfigStore extends events.EventEmitter {
         try {
             if (fs.existsSync(this.file)) {
                 this.config = JSON.parse(fs.readFileSync(this.file, 'utf8'));
+                // migration
+                const events = this.config.events;
+                if (events instanceof Array) {
+                    const eventMap = new Map();
+                    for (let i = 0; i < events.length; i++) {
+                        eventMap.set(events[i].event, events[i]);
+                    }
+                    this.config.events = eventMap;
+                    this.sync();
+                } else {
+                    // format events to map
+                    this.config.events = new Map(Object.entries(this.get('events', {})));
+                }
             }
         } catch (err) {
             err.fileName = this.file;
@@ -108,7 +121,10 @@ class ConfigStore extends events.EventEmitter {
 
     sync() {
         try {
-            const content = JSON.stringify(this.config, null, 4);
+            // format map to object
+            const noEventsConfig = _.clone(this.config);
+            noEventsConfig.events = Object.fromEntries(this.config.events);
+            const content = JSON.stringify(noEventsConfig);
             fs.writeFileSync(this.file, content, 'utf8');
         } catch (err) {
             log.error(`Unable to write data to "${this.file}"`);
