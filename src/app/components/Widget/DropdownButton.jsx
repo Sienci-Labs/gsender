@@ -60,6 +60,7 @@ class DropdownButton extends PureComponent {
         const toggleProps = {};
         Object.keys(props).forEach(propName => {
             const propValue = props[propName];
+            // eslint-disable-next-line react/forbid-foreign-prop-types
             if (Dropdown.ControlledComponent.propTypes[propName]) {
                 dropdownProps[propName] = propValue;
             } else {

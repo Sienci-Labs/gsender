@@ -25,6 +25,8 @@
 import { app, BrowserWindow, shell } from 'electron';
 import path from 'path';
 
+const remoteMain = require('@electron/remote/main');
+
 class WindowManager {
     windows = [];
 
@@ -96,6 +98,8 @@ class WindowManager {
             }
         });
         const webContents = window.webContents;
+        // Enable remote API
+        remoteMain.enable(window.webContents);
         //window.removeMenu();
         window.webContents.once('did-finish-load', () => {
             window.setTitle(options.title);

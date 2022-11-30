@@ -35,11 +35,21 @@ const ToolIntroduction = ({ readyHandler, isConnected }) => {
         <>
             <div>
                 <div style={{ fontSize: '1rem' }}>
-                    <p>Reasonable care during assembly will give an adequately square CNC machine, but if you’re looking to more finely tune your setup then this tool is for you.</p>
+                    <p>
+                        Reasonable care during assembly will give an adequately square CNC machine,
+                        but if you’re looking to more finely tune your setup then this tool is for you.
+                    </p>
 
-                    <p>Prepare your router collet by placing a tipped geometry inside, this could be a tapered bit, a v-bit, or even a sharpened dowel. Also have 3 squares of tape that you’ve marked with an ‘X’ and a long straight-edge ruler or measuring tape on hand.</p>
+                    <p>
+                        Prepare your router collet by placing a tipped geometry inside, this could be a tapered bit,
+                        a v-bit, or even a sharpened dowel. Also have 3 squares of tape that you’ve marked
+                        with an ‘X’ and a long straight-edge ruler or measuring tape on hand.
+                    </p>
 
-                    <p>Before starting, please jog your machine to a spot on the front, left corner of the wasteboard, with the tip only slightly offset from the board.</p>
+                    <p>
+                        Before starting, please jog your machine to a spot on the front,
+                        left corner of the wasteboard, with the tip only slightly offset from the board.
+                    </p>
                 </div>
                 <Keypad />
             </div>

@@ -24,6 +24,7 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+import noop from 'lodash/noop';
 import controller from 'app/lib/controller';
 import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
 import styles from './UnlockButton.styl';
@@ -46,16 +47,24 @@ const UnlockButton = ({ activeState, alarmCode }) => {
     };
 
     return (
-        <button onClick={handleUnlock} className={styles.unlockButton} onMouseOver={onMouseOver} onMouseLeave={onMouseOut}>
+        <button
+            type="button"
+            onClick={handleUnlock}
+            className={styles.unlockButton}
+            onMouseOver={onMouseOver}
+            onMouseLeave={onMouseOut}
+            onFocus={noop}
+        >
             <div className={styles.unlockIndicator}>
                 <i className="fas fa-caret-right" />
             </div>
             <i className={isHovering ? 'fas fa-lock-open' : 'fas fa-unlock fa-flip-horizontal'} />
             {
-                isHovering &&
-                <div className={styles.unlockText}>
-                    Unlock Machine
-                </div>
+                isHovering && (
+                    <div className={styles.unlockText}>
+                        Unlock Machine
+                    </div>
+                )
             }
         </button>
     );

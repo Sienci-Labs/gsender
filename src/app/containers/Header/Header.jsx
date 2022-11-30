@@ -312,12 +312,6 @@ class Header extends PureComponent {
     }
 
     registerIPCListeners () {
-        window.ipcRenderer.on('message', (event, msg) => {
-            console.log(msg);
-        });
-        window.ipcRenderer.on('updated_error', (event, err) => {
-            console.log(err);
-        });
         window.ipcRenderer.on('update_available', (info) => {
             this.setState({
                 updateAvailable: true

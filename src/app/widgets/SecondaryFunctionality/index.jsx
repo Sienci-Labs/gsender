@@ -195,8 +195,7 @@ class SecondaryFunctionality extends PureComponent {
 
         return (
             <TabbedWidget fullscreen={isFullscreen}>
-                <TabbedWidget.Tabs tabs={tabs} activeTabIndex={selectedTab} onClick={actions.handleTabSelect}>
-                </TabbedWidget.Tabs>
+                <TabbedWidget.Tabs tabs={tabs} activeTabIndex={selectedTab} onClick={actions.handleTabSelect} />
                 <TabbedWidget.Content>
                     {
                         tabs.map((tab, index) => {

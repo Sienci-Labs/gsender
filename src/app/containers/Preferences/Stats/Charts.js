@@ -40,8 +40,8 @@ const Charts = ({ state, actions }) => {
             <div className={[styles.addMargin, styles.chartsContainer].join(' ')}>
                 <span className={styles.chartsTitle}>Jobs Run</span>
                 {
-                    jobsFinished === 0 && jobsCancelled === 0 ?
-                        <span>No jobs run</span>
+                    jobsFinished === 0 && jobsCancelled === 0
+                        ? <span>No jobs run</span>
                         : <CustomPieChart propsData={data} />
                 }
             </div>

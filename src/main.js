@@ -39,6 +39,7 @@ import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 import { getGRBLLog } from './electron-app/grblLogs';
 
 
+
 let windowManager = null;
 let hostInformation = {};
 let grblLog = log.create('grbl');
@@ -48,6 +49,9 @@ const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
     const gotSingleInstanceLock = app.requestSingleInstanceLock();
     const shouldQuitImmediately = !gotSingleInstanceLock;
+
+    // Initialize remote main
+    require('@electron/remote/main').initialize();
 
     let prevDirectory = '';
 

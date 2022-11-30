@@ -24,6 +24,7 @@
 import React from 'react';
 import isEmpty from 'lodash/isEmpty';
 import get from 'lodash/get';
+import uniqueId from 'lodash/uniqueId';
 import { pdf, Page, View, Text, Document, StyleSheet } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
 import store from 'app/store';
@@ -32,6 +33,118 @@ import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import pkg from '../../package.json';
 import { LASER_MODE } from '../constants';
 import { getAllErrors } from '../containers/Preferences/Safety/helper';
+
+const styles = StyleSheet.create({
+    body: {
+        paddingTop: 35,
+        paddingBottom: 65,
+        paddingHorizontal: 35,
+    },
+    title: {
+        fontSize: 24,
+        textAlign: 'center',
+        fontFamily: 'Helvetica-Bold'
+    },
+    author: {
+        fontSize: 12,
+        textAlign: 'center',
+        marginBottom: 40,
+        fontFamily: 'Helvetica'
+    },
+    container: {
+        margin: 18,
+        marginTop: 0,
+        fontSize: 12,
+    },
+    subtitle: {
+        fontSize: 18,
+        margin: 12,
+        textDecoration: 'underline',
+        fontFamily: 'Helvetica-Bold'
+    },
+    lineWrapper: {
+        marginTop: 6
+    },
+    textBold: {
+        fontSize: 12,
+        textAlign: 'justify',
+        fontFamily: 'Helvetica-Bold',
+    },
+    text: {
+        fontSize: 12,
+        textAlign: 'justify',
+        fontFamily: 'Helvetica'
+    },
+    textItalic: {
+        fontSize: 12,
+        textAlign: 'justify',
+        fontFamily: 'Helvetica-Oblique'
+    },
+    image: {
+        marginVertical: 15,
+        marginHorizontal: 100,
+    },
+    header: {
+        fontSize: 12,
+        marginBottom: 20,
+        textAlign: 'center',
+        color: 'grey',
+    },
+    pageNumber: {
+        position: 'absolute',
+        fontSize: 12,
+        bottom: 30,
+        left: 0,
+        right: 0,
+        textAlign: 'center',
+        color: 'grey',
+    },
+
+    // table styles from https://github.com/diegomura/react-pdf/issues/487#issuecomment-465513123
+    table: {
+        display: 'table',
+        width: '280px',
+        margin: 12,
+        marginTop: 6,
+        borderStyle: 'solid',
+        borderLeftWidth: 1,
+        borderTopWidth: 1,
+    },
+    tableRow: {
+        // margin: 'auto',
+        flexDirection: 'row'
+    },
+    tableCol: {
+        width: '50%',
+        borderStyle: 'solid',
+        borderWidth: 1,
+        borderLeftWidth: 0,
+        borderTopWidth: 0
+    },
+    tableCell: {
+        margin: 'auto',
+        marginTop: 5,
+        fontSize: 10
+    },
+
+    clearTable: {
+        display: 'table',
+        width: '100%',
+        margin: 12,
+    },
+    clearTableRow: {
+        marginBottom: 12,
+        flexDirection: 'row'
+    },
+    clearTableCol: {
+        width: '50%',
+    },
+    clearTableCell: {
+        marginRight: 'auto',
+        marginTop: 12,
+        fontSize: 10
+    }
+});
 
 const getEEPROMValues = () => {
     const eeprom = get(reduxStore.getState(), 'controller.settings.settings', {});
@@ -81,7 +194,45 @@ const getFileInfo = () => {
     return fileInfo;
 };
 
-const generateSupportFile = () => {
+const unwrapObject = (obj, iteration) => {
+    let tabs = '';
+    for (let i = 0; i < iteration; i++) {
+        tabs += '    '; // non break spaces to indent
+    }
+    if (isEmpty(obj)) {
+        return tabs + 'NULL\n';
+    }
+    // .join('') is used to solve an issue where unwanted commas appeared: https://stackoverflow.com/a/45812277
+    return (
+        Object.keys(obj).map((key, i) => (
+            typeof obj[key] === 'object'
+                ? tabs + key + ': \n' + unwrapObject(obj[key], iteration + 1)
+                : tabs + key + ': ' + obj[key] + '\n'
+        )).join('')
+    );
+};
+
+const createTableRows = (array) => {
+    return (
+        Object.keys(array).map((key, i) => (
+            // from https://github.com/diegomura/react-pdf/issues/487#issuecomment-465513123
+            <View style={styles.tableRow} key={uniqueId()}>
+                <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>
+                        {key}
+                    </Text>
+                </View>
+                <View style={styles.tableCol}>
+                    <Text style={styles.tableCell}>
+                        {array[key]}
+                    </Text>
+                </View>
+            </View>
+        ))
+    );
+};
+
+function generateSupportFile() {
     const eeprom = getEEPROMValues();
     const machineProfile = getMachineProfile();
     const version = getGSenderVersion();
@@ -129,7 +280,7 @@ const generateSupportFile = () => {
                                     {'Machine Profile\n'}
                                 </Text>
                                 {
-                                    machineProfile ?
+                                    machineProfile ? (
                                         <>
                                             <Text style={styles.textBold}>
                                                 {'ID: '}
@@ -191,10 +342,11 @@ const generateSupportFile = () => {
                                                 </Text>
                                             </Text>
                                         </>
-                                        :
+                                    ) : (
                                         <Text style={styles.text}>
                                             {'NULL\n'}
                                         </Text>
+                                    )
                                 }
                             </Text>
                         </View>
@@ -206,7 +358,7 @@ const generateSupportFile = () => {
                                     {'Connection\n'}
                                 </Text>
                                 {
-                                    connection ?
+                                    connection ? (
                                         <>
                                             <Text style={styles.textBold}>
                                                 {'Available Ports:\n'}
@@ -237,10 +389,11 @@ const generateSupportFile = () => {
                                                 </Text>
                                             </Text>
                                         </>
-                                        :
+                                    ) : (
                                         <Text style={styles.text}>
                                             {'NULL\n'}
                                         </Text>
+                                    )
                                 }
                             </Text>
                         </View>
@@ -256,7 +409,7 @@ const generateSupportFile = () => {
                                     </Text>
                                 </Text>
                                 {
-                                    !isEmpty(grblInfo.mpos) ?
+                                    !isEmpty(grblInfo.mpos) ? (
                                         <Text style={styles.textBold}>
                                             {'MPos: \n'}
                                             <Text style={styles.textItalic}>
@@ -286,16 +439,17 @@ const generateSupportFile = () => {
                                                 </Text>
                                             </Text>
                                         </Text>
-                                        :
+                                    ) : (
                                         <Text style={styles.textBold}>
                                             {'MPos: '}
                                             <Text style={styles.text}>
                                                 {'NULL\n'}
                                             </Text>
                                         </Text>
+                                    )
                                 }
                                 {
-                                    !isEmpty(grblInfo.wpos) ?
+                                    !isEmpty(grblInfo.wpos) ? (
                                         <Text style={styles.textBold}>
                                             {'WPos: \n'}
                                             <Text style={styles.textItalic}>
@@ -325,16 +479,17 @@ const generateSupportFile = () => {
                                                 </Text>
                                             </Text>
                                         </Text>
-                                        :
+                                    ) : (
                                         <Text style={styles.textBold}>
                                             {'WPos: '}
                                             <Text style={styles.text}>
                                                 {'NULL\n'}
                                             </Text>
                                         </Text>
+                                    )
                                 }
                                 {
-                                    grblInfo.sender.status ?
+                                    grblInfo.sender.status ? (
                                         <Text style={styles.textBold}>
                                             {'Sender Status: \n'}
                                             <Text style={styles.textItalic}>
@@ -350,13 +505,14 @@ const generateSupportFile = () => {
                                                 </Text>
                                             </Text>
                                         </Text>
-                                        :
+                                    ) : (
                                         <Text style={styles.textBold}>
                                             {'Sender Status: '}
                                             <Text style={styles.text}>
                                                 {'NULL\n'}
                                             </Text>
                                         </Text>
+                                    )
                                 }
                                 <Text style={styles.textBold}>
                                     {'Workflow State: '}
@@ -401,14 +557,14 @@ const generateSupportFile = () => {
                 </Text>
                 <View style={styles.container}>
                     {
-                        logs.length > 0 ?
+                        logs.length > 0 ? (
                             logs.map((log, i) => {
                                 if (log.toLowerCase().includes('alarm') && log.includes('[error] GRBL_ALARM:')) {
                                     const split = log.split('[error] GRBL_ALARM:');
                                     const time = split[0].slice(1, 20).replace(' ', ' at ');
                                     const msg = split[1];
                                     return (
-                                        <View style={styles.lineWrapper} key={i}>
+                                        <View style={styles.lineWrapper} key={uniqueId()}>
                                             <Text style={styles.text}>
                                                 {time + '\n'}
                                                 <Text style={[styles.error, { color: 'red' }]}>
@@ -420,10 +576,11 @@ const generateSupportFile = () => {
                                 }
                                 return null;
                             })
-                            :
+                        ) : (
                             <Text style={styles.text}>
                                 None
                             </Text>
+                        )
                     }
                 </View>
                 <Text style={styles.subtitle}>
@@ -431,7 +588,7 @@ const generateSupportFile = () => {
                 </Text>
                 <View style={styles.container}>
                     {
-                        logs.length > 0 ?
+                        logs.length > 0 ? (
                             logs.map((log, i) => {
                                 if (log.toLowerCase().includes('error') && log.includes('[error] GRBL_ERROR:')) {
                                     const split = log.split('[error] GRBL_ERROR:');
@@ -441,7 +598,7 @@ const generateSupportFile = () => {
                                     const msg = content[0];
                                     const line = content[1].split('Origin')[0];
                                     return (
-                                        <View style={styles.lineWrapper} key={i}>
+                                        <View style={styles.lineWrapper} key={uniqueId()}>
                                             <Text style={styles.text}>
                                                 {time + '\n'}
                                                 <Text style={[styles.error, { color: 'red' }]}>
@@ -454,10 +611,11 @@ const generateSupportFile = () => {
                                 }
                                 return null;
                             })
-                            :
+                        ) : (
                             <Text style={styles.text}>
                                 None
                             </Text>
+                        )
                     }
                 </View>
                 <Text style={styles.subtitle}>
@@ -466,12 +624,13 @@ const generateSupportFile = () => {
                 <View style={styles.container}>
                     <Text style={styles.text}>
                         {
-                            history.length > 0 ?
+                            history.length > 0 ? (
                                 history.map((value, i) => {
                                     return value + '\n';
                                 })
-                                :
+                            ) : (
                                 'None'
+                            )
                         }
                     </Text>
                 </View>
@@ -479,7 +638,7 @@ const generateSupportFile = () => {
                     GCode File
                 </Text>
                 {
-                    fileInfo.fileLoaded && grblInfo.sender.status ?
+                    fileInfo.fileLoaded && grblInfo.sender.status ? (
                         <View style={styles.table}>
                             {/* TableHeader */}
                             <View style={styles.tableRow}>
@@ -544,7 +703,7 @@ const generateSupportFile = () => {
                                 </View>
                             </View>
                         </View>
-                        :
+                    ) : (
                         <View style={styles.table}>
                             {/* TableHeader */}
                             <View style={styles.tableRow}>
@@ -560,6 +719,7 @@ const generateSupportFile = () => {
                                 </View>
                             </View>
                         </View>
+                    )
                 }
                 <View style={styles.container}>
                     <Text style={styles.text}>
@@ -577,156 +737,6 @@ const generateSupportFile = () => {
         </Document>
     );
 
-    const styles = StyleSheet.create({
-        body: {
-            paddingTop: 35,
-            paddingBottom: 65,
-            paddingHorizontal: 35,
-        },
-        title: {
-            fontSize: 24,
-            textAlign: 'center',
-            fontFamily: 'Helvetica-Bold'
-        },
-        author: {
-            fontSize: 12,
-            textAlign: 'center',
-            marginBottom: 40,
-            fontFamily: 'Helvetica'
-        },
-        container: {
-            margin: 18,
-            marginTop: 0,
-            fontSize: 12,
-        },
-        subtitle: {
-            fontSize: 18,
-            margin: 12,
-            textDecoration: 'underline',
-            fontFamily: 'Helvetica-Bold'
-        },
-        lineWrapper: {
-            marginTop: 6
-        },
-        textBold: {
-            fontSize: 12,
-            textAlign: 'justify',
-            fontFamily: 'Helvetica-Bold',
-        },
-        text: {
-            fontSize: 12,
-            textAlign: 'justify',
-            fontFamily: 'Helvetica'
-        },
-        textItalic: {
-            fontSize: 12,
-            textAlign: 'justify',
-            fontFamily: 'Helvetica-Oblique'
-        },
-        image: {
-            marginVertical: 15,
-            marginHorizontal: 100,
-        },
-        header: {
-            fontSize: 12,
-            marginBottom: 20,
-            textAlign: 'center',
-            color: 'grey',
-        },
-        pageNumber: {
-            position: 'absolute',
-            fontSize: 12,
-            bottom: 30,
-            left: 0,
-            right: 0,
-            textAlign: 'center',
-            color: 'grey',
-        },
-
-        // table styles from https://github.com/diegomura/react-pdf/issues/487#issuecomment-465513123
-        table: {
-            display: 'table',
-            width: '280px',
-            margin: 12,
-            marginTop: 6,
-            borderStyle: 'solid',
-            borderLeftWidth: 1,
-            borderTopWidth: 1,
-        },
-        tableRow: {
-            // margin: 'auto',
-            flexDirection: 'row'
-        },
-        tableCol: {
-            width: '50%',
-            borderStyle: 'solid',
-            borderWidth: 1,
-            borderLeftWidth: 0,
-            borderTopWidth: 0
-        },
-        tableCell: {
-            margin: 'auto',
-            marginTop: 5,
-            fontSize: 10
-        },
-
-        clearTable: {
-            display: 'table',
-            width: '100%',
-            margin: 12,
-        },
-        clearTableRow: {
-            marginBottom: 12,
-            flexDirection: 'row'
-        },
-        clearTableCol: {
-            width: '50%',
-        },
-        clearTableCell: {
-            marginRight: 'auto',
-            marginTop: 12,
-            fontSize: 10
-        }
-    });
-
-    const unwrapObject = (obj, iteration) => {
-        let tabs = '';
-        for (let i = 0; i < iteration; i++) {
-            tabs += '    '; // non break spaces to indent
-        }
-        if (isEmpty(obj)) {
-            return tabs + 'NULL\n';
-        }
-        // .join('') is used to solve an issue where unwanted commas appeared: https://stackoverflow.com/a/45812277
-        return (
-            Object.keys(obj).map((key, i) => (
-                typeof obj[key] === 'object'
-                    ? tabs + key + ': \n' + unwrapObject(obj[key], iteration + 1)
-                    : tabs + key + ': ' + obj[key] + '\n'
-            )).join('')
-        );
-    };
-
-    const createTableRows = (array) => {
-        return (
-            Object.keys(array).map((key, i) => (
-                // from https://github.com/diegomura/react-pdf/issues/487#issuecomment-465513123
-                <View style={styles.tableRow} key={i}>
-                    <View style={styles.tableCol}>
-                        <Text style={styles.tableCell}>
-                            {key}
-                        </Text>
-                    </View>
-                    <View style={styles.tableCol}>
-                        <Text style={styles.tableCell}>
-                            {array[key]}
-                        </Text>
-                    </View>
-                </View>
-            ))
-        );
-    };
-
     const submitForm = async (event) => {
         event.preventDefault(); // prevent page reload
         const blob = await pdf(<SupportFile />).toBlob();
@@ -740,6 +750,6 @@ const generateSupportFile = () => {
     return (
         <FunctionButton primary onClick={submitForm}>Download Now!</FunctionButton>
     );
-};
+}
 
 export default generateSupportFile;

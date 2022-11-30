@@ -90,6 +90,7 @@ class GrblController {
         },
         close: (err) => {
             this.ready = false;
+            const received = this.sender?.state?.received;
             if (err) {
                 log.warn(`Disconnected from serial port "${this.options.port}":`, err);
             }
@@ -101,7 +102,7 @@ class GrblController {
 
                 // Destroy controller
                 this.destroy();
-            });
+            }, received);
         },
         error: (err) => {
             this.ready = false;
@@ -1078,7 +1079,7 @@ class GrblController {
         });
     }
 
-    close(callback) {
+    close(callback, received) {
         const { port } = this.options;
 
         // Assertion check
@@ -1096,8 +1097,8 @@ class GrblController {
 
         this.emit('serialport:close', {
             port: port,
-            inuse: false
-        });
+            inuse: false,
+        }, received);
 
         // Emit a change event to all connected sockets
         if (this.engine.io) {
@@ -1331,6 +1332,7 @@ class GrblController {
                     }
 
                     // Move up and then to cut start position
+                    modalGCode.push(this.event.getStartEventCode());
                     modalGCode.push(`G0 G90 G21 Z${zMax + 10}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);

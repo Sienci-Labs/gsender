@@ -31,8 +31,7 @@ import CoolantActiveIndicator from 'app/widgets/Coolant/CoolantActiveIndicator';
 const CoolantWidget = ({ widgetId, embedded }) => {
     return (
         <Widget>
-            <Widget.Header embedded={embedded}>
-            </Widget.Header>
+            <Widget.Header embedded={embedded} />
             <Widget.Content style={{ height: '100%' }}>
                 <CoolantActiveIndicator />
                 <CoolantControls />

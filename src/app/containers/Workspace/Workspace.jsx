@@ -607,12 +607,13 @@ class Workspace extends PureComponent {
                             <ConfirmationDialog />
                             <div className={classNames(rowStyle, { [styles.reverseWorkspace]: reverseWidgets })}>
                                 {
-                                    !mobile &&
+                                    !mobile && (
                                         <DefaultWidgets
                                             ref={node => {
                                                 this.defaultContainer = node;
                                             }}
                                         />
+                                    )
                                 }
                                 <div
                                     ref={node => {

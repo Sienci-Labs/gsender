@@ -48,7 +48,7 @@ const ColorCircle = ({ part, onClick, colour, index }) => {
     };
 
     return (
-        <button id={'colorButton' + index} className={styles.colorButton}/>
+        <button id={'colorButton' + index} type="button" className={styles.colorButton} />
     );
 };
 

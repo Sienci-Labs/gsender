@@ -46,7 +46,7 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis, isConnected
             <div className={styles.toolIntro}>
                 <p>
                     All CNCs ship with standard settings so the controller knows how much to turn the motors in order to move 1mm,
-                     a factor of the specs of the motors and the pitch of the lead screws.
+                    a factor of the specs of the motors and the pitch of the lead screws.
                 </p>
 
                 <p>

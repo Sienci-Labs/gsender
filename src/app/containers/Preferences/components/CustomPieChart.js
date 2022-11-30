@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { PieChart } from 'react-minimal-pie-chart';
+import noop from 'lodash/noop';
 import styles from '../index.styl';
 
 
@@ -57,6 +58,8 @@ const CustomPieChart = ({ propsData }) => {
                 onMouseOut={() => {
                     setHovered(null);
                 }}
+                onFocus={noop}
+                onBlur={noop}
             />
             <ReactTooltip
                 id="chart"

@@ -110,7 +110,7 @@ class JobStatus extends PureComponent {
                                                     className={styles.litetoggle}
                                                     checked={get(reduxStore.getState(), 'visualizer.jobOverrides.isChecked')}
                                                     size="md"
-                                                    style={{ 'min-width': '10rem' }}
+                                                    style={{ minWidth: '10rem' }}
                                                 />
                                             ) : <span />
                                         }
