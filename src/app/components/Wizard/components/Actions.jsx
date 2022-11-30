@@ -46,6 +46,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                         };
                         return (
                             <>
+                                {/* eslint-disable-next-line react/no-array-index-key */}
                                 <ToolModalButton key={`action-${index}`} onClick={cbWithCompletion} icon="fas fa-code">
                                     {action.label}
                                 </ToolModalButton>

@@ -9,14 +9,16 @@ const Stepper = () => {
     return (
         <div className={styles.stepperWrapper}>
             {
-                steps.map((step, index) => <Step
-                    step={step}
-                    key={index}
-                    index={index}
-                    active={activeStep === index}
-                    complete={activeStep > index}
-                    activeStep={activeStep}
-                />)
+                steps.map((step, index) => (
+                    <Step
+                        step={step}
+                        key={index}
+                        index={index}
+                        active={activeStep === index}
+                        complete={activeStep > index}
+                        activeStep={activeStep}
+                    />
+                ))
             }
         </div>
     );

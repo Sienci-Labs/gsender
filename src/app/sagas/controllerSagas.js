@@ -230,9 +230,9 @@ export function* initialize() {
                 <div>
                     <p>
                         {
-                            'The machine connection has been disrupted. To attempt to reconnect to the last active port and continue from the last line ('
-                            + received
-                            + '), press Resume.'
+                            'The machine connection has been disrupted. To attempt to reconnect to the last active port and continue from the last line (' +
+                            received +
+                            '), press Resume.'
                         }
                     </p>
                 </div>

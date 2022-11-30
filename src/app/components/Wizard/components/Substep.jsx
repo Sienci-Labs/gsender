@@ -37,7 +37,12 @@ const Substep = ({ step, index, stepIndex }) => {
     const stepIsActive = stepIndex === activeStep && index === activeSubstep;
 
     return (
-        <div className={cx(styles.substepWrapper, { [styles.substepComplete]: stepComplete, [styles.substepActive]: stepIsActive, [styles.substepPending]: futureStep })}>
+        <div className={cx(styles.substepWrapper,
+            { [styles.substepComplete]: stepComplete,
+                [styles.substepActive]: stepIsActive,
+                [styles.substepPending]: futureStep })
+        }
+        >
             <SubstepCompletionIndicator completed={stepComplete} future={futureStep} active={stepIsActive} />
             <div className={styles.substep} id={`step-${stepIndex}-${index}`}>
                 <span className={styles.substepTitle}>{step.title}</span>
@@ -48,7 +53,12 @@ const Substep = ({ step, index, stepIndex }) => {
                         }
                     </span>
                     <div>
-                        <Actions actions={step.actions} index={index} stepIndex={stepIndex} substepIndex={index} />
+                        <Actions
+                            actions={step.actions}
+                            index={index}
+                            stepIndex={stepIndex}
+                            substepIndex={index}
+                        />
                     </div>
                 </div>
             </div>

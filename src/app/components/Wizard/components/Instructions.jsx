@@ -29,7 +29,6 @@ import styles from '../index.styl';
 
 const Instructions = () => {
     const { steps } = useWizardContext();
-    //const {  } = useWizardAPI();
 
     return (
         <div className={styles.instructionWrapper}>
@@ -37,10 +36,19 @@ const Instructions = () => {
                 {
                     steps.map((step, stepIndex) => {
                         return (
+                            // eslint-disable-next-line react/no-array-index-key
                             <div className={styles.substeps} key={`substepwrapper-${stepIndex}`}>
                                 <h2 className={styles.instructionTitle}>{step.title}</h2>
                                 {
-                                    step.substeps.map((step, index) => <Substep step={step} key={`substep-${index}`} index={index} stepIndex={stepIndex} />)
+                                    // eslint-disable-next-line react/no-array-index-key
+                                    step.substeps.map((step, index) => (
+                                        <Substep
+                                            step={step}
+                                            key={`substep-${index}`}
+                                            index={index}
+                                            stepIndex={stepIndex}
+                                        />
+                                    ))
                                 }
                             </div>
                         );

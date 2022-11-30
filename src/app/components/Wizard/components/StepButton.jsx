@@ -27,6 +27,7 @@ import styles from '../index.styl';
 const StepButton = ({ children, inverted = false, ...props }) => {
     return (
         <button
+            type="button"
             className={inverted ? styles.stepButtonInverted : styles.stepButton}
             {...props}
         >
