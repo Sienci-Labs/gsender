@@ -301,7 +301,7 @@ const HeadlessIndicator = ({ address, port }) => {
                     </div>
                     { !_.isEqual(oldSettings, headlessSettings) && _.isEqual(settingErrors, defaultErrorMessage) ? (
                         <div className={styles.changes}>
-                            <b>Note: </b> Your new remote address after restart - {headlessSettings.ip}:{headlessSettings.port}
+                            <b>Note: </b> {headlessSettings.headlessStatus ? `Your new remote address after restart - ${headlessSettings.ip}:${headlessSettings.port}` : 'You are about to turn off headless mode.'}
                         </div>
                     ) : '' }
                     <div className={styles.footer}>
