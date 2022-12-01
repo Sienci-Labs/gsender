@@ -33,7 +33,6 @@ import {
 import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 
 import { profiles } from './gamepad';
-import { shortcuts } from './shortcuts';
 
 const [M3] = SPINDLE_MODES;
 
@@ -362,7 +361,7 @@ const defaultState = {
             showLineWarnings: false,
         }
     },
-    commandKeys: shortcuts
+    commandKeys: []
 };
 
 export default defaultState;
