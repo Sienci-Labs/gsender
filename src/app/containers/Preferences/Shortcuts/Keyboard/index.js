@@ -45,7 +45,6 @@ import styles from '../index.styl';
 const Keyboard = () => {
     // const { list: shortcutsList } = useSelector(state => state.preferences.shortcuts);
     const shortcutsList = store.get('commandKeys', []);
-    console.log(shortcutsList);
     // const dispatch = useDispatch();
 
     const [currentShortcut, setCurrentShortcut] = useState(null);
