@@ -27,6 +27,9 @@ import controller from 'app/lib/controller';
 import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
+import manualToolChange from 'app/wizards/manualToolchange';
+import semiautoToolChange from 'app/wizards/semiautoToolchange';
+import automaticToolChange from 'app/wizards/automaticToolchange';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
@@ -227,9 +230,9 @@ export function* initialize() {
                 <div>
                     <p>
                         {
-                            'The machine connection has been disrupted. To attempt to reconnect to the last active port and continue from the last line ('
-                            + received
-                            + '), press Resume.'
+                            'The machine connection has been disrupted. To attempt to reconnect to the last active port and continue from the last line (' +
+                            received +
+                            '), press Resume.'
                         }
                     </p>
                 </div>
@@ -255,7 +258,34 @@ export function* initialize() {
     });
 
     controller.addListener('gcode:toolChange', (context, comment = '',) => {
-        const content = (comment.length > 0)
+        const payload = {
+            context,
+            comment
+        };
+        const { option } = context;
+        if (option === 'Manual') {
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Manual Toolchange',
+                instructions: manualToolChange
+            });
+        } else if (option === 'Semi-Automatic') {
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Semi-Automatic Toolchange',
+                instructions: semiautoToolChange
+            });
+        } else if (option === 'Automatic') {
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Automatic Toolchange',
+                instructions: automaticToolChange
+            });
+        } else {
+            return;
+        }
+
+        /*const content = (comment.length > 0)
             ? <div><p>Press Resume to continue operation.</p><p>Line contained following comment: <b>{comment}</b></p></div>
             : 'Press Resume to continue operation.';
 
@@ -275,7 +305,7 @@ export function* initialize() {
             onConfirm: () => {
                 controller.command('gcode:resume');
             }
-        });
+        });*/
     });
 
     controller.addListener('gcode:load', (name, content) => {

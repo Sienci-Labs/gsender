@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -22,30 +22,22 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useWizardAPI, useWizardContext } from 'app/components/Wizard/context';
+import styles from '../index.styl';
 
-import ProgressArea from './ProgressArea';
-import SettingsArea from './SettingsArea';
-import styles from './Overrides.styl';
 
-/**
- * Override component responsible for allowing feed rate and spindle overrides as well as displaying their values
- * @prop {Object} state Default state given from parent component
- *
- */
-const Overrides = ({ state }) => {
+const MinMaxButton = () => {
+    const { minimized } = useWizardContext();
+    const { toggleMinimized } = useWizardAPI();
     return (
-        <div className={styles.wrapper}>
-
-            <ProgressArea state={state} />
-
-            <SettingsArea state={state} />
-        </div>
+        <button type="button" className={styles.minimize} onClick={() => toggleMinimized(minimized)}>
+            {
+                !minimized
+                    ? <i className="fas fa-minus" />
+                    : <i className="fas fa-plus" />
+            }
+        </button>
     );
 };
 
-Overrides.propTypes = {
-    state: PropTypes.object,
-};
-
-export default Overrides;
+export default MinMaxButton;

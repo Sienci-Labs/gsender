@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -22,30 +22,17 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import cx from 'classnames';
+import styles from '../index.styl';
 
-import ProgressArea from './ProgressArea';
-import SettingsArea from './SettingsArea';
-import styles from './Overrides.styl';
-
-/**
- * Override component responsible for allowing feed rate and spindle overrides as well as displaying their values
- * @prop {Object} state Default state given from parent component
- *
- */
-const Overrides = ({ state }) => {
+const SubstepCompletionIndicator = ({ completed = false, future = false, active = false }) => {
     return (
-        <div className={styles.wrapper}>
-
-            <ProgressArea state={state} />
-
-            <SettingsArea state={state} />
+        <div className={cx(styles.substepIndicator, { [styles.substepIndicatorComplete]: completed, [styles.substepIndicatorPending]: future })}>
+            {completed && <i className="fas fa-fw fa-clipboard-check" />}
+            {future && <i className="far fa-fw fa-clipboard" />}
+            {active && <i className="fas fa-fw fa-clipboard-list" />}
         </div>
     );
 };
 
-Overrides.propTypes = {
-    state: PropTypes.object,
-};
-
-export default Overrides;
+export default SubstepCompletionIndicator;

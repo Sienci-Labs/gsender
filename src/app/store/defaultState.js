@@ -53,6 +53,11 @@ const defaultState = {
         longestTimeRun: 0,
         jobTimes: [],
         toolChangeOption: 'Ignore',
+        toolChangePosition: {
+            x: 0,
+            y: 0,
+            z: 0
+        },
         toolChangeHooks: {
             preHook: '',
             postHook: ''

@@ -112,7 +112,7 @@ class JobStatus extends PureComponent {
                                                     size="md"
                                                     style={{ minWidth: '10rem' }}
                                                 />
-                                            ) : <span />
+                                            ) : null
                                         }
                                     </div>
 
