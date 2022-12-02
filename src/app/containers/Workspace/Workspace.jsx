@@ -521,8 +521,6 @@ class Workspace extends PureComponent {
             showPrimaryContainer,
             reverseWidgets,
             mobile,
-            tablet,
-            shouldShowRotate
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
         const tableStyle = mobile ? styles.workspaceTableMobile : styles.workspaceTable;
@@ -531,7 +529,6 @@ class Workspace extends PureComponent {
         return (
             <ScreenAwake>
                 <div style={style} className={classNames(className, styles.workspace)}>
-                    {tablet && shouldShowRotate && <RotatePrompt onClose={this.action.closePrompt} /> }
                     {modal.name === MODAL_FEEDER_PAUSED && (
                         <FeederPaused
                             title={modal.params.title}
