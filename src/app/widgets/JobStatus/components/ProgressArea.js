@@ -101,23 +101,23 @@ const ProgressArea = ({ state }) => {
 
 
     return (
-        <div style={{ width: '100%' }}>
+        <div style={{ width: '50%', marginRight: '1rem' }}>
             <div className={styles.progressArea}>
                 <div className={styles.progressItemsWrapper}>
                     <div className={styles.progressItem}>
-                        <span className={styles.progressItemTime}>{outputFormattedTime(elapsedTime)}</span>
                         <span>Time Cutting</span>
+                        <span className={styles.progressItemTime}>{outputFormattedTime(elapsedTime)}</span>
                         <span style={{ color: 'black' }}>{received} Lines</span>
                     </div>
                     <GaugeChart color="#3e85c7" value={percentageValue} />
                     <div className={styles.progressItem}>
+                        <span>Remaining</span>
                         <Tooltip
                             content={updateTime}
                             hideOnClick
                         >
                             <span className={styles.progressItemTime}>{outputFormattedTime(remainingTime)}</span>
                         </Tooltip>
-                        <span>Remaining</span>
                         <span style={{ color: 'black' }}>{total - received} Lines</span>
                     </div>
                 </div>
