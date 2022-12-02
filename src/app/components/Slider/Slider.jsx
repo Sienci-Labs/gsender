@@ -24,18 +24,22 @@
 import React from 'react';
 import styles from './slider.styl';
 
-const Slider = ({ step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, label = '', unitString = 'unit' }) => {
+const Slider = ({ step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, unitString = 'unit' }) => {
+    const handleMouseUp = (e) => {
+        onMouseUp(e.target.value);
+    };
+
     return (
         <div className={styles.sliderWrapper}>
-            <span style={{ width: '13%' }}>{label + ' '}</span>
             <input
-                style={{ width: '70%' }}
                 type="range" min={min} max={max}
-                value={value} onMouseUp={onMouseUp} className={styles.slider}
+                className={styles.slider}
+                value={value}
+                onMouseUp={handleMouseUp}
                 onChange={onChange}
                 step={step}
             />
-            <span style={{ width: '17%' }}>{ value } { unitString }</span>
+            <span>{value}{unitString}</span>
         </div>
     );
 };
