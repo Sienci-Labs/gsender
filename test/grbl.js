@@ -160,7 +160,8 @@ test('GrblLineParserResultParserState', (t) => {
                     feedrate: 'G94', // G93: Inverse Time Mode, G94: Units Per Minutes
                     program: 'M0',
                     spindle: 'M5',
-                    coolant: 'M9'
+                    coolant: 'M9',
+                    tool: '0',
                 },
                 tool: '0',
                 feedrate: '2540.',
@@ -188,7 +189,8 @@ test('GrblLineParserResultParserState', (t) => {
                     feedrate: 'G94', // G93: Inverse Time Mode, G94: Units Per Minutes
                     program: 'M0',
                     spindle: 'M5',
-                    coolant: ['M7', 'M8']
+                    coolant: ['M7', 'M8'],
+                    tool: '2',
                 },
                 tool: '2',
                 feedrate: '2540.',
