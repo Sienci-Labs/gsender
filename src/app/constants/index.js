@@ -171,3 +171,5 @@ export const VISUALIZER_SECONDARY = 'VISUALIZER_SECONDARY';
 export const MACRO_FORM_TYPES = ['ADD', 'EDIT'];
 
 export const SPINDLE_MODES = ['M3', 'M4', 'M5'];
+
+export const SURFACING_DWELL_DURATION = 4;

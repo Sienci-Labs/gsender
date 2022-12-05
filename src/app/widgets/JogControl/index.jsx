@@ -77,8 +77,6 @@ import useKeybinding from '../../lib/useKeybinding';
 class AxesWidget extends PureComponent {
     static propTypes = {
         widgetId: PropTypes.string.isRequired,
-        onFork: PropTypes.func.isRequired,
-        onRemove: PropTypes.func.isRequired,
         sortable: PropTypes.object,
         isSecondary: PropTypes.bool
     };
