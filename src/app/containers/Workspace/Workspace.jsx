@@ -55,7 +55,6 @@ import {
 import UpdateAvailableAlert from './UpdateAvailableAlert/UpdateAvailableAlert';
 import Toaster from '../../lib/toaster/Toaster';
 import ConfirmationDialog from '../../components/ConfirmationDialog/ConfirmationDialog';
-import RotatePrompt from './RotatePrompt';
 
 
 const WAIT = '%wait';
@@ -145,15 +144,7 @@ class Workspace extends PureComponent {
 
     primaryContainer = null;
 
-    secondaryContainer = null;
-
-    primaryToggler = null;
-
-    secondaryToggler = null;
-
     primaryWidgets = null;
-
-    secondaryWidgets = null;
 
     defaultContainer = null;
 
@@ -280,25 +271,17 @@ class Workspace extends PureComponent {
         }
     };
 
-    togglePrimaryContainer = () => {
-        const { showPrimaryContainer } = this.state;
-        this.setState({ showPrimaryContainer: !showPrimaryContainer });
-
-        // Publish a 'resize' event
-        pubsub.publish('resize'); // Also see "widgets/Visualizer"
-    };
-
     resizeDefaultContainer = () => {
         // const sidebar = document.querySelector('#sidebar');
         // const secondaryToggler = ReactDOM.findDOMNode(this.secondaryToggler);
         const { showPrimaryContainer } = this.state;
 
-        // Calculate VH based on current window height
+        /* Calculate VH based on current window height
         let vh = window.visualViewport.height * 0.01;
         let vw = window.visualViewport.width * 0.01;
         //Update styling with new VH value for CSS calculations
         document.documentElement.style.setProperty('--vh', `${vh}px`);
-        document.documentElement.style.setProperty('--vw', `${vw}px`);
+        document.documentElement.style.setProperty('--vw', `${vw}px`);*/
 
         { // Mobile-Friendly View
             const { location } = this.props;
@@ -313,8 +296,6 @@ class Workspace extends PureComponent {
                 document.body.style.overflowX = '';
             }
         }
-
-        // defaultContainer.style.right = secondaryToggler.offsetWidth + 'px';
         // Publish a 'resize' event
         pubsub.publish('resize'); // Also see "widgets/Visualizer"
     };
