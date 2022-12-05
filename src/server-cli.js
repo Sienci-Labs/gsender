@@ -25,11 +25,8 @@
 /* eslint no-console: 0 */
 import path from 'path';
 import isElectron from 'is-electron';
-import { app } from 'electron';
 import program from 'commander';
 import ip from 'quick-local-ip';
-import fs from 'fs';
-import settings from './server/config/settings';
 import pkg from './package.json';
 
 
@@ -105,23 +102,8 @@ if (normalizedArgv.length > 1) {
 export default () => new Promise((resolve, reject) => {
     // Change working directory to 'server' before require('./server')
     process.chdir(path.resolve(__dirname, 'server'));
-
-    let headless = false;
-    let port = defaultPort;
-    let host = defaultHost;
-
-    //VERIFY THIS
-    //Get headless settings
-    const rcfile = path.resolve(settings.rcfile);
-    const headlessSettings = JSON.parse(fs.readFileSync(rcfile, 'utf8'));
-
-    // If headless is off, go with default settings
-    // Else use settings from config
-    if (headlessSettings.headlessStatus && isElectron()) {
-        port = headlessSettings.port;
-        host = headlessSettings.ip;
-        headless = true;
-    }
+    let port = program.port, host = program.host;
+    let headless = !!program.remote;
 
     if (headless) {
         if (port === 0) {
@@ -147,14 +129,6 @@ export default () => new Promise((resolve, reject) => {
     }, (err, data) => {
         if (err) {
             reject(err);
-            //if wrong host or port, restart with default port and host
-            if (err.message.toLowerCase().includes('address not available') || err.message.toLowerCase().includes('404')) {
-                //TODO - Set headless settings in .sender_rc to default
-
-
-                app.relaunch();
-                app.exit(0);
-            }
             return;
         }
         console.log(data);
