@@ -28,14 +28,15 @@ import Button from '@mui/material/Button';
 import Select from 'react-select';
 import _ from 'lodash';
 import { Toaster, TOASTER_SUCCESS, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-import { app } from 'electron';
+import isElectron from 'is-electron';
 import actions from './apiActions';
 import Tooltip from '../TooltipCustom/ToolTip';
 import DialogBox from './DialogBox';
-import styles from './index.styl';
 import controller from '../../lib/controller';
+import styles from './index.styl';
 
-const HeadlessIndicator = ({ address, port }) => {
+
+const HeadlessIndicator = ({ address, port, headless }) => {
     const defaultHeadlessSettings = { ip: '', port: 8000, headlessStatus: false };
     const defaultErrorMessage = { ipError: '', ipHint: '', portError: '', portHint: '' };
     const [showConfig, setShowConfig] = useState(false);
@@ -161,7 +162,10 @@ const HeadlessIndicator = ({ address, port }) => {
         setOldSettings(headlessSettings);
 
         //App restart logic goes here
-        app.relaunch({ args: `--remote --port ${headlessSettings.port} --host ${headlessSettings.ip}` });
+        if (isElectron()) {
+            //call the event that handles app restart with remote settings
+            window.ipcRenderer.send('remoteMode-restart', headlessSettings);
+        }
 
         setShouldRestart(false);
         setShowConfirmation(false);
@@ -187,7 +191,7 @@ const HeadlessIndicator = ({ address, port }) => {
             <Tooltip content="Remote mode" placement="bottom" enterDelay={0}>
                 <div
                     className={styles.remoteAlert}
-                    style={port ? { background: '#06B881' } : { background: '#747474' }}
+                    style={headless ? { background: '#06B881' } : { background: '#747474' }}
                     role="button"
                     tabIndex={-3}
                     onClick={handleShowConfig}
@@ -196,7 +200,7 @@ const HeadlessIndicator = ({ address, port }) => {
                     <i className="fa fa-satellite-dish" />
                 </div>
             </Tooltip>
-            {port
+            {headless
                 ? (
                     <div>
                         <span
@@ -304,7 +308,7 @@ const HeadlessIndicator = ({ address, port }) => {
                     </div>
                     { !_.isEqual(oldSettings, headlessSettings) && _.isEqual(settingErrors, defaultErrorMessage) ? (
                         <div className={styles.changes}>
-                            <b>Note: </b> Your new remote address after restart - {headlessSettings.ip}:{headlessSettings.port}
+                            <b>Note: </b> {headlessSettings.headlessStatus ? `Your new remote address after restart - ${headlessSettings.ip}:${headlessSettings.port}` : 'You are about to turn off headless mode.'}
                         </div>
                     ) : '' }
                     <div className={styles.footer}>

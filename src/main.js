@@ -39,7 +39,6 @@ import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 import { getGRBLLog } from './electron-app/grblLogs';
 
 
-
 let windowManager = null;
 let hostInformation = {};
 let grblLog = log.create('grbl');
@@ -273,6 +272,12 @@ const main = () => {
                 windowManager.childWindows.forEach(window => {
                     window.webContents.send('recieve-data-' + widget, data);
                 });
+            });
+
+            //Handle app restart with remote settings
+            ipcMain.on('remoteMode-restart', (event, headlessSettings) => {
+                app.relaunch(); // flags are handled in server-cli
+                app.exit(0);
             });
         } catch (err) {
             log.error(err);
