@@ -4,6 +4,7 @@ import get from 'lodash/get';
 
 import defaultState from 'app/store/defaultState';
 import { METRIC_UNITS } from 'app/constants';
+import { Checkbox } from 'app/components/Checkbox';
 
 import Input from './Input';
 import MachinePosition from '../MachinePosition';
@@ -16,7 +17,7 @@ import { convertValuesToImperial } from '../../utils';
 const defaultSurfacingState = get(defaultState, 'widgets.surfacing', {});
 
 const InputArea = () => {
-    const { surfacing, units, onChange } = useContext(SurfacingContext);
+    const { surfacing, units, onChange, onSelect } = useContext(SurfacingContext);
 
     const {
         bitDiameter,
@@ -27,6 +28,7 @@ const InputArea = () => {
         skimDepth,
         spindleRPM,
         maxDepth,
+        shouldDwell,
     } = surfacing;
 
     const defaultValues = units === METRIC_UNITS
@@ -97,12 +99,25 @@ const InputArea = () => {
                 tooltip={{ content: `Default Value: ${defaultValues.bitDiameter}` }}
             />
 
-            <Input
+            <MultiInputBlock
                 label="Spindle RPM"
-                additionalProps={{ type: 'number', id: 'spindleRPM', min: 1, max: 200000, style: { borderRadius: 4, ...inputStyles } }}
-                value={spindleRPM}
-                onChange={onChange}
-                tooltip={{ content: `Default Value: ${defaultValues.spindleRPM}` }}
+                firstComponent={(
+                    <Input
+                        additionalProps={{ type: 'number', id: 'spindleRPM', min: 1, max: 200000, style: { borderRadius: 4, ...inputStyles } }}
+                        value={spindleRPM}
+                        onChange={onChange}
+                        tooltip={{ content: `Default Value: ${defaultValues.spindleRPM}` }}
+                    />
+                )}
+                secondComponent={(
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <label style={{ margin: '0 1rem' }}>Delay</label>
+                        <Checkbox
+                            checked={shouldDwell}
+                            onChange={(e) => onSelect({ type: 'shouldDwell', value: e.target.checked })}
+                        />
+                    </div>
+                )}
             />
 
             <Input
