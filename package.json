@@ -239,6 +239,7 @@
     "namespace-constants": "^1.0.1",
     "normalize.css": "~8.0.1",
     "objtools": "~2.0.0",
+    "sortablejs": "~1.10.2",
     "perfect-scrollbar": "~1.4.0",
     "prop-types": "~15.7.2",
     "pubsub-js": "~1.7.0",
