@@ -24,7 +24,6 @@
 import React, { PureComponent } from 'react';
 import { Redirect, withRouter } from 'react-router-dom';
 import pubsub from 'pubsub-js';
-import { trackPage } from '../lib/analytics';
 import Workspace from './Workspace';
 import styles from './App.styl';
 
@@ -58,8 +57,6 @@ class App extends PureComponent {
                 />
             );
         }
-
-        trackPage(location.pathname);
 
         return (
             <div className={styles.main}>

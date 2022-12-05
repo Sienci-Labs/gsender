@@ -79,7 +79,8 @@ class AxesWidget extends PureComponent {
         widgetId: PropTypes.string.isRequired,
         onFork: PropTypes.func.isRequired,
         onRemove: PropTypes.func.isRequired,
-        sortable: PropTypes.object
+        sortable: PropTypes.object,
+        isSecondary: PropTypes.bool
     };
 
     pubsubTokens = [];
@@ -1272,7 +1273,7 @@ class AxesWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId, machinePosition, workPosition, canJog } = this.props;
+        const { widgetId, machinePosition, workPosition, canJog, isSecondary } = this.props;
         const { minimized, isFullscreen } = this.state;
         const { units } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
@@ -1293,11 +1294,16 @@ class AxesWidget extends PureComponent {
             workPosition: mapValues(workPosition, (pos, axis) => {
                 return String(mapPositionToUnits(pos, units));
             }),
-            canJog
+            canJog,
+            isSecondary
         };
         const actions = {
             ...this.actions
         };
+
+        if (isSecondary) {
+            return <Axes config={config} state={state} actions={actions} />;
+        }
 
         return (
             <Widget fullscreen={isFullscreen}>
