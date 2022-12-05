@@ -126,7 +126,7 @@ const HeadlessIndicator = ({ address, port, headless }) => {
         });
     };
     const updateRemotePreferences = () => {
-        if (headlessSettings.ip.value === '') {
+        if (headlessSettings.ip === '') {
             setSettingErrors({ ...setSettingErrors, ipError: 'Invalid IP Address', ipHint: 'Ip addresses should consist of 4 sets of numbers between 0 and 255 following the pattern X.X.X.X' });
             return;
         }
