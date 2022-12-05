@@ -320,6 +320,7 @@ const defaultState = {
             startPosition: START_POSITION_BACK_LEFT,
             spindle: M3,
             cutDirectionFlipped: false,
+            shouldDwell: false,
         },
         visualizer: {
             minimized: false,
