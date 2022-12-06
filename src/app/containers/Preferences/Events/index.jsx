@@ -229,33 +229,36 @@ const Events = ({ active }) => {
         }
     };
 
-    useEffect(async () => {
-        try {
-            const response = await api.events.fetch();
-            const { jsonRecords } = response.body;
-            const records = new Map(Object.entries(jsonRecords));
-            const startEvent = records.get(PROGRAM_START);
-            const endEvent = records.get(PROGRAM_END);
-            const pauseEvent = records.get(PROGRAM_PAUSE);
-            const resumeEvent = records.get(PROGRAM_RESUME);
-            startEvent && setProgramStartEvent(startEvent);
-            startEvent && setProgramStartCode(startEvent.commands);
-            startEvent && setStartEnabled(startEvent.enabled);
-            endEvent && setProgramEndEvent(endEvent);
-            endEvent && setProgramEndCode(endEvent.commands);
-            endEvent && setEndEnabled(endEvent.enabled);
-            pauseEvent && setProgramPauseEvent(pauseEvent);
-            pauseEvent && setProgramPauseCode(pauseEvent.commands);
-            pauseEvent && setPauseEnabled(pauseEvent.enabled);
-            resumeEvent && setProgramResumeEvent(resumeEvent);
-            resumeEvent && setProgramResumeCode(resumeEvent.commands);
-            resumeEvent && setResumeEnabled(resumeEvent.enabled);
-        } catch (e) {
-            Toaster.pop({
-                msg: 'Unable to fetch Start/Stop event records',
-                type: TOASTER_DANGER
-            });
+    useEffect(() => {
+        async function fetchEvents() {
+            try {
+                const response = await api.events.fetch();
+                const { jsonRecords } = response.body;
+                const records = new Map(Object.entries(jsonRecords));
+                const startEvent = records.get(PROGRAM_START);
+                const endEvent = records.get(PROGRAM_END);
+                const pauseEvent = records.get(PROGRAM_PAUSE);
+                const resumeEvent = records.get(PROGRAM_RESUME);
+                startEvent && setProgramStartEvent(startEvent);
+                startEvent && setProgramStartCode(startEvent.commands);
+                startEvent && setStartEnabled(startEvent.enabled);
+                endEvent && setProgramEndEvent(endEvent);
+                endEvent && setProgramEndCode(endEvent.commands);
+                endEvent && setEndEnabled(endEvent.enabled);
+                pauseEvent && setProgramPauseEvent(pauseEvent);
+                pauseEvent && setProgramPauseCode(pauseEvent.commands);
+                pauseEvent && setPauseEnabled(pauseEvent.enabled);
+                resumeEvent && setProgramResumeEvent(resumeEvent);
+                resumeEvent && setProgramResumeCode(resumeEvent.commands);
+                resumeEvent && setResumeEnabled(resumeEvent.enabled);
+            } catch (e) {
+                Toaster.pop({
+                    msg: 'Unable to fetch Start/Stop event records',
+                    type: TOASTER_DANGER
+                });
+            }
         }
+        fetchEvents();
     }, []);
 
     return (
