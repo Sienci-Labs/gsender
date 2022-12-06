@@ -30,7 +30,7 @@ import logger from '../../lib/logger';
 const log = logger('service:configstore');
 
 const defaultState = { // default state
-    checkForUpdates: true,
+    checkForUpdates: false,
     controller: {
         exception: {
             ignoreErrors: false
