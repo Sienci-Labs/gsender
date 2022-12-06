@@ -125,9 +125,8 @@ const createServer = (options, callback) => {
         }
     }
 
-    const { backlog } = options;
-    let port = 8000;
-    let host = '0.0.0.0';
+    let { backlog, port = 0, host } = options;
+    //If headless setting is ON, change to correct port and IP
     if (config.get('remoteSettings').headlessStatus) {
         port = config.get('remoteSettings').port;
         host = config.get('remoteSettings').ip;

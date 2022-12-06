@@ -1,4 +1,5 @@
 import api from 'app/api';
+import isElectron from 'is-electron';
 
 const actions = {
     fetchSettings: async (setHeadlessSettings, setOldSettings) => {
@@ -12,7 +13,13 @@ const actions = {
         }
     },
     saveSettings: async (headlessSettings) => {
-        await api.remoteSetting.update(headlessSettings).catch((error) => {
+        await api.remoteSetting.update(headlessSettings).then(() => {
+            //App restart logic goes here
+            if (isElectron()) {
+            //call the event that handles app restart with remote settings
+                window.ipcRenderer.send('remoteMode-restart', headlessSettings);
+            }
+        }).catch((error) => {
             console.log(error.message);
         });
     }

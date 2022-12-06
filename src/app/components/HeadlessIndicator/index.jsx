@@ -28,7 +28,6 @@ import Button from '@mui/material/Button';
 import Select from 'react-select';
 import _ from 'lodash';
 import { Toaster, TOASTER_SUCCESS, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-import isElectron from 'is-electron';
 import actions from './apiActions';
 import Tooltip from '../TooltipCustom/ToolTip';
 import DialogBox from './DialogBox';
@@ -36,7 +35,7 @@ import controller from '../../lib/controller';
 import styles from './index.styl';
 
 
-const HeadlessIndicator = ({ address, port, headless }) => {
+const HeadlessIndicator = ({ address, port }) => {
     const defaultHeadlessSettings = { ip: '', port: 8000, headlessStatus: false };
     const defaultErrorMessage = { ipError: '', ipHint: '', portError: '', portHint: '' };
     const [showConfig, setShowConfig] = useState(false);
@@ -158,14 +157,8 @@ const HeadlessIndicator = ({ address, port, headless }) => {
             return;
         }
         //Save port and IP in .sender_rc (even if empty)
-        actions.saveSettings(headlessSettings);
+        actions.saveSettings(headlessSettings); // This will restart electron
         setOldSettings(headlessSettings);
-
-        //App restart logic goes here
-        if (isElectron()) {
-            //call the event that handles app restart with remote settings
-            window.ipcRenderer.send('remoteMode-restart', headlessSettings);
-        }
 
         setShouldRestart(false);
         setShowConfirmation(false);
@@ -191,7 +184,7 @@ const HeadlessIndicator = ({ address, port, headless }) => {
             <Tooltip content="Remote mode" placement="bottom" enterDelay={0}>
                 <div
                     className={styles.remoteAlert}
-                    style={headless ? { background: '#06B881' } : { background: '#747474' }}
+                    style={oldSettings.headlessStatus ? { background: '#06B881' } : { background: '#747474' }}
                     role="button"
                     tabIndex={-3}
                     onClick={handleShowConfig}
@@ -200,7 +193,7 @@ const HeadlessIndicator = ({ address, port, headless }) => {
                     <i className="fa fa-satellite-dish" />
                 </div>
             </Tooltip>
-            {headless
+            {oldSettings.headlessStatus
                 ? (
                     <div>
                         <span
@@ -218,7 +211,16 @@ const HeadlessIndicator = ({ address, port, headless }) => {
                 : ''
             }
             {
-                shouldRestart ? <div className={styles.restartLabel}>App restart pending</div> : ''
+                shouldRestart ? (
+                    <div
+                        className={styles.restartLabel} onClick={() => setShowConfirmation(true)} role="button"
+                        tabIndex={-3}
+                        onKeyDown={() => {
+                            return;
+                        }}
+                    >App restart pending
+                    </div>
+                ) : ''
             }
             {/* Headless config dialog */}
             <DialogBox
