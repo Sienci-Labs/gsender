@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -22,30 +22,15 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import { WizardProvider } from 'app/components/Wizard/context';
+import Wizard from 'app/components/Wizard/Wizard';
 
-import ProgressArea from './ProgressArea';
-import SettingsArea from './SettingsArea';
-import styles from './Overrides.styl';
-
-/**
- * Override component responsible for allowing feed rate and spindle overrides as well as displaying their values
- * @prop {Object} state Default state given from parent component
- *
- */
-const Overrides = ({ state }) => {
+const WizardWrapper = () => {
     return (
-        <div className={styles.wrapper}>
-
-            <ProgressArea state={state} />
-
-            <SettingsArea state={state} />
-        </div>
+        <WizardProvider>
+            <Wizard />
+        </WizardProvider>
     );
 };
 
-Overrides.propTypes = {
-    state: PropTypes.object,
-};
-
-export default Overrides;
+export default WizardWrapper;

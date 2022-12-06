@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Sienci Labs Inc.
+ * Copyright (C) 2022 Sienci Labs Inc.
  *
  * This file is part of gSender.
  *
@@ -22,30 +22,30 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useWizardAPI } from 'app/components/Wizard/context';
+import StepButton from 'app/components/Wizard/components/StepButton';
+import styles from '../index.styl';
 
-import ProgressArea from './ProgressArea';
-import SettingsArea from './SettingsArea';
-import styles from './Overrides.styl';
-
-/**
- * Override component responsible for allowing feed rate and spindle overrides as well as displaying their values
- * @prop {Object} state Default state given from parent component
- *
- */
-const Overrides = ({ state }) => {
+const Controls = () => {
+    const { completeSubStep, decrementStep, scrollToActiveStep, hasIncompleteActions } = useWizardAPI();
     return (
-        <div className={styles.wrapper}>
-
-            <ProgressArea state={state} />
-
-            <SettingsArea state={state} />
+        <div className={styles.controls}>
+            <StepButton inverted onClick={decrementStep}>
+                <i className="fas fa-arrow-left" />
+                Back
+            </StepButton>
+            <StepButton
+                onClick={() => {
+                    completeSubStep();
+                    scrollToActiveStep();
+                }}
+                disabled={hasIncompleteActions()}
+            >
+                Complete
+                <i className="fas fa-arrow-right" />
+            </StepButton>
         </div>
     );
 };
 
-Overrides.propTypes = {
-    state: PropTypes.object,
-};
-
-export default Overrides;
+export default Controls;

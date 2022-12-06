@@ -29,6 +29,26 @@ import styles from './index.styl';
 
 const Axes = (props) => {
     const { state, actions } = props;
+
+    if (state.isSecondary) {
+        return (
+            <div className={styles.jogWidget}>
+                <Keypad
+                    canClick={state.canClick}
+                    canClickCancel={state.canClickCancel}
+                    units={state.units}
+                    axes={state.axes}
+                    jog={state.jog}
+                    actions={actions}
+                    isJogging={state.isJogging}
+                    activeState={state.activeState}
+                    selectedSpeed={state.selectedSpeed}
+                    canJog={state.canJog}
+                />
+            </div>
+        );
+    }
+
     return (
         <div className={styles.jogWidget}>
             <Keypad

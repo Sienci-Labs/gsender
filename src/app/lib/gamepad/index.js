@@ -1,6 +1,5 @@
 import { GamepadListener } from 'gamepad.js';
 import throttle from 'lodash/throttle';
-
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
@@ -60,6 +59,8 @@ class Gamepad extends GamepadListener {
         this.emit(`gamepad:${index}:axis:${dataOutput.axis}`, dataOutput.detail);
     }
 }
+
+//  TODO:  Remove this when SSL is working correctly
 const gamepadInstance = new Gamepad();
 gamepadInstance.start();
 

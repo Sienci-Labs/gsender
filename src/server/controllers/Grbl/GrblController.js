@@ -104,6 +104,7 @@ class GrblController {
         },
         close: (err) => {
             this.ready = false;
+            const received = this.sender?.state?.received;
             if (err) {
                 log.warn(`Disconnected from serial port "${this.options.port}":`, err);
             }
@@ -115,7 +116,7 @@ class GrblController {
 
                 // Destroy controller
                 this.destroy();
-            });
+            }, received);
         },
         error: (err) => {
             this.ready = false;
@@ -422,7 +423,7 @@ class GrblController {
                     let tool = line.match(toolCommand);
 
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
-                    if (toolChangeOption === 'Pause' || toolChangeOption === 'Manual') {
+                    if (toolChangeOption !== 'Ignore') {
                         if (tool) {
                             this.emit('toolchange:tool', tool[0]);
                         }
@@ -430,18 +431,11 @@ class GrblController {
                         this.emit('gcode:toolChange', {
                             line: sent + 1,
                             block: line,
-                            option: 'Manual'
+                            option: toolChangeOption
                         }, commentString);
-                    } else if (toolChangeOption === 'Code') {
-                        if (tool) {
-                            commentString = `${tool[0]} - ${commentString}`;
-                        }
-                        this.workflow.pause({ data: 'M6', comment: commentString });
-                        this.emit('toolchange:start');
-                        this.runPreChangeHook(commentString);
                     }
 
-                    line = '(M6)';
+                    line = line.replace('M6', '(M6)');
                 }
 
                 return line;
@@ -1091,7 +1085,7 @@ class GrblController {
         });
     }
 
-    close(callback) {
+    close(callback, received) {
         const { port } = this.options;
 
         // Assertion check
@@ -1109,8 +1103,8 @@ class GrblController {
 
         this.emit('serialport:close', {
             port: port,
-            inuse: false
-        });
+            inuse: false,
+        }, received);
 
         // Emit a change event to all connected sockets
         if (this.engine.io) {

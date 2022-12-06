@@ -172,6 +172,8 @@ export const MACRO_FORM_TYPES = ['ADD', 'EDIT'];
 
 export const SPINDLE_MODES = ['M3', 'M4', 'M5'];
 
+export const SURFACING_DWELL_DURATION = 4;
+
 // Event Triggers
 export const PROGRAM_START = 'gcode:start';
 export const PROGRAM_END = 'gcode:stop';

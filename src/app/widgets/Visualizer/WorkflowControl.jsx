@@ -250,7 +250,6 @@ class WorkflowControl extends PureComponent {
     componentDidUpdate(prevProps) {
         const { activeState: prevActiveState, state: prevState } = prevProps;
         const { activeState: currentActiveState, state: currentState, fileCompletion } = this.props;
-
         const { gcode: { content: prevGcode } } = prevState;
         const { gcode: { content: currentGcode } } = currentState;
 
@@ -360,7 +359,6 @@ class WorkflowControl extends PureComponent {
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
-
         const { showModal, value } = this.state.startFromLine;
         const renderSVG = shouldVisualizeSVG();
 

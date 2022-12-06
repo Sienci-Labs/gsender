@@ -27,6 +27,9 @@ import controller from 'app/lib/controller';
 import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
+import manualToolChange from 'app/wizards/manualToolchange';
+import semiautoToolChange from 'app/wizards/semiautoToolchange';
+import automaticToolChange from 'app/wizards/automaticToolchange';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
@@ -38,6 +41,7 @@ import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/work
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import isElectron from 'is-electron';
+import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 
 
 export function* initialize() {
@@ -205,7 +209,7 @@ export function* initialize() {
         pubsub.publish('machine:connected');
     });
 
-    controller.addListener('serialport:close', (options) => {
+    controller.addListener('serialport:close', (options, received) => {
         // Reset homing run flag to prevent rapid position without running homing
         reduxStore.dispatch({
             type: controllerActions.RESET_HOMING,
@@ -216,6 +220,34 @@ export function* initialize() {
         });
 
         pubsub.publish('machine:disconnected');
+
+        // if the connection was closed unexpectedly (not by the user),
+        // the number of lines sent will be defined.
+        // create a pop up so the user can connect to the last active port
+        // and resume from the last line
+        if (received) {
+            const content = (
+                <div>
+                    <p>
+                        {
+                            'The machine connection has been disrupted. To attempt to reconnect to the last active port and continue from the last line (' +
+                            received +
+                            '), press Resume.'
+                        }
+                    </p>
+                </div>
+            );
+
+            Confirm({
+                title: 'Port Disconnected',
+                content,
+                confirmLabel: 'Resume',
+                cancelLabel: 'Close',
+                onConfirm: () => {
+                    connectToLastDevice(() => controller.command('gcode:start', received));
+                }
+            });
+        }
     });
 
     controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts) => {
@@ -226,7 +258,34 @@ export function* initialize() {
     });
 
     controller.addListener('gcode:toolChange', (context, comment = '',) => {
-        const content = (comment.length > 0)
+        const payload = {
+            context,
+            comment
+        };
+        const { option } = context;
+        if (option === 'Manual') {
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Manual Toolchange',
+                instructions: manualToolChange
+            });
+        } else if (option === 'Semi-Automatic') {
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Semi-Automatic Toolchange',
+                instructions: semiautoToolChange
+            });
+        } else if (option === 'Automatic') {
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Automatic Toolchange',
+                instructions: automaticToolChange
+            });
+        } else {
+            return;
+        }
+
+        /*const content = (comment.length > 0)
             ? <div><p>Press Resume to continue operation.</p><p>Line contained following comment: <b>{comment}</b></p></div>
             : 'Press Resume to continue operation.';
 
@@ -246,7 +305,7 @@ export function* initialize() {
             onConfirm: () => {
                 controller.command('gcode:resume');
             }
-        });
+        });*/
     });
 
     controller.addListener('gcode:load', (name, content) => {

@@ -7,7 +7,7 @@ const MultiInputBlock = ({ label, firstComponent, secondComponent, divider }) =>
         <InputWrapper>
             {label && <InputLabelStyled>{label}</InputLabelStyled>}
 
-            <MultiInputBlockContainer>
+            <MultiInputBlockContainer hasDivider={!!divider}>
                 {firstComponent}
 
                 {divider && typeof divider === 'string' ? <Divider>{divider}</Divider> : divider}

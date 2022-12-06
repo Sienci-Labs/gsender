@@ -9,6 +9,7 @@ import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD, WORKFLOW_STATE_IDLE, G
 import Widget from 'app/components/Widget';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import UnlockButton from 'app/widgets/Visualizer/UnlockButton';
+import Wizard from 'app/components/Wizard';
 import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
 import ValidationModal from './ValidationModal';
@@ -103,6 +104,7 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                         actions={actions}
                         invalidGcode={invalidLine.line}
                     />
+                    <Wizard />
 
 
                     {
