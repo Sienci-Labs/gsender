@@ -32,7 +32,6 @@ import connectRestreamer from 'connect-restreamer';
 import engines from 'consolidate';
 import errorhandler from 'errorhandler';
 import express from 'express';
-import https from 'https';
 import expressJwt from 'express-jwt';
 import session from 'express-session';
 import 'hogan.js';
