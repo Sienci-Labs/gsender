@@ -286,10 +286,9 @@ const createServer = (options, callback) => {
                 let settings = JSON.parse(fs.readFileSync(rcFile).toString());
                 settings.remoteSettings.headlessStatus = false;
                 fs.writeFileSync(rcFile, JSON.stringify(settings));
-                window.ipcRenderer.send('remoteMode-restart', null);
             }
-            callback && callback(err);
             log.error(err);
+            callback && callback(err, config.get('remoteSettings'));
         });
 };
 

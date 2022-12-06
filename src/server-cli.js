@@ -27,6 +27,7 @@ import path from 'path';
 import isElectron from 'is-electron';
 import program from 'commander';
 import ip from 'quick-local-ip';
+import { app } from 'electron';
 import pkg from './package.json';
 
 
@@ -128,6 +129,10 @@ export default () => new Promise((resolve, reject) => {
         controller: program.controller
     }, (err, data) => {
         if (err) {
+            if (data.headlessStatus) {
+                app.relaunch();
+                app.exit(0);
+            }
             reject(err);
             return;
         }
