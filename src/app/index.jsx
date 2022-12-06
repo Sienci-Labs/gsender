@@ -89,8 +89,7 @@ const renderPage = () => {
                     </Switch>
                 </Router>
             </GridSystemProvider>
-        </ReduxProvider>,
-        container
+        </ReduxProvider>
     );
 };
 
