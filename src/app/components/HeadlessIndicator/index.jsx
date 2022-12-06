@@ -118,7 +118,8 @@ const HeadlessIndicator = ({ address, port }) => {
         setHeadlessSettings({ ...headlessSettings, [name]: Number(value) });
     };
     const copyToClipboard = () => {
-        navigator.clipboard.writeText(`${address}:${port}`);
+        //Copy to electron clipboard
+        window.ipcRenderer.send('electron-copyText', `${address}:${port}`);
         Toaster.pop({
             msg: 'Address copied',
             type: TOASTER_SUCCESS,

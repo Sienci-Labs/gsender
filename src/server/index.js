@@ -281,6 +281,13 @@ const createServer = (options, callback) => {
             });
         })
         .on('error', (err) => {
+            if (err.message.includes('address not available')) {
+                const rcFile = path.resolve(settings.rcfile);
+                let settings = JSON.parse(fs.readFileSync(rcFile).toString());
+                settings.remoteSettings.headlessStatus = false;
+                fs.writeFileSync(rcFile, JSON.stringify(settings));
+                window.ipcRenderer.send('remoteMode-restart', null);
+            }
             callback && callback(err);
             log.error(err);
         });

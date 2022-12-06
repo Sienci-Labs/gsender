@@ -22,7 +22,7 @@
  */
 
 import '@babel/polyfill';
-import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session } from 'electron';
+import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session, clipboard } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -276,8 +276,13 @@ const main = () => {
 
             //Handle app restart with remote settings
             ipcMain.on('remoteMode-restart', (event, headlessSettings) => {
-                app.relaunch(); // flags are handled in server-cli
+                app.relaunch(); // flags are handled in server/index.js
                 app.exit(0);
+            });
+
+            //Copy text to clipboard on electron
+            ipcMain.on('', (event, text) => {
+                clipboard.writeText(text);
             });
         } catch (err) {
             log.error(err);
