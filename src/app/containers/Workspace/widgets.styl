@@ -22,7 +22,7 @@
  */
 
 .widgets {
-    height: calc(100vh - 6.5rem);
+    height: 100%;
     display: grid;
     grid-template-rows: minmax(0, 32fr) minmax(0, 38fr) minmax(0, 30fr);
     grid-gap: 0.5rem;
@@ -52,10 +52,12 @@
     min-width: 360px;
     background-color: #d1d5db;
     width: auto;
+    @media only screen and (min-width: 390px) and (max-width: 768px) {
+        display: none;
+    }
     @media (min-width: 1921px) {
         width: calc(100vw - 630px) !important;
     }
-
 }
 
 .margin-left {

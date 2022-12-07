@@ -33,7 +33,6 @@ import {
 import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 
 import { profiles } from './gamepad';
-import { shortcuts } from './shortcuts';
 
 const [M3] = SPINDLE_MODES;
 
@@ -53,6 +52,11 @@ const defaultState = {
         longestTimeRun: 0,
         jobTimes: [],
         toolChangeOption: 'Ignore',
+        toolChangePosition: {
+            x: 0,
+            y: 0,
+            z: 0
+        },
         toolChangeHooks: {
             preHook: '',
             postHook: ''
@@ -316,6 +320,7 @@ const defaultState = {
             startPosition: START_POSITION_BACK_LEFT,
             spindle: M3,
             cutDirectionFlipped: false,
+            shouldDwell: false,
         },
         visualizer: {
             minimized: false,
@@ -357,7 +362,7 @@ const defaultState = {
             showLineWarnings: false,
         }
     },
-    commandKeys: shortcuts
+    commandKeys: []
 };
 
 export default defaultState;

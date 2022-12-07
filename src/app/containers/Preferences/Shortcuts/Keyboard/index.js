@@ -25,12 +25,12 @@ import React, { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
-import { useSelector, useDispatch } from 'react-redux';
+// import { useSelector, useDispatch } from 'react-redux';
 
 import store from 'app/store';
 import Modal from 'app/components/Modal';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
-import { updateShortcutsList, holdShortcutsListener, unholdShortcutsListener } from 'app/actions/preferencesActions';
+// import { updateShortcutsList, holdShortcutsListener, unholdShortcutsListener } from 'app/actions/preferencesActions';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
 import ShortcutsTable from '../ShortcutsTable';
@@ -43,8 +43,9 @@ import styles from '../index.styl';
  * @prop {Boolean} active Check if this page is currently active or not
  */
 const Keyboard = () => {
-    const { list: shortcutsList } = useSelector(state => state.preferences.shortcuts);
-    const dispatch = useDispatch();
+    // const { list: shortcutsList } = useSelector(state => state.preferences.shortcuts);
+    const shortcutsList = store.get('commandKeys', []);
+    // const dispatch = useDispatch();
 
     const [currentShortcut, setCurrentShortcut] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -53,14 +54,14 @@ const Keyboard = () => {
         // Trigger pubsub for use in Location widget where keybindings are injected
         // When modifing keybindings, we remove the key listener in location widget to prevent
         // it from being fired during the edit
-        dispatch(holdShortcutsListener());
+        // dispatch(holdShortcutsListener());
         // pubsub.publish('removeshortcutsListener');
 
         // When we are not editing the keybindings anymore, make sure to re-inject the keybindings
         // within the location widget again
         return () => {
             // pubsub.publish('addshortcutsListener');
-            dispatch(unholdShortcutsListener());
+            // dispatch(unholdShortcutsListener());
         };
     }, []);
 
@@ -115,7 +116,7 @@ const Keyboard = () => {
         pubsub.publish('keybindingsUpdated');
 
         setShowEditModal(false);
-        dispatch(updateShortcutsList(shortcuts));
+        // dispatch(updateShortcutsList(shortcuts));
 
         if (showToast) {
             showToast();
@@ -132,7 +133,7 @@ const Keyboard = () => {
         store.set('commandKeys', enabledKeybindingsArr);
 
         setShowEditModal(false);
-        dispatch(updateShortcutsList(enabledKeybindingsArr));
+        // dispatch(updateShortcutsList(enabledKeybindingsArr));
 
         showToast('Shortcuts Enabled');
     };
@@ -141,7 +142,7 @@ const Keyboard = () => {
         const disabledShortcuts = shortcutsList.map(keybinding => ({ ...keybinding, isActive: false }));
 
         store.replace('commandKeys', disabledShortcuts);
-        dispatch(updateShortcutsList(disabledShortcuts));
+        // dispatch(updateShortcutsList(disabledShortcuts));
 
         showToast('Shortcuts Disabled');
     };

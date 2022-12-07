@@ -39,8 +39,6 @@ const Overrides = ({ state }) => {
 
             <ProgressArea state={state} />
 
-            <div className={styles.seperator} />
-
             <SettingsArea state={state} />
         </div>
     );

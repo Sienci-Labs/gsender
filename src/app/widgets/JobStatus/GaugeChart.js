@@ -4,10 +4,8 @@ import styled from 'styled-components';
 // https://codepen.io/dcode-software/pen/zYGVXyX
 
 const GaugeContainer = styled.div`
-  width: 100%;
-  min-width: 115px;
-  max-width: 500px;
-  font-size: 2rem;
+  width: clamp(100px, 100%, 150px);
+  font-size: 1.75rem;
   color: #3e85c7;
   padding: 5px 5px 0 5px;
 `;

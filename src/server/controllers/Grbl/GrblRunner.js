@@ -71,7 +71,8 @@ class GrblRunner extends events.EventEmitter {
                 feedrate: 'G94', // G93: Inverse time mode, G94: Units per minute
                 program: 'M0', // M0, M1, M2, M30
                 spindle: 'M5', // M3: Spindle (cw), M4: Spindle (ccw), M5: Spindle off
-                coolant: 'M9' // M7: Mist coolant, M8: Flood coolant, M9: Coolant off, [M7,M8]: Both on
+                coolant: 'M9', // M7: Mist coolant, M8: Flood coolant, M9: Coolant off, [M7,M8]: Both on
+                tool: '0' // Last non-0 parsed tool
             },
             tool: '',
             feedrate: '',
@@ -172,6 +173,14 @@ class GrblRunner extends events.EventEmitter {
         }
         if (type === GrblLineParserResultParserState) {
             const { modal, tool, feedrate, spindle } = payload;
+            const { tool: curTool } = this.state.parserstate.modal;
+
+            if (tool !== '0' && tool !== 0) {
+                modal.tool = tool;
+            } else {
+                modal.tool = curTool;
+            }
+
             const nextState = {
                 ...this.state,
                 parserstate: {

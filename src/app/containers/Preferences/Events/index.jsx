@@ -27,6 +27,7 @@ import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import { Toaster, TOASTER_DANGER, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import api from 'app/api';
 import ToggleSwitch from 'app/components/ToggleSwitch';
+import { PROGRAM_START, PROGRAM_END, PROGRAM_PAUSE, PROGRAM_RESUME } from '../../../constants';
 
 import Fieldset from '../components/Fieldset';
 import SettingWrapper from '../components/SettingWrapper';
@@ -57,7 +58,7 @@ const Events = ({ active }) => {
         try {
             if (programStartEvent) {
                 programStartEvent.enabled = !programStartEvent.enabled;
-                await api.events.update(programStartEvent.id, {
+                await api.events.update(PROGRAM_START, {
                     enabled: programStartEvent.enabled
                 });
                 setStartEnabled(programStartEvent.enabled);
@@ -74,7 +75,7 @@ const Events = ({ active }) => {
         try {
             if (programEndEvent) {
                 programEndEvent.enabled = !programEndEvent.enabled;
-                await api.events.update(programEndEvent.id, {
+                await api.events.update(PROGRAM_END, {
                     enabled: programEndEvent.enabled
                 });
                 setEndEnabled(programEndEvent.enabled);
@@ -91,7 +92,7 @@ const Events = ({ active }) => {
         try {
             if (programPauseEvent) {
                 programPauseEvent.enabled = !programPauseEvent.enabled;
-                await api.events.update(programPauseEvent.id, {
+                await api.events.update(PROGRAM_PAUSE, {
                     enabled: programPauseEvent.enabled
                 });
                 setPauseEnabled(programPauseEvent.enabled);
@@ -107,7 +108,7 @@ const Events = ({ active }) => {
         try {
             if (programResumeEvent) {
                 programResumeEvent.enabled = !programResumeEvent.enabled;
-                await api.events.update(programResumeEvent.id, {
+                await api.events.update(PROGRAM_RESUME, {
                     enabled: programResumeEvent.enabled
                 });
                 setResumeEnabled(programResumeEvent.enabled);
@@ -123,19 +124,17 @@ const Events = ({ active }) => {
     const updateProgramStartEvent = async () => {
         try {
             if (programStartEvent) {
-                await api.events.update(programStartEvent.id, {
+                await api.events.update(PROGRAM_START, {
                     commands: programStartCode
                 });
             } else {
                 const res = await api.events.create({
-                    event: 'gcode:start',
+                    event: PROGRAM_START,
                     trigger: 'gcode',
                     commands: programStartCode
                 });
-                const { id } = res.body;
-                setProgramStartEvent({
-                    id
-                });
+                const { record } = res.body;
+                setProgramStartEvent(record);
             }
             Toaster.pop({
                 msg: 'Updated Program Start event',
@@ -152,19 +151,17 @@ const Events = ({ active }) => {
     const updateProgramEndEvent = async () => {
         try {
             if (programEndEvent) {
-                await api.events.update(programEndEvent.id, {
+                await api.events.update(PROGRAM_END, {
                     commands: programEndCode
                 });
             } else {
                 const res = await api.events.create({
-                    event: 'gcode:stop',
+                    event: PROGRAM_END,
                     trigger: 'gcode',
                     commands: programEndCode
                 });
-                const { id } = res.body;
-                setProgramEndEvent({
-                    id
-                });
+                const { record } = res.body;
+                setProgramEndEvent(record);
             }
             Toaster.pop({
                 msg: 'Updated Program Stop event',
@@ -181,19 +178,17 @@ const Events = ({ active }) => {
     const updateProgramPauseEvent = async () => {
         try {
             if (programPauseEvent) {
-                await api.events.update(programPauseEvent.id, {
+                await api.events.update(PROGRAM_PAUSE, {
                     commands: programPauseCode
                 });
             } else {
                 const res = await api.events.create({
-                    event: 'gcode:pause',
+                    event: PROGRAM_PAUSE,
                     trigger: 'gcode',
                     commands: programPauseCode
                 });
-                const { id } = res.body;
-                setProgramPauseEvent({
-                    id
-                });
+                const { record } = res.body;
+                setProgramPauseEvent(record);
             }
             Toaster.pop({
                 msg: 'Updated Program Pause event',
@@ -210,19 +205,17 @@ const Events = ({ active }) => {
     const updateProgramResumeEvent = async () => {
         try {
             if (programResumeEvent) {
-                await api.events.update(programResumeEvent.id, {
+                await api.events.update(PROGRAM_RESUME, {
                     commands: programResumeCode
                 });
             } else {
                 const res = await api.events.create({
-                    event: 'gcode:resume',
+                    event: PROGRAM_RESUME,
                     trigger: 'gcode',
                     commands: programResumeCode
                 });
-                const { id } = res.body;
-                setProgramResumeEvent({
-                    id
-                });
+                const { record } = res.body;
+                setProgramResumeEvent(record);
             }
             Toaster.pop({
                 msg: 'Updated Program Resume event',
@@ -236,32 +229,36 @@ const Events = ({ active }) => {
         }
     };
 
-    useEffect(async () => {
-        try {
-            const response = await api.events.fetch();
-            const { records } = response.body;
-            const startEvent = records.filter((record) => record.event === 'gcode:start')[0];
-            const endEvent = records.filter((record) => record.event === 'gcode:stop')[0];
-            const pauseEvent = records.filter((record) => record.event === 'gcode:pause')[0];
-            const resumeEvent = records.filter((record) => record.event === 'gcode:resume')[0];
-            startEvent && setProgramStartEvent(startEvent);
-            startEvent && setProgramStartCode(startEvent.commands);
-            startEvent && setStartEnabled(startEvent.enabled);
-            endEvent && setProgramEndEvent(endEvent);
-            endEvent && setProgramEndCode(endEvent.commands);
-            endEvent && setEndEnabled(endEvent.enabled);
-            pauseEvent && setProgramPauseEvent(pauseEvent);
-            pauseEvent && setProgramPauseCode(pauseEvent.commands);
-            pauseEvent && setPauseEnabled(pauseEvent.enabled);
-            resumeEvent && setProgramResumeEvent(resumeEvent);
-            resumeEvent && setProgramResumeCode(resumeEvent.commands);
-            resumeEvent && setResumeEnabled(resumeEvent.enabled);
-        } catch (e) {
-            Toaster.pop({
-                msg: 'Unable to fetch Start/Stop event records',
-                type: TOASTER_DANGER
-            });
+    useEffect(() => {
+        async function fetchEvents() {
+            try {
+                const response = await api.events.fetch();
+                const { jsonRecords } = response.body;
+                const records = new Map(Object.entries(jsonRecords));
+                const startEvent = records.get(PROGRAM_START);
+                const endEvent = records.get(PROGRAM_END);
+                const pauseEvent = records.get(PROGRAM_PAUSE);
+                const resumeEvent = records.get(PROGRAM_RESUME);
+                startEvent && setProgramStartEvent(startEvent);
+                startEvent && setProgramStartCode(startEvent.commands);
+                startEvent && setStartEnabled(startEvent.enabled);
+                endEvent && setProgramEndEvent(endEvent);
+                endEvent && setProgramEndCode(endEvent.commands);
+                endEvent && setEndEnabled(endEvent.enabled);
+                pauseEvent && setProgramPauseEvent(pauseEvent);
+                pauseEvent && setProgramPauseCode(pauseEvent.commands);
+                pauseEvent && setPauseEnabled(pauseEvent.enabled);
+                resumeEvent && setProgramResumeEvent(resumeEvent);
+                resumeEvent && setProgramResumeCode(resumeEvent.commands);
+                resumeEvent && setResumeEnabled(resumeEvent.enabled);
+            } catch (e) {
+                Toaster.pop({
+                    msg: 'Unable to fetch Start/Stop event records',
+                    type: TOASTER_DANGER
+                });
+            }
         }
+        fetchEvents();
     }, []);
 
     return (
