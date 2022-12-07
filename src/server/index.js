@@ -281,14 +281,13 @@ const createServer = (options, callback) => {
             });
         })
         .on('error', (err) => {
-            if (err.message.includes('address not available')) {
-                const rcFile = path.resolve(settings.rcfile);
-                let settings = JSON.parse(fs.readFileSync(rcFile).toString());
-                settings.remoteSettings.headlessStatus = false;
-                fs.writeFileSync(rcFile, JSON.stringify(settings));
-            }
+            let shouldRestart = false;
+            // if (err.message.includes('address not available')) {
+            shouldRestart = true;
+            config.set('remoteSettings', { ...config.get('remoteSettings'), headlessStatus: false });
+            // }
             log.error(err);
-            callback && callback(err, config.get('remoteSettings'));
+            callback && callback(err, shouldRestart);
         });
 };
 

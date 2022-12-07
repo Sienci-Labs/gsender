@@ -129,11 +129,11 @@ export default () => new Promise((resolve, reject) => {
         controller: program.controller
     }, (err, data) => {
         if (err) {
-            if (data.headlessStatus) {
+            reject(err);
+            if (data === true) {
                 app.relaunch();
                 app.exit(0);
             }
-            reject(err);
             return;
         }
         console.log(data);
