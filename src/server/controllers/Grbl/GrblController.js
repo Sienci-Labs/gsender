@@ -58,7 +58,21 @@ import {
     GRBL_ERRORS,
     GRBL_SETTINGS, GRBL_ACTIVE_STATE_HOME
 } from './constants';
-import { METRIC_UNITS } from '../../../app/constants';
+import {
+    METRIC_UNITS,
+    PROGRAM_PAUSE,
+    PROGRAM_RESUME,
+    PROGRAM_START,
+    PROGRAM_END,
+    CONTROLLER_READY,
+    FEED_HOLD,
+    CYCLE_START,
+    HOMING,
+    SLEEP,
+    MACRO_RUN,
+    MACRO_LOAD,
+    FILE_UNLOAD
+} from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
@@ -260,7 +274,6 @@ class GrblController {
                     }
                     if (line === '%_GCODE_START') {
                         const { sent } = this.sender.state;
-                        this.event.trigger('gcode:start');
                         this.workflow.start();
                         // Feeder
                         this.feeder.reset();
@@ -878,7 +891,7 @@ class GrblController {
         // $13=1 (report in inches)
         this.writeln('$$');
         await delay(50);
-        this.event.trigger('controller:ready');
+        this.event.trigger(CONTROLLER_READY);
 
         //check if controller is ready and send the status
         this.emit('grbl:iSready', this.ready);
@@ -1249,7 +1262,7 @@ class GrblController {
                 this.sender.unload();
 
                 this.emit('file:unload');
-                this.event.trigger('file:unload');
+                this.event.trigger(FILE_UNLOAD);
             },
             'start': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
@@ -1258,7 +1271,7 @@ class GrblController {
             'gcode:start': () => {
                 const [lineToStartFrom, zMax] = args;
                 const totalLines = this.sender.state.total;
-                const startEventEnabled = this.event.hasEnabledStartEvent();
+                const startEventEnabled = this.event.hasEnabledEvent(PROGRAM_START);
                 log.info(startEventEnabled);
 
                 if (lineToStartFrom && lineToStartFrom <= totalLines) {
@@ -1325,7 +1338,7 @@ class GrblController {
                     }
 
                     // Move up and then to cut start position
-                    modalGCode.push(this.event.getStartEventCode());
+                    modalGCode.push(this.event.getEventCode(PROGRAM_START));
                     modalGCode.push(`G0 G90 G21 Z${zMax + 10}`);
                     modalGCode.push(`G0 G90 G21 X${xVal.toFixed(3)} Y${yVal.toFixed(3)}`);
                     modalGCode.push(`G0 G90 G21 Z${zVal.toFixed(3)}`);
@@ -1349,7 +1362,7 @@ class GrblController {
                         this.sender.next();
                         this.feederCB = null;
                     };
-                    this.event.trigger('gcode:start');
+                    this.event.trigger(PROGRAM_START);
                 } else {
                     this.workflow.start();
 
@@ -1391,16 +1404,16 @@ class GrblController {
                     }
                 }
                 // Moved this to end so it triggers AFTER the reset on force stop
-                this.event.trigger('gcode:stop');
+                this.event.trigger(PROGRAM_END);
             },
             'pause': () => {
                 log.warn(`Warning: The "${cmd}" command is deprecated and will be removed in a future release.`);
                 this.command('gcode:pause');
             },
             'gcode:pause': async () => {
-                if (this.event.hasEnabledPauseEvent()) {
+                if (this.event.hasEnabledEvent(PROGRAM_PAUSE)) {
                     this.workflow.pause();
-                    this.event.trigger('gcode:pause');
+                    this.event.trigger(PROGRAM_PAUSE);
                 } else {
                     this.workflow.pause();
                     await delay(100);
@@ -1412,13 +1425,13 @@ class GrblController {
                 this.command('gcode:resume');
             },
             'gcode:resume': async () => {
-                if (this.event.hasEnabledResumeEvent()) {
+                if (this.event.hasEnabledEvent(PROGRAM_RESUME)) {
                     this.feederCB = () => {
                         this.write('~');
                         this.workflow.resume();
                         this.feederCB = null;
                     };
-                    this.event.trigger('gcode:resume');
+                    this.event.trigger(PROGRAM_RESUME);
                 } else {
                     this.write('~');
                     await delay(1000);
@@ -1442,12 +1455,12 @@ class GrblController {
                 this.feeder.reset();
             },
             'feedhold': () => {
-                this.event.trigger('feedhold');
+                this.event.trigger(FEED_HOLD);
 
                 this.write('!');
             },
             'cyclestart': () => {
-                this.event.trigger('cyclestart');
+                this.event.trigger(CYCLE_START);
 
                 this.write('~');
             },
@@ -1455,7 +1468,7 @@ class GrblController {
                 this.write('?');
             },
             'homing': () => {
-                this.event.trigger('homing');
+                this.event.trigger(HOMING);
                 this.homingStarted = true; // Update homing cycle as having started
 
                 this.writeln('$H');
@@ -1463,7 +1476,7 @@ class GrblController {
                 this.emit('controller:state', GRBL, this.state);
             },
             'sleep': () => {
-                this.event.trigger('sleep');
+                this.event.trigger(SLEEP);
 
                 this.writeln('$SLP');
             },
@@ -1719,7 +1732,7 @@ class GrblController {
                     return;
                 }
 
-                this.event.trigger('macro:run');
+                this.event.trigger(MACRO_RUN);
                 this.command('gcode', macro.content, context);
 
                 callback(null);
@@ -1739,7 +1752,7 @@ class GrblController {
                     return;
                 }
 
-                this.event.trigger('macro:load');
+                this.event.trigger(MACRO_LOAD);
 
                 this.command('gcode:load', macro.name, macro.content, context, callback);
             },
