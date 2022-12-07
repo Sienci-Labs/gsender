@@ -131,7 +131,7 @@ export default () => new Promise((resolve, reject) => {
             reject(err);
             return;
         }
-        console.log(data);
+
         resolve({ ...data, headless });
     });
 });

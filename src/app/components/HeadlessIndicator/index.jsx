@@ -119,10 +119,12 @@ const HeadlessIndicator = ({ address, port }) => {
     };
     const copyToClipboard = () => {
         //Copy to electron clipboard
-        window.ipcRenderer.send('electron-copyText', `${address}:${port}`);
-        Toaster.pop({
-            msg: 'Address copied',
-            type: TOASTER_SUCCESS,
+        const text = `http://${address}:${port}`;
+        navigator.clipboard.writeText(text).then(() => {
+            Toaster.pop({
+                msg: 'Address copied',
+                type: TOASTER_SUCCESS,
+            });
         });
     };
     const updateRemotePreferences = () => {
