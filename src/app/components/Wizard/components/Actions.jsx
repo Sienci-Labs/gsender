@@ -22,8 +22,10 @@
  */
 
 import React from 'react';
+
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { useWizardAPI } from 'app/components/Wizard/context';
+
 import styles from '../index.styl';
 
 
@@ -45,15 +47,15 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                             scrollToActiveStep();
                         };
                         return (
-                            <>
-                                {/* eslint-disable-next-line react/no-array-index-key */}
-                                <ToolModalButton key={`action-${index}`} onClick={cbWithCompletion} icon="fas fa-code">
+                            // eslint-disable-next-line react/no-array-index-key
+                            <React.Fragment key={`action-${index}`}>
+                                <ToolModalButton onClick={cbWithCompletion} icon="fas fa-code">
                                     {action.label}
                                 </ToolModalButton>
                                 {
                                     (index !== actions.length - 1) && <span className={styles.orSpan}>OR</span>
                                 }
-                            </>
+                            </React.Fragment>
                         );
                     })
                 }

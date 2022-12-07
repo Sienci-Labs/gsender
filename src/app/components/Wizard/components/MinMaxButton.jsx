@@ -30,7 +30,12 @@ const MinMaxButton = () => {
     const { minimized } = useWizardContext();
     const { toggleMinimized } = useWizardAPI();
     return (
-        <button type="button" className={styles.minimize} onClick={() => toggleMinimized(minimized)}>
+        <button
+            type="button"
+            className={styles.actionButton}
+            onClick={() => toggleMinimized(minimized)}
+            style={{ marginRight: 5 }}
+        >
             {
                 !minimized
                     ? <i className="fas fa-minus" />
