@@ -281,13 +281,8 @@ const createServer = (options, callback) => {
             });
         })
         .on('error', (err) => {
-            let shouldRestart = false;
-            // if (err.message.includes('address not available')) {
-            shouldRestart = true;
-            config.set('remoteSettings', { ...config.get('remoteSettings'), headlessStatus: false });
-            // }
             log.error(err);
-            callback && callback(err, shouldRestart);
+            callback && callback(err);
         });
 };
 

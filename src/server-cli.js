@@ -27,7 +27,6 @@ import path from 'path';
 import isElectron from 'is-electron';
 import program from 'commander';
 import ip from 'quick-local-ip';
-import { app } from 'electron';
 import pkg from './package.json';
 
 
@@ -130,10 +129,6 @@ export default () => new Promise((resolve, reject) => {
     }, (err, data) => {
         if (err) {
             reject(err);
-            if (data === true) {
-                app.relaunch();
-                app.exit(0);
-            }
             return;
         }
         console.log(data);

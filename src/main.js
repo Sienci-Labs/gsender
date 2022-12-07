@@ -104,7 +104,17 @@ const main = () => {
                 splashScreen.focus();
             });
 
-            const res = await launchServer();
+            let res;
+            try {
+                res = await launchServer();
+            } catch (error) {
+                // if (error.message.includes('ERR_ADDRESS_INVALID')) {
+                log.error('Unable to launch the remote server' + error.message);
+                // config.set('remoteSettings', { ...config.get('remoteSettings'), headlessStatus: false });
+                app.relaunch();
+                app.exit(0);
+                // }
+            }
             const { address, port, headless, requestedHost } = { ...res };
             hostInformation = {
                 address,
