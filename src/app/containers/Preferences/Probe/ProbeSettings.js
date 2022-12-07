@@ -25,7 +25,6 @@ import React from 'react';
 
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import ToggleSwitch from 'app/components/ToggleSwitch';
-// import { TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_STANDARD } from 'app/lib/constants';
 import { TOUCHPLATE_TYPE_AUTOZERO } from 'app/lib/constants';
 
 import Fieldset from '../components/Fieldset';
@@ -37,7 +36,7 @@ const ProbeSettings = ({ state, probeActions, values, type }) => {
     const { probeSettings, units } = state;
 
     return (
-        <Fieldset legend="Probing Settings">
+        <Fieldset legend="Probing Settings" style={{ height: '100%' }}>
 
             {
                 type !== TOUCHPLATE_TYPE_AUTOZERO && (
