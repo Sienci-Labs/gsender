@@ -114,7 +114,7 @@ const createServer = (options, callback) => {
     }
 
     { // allowRemoteAccess
-        const allowRemoteAccess = config.get('remoteSettings').headlessStatus;
+        const allowRemoteAccess = options.allowRemoteAccess || config.get('allowRemoteAccess', false);
 
         if (allowRemoteAccess) {
             if (size(config.get('users')) === 0) {
@@ -126,11 +126,14 @@ const createServer = (options, callback) => {
     }
 
     let { backlog, port = 0, host } = options;
+
     //If headless setting is ON, change to correct port and IP
-    if (config.get('remoteSettings').headlessStatus) {
-        port = config.get('remoteSettings').port;
-        host = config.get('remoteSettings').ip;
+    const remoteSettings = config.get('remoteSettings', {});
+    if (remoteSettings.headlessStatus) {
+        port = remoteSettings.port;
+        host = remoteSettings.ip;
     }
+
     const mountPoints = uniqWith([
         ...ensureArray(options.mountPoints),
         ...ensureArray(config.get('mountPoints'))
