@@ -22,10 +22,7 @@ const Settings = () => {
     };
 
     const restoreDefault = async () => {
-        const res = await api.events.fetch();
-        const events = res.body.records;
-
-        events.clear();
+        await api.events.clearAll();
 
         restoreSettings(defaultState);
     };
