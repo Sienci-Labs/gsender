@@ -285,7 +285,16 @@ const createServer = (options, callback) => {
         })
         .on('error', (err) => {
             log.error(err);
-            callback && callback(err);
+            log.error(err.name);
+            let errData = {};
+            // Handle invalid IP by disabling remote mode until enabled again and signaling error
+            if (err.message.includes('address not available')) {
+                config.set('remoteSettings.headlessStatus', false);
+                config.set('remoteSettings.error', true);
+                errData.bindingErr = true;
+            }
+
+            callback && callback(err, errData);
         });
 };
 

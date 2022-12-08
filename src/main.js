@@ -108,13 +108,17 @@ const main = () => {
             try {
                 res = await launchServer();
             } catch (error) {
-                // if (error.message.includes('ERR_ADDRESS_INVALID')) {
-                log.error('Unable to launch the remote server' + error.message);
-                // config.set('remoteSettings', { ...config.get('remoteSettings'), headlessStatus: false });
-                app.relaunch();
-                app.exit(0);
-                // }
+                if (error.message.includes('EADDR')) {
+                    dialog.showMessageBoxSync(null, {
+                        title: 'Error binding remote address',
+                        message: 'There was an error binding the remote address.',
+                        detail: 'Remote mode has been disabled.  Double-check the configured IP address before restarting the application.'
+                    });
+                    app.relaunch();
+                    app.exit(-1);
+                }
             }
+
             const { address, port, headless, requestedHost } = { ...res };
             hostInformation = {
                 address,
@@ -296,6 +300,7 @@ const main = () => {
             });
         } catch (err) {
             log.error(err);
+            log.err(err.name);
             await dialog.showMessageBox({
                 message: err
             });

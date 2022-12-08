@@ -304,11 +304,10 @@ const HeadlessIndicator = ({ address, port }) => {
                         </div>
                     </div>
                     <div className={styles.warningWrapper}>
-                        <b>Warning: </b> Clicking &ldquo;OK&ldquo; will save new settings and will need you to restart the app.
-                        Please make sure to save all your tasks before your proceed.
+                        <b>Warning: </b> Any changes to remote mode settings will require a restart of the application before taking effect.  You will be prompted to restart on clicking &quot;OK&quot;
                     </div>
                     <div className={styles.changes}>
-                        <b>Note: </b> {headlessSettings.headlessStatus ? `Remote address - ${headlessSettings.ip}:${headlessSettings.port}` : 'Headless mode disabled.'}
+                        <b>Remote Address: </b> {headlessSettings.headlessStatus ? `${headlessSettings.ip}:${headlessSettings.port}` : 'Headless mode disabled.'}
                     </div>
                     <div className={styles.footer}>
                         <div className={styles.buttonWrapper}>

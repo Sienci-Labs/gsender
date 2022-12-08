@@ -26,6 +26,7 @@
 import path from 'path';
 import isElectron from 'is-electron';
 import program from 'commander';
+import { dialog } from 'electron';
 import ip from 'quick-local-ip';
 import pkg from './package.json';
 
@@ -126,9 +127,9 @@ export default () => new Promise((resolve, reject) => {
         accessTokenLifetime: program.accessTokenLifetime,
         allowRemoteAccess: !!program.allowRemoteAccess,
         controller: program.controller
-    }, (err, data) => {
+    }, (err, data = {}) => {
         if (err) {
-            reject(err);
+            reject(err, {});
             return;
         }
 
