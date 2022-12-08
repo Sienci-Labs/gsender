@@ -98,7 +98,8 @@ class Controller {
         'homing:flag': [],
         'electronErrors:errorList': [],
         'grbl:iSready': [],
-        'sender:M0M1': []
+        'sender:M0M1': [],
+        'wizard:next': []
     };
 
     context = {

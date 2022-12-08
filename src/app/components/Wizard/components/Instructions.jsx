@@ -22,7 +22,8 @@
  */
 
 import React from 'react';
-import { /*useWizardAPI,*/ useWizardContext } from 'app/components/Wizard/context';
+import { uniqueId } from 'lodash';
+import { useWizardContext } from 'app/components/Wizard/context';
 import Substep from 'app/components/Wizard/components/Substep';
 import Controls from './Controls';
 import styles from '../index.styl';
@@ -44,7 +45,7 @@ const Instructions = () => {
                                     step.substeps.map((step, index) => (
                                         <Substep
                                             step={step}
-                                            key={`substep-${index}`}
+                                            key={`substep-${uniqueId()}`}
                                             index={index}
                                             stepIndex={stepIndex}
                                         />

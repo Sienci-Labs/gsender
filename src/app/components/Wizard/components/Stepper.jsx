@@ -1,22 +1,22 @@
 import React from 'react';
+import { uniqueId } from 'lodash';
 import { useWizardContext } from 'app/components/Wizard/context';
 //import PropTypes from 'prop-types';
 import Step from './Step';
 import styles from '../index.styl';
 
 const Stepper = () => {
-    const { steps, activeStep } = useWizardContext();
+    const { steps, completedStep, activeStep } = useWizardContext();
     return (
         <div className={styles.stepperWrapper}>
             {
                 steps.map((step, index) => (
                     <Step
                         step={step}
-                        key={index}
+                        key={uniqueId()}
                         index={index}
                         active={activeStep === index}
-                        complete={activeStep > index}
-                        activeStep={activeStep}
+                        complete={completedStep > index}
                     />
                 ))
             }

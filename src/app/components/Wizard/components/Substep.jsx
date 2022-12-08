@@ -29,12 +29,17 @@ import Actions from './Actions';
 import styles from '../index.styl';
 
 const Substep = ({ step, index, stepIndex }) => {
-    const { activeSubstep, activeStep } = useWizardContext();
+    const { activeSubstep, activeStep, completedStep, completedSubStep } = useWizardContext();
 
-    // State calculation
-    const stepComplete = stepIndex < activeStep || ((activeStep === stepIndex) && activeSubstep > index);
-    const futureStep = stepIndex > activeStep || ((activeStep === stepIndex) && activeSubstep < index);
+    // // State calculation
+    /*
+        complete is:
+        - on or before the last completed step
+        - on the step after the completed one, but on a substep that is on or before a completed substep
+    */
+    const stepComplete = (stepIndex <= completedStep || (stepIndex === completedStep + 1 && index <= completedSubStep));
     const stepIsActive = stepIndex === activeStep && index === activeSubstep;
+    const futureStep = !stepIsActive && !stepComplete;
 
     return (
         <div className={cx(styles.substepWrapper,

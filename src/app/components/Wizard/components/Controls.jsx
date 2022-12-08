@@ -30,14 +30,20 @@ const Controls = () => {
     const { completeSubStep, decrementStep, scrollToActiveStep, hasIncompleteActions } = useWizardAPI();
     return (
         <div className={styles.controls}>
-            <StepButton inverted onClick={decrementStep}>
+            <StepButton
+                inverted
+                onClick={() => {
+                    const activeValues = decrementStep();
+                    scrollToActiveStep(activeValues);
+                }}
+            >
                 <i className="fas fa-arrow-left" />
                 Back
             </StepButton>
             <StepButton
                 onClick={() => {
-                    completeSubStep();
-                    scrollToActiveStep();
+                    const activeValues = completeSubStep();
+                    scrollToActiveStep(activeValues);
                 }}
                 disabled={hasIncompleteActions()}
             >
