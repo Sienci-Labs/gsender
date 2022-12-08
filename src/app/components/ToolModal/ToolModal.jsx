@@ -66,7 +66,7 @@ const ToolModal = ({ onClose, title, style, className, size, children, disableOv
         >
             <div className={styles.toolModal}>
                 <div className={styles.header}>
-                    <h3 className={styles.headerText}>{title}</h3>
+                    <h5 className={styles.headerText}>{title}</h5>
                 </div>
                 <div className={styles.container}>
                     {children}

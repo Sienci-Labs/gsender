@@ -272,6 +272,26 @@ class CNCEngine {
                     });
             });
 
+            //Sends back a list of available IPs in the computer
+            socket.on('listAllIps', () => {
+                const { networkInterfaces } = require('os');
+                const _networkInterfaces = networkInterfaces();
+                const ipList = [];
+
+                //Create a list of network list name: [{IP1},{IP2}...]
+                for (const networkName of Object.keys(_networkInterfaces)) {
+                    for (const ips of _networkInterfaces[networkName]) {
+                        //Consider only IPV4 addresses
+                        if (ips.family === 'IPv4') {
+                            if (ipList.indexOf(ips.address) < 0) {
+                                ipList.push(ips.address);
+                            }
+                        }
+                    }
+                }
+                socket.emit('ip:list', ipList);
+            });
+
             // Open serial port
             socket.on('open', (port, options, callback = noop) => {
                 if (typeof callback !== 'function') {

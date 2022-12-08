@@ -22,7 +22,7 @@
  */
 
 import '@babel/polyfill';
-import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session } from 'electron';
+import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session, clipboard } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -37,7 +37,6 @@ import pkg from './package.json';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 import { getGRBLLog } from './electron-app/grblLogs';
-
 
 
 let windowManager = null;
@@ -105,7 +104,21 @@ const main = () => {
                 splashScreen.focus();
             });
 
-            const res = await launchServer();
+            let res;
+            try {
+                res = await launchServer();
+            } catch (error) {
+                if (error.message.includes('EADDR')) {
+                    dialog.showMessageBoxSync(null, {
+                        title: 'Error binding remote address',
+                        message: 'There was an error binding the remote address.',
+                        detail: 'Remote mode has been disabled.  Double-check the configured IP address before restarting the application.'
+                    });
+                    app.relaunch();
+                    app.exit(-1);
+                }
+            }
+
             const { address, port, headless, requestedHost } = { ...res };
             hostInformation = {
                 address,
@@ -274,8 +287,20 @@ const main = () => {
                     window.webContents.send('recieve-data-' + widget, data);
                 });
             });
+
+            //Handle app restart with remote settings
+            ipcMain.on('remoteMode-restart', (event, headlessSettings) => {
+                app.relaunch(); // flags are handled in server/index.js
+                app.exit(0);
+            });
+
+            //Copy text to clipboard on electron
+            ipcMain.on('copy-clipboard', (event, text) => {
+                clipboard.writeText(text);
+            });
         } catch (err) {
             log.error(err);
+            log.err(err.name);
             await dialog.showMessageBox({
                 message: err
             });
