@@ -320,7 +320,7 @@ class Controller {
 
     //Send an event to get list of available IP addresses in the computer
     // @param {function} [callback] Called once completed.
-    listAllIps(callback) {
+    listAllIps(callback = null) {
         this.socket && this.socket.emit('listAllIps', callback);
     }
 

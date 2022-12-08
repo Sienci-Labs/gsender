@@ -25,7 +25,7 @@ import React, { useState, useEffect } from 'react';
 import reduxStore from 'app/store/redux';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
-import Select from 'react-select';
+import Creatable from 'react-select/creatable';
 import _ from 'lodash';
 import { Toaster, TOASTER_SUCCESS, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import actions from './apiActions';
@@ -36,7 +36,7 @@ import styles from './index.styl';
 
 
 const HeadlessIndicator = ({ address, port }) => {
-    const defaultHeadlessSettings = { ip: '', port: 8000, headlessStatus: false };
+    const defaultHeadlessSettings = { ip: '0.0.0.0', port: 8000, headlessStatus: false };
     const defaultErrorMessage = { ipError: '', ipHint: '', portError: '', portHint: '' };
     const [showConfig, setShowConfig] = useState(false);
     const [showConfirmation, setShowConfirmation] = useState(false);
@@ -247,7 +247,7 @@ const HeadlessIndicator = ({ address, port }) => {
                         <div className={styles.inputWrapper}>
                             <div className={styles.ipInput}>
                                 <span className={styles.titleIp}>IP: &#32;</span>
-                                <Select
+                                <Creatable
                                     name="ip"
                                     placeholder="select or type IP"
                                     value={{ value: headlessSettings.ip, label: headlessSettings.ip }}
@@ -311,11 +311,9 @@ const HeadlessIndicator = ({ address, port }) => {
                         <b>Warning: </b> Clicking &ldquo;OK&ldquo; will save new settings and will need you to restart the app.
                         Please make sure to save all your tasks before your proceed.
                     </div>
-                    { !_.isEqual(oldSettings, headlessSettings) && _.isEqual(settingErrors, defaultErrorMessage) ? (
-                        <div className={styles.changes}>
-                            <b>Note: </b> {headlessSettings.headlessStatus ? `Your new remote address after restart - ${headlessSettings.ip}:${headlessSettings.port}` : 'You are about to turn off headless mode.'}
-                        </div>
-                    ) : '' }
+                    <div className={styles.changes}>
+                        <b>Note: </b> {headlessSettings.headlessStatus ? `Remote address - ${headlessSettings.ip}:${headlessSettings.port}` : 'Headless mode disabled.'}
+                    </div>
                     <div className={styles.footer}>
                         <div className={styles.buttonWrapper}>
                             <Button variant="contained" style={{ backgroundColor: '#3e85c7' }} onClick={updateRemotePreferences}>OK</Button>
