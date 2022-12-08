@@ -24,6 +24,8 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
 import _ from 'lodash';
 
+import { Toaster } from 'app/lib/toaster/ToasterLib';
+
 const WizardContext = createContext({});
 const WizardAPI = createContext({});
 
@@ -231,6 +233,16 @@ export const WizardProvider = ({ children }) => {
             }
 
             return substep.actions.length > 0 && substep.actionTaken === false;
+        },
+        cancelToolchange: () => {
+            setActiveStep(0);
+            setActiveSubstep(0);
+            setSteps([]);
+            setVisible(false);
+            setStepCount(0);
+            setMinimized(false);
+
+            Toaster.clear();
         }
     }), [
         setActiveStep,

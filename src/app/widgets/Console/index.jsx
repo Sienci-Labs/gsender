@@ -100,18 +100,19 @@ class ConsoleWidget extends PureComponent {
     };
 
     controllerEvents = {
-        'serialport:open': (options) => {
-            const { port, baudrate } = options;
-            this.setState({ port: port });
+        'serialport:open': ({ port, baudrate }) => {
+            this.setState({ port });
 
-            if (this.terminal) {
-                this.terminal.refitTerminal();
-                this.terminal.writeln(color.white.bold(`gSender - [${controller.type}]`));
-                this.terminal.writeln(color.white(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: color.yellowBright(port), baudrate: color.blueBright(baudrate) })));
+            setTimeout(() => {
+                if (this.terminal) {
+                    this.terminal.refitTerminal();
+                    this.terminal.writeln(color.white.bold(`gSender - [${controller.type}]`));
+                    this.terminal.writeln(color.white(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: color.yellowBright(port), baudrate: color.blueBright(baudrate) })));
 
-                this.terminal.updateTerminalHistory(`gSender - [${controller.type}]`);
-                this.terminal.updateTerminalHistory(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: port, baudrate: baudrate }));
-            }
+                    this.terminal.updateTerminalHistory(`gSender - [${controller.type}]`);
+                    this.terminal.updateTerminalHistory(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: port, baudrate: baudrate }));
+                }
+            }, 0);
         },
         'serialport:close': (options) => {
             this.actions.clearAll();

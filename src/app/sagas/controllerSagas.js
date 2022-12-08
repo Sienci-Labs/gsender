@@ -226,14 +226,19 @@ export function* initialize() {
         // create a pop up so the user can connect to the last active port
         // and resume from the last line
         if (received) {
+            const homingEnabled = _get(reduxStore.getState(), 'controller.settings.settings.$22');
+            const msg = homingEnabled === '1'
+                ? 'The machine connection has been disrupted. To attempt to reconnect to the last active port, ' +
+                'home, and choose which line to continue from, press Resume.'
+                : 'The machine connection has been disrupted. To attempt to reconnect to the last active port, ' +
+                'press Resume. After that, you can set your Workspace 0 and use the Start From Line function to continue the job. ' +
+                'Suggested line to start from: ' +
+                received;
+
             const content = (
                 <div>
                     <p>
-                        {
-                            'The machine connection has been disrupted. To attempt to reconnect to the last active port and continue from the last line (' +
-                            received +
-                            '), press Resume.'
-                        }
+                        {msg}
                     </p>
                 </div>
             );
@@ -244,7 +249,12 @@ export function* initialize() {
                 confirmLabel: 'Resume',
                 cancelLabel: 'Close',
                 onConfirm: () => {
-                    connectToLastDevice(() => controller.command('gcode:start', received));
+                    connectToLastDevice(() => {
+                        // if limit switches active, home
+                        if (homingEnabled === '1') {
+                            pubsub.publish('disconnect:recovery', received);
+                        }
+                    });
                 }
             });
         }

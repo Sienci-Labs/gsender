@@ -29,6 +29,7 @@ import Stepper from 'app/components/Wizard/components/Stepper';
 import { useWizardContext, useWizardAPI } from 'app/components/Wizard/context';
 import cx from 'classnames';
 import MinMaxButton from 'app/components/Wizard/components/MinMaxButton';
+import CancelButton from 'app/components/Wizard/components/CancelButton';
 
 const Wizard = () => {
     const { title, visible, minimized, activeStep, steps } = useWizardContext();
@@ -48,7 +49,10 @@ const Wizard = () => {
         <div className={cx({ [styles.hidden]: !visible, [styles.minimizedWrapper]: minimized, [styles.wizardWrapper]: !minimized })}>
             <div className={styles.wizardTitle}>
                 <h1><i className="fas fa-hat-wizard" /> {title} - Step {activeStep + 1} of {steps.length}</h1>
-                <MinMaxButton />
+                <div style={{ display: 'flex' }}>
+                    <MinMaxButton />
+                    <CancelButton />
+                </div>
             </div>
             <div className={cx(styles.wizardContent, { [styles.hidden]: minimized })}>
                 <Stepper />

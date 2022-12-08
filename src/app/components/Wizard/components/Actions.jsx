@@ -57,7 +57,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                             action.cb();
                         };
                         return (
-                            <div key={`action-${uniqueId()}`}>
+                            <React.Fragment key={`action-${uniqueId()}`}>
                                 {
                                     isLoading
                                         ? (
@@ -74,7 +74,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                                             </>
                                         )
                                 }
-                            </div>
+                            </React.Fragment>
                         );
                     })
                 }
