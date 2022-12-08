@@ -291,7 +291,7 @@ const main = () => {
             });
 
             //Copy text to clipboard on electron
-            ipcMain.on('', (event, text) => {
+            ipcMain.on('copy-clipboard', (event, text) => {
                 clipboard.writeText(text);
             });
         } catch (err) {

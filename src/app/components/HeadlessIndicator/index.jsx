@@ -27,7 +27,7 @@ import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
 import Creatable from 'react-select/creatable';
 import _ from 'lodash';
-import { Toaster, TOASTER_SUCCESS, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import actions from './apiActions';
 import Tooltip from '../TooltipCustom/ToolTip';
 import DialogBox from './DialogBox';
@@ -120,13 +120,9 @@ const HeadlessIndicator = ({ address, port }) => {
     const copyToClipboard = () => {
         //Copy to electron clipboard
         const text = `http://${address}:${port}`;
-        navigator.clipboard.writeText(text).then(() => {
-            Toaster.pop({
-                msg: 'Address copied',
-                type: TOASTER_SUCCESS,
-            });
-        });
+        window.ipcRenderer.send('copy-clipboard', text);
     };
+
     const updateRemotePreferences = () => {
         if (headlessSettings.ip === '') {
             setSettingErrors({ ...setSettingErrors, ipError: 'Invalid IP Address', ipHint: 'Ip addresses should consist of 4 sets of numbers between 0 and 255 following the pattern X.X.X.X' });
