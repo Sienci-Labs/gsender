@@ -16,7 +16,7 @@ const Stepper = () => {
                         key={uniqueId()}
                         index={index}
                         active={activeStep === index}
-                        complete={completedStep > index}
+                        complete={completedStep >= index}
                     />
                 ))
             }

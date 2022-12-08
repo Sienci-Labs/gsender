@@ -26,33 +26,32 @@ import styles from '../index.styl';
 
 const Step = ({ step, index = 1, active, complete }) => {
     const getTitleClass = () => {
-        if (complete) {
-            return 'stepTitle';
-        }
         if (active) {
             return 'stepTitle-active';
         }
-
+        if (complete) {
+            return 'stepTitle';
+        }
         return 'stepTitle-future';
     };
     const getStepIndexClass = () => {
-        if (complete) {
-            return 'stepIndex-complete';
-        }
         if (active) {
             return 'stepIndex-active';
+        }
+        if (complete) {
+            return 'stepIndex-complete';
         }
         return 'stepIndex';
     };
 
     return (
-        <div className={active && !complete ? styles['step-active'] : styles.step}>
+        <div className={active ? styles['step-active'] : styles.step}>
             <div className={styles[getStepIndexClass()]}>
                 {complete ? <i className="fas fa-check" /> : (index + 1)}
             </div>
             <div className={styles.stepText}>
                 <span className={styles[getTitleClass()]}>Step {index + 1}</span>
-                <span className={active && !complete ? styles['stepperDescription-active'] : styles.stepperDescription}>{step.title}</span>
+                <span className={active ? styles['stepperDescription-active'] : styles.stepperDescription}>{step.title}</span>
             </div>
         </div>
     );
