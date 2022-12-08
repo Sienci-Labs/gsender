@@ -24,13 +24,14 @@
 import React from 'react';
 import cx from 'classnames';
 import { Image } from 'Components/Image';
-import { TOUCHPLATE_TYPE_STANDARD, TOUCHPLATE_TYPE_AUTOZERO } from 'app/lib/constants';
+import { TOUCHPLATE_TYPE_STANDARD, TOUCHPLATE_TYPE_AUTOZERO, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
 import styles from './index.styl';
 import XProbe from './assets/Block-X.gif';
 import YProbe from './assets/Block-Y.gif';
 import XYProbe from './assets/Block-XY.gif';
 import XYZProbe from './assets/Block-XYZ.gif';
 import ZProbe from './assets/Block-Z.gif';
+import ZOnlyProbe from './assets/Probe-Z.gif';
 import AutoZProbe from './assets/AutoZero-Z.gif';
 import AutoXYZProbe from './assets/AutoZero-Rem.gif';
 
@@ -43,6 +44,9 @@ const ProbeImage = ({ probeCommand, touchplateType = TOUCHPLATE_TYPE_STANDARD, v
                 return AutoZProbe;
             }
             return AutoXYZProbe;
+        }
+        if (touchplateType === TOUCHPLATE_TYPE_ZERO) {
+            return ZOnlyProbe;
         }
         if (id === 'X Touch') {
             return XProbe;

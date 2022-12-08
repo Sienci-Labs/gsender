@@ -40,7 +40,10 @@ const VisualizerOptions = ({ state, actions }) => {
                         <ToggleSwitch checked={objects.cutPath.visible} onChange={() => visualizerActions.handleCutPathToggle()} size="md" />
                         <ToggleSwitch checked={objects.cutPath.visibleLite} onChange={() => visualizerActions.handleCutPathToggle(true)} size="md" />
                     </div>
-                    <small>Specify which visualizer features are enabled or disable in both regular mode and light-mode, in order to save computer resources</small>
+                    <small>
+                        Specify which visualizer features are enabled or disable in both regular mode and light-mode,
+                        in order to save computer resources
+                    </small>
                 </div>
                 {
                     /*
@@ -59,7 +62,12 @@ const VisualizerOptions = ({ state, actions }) => {
                     <Tooltip content="Toggle whether the Visualizer is the classic 3D grid, or a 2D SVG" location="default">
                         <span>Enable SVG Visualizer</span>
                     </Tooltip>
-                    <ToggleSwitch disabled={disabledLite} checked={SVGEnabled} onChange={() => visualizerActions.handleSVGEnabledToggle()} size="sm" />
+                    <ToggleSwitch
+                        disabled={disabledLite}
+                        checked={SVGEnabled}
+                        onChange={() => visualizerActions.handleSVGEnabledToggle()}
+                        size="sm"
+                    />
                 </div>
             </Fieldset>
         </>

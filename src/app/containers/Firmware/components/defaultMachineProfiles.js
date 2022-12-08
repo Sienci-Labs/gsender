@@ -35,6 +35,74 @@ export default [
     {
         'id': 0,
         'company': 'Sienci Labs',
+        'name': 'LongMill MK2',
+        'type': '30x30',
+        'version': 'MK2',
+        'mm': {
+            'width': 792,
+            'depth': 845,
+            'height': 114.3
+        },
+        'in': {
+            'width': 31.18,
+            'depth': 33.27,
+            'height': 4.5
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'laserOnOutline': false,
+        'eepromSettings': MK2LongMill30x30File,
+    },
+    {
+        'id': 1,
+        'company': 'Sienci Labs',
+        'name': 'LongMill MK2',
+        'type': '48x30',
+        'version': 'MK2',
+        'mm': {
+            'width': 1279.9,
+            'depth': 845,
+            'height': 114.3
+        },
+        'in': {
+            'width': 50.39,
+            'depth': 33.27,
+            'height': 4.5
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'eepromSettings': MK2LongMill48x30File,
+    },
+    {
+        'id': 2,
+        'company': 'Sienci Labs',
+        'name': 'LongMill MK2',
+        'type': '12x30',
+        'version': 'MK2',
+        'mm': {
+            'width': 792,
+            'depth': 345,
+            'height': 114.3
+        },
+        'in': {
+            'width': 31.18,
+            'depth': 13.58,
+            'height': 4.5
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'laserOnOutline': false,
+        'eepromSettings': MK2LongMill12x30File,
+    },
+    {
+        'id': 7,
+        'company': 'Sienci Labs',
         'name': 'Mill One',
         'type': 'V1',
         'version': 'MK1',
@@ -56,7 +124,7 @@ export default [
         'eepromSettings': millOneFile,
     },
     {
-        'id': 1,
+        'id': 8,
         'company': 'Sienci Labs',
         'name': 'Mill One',
         'type': 'V2',
@@ -79,7 +147,7 @@ export default [
         'eepromSettings': millOneFile,
     },
     {
-        'id': 2,
+        'id': 9,
         'company': 'Sienci Labs',
         'name': 'Mill One',
         'type': 'V3',
@@ -104,7 +172,7 @@ export default [
     {
         'id': 3,
         'company': 'Sienci Labs',
-        'name': 'LongMill',
+        'name': 'LongMill MK1',
         'type': '12x12',
         'version': 'MK1',
         'mm': {
@@ -127,7 +195,7 @@ export default [
     {
         'id': 4,
         'company': 'Sienci Labs',
-        'name': 'LongMill',
+        'name': 'LongMill MK1',
         'type': '12x30',
         'version': 'MK1',
         'mm': {
@@ -150,7 +218,7 @@ export default [
     {
         'id': 5,
         'company': 'Sienci Labs',
-        'name': 'LongMill',
+        'name': 'LongMill MK1',
         'type': '30x30',
         'version': 'MK1',
         'mm': {
@@ -173,75 +241,7 @@ export default [
     {
         'id': 6,
         'company': 'Sienci Labs',
-        'name': 'LongMill MK2',
-        'type': '48x30',
-        'version': 'MK2',
-        'mm': {
-            'width': 1279.9,
-            'depth': 845,
-            'height': 114.3
-        },
-        'in': {
-            'width': 50.39,
-            'depth': 33.27,
-            'height': 4.5
-        },
-        'endstops': false,
-        'spindle': false,
-        'coolant': false,
-        'laser': false,
-        'eepromSettings': MK2LongMill48x30File,
-    },
-    {
-        'id': 7,
-        'company': 'Sienci Labs',
-        'name': 'LongMill MK2',
-        'type': '30x30',
-        'version': 'MK2',
-        'mm': {
-            'width': 792,
-            'depth': 845,
-            'height': 114.3
-        },
-        'in': {
-            'width': 31.18,
-            'depth': 33.27,
-            'height': 4.5
-        },
-        'endstops': false,
-        'spindle': false,
-        'coolant': false,
-        'laser': false,
-        'laserOnOutline': false,
-        'eepromSettings': MK2LongMill30x30File,
-    },
-    {
-        'id': 8,
-        'company': 'Sienci Labs',
-        'name': 'LongMill MK2',
-        'type': '12x30',
-        'version': 'MK2',
-        'mm': {
-            'width': 792,
-            'depth': 345,
-            'height': 114.3
-        },
-        'in': {
-            'width': 31.18,
-            'depth': 13.58,
-            'height': 4.5
-        },
-        'endstops': false,
-        'spindle': false,
-        'coolant': false,
-        'laser': false,
-        'laserOnOutline': false,
-        'eepromSettings': MK2LongMill12x30File,
-    },
-    {
-        'id': 9,
-        'company': 'Sienci Labs',
-        'name': 'LongMill',
+        'name': 'LongMill MK1',
         'type': '48x30',
         'version': 'MK1',
         'mm': {

@@ -70,6 +70,7 @@ class ModalWrapper extends PureComponent {
         return (
             <Modal
                 {...props}
+                overlayStyle={{ zIndex: 10000 }}
                 onClose={chainedFunction(onClose, this.unblockScrolling)}
             />
         );

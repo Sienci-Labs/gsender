@@ -125,25 +125,27 @@ const AxisTuning = ({ onClose }) => {
                         <ToolIntroduction readyHandler={startTool} onSelectAxis={(axis) => setCurrentAxis(axis)} currentAxis={currentAxis} />
                     }
                     {
-                        introComplete &&
-                        <Step
-                            actions={actions}
-                            onChange={onChange}
-                            currentAction={currentAction}
-                            options={options}
-                            setRequestedDistance={setRequestedDistance}
-                            setActualDistance={setActualDistance}
-                        />
+                        introComplete && (
+                            <Step
+                                actions={actions}
+                                onChange={onChange}
+                                currentAction={currentAction}
+                                options={options}
+                                setRequestedDistance={setRequestedDistance}
+                                setActualDistance={setActualDistance}
+                            />
+                        )
                     }
 
                     {
-                        introComplete &&
-                        <NavigationButtons
-                            onNext={next}
-                            onPrevious={prev}
-                            prevDisabled={prevDisabled}
-                            nextDisabled={nextDisabled}
-                        />
+                        introComplete && (
+                            <NavigationButtons
+                                onNext={next}
+                                onPrevious={prev}
+                                prevDisabled={prevDisabled}
+                                nextDisabled={nextDisabled}
+                            />
+                        )
                     }
                 </div>
 

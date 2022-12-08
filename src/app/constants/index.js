@@ -171,3 +171,31 @@ export const VISUALIZER_SECONDARY = 'VISUALIZER_SECONDARY';
 export const MACRO_FORM_TYPES = ['ADD', 'EDIT'];
 
 export const SPINDLE_MODES = ['M3', 'M4', 'M5'];
+
+export const SURFACING_DWELL_DURATION = 4;
+
+// Event Triggers
+export const PROGRAM_START = 'gcode:start';
+export const PROGRAM_END = 'gcode:stop';
+export const PROGRAM_PAUSE = 'gcode:pause';
+export const PROGRAM_RESUME = 'gcode:resume';
+
+export const CONTROLLER_READY = 'controller:ready';
+
+export const FILE_UNLOAD = 'file:unload';
+
+export const FEED_HOLD = 'feedhold';
+export const CYCLE_START = 'cyclestart';
+
+export const HOMING = 'homing';
+export const SLEEP = 'sleep';
+
+export const MACRO_RUN = 'macro:run';
+export const MACRO_LOAD = 'macro:load';
+
+export const PROGRAM_EVENTS = [
+    PROGRAM_START,
+    PROGRAM_END,
+    PROGRAM_PAUSE,
+    PROGRAM_RESUME
+];

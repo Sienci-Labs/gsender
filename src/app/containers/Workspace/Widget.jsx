@@ -53,7 +53,9 @@ class WidgetWrapper extends PureComponent {
     widget = null;
 
     state = null;
+
     actions = null;
+
     name = this.props.widgetId.split(':')[0];
 
     componentDidMount() {

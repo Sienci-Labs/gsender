@@ -32,10 +32,13 @@ const StatsList = ({ state, actions }) => {
 
     // solution found here: https://stackoverflow.com/a/25279340
     const convertMillisecondsToTimeStamp = (milliseconds) => {
-        let date = new Date(null);
-        date.setSeconds(milliseconds / 1000);
-        let result = date.toISOString().substring(11, 19);
-        return result;
+        if (milliseconds) {
+            let date = new Date(null);
+            date.setSeconds(milliseconds / 1000);
+            let result = date.toISOString().substring(11, 19);
+            return result;
+        }
+        return null;
     };
 
     const timeSpentRunning = convertMillisecondsToTimeStamp(store.get('workspace.timeSpentRunning'));
@@ -58,35 +61,35 @@ const StatsList = ({ state, actions }) => {
             <div className={styles.addMargin}>
                 <div className={styles.statsContainer}>
                     <span className={[styles.first, styles.bold].join(' ')}>Total Runtime</span>
-                    <div className={styles.dotsV2}></div>
+                    <div className={styles.dotsV2} />
                     <span className={[styles.second, styles.bold].join(' ')}>{timeSpentRunning}</span>
                 </div>
                 <div className={styles.indentContainer}>
                     <div className={styles.statsContainer}>
                         <span className={styles.first}>Longest Runtime</span>
-                        <div className={styles.dotsV2}></div>
+                        <div className={styles.dotsV2} />
                         <span className={styles.second}>{longestTimeRun}</span>
                     </div>
                     <div className={styles.statsContainer}>
                         <span className={styles.first}>Average Runtime</span>
-                        <div className={styles.dotsV2}></div>
+                        <div className={styles.dotsV2} />
                         <span className={styles.second}>{calculateAverageTimeRun()}</span>
                     </div>
                 </div>
                 <div className={styles.statsContainer}>
                     <span className={[styles.first, styles.bold].join(' ')}>Total Jobs Run</span>
-                    <div className={styles.dotsV2}></div>
+                    <div className={styles.dotsV2} />
                     <span className={[styles.second, styles.bold].join(' ')}>{jobsFinished + jobsCancelled}</span>
                 </div>
                 <div className={styles.indentContainer}>
                     <div className={styles.statsContainer}>
                         <span className={styles.first}>Jobs Completed</span>
-                        <div className={styles.dotsV2}></div>
+                        <div className={styles.dotsV2} />
                         <span className={styles.second}>{jobsFinished}</span>
                     </div>
                     <div className={styles.statsContainer}>
                         <span className={styles.first}>Jobs Cancelled</span>
-                        <div className={styles.dotsV2}></div>
+                        <div className={styles.dotsV2} />
                         <span className={styles.second}>{jobsCancelled}</span>
                     </div>
                 </div>

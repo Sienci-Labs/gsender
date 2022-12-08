@@ -9,9 +9,9 @@ const PinStatus = ({ pins }) => {
     return (
         <div className={cx(styles.pins, styles.card)}>
             <h2>Pins</h2>
-            <PinRow label="X" value={pins.X} />
-            <PinRow label="Y" value={pins.Y} />
-            <PinRow label="Z" value={pins.Z} />
+            <PinRow label="X Limit" value={pins.X} />
+            <PinRow label="Y Limit" value={pins.Y} />
+            <PinRow label="Z Limit" value={pins.Z} />
             <PinRow label="Probe" value={pins.P} />
             <PinRow label="Door" value={pins.D} />
             <PinRow label="Hold" value={pins.H} />

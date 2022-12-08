@@ -27,6 +27,9 @@ import controller from 'app/lib/controller';
 import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
+import manualToolChange from 'app/wizards/manualToolchange';
+import semiautoToolChange from 'app/wizards/semiautoToolchange';
+import automaticToolChange from 'app/wizards/automaticToolchange';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
@@ -38,6 +41,7 @@ import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/work
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import isElectron from 'is-electron';
+import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 
 
 export function* initialize() {
@@ -157,14 +161,10 @@ export function* initialize() {
             onJobStop(status.timeRunning);
         }
 
-        try {
-            reduxStore.dispatch({
-                type: controllerActions.UPDATE_SENDER_STATUS,
-                payload: { status },
-            });
-        } catch (e) {
-            console.log(e);
-        }
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_SENDER_STATUS,
+            payload: { status },
+        });
     });
 
     controller.addListener('workflow:state', (state) => {
@@ -209,7 +209,7 @@ export function* initialize() {
         pubsub.publish('machine:connected');
     });
 
-    controller.addListener('serialport:close', (options) => {
+    controller.addListener('serialport:close', (options, received) => {
         // Reset homing run flag to prevent rapid position without running homing
         reduxStore.dispatch({
             type: controllerActions.RESET_HOMING,
@@ -220,6 +220,44 @@ export function* initialize() {
         });
 
         pubsub.publish('machine:disconnected');
+
+        // if the connection was closed unexpectedly (not by the user),
+        // the number of lines sent will be defined.
+        // create a pop up so the user can connect to the last active port
+        // and resume from the last line
+        if (received) {
+            const homingEnabled = _get(reduxStore.getState(), 'controller.settings.settings.$22');
+            const msg = homingEnabled === '1'
+                ? 'The machine connection has been disrupted. To attempt to reconnect to the last active port, ' +
+                'home, and choose which line to continue from, press Resume.'
+                : 'The machine connection has been disrupted. To attempt to reconnect to the last active port, ' +
+                'press Resume. After that, you can set your Workspace 0 and use the Start From Line function to continue the job. ' +
+                'Suggested line to start from: ' +
+                received;
+
+            const content = (
+                <div>
+                    <p>
+                        {msg}
+                    </p>
+                </div>
+            );
+
+            Confirm({
+                title: 'Port Disconnected',
+                content,
+                confirmLabel: 'Resume',
+                cancelLabel: 'Close',
+                onConfirm: () => {
+                    connectToLastDevice(() => {
+                        // if limit switches active, home
+                        if (homingEnabled === '1') {
+                            pubsub.publish('disconnect:recovery', received);
+                        }
+                    });
+                }
+            });
+        }
     });
 
     controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts) => {
@@ -230,7 +268,34 @@ export function* initialize() {
     });
 
     controller.addListener('gcode:toolChange', (context, comment = '',) => {
-        const content = (comment.length > 0)
+        const payload = {
+            context,
+            comment
+        };
+        const { option } = context;
+        if (option === 'Manual') {
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Manual Toolchange',
+                instructions: manualToolChange
+            });
+        } else if (option === 'Semi-Automatic') {
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Semi-Automatic Toolchange',
+                instructions: semiautoToolChange
+            });
+        } else if (option === 'Automatic') {
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Automatic Toolchange',
+                instructions: automaticToolChange
+            });
+        } else {
+            return;
+        }
+
+        /*const content = (comment.length > 0)
             ? <div><p>Press Resume to continue operation.</p><p>Line contained following comment: <b>{comment}</b></p></div>
             : 'Press Resume to continue operation.';
 
@@ -250,7 +315,7 @@ export function* initialize() {
             onConfirm: () => {
                 controller.command('gcode:resume');
             }
-        });
+        });*/
     });
 
     controller.addListener('gcode:load', (name, content) => {
@@ -388,9 +453,15 @@ export function* initialize() {
             controller.command('toolchange:post');
         };
 
-        const content = (comment.length > 0)
-            ? <div><p>A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.</p><p>Comment: <b>{comment}</b></p></div>
-            : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
+        const content = (comment.length > 0) ? (
+            <div>
+                <p>
+                    A toolchange command (M6) was found - click confirm to verify
+                    the tool has been changed and run your post-toolchange code.
+                </p>
+                <p>Comment: <b>{comment}</b></p>
+            </div>
+        ) : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
 
         Confirm({
             title: 'Confirm Toolchange',
@@ -449,7 +520,7 @@ export function* initialize() {
         Toaster.clear();
         Toaster.pop({
             type: TOASTER_INFO,
-            msg: `Tool command found - <b>${tool}</b>`,
+            msg: `Tool command found - ${tool}`,
             duration: TOASTER_UNTIL_CLOSE
         });
     });
@@ -459,14 +530,8 @@ export function* initialize() {
     });
 
     controller.addListener('error', (error) => {
-        try {
-            if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
-                window.ipcRenderer.send('logError:electron', error);
-            } else {
-                console.log(error.message);
-            }
-        } catch (error) {
-            console.log(error.message);
+        if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
+            window.ipcRenderer.send('logError:electron', error);
         }
     });
 

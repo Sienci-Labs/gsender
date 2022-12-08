@@ -31,6 +31,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
 import reduxStore from 'app/store/redux';
+import { UPDATE_JOB_OVERRIDES } from 'app/actions/visualizerActions';
 import controller from 'app/lib/controller';
 import api from 'app/api';
 import pubsub from 'pubsub-js';
@@ -58,6 +59,8 @@ import {
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
     VISUALIZER_PRIMARY, LASER_MODE,
+    METRIC_UNITS,
+    GRBL_ACTIVE_STATE_HOME
 } from '../../constants';
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
@@ -93,7 +96,9 @@ class WorkflowControl extends PureComponent {
             runHasStarted: false,
             startFromLine: {
                 showModal: false,
+                showChoiceModal: false,
                 value: 1,
+                waitForHoming: false
             },
         };
     }
@@ -140,15 +145,11 @@ class WorkflowControl extends PureComponent {
             addRecentFile(recentFile);
         }
 
-        try {
-            await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
-            reduxStore.dispatch({
-                type: UPDATE_FILE_INFO,
-                payload: { path: file.path },
-            });
-        } catch (e) {
-            console.log(e);
-        }
+        await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
+        reduxStore.dispatch({
+            type: UPDATE_FILE_INFO,
+            payload: { path: file.path },
+        });
     };
 
     loadRecentFile = async (fileMetadata) => {
@@ -161,15 +162,11 @@ class WorkflowControl extends PureComponent {
         }
         const { result, name } = fileMetadata;
         const serializedFile = new File([result], name);
-        try {
-            await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
-            reduxStore.dispatch({
-                type: UPDATE_FILE_INFO,
-                payload: { path: fileMetadata.fullPath },
-            });
-        } catch (e) {
-            console.log(e);
-        }
+        await api.file.upload(serializedFile, controller.port, VISUALIZER_PRIMARY);
+        reduxStore.dispatch({
+            type: UPDATE_FILE_INFO,
+            payload: { path: fileMetadata.fullPath },
+        });
     }
 
     canRun() {
@@ -209,6 +206,7 @@ class WorkflowControl extends PureComponent {
 
         const { received } = senderStatus;
         handleStop();
+        reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         this.setState(prev => ({ runHasStarted: false, startFromLine: { ...prev.startFromLine, value: received } }));
         if (status.activeState === 'Check') {
             controller.command('gcode', '$C');
@@ -234,6 +232,7 @@ class WorkflowControl extends PureComponent {
         }
         this.setState({ fileLoaded: true });
         this.setState({ runHasStarted: true });
+        reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: { isChecked: true, toggleStatus: 'overrides' } });
         const { actions } = this.props;
         actions.onRunClick();
     }
@@ -255,21 +254,33 @@ class WorkflowControl extends PureComponent {
     componentDidUpdate(prevProps) {
         const { activeState: prevActiveState, state: prevState } = prevProps;
         const { activeState: currentActiveState, state: currentState, fileCompletion } = this.props;
-
         const { gcode: { content: prevGcode } } = prevState;
         const { gcode: { content: currentGcode } } = currentState;
+        const { waitForHoming } = this.state.startFromLine;
 
         if ((prevActiveState === GRBL_ACTIVE_STATE_CHECK && currentActiveState !== GRBL_ACTIVE_STATE_CHECK) || prevGcode !== currentGcode) {
-            this.setState({ runHasStarted: false });
+            this.updateRunHasStarted();
+        }
+        if (prevActiveState === GRBL_ACTIVE_STATE_HOME && currentActiveState !== GRBL_ACTIVE_STATE_HOME && waitForHoming) {
+            this.moveToWCSZero();
         }
         if (prevProps.fileCompletion === 0 && fileCompletion !== 0) {
-            this.setState({
-                startFromLine: {
-                    showModal: false,
-                    value: 1,
-                }
-            });
+            this.updateStartFromLine();
         }
+    }
+
+    updateRunHasStarted() {
+        this.setState({ runHasStarted: false });
+    }
+
+    updateStartFromLine() {
+        this.setState(prev => ({
+            startFromLine: {
+                ...prev.startFromLine,
+                showModal: false,
+                value: 1,
+            }
+        }));
     }
 
     componentWillUnmount() {
@@ -305,11 +316,17 @@ class WorkflowControl extends PureComponent {
 
     startFromLinePrompt = () => {
         const { received } = this.props.senderStatus;
-        this.setState(prev => ({ startFromLine: { showModal: true, value: received !== 0 ? received : prev.startFromLine.value } }));
+        this.setState(prev => ({
+            startFromLine: {
+                ...prev.startFromLine,
+                showModal: true,
+                value: received !== 0 ? received : prev.startFromLine.value
+            }
+        }));
     }
 
     handleStartFromLine = () => {
-        this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
+        this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false, showChoiceModal: false } }));
         controller.command('gcode:start', this.state.startFromLine.value, this.props.zMax);
 
         Toaster.pop({
@@ -317,6 +334,33 @@ class WorkflowControl extends PureComponent {
             type: TOASTER_SUCCESS,
             duration: 2000,
         });
+    }
+
+    moveToWCSZero = () => {
+        const { homingEnabled } = this.props;
+        const safeRetractHeight = store.get('workspace.safeRetractHeight');
+        const units = store.get('workspace.units', METRIC_UNITS);
+        const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+
+        if (safeRetractHeight !== 0) {
+            if (homingEnabled) {
+                controller.command('gcode:safe', `G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`, modal);
+            } else {
+                controller.command('gcode', 'G91');
+                controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+            }
+        }
+        controller.command('gcode', 'G90');
+        controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
+        controller.command('gcode', 'G0 Z0');
+
+        this.setState(prev => ({
+            startFromLine: {
+                ...prev.startFromLine,
+                showChoiceModal: true,
+                waitForHoming: false
+            }
+        }));
     }
 
     subscribe() {
@@ -330,6 +374,16 @@ class WorkflowControl extends PureComponent {
             }),
             pubsub.subscribe('outline:done', () => {
                 this.workerOutline.terminate();
+            }),
+            pubsub.subscribe('disconnect:recovery', (msg, received) => {
+                controller.command('homing');
+                this.setState(prev => ({
+                    startFromLine: {
+                        ...prev.startFromLine,
+                        value: received,
+                        waitForHoming: true
+                    }
+                }));
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -352,12 +406,12 @@ class WorkflowControl extends PureComponent {
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
         const canRun = this.canRun();
-        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && activeState !== GRBL_ACTIVE_STATE_CHECK && includes([WORKFLOW_STATE_RUNNING], workflowState);
+        const canPause = isReady && activeState !== GRBL_ACTIVE_STATE_HOLD && activeState !== GRBL_ACTIVE_STATE_CHECK &&
+            includes([WORKFLOW_STATE_RUNNING], workflowState);
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
-
-        const { showModal, value } = this.state.startFromLine;
+        const { showModal, showChoiceModal, value } = this.state.startFromLine;
         const renderSVG = shouldVisualizeSVG();
 
         return (
@@ -542,7 +596,14 @@ class WorkflowControl extends PureComponent {
                                             <Input
                                                 label="Start at this line in gcode file:"
                                                 value={value}
-                                                onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) && this.setState(prev => ({ startFromLine: { ...prev.startFromLine, value: Math.ceil(Number(e.target.value)) } }))}
+                                                onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) &&
+                                                    this.setState(prev => ({
+                                                        startFromLine: {
+                                                            ...prev.startFromLine,
+                                                            value: Math.ceil(Number(e.target.value))
+                                                        }
+                                                    }))
+                                                }
                                                 additionalProps={{ type: 'number' }}
                                             />
                                             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -574,11 +635,68 @@ class WorkflowControl extends PureComponent {
                     )
                 }
                 {
-                    !renderSVG ?
-                        <CameraDisplay
-                            camera={camera}
-                            cameraPosition={cameraPosition}
-                        /> : null
+                    showChoiceModal && (
+                        <Modal onClose={() => {
+                            this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showChoiceModal: false } }));
+                            actions.closeModal();
+                        }}
+                        >
+                            <Modal.Header className={styles.modalHeader}>
+                                <Modal.Title>Recovery: Start From Line</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                <div className={styles.runProbeBody}>
+                                    <div className={styles.left}>
+                                        <div className={styles.greyText}>
+                                            <Input
+                                                label="Start at this line in gcode file:"
+                                                value={value}
+                                                onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) &&
+                                                    this.setState(prev => ({
+                                                        startFromLine: {
+                                                            ...prev.startFromLine,
+                                                            value: Math.ceil(Number(e.target.value))
+                                                        }
+                                                    }))
+                                                }
+                                                additionalProps={{ type: 'number' }}
+                                            />
+                                            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                                                <p>Start from line will take into account all movements prior to this line.</p>
+                                                <p>
+                                                    For this file, the maximum line number is: <strong>{lineTotal}</strong>
+                                                </p>
+
+                                                {value && <p>Recommended starting lines: <strong>{value - 10}</strong> - <strong>{value}</strong></p>}
+                                            </div>
+                                        </div>
+                                        <div className={styles.buttonsContainer}>
+                                            <button
+                                                type="button"
+                                                className={styles['workflow-button-play']}
+                                                title="Start from Line"
+                                                onClick={this.handleStartFromLine}
+                                                disabled={!isConnected}
+                                            >
+                                                Start from Line
+                                                <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </Modal.Body>
+                        </Modal>
+                    )
+                }
+                {
+                    !renderSVG
+                        ? (
+                            <CameraDisplay
+                                camera={camera}
+                                cameraPosition={cameraPosition}
+                            />
+                        ) : null
                 }
             </div>
         );
@@ -598,6 +716,8 @@ export default connect((store) => {
     const gcode = get(store, 'file.content');
     const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
     const zMax = get(store, 'file.bbox.max.z', 0);
+    const homingSetting = get(store, 'controller.settings.settings.$22', 0);
+    const homingEnabled = homingSetting === '1';
     return {
         fileLoaded,
         isConnected,
@@ -610,6 +730,7 @@ export default connect((store) => {
         lineTotal,
         gcode,
         fileCompletion,
-        zMax
+        zMax,
+        homingEnabled
     };
 }, null, null, { forwardRef: true })(WorkflowControl);

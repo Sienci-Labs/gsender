@@ -55,7 +55,6 @@ import {
 import UpdateAvailableAlert from './UpdateAvailableAlert/UpdateAvailableAlert';
 import Toaster from '../../lib/toaster/Toaster';
 import ConfirmationDialog from '../../components/ConfirmationDialog/ConfirmationDialog';
-import RotatePrompt from './RotatePrompt';
 
 
 const WAIT = '%wait';
@@ -145,15 +144,7 @@ class Workspace extends PureComponent {
 
     primaryContainer = null;
 
-    secondaryContainer = null;
-
-    primaryToggler = null;
-
-    secondaryToggler = null;
-
     primaryWidgets = null;
-
-    secondaryWidgets = null;
 
     defaultContainer = null;
 
@@ -280,25 +271,17 @@ class Workspace extends PureComponent {
         }
     };
 
-    togglePrimaryContainer = () => {
-        const { showPrimaryContainer } = this.state;
-        this.setState({ showPrimaryContainer: !showPrimaryContainer });
-
-        // Publish a 'resize' event
-        pubsub.publish('resize'); // Also see "widgets/Visualizer"
-    };
-
     resizeDefaultContainer = () => {
         // const sidebar = document.querySelector('#sidebar');
         // const secondaryToggler = ReactDOM.findDOMNode(this.secondaryToggler);
         const { showPrimaryContainer } = this.state;
 
-        // Calculate VH based on current window height
+        /* Calculate VH based on current window height
         let vh = window.visualViewport.height * 0.01;
         let vw = window.visualViewport.width * 0.01;
         //Update styling with new VH value for CSS calculations
         document.documentElement.style.setProperty('--vh', `${vh}px`);
-        document.documentElement.style.setProperty('--vw', `${vw}px`);
+        document.documentElement.style.setProperty('--vw', `${vw}px`);*/
 
         { // Mobile-Friendly View
             const { location } = this.props;
@@ -313,18 +296,17 @@ class Workspace extends PureComponent {
                 document.body.style.overflowX = '';
             }
         }
-
-        // defaultContainer.style.right = secondaryToggler.offsetWidth + 'px';
         // Publish a 'resize' event
         pubsub.publish('resize'); // Also see "widgets/Visualizer"
     };
 
     updateScreenSize = () => {
-        let isMobile = window.visualViewport.width < 700;
+        const ratio = window.visualViewport.width / window.visualViewport.height;
+        const isMobile = ratio <= 0.5625; //9:16 ratio
         this.setState({
             mobile: isMobile
         });
-        let isTablet = window.visualViewport.width < 1000 && window.visualViewport.width >= 700;
+        const isTablet = ratio <= 1 && ratio > 0.5625; //width smaller than height and wider than a phone
         this.setState({
             tablet: isTablet
         });
@@ -520,14 +502,14 @@ class Workspace extends PureComponent {
             showPrimaryContainer,
             reverseWidgets,
             mobile,
-            tablet,
-            shouldShowRotate
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
+        const tableStyle = mobile ? styles.workspaceTableMobile : styles.workspaceTable;
+        const rowStyle = mobile ? styles.workspaceTableRowMobile : styles.workspaceTableRow;
+        const primaryContainerStyle = mobile ? styles.primaryContainerMobile : styles.primaryContainer;
         return (
             <ScreenAwake>
                 <div style={style} className={classNames(className, styles.workspace)}>
-                    {tablet && shouldShowRotate && <RotatePrompt onClose={this.action.closePrompt} /> }
                     {modal.name === MODAL_FEEDER_PAUSED && (
                         <FeederPaused
                             title={modal.params.title}
@@ -596,26 +578,27 @@ class Workspace extends PureComponent {
                             this.onDrop(acceptedFiles);
                         }}
                     >
-                        <div className={classNames(styles.workspaceTable)}>
+                        <div className={tableStyle}>
                             <UpdateAvailableAlert restartHandler={this.action.sendRestartCommand} />
                             <Toaster />
                             <Header />
                             <ConfirmationDialog />
-                            <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
+                            <div className={classNames(rowStyle, { [styles.reverseWorkspace]: reverseWidgets })}>
                                 {
-                                    !mobile &&
+                                    !mobile && (
                                         <DefaultWidgets
                                             ref={node => {
                                                 this.defaultContainer = node;
                                             }}
                                         />
+                                    )
                                 }
                                 <div
                                     ref={node => {
                                         this.primaryContainer = node;
                                     }}
                                     className={classNames(
-                                        styles.primaryContainer,
+                                        primaryContainerStyle,
                                         { [styles.hidden]: hidePrimaryContainer },
                                         { [styles.disabled]: disabled }
                                     )}

@@ -377,6 +377,18 @@ events.delete = (id) => new Promise((resolve, reject) => {
         });
 });
 
+events.clearAll = () => new Promise((resolve, reject) => {
+    authrequest
+        .delete('/api/events')
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 events.update = (id, options) => new Promise((resolve, reject) => {
     authrequest
         .put('/api/events/' + id)

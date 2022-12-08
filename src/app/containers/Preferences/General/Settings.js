@@ -22,10 +22,7 @@ const Settings = () => {
     };
 
     const restoreDefault = async () => {
-        const res = await api.events.fetch();
-        const events = res.body.records;
-
-        await Promise.all(events.map((event) => api.events.delete(event.id)));
+        await api.events.clearAll();
 
         restoreSettings(defaultState);
     };
@@ -56,11 +53,15 @@ const Settings = () => {
             reader.onload = async (event) => {
                 const { settings, events = [] } = JSON.parse(event.target.result);
 
-                await Promise.all(
-                    events.map((event) => (event.id
-                        ? api.events.update(event.id, event)
-                        : api.events.create(event)))
-                );
+                await new Promise((resolve, reject) => {
+                    // delete all old events
+                    const res = api.events.clearAll();
+                    resolve(res);
+                }).then((result) => {
+                    Promise.all([
+                        events.map((event) => api.events.create(event))
+                    ]);
+                });
 
                 restoreSettings(settings);
             };

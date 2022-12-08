@@ -28,7 +28,7 @@ import pubsub from 'pubsub-js';
 import qs from 'qs';
 import React from 'react';
 import reduxStore from 'app/store/redux';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import {
     HashRouter as Router,
     Route,
@@ -69,10 +69,11 @@ const renderPage = () => {
     document.title = `gSender ${settings.version}`;
     container.style.width = '100%';
     document.body.appendChild(container);
+    const root = createRoot(container);
 
     sagaMiddleware.run(rootSaga);
 
-    ReactDOM.render(
+    root.render(
         <ReduxProvider store={reduxStore}>
             <GridSystemProvider
                 breakpoints={[576, 768, 992, 1200]}
@@ -88,8 +89,7 @@ const renderPage = () => {
                     </Switch>
                 </Router>
             </GridSystemProvider>
-        </ReduxProvider>,
-        container
+        </ReduxProvider>
     );
 };
 

@@ -36,6 +36,7 @@ const RecentFileList = ({ visible, recentFiles, setShowPullout }) => {
                         const date = new Date(recentFile.timeUploaded).toLocaleDateString();
                         return (
                             <button
+                                type="button"
                                 key={recentFile.filePath}
                                 className={styles.recentFile}
                                 onClick={() => loadRecentFile(recentFile.filePath) && setShowPullout(false)}

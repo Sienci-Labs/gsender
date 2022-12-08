@@ -22,7 +22,7 @@
  */
 
 import '@babel/polyfill';
-import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen } from 'electron';
+import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -39,6 +39,7 @@ import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 import { getGRBLLog } from './electron-app/grblLogs';
 
 
+
 let windowManager = null;
 let hostInformation = {};
 let grblLog = log.create('grbl');
@@ -48,6 +49,9 @@ const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
     const gotSingleInstanceLock = app.requestSingleInstanceLock();
     const shouldQuitImmediately = !gotSingleInstanceLock;
+
+    // Initialize remote main
+    require('@electron/remote/main').initialize();
 
     let prevDirectory = '';
 
@@ -83,6 +87,7 @@ const main = () => {
 
     app.whenReady().then(async () => {
         try {
+            session.defaultSession.clearCache();
             windowManager = new WindowManager();
             // Create and show splash before server starts
             const splashScreen = windowManager.createSplashScreen({
