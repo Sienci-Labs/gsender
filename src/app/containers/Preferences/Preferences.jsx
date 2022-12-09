@@ -44,9 +44,7 @@ import styles from './index.styl';
 import { METRIC_UNITS, WORKFLOW_STATE_RUNNING } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 import {
-    CUST_THEME, DARK_THEME_VALUES,
-    BACKGROUND_PART, GRID_PART, XAXIS_PART, YAXIS_PART, ZAXIS_PART,
-    LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART
+    DARK_THEME_VALUES, PARTS_LIST, G1_PART
 } from '../../widgets/Visualizer/constants';
 import StatsPage from './Stats';
 import SafetySettings from './Safety';
@@ -126,7 +124,7 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 6,
-                    label: 'Start/Stop G-Code',
+                    label: 'Program Events',
                     component: ProgramEvents,
                 },
                 {
@@ -558,34 +556,22 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('theme:change', theme.value);
             },
-            handleCustThemeChange: (themeColours) => {
+            handleCustThemeChange: (themeColours, theme) => {
                 const { visualizer } = this.state;
-                const parts = [
-                    BACKGROUND_PART,
-                    GRID_PART,
-                    XAXIS_PART,
-                    YAXIS_PART,
-                    ZAXIS_PART,
-                    LIMIT_PART,
-                    CUTTING_PART,
-                    JOGGING_PART,
-                    G0_PART,
-                    G1_PART
-                ];
-                parts.map((value) => {
+                PARTS_LIST.map((value) => {
                     let label = value;
                     if (value === G1_PART) {
                         label = 'G1-3';
                     }
-                    return this.visualizerConfig.set(CUST_THEME + ' ' + label, themeColours.get(value));
+                    return this.visualizerConfig.set(theme + ' ' + label, themeColours.get(value));
                 });
                 this.setState({
                     visualizer: {
                         ...visualizer,
-                        theme: CUST_THEME,
+                        theme: theme,
                     }
                 });
-                pubsub.publish('theme:change', CUST_THEME);
+                pubsub.publish('theme:change', theme);
             },
             handleChangeComplete: (color, part) => {
                 const { visualizer } = this.state;
@@ -595,52 +581,10 @@ class PreferencesPage extends PureComponent {
                 pubsub.publish('part:change');
             },
             getDefaultColour: (part) => {
-                let defaultColour;
-                let themeType = DARK_THEME_VALUES;
-                switch (part) {
-                case 'Background':
-                    defaultColour = themeType.backgroundColor;
-                    break;
-                case 'Grid':
-                    defaultColour = themeType.gridColor;
-                    break;
-                case 'X Axis':
-                    defaultColour = themeType.xAxisColor;
-                    break;
-                case 'Y Axis':
-                    defaultColour = themeType.yAxisColor;
-                    break;
-                case 'Z Axis':
-                    defaultColour = themeType.zAxisColor;
-                    break;
-                case 'Limit':
-                    defaultColour = themeType.limitColor;
-                    break;
-                case 'Cutting Coordinates Lines':
-                    defaultColour = themeType.cuttingCoordinateLines;
-                    break;
-                case 'Jogging Coordinates Lines':
-                    defaultColour = themeType.joggingCoordinateLines;
-                    break;
-                case 'G0':
-                    defaultColour = themeType.G0Color;
-                    break;
-                case 'G1':
-                    defaultColour = themeType.G1Color;
-                    break;
-                case 'G2':
-                    defaultColour = themeType.G1Color;
-                    break;
-                case 'G3':
-                    defaultColour = themeType.G1Color;
-                    break;
-                default:
-                    defaultColour = '#000000';
-                }
-                return defaultColour;
+                return DARK_THEME_VALUES.get(part) || '#000000';
             },
-            getCurrentColor: (part, defaultColour) => {
-                return this.visualizerConfig.get(CUST_THEME + ' ' + part, defaultColour);
+            getCurrentColor: (theme, part, defaultColour) => {
+                return this.visualizerConfig.get(theme + ' ' + part, defaultColour);
             },
             handleVisEnabledToggle: (liteMode = false) => {
                 const { visualizer } = this.state;
@@ -833,7 +777,19 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight, customDecimalPlaces, spindle } = this.state;
+        const {
+            tools,
+            tool,
+            probe,
+            probeSettings,
+            units,
+            reverseWidgets,
+            autoReconnect,
+            visualizer,
+            safeRetractHeight,
+            customDecimalPlaces,
+            spindle
+        } = this.state;
 
         store.set('workspace.reverseWidgets', reverseWidgets);
         store.set('workspace.safeRetractHeight', safeRetractHeight);

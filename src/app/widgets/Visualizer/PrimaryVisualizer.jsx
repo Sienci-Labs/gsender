@@ -1,12 +1,15 @@
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
+import Icon from '@mdi/react';
+import { mdiEmoticonSadOutline } from '@mdi/js';
 
 import * as WebGL from 'app/lib/three/WebGL';
 import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_HOLD, WORKFLOW_STATE_IDLE, GRBL_ACTIVE_STATE_DOOR } from 'app/constants';
 import Widget from 'app/components/Widget';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import UnlockButton from 'app/widgets/Visualizer/UnlockButton';
+import Wizard from 'app/components/Wizard';
 import WorkflowControl from './WorkflowControl';
 import MachineStatusArea from './MachineStatusArea';
 import ValidationModal from './ValidationModal';
@@ -67,54 +70,63 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                     />
                 )}
 
-                {WebGL.isWebGLAvailable() && (
-                    <div className={styles.visualizerWrapper}>
-                        <SoftLimitsWarningArea />
-                        {
-                            showUnlockButton && <UnlockButton />
-                        }
-                        <MachineStatusArea
-                            state={state}
-                            actions={actions}
-                        />
-                        <VisualizerWrapper
-                            show={showVisualizer}
-                            cameraPosition={cameraPosition}
-                            ref={visualizerRef}
-                            state={state}
-                            actions={actions}
-                            containerID={containerID}
-                            isSecondary={false}
-                        />
-                        <WorkflowControl
-                            ref={workflowRef}
-                            state={state}
-                            actions={actions}
-                            invalidGcode={invalidLine.line}
-                        />
+
+                <div className={styles.visualizerWrapper}>
+                    <SoftLimitsWarningArea />
+                    {
+                        showUnlockButton && <UnlockButton />
+                    }
+                    <MachineStatusArea
+                        state={state}
+                        actions={actions}
+                    />
+                    {
+                        WebGL.isWebGLAvailable() ? (
+                            <VisualizerWrapper
+                                show={showVisualizer}
+                                cameraPosition={cameraPosition}
+                                ref={visualizerRef}
+                                state={state}
+                                actions={actions}
+                                containerID={containerID}
+                                isSecondary={false}
+                            />
+                        ) : (
+                            <div className={styles.visualizerMsgContainer}>
+                                <Icon path={mdiEmoticonSadOutline} size={4} />
+                                <span style={{ fontSize: '16px' }}>{'It looks like you don\'t support WebGL'}</span>
+                            </div>
+                        )
+                    }
+                    <WorkflowControl
+                        ref={workflowRef}
+                        state={state}
+                        actions={actions}
+                        invalidGcode={invalidLine.line}
+                    />
+                    <Wizard />
 
 
-                        {
-                            invalidGcode.shouldShow && invalidGcode.showModal && (
-                                <ValidationModal
-                                    invalidGcode={invalidGcode}
-                                    onProceed={handleRun}
-                                    onCancel={reset}
-                                />
-                            )
-                        }
-                        {
-                            invalidLine.shouldShow && invalidLine.show && (
-                                <WarningModal
-                                    onContinue={actions.lineWarning.onContinue}
-                                    onIgnoreWarning={actions.lineWarning.onIgnoreWarning}
-                                    onCancel={actions.lineWarning.onCancel}
-                                    invalidLine={invalidLine.line}
-                                />
-                            )
-                        }
-                    </div>
-                )}
+                    {
+                        invalidGcode.shouldShow && invalidGcode.showModal && (
+                            <ValidationModal
+                                invalidGcode={invalidGcode}
+                                onProceed={handleRun}
+                                onCancel={reset}
+                            />
+                        )
+                    }
+                    {
+                        invalidLine.shouldShow && invalidLine.show && (
+                            <WarningModal
+                                onContinue={actions.lineWarning.onContinue}
+                                onIgnoreWarning={actions.lineWarning.onIgnoreWarning}
+                                onCancel={actions.lineWarning.onCancel}
+                                invalidLine={invalidLine.line}
+                            />
+                        )
+                    }
+                </div>
             </Widget.Content>
         </Widget>
     );

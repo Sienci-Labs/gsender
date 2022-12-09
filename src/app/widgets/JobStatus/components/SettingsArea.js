@@ -22,7 +22,6 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import _ from 'lodash';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -35,6 +34,11 @@ import styles from './Overrides.styl';
 import Slider from '../../../components/Slider/Slider';
 import FeedControlButton from './FeedControlButton';
 
+const VALUE_RANGES = {
+    MIN: 5,
+    MAX: 230
+};
+
 /**
  * Settings Area component to display override controls for user
  * @prop {Object} state Default state given from parent component
@@ -42,6 +46,9 @@ import FeedControlButton from './FeedControlButton';
  */
 const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
     const [showSpindleOverride, setShowSpindleOverride] = useState(store.get('workspace.machineProfile.spindle'));
+    const ov = get(controllerState, 'status.ov', []);
+    const [ovF, setOvF] = useState(ov[0]);
+    const [ovS, setOvS] = useState(ov[2]);
 
     const { units } = state;
     const unitString = `${units}/min`;
@@ -54,8 +61,13 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
      * Override feed rate with given value with backend call
      * @param {Event} e Event Object
      */
-    const updateFeedRateChange = (e) => {
-        const feedRate = Number(e.target.value) || 100;
+    const updateFeedRateChange = (value) => {
+        const feedRate = Number(value) || 100;
+
+        if (feedRate < VALUE_RANGES.MIN && feedrate > VALUE_RANGES.MAX) {
+            return;
+        }
+
         setOvF(feedRate);
         controller.command('feedOverride', feedRate);
     };
@@ -64,8 +76,13 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
      * Override spindle with given value
      * @param {Event} e Event Object
      */
-    const updateSpindleSpeedChange = (e) => {
-        const spindleSpeed = Number(e.target.value) || 100;
+    const updateSpindleSpeedChange = (value) => {
+        const spindleSpeed = Number(value) || 100;
+
+        if (spindleSpeed < VALUE_RANGES.MIN && spindleSpeed > VALUE_RANGES.MAX) {
+            return;
+        }
+
         setOvS(spindleSpeed);
         controller.command('spindleOverride', spindleSpeed);
     };
@@ -81,19 +98,18 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
             store.removeListener('change', handleMachineProfileChange);
         };
     }, []);
-
-    let ov = _.get(controllerState, 'status.ov', []);
-    const [ovF, setOvF] = useState(ov[0]);
-    const [ovS, setOvS] = useState(ov[2]);
     const { spindleOverrideLabel } = state;
+
     return (
-        <div className={styles['settings-area']}>
-            <div className={styles.overrides}>
-                <span className={styles.overrideValue}>{feedrate} {unitString}</span>
+        <div className={styles.overrides}>
+            <div className={styles.overridesItem}>
+                <div className={styles.overridesValueWrapper}>
+                    <span style={{ color: 'grey' }}>Feed</span>
+                    <span className={styles.overrideValue}>{Math.round(feedrate * 100) / 100} {unitString}</span>
+                </div>
                 <Slider
-                    min={5}
-                    max={230}
-                    label="Feed:"
+                    min={VALUE_RANGES.MIN}
+                    max={VALUE_RANGES.MAX}
                     value={ovF || 100}
                     unitString="%"
                     step={5}
@@ -102,17 +118,29 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
                     }}
                     onMouseUp={updateFeedRateChange}
                 />
-                <FeedControlButton value={100} onClick={updateFeedRateChange}><i className="fas fa-redo fa-flip-horizontal" /></FeedControlButton>
+                <div className={styles.overridesButtonsWrapper}>
+                    <FeedControlButton value="100" onClick={() => updateFeedRateChange(100)}>
+                        <i className="fas fa-redo fa-flip-horizontal" />
+                    </FeedControlButton>
+                    <FeedControlButton value="5" onClick={() => updateFeedRateChange(ovF + 5)}>
+                        <i className="fas fa-plus" />
+                    </FeedControlButton>
+                    <FeedControlButton value="-5" onClick={() => updateFeedRateChange(ovF + -5)}>
+                        <i className="fas fa-minus" />
+                    </FeedControlButton>
+                </div>
             </div>
 
             {
                 showSpindleOverride && (
-                    <div className={styles.overrides}>
-                        <span className={styles.overrideValue}>{spindle} rpm</span>
+                    <div className={styles.overridesItem}>
+                        <div className={styles.overridesValueWrapper}>
+                            <span style={{ color: 'grey' }}>{spindleOverrideLabel}</span>
+                            <span className={styles.overrideValue}>{spindle} rpm</span>
+                        </div>
                         <Slider
-                            min={5}
-                            max={230}
-                            label={`${spindleOverrideLabel}:`}
+                            min={VALUE_RANGES.MIN}
+                            max={VALUE_RANGES.MAX}
                             value={ovS || 100}
                             unitString="%"
                             step={5}
@@ -121,7 +149,17 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
                             }}
                             onMouseUp={updateSpindleSpeedChange}
                         />
-                        <FeedControlButton value={100} onClick={updateSpindleSpeedChange}><i className="fas fa-redo fa-flip-horizontal" /></FeedControlButton>
+                        <div className={styles.overridesButtonsWrapper}>
+                            <FeedControlButton value="100" onClick={() => updateSpindleSpeedChange(100)}>
+                                <i className="fas fa-redo fa-flip-horizontal" />
+                            </FeedControlButton>
+                            <FeedControlButton value="5" onClick={() => updateSpindleSpeedChange(ovS + 5)}>
+                                <i className="fas fa-plus" />
+                            </FeedControlButton>
+                            <FeedControlButton value="-5" onClick={() => updateSpindleSpeedChange(ovS + -5)}>
+                                <i className="fas fa-minus" />
+                            </FeedControlButton>
+                        </div>
                     </div>
                 )
             }

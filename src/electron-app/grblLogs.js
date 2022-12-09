@@ -27,7 +27,6 @@ const getGRBLLog = async (logPath) => {
     let content = '';
     try {
         content = await fs.readFile(logPath, 'utf-8');
-        console.log(content);
         if (content) {
             content = content
                 .toString()

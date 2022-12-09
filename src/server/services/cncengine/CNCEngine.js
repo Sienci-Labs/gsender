@@ -24,7 +24,7 @@
 import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
 import partition from 'lodash/partition';
-import SerialPort from 'serialport';
+import { SerialPort } from 'serialport';
 import socketIO from 'socket.io';
 //import socketioJwt from 'socketio-jwt';
 import EventTrigger from '../../lib/EventTrigger';
@@ -270,6 +270,26 @@ class CNCEngine {
                     .catch(err => {
                         log.error(err);
                     });
+            });
+
+            //Sends back a list of available IPs in the computer
+            socket.on('listAllIps', () => {
+                const { networkInterfaces } = require('os');
+                const _networkInterfaces = networkInterfaces();
+                const ipList = [];
+
+                //Create a list of network list name: [{IP1},{IP2}...]
+                for (const networkName of Object.keys(_networkInterfaces)) {
+                    for (const ips of _networkInterfaces[networkName]) {
+                        //Consider only IPV4 addresses
+                        if (ips.family === 'IPv4') {
+                            if (ipList.indexOf(ips.address) < 0) {
+                                ipList.push(ips.address);
+                            }
+                        }
+                    }
+                }
+                socket.emit('ip:list', ipList);
             });
 
             // Open serial port

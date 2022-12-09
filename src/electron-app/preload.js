@@ -20,21 +20,10 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+const fs = require('fs');
 
-const { contextBridge, ipcRenderer } = require('electron');
-
-const WINDOW_API = {
-    persistConfig: (fileName, value) => ipcRenderer.send('persist-app-config', fileName, value),
-    getConfig: (fileName) => ipcRenderer.invoke('get-app-config'),
-    getAppPath: (state) => ipcRenderer.invoke('get-app-path'),
-    restartApp: () => ipcRenderer.send('restart_app'),
-    loadRecentFile: (path) => ipcRenderer.send('load-recent-file', path),
-    openUploadDialog: () => ipcRenderer.send('open-upload-dialog'),
-    logError: (err) => ipcRenderer.send('log-error', err),
-    registerListener: (channel, fn) => {
-        ipcRenderer.on(channel, (event, ...args) => fn(...args));
-    }
-};
-
-//contextBridge.exposeInMainWorld('api', WINDOW_API);
 window.ipcRenderer = require('electron').ipcRenderer;
+
+window.readFileSync = fs.readFileSync;
+window.writeFileSync = fs.writeFileSync;
+window.pathJoin = require('path').join;

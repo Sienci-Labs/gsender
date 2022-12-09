@@ -27,9 +27,9 @@ import classnames from 'classnames';
 
 import styles from '../index.styl';
 
-const Fieldset = ({ children, legend, className }) => {
+const Fieldset = ({ children, legend, className, style }) => {
     return (
-        <fieldset className={classnames(styles.fieldset, className)}>
+        <fieldset className={classnames(styles.fieldset, className)} style={style}>
             <legend className={styles.fieldsetLegend}>{legend}</legend>
             {children}
         </fieldset>

@@ -22,6 +22,7 @@
  */
 
 import config from '../services/configstore';
+import { PROGRAM_EVENTS } from '../../app/constants';
 
 const noop = () => {};
 
@@ -35,40 +36,61 @@ class EventTrigger {
             return;
         }
 
-        const events = config.get('events', []);
+        const events = config.get('events', new Map());
 
-        events
-            .filter(event => event && event.event === eventKey)
-            .forEach(options => {
-                const {
-                    enabled = false,
-                    event,
-                    trigger,
-                    commands
-                } = { ...options };
+        const element = events.get(eventKey);
+        if (element) {
+            const {
+                enabled = false,
+                event,
+                trigger,
+                commands
+            } = { ...element };
 
-                if (!enabled) {
-                    return;
-                }
+            if (!enabled) {
+                return;
+            }
 
-                if (typeof this.callback === 'function') {
-                    this.callback(event, trigger, commands);
-                }
-            });
+            if (typeof this.callback === 'function') {
+                this.callback(event, trigger, commands);
+            }
+        }
     }
 
-    hasEnabledStartEvent() {
+    hasEnabledEvent(eventType) {
+        if (!PROGRAM_EVENTS.includes(eventType)) {
+            return false;
+        }
+
         let isEnabled = false;
-        const events = config.get('events', []);
-        events
-            .filter(event => event && event.event === 'gcode:start')
-            .forEach(options => {
-                const { enabled, commands } = { ...options };
-                if (enabled && commands.length > 0) {
-                    isEnabled = true;
-                }
-            });
+        const events = config.get('events', new Map());
+        const element = events.get(eventType);
+
+        if (element) {
+            const { enabled, commands } = { ...element };
+            if (enabled && commands.length > 0) {
+                isEnabled = true;
+            }
+        }
         return isEnabled;
+    }
+
+    getEventCode(eventType) {
+        if (!PROGRAM_EVENTS.includes(eventType)) {
+            return '';
+        }
+
+        let code = '';
+        const events = config.get('events', new Map());
+        const element = events.get(eventType);
+
+        if (element) {
+            const { enabled, commands } = { ...element };
+            if (enabled && commands.length > 0) {
+                code = commands;
+            }
+        }
+        return code;
     }
 }
 

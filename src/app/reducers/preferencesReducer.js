@@ -1,12 +1,13 @@
 import { createReducer } from 'redux-action';
-import { SET_SHORTCUTS_LIST, HOLD_SHORTCUTS, UNHOLD_SHORTCUTS } from 'app/actions/preferencesActions';
+import { SET_SHORTCUTS_LIST, HOLD_SHORTCUTS, UNHOLD_SHORTCUTS, SET_IP_LIST } from 'app/actions/preferencesActions';
 import store from 'app/store';
 
 const initialState = {
     shortcuts: {
         list: store.get('commandKeys', []).sort((a, b) => a?.category?.localeCompare(b?.category)),
         shouldHold: false,
-    }
+    },
+    ipList: [],
 };
 
 const reducer = createReducer(initialState, {
@@ -37,6 +38,12 @@ const reducer = createReducer(initialState, {
             }
         };
     },
+    [SET_IP_LIST]: (payload, state) => {
+        return {
+            ...state,
+            ipList: payload,
+        };
+    }
 });
 
 export default reducer;

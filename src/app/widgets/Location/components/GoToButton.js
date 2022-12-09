@@ -28,6 +28,7 @@ import styles from '../index.styl';
 const GoToButton = ({ onClick, disabled }) => {
     return (
         <button
+            type="button"
             tabIndex={-1}
             disabled={disabled}
             onClick={onClick}

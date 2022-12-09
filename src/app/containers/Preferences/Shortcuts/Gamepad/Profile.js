@@ -25,7 +25,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (data.id === profile.id ? ({ ...profile, profileName: name }) : profile));
+            profiles.map(profile => (profile.id.includes(data.id) ? ({ ...profile, profileName: name }) : profile));
 
         onUpdateProfiles(updatedProfiles);
 
@@ -45,7 +45,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (data.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
+            profiles.map(profile => (profile.id.includes(data.id) ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
 
         onUpdateProfiles(updatedProfiles);
 
@@ -62,7 +62,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (data.id === profile.id ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
+            profiles.map(profile => (profile.id.includes(data.id) ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
 
         onUpdateProfiles(updatedProfiles);
     };

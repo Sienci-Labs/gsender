@@ -377,9 +377,52 @@ events.delete = (id) => new Promise((resolve, reject) => {
         });
 });
 
+events.clearAll = () => new Promise((resolve, reject) => {
+    authrequest
+        .delete('/api/events')
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 events.update = (id, options) => new Promise((resolve, reject) => {
     authrequest
         .put('/api/events/' + id)
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+//
+// Headless Mode / Remote Mode
+//
+const remoteSetting = {};
+
+remoteSetting.fetch = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/remote')
+        .query(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+remoteSetting.update = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .put('/api/remote')
         .send(options)
         .end((err, res) => {
             if (err) {
@@ -765,6 +808,7 @@ export default {
     events,
     machines,
     macros,
+    remoteSetting,
     mdi,
     users,
 

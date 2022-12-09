@@ -437,19 +437,36 @@ class LocationWidget extends PureComponent {
         },
         GO_TO_AXIS_ZERO: (_, { axisList }) => {
             const { state } = this.props;
+            const { machinePosition, safeRetractHeight, homingEnabled } = this.state;
             const activeState = get(state, 'status.activeState');
             if (!axisList || axisList.length === 0 || activeState !== GRBL_ACTIVE_STATE_IDLE) {
                 return;
             }
+            let safeHeightCommand = '';
+            let moveCommand = '';
 
-            let commandStr = '';
-
+            if (safeRetractHeight !== 0 && !axisList.includes('Z') && !axisList.includes('z')) {
+                if (homingEnabled) {
+                    // get current Z
+                    // eslint-disable-next-line dot-notation
+                    const currentZ = Number(machinePosition['z']);
+                    const retractHeight = (Math.abs(safeRetractHeight) * -1);
+                    // only move Z if it is less than Z0-SafeHeight
+                    if (currentZ < retractHeight) {
+                        safeHeightCommand += `G53 G0 Z${retractHeight}\n`;
+                    }
+                } else {
+                    safeHeightCommand += 'G91\n';
+                    safeHeightCommand += `G0 Z${safeRetractHeight}\n`; // Retract Z when moving across workspace
+                }
+            }
             for (const axis of axisList) {
-                commandStr += `${axis.toUpperCase()}0 `;
+                moveCommand += `${axis.toUpperCase()}0 `;
             }
 
+            controller.command('gcode', safeHeightCommand);
             controller.command('gcode', 'G90');
-            controller.command('gcode', `G0 ${commandStr}`);
+            controller.command('gcode', `G0 ${moveCommand}`);
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {

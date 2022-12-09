@@ -32,6 +32,7 @@ class VisualizerWrapper extends Component {
         super(props);
         this.state = { needRefresh: false };
     }
+
     visualizer = null;
 
     componentDidMount() {
@@ -41,28 +42,24 @@ class VisualizerWrapper extends Component {
     componentDidUpdate() {
         if (this.state.needRefresh) {
             this.visualizer.rerenderGCode();
-            this.setState(() => {
-                return {
-                    needRefresh: false
-                };
-            });
+            this.setNeedRefresh(false);
         }
+    }
+
+    setNeedRefresh(state) {
+        this.setState(() => {
+            return {
+                needRefresh: state
+            };
+        });
     }
 
     subscribe() {
         pubsub.subscribe('litemode:change', () => {
-            this.setState(() => {
-                return {
-                    needRefresh: true
-                };
-            });
+            this.setNeedRefresh(true);
         });
         pubsub.subscribe('visualizer:settings', () => {
-            this.setState(() => {
-                return {
-                    needRefresh: true
-                };
-            });
+            this.setNeedRefresh(true);
         });
     }
 
@@ -76,7 +73,7 @@ class VisualizerWrapper extends Component {
         return (
             <>
                 {
-                    !renderSVG &&
+                    !renderSVG && (
                         <Visualizer
                             show={show}
                             cameraPosition={cameraPosition}
@@ -88,9 +85,10 @@ class VisualizerWrapper extends Component {
                             containerID={containerID}
                             isSecondary={isSecondary}
                         />
+                    )
                 }
                 {
-                    renderSVG &&
+                    renderSVG && (
                         <SVGVisualizer
                             show={show}
                             ref={(visualizerRef) => {
@@ -101,6 +99,7 @@ class VisualizerWrapper extends Component {
                             containerID={containerID}
                             isSecondary={isSecondary}
                         />
+                    )
                 }
             </>
         );

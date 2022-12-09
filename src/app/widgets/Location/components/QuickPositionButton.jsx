@@ -28,6 +28,7 @@ import styles from '../index.styl';
 const QuickPositionButton = ({ className, icon, rotate, ...props }) => {
     return (
         <button
+            type="button"
             className={cx(className, styles.quickPositionButton)}
             {...props}
         >

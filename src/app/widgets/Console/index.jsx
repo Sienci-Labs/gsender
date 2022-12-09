@@ -100,18 +100,19 @@ class ConsoleWidget extends PureComponent {
     };
 
     controllerEvents = {
-        'serialport:open': (options) => {
-            const { port, baudrate } = options;
-            this.setState({ port: port });
+        'serialport:open': ({ port, baudrate }) => {
+            this.setState({ port });
 
-            if (this.terminal) {
-                this.terminal.refitTerminal();
-                this.terminal.writeln(color.white.bold(`gSender - [${controller.type}]`));
-                this.terminal.writeln(color.white(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: color.yellowBright(port), baudrate: color.blueBright(baudrate) })));
+            setTimeout(() => {
+                if (this.terminal) {
+                    this.terminal.refitTerminal();
+                    this.terminal.writeln(color.white.bold(`gSender - [${controller.type}]`));
+                    this.terminal.writeln(color.white(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: color.yellowBright(port), baudrate: color.blueBright(baudrate) })));
 
-                this.terminal.updateTerminalHistory(`gSender - [${controller.type}]`);
-                this.terminal.updateTerminalHistory(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: port, baudrate: baudrate }));
-            }
+                    this.terminal.updateTerminalHistory(`gSender - [${controller.type}]`);
+                    this.terminal.updateTerminalHistory(i18n._('Connected to {{-port}} with a baud rate of {{baudrate}}', { port: port, baudrate: baudrate }));
+                }
+            }, 0);
         },
         'serialport:close': (options) => {
             this.actions.clearAll();
@@ -142,6 +143,7 @@ class ConsoleWidget extends PureComponent {
             } else {
                 this.terminal.writeln(color.white(this.terminal.prompt + data));
             }
+
             this.terminal.updateTerminalHistory(this.terminal.prompt + data);
         },
         'serialport:read': (data) => {
@@ -177,9 +179,13 @@ class ConsoleWidget extends PureComponent {
         this.config.set('minimized', minimized);
 
         if (isElectron() && !this.hasSetState && this.props.state) {
-            this.hasSetState = true;
-            this.setState(this.props.state);
+            this.setHasSetState();
         }
+    }
+
+    setHasSetState() {
+        this.hasSetState = true;
+        this.setState(this.props.state);
     }
 
     getInitialState() {
@@ -235,17 +241,17 @@ class ConsoleWidget extends PureComponent {
         return (
             <Widget fullscreen={isFullscreen}>
                 {
-                    isMainWindow &&
-                    <Widget.Header embedded={embedded}>
-                        <Widget.Title>
-                            {isForkedWidget &&
-                            <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
-                            }
-                            {i18n._('Console')}
-                        </Widget.Title>
-                        <Widget.Controls>
-                        </Widget.Controls>
-                    </Widget.Header>
+                    isMainWindow && (
+                        <Widget.Header embedded={embedded}>
+                            <Widget.Title>
+                                {isForkedWidget &&
+                                <i className="fa fa-code-fork" style={{ marginRight: 5 }} />
+                                }
+                                {i18n._('Console')}
+                            </Widget.Title>
+                            <Widget.Controls />
+                        </Widget.Header>
+                    )
                 }
                 <Widget.Content
                     className={cx(
@@ -269,7 +275,7 @@ class ConsoleWidget extends PureComponent {
                     />
                     {
                         isElectron() && this.props.isMainWindow &&
-                        <PopOutButton id={widgetId} state={state}/>
+                        <PopOutButton id={widgetId} state={state} />
                     }
                 </Widget.Content>
             </Widget>

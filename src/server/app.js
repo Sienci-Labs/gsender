@@ -28,7 +28,6 @@ import bodyParser from 'body-parser';
 import compress from 'compression';
 import cookieParser from 'cookie-parser';
 import multer from 'multer';
-//import multiparty from 'connect-multiparty';
 import connectRestreamer from 'connect-restreamer';
 import engines from 'consolidate';
 import errorhandler from 'errorhandler';
@@ -310,6 +309,7 @@ const appMain = () => {
         app.get(urljoin(settings.route, 'api/events/:id'), api.events.read);
         app.put(urljoin(settings.route, 'api/events/:id'), api.events.update);
         app.delete(urljoin(settings.route, 'api/events/:id'), api.events.__delete);
+        app.delete(urljoin(settings.route, 'api/events'), api.events.clearAll);
 
         // Machines
         app.get(urljoin(settings.route, 'api/machines'), api.machines.fetch);
@@ -317,6 +317,10 @@ const appMain = () => {
         app.get(urljoin(settings.route, 'api/machines/:id'), api.machines.read);
         app.put(urljoin(settings.route, 'api/machines/:id'), api.machines.update);
         app.delete(urljoin(settings.route, 'api/machines/:id'), api.machines.__delete);
+
+        //Headless mode / Remote mode
+        app.put(urljoin(settings.route, '/api/remote'), api.remote.update);
+        app.get(urljoin(settings.route, 'api/remote'), api.remote.fetch);
 
         // Macros
         app.get(urljoin(settings.route, 'api/macros'), api.macros.fetch);

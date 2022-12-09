@@ -91,6 +91,7 @@ class UpdateAvailableAlert extends PureComponent {
                     </div>
                     { currentOS === 'Windows OS' ? (
                         <button
+                            type="button"
                             onClick={() => {
                                 this.setState({
                                     buttonActive: false
@@ -105,6 +106,7 @@ class UpdateAvailableAlert extends PureComponent {
                         </button>
                     ) : (
                         <button
+                            type="button"
                             onClick={() => {
                                 this.setState({
                                     buttonActive: false
@@ -119,7 +121,7 @@ class UpdateAvailableAlert extends PureComponent {
                     )}
                 </div>
                 <div className={styles.closeModal}>
-                    <button onClick={actions.hideModal}>
+                    <button type="button" onClick={actions.hideModal}>
                         <i className="fas fa-times" />
                     </button>
                 </div>

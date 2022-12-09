@@ -86,7 +86,7 @@ class ControlArea extends Component {
                                 Warning: Cut will leave soft limits!
                             </div>
                         )
-                        : <div/>
+                        : <div />
                 }
             </div>
         );

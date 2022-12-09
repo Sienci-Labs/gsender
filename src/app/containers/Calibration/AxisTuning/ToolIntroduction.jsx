@@ -24,13 +24,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Provider as ReduxProvider, connect } from 'react-redux';
-import reduxStore from 'app/store/redux';
-import get from 'lodash/get';
-import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import Select from 'react-select';
-import Keypad from '../JogControl';
-import styles from '../index.styl';
+import get from 'lodash/get';
 
+import reduxStore from 'app/store/redux';
+import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+import JogControl from 'app/widgets/JogControl';
+
+import styles from '../index.styl';
 
 const axisList = [
     { label: 'X', value: 'x' },
@@ -46,7 +47,7 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis, isConnected
             <div className={styles.toolIntro}>
                 <p>
                     All CNCs ship with standard settings so the controller knows how much to turn the motors in order to move 1mm,
-                     a factor of the specs of the motors and the pitch of the lead screws.
+                    a factor of the specs of the motors and the pitch of the lead screws.
                 </p>
 
                 <p>
@@ -68,10 +69,10 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis, isConnected
                         value={{ label: currentAxis.toUpperCase(), value: currentAxis }}
                     />
                 </div>
+            </div>
 
-                <Keypad />
-
-
+            <div>
+                <JogControl widgetId="jogcontrol" isSecondary />
             </div>
             <FunctionButton primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</FunctionButton>
         </ReduxProvider>

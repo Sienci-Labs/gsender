@@ -55,7 +55,12 @@ const PopOutButton = ({ id }) => {
         window.ipcRenderer.send('open-new-window', route);
     };
     return (
-        <Icon path={mdiOpenInNew} onClick={openWindow} className={styles.icon} color="white"/>
+        <Icon
+            path={mdiOpenInNew}
+            onClick={openWindow}
+            className={styles.icon}
+            color="white"
+        />
     );
 };
 

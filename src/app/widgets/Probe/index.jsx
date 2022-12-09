@@ -61,6 +61,7 @@ class ProbeWidget extends PureComponent {
         sortable: PropTypes.object,
         embedded: PropTypes.bool
     };
+
     pubsubTokens = []
 
     // Public methods
@@ -319,6 +320,10 @@ class ProbeWidget extends PureComponent {
         this.config.set('touchPlateHeight', touchPlateHeight);
 
         // get updated settings
+        this.getUpdatedSettings();
+    }
+
+    getUpdatedSettings() {
         this.setState({
             probeFeedrate: this.config.get('probeFeedrate') || this.state.probeFeedrate,
             probeFastFeedrate: this.config.get('probeFastFeedrate') || this.state.probeFastFeedrate,
@@ -801,9 +806,9 @@ class ProbeWidget extends PureComponent {
         const wcs = this.getWorkCoordinateSystem();
         const p = `P${this.mapWCSToPValue(wcs)}`;
 
-        const toolRadius = (diameter / 2);
-        const toolCompensatedThickness = ((-1 * toolRadius));
-        console.log(toolCompensatedThickness);
+        // const toolRadius = (diameter / 2);
+        // const toolCompensatedThickness = ((-1 * toolRadius));
+        // console.log(toolCompensatedThickness);
 
         if (axes.z && axes.y && axes.z) {
             code.push(

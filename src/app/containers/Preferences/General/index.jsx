@@ -42,7 +42,7 @@ const General = ({ active, state, actions }) => {
                 </GeneralArea.Half>
 
                 <GeneralArea.Half>
-                    <CustomDecimalPlaces state={state} actions={actions}/>
+                    <CustomDecimalPlaces state={state} actions={actions} />
                     <Settings />
                 </GeneralArea.Half>
 

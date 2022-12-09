@@ -125,7 +125,15 @@ const createServer = (options, callback) => {
         }
     }
 
-    const { port = 0, host, backlog } = options;
+    let { backlog, port = 0, host } = options;
+
+    //If headless setting is ON, change to correct port and IP
+    const remoteSettings = config.get('remoteSettings', {});
+    if (remoteSettings.headlessStatus) {
+        port = remoteSettings.port;
+        host = remoteSettings.ip;
+    }
+
     const mountPoints = uniqWith([
         ...ensureArray(options.mountPoints),
         ...ensureArray(config.get('mountPoints'))
@@ -276,8 +284,17 @@ const createServer = (options, callback) => {
             });
         })
         .on('error', (err) => {
-            callback && callback(err);
             log.error(err);
+            log.error(err.name);
+            let errData = {};
+            // Handle invalid IP by disabling remote mode until enabled again and signaling error
+            if (err.message.includes('address not available')) {
+                config.set('remoteSettings.headlessStatus', false);
+                config.set('remoteSettings.error', true);
+                errData.bindingErr = true;
+            }
+
+            callback && callback(err, errData);
         });
 };
 

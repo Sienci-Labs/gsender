@@ -1,4 +1,5 @@
 import Toolpath from 'gcode-toolpath';
+import get from 'lodash/get';
 
 import store from 'app/store';
 import {
@@ -10,9 +11,11 @@ import {
     START_POSITION_FRONT_LEFT,
     START_POSITION_FRONT_RIGHT,
     START_POSITION_CENTER,
-    SPINDLE_MODES
+    SPINDLE_MODES,
+    SURFACING_DWELL_DURATION
 } from 'app/constants';
 import controller from 'app/lib/controller';
+import defaultState from 'app/store/defaultState';
 
 import { convertToImperial } from '../../Preferences/calculate';
 
@@ -29,11 +32,15 @@ export default class Generator {
      * Main function to generate gcode
      */
     generate = () => {
+        const defaultSurfacingState = get(defaultState, 'workspace.widgets.surfacing');
+
         const { surfacing, units, generateGcode, getSafeZValue } = this;
-        const { skimDepth, maxDepth, feedrate, spindleRPM, spindle = M3 } = surfacing;
+        const { skimDepth, maxDepth, feedrate, spindleRPM, spindle = M3, shouldDwell } = { ...defaultSurfacingState, ...surfacing };
 
         const wcs = controller.state?.parserstate?.modal?.wcs || 'G54';
         const z = getSafeZValue();
+
+        const dwell = shouldDwell ? [`G04 P${SURFACING_DWELL_DURATION}`] : [];
 
         const depth = skimDepth;
         const gcodeArr = [
@@ -45,6 +52,7 @@ export default class Generator {
             `G0 X0 Y0 Z${z}`,
             `G1 F${feedrate}`,
             `${spindle} S${spindleRPM}`,
+            ...dwell,
             '(Header End)',
             '\n'
         ];
@@ -67,6 +75,7 @@ export default class Generator {
         gcodeArr.push(
             '(Footer)',
             'M5 ;Turn off spindle',
+            ...dwell,
             '(End of Footer)'
         );
 
@@ -384,7 +393,9 @@ export default class Generator {
 
             const xValueStart = startIsInCenter ? toFixedValue((halfOfWidth - endPos.x) * xFactor) : toFixedValue(endPos.x * xFactor);
             const yValueStart = startIsInCenter ? toFixedValue((halfOfLength - endPos.y) * yFactor) : toFixedValue(endPos.y * yFactor);
-            const xValueEnd = startIsInCenter ? toFixedValue((halfOfWidth - (startPos.x + stepoverAmount)) * xFactor) : toFixedValue((startPos.x + stepoverAmount) * xFactor);
+            const xValueEnd = startIsInCenter
+                ? toFixedValue((halfOfWidth - (startPos.x + stepoverAmount)) * xFactor)
+                : toFixedValue((startPos.x + stepoverAmount) * xFactor);
             const yValueEnd = startIsInCenter ? toFixedValue((halfOfLength - startPos.y) * yFactor) : toFixedValue(startPos.y * yFactor);
 
             if (cutDirectionFlipped) {

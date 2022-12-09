@@ -28,8 +28,8 @@ import styles from './index.styl';
 
 const RemoteAlert = () => {
     return (
-        <div className={cx(styles.remoteAlert, styles.pulse)} >
-            <i className="fas fa-broadcast-tower" />
+        <div className={cx(styles.remoteAlert, styles.pulse)}>
+            <i className="fa fa-satellite-dish" />
         </div>
     );
 };

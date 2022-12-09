@@ -26,9 +26,9 @@
 import path from 'path';
 import isElectron from 'is-electron';
 import program from 'commander';
+import { dialog } from 'electron';
 import ip from 'quick-local-ip';
 import pkg from './package.json';
-
 
 // Defaults to 'production'
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
@@ -102,6 +102,7 @@ if (normalizedArgv.length > 1) {
 export default () => new Promise((resolve, reject) => {
     // Change working directory to 'server' before require('./server')
     process.chdir(path.resolve(__dirname, 'server'));
+
     let port = program.port, host = program.host;
     let headless = !!program.remote;
 
@@ -126,12 +127,12 @@ export default () => new Promise((resolve, reject) => {
         accessTokenLifetime: program.accessTokenLifetime,
         allowRemoteAccess: !!program.allowRemoteAccess,
         controller: program.controller
-    }, (err, data) => {
+    }, (err, data = {}) => {
         if (err) {
-            reject(err);
+            reject(err, {});
             return;
         }
-        console.log(data);
+
         resolve({ ...data, headless });
     });
 });

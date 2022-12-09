@@ -149,6 +149,10 @@ class NumberInput extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        this.updateState();
+    }
+
+    updateState() {
         this.setState({
             value: this.props.value,
             min: this.props.min,
