@@ -543,6 +543,10 @@ export function* initialize() {
         }
     });
 
+    controller.addListener('wizard:next', (stepIndex, substepIndex) => {
+        pubsub.publish('wizard:next', { stepIndex, substepIndex });
+    });
+
     yield null;
 }
 

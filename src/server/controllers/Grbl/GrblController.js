@@ -1799,6 +1799,12 @@ class GrblController {
                 this.command('feeder:start');
                 this.runPostChangeHook();
             },
+            'wizard:step': () => {
+                const [stepIndex, substepIndex] = args;
+                this.feederCB = () => {
+                    this.emit('wizard:next', stepIndex, substepIndex);
+                };
+            }
         }[cmd];
 
         if (!handler) {

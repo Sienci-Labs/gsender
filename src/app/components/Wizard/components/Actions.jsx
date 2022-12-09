@@ -22,15 +22,26 @@
  */
 
 import React from 'react';
-
+import pubsub from 'pubsub-js';
+import { uniqueId } from 'lodash';
+import controller from 'app/lib/controller';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
-import { useWizardAPI } from 'app/components/Wizard/context';
-
+import { useWizardAPI, useWizardContext } from 'app/components/Wizard/context';
 import styles from '../index.styl';
 
 
 const Actions = ({ actions = [], stepIndex, substepIndex }) => {
-    const { markActionAsComplete, completeSubStep, scrollToActiveStep } = useWizardAPI();
+    const { markActionAsComplete, completeSubStep, scrollToActiveStep, setIsLoading } = useWizardAPI();
+    const { isLoading } = useWizardContext();
+    pubsub.subscribe('wizard:next', (msg, indexes) => {
+        const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
+        if (stepIn === stepIndex && subStepIn === substepIndex) {
+            markActionAsComplete(stepIndex, substepIndex);
+            const activeValues = completeSubStep(stepIndex, substepIndex);
+            scrollToActiveStep(activeValues);
+            setIsLoading(false);
+        }
+    });
     return (
         <>
             {
@@ -41,19 +52,27 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                 {
                     actions.map((action, index) => {
                         const cbWithCompletion = () => {
-                            markActionAsComplete(stepIndex, substepIndex);
+                            setIsLoading(true);
+                            controller.command('wizard:step', stepIndex, substepIndex);
                             action.cb();
-                            completeSubStep();
-                            scrollToActiveStep();
                         };
                         return (
-                            // eslint-disable-next-line react/no-array-index-key
-                            <React.Fragment key={`action-${index}`}>
-                                <ToolModalButton onClick={cbWithCompletion} icon="fas fa-code">
-                                    {action.label}
-                                </ToolModalButton>
+                            <React.Fragment key={`action-${uniqueId()}`}>
                                 {
-                                    (index !== actions.length - 1) && <span className={styles.orSpan}>OR</span>
+                                    isLoading
+                                        ? (
+                                            index === 0 &&
+                                                <span className={styles.loadingSpan}>Running</span>
+                                        ) : (
+                                            <>
+                                                <ToolModalButton onClick={cbWithCompletion} icon="fas fa-code" id="button-action">
+                                                    {action.label}
+                                                </ToolModalButton>
+                                                {
+                                                    (index !== actions.length - 1) && <span className={styles.orSpan}>OR</span>
+                                                }
+                                            </>
+                                        )
                                 }
                             </React.Fragment>
                         );

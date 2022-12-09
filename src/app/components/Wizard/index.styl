@@ -332,6 +332,27 @@ button-mixin($color) {
 
 }
 
+.loadingSpan {
+  font-size: 2rem;
+  font-weight: bold;
+}
+.loadingSpan:after {
+    animation: dots 0.5s linear infinite;
+    content: '';
+  }
+
+  @keyframes dots {
+    0%, 20% {
+      content: '.';
+    }
+    40% {
+      content: '..';
+    }
+    60%, 100% {
+      content: '...';
+    }
+}
+
 .subHeading {
   padding: 0;
   margin: 0;

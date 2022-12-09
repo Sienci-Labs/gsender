@@ -32,7 +32,6 @@ const Step = ({ step, index = 1, active, complete }) => {
         if (complete) {
             return 'stepTitle';
         }
-
         return 'stepTitle-future';
     };
     const getStepIndexClass = () => {

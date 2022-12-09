@@ -22,6 +22,7 @@
  */
 
 import React, { createContext, useContext, useState, useMemo } from 'react';
+import _ from 'lodash';
 
 import { Toaster } from 'app/lib/toaster/ToasterLib';
 
@@ -35,6 +36,8 @@ const WizardAPI = createContext({});
  * @returns {JSX.Element}
  */
 export const WizardProvider = ({ children }) => {
+    const [completedStep, setCompletedStep] = useState(-1);
+    const [completedSubStep, setCompletedSubStep] = useState(-1);
     const [activeStep, setActiveStep] = useState(0);
     const [activeSubstep, setActiveSubstep] = useState(0);
     const [title, setTitle] = useState('Wizard');
@@ -42,6 +45,7 @@ export const WizardProvider = ({ children }) => {
     const [visible, setVisible] = useState(false);
     const [stepCount, setStepCount] = useState(0);
     const [minimized, setMinimized] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
 
     // Memoized API for context, can be fetched separate to data context
@@ -49,6 +53,7 @@ export const WizardProvider = ({ children }) => {
         setWizardSteps: (steps) => setSteps(steps),
         setTitle: (title) => setTitle(title),
         setVisible: (b) => setVisible(b),
+        setIsLoading: (state) => setIsLoading(state),
         getStepTitle: (index) => {
             const step = steps[index];
             if (!step) {
@@ -70,42 +75,110 @@ export const WizardProvider = ({ children }) => {
             }
         },
         decrementStep: () => {
+            // first check if we have substeps
+            if (activeSubstep > 0) {
+                const decrementedSubStep = activeSubstep - 1;
+                setActiveSubstep(decrementedSubStep);
+                return {
+                    activeStep: activeStep,
+                    activeSubstep: decrementedSubStep
+                };
+            }
+            // if not, go back to previous step
             const decrementedStep = activeStep - 1;
             if (decrementedStep >= 0) {
                 setActiveStep(decrementedStep);
+                // make sure we dont go to the very beginning of the step
+                // go to the last substep
+                const step = steps[decrementedStep];
+                const numberOfSubSteps = step.substeps.length;
+                const newSubstep = numberOfSubSteps - 1;
+                setActiveSubstep(newSubstep);
+                return {
+                    activeStep: decrementedStep,
+                    activeSubstep: newSubstep
+                };
             }
+            return {};
         },
         toggleMinimized: (state) => {
             setMinimized(!state);
         },
-        completeSubStep: () => {
+        completeSubStep: (stepIndex = activeStep, substepIndex = activeSubstep) => {
+            // check that more steps can be completed
             const maxStepIndex = stepCount - 1;
-            if (activeStep > maxStepIndex) {
-                return;
+            if (stepIndex > maxStepIndex) {
+                return {};
             }
-            const step = steps[activeStep];
+            let returnValues = {};
+
+            // ACTIVE****
+            const step = steps[stepIndex];
             const numberOfSubSteps = step.substeps.length;
-            const nextStep = activeSubstep + 1;
+            const nextStep = substepIndex + 1;
             // Completed all substeps, move to next step
             if (nextStep >= numberOfSubSteps) {
-                setActiveStep(activeStep + 1);
+                setActiveStep(stepIndex + 1);
                 setActiveSubstep(0);
-                if (activeStep >= maxStepIndex) {
+                returnValues = {
+                    activeStep: stepIndex + 1,
+                    activeSubstep: 0
+                };
+                if (stepIndex >= maxStepIndex) {
+                    // reset values
                     setVisible(false);
+                    setCompletedStep(-1);
+                    setCompletedSubStep(-1);
+                    setActiveStep(0);
+                    setActiveSubstep(0);
+                    setTitle('Wizard');
+                    setSteps([]);
+                    setStepCount(0);
+                    setMinimized(false);
+                    return {};
                 }
-                return;
+            } else {
+                // didnt complete substeps, so increment substep only
+                setActiveSubstep(nextStep);
+                returnValues = {
+                    activeStep: stepIndex,
+                    activeSubstep: nextStep
+                };
             }
-            setActiveSubstep(nextStep);
             // close window on everything done.
             if (activeStep >= maxStepIndex) {
+                // reset values
                 setVisible(false);
+                setCompletedStep(-1);
+                setCompletedSubStep(-1);
+                setActiveStep(0);
+                setActiveSubstep(0);
+                setTitle('Wizard');
+                setSteps([]);
+                setStepCount(0);
+                setMinimized(false);
+                return {};
             }
+
+            // check that the step we are completed has not already been completed
+            if ((completedStep >= stepIndex || (stepIndex === completedStep + 1 && completedSubStep >= substepIndex))) {
+                return returnValues;
+            }
+
+            // COMPLETED****
+            if (nextStep >= numberOfSubSteps) {
+                setCompletedStep(stepIndex);
+                setCompletedSubStep(-1);
+            } else {
+                setCompletedSubStep(substepIndex);
+            }
+            return returnValues;
         },
         isSubstepCompleted: (stepIndex, substepIndex) => {
-            if (activeStep > stepIndex) {
+            if (completedStep > stepIndex) {
                 return true;
             }
-            return activeSubstep > substepIndex && stepIndex === activeStep;
+            return completedSubStep > substepIndex && stepIndex === completedStep;
         },
         load: (instructions, title) => {
             if (!instructions || !instructions.steps) {
@@ -125,7 +198,15 @@ export const WizardProvider = ({ children }) => {
             setActiveStep(0);
             setVisible(true);
         },
-        scrollToActiveStep: () => {
+        // you must pass an object with activeStep and activeSubstep to this function.
+        // this is bc if you change those values before running this function, they won't update in time,
+        // and you will get the old values.
+        // completeSubStep and decrementStep both return the new values they set that can then be passed to this function
+        scrollToActiveStep: (activeValues) => {
+            if (_.isEmpty(activeValues)) {
+                return;
+            }
+            const { activeStep, activeSubstep } = activeValues;
             if (activeStep > steps.length) {
                 return;
             }
@@ -138,6 +219,8 @@ export const WizardProvider = ({ children }) => {
             const nextSteps = [...steps];
             nextSteps[stepIndex].substeps[substepIndex].actionTaken = true;
             setSteps(nextSteps);
+            setActiveStep(stepIndex);
+            setActiveSubstep(substepIndex);
         },
         hasIncompleteActions: () => {
             const step = steps[activeStep];
@@ -161,10 +244,24 @@ export const WizardProvider = ({ children }) => {
 
             Toaster.clear();
         }
-    }), [setActiveStep, setSteps, setTitle, setVisible, steps, stepCount, activeStep, activeSubstep, setMinimized, setActiveSubstep]);
+    }), [
+        setActiveStep,
+        setSteps,
+        setTitle,
+        setVisible,
+        steps,
+        stepCount,
+        activeStep,
+        activeSubstep,
+        completedStep,
+        completedSubStep,
+        isLoading,
+        setMinimized,
+        setActiveSubstep
+    ]);
 
     return (
-        <WizardContext.Provider value={{ steps, activeStep, activeSubstep, title, visible, stepCount, minimized }}>
+        <WizardContext.Provider value={{ steps, activeStep, activeSubstep, completedStep, completedSubStep, title, visible, stepCount, minimized, isLoading }}>
             <WizardAPI.Provider value={api}>
                 {children}
             </WizardAPI.Provider>
