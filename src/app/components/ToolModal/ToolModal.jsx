@@ -58,8 +58,8 @@ const ToolModal = ({ onClose, title, style, className, size, children, disableOv
     return (
         <Modal
             onClose={onClose}
-            style={{ ...style, ...sizingStyles }}
             className={className}
+            style={{ ...style, ...sizingStyles }}
             size={size}
             disableOverlayClick={disableOverlayClick}
             {...rest}

@@ -329,6 +329,7 @@ class Header extends PureComponent {
 
     render() {
         const { updateAvailable, hostInformation, mobile } = this.state;
+        console.log(isElectron());
         return (
             <>
                 <div className={styles.navBar}>
@@ -340,7 +341,7 @@ class Header extends PureComponent {
                             widgetId="connection"
                         />
                         {
-                            isElectron() ? <HeadlessIndicator {...hostInformation} /> : ''
+                            /*isElectron() ?*/ <HeadlessIndicator {...hostInformation} />
                         }
                     </div>
                     { !mobile && <NavSidebar /> }

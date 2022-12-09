@@ -7,7 +7,7 @@ const DialogBox = ({ title = '', show = false, children, onClose }) => {
     return (
         <Modal
             title={title}
-            size="small"
+            size="medium"
             disableOverlayClick
             show={show}
             onClose={onClose}
