@@ -28,6 +28,7 @@ import Button from '@mui/material/Button';
 import Creatable from 'react-select/creatable';
 import _ from 'lodash';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import actions from './apiActions';
 import Tooltip from '../TooltipCustom/ToolTip';
 import DialogBox from './DialogBox';
@@ -317,25 +318,15 @@ const HeadlessIndicator = ({ address, port }) => {
                 </div>
             </DialogBox>
             {/* Restart confirmation dialog */}
-            <DialogBox
-                show={showConfirmation}
+            <Confirm
                 title="Restart app?"
-                onClose={() => {
-                    setShowConfirmation(false);
-                }}
-            >
-                <div className={styles.confirmationWrapper}>
-                    <div className={styles.warning}>
-                        <b>Note:</b> You are about to restart the app with new settings. Please make sure you save all the changes before you proceed.
-                    </div>
-                    <div className={styles.footer}>
-                        <div className={styles.buttonWrapper}>
-                            <Button variant="contained" style={{ backgroundColor: '#f9a13b' }} onClick={() => handleAppRestart('cancel')}>Restart later</Button>
-                            <Button variant="contained" style={{ backgroundColor: '#3e85c7' }} onClick={() => handleAppRestart('ok')}>Restart now</Button>
-                        </div>
-                    </div>
-                </div>
-            </DialogBox>
+                content="Note: You are about to restart the app with new settings. Please make sure you save all the changes before you proceed."
+                onClose={() => handleAppRestart('cancel')}
+                onConfirm={() => handleAppRestart('ok')}
+                confirmLabel="Restart now"
+                cancelLabel="Restart later"
+                show={showConfirmation}
+            />
         </div>
     );
 };

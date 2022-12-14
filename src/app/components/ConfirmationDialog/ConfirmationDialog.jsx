@@ -53,7 +53,7 @@ const ConfirmationDialog = () => {
             setOnConfirm(() => options.onConfirm);
             setConfirmLabel(options.confirmLabel);
             setCancelLabel(options.cancelLabel);
-            setShow(true);
+            setShow(options.show);
         });
     });
 
