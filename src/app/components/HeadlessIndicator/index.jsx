@@ -24,7 +24,7 @@
 import React, { useState, useEffect } from 'react';
 import reduxStore from 'app/store/redux';
 import Switch from '@mui/material/Switch';
-import Button from '@mui/material/Button';
+import Button from 'app/components/FunctionButton/FunctionButton';
 import Creatable from 'react-select/creatable';
 import _ from 'lodash';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
@@ -312,7 +312,7 @@ const HeadlessIndicator = ({ address, port }) => {
                     </div>
                     <div className={styles.footer}>
                         <div className={styles.buttonWrapper}>
-                            <Button variant="contained" style={{ backgroundColor: '#3e85c7' }} onClick={updateRemotePreferences}>OK</Button>
+                            <Button primary onClick={updateRemotePreferences}>OK</Button>
                         </div>
                     </div>
                 </div>
