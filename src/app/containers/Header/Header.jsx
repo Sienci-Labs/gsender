@@ -340,7 +340,7 @@ class Header extends PureComponent {
                             widgetId="connection"
                         />
                         {
-                            !isElectron() && <HeadlessIndicator {...hostInformation} />
+                            isElectron() && <HeadlessIndicator {...hostInformation} />
                         }
                     </div>
                     { !mobile && <NavSidebar /> }
