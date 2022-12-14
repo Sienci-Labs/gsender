@@ -47,6 +47,8 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
+import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import TrackballControls from 'app/lib/three/TrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
@@ -220,6 +222,8 @@ class Visualizer extends Component {
         this.scene = null;
         this.camera = null;
         this.bloomComposer = null;
+        this.copyComposer = null;
+        this.fxaaComposer = null;
         this.finalComposer = null;
         this.controls = null;
         this.viewport = null;
@@ -888,6 +892,8 @@ class Visualizer extends Component {
         this.controls.handleResize();
 
         this.renderer.setSize(width, height);
+        this.copyComposer.setSize(width, height);
+        this.fxaaComposer.setSize(width, height);
 
         // Update the scene
         this.updateScene();
@@ -1075,7 +1081,6 @@ class Visualizer extends Component {
         // WebGLRenderer
         this.renderer = new THREE.WebGLRenderer({
             autoClearColor: true,
-            antialias: true,
             alpha: true
         });
         this.renderer.shadowMap.enabled = true;
@@ -1242,10 +1247,29 @@ class Visualizer extends Component {
         this.scene.add(this.group);
     }
 
-    // from https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html
+    // from https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html,
+    // https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_fxaa.html
     setupScene() {
         const renderScene = new RenderPass(this.scene, this.camera);
+        const pixelRatio = this.renderer.getPixelRatio();
+        const width = this.getVisibleWidth();
+        const height = this.getVisibleHeight();
 
+        // fxaa
+        const fxaaPass = new ShaderPass(FXAAShader);
+        const copyPass = new ShaderPass(CopyShader);
+        this.copyComposer = new EffectComposer(this.renderer);
+        this.copyComposer.addPass(renderScene);
+        this.copyComposer.addPass(copyPass);
+
+        fxaaPass.material.uniforms.resolution.value.x = 1 / (width * pixelRatio);
+        fxaaPass.material.uniforms.resolution.value.y = 1 / (height * pixelRatio);
+
+        this.fxaaComposer = new EffectComposer(this.renderer);
+        this.fxaaComposer.addPass(renderScene);
+        this.fxaaComposer.addPass(fxaaPass);
+
+        // bloom
         const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1, 0.1, 0);
         this.bloomComposer = new EffectComposer(this.renderer);
         this.bloomComposer.renderToScreen = false;
@@ -1319,6 +1343,8 @@ class Visualizer extends Component {
 
         if (this.renderer && needUpdateScene) {
             this.renderer.render(this.scene, this.camera);
+            this.copyComposer.render();
+            this.fxaaComposer.render();
             this.renderBloom();
             this.finalComposer.render();
         }
