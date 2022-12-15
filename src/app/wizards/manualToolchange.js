@@ -52,6 +52,7 @@ const wizard = {
                 {
                     title: 'Safety First',
                     description: 'PH COPY - Turn off router or verify that spindle is off.  Save current modals and position',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Save Positions and Modals',
@@ -81,7 +82,8 @@ const wizard = {
                 },
                 {
                     title: 'Change Bit',
-                    description: () => `PH COPY - Change tool to requested bit - ${getToolString()}`
+                    description: () => `PH COPY - Change tool to requested bit - ${getToolString()}`,
+                    overlay: false
                 }
             ]
         },
@@ -90,11 +92,13 @@ const wizard = {
             substeps: [
                 {
                     title: 'Touchplate Setup',
-                    description: 'PH COPY - Setup touchplate and attach continuity collets.'
+                    description: 'PH COPY - Setup touchplate and attach continuity collets.',
+                    overlay: false
                 },
                 {
                     title: 'Position Router',
-                    description: 'PH COPY - Jog router into position above the touch plate using the jog controls'
+                    description: 'PH COPY - Jog router into position above the touch plate using the jog controls',
+                    overlay: false
                 }
             ]
         },
@@ -104,6 +108,7 @@ const wizard = {
                 {
                     title: 'Probe',
                     description: 'PH COPY - Probe tool length',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Probe Z',
@@ -140,6 +145,7 @@ const wizard = {
                 {
                     title: 'Resume Program',
                     description: 'PH COPY - Detach and remove your touchplate from the work area.  The following will restore modals, and move back to initial position.  Remember to turn on your router before resuming.',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Prepare for Resume',

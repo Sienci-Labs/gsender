@@ -46,6 +46,7 @@ export const WizardProvider = ({ children }) => {
     const [stepCount, setStepCount] = useState(0);
     const [minimized, setMinimized] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [overlay, setOverlay] = useState(false);
 
 
     // Memoized API for context, can be fetched separate to data context
@@ -54,6 +55,19 @@ export const WizardProvider = ({ children }) => {
         setTitle: (title) => setTitle(title),
         setVisible: (b) => setVisible(b),
         setIsLoading: (state) => setIsLoading(state),
+        updateSubstepOverlay: (activeValues, stepsList = steps) => {
+            const { activeStep, activeSubstep } = activeValues;
+            const step = stepsList[activeStep];
+            if (!step) {
+                return false;
+            }
+            const substep = step.substeps[activeSubstep];
+            if (!substep) {
+                return false;
+            }
+            setOverlay(substep.overlay);
+            return substep.overlay;
+        },
         getStepTitle: (index) => {
             const step = steps[index];
             if (!step) {
@@ -256,12 +270,27 @@ export const WizardProvider = ({ children }) => {
         completedStep,
         completedSubStep,
         isLoading,
+        overlay,
         setMinimized,
-        setActiveSubstep
+        setActiveSubstep,
     ]);
 
     return (
-        <WizardContext.Provider value={{ steps, activeStep, activeSubstep, completedStep, completedSubStep, title, visible, stepCount, minimized, isLoading }}>
+        <WizardContext.Provider
+            value={{
+                steps,
+                activeStep,
+                activeSubstep,
+                completedStep,
+                completedSubStep,
+                title,
+                visible,
+                stepCount,
+                minimized,
+                isLoading,
+                overlay
+            }}
+        >
             <WizardAPI.Provider value={api}>
                 {children}
             </WizardAPI.Provider>

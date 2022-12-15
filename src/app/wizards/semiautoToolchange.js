@@ -52,6 +52,7 @@ const wizard = {
                 {
                     title: 'Safety First',
                     description: 'PH COPY - Turn off router or verify that spindle is off.  Save current modals and position',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Save Positions and Modals',
@@ -83,7 +84,8 @@ const wizard = {
                 },
                 {
                     title: 'Position above touchplate',
-                    description: 'PH COPY - Jog the router into position, about 10mm above the touchplate.'
+                    description: 'PH COPY - Jog the router into position, about 10mm above the touchplate.',
+                    overlay: false,
                 },
             ]
         },
@@ -93,6 +95,7 @@ const wizard = {
                 {
                     title: 'Probe Initial Tool Length or confirm',
                     description: 'PH COPY - If you haven\'t probed your initial tool length, do so now by pressing \'Probe Tool Length\'.  Otherwise, continue.',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Probe Initial Tool Length',
@@ -132,10 +135,12 @@ const wizard = {
                 {
                     title: 'Change Tool',
                     description: () => `PH COPY - Change tool to requested bit - ${getToolString()}.`,
+                    overlay: false
                 },
                 {
                     title: 'Probe',
                     description: 'PH COPY - Move back about 10mm above touchplate and re-probe.',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Probe New Tool Length',
@@ -164,6 +169,7 @@ const wizard = {
                 {
                     title: 'Resume Program',
                     description: 'PH COPY - Move router back to initial position, restore modals, turn it on, resume cutting.',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Prepare for Resume',

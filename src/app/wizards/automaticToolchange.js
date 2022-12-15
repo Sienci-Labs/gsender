@@ -52,6 +52,7 @@ const wizard = {
                 {
                     title: 'Safety First',
                     description: 'PH COPY - Turn off router or verify that spindle is off.  Save current modals and position',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Save Positions and Modals',
@@ -92,7 +93,8 @@ const wizard = {
                 },
                 {
                     title: 'Touchplate Setup',
-                    description: 'PH COPY - Verify your probe is setup correctly and all collets are attached.'
+                    description: 'PH COPY - Verify your probe is setup correctly and all collets are attached.',
+                    overlay: false
                 },
             ]
         },
@@ -102,6 +104,7 @@ const wizard = {
                 {
                     title: 'Probe Initial Tool Length or confirm',
                     description: 'PH COPY - If you haven\'t probed your initial tool length, do so now by pressing \'Probe Tool Length\'.  Otherwise, continue.',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Probe Initial Tool Length',
@@ -138,7 +141,8 @@ const wizard = {
                 },
                 {
                     title: 'Change Tool',
-                    description: () => `PH COPY - Change the tool to the requested bit - ${getToolString()}`
+                    description: () => `PH COPY - Change the tool to the requested bit - ${getToolString()}`,
+                    overlay: false
                 },
             ]
         },
@@ -148,6 +152,7 @@ const wizard = {
                 {
                     title: 'Probe',
                     description: 'PH COPY - Probe new tool length.  This will move back to the configured probe position.',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Probe New Tool Length',
@@ -182,6 +187,7 @@ const wizard = {
                 {
                     title: 'Resume Program',
                     description: 'PH COPY - Move router back to initial position, restore modals, turn it on, resume cutting.',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Prepare for Resume',
