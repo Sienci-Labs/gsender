@@ -31,18 +31,24 @@ const Charts = ({ state, actions }) => {
     const jobsFinished = store.get('workspace.jobsFinished', 0);
     const jobsCancelled = store.get('workspace.jobsCancelled', 0);
     const data = [
-        { title: 'Cancelled', value: jobsCancelled, color: '#C13C37' },
-        { title: 'Completed', value: jobsFinished, color: '#E38627' },
+        { name: 'Cancelled', value: jobsCancelled, color: '#C13C37' },
+        { name: 'Completed', value: jobsFinished, color: '#E38627' },
     ];
 
     return (
         <Fieldset legend="Charts">
             <div className={[styles.addMargin, styles.chartsContainer].join(' ')}>
-                <span className={styles.chartsTitle}>Jobs Run</span>
                 {
                     jobsFinished === 0 && jobsCancelled === 0
                         ? <span>No jobs run</span>
-                        : <CustomPieChart propsData={data} />
+                        : (
+                            <CustomPieChart
+                                propsData={data}
+                                height={300}
+                                width={340}
+                                showAnimation={false}
+                            />
+                        )
                 }
             </div>
         </Fieldset>
