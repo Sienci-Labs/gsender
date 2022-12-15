@@ -48,34 +48,28 @@ const Wizard = () => {
 
     return (
         <>
-            <div className={cx({
-                [styles.hidden]: !visible,
-                [styles.overlay]: !minimized && overlay
-            })}
-            />
-            <div className={cx({
-                [styles.hidden]: !visible || !overlay,
-                [styles.infoMsgContainer]: !minimized && overlay
-            })}
-            >
-                <text className={styles.infoMsgHeading}>
-                    Widgets are disabled
-                </text>
-                <text className={styles.infoMsg}>
-                    Please use the button(s) in the wizard instead.
-                </text>
-            </div>
-            <div className={cx({ [styles.hidden]: !visible, [styles.minimizedWrapper]: minimized, [styles.wizardWrapper]: !minimized })}>
-                <div className={styles.wizardTitle}>
-                    <h1><i className="fas fa-hat-wizard" /> {title} - Step {activeStep + 1} of {steps.length}</h1>
-                    <div style={{ display: 'flex' }}>
-                        <MinMaxButton />
-                        <CancelButton />
+            <div className={cx({ [styles.hidden]: !visible, [styles.overlay]: !minimized && overlay })} />
+            <div className={cx({ [styles.hidden]: !visible, [styles.wrapper]: !minimized })}>
+                <div className={cx({ [styles.hidden]: !visible || !overlay, [styles.infoMsgContainer]: !minimized && overlay })}>
+                    <div className={styles.infoMsgHeading}>
+                        Widgets are disabled
+                    </div>
+                    <div className={styles.infoMsg}>
+                        Please use the button(s) in the wizard instead.
                     </div>
                 </div>
-                <div className={cx(styles.wizardContent, { [styles.hidden]: minimized })}>
-                    <Stepper />
-                    <Instructions />
+                <div className={cx({ [styles.hidden]: !visible, [styles.minimizedWrapper]: minimized, [styles.wizardWrapper]: !minimized })}>
+                    <div className={styles.wizardTitle}>
+                        <h1><i className="fas fa-hat-wizard" /> {title} - Step {activeStep + 1} of {steps.length}</h1>
+                        <div style={{ display: 'flex' }}>
+                            <MinMaxButton />
+                            <CancelButton />
+                        </div>
+                    </div>
+                    <div className={cx(styles.wizardContent, { [styles.hidden]: minimized })}>
+                        <Stepper />
+                        <Instructions />
+                    </div>
                 </div>
             </div>
         </>

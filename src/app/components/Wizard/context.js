@@ -276,7 +276,21 @@ export const WizardProvider = ({ children }) => {
     ]);
 
     return (
-        <WizardContext.Provider value={{ steps, activeStep, activeSubstep, completedStep, completedSubStep, title, visible, stepCount, minimized, isLoading, overlay }}>
+        <WizardContext.Provider
+            value={{
+                steps,
+                activeStep,
+                activeSubstep,
+                completedStep,
+                completedSubStep,
+                title,
+                visible,
+                stepCount,
+                minimized,
+                isLoading,
+                overlay
+            }}
+        >
             <WizardAPI.Provider value={api}>
                 {children}
             </WizardAPI.Provider>
