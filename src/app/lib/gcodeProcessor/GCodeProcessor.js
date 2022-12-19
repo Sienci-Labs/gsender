@@ -689,7 +689,11 @@ export class GCodeProcessor {
         this.vmState.totalTime += moveTime;
         // Update local coordinates
         for (let axisNum = 0; axisNum < to.length; axisNum++) {
-            this.vmState.pos[axisNum] = to[axisNum];
+            if (incremental) {
+                this.vmState.pos[axisNum] += to[axisNum];
+            } else {
+                this.vmState.pos[axisNum] = to[axisNum];
+            }
         }
         // Update machine position
         this._updateMPosFromPos();
