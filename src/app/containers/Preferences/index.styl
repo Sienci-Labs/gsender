@@ -180,6 +180,11 @@
   }
 }
 
+.sub-heading {
+  color: #9b1919;
+}
+
+// animation from https://codepen.io/seansean11/pen/DgGYPY
 .save-colour {
   width: 100%;
   background: #3e85c7;
@@ -189,6 +194,29 @@
   padding: .5rem;
   border-radius: .25rem;
   margin: 1rem 0;
+  box-shadow: 0 0 0 0 rgba(#5a99d4, .5);
+  -webkit-animation: pulse 1.5s infinite;
+}
+
+.save-colour:disabled {
+  color: #9ca3af;
+  background-color: #D9DCE1;
+  -webkit-animation: none;
+}
+
+.save-colour:hover {
+  -webkit-animation: none;
+}
+
+@-webkit-keyframes pulse {
+  0% {
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(#5a99d4, 0);
+  }
+    100% {
+    box-shadow: 0 0 0 0 rgba(#5a99d4, 0);
+  }
 }
 
 .choose-colour {
