@@ -60,7 +60,8 @@ import {
     WORKFLOW_STATE_RUNNING,
     VISUALIZER_PRIMARY, LASER_MODE,
     METRIC_UNITS,
-    GRBL_ACTIVE_STATE_HOME
+    GRBL_ACTIVE_STATE_HOME,
+    IMPERIAL_UNITS
 } from '../../constants';
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
@@ -98,7 +99,8 @@ class WorkflowControl extends PureComponent {
                 showModal: false,
                 showChoiceModal: false,
                 value: 1,
-                waitForHoming: false
+                waitForHoming: false,
+                safeHeight: 10,
             },
         };
     }
@@ -326,8 +328,13 @@ class WorkflowControl extends PureComponent {
     }
 
     handleStartFromLine = () => {
+        const { zMax } = this.props;
+        const { value, safeHeight } = this.state.startFromLine;
+        const units = store.get('workspace.units', METRIC_UNITS);
+
         this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false, showChoiceModal: false } }));
-        controller.command('gcode:start', this.state.startFromLine.value, this.props.zMax);
+        const newSafeHeight = units === IMPERIAL_UNITS ? safeHeight * 25.4 : safeHeight;
+        controller.command('gcode:start', value, zMax, newSafeHeight);
 
         Toaster.pop({
             msg: 'Running Start From Specific Line Command',
@@ -403,6 +410,7 @@ class WorkflowControl extends PureComponent {
         const { handleOnStop } = this;
         const { runHasStarted } = this.state;
         const { fileLoaded, actions, workflowState, isConnected, senderInHold, activeState, lineTotal } = this.props;
+        const units = store.get('workspace.units', METRIC_UNITS);
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
         const canRun = this.canRun();
@@ -411,7 +419,7 @@ class WorkflowControl extends PureComponent {
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
-        const { showModal, showChoiceModal, value } = this.state.startFromLine;
+        const { showModal, showChoiceModal, value, safeHeight } = this.state.startFromLine;
         const renderSVG = shouldVisualizeSVG();
 
         return (
@@ -604,6 +612,22 @@ class WorkflowControl extends PureComponent {
                                                         }
                                                     }))
                                                 }
+                                                additionalProps={{ type: 'number' }}
+                                            />
+                                            <Input
+                                                label={`With safe height (${units}):`}
+                                                value={safeHeight}
+                                                onChange={(e) => {
+                                                    if (e.target.value < 0) {
+                                                        e.target.value = 0;
+                                                    }
+                                                    this.setState(prev => ({
+                                                        startFromLine: {
+                                                            ...prev.startFromLine,
+                                                            safeHeight: Math.ceil(Number(e.target.value))
+                                                        }
+                                                    }));
+                                                }}
                                                 additionalProps={{ type: 'number' }}
                                             />
                                             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
