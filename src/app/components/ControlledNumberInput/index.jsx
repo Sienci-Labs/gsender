@@ -23,7 +23,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 
-const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnChange = null, ...props }) => {
+// default max value is the highest number consisting only of 9s that is below the safe integer value
+// it's more aesthetic than 9007199254740991 lol
+const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnChange = null, max = 999999999999999, min = 0, ...props }) => {
     const inputRef = useRef();
     const [originalValue, setOriginalValue] = useState(value);
     const [localValue, setLocalValue] = useState(value);
@@ -65,7 +67,16 @@ const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnC
     };
 
     const localChange = (e) => {
-        setLocalValue(inputRef.current.value);
+        const current = inputRef.current.value;
+        if (current < min) {
+            inputRef.current.value = min;
+            setLocalValue(min);
+        } else if (current > max) {
+            inputRef.current.value = max;
+            setLocalValue(max);
+        } else {
+            setLocalValue(current);
+        }
     };
 
     return (
