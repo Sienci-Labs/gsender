@@ -21,13 +21,16 @@
  *
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
+import Select from 'react-select';
+import map from 'lodash/map';
 import Table from 'app/components/Table';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 
 import {
+    ALL_CATEGORY,
     CARVING_CATEGORY,
     OVERRIDES_CATEGORY,
     VISUALIZER_CATEGORY,
@@ -38,7 +41,8 @@ import {
     GENERAL_CATEGORY,
     TOOLBAR_CATEGORY,
     MACRO_CATEGORY,
-    COOLANT_CATEGORY
+    COOLANT_CATEGORY,
+    ALL_CATEGORIES
 } from 'app/constants';
 
 import { formatShortcut } from './helpers';
@@ -50,6 +54,14 @@ import styles from './edit-area.styl';
  * @prop {Array} data List of shortcut objects
  */
 const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, data }) => {
+    const [filterCategory, setFilterCategory] = useState(ALL_CATEGORY);
+    const [dataSet, setDataSet] = useState(data);
+
+    const filter = (category) => {
+        const filteredData = category === ALL_CATEGORY ? data : data.filter(entry => entry.category === category);
+        setDataSet(filteredData);
+    };
+
     const renders = {
         renderShortcutCell: (_, row) => {
             const { keys, isActive, keysName } = row;
@@ -143,13 +155,50 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, data }) => {
         { dataKey: 'isActive', title: 'Active', width: '10%', render: renders.renderToggleCell }
     ];
 
+    const filterRenderer = (option) => {
+        const style = {
+            color: '#333',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            textTransform: 'capitalize'
+        };
+        return (
+            <div style={style} title={option.label}>{option.label}</div>
+        );
+    };
+
     return (
-        <Table
-            rowKey="id"
-            columns={columns}
-            data={data}
-            width={743}
-        />
+        <>
+            <div className={styles.filterArea}>
+                <div>Filter By Category:</div>
+                <div style={{ width: '80%', float: 'right' }}>
+                    <Select
+                        id="categorySelect"
+                        backspaceRemoves={false}
+                        className="sm"
+                        clearable={false}
+                        name="theme"
+                        onChange={(category) => {
+                            filter(category.value);
+                            setFilterCategory(category.value);
+                        }}
+                        options={map(ALL_CATEGORIES, (value) => ({
+                            value: value,
+                            label: value
+                        }))}
+                        searchable={false}
+                        value={{ label: filterCategory }}
+                        valueRenderer={filterRenderer}
+                    />
+                </div>
+            </div>
+            <Table
+                rowKey="id"
+                columns={columns}
+                data={dataSet}
+                width={743}
+            />
+        </>
     );
 };
 
