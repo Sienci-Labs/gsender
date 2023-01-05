@@ -171,7 +171,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, data }) => {
         <>
             <div className={styles.filterArea}>
                 <div>Filter By Category:</div>
-                <div style={{ width: '80%', float: 'right' }}>
+                <div className={styles.filterSelect}>
                     <Select
                         id="categorySelect"
                         backspaceRemoves={false}
