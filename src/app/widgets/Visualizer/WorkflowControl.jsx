@@ -718,7 +718,7 @@ export default connect((store) => {
     const port = get(store, 'connection.port');
     const gcode = get(store, 'file.content');
     const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
-    const zMax = get(store, 'file.bbox.max.z', 0);
+    const zMax = get(store, 'file.bbox.max.z', 0) || 0;
     const homingSetting = get(store, 'controller.settings.settings.$22', 0);
     const homingEnabled = homingSetting === '1';
     return {
