@@ -351,10 +351,6 @@ class ProbeWidget extends PureComponent {
             toolChangeActive: false,
             port: controller.port,
             units,
-            controller: {
-                type: controller.type,
-                state: controller.state
-            },
             modal: {
                 name: MODAL_NONE,
                 params: {}
@@ -1063,7 +1059,11 @@ class ProbeWidget extends PureComponent {
     }
 
     generateProbeCommands() {
-        const state = { ...this.state };
+        const state = { ...this.state,
+            controller: {
+                type: controller.type,
+                state: controller.state
+            }, };
         const {
             useSafeProbeOption,
             retractionDistance,
@@ -1264,7 +1264,11 @@ class ProbeWidget extends PureComponent {
         const state = {
             ...this.state,
             canClick: this.canClick(),
-            connected: controller.port
+            connected: controller.port,
+            controller: {
+                type: controller.type,
+                state: controller.state
+            },
         };
         const actions = {
             ...this.actions
