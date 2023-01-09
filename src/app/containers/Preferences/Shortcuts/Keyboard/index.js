@@ -44,7 +44,7 @@ import styles from '../index.styl';
  */
 const Keyboard = () => {
     // const { list: shortcutsList } = useSelector(state => state.preferences.shortcuts);
-    const shortcutsList = store.get('commandKeys', []);
+    const [shortcutsList, setShortcutsList] = useState(store.get('commandKeys', []));
     shortcutsList.sort((a, b) => {
         return a.category.localeCompare(b.category);
     });
@@ -114,14 +114,15 @@ const Keyboard = () => {
         updateKeybindings(updatedshortcutsList, showToast);
     };
 
-    const updateKeybindings = (shortcuts, showToast) => {
-        store.set('commandKeys', shortcuts);
+    const updateKeybindings = (shortcuts, shouldShowToast) => {
+        store.replace('commandKeys', shortcuts);
+        setShortcutsList(shortcuts);
         pubsub.publish('keybindingsUpdated');
 
         setShowEditModal(false);
         // dispatch(updateShortcutsList(shortcuts));
 
-        if (showToast) {
+        if (shouldShowToast) {
             showToast();
         }
     };
@@ -133,7 +134,8 @@ const Keyboard = () => {
     const enableAllShortcuts = () => {
         const enabledKeybindingsArr = shortcutsList.map(keybinding => ({ ...keybinding, isActive: true }));
 
-        store.set('commandKeys', enabledKeybindingsArr);
+        store.replace('commandKeys', enabledKeybindingsArr);
+        setShortcutsList(enabledKeybindingsArr);
 
         setShowEditModal(false);
         // dispatch(updateShortcutsList(enabledKeybindingsArr));
@@ -145,6 +147,7 @@ const Keyboard = () => {
         const disabledShortcuts = shortcutsList.map(keybinding => ({ ...keybinding, isActive: false }));
 
         store.replace('commandKeys', disabledShortcuts);
+        setShortcutsList(disabledShortcuts);
         // dispatch(updateShortcutsList(disabledShortcuts));
 
         showToast('Shortcuts Disabled');
