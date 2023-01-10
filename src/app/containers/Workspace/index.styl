@@ -44,6 +44,9 @@
     line-height: 1.5rem;
     background: none;
     position: relative;
+    @media (max-width: 599px) {
+    overflow-y: visible;
+    }
     &::-webkit-scrollbar {
         display: none;
     }
@@ -86,7 +89,7 @@
     }
 
     .workspace-table-mobile {
-        overflow-y: scroll;
+        overflow-y: auto;
         display: flex;
         flex-direction: column;
         flex-grow: 1;
@@ -95,6 +98,9 @@
         max-height: 100%;
         background-color: #d1d5db
         position: relative;
+         @media (max-width: 599px) {
+            height: 100%;
+        }
     }
 
     .workspace-table-row {
@@ -114,7 +120,7 @@
         flex-grow: 1;
         box-sizing border-box;
         padding: 10px 15px;
-        height: 100%;
+        min-height: fit-content;
         width: 100%;
         justify-content: center;
         align-content: center;
@@ -148,6 +154,10 @@
         min-width: 365px;
         max-width: 500px;
         overflow: hidden;
+        @media (max-width: 599px) {
+            min-width: auto;
+            max-width: auto;
+        }
         &.hidden {
             display: none;
         }

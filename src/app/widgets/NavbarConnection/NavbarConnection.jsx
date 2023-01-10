@@ -66,7 +66,7 @@ class NavbarConnection extends PureComponent {
     }
 
     updateScreenSize = () => {
-        const isMobile = window.visualViewport.width / window.visualViewport.height <= 0.5625;
+        const isMobile = window.visualViewport.width <= 599;
         this.setState({
             mobile: isMobile
         });
@@ -124,7 +124,7 @@ class NavbarConnection extends PureComponent {
         const { connected, ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
         const { isActive } = this.state;
         const iconState = this.getIconState(connected, connecting, alertMessage);
-        const isMobile = window.visualViewport.width / window.visualViewport.height <= 0.5625;
+        const isMobile = window.visualViewport.width <= 599;
 
         return (
             <div

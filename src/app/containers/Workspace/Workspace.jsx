@@ -301,12 +301,11 @@ class Workspace extends PureComponent {
     };
 
     updateScreenSize = () => {
-        const ratio = window.visualViewport.width / window.visualViewport.height;
-        const isMobile = ratio <= 0.5625; //9:16 ratio
+        const isMobile = window.visualViewport.width <= 599;
         this.setState({
             mobile: isMobile
         });
-        const isTablet = ratio <= 1 && ratio > 0.5625; //width smaller than height and wider than a phone
+        const isTablet = window.visualViewport.width > 599; //width smaller than height and wider than a phone
         this.setState({
             tablet: isTablet
         });
