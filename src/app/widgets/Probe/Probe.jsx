@@ -31,7 +31,7 @@ import useKeybinding from '../../lib/useKeybinding';
 import {
     MODAL_PREVIEW
 } from './constants';
-import { PROBING_CATEGORY } from '../../constants';
+import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
 import ProbeImage from './ProbeImage';
 import ProbeDiameter from './ProbeDiameter';
 import styles from './index.styl';
@@ -90,6 +90,46 @@ class Probe extends PureComponent {
                     newIndex = availableProbeCommands.length - 1;
                 }
                 actions.handleProbeCommandChange(newIndex);
+            },
+        },
+        PROBE_DIAMETER_SCROLL_UP: {
+            title: 'Probe Diameter Scroll Up',
+            keys: '',
+            cmd: 'PROBE_DIAMETER_SCROLL_UP',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                const { state, actions } = this.props;
+                const { toolDiameter, availableTools, units } = state;
+                const toolUnits = units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter';
+                const currIndex = availableTools.findIndex(element => element[toolUnits] === toolDiameter);
+
+                let newIndex = currIndex - 1;
+                if (newIndex < 0) {
+                    newIndex = availableTools.length - 1;
+                }
+                actions.setToolDiameter({ value: availableTools[newIndex][`${toolUnits}`] });
+            },
+        },
+        PROBE_DIAMETER_SCROLL_DOWN: {
+            title: 'Probe Diameter Scroll Down',
+            keys: '',
+            cmd: 'PROBE_DIAMETER_SCROLL_DOWN',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                const { state, actions } = this.props;
+                const { toolDiameter, availableTools, units } = state;
+                const toolUnits = units === METRIC_UNITS ? 'metricDiameter' : 'imperialDiameter';
+                const currIndex = availableTools.findIndex(element => element[toolUnits] === toolDiameter);
+
+                let newIndex = currIndex + 1;
+                if (newIndex >= availableTools.length) {
+                    newIndex = 0;
+                }
+                actions.setToolDiameter({ value: availableTools[newIndex][`${toolUnits}`] });
             },
         }
     }
