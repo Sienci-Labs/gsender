@@ -24,10 +24,14 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import cx from 'classnames';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+import combokeys from 'app/lib/combokeys';
+import gamepad, { runAction } from 'app/lib/gamepad';
+import useKeybinding from '../../lib/useKeybinding';
 
 import {
     MODAL_PREVIEW
 } from './constants';
+import { PROBING_CATEGORY } from '../../constants';
 import ProbeImage from './ProbeImage';
 import ProbeDiameter from './ProbeDiameter';
 import styles from './index.styl';
@@ -39,6 +43,82 @@ class Probe extends PureComponent {
         actions: PropTypes.object,
         probeActive: PropTypes.bool
     };
+
+    shuttleControlEvents = {
+        OPEN_PROBE: {
+            title: 'Open Probe',
+            keys: '',
+            cmd: 'OPEN_PROBE',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                this.props.actions.openModal(MODAL_PREVIEW);
+            },
+        },
+        PROBE_ROUTINE_SCROLL_RIGHT: {
+            title: 'Probe Routine Scroll Right',
+            keys: '',
+            cmd: 'PROBE_ROUTINE_SCROLL_RIGHT',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                const { state, actions } = this.props;
+                const { availableProbeCommands, selectedProbeCommand } = state;
+
+                let newIndex = selectedProbeCommand + 1;
+                if (availableProbeCommands.length <= newIndex) {
+                    newIndex = 0;
+                }
+                actions.handleProbeCommandChange(newIndex);
+            },
+        },
+        PROBE_ROUTINE_SCROLL_LEFT: {
+            title: 'Probe Routine Scroll Left',
+            keys: '',
+            cmd: 'PROBE_ROUTINE_SCROLL_LEFT',
+            preventDefault: false,
+            isActive: true,
+            category: PROBING_CATEGORY,
+            callback: () => {
+                const { state, actions } = this.props;
+                const { availableProbeCommands, selectedProbeCommand } = state;
+
+                let newIndex = selectedProbeCommand - 1;
+                if (newIndex < 0) {
+                    newIndex = availableProbeCommands.length - 1;
+                }
+                actions.handleProbeCommandChange(newIndex);
+            },
+        }
+    }
+
+    addShuttleControlEvents() {
+        combokeys.reload();
+
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName].callback;
+            combokeys.on(eventName, callback);
+        });
+    }
+
+    removeShuttleControlEvents() {
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName].callback;
+            combokeys.removeListener(eventName, callback);
+        });
+    }
+
+    componentDidMount() {
+        this.addShuttleControlEvents();
+        useKeybinding(this.shuttleControlEvents);
+        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
+    }
+
+    componentWillUnmount() {
+        this.removeShuttleControlEvents();
+    }
 
     render() {
         const { state, actions } = this.props;
