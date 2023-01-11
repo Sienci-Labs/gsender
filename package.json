@@ -241,7 +241,7 @@
     "objtools": "~2.0.0",
     "perfect-scrollbar": "~1.4.0",
     "prop-types": "~15.7.2",
-    "pubsub-js": "~1.7.0",
+    "pubsub-js": "~1.9.4",
     "push.js": "~1.0.9",
     "qs": "~6.7.0",
     "quick-local-ip": "^1.0.7",
