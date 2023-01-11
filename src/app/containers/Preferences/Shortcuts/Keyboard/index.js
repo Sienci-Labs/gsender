@@ -135,6 +135,7 @@ const Keyboard = () => {
         const enabledKeybindingsArr = shortcutsList.map(keybinding => ({ ...keybinding, isActive: true }));
 
         store.replace('commandKeys', enabledKeybindingsArr);
+
         setShortcutsList(enabledKeybindingsArr);
 
         setShowEditModal(false);
