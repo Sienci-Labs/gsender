@@ -1341,9 +1341,7 @@ class ProbeWidget extends PureComponent {
                     )}
                     active={active}
                 >
-                    {state.modal.name === MODAL_PREVIEW &&
-                    <RunProbe state={state} actions={actions} />
-                    }
+                    <RunProbe state={state} actions={actions} show={state.modal.name === MODAL_PREVIEW} />
                     <Probe
                         state={state}
                         actions={actions}

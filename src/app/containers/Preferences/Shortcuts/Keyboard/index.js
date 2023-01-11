@@ -114,15 +114,15 @@ const Keyboard = () => {
         updateKeybindings(updatedshortcutsList, showToast);
     };
 
-    const updateKeybindings = (shortcuts, showToast) => {
-        store.set('commandKeys', shortcuts);
+    const updateKeybindings = (shortcuts, shouldShowToast) => {
+        store.replace('commandKeys', shortcuts);
         setShortcutsList(shortcuts);
         pubsub.publish('keybindingsUpdated');
 
         setShowEditModal(false);
         // dispatch(updateShortcutsList(shortcuts));
 
-        if (showToast) {
+        if (shouldShowToast) {
             showToast();
         }
     };
@@ -133,7 +133,9 @@ const Keyboard = () => {
 
     const enableAllShortcuts = () => {
         const enabledKeybindingsArr = shortcutsList.map(keybinding => ({ ...keybinding, isActive: true }));
-        store.set('commandKeys', enabledKeybindingsArr);
+
+        store.replace('commandKeys', enabledKeybindingsArr);
+
         setShortcutsList(enabledKeybindingsArr);
 
         setShowEditModal(false);
