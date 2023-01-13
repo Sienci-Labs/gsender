@@ -45,9 +45,38 @@ class ConfigStore extends events.EventEmitter {
 
     watcher = null;
 
+    // take old file events and populate them in new file as key-value pairs
+    migrate(newFile, oldFile) {
+        if (fs.existsSync(oldFile)) {
+            const oldConfig = JSON.parse(fs.readFileSync(oldFile, 'utf8')); // get data
+            const events = oldConfig.events;
+            const macros = oldConfig.macros;
+            let eventMap = new Map();
+            // if it's in old format, convert
+            if (events instanceof Array) {
+                for (let i = 0; i < events.length; i++) {
+                    eventMap.set(events[i].event, events[i]);
+                }
+            } else { // if not, dont need to convert
+                eventMap = new Map(Object.entries(events));
+            }
+
+            // create the events and move over macros
+            this.config = JSON.parse(fs.readFileSync(newFile, 'utf8'));
+            this.config.events = eventMap;
+            this.config.macros = macros;
+
+            this.sync();
+
+            // rename old file
+            const name = oldFile.replace('sender_rc', 'old_sender_rc');
+            fs.renameSync(oldFile, name);
+        }
+    }
+
     // @param {string} file The path to a filename.
     // @return {object} The config object.
-    load(file) {
+    load(file, oldFile) {
         this.file = file;
         this.reload();
         this.emit('load', this.config); // emit load event
@@ -63,6 +92,8 @@ class ConfigStore extends events.EventEmitter {
                 const content = JSON.stringify({});
                 fs.writeFileSync(this.file, content, 'utf8');
             }
+
+            this.migrate(file, oldFile);
 
             this.watcher = fs.watch(this.file, (eventType, filename) => {
                 log.debug(`fs.watch(eventType='${eventType}', filename='${filename}')`);

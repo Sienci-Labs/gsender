@@ -188,6 +188,16 @@ const migrateStore = () => {
         return;
     }
 
+    console.log(cnc.version);
+
+    // if (semver.lt(cnc.version, '1.2.0')) {
+    // check for remote mode settings in new file
+    // if don't exist, create them, disabled by default
+
+    // make sure opt in for metrics is in new file
+    // if it doesn't exist, create it, disabled by default
+    // }
+
     if (semver.lt(cnc.version, '1.1.5')) {
         const currSurfacingState = store.get('widgets.surfacing');
         const defaultSurfacingState = get(defaultState, 'widgets.surfacing', currSurfacingState);

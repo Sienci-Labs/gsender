@@ -25,7 +25,8 @@ import path from 'path';
 import pkg from '../../package.json';
 import { languages } from '../../../build.config';
 
-const RC_FILE = '.edge_rc';
+const RC_FILE = '.gsender_rc';
+const OLD_RC_FILE = '.sender_rc';
 const SESSION_PATH = '.sienci-sessions';
 
 // Secret
@@ -35,6 +36,7 @@ const getUserHome = () => (process.env[(process.platform === 'win32') ? 'USERPRO
 
 export default {
     rcfile: path.resolve(getUserHome(), RC_FILE),
+    oldrcfile: path.resolve(getUserHome(), OLD_RC_FILE),
     verbosity: 0,
     version: pkg.version,
 

@@ -72,10 +72,11 @@ const createServer = (options, callback) => {
     }
 
     const rcfile = path.resolve(options.configFile || settings.rcfile);
+    const oldrcfile = path.resolve(settings.oldrcfile);
 
     // configstore service
     log.info(`Loading configuration from ${chalk.yellow(JSON.stringify(rcfile))}`);
-    config.load(rcfile);
+    config.load(rcfile, oldrcfile);
 
     // rcfile
     settings.rcfile = rcfile;
@@ -125,10 +126,25 @@ const createServer = (options, callback) => {
         }
     }
 
+    { // metrics
+        if (!config.get('metrics')) {
+            // default to false
+            config.set('metrics', false);
+        }
+
+        settings.metrics = config.get('metrics', settings.metrics);
+    }
+
     let { backlog, port = 0, host } = options;
 
     //If headless setting is ON, change to correct port and IP
     const remoteSettings = config.get('remoteSettings', {});
+    if (Object.keys(remoteSettings).length === 0) {
+        config.set('remoteSettings.ip', '');
+        config.set('remoteSettings.port', 8000);
+        config.set('remoteSettings.headlessStatus', false);
+        config.set('remoteSettings.error', false);
+    }
     if (remoteSettings.headlessStatus) {
         port = remoteSettings.port;
         host = remoteSettings.ip;
