@@ -51,7 +51,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Safety First',
-                    description: 'PH COPY - Turn off router or verify that spindle is off.  Save current modals and position',
+                    description: () => <div>If using a router, manually turn it off.  Click the below button to save current position and modals, and turn off spindle if active.</div>,
                     overlay: false,
                     actions: [
                         {
@@ -93,7 +93,7 @@ const wizard = {
                 },
                 {
                     title: 'Touchplate Setup',
-                    description: 'PH COPY - Verify your probe is setup correctly and all collets are attached.',
+                    description: 'Verify your probe is setup correctly and all collets are attached.',
                     overlay: false
                 },
             ]
