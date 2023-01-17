@@ -629,9 +629,6 @@ class LocationWidget extends PureComponent {
             canClick: true, // Defaults to true
             units: store.get('workspace.units', METRIC_UNITS),
             safeRetractHeight: store.get('workspace.safeRetractHeight'),
-            workflow: {
-                state: controller.workflow.state
-            },
             modal: {
                 name: MODAL_NONE,
                 params: {}
@@ -746,6 +743,9 @@ class LocationWidget extends PureComponent {
         //const wcs = this.getWorkCoordinateSystem();
         const state = {
             ...this.state,
+            workflow: {
+                state: this.props.workflow.state
+            },
             // Determine if the motion button is clickable
             canClick: this.canClick(),
             // Output machine position with the display units
