@@ -53,6 +53,6 @@ export default {
     },
     winston: {
         // https://github.com/winstonjs/winston#logging-levels
-        level: 'info'
+        level: 'debug'
     }
 };

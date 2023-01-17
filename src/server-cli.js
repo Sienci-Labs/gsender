@@ -26,7 +26,6 @@
 import path from 'path';
 import isElectron from 'is-electron';
 import program from 'commander';
-import { dialog } from 'electron';
 import ip from 'quick-local-ip';
 import pkg from './package.json';
 

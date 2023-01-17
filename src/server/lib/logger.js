@@ -53,7 +53,7 @@ const logger = winston.createLogger({
         }),
         new winston.transports.File({
             filename: 'gsender_server_log.txt',
-            level: 'info'
+            level: 'debug'
         })
     ]
 });

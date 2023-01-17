@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import combokeys from './combokeys';
 import store from '../store';
 import shuttleEvents from './shuttleEvents';
@@ -51,6 +52,7 @@ function useKeybinding(shuttleControlEvents) {
                     category: defaultCommand.category,
                     callback: defaultCommand.callback
                 });
+                console.log(updatedCommandKeys);
                 store.replace('commandKeys', updatedCommandKeys);
             }
 
@@ -100,28 +102,38 @@ function checkNumCalls() {
 export function removeOldKeybindings() {
     const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
     const currentCommandKeys = store.get('commandKeys', []);
-    let updatedCommandKeys = currentCommandKeys;
+    let updatedCommandKeys = _.cloneDeep(currentCommandKeys);
+
+    console.log(currentCommandKeys);
 
     // remove keybindings that don't exist in any of the shuttleControlEvents arrays
+    let count = 0;
+    let numRemoved = 0;
     currentCommandKeys.forEach(key => {
         const event = allShuttleControlEvents.find(event => event.cmd === key.cmd);
         if (event === undefined && key.category !== MACRO_CATEGORY) {
-            let keyToRemove = updatedCommandKeys.find(el => el.cmd === key.cmd);
-            updatedCommandKeys.splice(updatedCommandKeys.findIndex(el => el === keyToRemove), 1);
+            numRemoved++;
+            console.log('*********remove: ' + key.cmd);
+            let keyToRemove = updatedCommandKeys.findIndex(el => el.cmd === key.cmd);
+            updatedCommandKeys.splice(keyToRemove, 1);
         }
+        count++;
     });
+    console.log(count);
+    console.log(numRemoved);
+    console.log(updatedCommandKeys);
     store.replace('commandKeys', updatedCommandKeys);
 
     // do the same for gamepad shortcuts
     const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
     const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
         const shortcuts = profile.shortcuts;
-        let updatedProfileShortcuts = shortcuts;
+        let updatedProfileShortcuts = _.cloneDeep(shortcuts);
         shortcuts.forEach(key => {
             const event = allShuttleControlEvents.find(event => event.cmd === key.cmd);
-            if (event === undefined) {
-                let keyToRemove = updatedProfileShortcuts.find(el => el.cmd === key.cmd);
-                updatedProfileShortcuts.splice(updatedProfileShortcuts.findIndex(el => el === keyToRemove), 1);
+            if (event === undefined && key.category !== MACRO_CATEGORY) {
+                let keyToRemove = updatedProfileShortcuts.findIndex(el => el.cmd === key.cmd);
+                updatedProfileShortcuts.splice(keyToRemove, 1);
             }
         });
         return { ...profile, shortcuts: updatedProfileShortcuts };

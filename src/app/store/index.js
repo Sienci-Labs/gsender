@@ -23,7 +23,8 @@ if (isElectron()) {
     const path = window.require('path'); // Require the path module within Electron
 
     userData = {
-        path: path.join(app.getPath('userData'), 'preferences.json')
+        path: path.join(app.getPath('userData'), 'preferences.json'),
+        oldPath: path.join(app.getPath('userData'), 'gsender-0.5.6.json')
     };
 }
 
@@ -35,6 +36,9 @@ const getConfig = () => {
         const fs = window.require('fs'); // Require the fs module within Electron
         if (fs.existsSync(userData.path)) {
             content = fs.readFileSync(userData.path, 'utf8') || '{}';
+        } else if (fs.existsSync(userData.oldPath)) { // migrate
+            content = fs.readFileSync(userData.oldPath, 'utf8') || '{}';
+            fs.renameSync(userData.oldPath, userData.path);
         }
     } else {
         content = localStorage.getItem('sienci') || '{}';
@@ -177,6 +181,8 @@ store.state = normalizeState(merge({}, defaultState, cnc.state || {}));
 
 // Debouncing enforces that a function not be called again until a certain amount of time (e.g. 100ms) has passed without it being called.
 store.on('change', debounce((state) => {
+    console.log('STORE ON CHANGE**************');
+    console.log(state);
     persist({ state: state });
 }, 100));
 
@@ -187,16 +193,6 @@ const migrateStore = () => {
     if (!cnc.version) {
         return;
     }
-
-    console.log(cnc.version);
-
-    // if (semver.lt(cnc.version, '1.2.0')) {
-    // check for remote mode settings in new file
-    // if don't exist, create them, disabled by default
-
-    // make sure opt in for metrics is in new file
-    // if it doesn't exist, create it, disabled by default
-    // }
 
     if (semver.lt(cnc.version, '1.1.5')) {
         const currSurfacingState = store.get('widgets.surfacing');
