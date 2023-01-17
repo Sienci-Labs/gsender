@@ -23,7 +23,7 @@
 
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import Modal from 'app/components/Modal';
+import Modal from '@trendmicro/react-modal';
 import i18n from 'app/lib/i18n';
 import combokeys from 'app/lib/combokeys';
 import gamepad, { runAction } from 'app/lib/gamepad';
@@ -175,8 +175,7 @@ class RunProbe extends PureComponent {
     }
 
     render() {
-        const { actions } = this.props;
-        const { state } = this.props;
+        const { actions, state, show } = this.props;
         const { canClick, touchplate } = state;
         const { touchplateType } = touchplate;
         // const probeCommands = actions.generateProbeCommands();
@@ -187,7 +186,7 @@ class RunProbe extends PureComponent {
         const { connectionMade } = this.state;
 
         return (
-            <Modal disableOverlay onClose={actions.closeModal}>
+            <Modal disableOverlay onClose={actions.closeModal} show={show} className={styles.modalOverride}>
                 <Modal.Header className={styles.modalHeader}>
                     <Modal.Title>{i18n._(`Probe - ${probeCommand.id}`)}</Modal.Title>
                 </Modal.Header>

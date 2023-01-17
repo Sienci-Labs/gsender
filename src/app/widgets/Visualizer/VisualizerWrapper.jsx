@@ -33,6 +33,8 @@ class VisualizerWrapper extends Component {
         this.state = { needRefresh: false };
     }
 
+    pubsubTokens = [];
+
     visualizer = null;
 
     componentDidMount() {
@@ -55,16 +57,22 @@ class VisualizerWrapper extends Component {
     }
 
     subscribe() {
-        pubsub.subscribe('litemode:change', () => {
-            this.setNeedRefresh(true);
-        });
-        pubsub.subscribe('visualizer:settings', () => {
-            this.setNeedRefresh(true);
-        });
+        const tokens = [
+            pubsub.subscribe('litemode:change', () => {
+                this.setNeedRefresh(true);
+            }),
+            pubsub.subscribe('visualizer:settings', () => {
+                this.setNeedRefresh(true);
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
 
     unsubscribe() {
-        pubsub.unsubscribe('litemode:change');
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
     }
 
     render() {

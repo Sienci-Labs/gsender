@@ -35,6 +35,11 @@
     }
 }
 
+.alwaysAvailable{
+    display: flex;
+    width: 100%;
+}
+
 .hideHoming {
     display: none;
 }
@@ -49,7 +54,6 @@
 .col-space {
     margin-right: 5px;
 }
-
 .position-label {
     display: inline;
     border: 1px solid #9CA3AF;
@@ -93,6 +97,9 @@
     width: 100%;
     display: flex;
     justify-content: space-around;
+    @media (max-width: 599px) {
+        display: block;
+    }
 }
 .machine-position {
     width: 15ch;
@@ -104,6 +111,12 @@
     display: grid;
     grid-template-columns: repeat(3,minmax(0,1fr));
     height: max-content;
+    margin: auto;
+    @media (max-width: 599px) {
+        margin-top: 1rem;
+        width: 50%;
+        height: 40%
+    }
 }
 
 .quickPositionButton {
@@ -150,6 +163,11 @@
         transform: translateX(5%) rotate(45deg);
         width: 300%;
         text-align: left;
+        @media (max-width: 599px) {
+            width: 277%;
+            transform: translateX(9%) rotate(45deg);
+            font-size: 1.4rem !important;
+        }
     }
 }
 .QPBL {
@@ -167,6 +185,11 @@
          transform: translateX(-72%) rotate(-45deg);
         width: 300%;
         text-align: right;
+        @media (max-width: 599px) {
+            width: 271%;
+            transform: translateX(-73%) rotate(-45deg);
+            font-size: 1.4rem !important;
+        }
     }
 }
 .QPFR {
@@ -187,6 +210,11 @@
         position: relative;
         bottom: 8px;
 		display: block;
+        @media (max-width: 599px) {
+            width: 97%;
+            transform: translateX(1%) rotate(135deg);
+            font-size: 1.4rem !important;
+        }
     }
 }
 .QPFL {
@@ -208,6 +236,11 @@
         bottom: 8px;
 		display: block;
 		text-align: right;
+        @media (max-width: 599px) {
+            width: 99%;
+            transform: translate(3%) rotate(225deg)
+            font-size: 1.4rem !important;
+        }
 
     }
 }

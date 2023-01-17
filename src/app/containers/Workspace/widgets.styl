@@ -27,7 +27,9 @@
     grid-template-rows: minmax(0, 32fr) minmax(0, 38fr) minmax(0, 30fr);
     grid-gap: 0.5rem;
     width: 100%;
-    // margin-top: 1vh;
+    @media (max-width: 599px) {
+            grid-template: none;
+    }
     :global {
         // Class name for the chosen item
         .sortable-chosen {
@@ -52,7 +54,7 @@
     min-width: 360px;
     background-color: #d1d5db;
     width: auto;
-    @media only screen and (min-width: 390px) and (max-width: 768px) {
+    @media (max-width: 599px) {
         display: none;
     }
     @media (min-width: 1921px) {
