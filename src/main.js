@@ -272,7 +272,9 @@ const main = () => {
             ipcMain.on('reconnect-main', (event, options) => {
                 let shouldReconnect = false;
                 try {
-                    shouldReconnect = !event.sender.browserWindowOptions.parent && windowManager.childWindows.length > 0;
+                    if (event && event.sender && event.sender.browserWindowOptions) {
+                        shouldReconnect = !event.sender.browserWindowOptions.parent && windowManager.childWindows.length > 0;
+                    }
                 } catch (err) {
                     log.error(err);
                 }
