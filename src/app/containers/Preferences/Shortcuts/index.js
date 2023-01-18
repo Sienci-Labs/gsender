@@ -3,13 +3,12 @@ import React, { useState, useRef } from 'react';
 import TabbedWidget from 'app/components/TabbedWidget';
 import ReactToPrint from 'react-to-print';
 import { Button } from 'react-bootstrap';
-import ShortcutTable from './ShortcutTable';
 
 import KeyboardShortcuts from './Keyboard';
 import Gamepad from './Gamepad';
 
 import SettingWrapper from '../components/SettingWrapper';
-import styles from '../index.styl';
+import styles from './index.styl';
 
 const tabs = [
     {
@@ -38,7 +37,6 @@ const Shortcuts = ({ active }) => {
                     }}
                     content={() => componentRef.current}
                 />
-                <ShortcutTable forwardRef={componentRef} />
                 <TabbedWidget.Tabs
                     tabs={tabs}
                     activeTabIndex={tab}
