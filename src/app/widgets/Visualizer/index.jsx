@@ -1193,7 +1193,7 @@ class VisualizerWidget extends PureComponent {
                     .every(({ isActive }) => !isActive);
                 const keybindingsArr = shortcuts.map(shortcut => (shortcut.title === 'Toggle Shortcuts' ? shortcut : { ...shortcut, isActive: allDisabled }));
 
-                store.set('commandKeys', keybindingsArr);
+                store.replace('commandKeys', keybindingsArr);
                 pubsub.publish('keybindingsUpdated');
             }
         },

@@ -52,7 +52,6 @@ function useKeybinding(shuttleControlEvents) {
                     category: defaultCommand.category,
                     callback: defaultCommand.callback
                 });
-                console.log(updatedCommandKeys);
                 store.replace('commandKeys', updatedCommandKeys);
             }
 
@@ -104,24 +103,14 @@ export function removeOldKeybindings() {
     const currentCommandKeys = store.get('commandKeys', []);
     let updatedCommandKeys = _.cloneDeep(currentCommandKeys);
 
-    console.log(currentCommandKeys);
-
     // remove keybindings that don't exist in any of the shuttleControlEvents arrays
-    let count = 0;
-    let numRemoved = 0;
     currentCommandKeys.forEach(key => {
         const event = allShuttleControlEvents.find(event => event.cmd === key.cmd);
         if (event === undefined && key.category !== MACRO_CATEGORY) {
-            numRemoved++;
-            console.log('*********remove: ' + key.cmd);
             let keyToRemove = updatedCommandKeys.findIndex(el => el.cmd === key.cmd);
             updatedCommandKeys.splice(keyToRemove, 1);
         }
-        count++;
     });
-    console.log(count);
-    console.log(numRemoved);
-    console.log(updatedCommandKeys);
     store.replace('commandKeys', updatedCommandKeys);
 
     // do the same for gamepad shortcuts
