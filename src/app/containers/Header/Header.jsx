@@ -91,6 +91,7 @@ class Header extends PureComponent {
 
     shuttleControlEvents = {
         CONTROLLER_COMMAND_UNLOCK: {
+            id: 61,
             title: 'Unlock',
             keys: '$',
             cmd: 'CONTROLLER_COMMAND_UNLOCK',
@@ -103,6 +104,7 @@ class Header extends PureComponent {
             callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
         },
         CONTROLLER_COMMAND_RESET: {
+            id: 62,
             title: 'Soft Reset',
             keys: '%',
             cmd: 'CONTROLLER_COMMAND_RESET',
@@ -115,6 +117,7 @@ class Header extends PureComponent {
             callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
         },
         CONTROLLER_COMMAND_HOMING: {
+            id: 31,
             title: 'Homing',
             keys: ['ctrl', 'alt', 'command', 'h'].join('+'),
             cmd: 'CONTROLLER_COMMAND_HOMING',

@@ -72,6 +72,7 @@ const shuttleControlFunctions = {
 };
 const shuttleControlEvents = {
     MIST_COOLANT: {
+        id: 71,
         title: 'Mist Coolant',
         keys: '',
         cmd: 'MIST_COOLANT',
@@ -81,6 +82,7 @@ const shuttleControlEvents = {
         callback: shuttleControlFunctions.MIST_COOLANT
     },
     FLOOD_COOLANT: {
+        id: 72,
         title: 'Flood Coolant',
         keys: '',
         cmd: 'FLOOD_COOLANT',
@@ -90,6 +92,7 @@ const shuttleControlEvents = {
         callback: shuttleControlFunctions.FLOOD_COOLANT
     },
     STOP_COOLANT: {
+        id: 73,
         title: 'Stop Coolant',
         keys: '',
         cmd: 'STOP_COOLANT',
