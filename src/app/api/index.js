@@ -85,6 +85,22 @@ const getLatestVersion = () => new Promise((resolve, reject) => {
 });
 
 //
+// Check if electron auto-update is supported for the
+// installation package-type/file-extension
+//
+const getShouldInstallUpdates = () => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/version/appUpdateSupport')
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+//
 //Fetch latest app version for all OS from github
 //
 // const getLatestVersionAllOS = () => new Promise((resolve, reject) => {
@@ -738,8 +754,9 @@ log.printLog = (msg, file, lineNumber, level) => new Promise((resolve, reject) =
 });
 
 export default {
+    //OS
     getLatestVersion,
-    // getLatestVersionAllOS,
+    getShouldInstallUpdates,
 
     // State
     getState,

@@ -319,10 +319,14 @@ class Header extends PureComponent {
             console.log(err);
         });
         window.ipcRenderer.on('update_available', (info) => {
-            this.setState({
-                updateAvailable: true
+            api.getShouldInstallUpdates().then((res) => {
+                if (res.body) {
+                    this.setState({
+                        updateAvailable: true
+                    });
+                    pubsub.publish('showUpdateToast', info);
+                }
             });
-            pubsub.publish('showUpdateToast', info);
         });
     }
 
@@ -339,10 +343,10 @@ class Header extends PureComponent {
             <>
                 <div className={styles.navBar}>
                     <div className={styles.primary}>
-                        <NavLogo updateAvailable={ updateAvailable } onClick={ () => this.toggleUpdateToast() }/>
+                        <NavLogo updateAvailable={updateAvailable} onClick={() => this.toggleUpdateToast()} />
                         <NavbarConnection
-                            state={ this.state }
-                            actions={ this.actions }
+                            state={this.state}
+                            actions={this.actions}
                             widgetId="connection"
                         />
                         {

@@ -24,7 +24,6 @@
 import '@babel/polyfill';
 import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session } from 'electron';
 import { autoUpdater } from 'electron-updater';
-import os from 'os';
 import Store from 'electron-store';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
@@ -150,9 +149,7 @@ const main = () => {
             });
 
             autoUpdater.on('update-available', (info) => {
-                if (!os.platform().toLocaleLowerCase().includes('linux')) {
-                    window.webContents.send('update_available', info);
-                }
+                window.webContents.send('update_available', info);
             });
 
             autoUpdater.on('error', (err) => {
