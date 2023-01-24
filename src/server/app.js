@@ -280,6 +280,7 @@ const appMain = () => {
     { // Register API routes with authorized access
         // Version
         app.get(urljoin(settings.route, 'api/version/latest'), api.version.getLatestVersion);
+        app.get(urljoin(settings.route, 'api/version/appUpdateSupport'), api.version.getShouldInstallUpdates);
 
         // State
         app.get(urljoin(settings.route, 'api/state'), api.state.get);
