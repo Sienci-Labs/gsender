@@ -20,7 +20,9 @@ const Gamepad = () => {
     };
 
     const handleProfileDelete = (id) => {
-        const filteredProfiles = profiles.filter(profile => !profile.id.includes(id));
+        let filteredProfiles = profiles.filter((profile) => {
+            return JSON.stringify(profile.id) !== JSON.stringify(id);
+        });
 
         setProfiles(filteredProfiles);
         setCurrentProfileID(null);
