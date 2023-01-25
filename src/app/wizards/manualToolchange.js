@@ -117,7 +117,7 @@ const wizard = {
                                     '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
                                     'G91',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z5',
+                                    'G0 Z10',
                                     'G38.2 Z-10 F40',
                                     '%wait',
                                     'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]',
