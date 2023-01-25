@@ -37,6 +37,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
     };
 
     const handleDelete = (currShortcut) => {
+        console.log('Current Shortcut to delete :', currShortcut);
         const updatedShortcuts = shortcuts.map((shortcut) => (shortcut.id === currShortcut.id
             ? { ...shortcut, keys: '', keysName: '', isActive: false }
             : shortcut
@@ -44,8 +45,11 @@ const Profile = ({ data, onUpdateProfiles }) => {
 
         const profiles = store.get('workspace.gamepad.profiles', []);
 
+        //CHecks if parent array has all the child array elements
+        const arrayComparator = (parentArr, childArr) => childArr.every(element => parentArr.includes(element));
+
         const updatedProfiles =
-            profiles.map(profile => (profile.id.includes(data.id) ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
+            profiles.map(profile => (arrayComparator(profile.id, data.id) ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
 
         onUpdateProfiles(updatedProfiles);
 

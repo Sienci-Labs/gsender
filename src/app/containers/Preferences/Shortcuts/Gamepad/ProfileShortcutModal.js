@@ -82,10 +82,14 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
                     isActive: currentShortcut.id === shortcut.id ? true : currentShortcut.isActive,
                 }));
 
+
         const profiles = store.get('workspace.gamepad.profiles', []);
 
+        //CHecks if parent array has all the child array elements
+        const arrayComparator = (parentArr, childArr) => childArr.every(element => parentArr.includes(element));
+
         const cleanedProfiles =
-            profiles.map(currentProfile => (currentProfile.id.includes(profile.id) ? ({ ...profile, shortcuts: newShortcutsArr }) : currentProfile));
+            profiles.map(currentProfile => (arrayComparator(currentProfile.id, profile.id) ? ({ ...profile, shortcuts: newShortcutsArr }) : currentProfile));
 
         onUpdateProfiles(cleanedProfiles);
 

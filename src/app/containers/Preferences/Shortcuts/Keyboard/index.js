@@ -156,7 +156,7 @@ const Keyboard = () => {
 
     const allShortcutsEnabled = useMemo(() => shortcutsList.every(shortcut => shortcut.isActive), [shortcutsList]);
     const allShortcutsDisabled = useMemo(() => shortcutsList.every(shortcut => !shortcut.isActive), [shortcutsList]);
-
+    console.log('Keyboard: ', shortcutsList);
     return (
         <div>
             <div className={styles['table-wrapper']}>
