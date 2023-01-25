@@ -149,7 +149,7 @@ const wizard = {
                                 controller.command('gcode', [
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z10',
+                                    'G0 Z12',
                                     '%wait',
                                     'G38.2 Z-15 F40',
                                     'G4 P0.3',
