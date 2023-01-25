@@ -16,7 +16,7 @@ import Availability from './Availability';
 
 const { DEFAULT, AVAILABLE, UNAVAILABLE, IS_THE_SAME } = AVAILABILITY_TYPES;
 
-const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) => {
+const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, filter, filterCategory }) => {
     const [gamepadShortcut, setGamepadShortcut] = useState(null);
     const [availability, setAvailability] = useState(DEFAULT);
     const [shortcutName, setShortcutName] = useState('');
@@ -81,6 +81,8 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
                     keysName: currentShortcut.id === shortcut.id ? newKeysName : currentShortcut.keysName,
                     isActive: currentShortcut.id === shortcut.id ? true : currentShortcut.isActive,
                 }));
+
+        filter(filterCategory, newShortcutsArr);
 
         const profiles = store.get('workspace.gamepad.profiles', []);
 
