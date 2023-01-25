@@ -21,6 +21,7 @@
  *
  */
 import controller from 'app/lib/controller';
+import React from 'react';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import { get } from 'lodash';
