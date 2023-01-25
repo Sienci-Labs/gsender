@@ -146,10 +146,7 @@ const Surfacing = ({ onClose, showTitle }) => {
                     <div className={styles.mainContainer}>
                         <div>
                             <p style={{ fontSize: '1.1rem', lineHeight: '1.25', marginTop: '1rem', color: 'grey' }}>
-                                To best surface your whole wasteboard, ensure you know the exact limits of your CNCs
-                                movement and account for limit switches or other add-ons. Use a wide diameter bit to
-                                clear the largest space and consider turning off hard and soft limits so you don&apos;t
-                                encounter alarms or errors.
+                                <b>For ideal wasteboard surfacing:</b> know your CNCs exact movement limits accounting for limit switches and other add-ons, get nicer and faster cuts using your widest diameter bit, and consider turning off hard and soft limits so you don&apos;t encounter alarms or errors.
                             </p>
                             <InputArea />
                         </div>
