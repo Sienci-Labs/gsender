@@ -38,7 +38,7 @@ import {
     GENERAL_CATEGORY,
     TOOLBAR_CATEGORY,
     MACRO_CATEGORY,
-    COOLANT_CATEGORY
+    COOLANT_CATEGORY,
 } from 'app/constants';
 
 import { formatShortcut } from './helpers';
@@ -49,7 +49,7 @@ import styles from './edit-area.styl';
  * @prop {Function} onEdit Function to edit shortcuts
  * @prop {Array} data List of shortcut objects
  */
-const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, data }) => {
+const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
     const renders = {
         renderShortcutCell: (_, row) => {
             const { keys, isActive, keysName } = row;
@@ -144,12 +144,14 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, data }) => {
     ];
 
     return (
-        <Table
-            rowKey="id"
-            columns={columns}
-            data={data}
-            width={743}
-        />
+        <>
+            <Table
+                rowKey="id"
+                columns={columns}
+                data={dataSet}
+                width={743}
+            />
+        </>
     );
 };
 

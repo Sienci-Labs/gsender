@@ -21,6 +21,7 @@
  *
  */
 import controller from 'app/lib/controller';
+import React from 'react';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import { get } from 'lodash';
@@ -51,7 +52,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Safety First',
-                    description: 'PH COPY - Turn off router or verify that spindle is off.  Save current modals and position',
+                    description: () => <div>If using a router, manually turn it off.  Click the below button to save current position and modals, and turn off spindle if active.</div>,
                     overlay: false,
                     actions: [
                         {
@@ -82,7 +83,7 @@ const wizard = {
                 },
                 {
                     title: 'Change Bit',
-                    description: () => `PH COPY - Change tool to requested bit - ${getToolString()}`,
+                    description: () => `Change tool to requested bit - ${getToolString()}`,
                     overlay: false
                 }
             ]
@@ -92,12 +93,12 @@ const wizard = {
             substeps: [
                 {
                     title: 'Touchplate Setup',
-                    description: 'PH COPY - Setup touchplate and attach continuity collets.',
+                    description: 'Setup touchplate and attach continuity collets.',
                     overlay: false
                 },
                 {
                     title: 'Position Router',
-                    description: 'PH COPY - Jog router into position above the touch plate using the jog controls',
+                    description: 'Jog router into position above the touch plate using the jog controls',
                     overlay: false
                 }
             ]
@@ -107,7 +108,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Probe',
-                    description: 'PH COPY - Probe tool length',
+                    description: 'Probe tool length - the following code will probe Z and set a new zero based on the configured touchplate thickness.',
                     overlay: false,
                     actions: [
                         {
@@ -117,7 +118,7 @@ const wizard = {
                                     '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
                                     'G91',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z5',
+                                    'G0 Z10',
                                     'G38.2 Z-10 F40',
                                     '%wait',
                                     'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]',
@@ -144,7 +145,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Resume Program',
-                    description: 'PH COPY - Detach and remove your touchplate from the work area.  The following will restore modals, and move back to initial position.  Remember to turn on your router before resuming.',
+                    description: 'Detach and remove your touchplate from the work area.  The following code will restore modals, and move back to initial position.  Remember to turn on your router before resuming.',
                     overlay: false,
                     actions: [
                         {

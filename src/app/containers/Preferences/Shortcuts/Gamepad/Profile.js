@@ -4,10 +4,12 @@ import PropTypes from 'prop-types';
 
 import store from 'app/store';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import { ALL_CATEGORY } from 'app/constants';
 
 import styles from '../index.styl';
 import ShortcutsTable from '../ShortcutsTable';
 import ProfileShortcutModal from './ProfileShortcutModal';
+import CategoryFilter from '../CategoryFilter';
 
 const Profile = ({ data, onUpdateProfiles }) => {
     const { profileName, icon, shortcuts } = data;
@@ -16,6 +18,16 @@ const Profile = ({ data, onUpdateProfiles }) => {
     const [showModal, setShowModal] = useState(false);
 
     const [name, setName] = useState(profileName);
+
+    const [dataSet, setDataSet] = useState(shortcuts);
+    const [filterCategory, setFilterCategory] = useState(ALL_CATEGORY);
+
+    const filter = (category, shortcutsList) => {
+        const allShortcuts = shortcutsList || shortcuts;
+        const filteredData = category === ALL_CATEGORY ? allShortcuts : allShortcuts.filter(entry => entry.category === category);
+        setDataSet(filteredData);
+        setFilterCategory(category);
+    };
 
     const handleEditName = () => {
         if (name === profileName) {
@@ -93,12 +105,13 @@ const Profile = ({ data, onUpdateProfiles }) => {
                         onBlur={handleEditName}
                     />
                 </div>
-                <div style={{ overflowY: 'auto', height: '435px', backgroundColor: 'white' }}>
+                <CategoryFilter onChange={filter} filterCategory={filterCategory} />
+                <div style={{ overflowY: 'auto', height: '380px', backgroundColor: 'white' }}>
                     <ShortcutsTable
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                         onShortcutToggle={handleShortcutToggle}
-                        data={shortcuts}
+                        dataSet={dataSet}
                     />
                 </div>
             </div>
@@ -109,6 +122,8 @@ const Profile = ({ data, onUpdateProfiles }) => {
                     shortcut={currentShortcut}
                     onClose={() => setShowModal(false)}
                     onUpdateProfiles={onUpdateProfiles}
+                    filter={filter}
+                    filterCategory={filterCategory}
                 />
             )}
         </>

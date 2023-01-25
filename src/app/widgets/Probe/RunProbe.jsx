@@ -48,6 +48,7 @@ class RunProbe extends PureComponent {
 
     shuttleControlEvents = {
         START_PROBE: {
+            id: 50,
             title: 'Start Probing',
             keys: '',
             cmd: 'START_PROBE',
@@ -59,6 +60,7 @@ class RunProbe extends PureComponent {
             },
         },
         CONFIRM_PROBE: {
+            id: 49,
             title: 'Confirm Probe',
             keys: '',
             cmd: 'CONFIRM_PROBE',

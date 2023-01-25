@@ -25,6 +25,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
+import { ALL_CATEGORY } from 'app/constants';
+
 // import { useSelector, useDispatch } from 'react-redux';
 
 import store from 'app/store';
@@ -33,6 +35,7 @@ import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 // import { updateShortcutsList, holdShortcutsListener, unholdShortcutsListener } from 'app/actions/preferencesActions';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 
+import CategoryFilter from '../CategoryFilter';
 import ShortcutsTable from '../ShortcutsTable';
 import EditArea from './EditArea';
 
@@ -48,6 +51,15 @@ const Keyboard = () => {
     shortcutsList.sort((a, b) => {
         return a.category.localeCompare(b.category);
     });
+    const [dataSet, setDataSet] = useState(shortcutsList);
+    const [filterCategory, setFilterCategory] = useState(ALL_CATEGORY);
+
+    const filter = (category, shortcuts) => {
+        const allShortcuts = shortcuts || shortcutsList;
+        const filteredData = category === ALL_CATEGORY ? allShortcuts : allShortcuts.filter(entry => entry.category === category);
+        setDataSet(filteredData);
+        setFilterCategory(category);
+    };
     // const dispatch = useDispatch();
 
     const [currentShortcut, setCurrentShortcut] = useState(null);
@@ -84,7 +96,7 @@ const Keyboard = () => {
     const handleDelete = (shortcut) => {
         shortcut.keys = '';
 
-        const updatedshortcutsList = shortcutsList.map(keybinding => (keybinding.id === shortcut.id ? shortcut : keybinding));
+        const updatedshortcutsList = shortcutsList.map(keybinding => (keybinding.cmd === shortcut.cmd ? shortcut : keybinding));
 
         updateKeybindings(updatedshortcutsList, false);
 
@@ -117,6 +129,7 @@ const Keyboard = () => {
     const updateKeybindings = (shortcuts, shouldShowToast) => {
         store.replace('commandKeys', shortcuts);
         setShortcutsList(shortcuts);
+        filter(filterCategory, shortcuts);
         pubsub.publish('keybindingsUpdated');
 
         setShowEditModal(false);
@@ -137,6 +150,7 @@ const Keyboard = () => {
         store.replace('commandKeys', enabledKeybindingsArr);
 
         setShortcutsList(enabledKeybindingsArr);
+        filter(filterCategory, enabledKeybindingsArr);
 
         setShowEditModal(false);
         // dispatch(updateShortcutsList(enabledKeybindingsArr));
@@ -149,6 +163,7 @@ const Keyboard = () => {
 
         store.replace('commandKeys', disabledShortcuts);
         setShortcutsList(disabledShortcuts);
+        filter(filterCategory, disabledShortcuts);
         // dispatch(updateShortcutsList(disabledShortcuts));
 
         showToast('Shortcuts Disabled');
@@ -158,9 +173,10 @@ const Keyboard = () => {
     const allShortcutsDisabled = useMemo(() => shortcutsList.every(shortcut => !shortcut.isActive), [shortcutsList]);
     return (
         <div>
+            <CategoryFilter onChange={filter} filterCategory={filterCategory} />
             <div className={styles['table-wrapper']}>
                 <ShortcutsTable
-                    data={shortcutsList}
+                    dataSet={dataSet}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onShortcutToggle={toggleKeybinding}

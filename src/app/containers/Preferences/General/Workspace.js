@@ -29,12 +29,12 @@ const Workspace = ({ state, actions }) => {
                         <RadioButton className={styles.prefferedradio} label="Millimeters (G21)" value={METRIC_UNITS} />
                     </div>
                 </RadioGroup>
-                <small className={styles['item-info']}>Units to be displayed throughout the interface</small>
+                <small className={styles['item-info']}>What units would you like gSender to show you?</small>
             </div>
             <div className={styles.addMargin}>
                 <Tooltip content="Flip the location of the Visualizer with Machine Controls" location="default">
                     <ToggleSwitch
-                        label="Reverse workspace layout"
+                        label="Visualizer on right Side"
                         checked={reverseWidgets}
                         onChange={() => actions.general.setReverseWidgets()}
                         size="small"

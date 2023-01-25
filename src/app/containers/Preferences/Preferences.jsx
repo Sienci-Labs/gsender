@@ -93,14 +93,19 @@ class PreferencesPage extends PureComponent {
                     component: General
                 },
                 {
+                    id: 1,
+                    label: 'Safety',
+                    component: SafetySettings
+                },
+                {
                     id: 2,
                     label: 'Probe',
                     component: ProbeSettings
                 },
                 {
                     id: 3,
-                    label: 'Shortcuts',
-                    component: Shortcuts
+                    label: 'Spindle/Laser',
+                    component: SpindleLaser
                 },
                 {
                     id: 4,
@@ -108,32 +113,27 @@ class PreferencesPage extends PureComponent {
                     component: VisualizerSettings
                 },
                 {
-                    id: 1,
-                    label: 'Spindle/Laser',
-                    component: SpindleLaser
-                },
-                {
-                    id: 8,
-                    label: 'Safety',
-                    component: SafetySettings
-                },
-                {
                     id: 5,
-                    label: 'Tool Change',
-                    component: Events
+                    label: 'Shortcuts',
+                    component: Shortcuts
                 },
                 {
                     id: 6,
-                    label: 'Program Events',
-                    component: ProgramEvents,
-                },
-                {
-                    id: 9,
                     label: 'Stats',
                     component: StatsPage,
                 },
                 {
                     id: 7,
+                    label: 'Program Events',
+                    component: ProgramEvents,
+                },
+                {
+                    id: 8,
+                    label: 'Tool Change',
+                    component: Events
+                },
+                {
+                    id: 9,
                     label: 'About',
                     component: About,
                 }
