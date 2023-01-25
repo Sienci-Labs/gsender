@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 
 import store from 'app/store';
 import { Toaster, TOASTER_SUCCESS, TOASTER_SHORT } from 'app/lib/toaster/ToasterLib';
@@ -59,10 +59,6 @@ const Gamepad = () => {
 
     const allShortcutsEnabled = currentProfile?.shortcuts?.every(shortcut => shortcut.isActive);
     const allShortcutsDisabled = currentProfile?.shortcuts?.every(shortcut => !shortcut.isActive);
-
-    useEffect(() => {
-        console.log(' gamepad profiles updated');
-    }, [profiles]);
 
     return (
         <div className={styles.container}>
