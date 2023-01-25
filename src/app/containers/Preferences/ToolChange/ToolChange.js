@@ -19,22 +19,27 @@ import styles from '../index.styl';
 */
 export const TOOLCHANGE_OPTIONS = {
     IGNORE: {
+        key: 'IGNORE',
         label: 'Ignore',
         description: 'All M6 commands will be commented out and the toolpath will continue to run as if it wasn\'t included.'
     },
     PAUSE: {
+        key: 'PAUSE',
         label: 'Pause',
         description: 'M6 commands will pause sending further commands but allow the user to jog, use macros, and probe.'
     },
     MANUAL: {
+        key: 'MANUAL',
         label: 'Manual',
         description: 'M6 commands will initiate a guided process through which the user will manually probe a new tool to compensate for length differences.'
     },
     SEMI: {
+        key: 'SEMI',
         label: 'Semi-Automatic',
         description: 'M6 commands will initiate a guided process through which a saved tool offset will compensate for tool length differences.'
     },
     AUTO: {
+        key: 'AUTO',
         label: 'Automatic',
         description: 'M6 will commands will initiate an almost fully automated process in which preconfigured bitsetter or probe block will be used to set the new tool length.  Limit switches required.'
     }
@@ -44,9 +49,12 @@ const ToolChange = () => {
     // State
     const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
     const [toolChangePosition, setToolChangePosition] = useState(store.get('workspace.toolChangePosition'));
-    //const [optionDescription, setOptionDescription] = useState(store.get('workspace.toolChangeOption'));
+    const [optionDescription, setOptionDescription] = useState('');
     // Handlers
-    const handleToolChange = (selection) => setToolChangeOption(selection.value);
+    const handleToolChange = (selection) => {
+        setOptionDescription(TOOLCHANGE_OPTIONS[selection.value].description);
+        return setToolChangeOption(selection.label);
+    };
 
     const handlePositionChange = (event, axis) => {
         const value = event.target.value;
@@ -78,11 +86,12 @@ const ToolChange = () => {
                     name="toolchangeoption"
                     onChange={handleToolChange}
                     options={map(TOOLCHANGE_OPTIONS, (option) => ({
-                        value: option.label,
-                        label: option.label
+                        value: option.key,
+                        label: option.label,
                     }))}
                     value={{ label: toolChangeOption }}
                 />
+                <p className={styles.description}>{optionDescription}</p>
             </div>
             {
                 toolChangeOption === 'Automatic' && (
