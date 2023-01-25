@@ -34,7 +34,7 @@ const Workspace = ({ state, actions }) => {
             <div className={styles.addMargin}>
                 <Tooltip content="Flip the location of the Visualizer with Machine Controls" location="default">
                     <ToggleSwitch
-                        label="Reverse workspace layout"
+                        label="Visualizer on right Side"
                         checked={reverseWidgets}
                         onChange={() => actions.general.setReverseWidgets()}
                         size="small"
