@@ -20,19 +20,23 @@ import styles from '../index.styl';
 export const TOOLCHANGE_OPTIONS = {
     IGNORE: {
         label: 'Ignore',
-        description: 'This is place holder text that will eventually properly describe the behaviour of this particular strategy and the steps the user will need to take.'
+        description: 'All M6 commands will be commented out and the toolpath will continue to run as if it wasn\'t included.'
+    },
+    PAUSE: {
+        label: 'Pause',
+        description: 'M6 commands will pause sending further commands but allow the user to jog, use macros, and probe.'
     },
     MANUAL: {
         label: 'Manual',
-        description: 'This is place holder text that will eventually properly describe the behaviour of this particular strategy and the steps the user will need to take.'
+        description: 'M6 commands will initiate a guided process through which the user will manually probe a new tool to compensate for length differences.'
     },
     SEMI: {
         label: 'Semi-Automatic',
-        description: 'This is place holder text that will eventually properly describe the behaviour of this particular strategy and the steps the user will need to take.'
+        description: 'M6 commands will initiate a guided process through which a saved tool offset will compensate for tool length differences.'
     },
     AUTO: {
         label: 'Automatic',
-        description: 'This is place holder text that will eventually properly describe the behaviour of this particular strategy and the steps the user will need to take.'
+        description: 'M6 will commands will initiate an almost fully automated process in which preconfigured bitsetter or probe block will be used to set the new tool length.  Limit switches required.'
     }
 };
 
@@ -40,6 +44,7 @@ const ToolChange = () => {
     // State
     const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
     const [toolChangePosition, setToolChangePosition] = useState(store.get('workspace.toolChangePosition'));
+    //const [optionDescription, setOptionDescription] = useState(store.get('workspace.toolChangeOption'));
     // Handlers
     const handleToolChange = (selection) => setToolChangeOption(selection.value);
 
