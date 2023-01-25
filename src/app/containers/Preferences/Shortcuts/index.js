@@ -26,6 +26,12 @@ const tabs = [
     },
 ];
 
+const printButtonStyles = {
+    position: 'absolute',
+    top: '1.3em',
+    left: '26em',
+};
+
 const Shortcuts = ({ active }) => {
     const [tab, setTab] = useState(0);
     const componentRef = useRef();
@@ -34,7 +40,7 @@ const Shortcuts = ({ active }) => {
             <TabbedWidget>
                 <ReactToPrint
                     trigger={() => {
-                        return <Button>Print</Button>;
+                        return <Button style={printButtonStyles}>Print</Button>;
                     }}
                     content={() => componentRef.current}
                 />
