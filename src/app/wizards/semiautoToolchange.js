@@ -51,7 +51,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Safety First',
-                    description: 'PH COPY - Turn off router or verify that spindle is off.  Save current modals and position',
+                    description: () => <div>If using a router, manually turn it off.  Click the below button to save current position and modals, and turn off spindle if active.</div>,
                     overlay: false,
                     actions: [
                         {
@@ -84,7 +84,7 @@ const wizard = {
                 },
                 {
                     title: 'Position above touchplate',
-                    description: 'PH COPY - Jog the router into position, about 10mm above the touchplate.',
+                    description: 'Jog the router into position, about 10mm above the touchplate.',
                     overlay: false,
                 },
             ]
@@ -94,7 +94,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Probe Initial Tool Length or confirm',
-                    description: 'PH COPY - If you haven\'t probed your initial tool length, do so now by pressing \'Probe Tool Length\'.  Otherwise, continue.',
+                    description: 'If you haven\'t probed your initial tool length, do so now by pressing \'Probe Tool Length\'.  Otherwise, press continue.',
                     overlay: false,
                     actions: [
                         {
@@ -134,12 +134,12 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => `PH COPY - Change tool to requested bit - ${getToolString()}.`,
+                    description: () => `Change tool to requested bit - ${getToolString()}.`,
                     overlay: false
                 },
                 {
                     title: 'Probe',
-                    description: 'PH COPY - Move back about 10mm above touchplate and re-probe.',
+                    description: 'Probe new tool length - the following code will move back about 10mm above touchplate and re-probe.',
                     overlay: false,
                     actions: [
                         {
@@ -168,7 +168,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Resume Program',
-                    description: 'PH COPY - Move router back to initial position, restore modals, turn it on, resume cutting.',
+                    description: 'The following code will move router back to initial position, restore modals, turn it on, and prepare you to resume cutting.',
                     overlay: false,
                     actions: [
                         {
