@@ -26,7 +26,7 @@ const Connection = ({ state, actions }) => {
             <div className={styles.reconnect}>
                 <Tooltip content="Reconnect to the last machine you used automatically" location="default">
                     <ToggleSwitch
-                        label="Re-connect automatically"
+                        label="Reconnect Automatically"
                         checked={autoReconnect}
                         onChange={() => actions.general.setAutoReconnect()}
                         size="small"
