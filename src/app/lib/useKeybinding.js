@@ -1,6 +1,11 @@
 import combokeys from './combokeys';
 import store from '../store';
 import shuttleEvents from './shuttleEvents';
+import { MACRO_CATEGORY } from '../constants';
+
+const TARGET_NUM_CALLS = 9; // this is the current number of widgets that use the useKeybinding hook
+let numCalls = 0; // number of useKeybinding hooks that have been called
+
 /*
     shuttleControlEvents structure:
     {
@@ -79,6 +84,17 @@ function useKeybinding(shuttleControlEvents) {
             store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
         }
     });
+
+    numCalls++;
+    checkNumCalls();
+}
+
+// check to see if all widgets have added their keybindings
+// and call the remove function
+function checkNumCalls() {
+    if (numCalls === TARGET_NUM_CALLS) {
+        removeOldKeybindings();
+    }
 }
 
 export function removeOldKeybindings() {
@@ -89,7 +105,7 @@ export function removeOldKeybindings() {
     // remove keybindings that don't exist in any of the shuttleControlEvents arrays
     currentCommandKeys.forEach(key => {
         const event = allShuttleControlEvents.find(event => event.cmd === key.cmd);
-        if (event === undefined) {
+        if (event === undefined && key.category !== MACRO_CATEGORY) {
             let keyToRemove = updatedCommandKeys.find(el => el.cmd === key.cmd);
             updatedCommandKeys.splice(updatedCommandKeys.findIndex(el => el === keyToRemove), 1);
         }

@@ -40,10 +40,10 @@ class AutoUpdater {
         if (process.platform !== 'darwin') {
             return;
         }
-
-        autoUpdater.addListener('update-available', (event) => {
-            log.debug('A new update is available');
-        });
+        //This does not work for windows.
+        // autoUpdater.addListener('update-available', (event) => {
+        //     log.debug('A new update is available');
+        // });
         // On Windows only `releaseName` is available.
         autoUpdater.addListener('update-downloaded', (event, releaseNotes, releaseName, releaseDate, updateURL) => {
             const title = 'A new update is ready to install';

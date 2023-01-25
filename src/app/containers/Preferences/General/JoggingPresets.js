@@ -34,6 +34,8 @@ import styles from '../index.styl';
 import { convertToImperial, convertToMetric } from '../calculate';
 
 export default class JoggingPresets extends Component {
+    pubsubTokens = []
+
     state = {
         units: store.get('workspace.units'),
         jogSpeeds: this.getJogSpeeds(),
@@ -49,13 +51,19 @@ export default class JoggingPresets extends Component {
     }, 5000, { trailing: false });
 
     componentDidMount() {
-        pubsub.subscribe('units:change', (msg, units) => {
-            this.updateState(units);
-        });
+        const tokens = [
+            pubsub.subscribe('units:change', (msg, units) => {
+                this.updateState(units);
+            })
+        ];
+        this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
 
     componentWillUnmount() {
-        pubsub.unsubscribe('units:change');
+        this.pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.pubsubTokens = [];
     }
 
     getJogSpeeds() {

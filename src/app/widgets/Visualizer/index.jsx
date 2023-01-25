@@ -752,11 +752,6 @@ class VisualizerWidget extends PureComponent {
             units: store.get('workspace.units', METRIC_UNITS),
             theme: this.config.get('theme'),
             showSoftLimitsWarning: this.config.get('showSoftLimitsWarning', false),
-            controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
-            },
             workflow: {
                 state: controller.workflow.state
             },
@@ -1331,6 +1326,11 @@ class VisualizerWidget extends PureComponent {
         const { renderState, isSecondary, gcode, surfacingData, activeVisualizer, activeState, alarmCode, workflow, isConnected } = this.props;
         const state = {
             ...this.state,
+            controller: {
+                type: controller.type,
+                settings: controller.settings,
+                state: controller.state
+            },
             alarmCode,
             activeState,
             workflow,

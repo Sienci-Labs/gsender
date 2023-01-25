@@ -26,6 +26,8 @@ import pubsub from 'pubsub-js';
 import styles from '../index.styl';
 
 const ColorCircle = ({ part, onClick, colour, index }) => {
+    let pubsubTokens = [];
+
     useEffect(() => {
         document.getElementById('colorButton' + index).style.backgroundColor = colour;
         subscribe();
@@ -35,16 +37,22 @@ const ColorCircle = ({ part, onClick, colour, index }) => {
     }, []);
 
     const subscribe = () => {
-        pubsub.subscribe('colour:change', (msg, data) => {
-            const { currentPart, newColour } = data;
-            if (currentPart === part) {
-                document.getElementById('colorButton' + index).style.backgroundColor = newColour.hex ? newColour.hex : newColour;
-            }
-        });
+        const tokens = [
+            pubsub.subscribe('colour:change', (msg, data) => {
+                const { currentPart, newColour } = data;
+                if (currentPart === part) {
+                    document.getElementById('colorButton' + index).style.backgroundColor = newColour.hex ? newColour.hex : newColour;
+                }
+            })
+        ];
+        pubsubTokens = pubsubTokens.concat(tokens);
     };
 
     const unsubscribe = () => {
-        pubsub.unsubscribe('colour:change');
+        pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        pubsubTokens = [];
     };
 
     return (

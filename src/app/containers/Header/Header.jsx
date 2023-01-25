@@ -313,15 +313,19 @@ class Header extends PureComponent {
 
     registerIPCListeners () {
         window.ipcRenderer.on('update_available', (info) => {
-            this.setState({
-                updateAvailable: true
+            api.getShouldInstallUpdates().then((res) => {
+                if (res.body) {
+                    this.setState({
+                        updateAvailable: true
+                    });
+                    pubsub.publish('showUpdateToast', info);
+                }
             });
-            pubsub.publish('showUpdateToast', info);
         });
     }
 
     updateScreenSize = () => {
-        const isMobile = window.visualViewport.width / window.visualViewport.height <= 0.5625;
+        const isMobile = window.visualViewport.width <= 599;
         this.setState({
             mobile: isMobile
         });

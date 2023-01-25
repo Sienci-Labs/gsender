@@ -9,7 +9,7 @@ const Tooltip = ({ location, content, disabled, children, style, wrapperStyle, w
             placement={location === 'default' ? 'bottom' : location}
             enterDelay={1000}
             disabled={disabled}
-            tooltipStyle={style}
+            tooltipStyle={{ zIndex: 10001, ...style }}
         >
             <div style={wrapperStyle} className={wrapperClassName}>
                 {children}
