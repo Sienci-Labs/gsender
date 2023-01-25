@@ -82,10 +82,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, fi
                     isActive: currentShortcut.id === shortcut.id ? true : currentShortcut.isActive,
                 }));
 
-         //TODO
-         //Commented on merge conflict
-         //No such variables declared/imported anywhere on this file
-        //filter(filterCategory, newShortcutsArr);
+        filter(filterCategory, newShortcutsArr);
 
         const profiles = store.get('workspace.gamepad.profiles', []);
 
