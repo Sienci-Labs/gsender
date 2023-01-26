@@ -28,7 +28,7 @@ import isOnline from 'is-online';
 
 import config from '../services/configstore';
 import pkg from '../../package.json';
-import { ERR_BAD_REQUEST } from '../constants';
+import { ERR_BAD_REQUEST, ERR_INTERNAL_SERVER_ERROR } from '../constants';
 
 const CONFIG_KEY = 'metrics';
 
@@ -60,10 +60,11 @@ export const sendData = async (_, res) => {
         arch: os.arch(),
     };
 
-    const ENDPOINT = process.env;
+    const ENDPOINT = global.METRICS_ENDPOINT;
+    const NODE_ENV = global.NODE_ENV;
 
     //Don't need to ping the API
-    if (process.env.NODE_ENV === 'development') {
+    if (NODE_ENV === 'development') {
         res.json({ message: 'Mock 200 status return' });
         return;
     }
@@ -80,13 +81,6 @@ export const sendData = async (_, res) => {
 
         res.status(201).json(metricsRes.data);
     } catch (error) {
-        // If Metrics app is not running locally during development
-        // we can just send a mock 200 response so the client doesnt throw an error
-        if (error.code === 'ECONNREFUSED' && process.env.NODE_ENV === 'development') {
-            res.json({ message: 'Mock 200 OK status return' });
-            return;
-        }
-
-        res.json({ error, env: process.env });
+        res.status(ERR_INTERNAL_SERVER_ERROR).json({ error });
     }
 };
