@@ -214,3 +214,9 @@ export const PROGRAM_EVENTS = [
     PROGRAM_PAUSE,
     PROGRAM_RESUME
 ];
+
+export const USER_DATA_COLLECTION = {
+    INITIAL: 'INITIAL',
+    ACCEPTED: 'ACCEPTED',
+    REJECTED: 'REJECTED',
+};
