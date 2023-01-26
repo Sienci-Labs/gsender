@@ -29,6 +29,7 @@ import GeneralArea from '../components/GeneralArea';
 import Workspace from './Workspace';
 import Settings from './Settings';
 import CustomDecimalPlaces from './CustomDecimalPlaces';
+import DataCollection from './DataCollection';
 
 const General = ({ active, state, actions }) => {
     return (
@@ -44,6 +45,7 @@ const General = ({ active, state, actions }) => {
                 <GeneralArea.Half>
                     <CustomDecimalPlaces state={state} actions={actions} />
                     <Settings />
+                    <DataCollection />
                 </GeneralArea.Half>
 
             </GeneralArea>
