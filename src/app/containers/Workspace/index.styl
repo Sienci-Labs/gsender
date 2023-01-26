@@ -22,6 +22,7 @@
  */
 
 @import '../variables';
+@import '../styles/sienci-theme';
 
 
 ::root {
@@ -163,9 +164,10 @@
         }
     }
 
-.reverse-workspace {
-    flex-direction: row-reverse;
-}
+    .reverse-workspace {
+        flex-direction: row-reverse;
+    }
+
     .primary-toggler {
         border-right: 1px solid #ccc;
     }
@@ -187,5 +189,82 @@
 @media (max-width: 599px) {
     .primary-container{
         min-height: 650px;
+    }
+}
+
+.consent-popup {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    background: $primary;
+    width: 100%;
+    height: 200px;
+    z-index: 999;
+    padding: 1rem;
+
+    animation: consent-popup-animation 2s forwards;
+    animation-delay: 2s;
+
+    transform: translate(0, 200px);
+
+    .close-area {
+        display: flex;
+        justify-content: flex-end;
+
+        button {
+            padding: 0.25rem 0.5rem;
+            background-color: transparent;
+            color: white;
+            border: none;
+            animation: background-color 250ms ease-in-out;
+
+            &:hover {
+                background-color: white;
+                color: $primary;
+                animation: background-color 250ms ease-in-out;
+            }
+        }
+
+        i {
+            font-size: 2rem !important;
+        }
+    }
+}
+
+.consent-area {
+    display: flex;
+    justify-self: center;
+    align-self: center;
+    color: white;
+    height: 100%;
+    align-items: center;
+
+    h2 {
+        color: white;
+        margin: 0 0 0.5rem 0;
+    }
+
+    p {
+        font-size: 1.25rem;
+    }
+
+    i {
+        font-size: 4rem !important;
+        margin-right: 2rem;
+    }
+}
+
+@keyframes consent-popup-animation {
+    from {
+        transform: translate(0, 200px);
+    }
+    
+    to {
+        transform: translate(0);
     }
 }
