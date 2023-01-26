@@ -442,7 +442,7 @@ class Workspace extends PureComponent {
                 await api.metrics.sendData();
             // eslint-disable-next-line no-empty
             } catch (error) {
-                //Not connected to the internet or metrics API failed to return a response
+                console.log(error);
             }
         }
     }
