@@ -796,6 +796,25 @@ log.printLog = (msg, file, lineNumber, level) => new Promise((resolve, reject) =
         });
 });
 
+
+//
+// Metrics
+//
+const metrics = {};
+
+metrics.sendData = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/metrics/sendData')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 export default {
     //OS
     getLatestVersion,
@@ -833,5 +852,8 @@ export default {
     file,
 
     // Log
-    log
+    log,
+
+    // Metrics
+    metrics,
 };
