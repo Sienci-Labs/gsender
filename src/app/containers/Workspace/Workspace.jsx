@@ -27,12 +27,13 @@ import Dropzone from 'react-dropzone';
 import isElectron from 'is-electron';
 import pubsub from 'pubsub-js';
 import Header from 'app/containers/Header';
-import React, { PureComponent } from 'react';
+import React, { PureComponent, createRef } from 'react';
 import { withRouter } from 'react-router-dom';
 import api from 'app/api';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import {
-    WORKFLOW_STATE_IDLE
+    WORKFLOW_STATE_IDLE,
+    USER_DATA_COLLECTION
 } from 'app/constants';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
@@ -55,6 +56,7 @@ import {
 import UpdateAvailableAlert from './UpdateAvailableAlert/UpdateAvailableAlert';
 import Toaster from '../../lib/toaster/Toaster';
 import ConfirmationDialog from '../../components/ConfirmationDialog/ConfirmationDialog';
+import DataCollectionPopup from './DataCollectionPopup';
 
 
 const WAIT = '%wait';
@@ -147,6 +149,8 @@ class Workspace extends PureComponent {
     primaryWidgets = null;
 
     defaultContainer = null;
+
+    dataCollectionRef = createRef()
 
     controllerEvents = {
         'hPong': () => {
@@ -420,11 +424,35 @@ class Workspace extends PureComponent {
         });
     };
 
+    handleCollectUserData = async () => {
+        const { INITIAL, ACCEPTED, REJECTED } = USER_DATA_COLLECTION;
+        const collectUserData = store.get('workspace.collectUserData', USER_DATA_COLLECTION.INITIAL);
+
+        if (collectUserData === REJECTED) {
+            return;
+        }
+
+        if (collectUserData === INITIAL) {
+            this.dataCollectionRef.current.show();
+            return;
+        }
+
+        if (collectUserData === ACCEPTED) {
+            try {
+                await api.metrics.sendData();
+            // eslint-disable-next-line no-empty
+            } catch (error) {
+                //Not connected to the internet or metrics API failed to return a response
+            }
+        }
+    }
+
     componentDidMount() {
         this.updateScreenSize();
         this.addControllerEvents();
         this.addResizeEventListener();
         this.subscribe();
+        this.handleCollectUserData();
 
         setTimeout(() => {
             // A workaround solution to trigger componentDidUpdate on initial render
@@ -580,6 +608,7 @@ class Workspace extends PureComponent {
                         <div className={tableStyle}>
                             <UpdateAvailableAlert restartHandler={this.action.sendRestartCommand} />
                             <Toaster />
+                            <DataCollectionPopup ref={this.dataCollectionRef} />
                             <Header />
                             <ConfirmationDialog />
                             <div className={classNames(rowStyle, { [styles.reverseWorkspace]: reverseWidgets })}>
