@@ -203,21 +203,21 @@
 
     background: $primary;
     width: 100%;
-    height: 200px;
+    height: 250px;
     z-index: 999;
     padding: 1rem;
 
     animation: consent-popup-animation 2s forwards;
     animation-delay: 2s;
 
-    transform: translate(0, 200px);
+    transform: translate(0, 250px);
 
     .close-area {
         display: flex;
         justify-content: flex-end;
 
         button {
-            padding: 0.25rem 0.5rem;
+            padding: 0.25rem 0.5rem 0.1rem;
             background-color: transparent;
             color: white;
             border: none;
@@ -243,6 +243,7 @@
     color: white;
     height: 100%;
     align-items: center;
+    padding: 0 3rem;
 
     h2 {
         color: white;
@@ -261,7 +262,7 @@
 
 @keyframes consent-popup-animation {
     from {
-        transform: translate(0, 200px);
+        transform: translate(0, 250px);
     }
     
     to {

@@ -1,21 +1,39 @@
-import React, { useState } from 'react';
-import store from 'app/store';
+import React, { useEffect, useState } from 'react';
 
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import { USER_DATA_COLLECTION } from 'app/constants';
+import api from 'app/api';
 
 import Fieldset from '../components/Fieldset';
 
+const useGetCollectDataStatus = () => {
+    const [data, setData] = useState(USER_DATA_COLLECTION.INITIAL);
+
+    const retrieveData = async () => {
+        const res = await api.metrics.getCollectDataStatus();
+
+        const collectUserDataStatus = res.body.collectUserDataStatus;
+
+        setData(collectUserDataStatus);
+    };
+
+    useEffect(() => {
+        retrieveData();
+    }, []);
+
+    return [data, setData];
+};
+
 const DataCollection = () => {
-    const [collectUserData, setCollectUserData] = useState(store.get('workspace.collectUserData'));
+    const [collectUserData, setCollectUserData] = useGetCollectDataStatus();
 
-    const handleCollectDataToggle = (toggled) => {
-        const val = toggled ? USER_DATA_COLLECTION.ACCEPTED : USER_DATA_COLLECTION.REJECTED;
+    const handleCollectDataToggle = async (toggled) => {
+        const status = toggled ? USER_DATA_COLLECTION.ACCEPTED : USER_DATA_COLLECTION.REJECTED;
 
-        setCollectUserData(val);
+        await api.metrics.toggleCollectDataStatus({ collectUserDataStatus: status });
 
-        store.replace('workspace.collectUserData', val);
+        setCollectUserData(status);
     };
 
     return (

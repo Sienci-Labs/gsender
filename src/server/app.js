@@ -352,6 +352,8 @@ const appMain = () => {
         app.post(urljoin(settings.route, 'api/watch/file'), api.watch.readFile);
 
         // Metrics
+        app.get(urljoin(settings.route, 'api/metrics/collectUserData'), api.metrics.getCollectDataStatus);
+        app.post(urljoin(settings.route, 'api/metrics/collectUserData'), api.metrics.toggleCollectData);
         app.post(urljoin(settings.route, 'api/metrics/sendData'), api.metrics.sendData);
 
         // Files - with multer

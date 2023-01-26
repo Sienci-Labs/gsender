@@ -29,7 +29,6 @@ import {
     SPIRAL_MOVEMENT,
     START_POSITION_BACK_LEFT,
     SPINDLE_MODES,
-    USER_DATA_COLLECTION
 } from 'app/constants';
 import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 
@@ -47,7 +46,6 @@ const defaultState = {
         reverseWidgets: false,
         safeRetractHeight: 0,
         customDecimalPlaces: 0,
-        collectUserData: USER_DATA_COLLECTION.INITIAL,
         jobsFinished: 0,
         jobsCancelled: 0,
         timeSpentRunning: 0,
