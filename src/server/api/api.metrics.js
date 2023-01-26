@@ -60,6 +60,8 @@ export const sendData = async (_, res) => {
         arch: os.arch(),
     };
 
+    const ENDPOINT = process.env;
+
     //Don't need to ping the API
     if (process.env.NODE_ENV === 'development') {
         res.json({ message: 'Mock 200 status return' });
@@ -74,7 +76,7 @@ export const sendData = async (_, res) => {
     }
 
     try {
-        const metricsRes = await axios.post('http://localhost:3000/api/metrics', payload);
+        const metricsRes = await axios.post(ENDPOINT, payload);
 
         res.status(201).json(metricsRes.data);
     } catch (error) {
@@ -84,5 +86,7 @@ export const sendData = async (_, res) => {
             res.json({ message: 'Mock 200 OK status return' });
             return;
         }
+
+        res.json({ error, env: process.env });
     }
 };
