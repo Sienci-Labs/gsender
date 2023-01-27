@@ -35,7 +35,7 @@ const log = logger('api:events');
 const CONFIG_KEY = 'events';
 
 const getSanitizedRecords = () => {
-    const records = config.get(CONFIG_KEY, []);
+    const records = config.get(CONFIG_KEY, {});
 
     let shouldUpdate = false;
     records.forEach((value, key) => {
@@ -69,6 +69,7 @@ const getSanitizedRecords = () => {
 
 export const fetch = (req, res) => {
     const records = getSanitizedRecords();
+    console.log(records);
     res.send({ jsonRecords: Object.fromEntries(records) });
 };
 

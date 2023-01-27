@@ -25,6 +25,7 @@
 import fs from 'fs';
 import path from 'path';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import compress from 'compression';
 import cookieParser from 'cookie-parser';
 import multer from 'multer';
@@ -118,6 +119,9 @@ const appMain = () => {
 
         log.debug('app.settings: %j', app.settings);
     }
+
+    // Cors
+    app.use(cors());
 
     // Setup i18n (i18next)
     i18next

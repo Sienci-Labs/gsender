@@ -190,6 +190,7 @@
     "connect-restreamer": "~1.0.3",
     "consolidate": "~0.15.1",
     "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
     "debug": "~4.1.1",
     "deep-keys": "~0.5.0",
     "detect-browser": "~4.4.0",
