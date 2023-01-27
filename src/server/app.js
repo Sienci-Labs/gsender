@@ -38,7 +38,7 @@ import session from 'express-session';
 import 'hogan.js';
 import i18next from 'i18next';
 import Backend from 'i18next-fs-backend';
-import jwt from 'jsonwebtoken';
+//import jwt from 'jsonwebtoken';
 import methodOverride from 'method-override';
 import morgan from 'morgan';
 import favicon from 'serve-favicon';
@@ -62,7 +62,7 @@ import errserver from './lib/middleware/errserver';
 import config from './services/configstore';
 import {
     authorizeIPAddress,
-    validateUser
+    //validateUser
 } from './access-control';
 import {
     ERR_FORBIDDEN
@@ -237,7 +237,7 @@ const appMain = () => {
             credentialsRequired: true
         }));
 
-        app.use(async (err, req, res, next) => {
+        app.use((err, req, res, next) => {
             let bypass = !(err && (err.name === 'UnauthorizedError'));
 
             // Check whether the app is running in development mode
@@ -254,11 +254,11 @@ const appMain = () => {
 
             if (!bypass) {
                 // Check whether the provided credential is correct
-                const token = _get(req, 'query.token') || _get(req, 'body.token');
+                //const token = _get(req, 'query.token') || _get(req, 'body.token');
                 try {
                     // User Validation
-                    const user = jwt.verify(token, settings.secret) || {};
-                    await validateUser(user);
+                    //const user = jwt.verify(token, settings.secret) || {};
+                    //await validateUser(user);
                     bypass = true;
                 } catch (err) {
                     log.warn(err);
