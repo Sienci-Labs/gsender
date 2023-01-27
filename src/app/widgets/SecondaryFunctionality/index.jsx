@@ -152,10 +152,6 @@ class SecondaryFunctionality extends PureComponent {
             isFullscreen: false,
             disabled: this.config.get('disabled'),
             port: controller.port,
-            controller: {
-                type: controller.type,
-                state: controller.state
-            },
             selectedTab: 0,
             tabs: [
                 {

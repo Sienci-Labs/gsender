@@ -21,6 +21,7 @@
  *
  */
 import controller from 'app/lib/controller';
+import React from 'react';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import { get } from 'lodash';
@@ -51,7 +52,8 @@ const wizard = {
             substeps: [
                 {
                     title: 'Safety First',
-                    description: 'PH COPY - Turn off router or verify that spindle is off.  Save current modals and position',
+                    description: () => <div>If using a router, manually turn it off.  Click the below button to save current position and modals, and turn off spindle if active.</div>,
+                    overlay: false,
                     actions: [
                         {
                             label: 'Save Positions and Modals',
@@ -83,7 +85,8 @@ const wizard = {
                 },
                 {
                     title: 'Position above touchplate',
-                    description: 'PH COPY - Jog the router into position, about 10mm above the touchplate.'
+                    description: 'Jog the router into position, about 10mm above the touchplate.',
+                    overlay: false,
                 },
             ]
         },
@@ -92,7 +95,8 @@ const wizard = {
             substeps: [
                 {
                     title: 'Probe Initial Tool Length or confirm',
-                    description: 'PH COPY - If you haven\'t probed your initial tool length, do so now by pressing \'Probe Tool Length\'.  Otherwise, continue.',
+                    description: 'If you haven\'t probed your initial tool length, do so now by pressing \'Probe Tool Length\'.  Otherwise, press continue.',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Probe Initial Tool Length',
@@ -101,8 +105,8 @@ const wizard = {
                                     '(This is 10 above configured location)',
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    '%wait',
                                     'G0 Z10',
+                                    '%wait',
                                     'G38.2 Z-15 F40',
                                     'G4 P0.3',
                                     '%global.toolchange.TOOL_OFFSET=posz',
@@ -131,11 +135,13 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => `PH COPY - Change tool to requested bit - ${getToolString()}.`,
+                    description: () => `Change tool to requested bit - ${getToolString()}.`,
+                    overlay: false
                 },
                 {
                     title: 'Probe',
-                    description: 'PH COPY - Move back about 10mm above touchplate and re-probe.',
+                    description: 'Probe new tool length - the following code will move back about 10mm above touchplate and re-probe.',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Probe New Tool Length',
@@ -144,7 +150,8 @@ const wizard = {
                                 controller.command('gcode', [
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z10',
+                                    'G0 Z12',
+                                    '%wait',
                                     'G38.2 Z-15 F40',
                                     'G4 P0.3',
                                     '(Set Z to Tool offset and wait)',
@@ -163,7 +170,8 @@ const wizard = {
             substeps: [
                 {
                     title: 'Resume Program',
-                    description: 'PH COPY - Move router back to initial position, restore modals, turn it on, resume cutting.',
+                    description: 'The following code will move router back to initial position, restore modals, turn it on, and prepare you to resume cutting.',
+                    overlay: false,
                     actions: [
                         {
                             label: 'Prepare for Resume',

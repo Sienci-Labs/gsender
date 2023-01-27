@@ -206,7 +206,6 @@ const Alignment = ({ onClose }) => {
                         <>
                             <div className={styles.alignmentContainer}>
                                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                    <h4 style={{ margin: 0 }}>XY Squaring</h4>
                                     {
                                         !introComplete && <ToolIntroduction readyHandler={startTool} />
                                     }

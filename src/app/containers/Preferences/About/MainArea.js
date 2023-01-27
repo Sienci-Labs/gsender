@@ -8,7 +8,7 @@ import releases from './releases.json';
 
 const MainArea = () => {
     return (
-        <div style={{ height: "80%" }}>
+        <div style={{ height: "540px" }}>
             <div className={styles.section} style={{ height: "10%" }}>
                 <p style={{ marginTop: '1rem' }}>
                     gSender is a a free GRBL CNC control software that is

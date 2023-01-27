@@ -21,6 +21,7 @@ const Theme = ({ state, actions }) => {
     const { theme } = state.visualizer;
     const [isOpen, setIsOpen] = useState(false);
     const [currentPart, setCurrentPart] = useState(PARTS_LIST[0]);
+    const [hasChanges, setHasChanges] = useState(false);
     const fileLoaded = useSelector(store => store.file.fileLoaded);
 
     const getThemeColours = (theme) => {
@@ -29,7 +30,8 @@ const Theme = ({ state, actions }) => {
         return colourMap;
     };
 
-    const [themeColours, setThemeColours] = useState(getThemeColours(theme));
+    const [themeColours, setThemeColours] = useState(getThemeColours(theme)); // tracks all your unsaved changes
+    const [savedThemeColours, setSavedThemeColours] = useState(getThemeColours(theme)); // tracks all the colours that have been saved
 
     const themeRenderer = (option) => {
         const style = {
@@ -53,14 +55,22 @@ const Theme = ({ state, actions }) => {
     };
 
     const chooseColour = (colour) => {
-        let newThemeColours = themeColours;
-        newThemeColours.set(currentPart, colour.hex ? colour.hex : colour);
+        const newColour = colour.hex ? colour.hex : colour;
+        const newThemeColours = themeColours;
+        newThemeColours.set(currentPart, newColour);
         setThemeColours(newThemeColours);
         let data = {
             currentPart: currentPart,
             newColour: colour
         };
         pubsub.publish('colour:change', data);
+
+        // check if the new colour is different than the one that's currently saved
+        if (savedThemeColours.get(currentPart) !== newColour) {
+            setHasChanges(true);
+        } else {
+            setHasChanges(false);
+        }
     };
 
     return (
@@ -78,6 +88,7 @@ const Theme = ({ state, actions }) => {
                             onChange={(value) => {
                                 actions.visualizer.handleThemeChange(value);
                                 setThemeColours(getThemeColours(value.value));
+                                setSavedThemeColours(getThemeColours(value.value));
                             }}
                             options={map(ALL_THEMES, (value) => ({
                                 value: value,
@@ -95,13 +106,17 @@ const Theme = ({ state, actions }) => {
             { CUSTOMIZABLE_THEMES.includes(theme) && !fileLoaded && (
                 <Fieldset legend="Colours">
                     <div className={styles.addMargin}>
+                        <small className={styles.subHeading}>Click the Save button below to keep your changes.</small>
                         <Tooltip content="Save your changes" location="default">
                             <button
                                 className={styles.saveColour}
                                 type="button"
                                 onClick={() => {
                                     actions.visualizer.handleCustThemeChange(themeColours, theme);
+                                    setHasChanges(false);
+                                    setSavedThemeColours(new Map(themeColours));
                                 }}
+                                disabled={!hasChanges}
                             >
                                 Save
                             </button>

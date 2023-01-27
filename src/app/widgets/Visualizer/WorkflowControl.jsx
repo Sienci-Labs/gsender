@@ -60,7 +60,8 @@ import {
     WORKFLOW_STATE_RUNNING,
     VISUALIZER_PRIMARY, LASER_MODE,
     METRIC_UNITS,
-    GRBL_ACTIVE_STATE_HOME
+    GRBL_ACTIVE_STATE_HOME,
+    IMPERIAL_UNITS
 } from '../../constants';
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
@@ -68,7 +69,7 @@ import { addRecentFile, createRecentFile, createRecentFileFromRawPath } from './
 import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
 import { outlineResponse } from '../../workers/Outline.response';
 import { shouldVisualizeSVG } from '../../workers/Visualize.response';
-
+import Tooltip from '../../components/TooltipCustom/ToolTip';
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
@@ -88,6 +89,7 @@ class WorkflowControl extends PureComponent {
 
     getInitialState() {
         return {
+            units: store.get('workspace.units', METRIC_UNITS),
             testStarted: false,
             fileLoaded: true,
             closeFile: false,
@@ -96,9 +98,11 @@ class WorkflowControl extends PureComponent {
             runHasStarted: false,
             startFromLine: {
                 showModal: false,
-                showChoiceModal: false,
+                needsRecovery: false,
                 value: 1,
-                waitForHoming: false
+                waitForHoming: false,
+                safeHeight: store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 10 : 0.4,
+                defaultSafeHeight: store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 10 : 0.4
             },
         };
     }
@@ -326,8 +330,13 @@ class WorkflowControl extends PureComponent {
     }
 
     handleStartFromLine = () => {
-        this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false, showChoiceModal: false } }));
-        controller.command('gcode:start', this.state.startFromLine.value, this.props.zMax);
+        const { zMax } = this.props;
+        const { units } = this.state;
+        const { value, safeHeight } = this.state.startFromLine;
+
+        this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false, needsRecovery: false } }));
+        const newSafeHeight = units === IMPERIAL_UNITS ? safeHeight * 25.4 : safeHeight;
+        controller.command('gcode:start', value, zMax, newSafeHeight);
 
         Toaster.pop({
             msg: 'Running Start From Specific Line Command',
@@ -338,8 +347,8 @@ class WorkflowControl extends PureComponent {
 
     moveToWCSZero = () => {
         const { homingEnabled } = this.props;
+        const { units } = this.state;
         const safeRetractHeight = store.get('workspace.safeRetractHeight');
-        const units = store.get('workspace.units', METRIC_UNITS);
         const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
 
         if (safeRetractHeight !== 0) {
@@ -357,7 +366,8 @@ class WorkflowControl extends PureComponent {
         this.setState(prev => ({
             startFromLine: {
                 ...prev.startFromLine,
-                showChoiceModal: true,
+                showModal: true,
+                needsRecovery: true,
                 waitForHoming: false
             }
         }));
@@ -384,6 +394,9 @@ class WorkflowControl extends PureComponent {
                         waitForHoming: true
                     }
                 }));
+            }),
+            pubsub.subscribe('units:change', (msg, units) => {
+                this.changeUnits(units);
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -396,12 +409,30 @@ class WorkflowControl extends PureComponent {
         this.pubsubTokens = [];
     }
 
+    changeUnits(newUnits) {
+        const { safeHeight } = this.state.startFromLine;
+        const newSafeHeight = newUnits === METRIC_UNITS ? (safeHeight * 25.4).toFixed(1) : (safeHeight / 25.4).toFixed(1);
+        const newDefaultSafeHeight = newUnits === METRIC_UNITS ? 10 : 0.4;
+
+        this.setState({
+            units: newUnits,
+        }, () => {
+            this.setState(prev => ({
+                startFromLine: {
+                    ...prev.startFromLine,
+                    safeHeight: newSafeHeight,
+                    defaultSafeHeight: newDefaultSafeHeight
+                }
+            }));
+        });
+    }
+
 
     render() {
         const { cameraPosition } = this.props.state;
         const { camera } = this.props.actions;
         const { handleOnStop } = this;
-        const { runHasStarted } = this.state;
+        const { runHasStarted, units } = this.state;
         const { fileLoaded, actions, workflowState, isConnected, senderInHold, activeState, lineTotal } = this.props;
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
@@ -411,7 +442,7 @@ class WorkflowControl extends PureComponent {
         const canStop = isReady && includes([WORKFLOW_STATE_RUNNING, WORKFLOW_STATE_PAUSED], workflowState);
         const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
-        const { showModal, showChoiceModal, value } = this.state.startFromLine;
+        const { showModal, needsRecovery, value, safeHeight, defaultSafeHeight } = this.state.startFromLine;
         const renderSVG = shouldVisualizeSVG();
 
         return (
@@ -491,7 +522,7 @@ class WorkflowControl extends PureComponent {
                                     onClick={this.startRun}
                                     disabled={!isConnected}
                                 >
-                                    {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
+                                    {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb', marginLeft: '5px' }} />
                                 </button>
                                 {
                                     !workflowPaused && (
@@ -582,108 +613,80 @@ class WorkflowControl extends PureComponent {
                 {
                     showModal && (
                         <Modal onClose={() => {
-                            this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false } }));
+                            this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false, needsRecovery: false } }));
                             actions.closeModal();
                         }}
                         >
                             <Modal.Header className={styles.modalHeader}>
-                                <Modal.Title>Start From Line</Modal.Title>
+                                <Modal.Title>{needsRecovery ? 'Recovery: Start From Line' : 'Start From Line'}</Modal.Title>
                             </Modal.Header>
-                            <Modal.Body>
-                                <div className={styles.runProbeBody}>
-                                    <div className={styles.left}>
-                                        <div className={styles.greyText}>
+                            <Modal.Body style={{ backgroundColor: '#e5e7eb' }}>
+                                <div className={styles.startFromLineContainer}>
+                                    <div className={styles.startHeader}>
+                                        <p style={{ color: '#E2943B' }}>Start from line will take into account all movements prior to this line.</p>
+                                    </div>
+                                    <div>
+                                        <Input
+                                            label="Start at g-code Line:"
+                                            value={value}
+                                            onChange={(e) => (e.target.value <= lineTotal && e.target.value >= 0) &&
+                                                this.setState(prev => ({
+                                                    startFromLine: {
+                                                        ...prev.startFromLine,
+                                                        value: Math.ceil(Number(e.target.value))
+                                                    }
+                                                }))
+                                            }
+                                            additionalProps={{ type: 'number', max: lineTotal, min: 0 }}
+                                        />
+                                        <div className={styles.startDetails}>
+                                            <p className={styles.firstDetail}>
+                                                Max Line Number: <strong>{lineTotal}</strong>
+                                            </p>
+                                            {
+                                                needsRecovery ? (
+                                                    value && <p>Recommended starting lines: <strong>{value - 10}</strong> - <strong>{value}</strong></p>
+                                                ) : (
+                                                    value && <p>The last job was stopped on line number: <strong>{value}</strong></p>
+                                                )
+                                            }
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <Tooltip content={`Default Value: ${defaultSafeHeight}`}>
                                             <Input
-                                                label="Start at this line in gcode file:"
-                                                value={value}
-                                                onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) &&
+                                                label="With Safe Height:"
+                                                value={safeHeight}
+                                                onChange={(e) => {
                                                     this.setState(prev => ({
                                                         startFromLine: {
                                                             ...prev.startFromLine,
-                                                            value: Math.ceil(Number(e.target.value))
+                                                            safeHeight: Number(e.target.value)
                                                         }
-                                                    }))
-                                                }
+                                                    }));
+                                                }}
+                                                units={units}
                                                 additionalProps={{ type: 'number' }}
                                             />
-                                            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                                                <p>Start from line will take into account all movements prior to this line.</p>
-                                                <p>
-                                                    For this file, the maximum line number is: <strong>{lineTotal}</strong>
-                                                </p>
-
-                                                {value && <p>The last job was stopped on line number: <strong>{value}</strong></p>}
-                                            </div>
-                                        </div>
-                                        <div className={styles.buttonsContainer}>
-                                            <button
-                                                type="button"
-                                                className={styles['workflow-button-play']}
-                                                title="Start from Line"
-                                                onClick={this.handleStartFromLine}
-                                                disabled={!isConnected}
-                                            >
-                                                Start from Line
-                                                <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
-                                            </button>
+                                        </Tooltip>
+                                        <div className={styles.startDetails} style={{ float: 'left', marginLeft: '1rem' }}>
+                                            <p>
+                                                (Safe Height is the value above Z max)
+                                            </p>
                                         </div>
                                     </div>
-
-                                </div>
-                            </Modal.Body>
-                        </Modal>
-                    )
-                }
-                {
-                    showChoiceModal && (
-                        <Modal onClose={() => {
-                            this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showChoiceModal: false } }));
-                            actions.closeModal();
-                        }}
-                        >
-                            <Modal.Header className={styles.modalHeader}>
-                                <Modal.Title>Recovery: Start From Line</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                <div className={styles.runProbeBody}>
-                                    <div className={styles.left}>
-                                        <div className={styles.greyText}>
-                                            <Input
-                                                label="Start at this line in gcode file:"
-                                                value={value}
-                                                onChange={(e) => (e.target.value <= lineTotal && e.target.value > 0) &&
-                                                    this.setState(prev => ({
-                                                        startFromLine: {
-                                                            ...prev.startFromLine,
-                                                            value: Math.ceil(Number(e.target.value))
-                                                        }
-                                                    }))
-                                                }
-                                                additionalProps={{ type: 'number' }}
-                                            />
-                                            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                                                <p>Start from line will take into account all movements prior to this line.</p>
-                                                <p>
-                                                    For this file, the maximum line number is: <strong>{lineTotal}</strong>
-                                                </p>
-
-                                                {value && <p>Recommended starting lines: <strong>{value - 10}</strong> - <strong>{value}</strong></p>}
-                                            </div>
-                                        </div>
-                                        <div className={styles.buttonsContainer}>
-                                            <button
-                                                type="button"
-                                                className={styles['workflow-button-play']}
-                                                title="Start from Line"
-                                                onClick={this.handleStartFromLine}
-                                                disabled={!isConnected}
-                                            >
-                                                Start from Line
-                                                <i className="fa fa-play" style={{ writingMode: 'horizontal-tb' }} />
-                                            </button>
-                                        </div>
+                                    <div className={styles.buttonsContainer}>
+                                        <button
+                                            type="button"
+                                            className={styles['workflow-button-play']}
+                                            title="Start from Line"
+                                            onClick={this.handleStartFromLine}
+                                            disabled={!isConnected}
+                                        >
+                                            Start from Line
+                                            <i className="fa fa-play" style={{ writingMode: 'horizontal-tb', marginLeft: '5px' }} />
+                                        </button>
                                     </div>
-
                                 </div>
                             </Modal.Body>
                         </Modal>
@@ -715,7 +718,7 @@ export default connect((store) => {
     const port = get(store, 'connection.port');
     const gcode = get(store, 'file.content');
     const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
-    const zMax = get(store, 'file.bbox.max.z', 0);
+    const zMax = get(store, 'file.bbox.max.z', 0) || 0;
     const homingSetting = get(store, 'controller.settings.settings.$22', 0);
     const homingEnabled = homingSetting === '1';
     return {

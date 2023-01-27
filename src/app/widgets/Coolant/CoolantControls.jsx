@@ -29,8 +29,9 @@ import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import controller from 'app/lib/controller';
 import combokeys from 'app/lib/combokeys';
 import gamepad, { runAction } from 'app/lib/gamepad';
-import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
+import { GRBL_ACTIVE_STATE_IDLE, COOLANT_CATEGORY } from 'app/constants';
 import styles from './index.styl';
+import useKeybinding from '../../lib/useKeybinding';
 
 
 const sendM7 = () => {
@@ -43,7 +44,7 @@ const sendM9 = () => {
     controller.command('gcode', 'M9');
 };
 
-const shuttleControlEvents = {
+const shuttleControlFunctions = {
     MIST_COOLANT: () => {
         const isConnected = get(reduxStore.getState(), 'connection.isConnected');
         const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
@@ -69,12 +70,44 @@ const shuttleControlEvents = {
         }
     }
 };
+const shuttleControlEvents = {
+    MIST_COOLANT: {
+        id: 71,
+        title: 'Mist Coolant',
+        keys: '',
+        cmd: 'MIST_COOLANT',
+        preventDefault: false,
+        isActive: true,
+        category: COOLANT_CATEGORY,
+        callback: shuttleControlFunctions.MIST_COOLANT
+    },
+    FLOOD_COOLANT: {
+        id: 72,
+        title: 'Flood Coolant',
+        keys: '',
+        cmd: 'FLOOD_COOLANT',
+        preventDefault: false,
+        isActive: true,
+        category: COOLANT_CATEGORY,
+        callback: shuttleControlFunctions.FLOOD_COOLANT
+    },
+    STOP_COOLANT: {
+        id: 73,
+        title: 'Stop Coolant',
+        keys: '',
+        cmd: 'STOP_COOLANT',
+        preventDefault: false,
+        isActive: true,
+        category: COOLANT_CATEGORY,
+        callback: shuttleControlFunctions.STOP_COOLANT
+    }
+};
 
 const subscribeShuttleControl = () => {
     combokeys.reload();
 
     Object.keys(shuttleControlEvents).forEach(eventName => {
-        const callback = shuttleControlEvents[eventName];
+        const callback = shuttleControlEvents[eventName].callback;
         combokeys.on(eventName, callback);
     });
 
@@ -83,7 +116,7 @@ const subscribeShuttleControl = () => {
 
 const unsubscribeShuttleControl = () => {
     Object.keys(shuttleControlEvents).forEach(eventName => {
-        const callback = shuttleControlEvents[eventName];
+        const callback = shuttleControlEvents[eventName].callback;
         combokeys.removeListener(eventName, callback);
     });
 };
@@ -91,6 +124,7 @@ const unsubscribeShuttleControl = () => {
 const CoolantControls = ({ canClick }) => {
     useEffect(() => {
         subscribeShuttleControl();
+        useKeybinding(shuttleControlEvents);
         return function cleanup() {
             unsubscribeShuttleControl();
         };

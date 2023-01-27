@@ -52,7 +52,8 @@ module.exports = {
         new webpack.DefinePlugin({
             'global.NODE_ENV': JSON.stringify('production'),
             'global.PUBLIC_PATH': JSON.stringify(publicPath),
-            'global.BUILD_VERSION': JSON.stringify(buildVersion)
+            'global.BUILD_VERSION': JSON.stringify(buildVersion),
+            'global.METRICS_ENDPOINT': JSON.stringify(process.env.METRICS_ENDPOINT),
         }),
         new HtmlWebpackPlugin({
             filename: 'index.html',

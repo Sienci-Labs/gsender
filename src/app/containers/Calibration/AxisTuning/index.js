@@ -119,7 +119,6 @@ const AxisTuning = ({ onClose }) => {
         : (
             <div className={styles.alignmentContainer}>
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <h4 style={{ marginTop: 0 }}>Movement Tuning</h4>
                     {
                         !introComplete &&
                         <ToolIntroduction readyHandler={startTool} onSelectAxis={(axis) => setCurrentAxis(axis)} currentAxis={currentAxis} />

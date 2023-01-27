@@ -1,6 +1,11 @@
 import combokeys from './combokeys';
 import store from '../store';
 import shuttleEvents from './shuttleEvents';
+import { MACRO_CATEGORY } from '../constants';
+
+const TARGET_NUM_CALLS = 9; // this is the current number of widgets that use the useKeybinding hook
+let numCalls = 0; // number of useKeybinding hooks that have been called
+
 /*
     shuttleControlEvents structure:
     {
@@ -28,15 +33,10 @@ function useKeybinding(shuttleControlEvents) {
             // add keybindings
             const currentCommandKeys = store.get('commandKeys', []);
             if (currentCommandKeys.length === 0 || !currentCommandKeys.find(element => element.cmd === defaultCommand.cmd)) {
-                // set id
-                let id = 1;
-                if (currentCommandKeys.length !== 0) {
-                    id = currentCommandKeys[currentCommandKeys.length - 1].id + 1;
-                }
                 // add to store
                 let updatedCommandKeys = currentCommandKeys;
                 updatedCommandKeys.push({
-                    id: id,
+                    id: defaultCommand.id,
                     title: defaultCommand.title,
                     keys: defaultCommand.keys,
                     cmd: defaultCommand.cmd,
@@ -47,6 +47,14 @@ function useKeybinding(shuttleControlEvents) {
                     callback: defaultCommand.callback
                 });
                 store.replace('commandKeys', updatedCommandKeys);
+            } else if (currentCommandKeys.find(element => element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id)) {
+                // code to migrate incorrect ids to the correct ones
+                // if the id is not the default one, change it
+                let newKey = currentCommandKeys.find(element => element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id);
+                newKey.id = defaultCommand.id;
+                const updatedCommandKeys =
+                    currentCommandKeys.map(element => (element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id ? newKey : element));
+                store.replace('commandKeys', updatedCommandKeys);
             }
 
             // add gamepad shortcuts
@@ -55,14 +63,9 @@ function useKeybinding(shuttleControlEvents) {
                 const shortcuts = profile.shortcuts;
                 let updatedProfileShortcuts = shortcuts;
                 if (shortcuts.length === 0 || !shortcuts.find(element => element.cmd === defaultCommand.cmd)) {
-                    // set id
-                    let id = 1;
-                    if (shortcuts.length === 0) {
-                        id = shortcuts[shortcuts.length - 1].id + 1;
-                    }
                     // no default keys for gamepad
                     updatedProfileShortcuts.push({
-                        id: id,
+                        id: defaultCommand.id,
                         title: defaultCommand.title,
                         keys: '',
                         cmd: defaultCommand.cmd,
@@ -72,6 +75,13 @@ function useKeybinding(shuttleControlEvents) {
                         category: defaultCommand.category,
                         callback: defaultCommand.callback
                     });
+                } else if (shortcuts.find(element => element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id)) {
+                    // code to migrate incorrect ids to the correct ones
+                    // if the id is not the default one, change it
+                    let newKey = shortcuts.find(element => element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id);
+                    newKey.id = defaultCommand.id;
+                    updatedProfileShortcuts =
+                        shortcuts.map(element => (element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id ? newKey : element));
                 }
                 return { ...profile, shortcuts: updatedProfileShortcuts };
             });
@@ -79,6 +89,17 @@ function useKeybinding(shuttleControlEvents) {
             store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
         }
     });
+
+    numCalls++;
+    checkNumCalls();
+}
+
+// check to see if all widgets have added their keybindings
+// and call the remove function
+function checkNumCalls() {
+    if (numCalls === TARGET_NUM_CALLS) {
+        removeOldKeybindings();
+    }
 }
 
 export function removeOldKeybindings() {
@@ -89,7 +110,7 @@ export function removeOldKeybindings() {
     // remove keybindings that don't exist in any of the shuttleControlEvents arrays
     currentCommandKeys.forEach(key => {
         const event = allShuttleControlEvents.find(event => event.cmd === key.cmd);
-        if (event === undefined) {
+        if (event === undefined && key.category !== MACRO_CATEGORY) {
             let keyToRemove = updatedCommandKeys.find(el => el.cmd === key.cmd);
             updatedCommandKeys.splice(updatedCommandKeys.findIndex(el => el === keyToRemove), 1);
         }

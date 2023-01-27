@@ -91,6 +91,7 @@ class Header extends PureComponent {
 
     shuttleControlEvents = {
         CONTROLLER_COMMAND_UNLOCK: {
+            id: 61,
             title: 'Unlock',
             keys: '$',
             cmd: 'CONTROLLER_COMMAND_UNLOCK',
@@ -103,6 +104,7 @@ class Header extends PureComponent {
             callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
         },
         CONTROLLER_COMMAND_RESET: {
+            id: 62,
             title: 'Soft Reset',
             keys: '%',
             cmd: 'CONTROLLER_COMMAND_RESET',
@@ -115,6 +117,7 @@ class Header extends PureComponent {
             callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
         },
         CONTROLLER_COMMAND_HOMING: {
+            id: 31,
             title: 'Homing',
             keys: ['ctrl', 'alt', 'command', 'h'].join('+'),
             cmd: 'CONTROLLER_COMMAND_HOMING',
@@ -313,15 +316,19 @@ class Header extends PureComponent {
 
     registerIPCListeners () {
         window.ipcRenderer.on('update_available', (info) => {
-            this.setState({
-                updateAvailable: true
+            api.getShouldInstallUpdates().then((res) => {
+                if (res.body) {
+                    this.setState({
+                        updateAvailable: true
+                    });
+                    pubsub.publish('showUpdateToast', info);
+                }
             });
-            pubsub.publish('showUpdateToast', info);
         });
     }
 
     updateScreenSize = () => {
-        const isMobile = window.visualViewport.width / window.visualViewport.height <= 0.5625;
+        const isMobile = window.visualViewport.width <= 599;
         this.setState({
             mobile: isMobile
         });

@@ -85,6 +85,22 @@ const getLatestVersion = () => new Promise((resolve, reject) => {
 });
 
 //
+// Check if electron auto-update is supported for the
+// installation package-type/file-extension
+//
+const getShouldInstallUpdates = () => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/version/appUpdateSupport')
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+//
 //Fetch latest app version for all OS from github
 //
 // const getLatestVersionAllOS = () => new Promise((resolve, reject) => {
@@ -780,9 +796,55 @@ log.printLog = (msg, file, lineNumber, level) => new Promise((resolve, reject) =
         });
 });
 
+
+//
+// Metrics
+//
+const metrics = {};
+
+metrics.sendData = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/metrics/sendData')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+metrics.getCollectDataStatus = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/metrics/collectUserData')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+metrics.toggleCollectDataStatus = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/metrics/collectUserData')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 export default {
+    //OS
     getLatestVersion,
-    // getLatestVersionAllOS,
+    getShouldInstallUpdates,
 
     // State
     getState,
@@ -816,5 +878,8 @@ export default {
     file,
 
     // Log
-    log
+    log,
+
+    // Metrics
+    metrics,
 };

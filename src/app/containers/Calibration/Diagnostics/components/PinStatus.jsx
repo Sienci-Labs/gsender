@@ -14,9 +14,9 @@ const PinStatus = ({ pins }) => {
             <PinRow label="Z Limit" value={pins.Z} />
             <PinRow label="Probe" value={pins.P} />
             <PinRow label="Door" value={pins.D} />
+            <PinRow label="Cycle-Start" value={pins.S} />
             <PinRow label="Hold" value={pins.H} />
             <PinRow label="Soft-Reset" value={pins.R} />
-            <PinRow label="Cycle-Start" value={pins.S} />
         </div>
     );
 };

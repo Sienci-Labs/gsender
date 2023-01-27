@@ -752,11 +752,6 @@ class VisualizerWidget extends PureComponent {
             units: store.get('workspace.units', METRIC_UNITS),
             theme: this.config.get('theme'),
             showSoftLimitsWarning: this.config.get('showSoftLimitsWarning', false),
-            controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
-            },
             workflow: {
                 state: controller.workflow.state
             },
@@ -886,10 +881,62 @@ class VisualizerWidget extends PureComponent {
 
             changeCamera();
         },
+        VISUALIZER_VIEW_CYCLE: () => {
+            const {
+                to3DView,
+                toTopView,
+                toFrontView,
+                toRightSideView,
+                toLeftSideView,
+            } = this.actions.camera;
+
+            const cameraViews = [
+                '3d',
+                'top',
+                'front',
+                'right',
+                'left',
+                'default',
+            ];
+
+            let currIndex = cameraViews.findIndex(view => view === this.state.cameraPosition);
+
+            if (currIndex + 1 >= cameraViews.length) {
+                currIndex = 0;
+            } else {
+                currIndex += 1;
+            }
+
+            const currView = cameraViews[currIndex];
+
+            const changeCamera = {
+                '3d': to3DView,
+                'top': toTopView,
+                'front': toFrontView,
+                'right': toRightSideView,
+                'left': toLeftSideView,
+                'default': () => {
+                    const { cameraPosition } = this.getInitialState();
+                    this.setState({ cameraPosition });
+                }
+            }[currView];
+
+            changeCamera();
+        },
+        VISUALIZER_ZOOM_IN: () => {
+            this.actions.camera.zoomIn();
+        },
+        VISUALIZER_ZOOM_OUT: () => {
+            this.actions.camera.zoomOut();
+        },
+        VISUALIZER_ZOOM_FIT: () => {
+            this.actions.camera.zoomFit();
+        }
     }
 
     shuttleControlEvents = {
         LOAD_FILE: {
+            id: 0,
             title: 'Load File',
             keys: ['shift', 'l'].join('+'),
             cmd: 'LOAD_FILE',
@@ -903,6 +950,7 @@ class VisualizerWidget extends PureComponent {
             },
         },
         UNLOAD_FILE: {
+            id: 1,
             title: 'Unload File',
             keys: ['shift', 'k'].join('+'),
             cmd: 'UNLOAD_FILE',
@@ -916,6 +964,7 @@ class VisualizerWidget extends PureComponent {
             },
         },
         TEST_RUN: {
+            id: 2,
             title: 'Test Run',
             keys: '#',
             cmd: 'TEST_RUN',
@@ -927,6 +976,7 @@ class VisualizerWidget extends PureComponent {
             },
         },
         START_JOB: {
+            id: 3,
             title: 'Start Job',
             keys: '~',
             cmd: 'START_JOB',
@@ -940,6 +990,7 @@ class VisualizerWidget extends PureComponent {
             },
         },
         PAUSE_JOB: {
+            id: 4,
             title: 'Pause Job',
             keys: '!',
             cmd: 'PAUSE_JOB',
@@ -951,6 +1002,7 @@ class VisualizerWidget extends PureComponent {
             },
         },
         STOP_JOB: {
+            id: 5,
             title: 'Stop Job',
             keys: '@',
             cmd: 'STOP_JOB',
@@ -964,6 +1016,7 @@ class VisualizerWidget extends PureComponent {
             },
         },
         FEEDRATE_OVERRIDE_P: {
+            id: 6,
             title: 'Feed +',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_P',
@@ -974,6 +1027,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
         },
         FEEDRATE_OVERRIDE_PP: {
+            id: 7,
             title: 'Feed ++',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_PP',
@@ -984,6 +1038,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
         },
         FEEDRATE_OVERRIDE_M: {
+            id: 8,
             title: 'Feed -',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_M',
@@ -994,6 +1049,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
         },
         FEEDRATE_OVERRIDE_MM: {
+            id: 9,
             title: 'Feed --',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_MM',
@@ -1004,6 +1060,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
         },
         FEEDRATE_OVERRIDE_RESET: {
+            id: 10,
             title: 'Feed Reset',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_RESET',
@@ -1014,6 +1071,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
         },
         SPINDLE_OVERRIDE_P: {
+            id: 11,
             title: 'Spindle/Laser +',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_P',
@@ -1024,6 +1082,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE
         },
         SPINDLE_OVERRIDE_PP: {
+            id: 12,
             title: 'Spindle/Laser ++',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_PP',
@@ -1034,6 +1093,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE
         },
         SPINDLE_OVERRIDE_M: {
+            id: 13,
             title: 'Spindle/Laser -',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_M',
@@ -1044,6 +1104,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE
         },
         SPINDLE_OVERRIDE_MM: {
+            id: 14,
             title: 'Spindle/Laser --',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_MM',
@@ -1054,6 +1115,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE
         },
         SPINDLE_OVERRIDE_RESET: {
+            id: 15,
             title: 'Spindle/Laser Reset',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_RESET',
@@ -1064,6 +1126,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE
         },
         VISUALIZER_VIEW_3D: {
+            id: 16,
             title: '3D / Isometric',
             keys: '',
             cmd: 'VISUALIZER_VIEW_3D',
@@ -1074,6 +1137,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW
         },
         VISUALIZER_VIEW_TOP: {
+            id: 17,
             title: 'Top',
             keys: '',
             cmd: 'VISUALIZER_VIEW_TOP',
@@ -1084,6 +1148,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW
         },
         VISUALIZER_VIEW_FRONT: {
+            id: 18,
             title: 'Front',
             keys: '',
             cmd: 'VISUALIZER_VIEW_FRONT',
@@ -1094,6 +1159,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW
         },
         VISUALIZER_VIEW_RIGHT: {
+            id: 19,
             title: 'Right',
             keys: '',
             cmd: 'VISUALIZER_VIEW_RIGHT',
@@ -1104,6 +1170,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW
         },
         VISUALIZER_VIEW_LEFT: {
+            id: 20,
             title: 'Left',
             keys: '',
             cmd: 'VISUALIZER_VIEW_LEFT',
@@ -1114,6 +1181,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW
         },
         VISUALIZER_VIEW_RESET: {
+            id: 21,
             title: 'Reset View',
             keys: ['shift', 'n'].join('+'),
             cmd: 'VISUALIZER_VIEW_RESET',
@@ -1124,6 +1192,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW
         },
         LIGHTWEIGHT_MODE: {
+            id: 22,
             title: 'Lightweight Mode',
             keys: ['shift', 'm'].join('+'),
             cmd: 'LIGHTWEIGHT_MODE',
@@ -1133,6 +1202,7 @@ class VisualizerWidget extends PureComponent {
             callback: () => this.actions.handleLiteModeToggle(),
         },
         CUT: {
+            id: 55,
             title: 'Cut',
             keys: ['ctrl', 'x'].join('+'),
             cmd: 'CUT',
@@ -1144,6 +1214,7 @@ class VisualizerWidget extends PureComponent {
             },
         },
         COPY: {
+            id: 56,
             title: 'Copy',
             keys: ['ctrl', 'c'].join('+'),
             cmd: 'COPY',
@@ -1155,6 +1226,7 @@ class VisualizerWidget extends PureComponent {
             },
         },
         PASTE: {
+            id: 57,
             title: 'Paste',
             keys: ['ctrl', 'v'].join('+'),
             cmd: 'PASTE',
@@ -1166,6 +1238,7 @@ class VisualizerWidget extends PureComponent {
             },
         },
         UNDO: {
+            id: 58,
             title: 'Undo',
             keys: ['ctrl', 'z'].join('+'),
             cmd: 'UNDO',
@@ -1177,6 +1250,7 @@ class VisualizerWidget extends PureComponent {
             },
         },
         TOGGLE_SHORTCUTS: {
+            id: 63,
             title: 'Toggle Shortcuts',
             keys: '^',
             cmd: 'TOGGLE_SHORTCUTS',
@@ -1202,6 +1276,50 @@ class VisualizerWidget extends PureComponent {
             if (activeState === GRBL_ACTIVE_STATE_IDLE) {
                 controller.command('macro:run', macroID, controller.context);
             }
+        },
+        VISUALIZER_VIEW_CYCLE: {
+            id: 72,
+            title: 'Cycle Through Visualizer Cameras',
+            keys: ['shift', 'b'].join('+'),
+            cmd: 'VISUALIZER_VIEW_CYCLE',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW_CYCLE
+        },
+        VISUALIZER_ZOOM_IN: {
+            id: 73,
+            title: 'Zoom In',
+            keys: ['shift', 'p'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_IN',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_IN
+        },
+        VISUALIZER_ZOOM_OUT: {
+            id: 73,
+            title: 'Zoom In',
+            keys: ['shift', 'o'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_OUT',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT
+        },
+        VISUALIZER_ZOOM_FIT: {
+            id: 73,
+            title: 'Zoom In',
+            keys: ['shift', 'i'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_FIT',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_FIT
         },
     }
 
@@ -1331,6 +1449,11 @@ class VisualizerWidget extends PureComponent {
         const { renderState, isSecondary, gcode, surfacingData, activeVisualizer, activeState, alarmCode, workflow, isConnected } = this.props;
         const state = {
             ...this.state,
+            controller: {
+                type: controller.type,
+                settings: controller.settings,
+                state: controller.state
+            },
             alarmCode,
             activeState,
             workflow,

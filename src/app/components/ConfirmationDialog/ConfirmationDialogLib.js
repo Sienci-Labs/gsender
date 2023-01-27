@@ -35,7 +35,8 @@ export const Confirm = (options = {}) => {
         onClose = null,
         onConfirm = null,
         confirmLabel = 'Confirm',
-        cancelLabel = 'Cancel'
+        cancelLabel = 'Cancel',
+        show = true,
     } = options;
     pubsub.publish('dialog:new', {
         title: title,
@@ -44,6 +45,7 @@ export const Confirm = (options = {}) => {
         onClose: onClose,
         onConfirm: onConfirm,
         confirmLabel: confirmLabel,
-        cancelLabel: cancelLabel
+        cancelLabel: cancelLabel,
+        show: show
     });
 };

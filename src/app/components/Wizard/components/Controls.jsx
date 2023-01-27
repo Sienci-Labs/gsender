@@ -27,13 +27,14 @@ import StepButton from 'app/components/Wizard/components/StepButton';
 import styles from '../index.styl';
 
 const Controls = () => {
-    const { completeSubStep, decrementStep, scrollToActiveStep, hasIncompleteActions } = useWizardAPI();
+    const { completeSubStep, decrementStep, scrollToActiveStep, hasIncompleteActions, updateSubstepOverlay } = useWizardAPI();
     return (
         <div className={styles.controls}>
             <StepButton
                 inverted
                 onClick={() => {
                     const activeValues = decrementStep();
+                    updateSubstepOverlay(activeValues);
                     scrollToActiveStep(activeValues);
                 }}
             >
@@ -43,6 +44,7 @@ const Controls = () => {
             <StepButton
                 onClick={() => {
                     const activeValues = completeSubStep();
+                    updateSubstepOverlay(activeValues);
                     scrollToActiveStep(activeValues);
                 }}
                 disabled={hasIncompleteActions()}

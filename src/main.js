@@ -270,7 +270,15 @@ const main = () => {
             });
 
             ipcMain.on('reconnect-main', (event, options) => {
-                if (!event.sender.browserWindowOptions.parent && windowManager.childWindows.length > 0) {
+                let shouldReconnect = false;
+                try {
+                    if (event && event.sender && event.sender.browserWindowOptions) {
+                        shouldReconnect = !event.sender.browserWindowOptions.parent && windowManager.childWindows.length > 0;
+                    }
+                } catch (err) {
+                    log.error(err);
+                }
+                if (shouldReconnect) {
                     windowManager.childWindows.forEach(window => {
                         window.webContents.send('reconnect', options);
                     });
