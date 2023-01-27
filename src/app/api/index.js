@@ -815,6 +815,32 @@ metrics.sendData = (options) => new Promise((resolve, reject) => {
         });
 });
 
+metrics.getCollectDataStatus = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/metrics/collectUserData')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+metrics.toggleCollectDataStatus = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/metrics/collectUserData')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 export default {
     //OS
     getLatestVersion,

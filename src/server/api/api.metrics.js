@@ -29,6 +29,7 @@ import isOnline from 'is-online';
 import config from '../services/configstore';
 import pkg from '../../package.json';
 import { ERR_BAD_REQUEST, ERR_INTERNAL_SERVER_ERROR } from '../constants';
+import { USER_DATA_COLLECTION } from '../../app/constants';
 
 const CONFIG_KEY = 'metrics';
 
@@ -48,6 +49,20 @@ export const getUniqueID = () => {
     }
 
     return uniqueID;
+};
+
+export const toggleCollectData = (req, res) => {
+    const { collectUserDataStatus } = req.body;
+
+    config.set(`${CONFIG_KEY}.collectUserData`, collectUserDataStatus);
+
+    res.json({ collectUserDataStatus });
+};
+
+export const getCollectDataStatus = (_, res) => {
+    const collectUserDataStatus = config.get(`${CONFIG_KEY}.collectUserData`, USER_DATA_COLLECTION.INITIAL);
+
+    res.json({ collectUserDataStatus });
 };
 
 export const sendData = async (_, res) => {

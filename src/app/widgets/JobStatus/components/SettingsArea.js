@@ -122,11 +122,11 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
                     <FeedControlButton value="100" onClick={() => updateFeedRateChange(100)}>
                         <i className="fas fa-redo fa-flip-horizontal" />
                     </FeedControlButton>
-                    <FeedControlButton value="5" onClick={() => updateFeedRateChange(ovF + 5)}>
-                        <i className="fas fa-plus" />
-                    </FeedControlButton>
                     <FeedControlButton value="-5" onClick={() => updateFeedRateChange(ovF + -5)}>
                         <i className="fas fa-minus" />
+                    </FeedControlButton>
+                    <FeedControlButton value="5" onClick={() => updateFeedRateChange(ovF + 5)}>
+                        <i className="fas fa-plus" />
                     </FeedControlButton>
                 </div>
             </div>
@@ -153,11 +153,11 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
                             <FeedControlButton value="100" onClick={() => updateSpindleSpeedChange(100)}>
                                 <i className="fas fa-redo fa-flip-horizontal" />
                             </FeedControlButton>
-                            <FeedControlButton value="5" onClick={() => updateSpindleSpeedChange(ovS + 5)}>
-                                <i className="fas fa-plus" />
-                            </FeedControlButton>
                             <FeedControlButton value="-5" onClick={() => updateSpindleSpeedChange(ovS + -5)}>
                                 <i className="fas fa-minus" />
+                            </FeedControlButton>
+                            <FeedControlButton value="5" onClick={() => updateSpindleSpeedChange(ovS + 5)}>
+                                <i className="fas fa-plus" />
                             </FeedControlButton>
                         </div>
                     </div>

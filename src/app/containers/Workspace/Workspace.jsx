@@ -426,21 +426,22 @@ class Workspace extends PureComponent {
 
     handleCollectUserData = async () => {
         const { INITIAL, ACCEPTED, REJECTED } = USER_DATA_COLLECTION;
-        const collectUserData = store.get('workspace.collectUserData', USER_DATA_COLLECTION.INITIAL);
+        const res = await api.metrics.getCollectDataStatus();
 
-        if (collectUserData === REJECTED) {
+        const collectUserDataStatus = res.body.collectUserDataStatus;
+
+        if (collectUserDataStatus === REJECTED) {
             return;
         }
 
-        if (collectUserData === INITIAL) {
+        if (collectUserDataStatus === INITIAL) {
             this.dataCollectionRef.current.show();
             return;
         }
 
-        if (collectUserData === ACCEPTED) {
+        if (collectUserDataStatus === ACCEPTED) {
             try {
                 await api.metrics.sendData();
-            // eslint-disable-next-line no-empty
             } catch (error) {
                 console.log(error);
             }
