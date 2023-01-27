@@ -27,8 +27,8 @@ const Workspace = ({ state, actions }) => {
                     size="small"
                 >
                     <div>
-                        <RadioButton className={styles.prefferedradio} label="Inches (G20)" value={IMPERIAL_UNITS} />
-                        <RadioButton className={styles.prefferedradio} label="Millimeters (G21)" value={METRIC_UNITS} />
+                        <RadioButton className={styles.prefferedradio} label="Inches" value={IMPERIAL_UNITS} />
+                        <RadioButton className={styles.prefferedradio} label="Millimeters" value={METRIC_UNITS} />
                     </div>
                 </RadioGroup>
                 <small className={styles['item-info']}>What units would you like gSender to show you?</small>
@@ -36,7 +36,7 @@ const Workspace = ({ state, actions }) => {
             <div className={styles.addMargin}>
                 <Tooltip content="Flip the location of the Visualizer with Machine Controls" location="default">
                     <ToggleSwitch
-                        label="Visualizer on right Side"
+                        label="Visualizer on Right Side"
                         checked={reverseWidgets}
                         onChange={() => actions.general.setReverseWidgets()}
                         size="small"
