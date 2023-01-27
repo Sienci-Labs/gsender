@@ -38,7 +38,7 @@ const getSanitizedRecords = () => {
     const records = config.get(CONFIG_KEY, {});
 
     let shouldUpdate = false;
-    records.forEach((value, key) => {
+    Object.keys(records).forEach((key) => {
         const record = records.get(key);
         if (!record.id) {
             record.id = uuid.v4();
