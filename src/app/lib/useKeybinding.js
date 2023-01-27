@@ -115,7 +115,6 @@ export function removeOldKeybindings() {
             updatedCommandKeys.splice(updatedCommandKeys.findIndex(el => el === keyToRemove), 1);
         }
     });
-    console.log(updatedCommandKeys);
     store.replace('commandKeys', updatedCommandKeys);
 
     // do the same for gamepad shortcuts
@@ -132,7 +131,6 @@ export function removeOldKeybindings() {
         });
         return { ...profile, shortcuts: updatedProfileShortcuts };
     });
-    console.log(updatedGamepadProfiles);
     store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
 
     combokeys.reload();

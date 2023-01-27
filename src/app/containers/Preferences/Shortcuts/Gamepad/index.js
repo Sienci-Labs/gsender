@@ -15,8 +15,8 @@ const Gamepad = () => {
     const [currentProfileID, setCurrentProfileID] = useState(null);
     const [showAddProfile, setShowAddProfile] = useState(false);
 
-    const handleProfileClick = (id) => {
-        setCurrentProfileID(id[0]); //Can just grab one of the ids in the array for computing the profile information below
+    const handleProfileClick = (ids) => {
+        setCurrentProfileID(ids[0]); //Can just grab one of the ids in the array for computing the profile information below
     };
 
     const handleProfileDelete = (id) => {
