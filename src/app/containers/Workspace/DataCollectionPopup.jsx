@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
 
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
@@ -30,7 +31,8 @@ const DataCollectionPopup = (_, ref) => {
         await api.metrics.toggleCollectDataStatus({ collectUserDataStatus: USER_DATA_COLLECTION.REJECTED });
     };
 
-    if (toggle === false) {
+    // Don't display on web view
+    if (!toggle || !isElectron()) {
         return null;
     }
 
