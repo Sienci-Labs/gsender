@@ -7,13 +7,13 @@ import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib
 import styles from '../index.styl';
 
 const ProfileItem = ({ title, icon, id, onClick, onDelete }) => {
-    const handleDelete = (e) => {
+    const handleDelete = (e, ommitId) => {
         e.stopPropagation(); //Prevents bubbling that will fire the parent div's onclick first
 
         Confirm({
             content: 'Are you sure you want to delete this gamepad profile?',
             title: 'Delete Gamepad Profile',
-            onConfirm: () => onDelete(id)
+            onConfirm: () => onDelete(ommitId)
         });
     };
 
@@ -31,7 +31,7 @@ const ProfileItem = ({ title, icon, id, onClick, onDelete }) => {
             <i
                 tabIndex={-1}
                 role="button"
-                onClick={handleDelete}
+                onClick={(event) => handleDelete(event, id)}
                 onKeyDown={null}
                 className={classnames('fas fa-times', styles.profileItemDelete)}
             />
@@ -41,7 +41,7 @@ const ProfileItem = ({ title, icon, id, onClick, onDelete }) => {
 ProfileItem.propTypes = {
     title: PropTypes.string,
     icon: PropTypes.string,
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    id: PropTypes.array,
     onClick: PropTypes.func,
     onDelete: PropTypes.func,
 };

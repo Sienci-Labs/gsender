@@ -54,7 +54,6 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
         renderShortcutCell: (_, row) => {
             const { keys, isActive, keysName } = row;
             const shortcut = [...keys][0] === '+' ? ['+'] : keys.split('+');
-
             const hasShortcut = !!shortcut[0];
 
             let cleanedShortcut = null;
@@ -72,7 +71,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
             return (
                 <div className={styles.shortcutComboColumn}>
                     {
-                        hasShortcut || keysName
+                        hasShortcut || ''
                             ? (
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
                                     {keysName ? <kbd>{keysName}</kbd> : output}

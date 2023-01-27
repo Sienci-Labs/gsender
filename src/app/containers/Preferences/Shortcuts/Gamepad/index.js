@@ -15,12 +15,14 @@ const Gamepad = () => {
     const [currentProfileID, setCurrentProfileID] = useState(null);
     const [showAddProfile, setShowAddProfile] = useState(false);
 
-    const handleProfileClick = (id) => {
-        setCurrentProfileID(id[0]); //Can just grab one of the ids in the array for computing the profile information below
+    const handleProfileClick = (ids) => {
+        setCurrentProfileID(ids[0]); //Can just grab one of the ids in the array for computing the profile information below
     };
 
     const handleProfileDelete = (id) => {
-        const filteredProfiles = profiles.filter(profile => !profile.id.includes(id));
+        let filteredProfiles = profiles.filter((profile) => {
+            return JSON.stringify(profile.id) !== JSON.stringify(id);
+        });
 
         setProfiles(filteredProfiles);
         setCurrentProfileID(null);
@@ -44,8 +46,11 @@ const Gamepad = () => {
 
         const profiles = store.get('workspace.gamepad.profiles', []);
 
+        //CHecks if parent array has all the child array elements
+        const arrayComparator = (parentArr, childArr) => childArr.every(element => parentArr.includes(element));
+
         const updatedProfiles =
-            profiles.map(profile => (profile.id.includes(currentProfile.id) ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
+            profiles.map(profile => (arrayComparator(profile.id, currentProfile.id) ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
 
         handleUpdateProfiles(updatedProfiles);
     };

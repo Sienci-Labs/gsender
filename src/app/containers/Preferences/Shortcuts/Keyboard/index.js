@@ -171,7 +171,6 @@ const Keyboard = () => {
 
     const allShortcutsEnabled = useMemo(() => shortcutsList.every(shortcut => shortcut.isActive), [shortcutsList]);
     const allShortcutsDisabled = useMemo(() => shortcutsList.every(shortcut => !shortcut.isActive), [shortcutsList]);
-
     return (
         <div>
             <CategoryFilter onChange={filter} filterCategory={filterCategory} />
