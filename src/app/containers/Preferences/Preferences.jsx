@@ -890,15 +890,17 @@ class PreferencesPage extends PureComponent {
                         </div>
                         <div className={styles.preferencesOptions}>
                             {
-                                menu.map((menuItem, index) => (
-                                    <div key={menuItem.id}>
-                                        <menuItem.component
-                                            actions={actions}
-                                            state={state}
-                                            active={index === selectedMenu}
-                                        />
-                                    </div>
-                                ))
+                                menu.map((menuItem, index) => (index === selectedMenu
+                                    ? (
+                                        <div key={menuItem.id}>
+                                            <menuItem.component
+                                                actions={actions}
+                                                state={state}
+                                                active={index === selectedMenu}
+                                            />
+                                        </div>
+                                    )
+                                    : null))
                             }
                         </div>
                     </div>
