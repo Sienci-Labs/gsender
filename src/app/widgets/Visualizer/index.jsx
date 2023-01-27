@@ -881,6 +881,57 @@ class VisualizerWidget extends PureComponent {
 
             changeCamera();
         },
+        VISUALIZER_VIEW_CYCLE: () => {
+            const {
+                to3DView,
+                toTopView,
+                toFrontView,
+                toRightSideView,
+                toLeftSideView,
+            } = this.actions.camera;
+
+            const cameraViews = [
+                '3d',
+                'top',
+                'front',
+                'right',
+                'left',
+                'default',
+            ];
+
+            let currIndex = cameraViews.findIndex(view => view === this.state.cameraPosition);
+
+            if (currIndex + 1 >= cameraViews.length) {
+                currIndex = 0;
+            } else {
+                currIndex += 1;
+            }
+
+            const currView = cameraViews[currIndex];
+
+            const changeCamera = {
+                '3d': to3DView,
+                'top': toTopView,
+                'front': toFrontView,
+                'right': toRightSideView,
+                'left': toLeftSideView,
+                'default': () => {
+                    const { cameraPosition } = this.getInitialState();
+                    this.setState({ cameraPosition });
+                }
+            }[currView];
+
+            changeCamera();
+        },
+        VISUALIZER_ZOOM_IN: () => {
+            this.actions.camera.zoomIn();
+        },
+        VISUALIZER_ZOOM_OUT: () => {
+            this.actions.camera.zoomOut();
+        },
+        VISUALIZER_ZOOM_FIT: () => {
+            this.actions.camera.zoomFit();
+        }
     }
 
     shuttleControlEvents = {
@@ -1225,6 +1276,50 @@ class VisualizerWidget extends PureComponent {
             if (activeState === GRBL_ACTIVE_STATE_IDLE) {
                 controller.command('macro:run', macroID, controller.context);
             }
+        },
+        VISUALIZER_VIEW_CYCLE: {
+            id: 72,
+            title: 'Cycle Through Visualizer Cameras',
+            keys: ['shift', 'b'].join('+'),
+            cmd: 'VISUALIZER_VIEW_CYCLE',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW_CYCLE
+        },
+        VISUALIZER_ZOOM_IN: {
+            id: 73,
+            title: 'Zoom In',
+            keys: ['shift', 'p'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_IN',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_IN
+        },
+        VISUALIZER_ZOOM_OUT: {
+            id: 73,
+            title: 'Zoom In',
+            keys: ['shift', 'o'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_OUT',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT
+        },
+        VISUALIZER_ZOOM_FIT: {
+            id: 73,
+            title: 'Zoom In',
+            keys: ['shift', 'i'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_FIT',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_FIT
         },
     }
 
