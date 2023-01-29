@@ -334,7 +334,7 @@
     "css-split-webpack-plugin": "~0.2.6",
     "dotenv": "~7.0.0",
     "electron": "~19.0.6",
-    "electron-builder": "~23.6.0",
+    "electron-builder": "^23.6.0",
     "electron-rebuild": "~3.2.7",
     "eslint": "~5.16.0",
     "eslint-config-trendmicro": "~1.4.1",
