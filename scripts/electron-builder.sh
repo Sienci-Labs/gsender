@@ -25,7 +25,7 @@ npm install --production --ignore-engines
 npm dedupe
 popd
 
-#echo "Rebuild native modules using electron ${electron_version}"
+echo "Rebuild native modules using electron ${electron_version}"
 #npm run electron-rebuild -- \
 #    --version=${electron_version:1} \
 #    --module-dir=dist/gsender \
