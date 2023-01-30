@@ -77,8 +77,9 @@
     "appId": "org.sienci.gsender-edge",
     "asar": false,
     "asarUnpack": [],
+    "npmRebuild": false,
     "productName": "gSender Edge",
-    "buildDependenciesFromSource": true,
+    "buildDependenciesFromSource": false,
     "generateUpdatesFilesForAllChannels": true,
     "extraResources": [
       "./node_modules/@electron/remote/**"
