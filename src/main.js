@@ -119,7 +119,7 @@ const main = () => {
                 }
             }
 
-            const { address, port, headless, requestedHost } = { ...res };
+            const { address, port, headless, requestedHost, kiosk } = { ...res };
             hostInformation = {
                 address,
                 port,
@@ -146,7 +146,8 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `gSender ${pkg.version}`
+                title: `gSender ${pkg.version}`,
+                kiosk: kiosk
             };
             const window = windowManager.openWindow(url, options, splashScreen);
 

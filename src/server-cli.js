@@ -26,7 +26,6 @@
 import path from 'path';
 import isElectron from 'is-electron';
 import program from 'commander';
-import { dialog } from 'electron';
 import ip from 'quick-local-ip';
 import pkg from './package.json';
 
@@ -88,7 +87,8 @@ program
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
     .option('--allow-remote-access', 'Allow remote access to the server (default: false)', false)
     .option('--remote', 'Enable Headless mode, exposing the internal server on your local network', false)
-    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, 'Grbl');
+    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, 'Grbl')
+    .option('--kiosk', 'Enable Kiosk mode, only allowing this application to be run', false);
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
 // This is not the case when running from a packaged Electron app. Here you have the first value appname and then args.
@@ -105,6 +105,7 @@ export default () => new Promise((resolve, reject) => {
 
     let port = program.port, host = program.host;
     let headless = !!program.remote;
+    let kiosk = !!program.kiosk;
 
     if (headless) {
         if (port === 0) {
@@ -126,13 +127,14 @@ export default () => new Promise((resolve, reject) => {
         watchDirectory: program.watchDirectory,
         accessTokenLifetime: program.accessTokenLifetime,
         allowRemoteAccess: !!program.allowRemoteAccess,
-        controller: program.controller
+        controller: program.controller,
+        kiosk: !!program.kiosk
     }, (err, data = {}) => {
         if (err) {
             reject(err, {});
             return;
         }
 
-        resolve({ ...data, headless });
+        resolve({ ...data, headless, kiosk });
     });
 });
