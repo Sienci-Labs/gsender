@@ -38,6 +38,7 @@ import {
     GrblController
 } from '../../controllers';
 import { GRBL } from '../../controllers/Grbl/constants';
+import { GRBLHAL } from '../../controllers/Grblhal/constants';
 import {
     authorizeIPAddress,
     //validateUser
@@ -55,7 +56,7 @@ const caseInsensitiveEquals = (str1, str2) => {
     return str1 === str2;
 };
 
-const isValidController = (controller) => caseInsensitiveEquals(GRBL, controller);
+const isValidController = (controller) => caseInsensitiveEquals(GRBL, controller) || caseInsensitiveEquals(GRBLHAL, controller);
 
 class CNCEngine {
     controllerClass = {};

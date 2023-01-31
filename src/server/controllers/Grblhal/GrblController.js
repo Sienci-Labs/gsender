@@ -51,7 +51,7 @@ import {
 } from '../constants';
 import GrblRunner from './GrblRunner';
 import {
-    GRBL,
+    GRBLHAL,
     GRBL_ACTIVE_STATE_RUN,
     GRBL_REALTIME_COMMANDS,
     GRBL_ALARMS,
@@ -86,7 +86,7 @@ const log = logger('controller:Grbl');
 const noop = _.noop;
 
 class GrblController {
-    type = GRBL;
+    type = GRBLHAL;
 
     // CNCEngine
     engine = null;
