@@ -45,7 +45,6 @@ jobs:
       run: npm install -g yarn
     - name: Install necessary dependencies and perform initial checks
       run: |
-        yarn up
         yarn install
         yarn lint
         yarn test
@@ -146,7 +145,6 @@ jobs:
       run: npm install -g yarn
     - name: Install necessary dependencies and perform initial checks
       run: |
-        yarn up
         yarn install
         yarn lint
         yarn test
@@ -230,7 +228,6 @@ jobs:
       run: npm install -g yarn
     - name: Install necessary dependencies and perform initial checks
       run: |
-        yarn up
         yarn install
         yarn lint
         yarn test
