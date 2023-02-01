@@ -77,7 +77,6 @@
     "appId": "org.sienci.gsender-edge",
     "asar": false,
     "asarUnpack": [],
-    "npmRebuild": false,
     "productName": "gSender Edge",
     "buildDependenciesFromSource": false,
     "generateUpdatesFilesForAllChannels": true,

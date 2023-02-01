@@ -37,6 +37,7 @@ import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import {
     GrblController
 } from '../../controllers';
+import
 import { GRBL } from '../../controllers/Grbl/constants';
 import { GRBLHAL } from '../../controllers/Grblhal/constants';
 import {
@@ -56,7 +57,12 @@ const caseInsensitiveEquals = (str1, str2) => {
     return str1 === str2;
 };
 
-const isValidController = (controller) => caseInsensitiveEquals(GRBL, controller) || caseInsensitiveEquals(GRBLHAL, controller);
+const isValidController = (controller) => (
+    // Standard GRBL
+    caseInsensitiveEquals(GRBL, controller) ||
+    // GrblHal
+    caseInsensitiveEquals(GRBLHAL, controller)
+);
 
 class CNCEngine {
     controllerClass = {};

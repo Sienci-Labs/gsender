@@ -85,7 +85,7 @@ const PAUSE_START = '%pause_start';
 const log = logger('controller:Grbl');
 const noop = _.noop;
 
-class GrblController {
+class GrblHalController {
     type = GRBLHAL;
 
     // CNCEngine
@@ -1876,4 +1876,4 @@ class GrblController {
     }
 }
 
-export default GrblController;
+export default GrblHalController;
