@@ -35,9 +35,9 @@ import config from '../configstore';
 import taskRunner from '../taskrunner';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import {
-    GrblController
+    GrblController,
+    GrblHalController
 } from '../../controllers';
-import
 import { GRBL } from '../../controllers/Grbl/constants';
 import { GRBLHAL } from '../../controllers/Grblhal/constants';
 import {
@@ -120,6 +120,9 @@ class CNCEngine {
         // Grbl
         if (!controller || caseInsensitiveEquals(GRBL, controller)) {
             this.controllerClass[GRBL] = GrblController;
+        }
+        if (!controller || caseInsensitiveEquals(GRBLHAL, controller)) {
+            this.controllerClass[GRBLHAL] = GrblHalController;
         }
 
         if (Object.keys(this.controllerClass).length === 0) {

@@ -21,4 +21,7 @@
  *
  */
 
-export { default as GrblController } from './Grbl/GrblController';
+import GrblController from './Grbl/GrblController';
+import GrblHalController from './Grblhal/GrblHalController';
+
+export { GrblController, GrblHalController };
