@@ -21,11 +21,11 @@
  *
  */
 
-class GrblLineParserResultVersion {
+class GrblHalLineParserResultEcho {
     static parse(line) {
         // * Grbl v1.1
-        //   [VER:]
-        const r = line.match(/^\[(?:VER:)(.+)\]$/);
+        //   [echo:]
+        const r = line.match(/^\[(?:echo:)(.+)\]$/);
         if (!r) {
             return null;
         }
@@ -35,10 +35,10 @@ class GrblLineParserResultVersion {
         };
 
         return {
-            type: GrblLineParserResultVersion,
+            type: GrblHalLineParserResultEcho,
             payload: payload
         };
     }
 }
 
-export default GrblLineParserResultVersion;
+export default GrblHalLineParserResultEcho;

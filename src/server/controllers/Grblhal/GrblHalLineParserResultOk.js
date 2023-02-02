@@ -21,23 +21,20 @@
  *
  */
 
-// https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl#grbl-response-meanings
-class GrblLineParserResultError {
+class GrblHalLineParserResultOk {
     static parse(line) {
-        const r = line.match(/^error:\s*(.+)$/);
+        const r = line.match(/^ok$/);
         if (!r) {
             return null;
         }
 
-        const payload = {
-            message: r[1]
-        };
+        const payload = {};
 
         return {
-            type: GrblLineParserResultError,
+            type: GrblHalLineParserResultOk,
             payload: payload
         };
     }
 }
 
-export default GrblLineParserResultError;
+export default GrblHalLineParserResultOk;

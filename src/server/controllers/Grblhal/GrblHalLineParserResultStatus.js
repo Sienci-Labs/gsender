@@ -25,7 +25,7 @@
 import _ from 'lodash';
 
 //https://github.com/grbl/grbl/blob/master/grbl/report.c
-class GrblLineParserResultStatus {
+class GrblHalLineParserResultStatus {
     // * Grbl v0.9
     //   <Idle>
     //   <Idle,MPos:5.529,0.560,7.000,WPos:1.529,-5.440,-0.000>
@@ -192,10 +192,10 @@ class GrblLineParserResultStatus {
         }
 
         return {
-            type: GrblLineParserResultStatus,
+            type: GrblHalLineParserResultStatus,
             payload: payload
         };
     }
 }
 
-export default GrblLineParserResultStatus;
+export default GrblHalLineParserResultStatus;

@@ -24,16 +24,16 @@
 import events from 'events';
 import _ from 'lodash';
 import decimalPlaces from '../../lib/decimal-places';
-import GrblLineParser from './GrblLineParser';
-import GrblLineParserResultStatus from './GrblLineParserResultStatus';
-import GrblLineParserResultOk from './GrblLineParserResultOk';
-import GrblLineParserResultError from './GrblLineParserResultError';
-import GrblLineParserResultAlarm from './GrblLineParserResultAlarm';
-import GrblLineParserResultParserState from './GrblLineParserResultParserState';
-import GrblLineParserResultParameters from './GrblLineParserResultParameters';
-import GrblLineParserResultFeedback from './GrblLineParserResultFeedback';
-import GrblLineParserResultSettings from './GrblLineParserResultSettings';
-import GrblLineParserResultStartup from './GrblLineParserResultStartup';
+import GrblHalLineParser from './GrblLineParser';
+import GrblHalLineParserResultStatus from './GrblLineParserResultStatus';
+import GrblHalLineParserResultOk from './GrblLineParserResultOk';
+import GrblHalLineParserResultError from './GrblLineParserResultError';
+import GrblHalLineParserResultAlarm from './GrblLineParserResultAlarm';
+import GrbHalLineParserResultParserState from './GrblLineParserResultParserState';
+import GrblHalLineParserResultParameters from './GrblLineParserResultParameters';
+import GrblHalLineParserResultFeedback from './GrblLineParserResultFeedback';
+import GrblHalLineParserResultSettings from './GrblLineParserResultSettings';
+import GrblHalLineParserResultStartup from './GrblLineParserResultStartup';
 import logger from '../../lib/logger';
 import {
     GRBL_ACTIVE_STATE_IDLE,
@@ -42,7 +42,7 @@ import {
 
 const log = logger('controller:Grbl');
 
-class GrblRunner extends events.EventEmitter {
+class GrblHalRunner extends events.EventEmitter {
     state = {
         status: {
             activeState: '',
@@ -88,7 +88,7 @@ class GrblRunner extends events.EventEmitter {
         }
     };
 
-    parser = new GrblLineParser();
+    parser = new GrblHalLineParser();
 
     parse(data) {
         data = ('' + data).replace(/\s+$/, '');
@@ -103,7 +103,7 @@ class GrblRunner extends events.EventEmitter {
         const { type, payload } = result;
         const { raw } = payload;
 
-        if (type === GrblLineParserResultStatus) {
+        if (type === GrblHalLineParserResultStatus) {
             // Grbl v1.1
             // WCO:0.000,10.000,2.500
             // A current work coordinate offset is now sent to easily convert
@@ -144,18 +144,18 @@ class GrblRunner extends events.EventEmitter {
             this.emit('status', payload);
             return;
         }
-        if (type === GrblLineParserResultOk) {
+        if (type === GrblHalLineParserResultOk) {
             this.emit('ok', payload);
             return;
         }
-        if (type === GrblLineParserResultError) {
+        if (type === GrblHalLineParserResultError) {
             // https://nodejs.org/api/events.html#events_error_events
             // As a best practice, listeners should always be added for the 'error' events.
             this.emit('error', payload);
             log.error('Error found in GrblLineParserResultError');
             return;
         }
-        if (type === GrblLineParserResultAlarm) {
+        if (type === GrblHalLineParserResultAlarm) {
             const nextState = {
                 ...this.state,
                 status: {
@@ -171,7 +171,7 @@ class GrblRunner extends events.EventEmitter {
             log.warn('An Alarm was activated in Grbl Line Parser');
             return;
         }
-        if (type === GrblLineParserResultParserState) {
+        if (type === GrbHalLineParserResultParserState) {
             const { modal, tool, feedrate, spindle } = payload;
             const { tool: curTool } = this.state.parserstate.modal;
 
@@ -196,7 +196,7 @@ class GrblRunner extends events.EventEmitter {
             this.emit('parserstate', payload);
             return;
         }
-        if (type === GrblLineParserResultParameters) {
+        if (type === GrblHalLineParserResultParameters) {
             const { name, value } = payload;
             const nextSettings = {
                 ...this.settings,
@@ -211,11 +211,11 @@ class GrblRunner extends events.EventEmitter {
             this.emit('parameters', payload);
             return;
         }
-        if (type === GrblLineParserResultFeedback) {
+        if (type === GrblHalLineParserResultFeedback) {
             this.emit('feedback', payload);
             return;
         }
-        if (type === GrblLineParserResultSettings) {
+        if (type === GrblHalLineParserResultSettings) {
             const { name, value } = payload;
             const nextSettings = {
                 ...this.settings,
@@ -230,7 +230,7 @@ class GrblRunner extends events.EventEmitter {
             this.emit('settings', payload);
             return;
         }
-        if (type === GrblLineParserResultStartup) {
+        if (type === GrblHalLineParserResultStartup) {
             const { version } = payload;
             const nextSettings = { // enforce change
                 ...this.settings,
@@ -275,4 +275,4 @@ class GrblRunner extends events.EventEmitter {
     }
 }
 
-export default GrblRunner;
+export default GrblHalRunner;

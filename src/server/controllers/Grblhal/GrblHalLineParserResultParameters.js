@@ -21,7 +21,7 @@
  *
  */
 
-class GrblLineParserResultParameters {
+class GrblHalLineParserResultParameters {
     static parse(line) {
         const r = line.match(/^\[(G54|G55|G56|G57|G58|G59|G28|G30|G92|TLO|PRB):(.+)\]$/);
         if (!r) {
@@ -64,10 +64,10 @@ class GrblLineParserResultParameters {
         }
 
         return {
-            type: GrblLineParserResultParameters,
+            type: GrblHalLineParserResultParameters,
             payload: payload
         };
     }
 }
 
-export default GrblLineParserResultParameters;
+export default GrblHalLineParserResultParameters;

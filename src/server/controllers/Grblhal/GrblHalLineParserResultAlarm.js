@@ -21,20 +21,23 @@
  *
  */
 
-class GrblLineParserResultOk {
+// https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl#alarms
+class GrblHalLineParserResultAlarm {
     static parse(line) {
-        const r = line.match(/^ok$/);
+        const r = line.match(/^ALARM:\s*(.+)$/);
         if (!r) {
             return null;
         }
 
-        const payload = {};
+        const payload = {
+            message: r[1]
+        };
 
         return {
-            type: GrblLineParserResultOk,
+            type: GrblHalLineParserResultAlarm,
             payload: payload
         };
     }
 }
 
-export default GrblLineParserResultOk;
+export default GrblHalLineParserResultAlarm;

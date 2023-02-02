@@ -21,14 +21,11 @@
  *
  */
 
-// https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl#feedback-messages
-class GrblLineParserResultFeedback {
-    // * Grbl v0.9
-    //   []
-    // * Grbl v1.1
-    //   [MSG:]
+class GrblHalLineParserResultOption {
     static parse(line) {
-        const r = line.match(/^\[(?:MSG:)?(.+)\]$/);
+        // * Grbl v1.1
+        //   [OPT:]
+        const r = line.match(/^\[(?:OPT:)(.+)\]$/);
         if (!r) {
             return null;
         }
@@ -38,10 +35,10 @@ class GrblLineParserResultFeedback {
         };
 
         return {
-            type: GrblLineParserResultFeedback,
+            type: GrblHalLineParserResultOption,
             payload: payload
         };
     }
 }
 
-export default GrblLineParserResultFeedback;
+export default GrblHalLineParserResultOption;

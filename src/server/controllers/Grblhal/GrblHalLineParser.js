@@ -22,41 +22,41 @@
  */
 
 import _ from 'lodash';
-import GrblLineParserResultStatus from './GrblLineParserResultStatus';
-import GrblLineParserResultOk from './GrblLineParserResultOk';
-import GrblLineParserResultError from './GrblLineParserResultError';
-import GrblLineParserResultAlarm from './GrblLineParserResultAlarm';
-import GrblLineParserResultParserState from './GrblLineParserResultParserState';
-import GrblLineParserResultParameters from './GrblLineParserResultParameters';
-import GrblLineParserResultHelp from './GrblLineParserResultHelp';
-import GrblLineParserResultVersion from './GrblLineParserResultVersion';
-import GrblLineParserResultOption from './GrblLineParserResultOption';
-import GrblLineParserResultEcho from './GrblLineParserResultEcho';
-import GrblLineParserResultFeedback from './GrblLineParserResultFeedback';
-import GrblLineParserResultSettings from './GrblLineParserResultSettings';
-import GrblLineParserResultStartup from './GrblLineParserResultStartup';
+import GrblHalLineParserResultStatus from './GrblLineParserResultStatus';
+import GrblHalLineParserResultOk from './GrblLineParserResultOk';
+import GrblHalLineParserResultError from './GrblLineParserResultError';
+import GrblHalLineParserResultAlarm from './GrblLineParserResultAlarm';
+import GrbHalLineParserResultParserState from './GrblLineParserResultParserState';
+import GrblHalLineParserResultParameters from './GrblLineParserResultParameters';
+import GrblHalLineParserResultHelp from './GrblLineParserResultHelp';
+import GrblHalLineParserResultVersion from './GrblLineParserResultVersion';
+import GrblHalLineParserResultOption from './GrblLineParserResultOption';
+import GrblHalLineParserResultEcho from './GrblLineParserResultEcho';
+import GrblHalLineParserResultFeedback from './GrblLineParserResultFeedback';
+import GrblHalLineParserResultSettings from './GrblLineParserResultSettings';
+import GrblHalLineParserResultStartup from './GrblLineParserResultStartup';
 
 // Grbl v1.1
 // https://github.com/gnea/grbl/blob/edge/doc/markdown/interface.md
 
-class GrblLineParser {
+class GrblHalLineParser {
     parse(line) {
         const parsers = [
             // <>
-            GrblLineParserResultStatus,
+            GrblHalLineParserResultStatus,
 
             // ok
-            GrblLineParserResultOk,
+            GrblHalLineParserResultOk,
 
             // error:x
-            GrblLineParserResultError,
+            GrblHalLineParserResultError,
 
             // ALARM:
-            GrblLineParserResultAlarm,
+            GrblHalLineParserResultAlarm,
 
             // [G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v0.9)
             // [GC:G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.] (v1.1)
-            GrblLineParserResultParserState,
+            GrbHalLineParserResultParserState,
 
             // [G54:0.000,0.000,0.000]
             // [G55:0.000,0.000,0.000]
@@ -69,29 +69,29 @@ class GrblLineParser {
             // [G92:0.000,0.000,0.000]
             // [TLO:0.000]
             // [PRB:0.000,0.000,0.000:0]
-            GrblLineParserResultParameters,
+            GrblHalLineParserResultParameters,
 
             // [HLP:] (v1.1)
-            GrblLineParserResultHelp,
+            GrblHalLineParserResultHelp,
 
             // [VER:] (v1.1)
-            GrblLineParserResultVersion,
+            GrblHalLineParserResultVersion,
 
             // [OPT:] (v1.1)
-            GrblLineParserResultOption,
+            GrblHalLineParserResultOption,
 
             // [echo:] (v1.1)
-            GrblLineParserResultEcho,
+            GrblHalLineParserResultEcho,
 
             // [] (v0.9)
             // [MSG:] (v1.1)
-            GrblLineParserResultFeedback,
+            GrblHalLineParserResultFeedback,
 
             // $xx
-            GrblLineParserResultSettings,
+            GrblHalLineParserResultSettings,
 
             // Grbl X.Xx ['$' for help]
-            GrblLineParserResultStartup
+            GrblHalLineParserResultStartup
         ];
 
         for (let parser of parsers) {
@@ -111,4 +111,4 @@ class GrblLineParser {
     }
 }
 
-export default GrblLineParser;
+export default GrblHalLineParser;

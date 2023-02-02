@@ -32,7 +32,7 @@ import {
     GRBL_MODAL_GROUPS
 } from './constants';
 
-class GrblLineParserResultParserState {
+class GrbHalLineParserResultParserState {
     // * Grbl v0.9
     //   [G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.]
     // * Grbl v1.1
@@ -92,10 +92,10 @@ class GrblLineParserResultParserState {
         }
 
         return {
-            type: GrblLineParserResultParserState,
+            type: GrbHalLineParserResultParserState,
             payload: payload
         };
     }
 }
 
-export default GrblLineParserResultParserState;
+export default GrbHalLineParserResultParserState;

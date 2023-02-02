@@ -21,24 +21,38 @@
  *
  */
 
-class GrblLineParserResultEcho {
+import _trim from 'lodash/trim';
+
+const pattern = new RegExp(/^([a-zA-Z0-9]+)\s+((?:\d+\.){1,2}\d+[a-zA-Z0-9\-\.]*)([^\[]*\[[^\]]+\].*)?/);
+
+class GrblHalLineParserResultStartup {
+    // Grbl 0.9j ['$' for help]
+    // Grbl 1.1d ['$' for help]
+    // Grbl 1.1
+    // Grbl 1.1h: LongMill build ['$' for help]
+    // Grbl 1.1h ['$' for help] LongMill build Feb 25, 2020
+    // gCarvin 2.0.0 ['$' for help]
     static parse(line) {
-        // * Grbl v1.1
-        //   [echo:]
-        const r = line.match(/^\[(?:echo:)(.+)\]$/);
+        const r = line.match(pattern);
         if (!r) {
             return null;
         }
 
+        const firmware = r[1];
+        const version = r[2];
+        const message = _trim(r[3]);
+
         const payload = {
-            message: r[1]
+            firmware,
+            version,
+            message,
         };
 
         return {
-            type: GrblLineParserResultEcho,
+            type: GrblHalLineParserResultStartup,
             payload: payload
         };
     }
 }
 
-export default GrblLineParserResultEcho;
+export default GrblHalLineParserResultStartup;

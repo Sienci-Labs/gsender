@@ -49,7 +49,7 @@ import {
     WRITE_SOURCE_CLIENT,
     WRITE_SOURCE_FEEDER
 } from '../constants';
-import GrblRunner from './GrblRunner';
+import GrblHalRunner from './GrblHalRunner';
 import {
     GRBLHAL,
     GRBL_ACTIVE_STATE_RUN,
@@ -506,7 +506,7 @@ class GrblHalController {
         });
 
         // Grbl
-        this.runner = new GrblRunner();
+        this.runner = new GrblHalRunner();
 
         this.runner.on('raw', noop);
 
@@ -680,7 +680,7 @@ class GrblHalController {
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;
 
-                this.emit('controller:state', GRBL, this.state);
+                this.emit('controller:state', GRBLHAL, this.state);
             } else {
                 // Grbl v0.9
                 this.emit('serialport:read', res.raw);
@@ -843,14 +843,14 @@ class GrblHalController {
             // Grbl settings
             if (this.settings !== this.runner.settings) {
                 this.settings = this.runner.settings;
-                this.emit('controller:settings', GRBL, this.settings);
+                this.emit('controller:settings', GRBLHAL, this.settings);
                 this.emit('Grbl:settings', this.settings); // Backward compatibility
             }
 
             // Grbl state
             if (this.state !== this.runner.state) {
                 this.state = this.runner.state;
-                this.emit('controller:state', GRBL, this.state);
+                this.emit('controller:state', GRBLHAL, this.state);
                 this.emit('Grbl:state', this.state); // Backward compatibility
             }
 
@@ -1158,12 +1158,12 @@ class GrblHalController {
         }
         if (!_.isEmpty(this.settings)) {
             // controller settings
-            socket.emit('controller:settings', GRBL, this.settings);
+            socket.emit('controller:settings', GRBLHAL, this.settings);
             socket.emit('Grbl:settings', this.settings); // Backward compatibility
         }
         if (!_.isEmpty(this.state)) {
             // controller state
-            socket.emit('controller:state', GRBL, this.state);
+            socket.emit('controller:state', GRBLHAL, this.state);
             socket.emit('Grbl:state', this.state); // Backward compatibility
         }
         if (this.feeder) {
@@ -1473,7 +1473,7 @@ class GrblHalController {
 
                 this.writeln('$H');
                 this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
-                this.emit('controller:state', GRBL, this.state);
+                this.emit('controller:state', GRBLHAL, this.state);
             },
             'sleep': () => {
                 this.event.trigger(SLEEP);
@@ -1497,7 +1497,7 @@ class GrblHalController {
                 this.writeln('$X');
             },
             'checkStateUpdate': () => {
-                this.emit('controller:state', GRBL, this.state);
+                this.emit('controller:state', GRBLHAL, this.state);
             },
             // Feed Overrides
             // @param {number} value The amount of percentage increase or decrease.
@@ -1551,7 +1551,7 @@ class GrblHalController {
                     commands.push('M5 S0');
                 }
                 this.state.parserstate.modal.spindle = 'M3';
-                this.emit('controller:state', GRBL, this.state);
+                this.emit('controller:state', GRBLHAL, this.state);
                 this.command('gcode', commands);
             },
             'lasertest:off': () => {
@@ -1853,7 +1853,7 @@ class GrblHalController {
 
     updateSpindleModal(modal) {
         this.state.parserstate.modal.spindle = modal;
-        this.emit('controller:state', GRBL, this.state);
+        this.emit('controller:state', GRBLHAL, this.state);
     }
 
     /* Runs specified code segment on M6 command before alerting the UI as to what's happened */
