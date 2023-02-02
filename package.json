@@ -136,7 +136,7 @@
       "category": "Utility",
       "target": [
         "AppImage",
-        "deb",
+        "deb"
       ]
     }
   },
