@@ -88,6 +88,7 @@ export const METRIC_STEPS = [
 
 // Controller
 export const GRBL = 'Grbl';
+export const GRBLHAL = 'grblHAL';
 export const MARLIN = 'Marlin';
 export const SMOOTHIE = 'Smoothie';
 export const TINYG = 'TinyG';

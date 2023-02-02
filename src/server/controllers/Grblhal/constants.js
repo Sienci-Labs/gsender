@@ -23,7 +23,7 @@
 
 /* eslint max-len: 0 */
 // Grbl
-export const GRBLHAL = 'GrblHAL';
+export const GRBLHAL = 'grblHAL';
 
 // Active State
 export const GRBL_ACTIVE_STATE_IDLE = 'Idle';
