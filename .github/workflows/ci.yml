@@ -1,7 +1,6 @@
 name: CI
 
 on:
-  # https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#example-including-branches-and-tags
   push:
     # Sequence of patterns matched against refs/heads
     branches:
@@ -21,7 +20,7 @@ jobs:
       matrix:
         node-version: [14.x]
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.TOKEN }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -65,13 +64,10 @@ jobs:
         PACKAGE_NAME=`node -e "console.log(require('./src/package.json').name)"`
         PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
         mkdir -p releases/linux
-        cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.x86_64.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.x86_64.rpm"
         cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x86_64.AppImage"
         cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-amd64.deb"
-        cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.armv7l.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.armv7l.rpm"
         cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-armv7l.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.AppImage"
         cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_armv7l.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.deb"
-        cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.aarch64.rpm" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux.aarch64.rpm"
         cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-arm64.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.AppImage"
         cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_arm64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.deb"
         pushd releases/linux
@@ -121,7 +117,7 @@ jobs:
       matrix:
         node-version: [14.x]
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.TOKEN }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -202,7 +198,7 @@ jobs:
       matrix:
         node-version: [14.x]
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.TOKEN }}
     steps:
     - name: Prepare VC++ Runtime
       run: choco install -y vcredist2017
