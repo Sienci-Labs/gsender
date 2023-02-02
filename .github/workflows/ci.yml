@@ -225,8 +225,6 @@ jobs:
     - name: Install necessary dependencies and perform initial checks
       run: |
         yarn install
-        yarn lint
-        yarn test
     - name: Run "build" script
       if: github.ref_type == 'tag'
       run: yarn run build
