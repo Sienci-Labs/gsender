@@ -259,13 +259,6 @@ jobs:
             --body="${GIT_COMMIT_LOG}" \
             releases/windows/*;
         fi
-    #- name: Upload release assets
-    #  uses: actions/github-script@v6
-    #  with:
-    #    github-token: ${{ secrets.GITHUB_TOKEN }}
-    #    script: |
-    #      // https://github.com/actions/upload-release-asset/issues/47#issuecomment-659071145
-    #      console.log('environment:', process.versions);
     - name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
