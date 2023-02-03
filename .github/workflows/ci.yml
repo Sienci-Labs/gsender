@@ -201,7 +201,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.TOKEN }}
     steps:
     - name: Prepare VC++ Runtime
-      run: choco install -y vcredist2017
+      run: choco install -y vcredist2022
     - name: Checkout code
       uses: actions/checkout@v3
     - name: Setup Node.js ${{ matrix.node-version }}

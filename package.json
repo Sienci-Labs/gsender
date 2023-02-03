@@ -78,6 +78,7 @@
   },
   "build": {
     "appId": "org.sienci.gsender-edge",
+    "artifactName": "${name}-${version}-${arch}.${ext}",
     "asar": false,
     "asarUnpack": [],
     "productName": "gSender Edge",
@@ -355,7 +356,6 @@
     "json-loader": "~0.5.7",
     "mini-css-extract-plugin": "~0.6.0",
     "nib": "~1.1.2",
-    "node-gyp": "^9.3.0",
     "optimize-css-assets-webpack-plugin": "~5.0.1",
     "pre-push": "~0.1.1",
     "progress": "~2.0.3",
