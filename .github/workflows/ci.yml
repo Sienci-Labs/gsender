@@ -242,7 +242,7 @@ jobs:
         PACKAGE_VERSION=`node -e "console.log(require('./src/package.json').version)"`
         mkdir -p releases/windows
         ls -al output
-        cp -af "output/${PACKAGE_NAME}-Setup-${PACKAGE_VERSION}.exe" "releases/windows/${PACKAGE_NAME}-${PACKAGE_VERSION}-windows-x64.exe"
+        cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}.exe" "releases/windows/${PACKAGE_NAME}-${PACKAGE_VERSION}-windows-x64.exe"
         ls -al output releases/windows
         if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
           yarn github-release delete \
