@@ -41,7 +41,9 @@ jobs:
         echo "• RUNNER_TEMP=$RUNNER_TEMP"
         echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
     - name: Install Yarn package manager
-      run: npm install -g yarn
+      run: |
+        npm install -g yarn
+        yarn add -g node-gyp
     - name: Install necessary dependencies and perform initial checks
       run: |
         yarn install
@@ -137,8 +139,10 @@ jobs:
         echo "• RUNNER_OS=$RUNNER_OS"
         echo "• RUNNER_TEMP=$RUNNER_TEMP"
         echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
-    - name: Install Yarn package manager
-      run: npm install -g yarn
+    - name: Install Yarn package manager and Node Gyp
+      run: |
+        npm install -g yarn
+        yarn add -g node-gyp
     - name: Install necessary dependencies and perform initial checks
       run: |
         yarn install
@@ -220,8 +224,10 @@ jobs:
         echo "• RUNNER_OS=$RUNNER_OS"
         echo "• RUNNER_TEMP=$RUNNER_TEMP"
         echo "• RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
-    - name: Install Yarn package manager
-      run: npm install -g yarn
+    - name: Install Yarn package manager and Node Gyp
+      run: |
+        npm install -g yarn
+        yarn add -g node-gyp
     - name: Install necessary dependencies and perform initial checks
       run: |
         yarn install
