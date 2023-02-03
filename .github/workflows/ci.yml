@@ -43,7 +43,7 @@ jobs:
     - name: Install Yarn package manager
       run: |
         npm install -g yarn
-        yarn add -g node-gyp
+        yarn global add node-gyp
     - name: Install necessary dependencies and perform initial checks
       run: |
         yarn install
@@ -142,7 +142,7 @@ jobs:
     - name: Install Yarn package manager and Node Gyp
       run: |
         npm install -g yarn
-        yarn add -g node-gyp
+        yarn global add node-gyp
     - name: Install necessary dependencies and perform initial checks
       run: |
         yarn install
@@ -227,7 +227,7 @@ jobs:
     - name: Install Yarn package manager and Node Gyp
       run: |
         npm install -g yarn
-        yarn add -g node-gyp
+        yarn global add node-gyp
     - name: Install necessary dependencies and perform initial checks
       run: |
         yarn install
