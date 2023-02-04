@@ -21,9 +21,9 @@
  *
  */
 
-import AvrgirlArduino from 'avrgirl-arduino';
-import mk1Image from '!file-loader!./mk1_20220214.hex';
-import mk2Image from '!file-loader!./mk2_20220214.hex';
+//import AvrgirlArduino from 'avrgirl-arduino';
+//import mk1Image from '!file-loader!./mk1_20220214.hex';
+//import mk2Image from '!file-loader!./mk2_20220214.hex';
 import logger from '../../logger';
 
 const log = logger('FlashLib: ');
@@ -34,12 +34,13 @@ const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
     }
 
     try {
-        let avrgirl = new AvrgirlArduino({
+        console.log('test');
+        /*let avrgirl = new AvrgirlArduino({
             board: 'uno',
             port: flashPort,
-        });
-        let imageHex = (imageType === 'MK2') ? mk2Image : mk1Image;
-        avrgirl.flash(imageHex, (error) => {
+        });*/
+        //let imageHex = (imageType === 'MK2') ? mk2Image : mk1Image;
+        /*avrgirl.flash(imageHex, (error) => {
             if (error) {
                 socket.emit('task:error', error);
                 log.debug(`${error} Error flashing board`);
@@ -47,7 +48,7 @@ const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
                 socket.emit('message', flashPort);
                 log.debug('Flash successful');
             }
-        });
+        });*/
     } catch (error) {
         const message = 'An error occurred while flashing';
         log.debug(`${error} ${message}`);
