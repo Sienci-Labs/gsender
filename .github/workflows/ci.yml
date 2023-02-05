@@ -70,7 +70,7 @@ jobs:
         cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-x86_64.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x86_64.AppImage"
         cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-amd64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-amd64.deb"
         cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-armv7l.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.AppImage"
-        cp -af "output/${PACKAGE_NAME}_${PACKAGE_VERSION}_armv7l.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.deb"
+        cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}_armv7l.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.deb"
         cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-arm64.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.AppImage"
         cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.deb"
         pushd releases/linux
