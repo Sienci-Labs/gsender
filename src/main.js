@@ -21,7 +21,6 @@
  *
  */
 
-import '@babel/polyfill';
 import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session, clipboard } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';

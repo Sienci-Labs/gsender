@@ -201,6 +201,7 @@
     "downloadjs": "^1.4.7",
     "electron-log": "^4.3.5",
     "electron-store": "~8.1.0",
+    "electron-updater": "^5.3.0",
     "ensure-array": "~1.0.0",
     "ensure-type": "^1.4.2",
     "errorhandler": "~1.5.0",
