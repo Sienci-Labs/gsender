@@ -115,21 +115,20 @@ const main = () => {
                     });
                     app.relaunch();
                     app.exit(-1);
+                } else {
+                    log.error(error);
                 }
             }
 
-            const { address, port, headless, requestedHost } = { ...res };
+            const { address, port } = { ...res };
+            log.info(`Returned - http://${address}:${port}`);
             hostInformation = {
                 address,
                 port,
-                headless,
             };
             if (!(address && port)) {
                 log.error('Unable to start the server at ' + chalk.cyan(`http://${address}:${port}`));
                 return;
-            }
-            if (headless) {
-                log.debug(`Started remote build at ${address}:${port} - ${requestedHost}`);
             }
 
             const url = `http://${address}:${port}`;

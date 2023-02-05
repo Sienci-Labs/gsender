@@ -23,6 +23,7 @@ const resolvedImports = findImports(files, {
 const deps = _uniq([
     'core-js',
     '@serialport/parser-readline',
+    '@sienci/avrgirl-arduino',
     'regenerator-runtime',
     'debug',
     ...resolvedImports.map(x => x.split('/')[0]),

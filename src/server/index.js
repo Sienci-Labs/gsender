@@ -128,11 +128,11 @@ const createServer = (options, callback) => {
     let { backlog, port = 0, host } = options;
 
     //If headless setting is ON, change to correct port and IP
-    const remoteSettings = config.get('remoteSettings', {});
+    /*const remoteSettings = config.get('remoteSettings', {});
     if (remoteSettings.headlessStatus) {
         port = remoteSettings.port;
         host = remoteSettings.ip;
-    }
+    }*/
 
     const mountPoints = uniqWith([
         ...ensureArray(options.mountPoints),
