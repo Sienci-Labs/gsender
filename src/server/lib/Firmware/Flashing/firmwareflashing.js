@@ -34,7 +34,6 @@ const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
     }
 
     try {
-        console.log('test');
         let avrgirl = new AvrgirlArduino({
             board: 'uno',
             port: flashPort,
