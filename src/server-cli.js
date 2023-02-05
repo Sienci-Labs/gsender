@@ -23,12 +23,14 @@
 
 /* eslint max-len: 0 */
 /* eslint no-console: 0 */
-import path from 'path';
-import isElectron from 'is-electron';
-import program from 'commander';
-import { dialog } from 'electron';
-import ip from 'quick-local-ip';
-import pkg from './package.json';
+require('core-js/stable'); // to polyfill ECMAScript features
+require('regenerator-runtime/runtime'); // needed to use transpiled generator functions
+
+const path = require('path');
+const isElectron = require('is-electron');
+const program = require('commander');
+const ip = require('quick-local-ip');
+const pkg = require('./package.json');
 
 // Defaults to 'production'
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
@@ -76,7 +78,7 @@ const defaultHost = isElectron() ? '127.0.0.1' : '0.0.0.0';
 const defaultPort = isElectron() ? 0 : 8000;
 
 program
-    .version(pkg.version)
+    .version(pkg.version, '--version', 'Output the current program version')
     .usage('[options]')
     .option('-p, --port <port>', `Set listen port (default: ${defaultPort})`, defaultPort)
     .option('-H, --host <host>', `Set listen address or hostname (default: ${defaultHost})`, defaultHost)
@@ -99,22 +101,12 @@ if (normalizedArgv.length > 1) {
     program.parse(normalizedArgv);
 }
 
-export default () => new Promise((resolve, reject) => {
+module.exports = () => new Promise((resolve, reject) => {
     // Change working directory to 'server' before require('./server')
     process.chdir(path.resolve(__dirname, 'server'));
 
     let port = program.port, host = program.host;
     let headless = !!program.remote;
-
-    if (headless) {
-        if (port === 0) {
-            port = 8000;
-        }
-
-        if (host === '127.0.0.1') {
-            host = ip.getLocalIP4();
-        }
-    }
 
     require('./server').createServer({
         port: port,
