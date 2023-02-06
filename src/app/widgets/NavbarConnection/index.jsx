@@ -140,12 +140,12 @@ class NavbarConnectionWidget extends PureComponent {
     };
 
     setConnectedState() {
-        const { port, connectedBaudrate, type } = this.props;
+        const { port, connectedBaudrate } = this.props;
         this.setState(state => ({
             alertMessage: '',
             connecting: false,
             connected: true,
-            controllerType: type || state.controllerType, // there is a period of time where type is blank, so add a check here
+            controllerType: state.controllerType,
             port: port,
             baudrate: connectedBaudrate
         }));
