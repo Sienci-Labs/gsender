@@ -23,6 +23,7 @@
 
 import React from 'react';
 import JoggingPresets from './JoggingPresets';
+import Aaxis from './Aaxis';
 import SettingWrapper from '../components/SettingWrapper';
 import Connection from './Connection';
 import GeneralArea from '../components/GeneralArea';
@@ -44,6 +45,7 @@ const General = ({ active, state, actions }) => {
                 <GeneralArea.Half>
                     <Settings />
                     <DataCollection />
+                    <Aaxis />
                 </GeneralArea.Half>
 
             </GeneralArea>

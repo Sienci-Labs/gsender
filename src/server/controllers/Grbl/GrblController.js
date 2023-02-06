@@ -1723,7 +1723,6 @@ class GrblController {
                     callback = context;
                     context = {};
                 }
-
                 const macros = config.get('macros');
                 const macro = _.find(macros, { id: id });
 
@@ -1736,6 +1735,18 @@ class GrblController {
                 this.command('gcode', macro.content, context);
 
                 callback(null);
+            },
+            'macro:rotaryMMenable': () => {
+                // let [context = {}, mmMacro] = args;
+
+                // this.event.trigger(MACRO_RUN);
+                // this.command('gcode', mmMacro, context);
+            },
+            'macro:rotaryMMdisable': () => {
+                // let [context = {}, mmMacro] = args;
+
+                // this.event.trigger(MACRO_RUN);
+                // this.command('gcode', mmMacro, context);
             },
             'macro:load': () => {
                 let [id, context = {}, callback = noop] = args;
