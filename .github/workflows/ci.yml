@@ -21,6 +21,8 @@ jobs:
         node-version: [14.x]
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+    permissions:
+      contents: write
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -110,6 +112,8 @@ jobs:
         node-version: [14.x]
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+    permissions:
+      contents: write
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -193,6 +197,8 @@ jobs:
         node-version: [14.x]
     env:
       GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+    permissions:
+      contents: write
     steps:
     - name: Prepare VC++ Runtime
       run: choco install -y vcredist2017
