@@ -73,17 +73,6 @@ jobs:
         cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-armv7l.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.deb"
         cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}-arm64.AppImage" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.AppImage"
         cp -af "output/${PACKAGE_NAME}-${PACKAGE_VERSION}-arm64.deb" "releases/linux/${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.deb"
-        pushd releases/linux
-        ln -sf ../../output/linux-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64"
-        tar zcfh "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64.tar.gz" "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64"
-        rm -f "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-x64"
-        ln -sf ../../output/linux-armv7l-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l"
-        tar zcfh "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l.tar.gz" "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l"
-        rm -f "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-armv7l"
-        ln -sf ../../output/linux-arm64-unpacked "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
-        tar zcfh "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64.tar.gz" "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
-        rm -f "${PACKAGE_NAME}-${PACKAGE_VERSION}-linux-arm64"
-        popd
         ls -al output releases/linux
         if [[ "$GITHUB_REF_TYPE" == "branch" && "$GITHUB_REF_NAME" == "master" ]]; then
           yarn github-release delete \
