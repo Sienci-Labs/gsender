@@ -21,7 +21,7 @@
  *
  */
 
-import AvrgirlArduino from 'avrgirl-arduino';
+import AvrgirlArduino from '@sienci/avrgirl-arduino';
 import mk1Image from '!file-loader!./mk1_20220214.hex';
 import mk2Image from '!file-loader!./mk2_20220214.hex';
 import logger from '../../logger';
@@ -38,6 +38,7 @@ const FlashingFirmware = (flashPort, imageType = 'MK1', socket) => {
             board: 'uno',
             port: flashPort,
         });
+
         let imageHex = (imageType === 'MK2') ? mk2Image : mk1Image;
         avrgirl.flash(imageHex, (error) => {
             if (error) {

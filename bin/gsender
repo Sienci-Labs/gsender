@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 
-require('@babel/polyfill');
-
 const launchServer = (process.env.NODE_ENV === 'development')
-    ? require('../output/server-cli').default
-    : require('../dist/gsender/server-cli').default;
+    ? require('../output/server-cli')
+    : require('../dist/gsender/server-cli');
 
 launchServer().catch(err => {
     console.error('Error:', err);
