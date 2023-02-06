@@ -35,9 +35,9 @@ import config from '../configstore';
 import taskRunner from '../taskrunner';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import {
-    GrblController
+    GrblController,
+    GrblHalController
 } from '../../controllers';
-import
 import { GRBL } from '../../controllers/Grbl/constants';
 import { GRBLHAL } from '../../controllers/Grblhal/constants';
 import {
@@ -120,6 +120,11 @@ class CNCEngine {
         // Grbl
         if (!controller || caseInsensitiveEquals(GRBL, controller)) {
             this.controllerClass[GRBL] = GrblController;
+        }
+
+        // GrblHal
+        if (!controller || caseInsensitiveEquals(GRBLHAL, controller)) {
+            this.controllerClass[GRBLHAL] = GrblHalController;
         }
 
         if (Object.keys(this.controllerClass).length === 0) {
@@ -300,7 +305,7 @@ class CNCEngine {
             });
 
             // Open serial port
-            socket.on('open', (port, options, callback = noop) => {
+            socket.on('open', (port, controllerType, options, callback = noop) => {
                 if (typeof callback !== 'function') {
                     callback = noop;
                 }
@@ -309,7 +314,7 @@ class CNCEngine {
 
                 let controller = store.get(`controllers["${port}"]`);
                 if (!controller) {
-                    let { controllerType = GRBL, baudrate, rtscts } = { ...options };
+                    let { baudrate, rtscts } = { ...options };
 
                     const Controller = this.controllerClass[controllerType];
                     if (!Controller) {

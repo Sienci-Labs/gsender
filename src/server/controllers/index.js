@@ -22,3 +22,4 @@
  */
 
 export { default as GrblController } from './Grbl/GrblController';
+export { default as GrblHalController } from './Grblhal/GrblHalController';

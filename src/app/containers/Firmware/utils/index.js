@@ -26,8 +26,9 @@ export const connectToLastDevice = (callback) => {
 
     const port = connectionConfig.get('port');
     const baudrate = connectionConfig.get('baudrate');
-    controller.openPort(port, {
-        controllerType: GRBL,
+    const controllerType = connectionConfig.get('controller.type') || GRBL;
+
+    controller.openPort(port, controllerType, {
         baudrate,
         rtscts: false
     }, (err) => {

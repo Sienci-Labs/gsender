@@ -164,6 +164,12 @@ class NavbarConnection extends PureComponent {
                 }
                 <div style={isMobile ? { display: isActive ? 'block' : 'none' } : null} className={styles.NavbarConnectionDropdownList}>
                     {
+                        <>
+                            <button style={{ color: 'black' }} onClick={() => actions.onClickFirmwareButton('Grbl')}>GRBL</button>
+                            <button style={{ color: 'black' }} onClick={() => actions.onClickFirmwareButton('grblHAL')}>grblHAL</button>
+                        </>
+                    }
+                    {
                         !connected && <h5>Recognized Devices</h5>
                     }
                     {
