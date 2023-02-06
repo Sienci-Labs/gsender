@@ -121,6 +121,9 @@ class CNCEngine {
         if (!controller || caseInsensitiveEquals(GRBL, controller)) {
             this.controllerClass[GRBL] = GrblController;
         }
+        if (!controller || caseInsensitiveEquals(GRBLHAL, controller)) {
+            this.controllerClass[GRBLHAL] = GrblHalController;
+        }
 
         // GrblHal
         if (!controller || caseInsensitiveEquals(GRBLHAL, controller)) {
