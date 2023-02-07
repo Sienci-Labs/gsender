@@ -24,16 +24,16 @@
 import events from 'events';
 import _ from 'lodash';
 import decimalPlaces from '../../lib/decimal-places';
-import GrblHalLineParser from './GrblHalLineParser';
-import GrblHalLineParserResultStatus from './GrblHalLineParserResultStatus';
-import GrblHalLineParserResultOk from './GrblHalLineParserResultOk';
-import GrblHalLineParserResultError from './GrblHalLineParserResultError';
-import GrblHalLineParserResultAlarm from './GrblHalLineParserResultAlarm';
-import GrbHalLineParserResultParserState from './GrbHalLineParserResultParserState';
-import GrblHalLineParserResultParameters from './GrblHalLineParserResultParameters';
-import GrblHalLineParserResultFeedback from './GrblHalLineParserResultFeedback';
-import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
-import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
+import GrblHalLineParser from './GrblLineParser';
+import GrblHalLineParserResultStatus from './GrblLineParserResultStatus';
+import GrblHalLineParserResultOk from './GrblLineParserResultOk';
+import GrblHalLineParserResultError from './GrblLineParserResultError';
+import GrblHalLineParserResultAlarm from './GrblLineParserResultAlarm';
+import GrbHalLineParserResultParserState from './GrblLineParserResultParserState';
+import GrblHalLineParserResultParameters from './GrblLineParserResultParameters';
+import GrblHalLineParserResultFeedback from './GrblLineParserResultFeedback';
+import GrblHalLineParserResultSettings from './GrblLineParserResultSettings';
+import GrblHalLineParserResultStartup from './GrblLineParserResultStartup';
 import logger from '../../lib/logger';
 import {
     GRBL_ACTIVE_STATE_IDLE,

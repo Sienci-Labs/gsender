@@ -26,7 +26,6 @@ import reverse from 'lodash/reverse';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import { connect } from 'react-redux';
-import { GRBL } from 'app/constants';
 import includes from 'lodash/includes';
 //import map from 'lodash/map';
 import PropTypes from 'prop-types';
@@ -83,13 +82,19 @@ class NavbarConnectionWidget extends PureComponent {
                 port: option.value
             }));
         },
+        onClickFirmwareButton: (selectedFirmware) => {
+            this.setState(state => ({
+                alertMessage: '',
+                controllerType: selectedFirmware
+            }));
+        },
         onClickPortListing: (selectedPort) => {
             this.setState(state => ({
                 alertMessage: '',
                 port: selectedPort.port
             }), () => {
-                const { port, baudrate } = this.state;
-                this.openPort(port, { baudrate: baudrate });
+                const { port, baudrate, controllerType } = this.state;
+                this.openPort(port, controllerType, { baudrate: baudrate });
             });
         },
         toggleAutoReconnect: (event) => {
@@ -120,8 +125,8 @@ class NavbarConnectionWidget extends PureComponent {
             this.refreshPorts();
         },
         handleOpenPort: (event) => {
-            const { port, baudrate } = this.state;
-            this.openPort(port, { baudrate: baudrate });
+            const { port, baudrate, controllerType } = this.state;
+            this.openPort(port, controllerType, { baudrate: baudrate });
         },
         handleClosePort: (event) => {
             const { port } = this.state;
@@ -140,7 +145,7 @@ class NavbarConnectionWidget extends PureComponent {
             alertMessage: '',
             connecting: false,
             connected: true,
-            controllerType: GRBL,
+            controllerType: state.controllerType,
             port: port,
             baudrate: connectedBaudrate
         }));
@@ -208,6 +213,11 @@ class NavbarConnectionWidget extends PureComponent {
             controllerType = controller.loadedControllers[0];
         }
 
+        let selectedControllerType = this.config.get('controller.selectedType');
+        if (!includes(controller.loadedControllers, selectedControllerType)) {
+            selectedControllerType = controller.loadedControllers[0];
+        }
+
         // Common baud rates
         const defaultBaudrates = [
             250000,
@@ -227,6 +237,7 @@ class NavbarConnectionWidget extends PureComponent {
             connected: false,
             baudrates: reverse(sortBy(uniq(controller.baudrates.concat(defaultBaudrates)))),
             controllerType: controllerType,
+            selectedControllerType: selectedControllerType,
             port: this.config.get('port'),
             baudrate: this.config.get('baudrate'),
             connection: {
@@ -256,14 +267,14 @@ class NavbarConnectionWidget extends PureComponent {
     }
 
     attemptAutoConnect() {
-        const { autoReconnect, hasReconnected, port, baudrate } = this.state;
+        const { autoReconnect, hasReconnected, port, baudrate, controllerType } = this.state;
         const { ports } = this.props;
 
         if (autoReconnect && !hasReconnected) {
             this.setState(state => ({
                 hasReconnected: true
             }));
-            this.openPort(port, {
+            this.openPort(port, controllerType, {
                 baudrate: baudrate
             });
         } else {
@@ -292,15 +303,14 @@ class NavbarConnectionWidget extends PureComponent {
         controller.listPorts();
     }
 
-    openPort(port, options) {
+    openPort(port, controllerType, options) {
         const { baudrate } = { ...options };
 
         this.setState(state => ({
             connecting: true
         }));
 
-        controller.openPort(port, {
-            controllerType: GRBL,
+        controller.openPort(port, controllerType, {
             baudrate: baudrate,
             rtscts: this.state.connection.serial.rtscts
         }, (err) => {
@@ -380,8 +390,7 @@ class NavbarConnectionWidget extends PureComponent {
         const state = {
             ...this.state,
             ports,
-            unrecognizedPorts,
-            controllerType: GRBL,
+            unrecognizedPorts
         };
         const actions = {
             ...this.actions

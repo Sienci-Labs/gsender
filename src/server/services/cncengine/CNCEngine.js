@@ -125,6 +125,11 @@ class CNCEngine {
             this.controllerClass[GRBLHAL] = GrblHalController;
         }
 
+        // GrblHal
+        if (!controller || caseInsensitiveEquals(GRBLHAL, controller)) {
+            this.controllerClass[GRBLHAL] = GrblHalController;
+        }
+
         if (Object.keys(this.controllerClass).length === 0) {
             throw new Error(`No valid CNC controller specified (${controller})`);
         }
@@ -303,7 +308,7 @@ class CNCEngine {
             });
 
             // Open serial port
-            socket.on('open', (port, options, callback = noop) => {
+            socket.on('open', (port, controllerType, options, callback = noop) => {
                 if (typeof callback !== 'function') {
                     callback = noop;
                 }
@@ -312,7 +317,7 @@ class CNCEngine {
 
                 let controller = store.get(`controllers["${port}"]`);
                 if (!controller) {
-                    let { controllerType = GRBL, baudrate, rtscts } = { ...options };
+                    let { baudrate, rtscts } = { ...options };
 
                     const Controller = this.controllerClass[controllerType];
                     if (!Controller) {
