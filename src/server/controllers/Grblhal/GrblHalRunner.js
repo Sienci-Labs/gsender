@@ -36,11 +36,11 @@ import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
 import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
 import logger from '../../lib/logger';
 import {
-    GRBL_ACTIVE_STATE_IDLE,
-    GRBL_ACTIVE_STATE_ALARM
+    GRBL_HAL_ACTIVE_STATE_IDLE,
+    GRBL_HAL_ACTIVE_STATE_ALARM
 } from './constants';
 
-const log = logger('controller:Grbl');
+const log = logger('controller:GrblHal');
 
 class GrblHalRunner extends events.EventEmitter {
     state = {
@@ -93,7 +93,7 @@ class GrblHalRunner extends events.EventEmitter {
     parse(data) {
         data = ('' + data).replace(/\s+$/, '');
         if (!data) {
-            log.warn('Empty result parsed from GrlbLineParser');
+            log.warn('Empty result parsed from GrlbHalLineParser');
             return;
         }
 
@@ -152,7 +152,7 @@ class GrblHalRunner extends events.EventEmitter {
             // https://nodejs.org/api/events.html#events_error_events
             // As a best practice, listeners should always be added for the 'error' events.
             this.emit('error', payload);
-            log.error('Error found in GrblLineParserResultError');
+            log.error('Error found in GrblHalLineParserResultError');
             return;
         }
         if (type === GrblHalLineParserResultAlarm) {
@@ -160,7 +160,7 @@ class GrblHalRunner extends events.EventEmitter {
                 ...this.state,
                 status: {
                     ...this.state.status,
-                    activeState: GRBL_ACTIVE_STATE_ALARM,
+                    activeState: GRBL_HAL_ACTIVE_STATE_ALARM,
                     alarmCode: Number(payload.message)
                 }
             };
@@ -266,12 +266,12 @@ class GrblHalRunner extends events.EventEmitter {
 
     isAlarm() {
         const activeState = _.get(this.state, 'status.activeState');
-        return activeState === GRBL_ACTIVE_STATE_ALARM;
+        return activeState === GRBL_HAL_ACTIVE_STATE_ALARM;
     }
 
     isIdle() {
         const activeState = _.get(this.state, 'status.activeState');
-        return activeState === GRBL_ACTIVE_STATE_IDLE;
+        return activeState === GRBL_HAL_ACTIVE_STATE_IDLE;
     }
 }
 

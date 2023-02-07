@@ -26,17 +26,17 @@
 export const GRBLHAL = 'grblHAL';
 
 // Active State
-export const GRBL_ACTIVE_STATE_IDLE = 'Idle';
-export const GRBL_ACTIVE_STATE_RUN = 'Run';
-export const GRBL_ACTIVE_STATE_HOLD = 'Hold';
-export const GRBL_ACTIVE_STATE_DOOR = 'Door';
-export const GRBL_ACTIVE_STATE_HOME = 'Home';
-export const GRBL_ACTIVE_STATE_SLEEP = 'Sleep';
-export const GRBL_ACTIVE_STATE_ALARM = 'Alarm';
-export const GRBL_ACTIVE_STATE_CHECK = 'Check';
+export const GRBL_HAL_ACTIVE_STATE_IDLE = 'Idle';
+export const GRBL_HAL_ACTIVE_STATE_RUN = 'Run';
+export const GRBL_HAL_ACTIVE_STATE_HOLD = 'Hold';
+export const GRBL_HAL_ACTIVE_STATE_DOOR = 'Door';
+export const GRBL_HAL_ACTIVE_STATE_HOME = 'Home';
+export const GRBL_HAL_ACTIVE_STATE_SLEEP = 'Sleep';
+export const GRBL_HAL_ACTIVE_STATE_ALARM = 'Alarm';
+export const GRBL_HAL_ACTIVE_STATE_CHECK = 'Check';
 
 // Real-time Commands: ~, !, ?, and Ctrl-x
-export const GRBL_REALTIME_COMMANDS = [
+export const GRBL_HAL_REALTIME_COMMANDS = [
     '~', // Cycle Start
     '!', // Feed Hold
     '?', // Current Status
@@ -45,7 +45,7 @@ export const GRBL_REALTIME_COMMANDS = [
 
 // https://github.com/grbl/grbl/wiki/Configuring-Grbl-v0.9
 // http://linuxcnc.org/docs/html/gcode/overview.html#cap:modal-groups
-export const GRBL_MODAL_GROUPS = [
+export const GRBL_HAL_MODAL_GROUPS = [
     { // Motion Mode (Defaults to G0)
         group: 'motion',
         modes: ['G0', 'G1', 'G2', 'G3', 'G38.2', 'G38.3', 'G38.4', 'G38.5', 'G80']
@@ -86,7 +86,7 @@ export const GRBL_MODAL_GROUPS = [
 
 // Errors
 // https://github.com/gnea/grbl/blob/master/doc/csv/error_codes_en_US.csv
-export const GRBL_ERRORS = [
+export const GRBL_HAL_ERRORS = [
     {
         code: 1,
         message: 'Expected command letter',
@@ -271,7 +271,7 @@ export const GRBL_ERRORS = [
 
 // Alarms
 // https://github.com/gnea/grbl/blob/master/doc/csv/alarm_codes_en_US.csv
-export const GRBL_ALARMS = [
+export const GRBL_HAL_ALARMS = [
     {
         code: 1,
         message: 'Hard limit',
@@ -324,18 +324,18 @@ export const GRBL_ALARMS = [
     }
 ];
 
-export const GRBL_SETTINGS_INPUT_TYPES = {
+export const GRBL_HAL_SETTINGS_INPUT_TYPES = {
     NUMBER: 'number',
     MASK: 'mask',
     MASK_STATUS_REPORT: 'mask-status-report',
     SWITCH: 'switch',
 };
 
-const { NUMBER, MASK, MASK_STATUS_REPORT, SWITCH } = GRBL_SETTINGS_INPUT_TYPES;
+const { NUMBER, MASK, MASK_STATUS_REPORT, SWITCH } = GRBL_HAL_SETTINGS_INPUT_TYPES;
 
 // Settings
 // https://github.com/gnea/grbl/blob/master/doc/csv/setting_codes_en_US.csv
-export const GRBL_SETTINGS = [
+export const GRBL_HAL_SETTINGS = [
     {
         setting: '$0',
         message: 'Step pulse time',

@@ -52,11 +52,11 @@ import {
 import GrblHalRunner from './GrblHalRunner';
 import {
     GRBLHAL,
-    GRBL_ACTIVE_STATE_RUN,
-    GRBL_REALTIME_COMMANDS,
-    GRBL_ALARMS,
-    GRBL_ERRORS,
-    GRBL_SETTINGS, GRBL_ACTIVE_STATE_HOME
+    GRBL_HAL_ACTIVE_STATE_RUN,
+    GRBL_HAL_REALTIME_COMMANDS,
+    GRBL_HAL_ALARMS,
+    GRBL_HAL_ERRORS,
+    GRBL_HAL_SETTINGS, GRBL_HAL_ACTIVE_STATE_HOME
 } from './constants';
 import {
     METRIC_UNITS,
@@ -82,7 +82,7 @@ const PREHOOK_COMPLETE = '%pre_complete';
 const POSTHOOK_COMPLETE = '%post_complete';
 const PAUSE_START = '%pause_start';
 
-const log = logger('controller:Grbl');
+const log = logger('controller:GrblHal');
 const noop = _.noop;
 
 class GrblHalController {
@@ -594,7 +594,7 @@ class GrblHalController {
 
         this.runner.on('error', (res) => {
             const code = Number(res.message) || undefined;
-            const error = _.find(GRBL_ERRORS, { code: code });
+            const error = _.find(GRBL_HAL_ERRORS, { code: code });
 
             log.error(`Error occurred at ${Date.now()}`);
 
@@ -617,7 +617,7 @@ class GrblHalController {
             }
 
             this.emit('error', {
-                type: 'GRBL_ERROR',
+                type: 'GRBL_HAL_ERROR',
                 code: `${code}`,
                 description: error.description,
                 line: line,
@@ -667,13 +667,13 @@ class GrblHalController {
 
         this.runner.on('alarm', (res) => {
             const code = Number(res.message) || undefined;
-            const alarm = _.find(GRBL_ALARMS, { code: code });
+            const alarm = _.find(GRBL_HAL_ALARMS, { code: code });
 
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
                 this.emit('error', {
-                    type: 'GRBL_ALARM',
+                    type: 'GRBL_HAL_ALARM',
                     code: code,
                     description: alarm.description,
                 });
@@ -714,7 +714,7 @@ class GrblHalController {
         });
 
         this.runner.on('settings', (res) => {
-            const setting = _.find(GRBL_SETTINGS, { setting: res.name });
+            const setting = _.find(GRBL_HAL_SETTINGS, { setting: res.name });
 
             if (!res.message && setting) {
                 // Grbl v1.1
@@ -1391,7 +1391,7 @@ class GrblHalController {
                     let activeState;
 
                     activeState = _.get(this.state, 'status.activeState', '');
-                    if (activeState === GRBL_ACTIVE_STATE_RUN) {
+                    if (activeState === GRBL_HAL_ACTIVE_STATE_RUN) {
                         this.write('!'); // hold
                     }
 
@@ -1472,7 +1472,7 @@ class GrblHalController {
                 this.homingStarted = true; // Update homing cycle as having started
 
                 this.writeln('$H');
-                this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
+                this.state.status.activeState = GRBL_HAL_ACTIVE_STATE_HOME;
                 this.emit('controller:state', GRBLHAL, this.state);
             },
             'sleep': () => {
@@ -1836,7 +1836,7 @@ class GrblHalController {
     }
 
     writeln(data, context) {
-        if (_.includes(GRBL_REALTIME_COMMANDS, data)) {
+        if (_.includes(GRBL_HAL_REALTIME_COMMANDS, data)) {
             this.write(data, context);
         } else {
             this.write(data + '\n', context);
