@@ -1736,12 +1736,12 @@ class GrblController {
 
                 callback(null);
             },
-            'aaxis:updateMM': () => {
-                let [mmMacro = '', shouldEnableMM = false] = args;
-                console.log('WORKING :', mmMacro, shouldEnableMM); //delete this
-                if (shouldEnableMM) {
-                // this.event.trigger(MACRO_RUN);
-                // this.command('gcode', mmMacro);
+            'rotaryAxis:updateState': () => {
+                let [shouldEnableRotary = false] = args;
+                console.log('WORKING :', shouldEnableRotary); // TODO - delete this
+                if (shouldEnableRotary) {
+                // set new Ymax
+                    return;
                 }
                 //Else
                 //set Ymax to default

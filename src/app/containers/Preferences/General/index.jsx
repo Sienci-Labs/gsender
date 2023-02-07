@@ -23,7 +23,7 @@
 
 import React from 'react';
 import JoggingPresets from './JoggingPresets';
-import Aaxis from './Aaxis';
+import RotaryAaxis from './RotaryAxis';
 import SettingWrapper from '../components/SettingWrapper';
 import Connection from './Connection';
 import GeneralArea from '../components/GeneralArea';
@@ -45,7 +45,7 @@ const General = ({ active, state, actions }) => {
                 <GeneralArea.Half>
                     <Settings />
                     <DataCollection />
-                    <Aaxis />
+                    <RotaryAaxis state={state} />
                 </GeneralArea.Half>
 
             </GeneralArea>

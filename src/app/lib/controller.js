@@ -102,8 +102,8 @@ class Controller {
         'ip:list': [],
         'wizard:next': [],
 
-        //A-Axis events
-        'aaxis:updateMM': []
+        //A-Axis A.K.A Rotary-Axis events
+        'rotaryAxis:updateState': []
     };
 
     context = {
