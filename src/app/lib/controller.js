@@ -100,7 +100,10 @@ class Controller {
         'grbl:iSready': [],
         'sender:M0M1': [],
         'ip:list': [],
-        'wizard:next': []
+        'wizard:next': [],
+
+        //A-Axis events
+        'aaxis:updateMM': []
     };
 
     context = {

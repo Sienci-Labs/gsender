@@ -1736,17 +1736,15 @@ class GrblController {
 
                 callback(null);
             },
-            'macro:rotaryMMenable': () => {
-                // let [context = {}, mmMacro] = args;
-
+            'aaxis:updateMM': () => {
+                let [mmMacro = '', shouldEnableMM = false] = args;
+                console.log('WORKING :', mmMacro, shouldEnableMM); //delete this
+                if (shouldEnableMM) {
                 // this.event.trigger(MACRO_RUN);
-                // this.command('gcode', mmMacro, context);
-            },
-            'macro:rotaryMMdisable': () => {
-                // let [context = {}, mmMacro] = args;
-
-                // this.event.trigger(MACRO_RUN);
-                // this.command('gcode', mmMacro, context);
+                // this.command('gcode', mmMacro);
+                }
+                //Else
+                //set Ymax to default
             },
             'macro:load': () => {
                 let [id, context = {}, callback = noop] = args;
