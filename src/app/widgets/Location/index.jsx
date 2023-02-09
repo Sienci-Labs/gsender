@@ -24,6 +24,7 @@
 import cx from 'classnames';
 import ensureArray from 'ensure-array';
 import get from 'lodash/get';
+import reduxStore from 'app/store/redux';
 import includes from 'lodash/includes';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
@@ -410,6 +411,13 @@ class LocationWidget extends PureComponent {
             pubsub.publish('jogSpeeds', newSpeeds);
         },
         ZERO_AXIS: (event, { axis }) => {
+            const rotaryAxisStatus = store.get('rotaryAxisStatus');
+            const firmwareType = get(reduxStore.getState(), 'controller.type', 'grbl');
+            const grbl = firmwareType.toLocaleLowerCase() === 'grbl';
+
+            if (axis === 'a' && !rotaryAxisStatus || axis === 'a' && rotaryAxisStatus && grbl) {
+                return;
+            }
             console.log('ZERO_AXIS, Axis: ', axis); // TODO - Delete this
             const { state } = this.props;
             const activeState = get(state, 'status.activeState');
@@ -440,9 +448,16 @@ class LocationWidget extends PureComponent {
             const { state } = this.props;
             const { machinePosition, safeRetractHeight, homingEnabled } = this.state;
             const activeState = get(state, 'status.activeState');
+            const rotaryAxisStatus = store.get('rotaryAxisStatus');
+            const firmwareType = get(reduxStore.getState(), 'controller.type', 'grbl');
+            const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
             if (!axisList || axisList.length === 0 || activeState !== GRBL_ACTIVE_STATE_IDLE) {
                 return;
             }
+            if (axisList[0] === 'a' && !rotaryAxisStatus || axisList[0] === 'a' && rotaryAxisStatus && isGrbl) {
+                return;
+            }
+            console.log('LOCATION EVENT, Axis: ', axisList); // TODO - Delete this
             let safeHeightCommand = '';
             let moveCommand = '';
 
@@ -525,17 +540,6 @@ class LocationWidget extends PureComponent {
             category: LOCATION_CATEGORY,
             callback: this.shuttleControlFunctions.ZERO_AXIS
         },
-        GO_TO_A_AXIS_ZERO: {
-            id: 73,
-            title: 'Go to A Zero',
-            keys: ['shift', '1'].join('+'),
-            cmd: 'GO_TO_A_AXIS_ZERO',
-            preventDefault: true,
-            payload: { axis: AXIS_A },
-            isActive: true,
-            category: LOCATION_CATEGORY,
-            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
-        },
         ZERO_ALL_AXIS: {
             id: 26,
             title: 'Zero All',
@@ -546,6 +550,17 @@ class LocationWidget extends PureComponent {
             isActive: true,
             category: LOCATION_CATEGORY,
             callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        GO_TO_A_AXIS_ZERO: {
+            id: 73,
+            title: 'Go to A Zero',
+            keys: ['shift', '1'].join('+'),
+            cmd: 'GO_TO_A_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_A] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
         },
         GO_TO_X_AXIS_ZERO: {
             id: 27,

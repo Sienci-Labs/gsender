@@ -29,6 +29,7 @@ import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import includes from 'lodash/includes';
 import { throttle, inRange } from 'lodash';
+import reduxStore from 'app/store/redux';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Widget from 'app/components/Widget';
@@ -41,7 +42,7 @@ import { limit } from 'app/lib/normalize-range';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
-import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_SUCCESS, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
 import { connect } from 'react-redux';
 import store from '../../store';
 import Axes from './Axes';
@@ -479,14 +480,35 @@ class AxesWidget extends PureComponent {
 
     shuttleControlFunctions = {
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
+            const rotaryAxisStatus = store.get('rotaryAxisStatus');
+            const firmwareType = get(reduxStore.getState(), 'controller.type', 'grbl');
+            const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
             if (event) {
                 preventDefault(event);
             }
+            if (axis.a && !rotaryAxisStatus || axis.a && rotaryAxisStatus && isGrbl) {
+                return;
+            }
+
             console.log('JOG EVENT, Axis: ', axis); // TODO - Delete this
             this.handleShortcutJog({ axis, direction });
         },
         UPDATE_ROTARY_STATUS: (_, { command }) => {
+            const firmwareType = get(reduxStore.getState(), 'controller.type', 'grbl');
+            const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
             const shouldEnableRotary = !store.get('rotaryAxisStatus', false);
+
+            //If grbl, turn off Rotary Axis and update user
+            if (isGrbl) {
+                store.set('rotaryAxisStatus', false);
+                Toaster.clear();
+                Toaster.pop({
+                    type: TOASTER_WARNING,
+                    msg: 'Your firmware does not support Rotary Axis.',
+                });
+                return;
+            }
+
             store.set('rotaryAxisStatus', shouldEnableRotary);
             controller.command(command, shouldEnableRotary);
             //Notify user
