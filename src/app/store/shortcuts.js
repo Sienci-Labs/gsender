@@ -22,6 +22,7 @@ import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from 'app/widgets/JogControl
 const AXIS_X = 'x';
 const AXIS_Y = 'y';
 const AXIS_Z = 'z';
+const AXIS_A = 'a';
 
 export const shortcuts = [
     { // Load File
@@ -776,5 +777,41 @@ export const shortcuts = [
         preventDefault: false,
         isActive: true,
         category: TOOLBAR_CATEGORY,
+    },
+    { // Jog A+
+        id: 71,
+        title: 'Jog: A+',
+        keys: ['ctrl', '6'].join('+'),
+        cmd: 'JOG',
+        payload: {
+            axis: { [AXIS_A]: 1 },
+        },
+        preventDefault: false,
+        isActive: true,
+        category: JOGGING_CATEGORY,
+    },
+    { // Jog A-
+        id: 72,
+        title: 'Jog: A-',
+        keys: ['ctrl', '4'].join('+'),
+        cmd: 'JOG',
+        payload: {
+            axis: { [AXIS_A]: -1 },
+        },
+        preventDefault: false,
+        isActive: true,
+        category: JOGGING_CATEGORY,
+    },
+    { // Rotary Axis ON/OFF
+        id: 73,
+        title: 'Rotary Axis',
+        keys: ['ctrl', '5'].join('+'),
+        cmd: 'ROTARY_AXIS',
+        payload: {
+            command: 'rotaryAxis:updateState',
+        },
+        preventDefault: false,
+        isActive: true,
+        category: GENERAL_CATEGORY,
     },
 ];

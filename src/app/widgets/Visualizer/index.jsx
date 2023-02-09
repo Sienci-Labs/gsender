@@ -75,6 +75,7 @@ import {
     GENERAL_CATEGORY,
     OVERRIDES_CATEGORY,
     VISUALIZER_CATEGORY,
+    JOGGING_CATEGORY,
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
@@ -934,6 +935,22 @@ class VisualizerWidget extends PureComponent {
         }
     }
 
+    rotaryAxisFunctions = {
+        JOG_PLUS: (_, { axis }) => {
+            // TODO - delete this and write logic
+            console.log('A + ', axis.a);
+        },
+        JOG_MINUS: (_, { axis }) => {
+            // TODO - delete this and write logic
+            console.log('A - ', axis.a);
+        },
+        UPDATE_STATUS: (_, { command }) => {
+            // TODO - delete console log and fire this event
+            console.log('Controller command: ', command);
+            // controller.command(command, store.get('rotaryAxisStatus', false));
+        }
+    }
+
     shuttleControlEvents = {
         LOAD_FILE: {
             id: 0,
@@ -1277,8 +1294,47 @@ class VisualizerWidget extends PureComponent {
                 controller.command('macro:run', macroID, controller.context);
             }
         },
-        VISUALIZER_VIEW_CYCLE: {
+        JOG_A_PLUS: { // Jog A+
+            id: 71,
+            title: 'Jog: A+',
+            keys: ['ctrl', '6'].join('+'),
+            cmd: 'JOG',
+            payload: {
+                axis: { a: 1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.rotaryAxisFunctions.JOG_PLUS
+        },
+        JOG_A_MINUS: { // Jog A-
             id: 72,
+            title: 'Jog: A-',
+            keys: ['ctrl', '4'].join('+'),
+            cmd: 'JOG',
+            payload: {
+                axis: { a: -1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.rotaryAxisFunctions.JOG_MINUS
+        },
+        ROTARY_AXIS: { // Rotary Axis ON/OFF
+            id: 73,
+            title: 'Rotary Axis',
+            keys: ['ctrl', '5'].join('+'),
+            cmd: 'ROTARY_AXIS',
+            payload: {
+                command: 'rotaryAxis:updateState',
+            },
+            preventDefault: false,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: this.rotaryAxisFunctions.UPDATE_STATUS
+        },
+        VISUALIZER_VIEW_CYCLE: {
+            id: 74,
             title: 'Cycle Through Visualizer Cameras',
             keys: ['shift', 'b'].join('+'),
             cmd: 'VISUALIZER_VIEW_CYCLE',
@@ -1289,7 +1345,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW_CYCLE
         },
         VISUALIZER_ZOOM_IN: {
-            id: 73,
+            id: 75,
             title: 'Zoom In',
             keys: ['shift', 'p'].join('+'),
             cmd: 'VISUALIZER_ZOOM_IN',
@@ -1300,8 +1356,8 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_IN
         },
         VISUALIZER_ZOOM_OUT: {
-            id: 73,
-            title: 'Zoom In',
+            id: 76,
+            title: 'Zoom Out',
             keys: ['shift', 'o'].join('+'),
             cmd: 'VISUALIZER_ZOOM_OUT',
             payload: { type: 'default' },
@@ -1311,8 +1367,8 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT
         },
         VISUALIZER_ZOOM_FIT: {
-            id: 73,
-            title: 'Zoom In',
+            id: 77,
+            title: 'Zoom To Fit',
             keys: ['shift', 'i'].join('+'),
             cmd: 'VISUALIZER_ZOOM_FIT',
             payload: { type: 'default' },
