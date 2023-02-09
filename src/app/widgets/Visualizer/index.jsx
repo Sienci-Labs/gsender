@@ -75,7 +75,6 @@ import {
     GENERAL_CATEGORY,
     OVERRIDES_CATEGORY,
     VISUALIZER_CATEGORY,
-    JOGGING_CATEGORY,
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
@@ -935,22 +934,6 @@ class VisualizerWidget extends PureComponent {
         }
     }
 
-    rotaryAxisFunctions = {
-        JOG_PLUS: (_, { axis }) => {
-            // TODO - delete this and write logic
-            console.log('A + ', axis.a);
-        },
-        JOG_MINUS: (_, { axis }) => {
-            // TODO - delete this and write logic
-            console.log('A - ', axis.a);
-        },
-        UPDATE_STATUS: (_, { command }) => {
-            // TODO - delete console log and fire this event
-            console.log('Controller command: ', command);
-            // controller.command(command, store.get('rotaryAxisStatus', false));
-        }
-    }
-
     shuttleControlEvents = {
         LOAD_FILE: {
             id: 0,
@@ -1293,45 +1276,6 @@ class VisualizerWidget extends PureComponent {
             if (activeState === GRBL_ACTIVE_STATE_IDLE) {
                 controller.command('macro:run', macroID, controller.context);
             }
-        },
-        JOG_A_PLUS: { // Jog A+
-            id: 71,
-            title: 'Jog: A+',
-            keys: ['ctrl', '6'].join('+'),
-            cmd: 'JOG',
-            payload: {
-                axis: { a: 1 },
-            },
-            preventDefault: false,
-            isActive: true,
-            category: JOGGING_CATEGORY,
-            callback: this.rotaryAxisFunctions.JOG_PLUS
-        },
-        JOG_A_MINUS: { // Jog A-
-            id: 72,
-            title: 'Jog: A-',
-            keys: ['ctrl', '4'].join('+'),
-            cmd: 'JOG',
-            payload: {
-                axis: { a: -1 },
-            },
-            preventDefault: false,
-            isActive: true,
-            category: JOGGING_CATEGORY,
-            callback: this.rotaryAxisFunctions.JOG_MINUS
-        },
-        ROTARY_AXIS: { // Rotary Axis ON/OFF
-            id: 73,
-            title: 'Rotary Axis',
-            keys: ['ctrl', '5'].join('+'),
-            cmd: 'ROTARY_AXIS',
-            payload: {
-                command: 'rotaryAxis:updateState',
-            },
-            preventDefault: false,
-            isActive: true,
-            category: GENERAL_CATEGORY,
-            callback: this.rotaryAxisFunctions.UPDATE_STATUS
         },
         VISUALIZER_VIEW_CYCLE: {
             id: 74,
