@@ -66,6 +66,7 @@ import {
     AXIS_X,
     AXIS_Y,
     AXIS_Z,
+    AXIS_A
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -507,10 +508,32 @@ class LocationWidget extends PureComponent {
             keys: ['shift', 'r'].join('+'),
             cmd: 'ZERO_Z_AXIS',
             preventDefault: true,
-            payload: { axis: AXIS_Z },
+            payload: { axis: AXIS_A },
             isActive: true,
             category: LOCATION_CATEGORY,
             callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        ZERO_A_AXIS: {
+            id: 72,
+            title: 'Zero A Axis',
+            keys: ['shift', '0'].join('+'),
+            cmd: 'ZERO_A_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_A },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        GO_TO_A_AXIS_ZERO: {
+            id: 73,
+            title: 'Go to A Zero',
+            keys: ['shift', '1'].join('+'),
+            cmd: 'GO_TO_A_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axis: AXIS_A },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
         },
         ZERO_ALL_AXIS: {
             id: 26,

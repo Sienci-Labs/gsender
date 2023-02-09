@@ -41,6 +41,7 @@ import { limit } from 'app/lib/normalize-range';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
+import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import { connect } from 'react-redux';
 import store from '../../store';
 import Axes from './Axes';
@@ -481,14 +482,20 @@ class AxesWidget extends PureComponent {
             if (event) {
                 preventDefault(event);
             }
-
+            console.log(axis); // TODO - Delete this
             this.handleShortcutJog({ axis, direction });
         },
         UPDATE_ROTARY_STATUS: (_, { command }) => {
-            // TODO - delete console log and fire this event
-            console.log('Controller command: ', command);
-            const rotaryAxisStatus = store.get('rotaryAxisStatus', false);
-            controller.command(command, rotaryAxisStatus);
+            const shouldEnableRotary = !store.get('rotaryAxisStatus', false);
+            store.set('rotaryAxisStatus', shouldEnableRotary);
+            controller.command(command, shouldEnableRotary);
+            //Notify user
+            const notification = shouldEnableRotary ? 'Rotary Axis turned on' : 'Rotary Axis is off';
+            Toaster.clear();
+            Toaster.pop({
+                type: TOASTER_SUCCESS,
+                msg: notification,
+            });
         },
         SET_JOG_PRESET: (event, { key }) => {
             if (!key) {
@@ -589,7 +596,7 @@ class AxesWidget extends PureComponent {
             id: 100,
             title: 'Jog: A+',
             keys: ['ctrl', '6'].join('+'),
-            cmd: 'JOG',
+            cmd: 'JOG_A_PLUS',
             payload: {
                 axis: { [AXIS_A]: 1 },
             },
@@ -602,7 +609,7 @@ class AxesWidget extends PureComponent {
             id: 101,
             title: 'Jog: A-',
             keys: ['ctrl', '4'].join('+'),
-            cmd: 'JOG',
+            cmd: 'JOG_A_MINUS',
             payload: {
                 axis: { [AXIS_A]: -1 },
             },
