@@ -482,7 +482,7 @@ class AxesWidget extends PureComponent {
             if (event) {
                 preventDefault(event);
             }
-            console.log(axis); // TODO - Delete this
+            console.log('JOG EVENT, Axis: ', axis); // TODO - Delete this
             this.handleShortcutJog({ axis, direction });
         },
         UPDATE_ROTARY_STATUS: (_, { command }) => {

@@ -1738,7 +1738,7 @@ class GrblController {
             },
             'rotaryAxis:updateState': () => {
                 let [shouldEnableRotary = false] = args;
-                console.log('WORKING :', shouldEnableRotary); // TODO - delete this
+                console.log('rotaryAxis:updateState :', shouldEnableRotary); // TODO - delete this
                 if (shouldEnableRotary) {
                 // set new Ymax
                     return;

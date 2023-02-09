@@ -410,6 +410,7 @@ class LocationWidget extends PureComponent {
             pubsub.publish('jogSpeeds', newSpeeds);
         },
         ZERO_AXIS: (event, { axis }) => {
+            console.log('ZERO_AXIS, Axis: ', axis); // TODO - Delete this
             const { state } = this.props;
             const activeState = get(state, 'status.activeState');
             if (!axis || activeState !== GRBL_ACTIVE_STATE_IDLE) {
