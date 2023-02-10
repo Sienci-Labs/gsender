@@ -14,6 +14,7 @@ const RotaryAxis = ({ state }) => {
     //TODO
     const handleRotaryAxisToggle = () => {
         const shouldEnableRotary = !rotaryAxisStatus;
+
         store.set('rotaryAxisStatus', shouldEnableRotary);
         setRotaryAxisStatus(shouldEnableRotary);
         //Fire event to toggle rotary axis on server

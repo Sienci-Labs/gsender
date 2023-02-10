@@ -101,9 +101,6 @@ class Controller {
         'sender:M0M1': [],
         'ip:list': [],
         'wizard:next': [],
-
-        //A-Axis A.K.A Rotary-Axis events
-        'rotaryAxis:updateState': []
     };
 
     context = {

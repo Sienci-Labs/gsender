@@ -1278,7 +1278,7 @@ class VisualizerWidget extends PureComponent {
             }
         },
         VISUALIZER_VIEW_CYCLE: {
-            id: 72,
+            id: 74,
             title: 'Cycle Through Visualizer Cameras',
             keys: ['shift', 'b'].join('+'),
             cmd: 'VISUALIZER_VIEW_CYCLE',
@@ -1289,7 +1289,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_VIEW_CYCLE
         },
         VISUALIZER_ZOOM_IN: {
-            id: 73,
+            id: 75,
             title: 'Zoom In',
             keys: ['shift', 'p'].join('+'),
             cmd: 'VISUALIZER_ZOOM_IN',
@@ -1300,8 +1300,8 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_IN
         },
         VISUALIZER_ZOOM_OUT: {
-            id: 73,
-            title: 'Zoom In',
+            id: 76,
+            title: 'Zoom Out',
             keys: ['shift', 'o'].join('+'),
             cmd: 'VISUALIZER_ZOOM_OUT',
             payload: { type: 'default' },
@@ -1311,8 +1311,8 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT
         },
         VISUALIZER_ZOOM_FIT: {
-            id: 73,
-            title: 'Zoom In',
+            id: 77,
+            title: 'Zoom To Fit',
             keys: ['shift', 'i'].join('+'),
             cmd: 'VISUALIZER_ZOOM_FIT',
             payload: { type: 'default' },
