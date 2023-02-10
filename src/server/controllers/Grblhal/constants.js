@@ -109,13 +109,13 @@ export const GRBL_HAL_ERRORS = [
     },
     {
         code: 5,
-        message: 'Setting disabled',
+        message: 'Homing disabled',
         description: 'Homing cycle failure. Homing is not enabled via settings.'
     },
     {
         code: 6,
-        message: 'Value < 3 usec',
-        description: 'Minimum step pulse time must be greater than 3usec.'
+        message: 'Value < 2 microseconds',
+        description: 'Step pulse time must be greater or equal to 2 microseconds.'
     },
     {
         code: 7,
@@ -171,6 +171,16 @@ export const GRBL_HAL_ERRORS = [
         code: 17,
         message: 'Setting disabled',
         description: 'Laser mode requires PWM output.'
+    },
+    {
+        code: 18,
+        message: 'Reset asserted',
+        description: ''
+    },
+    {
+        code: 19,
+        message: 'Non positive value',
+        description: ''
     },
     {
         code: 20,
@@ -266,7 +276,117 @@ export const GRBL_HAL_ERRORS = [
         code: 38,
         message: 'Invalid gcode ID:38',
         description: 'Tool number greater than max supported value.'
-    }
+    },
+    {
+        code: 39,
+        message: 'Invalid gcode ID:39',
+        description: 'Value out of range.'
+    },
+    {
+        code: 40,
+        message: 'Invalid gcode ID:40',
+        description: 'G-code command not allowed when tool change is pending.'
+    },
+    {
+        code: 41,
+        message: 'Invalid gcode ID:41',
+        description: 'Spindle not running when motion commanded in CSS or spindle sync mode.'
+    },
+    {
+        code: 42,
+        message: 'Invalid gcode ID:42',
+        description: 'Plane must be ZX for threading.'
+    },
+    {
+        code: 43,
+        message: 'Invalid gcode ID:43',
+        description: 'Max. feed rate exceeded.'
+    },
+    {
+        code: 44,
+        message: 'Invalid gcode ID:44',
+        description: 'RPM out of range.'
+    },
+    {
+        code: 45,
+        message: 'Limit switch engaged',
+        description: 'Only homing is allowed when a limit switch is engaged.'
+    },
+    {
+        code: 46,
+        message: 'Homing required',
+        description: 'Home machine to continue.'
+    },
+    {
+        code: 47,
+        message: 'Invalid gcode ID:47',
+        description: 'ATC: current tool is not set. Set current tool with M61.'
+    },
+    {
+        code: 48,
+        message: 'Invalid gcode ID:48',
+        description: 'Value word conflict.'
+    },
+    {
+        code: 49,
+        message: 'Self test failed',
+        description: 'Power on self test failed. A hard reset is required.'
+    },
+    {
+        code: 50,
+        message: 'E-stop',
+        description: 'Emergency stop active.'
+    },
+    {
+        code: 51,
+        message: 'Motor fault',
+        description: 'Motor fault.'
+    },
+    {
+        code: 52,
+        message: 'Value out of range.',
+        description: 'Setting value is out of range.'
+    },
+    {
+        code: 53,
+        message: 'Setting disabled',
+        description: 'Setting is not available, possibly due to limited driver support.'
+    },
+    {
+        code: 54,
+        message: 'Invalid gcode ID:54',
+        description: 'Retract position is less than drill depth.'
+    },
+    {
+        code: 60,
+        message: 'SD Card',
+        description: 'SD Card mount failed.'
+    },
+    {
+        code: 61,
+        message: 'SD Card',
+        description: 'SD Card file open/read failed.'
+    },
+    {
+        code: 62,
+        message: 'SD Card',
+        description: 'SD Card directory listing failed.'
+    },
+    {
+        code: 63,
+        message: 'SD Card',
+        description: 'SD Card directory not found.'
+    },
+    {
+        code: 64,
+        message: 'SD Card',
+        description: 'SD Card file empty.'
+    },
+    {
+        code: 70,
+        message: 'Bluetooth',
+        description: 'Bluetooth initalisation failed.'
+    },
 ];
 
 // Alarms
@@ -318,6 +438,46 @@ export const GRBL_HAL_ALARMS = [
         description: 'Homing fail. Could not find limit switch within search distances. Try increasing max travel, decreasing pull-off distance, or check wiring.'
     },
     {
+        code: 10,
+        message: 'EStop',
+        description: 'EStop asserted. Clear and reset.'
+    },
+    {
+        code: 11,
+        message: 'Homing required',
+        description: 'Homing required. Execute homing command ($H) to continue.'
+    },
+    {
+        code: 12,
+        message: 'Limit switch engaged',
+        description: 'Limit switch engaged. Clear before continuing.'
+    },
+    {
+        code: 13,
+        message: 'Probe protection triggered',
+        description: 'Probe protection triggered. Clear before continuing.'
+    },
+    {
+        code: 14,
+        message: 'Spindle at speed timeout',
+        description: 'Spindle at speed timeout. Clear before continuing.'
+    },
+    {
+        code: 15,
+        message: 'Homing fail',
+        description: 'Homing fail. Could not find second limit switch for auto squared axis within search distances. Try increasing max travel, decreasing pull-off distance, or check wiring.'
+    },
+    {
+        code: 16,
+        message: 'Selftest failed',
+        description: 'Power on selftest (POS) failed.'
+    },
+    {
+        code: 17,
+        message: 'Motor fault',
+        description: 'Motor fault.'
+    },
+    {
         code: 'Homing',
         message: 'Homing required',
         description: 'Homing must be run if limit switches and homing cycle is enabled in EEPROM'
@@ -327,15 +487,119 @@ export const GRBL_HAL_ALARMS = [
 export const GRBL_HAL_SETTINGS_INPUT_TYPES = {
     NUMBER: 'number',
     MASK: 'mask',
+    AXIS_MASK: 'axis-mask',
     MASK_STATUS_REPORT: 'mask-status-report',
     SWITCH: 'switch',
+    SELECT: 'select',
+    STRING: 'string',
 };
 
-const { NUMBER, MASK, MASK_STATUS_REPORT, SWITCH } = GRBL_HAL_SETTINGS_INPUT_TYPES;
+const { NUMBER, MASK, AXIS_MASK, MASK_STATUS_REPORT, SWITCH, SELECT, STRING } = GRBL_HAL_SETTINGS_INPUT_TYPES;
 
 // Settings
 // https://github.com/gnea/grbl/blob/master/doc/csv/setting_codes_en_US.csv
 export const GRBL_HAL_SETTINGS = [
+    // network interface
+    {
+        // TODO default value
+        // NEW
+        setting: '$3x0',
+        message: 'Hostname',
+        category: 'NetInterface',
+        units: '',
+        description: 'Hostname.',
+        inputType: STRING,
+        maxChars: 32
+    },
+    {
+        // TODO default value
+        // NEW
+        setting: '$3x1',
+        message: 'IP Mode',
+        category: 'NetInterface',
+        units: '',
+        description: 'Interface IP mode.',
+        inputType: SELECT,
+        values: {
+            0: 'Static address',
+            1: 'DHCP supplied address',
+            2: 'Auto IP',
+        },
+    },
+    {
+        // TODO not sure about max
+        // NEW
+        setting: '$3x2',
+        message: 'Interface Gateway Address',
+        category: 'NetInterface',
+        units: '',
+        description: 'Interface gateway address. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text.',
+        inputType: NUMBER,
+        min: 0,
+        step: 1
+    },
+    {
+        // TODO not sure about max
+        // NEW
+        setting: '$3x3',
+        message: 'Interface Netmask',
+        category: 'NetInterface',
+        units: '',
+        description: 'Interface netmask. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text.',
+        inputType: NUMBER,
+        min: 0,
+        step: 1
+    },
+    {
+        // TODO not sure about max
+        // NEW
+        // default 255.255.255.0.
+        setting: '$3x4',
+        message: 'Interface Netmask',
+        category: 'NetInterface',
+        units: '',
+        description: 'Interface netmask. IPv4 or IPv6 address, up to 16 octets. May hold IPv4 address as either binary or text.',
+        inputType: STRING,
+    },
+    {
+        // NEW
+        // default value 23
+        setting: '$3x5',
+        message: 'Telnet port',
+        category: 'NetInterface',
+        units: '',
+        description: 'Port for serial communication, may be telnet protocol or a simple socket stream.',
+        inputType: NUMBER,
+        min: 0,
+        max: 65536,
+        step: 1
+    },
+    {
+        // NEW
+        // default value 80
+        setting: '$3x6',
+        message: 'HTTP port',
+        category: 'NetInterface',
+        units: '',
+        description: 'Web server port.',
+        inputType: NUMBER,
+        min: 0,
+        max: 65536,
+        step: 1
+    },
+    {
+        // NEW
+        // default value 81
+        setting: '$3x7',
+        message: 'Websocket port',
+        category: 'NetInterface',
+        units: '',
+        description: 'Port for two way communication, typically with web browser. Usually used for serial communication by grbl.',
+        inputType: NUMBER,
+        min: 0,
+        max: 65536,
+        step: 1
+    },
     {
         setting: '$0',
         message: 'Step pulse time',
@@ -364,7 +628,7 @@ export const GRBL_HAL_SETTINGS = [
         category: 'Motors',
         units: 'mask',
         description: 'Inverts the step signal. Set axis bit to invert (00000ZYX).',
-        inputType: MASK
+        inputType: AXIS_MASK
     },
     {
         setting: '$3',
@@ -372,7 +636,7 @@ export const GRBL_HAL_SETTINGS = [
         category: 'Motors',
         units: 'mask',
         description: 'Inverts the direction signal. Set axis bit to invert (00000ZYX).',
-        inputType: MASK
+        inputType: AXIS_MASK
     },
     {
         setting: '$4',
@@ -445,20 +709,54 @@ export const GRBL_HAL_SETTINGS = [
         inputType: SWITCH
     },
     {
+        // TODO
+        /*
+            MASK
+            - bit0 - enable hard limits.
+            - bit1 - enable strict mode when hard limits enabled, this bit cannot be changed when COMPATIBILITY_LEVEL > 1.
+        */
         setting: '$21',
         message: 'Hard limits enable',
         category: 'Homing',
-        units: 'boolean',
+        units: 'mask',
         description: 'Enables hard limits. Immediately halts motion and throws an alarm when switch is triggered.',
-        inputType: SWITCH
+        inputType: MASK,
+        bits: {
+            0: 'Enable Hard Limits',
+            1: 'Enable Strict Mode when Hard Limits enabled'
+        },
+        numBits: 2
     },
     {
+        // TODO
+        /*
+            - bit0 - enable homing. Only when this bit is set can the other bits be set.
+            - bit1 - enable single axis homing commands.
+            - bit2 - homing on startup required.
+            - bit3 - set machine origin to 0.
+            - bit4 - two switches shares one input pin.
+            - bit5 - allow manual homing of axes not automatically homed.
+            - bit6 - override locks, allow reset to clear homing on startup required alarm.
+            - bit7 - keep homed status on reset if possible.
+        */
         setting: '$22',
         message: 'Homing cycle enable',
         category: 'Homing',
-        units: 'boolean',
+        units: 'mask',
         description: 'Enables homing cycle. Requires limit switches on all axes.',
-        inputType: SWITCH
+        inputType: MASK,
+        bits: {
+            0: 'Enable homing.',
+            1: 'Enable single axis homing commands.',
+            2: 'Homing on startup required.',
+            3: 'Set machine origin to 0.',
+            4: 'Two switches shares one input pin.',
+            5: 'Allow manual homing of axes not automatically homed.',
+            6: 'Override locks, allow reset to clear homing on startup required alarm.',
+            7: 'Keep homed status on reset if possible.',
+        },
+        numBits: 8,
+        requiredBit: 0
     },
     {
         setting: '$23',
@@ -466,7 +764,7 @@ export const GRBL_HAL_SETTINGS = [
         category: 'Homing',
         units: 'mask',
         description: 'Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction.',
-        inputType: MASK
+        inputType: AXIS_MASK
     },
     {
         setting: '$24',
@@ -513,6 +811,30 @@ export const GRBL_HAL_SETTINGS = [
         step: 0.5
     },
     {
+        // TODO max and default
+        // NEW
+        setting: '$28',
+        message: 'G73 pull-off distance',
+        category: 'Homing',
+        units: 'mm',
+        description: 'Specifies G73 retract distance in mm.',
+        inputType: NUMBER,
+        min: 0,
+        step: 0.5
+    },
+    {
+        // TODO max and default
+        // NEW
+        setting: '$29',
+        message: 'Step Pulse Delay',
+        category: 'Homing',
+        units: 'μs',
+        description: 'Stepper pulse delay in microseconds.',
+        inputType: NUMBER,
+        min: 0,
+        step: 1
+    },
+    {
         setting: '$30',
         message: 'Maximum spindle speed',
         category: 'Spindle',
@@ -524,15 +846,26 @@ export const GRBL_HAL_SETTINGS = [
         step: 100
     },
     {
+        // TODO default value
+        /*
+            it seems we have it as spindle speed, but for grblHAL it’s enabling laser mode
+            - 0 - normal mode.
+            - 1 - laser mode.
+            - 2 - lathe mode.
+
+            we also may want a different input
+        */
         setting: '$31',
-        message: 'Minimum spindle speed',
+        message: 'Spindle Mode',
         category: 'Spindle',
-        units: 'rpm',
-        description: 'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
-        inputType: NUMBER,
-        min: 1,
-        max: 100,
-        step: 1
+        units: '',
+        description: 'Specifies Spindle/Laser/Lathe mode',
+        inputType: SELECT,
+        values: {
+            0: 'Normal mode',
+            1: 'Laser mode',
+            2: 'Lathe mode',
+        }
     },
     {
         setting: '$32',
@@ -541,6 +874,536 @@ export const GRBL_HAL_SETTINGS = [
         units: 'boolean',
         description: 'Converts spindle commands into laser mode. Consecutive G1/2/3 commands will not halt when spindle speed is changed.',
         inputType: SWITCH
+    },
+    {
+        // TODO default
+        // NEW
+        setting: '$33',
+        message: 'Spindle Frequency',
+        category: 'Spindle',
+        units: 'Hz',
+        description: 'Spindle PWM frequency in Hz',
+        inputType: NUMBER,
+        min: 1,
+        max: 10000,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$34',
+        message: 'Spindle Duty Cycle',
+        category: 'Spindle',
+        units: '%',
+        description: 'Spindle off PWM duty cycle in percent',
+        inputType: NUMBER,
+        min: 1,
+        max: 100,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$35',
+        message: 'Minimum spindle speed',
+        category: 'Spindle',
+        units: '%',
+        description: 'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
+        inputType: NUMBER,
+        min: 1,
+        max: 100,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$36',
+        message: 'Maximum spindle speed',
+        category: 'Spindle',
+        units: '%',
+        description: 'Maximum spindle speed.',
+        inputType: NUMBER,
+        min: 1,
+        max: 100,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$37',
+        message: 'Deenergized Steppers',
+        category: 'Spindle',
+        units: '%',
+        description: 'Defines which steppers is to be deenergized when motion completes.',
+        inputType: AXIS_MASK,
+        min: 1,
+        max: 100,
+        step: 1
+    },
+    {
+        // TODO max
+        // NEW
+        setting: '$38',
+        message: 'Encoder Pulses',
+        category: 'Spindle',
+        units: '/revolution',
+        description: 'Spindle encoder pulses per revolution.',
+        inputType: NUMBER,
+        min: 1,
+        max: 100,
+        step: 1
+    },
+    {
+        // NEW
+        /*
+            - default 1, enable
+            - 0, disable
+                (when disabled these characters (?, ! and ~)
+                are ignored as realtime commands and added to the input
+                instead when part of a comment or a $-setting.)
+        */
+        setting: '$39',
+        message: 'Printable Command Characters',
+        category: 'Spindle',
+        units: 'boolean',
+        description: 'Enable printable realtime command characters.',
+        inputType: SWITCH,
+    },
+    {
+        // NEW
+        setting: '$40',
+        message: 'Soft Limits Jogging',
+        category: 'Motors',
+        units: 'boolean',
+        description: 'Enable soft limits for jogging. When enabled jog targets will be limited to machine travel limits for homed axes.',
+        inputType: SWITCH,
+    },
+    {
+        // NEW
+        setting: '$43',
+        message: 'Homing Locate Cycle',
+        category: 'Homing',
+        units: '',
+        description: 'Number of homing locate cycles.',
+        inputType: NUMBER,
+        min: 0,
+        max: 255,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$44',
+        message: 'Axis Mask',
+        category: 'Homing',
+        units: '',
+        description: 'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        inputType: AXIS_MASK,
+    },
+    {
+        // NEW
+        setting: '$45',
+        message: 'Axis Mask',
+        category: 'Homing',
+        units: '',
+        description: 'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        inputType: AXIS_MASK,
+    },
+    {
+        // NEW
+        setting: '$46',
+        message: 'Axis Mask',
+        category: 'Homing',
+        units: '',
+        description: 'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        inputType: AXIS_MASK,
+    },
+    {
+        // NEW
+        setting: '$47',
+        message: 'Axis Mask',
+        category: 'Homing',
+        units: '',
+        description: 'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        inputType: AXIS_MASK,
+    },
+    {
+        // NEW
+        setting: '$48',
+        message: 'Axis Mask',
+        category: 'Homing',
+        units: '',
+        description: 'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        inputType: AXIS_MASK,
+    },
+    {
+        // NEW
+        setting: '$49',
+        message: 'Axis Mask',
+        category: 'Homing',
+        units: '',
+        description: 'Axis priority for homing lowest numbered executed first, number of available settings is same as number of supported axes. Replaces #define HOMING_CYCLE_0 etc.',
+        inputType: AXIS_MASK,
+    },
+    {
+        // NEW
+        setting: '$50',
+        message: 'Jogging Step Speed',
+        category: 'Motors',
+        units: 'mm/min',
+        description: 'Jogging step speed in mm/min. Used by driver/sender',
+        inputType: NUMBER,
+        min: 1,
+        max: 10000,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$51',
+        message: 'Jogging Slow Speed',
+        category: 'Motors',
+        units: 'mm/min',
+        description: 'Jogging slow speed in mm/min. Used by driver/sender',
+        inputType: NUMBER,
+        min: 1,
+        max: 10000,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$52',
+        message: 'Jogging Fast Speed',
+        category: 'Motors',
+        units: 'mm/min',
+        description: 'Jogging fast speed in mm/min. Used by driver/sender',
+        inputType: NUMBER,
+        min: 1,
+        max: 10000,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$53',
+        message: 'Jogging Step Distance',
+        category: 'Motors',
+        units: 'mm',
+        description: 'Jogging step distance in mm. Used by driver/sender',
+        inputType: NUMBER,
+        min: 1,
+        max: 10000,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$54',
+        message: 'Jogging Slow Distance',
+        category: 'Motors',
+        units: 'mm',
+        description: 'Jogging slow distance in mm. Used by driver/sender',
+        inputType: NUMBER,
+        min: 1,
+        max: 10000,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$55',
+        message: 'Jogging Fast Distance',
+        category: 'Motors',
+        units: 'mm',
+        description: 'Jogging fast distance in mm. Used by driver/sender',
+        inputType: NUMBER,
+        min: 1,
+        max: 10000,
+        step: 1
+    },
+    {
+        // NEW
+        // default 1 (on)
+        setting: '$60',
+        message: 'Restore Default Overrides',
+        category: 'GRBL',
+        units: 'boolean',
+        description: 'Restore default overrides when program ends.',
+        inputType: SWITCH,
+    },
+    {
+        // NEW
+        // default 0 (off)
+        setting: '$61',
+        message: 'Ignore Safety Door Signal',
+        category: 'GRBL',
+        units: 'boolean',
+        description: 'Ignore safety door signal when idle. If on only the spindle (laser) will be switched off. May be useful if positioning a laser head with the lid open is needed.',
+        inputType: SWITCH,
+    },
+    {
+        // NEW
+        // default 0 (off)
+        setting: '$62',
+        message: 'Sleep Function',
+        category: 'GRBL',
+        units: 'boolean',
+        description: 'Enable sleep function.',
+        inputType: SWITCH,
+    },
+    {
+        // NEW
+        // default 0 (on)
+        setting: '$63',
+        message: 'Disable Laser on Hold',
+        category: 'GRBL',
+        units: 'boolean',
+        description: 'Disable laser during hold.',
+        inputType: SWITCH,
+    },
+    {
+        // NEW
+        // default 0 (off)
+        setting: '$64',
+        message: 'Alarm on Startup',
+        category: 'GRBL',
+        units: 'boolean',
+        description: 'Force grbl to enter alarm mode on startup.',
+        inputType: SWITCH,
+    },
+    {
+        // NEW
+        // default 0 (off)
+        setting: '$65',
+        message: 'Allow Feedrate Override',
+        category: 'GRBL',
+        units: 'boolean',
+        description: 'Allow feed rate override during probing.',
+        inputType: SWITCH,
+    },
+    // Network Settings
+    {
+        // NEW
+        /*
+            Bit 0: Telnet
+            Bit 1: Websocket
+            Bit 2: HTTP
+            Bit 3: FTP
+            Bit 4: DNS
+            Bit 5: mDNS
+            Bit 6: SSDP
+            Bit 7: WebDAV
+        */
+        setting: '$70',
+        message: 'Network Service',
+        category: 'Network',
+        units: '',
+        description: 'Specify Network Service.',
+        inputType: MASK,
+        bits: {
+            0: 'Telnet',
+            1: 'Websocket',
+            2: 'HTTP',
+            3: 'FTP',
+            4: 'DNS',
+            5: 'mDNS',
+            6: 'SSDP',
+            7: 'WebDAV',
+        },
+        numBits: 8
+    },
+    {
+        // NEW
+        // default "GRBL"
+        setting: '$71',
+        message: 'Bluetooth Device',
+        category: 'Network',
+        units: '',
+        description: 'Bluetooth device name.',
+        inputType: STRING,
+        maxChars: 32
+    },
+    {
+        // NEW
+        // default "GRBL serial port"
+        setting: '$72',
+        message: 'Bluetooth Service',
+        category: 'Network',
+        units: '',
+        description: 'Bluetooth service name.',
+        inputType: STRING,
+        maxChars: 32
+    },
+    {
+        // TODO default value
+        // NEW
+        /*
+            0: NULL
+            1: STA - Station
+            2: AP - Access Point
+            3: APSTA - Access Point + Station
+        */
+        setting: '$73',
+        message: 'Wi-Fi Mode',
+        category: 'Network',
+        units: '',
+        description: 'Wi-Fi Mode.',
+        inputType: SELECT,
+        values: {
+            0: 'NULL',
+            1: 'STA',
+            2: 'AP',
+            3: 'APSTA',
+        }
+    },
+    {
+        // NEW
+        // default empty
+        setting: '$74',
+        message: 'Wi-Fi STA SSID',
+        category: 'Network',
+        units: '',
+        description: 'WiFi STA (Station) SSID.',
+        inputType: STRING,
+        maxChars: 64
+    },
+    {
+        // NEW
+        // default empty
+        setting: '$75',
+        message: 'Wi-Fi STA Password',
+        category: 'Network',
+        units: '',
+        description: 'WiFi STA (Station) password.',
+        inputType: STRING,
+        maxChars: 32
+    },
+    {
+        // NEW
+        // default empty
+        setting: '$76',
+        message: 'Wi-Fi AP SSID',
+        category: 'Network',
+        units: '',
+        description: 'WiFi AP (Access Point) SSID.',
+        inputType: STRING,
+        maxChars: 64
+    },
+    {
+        // TODO default
+        // NEW
+        // default provided by driver. blank = AP is "Open"
+        setting: '$77',
+        message: 'Wi-Fi AP Password',
+        category: 'Network',
+        units: '',
+        description: 'WiFi AP (Access Point) password.',
+        inputType: STRING,
+        maxChars: 32
+    },
+    {
+        // NEW
+        // default empty
+        setting: '$78',
+        message: 'Wi-Fi Country',
+        category: 'Network',
+        units: '',
+        description: 'WiFi AP Country (Access Point).',
+        inputType: STRING,
+        maxChars: 3
+    },
+    {
+        // NEW
+        // default 0
+        setting: '$79',
+        message: 'Wi-Fi AP Channel Password',
+        category: 'Network',
+        units: '',
+        description: 'WiFi AP Channel (Access Point) password.',
+        inputType: NUMBER,
+        min: 0,
+        max: 11,
+        step: 1
+    },
+    {
+        // TODO default
+        // NEW
+        setting: '$80',
+        message: 'Spindle PID Regulator Proportional Gain',
+        category: 'PID',
+        units: '',
+        description: 'Spindle PID regulator proportional gain.',
+        inputType: NUMBER,
+        min: 0,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$81',
+        message: 'Spindle PID Regulator Integral Gain',
+        category: 'PID',
+        units: '',
+        description: 'Spindle PID regulator integral gain.',
+        inputType: NUMBER,
+        min: 0,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$82',
+        message: 'Spindle PID Regulator Derivative Gain',
+        category: 'PID',
+        units: '',
+        description: 'Spindle PID regulator derivative gain.',
+        inputType: NUMBER,
+        min: 0,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$84',
+        message: 'Spindle PID Max Output Error',
+        category: 'PID',
+        units: '',
+        description: 'Spindle PID max output error.',
+        inputType: NUMBER,
+        min: 0,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$85',
+        message: 'Spindle PID Max Output Error',
+        category: 'PID',
+        units: '',
+        description: 'Spindle PID regulator max integral error.',
+        inputType: NUMBER,
+        min: 0,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$90',
+        message: 'Spindle Sunced Motion PID Regulator Proportional Gain',
+        category: 'PID',
+        units: '',
+        description: 'Spindle synced motion PID regulator proportional gain.',
+        inputType: NUMBER,
+        min: 0,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$91',
+        message: 'Spindle Sunced Motion PID Regulator Integral Gain',
+        category: 'PID',
+        units: '',
+        description: 'Spindle synced motion PID regulator integral gain.',
+        inputType: NUMBER,
+        min: 0,
+        step: 1
+    },
+    {
+        // NEW
+        setting: '$92',
+        message: 'Spindle Sunced Motion PID Regulator Derivative Gain',
+        category: 'PID',
+        units: '',
+        description: 'Spindle synced motion PID regulator derivative gain.',
+        inputType: NUMBER,
+        min: 0,
+        step: 1
     },
     {
         setting: '$100',
@@ -673,5 +1536,88 @@ export const GRBL_HAL_SETTINGS = [
         min: 1,
         max: 1500,
         step: 10
-    }
+    },
+    // spindle related settings
+    {
+        // NEW
+        // default 0 percent
+        setting: '$340',
+        message: 'Spindle at speed tolerance',
+        category: 'Limits',
+        units: '%',
+        description: 'Available for drivers and plugins that supports spindle at speed functionality. If set to a value > 0 then alarm 14 will be issued if the spindle speed is not within tolerance during a timeout delay.',
+        inputType: NUMBER,
+        min: 0,
+        max: 100,
+        step: 10
+    },
+    // manual tool change settings
+    {
+        // TODO type
+        /*
+            0: Normal. Manual tool change and touch off via jogging.
+            1: Manual touch off. Initial move to linear axis home position for tool change, manual or automatic touch off with $TPW command.
+            2: Manual touch off @ G59.3. Initial move to linear axis home position then to G59.3 position for tool change, manual or automatic touch off with $TPW command.
+            3: Manual touch off @ G59.3. Initial move to linear axis home position for tool change then to G59.3 position for automatic touch off.
+            4: Ignore M6.
+
+            Note: Mode 1 and 2 requires initial tool offset set when $TPW command is used for touch off. In mode 2 a successful touch off will automatically
+            Note: Mode 3 requires initial tool offset set.
+        */
+        // NEW
+        // default 0
+        setting: '$341',
+        message: 'Manual tool change mode',
+        category: 'Limits',
+        units: '',
+        description: 'Available for drivers and plugins that supports spindle at speed functionality. If set to a value > 0 then alarm 14 will be issued if the spindle speed is not within tolerance during a timeout delay.',
+        inputType: SELECT,
+        defaultValue: 0,
+        values: {
+            0: 'Normal',
+            1: 'Manual touch off',
+            2: 'Manual touch off @ G59.3, tool change @ home',
+            3: 'Manual touch off @ G59.3, tool change @ G59.3',
+            4: 'Ignore M6',
+        }
+    },
+    {
+        // TODO dont know max
+        // NEW
+        // default 30mm
+        setting: '$342',
+        message: 'Probing distance',
+        category: 'Limits',
+        units: 'mm',
+        description: 'Used in mode 1 and 2 when $TPW command is issued and in mode 3.',
+        inputType: NUMBER,
+        min: 0,
+        step: 10
+    },
+    {
+        // TODO dont know max
+        // NEW
+        // default 25mm/min
+        setting: '$343',
+        message: 'Probing slow feed rate',
+        category: 'Limits',
+        units: 'mm/min',
+        description: 'Used in mode 1 and 2 when $TPW command is issued and in mode 3 to obtain an accurate tool offset.',
+        inputType: NUMBER,
+        min: 0,
+        step: 10
+    },
+    {
+        // TODO dont know max
+        // NEW
+        // default 200mm/min
+        setting: '$344',
+        message: 'Probing seek feed rate',
+        category: 'Limits',
+        units: 'mm/min',
+        description: 'Used in mode 1 and 2 when $TPW command is issued and in mode 3 to obtain an initial tool offset. If successful tool is backed off a bit and probing is redone with the slow feed rate from $343.',
+        inputType: NUMBER,
+        min: 0,
+        step: 10
+    },
 ];
