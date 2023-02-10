@@ -82,7 +82,7 @@ const PREHOOK_COMPLETE = '%pre_complete';
 const POSTHOOK_COMPLETE = '%post_complete';
 const PAUSE_START = '%pause_start';
 
-const log = logger('controller:Grbl');
+const log = logger('controller:grblHAL');
 const noop = _.noop;
 
 class GrblHalController {
@@ -741,6 +741,7 @@ class GrblHalController {
         });
 
         const queryStatusReport = () => {
+            console.log(`Status Report Ready: ${this.ready}`);
             // Check the ready flag
             if (!(this.ready)) {
                 return;
@@ -1073,6 +1074,12 @@ class GrblHalController {
 
             // Clear action values
             this.clearActionValues();
+
+            // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
+            // We set controller ready if version found
+            setTimeout(() => {
+                this.connection.write('$I\n');
+            }, 500);
         });
     }
 
