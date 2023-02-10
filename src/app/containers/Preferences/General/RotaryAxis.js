@@ -3,9 +3,7 @@ import React, { useState } from 'react';
 import store from 'app/store';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
-import { Toaster, TOASTER_SUCCESS, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
-import get from 'lodash/get';
-import reduxStore from 'app/store/redux';
+import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import Input from '../components/Input';
 import Fieldset from '../components/Fieldset';
 
@@ -15,20 +13,7 @@ const RotaryAxis = ({ state }) => {
     const { units } = state;
     //TODO
     const handleRotaryAxisToggle = () => {
-        const firmwareType = get(reduxStore.getState(), 'controller.type', 'grbl');
-        const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
         const shouldEnableRotary = !rotaryAxisStatus;
-
-        //If grbl, turn off Rotary Axis and update user
-        if (isGrbl) {
-            store.set('rotaryAxisStatus', false);
-            Toaster.clear();
-            Toaster.pop({
-                type: TOASTER_WARNING,
-                msg: 'Your firmware does not support Rotary Axis.',
-            });
-            return;
-        }
 
         store.set('rotaryAxisStatus', shouldEnableRotary);
         setRotaryAxisStatus(shouldEnableRotary);

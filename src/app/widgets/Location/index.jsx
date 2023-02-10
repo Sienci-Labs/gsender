@@ -448,16 +448,11 @@ class LocationWidget extends PureComponent {
             const { state } = this.props;
             const { machinePosition, safeRetractHeight, homingEnabled } = this.state;
             const activeState = get(state, 'status.activeState');
-            const rotaryAxisStatus = store.get('rotaryAxisStatus');
-            const firmwareType = get(reduxStore.getState(), 'controller.type', 'grbl');
-            const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
+
             if (!axisList || axisList.length === 0 || activeState !== GRBL_ACTIVE_STATE_IDLE) {
                 return;
             }
-            if (axisList[0] === 'a' && !rotaryAxisStatus || axisList[0] === 'a' && rotaryAxisStatus && isGrbl) {
-                return;
-            }
-            console.log('LOCATION EVENT, Axis: ', axisList); // TODO - Delete this
+
             let safeHeightCommand = '';
             let moveCommand = '';
 
