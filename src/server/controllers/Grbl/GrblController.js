@@ -71,7 +71,8 @@ import {
     SLEEP,
     MACRO_RUN,
     MACRO_LOAD,
-    FILE_UNLOAD
+    FILE_UNLOAD,
+    FILE_TYPE
 } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
@@ -183,6 +184,7 @@ class GrblController {
 
     homingFlagSet = false;
 
+    // eslint-disable-next-line max-lines-per-function
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -1219,6 +1221,7 @@ class GrblController {
         }
     }
 
+    // eslint-disable-next-line max-lines-per-function
     command(cmd, ...args) {
         const handler = {
             'firmware:recievedProfiles': () => {
@@ -1260,6 +1263,14 @@ class GrblController {
                     return;
                 }
 
+                // TODO, need to check if file contains Y commands as well (4 axis being used)
+                // That file should not be runnable on grbl
+                const rotaryCommandRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)/g;
+                const isRotaryFile = rotaryCommandRegex.test(gcode);
+
+                if (isRotaryFile) {
+                    this.emit('filetype', FILE_TYPE.ROTARY);
+                }
 
                 log.debug(`Load G-code: name="${this.sender.state.name}", size=${this.sender.state.gcode.length}, total=${this.sender.state.total}`);
 
