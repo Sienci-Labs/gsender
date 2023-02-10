@@ -33,14 +33,16 @@ import GrbHalLineParserResultParserState from './GrblHalLineParserResultParserSt
 import GrblHalLineParserResultParameters from './GrblHalLineParserResultParameters';
 import GrblHalLineParserResultFeedback from './GrblHalLineParserResultFeedback';
 import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
-import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
+//import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
+import GrblHalLineParserResultVersion from './GrblHalLineParserResultVersion';
 import logger from '../../lib/logger';
 import {
     GRBL_HAL_ACTIVE_STATE_IDLE,
     GRBL_HAL_ACTIVE_STATE_ALARM
 } from './constants';
 
-const log = logger('controller:GrblHal');
+
+const log = logger('controller:grblHAL');
 
 class GrblHalRunner extends events.EventEmitter {
     state = {
@@ -216,6 +218,8 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultSettings) {
+            console.log('RESULT STATUS');
+            console.log(payload);
             const { name, value } = payload;
             const nextSettings = {
                 ...this.settings,
@@ -230,7 +234,7 @@ class GrblHalRunner extends events.EventEmitter {
             this.emit('settings', payload);
             return;
         }
-        if (type === GrblHalLineParserResultStartup) {
+        if (type === GrblHalLineParserResultVersion) {
             const { version } = payload;
             const nextSettings = { // enforce change
                 ...this.settings,

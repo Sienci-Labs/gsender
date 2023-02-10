@@ -29,7 +29,6 @@ class GrblHalLineParserResultVersion {
         if (!r) {
             return null;
         }
-
         const payload = {
             message: r[1]
         };

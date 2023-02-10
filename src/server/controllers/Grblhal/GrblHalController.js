@@ -52,11 +52,11 @@ import {
 import GrblHalRunner from './GrblHalRunner';
 import {
     GRBLHAL,
-    GRBL_HAL_ACTIVE_STATE_RUN,
-    GRBL_HAL_REALTIME_COMMANDS,
+    GRBL_ACTIVE_STATE_RUN,
+    GRBLHAL_REALTIME_COMMANDS,
     GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
-    GRBL_HAL_SETTINGS, GRBL_HAL_ACTIVE_STATE_HOME
+    GRBL_HAL_SETTINGS, GRBL_ACTIVE_STATE_HOME
 } from './constants';
 import {
     METRIC_UNITS,
@@ -82,7 +82,7 @@ const PREHOOK_COMPLETE = '%pre_complete';
 const POSTHOOK_COMPLETE = '%post_complete';
 const PAUSE_START = '%pause_start';
 
-const log = logger('controller:GrblHal');
+const log = logger('controller:grblHAL');
 const noop = _.noop;
 
 class GrblHalController {
@@ -126,7 +126,7 @@ class GrblHalController {
         }
     };
 
-    // Grbl
+    // grblHAL
     controller = null;
 
     ready = false;
@@ -653,11 +653,7 @@ class GrblHalController {
             }
 
             if (error) {
-                // Grbl v1.1
                 this.emit('serialport:read', `error:${code} (${error.message})`);
-            } else {
-                // Grbl v0.9
-                this.emit('serialport:read', res.raw);
             }
 
             // Feeder
@@ -719,9 +715,6 @@ class GrblHalController {
             if (!res.message && setting) {
                 // Grbl v1.1
                 this.emit('serialport:read', `${res.name}=${res.value} (${setting.message}, ${setting.units})`);
-            } else {
-                // Grbl v0.9
-                this.emit('serialport:read', res.raw);
             }
         });
 
@@ -734,9 +727,6 @@ class GrblHalController {
 
             // Set ready flag to true when a startup message has arrived
             this.ready = true;
-
-            // Clear sender - for physical buttons
-            //this.sender.unload();
 
             if (!this.initialized) {
                 this.initialized = true;
@@ -751,6 +741,7 @@ class GrblHalController {
         });
 
         const queryStatusReport = () => {
+            console.log(`Status Report Ready: ${this.ready}`);
             // Check the ready flag
             if (!(this.ready)) {
                 return;
@@ -778,10 +769,11 @@ class GrblHalController {
             if (this.isOpen()) {
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
-                this.connection.write('?');
+                this.connection.write(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
             }
         };
 
+        // TODO:  Do we need to not do this during toolpaths if it's a realtime command now?
         const queryParserState = _.throttle(() => {
             // Check the ready flag
             if (!(this.ready)) {
@@ -815,7 +807,7 @@ class GrblHalController {
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
-                this.connection.write('$G\n');
+                this.connection.write(GRBLHAL_REALTIME_COMMANDS.PARSER_STATE_REPORT); // $G equivalent
             }
         }, 500);
 
@@ -1082,6 +1074,12 @@ class GrblHalController {
 
             // Clear action values
             this.clearActionValues();
+
+            // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
+            // We set controller ready if version found
+            setTimeout(() => {
+                this.connection.write('$I\n');
+            }, 500);
         });
     }
 
@@ -1391,7 +1389,7 @@ class GrblHalController {
                     let activeState;
 
                     activeState = _.get(this.state, 'status.activeState', '');
-                    if (activeState === GRBL_HAL_ACTIVE_STATE_RUN) {
+                    if (activeState === GRBL_ACTIVE_STATE_RUN) {
                         this.write('!'); // hold
                     }
 
@@ -1472,7 +1470,7 @@ class GrblHalController {
                 this.homingStarted = true; // Update homing cycle as having started
 
                 this.writeln('$H');
-                this.state.status.activeState = GRBL_HAL_ACTIVE_STATE_HOME;
+                this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
                 this.emit('controller:state', GRBLHAL, this.state);
             },
             'sleep': () => {
@@ -1836,7 +1834,7 @@ class GrblHalController {
     }
 
     writeln(data, context) {
-        if (_.includes(GRBL_HAL_REALTIME_COMMANDS, data)) {
+        if (_.includes(GRBLHAL_REALTIME_COMMANDS, data)) {
             this.write(data, context);
         } else {
             this.write(data + '\n', context);
