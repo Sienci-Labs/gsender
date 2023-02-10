@@ -438,6 +438,19 @@ class GrblController {
                     line = line.replace('M6', '(M6)');
                 }
 
+                const ROTARY_COMMAND_LETTER = 'A';
+                const Y_AXIS_COMMAND_LETTER = 'Y';
+
+                if (_.includes(line, ROTARY_COMMAND_LETTER)) {
+                    const tempLine = line;
+
+                    log.debug('Translating Rotary Axis Command To Y Axis.', line);
+
+                    line = line.replaceAll(ROTARY_COMMAND_LETTER, Y_AXIS_COMMAND_LETTER);
+
+                    log.debug(`Line Before: [${tempLine}], Line After: [${line}]`);
+                }
+
                 return line;
             }
         });
