@@ -53,7 +53,7 @@ import GrblHalRunner from './GrblHalRunner';
 import {
     GRBLHAL,
     GRBL_ACTIVE_STATE_RUN,
-    GRBL_REALTIME_COMMANDS,
+    GRBLHAL_REALTIME_COMMANDS,
     GRBL_ALARMS,
     GRBL_ERRORS,
     GRBL_SETTINGS, GRBL_ACTIVE_STATE_HOME
@@ -126,7 +126,7 @@ class GrblHalController {
         }
     };
 
-    // Grbl
+    // grblHAL
     controller = null;
 
     ready = false;
@@ -653,11 +653,7 @@ class GrblHalController {
             }
 
             if (error) {
-                // Grbl v1.1
                 this.emit('serialport:read', `error:${code} (${error.message})`);
-            } else {
-                // Grbl v0.9
-                this.emit('serialport:read', res.raw);
             }
 
             // Feeder
@@ -719,9 +715,6 @@ class GrblHalController {
             if (!res.message && setting) {
                 // Grbl v1.1
                 this.emit('serialport:read', `${res.name}=${res.value} (${setting.message}, ${setting.units})`);
-            } else {
-                // Grbl v0.9
-                this.emit('serialport:read', res.raw);
             }
         });
 
@@ -734,9 +727,6 @@ class GrblHalController {
 
             // Set ready flag to true when a startup message has arrived
             this.ready = true;
-
-            // Clear sender - for physical buttons
-            //this.sender.unload();
 
             if (!this.initialized) {
                 this.initialized = true;
@@ -778,10 +768,11 @@ class GrblHalController {
             if (this.isOpen()) {
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
-                this.connection.write('?');
+                this.connection.write(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
             }
         };
 
+        // TODO:  Do we need to not do this during toolpaths if it's a realtime command now?
         const queryParserState = _.throttle(() => {
             // Check the ready flag
             if (!(this.ready)) {
@@ -815,7 +806,7 @@ class GrblHalController {
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
-                this.connection.write('$G\n');
+                this.connection.write(GRBLHAL_REALTIME_COMMANDS.PARSER_STATE_REPORT); // $G equivalent
             }
         }, 500);
 
@@ -1836,7 +1827,7 @@ class GrblHalController {
     }
 
     writeln(data, context) {
-        if (_.includes(GRBL_REALTIME_COMMANDS, data)) {
+        if (_.includes(GRBLHAL_REALTIME_COMMANDS, data)) {
             this.write(data, context);
         } else {
             this.write(data + '\n', context);

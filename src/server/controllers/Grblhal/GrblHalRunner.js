@@ -216,6 +216,8 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultSettings) {
+            console.log('RESULT STATUS');
+            console.log(payload);
             const { name, value } = payload;
             const nextSettings = {
                 ...this.settings,
