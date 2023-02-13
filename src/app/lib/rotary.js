@@ -17,7 +17,8 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
     }
 
     case ROTARY: {
-        store.replace('workspace.rotaryAxis.prev101Value', controller.settings.$101);
+        const prev101Value = controller.settings.settings.$101;
+        store.replace('workspace.rotaryAxis.prev101Value', prev101Value);
         controller.command('gcode', `$101=${ROTARY_AXIS_101_VALUE}`);
         return;
     }
