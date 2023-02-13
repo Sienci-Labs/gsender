@@ -741,7 +741,6 @@ class GrblHalController {
         });
 
         const queryStatusReport = () => {
-            console.log(`Status Report Ready: ${this.ready}`);
             // Check the ready flag
             if (!(this.ready)) {
                 return;
