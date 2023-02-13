@@ -72,7 +72,7 @@ import {
     MACRO_RUN,
     MACRO_LOAD,
     FILE_UNLOAD,
-    // FILE_TYPE
+    FILE_TYPE
 } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
@@ -1263,19 +1263,19 @@ class GrblController {
                     return;
                 }
 
-                // const rotaryCommandsRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)/g;
-                // const yAxisCommandsRegex = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)/g;
-                // const containsACommands = rotaryCommandsRegex.test(gcode);
-                // const containsYCommands = yAxisCommandsRegex.test(gcode);
+                const rotaryCommandsRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)/g;
+                const yAxisCommandsRegex = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)/g;
+                const containsACommands = rotaryCommandsRegex.test(gcode);
+                const containsYCommands = yAxisCommandsRegex.test(gcode);
 
-                // if (containsACommands && containsYCommands) {
-                //     callback(new Error('Files with Both Y commands and A commands cannot run on grbl machines'));
-                //     return;
-                // }
+                if (containsACommands && containsYCommands) {
+                    callback(new Error('Files with Both Y commands and A commands cannot run on grbl machines'));
+                    return;
+                }
 
-                // if (containsACommands) {
-                //     this.emit('filetype', FILE_TYPE.ROTARY);
-                // }
+                if (containsACommands) {
+                    this.emit('filetype', FILE_TYPE.ROTARY);
+                }
 
                 log.debug(`Load G-code: name="${this.sender.state.name}", size=${this.sender.state.gcode.length}, total=${this.sender.state.total}`);
 
