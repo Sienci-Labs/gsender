@@ -52,11 +52,15 @@ export const GRBLHAL_REALTIME_COMMANDS = {
 export const GRBL_MODAL_GROUPS = [
     { // Motion Mode (Defaults to G0)
         group: 'motion',
-        modes: ['G0', 'G1', 'G2', 'G3', 'G38.2', 'G38.3', 'G38.4', 'G38.5', 'G80']
+        modes: ['G0', 'G1', 'G2', 'G3', 'G5', 'G38.2', 'G38.3', 'G38.4', 'G38.5', 'G80']
     },
     { // Work Coordinate System Select (Defaults to G54)
         group: 'wcs',
         modes: ['G54', 'G55', 'G56', 'G57', 'G58', 'G59']
+    },
+    { // Lathe Mode
+        group: 'lathe',
+        modes: ['G7', 'G8']
     },
     { // Plane Select (Defaults to G17)
         group: 'plane',
@@ -77,6 +81,10 @@ export const GRBL_MODAL_GROUPS = [
     { // Program Mode (Defaults to M0)
         group: 'program',
         modes: ['M0', 'M1', 'M2', 'M30']
+    },
+    { // Cycle retract
+        group: 'cycle',
+        modes: ['G98', 'G99']
     },
     { // Spindle State (Defaults to M5)
         group: 'spindle',

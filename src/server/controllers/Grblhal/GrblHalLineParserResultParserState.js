@@ -33,10 +33,12 @@ import {
 } from './constants';
 
 class GrbHalLineParserResultParserState {
-    // * Grbl v0.9
-    //   [G38.2 G54 G17 G21 G91 G94 M0 M5 M9 T0 F20. S0.]
     // * Grbl v1.1
     //   [GC:G0 G54 G17 G21 G90 G94 M0 M5 M9 T0 S0.0 F500.0]
+    // * grblHAL
+    //   [GC:G0 G54 G17 G21 G90 G94 G49 G98 G50 M0 M5 M9 T0 S0.0 F500.0]
+    //   new: G49, G50, G98
+    //   don't care about G50
     static parse(line) {
         const r = line.match(/^\[(?:GC:)?((?:[a-zA-Z][0-9]+(?:\.[0-9]*)?\s*)+)\]$/);
         if (!r) {
