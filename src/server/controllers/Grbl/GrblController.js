@@ -72,7 +72,7 @@ import {
     MACRO_RUN,
     MACRO_LOAD,
     FILE_UNLOAD,
-    FILE_TYPE
+    // FILE_TYPE
 } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
