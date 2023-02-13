@@ -105,24 +105,25 @@ const Rotary = ({ active }) => {
                 className={classNames(
                     styles['widget-content'],
                     styles.heightOverride,
-                    styles['rotary-axis-wrapper']
                 )}
             >
-                <div className={styles['rotary-jog-control-area']}>
-                    <p className={styles['rotary-tab-section-title']}>
-                        Jog Control
-                    </p>
-                    <DROarea actions={actions} />
-                    <JogControlArea selectedSpeed={speedPreset} actions={actions} jog={jog} />
-                    <SpeedPresets selectedSpeed={speedPreset} actions={actions} />
-                    <SpeedControls jog={jog} actions={actions} />
-                </div>
+                <div className={styles['rotary-axis-wrapper']}>
+                    <div className={styles['rotary-jog-control-area']}>
+                        <p className={styles['rotary-tab-section-title']}>
+                            Jog Control
+                        </p>
+                        <DROarea actions={actions} />
+                        <JogControlArea selectedSpeed={speedPreset} actions={actions} jog={jog} />
+                        <SpeedPresets selectedSpeed={speedPreset} actions={actions} />
+                        <SpeedControls jog={jog} actions={actions} />
+                    </div>
 
-                <div className={styles['rotary-tools-area']}>
-                    <p className={styles['rotary-tab-section-title']}>Tools</p>
-                    <StepsToggle />
-                    {/* <StockDiameter /> */}
-                    <ActionArea />
+                    <div className={styles['rotary-tools-area']}>
+                        <p className={styles['rotary-tab-section-title']}>Tools</p>
+                        <StepsToggle />
+                        {/* <StockDiameter /> */}
+                        <ActionArea />
+                    </div>
                 </div>
             </Widget.Content>
         </Widget>
