@@ -220,3 +220,15 @@ export const USER_DATA_COLLECTION = {
     ACCEPTED: 'ACCEPTED',
     REJECTED: 'REJECTED',
 };
+
+export const ROTARY_AXIS_101_VALUE = '26.667';
+
+export const WORKSPACE_MODE = {
+    DEFAULT: 'DEFAULT',
+    ROTARY: 'ROTARY',
+};
+
+export const FILE_TYPE = {
+    DEFAULT: 'DEFAULT',
+    ROTARY: 'ROTARY',
+};

@@ -71,7 +71,8 @@ import {
     SLEEP,
     MACRO_RUN,
     MACRO_LOAD,
-    FILE_UNLOAD
+    FILE_UNLOAD,
+    FILE_TYPE
 } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
@@ -183,6 +184,7 @@ class GrblController {
 
     homingFlagSet = false;
 
+    // eslint-disable-next-line max-lines-per-function
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -436,6 +438,19 @@ class GrblController {
                     }
 
                     line = line.replace('M6', '(M6)');
+                }
+
+                const ROTARY_COMMAND_LETTER = 'A';
+                const Y_AXIS_COMMAND_LETTER = 'Y';
+
+                if (_.includes(line, ROTARY_COMMAND_LETTER)) {
+                    const tempLine = line;
+
+                    log.debug('Translating Rotary Axis Command To Y Axis.', line);
+
+                    line = line.replaceAll(ROTARY_COMMAND_LETTER, Y_AXIS_COMMAND_LETTER);
+
+                    log.debug(`Line Before: [${tempLine}], Line After: [${line}]`);
                 }
 
                 return line;
@@ -1206,6 +1221,7 @@ class GrblController {
         }
     }
 
+    // eslint-disable-next-line max-lines-per-function
     command(cmd, ...args) {
         const handler = {
             'firmware:recievedProfiles': () => {
@@ -1247,6 +1263,19 @@ class GrblController {
                     return;
                 }
 
+                const rotaryCommandsRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)/g;
+                const yAxisCommandsRegex = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)/g;
+                const containsACommands = rotaryCommandsRegex.test(gcode);
+                const containsYCommands = yAxisCommandsRegex.test(gcode);
+
+                if (containsACommands && containsYCommands) {
+                    callback(new Error('Files with Both Y commands and A commands cannot run on grbl machines'));
+                    return;
+                }
+
+                if (containsACommands) {
+                    this.emit('filetype', FILE_TYPE.ROTARY);
+                }
 
                 log.debug(`Load G-code: name="${this.sender.state.name}", size=${this.sender.state.gcode.length}, total=${this.sender.state.total}`);
 

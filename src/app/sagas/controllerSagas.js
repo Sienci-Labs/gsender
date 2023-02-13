@@ -21,11 +21,13 @@
  *
  */
 import React from 'react';
+import _get from 'lodash/get';
+import pubsub from 'pubsub-js';
+import isElectron from 'is-electron';
+
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
-import _get from 'lodash/get';
-import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
 import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
@@ -40,8 +42,7 @@ import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
-import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
-import isElectron from 'is-electron';
+import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD, FILE_TYPE } from 'app/constants';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 
 
@@ -527,6 +528,17 @@ export function* initialize() {
 
     controller.addListener('wizard:next', (stepIndex, substepIndex) => {
         pubsub.publish('wizard:next', { stepIndex, substepIndex });
+    });
+
+    controller.addListener('filetype', (type) => {
+        if (type === FILE_TYPE.ROTARY) {
+            Toaster.pop({
+                msg: 'Rotary File Loaded',
+                type: TOASTER_INFO,
+            });
+
+            store.replace('workspace.rotaryAxisMode', true);
+        }
     });
 
     yield null;
