@@ -77,9 +77,9 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, fi
             profile.shortcuts
                 .map(currentShortcut => ({
                     ...currentShortcut,
-                    keys: currentShortcut.id === shortcut.id ? newKeys : currentShortcut.keys,
-                    keysName: currentShortcut.id === shortcut.id ? newKeysName : currentShortcut.keysName,
-                    isActive: currentShortcut.id === shortcut.id ? true : currentShortcut.isActive,
+                    keys: currentShortcut.cmd === shortcut.cmd ? newKeys : currentShortcut.keys,
+                    keysName: currentShortcut.cmd === shortcut.cmd ? newKeysName : currentShortcut.keysName,
+                    isActive: currentShortcut.cmd === shortcut.cmd ? true : currentShortcut.isActive,
                 }));
 
         filter(filterCategory, newShortcutsArr);

@@ -573,7 +573,6 @@ class AxesWidget extends PureComponent {
 
     shuttleControlEvents = {
         JOG_X_P: {
-            id: 32,
             title: 'Jog: X+',
             keys: 'shift+right',
             cmd: 'JOG_X_P',
@@ -588,7 +587,6 @@ class AxesWidget extends PureComponent {
             }
         },
         JOG_X_M: {
-            id: 33,
             title: 'Jog: X-',
             keys: 'shift+left',
             cmd: 'JOG_X_M',
@@ -601,7 +599,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.JOG,
         },
         JOG_Y_P: {
-            id: 34,
             title: 'Jog: Y+',
             keys: 'shift+up',
             cmd: 'JOG_Y_P',
@@ -614,7 +611,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.JOG,
         },
         JOG_Y_M: {
-            id: 35,
             title: 'Jog: Y-',
             keys: 'shift+down',
             cmd: 'JOG_Y_M',
@@ -627,7 +623,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.JOG,
         },
         JOG_Z_P: {
-            id: 36,
             title: 'Jog: Z+',
             keys: 'shift+pageup',
             cmd: 'JOG_Z_P',
@@ -640,7 +635,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.JOG,
         },
         JOG_Z_M: {
-            id: 37,
             title: 'Jog: Z-',
             keys: 'shift+pagedown',
             cmd: 'JOG_Z_M',
@@ -653,7 +647,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.JOG,
         },
         JOG_X_P_Y_M: {
-            id: 38,
             title: 'Jog: X+ Y-',
             keys: '',
             cmd: 'JOG_X_P_Y_M',
@@ -666,7 +659,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.JOG,
         },
         JOG_X_M_Y_P: {
-            id: 39,
             title: 'Jog: X- Y+',
             keys: '',
             cmd: 'JOG_X_M_Y_P',
@@ -679,7 +671,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.JOG,
         },
         JOG_X_Y_P: {
-            id: 40,
             title: 'Jog: X+ Y+',
             keys: '',
             cmd: 'JOG_X_Y_P',
@@ -692,7 +683,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.JOG,
         },
         JOG_X_Y_M: {
-            id: 41,
             title: 'Jog: X- Y-',
             keys: '',
             cmd: 'JOG_X_Y_M',
@@ -705,7 +695,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.JOG,
         },
         STOP_JOG: {
-            id: 42,
             title: 'Stop Jog',
             keys: '',
             cmd: 'STOP_JOG',
@@ -722,7 +711,6 @@ class AxesWidget extends PureComponent {
             },
         },
         SET_R_JOG_PRESET: {
-            id: 45,
             title: 'Select Rapid Jog Preset',
             keys: ['shift', 'v'].join('+'),
             cmd: 'SET_R_JOG_PRESET',
@@ -735,7 +723,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.SET_JOG_PRESET,
         },
         SET_N_JOG_PRESET: {
-            id: 46,
             title: 'Select Normal Jog Preset',
             keys: ['shift', 'c'].join('+'),
             cmd: 'SET_N_JOG_PRESET',
@@ -748,7 +735,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.SET_JOG_PRESET,
         },
         SET_P_JOG_PRESET: {
-            id: 47,
             title: 'Select Precise Jog Preset',
             keys: ['shift', 'x'].join('+'),
             cmd: 'SET_P_JOG_PRESET',
@@ -761,7 +747,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.SET_JOG_PRESET,
         },
         CYCLE_JOG_PRESETS: {
-            id: 48,
             title: 'Cycle Through Jog Presets',
             keys: ['shift', 'z'].join('+'),
             cmd: 'CYCLE_JOG_PRESETS',
@@ -780,7 +765,6 @@ class AxesWidget extends PureComponent {
             },
         },
         JOG_SPEED_I: {
-            id: 43,
             title: 'Increase Jog Speed',
             keys: '=',
             cmd: 'JOG_SPEED_I',
@@ -793,7 +777,6 @@ class AxesWidget extends PureComponent {
             callback: this.shuttleControlFunctions.JOG_SPEED
         },
         JOG_SPEED_D: {
-            id: 44,
             title: 'Decrease Jog Speed',
             keys: '-',
             cmd: 'JOG_SPEED_D',

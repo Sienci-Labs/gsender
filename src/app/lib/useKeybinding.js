@@ -36,7 +36,6 @@ function useKeybinding(shuttleControlEvents) {
                 // add to store
                 let updatedCommandKeys = currentCommandKeys;
                 updatedCommandKeys.push({
-                    id: defaultCommand.id,
                     title: defaultCommand.title,
                     keys: defaultCommand.keys,
                     cmd: defaultCommand.cmd,
@@ -47,13 +46,13 @@ function useKeybinding(shuttleControlEvents) {
                     callback: defaultCommand.callback
                 });
                 store.replace('commandKeys', updatedCommandKeys);
-            } else if (currentCommandKeys.find(element => element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id)) {
-                // code to migrate incorrect ids to the correct ones
-                // if the id is not the default one, change it
-                let newKey = currentCommandKeys.find(element => element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id);
-                newKey.id = defaultCommand.id;
+            } else if (currentCommandKeys.find(element => element.cmd === defaultCommand.cmd && element.id)) {
+                // code to migrate, get rid of ids
+                // if the id exists, remove it
+                let newKey = currentCommandKeys.find(element => element.cmd === defaultCommand.cmd && element.id);
+                delete newKey.id;
                 const updatedCommandKeys =
-                    currentCommandKeys.map(element => (element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id ? newKey : element));
+                    currentCommandKeys.map(element => (element.cmd === defaultCommand.cmd && element.id ? newKey : element));
                 store.replace('commandKeys', updatedCommandKeys);
             }
 
@@ -65,7 +64,6 @@ function useKeybinding(shuttleControlEvents) {
                 if (shortcuts.length === 0 || !shortcuts.find(element => element.cmd === defaultCommand.cmd)) {
                     // no default keys for gamepad
                     updatedProfileShortcuts.push({
-                        id: defaultCommand.id,
                         title: defaultCommand.title,
                         keys: '',
                         cmd: defaultCommand.cmd,
@@ -75,13 +73,13 @@ function useKeybinding(shuttleControlEvents) {
                         category: defaultCommand.category,
                         callback: defaultCommand.callback
                     });
-                } else if (shortcuts.find(element => element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id)) {
+                } else if (shortcuts.find(element => element.cmd === defaultCommand.cmd && element.id)) {
                     // code to migrate incorrect ids to the correct ones
                     // if the id is not the default one, change it
-                    let newKey = shortcuts.find(element => element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id);
-                    newKey.id = defaultCommand.id;
+                    let newKey = shortcuts.find(element => element.cmd === defaultCommand.cmd && element.id);
+                    delete newKey.id;
                     updatedProfileShortcuts =
-                        shortcuts.map(element => (element.cmd === defaultCommand.cmd && element.id !== defaultCommand.id ? newKey : element));
+                        shortcuts.map(element => (element.cmd === defaultCommand.cmd && element.id ? newKey : element));
                 }
                 return { ...profile, shortcuts: updatedProfileShortcuts };
             });

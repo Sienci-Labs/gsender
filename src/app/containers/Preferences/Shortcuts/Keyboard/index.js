@@ -109,19 +109,19 @@ const Keyboard = () => {
      */
     const editKeybinding = (shortcut, showToast = true) => {
         //Replace old keybinding item with new one
-        const editedshortcutsList = shortcutsList.map(keybinding => (keybinding.id === shortcut.id ? shortcut : keybinding));
+        const editedshortcutsList = shortcutsList.map(keybinding => (keybinding.cmd === shortcut.cmd ? shortcut : keybinding));
 
         updateKeybindings(editedshortcutsList, showToast);
     };
 
     const toggleKeybinding = (shortcut, showToast) => {
-        const shortcutInUse = shortcutsList.filter(keybinding => keybinding.id !== shortcut.id).find(keybinding => keybinding.keys === shortcut.keys);
+        const shortcutInUse = shortcutsList.filter(keybinding => keybinding.cmd !== shortcut.cmd).find(keybinding => keybinding.keys === shortcut.keys);
 
         if (shortcutInUse && shortcut.isActive) {
             shortcut.keys = '';
         }
 
-        const updatedshortcutsList = shortcutsList.map(keybinding => (keybinding.id === shortcut.id ? shortcut : keybinding));
+        const updatedshortcutsList = shortcutsList.map(keybinding => (keybinding.cmd === shortcut.cmd ? shortcut : keybinding));
 
         updateKeybindings(updatedshortcutsList, showToast);
     };

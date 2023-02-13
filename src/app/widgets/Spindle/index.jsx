@@ -63,7 +63,6 @@ class SpindleWidget extends PureComponent {
 
     shuttleControlEvents = {
         TOGGLE_SPINDLE_LASER_MODE: {
-            id: 51,
             title: 'Toggle Mode',
             keys: '',
             cmd: 'TOGGLE_SPINDLE_LASER_MODE',
@@ -75,7 +74,6 @@ class SpindleWidget extends PureComponent {
             }
         },
         CW_LASER_ON: {
-            id: 52,
             title: 'CW / Laser On',
             keys: '',
             cmd: 'CW_LASER_ON',
@@ -89,7 +87,6 @@ class SpindleWidget extends PureComponent {
             }
         },
         CCW_LASER_TEST: {
-            id: 53,
             title: 'CCW / Laser Test',
             keys: '',
             cmd: 'CCW_LASER_TEST',
@@ -103,7 +100,6 @@ class SpindleWidget extends PureComponent {
             }
         },
         STOP_LASER_OFF: {
-            id: 54,
             title: 'Stop / Laser Off',
             keys: '',
             cmd: 'STOP_LASER_OFF',
