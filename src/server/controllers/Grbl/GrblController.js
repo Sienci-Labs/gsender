@@ -1263,14 +1263,19 @@ class GrblController {
                     return;
                 }
 
-                // TODO, need to check if file contains Y commands as well (4 axis being used)
-                // That file should not be runnable on grbl
-                const rotaryCommandRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)/g;
-                const isRotaryFile = rotaryCommandRegex.test(gcode);
+                // const rotaryCommandsRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)/g;
+                // const yAxisCommandsRegex = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)/g;
+                // const containsACommands = rotaryCommandsRegex.test(gcode);
+                // const containsYCommands = yAxisCommandsRegex.test(gcode);
 
-                if (isRotaryFile) {
-                    this.emit('filetype', FILE_TYPE.ROTARY);
-                }
+                // if (containsACommands && containsYCommands) {
+                //     callback(new Error('Files with Both Y commands and A commands cannot run on grbl machines'));
+                //     return;
+                // }
+
+                // if (containsACommands) {
+                //     this.emit('filetype', FILE_TYPE.ROTARY);
+                // }
 
                 log.debug(`Load G-code: name="${this.sender.state.name}", size=${this.sender.state.gcode.length}, total=${this.sender.state.total}`);
 
