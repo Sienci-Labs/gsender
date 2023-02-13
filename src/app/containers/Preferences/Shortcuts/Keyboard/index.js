@@ -25,6 +25,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
+import Mousetrap from 'mousetrap';
 import { ALL_CATEGORY } from 'app/constants';
 
 // import { useSelector, useDispatch } from 'react-redux';
@@ -64,6 +65,8 @@ const Keyboard = () => {
 
     const [currentShortcut, setCurrentShortcut] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
+
+    const stopCallbackFunc = Mousetrap.prototype.stopCallback;
 
     useEffect(() => {
         // Trigger pubsub for use in Location widget where keybindings are injected
@@ -142,6 +145,7 @@ const Keyboard = () => {
 
     const closeModal = () => {
         setShowEditModal(false);
+        resumeCallback();
     };
 
     const enableAllShortcuts = () => {
@@ -169,6 +173,18 @@ const Keyboard = () => {
         showToast('Shortcuts Disabled');
     };
 
+    const stopCallback = () => {
+        Mousetrap.prototype.stopCallback = function () {
+            return true;
+        };
+        return true;
+    };
+
+    const resumeCallback = () => {
+        Mousetrap.prototype.stopCallback = stopCallbackFunc;
+        return true;
+    };
+
     const allShortcutsEnabled = useMemo(() => shortcutsList.every(shortcut => shortcut.isActive), [shortcutsList]);
     const allShortcutsDisabled = useMemo(() => shortcutsList.every(shortcut => !shortcut.isActive), [shortcutsList]);
     return (
@@ -194,7 +210,7 @@ const Keyboard = () => {
                 </FunctionButton>
             </div>
 
-            { showEditModal && (
+            { showEditModal && stopCallback() && (
                 <Modal onClose={closeModal} size="md" style={{ padding: '1rem 1rem 2rem', backgroundColor: '#d1d5db' }}>
                     <h3 style={{ textAlign: 'center', marginBottom: '1rem' }}>Edit Shortcut</h3>
 
