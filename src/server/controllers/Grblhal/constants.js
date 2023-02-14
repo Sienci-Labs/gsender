@@ -44,7 +44,8 @@ export const GRBLHAL_REALTIME_COMMANDS = {
     PARSER_STATE_REPORT: '\x83', // $G equivalent
     COMPLETE_REALTIME_REPORT: '\x87',
     VIRTUAL_STOP_TOGGLE: '\x88',
-    TOOL_CHANGE_ACK: '\xA3'
+    TOOL_CHANGE_ACK: '\xA3',
+    ERR_CLEAR: 'ErrClear'
 };
 
 // https://github.com/grbl/grbl/wiki/Configuring-Grbl-v0.9

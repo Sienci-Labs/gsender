@@ -776,6 +776,7 @@ class GrblHalController {
         const queryParserState = _.throttle(() => {
             // Check the ready flag
             if (!(this.ready)) {
+                console.log('NOT ready in queryParserState');
                 return;
             }
 
@@ -803,6 +804,7 @@ class GrblHalController {
             }
 
             if (this.isOpen()) {
+                console.log('command sent');
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
@@ -874,7 +876,6 @@ class GrblHalController {
                 }
             }
         }, 250);
-        // Load file if it exists in CNC engine (AKA it was loaded before connection
     }
 
     async initController() {
@@ -1821,8 +1822,8 @@ class GrblHalController {
 
         const cmd = data.trim();
 
-        this.actionMask.replyStatusReport = (cmd === '?') || this.actionMask.replyStatusReport;
-        this.actionMask.replyParserState = (cmd === '$G') || this.actionMask.replyParserState;
+        this.actionMask.replyStatusReport = (cmd === GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT) || this.actionMask.replyStatusReport;
+        this.actionMask.replyParserState = (cmd === GRBLHAL_REALTIME_COMMANDS.PARSER_STATE_REPORT) || this.actionMask.replyParserState;
 
         this.emit('serialport:write', data, {
             ...context,
