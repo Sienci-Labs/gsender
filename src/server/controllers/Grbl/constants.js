@@ -326,12 +326,12 @@ export const GRBL_ALARMS = [
 
 export const GRBL_SETTINGS_INPUT_TYPES = {
     NUMBER: 'number',
-    MASK: 'mask',
+    AXIS_MASK: 'axis-mask',
     MASK_STATUS_REPORT: 'mask-status-report',
     SWITCH: 'switch',
 };
 
-const { NUMBER, MASK, MASK_STATUS_REPORT, SWITCH } = GRBL_SETTINGS_INPUT_TYPES;
+const { NUMBER, AXIS_MASK, MASK_STATUS_REPORT, SWITCH } = GRBL_SETTINGS_INPUT_TYPES;
 
 // Settings
 // https://github.com/gnea/grbl/blob/master/doc/csv/setting_codes_en_US.csv
@@ -364,7 +364,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'mask',
         description: 'Inverts the step signal. Set axis bit to invert (00000ZYX).',
-        inputType: MASK
+        inputType: AXIS_MASK
     },
     {
         setting: '$3',
@@ -372,7 +372,7 @@ export const GRBL_SETTINGS = [
         category: 'Motors',
         units: 'mask',
         description: 'Inverts the direction signal. Set axis bit to invert (00000ZYX).',
-        inputType: MASK
+        inputType: AXIS_MASK
     },
     {
         setting: '$4',
@@ -466,7 +466,7 @@ export const GRBL_SETTINGS = [
         category: 'Homing',
         units: 'mask',
         description: 'Homing searches for a switch in the positive direction. Set axis bit (00000ZYX) to search in negative direction.',
-        inputType: MASK
+        inputType: AXIS_MASK
     },
     {
         setting: '$24',

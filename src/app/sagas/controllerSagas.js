@@ -520,7 +520,9 @@ export function* initialize() {
     });
 
     controller.addListener('error', (error) => {
-        if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
+        const alarmReg = new RegExp(/GRBL_[a-zA-Z_]*ALARM/);
+        const errorReg = new RegExp(/GRBL_[a-zA-Z_]*ERROR/);
+        if (isElectron() && (alarmReg.test(error.type) || errorReg.test(error.type))) {
             window.ipcRenderer.send('logError:electron', error);
         }
     });

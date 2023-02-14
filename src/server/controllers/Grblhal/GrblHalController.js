@@ -54,9 +54,9 @@ import {
     GRBLHAL,
     GRBL_ACTIVE_STATE_RUN,
     GRBLHAL_REALTIME_COMMANDS,
-    GRBL_ALARMS,
-    GRBL_ERRORS,
-    GRBL_SETTINGS, GRBL_ACTIVE_STATE_HOME
+    GRBL_HAL_ALARMS,
+    GRBL_HAL_ERRORS,
+    GRBL_HAL_SETTINGS, GRBL_ACTIVE_STATE_HOME
 } from './constants';
 import {
     METRIC_UNITS,
@@ -594,7 +594,7 @@ class GrblHalController {
 
         this.runner.on('error', (res) => {
             const code = Number(res.message) || undefined;
-            const error = _.find(GRBL_ERRORS, { code: code });
+            const error = _.find(GRBL_HAL_ERRORS, { code: code });
 
             log.error(`Error occurred at ${Date.now()}`);
 
@@ -617,7 +617,7 @@ class GrblHalController {
             }
 
             this.emit('error', {
-                type: 'GRBL_ERROR',
+                type: 'GRBL_HAL_ERROR',
                 code: `${code}`,
                 description: error.description,
                 line: line,
@@ -663,13 +663,13 @@ class GrblHalController {
 
         this.runner.on('alarm', (res) => {
             const code = Number(res.message) || undefined;
-            const alarm = _.find(GRBL_ALARMS, { code: code });
+            const alarm = _.find(GRBL_HAL_ALARMS, { code: code });
 
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
                 this.emit('error', {
-                    type: 'GRBL_ALARM',
+                    type: 'GRBL_HAL_ALARM',
                     code: code,
                     description: alarm.description,
                 });
@@ -710,7 +710,7 @@ class GrblHalController {
         });
 
         this.runner.on('settings', (res) => {
-            const setting = _.find(GRBL_SETTINGS, { setting: res.name });
+            const setting = _.find(GRBL_HAL_SETTINGS, { setting: res.name });
 
             if (!res.message && setting) {
                 // Grbl v1.1

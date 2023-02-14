@@ -193,7 +193,7 @@ class NavbarConnectionWidget extends PureComponent {
 
         this.config.set('minimized', minimized);
         if (controllerType !== type) {
-            this.config.set('controller.type', type);
+            this.config.set('controller.type', controllerType);
         }
         if (port) {
             this.config.set('port', port);
@@ -211,11 +211,6 @@ class NavbarConnectionWidget extends PureComponent {
         let controllerType = this.config.get('controller.type');
         if (!includes(controller.loadedControllers, controllerType)) {
             controllerType = controller.loadedControllers[0];
-        }
-
-        let selectedControllerType = this.config.get('controller.selectedType');
-        if (!includes(controller.loadedControllers, selectedControllerType)) {
-            selectedControllerType = controller.loadedControllers[0];
         }
 
         // Common baud rates
@@ -237,7 +232,6 @@ class NavbarConnectionWidget extends PureComponent {
             connected: false,
             baudrates: reverse(sortBy(uniq(controller.baudrates.concat(defaultBaudrates)))),
             controllerType: controllerType,
-            selectedControllerType: selectedControllerType,
             port: this.config.get('port'),
             baudrate: this.config.get('baudrate'),
             connection: {

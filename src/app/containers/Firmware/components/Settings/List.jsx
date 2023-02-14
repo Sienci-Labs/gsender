@@ -77,6 +77,11 @@ const SettingsList = () => {
                                                     units={grbl.units}
                                                     onChange={handleSettingsChange(index)}
                                                     value={grbl.value}
+                                                    values={grbl.values}
+                                                    maxChars={grbl.maxChars}
+                                                    bits={grbl.bits}
+                                                    numBits={grbl.numBits}
+                                                    requiredBit={grbl.requiredBit}
                                                 />
                                             </div>
                                         </div>

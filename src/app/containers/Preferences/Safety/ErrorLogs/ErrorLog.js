@@ -48,10 +48,10 @@ const ErrorLog = () => {
                                             >
                                                 <span className={styles.errorTag}>Alarm</span>
                                                 <span className={styles.errorDate}>
-                                                    On {log.split('[error] GRBL_ALARM:')[0].slice(1, 20).replace(' ', ' at ') || ''}
+                                                    On {log.split(/\[error\] GRBL_[a-zA-Z_]*ALARM:/)[0].slice(1, 20).replace(' ', ' at ') || ''}
                                                 </span>
                                                 <p className={styles.errorReason}>
-                                                    {log.split('[error] GRBL_ALARM:')[1]}
+                                                    {log.split(/\[error\] GRBL_[a-zA-Z_]*ALARM:/)[1]}
                                                 </p>
                                             </VerticalTimelineElement>
                                         )
@@ -65,13 +65,13 @@ const ErrorLog = () => {
                                                 icon={<VscError />}
                                                 key={uniqueID()}
                                             >
-                                                <span className={styles.errorTag}>Error{log.split('[error] GRBL_ERROR:')[1].split('Origin')[1]}</span>
+                                                <span className={styles.errorTag}>Error{log.split(/\[error\] GRBL_[a-zA-Z_]*ERROR:/)[1].split('Origin')[1]}</span>
                                                 <span className={styles.errorDate}>
-                                                    On {log.split('[error] GRBL_ERROR:')[0].slice(1, 20).replace(' ', ' at ') || ''}
+                                                    On {log.split(/\[error\] GRBL_[a-zA-Z_]*ERROR:/)[0].slice(1, 20).replace(' ', ' at ') || ''}
                                                 </span>
                                                 <p className={styles.errorReason}>
-                                                    {log.split('[error] GRBL_ERROR:')[1].split('Line')[0]} <br />
-                                                    {log.includes('Feeder') ? '' : ('Line ' + log.split('[error] GRBL_ERROR:')[1].split('Line')[1].split('Origin')[0])} <br />
+                                                    {log.split(/\[error\] GRBL_[a-zA-Z_]*ERROR:/)[1].split('Line')[0]} <br />
+                                                    {log.includes('Feeder') ? '' : ('Line ' + log.split(/\[error\] GRBL_[a-zA-Z_]*ERROR:/)[1].split('Line')[1].split('Origin')[0])} <br />
                                                 </p>
                                             </VerticalTimelineElement>
                                         );

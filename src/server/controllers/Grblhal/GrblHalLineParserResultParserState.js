@@ -29,7 +29,7 @@ import _includes from 'lodash/includes';
 import _set from 'lodash/set';
 import _trim from 'lodash/trim';
 import {
-    GRBL_MODAL_GROUPS
+    GRBL_HAL_MODAL_GROUPS
 } from './constants';
 
 class GrbHalLineParserResultParserState {
@@ -56,7 +56,7 @@ class GrbHalLineParserResultParserState {
 
             // Gx, Mx
             if (word.indexOf('G') === 0 || word.indexOf('M') === 0) {
-                const r = _find(GRBL_MODAL_GROUPS, (group) => {
+                const r = _find(GRBL_HAL_MODAL_GROUPS, (group) => {
                     return _includes(group.modes, word);
                 });
 
