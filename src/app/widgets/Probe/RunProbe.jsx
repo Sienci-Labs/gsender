@@ -188,7 +188,7 @@ class RunProbe extends PureComponent {
         const { connectionMade } = this.state;
 
         return (
-            <Modal disableOverlay onClose={actions.closeModal} show={show} className={styles.modalOverride}>
+            <Modal disableOverlayClick onClose={actions.closeModal} show={show} className={styles.modalOverride}>
                 <Modal.Header className={styles.modalHeader}>
                     <Modal.Title>{i18n._(`Probe - ${probeCommand.id}`)}</Modal.Title>
                 </Modal.Header>

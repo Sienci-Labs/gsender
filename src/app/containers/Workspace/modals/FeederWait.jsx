@@ -33,7 +33,7 @@ import i18n from 'app/lib/i18n';
 const FeederWait = (props) => (
     <Modal
         size="xs"
-        disableOverlay={true}
+        disableOverlayClick={true}
         showCloseButton={false}
     >
         <Modal.Body>

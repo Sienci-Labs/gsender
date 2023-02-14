@@ -36,7 +36,7 @@ const ValidationModal = ({ onProceed, onCancel, invalidGcode }) => {
             size="xs"
             onClose={onProceed}
             style={modalStyle}
-            disableOverlay
+            disableOverlayClick
         >
             <Modal.Header style={modalHeaderStyle}>
                 <Modal.Title style={modalTitleStyle}>

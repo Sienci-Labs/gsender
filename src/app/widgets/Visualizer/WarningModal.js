@@ -34,7 +34,7 @@ const WarningModal = ({ onContinue, onIgnoreWarning, onCancel, invalidLine }) =>
             size="md"
             onClose={onContinue}
             style={modalStyle}
-            disableOverlay
+            disableOverlayClick
         >
             <Modal.Header style={modalHeaderStyle}>
                 <Modal.Title style={modalTitleStyle}>
