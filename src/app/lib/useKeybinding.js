@@ -65,7 +65,8 @@ function useKeybinding(shuttleControlEvents) {
                     // no default keys for gamepad
                     updatedProfileShortcuts.push({
                         title: defaultCommand.title,
-                        keys: '',
+                        keys: defaultCommand.gamepadKeys || '',
+                        keysName: defaultCommand.keysName,
                         cmd: defaultCommand.cmd,
                         payload: defaultCommand.payload,
                         preventDefault: defaultCommand.preventDefault,

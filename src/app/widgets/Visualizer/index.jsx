@@ -939,6 +939,8 @@ class VisualizerWidget extends PureComponent {
             title: 'Load File',
             keys: ['shift', 'l'].join('+'),
             cmd: 'LOAD_FILE',
+            gamepadKeys: '0',
+            keysName: 'A',
             preventDefault: false,
             isActive: true,
             category: CARVING_CATEGORY,
@@ -951,6 +953,8 @@ class VisualizerWidget extends PureComponent {
         UNLOAD_FILE: {
             title: 'Unload File',
             keys: ['shift', 'k'].join('+'),
+            gamepadKeys: '1',
+            keysName: 'B',
             cmd: 'UNLOAD_FILE',
             preventDefault: false,
             isActive: true,
@@ -975,6 +979,8 @@ class VisualizerWidget extends PureComponent {
         START_JOB: {
             title: 'Start Job',
             keys: '~',
+            gamepadKeys: '9',
+            keysName: 'Start',
             cmd: 'START_JOB',
             preventDefault: true,
             isActive: true,
@@ -988,6 +994,8 @@ class VisualizerWidget extends PureComponent {
         PAUSE_JOB: {
             title: 'Pause Job',
             keys: '!',
+            gamepadKeys: '2',
+            keysName: 'X',
             cmd: 'PAUSE_JOB',
             preventDefault: true,
             isActive: true,
@@ -999,6 +1007,8 @@ class VisualizerWidget extends PureComponent {
         STOP_JOB: {
             title: 'Stop Job',
             keys: '@',
+            gamepadKeys: '3',
+            keysName: 'Y',
             cmd: 'STOP_JOB',
             preventDefault: true,
             isActive: true,

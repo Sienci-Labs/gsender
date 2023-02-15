@@ -575,6 +575,8 @@ class AxesWidget extends PureComponent {
         JOG_X_P: {
             title: 'Jog: X+',
             keys: 'shift+right',
+            gamepadKeys: '15',
+            keysName: 'Arrow Right',
             cmd: 'JOG_X_P',
             payload: {
                 axis: { [AXIS_X]: 1 },
@@ -589,6 +591,8 @@ class AxesWidget extends PureComponent {
         JOG_X_M: {
             title: 'Jog: X-',
             keys: 'shift+left',
+            gamepadKeys: '14',
+            keysName: 'Arrow Left',
             cmd: 'JOG_X_M',
             payload: {
                 axis: { [AXIS_X]: -1 },
@@ -601,6 +605,8 @@ class AxesWidget extends PureComponent {
         JOG_Y_P: {
             title: 'Jog: Y+',
             keys: 'shift+up',
+            gamepadKeys: '12',
+            keysName: 'Arrow Up',
             cmd: 'JOG_Y_P',
             payload: {
                 axis: { [AXIS_Y]: 1 },
@@ -613,6 +619,8 @@ class AxesWidget extends PureComponent {
         JOG_Y_M: {
             title: 'Jog: Y-',
             keys: 'shift+down',
+            gamepadKeys: '13',
+            keysName: 'Arrow Down',
             cmd: 'JOG_Y_M',
             payload: {
                 axis: { [AXIS_Y]: -1 },
@@ -625,6 +633,8 @@ class AxesWidget extends PureComponent {
         JOG_Z_P: {
             title: 'Jog: Z+',
             keys: 'shift+pageup',
+            gamepadKeys: '5',
+            keysName: 'Left Button',
             cmd: 'JOG_Z_P',
             payload: {
                 axis: { [AXIS_Z]: 1 },
@@ -637,6 +647,8 @@ class AxesWidget extends PureComponent {
         JOG_Z_M: {
             title: 'Jog: Z-',
             keys: 'shift+pagedown',
+            gamepadKeys: '4',
+            keysName: 'Right Button',
             cmd: 'JOG_Z_M',
             payload: {
                 axis: { [AXIS_Z]: -1 },
@@ -649,6 +661,8 @@ class AxesWidget extends PureComponent {
         JOG_X_P_Y_M: {
             title: 'Jog: X+ Y-',
             keys: '',
+            gamepadKeys: '13+15',
+            keysName: 'Arrow Right and Arrow Down',
             cmd: 'JOG_X_P_Y_M',
             payload: {
                 axis: { [AXIS_X]: 1, [AXIS_Y]: -1 },
@@ -661,6 +675,8 @@ class AxesWidget extends PureComponent {
         JOG_X_M_Y_P: {
             title: 'Jog: X- Y+',
             keys: '',
+            gamepadKeys: '13+14',
+            keysName: 'Arrow Left and Arrow Down',
             cmd: 'JOG_X_M_Y_P',
             payload: {
                 axis: { [AXIS_X]: -1, [AXIS_Y]: 1 },
@@ -673,6 +689,8 @@ class AxesWidget extends PureComponent {
         JOG_X_Y_P: {
             title: 'Jog: X+ Y+',
             keys: '',
+            gamepadKeys: '12+15',
+            keysName: 'Arrow Right and Arrow Up',
             cmd: 'JOG_X_Y_P',
             payload: {
                 axis: { [AXIS_X]: 1, [AXIS_Y]: 1 },
@@ -685,6 +703,8 @@ class AxesWidget extends PureComponent {
         JOG_X_Y_M: {
             title: 'Jog: X- Y-',
             keys: '',
+            gamepadKeys: '13+14',
+            keysName: 'Arrow Left and Arrow Down',
             cmd: 'JOG_X_Y_M',
             payload: {
                 axis: { [AXIS_X]: -1, [AXIS_Y]: -1 },
@@ -767,6 +787,8 @@ class AxesWidget extends PureComponent {
         JOG_SPEED_I: {
             title: 'Increase Jog Speed',
             keys: '=',
+            gamepadKeys: '7',
+            keysName: 'Right Trigger',
             cmd: 'JOG_SPEED_I',
             payload: {
                 speed: 'increase'
@@ -779,6 +801,8 @@ class AxesWidget extends PureComponent {
         JOG_SPEED_D: {
             title: 'Decrease Jog Speed',
             keys: '-',
+            gamepadKeys: '6',
+            keysName: 'Left Trigger',
             cmd: 'JOG_SPEED_D',
             payload: {
                 speed: 'decrease'
