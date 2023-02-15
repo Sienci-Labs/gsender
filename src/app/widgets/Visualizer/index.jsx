@@ -91,7 +91,7 @@ import useKeybinding from '../../lib/useKeybinding';
 
 const displayWebGLErrorMessage = () => {
     portal(({ onClose }) => (
-        <Modal disableOverlay size="xs" onClose={onClose}>
+        <Modal disableOverlayClick size="xs" onClose={onClose}>
             <Modal.Header>
                 <Modal.Title>
                     WebGL Error Message
