@@ -136,6 +136,7 @@ const Keyboard = () => {
         pubsub.publish('keybindingsUpdated');
 
         setShowEditModal(false);
+        resumeCallback();
         // dispatch(updateShortcutsList(shortcuts));
 
         if (shouldShowToast) {
