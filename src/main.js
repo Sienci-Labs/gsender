@@ -120,7 +120,7 @@ const main = () => {
                 }
             }
 
-            const { address, port } = { ...res };
+            const { address, port, requestedHost, kiosk} = { ...res };
             log.info(`Returned - http://${address}:${port}`);
             hostInformation = {
                 address,
@@ -144,7 +144,8 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `gSender ${pkg.version}`
+                title: `gSender ${pkg.version}`,
+                kiosk
             };
             const window = windowManager.openWindow(url, options, splashScreen);
 
