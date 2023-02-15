@@ -113,6 +113,7 @@ class CNCEngine {
     // @param {string} controller Specify CNC controller.
     start(server, controller = '') {
         // Fallback to an empty string if the controller is not valid
+        log.debug(controller);
         if (!isValidController(controller)) {
             controller = '';
         }
@@ -121,11 +122,6 @@ class CNCEngine {
         if (!controller || caseInsensitiveEquals(GRBL, controller)) {
             this.controllerClass[GRBL] = GrblController;
         }
-        if (!controller || caseInsensitiveEquals(GRBLHAL, controller)) {
-            this.controllerClass[GRBLHAL] = GrblHalController;
-        }
-
-        // GrblHal
         if (!controller || caseInsensitiveEquals(GRBLHAL, controller)) {
             this.controllerClass[GRBLHAL] = GrblHalController;
         }
