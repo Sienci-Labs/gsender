@@ -46,7 +46,6 @@ class Probe extends PureComponent {
 
     shuttleControlEvents = {
         OPEN_PROBE: {
-            id: 74,
             title: 'Open Probe',
             keys: '',
             cmd: 'OPEN_PROBE',
@@ -58,7 +57,6 @@ class Probe extends PureComponent {
             },
         },
         PROBE_ROUTINE_SCROLL_RIGHT: {
-            id: 75,
             title: 'Probe Routine Scroll Right',
             keys: '',
             cmd: 'PROBE_ROUTINE_SCROLL_RIGHT',
@@ -77,7 +75,6 @@ class Probe extends PureComponent {
             },
         },
         PROBE_ROUTINE_SCROLL_LEFT: {
-            id: 76,
             title: 'Probe Routine Scroll Left',
             keys: '',
             cmd: 'PROBE_ROUTINE_SCROLL_LEFT',
@@ -96,7 +93,6 @@ class Probe extends PureComponent {
             },
         },
         PROBE_DIAMETER_SCROLL_UP: {
-            id: 77,
             title: 'Probe Diameter Scroll Up',
             keys: '',
             cmd: 'PROBE_DIAMETER_SCROLL_UP',
@@ -117,7 +113,6 @@ class Probe extends PureComponent {
             },
         },
         PROBE_DIAMETER_SCROLL_DOWN: {
-            id: 78,
             title: 'Probe Diameter Scroll Down',
             keys: '',
             cmd: 'PROBE_DIAMETER_SCROLL_DOWN',
