@@ -6,7 +6,7 @@ export const profiles = [
         icon: 'fas fa-gamepad',
         active: true,
         profileName: 'Logitech F710 Gamepad',
-        shortcuts: []
+        shortcuts: {}
     },
     {
         id: [
@@ -17,6 +17,6 @@ export const profiles = [
         icon: 'fas fa-gamepad',
         active: true,
         profileName: 'Xbox Controller',
-        shortcuts: []
+        shortcuts: {}
     }
 ];

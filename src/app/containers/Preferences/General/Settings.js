@@ -76,7 +76,7 @@ const Settings = () => {
 
     const exportSettings = async () => {
         const settings = store.get();
-        settings.commandKeys = settings.commandKeys.filter((key) => key.category !== 'Macros'); //Exclude macro shortcuts
+        settings.commandKeys = Object.fromEntries(Object.entries(settings.commandKeys).filter(([key, shortcut]) => shortcut.category !== 'Macros')); //Exclude macro shortcuts
         delete settings.session;
 
         const res = await api.events.fetch();

@@ -93,15 +93,15 @@ export const onGamepadButtonClick = ({ detail }) => {
             .map(button => button.buttonIndex)
     );
 
-    const foundAction = currentProfile.shortcuts.find(shortcut => shortcut.keys === buttonCombo);
+    const foundAction = Object.entries(currentProfile.shortcuts).find(([key, shortcut]) => shortcut.keys === buttonCombo);
 
     if (!pressed) {
-        const foundStopCommand = currentProfile.shortcuts.find(shortcut => shortcut.cmd === STOP_JOG_CMD);
+        const foundStopCommand = currentProfile.shortcuts[STOP_JOG_CMD];
         delete foundStopCommand?.payload; //We don't need to send a payload
         return foundStopCommand;
     }
 
-    if (!buttonCombo || !foundAction?.isActive) {
+    if (!buttonCombo || (foundAction && !foundAction[1].isActive)) {
         return null;
     }
 
@@ -116,7 +116,7 @@ export const runAction = ({ event, shuttleControlEvents }) => {
     }
 
     const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
-    const runEvent = allShuttleControlEvents.find(element => element.cmd === action.cmd).callback;
+    const runEvent = allShuttleControlEvents[action.cmd]?.callback;
     if (runEvent) {
         runEvent(null, action.payload);
     }

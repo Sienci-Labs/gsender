@@ -50,14 +50,14 @@ const ProfileModal = ({ onClose, onAdd }) => {
 
     const handleAddProfile = () => {
         const { profiles = [] } = store.get('workspace.gamepad');
-        const commandKeys = store.get('commandKeys', []);
+        const commandKeys = store.get('commandKeys', {});
 
         const newProfiles = [
             {
                 id: [gamepadInfo.id],
                 active: true,
                 profileName: customProfileName || gamepadInfo.id,
-                shortcuts: commandKeys.map((keyData) => ({ ...keyData, keys: '', command: keyData.cmd })),
+                shortcuts: Object.keys(commandKeys).forEach((key) => ({ ...commandKeys[key], keys: '' })),
                 icon: 'fas fa-gamepad'
             },
             ...profiles

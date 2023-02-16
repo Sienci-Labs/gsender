@@ -23,6 +23,7 @@
 
 import events from 'events';
 import Mousetrap from 'mousetrap';
+import _ from 'lodash';
 import api from 'app/api';
 import { MACRO_CATEGORY } from 'app/constants';
 import log from './log';
@@ -75,7 +76,7 @@ class Combokeys extends events.EventEmitter {
         }
         const commandKeys = await this.getCommandKeys();
 
-        commandKeys.filter(key => key.isActive).forEach((o) => {
+        Object.entries(commandKeys).filter(([key, keybinding]) => keybinding.isActive).forEach((o) => {
             const { keys, cmd, payload = null, isActive } = o;
 
             //Do not add any keybindings if the shortcut is disabled or there is no shortcut at all
@@ -152,35 +153,33 @@ class Combokeys extends events.EventEmitter {
     }
 
     async getCommandKeys() {
-        const setCommandKeys = store.get('commandKeys', []);
-        const setMacrosBinds = setCommandKeys.filter(command => command.category === MACRO_CATEGORY);
+        const setCommandKeys = store.get('commandKeys', {});
+        const setMacrosBinds = Object.entries(setCommandKeys).filter(([key, command]) => command.category === MACRO_CATEGORY);
 
         const res = await api.macros.fetch();
         const macros = res.body.records;
 
-        const newCommandKeysList = [...setCommandKeys];
+        const newCommandKeysList = _.cloneDeep(setCommandKeys);
 
         // get callback for macros
         const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
-        const macroCallback = allShuttleControlEvents.find(element => element.name === 'MACRO');
+        const macroCallback = allShuttleControlEvents[MACRO];
 
         macros.forEach(macro => {
-            const existingBind = setMacrosBinds.find(bind => bind.id === macro.id);
+            const existingBind = setMacrosBinds.find(([key, bind]) => bind.cmd === macro.id);
             if (!existingBind) {
-                newCommandKeysList.push({
-                    id: macro.id,
+                newCommandKeysList[macro.id] = {
                     keys: '',
                     title: macro.name,
-                    cmd: MACRO,
+                    cmd: macro.id,
                     payload: { macroID: macro.id },
                     preventDefault: false,
                     isActive: false,
                     category: MACRO_CATEGORY,
                     callback: macroCallback
-                });
+                };
             }
         });
-
         store.replace('commandKeys', newCommandKeysList);
 
         return newCommandKeysList;

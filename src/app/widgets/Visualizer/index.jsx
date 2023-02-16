@@ -938,9 +938,9 @@ class VisualizerWidget extends PureComponent {
         LOAD_FILE: {
             title: 'Load File',
             keys: ['shift', 'l'].join('+'),
-            cmd: 'LOAD_FILE',
             gamepadKeys: '0',
             keysName: 'A',
+            cmd: 'LOAD_FILE',
             preventDefault: false,
             isActive: true,
             category: CARVING_CATEGORY,
@@ -1240,15 +1240,16 @@ class VisualizerWidget extends PureComponent {
             isActive: true,
             category: GENERAL_CATEGORY,
             callback: () => {
-                const shortcuts = store.get('commandKeys', []);
+                const shortcuts = store.get('commandKeys', {});
 
                 // Ignore shortcut for toggling all other shortcuts to
                 // allow them to be turned on and off
-                const allDisabled = shortcuts
-                    .filter(shortcut => shortcut.title !== 'Toggle Shortcuts')
-                    .every(({ isActive }) => !isActive);
-                const keybindingsArr = shortcuts.map(shortcut => (shortcut.title === 'Toggle Shortcuts' ? shortcut : { ...shortcut, isActive: allDisabled }));
+                const allDisabled = Object.entries(shortcuts)
+                    .filter(([key, shortcut]) => shortcut.title !== 'Toggle Shortcuts')
+                    .every((([key, shortcut]) => !shortcut.isActive));
+                const keybindingsArr = Object.keys.apply(shortcuts).forEach(key => (shortcuts[key].title === 'Toggle Shortcuts' ? shortcuts[key] : { ...shortcuts[key], isActive: allDisabled }));
 
+                console.log(keybindingsArr);
                 store.replace('commandKeys', keybindingsArr);
                 pubsub.publish('keybindingsUpdated');
             }

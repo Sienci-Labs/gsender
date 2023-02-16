@@ -188,6 +188,35 @@ const migrateStore = () => {
         return;
     }
 
+    if (semver.lt(cnc.version, '1.2.3') || semver.lt(cnc.version, '1.2.3-EDGE')) {
+        const currentCommandKeys = store.get('commandKeys');
+        let newCommandKeysList = {};
+
+        if (Array.isArray(currentCommandKeys)) {
+            console.log('shouldnt be here');
+            currentCommandKeys.forEach(element => {
+                delete element.id;
+                newCommandKeysList[element.cmd] = element;
+            });
+            store.replace('commandKeys', newCommandKeysList);
+        }
+
+        const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
+        const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
+            const shortcuts = profile.shortcuts;
+            let updatedProfileShortcuts = shortcuts;
+
+            if (Array.isArray(shortcuts)) {
+                shortcuts.forEach(element => {
+                    delete element.id;
+                    updatedProfileShortcuts[element.cmd] = element;
+                });
+            }
+            return { ...profile, shortcuts: updatedProfileShortcuts };
+        });
+        store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
+    }
+
     if (semver.lt(cnc.version, '1.1.5')) {
         const currSurfacingState = store.get('widgets.surfacing');
         const defaultSurfacingState = get(defaultState, 'widgets.surfacing', currSurfacingState);

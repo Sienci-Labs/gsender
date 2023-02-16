@@ -48,16 +48,23 @@ import styles from '../index.styl';
  */
 const Keyboard = () => {
     // const { list: shortcutsList } = useSelector(state => state.preferences.shortcuts);
-    const [shortcutsList, setShortcutsList] = useState(store.get('commandKeys', []));
-    shortcutsList.sort((a, b) => {
-        return a.category.localeCompare(b.category);
-    });
+    const generateList = (shortcuts) => {
+        let shortcutsList = [];
+        Object.keys(shortcuts).forEach(key => {
+            shortcutsList.push(shortcuts[key]);
+        });
+        return shortcutsList;
+    };
+    const [shortcutsList, setShortcutsList] = useState(store.get('commandKeys', {}));
+    // shortcutsList.sort((a, b) => {
+    //     return a.category.localeCompare(b.category);
+    // });
     const [dataSet, setDataSet] = useState(shortcutsList);
     const [filterCategory, setFilterCategory] = useState(ALL_CATEGORY);
 
     const filter = (category, shortcuts) => {
         const allShortcuts = shortcuts || shortcutsList;
-        const filteredData = category === ALL_CATEGORY ? allShortcuts : allShortcuts.filter(entry => entry.category === category);
+        const filteredData = category === ALL_CATEGORY ? allShortcuts : Object.fromEntries(Object.entries(allShortcuts).filter(([key, entry]) => entry.category === category));
         setDataSet(filteredData);
         setFilterCategory(category);
     };
@@ -93,15 +100,13 @@ const Keyboard = () => {
 
     const handleEdit = (currentShortcut) => {
         setShowEditModal(true);
-        setCurrentShortcut(currentShortcut);
+        setCurrentShortcut(currentShortcut.cmd || currentShortcut.id);
     };
 
     const handleDelete = (shortcut) => {
-        shortcut.keys = '';
-
-        const updatedshortcutsList = shortcutsList.map(keybinding => (keybinding.cmd === shortcut.cmd ? shortcut : keybinding));
-
-        updateKeybindings(updatedshortcutsList, false);
+        const updatedShortcuts = _.cloneDeep(shortcutsList);
+        updatedShortcuts[shortcut.cmd].keys = '';
+        updateKeybindings(updatedShortcuts, false);
 
         showToast('Shortcut Cleared');
     };
@@ -112,21 +117,20 @@ const Keyboard = () => {
      */
     const editKeybinding = (shortcut, showToast = true) => {
         //Replace old keybinding item with new one
-        const editedshortcutsList = shortcutsList.map(keybinding => (keybinding.cmd === shortcut.cmd ? shortcut : keybinding));
-
-        updateKeybindings(editedshortcutsList, showToast);
+        const updatedShortcuts = _.cloneDeep(shortcutsList);
+        updatedShortcuts[shortcut.cmd] = shortcut;
+        updateKeybindings(updatedShortcuts, showToast);
     };
 
     const toggleKeybinding = (shortcut, showToast) => {
-        const shortcutInUse = shortcutsList.filter(keybinding => keybinding.cmd !== shortcut.cmd).find(keybinding => keybinding.keys === shortcut.keys);
-
+        const updatedShortcutsList = _.cloneDeep(shortcutsList);
+        const shortcutInUse = Object.entries(updatedShortcutsList).filter(([key, keybinding]) => keybinding.cmd !== shortcut.cmd).find(([key, keybinding]) => keybinding.keys === shortcut.keys);
         if (shortcutInUse && shortcut.isActive) {
             shortcut.keys = '';
         }
 
-        const updatedshortcutsList = shortcutsList.map(keybinding => (keybinding.cmd === shortcut.cmd ? shortcut : keybinding));
-
-        updateKeybindings(updatedshortcutsList, showToast);
+        updatedShortcutsList[shortcut.cmd] = shortcut;
+        updateKeybindings(updatedShortcutsList, showToast);
     };
 
     const updateKeybindings = (shortcuts, shouldShowToast) => {
@@ -136,6 +140,7 @@ const Keyboard = () => {
         pubsub.publish('keybindingsUpdated');
 
         setShowEditModal(false);
+        resumeCallback();
         // dispatch(updateShortcutsList(shortcuts));
 
         if (shouldShowToast) {
@@ -149,25 +154,29 @@ const Keyboard = () => {
     };
 
     const enableAllShortcuts = () => {
-        const enabledKeybindingsArr = shortcutsList.map(keybinding => ({ ...keybinding, isActive: true }));
+        let enabledKeybindings = _.cloneDeep(shortcutsList);
+        let enabledArr = Object.entries(enabledKeybindings);
+        enabledArr.forEach(([key, keybinding]) => {
+            keybinding.isActive = true;
+        });
+        enabledKeybindings = Object.fromEntries(enabledArr);
 
-        store.replace('commandKeys', enabledKeybindingsArr);
+        updateKeybindings(enabledKeybindings, false);
 
-        setShortcutsList(enabledKeybindingsArr);
-        filter(filterCategory, enabledKeybindingsArr);
-
-        setShowEditModal(false);
         // dispatch(updateShortcutsList(enabledKeybindingsArr));
 
         showToast('Shortcuts Enabled');
     };
 
     const disableAllShortcuts = () => {
-        const disabledShortcuts = shortcutsList.map(keybinding => ({ ...keybinding, isActive: false }));
+        let disabledShortcuts = _.cloneDeep(shortcutsList);
+        let disabledArr = Object.entries(disabledShortcuts);
+        disabledArr.forEach(([key, keybinding]) => {
+            keybinding.isActive = false;
+        });
+        disabledShortcuts = Object.fromEntries(disabledArr);
 
-        store.replace('commandKeys', disabledShortcuts);
-        setShortcutsList(disabledShortcuts);
-        filter(filterCategory, disabledShortcuts);
+        updateKeybindings(disabledShortcuts, false);
         // dispatch(updateShortcutsList(disabledShortcuts));
 
         showToast('Shortcuts Disabled');
@@ -185,14 +194,14 @@ const Keyboard = () => {
         return true;
     };
 
-    const allShortcutsEnabled = useMemo(() => shortcutsList.every(shortcut => shortcut.isActive), [shortcutsList]);
-    const allShortcutsDisabled = useMemo(() => shortcutsList.every(shortcut => !shortcut.isActive), [shortcutsList]);
+    const allShortcutsEnabled = useMemo(() => Object.entries(shortcutsList).every(([key, shortcut]) => shortcut.isActive), [shortcutsList]);
+    const allShortcutsDisabled = useMemo(() => Object.entries(shortcutsList).every(([key, shortcut]) => !shortcut.isActive), [shortcutsList]);
     return (
         <div>
             <CategoryFilter onChange={filter} filterCategory={filterCategory} />
             <div className={styles['table-wrapper']}>
                 <ShortcutsTable
-                    dataSet={dataSet}
+                    dataSet={generateList(dataSet)}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
                     onShortcutToggle={toggleKeybinding}
@@ -215,7 +224,7 @@ const Keyboard = () => {
                     <h3 style={{ textAlign: 'center', marginBottom: '1rem' }}>Edit Shortcut</h3>
 
                     <EditArea
-                        shortcut={currentShortcut}
+                        shortcut={shortcutsList[currentShortcut]}
                         shortcuts={shortcutsList}
                         edit={editKeybinding}
                         onClose={closeModal}
