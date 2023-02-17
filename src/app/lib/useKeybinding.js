@@ -10,10 +10,11 @@ let numCalls = 0; // number of useKeybinding hooks that have been called
 /*
     shuttleControlEvents structure:
     {
-        eventName: {
-            id: 68,
+        cmd: {
             title: 'Firmware',
             keys: 'f5',
+            (if applicable) gamepadKeys: '13',
+            (if applicable) keysName: 'Arrow Down'
             cmd: 'OPEN_TOOLBAR',
             payload: { toolbar: MODAL_FIRMWARE },
             preventDefault: false,
@@ -59,7 +60,7 @@ function useKeybinding(shuttleControlEvents) {
                     updatedProfileShortcuts[defaultCommand.cmd] = {
                         title: defaultCommand.title,
                         keys: defaultCommand.gamepadKeys || '',
-                        keysName: defaultCommand.keysName,
+                        keysName: defaultCommand.keysName || '',
                         cmd: defaultCommand.cmd,
                         payload: defaultCommand.payload,
                         preventDefault: defaultCommand.preventDefault,

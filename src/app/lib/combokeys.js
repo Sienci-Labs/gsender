@@ -76,7 +76,7 @@ class Combokeys extends events.EventEmitter {
         }
         const commandKeys = await this.getCommandKeys();
 
-        Object.entries(commandKeys).filter(([key, keybinding]) => keybinding.isActive).forEach((o) => {
+        Object.entries(commandKeys).filter(([key, keybinding]) => keybinding.isActive).forEach(([key, o]) => {
             const { keys, cmd, payload = null, isActive } = o;
 
             //Do not add any keybindings if the shortcut is disabled or there is no shortcut at all

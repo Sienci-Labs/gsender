@@ -204,7 +204,7 @@ const migrateStore = () => {
         const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
         const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
             const shortcuts = profile.shortcuts;
-            let updatedProfileShortcuts = shortcuts;
+            let updatedProfileShortcuts = {};
 
             if (Array.isArray(shortcuts)) {
                 shortcuts.forEach(element => {
