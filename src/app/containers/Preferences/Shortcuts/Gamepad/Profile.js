@@ -6,6 +6,7 @@ import _ from 'lodash';
 import store from 'app/store';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import Button from 'app/components/FunctionButton/FunctionButton';
+import { generateList } from '../utils';
 
 import styles from '../index.styl';
 import ShortcutsTable from '../ShortcutsTable';
@@ -91,16 +92,6 @@ const Profile = ({ data, onUpdateProfiles, setCurrentProfileID }) => {
     const handleEdit = (shortcut) => {
         setShowModal(true);
         setCurrentShortcutCMD(shortcut.cmd);
-    };
-
-    const generateList = (shortcuts) => {
-        let shortcutsList = [];
-        if (shortcuts) {
-            Object.keys(shortcuts).forEach(key => {
-                shortcutsList.push(shortcuts[key]);
-            });
-        }
-        return shortcutsList;
     };
 
     const handleShortcutsToggle = (toggle) => {

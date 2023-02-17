@@ -39,6 +39,7 @@ import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import CategoryFilter from '../CategoryFilter';
 import ShortcutsTable from '../ShortcutsTable';
 import EditArea from './EditArea';
+import { generateList } from '../utils';
 
 import styles from '../index.styl';
 
@@ -47,18 +48,7 @@ import styles from '../index.styl';
  * @prop {Boolean} active Check if this page is currently active or not
  */
 const Keyboard = () => {
-    // const { list: shortcutsList } = useSelector(state => state.preferences.shortcuts);
-    const generateList = (shortcuts) => {
-        let shortcutsList = [];
-        Object.keys(shortcuts).forEach(key => {
-            shortcutsList.push(shortcuts[key]);
-        });
-        return shortcutsList;
-    };
     const [shortcutsList, setShortcutsList] = useState(store.get('commandKeys', {}));
-    // shortcutsList.sort((a, b) => {
-    //     return a.category.localeCompare(b.category);
-    // });
     const [dataSet, setDataSet] = useState(shortcutsList);
     const [filterCategory, setFilterCategory] = useState(ALL_CATEGORY);
 

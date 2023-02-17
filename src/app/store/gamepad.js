@@ -1,6 +1,6 @@
 // import { shortcuts } from './shortcuts';
 
-/* 
+/*
 ***********IMPORTANT*************
 - default gamepad keys are in shuttleControlEvents now
     (this makes it easier to implement, since the default shortcuts don't have the new keybindings changes (cmd changes, id changes).
@@ -9,7 +9,7 @@
 - to find and remove them:
     - global search this regex: \s*gamepadKeys: .*\n\s*keysName: .*,
     - replace with nothing
-    - for reference, they should only exist in: 
+    - for reference, they should only exist in:
         /Users/sophiabeluli/Documents/work/dev2/gsender/src/app/widgets/JogControl/index.jsx
         /Users/sophiabeluli/Documents/work/dev2/gsender/src/app/widgets/Visualizer/index.jsx
 */
