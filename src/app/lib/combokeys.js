@@ -166,7 +166,7 @@ class Combokeys extends events.EventEmitter {
         const macroCallback = allShuttleControlEvents[MACRO];
 
         macros.forEach(macro => {
-            const existingBind = setMacrosBinds.find(([key, bind]) => bind.cmd === macro.id);
+            const existingBind = setMacrosBinds.find(([key, bind]) => key === macro.id);
             if (!existingBind) {
                 newCommandKeysList[macro.id] = {
                     keys: '',

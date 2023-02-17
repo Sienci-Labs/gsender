@@ -72,9 +72,14 @@ const Keyboard = () => {
         // dispatch(holdShortcutsListener());
         // pubsub.publish('removeshortcutsListener');
 
+        pubsub.subscribe('keybindingsUpdated', (msg, shortcuts) => {
+            updateKeybindings(shortcuts);
+        });
+
         // When we are not editing the keybindings anymore, make sure to re-inject the keybindings
         // within the location widget again
         return () => {
+            pubsub.unsubscribe('keybindingsUpdated');
             // pubsub.publish('addshortcutsListener');
             // dispatch(unholdShortcutsListener());
         };
@@ -127,7 +132,6 @@ const Keyboard = () => {
         store.replace('commandKeys', shortcuts);
         setShortcutsList(shortcuts);
         filter(filterCategory, shortcuts);
-        pubsub.publish('keybindingsUpdated');
 
         setShowEditModal(false);
         resumeCallback();

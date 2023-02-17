@@ -24,7 +24,7 @@
 /* eslint-disable consistent-return */
 import includes from 'lodash/includes';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import _, { get } from 'lodash';
 import api from 'app/api';
 import pubsub from 'pubsub-js';
 import combokeys from 'app/lib/combokeys';
@@ -1246,12 +1246,16 @@ class VisualizerWidget extends PureComponent {
                 // allow them to be turned on and off
                 const allDisabled = Object.entries(shortcuts)
                     .filter(([key, shortcut]) => shortcut.title !== 'Toggle Shortcuts')
-                    .every((([key, shortcut]) => !shortcut.isActive));
-                const keybindingsArr = Object.keys.apply(shortcuts).forEach(key => (shortcuts[key].title === 'Toggle Shortcuts' ? shortcuts[key] : { ...shortcuts[key], isActive: allDisabled }));
+                    .every(([key, shortcut]) => !shortcut.isActive);
+                const keybindings = _.cloneDeep(shortcuts);
+                Object.entries(keybindings).forEach(([key, keybinding]) => {
+                    if (key !== 'TOGGLE_SHORTCUTS') {
+                        keybinding.isActive = allDisabled;
+                    }
+                });
 
-                console.log(keybindingsArr);
-                store.replace('commandKeys', keybindingsArr);
-                pubsub.publish('keybindingsUpdated');
+                store.replace('commandKeys', keybindings);
+                pubsub.publish('keybindingsUpdated', keybindings);
             }
         },
         MACRO: (_, { macroID }) => {

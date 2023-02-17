@@ -193,7 +193,6 @@ const migrateStore = () => {
         let newCommandKeysList = {};
 
         if (Array.isArray(currentCommandKeys)) {
-            console.log('shouldnt be here');
             currentCommandKeys.forEach(element => {
                 delete element.id;
                 newCommandKeysList[element.cmd] = element;

@@ -94,9 +94,9 @@ export function removeOldKeybindings() {
     let updatedCommandKeys = currentCommandKeys;
 
     // remove keybindings that don't exist in any of the shuttleControlEvents arrays
-    Object.keys(currentCommandKeys).forEach(key => {
+    Object.keys(currentCommandKeys).forEach(([key, keybinding]) => {
         const event = allShuttleControlEvents[key];
-        if (event === undefined && key.category !== MACRO_CATEGORY) {
+        if (event === undefined && keybinding.category !== MACRO_CATEGORY) {
             delete updatedCommandKeys[key];
         }
     });
@@ -107,9 +107,9 @@ export function removeOldKeybindings() {
     const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
         const shortcuts = profile.shortcuts;
         let updatedProfileShortcuts = shortcuts;
-        Object.keys(shortcuts).forEach(key => {
+        Object.keys(shortcuts).forEach(([key, keybinding]) => {
             const event = allShuttleControlEvents[key];
-            if (event === undefined) {
+            if (event === undefined && keybinding.category !== MACRO_CATEGORY) {
                 delete updatedProfileShortcuts[key];
             }
         });
