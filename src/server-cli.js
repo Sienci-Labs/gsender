@@ -88,8 +88,9 @@ program
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
     .option('--allow-remote-access', 'Allow remote access to the server (default: false)', false)
-    .option('--remote', 'Enable Headless mode, exposing the internal server on your local network')
-    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, '');
+    .option('--remote', 'Enable Headless mode, exposing the internal server on your local network', false)
+    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, 'Grbl')
+    .option('--kiosk', 'Enable Kiosk mode, only allowing this application to be run', false);
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
 // This is not the case when running from a packaged Electron app. Here you have the first value appname and then args.
@@ -105,6 +106,7 @@ const options = program.opts();
 module.exports = () => new Promise((resolve, reject) => {
     // Change working directory to 'server' before require('./server')
     process.chdir(path.resolve(__dirname, 'server'));
+    let kiosk = !!options.kiosk;
 
     require('./server').createServer({
         port: options.port,
@@ -116,13 +118,14 @@ module.exports = () => new Promise((resolve, reject) => {
         watchDirectory: options.watchDirectory,
         accessTokenLifetime: options.accessTokenLifetime,
         allowRemoteAccess: !!options.allowRemoteAccess,
-        controller: options.controller
+        controller: options.controller,
+        kiosk
     }, (err, data = {}) => {
         if (err) {
             reject(err, {});
             return;
         }
 
-        resolve({ ...data, headless: false });
+        resolve({ ...data, headless: false, kiosk });
     });
 });
