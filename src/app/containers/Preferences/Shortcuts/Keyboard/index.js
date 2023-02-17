@@ -73,7 +73,9 @@ const Keyboard = () => {
         // pubsub.publish('removeshortcutsListener');
 
         pubsub.subscribe('keybindingsUpdated', (msg, shortcuts) => {
-            updateKeybindings(shortcuts);
+            if (shortcuts) { // if shortcuts not sent, updateKeybindings published it
+                updateKeybindings(shortcuts);
+            }
         });
 
         // When we are not editing the keybindings anymore, make sure to re-inject the keybindings
@@ -132,6 +134,7 @@ const Keyboard = () => {
         store.replace('commandKeys', shortcuts);
         setShortcutsList(shortcuts);
         filter(filterCategory, shortcuts);
+        pubsub.publish('keybindingsUpdated');
 
         setShowEditModal(false);
         resumeCallback();
