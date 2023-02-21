@@ -6,6 +6,9 @@ export const AVAILABILITY_TYPES = {
 };
 
 export const generateList = (shortcuts) => {
+    if (!shortcuts) {
+        return [];
+    }
     let shortcutsList = [];
     Object.keys(shortcuts).forEach(key => {
         shortcutsList.push(shortcuts[key]);

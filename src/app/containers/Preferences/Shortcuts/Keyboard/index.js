@@ -72,7 +72,7 @@ const Keyboard = () => {
         // dispatch(holdShortcutsListener());
         // pubsub.publish('removeshortcutsListener');
 
-        pubsub.subscribe('keybindingsUpdated', (msg, shortcuts) => {
+        const token = pubsub.subscribe('keybindingsUpdated', (msg, shortcuts) => {
             if (shortcuts) { // if shortcuts not sent, updateKeybindings published it
                 updateKeybindings(shortcuts);
             }
@@ -81,7 +81,7 @@ const Keyboard = () => {
         // When we are not editing the keybindings anymore, make sure to re-inject the keybindings
         // within the location widget again
         return () => {
-            pubsub.unsubscribe('keybindingsUpdated');
+            pubsub.unsubscribe(token);
             // pubsub.publish('addshortcutsListener');
             // dispatch(unholdShortcutsListener());
         };

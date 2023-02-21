@@ -6,12 +6,13 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import merge from 'lodash/merge';
 import uniq from 'lodash/uniq';
+import { isEmpty } from 'lodash';
 import semver from 'semver';
 import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
 import log from '../lib/log';
 import defaultState from './defaultState';
-import { METRIC_UNITS } from '../constants';
+import { MACRO_CATEGORY, METRIC_UNITS } from '../constants';
 
 const store = new ImmutableStore(defaultState);
 
@@ -194,6 +195,9 @@ const migrateStore = () => {
 
         if (Array.isArray(currentCommandKeys)) {
             currentCommandKeys.forEach(element => {
+                if (element.category === MACRO_CATEGORY) {
+                    element.cmd = element.id;
+                }
                 delete element.id;
                 newCommandKeysList[element.cmd] = element;
             });
@@ -207,11 +211,14 @@ const migrateStore = () => {
 
             if (Array.isArray(shortcuts)) {
                 shortcuts.forEach(element => {
+                    if (element.category === MACRO_CATEGORY) {
+                        element.cmd = element.id;
+                    }
                     delete element.id;
                     updatedProfileShortcuts[element.cmd] = element;
                 });
             }
-            return { ...profile, shortcuts: updatedProfileShortcuts };
+            return { ...profile, shortcuts: isEmpty(updatedProfileShortcuts) ? shortcuts : updatedProfileShortcuts };
         });
         store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
     }
