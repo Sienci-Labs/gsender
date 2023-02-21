@@ -105,7 +105,7 @@ export const onGamepadButtonClick = ({ detail }) => {
         return null;
     }
 
-    return foundAction;
+    return foundAction[1];
 };
 
 export const runAction = ({ event, shuttleControlEvents }) => {
