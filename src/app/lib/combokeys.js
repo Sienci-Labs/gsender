@@ -77,7 +77,7 @@ class Combokeys extends events.EventEmitter {
         const commandKeys = await this.getCommandKeys();
 
         Object.entries(commandKeys).filter(([key, keybinding]) => keybinding.isActive).forEach(([key, o]) => {
-            const { keys, cmd, payload = null, isActive } = o;
+            const { keys, cmd, payload = null, isActive, category } = o;
 
             //Do not add any keybindings if the shortcut is disabled or there is no shortcut at all
             if (!isActive || !keys) {
@@ -89,7 +89,11 @@ class Combokeys extends events.EventEmitter {
                 if (!!o.preventDefault) {
                     preventDefault(event);
                 }
-                this.emit(cmd, event, payload);
+                if (category === MACRO_CATEGORY) {
+                    this.emit(MACRO, event, payload);
+                } else {
+                    this.emit(cmd, event, payload);
+                }
             };
 
             const jogCmds = [
