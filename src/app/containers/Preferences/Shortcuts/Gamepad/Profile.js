@@ -14,7 +14,7 @@ import CategoryFilter from '../CategoryFilter';
 const Profile = ({ data, onUpdateProfiles }) => {
     const { profileName, icon, shortcuts } = data;
 
-    const [currentShortcutID, setCurrentShortcutID] = useState(null);
+    const [currentShortcutCMD, setCurrentShortcutCMD] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
     const [name, setName] = useState(profileName);
@@ -49,7 +49,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
     };
 
     const handleDelete = (currShortcut) => {
-        const updatedShortcuts = shortcuts.map((shortcut) => (shortcut.id === currShortcut.id
+        const updatedShortcuts = shortcuts.map((shortcut) => (shortcut.cmd === currShortcut.cmd
             ? { ...shortcut, keys: '', keysName: '', isActive: false }
             : shortcut
         ));
@@ -72,7 +72,7 @@ const Profile = ({ data, onUpdateProfiles }) => {
     };
 
     const handleShortcutToggle = (currShortcut) => {
-        const updatedShortcuts = shortcuts.map((shortcut) => (shortcut.id === currShortcut.id ? currShortcut : shortcut));
+        const updatedShortcuts = shortcuts.map((shortcut) => (shortcut.cmd === currShortcut.cmd ? currShortcut : shortcut));
 
         const profiles = store.get('workspace.gamepad.profiles', []);
 
@@ -87,10 +87,10 @@ const Profile = ({ data, onUpdateProfiles }) => {
 
     const handleEdit = (shortcut) => {
         setShowModal(true);
-        setCurrentShortcutID(shortcut.id);
+        setCurrentShortcutCMD(shortcut.cmd);
     };
 
-    const currentShortcut = useMemo(() => shortcuts.find(shortcut => shortcut.id === currentShortcutID), [shortcuts, currentShortcutID]);
+    const currentShortcut = useMemo(() => shortcuts.find(shortcut => shortcut.cmd === currentShortcutCMD), [shortcuts, currentShortcutCMD]);
 
     return (
         <>

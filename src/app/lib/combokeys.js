@@ -181,7 +181,7 @@ class Combokeys extends events.EventEmitter {
             }
         });
 
-        store.set('commandKeys', newCommandKeysList);
+        store.replace('commandKeys', newCommandKeysList);
 
         return newCommandKeysList;
     }

@@ -86,7 +86,6 @@ class NavSidebar extends PureComponent {
 
     shuttleControlEvents = {
         OPEN_TOOLBAR_CONN: {
-            id: 64,
             title: 'Connect',
             keys: 'f1',
             cmd: 'OPEN_TOOLBAR_CONN',
@@ -97,7 +96,6 @@ class NavSidebar extends PureComponent {
             callback: this.shuttleControlFunctions.OPEN_TOOLBAR
         },
         OPEN_TOOLBAR_SURF: {
-            id: 65,
             title: 'Surfacing',
             keys: 'f2',
             cmd: 'OPEN_TOOLBAR_SURF',
@@ -108,7 +106,6 @@ class NavSidebar extends PureComponent {
             callback: this.shuttleControlFunctions.OPEN_TOOLBAR
         },
         OPEN_TOOLBAR_MAP: {
-            id: 66,
             title: 'Heightmap',
             keys: 'f3',
             cmd: 'OPEN_TOOLBAR_MAP',
@@ -119,7 +116,6 @@ class NavSidebar extends PureComponent {
             callback: this.shuttleControlFunctions.OPEN_TOOLBAR
         },
         OPEN_TOOLBAR_CALI: {
-            id: 67,
             title: 'Calibrate',
             keys: 'f4',
             cmd: 'OPEN_TOOLBAR_CALI',
@@ -130,7 +126,6 @@ class NavSidebar extends PureComponent {
             callback: this.shuttleControlFunctions.OPEN_TOOLBAR
         },
         OPEN_TOOLBAR_FIRM: {
-            id: 68,
             title: 'Firmware',
             keys: 'f5',
             cmd: 'OPEN_TOOLBAR_FIRM',
@@ -141,7 +136,6 @@ class NavSidebar extends PureComponent {
             callback: this.shuttleControlFunctions.OPEN_TOOLBAR
         },
         OPEN_TOOLBAR_HELP: {
-            id: 69,
             title: 'Help',
             keys: 'f6',
             cmd: 'OPEN_TOOLBAR_HELP',
@@ -152,7 +146,6 @@ class NavSidebar extends PureComponent {
             callback: this.shuttleControlFunctions.OPEN_TOOLBAR
         },
         OPEN_TOOLBAR_SETT: {
-            id: 70,
             title: 'Settings',
             keys: 'f7',
             cmd: 'OPEN_TOOLBAR_SETT',
