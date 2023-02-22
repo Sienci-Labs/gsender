@@ -43,6 +43,7 @@ import {
     METRIC_UNITS,
     // Grbl
     GRBL,
+    GRBLHAL,
     GRBL_ACTIVE_STATE_IDLE,
     WORKFLOW_STATE_IDLE
 } from '../../constants';
@@ -1156,7 +1157,7 @@ class ProbeWidget extends PureComponent {
         if (workflow.state !== WORKFLOW_STATE_IDLE && !toolChangeActive) {
             return false;
         }
-        if (!includes([GRBL], type)) {
+        if (!includes([GRBL, GRBLHAL], type)) {
             return false;
         }
 

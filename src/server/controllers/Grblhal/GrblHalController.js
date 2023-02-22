@@ -656,6 +656,9 @@ class GrblHalController {
                 this.emit('serialport:read', `error:${code} (${error.message})`);
             }
 
+            // Clear error by sending newline for grblHAL
+            this.connection.write('\n');
+
             // Feeder
             this.feeder.ack();
             this.feeder.next();
@@ -776,7 +779,6 @@ class GrblHalController {
         const queryParserState = _.throttle(() => {
             // Check the ready flag
             if (!(this.ready)) {
-                console.log('NOT ready in queryParserState');
                 return;
             }
 
@@ -804,7 +806,6 @@ class GrblHalController {
             }
 
             if (this.isOpen()) {
-                console.log('command sent');
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
