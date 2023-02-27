@@ -223,9 +223,11 @@ const reducer = createReducer(initialState, {
         };
     },
     [UPDATE_TERMINAL_HISTORY]: (payload, reducerState) => {
-        const newHistory = [...reducerState.terminalHistory, payload];
-        if (reducerState.terminalHistory.length === MAX_TERMINAL_INPUT_ARRAY_SIZE) {
-            newHistory.shift();
+        const newHistory = [...reducerState.terminalHistory, ...payload];
+        if (reducerState.terminalHistory.length > MAX_TERMINAL_INPUT_ARRAY_SIZE) {
+            for (let i = 0; i < reducerState.terminalHistory.length - MAX_TERMINAL_INPUT_ARRAY_SIZE; i++) {
+                newHistory.shift();
+            }
         }
         return {
             terminalHistory: newHistory
