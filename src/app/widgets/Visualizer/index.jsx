@@ -24,7 +24,7 @@
 /* eslint-disable consistent-return */
 import includes from 'lodash/includes';
 import { connect } from 'react-redux';
-import _, { get } from 'lodash';
+import _, { get, debounce } from 'lodash';
 import api from 'app/api';
 import pubsub from 'pubsub-js';
 import combokeys from 'app/lib/combokeys';
@@ -944,11 +944,11 @@ class VisualizerWidget extends PureComponent {
             preventDefault: false,
             isActive: true,
             category: CARVING_CATEGORY,
-            callback: () => {
+            callback: debounce(() => {
                 if (this.workflowControl) {
                     this.workflowControl.handleClickUpload();
                 }
-            },
+            }, 300),
         },
         UNLOAD_FILE: {
             title: 'Unload File',
