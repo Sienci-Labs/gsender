@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import uniqueId from 'lodash/uniqueId';
 
 import TabbedWidget from 'app/components/TabbedWidget';
 import ToolModal from 'app/components/ToolModal/ToolModal';
@@ -60,7 +59,7 @@ const Calibration = ({ modalClose }) => {
                                 tabs.map((t, index) => {
                                     const active = index === tab;
                                     return (
-                                        <TabbedWidget.ChildComponent key={uniqueId()} active={active}>
+                                        <TabbedWidget.ChildComponent key={t.id} active={active}>
                                             {active && t.component}
                                         </TabbedWidget.ChildComponent>
                                     );
