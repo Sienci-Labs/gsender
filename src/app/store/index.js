@@ -218,6 +218,10 @@ const migrateStore = () => {
                     updatedProfileShortcuts[element.cmd] = element;
                 });
             }
+
+            if (!Array.isArray(profile.id)) {
+                profile.id = [profile.id];
+            }
             return { ...profile, shortcuts: isEmpty(updatedProfileShortcuts) ? shortcuts : updatedProfileShortcuts };
         });
         store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);

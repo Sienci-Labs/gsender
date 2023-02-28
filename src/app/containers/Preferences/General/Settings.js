@@ -51,7 +51,7 @@ const Settings = () => {
             const reader = new FileReader();
             reader.readAsText(file, 'UTF-8');
             reader.onload = async (event) => {
-                const { settings, events = [] } = JSON.parse(event.target.result);
+                const { settings, events = [], state } = JSON.parse(event.target.result);
 
                 await new Promise((resolve, reject) => {
                     // delete all old events
@@ -63,7 +63,11 @@ const Settings = () => {
                     ]);
                 });
 
-                restoreSettings(settings);
+                if (settings) {
+                    restoreSettings(settings);
+                } else {
+                    restoreSettings(state);
+                }
             };
             reader.onerror = () => {
                 Toaster.pop({
