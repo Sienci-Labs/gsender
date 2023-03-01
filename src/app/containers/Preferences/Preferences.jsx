@@ -24,6 +24,8 @@
 import Modal from 'app/components/Modal';
 import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
+import reduxStore from 'app/store/redux';
+import { SET_PROBE_CONNECTION_MADE } from 'app/actions/preferencesActions';
 import pubsub from 'pubsub-js';
 import _ from 'lodash';
 import get from 'lodash/get';
@@ -448,6 +450,10 @@ class PreferencesPage extends PureComponent {
                         ...probeSettings,
                         connectivityTest: value
                     }
+                });
+                reduxStore.dispatch({
+                    type: SET_PROBE_CONNECTION_MADE,
+                    payload: !value,
                 });
                 pubsub.publish('probe:test', value);
             },

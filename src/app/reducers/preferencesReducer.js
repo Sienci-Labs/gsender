@@ -1,5 +1,5 @@
 import { createReducer } from 'redux-action';
-import { SET_SHORTCUTS_LIST, HOLD_SHORTCUTS, UNHOLD_SHORTCUTS, SET_IP_LIST } from 'app/actions/preferencesActions';
+import { SET_SHORTCUTS_LIST, HOLD_SHORTCUTS, UNHOLD_SHORTCUTS, SET_IP_LIST, SET_PROBE_CONNECTION_MADE } from 'app/actions/preferencesActions';
 import store from 'app/store';
 
 const initialState = {
@@ -8,6 +8,7 @@ const initialState = {
         shouldHold: false,
     },
     ipList: [],
+    probeConnectionMade: false,
 };
 
 const reducer = createReducer(initialState, {
@@ -42,6 +43,12 @@ const reducer = createReducer(initialState, {
         return {
             ...state,
             ipList: payload,
+        };
+    },
+    [SET_PROBE_CONNECTION_MADE]: (payload, state) => {
+        return {
+            ...state,
+            probeConnectionMade: payload,
         };
     }
 });
