@@ -48,7 +48,20 @@ function useKeybinding(shuttleControlEvents) {
                     callback: defaultCommand.callback
                 };
                 store.replace('commandKeys', updatedCommandKeys);
-            } // don't need id migration code as that's done in store migration now
+            } else if (currentCommandKeys[defaultCommand.cmd].resetFlag) { // if reset flag is set, set everything but keys and isActive to default values
+                let updatedCommandKeys = currentCommandKeys;
+                updatedCommandKeys[defaultCommand.cmd] = {
+                    title: defaultCommand.title,
+                    cmd: defaultCommand.cmd,
+                    keys: currentCommandKeys[defaultCommand.cmd].keys,
+                    payload: defaultCommand.payload,
+                    preventDefault: defaultCommand.preventDefault,
+                    isActive: currentCommandKeys[defaultCommand.cmd].isActive,
+                    category: defaultCommand.category,
+                    callback: defaultCommand.callback
+                };
+                store.replace('commandKeys', updatedCommandKeys);
+            }
 
             // add gamepad shortcuts
             const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);

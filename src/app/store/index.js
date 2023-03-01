@@ -199,6 +199,8 @@ const migrateStore = () => {
                     element.cmd = element.id;
                 }
                 delete element.id;
+                // set flag so keybindings hook knows to change properties to the defaults
+                element.resetFlag = true;
                 newCommandKeysList[element.cmd] = element;
             });
             store.replace('commandKeys', newCommandKeysList);
