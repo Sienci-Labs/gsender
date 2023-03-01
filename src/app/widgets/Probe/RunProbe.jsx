@@ -29,9 +29,7 @@ import combokeys from 'app/lib/combokeys';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
-import reduxStore from 'app/store/redux';
-import { SET_PROBE_CONNECTION_MADE } from 'app/actions/preferencesActions';
-import _get from 'lodash/get';
+
 import styles from './index.styl';
 import ProbeCircuitStatus from './ProbeCircuitStatus';
 import ProbeImage from './ProbeImage';
@@ -68,8 +66,7 @@ class RunProbe extends PureComponent {
             isActive: true,
             category: PROBING_CATEGORY,
             callback: () => {
-                const connectionMade = _get(reduxStore.getState(), 'preferences.probeConnectionMade', false);
-                if (connectionMade) {
+                if (this.state.connectionMade) {
                     return;
                 }
                 Toaster.pop({
@@ -78,10 +75,8 @@ class RunProbe extends PureComponent {
                     duration: 5000,
                     icon: 'fa-satellite-dish'
                 });
-                //set connection made to true
-                reduxStore.dispatch({
-                    type: SET_PROBE_CONNECTION_MADE,
-                    payload: true,
+                this.setState({
+                    connectionMade: true,
                 });
             }
         }
@@ -89,6 +84,7 @@ class RunProbe extends PureComponent {
 
     getInitialState() {
         return {
+            connectionMade: false,
             testRunning: false
         };
     }
@@ -101,7 +97,7 @@ class RunProbe extends PureComponent {
 
     startProbe = () => {
         const { actions } = this.props;
-        const connectionMade = _get(reduxStore.getState(), 'preferences.probeConnectionMade', false);
+        const { connectionMade } = this.state;
         if (!connectionMade) {
             return;
         }
@@ -122,10 +118,8 @@ class RunProbe extends PureComponent {
     startConnectivityTest(probeStatus, connectivityTest) {
         // If we disabled test, immediately set connectionMade to true and return
         if (!connectivityTest) {
-            //set connection made to true
-            reduxStore.dispatch({
-                type: SET_PROBE_CONNECTION_MADE,
-                payload: true,
+            this.setState({
+                connectionMade: true
             });
             return;
         }
@@ -135,10 +129,8 @@ class RunProbe extends PureComponent {
         });
         this.testInterval = setInterval(() => {
             if (probeStatus()) {
-                //set connection made to true
-                reduxStore.dispatch({
-                    type: SET_PROBE_CONNECTION_MADE,
-                    payload: true,
+                this.setState({
+                    connectionMade: true,
                 });
                 clearInterval(this.testInterval);
                 this.testInterval = null;
@@ -191,6 +183,7 @@ class RunProbe extends PureComponent {
         const probeCommand = state.availableProbeCommands[state.selectedProbeCommand];
 
         const probeActive = actions.returnProbeConnectivity();
+        const { connectionMade } = this.state;
 
         return (
             <Modal
@@ -215,11 +208,11 @@ class RunProbe extends PureComponent {
                             </div>
                             <FunctionButton
                                 primary
-                                disabled={!_get(reduxStore.getState(), 'preferences.probeConnectionMade', false)}
+                                disabled={!connectionMade}
                                 onClick={this.startProbe}
                             >
                                 {
-                                    !_get(reduxStore.getState(), 'preferences.probeConnectionMade', false) ? 'Waiting on probe circuit confirmation...' : ' Start Probe'
+                                    !connectionMade ? 'Waiting on probe circuit confirmation...' : ' Start Probe'
                                 }
                             </FunctionButton>
                         </div>

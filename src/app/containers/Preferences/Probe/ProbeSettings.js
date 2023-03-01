@@ -82,7 +82,7 @@ const ProbeSettings = ({ state, probeActions, values, type }) => {
             }
             <Tooltip content="Toggle check to see if your probe is connected correctly" location="default">
                 <div className={styles.inputSpread}>
-                    <label htmlFor="probeConnectionMade">Probe connectivity test</label>
+                    <label htmlFor="probeConnectivityTest">Probe connectivity test</label>
                     <ToggleSwitch
                         checked={probeSettings.connectivityTest}
                         onChange={probeActions.changeConnectivityTest}
