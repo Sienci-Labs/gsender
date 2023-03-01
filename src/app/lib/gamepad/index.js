@@ -93,6 +93,7 @@ export const onGamepadButtonClick = ({ detail }) => {
             .map(button => button.buttonIndex)
     );
 
+    // the result is an array, [0] = key and [1] = shortcuts
     const foundAction = Object.entries(currentProfile.shortcuts).find(([key, shortcut]) => shortcut.keys === buttonCombo);
 
     if (!pressed) {
@@ -105,7 +106,8 @@ export const onGamepadButtonClick = ({ detail }) => {
         return null;
     }
 
-    return foundAction[1];
+    // null check
+    return foundAction ? foundAction[1] : foundAction;
 };
 
 export const runAction = ({ event, shuttleControlEvents }) => {
