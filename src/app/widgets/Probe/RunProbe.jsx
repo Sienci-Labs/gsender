@@ -97,10 +97,6 @@ class RunProbe extends PureComponent {
 
     startProbe = () => {
         const { actions } = this.props;
-        const { connectionMade } = this.state;
-        if (!connectionMade) {
-            return;
-        }
 
         const probeCommands = actions.generateProbeCommands();
 
@@ -184,6 +180,7 @@ class RunProbe extends PureComponent {
 
         const probeActive = actions.returnProbeConnectivity();
         const { connectionMade } = this.state;
+        const { connectivityTest } = state;
 
         return (
             <Modal
@@ -208,11 +205,11 @@ class RunProbe extends PureComponent {
                             </div>
                             <FunctionButton
                                 primary
-                                disabled={!connectionMade}
+                                disabled={!connectionMade && connectivityTest}
                                 onClick={this.startProbe}
                             >
                                 {
-                                    !connectionMade ? 'Waiting on probe circuit confirmation...' : ' Start Probe'
+                                    connectionMade || !connectivityTest ? 'Start Probe' : 'Waiting on probe circuit confirmation...'
                                 }
                             </FunctionButton>
                         </div>
