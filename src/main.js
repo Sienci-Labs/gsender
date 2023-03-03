@@ -85,7 +85,25 @@ const main = () => {
 
     app.whenReady().then(async () => {
         try {
-            session.defaultSession.clearCache();
+            await session.defaultSession.clearCache();
+
+
+            app.commandLine.appendSwitch('ignore-gpu-blacklist');
+            // Increase V8 heap size of the main process
+            if (process.arch === 'x64') {
+                const memoryLimit = 1024 * 4; // 4GB
+                app.commandLine.appendSwitch('--js-flags', `--max-old-space-size=${memoryLimit}`);
+            }
+
+            if (process.platform === 'linux') {
+                // https://github.com/electron/electron/issues/18265
+                // Run this at early startup, before app.on('ready')
+                //
+                // TODO: Maybe we can only disable --disable-setuid-sandbox
+                // reference changes: https://github.com/microsoft/vscode/pull/122909/files
+                app.commandLine.appendSwitch('--no-sandbox');
+            }
+
             windowManager = new WindowManager();
             // Create and show splash before server starts
             const splashScreen = windowManager.createSplashScreen({
