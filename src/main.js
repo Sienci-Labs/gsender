@@ -138,7 +138,7 @@ const main = () => {
                 }
             }
 
-            const { address, port, requestedHost, kiosk} = { ...res };
+            const { address, port, requestedHost, kiosk } = { ...res };
             log.info(`Returned - http://${address}:${port}`);
             hostInformation = {
                 address,
