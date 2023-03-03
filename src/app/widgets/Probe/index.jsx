@@ -264,9 +264,8 @@ class ProbeWidget extends PureComponent {
             controller.command('gcode:safe', commands, 'G21');
         },
         returnProbeConnectivity: () => {
-            const { status } = controller.state || {};
-            const { probeActive } = status || false;
-            return probeActive;
+            const { probePinStatus } = this.props;
+            return probePinStatus;
         },
         setToolDiameter: (selection) => {
             let diameter;
@@ -1345,7 +1344,9 @@ class ProbeWidget extends PureComponent {
                     )}
                     active={active}
                 >
-                    <RunProbe state={state} actions={actions} show={state.modal.name === MODAL_PREVIEW} />
+                    {state.modal.name === MODAL_PREVIEW &&
+                        <RunProbe state={state} actions={actions} />
+                    }
                     <Probe
                         state={state}
                         actions={actions}
@@ -1359,11 +1360,13 @@ class ProbeWidget extends PureComponent {
 
 export default connect((store) => {
     const state = get(store, 'controller.state');
+    const probePinStatus = get(store, 'controller.state.status.pinState.P', false);
     const type = get(store, 'controller.type');
     const workflow = get(store, 'controller.workflow');
     const isConnected = get(store, 'connection.isConnected');
     const $13 = get(store, 'controller.settings.settings.$13', '0');
     return {
+        probePinStatus,
         state,
         type,
         workflow,
