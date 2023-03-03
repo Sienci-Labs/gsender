@@ -27,10 +27,7 @@ const SettingsList = () => {
         <div className={styles.settingsContainer}>
             <div className={styles.tableHeader}>
                 <div className={[styles['non-default-value'], styles.tableColumnEEPROM].join(' ')}>
-                    <Tooltip content="When using the Setting number in the console, make sure to include the $ symbol in front. Ex: $120">
-                        <i className="fas fa-info-circle" style={{ paddingLeft: '5px' }} />
-                    </Tooltip>
-                    <span style={{ paddingLeft: '25px', paddingRight: '5px' }}>Setting</span>
+                    <span style={{ paddingLeft: '25px', paddingRight: '5px' }}>$ Setting</span>
                 </div>
                 <div className={styles.tableColumn}>
                     <span>Description</span>

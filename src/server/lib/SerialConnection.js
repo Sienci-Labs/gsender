@@ -22,9 +22,8 @@
  */
 
 import { EventEmitter } from 'events';
-import { SerialPort, ReadlineParser } from 'serialport';
-
-const Readline = ReadlineParser;
+import { SerialPort } from 'serialport';
+import { ReadlineParser } from '@serialport/parser-readline';
 
 // Validation
 
@@ -167,7 +166,7 @@ class SerialConnection extends EventEmitter {
         this.port.on('close', this.eventListener.close);
         this.port.on('error', this.eventListener.error);
 
-        this.parser = this.port.pipe(new Readline({ delimiter: '\n' }));
+        this.parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }));
         this.parser.on('data', this.eventListener.data);
 
         this.port.open(callback);

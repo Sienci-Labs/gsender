@@ -198,7 +198,7 @@ const defaultState = {
         connection: {
             minimized: false,
             controller: {
-                type: 'Grbl' // Grbl|Marlin|Smoothie|TinyG
+                type: 'Grbl' // Grbl
             },
             port: '', // will be deprecated in v2
             baudrate: 115200, // will be deprecated in v2
@@ -362,7 +362,7 @@ const defaultState = {
             showLineWarnings: false,
         }
     },
-    commandKeys: []
+    commandKeys: {}
 };
 
 export default defaultState;

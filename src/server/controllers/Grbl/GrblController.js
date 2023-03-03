@@ -894,7 +894,7 @@ class GrblController {
         this.event.trigger(CONTROLLER_READY);
 
         //check if controller is ready and send the status
-        this.emit('grbl:iSready', this.ready);
+        //this.emit('firmware:ready', this.ready);
     }
 
     populateContext(context = {}) {

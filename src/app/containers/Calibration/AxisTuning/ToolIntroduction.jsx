@@ -46,16 +46,14 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis, isConnected
         <ReduxProvider store={reduxStore}>
             <div className={styles.toolIntro}>
                 <p>
-                    All CNCs ship with standard settings so the controller knows how much to turn the motors in order to move 1mm,
-                    a factor of the specs of the motors and the pitch of the lead screws.
+                    If you’re looking to use your CNC for more accurate work and notice a specific axis is always off by a small amount - say 102mm instead of 100 - then use this tool.
                 </p>
 
                 <p>
-                    Manufacturing tolerances can make these presets inaccurate, meaning a move of 200mm could move 200.5mm in reality.
-                    If you’re looking to use your CNC for more accurate work or run a diagnosis, this tool is for you.
+                    Since CNC firmware needs to understand its hardware to make exact movements, small manufacturing variations in the motors, lead screws, pulleys, or incorrect firmware will create inaccuracies over longer distances.
                 </p>
 
-                <p>Before starting, you’ll want to have a marker or some tape on hand and a measuring tape to keep track of machine movements.</p>
+                <p>By testing for this difference using a marker or tape and a measuring tape, this tool will better tune the firmware to your machine.</p>
 
                 <div style={{ marginBottom: '1rem' }}>
                     <Select

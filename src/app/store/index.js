@@ -6,12 +6,13 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import merge from 'lodash/merge';
 import uniq from 'lodash/uniq';
+import { isEmpty } from 'lodash';
 import semver from 'semver';
 import settings from '../config/settings';
 import ImmutableStore from '../lib/immutable-store';
 import log from '../lib/log';
 import defaultState from './defaultState';
-import { METRIC_UNITS } from '../constants';
+import { MACRO_CATEGORY, METRIC_UNITS } from '../constants';
 
 const store = new ImmutableStore(defaultState);
 
@@ -190,6 +191,46 @@ store.on('change', debounce((state) => {
 const migrateStore = () => {
     if (!cnc.version) {
         return;
+    }
+
+    if (semver.lt(cnc.version, '1.2.3') || semver.lt(cnc.version, '1.2.3-EDGE')) {
+        const currentCommandKeys = store.get('commandKeys');
+        let newCommandKeysList = {};
+
+        if (Array.isArray(currentCommandKeys)) {
+            currentCommandKeys.forEach(element => {
+                if (element.category === MACRO_CATEGORY) {
+                    element.cmd = element.id;
+                }
+                delete element.id;
+                // set flag so keybindings hook knows to change properties to the defaults
+                element.resetFlag = true;
+                newCommandKeysList[element.cmd] = element;
+            });
+            store.replace('commandKeys', newCommandKeysList);
+        }
+
+        const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
+        const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
+            const shortcuts = profile.shortcuts;
+            let updatedProfileShortcuts = {};
+
+            if (Array.isArray(shortcuts)) {
+                shortcuts.forEach(element => {
+                    if (element.category === MACRO_CATEGORY) {
+                        element.cmd = element.id;
+                    }
+                    delete element.id;
+                    updatedProfileShortcuts[element.cmd] = element;
+                });
+            }
+
+            if (!Array.isArray(profile.id)) {
+                profile.id = [profile.id];
+            }
+            return { ...profile, shortcuts: isEmpty(updatedProfileShortcuts) ? shortcuts : updatedProfileShortcuts };
+        });
+        store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
     }
 
     if (semver.lt(cnc.version, '1.1.5')) {

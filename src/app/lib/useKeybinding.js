@@ -4,16 +4,17 @@ import store from '../store';
 import shuttleEvents from './shuttleEvents';
 import { MACRO_CATEGORY } from '../constants';
 
-const TARGET_NUM_CALLS = 8; // this is the current number of widgets that use the useKeybinding hook
+const TARGET_NUM_CALLS = 9; // this is the current number of widgets that use the useKeybinding hook
 let numCalls = 0; // number of useKeybinding hooks that have been called
 
 /*
     shuttleControlEvents structure:
     {
-        eventName: {
-            id: 68,
+        cmd: {
             title: 'Firmware',
             keys: 'f5',
+            (if applicable) gamepadKeys: '13',
+            (if applicable) keysName: 'Arrow Down'
             cmd: 'OPEN_TOOLBAR',
             payload: { toolbar: MODAL_FIRMWARE },
             preventDefault: false,
@@ -32,26 +33,33 @@ function useKeybinding(shuttleControlEvents) {
         const defaultCommand = shuttleControlEvents[eventName];
         if (eventName !== 'MACRO') {
             // add keybindings
-            const currentCommandKeys = store.get('commandKeys', []);
-            if (currentCommandKeys.length === 0 || !currentCommandKeys.find(element => element.cmd === defaultCommand.cmd)) {
-                // set id
-                let id = 1;
-                if (currentCommandKeys.length !== 0) {
-                    id = currentCommandKeys[currentCommandKeys.length - 1].id + 1;
-                }
+            const currentCommandKeys = store.get('commandKeys', {});
+            if (_.isEmpty(currentCommandKeys) || !currentCommandKeys[defaultCommand.cmd]) {
                 // add to store
                 let updatedCommandKeys = currentCommandKeys;
-                updatedCommandKeys.push({
-                    id: id,
+                updatedCommandKeys[defaultCommand.cmd] = {
                     title: defaultCommand.title,
-                    keys: defaultCommand.keys,
                     cmd: defaultCommand.cmd,
+                    keys: defaultCommand.keys,
                     payload: defaultCommand.payload,
                     preventDefault: defaultCommand.preventDefault,
                     isActive: defaultCommand.isActive,
                     category: defaultCommand.category,
                     callback: defaultCommand.callback
-                });
+                };
+                store.replace('commandKeys', updatedCommandKeys);
+            } else if (currentCommandKeys[defaultCommand.cmd].resetFlag) { // if reset flag is set, set everything but keys and isActive to default values
+                let updatedCommandKeys = currentCommandKeys;
+                updatedCommandKeys[defaultCommand.cmd] = {
+                    title: defaultCommand.title,
+                    cmd: defaultCommand.cmd,
+                    keys: currentCommandKeys[defaultCommand.cmd].keys,
+                    payload: defaultCommand.payload,
+                    preventDefault: defaultCommand.preventDefault,
+                    isActive: currentCommandKeys[defaultCommand.cmd].isActive,
+                    category: defaultCommand.category,
+                    callback: defaultCommand.callback
+                };
                 store.replace('commandKeys', updatedCommandKeys);
             }
 
@@ -60,24 +68,19 @@ function useKeybinding(shuttleControlEvents) {
             const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
                 const shortcuts = profile.shortcuts;
                 let updatedProfileShortcuts = shortcuts;
-                if (shortcuts.length === 0 || !shortcuts.find(element => element.cmd === defaultCommand.cmd)) {
-                    // set id
-                    let id = 1;
-                    if (shortcuts.length === 0) {
-                        id = shortcuts[shortcuts.length - 1].id + 1;
-                    }
+                if (_.isEmpty(shortcuts) || !shortcuts[defaultCommand.cmd]) {
                     // no default keys for gamepad
-                    updatedProfileShortcuts.push({
-                        id: id,
+                    updatedProfileShortcuts[defaultCommand.cmd] = {
                         title: defaultCommand.title,
-                        keys: '',
+                        keys: defaultCommand.gamepadKeys || '',
+                        keysName: defaultCommand.keysName || '',
                         cmd: defaultCommand.cmd,
                         payload: defaultCommand.payload,
                         preventDefault: defaultCommand.preventDefault,
                         isActive: defaultCommand.isActive,
                         category: defaultCommand.category,
                         callback: defaultCommand.callback
-                    });
+                    };
                 }
                 return { ...profile, shortcuts: updatedProfileShortcuts };
             });
@@ -100,15 +103,14 @@ function checkNumCalls() {
 
 export function removeOldKeybindings() {
     const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
-    const currentCommandKeys = store.get('commandKeys', []);
-    let updatedCommandKeys = _.cloneDeep(currentCommandKeys);
+    const currentCommandKeys = store.get('commandKeys', {});
+    let updatedCommandKeys = currentCommandKeys;
 
     // remove keybindings that don't exist in any of the shuttleControlEvents arrays
-    currentCommandKeys.forEach(key => {
-        const event = allShuttleControlEvents.find(event => event.cmd === key.cmd);
-        if (event === undefined && key.category !== MACRO_CATEGORY) {
-            let keyToRemove = updatedCommandKeys.findIndex(el => el.cmd === key.cmd);
-            updatedCommandKeys.splice(keyToRemove, 1);
+    Object.entries(currentCommandKeys).forEach(([key, keybinding]) => {
+        const event = allShuttleControlEvents[key];
+        if (event === undefined && keybinding.category !== MACRO_CATEGORY) {
+            delete updatedCommandKeys[key];
         }
     });
     store.replace('commandKeys', updatedCommandKeys);
@@ -117,12 +119,11 @@ export function removeOldKeybindings() {
     const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
     const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
         const shortcuts = profile.shortcuts;
-        let updatedProfileShortcuts = _.cloneDeep(shortcuts);
-        shortcuts.forEach(key => {
-            const event = allShuttleControlEvents.find(event => event.cmd === key.cmd);
-            if (event === undefined && key.category !== MACRO_CATEGORY) {
-                let keyToRemove = updatedProfileShortcuts.findIndex(el => el.cmd === key.cmd);
-                updatedProfileShortcuts.splice(keyToRemove, 1);
+        let updatedProfileShortcuts = shortcuts;
+        Object.entries(shortcuts).forEach(([key, keybinding]) => {
+            const event = allShuttleControlEvents[key];
+            if (event === undefined && keybinding.category !== MACRO_CATEGORY) {
+                delete updatedProfileShortcuts[key];
             }
         });
         return { ...profile, shortcuts: updatedProfileShortcuts };

@@ -34,8 +34,8 @@ const DiagnosticTool = () => {
             <div className={styles.diagnosticWrapper}>
                 <ProgramInfo />
                 <PinStatus />
-                <FirmwareOptions />
                 <AtAGlance />
+                <FirmwareOptions />
             </div>
         </div>
     );

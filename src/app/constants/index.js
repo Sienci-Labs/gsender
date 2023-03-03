@@ -138,6 +138,7 @@ export const TINYG_MACHINE_STATE_PANIC = 13; // Machine is in panic state. Needs
 export const LASER_MODE = 'laser';
 export const SPINDLE_MODE = 'spindle';
 
+export const ALL_CATEGORY = 'All';
 export const CARVING_CATEGORY = 'Carving';
 export const OVERRIDES_CATEGORY = 'Overrides';
 export const VISUALIZER_CATEGORY = 'Visualizer';
@@ -149,6 +150,20 @@ export const SPINDLE_LASER_CATEGORY = 'Spindle/Laser';
 export const GENERAL_CATEGORY = 'General';
 export const TOOLBAR_CATEGORY = 'Toolbar';
 export const COOLANT_CATEGORY = 'Coolant';
+export const ALL_CATEGORIES = [ // keep in alphabetical order
+    ALL_CATEGORY,
+    CARVING_CATEGORY,
+    COOLANT_CATEGORY,
+    GENERAL_CATEGORY,
+    JOGGING_CATEGORY,
+    LOCATION_CATEGORY,
+    MACRO_CATEGORY,
+    OVERRIDES_CATEGORY,
+    PROBING_CATEGORY,
+    SPINDLE_LASER_CATEGORY,
+    TOOLBAR_CATEGORY,
+    VISUALIZER_CATEGORY,
+];
 
 export const RENDER_NO_FILE = 'RENDER_NO_FILE';
 export const RENDER_LOADING = 'RENDER_LOADING';
@@ -199,3 +214,9 @@ export const PROGRAM_EVENTS = [
     PROGRAM_PAUSE,
     PROGRAM_RESUME
 ];
+
+export const USER_DATA_COLLECTION = {
+    INITIAL: 'INITIAL',
+    ACCEPTED: 'ACCEPTED',
+    REJECTED: 'REJECTED',
+};

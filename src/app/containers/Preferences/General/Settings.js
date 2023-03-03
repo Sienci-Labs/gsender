@@ -51,7 +51,7 @@ const Settings = () => {
             const reader = new FileReader();
             reader.readAsText(file, 'UTF-8');
             reader.onload = async (event) => {
-                const { settings, events = [] } = JSON.parse(event.target.result);
+                const { settings, events = [], state } = JSON.parse(event.target.result);
 
                 await new Promise((resolve, reject) => {
                     // delete all old events
@@ -63,7 +63,11 @@ const Settings = () => {
                     ]);
                 });
 
-                restoreSettings(settings);
+                if (settings) {
+                    restoreSettings(settings);
+                } else {
+                    restoreSettings(state);
+                }
             };
             reader.onerror = () => {
                 Toaster.pop({
@@ -76,7 +80,7 @@ const Settings = () => {
 
     const exportSettings = async () => {
         const settings = store.get();
-        settings.commandKeys = settings.commandKeys.filter((key) => key.category !== 'Macros'); //Exclude macro shortcuts
+        settings.commandKeys = Object.fromEntries(Object.entries(settings.commandKeys).filter(([key, shortcut]) => shortcut.category !== 'Macros')); //Exclude macro shortcuts
         delete settings.session;
 
         const res = await api.events.fetch();

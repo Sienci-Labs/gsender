@@ -48,7 +48,7 @@ const ErrorLog = () => {
                                             >
                                                 <span className={styles.errorTag}>Alarm</span>
                                                 <span className={styles.errorDate}>
-                                                    Occured on {log.split('[error] GRBL_ALARM:')[0].slice(1, 20).replace(' ', ' at ') || ''}
+                                                    On {log.split('[error] GRBL_ALARM:')[0].slice(1, 20).replace(' ', ' at ') || ''}
                                                 </span>
                                                 <p className={styles.errorReason}>
                                                     {log.split('[error] GRBL_ALARM:')[1]}
@@ -67,7 +67,7 @@ const ErrorLog = () => {
                                             >
                                                 <span className={styles.errorTag}>Error{log.split('[error] GRBL_ERROR:')[1].split('Origin')[1]}</span>
                                                 <span className={styles.errorDate}>
-                                                    Occured on {log.split('[error] GRBL_ERROR:')[0].slice(1, 20).replace(' ', ' at ') || ''}
+                                                    On {log.split('[error] GRBL_ERROR:')[0].slice(1, 20).replace(' ', ' at ') || ''}
                                                 </span>
                                                 <p className={styles.errorReason}>
                                                     {log.split('[error] GRBL_ERROR:')[1].split('Line')[0]} <br />

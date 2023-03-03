@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import store from 'app/store';
@@ -16,8 +17,8 @@ import Availability from './Availability';
 
 const { DEFAULT, AVAILABLE, UNAVAILABLE, IS_THE_SAME } = AVAILABILITY_TYPES;
 
-const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) => {
-    const [gamepadShortcut, setGamepadShortcut] = useState(null);
+const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, filterFunc, filterCategory }) => {
+    const [gamepadShortcut, setGamepadShortcut] = useState([]);
     const [availability, setAvailability] = useState(DEFAULT);
     const [shortcutName, setShortcutName] = useState('');
     const listenerRef = useRef();
@@ -54,12 +55,12 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
 
         const comboKeys = shortcutComboBuilder(clickedButtons.map(shortcut => shortcut.buttonIndex));
 
-        const comboInUse = currentProfile.shortcuts
-            .find(shortcut => shortcut.keys === comboKeys);
+        const comboInUse = Object.entries(currentProfile.shortcuts)
+            .find(([key, shortcut]) => shortcut.keys === comboKeys);
 
         if (!comboInUse) {
             setAvailability(AVAILABLE);
-        } else if (comboInUse?.id === shortcut?.id) {
+        } else if (comboInUse[1].cmd === shortcut?.cmd) {
             setAvailability(IS_THE_SAME);
         } else {
             setAvailability(UNAVAILABLE);
@@ -73,19 +74,20 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles }) 
         const newKeys = shortcutComboBuilder(gamepadShortcut.map(shortcut => shortcut.buttonIndex));
         const newKeysName = shortcutName || gamepadShortcut.map(shortcut => shortcut.buttonIndex).join(', ');
 
-        const newShortcutsArr =
-            profile.shortcuts
-                .map(currentShortcut => ({
-                    ...currentShortcut,
-                    keys: currentShortcut.id === shortcut.id ? newKeys : currentShortcut.keys,
-                    keysName: currentShortcut.id === shortcut.id ? newKeysName : currentShortcut.keysName,
-                    isActive: currentShortcut.id === shortcut.id ? true : currentShortcut.isActive,
-                }));
+        let newShortcuts = _.cloneDeep(profile.shortcuts);
+        newShortcuts[shortcut.cmd].keys = newKeys;
+        newShortcuts[shortcut.cmd].keysName = newKeysName;
+        newShortcuts[shortcut.cmd].isActive = true;
+
+        filterFunc(filterCategory, newShortcuts);
 
         const profiles = store.get('workspace.gamepad.profiles', []);
 
+        //CHecks if parent array has all the child array elements
+        const arrayComparator = (parentArr, childArr) => childArr.every(element => parentArr.includes(element));
+
         const cleanedProfiles =
-            profiles.map(currentProfile => (currentProfile.id.includes(profile.id) ? ({ ...profile, shortcuts: newShortcutsArr }) : currentProfile));
+            profiles.map(currentProfile => (arrayComparator(currentProfile.id, profile.id) ? ({ ...profile, shortcuts: newShortcuts }) : currentProfile));
 
         onUpdateProfiles(cleanedProfiles);
 

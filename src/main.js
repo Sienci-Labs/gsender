@@ -21,7 +21,6 @@
  *
  */
 
-import '@babel/polyfill';
 import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session, clipboard } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
@@ -86,7 +85,25 @@ const main = () => {
 
     app.whenReady().then(async () => {
         try {
-            session.defaultSession.clearCache();
+            await session.defaultSession.clearCache();
+
+
+            app.commandLine.appendSwitch('ignore-gpu-blacklist');
+            // Increase V8 heap size of the main process
+            if (process.arch === 'x64') {
+                const memoryLimit = 1024 * 4; // 4GB
+                app.commandLine.appendSwitch('--js-flags', `--max-old-space-size=${memoryLimit}`);
+            }
+
+            if (process.platform === 'linux') {
+                // https://github.com/electron/electron/issues/18265
+                // Run this at early startup, before app.on('ready')
+                //
+                // TODO: Maybe we can only disable --disable-setuid-sandbox
+                // reference changes: https://github.com/microsoft/vscode/pull/122909/files
+                app.commandLine.appendSwitch('--no-sandbox');
+            }
+
             windowManager = new WindowManager();
             // Create and show splash before server starts
             const splashScreen = windowManager.createSplashScreen({
@@ -116,21 +133,20 @@ const main = () => {
                     });
                     app.relaunch();
                     app.exit(-1);
+                } else {
+                    log.error(error);
                 }
             }
 
-            const { address, port, headless, requestedHost } = { ...res };
+            const { address, port, requestedHost, kiosk } = { ...res };
+            log.info(`Returned - http://${address}:${port}`);
             hostInformation = {
                 address,
                 port,
-                headless,
             };
             if (!(address && port)) {
                 log.error('Unable to start the server at ' + chalk.cyan(`http://${address}:${port}`));
                 return;
-            }
-            if (headless) {
-                log.debug(`Started remote build at ${address}:${port} - ${requestedHost}`);
             }
 
             const url = `http://${address}:${port}`;
@@ -146,7 +162,8 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `gSender ${pkg.version}`
+                title: `gSender ${pkg.version}`,
+                kiosk
             };
             const window = windowManager.openWindow(url, options, splashScreen);
 
@@ -270,7 +287,15 @@ const main = () => {
             });
 
             ipcMain.on('reconnect-main', (event, options) => {
-                if (!event.sender.browserWindowOptions.parent && windowManager.childWindows.length > 0) {
+                let shouldReconnect = false;
+                try {
+                    if (event && event.sender && event.sender.browserWindowOptions) {
+                        shouldReconnect = !event.sender.browserWindowOptions.parent && windowManager.childWindows.length > 0;
+                    }
+                } catch (err) {
+                    log.error(err);
+                }
+                if (shouldReconnect) {
                     windowManager.childWindows.forEach(window => {
                         window.webContents.send('reconnect', options);
                     });

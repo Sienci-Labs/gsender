@@ -97,7 +97,7 @@ class Controller {
         'file:unload': [],
         'homing:flag': [],
         'electronErrors:errorList': [],
-        'grbl:iSready': [],
+        'firmware:ready': [],
         'sender:M0M1': [],
         'ip:list': [],
         'wizard:next': []

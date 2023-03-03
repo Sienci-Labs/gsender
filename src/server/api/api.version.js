@@ -25,6 +25,7 @@ import url from 'url';
 import registryUrl from 'registry-url';
 import registryAuthToken from 'registry-auth-token';
 import request from 'superagent';
+import os from 'os';
 import {
     ERR_INTERNAL_SERVER_ERROR
 } from '../constants';
@@ -69,4 +70,16 @@ export const getLatestVersion = (req, res) => {
 
             res.send({ time, name, version, description, homepage });
         });
+};
+
+export const getShouldInstallUpdates = (req, res) => {
+    let shouldUpdate = true;
+    //Check command line inputs for electron file extention
+    //Sample: C:\Program Files\gSender Edge\gSender Edge.exe
+    process.argv.forEach((consoleInput, index) => {
+        if (os.platform().toLocaleLowerCase().includes('linux') && !consoleInput.toLocaleLowerCase().includes('.appimage')) {
+            shouldUpdate = false;
+        }
+    });
+    res.send(shouldUpdate);
 };

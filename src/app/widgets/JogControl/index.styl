@@ -111,6 +111,9 @@
     display: grid;
     grid-gap: 2rem;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    @media (max-width: 599px) {
+        grid-gap: 5px;
+    }
 }
 
 .controlGroupLabel {
@@ -211,6 +214,9 @@
     height: 100%;
     align-self: center;
     align-items: center;
+    @media (max-width: 599px) {
+        display: block;
+    }
 }
 
 .xy-keys {
@@ -221,6 +227,10 @@
 
     @media (max-height: 820px) {
         width: 43%;
+    }
+    @media (max-width: 599px) {
+        width: 91%;
+        grid-gap: 12px;
     }
 }
 
@@ -245,6 +255,14 @@
 
     button + button {
         margin-left: 0;
+    }
+    @media (max-width: 599px) {
+        display: flex;
+        width: 89%;
+        margin: 1rem;
+        button + button {
+            margin-left: 12px;
+        }
     }
 }
 

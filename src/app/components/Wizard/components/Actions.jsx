@@ -21,7 +21,7 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import pubsub from 'pubsub-js';
 import { uniqueId } from 'lodash';
 import controller from 'app/lib/controller';
@@ -34,16 +34,23 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
     const { markActionAsComplete, completeSubStep, scrollToActiveStep, setIsLoading, updateSubstepOverlay } = useWizardAPI();
     const { isLoading } = useWizardContext();
 
-    pubsub.subscribe('wizard:next', (msg, indexes) => {
-        const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
-        if (stepIn === stepIndex && subStepIn === substepIndex) {
-            markActionAsComplete(stepIndex, substepIndex);
-            const activeValues = completeSubStep(stepIndex, substepIndex);
-            updateSubstepOverlay(activeValues);
-            scrollToActiveStep(activeValues);
-            setIsLoading(false);
-        }
-    });
+    useEffect(() => {
+        const token = pubsub.subscribe('wizard:next', (msg, indexes) => {
+            const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
+            if (stepIn === stepIndex && subStepIn === substepIndex) {
+                markActionAsComplete(stepIndex, substepIndex);
+                const activeValues = completeSubStep(stepIndex, substepIndex);
+                updateSubstepOverlay(activeValues);
+                scrollToActiveStep(activeValues);
+                setIsLoading(false);
+            }
+        });
+
+        return () => {
+            pubsub.unsubscribe(token);
+        };
+    }, []);
+
     return (
         <>
             {

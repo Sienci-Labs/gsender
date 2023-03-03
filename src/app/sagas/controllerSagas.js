@@ -292,31 +292,13 @@ export function* initialize() {
                 title: 'Automatic Toolchange',
                 instructions: automaticToolChange
             });
-        } else {
-            return;
+        } else if (option === 'Pause') {
+            Toaster.pop({
+                msg: `Toolchange pause - ${comment}`,
+                type: TOASTER_INFO,
+                duration: TOASTER_UNTIL_CLOSE
+            });
         }
-
-        /*const content = (comment.length > 0)
-            ? <div><p>Press Resume to continue operation.</p><p>Line contained following comment: <b>{comment}</b></p></div>
-            : 'Press Resume to continue operation.';
-
-        const { option } = context;
-
-        // We don't throw a modal on manual tool changes
-        if (option === 'Manual') {
-            pubsub.publish('gcode:ManualToolChange');
-            return;
-        }
-
-        Confirm({
-            title: 'M6 Tool Change',
-            content,
-            confirmLabel: 'Resume',
-            cancelLabel: 'Stop',
-            onConfirm: () => {
-                controller.command('gcode:resume');
-            }
-        });*/
     });
 
     controller.addListener('gcode:load', (name, content) => {
@@ -533,8 +515,8 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('grbl:iSready', (status) => {
-        pubsub.publish('grblExists:update', status);
+    controller.addListener('firmware:ready', (status) => {
+        pubsub.publish('firmware:update', status);
     });
 
     controller.addListener('error', (error) => {

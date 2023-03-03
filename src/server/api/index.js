@@ -35,6 +35,7 @@ import * as mdi from './api.mdi';
 import * as users from './api.users';
 import * as files from './api.file';
 import * as logs from './api.log';
+import * as metrics from './api.metrics';
 
 export {
     version,
@@ -50,5 +51,6 @@ export {
     mdi,
     users,
     files,
-    logs
+    logs,
+    metrics
 };

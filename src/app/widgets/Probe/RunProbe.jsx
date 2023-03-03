@@ -23,7 +23,7 @@
 
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import Modal from 'app/components/Modal';
+import Modal from '@trendmicro/react-modal';
 import i18n from 'app/lib/i18n';
 import combokeys from 'app/lib/combokeys';
 import gamepad, { runAction } from 'app/lib/gamepad';
@@ -97,10 +97,6 @@ class RunProbe extends PureComponent {
 
     startProbe = () => {
         const { actions } = this.props;
-        const { connectionMade } = this.state;
-        if (!connectionMade) {
-            return;
-        }
 
         const probeCommands = actions.generateProbeCommands();
 
@@ -128,17 +124,14 @@ class RunProbe extends PureComponent {
             testRunning: true
         });
         this.testInterval = setInterval(() => {
+            console.log('Waiting on status');
             if (probeStatus()) {
+                console.log('we got it');
                 this.setState({
                     connectionMade: true,
                 });
                 clearInterval(this.testInterval);
                 this.testInterval = null;
-            } else {
-                const { timer } = this.state;
-                this.setState({
-                    timer: timer + 0.5
-                });
             }
         }, 500);
     }
@@ -186,7 +179,10 @@ class RunProbe extends PureComponent {
         const { connectionMade } = this.state;
 
         return (
-            <Modal disableOverlay onClose={actions.closeModal} show={show}>
+            <Modal
+                disableOverlay onClose={actions.closeModal} show={show}
+                className={styles.modalOverride}
+            >
                 <Modal.Header className={styles.modalHeader}>
                     <Modal.Title>{i18n._(`Probe - ${probeCommand.id}`)}</Modal.Title>
                 </Modal.Header>
@@ -209,7 +205,7 @@ class RunProbe extends PureComponent {
                                 onClick={this.startProbe}
                             >
                                 {
-                                    !connectionMade ? 'Waiting on probe circuit confirmation...' : ' Start Probe'
+                                    connectionMade ? 'Start Probe' : 'Waiting on probe circuit confirmation...'
                                 }
                             </FunctionButton>
                         </div>

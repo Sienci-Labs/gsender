@@ -63,7 +63,6 @@ import {
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_IDLE,
     LOCATION_CATEGORY,
-    JOGGING_CATEGORY,
     AXIS_X,
     AXIS_Y,
     AXIS_Z,
@@ -480,30 +479,6 @@ class LocationWidget extends PureComponent {
     }
 
     shuttleControlEvents = {
-        JOG_SPEED_I: {
-            title: 'Increase Jog Speed',
-            keys: '=',
-            cmd: 'JOG_SPEED_I',
-            payload: {
-                speed: 'increase'
-            },
-            preventDefault: false,
-            isActive: true,
-            category: JOGGING_CATEGORY,
-            callback: this.shuttleControlFunctions.JOG_SPEED
-        },
-        JOG_SPEED_D: {
-            title: 'Decrease Jog Speed',
-            keys: '-',
-            cmd: 'JOG_SPEED_D',
-            payload: {
-                speed: 'decrease'
-            },
-            preventDefault: false,
-            isActive: true,
-            category: JOGGING_CATEGORY,
-            callback: this.shuttleControlFunctions.JOG_SPEED
-        },
         ZERO_X_AXIS: {
             title: 'Zero X Axis',
             keys: ['shift', 'w'].join('+'),
@@ -629,9 +604,6 @@ class LocationWidget extends PureComponent {
             canClick: true, // Defaults to true
             units: store.get('workspace.units', METRIC_UNITS),
             safeRetractHeight: store.get('workspace.safeRetractHeight'),
-            workflow: {
-                state: controller.workflow.state
-            },
             modal: {
                 name: MODAL_NONE,
                 params: {}
@@ -746,6 +718,9 @@ class LocationWidget extends PureComponent {
         //const wcs = this.getWorkCoordinateSystem();
         const state = {
             ...this.state,
+            workflow: {
+                state: this.props.workflow.state
+            },
             // Determine if the motion button is clickable
             canClick: this.canClick(),
             // Output machine position with the display units

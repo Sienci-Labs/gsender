@@ -24,7 +24,7 @@
 /* eslint-disable consistent-return */
 import includes from 'lodash/includes';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import _, { get, debounce } from 'lodash';
 import api from 'app/api';
 import pubsub from 'pubsub-js';
 import combokeys from 'app/lib/combokeys';
@@ -752,11 +752,6 @@ class VisualizerWidget extends PureComponent {
             units: store.get('workspace.units', METRIC_UNITS),
             theme: this.config.get('theme'),
             showSoftLimitsWarning: this.config.get('showSoftLimitsWarning', false),
-            controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
-            },
             workflow: {
                 state: controller.workflow.state
             },
@@ -886,25 +881,80 @@ class VisualizerWidget extends PureComponent {
 
             changeCamera();
         },
+        VISUALIZER_VIEW_CYCLE: () => {
+            const {
+                to3DView,
+                toTopView,
+                toFrontView,
+                toRightSideView,
+                toLeftSideView,
+            } = this.actions.camera;
+
+            const cameraViews = [
+                '3d',
+                'top',
+                'front',
+                'right',
+                'left',
+                'default',
+            ];
+
+            let currIndex = cameraViews.findIndex(view => view === this.state.cameraPosition);
+
+            if (currIndex + 1 >= cameraViews.length) {
+                currIndex = 0;
+            } else {
+                currIndex += 1;
+            }
+
+            const currView = cameraViews[currIndex];
+
+            const changeCamera = {
+                '3d': to3DView,
+                'top': toTopView,
+                'front': toFrontView,
+                'right': toRightSideView,
+                'left': toLeftSideView,
+                'default': () => {
+                    const { cameraPosition } = this.getInitialState();
+                    this.setState({ cameraPosition });
+                }
+            }[currView];
+
+            changeCamera();
+        },
+        VISUALIZER_ZOOM_IN: () => {
+            this.actions.camera.zoomIn();
+        },
+        VISUALIZER_ZOOM_OUT: () => {
+            this.actions.camera.zoomOut();
+        },
+        VISUALIZER_ZOOM_FIT: () => {
+            this.actions.camera.zoomFit();
+        }
     }
 
     shuttleControlEvents = {
         LOAD_FILE: {
             title: 'Load File',
             keys: ['shift', 'l'].join('+'),
+            gamepadKeys: '0',
+            keysName: 'A',
             cmd: 'LOAD_FILE',
             preventDefault: false,
             isActive: true,
             category: CARVING_CATEGORY,
-            callback: () => {
+            callback: debounce(() => {
                 if (this.workflowControl) {
                     this.workflowControl.handleClickUpload();
                 }
-            },
+            }, 300),
         },
         UNLOAD_FILE: {
             title: 'Unload File',
             keys: ['shift', 'k'].join('+'),
+            gamepadKeys: '1',
+            keysName: 'B',
             cmd: 'UNLOAD_FILE',
             preventDefault: false,
             isActive: true,
@@ -929,6 +979,8 @@ class VisualizerWidget extends PureComponent {
         START_JOB: {
             title: 'Start Job',
             keys: '~',
+            gamepadKeys: '9',
+            keysName: 'Start',
             cmd: 'START_JOB',
             preventDefault: true,
             isActive: true,
@@ -942,6 +994,8 @@ class VisualizerWidget extends PureComponent {
         PAUSE_JOB: {
             title: 'Pause Job',
             keys: '!',
+            gamepadKeys: '2',
+            keysName: 'X',
             cmd: 'PAUSE_JOB',
             preventDefault: true,
             isActive: true,
@@ -953,6 +1007,8 @@ class VisualizerWidget extends PureComponent {
         STOP_JOB: {
             title: 'Stop Job',
             keys: '@',
+            gamepadKeys: '3',
+            keysName: 'Y',
             cmd: 'STOP_JOB',
             preventDefault: true,
             isActive: true,
@@ -1184,17 +1240,22 @@ class VisualizerWidget extends PureComponent {
             isActive: true,
             category: GENERAL_CATEGORY,
             callback: () => {
-                const shortcuts = store.get('commandKeys', []);
+                const shortcuts = store.get('commandKeys', {});
 
                 // Ignore shortcut for toggling all other shortcuts to
                 // allow them to be turned on and off
-                const allDisabled = shortcuts
-                    .filter(shortcut => shortcut.title !== 'Toggle Shortcuts')
-                    .every(({ isActive }) => !isActive);
-                const keybindingsArr = shortcuts.map(shortcut => (shortcut.title === 'Toggle Shortcuts' ? shortcut : { ...shortcut, isActive: allDisabled }));
+                const allDisabled = Object.entries(shortcuts)
+                    .filter(([key, shortcut]) => shortcut.title !== 'Toggle Shortcuts')
+                    .every(([key, shortcut]) => !shortcut.isActive);
+                const keybindings = _.cloneDeep(shortcuts);
+                Object.entries(keybindings).forEach(([key, keybinding]) => {
+                    if (key !== 'TOGGLE_SHORTCUTS') {
+                        keybinding.isActive = allDisabled;
+                    }
+                });
 
-                store.replace('commandKeys', keybindingsArr);
-                pubsub.publish('keybindingsUpdated');
+                store.replace('commandKeys', keybindings);
+                pubsub.publish('keybindingsUpdated', keybindings);
             }
         },
         MACRO: (_, { macroID }) => {
@@ -1202,6 +1263,46 @@ class VisualizerWidget extends PureComponent {
             if (activeState === GRBL_ACTIVE_STATE_IDLE) {
                 controller.command('macro:run', macroID, controller.context);
             }
+        },
+        VISUALIZER_VIEW_CYCLE: {
+            title: 'Cycle Through Visualizer Cameras',
+            keys: ['shift', 'b'].join('+'),
+            cmd: 'VISUALIZER_VIEW_CYCLE',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW_CYCLE
+        },
+        VISUALIZER_ZOOM_IN: {
+            title: 'Zoom In',
+            keys: ['shift', 'p'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_IN',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_IN
+        },
+        VISUALIZER_ZOOM_OUT: {
+            title: 'Zoom Out',
+            keys: ['shift', 'o'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_OUT',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT
+        },
+        VISUALIZER_ZOOM_FIT: {
+            title: 'Zoom Fit',
+            keys: ['shift', 'i'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_FIT',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_FIT
         },
     }
 
@@ -1331,6 +1432,11 @@ class VisualizerWidget extends PureComponent {
         const { renderState, isSecondary, gcode, surfacingData, activeVisualizer, activeState, alarmCode, workflow, isConnected } = this.props;
         const state = {
             ...this.state,
+            controller: {
+                type: controller.type,
+                settings: controller.settings,
+                state: controller.state
+            },
             alarmCode,
             activeState,
             workflow,
