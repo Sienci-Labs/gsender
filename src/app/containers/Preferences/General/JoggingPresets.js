@@ -166,9 +166,6 @@ export default class JoggingPresets extends Component {
         const metricValue = units === 'mm' ? value : convertToMetric(value);
         const imperialValue = units === 'in' ? value : convertToImperial(value);
 
-        currentPreset.mm.xyStep = metricValue;
-        currentPreset.in.xyStep = imperialValue;
-
         const prev = store.get('widgets.axes');
 
         const updated = {
@@ -176,7 +173,15 @@ export default class JoggingPresets extends Component {
             jog: {
                 ...prev.jog,
                 [selectedPreset]: {
-                    ...currentPreset
+                    ...currentPreset,
+                    mm: {
+                        ...currentPreset.mm,
+                        xyStep: metricValue
+                    },
+                    in: {
+                        ...currentPreset.in,
+                        xyStep: imperialValue
+                    }
                 }
             }
         };
@@ -220,9 +225,6 @@ export default class JoggingPresets extends Component {
         const metricValue = units === 'mm' ? value : convertToMetric(value);
         const imperialValue = units === 'in' ? value : convertToImperial(value);
 
-        currentPreset.mm.zStep = metricValue;
-        currentPreset.in.zStep = imperialValue;
-
         const prev = store.get('widgets.axes');
 
         const updated = {
@@ -230,7 +232,15 @@ export default class JoggingPresets extends Component {
             jog: {
                 ...prev.jog,
                 [selectedPreset]: {
-                    ...currentPreset
+                    ...currentPreset,
+                    mm: {
+                        ...currentPreset.mm,
+                        zStep: metricValue
+                    },
+                    in: {
+                        ...currentPreset.in,
+                        zStep: imperialValue
+                    },
                 }
             }
         };
@@ -273,9 +283,6 @@ export default class JoggingPresets extends Component {
         const metricValue = units === 'mm' ? value : convertToMetric(value);
         const imperialValue = units === 'in' ? value : convertToImperial(value);
 
-        currentPreset.mm.feedrate = metricValue;
-        currentPreset.in.feedrate = imperialValue;
-
         const prev = store.get('widgets.axes');
 
         const updated = {
@@ -283,7 +290,15 @@ export default class JoggingPresets extends Component {
             jog: {
                 ...prev.jog,
                 [selectedPreset]: {
-                    ...currentPreset
+                    ...currentPreset,
+                    mm: {
+                        ...currentPreset.mm,
+                        feedrate: metricValue,
+                    },
+                    in: {
+                        ...currentPreset.in,
+                        feedrate: imperialValue,
+                    },
                 }
             }
         };
