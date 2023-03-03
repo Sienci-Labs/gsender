@@ -1,96 +1,25 @@
-import { shortcuts } from './shortcuts';
+// import { shortcuts } from './shortcuts';
 
+/*
+***********IMPORTANT*************
+- default gamepad keys are in shuttleControlEvents now
+    (this makes it easier to implement, since the default shortcuts don't have the new keybindings changes (cmd changes, id changes).
+    this way I don't have to edit all 70 of them to make the gamepad shortcuts work,
+    and it makes the process of adding shortcuts consistent)
+- to find and remove them:
+    - global search this regex: \s*gamepadKeys: .*\n\s*keysName: .*,
+    - replace with nothing
+    - for reference, they should only exist in:
+        /Users/sophiabeluli/Documents/work/dev2/gsender/src/app/widgets/JogControl/index.jsx
+        /Users/sophiabeluli/Documents/work/dev2/gsender/src/app/widgets/Visualizer/index.jsx
+*/
 export const profiles = [
     {
         id: ['Logitech Cordless RumblePad 2 (STANDARD GAMEPAD Vendor: 046d Product: c219)'],
         icon: 'fas fa-gamepad',
         active: true,
         profileName: 'Logitech F710 Gamepad',
-        shortcuts: shortcuts.map(shortcut => {
-            const { cmd, title } = shortcut;
-
-            switch (cmd) {
-            case 'LOAD_FILE': {
-                return { ...shortcut, keys: '0', keysName: 'A' };
-            }
-
-            case 'UNLOAD_FILE': {
-                return { ...shortcut, keys: '1', keysName: 'B' };
-            }
-
-            case 'START_JOB': {
-                return { ...shortcut, keys: '9', keysName: 'Start' };
-            }
-
-            case 'PAUSE_JOB': {
-                return { ...shortcut, keys: '2', keysName: 'X' };
-            }
-
-            case 'STOP_JOB': {
-                return { ...shortcut, keys: '3', keysName: 'Y' };
-            }
-
-            case 'JOG': {
-                if (title === 'Jog: X+') {
-                    return { ...shortcut, keys: '15', keysName: 'Arrow Right' };
-                }
-
-                if (title === 'Jog: X-') {
-                    return { ...shortcut, keys: '14', keysName: 'Arrow Left' };
-                }
-
-                if (title === 'Jog: Y+') {
-                    return { ...shortcut, keys: '12', keysName: 'Arrow Up' };
-                }
-
-                if (title === 'Jog: Y-') {
-                    return { ...shortcut, keys: '13', keysName: 'Arrow Down' };
-                }
-
-                if (title === 'Jog: Z+') {
-                    return { ...shortcut, keys: '5', keysName: 'Left Button' };
-                }
-
-                if (title === 'Jog: Z-') {
-                    return { ...shortcut, keys: '4', keysName: 'Right Button' };
-                }
-
-                if (title === 'Jog: X+ Y+') {
-                    return { ...shortcut, keys: '12+15', keysName: 'Arrow Right and Arrow Up' };
-                }
-
-                if (title === 'Jog: X+ Y-') {
-                    return { ...shortcut, keys: '13+15', keysName: 'Arrow Right and Arrow Down' };
-                }
-
-                if (title === 'Jog: X- Y-') {
-                    return { ...shortcut, keys: '13+14', keysName: 'Arrow Left and Arrow Down' };
-                }
-
-                if (title === 'Jog: X- Y+') {
-                    return { ...shortcut, keys: '12+14', keysName: 'Arrow Left and Arrow Up' };
-                }
-
-                return { ...shortcut, keys: '' };
-            }
-
-            case 'JOG_SPEED': {
-                if (title === 'Decrease Jog Speed') {
-                    return { ...shortcut, keys: '6', keysName: 'Left Trigger' };
-                }
-
-                if (title === 'Increase Jog Speed') {
-                    return { ...shortcut, keys: '7', keysName: 'Right Trigger' };
-                }
-
-                return { ...shortcut, keys: '' };
-            }
-
-            default: {
-                return { ...shortcut, keys: '' };
-            }
-            }
-        })
+        shortcuts: {}
     },
     {
         id: [
@@ -101,90 +30,6 @@ export const profiles = [
         icon: 'fas fa-gamepad',
         active: true,
         profileName: 'Xbox Controller',
-        shortcuts: shortcuts.map(shortcut => {
-            const { cmd, title } = shortcut;
-
-            switch (cmd) {
-            case 'LOAD_FILE': {
-                return { ...shortcut, keys: '0', keysName: 'A' };
-            }
-
-            case 'UNLOAD_FILE': {
-                return { ...shortcut, keys: '1', keysName: 'B' };
-            }
-
-            case 'START_JOB': {
-                return { ...shortcut, keys: '9', keysName: 'Start' };
-            }
-
-            case 'PAUSE_JOB': {
-                return { ...shortcut, keys: '2', keysName: 'X' };
-            }
-
-            case 'STOP_JOB': {
-                return { ...shortcut, keys: '3', keysName: 'Y' };
-            }
-
-            case 'JOG': {
-                if (title === 'Jog: X+') {
-                    return { ...shortcut, keys: '15', keysName: 'Arrow Right' };
-                }
-
-                if (title === 'Jog: X-') {
-                    return { ...shortcut, keys: '14', keysName: 'Arrow Left' };
-                }
-
-                if (title === 'Jog: Y+') {
-                    return { ...shortcut, keys: '12', keysName: 'Arrow Up' };
-                }
-
-                if (title === 'Jog: Y-') {
-                    return { ...shortcut, keys: '13', keysName: 'Arrow Down' };
-                }
-
-                if (title === 'Jog: Z+') {
-                    return { ...shortcut, keys: '5', keysName: 'Left Button' };
-                }
-
-                if (title === 'Jog: Z-') {
-                    return { ...shortcut, keys: '4', keysName: 'Right Button' };
-                }
-
-                if (title === 'Jog: X+ Y+') {
-                    return { ...shortcut, keys: '12+15', keysName: 'Arrow Right and Arrow Up' };
-                }
-
-                if (title === 'Jog: X+ Y-') {
-                    return { ...shortcut, keys: '13+15', keysName: 'Arrow Right and Arrow Down' };
-                }
-
-                if (title === 'Jog: X- Y-') {
-                    return { ...shortcut, keys: '13+14', keysName: 'Arrow Left and Arrow Down' };
-                }
-
-                if (title === 'Jog: X- Y+') {
-                    return { ...shortcut, keys: '12+14', keysName: 'Arrow Left and Arrow Up' };
-                }
-
-                return { ...shortcut, keys: '' };
-            }
-
-            case 'JOG_SPEED': {
-                if (title === 'Decrease Jog Speed') {
-                    return { ...shortcut, keys: '6', keysName: 'Left Trigger' };
-                }
-
-                if (title === 'Increase Jog Speed') {
-                    return { ...shortcut, keys: '7', keysName: 'Right Trigger' };
-                }
-
-                return { ...shortcut, keys: '' };
-            }
-
-            default: {
-                return { ...shortcut, keys: '' };
-            }
-            }
-        })
+        shortcuts: {}
     }
 ];

@@ -158,8 +158,9 @@ class MacroWidget extends PureComponent {
                 const { records: macros } = res.body;
                 this.setState({ macros: macros });
 
-                const commandKeys = store.get('commandKeys', []);
-                const filteredCommandKeys = commandKeys.filter(key => key.id !== id);
+                const commandKeys = store.get('commandKeys', {});
+                const filteredCommandKeys = _.cloneDeep(commandKeys);
+                delete filteredCommandKeys[id];
 
                 store.replace('commandKeys', filteredCommandKeys);
                 combokeys.reload();

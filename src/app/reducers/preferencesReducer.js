@@ -4,7 +4,7 @@ import store from 'app/store';
 
 const initialState = {
     shortcuts: {
-        list: store.get('commandKeys', []).sort((a, b) => a?.category?.localeCompare(b?.category)),
+        list: store.get('commandKeys', {}),
         shouldHold: false,
     },
     ipList: [],
