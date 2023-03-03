@@ -1079,7 +1079,16 @@ class GrblHalController {
             // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
             // We set controller ready if version found
             setTimeout(() => {
-                this.connection.write('$I\n');
+                let counter = 3;
+                const interval = setInterval(() => {
+                    // check if 3 tries or controller is ready
+                    if (counter === 0 || this.ready) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    this.connection.write('$I\n');
+                    counter--;
+                }, 3000);
             }, 500);
         });
     }
