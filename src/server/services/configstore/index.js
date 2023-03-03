@@ -57,7 +57,7 @@ class ConfigStore extends events.EventEmitter {
                 for (let i = 0; i < events.length; i++) {
                     eventMap.set(events[i].event, events[i]);
                 }
-            } else { // if not, dont need to convert
+            } else if (events) { // if not, dont need to convert
                 eventMap = new Map(Object.entries(events));
             }
 
