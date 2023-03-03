@@ -1,11 +1,11 @@
 import React from 'react';
 
 class ShuttleEvents extends React.PureComponent {
-    allShuttleControlEvents = [];
+    allShuttleControlEvents = {};
 
     updateShuttleEvents(shuttleControlEvents) {
         Object.keys(shuttleControlEvents).forEach(eventName => {
-            this.allShuttleControlEvents.push(shuttleControlEvents[eventName]);
+            this.allShuttleControlEvents[eventName] = shuttleControlEvents[eventName];
         });
     }
 }

@@ -4,3 +4,17 @@ export const AVAILABILITY_TYPES = {
     UNAVAILABLE: 'UNAVAILABLE',
     IS_THE_SAME: 'IS_THE_SAME',
 };
+
+export const generateList = (shortcuts) => {
+    if (!shortcuts) {
+        return [];
+    }
+    let shortcutsList = [];
+    Object.keys(shortcuts).forEach(key => {
+        shortcutsList.push(shortcuts[key]);
+    });
+    shortcutsList.sort((a, b) => {
+        return a.category.localeCompare(b.category);
+    });
+    return shortcutsList;
+};
