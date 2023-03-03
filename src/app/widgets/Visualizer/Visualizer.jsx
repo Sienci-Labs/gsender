@@ -82,6 +82,7 @@ import styles from './index.styl';
 import { GRBL_ACTIVE_STATE_CHECK } from '../../../server/controllers/Grbl/constants';
 import WidgetConfig from '../WidgetConfig';
 import { isLaserMode } from '../../lib/laserMode';
+import RotaryStock from './RotaryStock';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -114,13 +115,19 @@ class Visualizer extends Component {
     machinePosition = {
         x: 0,
         y: 0,
-        z: 0
+        z: 0,
+        a: 0,
+        b: 0,
+        c: 0,
     };
 
     workPosition = {
         x: 0,
         y: 0,
-        z: 0
+        z: 0,
+        a: 0,
+        b: 0,
+        c: 0,
     };
 
     machineProfile = store.get('workspace.machineProfile');
@@ -230,6 +237,7 @@ class Visualizer extends Component {
         this.cuttingTool = null;
         this.laserPointer = null;
         this.cuttingPointer = null;
+        this.rotaryStock = null;
         this.limits = null;
         this.visualizer = null;
     }
@@ -362,6 +370,31 @@ class Visualizer extends Component {
                 this.laserPointer.visible = false;
                 this.cuttingPointer.visible = false;
             }
+        }
+
+        // TODO: Rotating the rotary stock needs to be updated from the
+        // a axis values, using y values currently to test it out
+        if (this.rotaryStock) {
+            this.rotateRotaryStock(this.machinePosition.y);
+
+            needUpdateScene = true;
+        }
+
+
+        // Update rotary stock object
+        if (prevProps.bbox.max.x !== this.props.bbox.max.x) {
+            const rotaryStock = this.group.getObjectByName('RotaryStockObject');
+
+            this.group.remove(rotaryStock);
+            this.rotaryStock = new RotaryStock({
+                height: this.props.bbox.max.x,
+                name: 'RotaryStockObject',
+            });
+
+            // this.rotaryStock.obj.rotateZ(this.getRadiansFromDegrees(90));
+            // this.rotaryStock.obj.position.set(0, 0, 0);
+
+            this.group.add(this.rotaryStock.obj);
         }
 
         { // Update position
@@ -1234,6 +1267,20 @@ class Visualizer extends Component {
             this.createCuttingPointer();
         }
 
+        { // Rotary Stock
+            this.rotaryStock = new RotaryStock({
+                name: 'RotaryStockObject',
+            });
+
+            // this.rotaryStock.obj.rotateZ(this.getRadiansFromDegrees(90));
+            // this.rotaryStock.obj.position.set(5, 15, 0);
+
+            this.group.add(this.rotaryStock.obj);
+
+            // Update the scene
+            this.updateScene();
+        }
+
 
         { // Limits
             const limits = _get(this.machineProfile, 'limits');
@@ -1460,6 +1507,20 @@ class Visualizer extends Component {
         });
 
         return controls;
+    }
+
+    getRadiansFromDegrees (val) {
+        return val * Math.PI / 180;
+    }
+
+    rotateRotaryStock (amount = 0) {
+        if (!this.rotaryStock) {
+            return;
+        }
+
+        const value = this.getRadiansFromDegrees(amount);
+
+        this.rotaryStock.obj.rotateY(value);
     }
 
     // Rotates the cutting tool around the z axis with a given rpm and an optional fps
@@ -1966,6 +2027,7 @@ export default connect((store) => {
     const machineCorner = _get(store, 'controller.settings.settings.$23');
     const { activeVisualizer } = store.visualizer;
     const isConnected = _get(store, 'connection.isConnected');
+    const bbox = _get(store, 'file.bbox');
     return {
         machinePosition,
         workPosition,
@@ -1976,6 +2038,7 @@ export default connect((store) => {
         homingFlag,
         machineCorner,
         activeVisualizer,
-        isConnected
+        isConnected,
+        bbox
     };
 }, null, null, { forwardRef: true })(Visualizer);
