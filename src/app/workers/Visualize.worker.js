@@ -21,8 +21,8 @@
  *
  */
 
-import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
+import Toolpath from '../lib/GcodeToolpath';
 
 onmessage = function({ data }) {
     const { content, visualizer, isLaser = false, shouldRenderSVG = false } = data;
