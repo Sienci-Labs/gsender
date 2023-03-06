@@ -11,7 +11,7 @@ class RotaryStock {
         radiusTop = 5,
         radiusBottom = 5,
         height = 30,
-        radialSegments = 20,
+        radialSegments = 15,
         heightSegments = 5,
         openEnded = false,
         name,
@@ -24,9 +24,8 @@ class RotaryStock {
         const material = new THREE.MeshStandardMaterial({ color: 'grey', wireframe: true });
         const cylinder = new THREE.Mesh(geometry, material);
 
-        group.rotateZ(-Math.PI / 2);
-
         group.name = name;
+        group.rotateZ(-Math.PI / 2);
         group.add(cylinder);
 
         this.obj = group;
