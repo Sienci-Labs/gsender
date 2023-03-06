@@ -533,15 +533,24 @@ export function* initialize() {
 
     controller.addListener('filetype', (type) => {
         if (type === FILE_TYPE.ROTARY) {
-            Confirm({
-                title: 'Rotary File Loaded',
-                content: 'This is a rotary axis file, would you like to update your $101 value now?',
-                confirmLabel: 'Update',
-                cancelLabel: 'Close',
-                onConfirm: () => {
-                    updateWorkspaceMode(type);
-                }
-            });
+            const workspaceMode = store.get('workspace.mode');
+
+            if (workspaceMode !== WORKSPACE_MODE.ROTARY) {
+                Confirm({
+                    title: 'Rotary File Loaded',
+                    content: 'GCode contains A-axis command, please enable Rotary Axis mode if your machine is equipped with a rotary axis.',
+                    confirmLabel: 'Enable Rotary Mode',
+                    cancelLabel: 'Close',
+                    onConfirm: () => {
+                        updateWorkspaceMode(WORKSPACE_MODE.ROTARY);
+                        Toaster.pop({
+                            msg: 'Rotary Mode Enabled',
+                            type: TOASTER_INFO,
+                        });
+                    }
+                });
+            }
+        }
         }
     });
 
