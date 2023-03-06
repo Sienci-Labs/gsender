@@ -382,22 +382,24 @@ class Visualizer extends Component {
 
 
         // Update rotary stock object
-        if (prevProps.bbox.delta.x !== this.props.bbox.delta.x) {
+        if (prevProps.bbox.max.x !== this.props.bbox.max.x) {
             const rotaryStock = this.group.getObjectByName('RotaryStockObject');
-            let height = this.props.bbox.delta.x;
+            let height = this.props.bbox.max.x;
 
-            // if (state.units === METRIC_UNITS && this.props.fileModal === IMPERIAL_UNITS) {
-            //     height = (this.props.bbox.delta.x * 25.4);
-            // }
+            if (state.units === METRIC_UNITS && this.props.fileModal === IMPERIAL_UNITS) {
+                height = (this.props.bbox.max.x * 25.4);
+            }
+
+            if (state.units === IMPERIAL_UNITS && this.props.fileModal === METRIC_UNITS) {
+                height = this.props.bbox.max.x / 25.4;
+            }
 
             this.group.remove(rotaryStock);
             this.rotaryStock = new RotaryStock({
                 height,
                 name: 'RotaryStockObject',
             });
-
-            // this.rotaryStock.obj.rotateZ(this.getRadiansFromDegrees(90));
-            // this.rotaryStock.obj.position.set(0, 0, 0);
+            this.updateRotaryStockPosition();
 
             this.group.add(this.rotaryStock.obj);
         }
@@ -1554,6 +1556,21 @@ class Visualizer extends Component {
         const z0 = wpoz - pivotPoint.z;
 
         this.cuttingTool.position.set(x0, y0, z0);
+    }
+
+    updateRotaryStockPosition() {
+        if (!this.rotaryStock) {
+            return;
+        }
+
+        const pivotPoint = this.pivotPoint.get();
+        // const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
+        // Use negative offset to keep rotary stock object at the center point
+        const x0 = -pivotPoint.x;
+        const y0 = -pivotPoint.y;
+        const z0 = -pivotPoint.z;
+
+        this.rotaryStock.obj.position.set(x0, y0, z0);
     }
 
     // Update cutting tool position
