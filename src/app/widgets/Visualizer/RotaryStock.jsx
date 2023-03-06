@@ -11,7 +11,7 @@ class RotaryStock {
         radiusTop = 5,
         radiusBottom = 5,
         height = 30,
-        radialSegments = 32,
+        radialSegments = 20,
         heightSegments = 5,
         openEnded = false,
         name,
