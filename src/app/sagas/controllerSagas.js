@@ -44,6 +44,7 @@ import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/work
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD, FILE_TYPE } from 'app/constants';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
+import { updateWorkspaceMode } from '../lib/rotary';
 
 
 export function* initialize() {
@@ -532,12 +533,15 @@ export function* initialize() {
 
     controller.addListener('filetype', (type) => {
         if (type === FILE_TYPE.ROTARY) {
-            Toaster.pop({
-                msg: 'Rotary File Loaded',
-                type: TOASTER_INFO,
+            Confirm({
+                title: 'Rotary File Loaded',
+                content: 'This is a rotary axis file, would you like to update your $101 value now?',
+                confirmLabel: 'Update',
+                cancelLabel: 'Close',
+                onConfirm: () => {
+                    updateWorkspaceMode(type);
+                }
             });
-
-            store.replace('workspace.rotaryAxisMode', true);
         }
     });
 
