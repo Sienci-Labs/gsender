@@ -374,8 +374,8 @@ class Visualizer extends Component {
 
         // TODO: Rotating the rotary stock needs to be updated from the
         // a axis values, using y values currently to test it out
-        if (this.rotaryStock) {
-            this.rotateRotaryStock(this.machinePosition.y);
+        if (this.rotaryStock && this.props.machinePosition.y !== prevProps.machinePosition.y) {
+            this.rotateRotaryStock(this.props.machinePosition.y);
 
             needUpdateScene = true;
         }
