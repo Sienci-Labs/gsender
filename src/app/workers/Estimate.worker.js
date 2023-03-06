@@ -39,6 +39,7 @@ onmessage = function({ data }) {
         invalidGcode: processor.vmState.invalidGcode,
         estimatedTime: processor.vmState.totalTime,
         bbox: processor.getBBox(),
-        fileModal: processor.vmState.units
+        fileModal: processor.vmState.units,
+        usedAxes: processor.vmState.usedAxes,
     });
 };
