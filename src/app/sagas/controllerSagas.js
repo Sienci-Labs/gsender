@@ -515,8 +515,8 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('grbl:iSready', (status) => {
-        pubsub.publish('grblExists:update', status);
+    controller.addListener('firmware:ready', (status) => {
+        pubsub.publish('firmware:update', status);
     });
 
     controller.addListener('error', (error) => {

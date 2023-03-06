@@ -140,6 +140,8 @@ export const WizardProvider = ({ children }) => {
                 };
                 if (stepIndex >= maxStepIndex) {
                     // reset values
+                    const element = document.getElementById('step-0-0');
+                    element.scrollIntoView();
                     setVisible(false);
                     setCompletedStep(-1);
                     setCompletedSubStep(-1);
@@ -162,6 +164,8 @@ export const WizardProvider = ({ children }) => {
             // close window on everything done.
             if (activeStep >= maxStepIndex) {
                 // reset values
+                const element = document.getElementById('step-0-0');
+                element.scrollIntoView();
                 setVisible(false);
                 setCompletedStep(-1);
                 setCompletedSubStep(-1);
@@ -249,10 +253,15 @@ export const WizardProvider = ({ children }) => {
             return substep.actions.length > 0 && substep.actionTaken === false;
         },
         cancelToolchange: () => {
+            const element = document.getElementById('step-0-0');
+            element.scrollIntoView();
+            setVisible(false);
+            setCompletedStep(-1);
+            setCompletedSubStep(-1);
             setActiveStep(0);
             setActiveSubstep(0);
+            setTitle('Wizard');
             setSteps([]);
-            setVisible(false);
             setStepCount(0);
             setMinimized(false);
 

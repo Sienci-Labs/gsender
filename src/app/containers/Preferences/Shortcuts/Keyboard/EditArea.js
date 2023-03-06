@@ -42,7 +42,7 @@ const triggerKeys = ['Meta', 'Alt', 'Shift', 'Control'];
 export default class EditArea extends Component {
     static propTypes = {
         shortcut: PropTypes.object,
-        shortcuts: PropTypes.array,
+        shortcuts: PropTypes.object,
         switchPages: PropTypes.func,
         edit: PropTypes.func,
         onClose: PropTypes.func,
@@ -146,8 +146,7 @@ export default class EditArea extends Component {
             return;
         }
 
-        const foundShortcut = this.props.shortcuts.filter(shortcut => shortcut.isActive).find(shortcut => shortcut.keys === keyCombo);
-
+        const foundShortcut = Object.entries(this.props.shortcuts).filter(([key, shortcut]) => shortcut.isActive).find(([key, shortcut]) => shortcut.keys === keyCombo);
         const keyState = {
             singleKey,
             keyCombo,
@@ -158,10 +157,10 @@ export default class EditArea extends Component {
         };
 
         if (foundShortcut) {
-            if (foundShortcut.keys !== this.props.shortcut.keys) {
+            if (foundShortcut[1].keys !== this.props.shortcut.keys) {
                 this.setState({
                     ...keyState,
-                    state: { available: false, error: true, message: `This shortcut is already in use by action "${foundShortcut.title}"` }
+                    state: { available: false, error: true, message: `This shortcut is already in use by action "${foundShortcut[1].title}"` }
                 });
             } else {
                 //If it found itself, return to original state

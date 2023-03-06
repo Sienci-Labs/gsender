@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import throttle from 'lodash/throttle';
+import _ from 'lodash';
 
 import store from 'app/store';
 import gamepad from 'app/lib/gamepad';
@@ -50,14 +51,18 @@ const ProfileModal = ({ onClose, onAdd }) => {
 
     const handleAddProfile = () => {
         const { profiles = [] } = store.get('workspace.gamepad');
-        const commandKeys = store.get('commandKeys', []);
+        const commandKeys = store.get('commandKeys', {});
+        const newShortcuts = _.cloneDeep(commandKeys);
+        Object.entries(newShortcuts).forEach(([key, shortcut]) => {
+            shortcut.keys = '';
+        });
 
         const newProfiles = [
             {
                 id: [gamepadInfo.id],
                 active: true,
                 profileName: customProfileName || gamepadInfo.id,
-                shortcuts: commandKeys.map((keyData) => ({ ...keyData, keys: '', command: keyData.cmd })),
+                shortcuts: newShortcuts,
                 icon: 'fas fa-gamepad'
             },
             ...profiles
