@@ -1245,9 +1245,9 @@ class GrblController {
                 }
 
 
-                const rotaryCommandsRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)/g;
-                const yAxisCommandsRegex = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)/g;
-                const containsACommands = rotaryCommandsRegex.test(gcode);
+                const aAxisCommandsRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)|A-(\d+\.\d+)|A-(\d+)/g;
+                const yAxisCommandsRegex = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)|Y-(\d+\.\d+)|Y-(\d+)/g;
+                const containsACommands = aAxisCommandsRegex.test(gcode);
                 const containsYCommands = yAxisCommandsRegex.test(gcode);
 
                 if (containsACommands && containsYCommands) {
@@ -1255,7 +1255,6 @@ class GrblController {
                     return;
                 } else if (containsACommands) {
                     this.emit('filetype', FILE_TYPE.ROTARY);
-                    log.debug('CONTAINS ROTARY COMMANDS');
                     // gcode = gcode.replaceAll('A', 'Y');
                 }
 
