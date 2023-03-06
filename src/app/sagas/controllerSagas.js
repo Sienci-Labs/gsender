@@ -42,10 +42,18 @@ import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
-import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD, FILE_TYPE } from 'app/constants';
+import {
+    RENDER_LOADING,
+    RENDER_RENDERED,
+    VISUALIZER_SECONDARY,
+    GRBL_ACTIVE_STATE_RUN,
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_HOLD,
+    FILE_TYPE,
+    WORKSPACE_MODE
+} from 'app/constants';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
-import { updateWorkspaceMode } from '../lib/rotary';
-
+import { updateWorkspaceMode } from 'app/lib/rotary';
 
 export function* initialize() {
     let visualizeWorker = null;
@@ -551,6 +559,16 @@ export function* initialize() {
                 });
             }
         }
+
+        if (type === FILE_TYPE.FOUR_AXIS) {
+            if (controller.type === 'Grbl') {
+                Confirm({
+                    title: '4 Axis File File Loaded',
+                    content: 'GCode file contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
+                    confirmLabel: null,
+                    cancelLabel: 'Close',
+                });
+            }
         }
     });
 
