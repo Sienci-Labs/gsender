@@ -47,7 +47,6 @@ const ConfirmationDialog = () => {
     useEffect(() => {
         pubsub.subscribe('dialog:new', (event, options) => {
             setTitle(options.title);
-            //setButtons(options.buttons);
             setContent(options.content);
             setOnClose(() => options.onClose);
             setOnConfirm(() => options.onConfirm);
@@ -69,28 +68,33 @@ const ConfirmationDialog = () => {
                     { content }
                 </div>
                 <div className={styles.confirmationDialogButtons}>
-                    <ConfirmationDialogButton
-                        onClick={() => {
-                            if (onClose !== null) {
-                                onClose();
-                            }
-                            return setShow(false);
-                        }}
-                        variant={DIALOG_CANCEL}
-                    >
-                        { cancelLabel }
-                    </ConfirmationDialogButton>
-                    <ConfirmationDialogButton
-                        onClick={() => {
-                            if (onConfirm !== null) {
-                                onConfirm();
-                            }
-                            return setShow(false);
-                        }}
-                        variant={DIALOG_CONFIRM}
-                    >
-                        { confirmLabel }
-                    </ConfirmationDialogButton>
+                    {cancelLabel && (
+                        <ConfirmationDialogButton
+                            onClick={() => {
+                                if (onClose !== null) {
+                                    onClose();
+                                }
+                                return setShow(false);
+                            }}
+                            variant={DIALOG_CANCEL}
+                        >
+                            { cancelLabel }
+                        </ConfirmationDialogButton>
+                    )}
+
+                    {confirmLabel && (
+                        <ConfirmationDialogButton
+                            onClick={() => {
+                                if (onConfirm !== null) {
+                                    onConfirm();
+                                }
+                                return setShow(false);
+                            }}
+                            variant={DIALOG_CONFIRM}
+                        >
+                            { confirmLabel }
+                        </ConfirmationDialogButton>
+                    )}
                 </div>
             </div>
         </div>
