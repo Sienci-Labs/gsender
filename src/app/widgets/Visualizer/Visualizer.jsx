@@ -382,12 +382,17 @@ class Visualizer extends Component {
 
 
         // Update rotary stock object
-        if (prevProps.bbox.max.x !== this.props.bbox.max.x) {
+        if (prevProps.bbox.delta.x !== this.props.bbox.delta.x) {
             const rotaryStock = this.group.getObjectByName('RotaryStockObject');
+            let height = this.props.bbox.delta.x;
+
+            // if (state.units === METRIC_UNITS && this.props.fileModal === IMPERIAL_UNITS) {
+            //     height = (this.props.bbox.delta.x * 25.4);
+            // }
 
             this.group.remove(rotaryStock);
             this.rotaryStock = new RotaryStock({
-                height: this.props.bbox.max.x,
+                height,
                 name: 'RotaryStockObject',
             });
 
@@ -2028,6 +2033,7 @@ export default connect((store) => {
     const { activeVisualizer } = store.visualizer;
     const isConnected = _get(store, 'connection.isConnected');
     const bbox = _get(store, 'file.bbox');
+    const fileModal = _get(store, 'file.fileModal');
     return {
         machinePosition,
         workPosition,
@@ -2039,6 +2045,7 @@ export default connect((store) => {
         machineCorner,
         activeVisualizer,
         isConnected,
-        bbox
+        bbox,
+        fileModal
     };
 }, null, null, { forwardRef: true })(Visualizer);
