@@ -1246,18 +1246,14 @@ class GrblController {
 
 
                 const rotaryCommandsRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)/g;
-                // const yAxisCommandsRegex = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)/g;
+                const yAxisCommandsRegex = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)/g;
                 const containsACommands = rotaryCommandsRegex.test(gcode);
-                // const containsYCommands = yAxisCommandsRegex.test(gcode);
+                const containsYCommands = yAxisCommandsRegex.test(gcode);
 
-                // if (containsACommands && containsYCommands) {
-                //     const message = 'Files with Both Y commands and A commands cannot run on grbl machines';
-                //     log.error(message);
-                //     callback(new Error(message));
-                //     return;
-                // }
-
-                if (containsACommands) {
+                if (containsACommands && containsYCommands) {
+                    this.emit('filetype', FILE_TYPE.FOUR_AXIS);
+                    return;
+                } else if (containsACommands) {
                     this.emit('filetype', FILE_TYPE.ROTARY);
                     log.debug('CONTAINS ROTARY COMMANDS');
                     // gcode = gcode.replaceAll('A', 'Y');

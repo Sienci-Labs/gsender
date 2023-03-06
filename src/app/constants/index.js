@@ -231,4 +231,5 @@ export const WORKSPACE_MODE = {
 export const FILE_TYPE = {
     DEFAULT: 'DEFAULT',
     ROTARY: 'ROTARY',
+    FOUR_AXIS: 'FOUR_AXIS'
 };
