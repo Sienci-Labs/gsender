@@ -117,19 +117,19 @@
 
 .icon-connecting {
   animation: spin 1s linear infinite;
-  background: #D97706;
+  background: #D97706 !important;
 }
 
 .icon-disconnected {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  //animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .icon-connected {
-  background: #059669;
+  background: #059669 !important;
 }
 
 .icon-error {
-  background: #EF4444;
+  background: #EF4444 !important;
 }
 
 .refreshButton {
@@ -250,6 +250,19 @@
 
 @media (max-width: 599px) {
   .NavbarConnection{
-    margin: auto;  
+    margin: auto;
+  }
+}
+
+.statusWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #4B5563;
+  height: 2.7rem;
+  width: 2.7rem;
+  border-radius: 5px;
+  i {
+    font-size: 1.4rem !important;
   }
 }

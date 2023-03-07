@@ -23,10 +23,11 @@
 
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import _, { find } from 'lodash';
+import _ from 'lodash';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
 import PortListing from './PortListing';
 import styles from './Index.styl';
+import StatusIndicator from './StatusIndicator';
 
 
 class NavbarConnection extends PureComponent {
@@ -72,13 +73,6 @@ class NavbarConnection extends PureComponent {
         });
     };
 
-    isPortInUse = (port) => {
-        const { state } = this.props;
-        port = port || state.port;
-        const o = find(state.ports, { port }) || {};
-        return !!(o.inuse);
-    };
-
     getConnectionStatusText = (connected, connecting, alertMessage,) => {
         if (connected) {
             return 'Connected';
@@ -89,28 +83,6 @@ class NavbarConnection extends PureComponent {
         }
         return 'Connect to Machine ▼';
     };
-
-    renderConnectionStatusIcon = (connected, connecting, alertMessage) => {
-        if (connected) {
-            return 'fa-check';
-        } else if (alertMessage) {
-            return 'fa-times';
-        } else if (connecting) {
-            return 'fa-spinner';
-        }
-        return 'fa-plug';
-    };
-
-    getIconState(connected, connecting, alertMessage) {
-        if (connected) {
-            return 'icon-connected';
-        } else if (alertMessage) {
-            return 'icon-error';
-        } else if (connecting) {
-            return 'icon-connecting';
-        }
-        return 'icon-disconnected';
-    }
 
     displayDropdown() {
         const { mobile, isActive } = this.state;
@@ -123,7 +95,7 @@ class NavbarConnection extends PureComponent {
         const { state, actions } = this.props;
         const { connected, ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
         const { isActive } = this.state;
-        const iconState = this.getIconState(connected, connecting, alertMessage);
+        //const iconState = this.getIconState(connected, connecting, alertMessage);
         const isMobile = window.visualViewport.width <= 599;
 
         return (
@@ -137,8 +109,9 @@ class NavbarConnection extends PureComponent {
                 onMouseLeave={actions.hideUnrecognizedDevices}
                 onTouchEnd={actions.handleRefreshPorts}
             >
-                <div className={`${styles.NavbarConnectionIcon} ${styles[iconState]}`}>
-                    <i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />
+                <div>
+                    { /*<i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />*/ }
+                    <StatusIndicator {...{ connected, connecting, alertMessage }} />
                 </div>
                 <div>
                     <div className="dropdown-label" id="connection-selection-list">
