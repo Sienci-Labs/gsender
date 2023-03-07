@@ -52,7 +52,7 @@ class ControlArea extends Component {
 
     subscribe() {
         const tokens = [
-            pubsub.subscribe('grblExists:update', (msg, value) => {
+            pubsub.subscribe('firmware:update', (msg, value) => {
                 this.setState({
                     grblExists: value
                 });

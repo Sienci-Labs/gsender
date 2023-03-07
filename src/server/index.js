@@ -125,6 +125,14 @@ const createServer = (options, callback) => {
         }
     }
 
+    { // kiosk mode
+        const kiosk = options.kiosk || config.get('kiosk', false);
+
+        if (kiosk) {
+            set(settings, 'kiosk', kiosk);
+        }
+    }
+
     let { backlog, port = 0, host } = options;
 
     //If headless setting is ON, change to correct port and IP

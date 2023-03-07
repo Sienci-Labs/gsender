@@ -492,7 +492,6 @@ class LocationWidget extends PureComponent {
 
     shuttleControlEvents = {
         ZERO_X_AXIS: {
-            id: 23,
             title: 'Zero X Axis',
             keys: ['shift', 'w'].join('+'),
             cmd: 'ZERO_X_AXIS',
@@ -503,7 +502,6 @@ class LocationWidget extends PureComponent {
             callback: this.shuttleControlFunctions.ZERO_AXIS
         },
         ZERO_Y_AXIS: {
-            id: 24,
             title: 'Zero Y Axis',
             keys: ['shift', 'e'].join('+'),
             cmd: 'ZERO_Y_AXIS',
@@ -514,7 +512,6 @@ class LocationWidget extends PureComponent {
             callback: this.shuttleControlFunctions.ZERO_AXIS
         },
         ZERO_Z_AXIS: {
-            id: 25,
             title: 'Zero Z Axis',
             keys: ['shift', 'r'].join('+'),
             cmd: 'ZERO_Z_AXIS',
@@ -536,7 +533,6 @@ class LocationWidget extends PureComponent {
             callback: this.shuttleControlFunctions.ZERO_AXIS
         },
         ZERO_ALL_AXIS: {
-            id: 26,
             title: 'Zero All',
             keys: ['shift', 'q'].join('+'),
             cmd: 'ZERO_ALL_AXIS',
@@ -558,7 +554,6 @@ class LocationWidget extends PureComponent {
             callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
         },
         GO_TO_X_AXIS_ZERO: {
-            id: 27,
             title: 'Go to X Zero',
             keys: ['shift', 's'].join('+'),
             cmd: 'GO_TO_X_AXIS_ZERO',
@@ -569,7 +564,6 @@ class LocationWidget extends PureComponent {
             callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
         },
         GO_TO_Y_AXIS_ZERO: {
-            id: 28,
             title: 'Go to Y Zero',
             keys: ['shift', 'd'].join('+'),
             cmd: 'GO_TO_Y_AXIS_ZERO',
@@ -580,7 +574,6 @@ class LocationWidget extends PureComponent {
             callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
         },
         GO_TO_Z_AXIS_ZERO: {
-            id: 29,
             title: 'Go to Z Zero',
             keys: ['shift', 'f'].join('+'),
             cmd: 'GO_TO_Z_AXIS_ZERO',
@@ -591,7 +584,6 @@ class LocationWidget extends PureComponent {
             callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
         },
         GO_TO_XY_AXIS_ZERO: {
-            id: 30,
             title: 'Go to XY Zero',
             keys: ['shift', 'a'].join('+'),
             cmd: 'GO_TO_XY_AXIS_ZERO',

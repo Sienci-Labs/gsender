@@ -238,7 +238,7 @@ class NavbarConnectionWidget extends PureComponent {
             hasReconnected: false,
             alertMessage: '',
             showUnrecognized: false,
-            grblExists: false,
+            grblExists: true,
         };
     }
 
@@ -345,7 +345,7 @@ class NavbarConnectionWidget extends PureComponent {
                     baudrate: value
                 });
             }),
-            pubsub.subscribe('grblExists:update', (msg, value) => {
+            pubsub.subscribe('firmware:update', (msg, value) => {
                 this.setState({
                     grblExists: value
                 });

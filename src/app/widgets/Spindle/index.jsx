@@ -63,7 +63,6 @@ class SpindleWidget extends PureComponent {
 
     shuttleControlEvents = {
         TOGGLE_SPINDLE_LASER_MODE: {
-            id: 51,
             title: 'Toggle Mode',
             keys: '',
             cmd: 'TOGGLE_SPINDLE_LASER_MODE',
@@ -75,7 +74,6 @@ class SpindleWidget extends PureComponent {
             }
         },
         CW_LASER_ON: {
-            id: 52,
             title: 'CW / Laser On',
             keys: '',
             cmd: 'CW_LASER_ON',
@@ -89,7 +87,6 @@ class SpindleWidget extends PureComponent {
             }
         },
         CCW_LASER_TEST: {
-            id: 53,
             title: 'CCW / Laser Test',
             keys: '',
             cmd: 'CCW_LASER_TEST',
@@ -103,7 +100,6 @@ class SpindleWidget extends PureComponent {
             }
         },
         STOP_LASER_OFF: {
-            id: 54,
             title: 'Stop / Laser Off',
             keys: '',
             cmd: 'STOP_LASER_OFF',
@@ -142,22 +138,14 @@ class SpindleWidget extends PureComponent {
             }
         },
         sendM3: () => {
-            const { spindleSpeed, mode } = this.state;
+            const { spindleSpeed } = this.state;
             this.isSpindleOn = true;
-            if (mode === LASER_MODE || spindleSpeed === 0) {
-                controller.command('gcode', 'M3');
-            } else {
-                controller.command('gcode', `M3 S${spindleSpeed}`);
-            }
+            controller.command('gcode', `M3 S${spindleSpeed}`);
         },
         sendM4: () => {
-            const { spindleSpeed, mode } = this.state;
+            const { spindleSpeed } = this.state;
             this.isSpindleOn = true;
-            if (mode === LASER_MODE || spindleSpeed === 0) {
-                controller.command('gcode', 'M4');
-            } else {
-                controller.command('gcode', `M4 S${spindleSpeed}`);
-            }
+            controller.command('gcode', `M4 S${spindleSpeed}`);
         },
         sendM5: () => {
             this.isLaserOn = false;

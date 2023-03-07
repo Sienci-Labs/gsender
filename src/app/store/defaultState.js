@@ -367,7 +367,7 @@ const defaultState = {
             showLineWarnings: false,
         }
     },
-    commandKeys: []
+    commandKeys: {}
 };
 
 export default defaultState;

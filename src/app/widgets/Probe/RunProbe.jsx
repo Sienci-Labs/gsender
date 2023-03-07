@@ -48,7 +48,6 @@ class RunProbe extends PureComponent {
 
     shuttleControlEvents = {
         START_PROBE: {
-            id: 50,
             title: 'Start Probing',
             keys: '',
             cmd: 'START_PROBE',
@@ -60,7 +59,6 @@ class RunProbe extends PureComponent {
             },
         },
         CONFIRM_PROBE: {
-            id: 49,
             title: 'Confirm Probe',
             keys: '',
             cmd: 'CONFIRM_PROBE',
@@ -99,10 +97,6 @@ class RunProbe extends PureComponent {
 
     startProbe = () => {
         const { actions } = this.props;
-        const { connectionMade } = this.state;
-        if (!connectionMade) {
-            return;
-        }
 
         const probeCommands = actions.generateProbeCommands();
 
@@ -186,9 +180,13 @@ class RunProbe extends PureComponent {
 
         const probeActive = actions.returnProbeConnectivity();
         const { connectionMade } = this.state;
+        const { connectivityTest } = state;
 
         return (
-            <Modal disableOverlayClick onClose={actions.closeModal} show={show} className={styles.modalOverride}>
+            <Modal
+                disableOverlay onClose={actions.closeModal} show={show}
+                className={styles.modalOverride}
+            >
                 <Modal.Header className={styles.modalHeader}>
                     <Modal.Title>{i18n._(`Probe - ${probeCommand.id}`)}</Modal.Title>
                 </Modal.Header>
@@ -207,11 +205,11 @@ class RunProbe extends PureComponent {
                             </div>
                             <FunctionButton
                                 primary
-                                disabled={!connectionMade}
+                                disabled={!connectionMade && connectivityTest}
                                 onClick={this.startProbe}
                             >
                                 {
-                                    !connectionMade ? 'Waiting on probe circuit confirmation...' : ' Start Probe'
+                                    connectionMade || !connectivityTest ? 'Start Probe' : 'Waiting on probe circuit confirmation...'
                                 }
                             </FunctionButton>
                         </div>

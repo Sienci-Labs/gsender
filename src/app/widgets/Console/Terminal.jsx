@@ -42,7 +42,6 @@ import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import color from 'cli-color';
 import { RED, ALARM_RED } from './variables';
 
-import History from './History';
 import styles from './index.styl';
 import { UPDATE_TERMINAL_HISTORY } from '../../actions/controllerActions';
 
@@ -74,7 +73,7 @@ class TerminalWrapper extends PureComponent {
 
     prompt = ' ';
 
-    history = new History(1000);
+    newHistory = [];
 
     verticalScrollbar = null;
 
@@ -265,11 +264,20 @@ class TerminalWrapper extends PureComponent {
     // updates the terminal history stored in redux for the current session
     // includes every line written to the terminal
     updateTerminalHistory = (line) => {
+        this.newHistory.push(line);
+        if (this.newHistory.length === MAX_TERMINAL_INPUT_ARRAY_SIZE) {
+            this.newHistory.shift();
+        }
+        this.pushUpdatedTerminalHistory();
+    }
+
+    pushUpdatedTerminalHistory = debounce(() => {
         reduxStore.dispatch({
             type: UPDATE_TERMINAL_HISTORY,
-            payload: line
+            payload: this.newHistory
         });
-    }
+        this.newHistory = [];
+    }, 1000);
 
     handleCopyLines = async () => {
         this.term.selectAll();
