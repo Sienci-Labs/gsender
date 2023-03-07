@@ -95,7 +95,6 @@ class NavbarConnection extends PureComponent {
         const { state, actions } = this.props;
         const { connected, ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
         const { isActive } = this.state;
-        //const iconState = this.getIconState(connected, connecting, alertMessage);
         const isMobile = window.visualViewport.width <= 599;
 
         return (
@@ -110,7 +109,6 @@ class NavbarConnection extends PureComponent {
                 onTouchEnd={actions.handleRefreshPorts}
             >
                 <div>
-                    { /*<i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />*/ }
                     <StatusIndicator {...{ connected, connecting, alertMessage }} />
                 </div>
                 <div>
