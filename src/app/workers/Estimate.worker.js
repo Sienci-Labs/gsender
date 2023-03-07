@@ -22,12 +22,27 @@
  */
 
 import { GCodeProcessor } from '../lib/gcodeProcessor/GCodeProcessor';
+import { FILE_TYPE } from '../constants';
 
 onmessage = function({ data }) {
     const { content, name, size, feedArray = null, accelArray = null } = data;
 
     const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z', 'a'], maxFeed: feedArray, acceleration: accelArray });
     processor.process(content);
+
+    const fileTypes = {
+        [FILE_TYPE.DEFAULT]: FILE_TYPE.DEFAULT,
+        [FILE_TYPE.ROTARY]: FILE_TYPE.ROTARY,
+        [FILE_TYPE.FOUR_AXIS]: FILE_TYPE.FOUR_AXIS,
+    };
+
+    let fileType = FILE_TYPE.DEFAULT;
+
+    if (processor.vmState.usedAxes.has('Y') && processor.vmState.usedAxes.has('A')) {
+        fileType = fileTypes[FILE_TYPE.FOUR_AXIS];
+    } else if (processor.vmState.usedAxes.has('A')) {
+        fileType = fileTypes[FILE_TYPE.ROTARY];
+    }
 
     postMessage({
         name,
@@ -41,5 +56,6 @@ onmessage = function({ data }) {
         bbox: processor.getBBox(),
         fileModal: processor.vmState.units,
         usedAxes: processor.vmState.usedAxes,
+        fileType,
     });
 };
