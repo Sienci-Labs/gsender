@@ -40,7 +40,8 @@ import {
     METRIC_UNITS,
     RENDER_RENDERED,
     VISUALIZER_PRIMARY,
-    VISUALIZER_SECONDARY
+    VISUALIZER_SECONDARY,
+    FILE_TYPE
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/CombinedCamera';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -376,32 +377,20 @@ class Visualizer extends Component {
         // a axis values, using y values currently to test it out
         if (this.rotaryStock && this.props.machinePosition.y !== prevProps.machinePosition.y) {
             this.rotateRotaryStock(this.props.machinePosition.y);
-
             needUpdateScene = true;
         }
 
+        const fileType = this.props.fileType;
+        const aAxisTypes = [FILE_TYPE.ROTARY, FILE_TYPE.FOUR_AXIS];
 
-        // Update rotary stock object
-        if (prevProps.bbox.max.x !== this.props.bbox.max.x) {
-            const rotaryStock = this.group.getObjectByName('RotaryStockObject');
-            let height = this.props.bbox.max.x;
-
-            if (state.units === METRIC_UNITS && this.props.fileModal === IMPERIAL_UNITS) {
-                height = (this.props.bbox.max.x * 25.4);
+        //Only setup rotary stock object if our file contains a-axis values, can be hidden otherwise
+        if (aAxisTypes.includes(fileType)) {
+            // Update rotary stock object
+            if (prevProps.bbox.max.x !== this.props.bbox.max.x) {
+                this.updateRotaryStock();
             }
-
-            if (state.units === IMPERIAL_UNITS && this.props.fileModal === METRIC_UNITS) {
-                height = this.props.bbox.max.x / 25.4;
-            }
-
-            this.group.remove(rotaryStock);
-            this.rotaryStock = new RotaryStock({
-                height,
-                name: 'RotaryStockObject',
-            });
-            this.updateRotaryStockPosition();
-
-            this.group.add(this.rotaryStock.obj);
+        } else {
+            this.rotaryStock.obj.visible = false;
         }
 
         { // Update position
@@ -1277,10 +1266,8 @@ class Visualizer extends Component {
         { // Rotary Stock
             this.rotaryStock = new RotaryStock({
                 name: 'RotaryStockObject',
+                visible: false,
             });
-
-            // this.rotaryStock.obj.rotateZ(this.getRadiansFromDegrees(90));
-            // this.rotaryStock.obj.position.set(5, 15, 0);
 
             this.group.add(this.rotaryStock.obj);
 
@@ -1514,6 +1501,30 @@ class Visualizer extends Component {
         });
 
         return controls;
+    }
+
+    updateRotaryStock = () => {
+        const { state, bbox } = this.props;
+        const rotaryStock = this.group.getObjectByName('RotaryStockObject');
+        let height = bbox.max.x;
+
+        if (state.units === METRIC_UNITS && this.props.fileModal === IMPERIAL_UNITS) {
+            height *= 25.4;
+        }
+
+        if (state.units === IMPERIAL_UNITS && this.props.fileModal === METRIC_UNITS) {
+            height /= 25.4;
+        }
+
+        this.group.remove(rotaryStock);
+        this.rotaryStock = new RotaryStock({
+            height,
+            name: 'RotaryStockObject',
+            visible: true,
+        });
+        this.updateRotaryStockPosition();
+
+        this.group.add(this.rotaryStock.obj);
     }
 
     getRadiansFromDegrees (val) {
@@ -2051,6 +2062,8 @@ export default connect((store) => {
     const isConnected = _get(store, 'connection.isConnected');
     const bbox = _get(store, 'file.bbox');
     const fileModal = _get(store, 'file.fileModal');
+    const fileType = _get(store, 'file.fileType');
+
     return {
         machinePosition,
         workPosition,
@@ -2063,6 +2076,7 @@ export default connect((store) => {
         activeVisualizer,
         isConnected,
         bbox,
-        fileModal
+        fileModal,
+        fileType
     };
 }, null, null, { forwardRef: true })(Visualizer);
