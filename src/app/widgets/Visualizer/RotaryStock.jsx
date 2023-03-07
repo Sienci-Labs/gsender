@@ -15,6 +15,7 @@ class RotaryStock {
         heightSegments = 5,
         openEnded = false,
         name,
+        visible = true,
     } = {}) => {
         const group = new THREE.Group();
 
@@ -25,6 +26,7 @@ class RotaryStock {
         const cylinder = new THREE.Mesh(geometry, material);
 
         group.name = name;
+        group.visible = visible;
         group.rotateZ(-Math.PI / 2);
         group.add(cylinder);
 
@@ -33,10 +35,6 @@ class RotaryStock {
 
     updateSize = (height = 100) => {
         this.createObject({ height });
-    }
-
-    dispose () {
-        //TODO: Properly dipose of three.js object to free up memory
     }
 }
 
