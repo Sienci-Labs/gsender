@@ -3,16 +3,21 @@ import reduxStore from 'app/store/redux';
 import * as fileActions from 'app/actions/fileInfoActions';
 import store from 'app/store';
 import { RENDER_RENDERING } from 'app/constants';
+import { isNumber } from 'lodash';
 
 export const visualizeResponse = ({ data }) => {
-    pubsub.publish('file:load', data);
-    // Visualizer Rendering
-    reduxStore.dispatch({
-        type: fileActions.UPDATE_FILE_RENDER_STATE,
-        payload: {
-            state: RENDER_RENDERING
-        }
-    });
+    if (isNumber(data)) {
+        pubsub.publish('toolpath:progress', data);
+    } else {
+        pubsub.publish('file:load', data);
+        // Visualizer Rendering
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_RENDER_STATE,
+            payload: {
+                state: RENDER_RENDERING
+            }
+        });
+    }
 };
 
 

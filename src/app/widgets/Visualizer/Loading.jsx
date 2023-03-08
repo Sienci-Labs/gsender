@@ -21,17 +21,43 @@
  *
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import pubsub from 'pubsub-js';
+import ProgressBar from 'react-bootstrap/ProgressBar';
 import i18n from 'app/lib/i18n';
 import styles from './loader.styl';
 
-export default () => (
-    <div className={styles.loader}>
-        <div className={styles.loaderIcon}>
-            <i className="fa fa-spinner fa-spin" />
-        </div>
-        <div className={styles.loaderText}>
-            {i18n._('Loading...')}
-        </div>
-    </div>
-);
+const Loading = () => {
+    const [progress, setProgress] = useState(0);
+
+    const subscribe = () => {
+        const tokens = [
+            pubsub.subscribe('toolpath:progress', (msg, progress) => {
+                setProgress(progress);
+            })
+        ];
+        return tokens;
+    };
+
+    useEffect(() => {
+        const token = subscribe();
+        return () => {
+            pubsub.unsubscribe(token);
+        };
+    }, []);
+
+    return (
+        <>
+            <div className={styles.loader}>
+                <div className={styles.loaderBar}>
+                    <ProgressBar striped now={progress} label={`${progress}%`} />
+                </div>
+                <div className={styles.loaderText}>
+                    {i18n._('Loading...')}
+                </div>
+            </div>
+        </>
+    );
+};
+
+export default Loading;
