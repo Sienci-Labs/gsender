@@ -53,33 +53,10 @@ class NavbarConnectionWidget extends PureComponent {
     state = this.getInitialState();
 
     actions = {
-        toggleFullscreen: () => {
-            const { minimized, isFullscreen } = this.state;
-            this.setState(state => ({
-                minimized: isFullscreen ? minimized : false,
-                isFullscreen: !isFullscreen
-            }));
-        },
         toggleMinimized: () => {
             const { minimized } = this.state;
             this.setState(state => ({
                 minimized: !minimized
-            }));
-        },
-        clearAlert: () => {
-            this.setState(state => ({
-                alertMessage: ''
-            }));
-        },
-        changeController: (controllerType) => {
-            this.setState(state => ({
-                controllerType: controllerType
-            }));
-        },
-        onChangePortOption: (option) => {
-            this.setState(state => ({
-                alertMessage: '',
-                port: option.value
             }));
         },
         onClickFirmwareButton: (selectedFirmware) => {
@@ -87,6 +64,7 @@ class NavbarConnectionWidget extends PureComponent {
                 alertMessage: '',
                 controllerType: selectedFirmware
             }));
+            this.config.set('controller.type', selectedFirmware);
         },
         onClickPortListing: (selectedPort) => {
             this.setState(state => ({
@@ -97,24 +75,6 @@ class NavbarConnectionWidget extends PureComponent {
                 this.openPort(port, controllerType, { baudrate: baudrate });
             });
         },
-        toggleAutoReconnect: (event) => {
-            const checked = event.target.checked;
-            this.setState(state => ({
-                autoReconnect: checked
-            }));
-        },
-        toggleHardwareFlowControl: (event) => {
-            const checked = event.target.checked;
-            this.setState(state => ({
-                connection: {
-                    ...state.connection,
-                    serial: {
-                        ...state.connection.serial,
-                        rtscts: checked
-                    }
-                }
-            }));
-        },
         toggleShowUnrecognized: () => {
             const { showUnrecognized } = this.state;
             this.setState({
@@ -123,10 +83,6 @@ class NavbarConnectionWidget extends PureComponent {
         },
         handleRefreshPorts: (event) => {
             this.refreshPorts();
-        },
-        handleOpenPort: (event) => {
-            const { port, baudrate, controllerType } = this.state;
-            this.openPort(port, controllerType, { baudrate: baudrate });
         },
         handleClosePort: (event) => {
             const { port } = this.state;

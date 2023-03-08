@@ -28,6 +28,7 @@ import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevice
 import PortListing from './PortListing';
 import styles from './Index.styl';
 import StatusIndicator from './StatusIndicator';
+import FirmwareSelector from './FirmwareSelector';
 
 
 class NavbarConnection extends PureComponent {
@@ -135,10 +136,12 @@ class NavbarConnection extends PureComponent {
                 }
                 <div style={isMobile ? { display: isActive ? 'block' : 'none' } : null} className={styles.NavbarConnectionDropdownList}>
                     {
+                        !connected && (
                         <>
-                            <button style={{ color: 'black' }} onClick={() => actions.onClickFirmwareButton('Grbl')}>GRBL</button>
-                            <button style={{ color: 'black' }} onClick={() => actions.onClickFirmwareButton('grblHAL')}>grblHAL</button>
+                            <h5>Firmware</h5>
+                            <FirmwareSelector options={['Grbl', 'grblHAL']} selectedFirmware={controllerType} handleSelect={actions.onClickFirmwareButton}/>
                         </>
+                        )
                     }
                     {
                         !connected && <h5>Recognized Devices</h5>
