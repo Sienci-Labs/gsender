@@ -41,7 +41,7 @@ export const GRBLHAL_REALTIME_COMMANDS = {
     FEED_HOLD: '\x82',
     STATUS_REPORT: '\x80',
     CMD_RESET: '\x18',
-    PARSER_STATE_REPORT: '\x83', // $G equivalent
+    PARSER_STATE_REPORT: '$G', // $G equivalent
     COMPLETE_REALTIME_REPORT: '\x87',
     VIRTUAL_STOP_TOGGLE: '\x88',
     TOOL_CHANGE_ACK: '\xA3',

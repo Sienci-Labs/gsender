@@ -809,7 +809,7 @@ class GrblHalController {
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
-                this.connection.write(GRBLHAL_REALTIME_COMMANDS.PARSER_STATE_REPORT); // $G equivalent
+                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.PARSER_STATE_REPORT}\n`); // $G equivalent
             }
         }, 500);
 
@@ -838,14 +838,12 @@ class GrblHalController {
             if (this.settings !== this.runner.settings) {
                 this.settings = this.runner.settings;
                 this.emit('controller:settings', GRBLHAL, this.settings);
-                this.emit('Grbl:settings', this.settings); // Backward compatibility
             }
 
             // Grbl state
             if (this.state !== this.runner.state) {
                 this.state = this.runner.state;
                 this.emit('controller:state', GRBLHAL, this.state);
-                this.emit('Grbl:state', this.state); // Backward compatibility
             }
 
             // Check the ready flag
@@ -1158,12 +1156,10 @@ class GrblHalController {
         if (!_.isEmpty(this.settings)) {
             // controller settings
             socket.emit('controller:settings', GRBLHAL, this.settings);
-            socket.emit('Grbl:settings', this.settings); // Backward compatibility
         }
         if (!_.isEmpty(this.state)) {
             // controller state
             socket.emit('controller:state', GRBLHAL, this.state);
-            socket.emit('Grbl:state', this.state); // Backward compatibility
         }
         if (this.feeder) {
             // feeder status
@@ -1172,7 +1168,6 @@ class GrblHalController {
         if (this.sender) {
             // sender status
             socket.emit('sender:status', this.sender.toJSON());
-            log.info('Emitting Sender');
         }
         if (this.workflow) {
             // workflow state
