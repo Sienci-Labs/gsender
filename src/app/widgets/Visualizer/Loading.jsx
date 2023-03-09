@@ -23,9 +23,10 @@
 
 import React, { useState, useEffect } from 'react';
 import pubsub from 'pubsub-js';
-import ProgressBar from 'react-bootstrap/ProgressBar';
 import i18n from 'app/lib/i18n';
 import styles from './loader.styl';
+import bitImage from './images/dustbit11.png';
+import bitEffect from './images/effect.png';
 
 const Loading = () => {
     const [progress, setProgress] = useState(0);
@@ -47,16 +48,32 @@ const Loading = () => {
     }, []);
 
     return (
-        <>
+        <div className={styles.loaderWrapper}>
+            <div className={styles.bitContainer}>
+                <div>
+                    <img src={bitEffect} width="33px" height="60px" alt="" className={styles.bitEffect} />
+                    <img src={bitImage} width="26px" height="60px" alt="" className={styles.bit} />
+                </div>
+            </div>
             <div className={styles.loader}>
                 <div className={styles.loaderBar}>
-                    <ProgressBar striped now={progress} label={`${progress}%`} />
+                    <div className="progress" style={{ marginBottom: '0px' }}>
+                        <div
+                            className="progress-bar progress-bar-info progress-bar-striped"
+                            role="progressbar"
+                            aria-valuenow={progress}
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            style={{ width: `${progress}%` }}
+                        />
+                    </div>
+                    <strong className="justify-content-center d-flex position-absolute w-100">{`${progress}%`}</strong>
                 </div>
                 <div className={styles.loaderText}>
                     {i18n._('Loading...')}
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
