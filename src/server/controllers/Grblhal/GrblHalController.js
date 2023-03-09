@@ -809,7 +809,7 @@ class GrblHalController {
                 this.actionMask.queryParserState.state = true;
                 this.actionMask.queryParserState.reply = false;
                 this.actionTime.queryParserState = now;
-                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.PARSER_STATE_REPORT}\n`); // $G equivalent
+                this.connection.write(`${GRBLHAL_REALTIME_COMMANDS.PARSER_STATE_REPORT}`); // $G equivalent
             }
         }, 500);
 

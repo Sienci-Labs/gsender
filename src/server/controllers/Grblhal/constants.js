@@ -39,9 +39,9 @@ export const GRBL_HAL_ACTIVE_STATE_CHECK = 'Check';
 export const GRBLHAL_REALTIME_COMMANDS = {
     CYCLE_START: '\x81',
     FEED_HOLD: '\x82',
-    STATUS_REPORT: '\x80',
+    STATUS_REPORT: '?',
     CMD_RESET: '\x18',
-    PARSER_STATE_REPORT: '$G', // $G equivalent
+    PARSER_STATE_REPORT: '$G\n', // $G equivalent
     COMPLETE_REALTIME_REPORT: '\x87',
     VIRTUAL_STOP_TOGGLE: '\x88',
     TOOL_CHANGE_ACK: '\xA3',
