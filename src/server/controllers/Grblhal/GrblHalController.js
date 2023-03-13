@@ -721,6 +721,11 @@ class GrblHalController {
             }
         });
 
+        this.runner.on('info', (res) => {
+            this.emit('serialport:read', res.raw);
+            this.emit('grblHal:info', res);
+        });
+
         this.runner.on('startup', (res) => {
             this.emit('serialport:read', res.raw);
 
