@@ -100,8 +100,7 @@ class Controller {
         'firmware:ready': [],
         'sender:M0M1': [],
         'ip:list': [],
-        'wizard:next': [],
-        'info': []
+        'wizard:next': []
     };
 
     context = {
