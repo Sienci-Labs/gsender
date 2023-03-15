@@ -1,10 +1,9 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
-
 import Modal from 'app/components/Modal';
-import { GRBLHAL, GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
+import { GRBL_ACTIVE_STATE_IDLE, GRBLHAL } from 'app/constants';
 import store from 'app/store';
 import libController from 'app/lib/controller';
 import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
@@ -15,8 +14,15 @@ import { GRBL_HAL_SETTINGS } from 'server/controllers/Grblhal/constants';
 
 import SettingsArea from './components/Settings';
 import ActionArea from './components/Actions';
-import { FirmwareContext, controllerSettingsLoaded, addControllerEvents, removeControllerEvents } from './utils';
+import { addControllerEvents, controllerSettingsLoaded, FirmwareContext, removeControllerEvents } from './utils';
 import styles from './index.styl';
+
+const getFilteredEEPROM = (settings, eeprom = {}) => {
+    const existingSettings = Object.keys(eeprom);
+    return settings
+        .filter((item) => existingSettings.includes(item.setting))
+        .map((item) => ({ ...item, value: Object.keys(eeprom).length ? eeprom[item.setting] : 0 }));
+};
 
 const Firmware = ({ modalClose }) => {
     const isConnected = useSelector(store => get(store, 'connection.isConnected'));
@@ -26,12 +32,13 @@ const Firmware = ({ modalClose }) => {
     const SETTINGS = controllerType === GRBLHAL ? GRBL_HAL_SETTINGS : GRBL_SETTINGS;
     const [initiateFlashing, setInitiateFlashing] = useState(false);
     const [shouldRestoreDefault, setShouldRestoreDefault] = useState(false);
-    const [settings, setSettings] = useState(SETTINGS.map(item => ({ ...item, value: eeprom ? eeprom[item.setting] : 0 })));
+    const [settings, setSettings] = useState(getFilteredEEPROM(SETTINGS, eeprom));
     const [filterText, setFilterText] = useState('');
     const [isFlashing, setIsFlashing] = useState(false);
     const [controller, setController] = useState(libController);
     const [settingsToApply, setSettingsToApply] = useState(false);
     const [machineProfile, setMachineProfile] = useState(store.get('workspace.machineProfile'));
+
 
     useEffect(() => {
         addControllerEvents(controllerEvents);
@@ -46,7 +53,7 @@ const Firmware = ({ modalClose }) => {
     }, [libController]);
 
     useEffect(() => {
-        setSettings(SETTINGS.map(item => ({ ...item, value: eeprom ? eeprom[item.setting] : 0 })));
+        setSettings(getFilteredEEPROM(SETTINGS, eeprom));
     }, [eeprom]);
 
     const controllerEvents = {

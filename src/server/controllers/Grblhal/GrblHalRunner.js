@@ -94,6 +94,7 @@ class GrblHalRunner extends events.EventEmitter {
 
     parse(data) {
         data = ('' + data).replace(/\s+$/, '');
+        console.log(data);
         if (!data) {
             log.warn('Empty result parsed from GrlbHalLineParser');
             return;
