@@ -42,6 +42,9 @@ onmessage = function({ data }) {
     let SVGVertices = [];
     let paths = [];
     let currentMotion = '';
+    let progress = 0;
+    let currentLines = 0;
+    let totalLines = (content.match(/\n/g) || []).length;
 
     /**
      * Updates local state with any spindle changes in line
@@ -251,47 +254,56 @@ onmessage = function({ data }) {
         addArcCurve
     });
 
+    toolpath
+        .loadFromString(content, (line, index) => {
+            const vertexIndex = vertices.length / 3;
+            let spindleValues = {};
 
-    toolpath.loadFromStringSync(content, (line, index) => {
-        const vertexIndex = vertices.length / 3;
-        let spindleValues = {};
+            frames.push(vertexIndex);
 
-        frames.push(vertexIndex);
+            if (isLaser) {
+                updateSpindleStateFromLine(line);
+                //console.log(`Spindle: ${spindleOn} - ${line.line}`);
+                spindleValues = {
+                    spindleOn,
+                    spindleSpeed
+                };
 
-        if (isLaser) {
-            updateSpindleStateFromLine(line);
-            //console.log(`Spindle: ${spindleOn} - ${line.line}`);
-            spindleValues = {
-                spindleOn,
-                spindleSpeed
+                spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
+            }
+        })
+        .on('data', (data) => {
+            currentLines++;
+            const newProgress = Math.floor(currentLines / totalLines * 100);
+            if (newProgress !== progress) {
+                progress = newProgress;
+                postMessage(progress);
+            }
+        })
+        .on('end', () => {
+            let tFrames = new Uint32Array(frames);
+            let tVertices = new Float32Array(vertices);
+
+            const message = {
+                vertices: tVertices,
+                colors,
+                frames: tFrames,
+                visualizer,
             };
 
-            spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
-        }
-    });
+            // create path for the last motion
+            if (shouldRenderSVG) {
+                createPath(currentMotion);
+                paths = JSON.parse(JSON.stringify(paths));
+                message.paths = paths;
+            }
 
-    let tFrames = new Uint32Array(frames);
-    let tVertices = new Float32Array(vertices);
+            if (isLaser) {
+                message.spindleSpeeds = spindleSpeeds;
+                message.isLaser = isLaser;
+                message.spindleChanges = spindleChanges;
+            }
 
-    const message = {
-        vertices: tVertices,
-        colors,
-        frames: tFrames,
-        visualizer
-    };
-
-    // create path for the last motion
-    if (shouldRenderSVG) {
-        createPath(currentMotion);
-        paths = JSON.parse(JSON.stringify(paths));
-        message.paths = paths;
-    }
-
-    if (isLaser) {
-        message.spindleSpeeds = spindleSpeeds;
-        message.isLaser = isLaser;
-        message.spindleChanges = spindleChanges;
-    }
-
-    postMessage(message);
+            postMessage(message);
+        });
 };
