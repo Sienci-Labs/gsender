@@ -886,6 +886,8 @@ class GrblHalController {
 
         //check if controller is ready and send the status
         this.emit('grbl:iSready', this.ready);
+
+        this.command('realtime_report');
     }
 
     populateContext(context = {}) {
@@ -1807,7 +1809,10 @@ class GrblHalController {
                 this.feederCB = () => {
                     this.emit('wizard:next', stepIndex, substepIndex);
                 };
-            }
+            },
+            'realtime_report': () => {
+                this.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+            },
         }[cmd];
 
         if (!handler) {

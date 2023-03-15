@@ -35,6 +35,7 @@ import GrblHalLineParserResultEcho from './GrblHalLineParserResultEcho';
 import GrblHalLineParserResultFeedback from './GrblHalLineParserResultFeedback';
 import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
 import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
+import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 
 // Grbl v1.1
 // https://github.com/gnea/grbl/blob/edge/doc/markdown/interface.md
@@ -42,6 +43,9 @@ import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
 class GrblHalLineParser {
     parse(line) {
         const parsers = [
+            // <Alarm:#|[...]>
+            GrblHalLineParserResultCode,
+
             // <>
             GrblHalLineParserResultStatus,
 
