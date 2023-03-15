@@ -44,7 +44,6 @@ class GrbHalLineParserResultParserState {
         if (!r) {
             return null;
         }
-
         const payload = {};
         const words = _compact(r[1].split(' '))
             .map((word) => {
