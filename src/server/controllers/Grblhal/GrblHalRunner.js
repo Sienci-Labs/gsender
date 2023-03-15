@@ -41,6 +41,7 @@ import {
     GRBL_HAL_ACTIVE_STATE_IDLE,
     GRBL_HAL_ACTIVE_STATE_ALARM
 } from './constants';
+import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 
 
 const log = logger('controller:grblHAL');
@@ -88,6 +89,8 @@ class GrblHalRunner extends events.EventEmitter {
         parameters: {
         },
         settings: {
+        },
+        info: {
         }
     };
 
@@ -259,6 +262,21 @@ class GrblHalRunner extends events.EventEmitter {
                 this.state = nextState; // enforce change
             }
             this.emit('alarm', payload);
+        }
+        if (type === GrblHalLineParserResultInfo) {
+            const { name, value } = payload;
+            const nextSettings = { // enforce change
+                ...this.settings,
+                info: {
+                    ...this.settings.info,
+                    [name]: value
+                }
+            };
+            if (this.settings.info[name] !== nextSettings.info[name]) {
+                this.settings = nextSettings; // enforce change
+            }
+            this.emit('info', payload);
+            return;
         }
         if (data.length > 0) {
             this.emit('others', payload);

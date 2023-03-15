@@ -30,12 +30,12 @@ import GrbHalLineParserResultParserState from './GrblHalLineParserResultParserSt
 import GrblHalLineParserResultParameters from './GrblHalLineParserResultParameters';
 import GrblHalLineParserResultHelp from './GrblHalLineParserResultHelp';
 import GrblHalLineParserResultVersion from './GrblHalLineParserResultVersion';
-import GrblHalLineParserResultOption from './GrblHalLineParserResultOption';
 import GrblHalLineParserResultEcho from './GrblHalLineParserResultEcho';
 import GrblHalLineParserResultFeedback from './GrblHalLineParserResultFeedback';
 import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
 import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
 import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
+import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 
 // Grbl v1.1
 // https://github.com/gnea/grbl/blob/edge/doc/markdown/interface.md
@@ -81,8 +81,8 @@ class GrblHalLineParser {
             // [VER:] (v1.1)
             GrblHalLineParserResultVersion,
 
-            // [OPT:] (v1.1)
-            GrblHalLineParserResultOption,
+            // [XXXX:] (v1.1)
+            GrblHalLineParserResultInfo,
 
             // [echo:] (v1.1)
             GrblHalLineParserResultEcho,
