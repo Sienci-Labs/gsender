@@ -492,10 +492,11 @@ class CNCEngine {
             if (controller) {
                 controller.loadFile(this.gcode, this.meta);
             }
+        } else {
+            this.emit('file:load', gcode, meta.size, meta.name, meta.visualizer);
         }
 
         log.info(`Loaded file '${meta.name}' to CNCEngine`);
-        this.emit('file:load', gcode, meta.size, meta.name, meta.visualizer);
     }
 
     unload() {
