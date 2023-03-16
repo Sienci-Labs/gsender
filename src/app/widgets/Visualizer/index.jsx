@@ -382,6 +382,12 @@ class VisualizerWidget extends PureComponent {
         onRunClick: () => {
             this.actions.handleRun();
         },
+        canStart: () => {
+            //TODO check file for both X and Y axis
+            //IF both Axes found, return false to stop hob start
+            //ELSE return true
+            return true;
+        },
         handleRun: () => {
             const { workflow, activeState } = this.props;
             console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state) || activeState === GRBL_ACTIVE_STATE_HOLD);
@@ -986,8 +992,13 @@ class VisualizerWidget extends PureComponent {
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
-                if (this.workflowControl) {
+                if (this.workflowControl && this.actions.canStart()) {
                     this.workflowControl.startRun();
+                } else {
+                    Toaster.pop({
+                        type: TOASTER_WARNING,
+                        msg: 'Cannot start job'
+                    });
                 }
             },
         },
