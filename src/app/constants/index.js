@@ -222,6 +222,9 @@ export const USER_DATA_COLLECTION = {
 };
 
 export const ROTARY_AXIS_101_VALUE = '26.667';
+export const ROTARY_AXIS_103_VALUE = '10.5';
+export const ROTARY_AXIS_113_VALUE = '12';
+export const ROTARY_AXIS_123_VALUE = '15';
 
 export const WORKSPACE_MODE = {
     DEFAULT: 'DEFAULT',

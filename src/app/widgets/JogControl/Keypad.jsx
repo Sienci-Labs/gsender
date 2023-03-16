@@ -34,12 +34,16 @@ import { MenuItem } from 'app/components/Dropdown';
 import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
+import store from 'app/store';
+import reduxStore from 'app/store/redux';
+import get from 'lodash/get';
 import Fraction from './components/Fraction';
 import {
     IMPERIAL_UNITS,
     IMPERIAL_STEPS,
     METRIC_UNITS,
-    METRIC_STEPS
+    METRIC_STEPS,
+    WORKSPACE_MODE
 } from '../../constants';
 import styles from './index.styl';
 import JogControl from './components/JogControl';
@@ -155,6 +159,10 @@ class Keypad extends PureComponent {
         const canClickXY = canClickX && canClickY;
         const canClickZ = canClick && _includes(axes, 'z');
 
+        const { ROTARY } = WORKSPACE_MODE;
+        const rotary = store.get('workspace.mode') === ROTARY;
+        const firmwareType = get(reduxStore.getState(), 'controller.type');
+
         const xyControlsDisabled = !canClickXY;
         const zControlsDisabled = !canClickZ;
 
@@ -192,11 +200,12 @@ class Keypad extends PureComponent {
                             jog={() => actions.jog({ Y: xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ Y: 1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled}
+                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
                         >
                             <KeypadText>Y</KeypadText>
                             <KeypadDirectionText>+</KeypadDirectionText>
                         </JogControl>
+
                         <JogControl
                             className={styles.btnUpRight}
                             jog={() => actions.jog({ X: xyDistance, Y: xyDistance, F: feedrate })}
@@ -250,7 +259,7 @@ class Keypad extends PureComponent {
                             jog={() => actions.jog({ Y: -xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ Y: -1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled}
+                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
                         >
                             <KeypadText>Y</KeypadText>
                             <KeypadDirectionText>-</KeypadDirectionText>

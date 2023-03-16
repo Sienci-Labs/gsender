@@ -1,3 +1,10 @@
+export const XSMALL = {
+    height: '99vh',
+    width: '99vw',
+    maxWidth: '300px',
+    maxHeight: '200px'
+};
+
 export const SMALL = {
     height: '99vh',
     width: '99vw',

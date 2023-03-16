@@ -7,6 +7,7 @@ import get from 'lodash/get';
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import store from 'app/store';
+import { WORKSPACE_MODE, METRIC_UNITS } from 'app/constants';
 
 import styles from './index.styl';
 import StepsToggle from './StepsToggle';
@@ -18,7 +19,6 @@ import SpeedControls from './SpeedControls';
 import ActionArea from './ActionArea';
 
 import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../JogControl/constants';
-import { METRIC_UNITS } from '../../constants';
 
 const Rotary = ({ active }) => {
     const [speedPreset, setSpeedPreset] = useState(SPEED_NORMAL);
@@ -28,6 +28,9 @@ const Rotary = ({ active }) => {
     });
     const [, setIsContinuousJogging] = useState(false);
     const controllerState = useSelector(state => state.controller.state);
+
+    const { ROTARY } = WORKSPACE_MODE;
+    const rotary = store.get('workspace.mode') === ROTARY;
 
     const actions = {
         setSelectedSpeed: (speed) => {
@@ -112,8 +115,11 @@ const Rotary = ({ active }) => {
                         <p className={styles['rotary-tab-section-title']}>
                             Jog Control
                         </p>
-                        <DROarea actions={actions} />
-                        <JogControlArea selectedSpeed={speedPreset} actions={actions} jog={jog} />
+                        <DROarea actions={actions} canClick={rotary} />
+                        <JogControlArea
+                            selectedSpeed={speedPreset} actions={actions} jog={jog}
+                            disabled={!rotary}
+                        />
                         <SpeedPresets selectedSpeed={speedPreset} actions={actions} />
                         <SpeedControls jog={jog} actions={actions} />
                     </div>

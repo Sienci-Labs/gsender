@@ -24,7 +24,7 @@
 import React, { useRef } from 'react';
 import style from './MachinePositionInput.styl';
 
-const MachinePositionInput = ({ value, handleManualMovement }) => {
+const MachinePositionInput = ({ value, handleManualMovement, disabled = false }) => {
     const inputRef = useRef();
 
     const onKeyPress = (e) => {
@@ -54,6 +54,7 @@ const MachinePositionInput = ({ value, handleManualMovement }) => {
                 onKeyDown={onKeyPress}
                 onBlur={onBlur}
                 ref={inputRef}
+                disabled={disabled ? 'disabled' : ''}
             />
         </div>
     );

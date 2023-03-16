@@ -29,6 +29,7 @@ import includes from 'lodash/includes';
 import MachinePositionInput from 'app/widgets/Location/components/MachinePositionInput';
 import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
+import reduxStore from 'app/store/redux';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -53,7 +54,8 @@ import {
     METRIC_UNITS,
     GRBL_ACTIVE_STATE_IDLE,
     WORKFLOW_STATE_RUNNING,
-    GRBL_ACTIVE_STATE_ALARM
+    GRBL_ACTIVE_STATE_ALARM,
+    WORKSPACE_MODE
 } from '../../constants';
 import styles from './index.styl';
 import AxisButton from './components/AxisButton';
@@ -122,7 +124,7 @@ class DisplayPanel extends PureComponent {
             [AXIS_B]: false,
             [AXIS_C]: false
         },
-        machineProfile: store.get('workspace.machineProfile')
+        machineProfile: store.get('workspace.machineProfile'),
     };
 
     handleSelect = (eventKey) => {
@@ -158,7 +160,7 @@ class DisplayPanel extends PureComponent {
         }
     }
 
-    renderAxis = (axis) => {
+    renderAxis = (axis, disabled = false) => {
         const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units, homingEnabled } = this.props;
         let mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';
@@ -187,7 +189,7 @@ class DisplayPanel extends PureComponent {
             <tr>
                 <td className={styles.coordinate}>
                     <GoToButton
-                        disabled={!canClick}
+                        disabled={!canClick || disabled}
                         onClick={() => {
                             const commands = [];
                             const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
@@ -214,10 +216,15 @@ class DisplayPanel extends PureComponent {
                             controller.command('gcode:safe', commands, modal);
                         }}
                     />
-                    <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick} />
+                    <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick || disabled} />
                 </td>
                 <td className={styles.machinePosition}>
-                    <MachinePositionInput value={this.customMathRound(wpos)} handleManualMovement={(value) => actions.handleManualMovement(value, axis)} />
+                    <MachinePositionInput
+                        disabled={disabled}
+                        value={this.customMathRound(wpos)} handleManualMovement={(value) => {
+                            actions.handleManualMovement(value, axis);
+                        }}
+                    />
                     {!showPositionInput && <PositionLabel value={this.customMathRound(mpos)} small />}
                 </td>
             </tr>
@@ -272,22 +279,36 @@ class DisplayPanel extends PureComponent {
     }
 
     render() {
-        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome, homingDirection, homingRun } = this.props;
+        const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome, homingDirection, homingRun, firmware } = this.props;
         const homingLocation = getHomingLocation(homingDirection);
         const hasAxisX = includes(axes, AXIS_X);
         const hasAxisY = includes(axes, AXIS_Y);
         const hasAxisZ = includes(axes, AXIS_Z);
+
+        const { ROTARY } = WORKSPACE_MODE;
+        const rotary = store.get('workspace.mode') === ROTARY;
 
         return (
             <Panel className={styles.displayPanel}>
                 <div className={styles.locationWrapper}>
                     <div className={styles.alwaysAvailable}>
                         <table className={styles.displaypanelTable}>
-                            <tbody>
-                                {hasAxisX && this.renderAxis(AXIS_X)}
-                                {hasAxisY && this.renderAxis(AXIS_Y)}
-                                {hasAxisZ && this.renderAxis(AXIS_Z)}
-                            </tbody>
+                            {firmware === 'Grbl'
+                                ? (
+                                    <tbody>
+                                        {hasAxisX && this.renderAxis(AXIS_X)}
+                                        {!rotary && hasAxisY ? this.renderAxis(AXIS_Y) : this.renderAxis(AXIS_Y, true)}
+                                        {hasAxisZ && this.renderAxis(AXIS_Z)}
+                                    </tbody>
+                                )
+                                : (
+                                    <tbody>
+                                        {hasAxisX && this.renderAxis(AXIS_X)}
+                                        {hasAxisY && this.renderAxis(AXIS_Y)}
+                                        {hasAxisZ && this.renderAxis(AXIS_Z)}
+                                    </tbody>
+                                )
+                            }
                         </table>
                         <div className={styles.controlButtons}>
                             <FunctionButton
@@ -400,6 +421,7 @@ export default connect((store) => {
     const activeState = get(store, 'controller.state.status.activeState');
     const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
     const mpos = get(store, 'controller.mpos');
+    const firmware = get(reduxStore.getState(), 'controller.type');
     return {
         homingEnabled,
         canHome,
@@ -407,6 +429,7 @@ export default connect((store) => {
         homingFlag,
         homingRun,
         pullOff,
-        mpos
+        mpos,
+        firmware
     };
 })(DisplayPanel);

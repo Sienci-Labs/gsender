@@ -179,6 +179,11 @@ class AxesWidget extends PureComponent {
             const { xyStep } = jog;
             return xyStep;
         },
+        getXAJogDistance: () => {
+            const { jog } = this.state;
+            const { ayStep } = jog;
+            return ayStep;
+        },
         getZJogDistance: () => {
             const { jog } = this.state;
             const { zStep } = jog;
@@ -1262,6 +1267,7 @@ class AxesWidget extends PureComponent {
             },
             jog: {
                 xyStep: this.getInitialXYStep(),
+                ayStep: this.getInitialXAStep(),
                 zStep: this.getInitialZStep(),
                 aStep: this.getInitialAStep(),
                 feedrate: this.getInitialFeedRate(),
@@ -1289,6 +1295,13 @@ class AxesWidget extends PureComponent {
         const speeds = this.config.get('jog.normal');
 
         return (units === METRIC_UNITS) ? get(speeds, 'mm.xyStep') : get(speeds, 'in.xyStep');
+    }
+
+    getInitialXAStep() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+        const speeds = this.config.get('jog.normal');
+
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.xaStep') : get(speeds, 'in.xaStep');
     }
 
     getInitialZStep() {
