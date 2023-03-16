@@ -77,6 +77,7 @@ import {
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
+import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -1133,9 +1134,9 @@ class GrblController {
         return !(this.isOpen());
     }
 
-    loadFile(gcode, { name }) {
-        log.debug(`Loading file '${name}' to controller`);
-        this.command('gcode:load', name, gcode);
+    loadFile(gcode, meta) {
+        log.debug(`Loading file '${meta.name}' to controller`);
+        this.command('gcode:load', meta, gcode);
     }
 
     addConnection(socket) {
@@ -1225,7 +1226,9 @@ class GrblController {
                 this.emit('sender:status', machineProfile);
             },
             'gcode:load': () => {
-                let [name, gcode, context = {}, callback = noop] = args;
+                let [meta, gcode, context = {}, callback = noop] = args;
+                const { name } = meta;
+
                 if (typeof context === 'function') {
                     callback = context;
                     context = {};
@@ -1244,18 +1247,28 @@ class GrblController {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }
 
+                const aAxisCommandsRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)|A-(\d+\.\d+)|A-(\d+)/;
+                const yAxisCommandsRegex = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)|Y-(\d+\.\d+)|Y-(\d+)/;
+                const imperialUnitsRegex = /(G20)|(G 20)/;
+                const containsACommand = aAxisCommandsRegex.test(gcode);
+                const containsYCommand = yAxisCommandsRegex.test(gcode);
 
-                const aAxisCommandsRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)|A-(\d+\.\d+)|A-(\d+)/g;
-                const yAxisCommandsRegex = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)|Y-(\d+\.\d+)|Y-(\d+)/g;
-                const containsACommands = aAxisCommandsRegex.test(gcode);
-                const containsYCommands = yAxisCommandsRegex.test(gcode);
-
-                if (containsACommands && containsYCommands) {
+                // We don't need to do any gcode translation on files that have 4 axes since they
+                // are not compatible with vanilla grbl anyway
+                if (containsACommand && containsYCommand) {
                     this.emit('filetype', FILE_TYPE.FOUR_AXIS);
-                    return;
-                } else if (containsACommands) {
+                } else if (containsACommand) {
                     this.emit('filetype', FILE_TYPE.ROTARY);
-                    // gcode = gcode.replaceAll('A', 'Y');
+                    const gcodeIsImperial = imperialUnitsRegex.test(gcode);
+                    const regexWithGlobal = new RegExp(aAxisCommandsRegex, 'g');
+
+                    gcode = translateGcode({
+                        gcode,
+                        from: 'A',
+                        to: 'Y',
+                        regex: regexWithGlobal,
+                        type: gcodeIsImperial ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                    });
                 }
 
                 const ok = this.sender.load(name, gcode + '\n' + dwell, context);
@@ -1269,6 +1282,7 @@ class GrblController {
                 this.workflow.stop();
 
                 callback(null, this.sender.toJSON());
+                this.emit('file:load', gcode, meta.size, meta.name, meta.visualizer);
             },
             'gcode:unload': () => {
                 this.workflow.stop();
@@ -1779,7 +1793,7 @@ class GrblController {
 
                 this.event.trigger(MACRO_LOAD);
 
-                this.command('gcode:load', macro.name, macro.content, context, callback);
+                this.command('gcode:load', { name: macro.name }, macro.content, context, callback);
             },
             'watchdir:load': () => {
                 const [file, callback = noop] = args;
