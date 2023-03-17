@@ -4,16 +4,16 @@ import store from 'app/store';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import reduxStore from 'app/store/redux';
-import get from 'lodash/get';
 import { ROTARY_AXIS_101_VALUE, WORKSPACE_MODE } from 'app/constants';
 import { updateWorkspaceMode } from 'app/lib/rotary';
+import { useSelector } from 'react-redux';
 
 const { DEFAULT, ROTARY } = WORKSPACE_MODE;
 
 const StepsToggle = () => {
     const [workspaceMode, setWorkspaceMode] = useState(store.get('workspace.mode', DEFAULT));
-    const firmwareType = get(reduxStore.getState(), 'controller.type');
+    // const firmwareType = get(reduxStore.getState(), 'controller.type');
+    const firmwareType = useSelector(state => state.controller.type);
     const handleToggle = (toggled) => {
         const newMode = toggled ? ROTARY : DEFAULT;
         setWorkspaceMode(newMode);
