@@ -25,13 +25,7 @@
 import _ from 'lodash';
 
 //https://github.com/grbl/grbl/blob/master/grbl/report.c
-class GrblLineParserResultStatus {
-    // * Grbl v0.9
-    //   <Idle>
-    //   <Idle,MPos:5.529,0.560,7.000,WPos:1.529,-5.440,-0.000>
-    //   <Idle,MPos:5.529,0.560,7.000,0.000,WPos:1.529,-5.440,-0.000,0.000>
-    //   <Idle,MPos:0.000,0.000,0.000,WPos:0.000,0.000,0.000,Buf:0,RX:0,Lim:000>
-    //   <Idle,MPos:0.000,0.000,0.000,WPos:0.000,0.000,0.000,Buf:0,RX:0,Ln:0,F:0.>
+class GrblHalLineParserResultStatus {
     // * Grbl v1.1
     //   <Idle|MPos:3.000,2.000,0.000|FS:0,0>
     //   <Hold:0|MPos:5.000,2.000,0.000|FS:0,0>
@@ -166,9 +160,9 @@ class GrblLineParserResultStatus {
         //   - D H R S the door, hold, soft-reset, and cycle-start pins, respectively.
         //   - Example: Pn:PZ indicates the probe and z-limit pins are 'triggered'.
         //   - Note: A may be added in later versions for an A-axis limit pin.
-        payload.pinState = {};
         if (_.has(result, 'Pn')) {
             const pins = _.get(result, 'Pn[0]', '');
+            payload.pinState = {};
             pins.split('').forEach(pin => {
                 payload.pinState[pin] = true;
             });
@@ -192,10 +186,10 @@ class GrblLineParserResultStatus {
         }
 
         return {
-            type: GrblLineParserResultStatus,
+            type: GrblHalLineParserResultStatus,
             payload: payload
         };
     }
 }
 
-export default GrblLineParserResultStatus;
+export default GrblHalLineParserResultStatus;

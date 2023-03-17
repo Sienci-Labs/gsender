@@ -21,7 +21,23 @@
  *
  */
 
-import GrblController from './Grbl/GrblController';
-import GrblHalController from './Grblhal/GrblHalController';
+// https://github.com/grbl/grbl/wiki/Interfacing-with-Grbl#alarms
+class GrblHalLineParserResultAlarm {
+    static parse(line) {
+        const r = line.match(/^ALARM:\s*(.+)$/);
+        if (!r) {
+            return null;
+        }
 
-export { GrblController, GrblHalController };
+        const payload = {
+            message: r[1]
+        };
+
+        return {
+            type: GrblHalLineParserResultAlarm,
+            payload: payload
+        };
+    }
+}
+
+export default GrblHalLineParserResultAlarm;

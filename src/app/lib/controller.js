@@ -283,7 +283,7 @@ class Controller {
     // @param {string} [options.controllerType] One of: 'Grbl', 'Smoothe', 'TinyG'. Defaults to 'Grbl'.
     // @param {number} [options.baudrate] Defaults to 115200.
     // @param {function} [callback] Called after a connection is opened.
-    openPort(port, options, callback) {
+    openPort(port, controllerType, options, callback) {
         if (typeof options !== 'object') {
             options = {};
             callback = options;
@@ -291,7 +291,7 @@ class Controller {
         if (typeof callback !== 'function') {
             callback = noop;
         }
-        this.socket && this.socket.emit('open', port, options, callback);
+        this.socket && this.socket.emit('open', port, controllerType, options, callback);
     }
 
     // Closes an open connection.

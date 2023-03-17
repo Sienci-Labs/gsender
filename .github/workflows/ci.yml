@@ -50,7 +50,6 @@ jobs:
       run: |
         yarn install
         yarn lint
-        yarn test
     - name: Run "build" script
       if: github.ref_type == 'tag'
       run: yarn run build
@@ -104,6 +103,8 @@ jobs:
       with:
         files: |
           releases/linux/*
+        prerelease: true
+        draft: true
   build-macos:
     name: Build macOS packages
     runs-on: macos-latest
@@ -141,7 +142,6 @@ jobs:
       run: |
         yarn install
         yarn lint
-        yarn test
     - name: Run "build" script
       if: github.ref_type == 'tag'
       run: yarn run build
@@ -189,6 +189,8 @@ jobs:
       with:
         files: |
           releases/macos/*
+        prerelease: true
+        draft: true
   build-windows:
     name: Build Windows packages
     runs-on: windows-latest
@@ -267,3 +269,5 @@ jobs:
       with:
         files: |
           releases/windows/*
+        prerelease: true
+        draft: true

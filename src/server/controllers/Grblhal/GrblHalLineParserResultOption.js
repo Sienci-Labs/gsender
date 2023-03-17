@@ -21,7 +21,24 @@
  *
  */
 
-import GrblController from './Grbl/GrblController';
-import GrblHalController from './Grblhal/GrblHalController';
+class GrblHalLineParserResultOption {
+    static parse(line) {
+        // * Grbl v1.1
+        //   [OPT:]
+        const r = line.match(/^\[(?:OPT:)(.+)\]$/);
+        if (!r) {
+            return null;
+        }
 
-export { GrblController, GrblHalController };
+        const payload = {
+            message: r[1]
+        };
+
+        return {
+            type: GrblHalLineParserResultOption,
+            payload: payload
+        };
+    }
+}
+
+export default GrblHalLineParserResultOption;

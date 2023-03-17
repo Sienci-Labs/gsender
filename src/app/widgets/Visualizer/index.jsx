@@ -1450,7 +1450,6 @@ class VisualizerWidget extends PureComponent {
 
         const showRendering = renderState === RENDER_RENDERING;
         const showLoading = renderState === RENDER_LOADING;
-        const showLoader = showLoading || showRendering;
         // Handle visualizer render
         const isVisualizerDisabled = (state.liteMode) ? state.disabledLite : state.disabled;
 
@@ -1460,7 +1459,6 @@ class VisualizerWidget extends PureComponent {
 
         const showVisualizer =
             capable.view3D &&
-            !showLoader &&
             (
                 (isSecondary && activeVisualizer === VISUALIZER_SECONDARY) ||
                 !isSecondary && activeVisualizer === VISUALIZER_PRIMARY

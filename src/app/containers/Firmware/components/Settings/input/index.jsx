@@ -1,14 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { GRBL_SETTINGS_INPUT_TYPES } from 'server/controllers/Grbl/constants';
+import { GRBL_HAL_SETTINGS_INPUT_TYPES } from 'server/controllers/Grblhal/constants';
 
 import BitShiftInput from './BitShiftInput';
 import Number from './Number';
 import StatusReportSwitch from './StatusReportSwitch';
 import Switch from './Switch';
+import Select from './Select';
+import String from './String';
+import Mask from './Mask';
 
-const { NUMBER, MASK, MASK_STATUS_REPORT, SWITCH } = GRBL_SETTINGS_INPUT_TYPES;
+const { NUMBER, AXIS_MASK, MASK_STATUS_REPORT, SWITCH, SELECT, STRING, MASK } = GRBL_HAL_SETTINGS_INPUT_TYPES;
 
 const InputController = (props) => {
     switch (props.type) {
@@ -20,12 +23,24 @@ const InputController = (props) => {
         return <Switch {...props} />;
     }
 
-    case MASK: {
+    case AXIS_MASK: {
         return <BitShiftInput {...props} />;
     }
 
     case MASK_STATUS_REPORT: {
         return <StatusReportSwitch {...props} />;
+    }
+
+    case SELECT: {
+        return <Select {...props} />;
+    }
+
+    case STRING: {
+        return <String {...props} />;
+    }
+
+    case MASK: {
+        return <Mask {...props} />;
     }
 
     default: {
@@ -35,7 +50,7 @@ const InputController = (props) => {
 };
 
 InputController.propTypes = {
-    type: PropTypes.oneOf(Object.values(GRBL_SETTINGS_INPUT_TYPES))
+    type: PropTypes.oneOf(Object.values(GRBL_HAL_SETTINGS_INPUT_TYPES))
 };
 
 export default InputController;

@@ -21,7 +21,32 @@
  *
  */
 
-import GrblController from './Grbl/GrblController';
-import GrblHalController from './Grblhal/GrblHalController';
+import _trim from 'lodash/trim';
 
-export { GrblController, GrblHalController };
+const pattern = new RegExp(/^([a-zA-Z0-9]+)\s+((?:\d+\.){1,2}\d+[a-zA-Z0-9\-\.]*)([^\[]*\[[^\]]+\].*)?/);
+
+class GrblHalLineParserResultStartup {
+    static parse(line) {
+        const r = line.match(pattern);
+        if (!r) {
+            return null;
+        }
+
+        const firmware = r[1];
+        const version = r[2];
+        const message = _trim(r[3]);
+
+        const payload = {
+            firmware,
+            version,
+            message,
+        };
+
+        return {
+            type: GrblHalLineParserResultStartup,
+            payload: payload
+        };
+    }
+}
+
+export default GrblHalLineParserResultStartup;

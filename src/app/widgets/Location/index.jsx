@@ -52,14 +52,9 @@ import {
     METRIC_STEPS,
     // Grbl
     GRBL,
+    GRBLHAL,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_RUN,
-    // Marlin
-    MARLIN,
-    // Smoothie
-    SMOOTHIE,
-    // TinyG
-    TINYG,
     // Workflow
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_IDLE,
@@ -723,7 +718,7 @@ class LocationWidget extends PureComponent {
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
+        if (!includes([GRBL, GRBLHAL], type)) {
             return false;
         }
 

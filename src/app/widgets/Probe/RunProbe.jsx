@@ -124,17 +124,14 @@ class RunProbe extends PureComponent {
             testRunning: true
         });
         this.testInterval = setInterval(() => {
+            console.log('Waiting on status');
             if (probeStatus()) {
+                console.log('we got it');
                 this.setState({
                     connectionMade: true,
                 });
                 clearInterval(this.testInterval);
                 this.testInterval = null;
-            } else {
-                const { timer } = this.state;
-                this.setState({
-                    timer: timer + 0.5
-                });
             }
         }, 500);
     }
@@ -180,7 +177,6 @@ class RunProbe extends PureComponent {
 
         const probeActive = actions.returnProbeConnectivity();
         const { connectionMade } = this.state;
-        const { connectivityTest } = state;
 
         return (
             <Modal
@@ -205,11 +201,11 @@ class RunProbe extends PureComponent {
                             </div>
                             <FunctionButton
                                 primary
-                                disabled={!connectionMade && connectivityTest}
+                                disabled={!connectionMade}
                                 onClick={this.startProbe}
                             >
                                 {
-                                    connectionMade || !connectivityTest ? 'Start Probe' : 'Waiting on probe circuit confirmation...'
+                                    connectionMade ? 'Start Probe' : 'Waiting on probe circuit confirmation...'
                                 }
                             </FunctionButton>
                         </div>
