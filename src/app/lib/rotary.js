@@ -28,9 +28,7 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
         controller.command('gcode', `$101=${ROTARY_AXIS_101_VALUE}`);
 
         if (firmwareType === 'Grbl') {
-            controller.command('gcode', `$103=${ROTARY_AXIS_103_VALUE}`);
-            controller.command('gcode', `$113=${ROTARY_AXIS_113_VALUE}`);
-            controller.command('gcode', `$123=${ROTARY_AXIS_123_VALUE}`);
+            controller.command('gcode', [`$103=${ROTARY_AXIS_103_VALUE}`, `$113=${ROTARY_AXIS_113_VALUE}`, `$123=${ROTARY_AXIS_123_VALUE}`]);
         }
 
         return;

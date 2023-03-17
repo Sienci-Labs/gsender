@@ -29,7 +29,6 @@ import includes from 'lodash/includes';
 import MachinePositionInput from 'app/widgets/Location/components/MachinePositionInput';
 import { connect } from 'react-redux';
 import _isEqual from 'lodash/isEqual';
-import reduxStore from 'app/store/redux';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
@@ -421,7 +420,7 @@ export default connect((store) => {
     const activeState = get(store, 'controller.state.status.activeState');
     const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
     const mpos = get(store, 'controller.mpos');
-    const firmware = get(reduxStore.getState(), 'controller.type');
+    const firmware = get(store, 'controller.type');
     return {
         homingEnabled,
         canHome,

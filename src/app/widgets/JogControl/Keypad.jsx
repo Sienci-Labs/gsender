@@ -35,8 +35,6 @@ import Space from 'app/components/Space';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import store from 'app/store';
-import reduxStore from 'app/store/redux';
-import get from 'lodash/get';
 import Fraction from './components/Fraction';
 import {
     IMPERIAL_UNITS,
@@ -68,7 +66,8 @@ class Keypad extends PureComponent {
         units: PropTypes.oneOf([IMPERIAL_UNITS, METRIC_UNITS]),
         axes: PropTypes.array,
         jog: PropTypes.object,
-        actions: PropTypes.object
+        actions: PropTypes.object,
+        firmwareType: PropTypes.string,
     };
 
     handleSelect = (eventKey) => {
@@ -153,7 +152,7 @@ class Keypad extends PureComponent {
     }
 
     render() {
-        const { canClick, canClickCancel, actions, axes, activeState, selectedSpeed } = this.props;
+        const { canClick, canClickCancel, actions, axes, activeState, selectedSpeed, firmwareType } = this.props;
         const canClickX = canClick && _includes(axes, 'x');
         const canClickY = canClick && _includes(axes, 'y');
         const canClickXY = canClickX && canClickY;
@@ -161,7 +160,6 @@ class Keypad extends PureComponent {
 
         const { ROTARY } = WORKSPACE_MODE;
         const rotary = store.get('workspace.mode') === ROTARY;
-        const firmwareType = get(reduxStore.getState(), 'controller.type');
 
         const xyControlsDisabled = !canClickXY;
         const zControlsDisabled = !canClickZ;
@@ -205,7 +203,6 @@ class Keypad extends PureComponent {
                             <KeypadText>Y</KeypadText>
                             <KeypadDirectionText>+</KeypadDirectionText>
                         </JogControl>
-
                         <JogControl
                             className={styles.btnUpRight}
                             jog={() => actions.jog({ X: xyDistance, Y: xyDistance, F: feedrate })}

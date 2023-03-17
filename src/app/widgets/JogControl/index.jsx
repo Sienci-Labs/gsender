@@ -29,7 +29,6 @@ import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import includes from 'lodash/includes';
 import { throttle, inRange } from 'lodash';
-import reduxStore from 'app/store/redux';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Widget from 'app/components/Widget';
@@ -486,7 +485,7 @@ class AxesWidget extends PureComponent {
     shuttleControlFunctions = {
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
             const rotaryAxisStatus = store.get('rotaryAxisStatus');
-            const firmwareType = get(reduxStore.getState(), 'controller.type', 'grbl');
+            const firmwareType = this.props.type;
             const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
             if (event) {
                 preventDefault(event);
@@ -494,12 +493,10 @@ class AxesWidget extends PureComponent {
             if (axis.a && !rotaryAxisStatus || axis.a && rotaryAxisStatus && isGrbl) {
                 return;
             }
-
-            console.log('JOG EVENT, Axis: ', axis); // TODO - Delete this
             this.handleShortcutJog({ axis, direction });
         },
         UPDATE_ROTARY_STATUS: (_, { command }) => {
-            const firmwareType = get(reduxStore.getState(), 'controller.type', 'grbl');
+            const firmwareType = this.props.type;
             const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
             const shouldEnableRotary = !store.get('rotaryAxisStatus', false);
 
@@ -1420,7 +1417,7 @@ class AxesWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId, machinePosition, workPosition, canJog, isSecondary } = this.props;
+        const { widgetId, machinePosition, workPosition, canJog, isSecondary, type } = this.props;
         const { minimized, isFullscreen } = this.state;
         const { units } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
@@ -1430,6 +1427,7 @@ class AxesWidget extends PureComponent {
             ...this.state,
             // Determine if the motion button is clickable
             canClick: this.canClick(),
+            type: type,
             canClickCancel: this.canClickCancel(),
             isJogging: this.isJogging(),
             activeState: activeState,
@@ -1495,6 +1493,6 @@ export default connect((store) => {
         workflow,
         canJog,
         isConnected,
-        activeState
+        activeState,
     };
 })(AxesWidget);
