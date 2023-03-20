@@ -88,6 +88,7 @@ import {
 } from './constants';
 import SecondaryVisualizer from './SecondaryVisualizer';
 import useKeybinding from '../../lib/useKeybinding';
+import shuttleEvents from '../../lib/shuttleEvents';
 
 const displayWebGLErrorMessage = () => {
     portal(({ onClose }) => (
@@ -1241,11 +1242,12 @@ class VisualizerWidget extends PureComponent {
             category: GENERAL_CATEGORY,
             callback: () => {
                 const shortcuts = store.get('commandKeys', {});
+                const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
                 // Ignore shortcut for toggling all other shortcuts to
                 // allow them to be turned on and off
                 const allDisabled = Object.entries(shortcuts)
-                    .filter(([key, shortcut]) => shortcut.title !== 'Toggle Shortcuts')
+                    .filter(([key, shortcut]) => (allShuttleControlEvents[key] ? allShuttleControlEvents[key].title : shortcut.title) !== 'Toggle Shortcuts')
                     .every(([key, shortcut]) => !shortcut.isActive);
                 const keybindings = _.cloneDeep(shortcuts);
                 Object.entries(keybindings).forEach(([key, keybinding]) => {
