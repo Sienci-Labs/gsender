@@ -1,6 +1,6 @@
 {
   "name": "gSender-Edge",
-  "version": "1.2.4-EDGE",
+  "version": "1.2.5-EDGE",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -276,7 +276,7 @@
     "react-select": "^4.3.0",
     "react-sortablejs": "~1.5.1",
     "react-switch": "^6.0.0",
-    "react-to-print": "^2.14.7",
+    "react-to-print": "2.14.7",
     "react-toggle": "~4.0.2",
     "react-tooltip": "^4.2.21",
     "react-vertical-timeline-component": "^3.5.2",
