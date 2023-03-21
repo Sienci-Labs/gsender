@@ -54,7 +54,7 @@ const MachinePositionInput = ({ value, handleManualMovement, disabled = false })
                 onKeyDown={onKeyPress}
                 onBlur={onBlur}
                 ref={inputRef}
-                disabled={disabled ? 'disabled' : ''}
+                disabled={disabled}
             />
         </div>
     );
