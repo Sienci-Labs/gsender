@@ -24,7 +24,6 @@
 import cx from 'classnames';
 import ensureArray from 'ensure-array';
 import get from 'lodash/get';
-import reduxStore from 'app/store/redux';
 import includes from 'lodash/includes';
 import mapValues from 'lodash/mapValues';
 import PropTypes from 'prop-types';
@@ -67,7 +66,7 @@ import {
     AXIS_X,
     AXIS_Y,
     AXIS_Z,
-    AXIS_A
+    AXIS_A,
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -410,15 +409,7 @@ class LocationWidget extends PureComponent {
 
             pubsub.publish('jogSpeeds', newSpeeds);
         },
-        ZERO_AXIS: (event, { axis }) => {
-            const rotaryAxisStatus = store.get('rotaryAxisStatus');
-            const firmwareType = get(reduxStore.getState(), 'controller.type', 'grbl');
-            const grbl = firmwareType.toLocaleLowerCase() === 'grbl';
-
-            if (axis === 'a' && !rotaryAxisStatus || axis === 'a' && rotaryAxisStatus && grbl) {
-                return;
-            }
-            console.log('ZERO_AXIS, Axis: ', axis); // TODO - Delete this
+        ZERO_AXIS: (_, { axis }) => {
             const { state } = this.props;
             const activeState = get(state, 'status.activeState');
             if (!axis || activeState !== GRBL_ACTIVE_STATE_IDLE) {
