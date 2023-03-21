@@ -41,7 +41,7 @@ import { limit } from 'app/lib/normalize-range';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
-import { Toaster, TOASTER_SUCCESS, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import { connect } from 'react-redux';
 import store from '../../store';
 import Axes from './Axes';
@@ -65,7 +65,8 @@ import {
     AXIS_X,
     AXIS_Y,
     AXIS_Z,
-    AXIS_A
+    AXIS_A,
+    WORKSPACE_MODE
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -484,42 +485,28 @@ class AxesWidget extends PureComponent {
 
     shuttleControlFunctions = {
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
-            const rotaryAxisStatus = store.get('rotaryAxisStatus');
+            const isInRotaryMode = store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
             const firmwareType = this.props.type;
             const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
             if (event) {
                 preventDefault(event);
             }
-            if (axis.a && !rotaryAxisStatus || axis.a && rotaryAxisStatus && isGrbl) {
+            if (axis.a && !isInRotaryMode || axis.a && isInRotaryMode && isGrbl) {
                 return;
             }
             this.handleShortcutJog({ axis, direction });
         },
-        UPDATE_ROTARY_STATUS: (_, { command }) => {
-            const firmwareType = this.props.type;
-            const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
-            const shouldEnableRotary = !store.get('rotaryAxisStatus', false);
+        UPDATE_WORKSPACE_MODE: () => {
+            const currentWorkspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
+            const workspaceModesList = Object.values(WORKSPACE_MODE);
+            const currentWorkspaceModeIndex = workspaceModesList.findIndex(mode => mode === currentWorkspaceMode);
+            const nextWorkspaceMode = workspaceModesList[currentWorkspaceModeIndex + 1] ?? workspaceModesList[0];
 
-            //If grbl, turn off Rotary Axis and update user
-            if (isGrbl) {
-                store.set('rotaryAxisStatus', false);
-                Toaster.clear();
-                Toaster.pop({
-                    type: TOASTER_WARNING,
-                    msg: 'Your firmware does not support Rotary Axis.',
-                });
-                return;
-            }
+            store.replace('workspace.mode', nextWorkspaceMode);
 
-            store.set('rotaryAxisStatus', shouldEnableRotary);
-            controller.command(command, shouldEnableRotary);
-            //Notify user
-            const notification = shouldEnableRotary ? 'Rotary Axis turned on' : 'Rotary Axis is off';
+            const msg = `Workspace Mode set to ${nextWorkspaceMode.charAt(0).toUpperCase() + nextWorkspaceMode.slice(1).toLowerCase()}`;
             Toaster.clear();
-            Toaster.pop({
-                type: TOASTER_SUCCESS,
-                msg: notification,
-            });
+            Toaster.pop({ type: TOASTER_SUCCESS, msg });
         },
         SET_JOG_PRESET: (event, { key }) => {
             if (!key) {
@@ -642,18 +629,15 @@ class AxesWidget extends PureComponent {
             category: JOGGING_CATEGORY,
             callback: this.shuttleControlFunctions.JOG,
         },
-        ROTARY_AXIS: { // Rotary Axis ON/OFF
+        SWITCH_WORKSPACE_MODE: {
             id: 103,
-            title: 'Rotary Axis',
+            title: 'Switch Between Workspace Modes',
             keys: ['ctrl', '5'].join('+'),
-            cmd: 'ROTARY_AXIS',
-            payload: {
-                command: 'rotaryAxis:updateState',
-            },
+            cmd: 'SWITCH_WORKSPACE_MODE',
             preventDefault: false,
             isActive: true,
             category: GENERAL_CATEGORY,
-            callback: this.shuttleControlFunctions.UPDATE_ROTARY_STATUS
+            callback: this.shuttleControlFunctions.UPDATE_WORKSPACE_MODE
         },
         JOG_X_P: {
             title: 'Jog: X+',
