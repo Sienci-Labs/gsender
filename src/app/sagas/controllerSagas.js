@@ -546,7 +546,7 @@ export function* initialize() {
             if (workspaceMode !== WORKSPACE_MODE.ROTARY) {
                 Confirm({
                     title: 'Rotary File Loaded',
-                    content: 'GCode contains A-axis command, please enable Rotary Axis mode if your machine is equipped with a rotary axis.',
+                    content: 'G-Code contains A-axis command, please enable Rotary mode if your machine is equipped with a rotary axis unit.',
                     confirmLabel: 'Enable Rotary Mode',
                     cancelLabel: 'Close',
                     onConfirm: () => {
@@ -564,7 +564,7 @@ export function* initialize() {
             if (controller.type === 'Grbl') {
                 Confirm({
                     title: '4 Axis File File Loaded',
-                    content: 'GCode file contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
+                    content: 'G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
                     confirmLabel: null,
                     cancelLabel: 'Close',
                 });
