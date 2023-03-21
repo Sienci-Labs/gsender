@@ -986,9 +986,7 @@ class VisualizerWidget extends PureComponent {
             isActive: true,
             category: CARVING_CATEGORY,
             callback: () => {
-                if (this.workflowControl) {
-                    this.workflowControl.startRun();
-                }
+                this.workflowControl.startRun();
             },
         },
         PAUSE_JOB: {

@@ -29,7 +29,6 @@ import map from 'lodash/map';
 import mapValues from 'lodash/mapValues';
 import includes from 'lodash/includes';
 import { throttle, inRange } from 'lodash';
-import reduxStore from 'app/store/redux';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import Widget from 'app/components/Widget';
@@ -42,7 +41,7 @@ import { limit } from 'app/lib/normalize-range';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
-import { Toaster, TOASTER_SUCCESS, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import { connect } from 'react-redux';
 import store from '../../store';
 import Axes from './Axes';
@@ -66,7 +65,8 @@ import {
     AXIS_X,
     AXIS_Y,
     AXIS_Z,
-    AXIS_A
+    AXIS_A,
+    WORKSPACE_MODE
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -178,6 +178,11 @@ class AxesWidget extends PureComponent {
             const { jog } = this.state;
             const { xyStep } = jog;
             return xyStep;
+        },
+        getXAJogDistance: () => {
+            const { jog } = this.state;
+            const { ayStep } = jog;
+            return ayStep;
         },
         getZJogDistance: () => {
             const { jog } = this.state;
@@ -480,44 +485,28 @@ class AxesWidget extends PureComponent {
 
     shuttleControlFunctions = {
         JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
-            const rotaryAxisStatus = store.get('rotaryAxisStatus');
-            const firmwareType = get(reduxStore.getState(), 'controller.type', 'grbl');
+            const isInRotaryMode = store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
+            const firmwareType = this.props.type;
             const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
             if (event) {
                 preventDefault(event);
             }
-            if (axis.a && !rotaryAxisStatus || axis.a && rotaryAxisStatus && isGrbl) {
+            if (axis.a && !isInRotaryMode || axis.a && isInRotaryMode && isGrbl) {
                 return;
             }
-
-            console.log('JOG EVENT, Axis: ', axis); // TODO - Delete this
             this.handleShortcutJog({ axis, direction });
         },
-        UPDATE_ROTARY_STATUS: (_, { command }) => {
-            const firmwareType = get(reduxStore.getState(), 'controller.type', 'grbl');
-            const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
-            const shouldEnableRotary = !store.get('rotaryAxisStatus', false);
+        UPDATE_WORKSPACE_MODE: () => {
+            const currentWorkspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
+            const workspaceModesList = Object.values(WORKSPACE_MODE);
+            const currentWorkspaceModeIndex = workspaceModesList.findIndex(mode => mode === currentWorkspaceMode);
+            const nextWorkspaceMode = workspaceModesList[currentWorkspaceModeIndex + 1] ?? workspaceModesList[0];
 
-            //If grbl, turn off Rotary Axis and update user
-            if (isGrbl) {
-                store.set('rotaryAxisStatus', false);
-                Toaster.clear();
-                Toaster.pop({
-                    type: TOASTER_WARNING,
-                    msg: 'Your firmware does not support Rotary Axis.',
-                });
-                return;
-            }
+            store.replace('workspace.mode', nextWorkspaceMode);
 
-            store.set('rotaryAxisStatus', shouldEnableRotary);
-            controller.command(command, shouldEnableRotary);
-            //Notify user
-            const notification = shouldEnableRotary ? 'Rotary Axis turned on' : 'Rotary Axis is off';
+            const msg = `Workspace Mode set to ${nextWorkspaceMode.charAt(0).toUpperCase() + nextWorkspaceMode.slice(1).toLowerCase()}`;
             Toaster.clear();
-            Toaster.pop({
-                type: TOASTER_SUCCESS,
-                msg: notification,
-            });
+            Toaster.pop({ type: TOASTER_SUCCESS, msg });
         },
         SET_JOG_PRESET: (event, { key }) => {
             if (!key) {
@@ -640,18 +629,15 @@ class AxesWidget extends PureComponent {
             category: JOGGING_CATEGORY,
             callback: this.shuttleControlFunctions.JOG,
         },
-        ROTARY_AXIS: { // Rotary Axis ON/OFF
+        SWITCH_WORKSPACE_MODE: {
             id: 103,
-            title: 'Rotary Axis',
+            title: 'Switch Between Workspace Modes',
             keys: ['ctrl', '5'].join('+'),
-            cmd: 'ROTARY_AXIS',
-            payload: {
-                command: 'rotaryAxis:updateState',
-            },
+            cmd: 'SWITCH_WORKSPACE_MODE',
             preventDefault: false,
             isActive: true,
             category: GENERAL_CATEGORY,
-            callback: this.shuttleControlFunctions.UPDATE_ROTARY_STATUS
+            callback: this.shuttleControlFunctions.UPDATE_WORKSPACE_MODE
         },
         JOG_X_P: {
             title: 'Jog: X+',
@@ -1262,6 +1248,7 @@ class AxesWidget extends PureComponent {
             },
             jog: {
                 xyStep: this.getInitialXYStep(),
+                ayStep: this.getInitialXAStep(),
                 zStep: this.getInitialZStep(),
                 aStep: this.getInitialAStep(),
                 feedrate: this.getInitialFeedRate(),
@@ -1289,6 +1276,13 @@ class AxesWidget extends PureComponent {
         const speeds = this.config.get('jog.normal');
 
         return (units === METRIC_UNITS) ? get(speeds, 'mm.xyStep') : get(speeds, 'in.xyStep');
+    }
+
+    getInitialXAStep() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+        const speeds = this.config.get('jog.normal');
+
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.xaStep') : get(speeds, 'in.xaStep');
     }
 
     getInitialZStep() {
@@ -1407,7 +1401,7 @@ class AxesWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId, machinePosition, workPosition, canJog, isSecondary } = this.props;
+        const { widgetId, machinePosition, workPosition, canJog, isSecondary, type } = this.props;
         const { minimized, isFullscreen } = this.state;
         const { units } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
@@ -1417,6 +1411,7 @@ class AxesWidget extends PureComponent {
             ...this.state,
             // Determine if the motion button is clickable
             canClick: this.canClick(),
+            type: type,
             canClickCancel: this.canClickCancel(),
             isJogging: this.isJogging(),
             activeState: activeState,
@@ -1482,6 +1477,6 @@ export default connect((store) => {
         workflow,
         canJog,
         isConnected,
-        activeState
+        activeState,
     };
 })(AxesWidget);

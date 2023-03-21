@@ -180,7 +180,9 @@ class RunProbe extends PureComponent {
 
         return (
             <Modal
-                disableOverlay onClose={actions.closeModal} show={show}
+                disableOverlayClick
+                onClose={actions.closeModal}
+                show={show}
                 className={styles.modalOverride}
             >
                 <Modal.Header className={styles.modalHeader}>

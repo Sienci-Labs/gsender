@@ -15,12 +15,14 @@ const KeypadDirectionText = styled(KeypadText)`
     min-width: 10px;
 `;
 
-const JogControlArea = ({ actions, jog }) => {
+const JogControlArea = ({ actions, jog, disabled = false }) => {
     const { aStep, feedrate } = jog;
+
     return (
         <div className={styles['jog-control-wrapper']}>
             <JogControl
                 className={styles.btnLeft}
+                disabled={disabled}
                 jog={() => actions.jog({ A: -aStep, F: feedrate })}
                 continuousJog={() => actions.startContinuousJog({ A: -1 }, feedrate)}
                 stopContinuousJog={() => actions.stopContinuousJog()}
@@ -30,6 +32,7 @@ const JogControlArea = ({ actions, jog }) => {
             </JogControl>
             <JogControl
                 className={styles.btnRight}
+                disabled={disabled}
                 jog={() => actions.jog({ A: aStep, F: feedrate })}
                 continuousJog={() => actions.startContinuousJog({ A: 1 }, feedrate)}
                 stopContinuousJog={() => actions.stopContinuousJog()}

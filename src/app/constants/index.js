@@ -208,7 +208,11 @@ export const USER_DATA_COLLECTION = {
     REJECTED: 'REJECTED',
 };
 
-export const ROTARY_AXIS_101_VALUE = '26.667';
+export const ROTARY_MODE_FIRMWARE_SETTINGS = {
+    $101: '17.777',
+    // $111: '0.00',
+    // $121: '0.00',
+};
 
 export const WORKSPACE_MODE = {
     DEFAULT: 'DEFAULT',
