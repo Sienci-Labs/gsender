@@ -1752,16 +1752,6 @@ class GrblController {
 
                 callback(null);
             },
-            'rotaryAxis:updateState': () => {
-                let [shouldEnableRotary = false] = args;
-                console.log('rotaryAxis:updateState :', shouldEnableRotary); // TODO - delete this
-                if (shouldEnableRotary) {
-                // set new Ymax
-                    return;
-                }
-                //Else
-                //set Ymax to default
-            },
             'macro:load': () => {
                 let [id, context = {}, callback = noop] = args;
                 if (typeof context === 'function') {
