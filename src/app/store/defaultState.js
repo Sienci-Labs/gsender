@@ -133,7 +133,7 @@ const defaultState = {
         },
         mode: WORKSPACE_MODE.DEFAULT,
         rotaryAxis: {
-            prev101Value: null,
+            prevFirmwareSettings: {},
         }
     },
     widgets: {
