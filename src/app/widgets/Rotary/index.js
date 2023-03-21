@@ -10,7 +10,7 @@ import store from 'app/store';
 import { WORKSPACE_MODE, METRIC_UNITS } from 'app/constants';
 
 import styles from './index.styl';
-import StepsToggle from './StepsToggle';
+import RotaryToggle from './RotaryToggle';
 import DROarea from './DROarea';
 import JogControlArea from './JogControlArea';
 import SpeedPresets from './SpeedPresets';
@@ -126,7 +126,7 @@ const Rotary = ({ active }) => {
 
                     <div className={styles['rotary-tools-area']}>
                         <p className={styles['rotary-tab-section-title']}>Tools</p>
-                        <StepsToggle />
+                        <RotaryToggle />
                         {/* <StockDiameter /> */}
                         <ActionArea />
                     </div>
