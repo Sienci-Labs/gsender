@@ -1419,13 +1419,18 @@ class GrblHalController {
                 this.command('gcode:pause');
             },
             'gcode:pause': async () => {
+                const [type] = args;
                 if (this.event.hasEnabledEvent(PROGRAM_PAUSE)) {
                     this.workflow.pause();
                     this.event.trigger(PROGRAM_PAUSE);
                 } else {
                     this.workflow.pause();
                     await delay(100);
-                    this.write('!');
+                    if (type === GRBLHAL) {
+                        this.write(GRBLHAL_REALTIME_COMMANDS.FEED_HOLD);
+                    } else {
+                        this.write('!');
+                    }
                 }
             },
             'resume': () => {
@@ -1433,15 +1438,24 @@ class GrblHalController {
                 this.command('gcode:resume');
             },
             'gcode:resume': async () => {
+                const [type] = args;
                 if (this.event.hasEnabledEvent(PROGRAM_RESUME)) {
                     this.feederCB = () => {
-                        this.write('~');
+                        if (type === GRBLHAL) {
+                            this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
+                        } else {
+                            this.write('~');
+                        }
                         this.workflow.resume();
                         this.feederCB = null;
                     };
                     this.event.trigger(PROGRAM_RESUME);
                 } else {
-                    this.write('~');
+                    if (type === GRBLHAL) {
+                        this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
+                    } else {
+                        this.write('~');
+                    }
                     await delay(1000);
                     this.workflow.resume();
                 }
@@ -1467,10 +1481,20 @@ class GrblHalController {
 
                 this.write('!');
             },
+            'feedhold_alt': () => {
+                this.event.trigger(FEED_HOLD);
+
+                this.write(GRBLHAL_REALTIME_COMMANDS.FEED_HOLD);
+            },
             'cyclestart': () => {
                 this.event.trigger(CYCLE_START);
 
                 this.write('~');
+            },
+            'cyclestart_alt': () => {
+                this.event.trigger(CYCLE_START);
+
+                this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
             },
             'statusreport': () => {
                 this.write('?');
@@ -1812,7 +1836,19 @@ class GrblHalController {
                 this.feederCB = () => {
                     this.emit('wizard:next', stepIndex, substepIndex);
                 };
-            }
+            },
+            'realtime_report': () => {
+                this.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+            },
+            'error_clear': () => {
+                this.write('$');
+            },
+            'toolchange:acknowledge': () => {
+                this.write(GRBLHAL_REALTIME_COMMANDS.TOOL_CHANGE_ACK);
+            },
+            'virtual_stop_toggle': () => {
+                this.write(GRBLHAL_REALTIME_COMMANDS.VIRTUAL_STOP_TOGGLE);
+            },
         }[cmd];
 
         if (!handler) {

@@ -100,7 +100,13 @@ class Controller {
         'firmware:ready': [],
         'sender:M0M1': [],
         'ip:list': [],
-        'wizard:next': []
+        'wizard:next': [],
+        'realtime_report': [],
+        'error_clear': [],
+        'toolchange:acknowledge': [],
+        'cyclestart_alt': [],
+        'feedhold_alt': [],
+        'virtual_stop_toggle': [],
     };
 
     context = {

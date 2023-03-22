@@ -132,6 +132,7 @@ const Profile = ({ data, onUpdateProfiles, setCurrentProfileID }) => {
                     />
                 </div>
                 <CategoryFilter onChange={filter} filterCategory={filterCategory} />
+                <strong>* GrblHAL ONLY</strong>
                 <div style={{ overflowY: 'auto', height: '380px', backgroundColor: 'white' }}>
                     <ShortcutsTable
                         onEdit={handleEdit}

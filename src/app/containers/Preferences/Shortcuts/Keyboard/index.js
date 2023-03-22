@@ -196,6 +196,7 @@ const Keyboard = () => {
     return (
         <div>
             <CategoryFilter onChange={filter} filterCategory={filterCategory} />
+            <strong>* GrblHAL ONLY</strong>
             <div className={styles['table-wrapper']}>
                 <ShortcutsTable
                     dataSet={generateList(dataSet)}

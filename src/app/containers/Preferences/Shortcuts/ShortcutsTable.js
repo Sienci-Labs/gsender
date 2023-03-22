@@ -26,6 +26,7 @@ import PropTypes from 'prop-types';
 import cx from 'classnames';
 import Table from 'app/components/Table';
 import ToggleSwitch from 'app/components/ToggleSwitch';
+import shuttleEvents from 'app/lib/shuttleEvents';
 
 import {
     CARVING_CATEGORY,
@@ -39,10 +40,13 @@ import {
     TOOLBAR_CATEGORY,
     MACRO_CATEGORY,
     COOLANT_CATEGORY,
+    GRBLHAL
 } from 'app/constants';
 
 import { formatShortcut } from './helpers';
 import styles from './edit-area.styl';
+
+const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
 /**
  * Shortcuts Table Component
@@ -132,11 +136,18 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
             return (
                 <div className={styles[category]}>{row.category}</div>
             );
+        },
+        renderTitleCell: (_, row) => {
+            const rowTitle = allShuttleControlEvents[row.cmd] ? allShuttleControlEvents[row.cmd].title : row.title;
+            const isSpecial = allShuttleControlEvents[row.cmd]?.payload?.type === GRBLHAL;
+            return (
+                <div>{rowTitle}{isSpecial ? <strong>*</strong> : ''}</div>
+            );
         }
     };
 
     const columns = [
-        { dataKey: 'title', title: 'Action', sortable: true, width: '25%' },
+        { dataKey: 'title', title: 'Action', sortable: true, width: '25%', render: renders.renderTitleCell },
         { dataKey: 'keys', title: 'Shortcut', sortable: true, width: '45%', render: renders.renderShortcutCell },
         { dataKey: 'category', title: 'Category', sortable: true, width: '20%', render: renders.renderCategoryCell },
         { dataKey: 'isActive', title: 'Active', width: '10%', render: renders.renderToggleCell }
