@@ -35,6 +35,7 @@ import GrblHalLineParserResultFeedback from './GrblHalLineParserResultFeedback';
 import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
 //import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
 import GrblHalLineParserResultVersion from './GrblHalLineParserResultVersion';
+import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 import logger from '../../lib/logger';
 import {
     GRBL_HAL_ACTIVE_STATE_IDLE,
@@ -60,7 +61,7 @@ class GrblHalRunner extends events.EventEmitter {
                 z: '0.000'
             },
             ov: [],
-            alarmCode: 'Homing',
+            alarmCode: 11,
             probeActive: false,
             pinState: {}
         },
@@ -246,6 +247,21 @@ class GrblHalRunner extends events.EventEmitter {
             }
             this.emit('startup', payload);
             return;
+        }
+        if (type === GrblHalLineParserResultCode) {
+            const { code } = payload;
+            const nextState = {
+                ...this.state,
+                status: {
+                    ...this.state.status,
+                    activeState: GRBL_HAL_ACTIVE_STATE_ALARM,
+                    alarmCode: Number(code)
+                }
+            };
+            if (!_.isEqual(this.state.status, nextState.status)) {
+                this.state = nextState; // enforce change
+            }
+            this.emit('alarm', payload);
         }
         if (type === GrblHalLineParserResultInfo) {
             const { name, value } = payload;

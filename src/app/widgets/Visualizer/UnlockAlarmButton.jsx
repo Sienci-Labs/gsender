@@ -28,7 +28,7 @@ import styles from './index.styl';
 
 const UnlockAlarmButton = ({ onClick, newMessage, alarmCode }) => {
     let message = 'Click to Unlock Machine';
-    if (alarmCode === 'Homing') {
+    if (alarmCode === 'Homing' || alarmCode === 11) {
         message = 'Click to Run Homing';
     }
     return (
@@ -36,7 +36,7 @@ const UnlockAlarmButton = ({ onClick, newMessage, alarmCode }) => {
             <div className={styles.alarmButtonWrap}>
                 <button type="button" className={styles.alarmButton} onClick={onClick}>
                     <i
-                        className={classnames('fas', alarmCode !== 'Homing' ? 'fa-unlock' : 'fa-home')}
+                        className={classnames('fas', alarmCode !== 'Homing' && alarmCode !== 11 ? 'fa-unlock' : 'fa-home')}
                         role="button"
                         tabIndex={-1}
                     />
@@ -47,7 +47,7 @@ const UnlockAlarmButton = ({ onClick, newMessage, alarmCode }) => {
             <div className={styles.alarmButtonWrap}>
                 <button type="button" className={styles.alarmButton} onClick={onClick}>
                     <i
-                        className={classnames('fas', alarmCode !== 'Homing' ? 'fa-unlock' : 'fa-home')}
+                        className={classnames('fas', alarmCode !== 'Homing' && alarmCode !== 11 ? 'fa-unlock' : 'fa-home')}
                         role="button"
                         tabIndex={-1}
                     />
