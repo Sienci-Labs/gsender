@@ -76,8 +76,9 @@ class Combokeys extends events.EventEmitter {
         }
         const commandKeys = await this.getCommandKeys();
 
-        Object.entries(commandKeys).filter(([key, keybinding]) => keybinding.isActive).forEach(([key, o]) => {
-            const { keys, cmd, payload = null, isActive, category } = o;
+        Object.entries(commandKeys).forEach(([key, o]) => {
+            const { keys, isActive } = o;
+            const { cmd, payload = null, category, preventDefault: preventDefaultBool } = shuttleEvents.allShuttleControlEvents[key] ?? o; // if macro, won't have shuttleEvents to pull defaults from
 
             //Do not add any keybindings if the shortcut is disabled or there is no shortcut at all
             if (!isActive || !keys) {
@@ -86,7 +87,7 @@ class Combokeys extends events.EventEmitter {
 
             const callback = (event) => {
                 log.debug(`combokeys: keys=${keys} cmd=${cmd} payload=${JSON.stringify(payload)}`);
-                if (!!o.preventDefault) {
+                if (!!preventDefaultBool) {
                     preventDefault(event);
                 }
                 if (category === MACRO_CATEGORY) {
@@ -112,14 +113,14 @@ class Combokeys extends events.EventEmitter {
             if (jogCmds.includes(cmd)) {
                 const callback = (event) => {
                     log.debug(`combokeys: keys=${keys} cmd=${STOP_CMD} payload=${JSON.stringify(payload)}`);
-                    if (!!o.preventDefault) {
+                    if (!!preventDefaultBool) {
                         preventDefault(event);
                     }
                     this.emit(STOP_CMD, event, payload);
                 };
 
                 const modiferKeyCB = (e) => {
-                    if (!!o.preventDefault) {
+                    if (!!preventDefaultBool) {
                         preventDefault(e);
                     }
 
