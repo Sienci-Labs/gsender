@@ -8,6 +8,7 @@ import store from 'app/store';
 import gamepad, { shortcutComboBuilder } from 'app/lib/gamepad';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import Modal from 'app/components/ToolModal/ToolModal';
+import shuttleEvents from 'app/lib/shuttleEvents';
 
 import Input from '../../components/Input';
 
@@ -16,6 +17,7 @@ import { AVAILABILITY_TYPES } from '../utils';
 import Availability from './Availability';
 
 const { DEFAULT, AVAILABLE, UNAVAILABLE, IS_THE_SAME } = AVAILABILITY_TYPES;
+const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
 const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, filterFunc, filterCategory }) => {
     const [gamepadShortcut, setGamepadShortcut] = useState([]);
@@ -105,7 +107,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, fi
             <div className={styles.profileActionWrapper}>
                 <Availability
                     type={availability}
-                    shortcutTitle={shortcut.title}
+                    shortcutTitle={allShuttleControlEvents[shortcut.cmd] ? allShuttleControlEvents[shortcut.cmd].title : shortcut.title}
                     shortcut={gamepadShortcut}
                     listenerRef={listenerRef}
                 />

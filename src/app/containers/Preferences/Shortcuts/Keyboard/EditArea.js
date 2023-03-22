@@ -25,11 +25,13 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, ButtonGroup } from 'app/components/Buttons';
+import shuttleEvents from 'app/lib/shuttleEvents';
 
 import { formatShortcut } from '../helpers';
 import styles from '../edit-area.styl';
 
 const triggerKeys = ['Meta', 'Alt', 'Shift', 'Control'];
+const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
 /**
  * Keybinding Edit Area Component
@@ -158,9 +160,11 @@ export default class EditArea extends Component {
 
         if (foundShortcut) {
             if (foundShortcut[1].keys !== this.props.shortcut.keys) {
+                const title = allShuttleControlEvents[foundShortcut[1].cmd] ?
+                    allShuttleControlEvents[foundShortcut[1].cmd].title : foundShortcut[1].title;
                 this.setState({
                     ...keyState,
-                    state: { available: false, error: true, message: `This shortcut is already in use by action "${foundShortcut[1].title}"` }
+                    state: { available: false, error: true, message: `This shortcut is already in use by action "${title}"` }
                 });
             } else {
                 //If it found itself, return to original state
@@ -253,6 +257,9 @@ export default class EditArea extends Component {
 
         const shortcutkeys = this.displayShortcut();
 
+        const title = allShuttleControlEvents[shortcut.cmd] ?
+            allShuttleControlEvents[shortcut.cmd].title : shortcut.title;
+
         return (
             <div className={styles.wrapper}>
 
@@ -260,7 +267,7 @@ export default class EditArea extends Component {
                     <h4 className={styles['edit-subtitle']}>Action</h4>
                     <h4 className={styles['edit-subtitle']}>Current Shortcut</h4>
 
-                    <h4 style={{ textAlign: 'center' }}>{shortcut.title}</h4>
+                    <h4 style={{ textAlign: 'center' }}>{title}</h4>
                     <h4 style={{ textAlign: 'center' }}>{shortcutkeys}</h4>
                 </div>
 
