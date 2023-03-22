@@ -131,10 +131,11 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                 [COOLANT_CATEGORY]: 'categoryDarkRed'
             };
 
-            const category = categories[row.category];
+            const rowCategory = allShuttleControlEvents[row.cmd] ? allShuttleControlEvents[row.cmd].category : row.category;
+            const category = categories[rowCategory];
 
             return (
-                <div className={styles[category]}>{row.category}</div>
+                <div className={styles[category]}>{rowCategory}</div>
             );
         },
         renderTitleCell: (_, row) => {
@@ -143,7 +144,7 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
             return (
                 <div>{rowTitle}{isSpecial ? <strong>*</strong> : ''}</div>
             );
-        }
+        },
     };
 
     const columns = [

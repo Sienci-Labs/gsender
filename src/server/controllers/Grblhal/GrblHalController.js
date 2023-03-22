@@ -891,6 +891,8 @@ class GrblHalController {
 
         //check if controller is ready and send the status
         this.emit('grbl:iSready', this.ready);
+
+        this.command('realtime_report');
     }
 
     populateContext(context = {}) {

@@ -34,6 +34,7 @@ import GrblHalLineParserResultEcho from './GrblHalLineParserResultEcho';
 import GrblHalLineParserResultFeedback from './GrblHalLineParserResultFeedback';
 import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
 import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
+import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 
 // Grbl v1.1
@@ -42,6 +43,9 @@ import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 class GrblHalLineParser {
     parse(line) {
         const parsers = [
+            // <Alarm:#|[...]>
+            GrblHalLineParserResultCode,
+
             // <>
             GrblHalLineParserResultStatus,
 

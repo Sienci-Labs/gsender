@@ -19,16 +19,10 @@ const Mask = ({ value, bits, numBits, requiredBit, onChange }) => {
         initializeSettings();
     }, [value]);
 
-    useEffect(() => {
-        updateValues(bitShiftSettings);
-    }, [bitShiftSettings]);
-
     const handleSwitch = (value, index) => {
-        setBitShiftSettings(prev => {
-            const newBitShiftSettings = [...prev];
-            newBitShiftSettings[index] = value;
-            return newBitShiftSettings;
-        });
+        const newBitShiftSettings = [...bitShiftSettings];
+        newBitShiftSettings[index] = value;
+        updateValues(newBitShiftSettings);
     };
 
     const initializeSettings = () => {
@@ -40,7 +34,7 @@ const Mask = ({ value, bits, numBits, requiredBit, onChange }) => {
         const binary = (Number(value) >>> 0).toString(2);
         let settings = [];
         for (let i = 0; i < numBits; i++) {
-            settings.push(binary.indexOf(i) === '1');
+            settings.push(binary.charAt(i) === '1');
         }
 
         setBitShiftSettings(settings);
