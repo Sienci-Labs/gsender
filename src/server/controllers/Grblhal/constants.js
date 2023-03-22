@@ -533,6 +533,7 @@ export const GRBL_HAL_SETTINGS = [
         units: '',
         description: 'Interface IP mode.',
         inputType: SELECT,
+        defaultValue: 0,
         values: {
             0: 'Static address',
             1: 'DHCP supplied address',
@@ -874,6 +875,7 @@ export const GRBL_HAL_SETTINGS = [
         units: '',
         description: 'Specifies Spindle/Laser/Lathe mode',
         inputType: SELECT,
+        defaultValue: 0,
         values: {
             0: 'Normal mode',
             1: 'Laser mode',
@@ -1253,6 +1255,7 @@ export const GRBL_HAL_SETTINGS = [
         units: '',
         description: 'Wi-Fi Mode.',
         inputType: SELECT,
+        defaultValue: 0,
         values: {
             0: 'NULL',
             1: 'STA',

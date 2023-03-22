@@ -5,17 +5,16 @@ import { RadioGroup, RadioButton } from 'app/components/Radio';
 import styles from './index.styl';
 
 const Select = ({ value, values, onChange }) => {
+    const correctedValue = parseInt(value, 10).toString();
     return (
         <div className={styles.select}>
             <RadioGroup
-                value={value}
-                onChange={(value) => {
-                    onChange(Number(value).toString());
-                }}
+                value={correctedValue}
+                onChange={onChange}
             >
                 {
                     Object.keys(values).map((key, index) => {
-                        return <RadioButton key={uniqueId()} className={styles.radioButton} value={key} checked={key === Number(value)}>{values[key]}</RadioButton>;
+                        return <RadioButton key={uniqueId()} className={styles.radioButton} value={key} checked={key === correctedValue}>{values[key]}</RadioButton>;
                     })
                 }
             </RadioGroup>
