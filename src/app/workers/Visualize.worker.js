@@ -255,14 +255,15 @@ onmessage = function({ data }) {
     });
 
     toolpath
-        .loadFromString(content, (line, index) => {
+        .loadFromString(content, (err, data) => {
             const vertexIndex = vertices.length / 3;
-            let spindleValues = {};
 
             frames.push(vertexIndex);
-
+        })
+        .on('data', (data) => {
+            let spindleValues = {};
             if (isLaser) {
-                updateSpindleStateFromLine(line);
+                updateSpindleStateFromLine(data);
                 //console.log(`Spindle: ${spindleOn} - ${line.line}`);
                 spindleValues = {
                     spindleOn,
@@ -271,8 +272,7 @@ onmessage = function({ data }) {
 
                 spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
             }
-        })
-        .on('data', (data) => {
+
             currentLines++;
             const newProgress = Math.floor(currentLines / totalLines * 100);
             if (newProgress !== progress) {
