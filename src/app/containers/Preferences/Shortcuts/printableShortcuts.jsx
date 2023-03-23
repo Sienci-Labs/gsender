@@ -57,7 +57,7 @@ const PrintableShortcuts = React.forwardRef((props, ref) => {
                     <tbody>
                         {
                             keys.map(shortcut => (
-                                <tr key={`${shortcut.k}`}>
+                                <tr key={`${shortcut.id}`}>
                                     <td>{shortcut.title || '-'}</td>
                                     <td><i>{shortcut.keys || '-'}</i></td>
                                 </tr>
