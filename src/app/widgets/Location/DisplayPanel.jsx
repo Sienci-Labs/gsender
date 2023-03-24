@@ -394,7 +394,7 @@ export default connect((store) => {
     const pullOff = get(store, 'controller.settings.settings.$27', '1');
     const homingFlag = get(store, 'controller.homingFlag', false);
     const homingRun = get(store, 'controller.homingRun', false);
-    const homingEnabled = homingSetting === '1';
+    const homingEnabled = homingSetting !== '0';
     const isConnected = get(store, 'connection.isConnected');
     const workflowState = get(store, 'controller.workflow.state');
     const activeState = get(store, 'controller.state.status.activeState');
