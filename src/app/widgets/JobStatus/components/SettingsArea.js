@@ -84,8 +84,8 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
     };
 
     // debounced handlers
-    const debouncedSpindleHandler = debounce((val) => updateSpindleSpeedChange(val), 250);
-    const debouncedFeedHandler = debounce((val) => updateFeedRateChange(val), 250);
+    const debouncedSpindleHandler = debounce((val) => updateSpindleSpeedChange(val), 100, { leading: false, trailing: true });
+    const debouncedFeedHandler = debounce((val) => updateFeedRateChange(val), 100, { leading: false, trailing: true });
 
     const handleMachineProfileChange = () => {
         setShowSpindleOverride(store.get('workspace.machineProfile.spindle'));
