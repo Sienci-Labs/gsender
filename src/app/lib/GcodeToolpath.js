@@ -15,6 +15,33 @@ const translatePosition = (position, newPosition, relative) => {
     return relative ? (position + newPosition) : newPosition;
 };
 
+export const toRadians = (degrees) => {
+    return degrees * Math.PI / 180;
+};
+
+export const shouldRotate = (aValue) => {
+    return aValue !== 0;
+};
+
+export const rotateAxis = (axis, { y, z, a }) => {
+    if (!axis) {
+        throw new Error('Axis is required');
+    }
+
+    const sinA = Math.sin(toRadians(a));
+    const cosA = Math.cos(toRadians(a));
+
+    if (axis === 'y') {
+        return y * cosA - z * sinA;
+    }
+
+    if (axis === 'z') {
+        return y * sinA + z * cosA;
+    }
+
+    return null;
+};
+
 class GcodeToolpath {
     g92offset = {
         x: 0,
@@ -32,8 +59,8 @@ class GcodeToolpath {
         };
     }
 
-    offsetAddLine = (start, end) => {
-        this.fn.addLine(this.modal, this.offsetG92(start), this.offsetG92(end));
+    offsetAddLine = (start, end, prev) => {
+        this.fn.addLine(this.modal, this.offsetG92(start), this.offsetG92(end), prev);
     }
 
     offsetAddArcCurve = (start, end, center) => {
@@ -46,6 +73,13 @@ class GcodeToolpath {
         z: 0,
         a: 0,
     };
+
+    prevPosition = {
+        x: 0,
+        y: 0,
+        z: 0,
+        a: 0,
+    }
 
     modal = {
         // Moton Mode
@@ -105,21 +139,30 @@ class GcodeToolpath {
                 this.setModal({ motion: 'G0' });
             }
 
+            const v0 = {
+                x: this.prevPosition.x,
+                y: this.prevPosition.y,
+                z: this.prevPosition.z,
+                a: this.prevPosition.a,
+            };
+
             const v1 = {
                 x: this.position.x,
                 y: this.position.y,
                 z: this.position.z,
                 a: this.position.a,
             };
+
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
                 z: this.translateZ(params.Z),
                 a: this.translateA(params.A)
             };
+
             const targetPosition = { x: v2.x, y: v2.y, z: v2.z, a: v2.a };
 
-            this.offsetAddLine(v1, v2);
+            this.offsetAddLine(v1, v2, v0);
 
             // Update position
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z, targetPosition.a);
@@ -143,12 +186,20 @@ class GcodeToolpath {
                 this.setModal({ motion: 'G1' });
             }
 
+            const v0 = {
+                x: this.prevPosition.x,
+                y: this.prevPosition.y,
+                z: this.prevPosition.z,
+                a: this.prevPosition.a,
+            };
+
             const v1 = {
                 x: this.position.x,
                 y: this.position.y,
                 z: this.position.z,
                 a: this.position.a,
             };
+
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
@@ -158,7 +209,7 @@ class GcodeToolpath {
 
             const targetPosition = { x: v2.x, y: v2.y, z: v2.z, a: v2.a };
 
-            this.offsetAddLine(v1, v2);
+            this.offsetAddLine(v1, v2, v0);
 
             // Update position
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z, targetPosition.a);
@@ -696,14 +747,21 @@ class GcodeToolpath {
     }
 
     setPosition(...pos) {
+        this.prevPosition.x = this.position.x;
+        this.prevPosition.y = this.position.y;
+        this.prevPosition.z = this.position.z;
+        this.prevPosition.a = this.position.a;
+
         if (typeof pos[0] === 'object') {
             const { x, y, z, a } = { ...pos[0] };
+
             this.position.x = (typeof x === 'number') ? x : this.position.x;
             this.position.y = (typeof y === 'number') ? y : this.position.y;
             this.position.z = (typeof z === 'number') ? z : this.position.z;
             this.position.a = (typeof a === 'number') ? a : this.position.a;
         } else {
             const [x, y, z, a] = pos;
+
             this.position.x = (typeof x === 'number') ? x : this.position.x;
             this.position.y = (typeof y === 'number') ? y : this.position.y;
             this.position.z = (typeof z === 'number') ? z : this.position.z;
