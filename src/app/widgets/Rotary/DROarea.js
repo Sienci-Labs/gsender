@@ -11,6 +11,7 @@ import {
     AXIS_B,
     AXIS_C,
     METRIC_UNITS,
+    WORKSPACE_MODE
 } from 'app/constants';
 import store from 'app/store';
 
@@ -24,7 +25,7 @@ const DROarea = ({ canClick = true, actions }) => {
 
     const machinePosition = useSelector(state => state.controller.mpos);
     const workPosition = useSelector(state => state.controller.wpos);
-    const controllerState = useSelector(state => state.controller.state);
+    const { type: controllerType, state: controllerState } = useSelector(state => state.controller);
     const [positionInput] = useState({
         [AXIS_E]: false,
         [AXIS_X]: false,
@@ -35,13 +36,17 @@ const DROarea = ({ canClick = true, actions }) => {
         [AXIS_C]: false
     });
 
-    const renderAxis = (axis) => {
+    const renderAxis = (axis, label) => {
+        const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
+        const inRotaryModeAndIsGrbl = workspaceMode === WORKSPACE_MODE.ROTARY && controllerType === 'Grbl';
+
+        // Report the y value in the DRO since the A-axis is not reported back from the grbl controller we are simulating the rotary axis
+        axis = axis === AXIS_A && inRotaryModeAndIsGrbl ? AXIS_Y : axis;
+
         let mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';
         const axisLabel = axis.toUpperCase();
         const showPositionInput = canClick && positionInput[axis];
-
-        //mpos = Number(mpos).toFixed(3);
 
         //Function to zero out given axis
         const handleAxisButtonClick = () => {
@@ -60,12 +65,13 @@ const DROarea = ({ canClick = true, actions }) => {
         };
 
         const customMathRound = (num) => {
-            let radix = num % 1.0;
-            if ((radix > 0.899 && radix < 1.0) && (Number(num.split('.')[1].slice(0, 2)) > 97)) {
-                return Math.ceil(num).toFixed(Number(num.split('.')[1].length));
-            } else {
-                return num;
-            }
+            // let radix = num % 1.0;
+            // if ((radix > 0.899 && radix < 1.0) && (Number(num.split('.')[1].slice(0, 2)) > 97)) {
+            //     return Math.ceil(num).toFixed(2);
+            // } else {
+            //     return num;
+            // }
+            return Number(num).toFixed(2);
         };
 
         return (
@@ -80,10 +86,14 @@ const DROarea = ({ canClick = true, actions }) => {
                             controller.command('gcode:safe', commands, modal);
                         }}
                     />
-                    <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick} />
+                    <AxisButton axis={label || axisLabel} onClick={handleAxisButtonClick} disabled={!canClick} />
                 </div>
                 <div>
-                    <MachinePositionInput value={customMathRound(wpos)} disabled={!canClick} handleManualMovement={(value) => actions.handleManualMovement(value, axis)} />
+                    <MachinePositionInput
+                        value={customMathRound(wpos)}
+                        disabled={!canClick}
+                        handleManualMovement={(value) => actions.handleManualMovement(value, axis)}
+                    />
                     {!showPositionInput && <PositionLabel value={customMathRound(mpos)} small />}
                 </div>
             </div>
@@ -91,7 +101,7 @@ const DROarea = ({ canClick = true, actions }) => {
     };
 
     return (
-        <div>{renderAxis(AXIS_A)}</div>
+        <div>{renderAxis(AXIS_A, 'A')}</div>
     );
 };
 
