@@ -21,9 +21,10 @@
  *
  */
 
-import Toolpath from 'gcode-toolpath';
 import ch from 'hull.js';
 import * as THREE from 'three';
+
+import Toolpath, { rotateAxis, shouldRotate } from '../lib/GcodeToolpath';
 
 onmessage = ({ data }) => {
     const { gcode, isLaser = false } = data;
@@ -37,6 +38,14 @@ onmessage = ({ data }) => {
         const toolpath = new Toolpath({
             addLine: ({ motion }, v1, v2) => {
                 if (motion === 'G1' || motion === 'G0') {
+                    if (shouldRotate(v1.a) || shouldRotate(v2.a)) {
+                        v1.y = rotateAxis('y', v1);
+                        v1.z = rotateAxis('z', v1);
+
+                        v2.y = rotateAxis('y', v2);
+                        v2.z = rotateAxis('z', v2);
+                    }
+
                     vertices.push(vertex(v2.x, v2.y));
                 }
             },
