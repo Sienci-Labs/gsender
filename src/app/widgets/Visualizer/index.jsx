@@ -846,6 +846,7 @@ class VisualizerWidget extends PureComponent {
                 line: '',
             },
             layoutIsReversed: store.get('workspace.reverseWidgets'),
+            workspaceMode: store.get('workspace.mode'),
         };
     }
 
