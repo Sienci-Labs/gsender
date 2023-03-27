@@ -256,11 +256,14 @@ onmessage = function({ data }) {
 
     toolpath
         .loadFromString(content, (err, data) => {
-            const vertexIndex = vertices.length / 3;
-
-            frames.push(vertexIndex);
+            if (err) {
+                console.error(err);
+            }
         })
         .on('data', (data) => {
+            const vertexIndex = vertices.length / 3;
+            frames.push(vertexIndex);
+
             let spindleValues = {};
             if (isLaser) {
                 updateSpindleStateFromLine(data);
