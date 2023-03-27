@@ -91,7 +91,7 @@ const main = () => {
             app.commandLine.appendSwitch('ignore-gpu-blacklist');
             // Increase V8 heap size of the main process
             if (process.arch === 'x64') {
-                const memoryLimit = 1024 * 4; // 4GB
+                const memoryLimit = 1024 * 8; // 8GB
                 app.commandLine.appendSwitch('--js-flags', `--max-old-space-size=${memoryLimit}`);
             }
 

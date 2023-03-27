@@ -23,7 +23,10 @@
 
 import React, { useState, useEffect } from 'react';
 import store from 'app/store';
+import shuttleEvents from 'app/lib/shuttleEvents';
 import styles from './index.styl';
+
+const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
 const PrintableShortcuts = React.forwardRef((props, ref) => {
     const [shortcutsList] = useState(store.get('commandKeys', {}));
@@ -33,8 +36,9 @@ const PrintableShortcuts = React.forwardRef((props, ref) => {
         const keysToPrint = [];
         for (const [k, shortcut] of Object.entries(shortcutsList)) {
             if (shortcut.isActive && shortcut.keys !== '') {
+                const title = allShuttleControlEvents[k] ? allShuttleControlEvents[k].title : shortcut.title;
                 keysToPrint.push({
-                    title: shortcut.title,
+                    title: title,
                     keys: shortcut.keys,
                     id: k
                 });
