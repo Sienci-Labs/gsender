@@ -27,10 +27,11 @@ const Rotary = ({ active }) => {
         aStep: '5.00',
     });
     const [, setIsContinuousJogging] = useState(false);
-    const controllerState = useSelector(state => state.controller.state);
+    const { state: controllerState, type: controllerType } = useSelector(state => state.controller);
 
     const { ROTARY } = WORKSPACE_MODE;
-    const rotary = store.get('workspace.mode') === ROTARY;
+    const workspaceMode = store.get('workspace.mode');
+    const enableRotaryAxis = (workspaceMode === ROTARY && controllerType === 'Grbl') || controllerType === 'grblHAL';
 
     const actions = {
         setSelectedSpeed: (speed) => {
@@ -115,10 +116,10 @@ const Rotary = ({ active }) => {
                         <p className={styles['rotary-tab-section-title']}>
                             Jog Control
                         </p>
-                        <DROarea actions={actions} canClick={rotary} />
+                        <DROarea actions={actions} canClick={enableRotaryAxis} />
                         <JogControlArea
                             selectedSpeed={speedPreset} actions={actions} jog={jog}
-                            disabled={!rotary}
+                            disabled={!enableRotaryAxis}
                         />
                         <SpeedPresets selectedSpeed={speedPreset} actions={actions} />
                         <SpeedControls jog={jog} actions={actions} />
