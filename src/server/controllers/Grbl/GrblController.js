@@ -45,9 +45,11 @@ import monitor from '../../services/monitor';
 import taskRunner from '../../services/taskrunner';
 import store from '../../store';
 import {
+    A_AXIS_COMMANDS,
     GLOBAL_OBJECTS as globalObjects,
     WRITE_SOURCE_CLIENT,
-    WRITE_SOURCE_FEEDER
+    WRITE_SOURCE_FEEDER,
+    Y_AXIS_COMMANDS
 } from '../constants';
 import GrblRunner from './GrblRunner';
 import {
@@ -322,6 +324,16 @@ class GrblController {
                     line = line.replace('M6', '(M6)');
                 }
 
+                const isUsingImperialUnits = context.modal.units === 'G20';
+
+                line = translateGcode({
+                    gcode: line,
+                    from: 'A',
+                    to: 'Y',
+                    regex: A_AXIS_COMMANDS,
+                    type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                });
+
                 return line;
             }
         });
@@ -440,6 +452,27 @@ class GrblController {
 
                     line = line.replace('M6', '(M6)');
                 }
+
+                /**
+                 * Rotary Logic
+                 */
+                const containsACommand = A_AXIS_COMMANDS.test(line);
+                const containsYCommand = Y_AXIS_COMMANDS.test(line);
+
+                if (containsACommand && !containsYCommand) {
+                    const isUsingImperialUnits = context.modal.units === 'G20';
+
+                    line = translateGcode({
+                        gcode: line,
+                        from: 'A',
+                        to: 'Y',
+                        regex: A_AXIS_COMMANDS,
+                        type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                    });
+                }
+                /**
+                 * End of Rotary Logic
+                 */
 
                 return line;
             }
@@ -1247,28 +1280,13 @@ class GrblController {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }
 
-                const aAxisCommandsRegex = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)|A-(\d+\.\d+)|A-(\d+)/;
-                const yAxisCommandsRegex = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)|Y-(\d+\.\d+)|Y-(\d+)/;
-                const imperialUnitsRegex = /(G20)|(G 20)/;
-                const containsACommand = aAxisCommandsRegex.test(gcode);
-                const containsYCommand = yAxisCommandsRegex.test(gcode);
+                const containsACommand = A_AXIS_COMMANDS.test(gcode);
+                const containsYCommand = Y_AXIS_COMMANDS.test(gcode);
 
-                // We don't need to do any gcode translation on files that have 4 axes since they
-                // are not compatible with vanilla grbl anyway
                 if (containsACommand && containsYCommand) {
                     this.emit('filetype', FILE_TYPE.FOUR_AXIS);
                 } else if (containsACommand) {
                     this.emit('filetype', FILE_TYPE.ROTARY);
-                    const gcodeIsImperial = imperialUnitsRegex.test(gcode);
-                    const regexWithGlobal = new RegExp(aAxisCommandsRegex, 'g');
-
-                    gcode = translateGcode({
-                        gcode,
-                        from: 'A',
-                        to: 'Y',
-                        regex: regexWithGlobal,
-                        type: gcodeIsImperial ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
-                    });
                 }
 
                 const ok = this.sender.load(name, gcode + '\n' + dwell, context);
@@ -1282,7 +1300,6 @@ class GrblController {
                 this.workflow.stop();
 
                 callback(null, this.sender.toJSON());
-                this.emit('file:load', gcode, meta.size, meta.name, meta.visualizer);
             },
             'gcode:unload': () => {
                 this.workflow.stop();
@@ -1739,7 +1756,7 @@ class GrblController {
                 }
 
                 const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-                this.writeln(jogCommand);
+                this.command('gcode', jogCommand);
             },
             'jog:stop': () => {
                 this.write('\x85');
