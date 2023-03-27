@@ -41,7 +41,8 @@ import {
     RENDER_RENDERED,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
-    FILE_TYPE
+    FILE_TYPE,
+    WORKSPACE_MODE
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/CombinedCamera';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -390,7 +391,7 @@ class Visualizer extends Component {
                 this.updateRotaryStock();
             }
         } else {
-            this.rotaryStock.obj.visible = false;
+            this.rotaryStock.visible = false;
         }
 
         { // Update position
@@ -1269,7 +1270,7 @@ class Visualizer extends Component {
                 visible: false,
             });
 
-            this.group.add(this.rotaryStock.obj);
+            this.group.add(this.rotaryStock);
 
             // Update the scene
             this.updateScene();
@@ -1524,7 +1525,7 @@ class Visualizer extends Component {
         });
         this.updateRotaryStockPosition();
 
-        this.group.add(this.rotaryStock.obj);
+        this.group.add(this.rotaryStock);
     }
 
     getRadiansFromDegrees (val) {
@@ -1538,7 +1539,7 @@ class Visualizer extends Component {
 
         const value = this.getRadiansFromDegrees(amount);
 
-        this.rotaryStock.obj.rotateY(value);
+        this.rotaryStock.rotateY(value);
     }
 
     // Rotates the cutting tool around the z axis with a given rpm and an optional fps
@@ -1560,8 +1561,22 @@ class Visualizer extends Component {
             return;
         }
 
+        const { fileType } = this.props;
+        const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
+
         const pivotPoint = this.pivotPoint.get();
         const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
+
+        if (workspaceMode === WORKSPACE_MODE.ROTARY && fileType === FILE_TYPE.ROTARY) {
+            const x0 = wpox - pivotPoint.x;
+            const z0 = wpoz - pivotPoint.z;
+
+            this.cuttingTool.position.setX(x0);
+            this.cuttingTool.position.setZ(z0);
+
+            return;
+        }
+
         const x0 = wpox - pivotPoint.x;
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
@@ -1581,7 +1596,7 @@ class Visualizer extends Component {
         const y0 = -pivotPoint.y;
         const z0 = -pivotPoint.z;
 
-        this.rotaryStock.obj.position.set(x0, y0, z0);
+        this.rotaryStock.position.set(x0, y0, z0);
     }
 
     // Update cutting tool position
