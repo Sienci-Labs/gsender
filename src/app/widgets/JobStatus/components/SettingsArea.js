@@ -23,6 +23,7 @@
 
 import React, { useState, useEffect } from 'react';
 import get from 'lodash/get';
+import debounce from 'lodash/debounce';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import controller from 'app/lib/controller';
@@ -44,11 +45,8 @@ const VALUE_RANGES = {
  * @prop {Object} state Default state given from parent component
  *
  */
-const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
+const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
     const [showSpindleOverride, setShowSpindleOverride] = useState(store.get('workspace.machineProfile.spindle'));
-    const ov = get(controllerState, 'status.ov', []);
-    const [ovF, setOvF] = useState(ov[0]);
-    const [ovS, setOvS] = useState(ov[2]);
 
     const { units } = state;
     const unitString = `${units}/min`;
@@ -68,7 +66,6 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
             return;
         }
 
-        setOvF(feedRate);
         controller.command('feedOverride', feedRate);
     };
 
@@ -83,9 +80,12 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
             return;
         }
 
-        setOvS(spindleSpeed);
         controller.command('spindleOverride', spindleSpeed);
     };
+
+    // debounced handlers
+    const debouncedSpindleHandler = debounce((val) => updateSpindleSpeedChange(val), 250);
+    const debouncedFeedHandler = debounce((val) => updateFeedRateChange(val), 250);
 
     const handleMachineProfileChange = () => {
         setShowSpindleOverride(store.get('workspace.machineProfile.spindle'));
@@ -114,9 +114,8 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
                     unitString="%"
                     step={5}
                     onChange={(e) => {
-                        setOvF(e.target.value);
+                        debouncedFeedHandler(e.target.value);
                     }}
-                    onMouseUp={updateFeedRateChange}
                 />
                 <div className={styles.overridesButtonsWrapper}>
                     <FeedControlButton value="100" onClick={() => updateFeedRateChange(100)}>
@@ -145,9 +144,8 @@ const SettingsArea = ({ state, controllerState, spindle, feedrate }) => {
                             unitString="%"
                             step={5}
                             onChange={(e) => {
-                                setOvS(e.target.value);
+                                debouncedSpindleHandler(e.target.value);
                             }}
-                            onMouseUp={updateSpindleSpeedChange}
                         />
                         <div className={styles.overridesButtonsWrapper}>
                             <FeedControlButton value="100" onClick={() => updateSpindleSpeedChange(100)}>
@@ -175,10 +173,15 @@ export default connect((store) => {
     const controllerState = get(store, 'controller.state');
     let spindle = get(controllerState, 'status.spindle');
     let feedrate = get(controllerState, 'status.feedrate');
+    const ov = get(controllerState, 'status.ov', [0, 0, 0]);
+    const ovF = ov[0];
+    const ovS = ov[2];
 
     return {
         controllerState,
         spindle,
-        feedrate
+        feedrate,
+        ovF,
+        ovS
     };
 })(SettingsArea);
