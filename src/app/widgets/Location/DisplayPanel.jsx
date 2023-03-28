@@ -113,7 +113,6 @@ class DisplayPanel extends PureComponent {
     }
 
     state = {
-        homingRun: false,
         controllerAlarmState: null,
         positionInput: {
             [AXIS_E]: false,
@@ -265,10 +264,10 @@ class DisplayPanel extends PureComponent {
             const gcode = getMovementGCode('BL', homingDirection, homingFlag, pullOff);
             controller.command('gcode', gcode);
         },
-        startHoming: (axis) => {
-            this.setState({
-                homingRun: true
-            });
+        startHoming: () => {
+            controller.command('homing');
+        },
+        startSingleAxisHoming: (axis) => {
             controller.command('homing', axis);
         }
     }
@@ -358,7 +357,7 @@ class DisplayPanel extends PureComponent {
                                             <ButtonCollection
                                                 disabled={!canHome}
                                                 buttons={['X', 'Y', 'Z', 'A']}
-                                                onClick={this.actions.startHoming}
+                                                onClick={this.actions.startSingleAxisHoming}
                                             >
                                             </ButtonCollection>
                                         </>
