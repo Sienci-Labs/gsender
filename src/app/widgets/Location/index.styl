@@ -77,11 +77,10 @@
 }
 
 .control-buttons {
-    padding: 0 2rem
     display: flex;
     flex-grow 1;
     flex-direction column;
-   padding: 0 1rem;
+    padding: 0 1rem;
     button {
         margin-bottom: 10px;
     }
@@ -106,12 +105,27 @@
     align-items center;
 }
 
-.end-stop-active-controls {
-    width: 24%;
-    display: grid;
-    grid-template-columns: repeat(3,minmax(0,1fr));
+.end-stop {
+    width: 30%;
+    display: flex;
+    flex-direction: column;
     height: max-content;
     margin: auto;
+}
+
+.homeWrapper {
+    align-self: center;
+    justify-self: center;
+    margin-bottom: 5px;
+}
+
+.homeIcon {
+    font-size: 1.5em !important;
+}
+
+.end-stop-active-controls {
+    display: grid;
+    grid-template-columns: repeat(3,minmax(0,1fr));
     @media (max-width: 599px) {
         margin-top: 1rem;
         width: 50%;

@@ -32,6 +32,7 @@ import _isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import cx from 'classnames';
 import controller from 'app/lib/controller';
 //import DRO from 'app/widgets/Location/components/DRO';
 import store from 'app/store';
@@ -59,6 +60,7 @@ import styles from './index.styl';
 import AxisButton from './components/AxisButton';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import QuickPositionButton from './components/QuickPositionButton';
+import ButtonCollection from '../../components/ButtonCollection/ButtonCollection';
 
 class DisplayPanel extends PureComponent {
     static propTypes = {
@@ -263,12 +265,19 @@ class DisplayPanel extends PureComponent {
             const gcode = getMovementGCode('BL', homingDirection, homingFlag, pullOff);
             controller.command('gcode', gcode);
         },
-        startHoming: () => {
+        startHoming: (axis) => {
             this.setState({
                 homingRun: true
             });
-            controller.command('homing');
+            controller.command('homing', axis);
         }
+    }
+
+    determineSingleAxisHoming() {
+        const { homingSetting } = this.props;
+        const binary = parseInt(homingSetting, 10).toString(2);
+        const singleAxis = binary.charAt(binary.length - 2);
+        return singleAxis;
     }
 
     render() {
@@ -277,6 +286,8 @@ class DisplayPanel extends PureComponent {
         const hasAxisX = includes(axes, AXIS_X);
         const hasAxisY = includes(axes, AXIS_Y);
         const hasAxisZ = includes(axes, AXIS_Z);
+
+        const singleAxisHoming = this.determineSingleAxisHoming();
 
         return (
             <Panel className={styles.displayPanel}>
@@ -337,48 +348,66 @@ class DisplayPanel extends PureComponent {
 
                     {
                         homingEnabled && (
-                            <div className={styles.endStopActiveControls}>
-                                <FunctionButton
-                                    primary
-                                    disabled={!canHome}
-                                    onClick={this.actions.startHoming}
-                                    className={styles.runHomeButton}
-                                >
-                                    <i className="fas fa-home" /> Home
-                                </FunctionButton>
-                                <QuickPositionButton
-                                    disabled={!canClick || !homingRun}
-                                    className={styles.QPBL}
-                                    onClick={() => {
-                                        this.actions.jogtoBLCorner();
-                                    }}
-                                    icon={(homingLocation === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                />
-                                <QuickPositionButton
-                                    disabled={!canClick || !homingRun}
-                                    className={styles.QPBR}
-                                    rotate={45}
-                                    onClick={() => {
-                                        this.actions.jogtoBRCorner();
-                                    }}
-                                    icon={(homingLocation === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                />
-                                <QuickPositionButton
-                                    disabled={!canClick || !homingRun}
-                                    className={styles.QPFL}
-                                    onClick={() => {
-                                        this.actions.jogtoFLCorner();
-                                    }}
-                                    icon={(homingLocation === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                />
-                                <QuickPositionButton
-                                    disabled={!canClick || !homingRun}
-                                    className={styles.QPFR}
-                                    onClick={() => {
-                                        this.actions.jogtoFRCorner();
-                                    }}
-                                    icon={(homingLocation === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                />
+                            <div className={styles.endStop}>
+                                {
+                                    singleAxisHoming ? (
+                                        <>
+                                            <div className={styles.homeWrapper}>
+                                                <i className={cx('fas fa-home fa-2xl', styles.homeIcon)} /> Homing
+                                            </div>
+                                            <ButtonCollection
+                                                disabled={!canHome}
+                                                buttons={['X', 'Y', 'Z', 'A']}
+                                                onClick={this.actions.startHoming}
+                                            >
+                                            </ButtonCollection>
+                                        </>
+                                    ) : (
+                                        <FunctionButton
+                                            primary
+                                            disabled={!canHome}
+                                            onClick={this.actions.startHoming}
+                                            className={styles.runHomeButton}
+                                        >
+                                            <i className="fas fa-home" /> Home
+                                        </FunctionButton>
+                                    )
+                                }
+                                <div className={styles.endStopActiveControls}>
+                                    <QuickPositionButton
+                                        disabled={!canClick || !homingRun}
+                                        className={styles.QPBL}
+                                        onClick={() => {
+                                            this.actions.jogtoBLCorner();
+                                        }}
+                                        icon={(homingLocation === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    />
+                                    <QuickPositionButton
+                                        disabled={!canClick || !homingRun}
+                                        className={styles.QPBR}
+                                        rotate={45}
+                                        onClick={() => {
+                                            this.actions.jogtoBRCorner();
+                                        }}
+                                        icon={(homingLocation === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    />
+                                    <QuickPositionButton
+                                        disabled={!canClick || !homingRun}
+                                        className={styles.QPFL}
+                                        onClick={() => {
+                                            this.actions.jogtoFLCorner();
+                                        }}
+                                        icon={(homingLocation === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    />
+                                    <QuickPositionButton
+                                        disabled={!canClick || !homingRun}
+                                        className={styles.QPFR}
+                                        onClick={() => {
+                                            this.actions.jogtoFRCorner();
+                                        }}
+                                        icon={(homingLocation === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                    />
+                                </div>
                             </div>
                         )
                     }
@@ -401,6 +430,7 @@ export default connect((store) => {
     const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
     const mpos = get(store, 'controller.mpos');
     return {
+        homingSetting,
         homingEnabled,
         canHome,
         homingDirection,
