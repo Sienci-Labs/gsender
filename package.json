@@ -1,5 +1,5 @@
 {
-  "name": "gSender-Edge",
+  "name": "gSender-hal-rotary",
   "version": "1.3.0",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
@@ -81,7 +81,7 @@
     "artifactName": "${name}-${version}-${arch}.${ext}",
     "asar": false,
     "asarUnpack": [],
-    "productName": "gSender Edge",
+    "productName": "gSender Hal/Rotary",
     "generateUpdatesFilesForAllChannels": true,
     "extraResources": [
       "./node_modules/@electron/remote/**"
