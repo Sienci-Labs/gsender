@@ -29,6 +29,8 @@ class GrblHalLineParserResultError {
             return null;
         }
 
+        console.log(line);
+
         const payload = {
             message: r[1]
         };
