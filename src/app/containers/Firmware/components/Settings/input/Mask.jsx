@@ -31,10 +31,10 @@ const Mask = ({ value, bits, numBits, requiredBit, onChange }) => {
         }
 
         // eslint-disable-next-line no-bitwise
-        const binary = (Number(value) >>> 0).toString(2);
+        const binary = (Number(value) >>> 0).toString(2).padStart(numBits, 0);
         let settings = [];
         for (let i = 0; i < numBits; i++) {
-            settings.push(binary.charAt(i) === '1');
+            settings[i] = binary.charAt(numBits - 1 - i) === '1';
         }
 
         setBitShiftSettings(settings);
