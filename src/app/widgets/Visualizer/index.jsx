@@ -53,6 +53,7 @@ import {
     METRIC_UNITS,
     // Grbl
     GRBL,
+    GRBLHAL,
     GRBL_ACTIVE_STATE_RUN,
     // Marlin
     MARLIN,
@@ -380,10 +381,10 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
         },
-        onRunClick: () => {
-            this.actions.handleRun();
+        onRunClick: (type) => {
+            this.actions.handleRun(type);
         },
-        handleRun: () => {
+        handleRun: (type) => {
             const { workflow, activeState } = this.props;
             console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state) || activeState === GRBL_ACTIVE_STATE_HOLD);
             this.setState((prev) => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
@@ -394,14 +395,14 @@ class VisualizerWidget extends PureComponent {
             }
 
             if (workflow.state === WORKFLOW_STATE_PAUSED || activeState === GRBL_ACTIVE_STATE_HOLD) {
-                controller.command('gcode:resume');
+                controller.command('gcode:resume', type);
             }
         },
-        handlePause: () => {
+        handlePause: (type) => {
             const { workflow } = this.props;
             console.assert(includes([WORKFLOW_STATE_RUNNING], workflow.state));
 
-            controller.command('gcode:pause');
+            controller.command('gcode:pause', type);
         },
         handleStop: () => {
             //const { workflow } = this.props;
@@ -850,6 +851,14 @@ class VisualizerWidget extends PureComponent {
         };
     }
 
+    showToast = _.throttle(() => {
+        Toaster.pop({
+            msg: 'Unable to activate GrblHAL ONLY shortcut',
+            type: TOASTER_WARNING,
+            duration: 3000
+        });
+    }, 3000, { trailing: false });
+
     shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
             const feedRate = Number(amount) || 0;
@@ -858,6 +867,26 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE: (_, { amount }) => {
             const spindleSpeed = Number(amount) || 0;
             controller.command('spindleOverride', spindleSpeed);
+        },
+        START_JOB: (_, { type }) => {
+            const { controllerType } = this.props;
+            // if it's a grblHAL only shortcut, don't run it
+            if (type === GRBLHAL && controllerType !== GRBLHAL) {
+                this.showToast();
+                return;
+            }
+            if (this.workflowControl) {
+                this.workflowControl.startRun(type);
+            }
+        },
+        PAUSE_JOB: (_, { type }) => {
+            const { controllerType } = this.props;
+            // if it's a grblHAL only shortcut, don't run it
+            if (type === GRBLHAL && controllerType !== GRBLHAL) {
+                this.showToast();
+                return;
+            }
+            this.actions.handlePause(type);
         },
         VISUALIZER_VIEW: (_, { type }) => {
             const {
@@ -983,14 +1012,25 @@ class VisualizerWidget extends PureComponent {
             gamepadKeys: '9',
             keysName: 'Start',
             cmd: 'START_JOB',
+            payload: {
+                type: GRBL
+            },
             preventDefault: true,
             isActive: true,
             category: CARVING_CATEGORY,
-            callback: () => {
-                if (this.workflowControl) {
-                    this.workflowControl.startRun();
-                }
+            callback: this.shuttleControlFunctions.START_JOB
+        },
+        START_JOB_ALT: {
+            title: 'Start Job (Alt)',
+            keys: ['ctrl', '`'].join('+'),
+            cmd: 'START_JOB_ALT',
+            payload: {
+                type: GRBLHAL
             },
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: this.shuttleControlFunctions.START_JOB
         },
         PAUSE_JOB: {
             title: 'Pause Job',
@@ -998,12 +1038,25 @@ class VisualizerWidget extends PureComponent {
             gamepadKeys: '2',
             keysName: 'X',
             cmd: 'PAUSE_JOB',
+            payload: {
+                type: GRBL
+            },
             preventDefault: true,
             isActive: true,
             category: CARVING_CATEGORY,
-            callback: () => {
-                this.actions.handlePause();
+            callback: this.shuttleControlFunctions.PAUSE_JOB
+        },
+        PAUSE_JOB_ALT: {
+            title: 'Pause Job (Alt)',
+            keys: ['ctrl', '1'].join('+'),
+            cmd: 'PAUSE_JOB_ALT',
+            payload: {
+                type: GRBLHAL
             },
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: this.shuttleControlFunctions.PAUSE_JOB
         },
         STOP_JOB: {
             title: 'Stop Job',

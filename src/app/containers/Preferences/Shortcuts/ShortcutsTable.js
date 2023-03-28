@@ -40,6 +40,7 @@ import {
     TOOLBAR_CATEGORY,
     MACRO_CATEGORY,
     COOLANT_CATEGORY,
+    GRBLHAL
 } from 'app/constants';
 
 import { formatShortcut } from './helpers';
@@ -139,10 +140,11 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
         },
         renderTitleCell: (_, row) => {
             const rowTitle = allShuttleControlEvents[row.cmd] ? allShuttleControlEvents[row.cmd].title : row.title;
+            const isSpecial = allShuttleControlEvents[row.cmd]?.payload?.type === GRBLHAL;
             return (
-                <div>{rowTitle}</div>
+                <div>{rowTitle}{isSpecial ? <strong>*</strong> : ''}</div>
             );
-        }
+        },
     };
 
     const columns = [
