@@ -1478,10 +1478,15 @@ class GrblHalController {
                 this.write('?');
             },
             'homing': () => {
+                const [axis] = args;
                 this.event.trigger(HOMING);
                 this.homingStarted = true; // Update homing cycle as having started
 
-                this.writeln('$H');
+                if (axis) {
+                    this.writeln('$H' + axis);
+                } else {
+                    this.writeln('$H');
+                }
                 this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
                 this.emit('controller:state', GRBLHAL, this.state);
             },
