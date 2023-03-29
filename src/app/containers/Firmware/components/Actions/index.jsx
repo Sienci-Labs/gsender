@@ -1,5 +1,8 @@
 import React, { useRef, useContext } from 'react';
+import { get } from 'lodash';
+import reduxStore from 'app/store/redux';
 
+import { GRBLHAL } from 'app/constants';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { Toaster, TOASTER_INFO, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
@@ -21,6 +24,10 @@ const ActionArea = () => {
         setSettingsToApply
     } = useContext(FirmwareContext);
     const inputRef = useRef();
+    const controllerType = get(reduxStore.getState(), 'controller.type');
+    const tooltipContent = controllerType === GRBLHAL ?
+        'Flashing is disabled for grblHAL. We are unable to detect what chip is being used and therefore cannot flash it.'
+        : 'Flash your Arduino board to GRBL default values';
 
     const openSettingsFile = (e) => {
         const file = e.target.files[0];
@@ -60,8 +67,8 @@ const ActionArea = () => {
 
             <div className={styles.buttonsContainer}>
                 <div>
-                    <Tooltip content="Flash your Arduino board to GRBL default values" location="default">
-                        <ToolModalButton icon="fas fa-bolt" onClick={() => setInitiateFlashing(true)}>
+                    <Tooltip content={tooltipContent} location="default">
+                        <ToolModalButton icon="fas fa-bolt" onClick={() => setInitiateFlashing(true)} disabled={controllerType === GRBLHAL}>
                             Flash GRBL
                         </ToolModalButton>
                     </Tooltip>
