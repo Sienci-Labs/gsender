@@ -39,6 +39,7 @@ import controller from 'app/lib/controller';
 import WidgetConfig from '../WidgetConfig';
 import {
     GRBL,
+    GRBLHAL,
     GRBL_ACTIVE_STATE_IDLE,
     IMPERIAL_UNITS,
     LASER_MODE,
@@ -443,7 +444,7 @@ class SpindleWidget extends PureComponent {
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL], type)) {
+        if (!includes([GRBL, GRBLHAL], type)) {
             return false;
         }
 
