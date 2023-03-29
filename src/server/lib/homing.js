@@ -43,10 +43,9 @@ export const getHomingLocation = (setting) => {
     return BACK_RIGHT;
 };
 
-export const determineMaxMovement = (position, movementDirection, limitLocation, limit) => {
+export const determineMaxMovement = ({ position, movementDirection, limitLocation, limit }) => {
     const OFFSET = 1;
     limit -= OFFSET; // We add a slight offset to make sure calculations don't fail due to rounding, 1.1mm is not noticeable in most cases
-
     if (position === 0) {
         if (movementDirection !== limitLocation) {
             return 0;
