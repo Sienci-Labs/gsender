@@ -892,9 +892,6 @@ class GrblController {
         this.writeln('$$');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
-
-        //check if controller is ready and send the status
-        //this.emit('firmware:ready', this.ready);
     }
 
     populateContext(context = {}) {
