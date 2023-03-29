@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -1625,22 +1626,25 @@ class GrblController {
                 this.command('gcode', code);
             },
             'jog:start': () => {
+                log.debug('INSIDE JOG START');
                 let [axes, feedrate = 1000, units = METRIC_UNITS] = args;
                 //const JOG_COMMAND_INTERVAL = 80;
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
                 let { $20, $130, $131, $132, $23, $13 } = this.settings.settings;
+                let { mpos } = this.state.status;
 
                 let jogFeedrate;
                 if ($20 === '1') {
                     $130 = Number($130);
                     $131 = Number($131);
                     $132 = Number($132);
-
+                    log.debug($130, $131, $132);
                     // Convert feedrate to metric if working in imperial - easier to convert feedrate and treat everything else as MM than opposite
                     if (units !== METRIC_UNITS) {
                         feedrate = (feedrate * 25.4).toFixed(2);
                         unitModal = 'G21';
                     }
+                    log.debug(`FEEDRATE :${feedrate}`);
 
                     const FIXED = 2;
 
@@ -1649,20 +1653,20 @@ class GrblController {
                     //we are moving in the negative direction we need to subtract the max travel
                     //by it to reach the maximum amount in that direction
                     const calculateAxisValue = ({ direction, position, maxTravel }) => {
+                        log.debug(`MAX TRAVEL: ${maxTravel}, DIRECTION: ${direction}, POSITION: ${position}`);
                         const OFFSET = 1;
 
-                        if (position === 0) {
-                            return ((maxTravel) * direction).toFixed(FIXED);
-                        }
+                        // if (position === 0) {
+                        //     return ((maxTravel) * direction).toFixed(FIXED);
+                        // }
 
-                        if (direction === 1) {
-                            return Number(maxTravel - position - OFFSET).toFixed(FIXED);
+                        if (direction === -1) {
+                            return Number(-1 * (maxTravel - position - OFFSET)).toFixed(FIXED);
                         } else {
-                            return Number(-1 * (position - OFFSET)).toFixed(FIXED);
+                            return position === 0 ? 0 : Number((position - OFFSET)).toFixed(FIXED);
                         }
                     };
 
-                    let { mpos } = this.state.status;
                     Object.keys(mpos).forEach((axis) => {
                         const val = Number(mpos[axis]);
 
@@ -1675,25 +1679,32 @@ class GrblController {
                     });
 
                     if (this.homingFlagSet) {
+                        log.debug('homingFlagSet IS TRUE');
                         const [xMaxLoc, yMaxLoc] = getAxisMaximumLocation($23);
 
                         if (axes.X) {
                             axes.X = determineMaxMovement(Math.abs(mpos.x), axes.X, xMaxLoc, $130);
+                            log.debug(axes.X);
                         }
                         if (axes.Y) {
                             axes.Y = determineMaxMovement(Math.abs(mpos.y), axes.Y, yMaxLoc, $131);
+                            log.debug(axes.Y);
                         }
                     } else {
+                        log.debug('homingFlagSet IS FALSE');
                         if (axes.X) {
                             axes.X = calculateAxisValue({ direction: Math.sign(axes.X), position: Math.abs(mpos.x), maxTravel: $130 });
+                            log.debug(axes.X);
                         }
                         if (axes.Y) {
                             axes.Y = calculateAxisValue({ direction: Math.sign(axes.Y), position: Math.abs(mpos.y), maxTravel: $131 });
+                            log.debug(axes.Y);
                         }
                     }
 
                     if (axes.Z) {
                         axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: Math.abs(mpos.z), maxTravel: $132 });
+                        log.debug(axes.Z);
                     }
                 } else {
                     jogFeedrate = 1250;
