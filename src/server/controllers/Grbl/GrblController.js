@@ -45,9 +45,11 @@ import monitor from '../../services/monitor';
 import taskRunner from '../../services/taskrunner';
 import store from '../../store';
 import {
+    A_AXIS_COMMANDS,
     GLOBAL_OBJECTS as globalObjects,
     WRITE_SOURCE_CLIENT,
-    WRITE_SOURCE_FEEDER
+    WRITE_SOURCE_FEEDER,
+    Y_AXIS_COMMANDS
 } from '../constants';
 import GrblRunner from './GrblRunner';
 import {
@@ -71,11 +73,13 @@ import {
     SLEEP,
     MACRO_RUN,
     MACRO_LOAD,
-    FILE_UNLOAD
+    FILE_UNLOAD,
+    FILE_TYPE
 } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
+import { GCODE_TRANSLATION_TYPE, translateGcode } from '../../lib/gcode-translation';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -183,6 +187,7 @@ class GrblController {
 
     homingFlagSet = false;
 
+    // eslint-disable-next-line max-lines-per-function
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -319,6 +324,16 @@ class GrblController {
                     line = line.replace('M6', '(M6)');
                 }
 
+                const isUsingImperialUnits = context.modal.units === 'G20';
+
+                line = translateGcode({
+                    gcode: line,
+                    from: 'A',
+                    to: 'Y',
+                    regex: A_AXIS_COMMANDS,
+                    type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                });
+
                 return line;
             }
         });
@@ -437,6 +452,27 @@ class GrblController {
 
                     line = line.replace('M6', '(M6)');
                 }
+
+                /**
+                 * Rotary Logic
+                 */
+                const containsACommand = A_AXIS_COMMANDS.test(line);
+                const containsYCommand = Y_AXIS_COMMANDS.test(line);
+
+                if (containsACommand && !containsYCommand) {
+                    const isUsingImperialUnits = context.modal.units === 'G20';
+
+                    line = translateGcode({
+                        gcode: line,
+                        from: 'A',
+                        to: 'Y',
+                        regex: A_AXIS_COMMANDS,
+                        type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                    });
+                }
+                /**
+                 * End of Rotary Logic
+                 */
 
                 return line;
             }
@@ -1128,9 +1164,9 @@ class GrblController {
         return !(this.isOpen());
     }
 
-    loadFile(gcode, { name }) {
-        log.debug(`Loading file '${name}' to controller`);
-        this.command('gcode:load', name, gcode);
+    loadFile(gcode, meta) {
+        log.debug(`Loading file '${meta.name}' to controller`);
+        this.command('gcode:load', meta, gcode);
     }
 
     addConnection(socket) {
@@ -1203,6 +1239,7 @@ class GrblController {
         }
     }
 
+    // eslint-disable-next-line max-lines-per-function
     command(cmd, ...args) {
         const handler = {
             'firmware:recievedProfiles': () => {
@@ -1219,7 +1256,9 @@ class GrblController {
                 this.emit('sender:status', machineProfile);
             },
             'gcode:load': () => {
-                let [name, gcode, context = {}, callback = noop] = args;
+                let [meta, gcode, context = {}, callback = noop] = args;
+                const { name } = meta;
+
                 if (typeof context === 'function') {
                     callback = context;
                     context = {};
@@ -1238,12 +1277,20 @@ class GrblController {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }
 
+                const containsACommand = A_AXIS_COMMANDS.test(gcode);
+                const containsYCommand = Y_AXIS_COMMANDS.test(gcode);
+
+                if (containsACommand && containsYCommand) {
+                    this.emit('filetype', FILE_TYPE.FOUR_AXIS);
+                } else if (containsACommand) {
+                    this.emit('filetype', FILE_TYPE.ROTARY);
+                }
+
                 const ok = this.sender.load(name, gcode + '\n' + dwell, context);
                 if (!ok) {
                     callback(new Error(`Invalid G-code: name=${name}`));
                     return;
                 }
-
 
                 log.debug(`Load G-code: name="${this.sender.state.name}", size=${this.sender.state.gcode.length}, total=${this.sender.state.total}`);
 
@@ -1706,7 +1753,7 @@ class GrblController {
                 }
 
                 const jogCommand = `$J=${unitModal}G91 ` + map(axes, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
-                this.writeln(jogCommand);
+                this.command('gcode', jogCommand);
             },
             'jog:stop': () => {
                 this.write('\x85');
@@ -1720,7 +1767,6 @@ class GrblController {
                     callback = context;
                     context = {};
                 }
-
                 const macros = config.get('macros');
                 const macro = _.find(macros, { id: id });
 
@@ -1751,7 +1797,7 @@ class GrblController {
 
                 this.event.trigger(MACRO_LOAD);
 
-                this.command('gcode:load', macro.name, macro.content, context, callback);
+                this.command('gcode:load', { name: macro.name }, macro.content, context, callback);
             },
             'watchdir:load': () => {
                 const [file, callback = noop] = args;

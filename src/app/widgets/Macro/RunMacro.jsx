@@ -38,7 +38,7 @@ class RunMacro extends PureComponent {
         const { id, name, content } = { ...state.modal.params };
 
         return (
-            <Modal disableOverlay size="md" onClose={actions.closeModal}>
+            <Modal disableOverlayClick size="md" onClose={actions.closeModal}>
                 <Modal.Header>
                     <Modal.Title>
                         {i18n._('Run Macro')}

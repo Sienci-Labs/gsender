@@ -50,3 +50,6 @@ export const WRITE_SOURCE_CLIENT = 'client';
 export const WRITE_SOURCE_SERVER = 'server';
 export const WRITE_SOURCE_FEEDER = 'feeder';
 export const WRITE_SOURCE_SENDER = 'sender';
+
+export const A_AXIS_COMMANDS = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)|A-(\d+\.\d+)|A-(\d+)/;
+export const Y_AXIS_COMMANDS = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)|Y-(\d+\.\d+)|Y-(\d+)/;

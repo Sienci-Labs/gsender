@@ -207,3 +207,20 @@ export const USER_DATA_COLLECTION = {
     ACCEPTED: 'ACCEPTED',
     REJECTED: 'REJECTED',
 };
+
+export const ROTARY_MODE_FIRMWARE_SETTINGS = {
+    $101: '17.777',
+    // $111: '0.00',
+    // $121: '0.00',
+};
+
+export const WORKSPACE_MODE = {
+    DEFAULT: 'DEFAULT',
+    ROTARY: 'ROTARY',
+};
+
+export const FILE_TYPE = {
+    DEFAULT: 'DEFAULT',
+    ROTARY: 'ROTARY',
+    FOUR_AXIS: 'FOUR_AXIS'
+};

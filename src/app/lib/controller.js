@@ -107,6 +107,10 @@ class Controller {
         'cyclestart_alt': [],
         'feedhold_alt': [],
         'virtual_stop_toggle': [],
+        'filetype': [],
+
+        //A-Axis A.K.A Rotary-Axis events
+        'rotaryAxis:updateState': []
     };
 
     context = {

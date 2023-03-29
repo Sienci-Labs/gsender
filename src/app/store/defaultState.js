@@ -29,6 +29,7 @@ import {
     SPIRAL_MOVEMENT,
     START_POSITION_BACK_LEFT,
     SPINDLE_MODES,
+    WORKSPACE_MODE
 } from 'app/constants';
 import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 
@@ -129,6 +130,10 @@ const defaultState = {
         },
         terminal: {
             inputHistory: [],
+        },
+        mode: WORKSPACE_MODE.DEFAULT,
+        rotaryAxis: {
+            prevFirmwareSettings: {},
         }
     },
     widgets: {

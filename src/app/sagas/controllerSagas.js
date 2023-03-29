@@ -21,11 +21,13 @@
  *
  */
 import React from 'react';
+import _get from 'lodash/get';
+import pubsub from 'pubsub-js';
+import isElectron from 'is-electron';
+
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
-import _get from 'lodash/get';
-import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
 import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
@@ -40,10 +42,18 @@ import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
-import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
-import isElectron from 'is-electron';
+import {
+    RENDER_LOADING,
+    RENDER_RENDERED,
+    VISUALIZER_SECONDARY,
+    GRBL_ACTIVE_STATE_RUN,
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_HOLD,
+    FILE_TYPE,
+    WORKSPACE_MODE
+} from 'app/constants';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
-
+import { updateWorkspaceMode } from 'app/lib/rotary';
 
 export function* initialize() {
     let visualizeWorker = null;
@@ -529,6 +539,39 @@ export function* initialize() {
 
     controller.addListener('wizard:next', (stepIndex, substepIndex) => {
         pubsub.publish('wizard:next', { stepIndex, substepIndex });
+    });
+
+    controller.addListener('filetype', (type) => {
+        if (type === FILE_TYPE.ROTARY) {
+            const workspaceMode = store.get('workspace.mode');
+
+            if (workspaceMode !== WORKSPACE_MODE.ROTARY) {
+                Confirm({
+                    title: 'Rotary File Loaded',
+                    content: 'G-Code contains A-axis command, please enable Rotary mode if your machine is equipped with a rotary axis unit.',
+                    confirmLabel: 'Enable Rotary Mode',
+                    cancelLabel: 'Close',
+                    onConfirm: () => {
+                        updateWorkspaceMode(WORKSPACE_MODE.ROTARY);
+                        Toaster.pop({
+                            msg: 'Rotary Mode Enabled',
+                            type: TOASTER_INFO,
+                        });
+                    }
+                });
+            }
+        }
+
+        if (type === FILE_TYPE.FOUR_AXIS) {
+            if (controller.type === 'Grbl') {
+                Confirm({
+                    title: '4 Axis File File Loaded',
+                    content: 'G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
+                    confirmLabel: null,
+                    cancelLabel: 'Close',
+                });
+            }
+        }
     });
 
     yield null;

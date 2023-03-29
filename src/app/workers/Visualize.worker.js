@@ -21,8 +21,8 @@
  *
  */
 
-import Toolpath from 'gcode-toolpath';
 import * as THREE from 'three';
+import Toolpath, { rotateAxis, shouldRotate } from '../lib/GcodeToolpath';
 
 onmessage = function({ data }) {
     const { content, visualizer, isLaser = false, shouldRenderSVG = false } = data;
@@ -81,8 +81,27 @@ onmessage = function({ data }) {
             // @param {object} modal The modal object.
             // @param {object} v1 A 3D vector of the start point.
             // @param {object} v2 A 3D vector of the end point.
-            addLine: (modal, v1, v2) => {
+            addLine: (modal, v1, v2, v0) => {
                 const { motion } = modal;
+
+
+                // if (shouldRotate(v1.a)) {
+                //     v1.y = rotateAxis('y', v1);
+                //     v1.z = rotateAxis('z', v1);
+                // }
+
+                // if (shouldRotate(v2.a)) {
+                //     v2.y = rotateAxis('y', v2);
+                //     v2.z = rotateAxis('z', v2);
+                // }
+
+                if (shouldRotate(v1.a) || shouldRotate(v2.a)) {
+                    v1.y = rotateAxis('y', v1);
+                    v1.z = rotateAxis('z', v1);
+
+                    v2.y = rotateAxis('y', v2);
+                    v2.z = rotateAxis('z', v2);
+                }
 
                 const opacity = (motion === 'G0') ? 0.5 : 1;
                 const color = [motion, opacity];

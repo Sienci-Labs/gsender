@@ -40,7 +40,9 @@ import {
     METRIC_UNITS,
     RENDER_RENDERED,
     VISUALIZER_PRIMARY,
-    VISUALIZER_SECONDARY
+    VISUALIZER_SECONDARY,
+    FILE_TYPE,
+    WORKSPACE_MODE
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/CombinedCamera';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -82,6 +84,7 @@ import styles from './index.styl';
 import { GRBL_ACTIVE_STATE_CHECK } from '../../../server/controllers/Grbl/constants';
 import WidgetConfig from '../WidgetConfig';
 import { isLaserMode } from '../../lib/laserMode';
+import RotaryStock from './RotaryStock';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -114,13 +117,19 @@ class Visualizer extends Component {
     machinePosition = {
         x: 0,
         y: 0,
-        z: 0
+        z: 0,
+        a: 0,
+        b: 0,
+        c: 0,
     };
 
     workPosition = {
         x: 0,
         y: 0,
-        z: 0
+        z: 0,
+        a: 0,
+        b: 0,
+        c: 0,
     };
 
     machineProfile = store.get('workspace.machineProfile');
@@ -230,6 +239,7 @@ class Visualizer extends Component {
         this.cuttingTool = null;
         this.laserPointer = null;
         this.cuttingPointer = null;
+        this.rotaryStock = null;
         this.limits = null;
         this.visualizer = null;
     }
@@ -362,6 +372,26 @@ class Visualizer extends Component {
                 this.laserPointer.visible = false;
                 this.cuttingPointer.visible = false;
             }
+        }
+
+        // TODO: Rotating the rotary stock needs to be updated from the
+        // a axis values, using y values currently to test it out
+        if (this.rotaryStock && this.props.machinePosition.y !== prevProps.machinePosition.y) {
+            this.rotateRotaryStock(this.props.machinePosition.y);
+            needUpdateScene = true;
+        }
+
+        const fileType = this.props.fileType;
+        const aAxisTypes = [FILE_TYPE.ROTARY, FILE_TYPE.FOUR_AXIS];
+
+        //Only setup rotary stock object if our file contains a-axis values, can be hidden otherwise
+        if (aAxisTypes.includes(fileType)) {
+            // Update rotary stock object
+            if (prevProps.bbox.max.x !== this.props.bbox.max.x) {
+                this.updateRotaryStock();
+            }
+        } else {
+            this.rotaryStock.visible = false;
         }
 
         { // Update position
@@ -1234,6 +1264,18 @@ class Visualizer extends Component {
             this.createCuttingPointer();
         }
 
+        { // Rotary Stock
+            this.rotaryStock = new RotaryStock({
+                name: 'RotaryStockObject',
+                visible: false,
+            });
+
+            this.group.add(this.rotaryStock);
+
+            // Update the scene
+            this.updateScene();
+        }
+
 
         { // Limits
             const limits = _get(this.machineProfile, 'limits');
@@ -1462,6 +1504,44 @@ class Visualizer extends Component {
         return controls;
     }
 
+    updateRotaryStock = () => {
+        const { state, bbox } = this.props;
+        const rotaryStock = this.group.getObjectByName('RotaryStockObject');
+        let height = bbox.max.x;
+
+        if (state.units === METRIC_UNITS && this.props.fileModal === IMPERIAL_UNITS) {
+            height *= 25.4;
+        }
+
+        if (state.units === IMPERIAL_UNITS && this.props.fileModal === METRIC_UNITS) {
+            height /= 25.4;
+        }
+
+        this.group.remove(rotaryStock);
+        this.rotaryStock = new RotaryStock({
+            height,
+            name: 'RotaryStockObject',
+            visible: true,
+        });
+        this.updateRotaryStockPosition();
+
+        this.group.add(this.rotaryStock);
+    }
+
+    getRadiansFromDegrees (val) {
+        return val * Math.PI / 180;
+    }
+
+    rotateRotaryStock (amount = 0) {
+        if (!this.rotaryStock) {
+            return;
+        }
+
+        const value = this.getRadiansFromDegrees(amount);
+
+        this.rotaryStock.rotateY(value);
+    }
+
     // Rotates the cutting tool around the z axis with a given rpm and an optional fps
     // @param {number} rpm The rounds per minutes
     // @param {number} [fps] The frame rate (Defaults to 60 frames per second)
@@ -1481,13 +1561,42 @@ class Visualizer extends Component {
             return;
         }
 
+        const { fileType } = this.props;
+        const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
+
         const pivotPoint = this.pivotPoint.get();
         const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
+
+        if (workspaceMode === WORKSPACE_MODE.ROTARY && fileType === FILE_TYPE.ROTARY) {
+            const x0 = wpox - pivotPoint.x;
+            const z0 = wpoz - pivotPoint.z;
+
+            this.cuttingTool.position.setX(x0);
+            this.cuttingTool.position.setZ(z0);
+
+            return;
+        }
+
         const x0 = wpox - pivotPoint.x;
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
         this.cuttingTool.position.set(x0, y0, z0);
+    }
+
+    updateRotaryStockPosition() {
+        if (!this.rotaryStock) {
+            return;
+        }
+
+        const pivotPoint = this.pivotPoint.get();
+        // const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
+        // Use negative offset to keep rotary stock object at the center point
+        const x0 = -pivotPoint.x;
+        const y0 = -pivotPoint.y;
+        const z0 = -pivotPoint.z;
+
+        this.rotaryStock.position.set(x0, y0, z0);
     }
 
     // Update cutting tool position
@@ -1966,6 +2075,10 @@ export default connect((store) => {
     const machineCorner = _get(store, 'controller.settings.settings.$23');
     const { activeVisualizer } = store.visualizer;
     const isConnected = _get(store, 'connection.isConnected');
+    const bbox = _get(store, 'file.bbox');
+    const fileModal = _get(store, 'file.fileModal');
+    const fileType = _get(store, 'file.fileType');
+
     return {
         machinePosition,
         workPosition,
@@ -1976,6 +2089,9 @@ export default connect((store) => {
         homingFlag,
         machineCorner,
         activeVisualizer,
-        isConnected
+        isConnected,
+        bbox,
+        fileModal,
+        fileType
     };
 }, null, null, { forwardRef: true })(Visualizer);

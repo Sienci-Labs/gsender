@@ -127,7 +127,7 @@ class Settings extends PureComponent {
 
         return (
             <Modal
-                disableOverlay
+                disableOverlayClick
                 size="md"
                 onClose={this.props.onCancel}
             >

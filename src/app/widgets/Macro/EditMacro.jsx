@@ -97,7 +97,7 @@ class EditMacro extends PureComponent {
                 title="Edit Macro"
                 size="large"
                 onClose={actions.closeModal}
-                disableOverlay
+                disableOverlayClick
             >
                 <div style={modalContainerStyle}>
                     <div style={modalBodyStyle}>

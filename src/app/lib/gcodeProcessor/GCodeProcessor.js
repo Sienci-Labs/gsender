@@ -84,6 +84,7 @@ export class GCodeProcessor {
         vmState.lineCounter = 0;
         vmState.hasMovedToAxes = this.zerocoord(false); // true for each axis that we've moved on, and have a definite position for
         vmState.seenWordSet = {}; // a mapping from word letters to boolean true if that word has been seen at least once
+        vmState.usedAxes = new Set();
 
         vmState.tool = null;
         vmState.countT = 0;
@@ -228,6 +229,7 @@ export class GCodeProcessor {
                 coordPos[axisNum] = val;
                 coordPosSparse[axisNum] = val;
                 coordFlags[axisNum] = true;
+                this.vmState.usedAxes.add(axis);
             }
             if (gline.has(axis)) {
                 hasCoords.push(axis);

@@ -61,6 +61,7 @@ import {
     AXIS_X,
     AXIS_Y,
     AXIS_Z,
+    AXIS_A,
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -403,7 +404,7 @@ class LocationWidget extends PureComponent {
 
             pubsub.publish('jogSpeeds', newSpeeds);
         },
-        ZERO_AXIS: (event, { axis }) => {
+        ZERO_AXIS: (_, { axis }) => {
             const { state } = this.props;
             const activeState = get(state, 'status.activeState');
             if (!axis || activeState !== GRBL_ACTIVE_STATE_IDLE) {
@@ -433,9 +434,11 @@ class LocationWidget extends PureComponent {
             const { state } = this.props;
             const { machinePosition, safeRetractHeight, homingEnabled } = this.state;
             const activeState = get(state, 'status.activeState');
+
             if (!axisList || axisList.length === 0 || activeState !== GRBL_ACTIVE_STATE_IDLE) {
                 return;
             }
+
             let safeHeightCommand = '';
             let moveCommand = '';
 
@@ -499,7 +502,18 @@ class LocationWidget extends PureComponent {
             keys: ['shift', 'r'].join('+'),
             cmd: 'ZERO_Z_AXIS',
             preventDefault: true,
-            payload: { axis: AXIS_Z },
+            payload: { axis: AXIS_A },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        ZERO_A_AXIS: {
+            id: 72,
+            title: 'Zero A Axis',
+            keys: ['shift', '0'].join('+'),
+            cmd: 'ZERO_A_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_A },
             isActive: true,
             category: LOCATION_CATEGORY,
             callback: this.shuttleControlFunctions.ZERO_AXIS
@@ -513,6 +527,17 @@ class LocationWidget extends PureComponent {
             isActive: true,
             category: LOCATION_CATEGORY,
             callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        GO_TO_A_AXIS_ZERO: {
+            id: 73,
+            title: 'Go to A Zero',
+            keys: ['shift', '1'].join('+'),
+            cmd: 'GO_TO_A_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_A] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
         },
         GO_TO_X_AXIS_ZERO: {
             title: 'Go to X Zero',
