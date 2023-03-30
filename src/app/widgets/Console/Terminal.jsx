@@ -243,7 +243,7 @@ class TerminalWrapper extends PureComponent {
             return;
         }
 
-        controller.command('gcode', command);
+        controller.writeln(command);
 
         // update input history
         const { terminalInputHistory = [] } = this.state;
