@@ -124,9 +124,7 @@ class RunProbe extends PureComponent {
             testRunning: true
         });
         this.testInterval = setInterval(() => {
-            console.log('Waiting on status');
             if (probeStatus()) {
-                console.log('we got it');
                 this.setState({
                     connectionMade: true,
                 });

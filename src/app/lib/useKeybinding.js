@@ -81,7 +81,6 @@ function checkNumCalls() {
 export function removeOldKeybindings() {
     const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
     const currentCommandKeys = store.get('commandKeys', {});
-    console.log(currentCommandKeys);
     let updatedCommandKeys = currentCommandKeys;
 
     // remove keybindings that don't exist in any of the shuttleControlEvents arrays

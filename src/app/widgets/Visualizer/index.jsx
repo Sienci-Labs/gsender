@@ -1300,9 +1300,10 @@ class VisualizerWidget extends PureComponent {
 
                 // Ignore shortcut for toggling all other shortcuts to
                 // allow them to be turned on and off
-                const allDisabled = Object.entries(shortcuts)
-                                          .filter(([key, shortcut]) => (allShuttleControlEvents[key] ? allShuttleControlEvents[key].title : shortcut.title) !== 'Toggle Shortcuts')
-                                          .every(([key, shortcut]) => !shortcut.isActive);
+                const allDisabled = Object
+                    .entries(shortcuts)
+                    .filter(([key, shortcut]) => (allShuttleControlEvents[key] ? allShuttleControlEvents[key].title : shortcut.title) !== 'Toggle Shortcuts')
+                    .every(([key, shortcut]) => !shortcut.isActive);
                 const keybindings = _.cloneDeep(shortcuts);
                 Object.entries(keybindings).forEach(([key, keybinding]) => {
                     if (key !== 'TOGGLE_SHORTCUTS') {

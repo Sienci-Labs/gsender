@@ -26,7 +26,6 @@ import cx from 'classnames';
 import styles from './Index.styl';
 
 const FirmwareSelector = ({ options = [], selectedFirmware, handleSelect }) => {
-    console.log(selectedFirmware);
     return (
         <div className={styles.firmwareSelector}>
             <div className={styles.selectorWrapper}>

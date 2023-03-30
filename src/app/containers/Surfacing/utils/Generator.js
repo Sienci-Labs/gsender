@@ -335,22 +335,6 @@ export default class Generator {
         }
 
         function exitCondition (startPos, endPos, prevStartPos, prevEndPos) {
-            // if (startIsInCenter) {
-            //     console.log({ startPos, endPos });
-
-            //     if (length < width) {
-            //         const y1 = toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount)));
-            //         const y2 = toFixedValue(Math.abs(halfOfLength - (endPos.y - (stepoverAmount * 2))));
-
-            //         return y1 - y2 < 0;
-            //     } else {
-            //         const x1 = toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount)));
-            //         const x2 = toFixedValue(Math.abs(halfOfWidth - (endPos.x - (stepoverAmount * 2))));
-
-            //         return x1 - x2 < 0;
-            //     }
-            // }
-
             return endPos.x < startPos.x || endPos.y < startPos.y;
         }
 
