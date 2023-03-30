@@ -53,3 +53,10 @@ export const WRITE_SOURCE_SENDER = 'sender';
 
 export const A_AXIS_COMMANDS = /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)|A-(\d+\.\d+)|A-(\d+)/;
 export const Y_AXIS_COMMANDS = /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)|Y-(\d+\.\d+)|Y-(\d+)/;
+
+export const REGEX_MATCHER = {
+    A_AXIS_COMMAND: /A(\d+\.\d+)|A (\d+\.\d+)|A(\d+)|A (\d+)|A-(\d+\.\d+)|A-(\d+)/,
+    Y_AXIS_COMMAND_REGEX: /Y(\d+\.\d+)|Y (\d+\.\d+)|Y(\d+)|Y (\d+)|Y-(\d+\.\d+)|Y-(\d+)/,
+    COMMENT_SEMI_COLON: /\s*;.*/g,
+    COMMENT_BRACKETS: /\([^\)]*\)/gm,
+};

@@ -45,10 +45,10 @@ import monitor from '../../services/monitor';
 import taskRunner from '../../services/taskrunner';
 import store from '../../store';
 import {
-    A_AXIS_COMMANDS,
     GLOBAL_OBJECTS as globalObjects,
     WRITE_SOURCE_CLIENT,
     WRITE_SOURCE_FEEDER,
+    A_AXIS_COMMANDS,
     Y_AXIS_COMMANDS
 } from '../constants';
 import GrblRunner from './GrblRunner';
@@ -455,6 +455,7 @@ class GrblController {
 
                 /**
                  * Rotary Logic
+                 * Need to change the A-axis movements to Y-movements to emulate the rotary axis on grbl
                  */
                 const containsACommand = A_AXIS_COMMANDS.test(line);
                 const containsYCommand = Y_AXIS_COMMANDS.test(line);
@@ -1261,6 +1262,7 @@ class GrblController {
             'gcode:load': () => {
                 let [meta, gcode, context = {}, callback = noop] = args;
                 const { name } = meta;
+                const bracketCommentLine = /\([^\)]*\)/gm;
 
                 if (typeof context === 'function') {
                     callback = context;
@@ -1279,6 +1281,8 @@ class GrblController {
                 if (delay) {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }
+
+                gcode = gcode.replace(bracketCommentLine, '');
 
                 const containsACommand = A_AXIS_COMMANDS.test(gcode);
                 const containsYCommand = Y_AXIS_COMMANDS.test(gcode);
