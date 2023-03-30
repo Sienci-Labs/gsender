@@ -161,8 +161,8 @@ class DisplayPanel extends PureComponent {
 
     renderAxis = (axis, disabled = false) => {
         const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units, homingEnabled } = this.props;
-        let mpos = machinePosition[axis] || '0.000';
-        const wpos = workPosition[axis] || '0.000';
+        let mpos = !disabled ? machinePosition[axis] : '0.00';
+        const wpos = !disabled ? workPosition[axis] : '0.00';
         const axisLabel = axis.toUpperCase();
         const showPositionInput = canClick && this.state.positionInput[axis];
 
@@ -285,7 +285,7 @@ class DisplayPanel extends PureComponent {
         const hasAxisZ = includes(axes, AXIS_Z);
 
         const { ROTARY } = WORKSPACE_MODE;
-        const rotary = store.get('workspace.mode') === ROTARY;
+        const isInRotaryMode = store.get('workspace.mode') === ROTARY;
 
         return (
             <Panel className={styles.displayPanel}>
@@ -296,7 +296,7 @@ class DisplayPanel extends PureComponent {
                                 ? (
                                     <tbody>
                                         {hasAxisX && this.renderAxis(AXIS_X)}
-                                        {!rotary && hasAxisY ? this.renderAxis(AXIS_Y) : this.renderAxis(AXIS_Y, true)}
+                                        {!isInRotaryMode && hasAxisY ? this.renderAxis(AXIS_Y) : this.renderAxis(AXIS_Y, true)}
                                         {hasAxisZ && this.renderAxis(AXIS_Z)}
                                     </tbody>
                                 )
