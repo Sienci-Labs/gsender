@@ -1501,10 +1501,20 @@ class GrblController {
             'feedOverride': () => {
                 const [value] = args;
                 const [feedOV] = this.state.status.ov;
-                const diff = value - feedOV;
+
+                let diff = value - feedOV;
+                //Limits for keyboard/gamepad shortcuts
+                if (value < 4) {
+                    diff = 4 - feedOV;
+                } else if (value > 230) {
+                    diff = 230 - feedOV;
+                }
+
+
                 if (value === 100) {
                     this.write('\x90');
                 } else {
+                    log.debug(`VALUE :${value}, FEED_OV :${feedOV}, DIFF :${diff}`);
                     calcOverrides(this, diff, 'feed');
                 }
             },
@@ -1513,10 +1523,20 @@ class GrblController {
             'spindleOverride': () => {
                 const [value] = args;
                 const [, spindleOV] = this.state.status.ov;
-                const diff = value - spindleOV;
+
+                let diff = value - spindleOV;
+                //Limits for keyboard/gamepad shortcuts
+                if (value < 10) {
+                    diff = 10 - spindleOV;
+                } else if (value > 230) {
+                    diff = 230 - spindleOV;
+                }
+
+
                 if (value === 100) {
                     this.write('\x99');
                 } else {
+                    log.debug(`VALUE :${value}, SPINDLE_OV :${spindleOV}, DIFF :${diff}`);
                     calcOverrides(this, diff, 'spindle');
                 }
             },

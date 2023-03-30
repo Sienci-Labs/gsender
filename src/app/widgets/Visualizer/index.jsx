@@ -847,11 +847,13 @@ class VisualizerWidget extends PureComponent {
                 line: '',
             },
             layoutIsReversed: store.get('workspace.reverseWidgets'),
+
         };
     }
 
     shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
+            console.log('FEEDRATE_OVERRIDE', amount);
             const feedRate = Number(amount) || 0;
             controller.command('feedOverride', feedRate);
         },
@@ -1024,7 +1026,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Feed +',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_P',
-            payload: { amount: 1 },
+            payload: { amount: this.props.ovF + 1 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1034,7 +1036,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Feed ++',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_PP',
-            payload: { amount: 10 },
+            payload: { amount: this.props.ovF + 10 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1044,7 +1046,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Feed -',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_M',
-            payload: { amount: -1 },
+            payload: { amount: this.props.ovF - 1 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1054,7 +1056,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Feed --',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_MM',
-            payload: { amount: -10 },
+            payload: { amount: this.props.ovF - 10 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1064,7 +1066,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Feed Reset',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_RESET',
-            payload: { amount: 0 },
+            payload: { amount: this.props.ovF },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1074,7 +1076,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Spindle/Laser +',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_P',
-            payload: { amount: 1 },
+            payload: { amount: this.props.ovS + 1 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1084,7 +1086,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Spindle/Laser ++',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_PP',
-            payload: { amount: 10 },
+            payload: { amount: this.props.ovS + 10 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1094,7 +1096,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Spindle/Laser -',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_M',
-            payload: { amount: -1 },
+            payload: { amount: this.props.ovS - 1 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1104,7 +1106,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Spindle/Laser --',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_MM',
-            payload: { amount: -10 },
+            payload: { amount: this.props.ovS - 10 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1114,7 +1116,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Spindle/Laser Reset',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_RESET',
-            payload: { amount: 0 },
+            payload: { amount: this.props.ovS },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1431,6 +1433,7 @@ class VisualizerWidget extends PureComponent {
     }
 
     render() {
+        console.log(this.state);
         const { renderState, isSecondary, gcode, surfacingData, activeVisualizer, activeState, alarmCode, workflow, isConnected } = this.props;
         const state = {
             ...this.state,
@@ -1519,10 +1522,20 @@ export default connect((store) => {
     const controllerType = get(store, 'controller.type');
     const activeState = get(store, 'controller.state.status.activeState');
     const alarmCode = get(store, 'controller.state.status.alarmCode');
+    const overrides = get(store, 'controller.state.status.ov', [0, 0, 0]);
+
     const { activeVisualizer } = store.visualizer;
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
     const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
+
+    const ovF = overrides[0];
+    const ovS = overrides[2];
+
+    console.log('OVF :', ovF);
+    console.log('OVS :', ovS);
+
+
     return {
         feedArray,
         accelArray,
@@ -1532,6 +1545,8 @@ export default connect((store) => {
         controllerType,
         activeState,
         activeVisualizer,
-        alarmCode
+        alarmCode,
+        ovF,
+        ovS
     };
 }, null, null, { forwardRef: true })(VisualizerWidget);
