@@ -22,12 +22,12 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
 
         store.replace('workspace.rotaryAxis.prevFirmwareSettings', {});
 
-        controller.command('gcode', prevFirmwareSettingsArr);
+        controller.command('gcode', [...prevFirmwareSettingsArr, '$$']);
         return;
     }
 
     case ROTARY: {
-        const currentFirmwareSettings = controller.settings.settings;
+        const currentFirmwareSettings = get(reduxStore.getState(), 'controller.settings.settings');
 
         // Only grab the settings we want, will be based off of the settings in the constant we have
         const retrievedSettings = Object.keys(ROTARY_MODE_FIRMWARE_SETTINGS).reduce((accumulator, currentKey) => {
@@ -44,7 +44,7 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
         if (firmwareType === 'Grbl') {
             // Convert to array to send to the controller, will look something like this: ["$101=26.667", ...]
             const rotaryFirmwareSettingsArr = Object.entries(ROTARY_MODE_FIRMWARE_SETTINGS).map(([key, value]) => `${key}=${value}`);
-            controller.command('gcode', rotaryFirmwareSettingsArr);
+            controller.command('gcode', [...rotaryFirmwareSettingsArr, '$$']);
 
             Confirm({
                 title: 'Wiring Changeover',
