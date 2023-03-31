@@ -1421,18 +1421,13 @@ class GrblHalController {
                 this.command('gcode:pause');
             },
             'gcode:pause': async () => {
-                const [type] = args;
                 if (this.event.hasEnabledEvent(PROGRAM_PAUSE)) {
                     this.workflow.pause();
                     this.event.trigger(PROGRAM_PAUSE);
                 } else {
                     this.workflow.pause();
                     await delay(100);
-                    if (type === GRBLHAL) {
-                        this.write(GRBLHAL_REALTIME_COMMANDS.FEED_HOLD);
-                    } else {
-                        this.write('!');
-                    }
+                    this.write('!');
                 }
             },
             'resume': () => {

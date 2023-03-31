@@ -398,16 +398,10 @@ class VisualizerWidget extends PureComponent {
                 controller.command('gcode:resume', type);
             }
         },
-        handlePause: (type) => {
-            const { workflow } = this.props;
-            console.assert(includes([WORKFLOW_STATE_RUNNING], workflow.state));
-
-            controller.command('gcode:pause', type);
+        handlePause: () => {
+            controller.command('gcode:pause');
         },
         handleStop: () => {
-            //const { workflow } = this.props;
-            //console.assert(includes([WORKFLOW_STATE_PAUSED], workflow.state));
-
             controller.command('gcode:stop', { force: true });
         },
         handleClose: () => {
