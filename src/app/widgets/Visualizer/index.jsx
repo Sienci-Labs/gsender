@@ -1058,6 +1058,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_P: {
             title: 'Feed +',
             keys: '',
+            gamepadKeys: '5',
+            keysName: 'R1',
             cmd: 'FEEDRATE_OVERRIDE_P',
             payload: { amount: 1 },
             preventDefault: true,
@@ -1068,6 +1070,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_PP: {
             title: 'Feed ++',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed ++',
             cmd: 'FEEDRATE_OVERRIDE_PP',
             payload: { amount: 10 },
             preventDefault: true,
@@ -1078,6 +1082,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_M: {
             title: 'Feed -',
             keys: '',
+            gamepadKeys: '7',
+            keysName: 'R2',
             cmd: 'FEEDRATE_OVERRIDE_M',
             payload: { amount: -1 },
             preventDefault: true,
@@ -1088,6 +1094,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_MM: {
             title: 'Feed --',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed --',
             cmd: 'FEEDRATE_OVERRIDE_MM',
             payload: { amount: -10 },
             preventDefault: true,
@@ -1098,6 +1106,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_RESET: {
             title: 'Feed Reset',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed Reset',
             cmd: 'FEEDRATE_OVERRIDE_RESET',
             payload: { amount: 0 },
             preventDefault: true,
@@ -1108,6 +1118,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_P: {
             title: 'Spindle/Laser +',
             keys: '',
+            gamepadKeys: '4',
+            keysName: 'L1',
             cmd: 'SPINDLE_OVERRIDE_P',
             payload: { amount: 1 },
             preventDefault: true,
@@ -1118,6 +1130,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_PP: {
             title: 'Spindle/Laser ++',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser ++',
             cmd: 'SPINDLE_OVERRIDE_PP',
             payload: { amount: 10 },
             preventDefault: true,
@@ -1128,6 +1142,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_M: {
             title: 'Spindle/Laser -',
             keys: '',
+            gamepadKeys: '6',
+            keysName: 'L2',
             cmd: 'SPINDLE_OVERRIDE_M',
             payload: { amount: -1 },
             preventDefault: true,
@@ -1138,6 +1154,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_MM: {
             title: 'Spindle/Laser --',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser --',
             cmd: 'SPINDLE_OVERRIDE_MM',
             payload: { amount: -10 },
             preventDefault: true,
@@ -1148,6 +1166,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_RESET: {
             title: 'Spindle/Laser Reset',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser Reset',
             cmd: 'SPINDLE_OVERRIDE_RESET',
             payload: { amount: 0 },
             preventDefault: true,
