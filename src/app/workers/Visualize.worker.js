@@ -272,6 +272,7 @@ onmessage = function({ data }) {
         addLine,
         addArcCurve
     });
+    const start = Date.now();
 
     toolpath
         .loadFromString(content, (err, data) => {
@@ -302,6 +303,7 @@ onmessage = function({ data }) {
             }
         })
         .on('end', () => {
+            console.log(`Duration: ${Date.now() - start} ms`);
             let tFrames = new Uint32Array(frames);
             let tVertices = new Float32Array(vertices);
 

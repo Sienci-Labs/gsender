@@ -1414,10 +1414,10 @@ class VisualizerWidget extends PureComponent {
         if (!objects.cuttingTool.visible) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
+        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG, GRBLHAL], controllerType)) {
             return false;
         }
-        if (controllerType === GRBL) {
+        if (controllerType === GRBL || controllerType === GRBLHAL) {
             if (activeState !== GRBL_ACTIVE_STATE_RUN && activeState !== GRBL_ACTIVE_STATE_CHECK) {
                 return false;
             }
