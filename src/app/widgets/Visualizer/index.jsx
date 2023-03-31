@@ -853,12 +853,50 @@ class VisualizerWidget extends PureComponent {
 
     shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
-            console.log('FEEDRATE_OVERRIDE', amount);
-            const feedRate = Number(amount) || 0;
+            let feedRate = 0;
+            switch (Number(amount)) {
+            case 1:
+                feedRate = this.props.ovF + 1;
+                break;
+            case -1:
+                feedRate = this.props.ovF - 1;
+                break;
+            case 10:
+                feedRate = this.props.ovF + 10;
+                break;
+            case -10:
+                feedRate = this.props.ovF - 10;
+                break;
+            case 0:
+                feedRate = this.props.ovF;
+                break;
+            default:
+                return;
+            }
             controller.command('feedOverride', feedRate);
         },
         SPINDLE_OVERRIDE: (_, { amount }) => {
-            const spindleSpeed = Number(amount) || 0;
+            let spindleSpeed = 0;
+            console.log(amount);
+            switch (Number(amount)) {
+            case 1:
+                spindleSpeed = this.props.ovS + 1;
+                break;
+            case -1:
+                spindleSpeed = this.props.ovS - 1;
+                break;
+            case 10:
+                spindleSpeed = this.props.ovS + 10;
+                break;
+            case -10:
+                spindleSpeed = this.props.ovS - 10;
+                break;
+            case 0:
+                spindleSpeed = this.props.ovS;
+                break;
+            default:
+                return;
+            }
             controller.command('spindleOverride', spindleSpeed);
         },
         VISUALIZER_VIEW: (_, { type }) => {
@@ -1026,7 +1064,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Feed +',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_P',
-            payload: { amount: this.props.ovF + 1 },
+            payload: { amount: 1 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1036,7 +1074,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Feed ++',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_PP',
-            payload: { amount: this.props.ovF + 10 },
+            payload: { amount: 10 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1046,7 +1084,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Feed -',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_M',
-            payload: { amount: this.props.ovF - 1 },
+            payload: { amount: -1 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1056,7 +1094,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Feed --',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_MM',
-            payload: { amount: this.props.ovF - 10 },
+            payload: { amount: -10 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1066,7 +1104,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Feed Reset',
             keys: '',
             cmd: 'FEEDRATE_OVERRIDE_RESET',
-            payload: { amount: this.props.ovF },
+            payload: { amount: 0 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1076,7 +1114,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Spindle/Laser +',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_P',
-            payload: { amount: this.props.ovS + 1 },
+            payload: { amount: 1 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1086,7 +1124,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Spindle/Laser ++',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_PP',
-            payload: { amount: this.props.ovS + 10 },
+            payload: { amount: 10 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1096,7 +1134,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Spindle/Laser -',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_M',
-            payload: { amount: this.props.ovS - 1 },
+            payload: { amount: -1 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1106,7 +1144,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Spindle/Laser --',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_MM',
-            payload: { amount: this.props.ovS - 10 },
+            payload: { amount: -10 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
@@ -1116,7 +1154,7 @@ class VisualizerWidget extends PureComponent {
             title: 'Spindle/Laser Reset',
             keys: '',
             cmd: 'SPINDLE_OVERRIDE_RESET',
-            payload: { amount: this.props.ovS },
+            payload: { amount: 0 },
             preventDefault: true,
             isActive: true,
             category: OVERRIDES_CATEGORY,
