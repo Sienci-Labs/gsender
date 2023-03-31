@@ -78,11 +78,11 @@
     "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls"
   },
   "build": {
-    "appId": "org.sienci.gsender-edge",
+    "appId": "org.sienci.gsender-hal",
     "artifactName": "${name}-${version}-${arch}.${ext}",
     "asar": false,
     "asarUnpack": [],
-    "productName": "gSender Hal/Rotary",
+    "productName": "gSender Hal and Rotary Alpha",
     "generateUpdatesFilesForAllChannels": true,
     "extraResources": [
       "./node_modules/@electron/remote/**"

@@ -161,11 +161,6 @@ class SecondaryFunctionality extends PureComponent {
                     component: ProbeWidget,
                 },
                 {
-                    label: 'Rotary',
-                    widgetId: 'rotary',
-                    component: RotaryWidget,
-                },
-                {
                     label: 'Macros',
                     widgetId: 'macro',
                     component: MacroWidget,
@@ -184,7 +179,12 @@ class SecondaryFunctionality extends PureComponent {
                     label: 'Coolant',
                     widgetId: 'coolant',
                     component: CoolantWidget
-                }
+                },
+                {
+                    label: 'Rotary',
+                    widgetId: 'rotary',
+                    component: RotaryWidget
+                },
             ]
         };
     }
