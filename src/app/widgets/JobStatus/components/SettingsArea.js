@@ -79,7 +79,6 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
         if (spindleSpeed < VALUE_RANGES.MIN && spindleSpeed > VALUE_RANGES.MAX) {
             return;
         }
-        console.log(spindleSpeed);
         controller.command('spindleOverride', spindleSpeed);
     };
 
