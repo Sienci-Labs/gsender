@@ -1515,7 +1515,6 @@ class GrblController {
                 if (value === 100) {
                     this.write('\x90');
                 } else {
-                    log.debug(`VALUE :${value}, FEED_OV :${feedOV}, DIFF :${diff}`);
                     calcOverrides(this, diff, 'feed');
                 }
             },
@@ -1533,11 +1532,9 @@ class GrblController {
                     diff = 230 - spindleOV;
                 }
 
-
                 if (value === 100) {
                     this.write('\x99');
                 } else {
-                    log.debug(`VALUE :${value}, SPINDLE_OV :${spindleOV}, DIFF :${diff}`);
                     calcOverrides(this, diff, 'spindle');
                 }
             },

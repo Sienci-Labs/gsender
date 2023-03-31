@@ -853,51 +853,46 @@ class VisualizerWidget extends PureComponent {
 
     shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
-            let feedRate = 0;
             switch (Number(amount)) {
             case 1:
-                feedRate = this.props.ovF + 1;
+                controller.write('\x93');
                 break;
             case -1:
-                feedRate = this.props.ovF - 1;
+                controller.write('\x94');
                 break;
             case 10:
-                feedRate = this.props.ovF + 10;
+                controller.write('\x91');
                 break;
             case -10:
-                feedRate = this.props.ovF - 10;
+                controller.write('\x92');
                 break;
             case 0:
-                feedRate = this.props.ovF;
+                controller.write('\x90');
                 break;
             default:
                 return;
             }
-            controller.command('feedOverride', feedRate);
         },
         SPINDLE_OVERRIDE: (_, { amount }) => {
-            let spindleSpeed = 0;
-            console.log(amount);
             switch (Number(amount)) {
             case 1:
-                spindleSpeed = this.props.ovS + 1;
+                controller.write('\x9C');
                 break;
             case -1:
-                spindleSpeed = this.props.ovS - 1;
+                controller.write('\x9D');
                 break;
             case 10:
-                spindleSpeed = this.props.ovS + 10;
+                controller.write('\x9A');
                 break;
             case -10:
-                spindleSpeed = this.props.ovS - 10;
+                controller.write('\x9B');
                 break;
             case 0:
-                spindleSpeed = this.props.ovS;
+                controller.write('\x99');
                 break;
             default:
                 return;
             }
-            controller.command('spindleOverride', spindleSpeed);
         },
         VISUALIZER_VIEW: (_, { type }) => {
             const {
@@ -1471,7 +1466,6 @@ class VisualizerWidget extends PureComponent {
     }
 
     render() {
-        console.log(this.state);
         const { renderState, isSecondary, gcode, surfacingData, activeVisualizer, activeState, alarmCode, workflow, isConnected } = this.props;
         const state = {
             ...this.state,
@@ -1569,10 +1563,6 @@ export default connect((store) => {
 
     const ovF = overrides[0];
     const ovS = overrides[2];
-
-    console.log('OVF :', ovF);
-    console.log('OVS :', ovS);
-
 
     return {
         feedArray,
