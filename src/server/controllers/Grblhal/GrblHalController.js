@@ -1092,11 +1092,13 @@ class GrblHalController {
                 let counter = 3;
                 const interval = setInterval(() => {
                     // check if 3 tries or controller is ready
-                    if (counter === 0 || this.ready) {
+                    if (counter <= 0 || this.ready) {
                         clearInterval(interval);
                         return;
                     }
-                    this.connection.write('$I\n');
+                    if (this.connection) {
+                        this.connection.write('$I\n');
+                    }
                     counter--;
                 }, 3000);
             }, 500);

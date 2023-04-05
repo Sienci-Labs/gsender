@@ -23,6 +23,7 @@
 
 import React from 'react';
 import cx from 'classnames';
+import { uniqueId } from 'lodash';
 import styles from './Index.styl';
 
 const FirmwareSelector = ({ options = [], selectedFirmware, handleSelect }) => {
@@ -34,6 +35,7 @@ const FirmwareSelector = ({ options = [], selectedFirmware, handleSelect }) => {
                         const active = selectedFirmware === option;
                         return (
                             <button
+                                key={uniqueId()}
                                 type="button"
                                 onClick={() => handleSelect(option)}
                                 className={cx(styles.selectorButton, { [styles.selected]: active })}
