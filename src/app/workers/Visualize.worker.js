@@ -34,23 +34,23 @@ onmessage = function({ data }) {
 
     // Laser specific state variables
     const spindleSpeeds = new Set();
-    let spindleSpeed = 0;
-    let spindleOn = false;
+    //let spindleSpeed = 0;
+    //let spindleOn = false;
     let spindleChanges = [];
 
     // SVG specific state variables
     let SVGVertices = [];
     let paths = [];
     let currentMotion = '';
-    let progress = 0;
-    let currentLines = 0;
-    let totalLines = (content.match(/\n/g) || []).length;
+    //let progress = 0;
+    //let currentLines = 0;
+    //let totalLines = (content.match(/\n/g) || []).length;
 
     /**
      * Updates local state with any spindle changes in line
      * @param words
      */
-    const updateSpindleStateFromLine = ({ words }) => {
+    /*const updateSpindleStateFromLine = ({ words }) => {
         const spindleMatches = words.filter((word) => word[0] === 'S');
         const [spindleCommand, spindleValue] = spindleMatches[0] || [];
         if (spindleCommand) {
@@ -58,7 +58,7 @@ onmessage = function({ data }) {
             spindleSpeed = spindleValue;
             spindleOn = spindleValue > 0;
         }
-    };
+    };*/
 
     // create path for the vertices of the last motion
     const createPath = (motion) => {
@@ -110,7 +110,7 @@ onmessage = function({ data }) {
                     endAngle += (2 * Math.PI);
                 }
 
-                const arcCurve = new THREE.ArcCurve(
+                const arcCurve = new ArcCurve(
                     v0.x, // aX
                     v0.y, // aY
                     radius, // aRadius
@@ -184,7 +184,7 @@ onmessage = function({ data }) {
                     endAngle += (2 * Math.PI);
                 }
 
-                const arcCurve = new THREE.ArcCurve(
+                const arcCurve = new ArcCurve(
                     v0.x, // aX
                     v0.y, // aY
                     radius, // aRadius
@@ -247,11 +247,11 @@ onmessage = function({ data }) {
         handlerKey = 'laser';
     }
 
-    const { addLine, addArcCurve } = handlers[handlerKey];
+    const { addLine, addArcCurve: addCurve } = handlers[handlerKey];
 
-    const vm = new GCodeVirtualizer({addLine, addArcCurve});
+    const vm = new GCodeVirtualizer({ addLine, addCurve });
 
-    const toolpath = new Toolpath({
+    /*const toolpath = new Toolpath({
         addLine,
         addArcCurve
     });
@@ -314,7 +314,7 @@ onmessage = function({ data }) {
             }
 
             postMessage(message);
-        });
+        });*/
 
     const lines = content
         .split(/\r?\n/)
@@ -327,4 +327,33 @@ onmessage = function({ data }) {
         vm.virtualize(line);
     }
     console.log(`Duration: ${Date.now() - start}`);
+
+    let tFrames = new Uint32Array(frames);
+    let tVertices = new Float32Array(vertices);
+
+    const info = vm.generateFileStats();
+    console.log(JSON.stringify(info));
+
+    const message = {
+        vertices: tVertices,
+        colors,
+        frames: tFrames,
+        visualizer,
+        info
+    };
+
+    // create path for the last motion
+    if (shouldRenderSVG) {
+        createPath(currentMotion);
+        paths = JSON.parse(JSON.stringify(paths));
+        message.paths = paths;
+    }
+
+    if (isLaser) {
+        message.spindleSpeeds = spindleSpeeds;
+        message.isLaser = isLaser;
+        message.spindleChanges = spindleChanges;
+    }
+
+    postMessage(message);
 };
