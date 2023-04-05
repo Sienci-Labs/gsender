@@ -2,7 +2,7 @@ import React from 'react';
 
 import styles from './index.styl';
 
-const String = ({ value, maxChars, onChange }) => {
+const String = ({ value, maxChars = 64, onChange }) => {
     return (
         <div className={styles.numberInputs}>
             <input

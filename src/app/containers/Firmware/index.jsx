@@ -17,9 +17,17 @@ import ActionArea from './components/Actions';
 import { addControllerEvents, controllerSettingsLoaded, FirmwareContext, removeControllerEvents } from './utils';
 import styles from './index.styl';
 
-const getEEPROM = (settings, eeprom = {}) => {
-    return settings
-        .map((item) => ({ ...item, value: Object.keys(eeprom).length ? eeprom[item.setting] : 0 }));
+const getFilteredEEPROM = (settings, eeprom = {}) => {
+    return Object.keys(eeprom).map((setting) => {
+        const properties = settings.find(obj => {
+            return obj.setting === setting;
+        });
+        return {
+            ...properties || {},
+            setting: setting,
+            value: eeprom[setting]
+        };
+    });
 };
 
 const Firmware = ({ modalClose }) => {
@@ -30,7 +38,7 @@ const Firmware = ({ modalClose }) => {
     const SETTINGS = controllerType === GRBLHAL ? GRBL_HAL_SETTINGS : GRBL_SETTINGS;
     const [initiateFlashing, setInitiateFlashing] = useState(false);
     const [shouldRestoreDefault, setShouldRestoreDefault] = useState(false);
-    const [settings, setSettings] = useState(getEEPROM(SETTINGS, eeprom));
+    const [settings, setSettings] = useState(getFilteredEEPROM(SETTINGS, eeprom));
     const [filterText, setFilterText] = useState('');
     const [isFlashing, setIsFlashing] = useState(false);
     const [controller, setController] = useState(libController);
@@ -51,7 +59,7 @@ const Firmware = ({ modalClose }) => {
     }, [libController]);
 
     useEffect(() => {
-        setSettings(getEEPROM(SETTINGS, eeprom));
+        setSettings(getFilteredEEPROM(SETTINGS, eeprom));
     }, [eeprom]);
 
     const controllerEvents = {
