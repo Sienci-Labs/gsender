@@ -25,9 +25,11 @@
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import get from 'lodash/get';
+import reduxStore from 'app/store/redux';
+import { UPDATE_JOB_OVERRIDES } from 'app/actions/visualizerActions';
 import { connect } from 'react-redux';
 import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
-
+import ToggleSwitch from 'app/components/ToggleSwitch';
 import IdleInfo from './components/IdleInfo';
 import Overrides from './components/Overrides';
 import styles from './index.styl';
@@ -57,10 +59,37 @@ class JobStatus extends PureComponent {
         return `${size} bytes`;
     };
 
-    render() {
-        const { state, name, size, total, fileLoaded, path, filteredPath } = this.props;
-        const { isRunningJob } = state;
+    handleOverrideToggle = () => {
+        if (get(reduxStore.getState(), 'visualizer.jobOverrides.toggleStatus') === 'jobStatus') {
+            localStorage.setItem('jobOverrideToggle', JSON.stringify({
+                isChecked: true,
+                toggleStatus: 'overrides',
+            }));
+        } else {
+            localStorage.setItem('jobOverrideToggle', JSON.stringify({
+                isChecked: false,
+                toggleStatus: 'jobStatus',
+            }));
+        }
+        reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: JSON.parse(localStorage.getItem('jobOverrideToggle')) });
+    }
 
+    componentDidUpdate() {
+        if (!this.props.fileLoaded || !this.props.connection.isConnected) {
+            localStorage.setItem('jobOverrideToggle', JSON.stringify({ isChecked: false,
+                toggleStatus: 'jobStatus', }));
+        }
+    }
+
+    componentDidMount() {
+        localStorage.setItem('jobOverrideToggle', JSON.stringify({
+            isChecked: false,
+            toggleStatus: 'jobStatus',
+        }));
+    }
+
+    render() {
+        const { state, name, size, total, fileLoaded, path, filteredPath, connection } = this.props;
         return (
             <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <div className={styles['file-info']}>
@@ -71,7 +100,20 @@ class JobStatus extends PureComponent {
                                     <div className={styles['file-name']}>
                                         <TooltipCustom content={`${name} (${this.fileSizeFormat(size)}, ${total} lines)`} style={{ wordWrap: 'break-word' }}>
                                             <span className={styles['file-text']}>{name}</span>{' '}<span>({this.fileSizeFormat(size)}, {total} lines)</span>
+                                            <span style={{ marginLeft: '2rem' }} />
                                         </TooltipCustom>
+                                        {connection.isConnected
+                                            ? (
+                                                <ToggleSwitch
+                                                    label="Overrides"
+                                                    onChange={() => this.handleOverrideToggle()}
+                                                    className={styles.litetoggle}
+                                                    checked={get(reduxStore.getState(), 'visualizer.jobOverrides.isChecked')}
+                                                    size="md"
+                                                    style={{ minWidth: '10rem' }}
+                                                />
+                                            ) : null
+                                        }
                                     </div>
 
                                     {filteredPath && (
@@ -85,11 +127,11 @@ class JobStatus extends PureComponent {
                                     )}
                                 </>
                             )
-                            : <div className={styles['file-name']}><span className={styles['file-text']}>No File Loaded</span></div>}
+                            : (<div className={styles['file-name']}><span className={styles['file-text']}>No File Loaded</span></div>)}
                 </div>
-                {!isRunningJob
-                    ? <IdleInfo state={state} />
-                    : <Overrides state={state} />
+                {get(reduxStore.getState(), 'visualizer.jobOverrides.isChecked') && state.senderStatus
+                    ? <Overrides state={state} />
+                    : <IdleInfo state={state} />
                 }
             </div>
         );
@@ -101,8 +143,12 @@ export default connect((store) => {
     const path = get(file, 'path', '');
     const name = get(file, 'name', '');
     const filteredPath = path.replace(name, '');
+    const connection = get(store, 'connection');
+    const activeState = get(store, 'controller.state.status.activeState', 'Idle');
     return {
         ...file,
-        filteredPath
+        filteredPath,
+        connection,
+        activeState
     };
 })(JobStatus);

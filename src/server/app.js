@@ -25,10 +25,10 @@
 import fs from 'fs';
 import path from 'path';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import compress from 'compression';
 import cookieParser from 'cookie-parser';
 import multer from 'multer';
-//import multiparty from 'connect-multiparty';
 import connectRestreamer from 'connect-restreamer';
 import engines from 'consolidate';
 import errorhandler from 'errorhandler';
@@ -38,7 +38,7 @@ import session from 'express-session';
 import 'hogan.js';
 import i18next from 'i18next';
 import Backend from 'i18next-fs-backend';
-import jwt from 'jsonwebtoken';
+//import jwt from 'jsonwebtoken';
 import methodOverride from 'method-override';
 import morgan from 'morgan';
 import favicon from 'serve-favicon';
@@ -62,7 +62,7 @@ import errserver from './lib/middleware/errserver';
 import config from './services/configstore';
 import {
     authorizeIPAddress,
-    validateUser
+    //validateUser
 } from './access-control';
 import {
     ERR_FORBIDDEN
@@ -119,6 +119,9 @@ const appMain = () => {
 
         log.debug('app.settings: %j', app.settings);
     }
+
+    // Cors
+    app.use(cors());
 
     // Setup i18n (i18next)
     i18next
@@ -234,7 +237,7 @@ const appMain = () => {
             credentialsRequired: true
         }));
 
-        app.use(async (err, req, res, next) => {
+        app.use((err, req, res, next) => {
             let bypass = !(err && (err.name === 'UnauthorizedError'));
 
             // Check whether the app is running in development mode
@@ -251,11 +254,11 @@ const appMain = () => {
 
             if (!bypass) {
                 // Check whether the provided credential is correct
-                const token = _get(req, 'query.token') || _get(req, 'body.token');
+                //const token = _get(req, 'query.token') || _get(req, 'body.token');
                 try {
                     // User Validation
-                    const user = jwt.verify(token, settings.secret) || {};
-                    await validateUser(user);
+                    //const user = jwt.verify(token, settings.secret) || {};
+                    //await validateUser(user);
                     bypass = true;
                 } catch (err) {
                     log.warn(err);
@@ -281,6 +284,7 @@ const appMain = () => {
     { // Register API routes with authorized access
         // Version
         app.get(urljoin(settings.route, 'api/version/latest'), api.version.getLatestVersion);
+        app.get(urljoin(settings.route, 'api/version/appUpdateSupport'), api.version.getShouldInstallUpdates);
 
         // State
         app.get(urljoin(settings.route, 'api/state'), api.state.get);
@@ -310,6 +314,7 @@ const appMain = () => {
         app.get(urljoin(settings.route, 'api/events/:id'), api.events.read);
         app.put(urljoin(settings.route, 'api/events/:id'), api.events.update);
         app.delete(urljoin(settings.route, 'api/events/:id'), api.events.__delete);
+        app.delete(urljoin(settings.route, 'api/events'), api.events.clearAll);
 
         // Machines
         app.get(urljoin(settings.route, 'api/machines'), api.machines.fetch);
@@ -317,6 +322,10 @@ const appMain = () => {
         app.get(urljoin(settings.route, 'api/machines/:id'), api.machines.read);
         app.put(urljoin(settings.route, 'api/machines/:id'), api.machines.update);
         app.delete(urljoin(settings.route, 'api/machines/:id'), api.machines.__delete);
+
+        //Headless mode / Remote mode
+        app.put(urljoin(settings.route, '/api/remote'), api.remote.update);
+        app.get(urljoin(settings.route, 'api/remote'), api.remote.fetch);
 
         // Macros
         app.get(urljoin(settings.route, 'api/macros'), api.macros.fetch);
@@ -346,12 +355,20 @@ const appMain = () => {
         app.get(urljoin(settings.route, 'api/watch/file'), api.watch.readFile);
         app.post(urljoin(settings.route, 'api/watch/file'), api.watch.readFile);
 
+        // Metrics
+        app.get(urljoin(settings.route, 'api/metrics/collectUserData'), api.metrics.getCollectDataStatus);
+        app.post(urljoin(settings.route, 'api/metrics/collectUserData'), api.metrics.toggleCollectData);
+        app.post(urljoin(settings.route, 'api/metrics/sendData'), api.metrics.sendData);
+
         // Files - with multer
         const storage = multer.memoryStorage();
         const upload = multer({
             storage
         });
         app.post(urljoin(settings.route, 'api/file'), upload.single('gcode'), api.files.uploadFile);
+
+        // Log
+        app.post(urljoin(settings.route, 'api/log'), api.logs.printLog);
     }
 
     // page

@@ -23,8 +23,10 @@
 
 import React from 'react';
 import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
+import Select from 'react-select';
 import Input from '../../components/Input';
 import styles from '../../index.styl';
+import { DRILL, END_MILL } from '../../../../lib/constants';
 
 const AddTool = ({ actions, state }) => {
     const { tool } = state;
@@ -50,6 +52,18 @@ const AddTool = ({ actions, state }) => {
                     onChange={toolActions.setImperialDiameter}
                 />
             </TooltipCustom>
+            <div className={styles.inputSpread}>
+                <label htmlFor="touchplateType">Touchplate Type</label>
+                <Select
+                    options={[
+                        { label: END_MILL, value: END_MILL },
+                        { label: DRILL, value: DRILL },
+                    ]}
+                    placeholder="Select Type"
+                    value={{ label: tool.type, value: tool.type }}
+                    onChange={toolActions.setToolType}
+                />
+            </div>
             <TooltipCustom content="Add your new custom tool to the list" location="default">
                 <button
                     className={styles.addTool}
@@ -57,7 +71,7 @@ const AddTool = ({ actions, state }) => {
                     onClick={toolActions.addTool}
                     disabled={tool.imperialDiameter === 0 || tool.metricDiameter === 0}
                 >
-                Add Tool
+                    Add Tool
                 </button>
             </TooltipCustom>
         </div>

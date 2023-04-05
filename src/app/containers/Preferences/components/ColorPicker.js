@@ -21,65 +21,68 @@
  *
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import Modal from 'app/components/Modal';
 import { SketchPicker } from 'react-color';
-import { LIGHT_THEME, CUST_DARK_THEME, CUST_LIGHT_THEME } from 'app/widgets/Visualizer/constants';
-import pubsub from 'pubsub-js';
 import styles from '../index.styl';
 
-const ColorPicker = ({ actions, theme, part }) => {
-    const [color, setColor] = useState(actions.visualizer.getCurrentColor(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
+const ColorPicker = ({ actions, theme, part, isOpen, onClose, chooseColour }) => {
+    const [color, setColor] = useState(actions.visualizer.getCurrentColor(theme, part, actions.visualizer.getDefaultColour(part)));
+    const [currentPart, setCurrentPart] = useState(part);
 
-    pubsub.subscribe('theme:change', () => {
-        setColor(actions.visualizer.getCurrentColor(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
-    });
-    pubsub.subscribe('part:change', () => {
-        setColor(actions.visualizer.getCurrentColor(part.value, actions.visualizer.getDefaultColour(theme, part.value)));
-    });
+    const onOpen = () => {
+        if (color !== actions.visualizer.getCurrentColor(theme, part, actions.visualizer.getDefaultColour(part)) && currentPart !== part) {
+            setColor(actions.visualizer.getCurrentColor(theme, part, actions.visualizer.getDefaultColour(part)));
+            setCurrentPart(part);
+        }
+        return 1;
+    };
 
-    // clean the state in the unmount
-    useEffect(() => {
-        return () => {
-            setColor();
-        };
-    }, []);
+    const onCloseModal = () => {
+        setCurrentPart(null);
+        onClose(color);
+    };
 
     return (
-        <div className={styles.addMargin}>
-            {(theme === CUST_DARK_THEME || theme === CUST_LIGHT_THEME) &&
-                <div id="picker" className={styles.colourPicker}>
-                    <SketchPicker
-                        id="colorpicker"
-                        disableAlpha={true}
-                        color={color}
-                        onChange={setColor}
-                        onChangeComplete={(color) => actions.visualizer.handleChangeComplete(color, part.value)}
-                    />
-                    <button
-                        className={styles.saveColour}
-                        type="button"
-                        onClick={() => {
-                            let newTheme;
-                            if (theme === LIGHT_THEME || theme === CUST_LIGHT_THEME) {
-                                newTheme = CUST_LIGHT_THEME;
-                            } else {
-                                newTheme = CUST_DARK_THEME;
-                            }
-                            actions.visualizer.handleCustThemeChange(newTheme, part.value);
-                        }}
-                    >
-                    Save
-                    </button>
-                    <button
-                        className={styles.resetColour}
-                        type="button"
-                        onClick={() => actions.visualizer.resetCustomThemeColours(theme)}
-                    >
-                    Reset Colours
-                    </button>
+        isOpen && onOpen() && (
+            <Modal
+                size="xs"
+                onClose={onCloseModal}
+                className={styles.colorModal}
+            >
+                <Modal.Header>
+                    <Modal.Title>{part}</Modal.Title>
+                </Modal.Header>
+                <div className={styles.addMargin}>
+                    <div id="picker" className={styles.colorPicker}>
+                        <SketchPicker
+                            id="colorpicker"
+                            disableAlpha={true}
+                            color={color}
+                            onChange={setColor}
+                            onChangeComplete={setColor}
+                        />
+                        <button
+                            className={styles.chooseColour}
+                            type="button"
+                            onClick={() => {
+                                chooseColour(color);
+                                onClose(color);
+                            }}
+                        >
+                            Choose Colour
+                        </button>
+                        <button
+                            className={styles.resetColour}
+                            type="button"
+                            onClick={() => setColor(actions.visualizer.getDefaultColour(part))}
+                        >
+                            Reset to Default
+                        </button>
+                    </div>
                 </div>
-            }
-        </div>
+            </Modal>
+        )
     );
 };
 

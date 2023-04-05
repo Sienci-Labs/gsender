@@ -27,12 +27,13 @@ import Dropzone from 'react-dropzone';
 import isElectron from 'is-electron';
 import pubsub from 'pubsub-js';
 import Header from 'app/containers/Header';
-import React, { PureComponent } from 'react';
+import React, { PureComponent, createRef } from 'react';
 import { withRouter } from 'react-router-dom';
 import api from 'app/api';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import {
-    WORKFLOW_STATE_IDLE
+    WORKFLOW_STATE_IDLE,
+    USER_DATA_COLLECTION
 } from 'app/constants';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
@@ -55,6 +56,7 @@ import {
 import UpdateAvailableAlert from './UpdateAvailableAlert/UpdateAvailableAlert';
 import Toaster from '../../lib/toaster/Toaster';
 import ConfirmationDialog from '../../components/ConfirmationDialog/ConfirmationDialog';
+import DataCollectionPopup from './DataCollectionPopup';
 
 
 const WAIT = '%wait';
@@ -91,7 +93,10 @@ class Workspace extends PureComponent {
         showPrimaryContainer: store.get('workspace.container.primary.show'),
         inactiveCount: _.size(widgetManager.getInactiveWidgets()),
         reverseWidgets: store.get('workspace.reverseWidgets'),
-        lastHealthUpdate: null
+        lastHealthUpdate: null,
+        mobile: false,
+        tablet: false,
+        shouldShowRotate: true
     };
 
     pubsubTokens = [];
@@ -111,6 +116,11 @@ class Workspace extends PureComponent {
                     name: MODAL_NONE,
                     params: {}
                 }
+            }));
+        },
+        closePrompt: () => {
+            this.setState(state => ({
+                shouldShowRotate: false
             }));
         },
         updateModalParams: (params = {}) => {
@@ -136,17 +146,11 @@ class Workspace extends PureComponent {
 
     primaryContainer = null;
 
-    secondaryContainer = null;
-
-    primaryToggler = null;
-
-    secondaryToggler = null;
-
     primaryWidgets = null;
 
-    secondaryWidgets = null;
-
     defaultContainer = null;
+
+    dataCollectionRef = createRef()
 
     controllerEvents = {
         'hPong': () => {
@@ -271,25 +275,17 @@ class Workspace extends PureComponent {
         }
     };
 
-    togglePrimaryContainer = () => {
-        const { showPrimaryContainer } = this.state;
-        this.setState({ showPrimaryContainer: !showPrimaryContainer });
-
-        // Publish a 'resize' event
-        pubsub.publish('resize'); // Also see "widgets/Visualizer"
-    };
-
     resizeDefaultContainer = () => {
         // const sidebar = document.querySelector('#sidebar');
         // const secondaryToggler = ReactDOM.findDOMNode(this.secondaryToggler);
         const { showPrimaryContainer } = this.state;
 
-        // Calculate VH based on current window height
-        let vh = window.innerHeight * 0.01;
-        let vw = window.innerWidth * 0.01;
+        /* Calculate VH based on current window height
+        let vh = window.visualViewport.height * 0.01;
+        let vw = window.visualViewport.width * 0.01;
         //Update styling with new VH value for CSS calculations
         document.documentElement.style.setProperty('--vh', `${vh}px`);
-        document.documentElement.style.setProperty('--vw', `${vw}px`);
+        document.documentElement.style.setProperty('--vw', `${vw}px`);*/
 
         { // Mobile-Friendly View
             const { location } = this.props;
@@ -304,10 +300,19 @@ class Workspace extends PureComponent {
                 document.body.style.overflowX = '';
             }
         }
-
-        // defaultContainer.style.right = secondaryToggler.offsetWidth + 'px';
         // Publish a 'resize' event
         pubsub.publish('resize'); // Also see "widgets/Visualizer"
+    };
+
+    updateScreenSize = () => {
+        const isMobile = window.visualViewport.width <= 599;
+        this.setState({
+            mobile: isMobile
+        });
+        const isTablet = window.visualViewport.width > 599; //width smaller than height and wider than a phone
+        this.setState({
+            tablet: isTablet
+        });
     };
 
     onDrop = (files) => {
@@ -347,6 +352,7 @@ class Workspace extends PureComponent {
                 .then((res) => {
                     const { name = '', gcode = '' } = { ...res.body };
                     pubsub.publish('gcode:load', { name, gcode });
+                    log.error('Failed to upload G-code file');
                 })
                 .catch((res) => {
                     log.error('Failed to upload G-code file');
@@ -418,10 +424,36 @@ class Workspace extends PureComponent {
         });
     };
 
+    handleCollectUserData = async () => {
+        const { INITIAL, ACCEPTED, REJECTED } = USER_DATA_COLLECTION;
+        const res = await api.metrics.getCollectDataStatus();
+
+        const collectUserDataStatus = res.body.collectUserDataStatus;
+
+        if (collectUserDataStatus === REJECTED) {
+            return;
+        }
+
+        if (collectUserDataStatus === INITIAL) {
+            this.dataCollectionRef.current.show();
+            return;
+        }
+
+        if (collectUserDataStatus === ACCEPTED) {
+            try {
+                await api.metrics.sendData();
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
+
     componentDidMount() {
+        this.updateScreenSize();
         this.addControllerEvents();
         this.addResizeEventListener();
         this.subscribe();
+        this.handleCollectUserData();
 
         setTimeout(() => {
             // A workaround solution to trigger componentDidUpdate on initial render
@@ -456,12 +488,15 @@ class Workspace extends PureComponent {
     }
 
     addResizeEventListener() {
-        this.onResizeThrottled = _.throttle(this.resizeDefaultContainer, 25);
-        window.addEventListener('resize', this.onResizeThrottled);
+        this.onResizeThrottled = _.throttle(() => {
+            this.updateScreenSize();
+            this.resizeDefaultContainer();
+        }, 25);
+        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
     }
 
     removeResizeEventListener() {
-        window.removeEventListener('resize', this.onResizeThrottled);
+        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
         this.onResizeThrottled = null;
     }
 
@@ -493,9 +528,13 @@ class Workspace extends PureComponent {
             isDraggingFile,
             isDraggingWidget,
             showPrimaryContainer,
-            reverseWidgets
+            reverseWidgets,
+            mobile,
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
+        const tableStyle = mobile ? styles.workspaceTableMobile : styles.workspaceTable;
+        const rowStyle = mobile ? styles.workspaceTableRowMobile : styles.workspaceTableRow;
+        const primaryContainerStyle = mobile ? styles.primaryContainerMobile : styles.primaryContainer;
         return (
             <ScreenAwake>
                 <div style={style} className={classNames(className, styles.workspace)}>
@@ -567,23 +606,28 @@ class Workspace extends PureComponent {
                             this.onDrop(acceptedFiles);
                         }}
                     >
-                        <div className={classNames(styles.workspaceTable)}>
+                        <div className={tableStyle}>
                             <UpdateAvailableAlert restartHandler={this.action.sendRestartCommand} />
                             <Toaster />
+                            <DataCollectionPopup ref={this.dataCollectionRef} />
                             <Header />
                             <ConfirmationDialog />
-                            <div className={classNames(styles.workspaceTableRow, { [styles.reverseWorkspace]: reverseWidgets })}>
-                                <DefaultWidgets
-                                    ref={node => {
-                                        this.defaultContainer = node;
-                                    }}
-                                />
+                            <div className={classNames(rowStyle, { [styles.reverseWorkspace]: reverseWidgets })}>
+                                {
+                                    !mobile && (
+                                        <DefaultWidgets
+                                            ref={node => {
+                                                this.defaultContainer = node;
+                                            }}
+                                        />
+                                    )
+                                }
                                 <div
                                     ref={node => {
                                         this.primaryContainer = node;
                                     }}
                                     className={classNames(
-                                        styles.primaryContainer,
+                                        primaryContainerStyle,
                                         { [styles.hidden]: hidePrimaryContainer },
                                         { [styles.disabled]: disabled }
                                     )}

@@ -35,6 +35,7 @@ import React, { PureComponent } from 'react';
 import controller from 'app/lib/controller';
 //import DRO from 'app/widgets/Location/components/DRO';
 import store from 'app/store';
+import pubsub from 'pubsub-js';
 import { getHomingLocation, getMovementGCode } from 'app/widgets/Location/RapidPosition';
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
@@ -147,12 +148,24 @@ class DisplayPanel extends PureComponent {
         }));
     };
 
+    //Only rounds values with more than 3 decimal places which begin with 9
+    customMathRound(num) {
+        let radix = num % 1.0;
+        if ((radix > 0.899 && radix < 1.0) && (Number(num.split('.')[1].slice(0, 2)) > 97)) {
+            return Math.ceil(num).toFixed(Number(num.split('.')[1].length));
+        } else {
+            return num;
+        }
+    }
+
     renderAxis = (axis) => {
         const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units, homingEnabled } = this.props;
-        const mpos = machinePosition[axis] || '0.000';
+        let mpos = machinePosition[axis] || '0.000';
         const wpos = workPosition[axis] || '0.000';
         const axisLabel = axis.toUpperCase();
         const showPositionInput = canClick && this.state.positionInput[axis];
+
+        //mpos = Number(mpos).toFixed(3);
 
         //Function to zero out given axis
         const handleAxisButtonClick = () => {
@@ -170,40 +183,6 @@ class DisplayPanel extends PureComponent {
             controller.command('gcode', `G10 L20 P${p} ${axisLabel}0`);
         };
 
-        /*const gotoHandler = () => {
-            const commands = [];
-            const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-            if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
-                if (homingEnabled) {
-                    commands.push(`G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`);
-                } else {
-                    commands.push('G91');
-                    commands.push(`G0 Z${safeRetractHeight}`); // Retract Z when moving across workspace
-                }
-            }
-            commands.push(`G90 G0 ${axisLabel}0`); //Move to Work Position Zero
-            // We go down if homing not enabled
-            if (safeRetractHeight !== 0 && axisLabel !== 'Z' && !homingEnabled) {
-                commands.push(`G91 G0 Z${safeRetractHeight * -1}`);
-                commands.push('G90');
-            }
-            controller.command('gcode:safe', commands, modal);
-        };
-
-        const droHandler = (value) => actions.handleManualMovement(value, axis);
-
-        return (
-            <DRO
-                label={axisLabel}
-                zeroHandler={handleAxisButtonClick}
-                mpos={mpos}
-                wpos={wpos}
-                gotoHandler={gotoHandler}
-                droHandler={droHandler}
-                canClick={canClick}
-            />
-        );*/
-
         return (
             <tr>
                 <td className={styles.coordinate}>
@@ -215,10 +194,11 @@ class DisplayPanel extends PureComponent {
                             if (safeRetractHeight !== 0 && axisLabel !== 'Z') {
                                 if (homingEnabled) {
                                     // get current Z
-                                    const currentZ = machinePosition.z;
+                                    const currentZ = Number(machinePosition['z']);
+                                    const retractHeight = (Math.abs(safeRetractHeight) * -1);
                                     // only move Z if it is less than Z0-SafeHeight
-                                    if (currentZ < -safeRetractHeight) {
-                                        commands.push(`G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`);
+                                    if (currentZ < retractHeight) {
+                                        commands.push(`G53 G0 Z${retractHeight}`);
                                     }
                                 } else {
                                     commands.push('G91');
@@ -237,8 +217,8 @@ class DisplayPanel extends PureComponent {
                     <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick} />
                 </td>
                 <td className={styles.machinePosition}>
-                    <MachinePositionInput value={wpos} handleManualMovement={(value) => actions.handleManualMovement(value, axis)} />
-                    {!showPositionInput && <PositionLabel value={mpos} small />}
+                    <MachinePositionInput value={this.customMathRound(wpos)} handleManualMovement={(value) => actions.handleManualMovement(value, axis)} />
+                    {!showPositionInput && <PositionLabel value={this.customMathRound(mpos)} small />}
                 </td>
             </tr>
         );
@@ -301,55 +281,58 @@ class DisplayPanel extends PureComponent {
         return (
             <Panel className={styles.displayPanel}>
                 <div className={styles.locationWrapper}>
-                    <table className={styles.displaypanelTable}>
-                        <tbody>
-                            {hasAxisX && this.renderAxis(AXIS_X)}
-                            {hasAxisY && this.renderAxis(AXIS_Y)}
-                            {hasAxisZ && this.renderAxis(AXIS_Z)}
-                        </tbody>
-                    </table>
-                    <div className={styles.controlButtons}>
-                        <FunctionButton
-                            onClick={() => {
-                                const wcs = actions.getWorkCoordinateSystem();
-                                const p = {
-                                    'G54': 1,
-                                    'G55': 2,
-                                    'G56': 3,
-                                    'G57': 4,
-                                    'G58': 5,
-                                    'G59': 6
-                                }[wcs] || 0;
+                    <div className={styles.alwaysAvailable}>
+                        <table className={styles.displaypanelTable}>
+                            <tbody>
+                                {hasAxisX && this.renderAxis(AXIS_X)}
+                                {hasAxisY && this.renderAxis(AXIS_Y)}
+                                {hasAxisZ && this.renderAxis(AXIS_Z)}
+                            </tbody>
+                        </table>
+                        <div className={styles.controlButtons}>
+                            <FunctionButton
+                                onClick={() => {
+                                    const wcs = actions.getWorkCoordinateSystem();
+                                    const p = {
+                                        'G54': 1,
+                                        'G55': 2,
+                                        'G56': 3,
+                                        'G57': 4,
+                                        'G58': 5,
+                                        'G59': 6
+                                    }[wcs] || 0;
 
-                                controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
-                            }}
-                            disabled={!canClick}
-                        >
-                            <i className="fas fa-bullseye" />
-                            Zero All
-                        </FunctionButton>
-                        <FunctionButton
-                            onClick={() => {
-                                const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-                                if (safeRetractHeight !== 0) {
-                                    if (homingEnabled) {
-                                        controller.command('gcode:safe', `G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`, modal);
-                                    } else {
-                                        controller.command('gcode', 'G91');
-                                        controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                    controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
+                                    pubsub.publish('softlimits:check', 0);
+                                }}
+                                disabled={!canClick}
+                            >
+                                <i className="fas fa-bullseye" />
+                                Zero All
+                            </FunctionButton>
+                            <FunctionButton
+                                onClick={() => {
+                                    const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+                                    if (safeRetractHeight !== 0) {
+                                        if (homingEnabled) {
+                                            controller.command('gcode:safe', `G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`, modal);
+                                        } else {
+                                            controller.command('gcode', 'G91');
+                                            controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                        }
                                     }
-                                }
 
-                                controller.command('gcode', 'G90');
-                                controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
-                            }}
-                            disabled={!canClick}
-                            className={styles.fontMonospace}
-                            primary
-                        >
-                            <i className="fas fa-chart-line" />
-                            Go XY0
-                        </FunctionButton>
+                                    controller.command('gcode', 'G90');
+                                    controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
+                                }}
+                                disabled={!canClick}
+                                className={styles.fontMonospace}
+                                primary
+                            >
+                                <i className="fas fa-chart-line" />
+                                Go XY0
+                            </FunctionButton>
+                        </div>
                     </div>
 
                     {
@@ -416,7 +399,7 @@ export default connect((store) => {
     const workflowState = get(store, 'controller.workflow.state');
     const activeState = get(store, 'controller.state.status.activeState');
     const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
-    const machinePosition = get(store, 'controller.mpos');
+    const mpos = get(store, 'controller.mpos');
     return {
         homingEnabled,
         canHome,
@@ -424,6 +407,6 @@ export default connect((store) => {
         homingFlag,
         homingRun,
         pullOff,
-        machinePosition
+        mpos
     };
 })(DisplayPanel);

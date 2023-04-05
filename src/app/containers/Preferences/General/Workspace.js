@@ -7,12 +7,14 @@ import {
 import { RadioGroup, RadioButton } from 'app/components/Radio';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import ToggleSwitch from 'app/components/ToggleSwitch';
+
 import Fieldset from '../components/Fieldset';
+import Input from '../components/Input';
 
 import styles from '../index.styl';
 
 const Workspace = ({ state, actions }) => {
-    const { units, reverseWidgets } = state;
+    const { units, reverseWidgets, customDecimalPlaces } = state;
 
     return (
         <Fieldset legend="Workspace">
@@ -25,39 +27,37 @@ const Workspace = ({ state, actions }) => {
                     size="small"
                 >
                     <div>
-                        <RadioButton className={styles.prefferedradio} label="Inches (G20)" value={IMPERIAL_UNITS} />
-                        <RadioButton className={styles.prefferedradio} label="Millimeters (G21)" value={METRIC_UNITS} />
+                        <RadioButton className={styles.prefferedradio} label="Inches" value={IMPERIAL_UNITS} />
+                        <RadioButton className={styles.prefferedradio} label="Millimeters" value={METRIC_UNITS} />
                     </div>
                 </RadioGroup>
-                <small className={styles['item-info']}>Units to be displayed throughout the interface</small>
+                <small className={styles['item-info']}>What units would you like gSender to show you?</small>
             </div>
             <div className={styles.addMargin}>
                 <Tooltip content="Flip the location of the Visualizer with Machine Controls" location="default">
                     <ToggleSwitch
-                        label="Reverse workspace layout"
+                        label="Visualizer on Right Side"
                         checked={reverseWidgets}
                         onChange={() => actions.general.setReverseWidgets()}
                         size="small"
                     />
                 </Tooltip>
             </div>
-            <div style={{ marginBottom: '10px' }}>
-                <Tooltip content="gSender will warn you on file load if any invalid commands are found" location="default">
-                    <ToggleSwitch
-                        label="Warn if file contains invalid G-Code"
-                        checked={state.showWarning}
-                        onChange={() => actions.general.setShowWarning(!state.showWarning)}
-                        size="small"
-                    />
-                </Tooltip>
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-                <Tooltip content="gSender will warn you while running if any invalid commands are found" location="default">
-                    <ToggleSwitch
-                        label="Warn if invalid line detected during job"
-                        checked={state.showLineWarnings}
-                        onChange={() => actions.general.setShowLineWarnings(!state.showLineWarnings)}
-                        size="small"
+            <div className={styles.addMargin}>
+                <Tooltip
+                    content="Default Value = 0 (2 decimal places for mm and 3 for inches). Anything other than 0 sets both MM and Inches to the selected decimal places. Min = 1, Max = 5"
+                    location="default"
+                >
+                    <Input
+                        label="DRO Zeros"
+                        value={customDecimalPlaces}
+                        onChange={(e) => actions.general.setCustomDecimalPlaces(e)}
+                        additionalProps={{
+                            name: 'customDecimalPlaces',
+                            type: 'number',
+                            min: '0',
+                            max: '5',
+                        }}
                     />
                 </Tooltip>
             </div>

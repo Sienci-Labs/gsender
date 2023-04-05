@@ -21,14 +21,10 @@
  *
  */
 
-import find from 'lodash/find';
-import castArray from 'lodash/castArray';
-import isPlainObject from 'lodash/isPlainObject';
 import uuid from 'uuid';
 import settings from '../config/settings';
 import logger from '../lib/logger';
 import config from '../services/configstore';
-import { getPagingRange } from './paging';
 import {
     ERR_BAD_REQUEST,
     ERR_NOT_FOUND,
@@ -39,16 +35,11 @@ const log = logger('api:events');
 const CONFIG_KEY = 'events';
 
 const getSanitizedRecords = () => {
-    const records = castArray(config.get(CONFIG_KEY, []));
+    const records = config.get(CONFIG_KEY, {});
 
     let shouldUpdate = false;
-    for (let i = 0; i < records.length; ++i) {
-        if (!isPlainObject(records[i])) {
-            records[i] = {};
-        }
-
-        const record = records[i];
-
+    Object.keys(records).forEach((key) => {
+        const record = records.get(key);
         if (!record.id) {
             record.id = uuid.v4();
             shouldUpdate = true;
@@ -64,7 +55,7 @@ const getSanitizedRecords = () => {
             record.commands = record.command || '';
             delete record.command;
         }
-    }
+    });
 
     if (shouldUpdate) {
         log.debug(`update sanitized records: ${JSON.stringify(records)}`);
@@ -78,33 +69,8 @@ const getSanitizedRecords = () => {
 
 export const fetch = (req, res) => {
     const records = getSanitizedRecords();
-    const paging = !!req.query.paging;
-
-    if (paging) {
-        const { page = 1, pageLength = 10 } = req.query;
-        const totalRecords = records.length;
-        const [begin, end] = getPagingRange({ page, pageLength, totalRecords });
-        const pagedRecords = records.slice(begin, end);
-
-        res.send({
-            pagination: {
-                page: Number(page),
-                pageLength: Number(pageLength),
-                totalRecords: Number(totalRecords)
-            },
-            records: pagedRecords.map(record => {
-                const { id, mtime, enabled, event, trigger, commands } = { ...record };
-                return { id, mtime, enabled, event, trigger, commands };
-            })
-        });
-    } else {
-        res.send({
-            records: records.map(record => {
-                const { id, mtime, enabled, event, trigger, commands } = { ...record };
-                return { id, mtime, enabled, event, trigger, commands };
-            })
-        });
-    }
+    console.log(records);
+    res.send({ jsonRecords: Object.fromEntries(records) });
 };
 
 export const create = (req, res) => {
@@ -147,10 +113,10 @@ export const create = (req, res) => {
             commands: commands
         };
 
-        records.push(record);
+        records.set(event, record);
         config.set(CONFIG_KEY, records);
 
-        res.send({ id: record.id, mtime: record.mtime });
+        res.send({ record: record });
     } catch (err) {
         res.status(ERR_INTERNAL_SERVER_ERROR).send({
             msg: 'Failed to save ' + JSON.stringify(settings.rcfile)
@@ -161,7 +127,7 @@ export const create = (req, res) => {
 export const read = (req, res) => {
     const id = req.params.id;
     const records = getSanitizedRecords();
-    const record = find(records, { id: id });
+    const record = records.get(id);
 
     if (!record) {
         res.status(ERR_NOT_FOUND).send({
@@ -170,14 +136,13 @@ export const read = (req, res) => {
         return;
     }
 
-    const { mtime, enabled, event, trigger, commands } = { ...record };
-    res.send({ id, mtime, enabled, event, trigger, commands });
+    res.send({ record: record });
 };
 
 export const update = (req, res) => {
     const id = req.params.id;
     const records = getSanitizedRecords();
-    const record = find(records, { id: id });
+    const record = records.get(id);
 
     if (!record) {
         res.status(ERR_NOT_FOUND).send({
@@ -212,7 +177,7 @@ export const update = (req, res) => {
 
         config.set(CONFIG_KEY, records);
 
-        res.send({ id: record.id, mtime: record.mtime });
+        res.send({ jsonRecords: Object.fromEntries(records) });
     } catch (err) {
         res.status(ERR_INTERNAL_SERVER_ERROR).send({
             msg: 'Failed to save ' + JSON.stringify(settings.rcfile)
@@ -223,7 +188,7 @@ export const update = (req, res) => {
 export const __delete = (req, res) => {
     const id = req.params.id;
     const records = getSanitizedRecords();
-    const record = find(records, { id: id });
+    const record = records.get(id);
 
     if (!record) {
         res.status(ERR_NOT_FOUND).send({
@@ -233,12 +198,25 @@ export const __delete = (req, res) => {
     }
 
     try {
-        const filteredRecords = records.filter(record => {
-            return record.id !== id;
-        });
-        config.set(CONFIG_KEY, filteredRecords);
+        records.delete(id);
+        config.set(CONFIG_KEY, records);
 
-        res.send({ id: record.id });
+        res.send({ id: record.id, event: record.event });
+    } catch (err) {
+        res.status(ERR_INTERNAL_SERVER_ERROR).send({
+            msg: 'Failed to save ' + JSON.stringify(settings.rcfile)
+        });
+    }
+};
+
+export const clearAll = (req, res) => {
+    const records = getSanitizedRecords();
+
+    try {
+        records.clear();
+        config.set(CONFIG_KEY, records);
+
+        res.send({ msg: 'Successfully deleted events' });
     } catch (err) {
         res.status(ERR_INTERNAL_SERVER_ERROR).send({
             msg: 'Failed to save ' + JSON.stringify(settings.rcfile)

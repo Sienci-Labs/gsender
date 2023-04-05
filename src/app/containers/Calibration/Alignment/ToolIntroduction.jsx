@@ -25,23 +25,36 @@ import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
-import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
-import Keypad from '../JogControl';
+import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+import JogControl from 'app/widgets/JogControl';
+
 
 const ToolIntroduction = ({ readyHandler, isConnected }) => {
     const buttonText = isConnected ? 'Ready to start' : 'You must be connected to a device';
+
     return (
         <>
+            <div style={{ fontSize: '1.1rem', lineHeight: '1.25', marginTop: '1rem', color: 'grey' }}>
+                <p>
+                    If your y-axis hardstops or endstops aren&apos;t &apos;in-line&apos; when you autosquare your CNC manually or during
+                    homing then it will skew the x-axis and produce off-square cuts (see the picture). You can fix this by shimming the y-axis plates, realigning the y-axes,
+                    or tuning the dual endstops if your CNC has autosquaring.
+                </p>
+
+                <p>
+                    To know how much adjustment is needed, prepare:
+                </p>
+
+                <ul>
+                    <li>Something pointed in the router like an old tapered bit, v-bit, or a dowel</li>
+                    <li>3 squares of tape marked with an &apos;X&apos;</li>
+                    <li>A long ruler or measuring tape</li>
+                    <li>The CNC positioned somewhere in the front, left corner with the pointed tip close to the wasteboard</li>
+                </ul>
+            </div>
             <div>
-                <div style={{ fontSize: '1rem' }}>
-                    <p>Reasonable care during assembly will give an adequately square CNC machine, but if you’re looking to more finely tune your setup then this tool is for you.</p>
-
-                    <p>Prepare your router collet by placing a tipped geometry inside, this could be a tapered bit, a v-bit, or even a sharpened dowel. Also have 3 squares of tape that you’ve marked with an ‘X’ and a long straight-edge ruler or measuring tape on hand.</p>
-
-                    <p>Before starting, please jog your machine to a spot on the front, left corner of the wasteboard, with the tip only slightly offset from the board.</p>
-                </div>
-                <Keypad />
+                <JogControl widgetId="jogcontrol" isSecondary />
             </div>
             <FunctionButton primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</FunctionButton>
         </>

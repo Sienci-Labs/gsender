@@ -23,7 +23,7 @@
 
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { find } from 'lodash';
+import _, { find } from 'lodash';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
 import PortListing from './PortListing';
 import styles from './Index.styl';
@@ -34,6 +34,42 @@ class NavbarConnection extends PureComponent {
         state: PropTypes.object,
         actions: PropTypes.object,
         connected: PropTypes.bool
+    };
+
+    constructor() {
+        super();
+        this.displayDropdown = this.displayDropdown.bind(this);
+    }
+
+    state = {
+        mobile: false,
+        isActive: false
+    }
+
+    componentDidMount() {
+        this.addResizeEventListener();
+        this.updateScreenSize();
+    }
+
+    componentWillUnmount() {
+        this.removeResizeEventListener();
+    }
+
+    addResizeEventListener() {
+        this.onResizeThrottled = _.throttle(this.updateScreenSize, 25);
+        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+    }
+
+    removeResizeEventListener() {
+        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        this.onResizeThrottled = null;
+    }
+
+    updateScreenSize = () => {
+        const isMobile = window.visualViewport.width <= 599;
+        this.setState({
+            mobile: isMobile
+        });
     };
 
     isPortInUse = (port) => {
@@ -76,13 +112,31 @@ class NavbarConnection extends PureComponent {
         return 'icon-disconnected';
     }
 
+    displayDropdown() {
+        const { mobile, isActive } = this.state;
+        if (mobile) {
+            this.setState({ isActive: !isActive });
+        }
+    }
+
     render() {
         const { state, actions } = this.props;
         const { connected, ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
+        const { isActive } = this.state;
         const iconState = this.getIconState(connected, connecting, alertMessage);
+        const isMobile = window.visualViewport.width <= 599;
 
         return (
-            <div className={styles.NavbarConnection} onMouseEnter={actions.handleRefreshPorts} onMouseLeave={actions.hideUnrecognizedDevices}>
+            <div
+                className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection}
+                role="button"
+                tabIndex={0}
+                onClick={this.displayDropdown}
+                onKeyDown={this.displayDropdown}
+                onMouseEnter={actions.handleRefreshPorts}
+                onMouseLeave={actions.hideUnrecognizedDevices}
+                onTouchEnd={actions.handleRefreshPorts}
+            >
                 <div className={`${styles.NavbarConnectionIcon} ${styles[iconState]}`}>
                     <i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />
                 </div>
@@ -108,7 +162,7 @@ class NavbarConnection extends PureComponent {
 
                     )
                 }
-                <div className={styles.NavbarConnectionDropdownList}>
+                <div style={isMobile ? { display: isActive ? 'block' : 'none' } : null} className={styles.NavbarConnectionDropdownList}>
                     {
                         !connected && <h5>Recognized Devices</h5>
                     }
@@ -133,7 +187,8 @@ class NavbarConnection extends PureComponent {
                         )
                     }
                     {
-                        !connected && !connecting && (unrecognizedPorts.length > 0) && <UnrecognizedDevices ports={unrecognizedPorts} onClick={actions.toggleShowUnrecognized} />
+                        !connected && !connecting && (unrecognizedPorts.length > 0) &&
+                            <UnrecognizedDevices ports={unrecognizedPorts} onClick={actions.toggleShowUnrecognized} />
                     }
                     {
                         !connected && !connecting && showUnrecognized && unrecognizedPorts.map(

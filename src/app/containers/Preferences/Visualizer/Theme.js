@@ -1,47 +1,37 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 import map from 'lodash/map';
+import uniqueId from 'lodash/uniqueId';
 import { useSelector } from 'react-redux';
 
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
-import { DARK_THEME, LIGHT_THEME, CUST_DARK_THEME, CUST_LIGHT_THEME,
-    BACKGROUND_PART, GRID_PART, XAXIS_PART, YAXIS_PART, ZAXIS_PART,
-    LIMIT_PART, CUTTING_PART, JOGGING_PART, G0_PART, G1_PART, G2_PART, G3_PART }
+import {
+    CUSTOMIZABLE_THEMES, ALL_THEMES, PARTS_LIST,
+    G1_PART, CUTTING_PART, JOGGING_PART
+}
 from 'app/widgets/Visualizer/constants';
+import pubsub from 'pubsub-js';
 import Fieldset from '../components/Fieldset';
 import ColorPicker from '../components/ColorPicker';
+import ColorCircle from '../components/ColorCircle';
 
 import styles from '../index.styl';
 
-const themes = [
-    DARK_THEME,
-    LIGHT_THEME,
-    /*CUST_DARK_THEME,
-    CUST_LIGHT_THEME*/
-];
-
-const parts = [
-    BACKGROUND_PART,
-    GRID_PART,
-    XAXIS_PART,
-    YAXIS_PART,
-    ZAXIS_PART,
-    LIMIT_PART,
-    CUTTING_PART,
-    JOGGING_PART,
-    G0_PART,
-    G1_PART,
-    G2_PART,
-    G3_PART,
-];
-
 const Theme = ({ state, actions }) => {
     const { theme } = state.visualizer;
-    const [part, setPart] = useState({
-        value: BACKGROUND_PART,
-        label: BACKGROUND_PART
-    });
+    const [isOpen, setIsOpen] = useState(false);
+    const [currentPart, setCurrentPart] = useState(PARTS_LIST[0]);
+    const [hasChanges, setHasChanges] = useState(false);
     const fileLoaded = useSelector(store => store.file.fileLoaded);
+
+    const getThemeColours = (theme) => {
+        let colourMap = new Map();
+        PARTS_LIST.map(part => colourMap.set(part, actions.visualizer.getCurrentColor(theme, part, actions.visualizer.getDefaultColour(part))));
+        return colourMap;
+    };
+
+    const [themeColours, setThemeColours] = useState(getThemeColours(theme)); // tracks all your unsaved changes
+    const [savedThemeColours, setSavedThemeColours] = useState(getThemeColours(theme)); // tracks all the colours that have been saved
 
     const themeRenderer = (option) => {
         const style = {
@@ -55,63 +45,127 @@ const Theme = ({ state, actions }) => {
         );
     };
 
+    const openModal = (part) => {
+        setCurrentPart(part);
+        setIsOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsOpen(false);
+    };
+
+    const chooseColour = (colour) => {
+        const newColour = colour.hex ? colour.hex : colour;
+        const newThemeColours = themeColours;
+        newThemeColours.set(currentPart, newColour);
+        setThemeColours(newThemeColours);
+        let data = {
+            currentPart: currentPart,
+            newColour: colour
+        };
+        pubsub.publish('colour:change', data);
+
+        // check if the new colour is different than the one that's currently saved
+        if (savedThemeColours.get(currentPart) !== newColour) {
+            setHasChanges(true);
+        } else {
+            setHasChanges(false);
+        }
+    };
+
     return (
-        <Fieldset legend="Theme">
-            <Tooltip content="Toggle the main colour of the Visualizer" location="default">
-                <div className={styles.addMargin}>
-                    <Select
-                        id="themeSelect"
-                        backspaceRemoves={false}
-                        className="sm"
-                        clearable={false}
-                        menuContainerStyle={{ zIndex: 5 }}
-                        name="theme"
-                        onChange={actions.visualizer.handleThemeChange}
-                        options={map(themes, (value) => ({
-                            value: value,
-                            label: value
-                        }))}
-                        searchable={false}
-                        value={{ label: theme }}
-                        valueRenderer={themeRenderer}
-                        isDisabled={fileLoaded}
-                    />
-                    <small>Colours used when visualizing a G-Code file.</small>
-                </div>
-            </Tooltip>
-            <Tooltip content="Toggle the part of the Visualizer to customize" location="default">
-                {(theme === CUST_DARK_THEME || theme === CUST_LIGHT_THEME) && (
+        <>
+            <Fieldset legend="Theme">
+                <Tooltip content="Toggle the main colour of the Visualizer" location="default">
                     <div className={styles.addMargin}>
                         <Select
-                            id="partSelect"
+                            id="themeSelect"
                             backspaceRemoves={false}
                             className="sm"
                             clearable={false}
                             menuContainerStyle={{ zIndex: 5 }}
-                            name="part"
-                            onChange={(part) => {
-                                setPart(part);
-                                actions.visualizer.handlePartChange();
+                            name="theme"
+                            onChange={(value) => {
+                                actions.visualizer.handleThemeChange(value);
+                                setThemeColours(getThemeColours(value.value));
+                                setSavedThemeColours(getThemeColours(value.value));
                             }}
-                            options={map(parts, (value) => ({
+                            options={map(ALL_THEMES, (value) => ({
                                 value: value,
                                 label: value
                             }))}
                             searchable={false}
-                            value={{ label: part.value }}
+                            value={{ label: theme }}
                             valueRenderer={themeRenderer}
                             isDisabled={fileLoaded}
                         />
-                        <small>Choose which part to customize.</small>
+                        <small>Colours used when visualizing a G-Code file.</small>
                     </div>
-                )}
-            </Tooltip>
+                </Tooltip>
+            </Fieldset>
+            { CUSTOMIZABLE_THEMES.includes(theme) && !fileLoaded && (
+                <Fieldset legend="Colours">
+                    <div className={styles.addMargin}>
+                        <small className={styles.subHeading}>Click the Save button below to keep your changes.</small>
+                        <Tooltip content="Save your changes" location="default">
+                            <button
+                                className={styles.saveColour}
+                                type="button"
+                                onClick={() => {
+                                    actions.visualizer.handleCustThemeChange(themeColours, theme);
+                                    setHasChanges(false);
+                                    setSavedThemeColours(new Map(themeColours));
+                                }}
+                                disabled={!hasChanges}
+                            >
+                                Save
+                            </button>
+                        </Tooltip>
+                        <Tooltip content="Click on the colour circles to change the colour for that component" location="default">
+                            {
+                                PARTS_LIST.map((value, i) => {
+                                    let title = value;
+                                    if (title === G1_PART) {
+                                        title = 'G1-G3';
+                                    } else if (title === CUTTING_PART) {
+                                        title = 'Cutting Coord Lines';
+                                    } else if (title === JOGGING_PART) {
+                                        title = 'Jogging Coord Lines';
+                                    }
+                                    return (
+                                        <div key={theme + uniqueId()} className={styles.colorContainer}>
+                                            <span className={styles.first}>{title}</span>
+                                            <div className={styles.dotsV2} />
+                                            <div
+                                                role="button"
+                                                className={styles.colorDisplay}
+                                                onClick={() => openModal(value)}
+                                                onKeyDown={() => openModal(value)}
+                                                tabIndex={0}
+                                            >
+                                                <span>{themeColours.get(value)}</span>
+                                                <ColorCircle part={value} colour={themeColours.get(value)} index={i} />
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            }
+                        </Tooltip>
+                    </div>
+                    <ColorPicker
+                        actions={actions}
+                        theme={theme}
+                        part={currentPart}
+                        isOpen={isOpen}
+                        onClose={closeModal}
+                        chooseColour={chooseColour}
+                    />
+                </Fieldset>
+            )}
             {
-                !fileLoaded
-                    ? <ColorPicker actions={actions} theme={theme} part={part} />
-                    : (<p className={styles.disabledMessage}>Unload file in the visualizer to edit the theme</p>)
+                fileLoaded && (<p className={styles.disabledMessage}>Unload file in the visualizer to edit the theme</p>)
             }
-        </Fieldset>
+        </>
     );
 };
 

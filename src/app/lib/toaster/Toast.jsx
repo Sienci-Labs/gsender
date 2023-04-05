@@ -31,7 +31,14 @@ const Toast = ({ id, msg = 'NO_MSG_SPECIFIED', type = TOASTER_INFO, closeHandler
     //const hasDuration = duration !== TOASTER_UNTIL_CLOSE;
 
     return (
-        <div id={id} className={styles.toastWrapper} tabIndex="0" role="button" onClick={closeHandler}>
+        <div
+            id={id}
+            className={styles.toastWrapper}
+            tabIndex="0"
+            role="button"
+            onClick={closeHandler}
+            onKeyDown={closeHandler}
+        >
             <div
                 className={cx(styles.toastIcon,
                     { [styles.toastInfo]: (type === TOASTER_INFO) },
@@ -42,10 +49,10 @@ const Toast = ({ id, msg = 'NO_MSG_SPECIFIED', type = TOASTER_INFO, closeHandler
                 <i className={`fas ${icon}`} />
             </div>
             <div className={styles.toastContent}>
-                <div dangerouslySetInnerHTML={{ __html: msg }} />
+                {msg}
             </div>
             <div className={styles.toastClose}>
-                <button onClick={closeHandler}>
+                <button type="button" onClick={closeHandler}>
                     <i className="fas fa-times" />
                 </button>
             </div>

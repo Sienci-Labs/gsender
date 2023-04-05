@@ -1,6 +1,9 @@
 import { GamepadListener } from 'gamepad.js';
+import throttle from 'lodash/throttle';
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+
+import shuttleEvents from '../shuttleEvents';
 
 const STOP_JOG_CMD = 'STOP_JOG';
 
@@ -56,6 +59,8 @@ class Gamepad extends GamepadListener {
         this.emit(`gamepad:${index}:axis:${dataOutput.axis}`, dataOutput.detail);
     }
 }
+
+//  TODO:  Remove this when SSL is working correctly
 const gamepadInstance = new Gamepad();
 gamepadInstance.start();
 
@@ -75,7 +80,7 @@ export const onGamepadButtonClick = ({ detail }) => {
     const gamepadID = gamepad.id;
 
     const profiles = store.get('workspace.gamepad.profiles', []);
-    const currentProfile = profiles.find(profile => profile.id === gamepadID);
+    const currentProfile = profiles.find(profile => profile.id.includes(gamepadID));
 
     if (!currentProfile) {
         return null;
@@ -88,19 +93,21 @@ export const onGamepadButtonClick = ({ detail }) => {
             .map(button => button.buttonIndex)
     );
 
-    const foundAction = currentProfile.shortcuts.find(shortcut => shortcut.keys === buttonCombo);
+    // the result is an array, [0] = key and [1] = shortcuts
+    const foundAction = Object.entries(currentProfile.shortcuts).find(([key, shortcut]) => shortcut.keys === buttonCombo);
 
     if (!pressed) {
-        const foundStopCommand = currentProfile.shortcuts.find(shortcut => shortcut.cmd === STOP_JOG_CMD);
+        const foundStopCommand = currentProfile.shortcuts[STOP_JOG_CMD];
         delete foundStopCommand?.payload; //We don't need to send a payload
         return foundStopCommand;
     }
 
-    if (!buttonCombo || !foundAction?.isActive) {
+    if (!buttonCombo || (foundAction && !foundAction[1].isActive)) {
         return null;
     }
 
-    return foundAction;
+    // null check
+    return foundAction ? foundAction[1] : foundAction;
 };
 
 export const runAction = ({ event, shuttleControlEvents }) => {
@@ -110,29 +117,29 @@ export const runAction = ({ event, shuttleControlEvents }) => {
         return;
     }
 
-    const runEvent = shuttleControlEvents[action.cmd];
-
+    const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+    const runEvent = allShuttleControlEvents[action.cmd]?.callback;
     if (runEvent) {
         runEvent(null, action.payload);
     }
 };
 
-gamepadInstance.on('gamepad:connected', ({ detail }) => {
+gamepadInstance.on('gamepad:connected', throttle(({ detail }) => {
     const { gamepad } = detail;
 
     const profiles = store.get('workspace.gamepad.profiles');
 
-    const foundGamepad = profiles.find(profile => profile.id === gamepad.id);
+    const foundGamepad = profiles.find(profile => profile.id.includes(gamepad.id));
 
     Toaster.pop({
-        msg: foundGamepad ? `${foundGamepad.profileName} Connected` : 'New joystick connected, add it as a profile in your preferences',
+        msg: foundGamepad ? `${foundGamepad.profileName} Connected` : 'New gamepad connected, add it as a profile in your preferences',
         type: TOASTER_INFO,
     });
-});
+}, 250, { leading: true, trailing: false }));
 
 gamepadInstance.on('gamepad:disconnected', () => {
     Toaster.pop({
-        msg: 'Joystick Disconnected',
+        msg: 'Gamepad Disconnected',
         type: TOASTER_INFO,
         duration: 2000,
     });

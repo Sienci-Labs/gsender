@@ -23,6 +23,7 @@
 
 import events from 'events';
 import Mousetrap from 'mousetrap';
+import _ from 'lodash';
 import api from 'app/api';
 import { MACRO_CATEGORY } from 'app/constants';
 import log from './log';
@@ -31,6 +32,7 @@ import { modifierKeys } from './constants';
 
 
 import store from '../store';
+import shuttleEvents from './shuttleEvents';
 
 const STOP_CMD = 'STOP_JOG';
 const MACRO = 'MACRO';
@@ -74,8 +76,9 @@ class Combokeys extends events.EventEmitter {
         }
         const commandKeys = await this.getCommandKeys();
 
-        commandKeys.filter(key => key.isActive).forEach((o) => {
-            const { keys, cmd, payload = null, isActive } = o;
+        Object.entries(commandKeys).forEach(([key, o]) => {
+            const { keys, isActive } = o;
+            const { cmd, payload = null, category, preventDefault: preventDefaultBool } = shuttleEvents.allShuttleControlEvents[key] ?? o; // if macro, won't have shuttleEvents to pull defaults from
 
             //Do not add any keybindings if the shortcut is disabled or there is no shortcut at all
             if (!isActive || !keys) {
@@ -84,24 +87,40 @@ class Combokeys extends events.EventEmitter {
 
             const callback = (event) => {
                 log.debug(`combokeys: keys=${keys} cmd=${cmd} payload=${JSON.stringify(payload)}`);
-                if (!!o.preventDefault) {
+                if (!!preventDefaultBool) {
                     preventDefault(event);
                 }
-                this.emit(cmd, event, payload);
+                if (category === MACRO_CATEGORY) {
+                    this.emit(MACRO, event, payload);
+                } else {
+                    this.emit(cmd, event, payload);
+                }
             };
 
+            const jogCmds = [
+                'JOG_X_P',
+                'JOG_X_M',
+                'JOG_Y_P',
+                'JOG_Y_M',
+                'JOG_Z_P',
+                'JOG_Z_M',
+                'JOG_X_P_Y_M',
+                'JOG_X_M_Y_P',
+                'JOG_X_Y_P',
+                'JOG_X_Y_M'
+            ];
             //Add keyup listeners for jogging events
-            if (cmd === 'JOG') {
+            if (jogCmds.includes(cmd)) {
                 const callback = (event) => {
                     log.debug(`combokeys: keys=${keys} cmd=${STOP_CMD} payload=${JSON.stringify(payload)}`);
-                    if (!!o.preventDefault) {
+                    if (!!preventDefaultBool) {
                         preventDefault(event);
                     }
                     this.emit(STOP_CMD, event, payload);
                 };
 
                 const modiferKeyCB = (e) => {
-                    if (!!o.preventDefault) {
+                    if (!!preventDefaultBool) {
                         preventDefault(e);
                     }
 
@@ -139,49 +158,34 @@ class Combokeys extends events.EventEmitter {
     }
 
     async getCommandKeys() {
-        const setCommandKeys = store.get('commandKeys', []);
-        const setMacrosBinds = setCommandKeys.filter(command => command.category === MACRO_CATEGORY);
+        const setCommandKeys = store.get('commandKeys', {});
+        const setMacrosBinds = Object.entries(setCommandKeys).filter(([key, command]) => command.category === MACRO_CATEGORY);
 
         const res = await api.macros.fetch();
         const macros = res.body.records;
 
-        const newCommandKeysList = [...setCommandKeys];
+        const newCommandKeysList = _.cloneDeep(setCommandKeys);
+
+        // get callback for macros
+        const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+        const macroCallback = allShuttleControlEvents[MACRO];
 
         macros.forEach(macro => {
-            const existingBind = setMacrosBinds.find(bind => bind.id === macro.id);
+            const existingBind = setMacrosBinds.find(([key, bind]) => key === macro.id);
             if (!existingBind) {
-                newCommandKeysList.push({
-                    id: macro.id,
+                newCommandKeysList[macro.id] = {
                     keys: '',
                     title: macro.name,
-                    cmd: MACRO,
+                    cmd: macro.id,
                     payload: { macroID: macro.id },
                     preventDefault: false,
                     isActive: false,
-                    category: MACRO_CATEGORY
-                });
+                    category: MACRO_CATEGORY,
+                    callback: macroCallback
+                };
             }
         });
-        /*
-        if (!commandKeys.find(command => command.category === MACRO_CATEGORY)) {
-            for (let i = lastID; i < macros.length + lastID; i++) {
-                const currentMacroIndex = i - lastID;
-                const currentMacro = macros[currentMacroIndex];
-
-                newCommandKeysList.push({
-                    id: currentMacro.id,
-                    keys: '',
-                    title: currentMacro.name,
-                    cmd: MACRO,
-                    payload: { macroID: currentMacro.id },
-                    preventDefault: false,
-                    isActive: false,
-                    category: MACRO_CATEGORY
-                });
-            }
-        }*/
-
-        store.set('commandKeys', newCommandKeysList);
+        store.replace('commandKeys', newCommandKeysList);
 
         return newCommandKeysList;
     }

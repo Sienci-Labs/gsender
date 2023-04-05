@@ -4,7 +4,7 @@ import ControlledNumberInput from 'app/components/ControlledNumberInput';
 
 export const MultiInputBlockContainer = styled.div`
   display: grid;
-  grid-template-columns: 4fr 1fr 5fr;
+  grid-template-columns: ${(props) => (props.hasDivider ? '4fr 1fr 5fr' : '1fr 1fr')};
   align-items: center;
   margin-bottom: 1rem;
 `;

@@ -24,6 +24,7 @@
 import ensureArray from 'ensure-array';
 import superagent from 'superagent';
 import superagentUse from 'superagent-use';
+// import axios from 'axios';
 import store from '../store';
 
 const bearer = (request) => {
@@ -69,7 +70,7 @@ const signin = (options) => new Promise((resolve, reject) => {
 });
 
 //
-// Latest Version
+// Latest Version for windows
 //
 const getLatestVersion = () => new Promise((resolve, reject) => {
     authrequest
@@ -82,6 +83,34 @@ const getLatestVersion = () => new Promise((resolve, reject) => {
             }
         });
 });
+
+//
+// Check if electron auto-update is supported for the
+// installation package-type/file-extension
+//
+const getShouldInstallUpdates = () => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/version/appUpdateSupport')
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+//
+//Fetch latest app version for all OS from github
+//
+// const getLatestVersionAllOS = () => new Promise((resolve, reject) => {
+//     axios.get('https://api.github.com/repos/Sienci-Labs/gsender/releases').then((res) => {
+//         resolve(res.data[0].assets);
+//     }).catch((error) => {
+//         console.log(error);
+//         return [];
+//     });
+// });
 
 //
 // State
@@ -364,9 +393,52 @@ events.delete = (id) => new Promise((resolve, reject) => {
         });
 });
 
+events.clearAll = () => new Promise((resolve, reject) => {
+    authrequest
+        .delete('/api/events')
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 events.update = (id, options) => new Promise((resolve, reject) => {
     authrequest
         .put('/api/events/' + id)
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+//
+// Headless Mode / Remote Mode
+//
+const remoteSetting = {};
+
+remoteSetting.fetch = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/remote')
+        .query(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+remoteSetting.update = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .put('/api/remote')
         .send(options)
         .end((err, res) => {
             if (err) {
@@ -703,8 +775,76 @@ file.upload = (file, port, visualizer) => new Promise((resolve, reject) => {
         });
 });
 
+//
+// Log
+//
+const log = {};
+
+log.printLog = (msg, file, lineNumber, level) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/log')
+        .send({ msg: msg })
+        .send({ file: file })
+        .send({ lineNumber: lineNumber })
+        .send({ level: level })
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+
+//
+// Metrics
+//
+const metrics = {};
+
+metrics.sendData = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/metrics/sendData')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+metrics.getCollectDataStatus = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/metrics/collectUserData')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+metrics.toggleCollectDataStatus = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .post('/api/metrics/collectUserData')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 export default {
+    //OS
     getLatestVersion,
+    getShouldInstallUpdates,
 
     // State
     getState,
@@ -730,9 +870,16 @@ export default {
     events,
     machines,
     macros,
+    remoteSetting,
     mdi,
     users,
 
     // Files
     file,
+
+    // Log
+    log,
+
+    // Metrics
+    metrics,
 };

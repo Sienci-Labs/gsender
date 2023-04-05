@@ -96,8 +96,11 @@ class Controller {
         'file:load': [],
         'file:unload': [],
         'homing:flag': [],
-        'grbl:iSready': [],
-        'sender:M0M1': []
+        'electronErrors:errorList': [],
+        'firmware:ready': [],
+        'sender:M0M1': [],
+        'ip:list': [],
+        'wizard:next': []
     };
 
     context = {
@@ -310,6 +313,18 @@ class Controller {
         this.socket && this.socket.emit('list', callback);
     }
 
+    // Adds client to the connection
+    // @param {string} port The path of the serial port you want to close. For example, `dev/tty.XXX` on Mac and Linux, or `COM1` on Windows.
+    addClient(port) {
+        this.socket && this.socket.emit('addclient', port);
+    }
+
+    //Send an event to get list of available IP addresses in the computer
+    // @param {function} [callback] Called once completed.
+    listAllIps(callback = null) {
+        this.socket && this.socket.emit('listAllIps', callback);
+    }
+
     // Executes a command on the server.
     // @param {string} cmd The command string
     // @example Example Usage
@@ -344,6 +359,8 @@ class Controller {
     //   controller.command('unlock')
     // - Reset
     //   controller.command('reset')
+    // - Check for State Update
+    //   controller.command('checkStateUpdate')
     // - Feed Override
     //   controller.command('feedOverride')
     // - Spindle Override

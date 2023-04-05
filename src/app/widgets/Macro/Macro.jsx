@@ -55,6 +55,13 @@ const Macro = ({ state, actions, workflow }) => {
         column2: { items: [] },
     });
 
+    const setRowIndices = macros => {
+        for (let i = 0; i < macros.length; i++) {
+            macros[i].rowIndex = i;
+        }
+        return macros;
+    };
+
     useEffect(() => {
         const computedColumns = [computeColumn('column1'), computeColumn('column2')];
 
@@ -94,10 +101,13 @@ const Macro = ({ state, actions, workflow }) => {
 
             // Update the macro column and row index properties so they can be saved
             // within the API call and can be sorted properly when the user closes and opens the program again
-            popped.rowIndex = destination.rowIndex;
             popped.column = destination.droppableId;
 
             destItems.splice(destination.index, 0, popped);
+
+            setRowIndices(sourceItems);
+            setRowIndices(destItems);
+
             setColumns({
                 ...columns,
                 [source.droppableId]: {
@@ -114,6 +124,7 @@ const Macro = ({ state, actions, workflow }) => {
             const copiedItems = [...column.items];
             const [removed] = copiedItems.splice(source.index, 1);
             copiedItems.splice(destination.index, 0, removed);
+            setRowIndices(copiedItems);
             setColumns({
                 ...columns,
                 [source.droppableId]: {
@@ -124,7 +135,8 @@ const Macro = ({ state, actions, workflow }) => {
         }
     };
 
-    const computeColumn = (columnName) => macros.filter(macro => macro.column === columnName);
+    // Set rowIndices after sorting to correct any invalid saved data, normally it should be a no-op
+    const computeColumn = (columnName) => setRowIndices(macros.filter(macro => macro.column === columnName).sort((a, b) => a.rowIndex - b.rowIndex));
 
     const disabled = !canRunMacro();
     const { column1, column2 } = columns;

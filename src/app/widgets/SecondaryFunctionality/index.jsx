@@ -125,6 +125,7 @@ class SecondaryFunctionality extends PureComponent {
 
     componentDidMount() {
         store.on('change', this.handleMachineProfileChange);
+        this.handleMachineProfileChange();
     }
 
     componentWillUnmount() {
@@ -151,10 +152,6 @@ class SecondaryFunctionality extends PureComponent {
             isFullscreen: false,
             disabled: this.config.get('disabled'),
             port: controller.port,
-            controller: {
-                type: controller.type,
-                state: controller.state
-            },
             selectedTab: 0,
             tabs: [
                 {
@@ -194,8 +191,7 @@ class SecondaryFunctionality extends PureComponent {
 
         return (
             <TabbedWidget fullscreen={isFullscreen}>
-                <TabbedWidget.Tabs tabs={tabs} activeTabIndex={selectedTab} onClick={actions.handleTabSelect}>
-                </TabbedWidget.Tabs>
+                <TabbedWidget.Tabs tabs={tabs} activeTabIndex={selectedTab} onClick={actions.handleTabSelect} />
                 <TabbedWidget.Content>
                     {
                         tabs.map((tab, index) => {
@@ -209,6 +205,7 @@ class SecondaryFunctionality extends PureComponent {
                                         widgetId={tab.widgetId}
                                         embedded
                                         active={active}
+                                        isMainWindow={true}
                                     />
                                 </TabbedWidget.ChildComponent>
                             );

@@ -24,7 +24,7 @@
 import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
 import partition from 'lodash/partition';
-import SerialPort from 'serialport';
+import { SerialPort } from 'serialport';
 import socketIO from 'socket.io';
 //import socketioJwt from 'socketio-jwt';
 import EventTrigger from '../../lib/EventTrigger';
@@ -209,6 +209,17 @@ class CNCEngine {
                 }
             });
 
+            socket.on('addclient', (port) => {
+                let controller = store.get(`controllers["${port}"]`);
+                if (!controller) {
+                    log.info(`No controller found on port ${port} to reconnect to`);
+                    return;
+                }
+                log.info(`Adding new client to controller on port ${port} with socket ID ${socket.id}`);
+                controller.addConnection(socket);
+                log.info(`Controller state: ${controller.isOpen()}`);
+            });
+
             // List the available serial ports
             socket.on('list', () => {
                 log.debug(`socket.list(): id=${socket.id}`);
@@ -259,6 +270,26 @@ class CNCEngine {
                     .catch(err => {
                         log.error(err);
                     });
+            });
+
+            //Sends back a list of available IPs in the computer
+            socket.on('listAllIps', () => {
+                const { networkInterfaces } = require('os');
+                const _networkInterfaces = networkInterfaces();
+                const ipList = [];
+
+                //Create a list of network list name: [{IP1},{IP2}...]
+                for (const networkName of Object.keys(_networkInterfaces)) {
+                    for (const ips of _networkInterfaces[networkName]) {
+                        //Consider only IPV4 addresses
+                        if (ips.family === 'IPv4') {
+                            if (ipList.indexOf(ips.address) < 0) {
+                                ipList.push(ips.address);
+                            }
+                        }
+                    }
+                }
+                socket.emit('ip:list', ipList);
             });
 
             // Open serial port
@@ -361,7 +392,6 @@ class CNCEngine {
 
             socket.on('command', (port, cmd, ...args) => {
                 log.debug(`socket.command("${port}", "${cmd}"): id=${socket.id}`);
-
                 const controller = store.get(`controllers["${port}"]`);
                 if (!controller || controller.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);
@@ -372,6 +402,7 @@ class CNCEngine {
             });
 
             socket.on('flash:start', (flashPort, imageType) => {
+                log.debug('flash-start called');
                 if (!flashPort) {
                     log.error('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
                     return;
@@ -402,7 +433,7 @@ class CNCEngine {
 
             socket.on('writeln', (port, data, context = {}) => {
                 log.debug(`socket.writeln("${port}", "${data}", ${JSON.stringify(context)}): id=${socket.id}`);
-
+                store.set('inAppConsoleInput', data);
                 const controller = store.get(`controllers["${port}"]`);
                 if (!controller || controller.isClose()) {
                     log.error(`Serial port "${port}" not accessible`);

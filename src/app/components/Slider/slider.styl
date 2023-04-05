@@ -1,0 +1,50 @@
+.slider-wrapper {
+    display: flex;
+    grid-template-columns: 4fr 1fr;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    width: 100%;
+
+    span {
+      min-width: 5ch;
+      text-align: right;
+    }
+}
+
+.slider {
+    -webkit-appearance: none;
+    height: 5px;
+    border-radius: 5px;
+    background: none;
+    outline: none;
+    transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3e85c7;
+    cursor: pointer;
+    margin-top: -8px;
+}
+
+// https://medium.com/@manoj10101996/customize-your-input-range-slider-into-gradient-slider-without-any-external-stylesheet-be8d6ec224ce
+.slider::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  border-radius: 10px;
+  background: #3e85c7; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to right,
+    #d1d5db 40%,
+    #3e85c7
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to right,
+    #d1d5db 40%,
+    #3e85c7
+  );
+  height: 3.5px;
+}

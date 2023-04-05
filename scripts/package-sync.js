@@ -4,19 +4,31 @@
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
+const _uniq = require('lodash/uniq');
 const findImports = require('find-imports');
 
 // Copy necessary properties from 'package.json' to 'src/package.json'
 const pkg = require('../package.json');
 const pkgApp = require('../src/package.json');
 
-const files = ['src/*.js', 'src/server/**/*.{js,jsx}'];
-const deps = [
-    '@babel/runtime', // 'babel-runtime' is required for electron app
-    'debug', // 'debug' is required for electron app
-]
-    .concat(findImports(files, { flatten: true }))
-    .sort();
+const files = [
+    'src/*.js',
+    'src/server/**/*.{js,jsx}'
+];
+
+const resolvedImports = findImports(files, {
+    flatten: true,
+});
+
+const deps = _uniq([
+    'core-js',
+    '@serialport/parser-readline',
+    '@sienci/avrgirl-arduino',
+    'regenerator-runtime',
+    'debug',
+    ...resolvedImports.map(x => x.split('/')[0]),
+]).sort();
+
 
 //pkgApp.name = pkg.name; // Exclude the name field
 pkgApp.version = pkg.version;
@@ -50,7 +62,7 @@ try {
             if (line.length < 2) {
                 return false;
             }
-            return headerCount < 2;
+            return headerCount < 4;
         }).map(line => line.trim());
     };
     let readme = fs.readFileSync(path.resolve('README.md'), 'utf8');

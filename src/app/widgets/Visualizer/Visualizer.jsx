@@ -43,6 +43,12 @@ import {
     VISUALIZER_SECONDARY
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/CombinedCamera';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
+import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
 import TrackballControls from 'app/lib/three/TrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
@@ -56,15 +62,26 @@ import Viewport from './Viewport';
 import CoordinateAxes from './CoordinateAxes';
 import Cuboid from './Cuboid';
 import CuttingPointer from './CuttingPointer';
+import LaserPointer from './LaserPointer';
 import GridLine from './GridLine';
 import PivotPoint3 from './PivotPoint3';
 import TextSprite from './TextSprite';
 import GCodeVisualizer from './GCodeVisualizer';
 import {
+    BACKGROUND_PART,
     CAMERA_MODE_PAN,
-    CAMERA_MODE_ROTATE
+    CAMERA_MODE_ROTATE,
+    CUTTING_PART,
+    GRID_PART,
+    LIMIT_PART,
+    XAXIS_PART,
+    YAXIS_PART,
+    ZAXIS_PART
 } from './constants';
 import styles from './index.styl';
+import { GRBL_ACTIVE_STATE_CHECK } from '../../../server/controllers/Grbl/constants';
+import WidgetConfig from '../WidgetConfig';
+import { isLaserMode } from '../../lib/laserMode';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -87,6 +104,8 @@ class Visualizer extends Component {
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
+
+    visualizerConfig = new WidgetConfig('visualizer');
 
     pubsubTokens = [];
 
@@ -119,6 +138,12 @@ class Visualizer extends Component {
     });
 
     node = null;
+
+    fileLoaded = false;
+
+    machineConnected = false;
+
+    showSoftLimitsWarning = this.visualizerConfig.get('showSoftLimitsWarning');
 
     setRef = (node) => {
         this.node = node;
@@ -156,6 +181,7 @@ class Visualizer extends Component {
         this.unload();
 
         this.updateCuttingToolPosition();
+        this.updateLaserPointerPosition();
         this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
 
@@ -195,9 +221,14 @@ class Visualizer extends Component {
         this.renderer = null;
         this.scene = null;
         this.camera = null;
+        this.bloomComposer = null;
+        this.copyComposer = null;
+        this.fxaaComposer = null;
+        this.finalComposer = null;
         this.controls = null;
         this.viewport = null;
         this.cuttingTool = null;
+        this.laserPointer = null;
         this.cuttingPointer = null;
         this.limits = null;
         this.visualizer = null;
@@ -225,6 +256,7 @@ class Visualizer extends Component {
         const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
         const prevState = prevProps.state;
         const state = this.props.state;
+        const isConnected = this.props.isConnected;
 
         // Update the visualizer size whenever the machine is running,
         // to fill the empty area between it and the job status widget when necessary
@@ -316,15 +348,31 @@ class Visualizer extends Component {
         }
 
         // Whether to show cutting tool or cutting pointer
-        if (this.cuttingTool && this.cuttingPointer) {
-            const { liteMode } = state;
-            this.cuttingTool.visible = liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible;
-            this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
-            needUpdateScene = true;
+        if (this.cuttingTool && this.laserPointer && this.cuttingPointer) {
+            // if connected, set visibility
+            if (isConnected) {
+                const { liteMode } = state;
+                const isLaser = isLaserMode();
+                this.cuttingTool.visible = !isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
+                this.laserPointer.visible = isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
+                this.cuttingPointer.visible = liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible;
+                needUpdateScene = true;
+            } else { // if not, don't show
+                this.cuttingTool.visible = false;
+                this.laserPointer.visible = false;
+                this.cuttingPointer.visible = false;
+            }
         }
 
         { // Update position
+            const { state } = this.props;
+            const { activeState } = state;
             const { machinePosition, workPosition } = this.props;
+
+            let newPos = workPosition;
+            if (activeState === GRBL_ACTIVE_STATE_CHECK && this.fileLoaded) {
+                newPos = this.visualizer.getCurrentLocation();
+            }
             let needUpdatePosition = false;
 
             // Machine position
@@ -338,15 +386,16 @@ class Visualizer extends Component {
 
             // Work position
             const { x: wpox0, y: wpoy0, z: wpoz0 } = this.workPosition;
-            const { x: wpox1, y: wpoy1, z: wpoz1 } = workPosition;
+            const { x: wpox1, y: wpoy1, z: wpoz1 } = newPos;
             if (wpox0 !== wpox1 || wpoy0 !== wpoy1 || wpoz0 !== wpoz1) {
-                this.workPosition = workPosition;
+                this.workPosition = newPos;
                 needUpdatePosition = true;
                 needUpdateScene = true;
             }
 
             if (needUpdatePosition) {
                 this.updateCuttingToolPosition();
+                this.updateLaserPointerPosition();
                 this.updateCuttingPointerPosition();
                 this.updateLimitsPosition();
             }
@@ -521,19 +570,18 @@ class Visualizer extends Component {
 
     recolorGrids() {
         const { currentTheme } = this.props.state;
-        const { gridColor } = currentTheme;
         const impGroup = this.group.getObjectByName('ImperialCoordinateSystem');
         const metGroup = this.group.getObjectByName('MetricCoordinateSystem');
 
         { // Imperial Coordinate System
             _each(impGroup.getObjectByName('GridLine').children, (o) => {
-                o.material.color.set(gridColor);
+                o.material.color.set(currentTheme.get(GRID_PART));
             });
         }
 
         { // Metric Coordinate System
             _each(metGroup.getObjectByName('GridLine').children, (o) => {
-                o.material.color.set(gridColor);
+                o.material.color.set(currentTheme.get(GRID_PART));
             });
         }
 
@@ -552,10 +600,9 @@ class Visualizer extends Component {
         const height = (units === IMPERIAL_UNITS) ? inches.height : mm.height;
 
         const { currentTheme } = this.props.state;
-        const { xAxisColor, yAxisColor, zAxisColor } = currentTheme;
 
-        const unitGroup = units === IMPERIAL_UNITS ?
-            this.group.getObjectByName('ImperialCoordinateSystem')
+        const unitGroup = units === IMPERIAL_UNITS
+            ? this.group.getObjectByName('ImperialCoordinateSystem')
             : this.group.getObjectByName('MetricCoordinateSystem');
 
         unitGroup.remove(unitGroup.getObjectByName('xAxis'));
@@ -569,7 +616,7 @@ class Visualizer extends Component {
                 z: 0,
                 size: 20,
                 text: 'X',
-                color: xAxisColor
+                color: currentTheme.get(XAXIS_PART)
             });
             axisXLabel.name = 'xAxis';
             const axisYLabel = new TextSprite({
@@ -578,7 +625,7 @@ class Visualizer extends Component {
                 z: 0,
                 size: 20,
                 text: 'Y',
-                color: yAxisColor
+                color: currentTheme.get(YAXIS_PART)
             });
             axisYLabel.name = 'yAxis';
             const axisZLabel = new TextSprite({
@@ -587,7 +634,7 @@ class Visualizer extends Component {
                 z: height + 10,
                 size: 20,
                 text: 'Z',
-                color: zAxisColor
+                color: currentTheme.get(ZAXIS_PART)
             });
             axisZLabel.name = 'zAxis';
 
@@ -612,10 +659,9 @@ class Visualizer extends Component {
         const textOffset = (units === IMPERIAL_UNITS) ? (25.4 / 5) : (10 / 5);
 
         const { currentTheme } = this.props.state;
-        const { xAxisColor, yAxisColor } = currentTheme;
 
-        const unitGroup = units === IMPERIAL_UNITS ?
-            this.group.getObjectByName('ImperialGridLineNumbers')
+        const unitGroup = units === IMPERIAL_UNITS
+            ? this.group.getObjectByName('ImperialGridLineNumbers')
             : this.group.getObjectByName('MetricGridLineNumbers');
 
         for (let i = -gridCount; i <= gridCount; ++i) {
@@ -629,7 +675,7 @@ class Visualizer extends Component {
                     text: (units === IMPERIAL_UNITS) ? i : i * 10,
                     textAlign: 'center',
                     textBaseline: 'bottom',
-                    color: xAxisColor,
+                    color: currentTheme.get(XAXIS_PART),
                     opacity: 0.5
                 });
                 xtextLabel.name = 'xtextLabel' + i;
@@ -644,7 +690,7 @@ class Visualizer extends Component {
                     text: (units === IMPERIAL_UNITS) ? i : i * 10,
                     textAlign: 'right',
                     textBaseline: 'middle',
-                    color: yAxisColor,
+                    color: currentTheme.get(YAXIS_PART),
                     opacity: 0.5
                 });
                 ytextLabel.name = 'ytextLabel' + i;
@@ -653,12 +699,32 @@ class Visualizer extends Component {
         }
     }
 
+    recolorCuttingPointer() {
+        const pointerObject = this.group.getObjectByName('CuttingPointer');
+        if (pointerObject) {
+            this.group.remove(pointerObject);
+            this.createCuttingPointer();
+        }
+    }
+
+    createCuttingPointer() {
+        const { state } = this.props;
+        const { currentTheme } = state;
+        this.cuttingPointer = new CuttingPointer({
+            color: currentTheme.get(CUTTING_PART),
+            diameter: 2
+        });
+        this.cuttingPointer.name = 'CuttingPointer';
+        this.cuttingPointer.visible = false;
+        this.group.add(this.cuttingPointer);
+    }
+
     recolorScene() {
         const { currentTheme } = this.props.state;
-        const { backgroundColor } = currentTheme;
         // Handle Background color
-        this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
+        this.renderer.setClearColor(new THREE.Color(currentTheme.get(BACKGROUND_PART)), 1);
         this.recolorGrids();
+        this.recolorCuttingPointer();
         this.rerenderGCode();
     }
 
@@ -699,7 +765,40 @@ class Visualizer extends Component {
                     this.load('', data);
                     return;
                 }
-            })
+            }),
+            pubsub.subscribe('softlimits:changevisibility', (msg, visibility) => {
+                this.showSoftLimitsWarning = visibility;
+                if (this.showSoftLimitsWarning) {
+                    this.checkSoftLimits();
+                } else {
+                    pubsub.publish('softlimits:ok');
+                }
+            }),
+            pubsub.subscribe('machine:connected', () => {
+                this.machineConnected = true;
+                this.checkSoftLimits();
+            }),
+            pubsub.subscribe('file:loaded', () => {
+                this.fileLoaded = true;
+                this.checkSoftLimits();
+            }),
+            pubsub.subscribe('softlimits:check', (msg, data) => {
+                // because setting the workspace 0 is a call to run gcode,
+                // there is no way for me to publish when it's
+                // confirmed to be finished. since it uses the feeder,
+                // it's slow, and the wpos is not changed to 0 when I run the check.
+                // therefore, I'm sending data with the publish so the function knows
+                // to manually set the wpos to 0.
+                this.checkSoftLimits(data);
+            }),
+            pubsub.subscribe('machine:disconnected', () => {
+                this.machineConnected = false;
+                pubsub.publish('softlimits:ok');
+            }),
+            pubsub.subscribe('gcode:unload', () => {
+                this.fileLoaded = false;
+                pubsub.publish('softlimits:ok');
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -709,6 +808,12 @@ class Visualizer extends Component {
             pubsub.unsubscribe(token);
         });
         this.pubsubTokens = [];
+    }
+
+    checkSoftLimits(data) {
+        if (this.machineConnected && this.fileLoaded && this.showSoftLimitsWarning) {
+            this.calculateLimits(data);
+        }
     }
 
     // https://tylercipriani.com/blog/2014/07/12/crossbrowser-javascript-scrollbar-detection/
@@ -734,6 +839,13 @@ class Visualizer extends Component {
     getVisibleHeight() {
         const { containerID, isSecondary } = this.props;
         const container = document.getElementById(containerID);
+
+        // when changing screen size to mobile,
+        // this function runs as the visualizer is getting removed,
+        // resulting in a null container
+        if (!container) {
+            return 0;
+        }
 
         const clientHeight = isSecondary ? container.clientHeight - 2 : container.clientHeight - 30;
 
@@ -780,6 +892,10 @@ class Visualizer extends Component {
         this.controls.handleResize();
 
         this.renderer.setSize(width, height);
+        this.copyComposer.setSize(width, height);
+        this.fxaaComposer.setSize(width, height);
+        this.bloomComposer.setSize(width, height);
+        this.finalComposer.setSize(width, height);
 
         // Update the scene
         this.updateScene();
@@ -787,12 +903,11 @@ class Visualizer extends Component {
 
     createLimits(xmin, xmax, ymin, ymax, zmin, zmax) {
         const { currentTheme } = this.props.state;
-        const { limitColor } = currentTheme;
 
         const dx = Math.abs(xmax - xmin) || Number.MIN_VALUE;
         const dy = Math.abs(ymax - ymin) || Number.MIN_VALUE;
         const dz = Math.abs(zmax - zmin) || Number.MIN_VALUE;
-        const color = limitColor;
+        const color = currentTheme.get(LIMIT_PART);
         const opacity = 0.5;
         const transparent = true;
         const dashed = true;
@@ -832,7 +947,6 @@ class Visualizer extends Component {
         const group = new THREE.Group();
 
         const { currentTheme } = this.props.state;
-        const { gridColor, xAxisColor, yAxisColor, zAxisColor } = currentTheme;
 
         { // Coordinate Grid
             const gridLine = new GridLine(
@@ -840,8 +954,8 @@ class Visualizer extends Component {
                 gridSpacing,
                 gridCount * gridSpacing,
                 gridSpacing,
-                gridColor, // center line
-                gridColor // grid
+                currentTheme.get(GRID_PART), // center line
+                currentTheme.get(GRID_PART) // grid
             );
             _each(gridLine.children, (o) => {
                 o.material.opacity = 0.15;
@@ -865,7 +979,7 @@ class Visualizer extends Component {
                 z: 0,
                 size: 20,
                 text: 'X',
-                color: xAxisColor
+                color: currentTheme.get(XAXIS_PART)
             });
             axisXLabel.name = 'xAxis';
             const axisYLabel = new TextSprite({
@@ -874,7 +988,7 @@ class Visualizer extends Component {
                 z: 0,
                 size: 20,
                 text: 'Y',
-                color: yAxisColor
+                color: currentTheme.get(YAXIS_PART)
             });
             axisYLabel.name = 'yAxis';
             const axisZLabel = new TextSprite({
@@ -883,7 +997,7 @@ class Visualizer extends Component {
                 z: height + 10,
                 size: 20,
                 text: 'Z',
-                color: zAxisColor
+                color: currentTheme.get(ZAXIS_PART)
             });
             axisZLabel.name = 'zAxis';
 
@@ -912,7 +1026,6 @@ class Visualizer extends Component {
         const group = new THREE.Group();
 
         const { currentTheme } = this.props.state;
-        const { xAxisColor, yAxisColor } = currentTheme;
 
         for (let i = -gridCount; i <= gridCount; ++i) {
             if (i !== 0) {
@@ -924,7 +1037,7 @@ class Visualizer extends Component {
                     text: (units === IMPERIAL_UNITS) ? i : i * 10,
                     textAlign: 'center',
                     textBaseline: 'bottom',
-                    color: xAxisColor,
+                    color: currentTheme.get(XAXIS_PART),
                     opacity: 0.5
                 });
                 textLabel.name = 'xtextLabel' + i;
@@ -941,7 +1054,7 @@ class Visualizer extends Component {
                     text: (units === IMPERIAL_UNITS) ? i : i * 10,
                     textAlign: 'right',
                     textBaseline: 'middle',
-                    color: yAxisColor,
+                    color: currentTheme.get(YAXIS_PART),
                     opacity: 0.5
                 });
                 textLabel.name = 'ytextLabel' + i;
@@ -966,17 +1079,15 @@ class Visualizer extends Component {
         const width = this.getVisibleWidth();
         const height = this.getVisibleHeight();
 
-        const { backgroundColor, cuttingCoordinateLines } = currentTheme;
 
         // WebGLRenderer
         this.renderer = new THREE.WebGLRenderer({
             autoClearColor: true,
-            antialias: true,
             alpha: true
         });
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.setClearColor(new THREE.Color(backgroundColor), 1);
+        this.renderer.setClearColor(new THREE.Color(currentTheme.get(BACKGROUND_PART)), 1);
         this.renderer.setSize(width, height);
         this.renderer.clear();
 
@@ -1084,6 +1195,8 @@ class Visualizer extends Component {
                         map: texture,
                         opacity: 0.6,
                         transparent: false,
+                        emissive: 0xffffff,
+                        emissiveIntensity: 0.4,
                         color: '#caf0f8'
                     });
                 }
@@ -1093,7 +1206,7 @@ class Visualizer extends Component {
 
                 this.cuttingTool = object;
                 this.cuttingTool.name = 'CuttingTool';
-                this.cuttingTool.visible = state.liteMode ? objects.cuttingTool.visibleLite : objects.cuttingTool.visible;
+                this.cuttingTool.visible = false;
 
                 this.group.add(this.cuttingTool);
 
@@ -1102,15 +1215,27 @@ class Visualizer extends Component {
             });
         }
 
-        { // Cutting Pointer
-            this.cuttingPointer = new CuttingPointer({
-                color: cuttingCoordinateLines,
-                diameter: 2
+        { // Laser Tool
+            this.setupScene();
+
+            // add tool
+            this.laserPointer = new LaserPointer({
+                color: currentTheme.get(CUTTING_PART),
+                diameter: 4
             });
-            this.cuttingPointer.name = 'CuttingPointer';
-            this.cuttingPointer.visible = (state.liteMode) ? !objects.cuttingTool.visibleLite : !objects.cuttingTool.visible;
-            this.group.add(this.cuttingPointer);
+            this.laserPointer.name = 'LaserPointer';
+            this.laserPointer.visible = false;
+
+            this.group.add(this.laserPointer);
+
+            // Update the scene
+            this.updateScene();
         }
+
+        { // Cutting Pointer
+            this.createCuttingPointer();
+        }
+
 
         { // Limits
             const limits = _get(this.machineProfile, 'limits');
@@ -1124,6 +1249,94 @@ class Visualizer extends Component {
         this.scene.add(this.group);
     }
 
+    // from https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html,
+    // https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_fxaa.html
+    setupScene() {
+        const renderScene = new RenderPass(this.scene, this.camera);
+        const pixelRatio = this.renderer.getPixelRatio();
+        const width = this.getVisibleWidth();
+        const height = this.getVisibleHeight();
+
+        // fxaa
+        const fxaaPass = new ShaderPass(FXAAShader);
+        const copyPass = new ShaderPass(CopyShader);
+        this.copyComposer = new EffectComposer(this.renderer);
+        this.copyComposer.addPass(renderScene);
+        this.copyComposer.addPass(copyPass);
+
+        fxaaPass.material.uniforms.resolution.value.x = 1 / (width * pixelRatio);
+        fxaaPass.material.uniforms.resolution.value.y = 1 / (height * pixelRatio);
+
+        this.fxaaComposer = new EffectComposer(this.renderer);
+        this.fxaaComposer.addPass(renderScene);
+        this.fxaaComposer.addPass(fxaaPass);
+
+        // bloom
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1, 0.1, 0);
+        this.bloomComposer = new EffectComposer(this.renderer);
+        this.bloomComposer.renderToScreen = false;
+        this.bloomComposer.addPass(renderScene);
+        this.bloomComposer.addPass(bloomPass);
+
+        const finalPass = new ShaderPass(
+            new THREE.ShaderMaterial({
+                uniforms: {
+                    baseTexture: { value: null },
+                    bloomTexture: { value: this.bloomComposer.renderTarget2.texture },
+                },
+                vertexShader:
+                    `varying vec2 vUv;
+                    void main() {
+                        vUv = uv;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+                    }`,
+                fragmentShader:
+                    `uniform sampler2D baseTexture;
+                    uniform sampler2D bloomTexture;
+                    varying vec2 vUv;
+                    void main() {
+                        gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
+                    }`,
+                defines: {}
+            }), 'baseTexture'
+        );
+        finalPass.needsSwap = true;
+
+        this.finalComposer = new EffectComposer(this.renderer);
+        this.finalComposer.addPass(renderScene);
+        this.finalComposer.addPass(finalPass);
+    }
+
+    // from https://github.com/mrdoob/three.js/blob/master/examples/webgl_postprocessing_unreal_bloom_selective.html
+    renderBloom() {
+        const { state } = this.props;
+        const { currentTheme } = state;
+        let materials = {};
+        const darkMaterial = new THREE.MeshBasicMaterial({ color: 'black' });
+        const bloomLayer = new THREE.Layers();
+        bloomLayer.set(1);
+
+        this.renderer.setClearColor(0x000000);
+        this.scene.traverse(darkenNonBloomed);
+        this.bloomComposer.render();
+        this.scene.traverse(restoreMaterial);
+        this.renderer.setClearColor(new THREE.Color(currentTheme.get(BACKGROUND_PART)), 1);
+
+        function darkenNonBloomed(obj) {
+            if (bloomLayer.test(obj.layers) === false) {
+                materials[obj.uuid] = obj.material;
+                obj.material = darkMaterial;
+            }
+        }
+
+        function restoreMaterial(obj) {
+            if (materials[obj.uuid]) {
+                obj.material = materials[obj.uuid];
+                delete materials[obj.uuid];
+            }
+        }
+    }
+
     // @param [options] The options object.
     // @param [options.forceUpdate] Force rendering
     updateScene(options) {
@@ -1132,6 +1345,10 @@ class Visualizer extends Component {
 
         if (this.renderer && needUpdateScene) {
             this.renderer.render(this.scene, this.camera);
+            this.copyComposer.render();
+            this.fxaaComposer.render();
+            this.renderBloom();
+            this.finalComposer.render();
         }
     }
 
@@ -1275,6 +1492,21 @@ class Visualizer extends Component {
         this.cuttingTool.position.set(x0, y0, z0);
     }
 
+    // Update cutting tool position
+    updateLaserPointerPosition() {
+        if (!this.laserPointer) {
+            return;
+        }
+
+        const pivotPoint = this.pivotPoint.get();
+        const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
+        const x0 = wpox - pivotPoint.x;
+        const y0 = wpoy - pivotPoint.y;
+        const z0 = wpoz - pivotPoint.z;
+
+        this.laserPointer.position.set(x0, y0, z0);
+    }
+
     // Update cutting pointer position
     updateCuttingPointerPosition() {
         if (!this.cuttingPointer) {
@@ -1352,13 +1584,14 @@ class Visualizer extends Component {
 
         // Update position
         this.updateCuttingToolPosition();
+        this.updateLaserPointerPosition();
         this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
 
         if (this.viewport && dX > 0 && dY > 0 && shouldZoom) {
             // The minimum viewport is 50x50mm
-            const width = Math.max(dX, 50);
-            const height = Math.max(dY, 50);
+            const width = Math.max(dX + 50, 100);
+            const height = Math.max(dY + 50, 100);
             const target = new THREE.Vector3(0, 0, bbox.max.z);
             this.viewport.set(width, height, target);
         }
@@ -1419,9 +1652,92 @@ class Visualizer extends Component {
         } else {
             setVisualizerReady();
         }
+
+        this.fileLoaded = true;
+    }
+
+    calculateLimits(data) {
+        const { workPosition, machinePosition, softXMax, softYMax, softZMax, homingFlag, machineCorner } = this.props;
+        /* machineCorner:
+            0 is top right
+            1 is top left
+            2 bottom right
+            3 bottom left
+        */
+        let xMultiplier = 1;
+        let yMultiplier = 1;
+        if (homingFlag) {
+            switch (machineCorner) {
+            case 0:
+                xMultiplier = -1;
+                yMultiplier = -1;
+                break;
+            case 1:
+                xMultiplier = 1;
+                yMultiplier = -1;
+                break;
+            case 2:
+                xMultiplier = -1;
+                yMultiplier = 1;
+                break;
+            case 3:
+                xMultiplier = 1;
+                yMultiplier = 1;
+                break;
+            default:
+                break;
+            }
+        }
+
+        // get wpos
+        let wpos;
+        if (data !== 0) {
+            wpos = workPosition;
+        } else {
+            wpos = {
+                x: 0,
+                y: 0,
+                z: workPosition.z,
+            };
+        }
+
+        // get mpos
+        let mpos = machinePosition;
+
+        let origin = {
+            x: parseFloat(mpos.x) - parseFloat(wpos.x) * xMultiplier,
+            y: parseFloat(mpos.y) - parseFloat(wpos.y) * yMultiplier,
+            z: parseFloat(mpos.z) - parseFloat(wpos.z) * -1,
+        };
+        let limitsMax = {
+            x: softXMax * xMultiplier - origin.x,
+            y: softYMax * yMultiplier - origin.y,
+            z: softZMax - origin.z,
+        };
+
+        // let limitsMin = {
+        //     x: origin.x === 0 ? origin.x : origin.x * -1,
+        //     y: origin.y === 0 ? origin.y : origin.y * -1,
+        //     z: origin.z,
+        // };
+
+        // get bbox
+        let bbox = reduxStore.getState().file.bbox;
+        // let bboxMin = bbox.min;
+        let bboxMax = bbox.max;
+
+        // check if machine will leave soft limits
+        if (bboxMax.x > limitsMax.x ||
+            bboxMax.y > limitsMax.y ||
+            bboxMax.z > limitsMax.z) {
+            pubsub.publish('softlimits:warning');
+        } else {
+            pubsub.publish('softlimits:ok');
+        }
     }
 
     unload() {
+        this.fileLoaded = false;
         const visualizerObject = this.group.getObjectByName('Visualizer');
         const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
 
@@ -1644,11 +1960,24 @@ export default connect((store) => {
     const machinePosition = _get(store, 'controller.mpos');
     const workPosition = _get(store, 'controller.wpos');
     const receivedLines = _get(store, 'controller.sender.status.received', 0);
+    // soft limits
+    const softXMax = _get(store, 'controller.settings.settings.$130');
+    const softYMax = _get(store, 'controller.settings.settings.$131');
+    const softZMax = _get(store, 'controller.settings.settings.$132');
+    const homingFlag = _get(store, 'controller.homingFlag');
+    const machineCorner = _get(store, 'controller.settings.settings.$23');
     const { activeVisualizer } = store.visualizer;
+    const isConnected = _get(store, 'connection.isConnected');
     return {
         machinePosition,
         workPosition,
         receivedLines,
-        activeVisualizer
+        softXMax,
+        softYMax,
+        softZMax,
+        homingFlag,
+        machineCorner,
+        activeVisualizer,
+        isConnected
     };
 }, null, null, { forwardRef: true })(Visualizer);

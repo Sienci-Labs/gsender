@@ -33,7 +33,7 @@ import ProgramEvents from 'app/containers/Preferences/Events';
 import gamepad from 'app/lib/gamepad';
 import { Toaster, TOASTER_SUCCESS } from '../../lib/toaster/ToasterLib';
 import General from './General';
-import Shortcuts from './Keybindings';
+import Shortcuts from './Shortcuts';
 import ProbeSettings from './Probe';
 import SpindleLaser from './SpindleLaser';
 import WidgetConfig from '../../widgets/WidgetConfig';
@@ -43,7 +43,12 @@ import store from '../../store';
 import styles from './index.styl';
 import { METRIC_UNITS, WORKFLOW_STATE_RUNNING } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
-import { CUST_LIGHT_THEME, DARK_THEME, DARK_THEME_VALUES, LIGHT_THEME, LIGHT_THEME_VALUES } from '../../widgets/Visualizer/constants';
+import {
+    DARK_THEME_VALUES, PARTS_LIST, G1_PART
+} from '../../widgets/Visualizer/constants';
+import StatsPage from './Stats';
+import SafetySettings from './Safety';
+//from '../../widgets/Visualizer/constants';
 import { convertValuesToMetric, convertValuesToImperial } from '../Surfacing/utils';
 
 
@@ -75,6 +80,7 @@ class PreferencesPage extends PureComponent {
             autoReconnect: store.get('widgets.connection.autoReconnect', false),
             baudrate: store.get('widgets.connection.baudrate', 115200),
             safeRetractHeight: store.get('workspace.safeRetractHeight', 10),
+            customDecimalPlaces: store.get('workspace.customDecimalPlaces', 0),
             controller: {
                 type: controller.type,
                 settings: controller.settings,
@@ -87,14 +93,19 @@ class PreferencesPage extends PureComponent {
                     component: General
                 },
                 {
+                    id: 1,
+                    label: 'Safety',
+                    component: SafetySettings
+                },
+                {
                     id: 2,
                     label: 'Probe',
                     component: ProbeSettings
                 },
                 {
                     id: 3,
-                    label: 'Shortcuts',
-                    component: Shortcuts
+                    label: 'Spindle/Laser',
+                    component: SpindleLaser
                 },
                 {
                     id: 4,
@@ -102,22 +113,27 @@ class PreferencesPage extends PureComponent {
                     component: VisualizerSettings
                 },
                 {
-                    id: 1,
-                    label: 'Spindle/Laser',
-                    component: SpindleLaser
+                    id: 5,
+                    label: 'Shortcuts',
+                    component: Shortcuts
                 },
                 {
-                    id: 5,
+                    id: 6,
+                    label: 'Stats',
+                    component: StatsPage,
+                },
+                {
+                    id: 7,
+                    label: 'Program Events',
+                    component: ProgramEvents,
+                },
+                {
+                    id: 8,
                     label: 'Tool Change',
                     component: Events
                 },
                 {
-                    id: 6,
-                    label: 'Start/Stop G-Code',
-                    component: ProgramEvents,
-                },
-                {
-                    id: 7,
+                    id: 9,
                     label: 'About',
                     component: About,
                 }
@@ -126,7 +142,7 @@ class PreferencesPage extends PureComponent {
             tool: {
                 metricDiameter: 0,
                 imperialDiameter: 0,
-                type: 'end mill'
+                type: 'End Mill'
             },
             probe: store.get('workspace[probeProfile]'),
             probeSettings: {
@@ -134,20 +150,24 @@ class PreferencesPage extends PureComponent {
                 normalFeedrate: this.probeConfig.get('probeFeedrate', {}),
                 fastFeedrate: this.probeConfig.get('probeFastFeedrate', {}),
                 probeCommand: this.probeConfig.get('probeCommand', 'G38.2'),
-                connectivityTest: this.probeConfig.get('connectivityTest', true)
+                connectivityTest: this.probeConfig.get('connectivityTest', true),
+                zProbeDistance: this.probeConfig.get('zProbeDistance', {})
             },
             laser: {
                 ...this.spindleConfig.get('laser')
             },
             spindle: {
-                ...this.spindleConfig.get()
+                ...this.spindleConfig.get(),
+                delay: this.spindleConfig.get('delay')
             },
             visualizer: {
                 minimizeRenders: this.visualizerConfig.get('minimizeRenders'),
                 theme: this.visualizerConfig.get('theme'),
                 objects: this.visualizerConfig.get('objects'),
                 disabled: this.visualizerConfig.get('disabled'),
-                disabledLite: this.visualizerConfig.get('disabledLite')
+                disabledLite: this.visualizerConfig.get('disabledLite'),
+                showSoftLimitsWarning: this.visualizerConfig.get('showSoftLimitsWarning', false),
+                SVGEnabled: this.visualizerConfig.get('SVGEnabled', false),
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
@@ -167,6 +187,19 @@ class PreferencesPage extends PureComponent {
                     safeRetractHeight: value
                 });
                 pubsub.publish('safeHeight:update', value);
+            },
+            setCustomDecimalPlaces: (e) => {
+                let value = Math.abs(Number(e.target.value));
+                if (value < 0) {
+                    value = 0;
+                } else if (value > 5) {
+                    value = 5;
+                }
+                e.target.value = value;
+                this.setState({
+                    customDecimalPlaces: value
+                });
+                controller.command('checkStateUpdate');
             },
             setUnits: (units) => {
                 this.setState({
@@ -231,7 +264,7 @@ class PreferencesPage extends PureComponent {
                 });
             },
             setToolType: (e) => {
-                const type = e.target.value;
+                const type = e.value;
                 const tool = this.state.tool;
                 this.setState({
                     tool: {
@@ -417,6 +450,25 @@ class PreferencesPage extends PureComponent {
                     }
                 });
                 pubsub.publish('probe:test', value);
+            },
+            changeZProbeDistance: (e) => {
+                const probeSettings = { ...this.state.probeSettings };
+                const value = Math.abs(Number(e.target.value).toFixed(3) * 1);
+
+                const { units } = this.state;
+
+                const metricValue = units === 'mm' ? value : Math.abs(convertToMetric(value));
+                const imperialValue = units === 'in' ? value : Math.abs(convertToImperial(value));
+
+                this.setState({
+                    probeSettings: {
+                        ...probeSettings,
+                        zProbeDistance: {
+                            mm: metricValue,
+                            in: imperialValue,
+                        }
+                    }
+                });
             }
         },
         laser: {
@@ -471,6 +523,15 @@ class PreferencesPage extends PureComponent {
                 this.setState({ spindle: newSpindleValue });
 
                 pubsub.publish('spindle:updated', newSpindleValue);
+            },
+            handleDelayToggle: (hasDelay) => {
+                const { spindle } = this.state;
+                this.setState({
+                    spindle: {
+                        ...spindle,
+                        delay: hasDelay
+                    }
+                });
             }
         },
         visualizer: {
@@ -495,14 +556,19 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('theme:change', theme.value);
             },
-            handleCustThemeChange: (theme, part) => {
+            handleCustThemeChange: (themeColours, theme) => {
                 const { visualizer } = this.state;
-                this.visualizerConfig.set(theme + ' ' + part,
-                    this.visualizerConfig.get('temp ' + theme + ' ' + part));
+                PARTS_LIST.map((value) => {
+                    let label = value;
+                    if (value === G1_PART) {
+                        label = 'G1-3';
+                    }
+                    return this.visualizerConfig.set(theme + ' ' + label, themeColours.get(value));
+                });
                 this.setState({
                     visualizer: {
                         ...visualizer,
-                        theme: theme
+                        theme: theme,
                     }
                 });
                 pubsub.publish('theme:change', theme);
@@ -514,85 +580,11 @@ class PreferencesPage extends PureComponent {
             handlePartChange: () => {
                 pubsub.publish('part:change');
             },
-            getDefaultColour: (theme, part) => {
-                let defaultColour;
-                let themeType = DARK_THEME_VALUES;
-                if (theme === CUST_LIGHT_THEME) {
-                    themeType = LIGHT_THEME_VALUES;
-                }
-                switch (part) {
-                case 'Background':
-                    defaultColour = themeType.backgroundColor;
-                    break;
-                case 'Grid':
-                    defaultColour = themeType.gridColor;
-                    break;
-                case 'X Axis':
-                    defaultColour = themeType.xAxisColor;
-                    break;
-                case 'Y Axis':
-                    defaultColour = themeType.yAxisColor;
-                    break;
-                case 'Z Axis':
-                    defaultColour = themeType.zAxisColor;
-                    break;
-                case 'Limit':
-                    defaultColour = themeType.limitColor;
-                    break;
-                case 'Cutting Coordinates Lines':
-                    defaultColour = themeType.cuttingCoordinateLines;
-                    break;
-                case 'Jogging Coordinates Lines':
-                    defaultColour = themeType.joggingCoordinateLines;
-                    break;
-                case 'G0':
-                    defaultColour = themeType.G0Color;
-                    break;
-                case 'G1':
-                    defaultColour = themeType.G1Color;
-                    break;
-                case 'G2':
-                    defaultColour = themeType.G2Color;
-                    break;
-                case 'G3':
-                    defaultColour = themeType.G3Color;
-                    break;
-                default:
-                    defaultColour = '#000000';
-                }
-                return defaultColour;
+            getDefaultColour: (part) => {
+                return DARK_THEME_VALUES.get(part) || '#000000';
             },
-            getCurrentColor: (part, defaultColour) => {
-                const { visualizer } = this.state;
-                if (visualizer.theme === LIGHT_THEME) {
-                    return LIGHT_THEME_VALUES.backgroundColor;
-                } else if (visualizer.theme === DARK_THEME) {
-                    return DARK_THEME_VALUES.backgroundColor;
-                } else {
-                    return this.visualizerConfig.get(visualizer.theme + ' ' + part)
-                        ? this.visualizerConfig.get(visualizer.theme + ' ' + part)
-                        : defaultColour;
-                }
-            },
-            resetCustomThemeColours: (theme) => {
-                let themeColours = DARK_THEME_VALUES;
-                if (theme === CUST_LIGHT_THEME) {
-                    themeColours = LIGHT_THEME_VALUES;
-                }
-                this.visualizerConfig.set(theme + ' Background', themeColours.backgroundColor);
-                this.visualizerConfig.set(theme + ' Grid', themeColours.gridColor);
-                this.visualizerConfig.set(theme + ' X Axis', themeColours.xAxisColor);
-                this.visualizerConfig.set(theme + ' Y Axis', themeColours.yAxisColor);
-                this.visualizerConfig.set(theme + ' Z Axis', themeColours.zAxisColor);
-                this.visualizerConfig.set(theme + ' Limit', themeColours.limitColor);
-                this.visualizerConfig.set(theme + ' Cutting Coordinate Lines', themeColours.cuttingCoordinateLines);
-                this.visualizerConfig.set(theme + ' Jogging Coordinate Lines', themeColours.joggingCoordinateLines);
-                this.visualizerConfig.set(theme + ' G0', themeColours.G0Color);
-                this.visualizerConfig.set(theme + ' G1', themeColours.G1Color);
-                this.visualizerConfig.set(theme + ' G2', themeColours.G2Color);
-                this.visualizerConfig.set(theme + ' G3', themeColours.G3Color);
-
-                pubsub.publish('theme:change');
+            getCurrentColor: (theme, part, defaultColour) => {
+                return this.visualizerConfig.get(theme + ' ' + part, defaultColour);
             },
             handleVisEnabledToggle: (liteMode = false) => {
                 const { visualizer } = this.state;
@@ -613,6 +605,17 @@ class PreferencesPage extends PureComponent {
                         }
                     });
                 }
+                pubsub.publish('visualizer:settings');
+            },
+            handleSVGEnabledToggle: () => {
+                const { visualizer } = this.state;
+                const value = visualizer.SVGEnabled;
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        SVGEnabled: !value
+                    }
+                });
                 pubsub.publish('visualizer:settings');
             },
             handleCutPathToggle: (liteMode = false) => {
@@ -719,6 +722,18 @@ class PreferencesPage extends PureComponent {
                     });
                 }
                 pubsub.publish('visualizer:settings');
+            },
+            handleLimitsWarningToggle: () => {
+                const { visualizer } = this.state;
+                this.visualizerConfig.set('showSoftLimitsWarning', !this.state.visualizer.showSoftLimitsWarning);
+                pubsub.publish('softlimits:changevisibility', !this.state.visualizer.showSoftLimitsWarning);
+                this.setState({
+                    visualizer: {
+                        ...visualizer,
+                        showSoftLimitsWarning: !this.state.visualizer.showSoftLimitsWarning
+                    }
+                });
+                pubsub.publish('visualizer:settings');
             }
         }
     }
@@ -762,14 +777,28 @@ class PreferencesPage extends PureComponent {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { tools, tool, probe, probeSettings, units, reverseWidgets, autoReconnect, visualizer, safeRetractHeight, spindle } = this.state;
+        const {
+            tools,
+            tool,
+            probe,
+            probeSettings,
+            units,
+            reverseWidgets,
+            autoReconnect,
+            visualizer,
+            safeRetractHeight,
+            customDecimalPlaces,
+            spindle
+        } = this.state;
 
         store.set('workspace.reverseWidgets', reverseWidgets);
         store.set('workspace.safeRetractHeight', safeRetractHeight);
+        store.set('workspace.customDecimalPlaces', customDecimalPlaces);
         store.set('widgets.connection.autoReconnect', autoReconnect);
         store.set('widgets.visualizer.theme', visualizer.theme);
         store.set('widgets.visualizer.disabled', visualizer.disabled);
         store.set('widgets.visualizer.disabledLite', visualizer.disabledLite);
+        store.set('widgets.visualizer.SVGEnabled', visualizer.SVGEnabled);
         store.set('widgets.visualizer.minimizeRenders', visualizer.minimizeRenders);
         store.set('workspace.units', units);
         store.replace('workspace[tools]', tools);
@@ -778,10 +807,12 @@ class PreferencesPage extends PureComponent {
         store.replace('workspace[probeProfile]', probe);
         store.set('widgets.spindle.spindleMax', spindle.spindleMax);
         store.set('widgets.spindle.spindleMin', spindle.spindleMin);
+        store.set('widgets.spindle.delay', spindle.delay);
         this.probeConfig.set('retractionDistance', probeSettings.retractionDistance);
         this.probeConfig.set('probeFeedrate', probeSettings.normalFeedrate);
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
         this.probeConfig.set('connectivityTest', probeSettings.connectivityTest);
+        this.probeConfig.set('zProbeDistance', probeSettings.zProbeDistance);
 
         controller.command('settings:updated', this.state);
 
@@ -859,15 +890,17 @@ class PreferencesPage extends PureComponent {
                         </div>
                         <div className={styles.preferencesOptions}>
                             {
-                                menu.map((menuItem, index) => (
-                                    <div key={menuItem.id}>
-                                        <menuItem.component
-                                            actions={actions}
-                                            state={state}
-                                            active={index === selectedMenu}
-                                        />
-                                    </div>
-                                ))
+                                menu.map((menuItem, index) => (index === selectedMenu
+                                    ? (
+                                        <div key={menuItem.id}>
+                                            <menuItem.component
+                                                actions={actions}
+                                                state={state}
+                                                active={index === selectedMenu}
+                                            />
+                                        </div>
+                                    )
+                                    : null))
                             }
                         </div>
                     </div>

@@ -24,7 +24,7 @@
 /* eslint-disable consistent-return */
 import includes from 'lodash/includes';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import _, { get, debounce } from 'lodash';
 import api from 'app/api';
 import pubsub from 'pubsub-js';
 import combokeys from 'app/lib/combokeys';
@@ -70,6 +70,11 @@ import {
     GRBL_ACTIVE_STATE_IDLE,
     VISUALIZER_PRIMARY,
     VISUALIZER_SECONDARY,
+    GRBL_ACTIVE_STATE_CHECK,
+    CARVING_CATEGORY,
+    GENERAL_CATEGORY,
+    OVERRIDES_CATEGORY,
+    VISUALIZER_CATEGORY,
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
@@ -78,10 +83,12 @@ import {
     LIGHT_THEME_VALUES,
     DARK_THEME,
     DARK_THEME_VALUES,
-    CUST_DARK_THEME,
-    CUST_LIGHT_THEME
+    CUSTOMIZABLE_THEMES,
+    PARTS_LIST
 } from './constants';
 import SecondaryVisualizer from './SecondaryVisualizer';
+import useKeybinding from '../../lib/useKeybinding';
+import shuttleEvents from '../../lib/shuttleEvents';
 
 const displayWebGLErrorMessage = () => {
     portal(({ onClose }) => (
@@ -95,16 +102,16 @@ const displayWebGLErrorMessage = () => {
                 <ModalTemplate type="warning">
                     {window.WebGLRenderingContext && (
                         <div>
-                        Your graphics card does not seem to support <Anchor href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</Anchor>.
+                            Your graphics card does not seem to support <Anchor href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</Anchor>.
                             <br />
-                        Find out how to get it <Anchor href="http://get.webgl.org/">here</Anchor>.
+                            Find out how to get it <Anchor href="http://get.webgl.org/">here</Anchor>.
                         </div>
                     )}
                     {!window.WebGLRenderingContext && (
                         <div>
-                        Your browser does not seem to support <Anchor href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</Anchor>.
+                            Your browser does not seem to support <Anchor href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</Anchor>.
                             <br />
-                        Find out how to get it <Anchor href="http://get.webgl.org/">here</Anchor>.
+                            Find out how to get it <Anchor href="http://get.webgl.org/">here</Anchor>.
                         </div>
                     )}
                 </ModalTemplate>
@@ -558,15 +565,15 @@ class VisualizerWidget extends PureComponent {
             }
         },
         handleLiteModeToggle: () => {
-            const { liteMode, disabled, disabledLite } = this.state;
+            const { liteMode, gcode } = this.state;
             const newLiteModeValue = !liteMode;
-            const shouldRenderVisualization = newLiteModeValue ? !disabledLite : !disabled;
-            this.renderIfNecessary(shouldRenderVisualization);
 
             this.setState({
                 liteMode: newLiteModeValue,
                 minimizeRenders: newLiteModeValue
             });
+
+            pubsub.publish('litemode:change', gcode);
         },
         lineWarning: {
             onContinue: () => {
@@ -684,6 +691,7 @@ class VisualizerWidget extends PureComponent {
     componentDidMount() {
         this.subscribe();
         this.addShuttleControlEvents();
+        useKeybinding(this.shuttleControlEvents);
         this.subscribe();
 
         if (!WebGL.isWebGLAvailable() && !this.state.disabled) {
@@ -742,11 +750,7 @@ class VisualizerWidget extends PureComponent {
             port: controller.port,
             units: store.get('workspace.units', METRIC_UNITS),
             theme: this.config.get('theme'),
-            controller: {
-                type: controller.type,
-                settings: controller.settings,
-                state: controller.state
-            },
+            showSoftLimitsWarning: this.config.get('showSoftLimitsWarning', false),
             workflow: {
                 state: controller.workflow.state
             },
@@ -844,47 +848,7 @@ class VisualizerWidget extends PureComponent {
         };
     }
 
-    shuttleControlEvents = {
-        LOAD_FILE: () => {
-            const { activeState } = this.props;
-            if (this.workflowControl && activeState === GRBL_ACTIVE_STATE_IDLE) {
-                this.workflowControl.handleClickUpload();
-            }
-        },
-        UNLOAD_FILE: () => {
-            const { activeState } = this.props;
-            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
-                this.actions.closeModal();
-                this.actions.unloadGCode();
-                this.actions.reset();
-            }
-        },
-        TEST_RUN: () => {
-            if (this.workflowControl.canRun()) {
-                const gcode = this.state.gcode.content;
-                const lines = gcode.split('\n');
-                const testLines = ['$C', ...lines, '$C'];
-                controller.command('gcode', testLines);
-                this.actions.onRunClick();
-            }
-        },
-        START_JOB: () => {
-            if (this.workflowControl && this.workflowControl.canRun()) {
-                this.workflowControl.startRun();
-            }
-        },
-        PAUSE_JOB: () => {
-            const { activeState } = this.props;
-            if (activeState === GRBL_ACTIVE_STATE_RUN) {
-                this.actions.handlePause();
-            }
-        },
-        STOP_JOB: () => {
-            const { activeState } = this.props;
-            if (this.workflowControl && (activeState === GRBL_ACTIVE_STATE_RUN || activeState === GRBL_ACTIVE_STATE_HOLD)) {
-                this.workflowControl.handleOnStop();
-            }
-        },
+    shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
             const feedRate = Number(amount) || 0;
             controller.command('feedOverride', feedRate);
@@ -916,18 +880,383 @@ class VisualizerWidget extends PureComponent {
 
             changeCamera();
         },
-        LIGHTWEIGHT_MODE: () => this.actions.handleLiteModeToggle(),
-        CUT: () => {
-            document.execCommand('cut');
+        VISUALIZER_VIEW_CYCLE: () => {
+            const {
+                to3DView,
+                toTopView,
+                toFrontView,
+                toRightSideView,
+                toLeftSideView,
+            } = this.actions.camera;
+
+            const cameraViews = [
+                '3d',
+                'top',
+                'front',
+                'right',
+                'left',
+                'default',
+            ];
+
+            let currIndex = cameraViews.findIndex(view => view === this.state.cameraPosition);
+
+            if (currIndex + 1 >= cameraViews.length) {
+                currIndex = 0;
+            } else {
+                currIndex += 1;
+            }
+
+            const currView = cameraViews[currIndex];
+
+            const changeCamera = {
+                '3d': to3DView,
+                'top': toTopView,
+                'front': toFrontView,
+                'right': toRightSideView,
+                'left': toLeftSideView,
+                'default': () => {
+                    const { cameraPosition } = this.getInitialState();
+                    this.setState({ cameraPosition });
+                }
+            }[currView];
+
+            changeCamera();
         },
-        COPY: () => {
-            document.execCommand('copy');
+        VISUALIZER_ZOOM_IN: () => {
+            this.actions.camera.zoomIn();
         },
-        PASTE: () => {
-            document.execCommand('paste');
+        VISUALIZER_ZOOM_OUT: () => {
+            this.actions.camera.zoomOut();
         },
-        UNDO: () => {
-            document.execCommand('undo');
+        VISUALIZER_ZOOM_FIT: () => {
+            this.actions.camera.zoomFit();
+        }
+    }
+
+    shuttleControlEvents = {
+        LOAD_FILE: {
+            title: 'Load File',
+            keys: ['shift', 'l'].join('+'),
+            gamepadKeys: '0',
+            keysName: 'A',
+            cmd: 'LOAD_FILE',
+            preventDefault: false,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: debounce(() => {
+                if (this.workflowControl) {
+                    this.workflowControl.handleClickUpload();
+                }
+            }, 300),
+        },
+        UNLOAD_FILE: {
+            title: 'Unload File',
+            keys: ['shift', 'k'].join('+'),
+            gamepadKeys: '1',
+            keysName: 'B',
+            cmd: 'UNLOAD_FILE',
+            preventDefault: false,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                this.actions.closeModal();
+                this.actions.unloadGCode();
+                this.actions.reset();
+            },
+        },
+        TEST_RUN: {
+            title: 'Test Run',
+            keys: '#',
+            cmd: 'TEST_RUN',
+            preventDefault: false,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                controller.command('gcode:test');
+            },
+        },
+        START_JOB: {
+            title: 'Start Job',
+            keys: '~',
+            gamepadKeys: '9',
+            keysName: 'Start',
+            cmd: 'START_JOB',
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                if (this.workflowControl) {
+                    this.workflowControl.startRun();
+                }
+            },
+        },
+        PAUSE_JOB: {
+            title: 'Pause Job',
+            keys: '!',
+            gamepadKeys: '2',
+            keysName: 'X',
+            cmd: 'PAUSE_JOB',
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                this.actions.handlePause();
+            },
+        },
+        STOP_JOB: {
+            title: 'Stop Job',
+            keys: '@',
+            gamepadKeys: '3',
+            keysName: 'Y',
+            cmd: 'STOP_JOB',
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                if (this.workflowControl) {
+                    this.workflowControl.handleOnStop();
+                }
+            },
+        },
+        FEEDRATE_OVERRIDE_P: {
+            title: 'Feed +',
+            keys: '',
+            cmd: 'FEEDRATE_OVERRIDE_P',
+            payload: { amount: 1 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
+        },
+        FEEDRATE_OVERRIDE_PP: {
+            title: 'Feed ++',
+            keys: '',
+            cmd: 'FEEDRATE_OVERRIDE_PP',
+            payload: { amount: 10 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
+        },
+        FEEDRATE_OVERRIDE_M: {
+            title: 'Feed -',
+            keys: '',
+            cmd: 'FEEDRATE_OVERRIDE_M',
+            payload: { amount: -1 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
+        },
+        FEEDRATE_OVERRIDE_MM: {
+            title: 'Feed --',
+            keys: '',
+            cmd: 'FEEDRATE_OVERRIDE_MM',
+            payload: { amount: -10 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
+        },
+        FEEDRATE_OVERRIDE_RESET: {
+            title: 'Feed Reset',
+            keys: '',
+            cmd: 'FEEDRATE_OVERRIDE_RESET',
+            payload: { amount: 0 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.FEEDRATE_OVERRIDE,
+        },
+        SPINDLE_OVERRIDE_P: {
+            title: 'Spindle/Laser +',
+            keys: '',
+            cmd: 'SPINDLE_OVERRIDE_P',
+            payload: { amount: 1 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE
+        },
+        SPINDLE_OVERRIDE_PP: {
+            title: 'Spindle/Laser ++',
+            keys: '',
+            cmd: 'SPINDLE_OVERRIDE_PP',
+            payload: { amount: 10 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE
+        },
+        SPINDLE_OVERRIDE_M: {
+            title: 'Spindle/Laser -',
+            keys: '',
+            cmd: 'SPINDLE_OVERRIDE_M',
+            payload: { amount: -1 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE
+        },
+        SPINDLE_OVERRIDE_MM: {
+            title: 'Spindle/Laser --',
+            keys: '',
+            cmd: 'SPINDLE_OVERRIDE_MM',
+            payload: { amount: -10 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE
+        },
+        SPINDLE_OVERRIDE_RESET: {
+            title: 'Spindle/Laser Reset',
+            keys: '',
+            cmd: 'SPINDLE_OVERRIDE_RESET',
+            payload: { amount: 0 },
+            preventDefault: true,
+            isActive: true,
+            category: OVERRIDES_CATEGORY,
+            callback: this.shuttleControlFunctions.SPINDLE_OVERRIDE
+        },
+        VISUALIZER_VIEW_3D: {
+            title: '3D / Isometric',
+            keys: '',
+            cmd: 'VISUALIZER_VIEW_3D',
+            payload: { type: 'isometirc' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW
+        },
+        VISUALIZER_VIEW_TOP: {
+            title: 'Top',
+            keys: '',
+            cmd: 'VISUALIZER_VIEW_TOP',
+            payload: { type: 'top' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW
+        },
+        VISUALIZER_VIEW_FRONT: {
+            title: 'Front',
+            keys: '',
+            cmd: 'VISUALIZER_VIEW_FRONT',
+            payload: { type: 'front' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW
+        },
+        VISUALIZER_VIEW_RIGHT: {
+            title: 'Right',
+            keys: '',
+            cmd: 'VISUALIZER_VIEW_RIGHT',
+            payload: { type: 'right' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW
+        },
+        VISUALIZER_VIEW_LEFT: {
+            title: 'Left',
+            keys: '',
+            cmd: 'VISUALIZER_VIEW_LEFT',
+            payload: { type: 'left' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW
+        },
+        VISUALIZER_VIEW_RESET: {
+            title: 'Reset View',
+            keys: ['shift', 'n'].join('+'),
+            cmd: 'VISUALIZER_VIEW_RESET',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW
+        },
+        LIGHTWEIGHT_MODE: {
+            title: 'Lightweight Mode',
+            keys: ['shift', 'm'].join('+'),
+            cmd: 'LIGHTWEIGHT_MODE',
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: () => this.actions.handleLiteModeToggle(),
+        },
+        CUT: {
+            title: 'Cut',
+            keys: ['ctrl', 'x'].join('+'),
+            cmd: 'CUT',
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: () => {
+                document.execCommand('cut');
+            },
+        },
+        COPY: {
+            title: 'Copy',
+            keys: ['ctrl', 'c'].join('+'),
+            cmd: 'COPY',
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: () => {
+                document.execCommand('copy');
+            },
+        },
+        PASTE: {
+            title: 'Paste',
+            keys: ['ctrl', 'v'].join('+'),
+            cmd: 'PASTE',
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: () => {
+                document.execCommand('paste');
+            },
+        },
+        UNDO: {
+            title: 'Undo',
+            keys: ['ctrl', 'z'].join('+'),
+            cmd: 'UNDO',
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: () => {
+                document.execCommand('undo');
+            },
+        },
+        TOGGLE_SHORTCUTS: {
+            title: 'Toggle Shortcuts',
+            keys: '^',
+            cmd: 'TOGGLE_SHORTCUTS',
+            preventDefault: false,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: () => {
+                const shortcuts = store.get('commandKeys', {});
+                const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+
+                // Ignore shortcut for toggling all other shortcuts to
+                // allow them to be turned on and off
+                const allDisabled = Object.entries(shortcuts)
+                    .filter(([key, shortcut]) => (allShuttleControlEvents[key] ? allShuttleControlEvents[key].title : shortcut.title) !== 'Toggle Shortcuts')
+                    .every(([key, shortcut]) => !shortcut.isActive);
+                const keybindings = _.cloneDeep(shortcuts);
+                Object.entries(keybindings).forEach(([key, keybinding]) => {
+                    if (key !== 'TOGGLE_SHORTCUTS') {
+                        keybinding.isActive = allDisabled;
+                    }
+                });
+
+                store.replace('commandKeys', keybindings);
+                pubsub.publish('keybindingsUpdated', keybindings);
+            }
         },
         MACRO: (_, { macroID }) => {
             const { activeState } = this.props;
@@ -935,26 +1264,53 @@ class VisualizerWidget extends PureComponent {
                 controller.command('macro:run', macroID, controller.context);
             }
         },
-        TOGGLE_SHORTCUTS: () => {
-            const shortcuts = store.get('commandKeys', []);
-
-            // Ignore shortcut for toggling all other shortcuts to
-            // allow them to be turned on and off
-            const allDisabled = shortcuts
-                .filter(shortcut => shortcut.title !== 'Toggle Shortcuts')
-                .every(({ isActive }) => !isActive);
-            const keybindingsArr = shortcuts.map(shortcut => (shortcut.title === 'Toggle Shortcuts' ? shortcut : { ...shortcut, isActive: allDisabled }));
-
-            store.set('commandKeys', keybindingsArr);
-            pubsub.publish('keybindingsUpdated');
-        }
+        VISUALIZER_VIEW_CYCLE: {
+            title: 'Cycle Through Visualizer Cameras',
+            keys: ['shift', 'b'].join('+'),
+            cmd: 'VISUALIZER_VIEW_CYCLE',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_VIEW_CYCLE
+        },
+        VISUALIZER_ZOOM_IN: {
+            title: 'Zoom In',
+            keys: ['shift', 'p'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_IN',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_IN
+        },
+        VISUALIZER_ZOOM_OUT: {
+            title: 'Zoom Out',
+            keys: ['shift', 'o'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_OUT',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT
+        },
+        VISUALIZER_ZOOM_FIT: {
+            title: 'Zoom Fit',
+            keys: ['shift', 'i'].join('+'),
+            cmd: 'VISUALIZER_ZOOM_FIT',
+            payload: { type: 'default' },
+            preventDefault: true,
+            isActive: true,
+            category: VISUALIZER_CATEGORY,
+            callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_FIT
+        },
     }
 
     addShuttleControlEvents() {
         combokeys.reload();
 
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = eventName === 'MACRO' ? this.shuttleControlEvents[eventName] : this.shuttleControlEvents[eventName].callback;
             combokeys.on(eventName, callback);
         });
     }
@@ -966,7 +1322,7 @@ class VisualizerWidget extends PureComponent {
 
     removeShuttleControlEvents() {
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = eventName === 'MACRO' ? this.shuttleControlEvents[eventName] : this.shuttleControlEvents[eventName].callback;
             combokeys.removeListener(eventName, callback);
         });
     }
@@ -975,41 +1331,12 @@ class VisualizerWidget extends PureComponent {
         const { theme } = store.get('widgets.visualizer');
         if (theme === LIGHT_THEME) {
             return LIGHT_THEME_VALUES;
-        }
-        if (theme === DARK_THEME) {
+        } else if (theme === DARK_THEME) {
             return DARK_THEME_VALUES;
-        }
-        if (theme === CUST_DARK_THEME) {
-            return {
-                backgroundColor: this.config.get('Custom Dark Background') ? this.config.get('Custom Dark Background') : DARK_THEME_VALUES.backgroundColor,
-                gridColor: this.config.get('Custom Dark Grid') ? this.config.get('Custom Dark Grid') : DARK_THEME_VALUES.gridColor,
-                xAxisColor: this.config.get('Custom Dark X Axis') ? this.config.get('Custom Dark X Axis') : DARK_THEME_VALUES.xAxisColor,
-                yAxisColor: this.config.get('Custom Dark Y Axis') ? this.config.get('Custom Dark Y Axis') : DARK_THEME_VALUES.yAxisColor,
-                zAxisColor: this.config.get('Custom Dark Z Axis') ? this.config.get('Custom Dark Z Axis') : DARK_THEME_VALUES.zAxisColor,
-                limitColor: this.config.get('Custom Dark Limit') ? this.config.get('Custom Dark Limit') : DARK_THEME_VALUES.limitColor,
-                cuttingCoordinateLines: this.config.get('Custom Dark Cutting Coordinate Lines') ? this.config.get('Custom Dark Cutting Coordinate Lines') : DARK_THEME_VALUES.cuttingCoordinateLines,
-                joggingCoordinateLines: this.config.get('Custom Dark Jogging Coordinate Lines') ? this.config.get('Custom Dark Jogging Coordinate Lines') : DARK_THEME_VALUES.joggingCoordinateLines,
-                G0Color: this.config.get('Custom Dark G0') ? this.config.get('Custom Dark G0') : DARK_THEME_VALUES.G0Color,
-                G1Color: this.config.get('Custom Dark G1') ? this.config.get('Custom Dark G1') : DARK_THEME_VALUES.G1Color,
-                G2Color: this.config.get('Custom Dark G2') ? this.config.get('Custom Dark G2') : DARK_THEME_VALUES.G2Color,
-                G3Color: this.config.get('Custom Dark G3') ? this.config.get('Custom Dark G3') : DARK_THEME_VALUES.G3Color,
-            };
-        }
-        if (theme === CUST_LIGHT_THEME) {
-            return {
-                backgroundColor: this.config.get('Custom Light Background') ? this.config.get('Custom Light Background') : LIGHT_THEME_VALUES.backgroundColor,
-                gridColor: this.config.get('Custom Light Grid') ? this.config.get('Custom Light Grid') : LIGHT_THEME_VALUES.gridColor,
-                xAxisColor: this.config.get('Custom Light X Axis') ? this.config.get('Custom Light X Axis') : LIGHT_THEME_VALUES.xAxisColor,
-                yAxisColor: this.config.get('Custom Light Y Axis') ? this.config.get('Custom Light Y Axis') : LIGHT_THEME_VALUES.yAxisColor,
-                zAxisColor: this.config.get('Custom Light Z Axis') ? this.config.get('Custom Light Z Axis') : LIGHT_THEME_VALUES.zAxisColor,
-                limitColor: this.config.get('Custom Light Limit') ? this.config.get('Custom Light Limit') : LIGHT_THEME_VALUES.limitColor,
-                cuttingCoordinateLines: this.config.get('Custom Light Cutting Coordinate Lines') ? this.config.get('Custom Light Cutting Coordinate Lines') : LIGHT_THEME_VALUES.cuttingCoordinateLines,
-                joggingCoordinateLines: this.config.get('Custom Light Jogging Coordinate Lines') ? this.config.get('Custom Light Jogging Coordinate Lines') : LIGHT_THEME_VALUES.joggingCoordinateLines,
-                G0Color: this.config.get('Custom Light G0') ? this.config.get('Custom Light G0') : LIGHT_THEME_VALUES.G0Color,
-                G1Color: this.config.get('Custom Light G1') ? this.config.get('Custom Light G1') : LIGHT_THEME_VALUES.G1Color,
-                G2Color: this.config.get('Custom Light G2') ? this.config.get('Custom Light G2') : LIGHT_THEME_VALUES.G2Color,
-                G3Color: this.config.get('Custom Light G3') ? this.config.get('Custom Light G3') : LIGHT_THEME_VALUES.G3Color,
-            };
+        } else if (CUSTOMIZABLE_THEMES.includes(theme)) {
+            let colourMap = new Map();
+            PARTS_LIST.map(part => colourMap.set(part, this.config.get(theme + ' ' + part, DARK_THEME_VALUES.get(part))));
+            return colourMap;
         }
         return DARK_THEME_VALUES;
     }
@@ -1033,7 +1360,7 @@ class VisualizerWidget extends PureComponent {
             return false;
         }
         if (controllerType === GRBL) {
-            if (activeState !== GRBL_ACTIVE_STATE_RUN) {
+            if (activeState !== GRBL_ACTIVE_STATE_RUN && activeState !== GRBL_ACTIVE_STATE_CHECK) {
                 return false;
             }
         }
@@ -1105,6 +1432,11 @@ class VisualizerWidget extends PureComponent {
         const { renderState, isSecondary, gcode, surfacingData, activeVisualizer, activeState, alarmCode, workflow, isConnected } = this.props;
         const state = {
             ...this.state,
+            controller: {
+                type: controller.type,
+                settings: controller.settings,
+                state: controller.state
+            },
             alarmCode,
             activeState,
             workflow,
@@ -1117,7 +1449,6 @@ class VisualizerWidget extends PureComponent {
 
         const showRendering = renderState === RENDER_RENDERING;
         const showLoading = renderState === RENDER_LOADING;
-        const showLoader = showLoading || showRendering;
         // Handle visualizer render
         const isVisualizerDisabled = (state.liteMode) ? state.disabledLite : state.disabled;
 
@@ -1127,7 +1458,6 @@ class VisualizerWidget extends PureComponent {
 
         const showVisualizer =
             capable.view3D &&
-            !showLoader &&
             (
                 (isSecondary && activeVisualizer === VISUALIZER_SECONDARY) ||
                 !isSecondary && activeVisualizer === VISUALIZER_PRIMARY
@@ -1142,7 +1472,7 @@ class VisualizerWidget extends PureComponent {
                     showRendering={showRendering}
                     showVisualizer={showVisualizer}
                     visualizerRef={(ref) => {
-                        this.visualizer = ref;
+                        this.visualizer = ref?.visualizer;
                     }}
                     gcode={gcode}
                     surfacingData={surfacingData}
@@ -1158,7 +1488,7 @@ class VisualizerWidget extends PureComponent {
                     showRendering={showRendering}
                     showVisualizer={showVisualizer}
                     visualizerRef={(ref) => {
-                        this.visualizer = ref;
+                        this.visualizer = ref?.visualizer;
                     }}
                     workflowRef={(ref) => {
                         this.workflowControl = ref;

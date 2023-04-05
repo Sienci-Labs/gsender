@@ -31,6 +31,7 @@ import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import { connect } from 'react-redux';
+import store from 'app/store';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import combokeys from 'app/lib/combokeys';
 import Widget from 'app/components/Widget';
@@ -38,13 +39,11 @@ import controller from 'app/lib/controller';
 import WidgetConfig from '../WidgetConfig';
 import {
     GRBL,
-    GRBL_ACTIVE_STATE_HOLD,
     GRBL_ACTIVE_STATE_IDLE,
+    IMPERIAL_UNITS,
     LASER_MODE,
-    MARLIN,
-    SMOOTHIE,
+    SPINDLE_LASER_CATEGORY,
     SPINDLE_MODE,
-    TINYG,
     WORKFLOW_STATE_RUNNING
 } from '../../constants';
 import styles from './index.styl';
@@ -52,6 +51,7 @@ import SpindleControls from './components/SpindleControls';
 import LaserControls from './components/LaserControls';
 import ModalToggle from './components/ModalToggle';
 import ActiveIndicator from './components/ActiveIndicator';
+import useKeybinding from '../../lib/useKeybinding';
 
 
 class SpindleWidget extends PureComponent {
@@ -64,34 +64,54 @@ class SpindleWidget extends PureComponent {
     };
 
     shuttleControlEvents = {
-        TOGGLE_SPINDLE_LASER_MODE: () => {
-            this.actions.handleModeToggle();
+        TOGGLE_SPINDLE_LASER_MODE: {
+            title: 'Toggle Mode',
+            keys: '',
+            cmd: 'TOGGLE_SPINDLE_LASER_MODE',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
+                this.actions.handleModeToggle();
+            }
         },
-        CW_LASER_ON: () => {
-            const { state } = this.props;
-            const activeState = get(state, 'status.activeState');
-            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+        CW_LASER_ON: {
+            title: 'CW / Laser On',
+            keys: '',
+            cmd: 'CW_LASER_ON',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
                 this.state.mode === LASER_MODE
                     ? this.actions.sendLaserM3()
                     : this.actions.sendM3();
             }
         },
-        CCW_LASER_TEST: () => {
-            const { state } = this.props;
-            const activeState = get(state, 'status.activeState');
-            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+        CCW_LASER_TEST: {
+            title: 'CCW / Laser Test',
+            keys: '',
+            cmd: 'CCW_LASER_TEST',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
                 this.state.mode === LASER_MODE
                     ? this.actions.runLaserTest()
                     : this.actions.sendM4();
             }
         },
-        STOP_LASER_OFF: () => {
-            const { state } = this.props;
-            const activeState = get(state, 'status.activeState');
-            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
+        STOP_LASER_OFF: {
+            title: 'Stop / Laser Off',
+            keys: '',
+            cmd: 'STOP_LASER_OFF',
+            preventDefault: false,
+            isActive: true,
+            category: SPINDLE_LASER_CATEGORY,
+            callback: () => {
                 this.actions.sendM5();
             }
-        }
+        },
     }
 
     config = new WidgetConfig(this.props.widgetId);
@@ -99,6 +119,8 @@ class SpindleWidget extends PureComponent {
     state = this.getInitialState();
 
     pubsubTokens = [];
+
+    isLaserOn = false;
 
     actions = {
         handleModeToggle: () => {
@@ -118,40 +140,44 @@ class SpindleWidget extends PureComponent {
             }
         },
         sendM3: () => {
-            const { spindleSpeed, mode } = this.state;
-            if (mode === LASER_MODE || spindleSpeed === 0) {
-                controller.command('gcode', 'M3');
-            } else {
-                controller.command('gcode', `M3 S${spindleSpeed}`);
-            }
+            const { spindleSpeed } = this.state;
+            this.isSpindleOn = true;
+            controller.command('gcode', `M3 S${spindleSpeed}`);
         },
         sendM4: () => {
-            const { spindleSpeed, mode } = this.state;
-            if (mode === LASER_MODE || spindleSpeed === 0) {
-                controller.command('gcode', 'M4');
-            } else {
-                controller.command('gcode', `M4 S${spindleSpeed}`);
-            }
+            const { spindleSpeed } = this.state;
+            this.isSpindleOn = true;
+            controller.command('gcode', `M4 S${spindleSpeed}`);
         },
         sendM5: () => {
+            this.isLaserOn = false;
+            this.isSpindleOn = false;
             controller.command('gcode', 'M5 S0');
         },
         sendLaserM3: () => {
             const { laser } = this.state;
             const { power } = laser;
             const laserPower = laser.maxPower * (power / 100);
+            this.isLaserOn = true;
 
             controller.command('gcode', `G1F1 M3 S${laserPower}`);
         },
         handleSpindleSpeedChange: (e) => {
             const value = Number(e.target.value);
+            if (this.isSpindleOn) {
+                this.debounceSpindleSpeed(value);
+            }
             this.setState({
                 spindleSpeed: value
             });
         },
         handleLaserPowerChange: (e) => {
             const { laser } = this.state;
+            const { power, maxPower } = laser;
             const value = Number(e.target.value);
+            if (this.isLaserOn) {
+                this.debounceLaserPower(power, maxPower);
+            }
             this.setState({
                 laser: {
                     ...laser,
@@ -209,14 +235,14 @@ class SpindleWidget extends PureComponent {
         combokeys.reload();
 
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.on(eventName, callback);
         });
     }
 
     removeShuttleControlEvents() {
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.removeListener(eventName, callback);
         });
     }
@@ -224,6 +250,7 @@ class SpindleWidget extends PureComponent {
     componentDidMount() {
         this.subscribe();
         this.addShuttleControlEvents();
+        useKeybinding(this.shuttleControlEvents);
 
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }
@@ -262,18 +289,23 @@ class SpindleWidget extends PureComponent {
     }
 
     enableSpindleMode() {
+        const { units } = this.props;
+        const preferredUnits = store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
         const active = this.getSpindleActiveState();
         if (active) {
+            this.isSpindleOn = false;
             controller.command('gcode', 'M5');
-            this.setInactive();
+            //this.setInactive();
         }
         const spindleMin = this.config.get('spindleMin');
         const spindleMax = this.config.get('spindleMax');
         const commands = [
+            preferredUnits,
             ...this.getSpindleOffsetCode(),
             `$30=${spindleMax}`,
             `$31=${spindleMin}`,
-            '$32=0'
+            '$32=0',
+            units
         ];
         this.updateControllerSettings(spindleMax, spindleMin, 0);
         controller.command('gcode', commands);
@@ -282,6 +314,14 @@ class SpindleWidget extends PureComponent {
     debouncedSpindleOverride = debounce((spindleSpeed) => {
         controller.command('spindleOverride', spindleSpeed);
     }, 250);
+
+    debounceLaserPower = debounce((power, maxPower) => {
+        controller.command('laserpower:change', power, maxPower);
+    }, 300);
+
+    debounceSpindleSpeed = debounce((speed) => {
+        controller.command('spindlespeed:change', speed);
+    }, 300);
 
     updateControllerSettings(max, min, mode) {
         reduxStore.dispatch({
@@ -367,18 +407,23 @@ class SpindleWidget extends PureComponent {
 
 
     enableLaserMode() {
-        const { active } = this.state;
+        const { units } = this.props;
+        const preferredUnits = store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
+        const active = this.getSpindleActiveState();
         const laser = this.config.get('laser');
 
         const { minPower, maxPower } = laser;
         if (active) {
+            this.isLaserOn = false;
             controller.command('gcode', 'M5');
         }
         const commands = [
+            preferredUnits,
             ...this.getLaserOffsetCode(),
             `$30=${maxPower}`,
             `$31=${minPower}`,
-            '$32=1'
+            '$32=1',
+            units
         ];
         this.updateControllerSettings(maxPower, minPower, 1);
         controller.command('gcode', commands);
@@ -398,14 +443,13 @@ class SpindleWidget extends PureComponent {
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
+        if (!includes([GRBL], type)) {
             return false;
         }
 
         const activeState = get(state, 'status.activeState');
         const states = [
             GRBL_ACTIVE_STATE_IDLE,
-            GRBL_ACTIVE_STATE_HOLD
         ];
 
         return includes(states, activeState);
@@ -467,6 +511,7 @@ export default connect((store) => {
     const spindleMax = Number(get(settings, 'settings.$30', 30000));
     const wcs = get(store, 'controller.modal.wcs');
     const wpos = get(store, 'controller.wpos', {});
+    const units = get(store, 'controller.modal.units', {});
 
     return {
         workflow,
@@ -478,6 +523,7 @@ export default connect((store) => {
         spindleMin,
         spindleMax,
         wcs,
-        wpos
+        wpos,
+        units
     };
 })(SpindleWidget);

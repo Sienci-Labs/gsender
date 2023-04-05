@@ -4,11 +4,12 @@ import { Provider as ReduxProvider } from 'react-redux';
 import ToolIntroduction from 'app/containers/Calibration/Alignment/ToolIntroduction';
 import reduxStore from 'app/store/redux';
 import Modal from 'app/components/Modal';
+import JogControl from 'app/widgets/JogControl';
+
 import Step from './Step';
 import NavigationButtons from './NavigationButtons';
 import TriangleDiagram from '../TriangleDiagram';
 import Result from './Result';
-import Keypad from '../JogControl';
 import introImage from './assets/XY_squaring_example.jpg';
 
 import styles from './index.styl';
@@ -194,12 +195,17 @@ const Alignment = ({ onClose }) => {
         <ReduxProvider store={reduxStore}>
             {
                 isFullyComplete
-                    ? <Result triangle={triangle} jogValues={jogValues} onBack={onBack} onClose={onClose} />
-                    : (
+                    ? (
+                        <Result
+                            triangle={triangle}
+                            jogValues={jogValues}
+                            onBack={onBack}
+                            onClose={onClose}
+                        />
+                    ) : (
                         <>
                             <div className={styles.alignmentContainer}>
                                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                    <h4 style={{ margin: 0 }}>XY Squaring</h4>
                                     {
                                         !introComplete && <ToolIntroduction readyHandler={startTool} />
                                     }
@@ -245,7 +251,8 @@ const Alignment = ({ onClose }) => {
                                                 <>
                                                     <img src={introImage} alt="Introduction Diagram" style={{ width: '75%', margin: 'auto' }} />
                                                     <p style={{ width: '100%', fontWeight: 'bold' }}>
-                                                        Since many CNCs run on two independent rails in the Y-axis, misalignment between these rails can cause your cutting to become skewed.
+                                                        Since many CNCs run on two independent rails in the Y-axis,
+                                                        misalignment between these rails can cause your cutting to become skewed.
                                                     </p>
                                                 </>
                                             )
@@ -259,7 +266,7 @@ const Alignment = ({ onClose }) => {
                                 </Modal.Header>
                                 <Modal.Body>
                                     <ReduxProvider store={reduxStore}>
-                                        <Keypad />
+                                        <JogControl widgetId="jogcontrol" isSecondary />
                                     </ReduxProvider>
                                 </Modal.Body>
                             </Modal>

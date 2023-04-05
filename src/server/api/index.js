@@ -30,9 +30,12 @@ import * as commands from './api.commands';
 import * as events from './api.events';
 import * as machines from './api.machines';
 import * as macros from './api.macros';
+import * as remote from './api.remote';
 import * as mdi from './api.mdi';
 import * as users from './api.users';
 import * as files from './api.file';
+import * as logs from './api.log';
+import * as metrics from './api.metrics';
 
 export {
     version,
@@ -44,7 +47,10 @@ export {
     events,
     machines,
     macros,
+    remote,
     mdi,
     users,
-    files
+    files,
+    logs,
+    metrics
 };

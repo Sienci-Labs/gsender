@@ -21,8 +21,7 @@
  *
  */
 
-import '@babel/polyfill';
-import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor } from 'electron';
+import { app, ipcMain, dialog, powerSaveBlocker, powerMonitor, screen, session, clipboard } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import Store from 'electron-store';
 import chalk from 'chalk';
@@ -31,24 +30,26 @@ import isOnline from 'is-online';
 import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
-//import menuTemplate from './electron-app/menu-template';
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
-//import './sentryInit';
 import { parseAndReturnGCode } from './electron-app/RecentFiles';
-import { loadConfig, persistConfig } from './electron-app/store';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
+import { getGRBLLog } from './electron-app/grblLogs';
 
 
 let windowManager = null;
-let powerSaverId = null;
-let appConfig = null;
+let hostInformation = {};
+let grblLog = log.create('grbl');
+let logPath;
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
     const gotSingleInstanceLock = app.requestSingleInstanceLock();
     const shouldQuitImmediately = !gotSingleInstanceLock;
+
+    // Initialize remote main
+    require('@electron/remote/main').initialize();
 
     let prevDirectory = '';
 
@@ -77,13 +78,32 @@ const main = () => {
     // Create the user data directory if it does not exist
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
+    // Extra logging
+    logPath = path.join(app.getPath('userData'), 'logs/grbl.log');
+    grblLog.transports.file.resolvePath = () => logPath;
 
-    // Load app config into variable
-    const filePath = path.join(app.getPath('userData'), 'gsender-0.5.6.json');
-    //appConfig = loadConfig(filePath);
 
     app.whenReady().then(async () => {
         try {
+            await session.defaultSession.clearCache();
+
+
+            app.commandLine.appendSwitch('ignore-gpu-blacklist');
+            // Increase V8 heap size of the main process
+            if (process.arch === 'x64') {
+                const memoryLimit = 1024 * 8; // 8GB
+                app.commandLine.appendSwitch('--js-flags', `--max-old-space-size=${memoryLimit}`);
+            }
+
+            if (process.platform === 'linux') {
+                // https://github.com/electron/electron/issues/18265
+                // Run this at early startup, before app.on('ready')
+                //
+                // TODO: Maybe we can only disable --disable-setuid-sandbox
+                // reference changes: https://github.com/microsoft/vscode/pull/122909/files
+                app.commandLine.appendSwitch('--no-sandbox');
+            }
+
             windowManager = new WindowManager();
             // Create and show splash before server starts
             const splashScreen = windowManager.createSplashScreen({
@@ -101,8 +121,29 @@ const main = () => {
                 splashScreen.focus();
             });
 
-            const res = await launchServer();
-            const { address, port, mountPoints } = { ...res };
+            let res;
+            try {
+                res = await launchServer();
+            } catch (error) {
+                if (error.message.includes('EADDR')) {
+                    dialog.showMessageBoxSync(null, {
+                        title: 'Error binding remote address',
+                        message: 'There was an error binding the remote address.',
+                        detail: 'Remote mode has been disabled.  Double-check the configured IP address before restarting the application.'
+                    });
+                    app.relaunch();
+                    app.exit(-1);
+                } else {
+                    log.error(error);
+                }
+            }
+
+            const { address, port, requestedHost, kiosk } = { ...res };
+            log.info(`Returned - http://${address}:${port}`);
+            hostInformation = {
+                address,
+                port,
+            };
             if (!(address && port)) {
                 log.error('Unable to start the server at ' + chalk.cyan(`http://${address}:${port}`));
                 return;
@@ -122,11 +163,12 @@ const main = () => {
             const options = {
                 ...bounds,
                 title: `gSender ${pkg.version}`,
+                kiosk
             };
             const window = windowManager.openWindow(url, options, splashScreen);
 
             // Power saver - display sleep higher precedence over app suspension
-            powerSaverId = powerSaveBlocker.start('prevent-display-sleep');
+            powerSaveBlocker.start('prevent-display-sleep');
             powerMonitor.on('lock-screen', () => {
                 powerSaveBlocker.start('prevent-display-sleep');
             });
@@ -150,7 +192,7 @@ const main = () => {
 
             ipcMain.once('restart_app', async () => {
                 await autoUpdater.downloadUpdate();
-                autoUpdater.quitAndInstall(false, true);
+                autoUpdater.quitAndInstall(false, false);
             });
 
             ipcMain.on('load-recent-file', async (msg, recentFile) => {
@@ -158,27 +200,26 @@ const main = () => {
                 window.webContents.send('loaded-recent-file', fileMetadata);
             });
 
-            ipcMain.on('log-error', (channel, err) => {
-                log.error(err.message);
+            ipcMain.on('logError:electron', (channel, error) => {
+                if ('type' in error) {
+                    log.transports.file.level = 'error';
+                }
+                (error.type === 'GRBL_ERROR') ? grblLog.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
+            });
+
+            ipcMain.handle('grblLog:fetch', async (channel) => {
+                const data = await getGRBLLog(logPath);
+                return data;
+            });
+
+            ipcMain.handle('check-remote-status', (channel) => {
+                log.debug(hostInformation);
+                return hostInformation;
             });
 
             /**
              * gSender config events - move electron store changes out of renderer process
              */
-            ipcMain.handle('get-app-path', (event) => {
-                return path.join(app.getPath('userData'), 'gsender-0.5.6.json');
-            });
-
-            ipcMain.handle('get-app-config', (event) => {
-                return appConfig;
-            });
-
-            ipcMain.on('persist-app-config', (event, filename, state) => {
-                const filePath = path.join(app.getPath('userData'), filename);
-                persistConfig(filePath, state);
-                appConfig = state;
-            });
-
             ipcMain.on('open-upload-dialog', async () => {
                 try {
                     let additionalOptions = {};
@@ -193,8 +234,7 @@ const main = () => {
                                 { name: 'GCode Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
                                 { name: 'All Files', extensions: ['*'] }
                             ]
-                        },
-                    );
+                        },);
 
                     if (!file) {
                         return;
@@ -226,8 +266,66 @@ const main = () => {
                     log.error(`Caught error in listener - ${e}`);
                 }
             });
+
+            ipcMain.on('open-new-window', (msg, route) => {
+                const factor = screen.getPrimaryDisplay().scaleFactor;
+                const childOptions = {
+                    width: 550 / factor,
+                    height: 460 / factor,
+                    minWidth: 550 / factor,
+                    minHeight: 460 / factor,
+                    useContentSize: true,
+                    title: 'gSender',
+                    parent: window
+                };
+                // Hash router URL should look like '{url}/#/widget/:id'
+                const address = `${url}/#${route}`;
+                const shouldMaximize = false;
+                const isChild = true;
+
+                windowManager.openWindow(address, childOptions, null, shouldMaximize, isChild);
+            });
+
+            ipcMain.on('reconnect-main', (event, options) => {
+                let shouldReconnect = false;
+                try {
+                    if (event && event.sender && event.sender.browserWindowOptions) {
+                        shouldReconnect = !event.sender.browserWindowOptions.parent && windowManager.childWindows.length > 0;
+                    }
+                } catch (err) {
+                    log.error(err);
+                }
+                if (shouldReconnect) {
+                    windowManager.childWindows.forEach(window => {
+                        window.webContents.send('reconnect', options);
+                    });
+                }
+            });
+
+            ipcMain.on('get-data', (event, widget) => {
+                window.webContents.send('get-data-' + widget);
+            });
+
+            ipcMain.on('recieve-data', (event, msg) => {
+                const { widget, data } = msg;
+                windowManager.childWindows.forEach(window => {
+                    window.webContents.send('recieve-data-' + widget, data);
+                });
+            });
+
+            //Handle app restart with remote settings
+            ipcMain.on('remoteMode-restart', (event, headlessSettings) => {
+                app.relaunch(); // flags are handled in server/index.js
+                app.exit(0);
+            });
+
+            //Copy text to clipboard on electron
+            ipcMain.on('copy-clipboard', (event, text) => {
+                clipboard.writeText(text);
+            });
         } catch (err) {
             log.error(err);
+            log.err(err.name);
             await dialog.showMessageBox({
                 message: err
             });
@@ -235,6 +333,9 @@ const main = () => {
         //Check for available updates at end to avoid try-catch failing to load events
         const internetConnectivity = await isOnline();
         if (internetConnectivity) {
+            if (pkg.version.includes('EDGE') || pkg.version.includes('BETA')) {
+                autoUpdater.allowPrerelease = true;
+            }
             autoUpdater.autoDownload = false; // We don't want to force update but will prompt until it is updated
             // There may be situations where something is blocking the update check outside of internet connectivity
             // This sets a 5 second timeout on the await.

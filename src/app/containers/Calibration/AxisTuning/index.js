@@ -119,31 +119,32 @@ const AxisTuning = ({ onClose }) => {
         : (
             <div className={styles.alignmentContainer}>
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    <h4 style={{ marginTop: 0 }}>Movement Tuning</h4>
                     {
                         !introComplete &&
                         <ToolIntroduction readyHandler={startTool} onSelectAxis={(axis) => setCurrentAxis(axis)} currentAxis={currentAxis} />
                     }
                     {
-                        introComplete &&
-                        <Step
-                            actions={actions}
-                            onChange={onChange}
-                            currentAction={currentAction}
-                            options={options}
-                            setRequestedDistance={setRequestedDistance}
-                            setActualDistance={setActualDistance}
-                        />
+                        introComplete && (
+                            <Step
+                                actions={actions}
+                                onChange={onChange}
+                                currentAction={currentAction}
+                                options={options}
+                                setRequestedDistance={setRequestedDistance}
+                                setActualDistance={setActualDistance}
+                            />
+                        )
                     }
 
                     {
-                        introComplete &&
-                        <NavigationButtons
-                            onNext={next}
-                            onPrevious={prev}
-                            prevDisabled={prevDisabled}
-                            nextDisabled={nextDisabled}
-                        />
+                        introComplete && (
+                            <NavigationButtons
+                                onNext={next}
+                                onPrevious={prev}
+                                prevDisabled={prevDisabled}
+                                nextDisabled={nextDisabled}
+                            />
+                        )
                     }
                 </div>
 

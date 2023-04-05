@@ -2,8 +2,14 @@ const crypto = require('crypto');
 const path = require('path');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
+const dotenv = require('dotenv');
+
 const babelConfig = require('./babel.config');
 const pkg = require('./package.json');
+
+dotenv.config({
+    path: path.resolve('webpack.config.server.development.env')
+});
 
 // Use publicPath for production
 const payload = pkg.version;
@@ -34,7 +40,8 @@ module.exports = {
         new webpack.DefinePlugin({
             'global.NODE_ENV': JSON.stringify('development'),
             'global.PUBLIC_PATH': JSON.stringify(publicPath),
-            'global.BUILD_VERSION': JSON.stringify(buildVersion)
+            'global.BUILD_VERSION': JSON.stringify(buildVersion),
+            'process.env': JSON.stringify(process.env),
         })
     ],
     module: {

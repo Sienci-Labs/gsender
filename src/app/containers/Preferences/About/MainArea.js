@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import React from 'react';
 import classnames from 'classnames';
 import ReactMarkdown from 'react-markdown';
@@ -7,8 +8,8 @@ import releases from './releases.json';
 
 const MainArea = () => {
     return (
-        <div>
-            <div className={styles.section}>
+        <div style={{ height: "540px" }}>
+            <div className={styles.section} style={{ height: "10%" }}>
                 <p style={{ marginTop: '1rem' }}>
                     gSender is a a free GRBL CNC control software that is
                     Feature-packed and is designed to be clean and easy to learn
@@ -20,7 +21,7 @@ const MainArea = () => {
                 </p>
             </div>
 
-            <div className={styles.section}>
+            <div className={styles.section} style={{ height: "10%" }}>
                 <h3>gSender Team:</h3>
 
                 <p>
@@ -33,10 +34,20 @@ const MainArea = () => {
                 </p>
             </div>
 
-            <div className={classnames(styles.section, styles.last)}>
-                <h3>Release Notes:</h3>
-
-                <div className={styles.timeline}>
+            <div
+                className={classnames(styles.section, styles.last)} style={{ height: "60%",
+                    maxHeight: "none",
+                    marginBottom: "1rem" }}
+            >
+                <span style={{ fontSize: '1.6rem', position: 'relative', bottom: '6px' }}>Release Notes:</span>
+                <a
+                    href="https://github.com/Sienci-Labs/gsender#-development-history" target="_blank" rel="noreferrer"
+                    style={{ float: "right" }}
+                >See all latest patch notes <i className="fas fa-external-link-alt" />
+                </a>
+                <div
+                    className={styles.timeline} style={{ minHeight: "100%" }}
+                >
                     <div className={styles.timeline.content}>
                         {releases.map((element) => {
                             return (

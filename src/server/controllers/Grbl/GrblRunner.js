@@ -34,11 +34,13 @@ import GrblLineParserResultParameters from './GrblLineParserResultParameters';
 import GrblLineParserResultFeedback from './GrblLineParserResultFeedback';
 import GrblLineParserResultSettings from './GrblLineParserResultSettings';
 import GrblLineParserResultStartup from './GrblLineParserResultStartup';
+import logger from '../../lib/logger';
 import {
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_ALARM
 } from './constants';
 
+const log = logger('controller:Grbl');
 
 class GrblRunner extends events.EventEmitter {
     state = {
@@ -69,7 +71,8 @@ class GrblRunner extends events.EventEmitter {
                 feedrate: 'G94', // G93: Inverse time mode, G94: Units per minute
                 program: 'M0', // M0, M1, M2, M30
                 spindle: 'M5', // M3: Spindle (cw), M4: Spindle (ccw), M5: Spindle off
-                coolant: 'M9' // M7: Mist coolant, M8: Flood coolant, M9: Coolant off, [M7,M8]: Both on
+                coolant: 'M9', // M7: Mist coolant, M8: Flood coolant, M9: Coolant off, [M7,M8]: Both on
+                tool: '0' // Last non-0 parsed tool
             },
             tool: '',
             feedrate: '',
@@ -90,6 +93,7 @@ class GrblRunner extends events.EventEmitter {
     parse(data) {
         data = ('' + data).replace(/\s+$/, '');
         if (!data) {
+            log.warn('Empty result parsed from GrlbLineParser');
             return;
         }
 
@@ -148,6 +152,7 @@ class GrblRunner extends events.EventEmitter {
             // https://nodejs.org/api/events.html#events_error_events
             // As a best practice, listeners should always be added for the 'error' events.
             this.emit('error', payload);
+            log.error('Error found in GrblLineParserResultError');
             return;
         }
         if (type === GrblLineParserResultAlarm) {
@@ -163,10 +168,19 @@ class GrblRunner extends events.EventEmitter {
                 this.state = nextState; // enforce change
             }
             this.emit('alarm', payload);
+            log.warn('An Alarm was activated in Grbl Line Parser');
             return;
         }
         if (type === GrblLineParserResultParserState) {
             const { modal, tool, feedrate, spindle } = payload;
+            const { tool: curTool } = this.state.parserstate.modal;
+
+            if (tool !== '0' && tool !== 0) {
+                modal.tool = tool;
+            } else {
+                modal.tool = curTool;
+            }
+
             const nextState = {
                 ...this.state,
                 parserstate: {

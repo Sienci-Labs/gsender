@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import TabbedWidget from 'app/components/TabbedWidget';
 import ToolModal from 'app/components/ToolModal/ToolModal';
+import Diagnostics from 'app/containers/Calibration/Diagnostics';
 import Surfacing from 'app/containers/Surfacing/components/Surfacing';
 import { Provider as ReduxProvider } from 'react-redux';
 import reduxStore from 'app/store/redux';
@@ -17,6 +18,18 @@ const Calibration = ({ modalClose }) => {
 
     const tabs = [
         {
+            id: 3,
+            label: 'Diagnostics',
+            widgetId: 'diagnostics',
+            component: <Diagnostics onClose={modalClose} />,
+        },
+        {
+            id: 2,
+            label: 'Surfacing Wasteboard',
+            widgetId: 'calibration-surfacing',
+            component: <Surfacing onClose={modalClose} />,
+        },
+        {
             id: 0,
             label: 'XY Squaring',
             widgetId: 'calibration-alignment',
@@ -28,12 +41,6 @@ const Calibration = ({ modalClose }) => {
             widgetId: 'calibration-axis-tuning',
             component: <AxisTuning onClose={modalClose} />,
         },
-        {
-            id: 2,
-            label: 'Surfacing Wasteboard',
-            widgetId: 'calibration-surfacing',
-            component: <Surfacing onClose={modalClose} />,
-        },
     ];
 
     return (
@@ -44,8 +51,7 @@ const Calibration = ({ modalClose }) => {
                     activeTabIndex={tab}
                     onClick={(index) => setTab(index)}
                     className={styles.tabs}
-                >
-                </TabbedWidget.Tabs>
+                />
                 <TabbedWidget.Content>
                     <ReduxProvider store={reduxStore}>
                         <div className={styles.container}>

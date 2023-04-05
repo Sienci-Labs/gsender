@@ -47,6 +47,7 @@ const Probe = ({ active, state, actions }) => {
         fastFeedrate: units === 'mm' ? probeSettings.fastFeedrate.mm : probeSettings.fastFeedrate.in,
         normalFeedrate: units === 'mm' ? probeSettings.normalFeedrate.mm : probeSettings.normalFeedrate.in,
         retractionDistance: units === 'mm' ? probeSettings.retractionDistance.mm : probeSettings.retractionDistance.in,
+        zProbeDistance: units === 'mm' ? probeSettings.zProbeDistance.mm : probeSettings.zProbeDistance.in,
     };
 
     const handleTouchplateTypeChange = (option) => {

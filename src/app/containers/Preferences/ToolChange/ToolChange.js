@@ -1,56 +1,75 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import map from 'lodash/map';
-
-import { TOASTER_SUCCESS, Toaster } from 'app/lib/toaster/ToasterLib';
 import store from 'app/store';
 import controller from 'app/lib/controller';
-import FunctionButton from 'app/components/FunctionButton/FunctionButton';
-import MacroVariableDropdown from 'app/components/MacroVariableDropdown';
+import Input from '../components/Input';
+
 
 import Fieldset from '../components/Fieldset';
 
 import styles from '../index.styl';
 
-const options = [
+/*const options = [
     'Ignore',
     'Manual',
-    'Code'
+    'Semi-Auto',
+    'Automatic'
 ];
+*/
+export const TOOLCHANGE_OPTIONS = {
+    IGNORE: {
+        key: 'IGNORE',
+        label: 'Ignore',
+        description: 'All M6 commands will be commented out and the toolpath will continue to run as if it wasn\'t included.'
+    },
+    PAUSE: {
+        key: 'PAUSE',
+        label: 'Pause',
+        description: 'M6 commands will pause sending further commands but allow the user to jog, use macros, and probe.'
+    },
+    MANUAL: {
+        key: 'MANUAL',
+        label: 'Manual',
+        description: 'M6 commands will initiate a guided process through which the user will manually probe a new tool to compensate for length differences.'
+    },
+    SEMI: {
+        key: 'SEMI',
+        label: 'Semi-Automatic',
+        description: 'M6 commands will initiate a guided process through which a saved tool offset will compensate for tool length differences.'
+    },
+    AUTO: {
+        key: 'AUTO',
+        label: 'Automatic',
+        description: 'M6 will commands will initiate an almost fully automated process in which preconfigured bitsetter or probe block will be used to set the new tool length.  Limit switches required.'
+    }
+};
 
 const ToolChange = () => {
     // State
     const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
-    const [preHook, setPreHook] = useState(store.get('workspace.toolChangeHooks.preHook'));
-    const [postHook, setPostHook] = useState(store.get('workspace.toolChangeHooks.postHook'));
+    const [toolChangePosition, setToolChangePosition] = useState(store.get('workspace.toolChangePosition'));
+    const [optionDescription, setOptionDescription] = useState('');
     // Handlers
-    const handleToolChange = (selection) => setToolChangeOption(selection.value);
-    const handlePreHookChange = (e) => setPreHook(e.target.value);
-    const handlePostHookChange = (e) => setPostHook(e.target.value);
-    const preHookRef = useRef();
-    const postHookRef = useRef();
-    const handleSaveCode = () => {
-        store.set('workspace.toolChangeHooks.preHook', preHook);
-        store.set('workspace.toolChangeHooks.postHook', postHook);
-        const context = {
-            toolChangeOption,
-            postHook,
-            preHook
+    const handleToolChange = (selection) => {
+        setOptionDescription(TOOLCHANGE_OPTIONS[selection.value].description);
+        return setToolChangeOption(selection.label);
+    };
+
+    const handlePositionChange = (event, axis) => {
+        const value = event.target.value;
+        const newPosition = {
+            ...toolChangePosition,
+            [axis]: Number(value)
         };
-        controller.command('toolchange:context', context);
-        Toaster.pop({
-            msg: 'Saved tool change hooks',
-            type: TOASTER_SUCCESS,
-            icon: 'fa-check'
-        });
+        setToolChangePosition(newPosition);
+        store.replace('workspace.toolChangePosition', newPosition);
     };
 
     useEffect(() => {
         store.set('workspace.toolChangeOption', toolChangeOption);
         const context = {
             toolChangeOption,
-            postHook,
-            preHook
         };
         controller.command('toolchange:context', context);
     }, [toolChangeOption]);
@@ -66,42 +85,35 @@ const ToolChange = () => {
                     menuContainerStyle={{ zIndex: 5 }}
                     name="toolchangeoption"
                     onChange={handleToolChange}
-                    options={map(options, (value) => ({
-                        value: value,
-                        label: value
+                    options={map(TOOLCHANGE_OPTIONS, (option) => ({
+                        value: option.key,
+                        label: option.label,
                     }))}
                     value={{ label: toolChangeOption }}
                 />
+                <p className={styles.description}>{optionDescription}</p>
             </div>
             {
-                toolChangeOption === 'Code' && (
+                toolChangeOption === 'Automatic' && (
                     <div>
-                        <div className={styles.spreadRow}>
-                            <MacroVariableDropdown textarea={preHookRef} label="Before change code"/>
-                        </div>
-                        <textarea
-                            rows="9"
-                            className="form-control"
-                            style={{ resize: 'none' }}
-                            name="preHook"
-                            value={preHook}
-                            onChange={handlePreHookChange}
-                            ref={preHookRef}
+                        <Input
+                            label="Tool Length Sensor X position"
+                            units=""
+                            value={toolChangePosition.x}
+                            onChange={(e) => handlePositionChange(e, 'x')}
                         />
-                        <br />
-                        <div className={styles.spreadRow}>
-                            <MacroVariableDropdown textarea={postHookRef} label="After change code"/>
-                        </div>
-                        <textarea
-                            rows="9"
-                            className="form-control"
-                            style={{ resize: 'none' }}
-                            name="postHook"
-                            value={postHook}
-                            onChange={handlePostHookChange}
-                            ref={postHookRef}
+                        <Input
+                            label="Tool Length Sensor Y position"
+                            units=""
+                            value={toolChangePosition.y}
+                            onChange={(e) => handlePositionChange(e, 'y')}
                         />
-                        <FunctionButton primary onClick={handleSaveCode}>Save G-Code</FunctionButton>
+                        <Input
+                            label="Tool Length Sensor Z position"
+                            units=""
+                            value={toolChangePosition.z}
+                            onChange={(e) => handlePositionChange(e, 'z')}
+                        />
                     </div>
                 )
             }

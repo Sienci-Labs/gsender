@@ -1,6 +1,6 @@
 G21
 G90
-M6 ;Use a 1/4 inch bit
+M6 T17;Use a 1/4 inch bit
 G0 X4.327 Y2.827 Z2.0
 G1 Z-2.6429 F400
 G1 X-4.328

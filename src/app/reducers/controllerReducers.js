@@ -24,6 +24,7 @@ import { createReducer } from 'redux-action';
 import { ensurePositiveNumber } from 'ensure-type';
 import _get from 'lodash/get';
 import _mapValues from 'lodash/mapValues';
+import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
 import {
     TOOL_CHANGE,
     UPDATE_CONTROLLER_SETTINGS,
@@ -31,7 +32,8 @@ import {
     UPDATE_FEEDER_STATUS, UPDATE_SENDER_STATUS, UPDATE_WORKFLOW_STATE,
     UPDATE_HOMING_FLAG,
     RESET_HOMING,
-    UPDATE_PARTIAL_CONTROLLER_SETTINGS
+    UPDATE_PARTIAL_CONTROLLER_SETTINGS,
+    UPDATE_TERMINAL_HISTORY
 } from '../actions/controllerActions';
 import { in2mm, mm2in } from '../lib/units';
 import { WORKFLOW_STATE_IDLE } from '../constants';
@@ -58,7 +60,8 @@ const initialState = {
     },
     tool: {
         context: null
-    }
+    },
+    terminalHistory: []
 };
 
 /**
@@ -100,7 +103,8 @@ function consolidateModals(state) {
         spindle: '',
         units: '',
         wcs: '',
-        distance: ''
+        distance: '',
+        tool: ''
     };
 
     const modal = _get(state, 'parserstate.modal');
@@ -216,6 +220,17 @@ const reducer = createReducer(initialState, {
         return {
             homingFlag: false,
             homingRun: false
+        };
+    },
+    [UPDATE_TERMINAL_HISTORY]: (payload, reducerState) => {
+        const newHistory = [...reducerState.terminalHistory, ...payload];
+        if (reducerState.terminalHistory.length > MAX_TERMINAL_INPUT_ARRAY_SIZE) {
+            for (let i = 0; i < reducerState.terminalHistory.length - MAX_TERMINAL_INPUT_ARRAY_SIZE; i++) {
+                newHistory.shift();
+            }
+        }
+        return {
+            terminalHistory: newHistory
         };
     }
 });

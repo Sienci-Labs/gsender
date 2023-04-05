@@ -26,6 +26,8 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
+import reduxStore from 'app/store/redux';
+// import get from 'lodash/get';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { debounce } from 'lodash';
@@ -37,8 +39,11 @@ import { MAX_TERMINAL_INPUT_ARRAY_SIZE } from 'app/lib/constants';
 import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
-import History from './History';
+import color from 'cli-color';
+import { RED, ALARM_RED } from './variables';
+
 import styles from './index.styl';
+import { UPDATE_TERMINAL_HISTORY } from '../../actions/controllerActions';
 
 const LINES_TO_COPY = 50;
 class TerminalWrapper extends PureComponent {
@@ -62,13 +67,13 @@ class TerminalWrapper extends PureComponent {
     };
 
     state = {
-        terminalInputHistory: store.get('workspace.terminal.inputHistory', []),
+        terminalInputHistory: store.get('workspace.terminal.inputHistory', []), // to store user input from the terminal
         terminalInputIndex: store.get('workspace.terminal.inputHistory')?.length
     }
 
     prompt = ' ';
 
-    history = new History(1000);
+    newHistory = [];
 
     verticalScrollbar = null;
 
@@ -125,6 +130,7 @@ class TerminalWrapper extends PureComponent {
 
         const xtermElement = el.querySelector('.xterm');
         xtermElement.style.paddingLeft = '3px';
+        xtermElement.style.height = '100%';
 
         const viewportElement = el.querySelector('.xterm-viewport');
         this.verticalScrollbar = new PerfectScrollbar(viewportElement);
@@ -220,7 +226,13 @@ class TerminalWrapper extends PureComponent {
 
     writeln(data) {
         this.term.write('\r');
-        this.term.write(data);
+        if (data.includes('error:')) {
+            this.term.write(color.xterm(RED)(data));
+        } else if (data.includes('ALARM:')) {
+            this.term.write(color.xterm(ALARM_RED)(data));
+        } else {
+            this.term.write(data);
+        }
         this.term.prompt();
     }
 
@@ -233,6 +245,7 @@ class TerminalWrapper extends PureComponent {
 
         controller.writeln(command);
 
+        // update input history
         const { terminalInputHistory = [] } = this.state;
 
         const newTerminalInputHistory = [...terminalInputHistory];
@@ -247,6 +260,24 @@ class TerminalWrapper extends PureComponent {
 
         this.inputRef.current.value = '';
     }
+
+    // updates the terminal history stored in redux for the current session
+    // includes every line written to the terminal
+    updateTerminalHistory = (line) => {
+        this.newHistory.push(line);
+        if (this.newHistory.length === MAX_TERMINAL_INPUT_ARRAY_SIZE) {
+            this.newHistory.shift();
+        }
+        this.pushUpdatedTerminalHistory();
+    }
+
+    pushUpdatedTerminalHistory = debounce(() => {
+        reduxStore.dispatch({
+            type: UPDATE_TERMINAL_HISTORY,
+            payload: this.newHistory
+        });
+        this.newHistory = [];
+    }, 1000);
 
     handleCopyLines = async () => {
         this.term.selectAll();
@@ -285,7 +316,7 @@ class TerminalWrapper extends PureComponent {
         const { terminalInputIndex } = this.state;
 
         return (
-            <div style={{ display: 'grid', width: '100%', gridTemplateRows: '11fr 1fr' }}>
+            <div style={{ display: 'grid', width: '100%', gridTemplateRows: '11fr 35px' }}>
                 <div
                     ref={node => {
                         this.terminalContainer = node;

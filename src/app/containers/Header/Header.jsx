@@ -24,6 +24,8 @@ import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import without from 'lodash/without';
+import _ from 'lodash';
+import HeadlessIndicator from 'app/components/HeadlessIndicator';
 import Push from 'push.js';
 import isElectron from 'is-electron';
 import reduxStore from 'app/store/redux';
@@ -37,7 +39,8 @@ import NavbarConnection from 'app/widgets/NavbarConnection';
 import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
-import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE } from '../../constants';
+import useKeybinding from '../../lib/useKeybinding';
+import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE, GENERAL_CATEGORY, LOCATION_CATEGORY } from '../../constants';
 
 class Header extends PureComponent {
     static propTypes = {
@@ -47,37 +50,6 @@ class Header extends PureComponent {
     state = this.getInitialState();
 
     actions = {
-        requestPushPermission: () => {
-            const onGranted = () => {
-                this.setState({ pushPermission: Push.Permission.GRANTED });
-            };
-            const onDenied = () => {
-                this.setState({ pushPermission: Push.Permission.DENIED });
-            };
-            // Note that if "Permission.DEFAULT" is returned, no callback is executed
-            const permission = Push.Permission.request(onGranted, onDenied);
-            if (permission === Push.Permission.DEFAULT) {
-                this.setState({ pushPermission: Push.Permission.DEFAULT });
-            }
-        },
-        checkForUpdates: async () => {
-            try {
-                const res = await api.getState();
-                const { checkForUpdates } = res.body;
-
-                if (checkForUpdates) {
-                    const res = await api.getLatestVersion();
-                    const { time, version } = res.body;
-
-                    this._isMounted && this.setState({
-                        latestVersion: version,
-                        latestTime: time
-                    });
-                }
-            } catch (res) {
-                // Ignore error
-            }
-        },
         fetchCommands: async () => {
             try {
                 const res = await api.commands.fetch({ paging: false });
@@ -106,7 +78,7 @@ class Header extends PureComponent {
         },
     };
 
-    actionHandlers = {
+    shuttleControlFunctions = {
         CONTROLLER_COMMAND: (event, { command }) => {
             const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
             // feedhold, cyclestart, homing, unlock, reset
@@ -114,6 +86,45 @@ class Header extends PureComponent {
                 (command !== 'unlock' && activeState === GRBL_ACTIVE_STATE_IDLE)) {
                 controller.command(command);
             }
+        }
+    }
+
+    shuttleControlEvents = {
+        CONTROLLER_COMMAND_UNLOCK: {
+            title: 'Unlock',
+            keys: '$',
+            cmd: 'CONTROLLER_COMMAND_UNLOCK',
+            payload: {
+                command: 'unlock'
+            },
+            preventDefault: false,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
+        },
+        CONTROLLER_COMMAND_RESET: {
+            title: 'Soft Reset',
+            keys: '%',
+            cmd: 'CONTROLLER_COMMAND_RESET',
+            payload: {
+                command: 'reset'
+            },
+            preventDefault: false,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
+        },
+        CONTROLLER_COMMAND_HOMING: {
+            title: 'Homing',
+            keys: ['ctrl', 'alt', 'command', 'h'].join('+'),
+            cmd: 'CONTROLLER_COMMAND_HOMING',
+            payload: {
+                command: 'homing'
+            },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
         }
     };
 
@@ -219,40 +230,55 @@ class Header extends PureComponent {
             currentVersion: settings.version,
             latestVersion: settings.version,
             updateAvailable: false,
-            connected: controller.connected
+            connected: controller.connected,
+            hostInformation: {
+                address: '0.0.0.0',
+                port: 0,
+                headless: false
+            }
         };
     }
 
     componentDidMount() {
         this._isMounted = true;
-
-        this.addActionHandlers();
+        this.updateScreenSize();
+        this.addShuttleControlEvents();
         this.addControllerEvents();
+        this.addResizeEventListener();
+        useKeybinding(this.shuttleControlEvents);
 
         if (isElectron()) {
             this.registerIPCListeners();
+            window.ipcRenderer.invoke('check-remote-status').then(result => {
+                this.setState({
+                    hostInformation: {
+                        ...result
+                    }
+                });
+            });
         }
     }
 
     componentWillUnmount() {
         this._isMounted = false;
 
-        this.removeActionHandlers();
+        this.removeShuttleControlEvents();
         this.removeControllerEvents();
+        this.removeResizeEventListener();
 
         this.runningTasks = [];
     }
 
-    addActionHandlers() {
-        Object.keys(this.actionHandlers).forEach(eventName => {
-            const callback = this.actionHandlers[eventName];
+    addShuttleControlEvents() {
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.on(eventName, callback);
         });
     }
 
-    removeActionHandlers() {
-        Object.keys(this.actionHandlers).forEach(eventName => {
-            const callback = this.actionHandlers[eventName];
+    removeShuttleControlEvents() {
+        Object.keys(this.shuttleControlEvents).forEach(eventName => {
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.removeListener(eventName, callback);
         });
     }
@@ -271,39 +297,59 @@ class Header extends PureComponent {
         });
     }
 
+    addResizeEventListener() {
+        this.onResizeThrottled = _.throttle(this.updateScreenSize, 25);
+        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+    }
+
+    removeResizeEventListener() {
+        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        this.onResizeThrottled = null;
+    }
+
     toggleUpdateToast() {
         pubsub.publish('showUpdateToast');
     }
 
     registerIPCListeners () {
-        window.ipcRenderer.on('message', (event, msg) => {
-            console.log(msg);
-        });
-        window.ipcRenderer.on('updated_error', (event, err) => {
-            console.log(err);
-        });
         window.ipcRenderer.on('update_available', (info) => {
-            this.setState({
-                updateAvailable: true
+            api.getShouldInstallUpdates().then((res) => {
+                if (res.body) {
+                    this.setState({
+                        updateAvailable: true
+                    });
+                    pubsub.publish('showUpdateToast', info);
+                }
             });
-            pubsub.publish('showUpdateToast', info);
         });
     }
 
+    updateScreenSize = () => {
+        const isMobile = window.visualViewport.width <= 599;
+        this.setState({
+            mobile: isMobile
+        });
+    };
+
     render() {
-        const { updateAvailable } = this.state;
+        const { updateAvailable, hostInformation, mobile } = this.state;
         return (
-            <div className={ styles.navBar }>
-                <div className={ styles.primary }>
-                    <NavLogo updateAvailable={ updateAvailable } onClick={ () => this.toggleUpdateToast() }/>
-                    <NavbarConnection
-                        state={ this.state }
-                        actions={ this.actions }
-                        widgetId="connection"
-                    />
+            <>
+                <div className={styles.navBar}>
+                    <div className={styles.primary}>
+                        <NavLogo updateAvailable={updateAvailable} onClick={() => this.toggleUpdateToast()} />
+                        <NavbarConnection
+                            state={this.state}
+                            actions={this.actions}
+                            widgetId="connection"
+                        />
+                        {
+                            isElectron() && <HeadlessIndicator {...hostInformation} />
+                        }
+                    </div>
+                    { !mobile && <NavSidebar /> }
                 </div>
-                <NavSidebar />
-            </div>
+            </>
         );
     }
 }

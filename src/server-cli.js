@@ -23,10 +23,13 @@
 
 /* eslint max-len: 0 */
 /* eslint no-console: 0 */
-import path from 'path';
-import isElectron from 'is-electron';
-import program from 'commander';
-import pkg from './package.json';
+require('core-js/stable');
+require('regenerator-runtime/runtime');
+
+const path = require('path');
+const isElectron = require('is-electron');
+const program = require('commander');
+const pkg = require('./package.json');
 
 // Defaults to 'production'
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
@@ -63,7 +66,7 @@ const parseMountPoint = (val, acc) => {
 const parseController = (val) => {
     val = val ? (val + '').toLowerCase() : '';
 
-    if (['grbl', 'marlin', 'smoothie', 'tinyg', 'g2core'].includes(val)) {
+    if (['grbl'].includes(val)) {
         return val;
     } else {
         return '';
@@ -74,7 +77,7 @@ const defaultHost = isElectron() ? '127.0.0.1' : '0.0.0.0';
 const defaultPort = isElectron() ? 0 : 8000;
 
 program
-    .version(pkg.version)
+    .version(pkg.version, '--version', 'Output the current program version')
     .usage('[options]')
     .option('-p, --port <port>', `Set listen port (default: ${defaultPort})`, defaultPort)
     .option('-H, --host <host>', `Set listen address or hostname (default: ${defaultHost})`, defaultHost)
@@ -84,8 +87,10 @@ program
     .option('-m, --mount <route-path>:<target>', 'Add a mount point for serving static files', parseMountPoint, [])
     .option('-w, --watch-directory <path>', 'Watch a directory for changes')
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
-    .option('--allow-remote-access', 'Allow remote access to the server (default: false)')
-    .option('--controller <type>', 'Specify CNC controller: Grbl|Marlin|Smoothie|TinyG|g2core (default: \'\')', parseController, '');
+    .option('--allow-remote-access', 'Allow remote access to the server (default: false)', false)
+    .option('--remote', 'Enable Headless mode, exposing the internal server on your local network', false)
+    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, 'Grbl')
+    .option('--kiosk', 'Enable Kiosk mode, only allowing this application to be run', false);
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.
 // This is not the case when running from a packaged Electron app. Here you have the first value appname and then args.
@@ -96,27 +101,31 @@ if (normalizedArgv.length > 1) {
     program.parse(normalizedArgv);
 }
 
-export default () => new Promise((resolve, reject) => {
+const options = program.opts();
+
+module.exports = () => new Promise((resolve, reject) => {
     // Change working directory to 'server' before require('./server')
     process.chdir(path.resolve(__dirname, 'server'));
+    let kiosk = !!options.kiosk;
 
     require('./server').createServer({
-        port: program.port,
-        host: program.host,
-        backlog: program.backlog,
-        configFile: program.config,
-        verbosity: program.verbose,
-        mountPoints: program.mount,
-        watchDirectory: program.watchDirectory,
-        accessTokenLifetime: program.accessTokenLifetime,
-        allowRemoteAccess: !!program.allowRemoteAccess,
-        controller: program.controller
-    }, (err, data) => {
+        port: options.port,
+        host: options.host,
+        backlog: options.backlog,
+        configFile: options.config,
+        verbosity: options.verbose,
+        mountPoints: options.mount,
+        watchDirectory: options.watchDirectory,
+        accessTokenLifetime: options.accessTokenLifetime,
+        allowRemoteAccess: !!options.allowRemoteAccess,
+        controller: options.controller,
+        kiosk
+    }, (err, data = {}) => {
         if (err) {
-            reject(err);
+            reject(err, {});
             return;
         }
 
-        resolve(data);
+        resolve({ ...data, headless: false, kiosk });
     });
 });

@@ -28,14 +28,14 @@ import ControlledNumberInput from 'app/components/ControlledNumberInput';
 
 import styles from '../index.styl';
 
-const Input = ({ value, label, units, onChange, additionalProps, className }) => {
+const Input = ({ value, label, units, onChange, additionalProps, className, isNumber }) => {
     return (
         <div className={classNames(styles.input, 'form-group', className)} style={{ gridTemplateColumns: !label ? '1fr' : '' }}>
             {label && <label htmlFor="">{`${label}`}</label>}
-            <div className="input-group">
+            <div className="input-group" style={{ maxHeight: '30px' }}>
                 <ControlledNumberInput
                     {...additionalProps}
-                    value={Number(value).toString()}
+                    value={isNumber ? Number(value).toString() : value}
                     externalOnChange={onChange}
                     className={classNames('form-control', styles.inputText)}
                     style={{ zIndex: '0', textAlign: 'center', color: '#3e85c7' }}
@@ -56,10 +56,12 @@ Input.propTypes = {
     ]),
     additionalProps: PropTypes.object,
     className: PropTypes.string,
+    isNumber: PropTypes.bool
 };
 
 Input.defaultProps = {
     additionalProps: { type: 'text' },
+    isNumber: true,
 };
 
 export default Input;

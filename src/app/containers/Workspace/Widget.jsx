@@ -23,6 +23,8 @@
 
 import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
+import isElectron from 'is-electron';
+import controller from 'app/lib/controller';
 import AxesWidget from 'app/widgets/JogControl';
 import ConsoleWidget from 'app/widgets/Console';
 import JobStatusWidget from 'app/widgets/JobStatus';
@@ -50,6 +52,47 @@ const getWidgetByName = (name) => {
 class WidgetWrapper extends PureComponent {
     widget = null;
 
+    state = null;
+
+    actions = null;
+
+    name = this.props.widgetId.split(':')[0];
+
+    componentDidMount() {
+        if (isElectron()) {
+            this.registerIPCListeners();
+            // ask main window for data for component we are about to render
+            window.ipcRenderer.send('get-data', this.name);
+        }
+    }
+
+    registerIPCListeners () {
+        // recieve state of console and controller port from main window
+        window.ipcRenderer.on('recieve-data-' + this.name, (event, data) => {
+            const { port, state } = data;
+            // set port
+            controller.port = port;
+            // add client
+            controller.addClient(port);
+            // set state
+            this.setState(() => {
+                return { ...state };
+            });
+        });
+        window.ipcRenderer.on('reconnect', (event, options) => {
+            const { port, type } = options;
+            // set port
+            controller.port = port;
+            controller.type = type;
+            // add client
+            controller.addClient(port);
+
+            this.setState(() => {
+                return { port: port, ...this.state };
+            });
+        });
+    }
+
     render() {
         const { widgetId } = this.props;
 
@@ -58,8 +101,7 @@ class WidgetWrapper extends PureComponent {
         }
 
         // e.g. "webcam" or "webcam:d8e6352f-80a9-475f-a4f5-3e9197a48a23"
-        const name = widgetId.split(':')[0];
-        const Widget = getWidgetByName(name);
+        const Widget = getWidgetByName(this.name);
 
         if (!Widget) {
             return null;
@@ -67,7 +109,10 @@ class WidgetWrapper extends PureComponent {
 
         return (
             <Widget
+                state={this.state}
+                isMainWindow={false}
                 {...this.props}
+                active={true}
             />
         );
     }

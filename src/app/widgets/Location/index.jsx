@@ -62,6 +62,10 @@ import {
     // Workflow
     WORKFLOW_STATE_RUNNING,
     WORKFLOW_STATE_IDLE,
+    LOCATION_CATEGORY,
+    AXIS_X,
+    AXIS_Y,
+    AXIS_Z,
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -75,6 +79,7 @@ import {
     FEEDRATE_MIN
 } from './constants';
 import styles from './index.styl';
+import useKeybinding from '../../lib/useKeybinding';
 
 class LocationWidget extends PureComponent {
     static propTypes = {
@@ -85,6 +90,8 @@ class LocationWidget extends PureComponent {
     };
 
     pubsubTokens = [];
+
+    workspaceSelectRef = React.createRef();
 
     subscribe() {
         const tokens = [
@@ -346,14 +353,7 @@ class LocationWidget extends PureComponent {
         return workflow.state === WORKFLOW_STATE_IDLE;
     }
 
-    shuttleControlEvents = {
-        GO_TO_ZERO: () => {
-            const { state } = this.props;
-            const activeState = get(state, 'status.activeState');
-            if (activeState === GRBL_ACTIVE_STATE_IDLE) {
-                controller.command('gcode', 'G0 X0 Y0 Z0'); //Move to Work Position Zero
-            }
-        },
+    shuttleControlFunctions = {
         JOG_SPEED: (event, { speed }) => {
             const { speeds } = this.state.jog;
             const newSpeeds = speeds;
@@ -436,19 +436,36 @@ class LocationWidget extends PureComponent {
         },
         GO_TO_AXIS_ZERO: (_, { axisList }) => {
             const { state } = this.props;
+            const { machinePosition, safeRetractHeight, homingEnabled } = this.state;
             const activeState = get(state, 'status.activeState');
             if (!axisList || axisList.length === 0 || activeState !== GRBL_ACTIVE_STATE_IDLE) {
                 return;
             }
+            let safeHeightCommand = '';
+            let moveCommand = '';
 
-            let commandStr = '';
-
+            if (safeRetractHeight !== 0 && !axisList.includes('Z') && !axisList.includes('z')) {
+                if (homingEnabled) {
+                    // get current Z
+                    // eslint-disable-next-line dot-notation
+                    const currentZ = Number(machinePosition['z']);
+                    const retractHeight = (Math.abs(safeRetractHeight) * -1);
+                    // only move Z if it is less than Z0-SafeHeight
+                    if (currentZ < retractHeight) {
+                        safeHeightCommand += `G53 G0 Z${retractHeight}\n`;
+                    }
+                } else {
+                    safeHeightCommand += 'G91\n';
+                    safeHeightCommand += `G0 Z${safeRetractHeight}\n`; // Retract Z when moving across workspace
+                }
+            }
             for (const axis of axisList) {
-                commandStr += `${axis.toUpperCase()}0 `;
+                moveCommand += `${axis.toUpperCase()}0 `;
             }
 
+            controller.command('gcode', safeHeightCommand);
             controller.command('gcode', 'G90');
-            controller.command('gcode', `G0 ${commandStr}`);
+            controller.command('gcode', `G0 ${moveCommand}`);
         },
         JOG_LEVER_SWITCH: (event, { key = '' }) => {
             if (key === '-') {
@@ -459,6 +476,89 @@ class LocationWidget extends PureComponent {
                 this.actions.stepNext();
             }
         },
+    }
+
+    shuttleControlEvents = {
+        ZERO_X_AXIS: {
+            title: 'Zero X Axis',
+            keys: ['shift', 'w'].join('+'),
+            cmd: 'ZERO_X_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_X },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        ZERO_Y_AXIS: {
+            title: 'Zero Y Axis',
+            keys: ['shift', 'e'].join('+'),
+            cmd: 'ZERO_Y_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_Y },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        ZERO_Z_AXIS: {
+            title: 'Zero Z Axis',
+            keys: ['shift', 'r'].join('+'),
+            cmd: 'ZERO_Z_AXIS',
+            preventDefault: true,
+            payload: { axis: AXIS_Z },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        ZERO_ALL_AXIS: {
+            title: 'Zero All',
+            keys: ['shift', 'q'].join('+'),
+            cmd: 'ZERO_ALL_AXIS',
+            payload: { axis: 'all' },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.ZERO_AXIS
+        },
+        GO_TO_X_AXIS_ZERO: {
+            title: 'Go to X Zero',
+            keys: ['shift', 's'].join('+'),
+            cmd: 'GO_TO_X_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_X] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
+        },
+        GO_TO_Y_AXIS_ZERO: {
+            title: 'Go to Y Zero',
+            keys: ['shift', 'd'].join('+'),
+            cmd: 'GO_TO_Y_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_Y] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
+        },
+        GO_TO_Z_AXIS_ZERO: {
+            title: 'Go to Z Zero',
+            keys: ['shift', 'f'].join('+'),
+            cmd: 'GO_TO_Z_AXIS_ZERO',
+            preventDefault: true,
+            payload: { axisList: [AXIS_Z] },
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
+        },
+        GO_TO_XY_AXIS_ZERO: {
+            title: 'Go to XY Zero',
+            keys: ['shift', 'a'].join('+'),
+            cmd: 'GO_TO_XY_AXIS_ZERO',
+            payload: { axisList: [AXIS_X, AXIS_Y] },
+            preventDefault: true,
+            isActive: true,
+            category: LOCATION_CATEGORY,
+            callback: this.shuttleControlFunctions.GO_TO_AXIS_ZERO
+        },
     };
 
 
@@ -468,6 +568,7 @@ class LocationWidget extends PureComponent {
     componentDidMount() {
         this.subscribe();
         this.addShuttleControlEvents();
+        useKeybinding(this.shuttleControlEvents);
 
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
     }
@@ -503,9 +604,6 @@ class LocationWidget extends PureComponent {
             canClick: true, // Defaults to true
             units: store.get('workspace.units', METRIC_UNITS),
             safeRetractHeight: store.get('workspace.safeRetractHeight'),
-            workflow: {
-                state: controller.workflow.state
-            },
             modal: {
                 name: MODAL_NONE,
                 params: {}
@@ -554,7 +652,7 @@ class LocationWidget extends PureComponent {
         combokeys.reload();
 
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.on(eventName, callback);
         });
 
@@ -572,7 +670,7 @@ class LocationWidget extends PureComponent {
 
     removeShuttleControlEvents() {
         Object.keys(this.shuttleControlEvents).forEach(eventName => {
-            const callback = this.shuttleControlEvents[eventName];
+            const callback = this.shuttleControlEvents[eventName].callback;
             combokeys.removeListener(eventName, callback);
         });
 
@@ -620,6 +718,9 @@ class LocationWidget extends PureComponent {
         //const wcs = this.getWorkCoordinateSystem();
         const state = {
             ...this.state,
+            workflow: {
+                state: this.props.workflow.state
+            },
             // Determine if the motion button is clickable
             canClick: this.canClick(),
             // Output machine position with the display units
@@ -689,9 +790,11 @@ class LocationWidget extends PureComponent {
                             className={styles.workspaceInput}
                             onChange={(selection) => {
                                 controller.command('gcode', selection.value);
+                                this.workspaceSelectRef.current.blur();
                             }}
                             name="workspace"
                             options={gcodes}
+                            ref={this.workspaceSelectRef}
                         />
                     </Widget.Controls>
                 </Widget.Header>

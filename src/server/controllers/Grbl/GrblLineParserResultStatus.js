@@ -166,9 +166,9 @@ class GrblLineParserResultStatus {
         //   - D H R S the door, hold, soft-reset, and cycle-start pins, respectively.
         //   - Example: Pn:PZ indicates the probe and z-limit pins are 'triggered'.
         //   - Note: A may be added in later versions for an A-axis limit pin.
+        payload.pinState = {};
         if (_.has(result, 'Pn')) {
             const pins = _.get(result, 'Pn[0]', '');
-            payload.pinState = {};
             pins.split('').forEach(pin => {
                 payload.pinState[pin] = true;
             });

@@ -27,24 +27,105 @@ import controller from 'app/lib/controller';
 import _get from 'lodash/get';
 import pubsub from 'pubsub-js';
 import * as controllerActions from 'app/actions/controllerActions';
+import manualToolChange from 'app/wizards/manualToolchange';
+import semiautoToolChange from 'app/wizards/semiautoToolchange';
+import automaticToolChange from 'app/wizards/automaticToolchange';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
+import * as preferenceActions from 'app/actions/preferencesActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { estimateResponseHandler } from 'app/workers/Estimate.response';
-import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
-import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY } from 'app/constants';
+import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
+import { isLaserMode } from 'app/lib/laserMode';
+import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
+import isElectron from 'is-electron';
+import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 
 
 export function* initialize() {
     let visualizeWorker = null;
     let estimateWorker = null;
+    let currentState = GRBL_ACTIVE_STATE_IDLE;
+    let prevState = GRBL_ACTIVE_STATE_IDLE;
+    let areStatsInitialized = false;
+
     /* Health check - every 3 minutes */
     setInterval(() => {
         controller.healthCheck();
     }, 1000 * 60 * 3);
+
+    const incrementJobCounter = () => {
+        let jobsFinished = store.get('workspace.jobsFinished');
+        jobsFinished++;
+        store.set('workspace.jobsFinished', jobsFinished);
+    };
+
+    const addToCancelledCounter = (isAdd) => {
+        let jobsCancelled = store.get('workspace.jobsCancelled');
+        if (isAdd) {
+            jobsCancelled++;
+        } else {
+            jobsCancelled--;
+        }
+        store.set('workspace.jobsCancelled', jobsCancelled);
+    };
+
+    const incrementTimeRun = (elapsedTime) => {
+        // add elapsed time to total time run
+        let timeSpentRunning = store.get('workspace.timeSpentRunning');
+        timeSpentRunning += elapsedTime;
+        store.set('workspace.timeSpentRunning', timeSpentRunning);
+
+        // also add it to last element in array of job times
+        let jobTimes = store.get('workspace.jobTimes');
+        jobTimes[jobTimes.length - 1] += elapsedTime;
+        store.set('workspace.jobTimes', jobTimes);
+
+        // compare last element to the longest time
+        compareLongestTime(jobTimes[jobTimes.length - 1]);
+    };
+
+    const compareLongestTime = (time) => {
+        let longestTimeRun = store.get('workspace.longestTimeRun');
+        if (time > longestTimeRun) {
+            store.set('workspace.longestTimeRun', time);
+        }
+    };
+
+    const onJobStart = () => {
+        // increment cancelled jobs
+        addToCancelledCounter(true);
+
+        // add another index to array of job times
+        let jobTimes = store.get('workspace.jobTimes');
+        jobTimes.push(0);
+        store.set('workspace.jobTimes', jobTimes);
+    };
+
+    const onJobStop = (elapsedTime) => {
+        if (!areStatsInitialized) {
+            onJobStart();
+            areStatsInitialized = true;
+        }
+        incrementTimeRun(elapsedTime);
+    };
+
+    const onJobEnd = (elapsedTime) => {
+        if (!areStatsInitialized) {
+            onJobStart();
+            areStatsInitialized = true;
+        }
+        // decrement cancelled jobs
+        addToCancelledCounter(false);
+        incrementJobCounter();
+        onJobStop(elapsedTime);
+
+        // reset to false since it's the end of the job
+        areStatsInitialized = false;
+    };
 
     controller.addListener('controller:settings', (type, settings) => {
         reduxStore.dispatch({
@@ -54,6 +135,11 @@ export function* initialize() {
     });
 
     controller.addListener('controller:state', (type, state) => {
+        // if state is the same, don't update the prev and current state
+        if (currentState !== state.status.activeState) {
+            prevState = currentState;
+            currentState = state.status.activeState;
+        }
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_STATE,
             payload: { type, state }
@@ -68,14 +154,18 @@ export function* initialize() {
     });
 
     controller.addListener('sender:status', (status) => {
-        try {
-            reduxStore.dispatch({
-                type: controllerActions.UPDATE_SENDER_STATUS,
-                payload: { status },
-            });
-        } catch (e) {
-            console.log(e);
+        // finished job
+        if (status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) {
+            onJobEnd(status.timeRunning);
+        // cancelled job
+        } else if (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD) {
+            onJobStop(status.timeRunning);
         }
+
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_SENDER_STATUS,
+            payload: { status },
+        });
     });
 
     controller.addListener('workflow:state', (state) => {
@@ -86,6 +176,10 @@ export function* initialize() {
     });
 
     controller.addListener('serialport:open', (options) => {
+        if (isElectron()) {
+            window.ipcRenderer.send('reconnect-main', options);
+        }
+
         const machineProfile = store.get('workspace.machineProfile');
         const showLineWarnings = store.get('widgets.visualizer.showLineWarnings');
         // Reset homing run flag to prevent rapid position without running homing
@@ -112,9 +206,11 @@ export function* initialize() {
             type: connectionActions.OPEN_CONNECTION,
             payload: { options }
         });
+
+        pubsub.publish('machine:connected');
     });
 
-    controller.addListener('serialport:close', (options) => {
+    controller.addListener('serialport:close', (options, received) => {
         // Reset homing run flag to prevent rapid position without running homing
         reduxStore.dispatch({
             type: controllerActions.RESET_HOMING,
@@ -123,6 +219,46 @@ export function* initialize() {
             type: connectionActions.CLOSE_CONNECTION,
             payload: { options }
         });
+
+        pubsub.publish('machine:disconnected');
+
+        // if the connection was closed unexpectedly (not by the user),
+        // the number of lines sent will be defined.
+        // create a pop up so the user can connect to the last active port
+        // and resume from the last line
+        if (received) {
+            const homingEnabled = _get(reduxStore.getState(), 'controller.settings.settings.$22');
+            const msg = homingEnabled === '1'
+                ? 'The machine connection has been disrupted. To attempt to reconnect to the last active port, ' +
+                'home, and choose which line to continue from, press Resume.'
+                : 'The machine connection has been disrupted. To attempt to reconnect to the last active port, ' +
+                'press Resume. After that, you can set your Workspace 0 and use the Start From Line function to continue the job. ' +
+                'Suggested line to start from: ' +
+                received;
+
+            const content = (
+                <div>
+                    <p>
+                        {msg}
+                    </p>
+                </div>
+            );
+
+            Confirm({
+                title: 'Port Disconnected',
+                content,
+                confirmLabel: 'Resume',
+                cancelLabel: 'Close',
+                onConfirm: () => {
+                    connectToLastDevice(() => {
+                        // if limit switches active, home
+                        if (homingEnabled === '1') {
+                            pubsub.publish('disconnect:recovery', received);
+                        }
+                    });
+                }
+            });
+        }
     });
 
     controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts) => {
@@ -133,27 +269,36 @@ export function* initialize() {
     });
 
     controller.addListener('gcode:toolChange', (context, comment = '',) => {
-        const content = (comment.length > 0)
-            ? <div><p>Press Resume to continue operation.</p><p>Line contained following comment: <b>{comment}</b></p></div>
-            : 'Press Resume to continue operation.';
-
+        const payload = {
+            context,
+            comment
+        };
         const { option } = context;
-
-        // We don't throw a modal on manual tool changes
         if (option === 'Manual') {
-            pubsub.publish('gcode:ManualToolChange');
-            return;
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Manual Toolchange',
+                instructions: manualToolChange
+            });
+        } else if (option === 'Semi-Automatic') {
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Semi-Automatic Toolchange',
+                instructions: semiautoToolChange
+            });
+        } else if (option === 'Automatic') {
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title: 'Automatic Toolchange',
+                instructions: automaticToolChange
+            });
+        } else if (option === 'Pause') {
+            Toaster.pop({
+                msg: `Toolchange pause - ${comment}`,
+                type: TOASTER_INFO,
+                duration: TOASTER_UNTIL_CLOSE
+            });
         }
-
-        Confirm({
-            title: 'M6 Tool Change',
-            content,
-            confirmLabel: 'Resume',
-            cancelLabel: 'Stop',
-            onConfirm: () => {
-                controller.command('gcode:resume');
-            }
-        });
     });
 
     controller.addListener('gcode:load', (name, content) => {
@@ -169,6 +314,7 @@ export function* initialize() {
     });
 
     controller.addListener('file:load', (content, size, name, visualizer) => {
+        const isLaser = isLaserMode();
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch({
                 type: fileActions.UPDATE_FILE_RENDER_STATE,
@@ -178,13 +324,15 @@ export function* initialize() {
             });
 
             const needsVisualization = shouldVisualize();
+            const shouldRenderSVG = shouldVisualizeSVG();
 
             if (needsVisualization) {
                 visualizeWorker = new VisualizeWorker();
                 visualizeWorker.onmessage = visualizeResponse;
                 visualizeWorker.postMessage({
                     content,
-                    visualizer
+                    visualizer,
+                    shouldRenderSVG
                 });
             } else {
                 reduxStore.dispatch({
@@ -235,13 +383,16 @@ export function* initialize() {
         });
 
         const needsVisualization = shouldVisualize();
+        const shouldRenderSVG = shouldVisualizeSVG();
 
         if (needsVisualization) {
             visualizeWorker = new VisualizeWorker();
             visualizeWorker.onmessage = visualizeResponse;
             visualizeWorker.postMessage({
                 content,
-                visualizer
+                visualizer,
+                isLaser,
+                shouldRenderSVG
             });
         } else {
             reduxStore.dispatch({
@@ -257,6 +408,17 @@ export function* initialize() {
         reduxStore.dispatch({
             type: fileActions.UNLOAD_FILE_INFO,
             payload: {}
+        });
+    });
+
+    controller.addListener('electronErrors:errorList', (errorList) => {
+        store.set('electron-error-list', errorList);
+    });
+
+    controller.addListener('ip:list', (ipList) => {
+        reduxStore.dispatch({
+            type: preferenceActions.SET_IP_LIST,
+            payload: ipList,
         });
     });
 
@@ -281,9 +443,15 @@ export function* initialize() {
             controller.command('toolchange:post');
         };
 
-        const content = (comment.length > 0)
-            ? <div><p>A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.</p><p>Comment: <b>{comment}</b></p></div>
-            : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
+        const content = (comment.length > 0) ? (
+            <div>
+                <p>
+                    A toolchange command (M6) was found - click confirm to verify
+                    the tool has been changed and run your post-toolchange code.
+                </p>
+                <p>Comment: <b>{comment}</b></p>
+            </div>
+        ) : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
 
         Confirm({
             title: 'Confirm Toolchange',
@@ -335,19 +503,30 @@ export function* initialize() {
                 homingFlag: flag
             }
         });
+        pubsub.publish('softlimits:check');
     });
 
     controller.addListener('toolchange:tool', (tool) => {
         Toaster.clear();
         Toaster.pop({
             type: TOASTER_INFO,
-            msg: `Tool command found - <b>${tool}</b>`,
+            msg: `Tool command found - ${tool}`,
             duration: TOASTER_UNTIL_CLOSE
         });
     });
 
-    controller.addListener('grbl:iSready', (status) => {
-        pubsub.publish('grblExists:update', status);
+    controller.addListener('firmware:ready', (status) => {
+        pubsub.publish('firmware:update', status);
+    });
+
+    controller.addListener('error', (error) => {
+        if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
+            window.ipcRenderer.send('logError:electron', error);
+        }
+    });
+
+    controller.addListener('wizard:next', (stepIndex, substepIndex) => {
+        pubsub.publish('wizard:next', { stepIndex, substepIndex });
     });
 
     yield null;
