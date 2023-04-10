@@ -249,7 +249,11 @@ class GrblRunner extends events.EventEmitter {
     getTool(state = this.state) {
         return Number(_.get(state, 'parserstate.tool')) || 0;
     }
-
+    
+    getParameters() {
+        return _.get(this.settings, 'parameters', {});
+    }
+    
     isAlarm() {
         const activeState = _.get(this.state, 'status.activeState');
         return activeState === GRBL_ACTIVE_STATE_ALARM;
