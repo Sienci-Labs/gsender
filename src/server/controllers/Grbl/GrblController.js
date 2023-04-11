@@ -53,10 +53,12 @@ import GrblRunner from './GrblRunner';
 import {
     GRBL,
     GRBL_ACTIVE_STATE_RUN,
+    GRBL_ACTIVE_STATE_HOME,
+    GRBL_ACTIVE_STATE_ALARM,
     GRBL_REALTIME_COMMANDS,
     GRBL_ALARMS,
     GRBL_ERRORS,
-    GRBL_SETTINGS, GRBL_ACTIVE_STATE_HOME
+    GRBL_SETTINGS
 } from './constants';
 import {
     METRIC_UNITS,
@@ -142,6 +144,8 @@ class GrblController {
     queryTimer = null;
 
     timePaused = null;
+
+    waitingForStatus = false;
 
     actionMask = {
         queryParserState: {
@@ -522,6 +526,17 @@ class GrblController {
             if (this.actionMask.replyStatusReport) {
                 this.actionMask.replyStatusReport = false;
                 this.emit('serialport:read', res.raw);
+            }
+
+            if (this.waitingForStatus) {
+                this.waitingForStatus = false;
+                if (res.activeState === GRBL_ACTIVE_STATE_ALARM) {
+                    log.debug('System is alarm locked. Soft resetting');
+                    this.write('\x18');
+                } else {
+                    log.debug('Status found. Getting version info');
+                    this.write('$I');
+                }
             }
 
             // Check if the receive buffer is available in the status report
@@ -1079,7 +1094,26 @@ class GrblController {
 
             // Clear action values
             this.clearActionValues();
+
+            // set timeout to wait for connection
+            this.waitForInfo();
         });
+    }
+
+    waitForInfo() {
+        setTimeout(() => {
+            if (!this.ready) {
+                log.debug('No start message. Waiting for status');
+                this.waitingForStatus = true;
+                this.write('?');
+                setTimeout(() => {
+                    if (this.waitingForStatus) {
+                        log.debug('No status. Soft resetting');
+                        this.write('\x18');
+                    }
+                }, 3000);
+            }
+        }, 3000);
     }
 
     close(callback, received) {
