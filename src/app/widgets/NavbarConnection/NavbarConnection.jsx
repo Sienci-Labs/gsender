@@ -98,6 +98,13 @@ class NavbarConnection extends PureComponent {
         const { isActive } = this.state;
         const isMobile = window.visualViewport.width <= 599;
 
+        const fakePort = {
+            port: '192.168.1.1',
+            key: '192.168.1.1',
+            baudrate: 19700,
+            controllerType: 'Grbl',
+        };
+
         return (
             <div
                 className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection}
@@ -165,6 +172,16 @@ class NavbarConnection extends PureComponent {
                                 />
                             )
                         )
+                    }
+                    {
+                        !connected && !connecting &&
+                            <PortListing
+                                {...fakePort}
+                                key={fakePort.port}
+                                baudrate={fakePort.baudrate}
+                                controllerType={fakePort.controllerType}
+                                onClick={() => actions.onClickPortListing(fakePort)}
+                            />
                     }
                     {
                         !connected && !connecting && (unrecognizedPorts.length > 0) &&
