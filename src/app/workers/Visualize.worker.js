@@ -34,23 +34,23 @@ onmessage = function({ data }) {
 
     // Laser specific state variables
     const spindleSpeeds = new Set();
-    //let spindleSpeed = 0;
-    //let spindleOn = false;
+    let spindleSpeed = 0;
+    let spindleOn = false;
     let spindleChanges = [];
 
     // SVG specific state variables
     let SVGVertices = [];
     let paths = [];
     let currentMotion = '';
-    //let progress = 0;
-    //let currentLines = 0;
-    //let totalLines = (content.match(/\n/g) || []).length;
+    let progress = 0;
+    let currentLines = 0;
+    let totalLines = (content.match(/\n/g) || []).length;
 
     /**
      * Updates local state with any spindle changes in line
      * @param words
      */
-    /*const updateSpindleStateFromLine = ({ words }) => {
+    const updateSpindleStateFromLine = ({ words }) => {
         const spindleMatches = words.filter((word) => word[0] === 'S');
         const [spindleCommand, spindleValue] = spindleMatches[0] || [];
         if (spindleCommand) {
@@ -58,7 +58,7 @@ onmessage = function({ data }) {
             spindleSpeed = spindleValue;
             spindleOn = spindleValue > 0;
         }
-    };*/
+    };
 
     // create path for the vertices of the last motion
     const createPath = (motion) => {
@@ -251,6 +251,30 @@ onmessage = function({ data }) {
 
     const vm = new GCodeVirtualizer({ addLine, addCurve });
 
+    vm.on('data', (data) => {
+        const vertexIndex = vertices.length / 3;
+        frames.push(vertexIndex);
+
+        let spindleValues = {};
+        if (isLaser) {
+            updateSpindleStateFromLine(data);
+            //console.log(`Spindle: ${spindleOn} - ${line.line}`);
+            spindleValues = {
+                spindleOn,
+                spindleSpeed
+            };
+
+            spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
+        }
+
+        currentLines++;
+        const newProgress = Math.floor(currentLines / totalLines * 100);
+        if (newProgress !== progress) {
+            progress = newProgress;
+            postMessage(progress);
+        }
+    });
+
     /*const toolpath = new Toolpath({
         addLine,
         addArcCurve
@@ -332,7 +356,6 @@ onmessage = function({ data }) {
     let tVertices = new Float32Array(vertices);
 
     const info = vm.generateFileStats();
-    console.log(JSON.stringify(info));
 
     const message = {
         vertices: tVertices,

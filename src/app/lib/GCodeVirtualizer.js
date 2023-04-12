@@ -22,6 +22,8 @@ class GCodeVirtualizer extends EventEmitter {
 
     totalLines = 0;
 
+    currentLine = null;
+
     collate = false;
 
     modal = {
@@ -726,6 +728,7 @@ class GCodeVirtualizer extends EventEmitter {
         }
         this.totalLines += 1;
         this.fn.callback();
+        this.emit('data', parsedLine);
     }
 
     generateFileStats() {

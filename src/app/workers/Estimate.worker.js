@@ -24,7 +24,7 @@
 import { GCodeProcessor } from '../lib/gcodeProcessor/GCodeProcessor';
 
 onmessage = function({ data }) {
-    const { content, name, size, feedArray = null, accelArray = null } = data;
+    const { name, size, feedArray = null, accelArray = null } = data;
 
     const processor = new GCodeProcessor({ axisLabels: ['x', 'y', 'z'], maxFeed: feedArray, acceleration: accelArray });
     //processor.process(content);
