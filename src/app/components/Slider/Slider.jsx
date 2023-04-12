@@ -24,9 +24,9 @@
 import React from 'react';
 import styles from './slider.styl';
 
-const Slider = ({ step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, unitString = 'unit' }) => {
+const Slider = ({ step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, unitString = 'unit', ...props }) => {
     const handleMouseUp = (e) => {
-        onMouseUp(e.target.value);
+        // onMouseUp(e.target.value);
     };
 
     return (
@@ -38,6 +38,7 @@ const Slider = ({ step = 1, min = 0, max = 100, value, onChange = null, onMouseU
                 onMouseUp={handleMouseUp}
                 onChange={onChange}
                 step={step}
+                {...props}
             />
             <span>{value}{unitString}</span>
         </div>

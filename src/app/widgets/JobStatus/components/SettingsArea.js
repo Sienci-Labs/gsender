@@ -79,13 +79,12 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
         if (spindleSpeed < VALUE_RANGES.MIN && spindleSpeed > VALUE_RANGES.MAX) {
             return;
         }
-
         controller.command('spindleOverride', spindleSpeed);
     };
 
     // debounced handlers
-    const debouncedSpindleHandler = debounce((val) => updateSpindleSpeedChange(val), 100);
-    const debouncedFeedHandler = debounce((val) => updateFeedRateChange(val), 100);
+    const debouncedSpindleHandler = debounce((val) => updateSpindleSpeedChange(val), 500);
+    const debouncedFeedHandler = debounce((val) => updateFeedRateChange(val), 500);
 
     const handleMachineProfileChange = () => {
         setShowSpindleOverride(store.get('workspace.machineProfile.spindle'));
@@ -121,7 +120,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                     <FeedControlButton value="100" onClick={() => updateFeedRateChange(100)}>
                         <i className="fas fa-redo fa-flip-horizontal" />
                     </FeedControlButton>
-                    <FeedControlButton value="-5" onClick={() => updateFeedRateChange(ovF + -5)}>
+                    <FeedControlButton value="-5" onClick={() => updateFeedRateChange(ovF - 5)}>
                         <i className="fas fa-minus" />
                     </FeedControlButton>
                     <FeedControlButton value="5" onClick={() => updateFeedRateChange(ovF + 5)}>
@@ -151,7 +150,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                             <FeedControlButton value="100" onClick={() => updateSpindleSpeedChange(100)}>
                                 <i className="fas fa-redo fa-flip-horizontal" />
                             </FeedControlButton>
-                            <FeedControlButton value="-5" onClick={() => updateSpindleSpeedChange(ovS + -5)}>
+                            <FeedControlButton value="-5" onClick={() => updateSpindleSpeedChange(ovS - 5)}>
                                 <i className="fas fa-minus" />
                             </FeedControlButton>
                             <FeedControlButton value="5" onClick={() => updateSpindleSpeedChange(ovS + 5)}>
