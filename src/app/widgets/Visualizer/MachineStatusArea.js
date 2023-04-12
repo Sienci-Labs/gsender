@@ -20,7 +20,6 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -44,10 +43,7 @@ class ControlArea extends Component {
 
     state = {
         currentAlarmIcon: 'fa-lock',
-        grblExists: true,
     }
-
-    pubsubTokens = [];
 
     unlock = () => {
         const { alarmCode } = this.props;
@@ -100,16 +96,15 @@ class ControlArea extends Component {
                             </div>
                         </div>
                     );
-                } else if (activeState && this.state.grblExists) {
-                    return (
-                        <div className={styles[`machine-${activeState}`]}>
-                            { message[activeState] }
-                        </div>
-                    );
-                } else if (activeState && !this.state.grblExists) {
-                    return <div className={styles['machine-Disconnected']}>Invalid firmware response</div>;
+                } {
+                    return activeState
+                        ? (
+                            <div className={styles[`machine-${activeState}`]}>
+                                { message[activeState] }
+                            </div>
+                        )
+                        : <div className={styles['machine-Disconnected']}>Disconnected</div>;
                 }
-                return <div className={styles['machine-Disconnected']}>Connecting</div>;
             } else {
                 return <div className={styles['machine-Disconnected']}>Disconnected</div>;
             }
