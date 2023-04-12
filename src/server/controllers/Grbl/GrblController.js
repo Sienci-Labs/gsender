@@ -512,7 +512,13 @@ class GrblController {
         // Grbl
         this.runner = new GrblRunner();
 
-        this.runner.on('raw', noop);
+        this.runner.on('raw', (data) => {
+            const { raw } = data;
+            if (raw) {
+                this.ready = true;
+                this.waitingForStatus = false;
+            }
+        });
 
         this.runner.on('status', (res) => {
             if (this.homingStarted) {
@@ -529,6 +535,7 @@ class GrblController {
             }
 
             if (this.waitingForStatus) {
+                this.ready = true;
                 this.waitingForStatus = false;
                 if (res.activeState === GRBL_ACTIVE_STATE_ALARM) {
                     log.debug('System is alarm locked. Soft resetting');
