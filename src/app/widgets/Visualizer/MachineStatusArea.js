@@ -25,7 +25,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import pubsub from 'pubsub-js';
 import get from 'lodash/get';
 import controller from 'app/lib/controller';
 import AlarmDescriptionIcon from 'app/widgets/Visualizer/AlarmDescriptionIcon';
@@ -50,24 +49,6 @@ class ControlArea extends Component {
 
     pubsubTokens = [];
 
-    subscribe() {
-        const tokens = [
-            pubsub.subscribe('grblExists:update', (msg, value) => {
-                this.setState({
-                    grblExists: value
-                });
-            }),
-        ];
-        this.pubsubTokens = this.pubsubTokens.concat(tokens);
-    }
-
-    unsubscribe() {
-        this.pubsubTokens.forEach((token) => {
-            pubsub.unsubscribe(token);
-        });
-        this.pubsubTokens = [];
-    }
-
     unlock = () => {
         const { alarmCode } = this.props;
         if (alarmCode === 1 || alarmCode === 2) {
@@ -78,14 +59,6 @@ class ControlArea extends Component {
             return;
         }
         controller.command('unlock');
-    }
-
-    componentDidMount() {
-        this.subscribe();
-    }
-
-    componentWillUnmount() {
-        this.unsubscribe();
     }
 
     render() {

@@ -850,9 +850,6 @@ class GrblController {
         this.writeln('$$');
         await delay(50);
         this.event.trigger('controller:ready');
-
-        //check if controller is ready and send the status
-        this.emit('grbl:iSready', this.ready);
     }
 
     populateContext(context = {}) {
