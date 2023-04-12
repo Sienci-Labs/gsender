@@ -127,6 +127,7 @@ const ToolsNotificationModal = ({ onClose, show, title, children, footer, footer
                                 <Select
                                     options={
                                         machineProfiles
+                                            .filter(profile => profile.company === 'Sienci Labs' || profile.name === 'Generic CNC')
                                             .sort((a, b) => getMachineProfileLabel(a).localeCompare(getMachineProfileLabel(b)))
                                             .map(({ id, name, type }) => ({ key: id, value: id, label: getMachineProfileLabel({ name, type }) }))
                                     }
