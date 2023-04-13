@@ -126,7 +126,7 @@ class GCodeVirtualizer extends EventEmitter {
             };
             const targetPosition = { x: v2.x, y: v2.y, z: v2.z };
 
-            this.fn.addLine(this.modal.motion, this.offsetG92(v1), this.offsetG92(v2));
+            this.fn.addLine(this.modal, this.offsetG92(v1), this.offsetG92(v2));
 
             // Update position
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
@@ -162,7 +162,7 @@ class GCodeVirtualizer extends EventEmitter {
             };
             const targetPosition = { x: v2.x, y: v2.y, z: v2.z };
 
-            this.fn.addLine(this.modal.motion, this.offsetG92(v1), this.offsetG92(v2));
+            this.fn.addLine(this.modal, this.offsetG92(v1), this.offsetG92(v2));
 
             // Update position
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
@@ -247,7 +247,7 @@ class GCodeVirtualizer extends EventEmitter {
             }
 
             //this.offsetAddArcCurve(v1, v2, v0);
-            this.fn.addCurve(this.modal.motion, this.modal.plane, this.offsetG92(v1), this.offsetG92(v2), this.offsetG92(v0));
+            this.fn.addCurve(this.modal, this.offsetG92(v1), this.offsetG92(v2), this.offsetG92(v0));
 
             // Update position
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
@@ -313,7 +313,7 @@ class GCodeVirtualizer extends EventEmitter {
                 v0.y = v1.y + offsetY;
             }
 
-            this.fn.addCurve(this.modal.motion, this.modal.plane, this.offsetG92(v1), this.offsetG92(v2), this.offsetG92(v0));
+            this.fn.addCurve(this.modal, this.offsetG92(v1), this.offsetG92(v2), this.offsetG92(v0));
 
             // Update position
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
