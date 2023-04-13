@@ -190,7 +190,6 @@ const migrateStore = () => {
     }
 
     if (semver.lt(cnc.version, '1.2.4') || semver.lt(cnc.version, '1.2.4-EDGE')) {
-        console.log('hello');
         const currentCommandKeys = store.get('commandKeys');
         let newCommandKeysList = {};
 
@@ -215,7 +214,6 @@ const migrateStore = () => {
             newCommandKeysList[key] = shortcut;
         });
 
-        console.log(newCommandKeysList);
         store.replace('commandKeys', newCommandKeysList);
 
         const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
