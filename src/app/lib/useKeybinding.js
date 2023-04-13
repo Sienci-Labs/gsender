@@ -81,7 +81,6 @@ function checkNumCalls() {
 export function removeOldKeybindings() {
     const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
     const currentCommandKeys = store.get('commandKeys', {});
-    console.log(currentCommandKeys);
     let updatedCommandKeys = currentCommandKeys;
 
     // remove keybindings that don't exist in any of the shuttleControlEvents arrays
@@ -99,7 +98,6 @@ export function removeOldKeybindings() {
     const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
     const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
         const shortcuts = profile.shortcuts;
-        console.log(shortcuts);
         let updatedProfileShortcuts = shortcuts;
         Object.entries(shortcuts).forEach(([key, keybinding]) => {
             const event = allShuttleControlEvents[key];

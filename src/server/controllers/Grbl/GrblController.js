@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -53,10 +54,12 @@ import GrblRunner from './GrblRunner';
 import {
     GRBL,
     GRBL_ACTIVE_STATE_RUN,
+    GRBL_ACTIVE_STATE_HOME,
+    GRBL_ACTIVE_STATE_ALARM,
     GRBL_REALTIME_COMMANDS,
     GRBL_ALARMS,
     GRBL_ERRORS,
-    GRBL_SETTINGS, GRBL_ACTIVE_STATE_HOME
+    GRBL_SETTINGS
 } from './constants';
 import {
     METRIC_UNITS,
@@ -142,6 +145,8 @@ class GrblController {
     queryTimer = null;
 
     timePaused = null;
+
+    waitingForStatus = false;
 
     actionMask = {
         queryParserState: {
@@ -508,7 +513,13 @@ class GrblController {
         // Grbl
         this.runner = new GrblRunner();
 
-        this.runner.on('raw', noop);
+        this.runner.on('raw', (data) => {
+            const { raw } = data;
+            if (raw) {
+                this.ready = true;
+                this.waitingForStatus = false;
+            }
+        });
 
         this.runner.on('status', (res) => {
             if (this.homingStarted) {
@@ -522,6 +533,18 @@ class GrblController {
             if (this.actionMask.replyStatusReport) {
                 this.actionMask.replyStatusReport = false;
                 this.emit('serialport:read', res.raw);
+            }
+
+            if (this.waitingForStatus) {
+                this.ready = true;
+                this.waitingForStatus = false;
+                if (res.activeState === GRBL_ACTIVE_STATE_ALARM) {
+                    log.debug('System is alarm locked. Soft resetting');
+                    this.write('\x18');
+                } else {
+                    log.debug('Status found. Getting version info');
+                    this.write('$I');
+                }
             }
 
             // Check if the receive buffer is available in the status report
@@ -1079,7 +1102,26 @@ class GrblController {
 
             // Clear action values
             this.clearActionValues();
+
+            // set timeout to wait for connection
+            this.waitForInfo();
         });
+    }
+
+    waitForInfo() {
+        setTimeout(() => {
+            if (!this.ready) {
+                log.debug('No start message. Waiting for status');
+                this.waitingForStatus = true;
+                this.write('?');
+                setTimeout(() => {
+                    if (this.waitingForStatus) {
+                        log.debug('No status. Soft resetting');
+                        this.write('\x18');
+                    }
+                }, 3000);
+            }
+        }, 3000);
     }
 
     close(callback, received) {
@@ -1501,7 +1543,16 @@ class GrblController {
             'feedOverride': () => {
                 const [value] = args;
                 const [feedOV] = this.state.status.ov;
-                const diff = value - feedOV;
+
+                let diff = value - feedOV;
+                //Limits for keyboard/gamepad shortcuts
+                if (value < 4) {
+                    diff = 4 - feedOV;
+                } else if (value > 230) {
+                    diff = 230 - feedOV;
+                }
+
+
                 if (value === 100) {
                     this.write('\x90');
                 } else {
@@ -1512,8 +1563,16 @@ class GrblController {
             // @param {number} value The amount of percentage increase or decrease.
             'spindleOverride': () => {
                 const [value] = args;
-                const [, spindleOV] = this.state.status.ov;
-                const diff = value - spindleOV;
+                const [spindleOV] = this.state.status.ov;
+
+                let diff = value - spindleOV;
+                //Limits for keyboard/gamepad shortcuts
+                if (value < 10) {
+                    diff = 10 - spindleOV;
+                } else if (value > 230) {
+                    diff = 230 - spindleOV;
+                }
+
                 if (value === 100) {
                     this.write('\x99');
                 } else {

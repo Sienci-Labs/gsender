@@ -124,9 +124,7 @@ class RunProbe extends PureComponent {
             testRunning: true
         });
         this.testInterval = setInterval(() => {
-            console.log('Waiting on status');
             if (probeStatus()) {
-                console.log('we got it');
                 this.setState({
                     connectionMade: true,
                 });
@@ -137,9 +135,7 @@ class RunProbe extends PureComponent {
     }
 
     componentDidMount() {
-        const { actions, state } = this.props;
-        const { connectivityTest } = state;
-        this.startConnectivityTest(actions.returnProbeConnectivity, connectivityTest);
+        //this.startConnectivityTest(actions.returnProbeConnectivity, connectivityTest);
         this.addShuttleControlEvents();
         useKeybinding(this.shuttleControlEvents);
 
@@ -169,14 +165,13 @@ class RunProbe extends PureComponent {
 
     render() {
         const { actions, state, show } = this.props;
-        const { canClick, touchplate } = state;
+        const { canClick, touchplate, connectionMade } = state;
         const { touchplateType } = touchplate;
         // const probeCommands = actions.generateProbeCommands();
         // console.log(probeCommands.join('\n'));
         const probeCommand = state.availableProbeCommands[state.selectedProbeCommand];
 
         const probeActive = actions.returnProbeConnectivity();
-        const { connectionMade } = this.state;
 
         return (
             <Modal
