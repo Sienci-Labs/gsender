@@ -35,9 +35,7 @@ import * as fileActions from 'app/actions/fileInfoActions';
 import * as preferenceActions from 'app/actions/preferencesActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
-import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
-import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
@@ -368,19 +366,10 @@ export function* initialize() {
                 state: RENDER_LOADING
             }
         });
-        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
-        const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
-        const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
-        const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
-
-        estimateWorker = new EstimateWorker();
-        estimateWorker.onmessage = estimateResponseHandler;
-        estimateWorker.postMessage({
-            content,
-            name,
-            size,
-            accelArray
-        });
+        /*        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
+                const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
+                const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
+                const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];*/
 
         const needsVisualization = shouldVisualize();
         const shouldRenderSVG = shouldVisualizeSVG();

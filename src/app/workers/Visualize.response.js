@@ -11,6 +11,8 @@ export const visualizeResponse = ({ data }) => {
         pubsub.publish('toolpath:progress', data);
     } else {
         // Update estimate worker with values
+        console.log('info in response');
+        console.log(JSON.stringify(data.info));
         const estimatePayload = {
             ...data.info,
             fileProcessing: false

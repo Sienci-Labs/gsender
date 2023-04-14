@@ -44,7 +44,6 @@ import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
-import EstimateWorker from './Estimate.worker';
 import WidgetConfig from '../WidgetConfig';
 import PrimaryVisualizer from './PrimaryVisualizer';
 
@@ -231,10 +230,6 @@ class VisualizerWidget extends PureComponent {
                     ready: false
                 }
             }));
-
-            // Start file parsing worker
-            this.processGCode(gcode, name, size);
-
 
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
@@ -653,25 +648,7 @@ class VisualizerWidget extends PureComponent {
     }
 
     processGCode = (gcode, name, size) => {
-        const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
-        //Clean up lines and remove ones that are comments and headers
-        const lines = gcode.split('\n')
-            .filter(line => (line.trim().length > 0))
-            .filter(line => !comments.some(comment => line.includes(comment)));
 
-
-        // Set "Loading" state to job info widget and start file VM processor
-        const estimateWorker = new EstimateWorker();
-        const { feedArray, accelArray } = this.props;
-
-        estimateWorker.onmessage = this.onProcessedGcode;
-        estimateWorker.postMessage({
-            lines: lines,
-            name,
-            size,
-            feedArray,
-            accelArray
-        });
     };
 
     unsubscribe() {

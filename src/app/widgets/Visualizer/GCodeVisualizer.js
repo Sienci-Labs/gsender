@@ -23,7 +23,6 @@
 
 // import colornames from 'colornames';
 import * as THREE from 'three';
-import log from 'app/lib/log';
 import { BACKGROUND_PART, CUTTING_PART, G0_PART, G1_PART, G2_PART, G3_PART, LASER_PART } from './constants';
 
 class GCodeVisualizer {
@@ -94,13 +93,11 @@ class GCodeVisualizer {
                 opacity: 0.9,
             })
         );
-        this.group.add(workpiece);
 
-        log.debug({
-            workpiece: workpiece,
-            frames: this.frames,
-            frameIndex: this.frameIndex
-        });
+        this.geometry.computeBoundingBox();
+        console.log(this.geometry.boundingBox);
+
+        this.group.add(workpiece);
 
         return this.group;
     }

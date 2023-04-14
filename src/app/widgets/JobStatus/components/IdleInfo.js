@@ -37,7 +37,7 @@ const IdleInfo = ({ state, ...props }) => {
     let spindleMax = Math.max(...spindleSet);
 
 
-    if (units === METRIC_UNITS) {
+    if (units === IMPERIAL_UNITS) {
         convertedFeedMin = (fileModal === METRIC_UNITS) ? feedrateMin : in2mm(feedrateMin).toFixed(2);
         convertedFeedMax = (fileModal === METRIC_UNITS) ? feedrateMax : in2mm(feedrateMax).toFixed(2);
     } else {

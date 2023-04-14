@@ -874,7 +874,6 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     updateBounds(position) {
-        console.log(JSON.stringify(position));
         const { x, y, z } = position;
 
         if (x > this.maxBounds[0]) {
@@ -897,7 +896,6 @@ class GCodeVirtualizer extends EventEmitter {
         if (z < this.minBounds[0]) {
             this.minBounds[2] = z;
         }
-
     }
 
     getBBox() {
