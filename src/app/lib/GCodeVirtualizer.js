@@ -22,9 +22,21 @@ class GCodeVirtualizer extends EventEmitter {
 
     totalLines = 0;
 
+    totalTime = 0;
+
     currentLine = null;
 
     collate = false;
+
+    re1 = new RegExp(/\s*\([^\)]*\)/g); // Remove anything inside the parentheses
+
+    re2 = new RegExp(/\s*;.*/g); // Remove anything after a semi-colon to the end of the line, including preceding spaces
+
+    re3 = new RegExp(/\s+/g);
+
+    minBounds = [0, 0, 0]
+
+    maxBounds = [0, 0, 0]
 
     modal = {
         // Motion Mode
@@ -611,12 +623,10 @@ class GCodeVirtualizer extends EventEmitter {
             }
         },
         'T': (tool) => {
-            console.log('Tool found', tool);
             if (tool !== undefined) {
                 this.setModal({ tool: tool });
                 if (this.collate) {
                     this.vmState.tools.add(`T${tool}`);
-                    console.log(this.vmState.tools);
                 }
             }
         }
@@ -626,11 +636,12 @@ class GCodeVirtualizer extends EventEmitter {
         super();
         const { addLine = noop, addCurve = noop, callback = noop, collate = false } = options;
         this.fn = { addLine, addCurve, callback };
-        if (collate) {
+        this.collate = collate;
+
+        if (this.collate) {
             this.vmState.feedrates = new Set();
             this.vmState.tools = new Set();
             this.vmState.spindle = new Set();
-            this.collate = true;
         }
     }
 
@@ -682,7 +693,29 @@ class GCodeVirtualizer extends EventEmitter {
             this.fn.callback();
             return;
         }
+
+        line = line
+            .replace(this.re1, '')
+            .replace(this.re2, '')
+            .replace(this.re3, '');
+
+        if (line === '') {
+            return;
+        }
+
         const parsedLine = parseLine(line);
+        // collect spindle and feed rates
+        for (let word of parsedLine.words) {
+            const letter = word[0];
+            const code = word[1];
+            if (letter === 'F') {
+                this.vmState.feedrates.add(`F${code}`);
+            }
+            if (letter === 'S') {
+                this.vmState.spindle.add(`S${code}`);
+            }
+        }
+
         const groups = this.partitionWordsByGroup(parsedLine.words);
         for (let i = 0; i < groups.length; ++i) {
             const words = groups[i];
@@ -708,7 +741,7 @@ class GCodeVirtualizer extends EventEmitter {
             } else if (letter === 'T') { // T1 ; w/o M6
                 cmd = letter;
                 args = code;
-            } else if (letter === 'F') { // F750 ; w/o motion command
+            } else if (letter === 'S') {
                 cmd = letter;
                 args = code;
             } else if (letter === 'X' || letter === 'Y' || letter === 'Z' || letter === 'A' || letter === 'B' || letter === 'C' || letter === 'I' || letter === 'J' || letter === 'K') {
@@ -732,11 +765,14 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     generateFileStats() {
-        console.log(this.vmState.tools);
         return {
             fileModal: this.modal.units,
             total: this.totalLines,
-            toolSet: this.vmState.tools
+            toolSet: Array.from(this.vmState.tools),
+            spindleSet: Array.from(this.vmState.spindle),
+            movementSet: Array.from(this.vmState.feedrates),
+            estimatedTime: this.totalTime,
+            bbox: this.getBBox()
         };
     }
 
@@ -831,6 +867,29 @@ class GCodeVirtualizer extends EventEmitter {
             return 0;
         }
         return this.isImperialUnits() ? in2mm(r) : r;
+    }
+
+    getBBox(returnMBounds = false) {
+        const [minX, minY, minZ] = this.minBounds;
+        const [maxX, maxY, maxZ] = this.maxBounds;
+
+        return {
+            min: {
+                x: minX,
+                y: minY,
+                z: minZ
+            },
+            max: {
+                x: maxX,
+                y: maxY,
+                z: maxZ
+            },
+            delta: {
+                x: maxX - minX,
+                y: maxY - minY,
+                z: maxZ - minZ
+            }
+        };
     }
 }
 

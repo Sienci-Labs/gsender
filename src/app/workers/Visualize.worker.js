@@ -249,7 +249,7 @@ onmessage = function({ data }) {
 
     const { addLine, addArcCurve: addCurve } = handlers[handlerKey];
 
-    const vm = new GCodeVirtualizer({ addLine, addCurve });
+    const vm = new GCodeVirtualizer({ addLine, addCurve, collate: true });
 
     vm.on('data', (data) => {
         const vertexIndex = vertices.length / 3;
@@ -258,7 +258,6 @@ onmessage = function({ data }) {
         let spindleValues = {};
         if (isLaser) {
             updateSpindleStateFromLine(data);
-            //console.log(`Spindle: ${spindleOn} - ${line.line}`);
             spindleValues = {
                 spindleOn,
                 spindleSpeed
@@ -275,74 +274,8 @@ onmessage = function({ data }) {
         }
     });
 
-    /*const toolpath = new Toolpath({
-        addLine,
-        addArcCurve
-    });
-
-    toolpath
-        .loadFromString(content, (err, data) => {
-            if (err) {
-                console.error(err);
-            }
-        })
-        .on('data', (data) => {
-            const vertexIndex = vertices.length / 3;
-            frames.push(vertexIndex);
-
-            let spindleValues = {};
-            if (isLaser) {
-                updateSpindleStateFromLine(data);
-                //console.log(`Spindle: ${spindleOn} - ${line.line}`);
-                spindleValues = {
-                    spindleOn,
-                    spindleSpeed
-                };
-
-                spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
-            }
-
-            currentLines++;
-            const newProgress = Math.floor(currentLines / totalLines * 100);
-            if (newProgress !== progress) {
-                progress = newProgress;
-                postMessage(progress);
-            }
-        })
-        .on('end', () => {
-            let tFrames = new Uint32Array(frames);
-            let tVertices = new Float32Array(vertices);
-            console.log(`Duration: ${Date.now() - start}`);
-
-            const info = vm.generateFileStats();
-            console.log(JSON.stringify(info));
-            const message = {
-                vertices: tVertices,
-                colors,
-                frames: tFrames,
-                visualizer,
-                info
-            };
-
-            // create path for the last motion
-            if (shouldRenderSVG) {
-                createPath(currentMotion);
-                paths = JSON.parse(JSON.stringify(paths));
-                message.paths = paths;
-            }
-
-            if (isLaser) {
-                message.spindleSpeeds = spindleSpeeds;
-                message.isLaser = isLaser;
-                message.spindleChanges = spindleChanges;
-            }
-
-            postMessage(message);
-        });*/
-
     const lines = content
         .split(/\r?\n/)
-        .filter(element => element)
         .reverse();
 
     const start = Date.now();
@@ -356,6 +289,7 @@ onmessage = function({ data }) {
     let tVertices = new Float32Array(vertices);
 
     const info = vm.generateFileStats();
+    console.log(JSON.stringify(info));
 
     const message = {
         vertices: tVertices,
