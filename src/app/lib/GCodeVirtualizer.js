@@ -24,6 +24,8 @@ class GCodeVirtualizer extends EventEmitter {
 
     totalTime = 0;
 
+    feed = 0;
+
     currentLine = null;
 
     collate = false;
@@ -141,6 +143,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.fn.addLine(this.modal, this.offsetG92(v1), this.offsetG92(v2));
 
             // Update position
+            this.calculateMachiningTime(targetPosition);
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
         },
@@ -177,7 +180,8 @@ class GCodeVirtualizer extends EventEmitter {
 
             this.fn.addLine(this.modal, this.offsetG92(v1), this.offsetG92(v2));
 
-            // Update position
+            // Update position + increment machining time
+            this.calculateMachiningTime(v1, targetPosition);
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
         },
@@ -264,6 +268,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.fn.addCurve(this.modal, this.offsetG92(v1), this.offsetG92(v2), this.offsetG92(v0));
 
             // Update position
+            this.calculateMachiningTime(v1, targetPosition);
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
         },
@@ -331,6 +336,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.fn.addCurve(this.modal, this.offsetG92(v1), this.offsetG92(v2), this.offsetG92(v0));
 
             // Update position
+            this.calculateMachiningTime(v1, targetPosition);
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
         },
@@ -713,6 +719,7 @@ class GCodeVirtualizer extends EventEmitter {
             const letter = word[0];
             const code = word[1];
             if (letter === 'F') {
+                this.feed = code;
                 this.vmState.feedrates.add(`F${code}`);
             }
             if (letter === 'S') {
@@ -919,6 +926,17 @@ class GCodeVirtualizer extends EventEmitter {
                 z: maxZ - minZ
             }
         };
+    }
+
+    calculateMachiningTime(endPos) {
+        // Convert to metric
+        const feed = this.modal.units === 'G20' ? this.feed * 25.4 : this.feed;
+
+        const distance = ((endPos.x - this.position.x) ** 2) + ((endPos.y - this.position.y) ** 2) + ((endPos.z - this.position.z) ** 2);
+
+        const time = distance / (feed) * 60;
+
+        this.totalTime += time;
     }
 }
 
