@@ -141,6 +141,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.fn.addLine(this.modal, this.offsetG92(v1), this.offsetG92(v2));
 
             // Update position
+            this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
         },
         // G1: Linear Move
@@ -177,6 +178,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.fn.addLine(this.modal, this.offsetG92(v1), this.offsetG92(v2));
 
             // Update position
+            this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
         },
         // G2 & G3: Controlled Arc Move
@@ -262,6 +264,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.fn.addCurve(this.modal, this.offsetG92(v1), this.offsetG92(v2), this.offsetG92(v0));
 
             // Update position
+            this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
         },
         'G3': (params) => {
@@ -328,6 +331,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.fn.addCurve(this.modal, this.offsetG92(v1), this.offsetG92(v2), this.offsetG92(v0));
 
             // Update position
+            this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
         },
         // G4: Dwell
@@ -869,7 +873,34 @@ class GCodeVirtualizer extends EventEmitter {
         return this.isImperialUnits() ? in2mm(r) : r;
     }
 
-    getBBox(returnMBounds = false) {
+    updateBounds(position) {
+        console.log(JSON.stringify(position));
+        const { x, y, z } = position;
+
+        if (x > this.maxBounds[0]) {
+            this.maxBounds[0] = x;
+        }
+        if (x < this.minBounds[0]) {
+            this.minBounds[0] = x;
+        }
+
+        if (y > this.maxBounds[1]) {
+            this.maxBounds[1] = y;
+        }
+        if (y < this.minBounds[1]) {
+            this.minBounds[1] = y;
+        }
+
+        if (z > this.maxBounds[2]) {
+            this.maxBounds[2] = z;
+        }
+        if (z < this.minBounds[0]) {
+            this.minBounds[2] = z;
+        }
+
+    }
+
+    getBBox() {
         const [minX, minY, minZ] = this.minBounds;
         const [maxX, maxY, maxZ] = this.maxBounds;
 
