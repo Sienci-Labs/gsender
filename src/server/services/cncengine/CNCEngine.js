@@ -25,6 +25,7 @@ import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
 import partition from 'lodash/partition';
 import { SerialPort } from 'serialport';
+import Evilscan from 'evilscan';
 import socketIO from 'socket.io';
 //import socketioJwt from 'socketio-jwt';
 import EventTrigger from '../../lib/EventTrigger';
@@ -100,6 +101,8 @@ class CNCEngine {
     gcode = null;
 
     meta = null;
+
+    networkDevices = [];
 
     // Event Trigger
     event = new EventTrigger((event, trigger, commands) => {
@@ -463,6 +466,44 @@ class CNCEngine {
             socket.on('file:unload', () => {
                 log.debug('Socket unload called');
                 this.unload();
+            });
+
+            socket.on('networkScan', (port) => {
+                this.networkDevices = [];
+                const options = {
+                    target: '192.168.1.1-192.168.255.255',
+                    port: port,
+                    status: 'TROU', // Timeout, Refused, Open, Unreachable
+                    banner: true
+                };
+
+                const scan = new Evilscan(options);
+
+                scan.on('result', (device) => {
+                    // fired when item is matching options
+                    // only take open devices
+                    if (device.status === 'open') {
+                        if (device.banner.includes(GRBL) || device.banner.includes(GRBLHAL)) {
+                            this.networkDevices.push({
+                                ...device,
+                                type: device.banner.includes(GRBL) ? GRBL : GRBLHAL,
+                            });
+                        }
+                    }
+                });
+
+                scan.on('error', (err) => {
+                    log.error(err);
+                });
+
+                scan.on('done', () => {
+                    // finished !
+                    log.debug(this.networkDevices);
+                    log.info('done scan');
+                });
+
+                log.info('starting network scan');
+                scan.run();
             });
         });
     }

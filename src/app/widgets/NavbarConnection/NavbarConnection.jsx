@@ -24,7 +24,9 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import controller from 'app/lib/controller';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
+import Button from 'app/components/FunctionButton/FunctionButton';
 import PortListing from './PortListing';
 import styles from './Index.styl';
 import StatusIndicator from './StatusIndicator';
@@ -106,102 +108,115 @@ class NavbarConnection extends PureComponent {
         };
 
         return (
-            <div
-                className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection}
-                role="button"
-                tabIndex={0}
-                onClick={this.displayDropdown}
-                onKeyDown={this.displayDropdown}
-                onMouseEnter={actions.handleRefreshPorts}
-                onMouseLeave={actions.hideUnrecognizedDevices}
-                onTouchEnd={actions.handleRefreshPorts}
-            >
-                <div>
-                    <StatusIndicator {...{ connected, connecting, alertMessage }} />
-                </div>
-                <div>
-                    <div className="dropdown-label" id="connection-selection-list">
-                        {this.getConnectionStatusText(connected, connecting, alertMessage)}
+            <>
+                <div
+                    className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection}
+                    role="button"
+                    tabIndex={0}
+                    onClick={this.displayDropdown}
+                    onKeyDown={this.displayDropdown}
+                    onMouseEnter={actions.handleRefreshPorts}
+                    onMouseLeave={actions.hideUnrecognizedDevices}
+                    onTouchEnd={actions.handleRefreshPorts}
+                >
+                    <div>
+                        <StatusIndicator {...{ connected, connecting, alertMessage }} />
                     </div>
-                </div>
-                {
-                    connected && (
-                        <div className={styles.ConnectionInfo}>
-                            <div className={styles.portLabel}>{port}</div>
-                            <div>{controllerType}</div>
+                    <div>
+                        <div className="dropdown-label" id="connection-selection-list">
+                            {this.getConnectionStatusText(connected, connecting, alertMessage)}
                         </div>
-                    )
-                }
-                {
-                    connected && (
-                        <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
-                            <i className="fa fa-unlink" />
-                            Disconnect
-                        </button>
-
-                    )
-                }
-                <div style={isMobile ? { display: isActive ? 'block' : 'none' } : null} className={styles.NavbarConnectionDropdownList}>
+                    </div>
                     {
-                        !connected && (
-                        <>
-                            <h5>Firmware</h5>
-                            <FirmwareSelector options={['Grbl', 'grblHAL']} selectedFirmware={controllerType} handleSelect={actions.onClickFirmwareButton}/>
-                        </>
-                        )
-                    }
-                    {
-                        !connected && <h5>Recognized Devices</h5>
-                    }
-                    {
-                        !connected && (ports.length === 0) && (
-                            <div className={styles.noDevicesWarning}>
-                                No Devices Found
+                        connected && (
+                            <div className={styles.ConnectionInfo}>
+                                <div className={styles.portLabel}>{port}</div>
+                                <div>{controllerType}</div>
                             </div>
                         )
                     }
                     {
-                        !connected && !connecting && ports.map(
-                            port => (
-                                <PortListing
-                                    {...port}
-                                    key={port.port}
-                                    baudrate={baudrate}
-                                    controllerType={controllerType}
-                                    onClick={() => actions.onClickPortListing(port)}
-                                />
-                            )
+                        connected && (
+                            <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
+                                <i className="fa fa-unlink" />
+                                Disconnect
+                            </button>
+
                         )
                     }
-                    {
-                        !connected && !connecting &&
-                            <PortListing
-                                {...fakePort}
-                                key={fakePort.port}
-                                baudrate={fakePort.baudrate}
-                                controllerType={fakePort.controllerType}
-                                onClick={() => actions.onClickPortListing(fakePort)}
-                            />
-                    }
-                    {
-                        !connected && !connecting && (unrecognizedPorts.length > 0) &&
-                            <UnrecognizedDevices ports={unrecognizedPorts} onClick={actions.toggleShowUnrecognized} />
-                    }
-                    {
-                        !connected && !connecting && showUnrecognized && unrecognizedPorts.map(
-                            port => (
-                                <PortListing
-                                    {...port}
-                                    key={port.port}
-                                    baudrate={baudrate}
-                                    controllerType={controllerType}
-                                    onClick={() => actions.onClickPortListing(port)}
-                                />
+                    <div style={isMobile ? { display: isActive ? 'block' : 'none' } : null} className={styles.NavbarConnectionDropdownList}>
+                        {
+                            !connected && (
+                            <>
+                                <h5>Firmware</h5>
+                                <FirmwareSelector options={['Grbl', 'grblHAL']} selectedFirmware={controllerType} handleSelect={actions.onClickFirmwareButton}/>
+                            </>
                             )
-                        )
-                    }
+                        }
+                        {
+                            !connected && <h5>Recognized Devices</h5>
+                        }
+                        {
+                            !connected && (ports.length === 0) && (
+                                <div className={styles.noDevicesWarning}>
+                                    No Devices Found
+                                </div>
+                            )
+                        }
+                        {
+                            !connected && !connecting && ports.map(
+                                port => (
+                                    <PortListing
+                                        {...port}
+                                        key={port.port}
+                                        baudrate={baudrate}
+                                        controllerType={controllerType}
+                                        onClick={() => actions.onClickPortListing(port)}
+                                    />
+                                )
+                            )
+                        }
+                        {
+                            !connected && !connecting &&
+                                <PortListing
+                                    {...fakePort}
+                                    key={fakePort.port}
+                                    baudrate={fakePort.baudrate}
+                                    controllerType={fakePort.controllerType}
+                                    onClick={() => actions.onClickPortListing(fakePort)}
+                                />
+                        }
+                        {
+                            !connected && !connecting && (unrecognizedPorts.length > 0) &&
+                                <UnrecognizedDevices ports={unrecognizedPorts} onClick={actions.toggleShowUnrecognized} />
+                        }
+                        {
+                            !connected && !connecting && showUnrecognized && unrecognizedPorts.map(
+                                port => (
+                                    <PortListing
+                                        {...port}
+                                        key={port.port}
+                                        baudrate={baudrate}
+                                        controllerType={controllerType}
+                                        onClick={() => actions.onClickPortListing(port)}
+                                    />
+                                )
+                            )
+                        }
+                    </div>
                 </div>
-            </div>
+                <div>
+                    <Button
+                        primary
+                        type="button"
+                        title="Network Scan"
+                        style={{ marginBottom: '1rem' }}
+                        onClick={() => controller.networkScan('23-93')}
+                    >
+                        Network Scan
+                    </Button>
+                </div>
+            </>
         );
     }
 }

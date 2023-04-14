@@ -335,6 +335,10 @@ class Controller {
         this.socket && this.socket.emit('listAllIps', callback);
     }
 
+    networkScan(port) {
+        this.socket && this.socket.emit('networkScan', port);
+    }
+
     // Executes a command on the server.
     // @param {string} cmd The command string
     // @example Example Usage
