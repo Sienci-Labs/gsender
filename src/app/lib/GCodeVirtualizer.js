@@ -26,6 +26,8 @@ class GCodeVirtualizer extends EventEmitter {
 
     feed = 0;
 
+    lastF = 0; // Last feed in mm/m
+
     currentLine = null;
 
     collate = false;
@@ -181,7 +183,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.fn.addLine(this.modal, this.offsetG92(v1), this.offsetG92(v2));
 
             // Update position + increment machining time
-            this.calculateMachiningTime(v1, targetPosition);
+            this.calculateMachiningTime(targetPosition);
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
         },
@@ -268,7 +270,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.fn.addCurve(this.modal, this.offsetG92(v1), this.offsetG92(v2), this.offsetG92(v0));
 
             // Update position
-            this.calculateMachiningTime(v1, targetPosition);
+            this.calculateMachiningTime(targetPosition);
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
         },
@@ -336,7 +338,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.fn.addCurve(this.modal, this.offsetG92(v1), this.offsetG92(v2), this.offsetG92(v0));
 
             // Update position
-            this.calculateMachiningTime(v1, targetPosition);
+            this.calculateMachiningTime(targetPosition);
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
         },
@@ -929,14 +931,45 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     calculateMachiningTime(endPos) {
+        // assumption:  750/s^2 acceleration, TODO: Look at eeprom/configure
+        const ACCELERATION = 750;
+
+        let moveDuration = 0;
         // Convert to metric
         const feed = this.modal.units === 'G20' ? this.feed * 25.4 : this.feed;
 
-        const distance = ((endPos.x - this.position.x) ** 2) + ((endPos.y - this.position.y) ** 2) + ((endPos.z - this.position.z) ** 2);
+        // mm/s to mm/m
+        const f = feed / 60;
 
-        const time = distance / (feed) * 60;
+        const dx = endPos.x - this.position.x;
+        const dy = endPos.y - this.position.y;
 
-        this.totalTime += time;
+        let travel = Math.hypot(dx, dy);
+        if (Number.isNaN(travel)) {
+            console.error('Invalid travel while calculating distance between V1 and V2');
+            return;
+        }
+
+        // Look for Z movement if no X/Y movement
+        if (travel === 0) {
+            if (endPos.z !== this.position.z) {
+                travel = Math.abs(endPos.z - this.position.z);
+            }
+        }
+
+        if (f === this.lastF) {
+            moveDuration = f !== 0 ? (travel / f) : 0;
+        } else {
+            const distance = 2 * Math.abs(((this.lastF + f) * (f - this.lastF) * 0.5) / ACCELERATION);
+            if (distance < travel && (this.lastF + f !== 0) && f !== 0) {
+                moveDuration = 2 * distance / (this.lastF + f);
+                moveDuration += (travel - distance) / f;
+            } else {
+                moveDuration = 2 * (travel / (this.lastF + f));
+            }
+        }
+        this.lastF = f;
+        this.totalTime += moveDuration;
     }
 }
 
