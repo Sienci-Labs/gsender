@@ -48,15 +48,6 @@ const IdleInfo = ({ state, ...props }) => {
         convertedFeedMax = mm2in(feedrateMax).toFixed(2);
     }
 
-    /*if (units === IMPERIAL_UNITS) {
-        convertedFeedMin = (fileModal === METRIC_UNITS) ? feedrateMin : mm2in(feedrateMin).toFixed(3);
-        convertedFeedMax = (fileModal === METRIC_UNITS) ? feedrateMax : mm2in(feedrateMax).toFixed(3);
-    } else {
-        convertedFeedMin = (fileModal === IMPERIAL_UNITS) ? feedrateMin : mm2in(feedrateMin).toFixed(2);
-        convertedFeedMax = (fileModal === IMPERIAL_UNITS) ? feedrateMax : mm2in(feedrateMax).toFixed(2);
-    }*/
-
-
     /**
      * Return formatted list of tools in use
      */
