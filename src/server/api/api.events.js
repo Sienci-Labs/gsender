@@ -69,7 +69,6 @@ const getSanitizedRecords = () => {
 
 export const fetch = (req, res) => {
     const records = getSanitizedRecords();
-    console.log(records);
     res.send({ jsonRecords: Object.fromEntries(records) });
 };
 

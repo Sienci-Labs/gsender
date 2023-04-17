@@ -33,6 +33,7 @@ import { mapPositionToUnits } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
 import JobStatus from './JobStatus';
 import {
+    IMPERIAL_UNITS,
     METRIC_UNITS, SPINDLE_MODE,
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED
@@ -172,9 +173,10 @@ class JobStatusWidget extends PureComponent {
 
     render() {
         const { units } = this.state;
-        const { workflow, isConnected, senderStatus, bbox, fileProcessing } = this.props;
+        const { workflow, isConnected, senderStatus, bbox, fileProcessing, fileModal } = this.props;
         const state = {
             ...this.state,
+            fileModal,
             workflow,
             senderStatus,
             isRunningJob: this.isRunningJob(),
@@ -213,7 +215,8 @@ export default connect((store) => {
     const isConnected = get(store, 'connection.isConnected');
     const bbox = get(store, 'file.bbox');
     const fileProcessing = get(store, 'file.fileProcessing');
-    const fileModal = get(store, 'file.fileModal');
+    let fileModal = get(store, 'file.fileModal');
+    fileModal = (fileModal === 'G21' ? METRIC_UNITS : IMPERIAL_UNITS);
     return {
         workflow,
         senderStatus,
