@@ -968,6 +968,7 @@ class GCodeVirtualizer extends EventEmitter {
                 moveDuration = 2 * (travel / (this.lastF + f));
             }
         }
+
         this.lastF = f;
         this.totalTime += moveDuration;
     }

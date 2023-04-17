@@ -283,7 +283,7 @@ onmessage = function({ data }) {
         let line = lines.pop();
         vm.virtualize(line);
     }
-    console.log(`Duration: ${Date.now() - start}`);
+    console.log(`Parse duration: ${Date.now() - start}`);
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);

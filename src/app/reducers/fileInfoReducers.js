@@ -64,10 +64,7 @@ const reducer = createReducer(initialState, {
         };
     },
     [UPDATE_FILE_INFO]: (payload, reducerState) => {
-        console.log('reducer');
-        console.log(JSON.stringify(payload));
         const bbox = payload.bbox ? { bbox: normalizeBBox(payload.bbox) } : {};
-        console.log(JSON.stringify(bbox));
         return {
             ...payload,
             fileLoaded: true,

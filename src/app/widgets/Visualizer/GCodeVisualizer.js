@@ -94,9 +94,6 @@ class GCodeVisualizer {
             })
         );
 
-        this.geometry.computeBoundingBox();
-        console.log(this.geometry.boundingBox);
-
         this.group.add(workpiece);
 
         return this.group;
