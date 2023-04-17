@@ -289,7 +289,6 @@ onmessage = function({ data }) {
     let tVertices = new Float32Array(vertices);
 
     const info = vm.generateFileStats();
-    console.log(JSON.stringify(info));
 
     const message = {
         vertices: tVertices,
