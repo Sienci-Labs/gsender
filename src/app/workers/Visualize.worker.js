@@ -84,23 +84,12 @@ onmessage = function({ data }) {
             addLine: (modal, v1, v2, v0) => {
                 const { motion } = modal;
 
-
-                // if (shouldRotate(v1.a)) {
-                //     v1.y = rotateAxis('y', v1);
-                //     v1.z = rotateAxis('z', v1);
-                // }
-
-                // if (shouldRotate(v2.a)) {
-                //     v2.y = rotateAxis('y', v2);
-                //     v2.z = rotateAxis('z', v2);
-                // }
-
                 if (shouldRotate(v1.a) || shouldRotate(v2.a)) {
-                    v1.y = rotateAxis('y', v1);
-                    v1.z = rotateAxis('z', v1);
+                    v1.y = rotateAxis('y', v1).y;
+                    v1.z = rotateAxis('z', v1).z;
 
-                    v2.y = rotateAxis('y', v2);
-                    v2.z = rotateAxis('z', v2);
+                    v2.y = rotateAxis('y', v2).y;
+                    v2.z = rotateAxis('z', v2).z;
                 }
 
                 const opacity = (motion === 'G0') ? 0.5 : 1;
