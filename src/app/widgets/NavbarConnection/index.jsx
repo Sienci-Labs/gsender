@@ -66,13 +66,17 @@ class NavbarConnectionWidget extends PureComponent {
             }));
             this.config.set('controller.type', selectedFirmware);
         },
-        onClickPortListing: (selectedPort) => {
+        onClickPortListing: (selectedPort, isNetworkDevice) => {
             this.setState(state => ({
                 alertMessage: '',
                 port: selectedPort.port
             }), () => {
                 const { port, baudrate, controllerType } = this.state;
-                this.openPort(port, controllerType, { baudrate: baudrate });
+                if (isNetworkDevice) {
+                    this.openPort(port, selectedPort.controllerType, { baudrate: baudrate });
+                } else {
+                    this.openPort(port, controllerType, { baudrate: baudrate });
+                }
             });
         },
         toggleShowUnrecognized: () => {
