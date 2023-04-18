@@ -22,10 +22,11 @@
  */
 
 import { createReducer } from 'redux-action';
-import { CLOSE_CONNECTION, LIST_PORTS, OPEN_CONNECTION } from 'app/actions/connectionActions';
+import { CLOSE_CONNECTION, LIST_PORTS, OPEN_CONNECTION, SCAN_NETWORK } from 'app/actions/connectionActions';
 
 const initialState = {
     isConnected: false,
+    isScanning: false,
     port: null,
     baudrate: '',
     ports: [],
@@ -53,12 +54,19 @@ const reducer = createReducer(initialState, {
         };
     },
     [LIST_PORTS]: (payload, reducerState) => {
-        const { recognizedPorts, unrecognizedPorts } = payload;
+        const { recognizedPorts, unrecognizedPorts, networkPorts } = payload;
         return {
             ports: recognizedPorts,
-            unrecognizedPorts
+            unrecognizedPorts,
+            networkPorts
         };
-    }
+    },
+    [SCAN_NETWORK]: (payload, reducerState) => {
+        const { isScanning } = payload;
+        return {
+            isScanning: isScanning
+        };
+    },
 });
 
 export default reducer;

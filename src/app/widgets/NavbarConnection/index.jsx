@@ -101,6 +101,7 @@ class NavbarConnectionWidget extends PureComponent {
             alertMessage: '',
             connecting: false,
             connected: true,
+            scanning: false,
             controllerType: state.controllerType,
             port: port,
             baudrate: connectedBaudrate
@@ -113,10 +114,17 @@ class NavbarConnectionWidget extends PureComponent {
         this.setState(state => ({
             alertMessage: '',
             connecting: false,
-            connected: false
+            connected: false,
+            scanning: false
         }));
 
         this.refreshPorts();
+    }
+
+    setScanningState(isScanning) {
+        this.setState(state => ({
+            scanning: isScanning
+        }));
     }
 
     componentDidMount() {
@@ -138,7 +146,7 @@ class NavbarConnectionWidget extends PureComponent {
             autoReconnect,
             connection,
         } = this.state;
-        const { isConnected, type } = this.props;
+        const { isConnected, isScanning, type } = this.props;
         const wasConnected = prevProps.isConnected;
         if (!wasConnected && isConnected) {
             this.setConnectedState();
@@ -146,6 +154,7 @@ class NavbarConnectionWidget extends PureComponent {
         if (!isConnected && wasConnected) {
             this.setDisconnectedState();
         }
+        this.setScanningState(isScanning);
 
         this.config.set('minimized', minimized);
         if (controllerType !== type) {
@@ -186,6 +195,7 @@ class NavbarConnectionWidget extends PureComponent {
             loading: false,
             connecting: false,
             connected: false,
+            scanning: false,
             baudrates: reverse(sortBy(uniq(controller.baudrates.concat(defaultBaudrates)))),
             controllerType: controllerType,
             port: this.config.get('port'),
@@ -268,7 +278,8 @@ class NavbarConnectionWidget extends PureComponent {
                 this.setState(state => ({
                     alertMessage: i18n._('Error opening port \'{{- port}}\'', { port: port }),
                     connecting: false,
-                    connected: false
+                    connected: false,
+                    scanning: false
                 }));
 
                 log.error(err);
@@ -280,7 +291,8 @@ class NavbarConnectionWidget extends PureComponent {
     closePort(port = this.state.port) {
         this.setState(state => ({
             connecting: false,
-            connected: false
+            connected: false,
+            scanning: false
         }));
         controller.closePort(port, (err) => {
             if (err) {
@@ -336,10 +348,11 @@ class NavbarConnectionWidget extends PureComponent {
     }
 
     render() {
-        const { ports, unrecognizedPorts } = this.props;
+        const { ports, unrecognizedPorts, networkPorts } = this.props;
         const state = {
             ...this.state,
             ports,
+            networkPorts,
             unrecognizedPorts
         };
         const actions = {
@@ -355,7 +368,9 @@ class NavbarConnectionWidget extends PureComponent {
 export default connect((store) => {
     const ports = get(store, 'connection.ports');
     const unrecognizedPorts = get(store, 'connection.unrecognizedPorts', []);
+    const networkPorts = get(store, 'connection.networkPorts', []);
     const isConnected = get(store, 'connection.isConnected');
+    const isScanning = get(store, 'connection.isScanning');
     const type = get(store, 'controller.type');
     const port = get(store, 'connection.port');
     const connectedBaudrate = get(store, 'connection.baudrate');
@@ -363,10 +378,12 @@ export default connect((store) => {
     return {
         ports,
         isConnected,
+        isScanning,
         type,
         port,
         connectedBaudrate,
         unrecognizedPorts,
+        networkPorts,
         state
     };
 })(NavbarConnectionWidget);

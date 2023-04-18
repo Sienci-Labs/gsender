@@ -266,6 +266,13 @@ class CNCEngine {
 
                         recognizedPorts = recognizedPorts.map(portInfoMapFn);
                         unrecognizedPorts = unrecognizedPorts.map(portInfoMapFn);
+                        const networkPorts = this.networkDevices.map((port) => {
+                            return {
+                                port: port.ip,
+                                manufacturer: undefined,
+                                inuse: controllers[port],
+                            };
+                        });
                         /*unrecognizedPorts = [{
                             port: 'COM3',
                             manufacturer: 'Microsoft',
@@ -276,7 +283,7 @@ class CNCEngine {
                             inuse: false
                         }];*/
 
-                        socket.emit('serialport:list', recognizedPorts, unrecognizedPorts);
+                        socket.emit('serialport:list', recognizedPorts, unrecognizedPorts, networkPorts);
                     })
                     .catch(err => {
                         log.error(err);
@@ -498,11 +505,12 @@ class CNCEngine {
 
                 scan.on('done', () => {
                     // finished !
-                    log.debug(this.networkDevices);
                     log.info('done scan');
+                    socket.emit('networkScan', false);
                 });
 
                 log.info('starting network scan');
+                socket.emit('networkScan', true);
                 scan.run();
             });
         });

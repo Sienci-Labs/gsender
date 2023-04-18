@@ -26,7 +26,6 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import controller from 'app/lib/controller';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
-import Button from 'app/components/FunctionButton/FunctionButton';
 import PortListing from './PortListing';
 import styles from './Index.styl';
 import StatusIndicator from './StatusIndicator';
@@ -76,13 +75,15 @@ class NavbarConnection extends PureComponent {
         });
     };
 
-    getConnectionStatusText = (connected, connecting, alertMessage,) => {
+    getConnectionStatusText = (connected, connecting, scanning, alertMessage,) => {
         if (connected) {
             return 'Connected';
         } else if (alertMessage) {
             return alertMessage;
         } else if (connecting) {
             return 'Connecting...';
+        } else if (scanning) {
+            return 'Scanning...';
         }
         return 'Connect to Machine ▼';
     };
@@ -96,16 +97,10 @@ class NavbarConnection extends PureComponent {
 
     render() {
         const { state, actions } = this.props;
-        const { connected, ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
+        const { connected, ports, connecting, scanning, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized, networkPorts } = state;
         const { isActive } = this.state;
         const isMobile = window.visualViewport.width <= 599;
 
-        const fakePort = {
-            port: '192.168.1.1',
-            key: '192.168.1.1',
-            baudrate: 19700,
-            controllerType: 'Grbl',
-        };
 
         return (
             <>
@@ -120,11 +115,11 @@ class NavbarConnection extends PureComponent {
                     onTouchEnd={actions.handleRefreshPorts}
                 >
                     <div>
-                        <StatusIndicator {...{ connected, connecting, alertMessage }} />
+                        <StatusIndicator {...{ connected, connecting, scanning, alertMessage }} />
                     </div>
                     <div>
                         <div className="dropdown-label" id="connection-selection-list">
-                            {this.getConnectionStatusText(connected, connecting, alertMessage)}
+                            {this.getConnectionStatusText(connected, connecting, scanning, alertMessage)}
                         </div>
                     </div>
                     {
@@ -177,14 +172,44 @@ class NavbarConnection extends PureComponent {
                             )
                         }
                         {
-                            !connected && !connecting &&
-                                <PortListing
-                                    {...fakePort}
-                                    key={fakePort.port}
-                                    baudrate={fakePort.baudrate}
-                                    controllerType={fakePort.controllerType}
-                                    onClick={() => actions.onClickPortListing(fakePort)}
-                                />
+                            !connected && <h5>Network Scan</h5>
+                        }
+                        {
+                            !connected &&
+                                <div className={styles.firmwareSelector}>
+                                    <div className={styles.selectorWrapper}>
+                                        <button
+                                            type="button"
+                                            onClick={() => controller.networkScan(23)}
+                                            className={styles.scanButton}
+                                        >
+                                            SCAN for Devices
+                                        </button>
+                                    </div>
+                                </div>
+                        }
+                        {
+                            !connected && <h5>Network Devices</h5>
+                        }
+                        {
+                            !connected && (networkPorts.length === 0) && (
+                                <div className={styles.noDevicesWarning}>
+                                    No Devices Found
+                                </div>
+                            )
+                        }
+                        {
+                            !connected && !connecting && networkPorts.map(
+                                port => (
+                                    <PortListing
+                                        {...port}
+                                        key={port.port}
+                                        baudrate={baudrate}
+                                        controllerType={controllerType}
+                                        onClick={() => actions.onClickPortListing(port)}
+                                    />
+                                )
+                            )
                         }
                         {
                             !connected && !connecting && (unrecognizedPorts.length > 0) &&
@@ -204,17 +229,6 @@ class NavbarConnection extends PureComponent {
                             )
                         }
                     </div>
-                </div>
-                <div>
-                    <Button
-                        primary
-                        type="button"
-                        title="Network Scan"
-                        style={{ marginBottom: '1rem' }}
-                        onClick={() => controller.networkScan('23-93')}
-                    >
-                        Network Scan
-                    </Button>
                 </div>
             </>
         );
