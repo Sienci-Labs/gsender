@@ -36,7 +36,7 @@ const attemptReconnect = (forcedReload = true) => {
 const ServerDisconnected = (props) => (
     <Modal
         size="xs"
-        disableOverlay={true}
+        disableOverlayClick
         showCloseButton={false}
     >
         <Modal.Body>

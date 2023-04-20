@@ -198,7 +198,7 @@ series([
         await portal(({ onClose }) => (
             <Modal
                 onClose={onClose}
-                disableOverlay={true}
+                disableOverlayClick
                 showCloseButton={false}
             >
                 <Modal.Body>

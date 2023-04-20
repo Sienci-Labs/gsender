@@ -65,7 +65,7 @@ class CreateRecord extends PureComponent {
 
         return (
             <Modal
-                disableOverlay
+                disableOverlayClick
                 size="sm"
                 onClose={action.closeModal}
             >
