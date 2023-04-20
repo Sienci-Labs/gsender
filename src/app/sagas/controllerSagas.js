@@ -512,6 +512,7 @@ export function* initialize() {
         if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
             window.ipcRenderer.send('logError:electron', error);
         }
+        pubsub.publish('error', error);
     });
 
     controller.addListener('wizard:next', (stepIndex, substepIndex) => {
