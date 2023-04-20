@@ -386,15 +386,26 @@ class WorkflowControl extends PureComponent {
             pubsub.subscribe('outline:done', () => {
                 this.workerOutline.terminate();
             }),
-            pubsub.subscribe('disconnect:recovery', (msg, received) => {
-                controller.command('homing');
-                this.setState(prev => ({
-                    startFromLine: {
-                        ...prev.startFromLine,
-                        value: received,
-                        waitForHoming: true
-                    }
-                }));
+            pubsub.subscribe('disconnect:recovery', (msg, received, homingEnabled) => {
+                if (homingEnabled) {
+                    controller.command('homing');
+                    this.setState(prev => ({
+                        startFromLine: {
+                            ...prev.startFromLine,
+                            value: received,
+                            waitForHoming: true
+                        }
+                    }));
+                } else {
+                    this.setState(prev => ({
+                        startFromLine: {
+                            ...prev.startFromLine,
+                            value: received,
+                            needsRecovery: true,
+                            showModal: true
+                        }
+                    }));
+                }
             }),
             pubsub.subscribe('units:change', (msg, units) => {
                 this.changeUnits(units);
@@ -632,7 +643,7 @@ class WorkflowControl extends PureComponent {
                                         <p>on a g-code file with a total of <strong>{lineTotal}</strong> lines</p>
                                         {
                                             needsRecovery && value &&
-                                                <p>Recommended starting lines: <strong>{value - 10}</strong> - <strong>{value}</strong></p>
+                                                <p>Recommended starting lines: <strong>{value - 10 >= 0 ? value - 10 : 0}</strong> - <strong>{value}</strong></p>
                                         }
                                     </div>
                                     <div>
