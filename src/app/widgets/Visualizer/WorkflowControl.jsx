@@ -100,7 +100,7 @@ class WorkflowControl extends PureComponent {
             startFromLine: {
                 showModal: false,
                 needsRecovery: false,
-                value: 1,
+                value: 0,
                 waitForHoming: false,
                 safeHeight: store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 10 : 0.4,
                 defaultSafeHeight: store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 10 : 0.4
@@ -401,8 +401,7 @@ class WorkflowControl extends PureComponent {
                         startFromLine: {
                             ...prev.startFromLine,
                             value: received,
-                            needsRecovery: true,
-                            showModal: true
+                            needsRecovery: true
                         }
                     }));
                 }
@@ -540,7 +539,10 @@ class WorkflowControl extends PureComponent {
                                     !workflowPaused && (
                                         <div
                                             role="button"
-                                            className={styles['start-from-line-button']}
+                                            className={cx(
+                                                styles['start-from-line-button'],
+                                                { [styles.pulse]: needsRecovery }
+                                            )}
                                             onClick={this.startFromLinePrompt}
                                         >
                                             <i className="fas fa-list-ol" />
@@ -642,7 +644,7 @@ class WorkflowControl extends PureComponent {
                                         <p style={{ marginBottom: '0px' }}>Your job was last stopped around line: <strong>{value}</strong></p>
                                         <p>on a g-code file with a total of <strong>{lineTotal}</strong> lines</p>
                                         {
-                                            needsRecovery && value &&
+                                            value > 0 &&
                                                 <p>Recommended starting lines: <strong>{value - 10 >= 0 ? value - 10 : 0}</strong> - <strong>{value}</strong></p>
                                         }
                                     </div>
@@ -686,7 +688,7 @@ class WorkflowControl extends PureComponent {
                                     </div>
                                     <div className={styles.startHeader}>
                                         <p style={{ color: '#E2943B' }}>
-                                            Accounts for all pase CNC movements, units, spindle speeds,
+                                            Accounts for all past CNC movements, units, spindle speeds,
                                             laser power, Start/Stop gcode, and any other file modals or setup.
                                         </p>
                                     </div>
