@@ -881,7 +881,7 @@ class GrblController {
 
         // Tool
         const tool = this.runner.getTool();
-        
+
         // G-code parameters
         const parameters = this.runner.getParameters();
 
@@ -929,7 +929,7 @@ class GrblController {
 
             // Tool
             tool: Number(tool) || 0,
-            
+
             // G-code parameters
             params: parameters,
 
