@@ -52,4 +52,11 @@ module.exports = [
     '[posa]',
     { type: 'header', text: 'Set bounding box' },
     '%xmin=0,xmax=100,ymin=0,ymax=100,zmin=0,zmax=50\n',
+    { type: 'header', text: 'Get current Parameters' },
+    '%PROBE_X = params.PRB.x',
+    '%PROBE_Y = params.PRB.y',
+    '%PROBE_Z = params.PRB.z',
+    '%G54_Z = params.G54.z',
+    '%G57_Z = params.G57.z',
+    '%TOOL_OFFSET = params.TLO',
 ];
