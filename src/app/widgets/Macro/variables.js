@@ -62,4 +62,3 @@ module.exports = [
     '%G57_Z=params.G57.z\n',
     '%TOOL_OFFSET=params.TLO\n',
 ];
-
