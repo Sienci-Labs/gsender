@@ -20,12 +20,10 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import pubsub from 'pubsub-js';
 import get from 'lodash/get';
 import controller from 'app/lib/controller';
 import AlarmDescriptionIcon from 'app/widgets/Visualizer/AlarmDescriptionIcon';
@@ -45,27 +43,6 @@ class ControlArea extends Component {
 
     state = {
         currentAlarmIcon: 'fa-lock',
-        grblExists: true,
-    }
-
-    pubsubTokens = [];
-
-    subscribe() {
-        const tokens = [
-            pubsub.subscribe('grblExists:update', (msg, value) => {
-                this.setState({
-                    grblExists: value
-                });
-            }),
-        ];
-        this.pubsubTokens = this.pubsubTokens.concat(tokens);
-    }
-
-    unsubscribe() {
-        this.pubsubTokens.forEach((token) => {
-            pubsub.unsubscribe(token);
-        });
-        this.pubsubTokens = [];
     }
 
     unlock = () => {
@@ -78,14 +55,6 @@ class ControlArea extends Component {
             return;
         }
         controller.command('unlock');
-    }
-
-    componentDidMount() {
-        this.subscribe();
-    }
-
-    componentWillUnmount() {
-        this.unsubscribe();
     }
 
     render() {
@@ -127,16 +96,15 @@ class ControlArea extends Component {
                             </div>
                         </div>
                     );
-                } else if (activeState && this.state.grblExists) {
-                    return (
-                        <div className={styles[`machine-${activeState}`]}>
-                            { message[activeState] }
-                        </div>
-                    );
-                } else if (activeState && !this.state.grblExists) {
-                    return <div className={styles['machine-Disconnected']}>Invalid firmware response</div>;
+                } {
+                    return activeState
+                        ? (
+                            <div className={styles[`machine-${activeState}`]}>
+                                { message[activeState] }
+                            </div>
+                        )
+                        : <div className={styles['machine-Disconnected']}>Disconnected</div>;
                 }
-                return <div className={styles['machine-Disconnected']}>Connecting</div>;
             } else {
                 return <div className={styles['machine-Disconnected']}>Disconnected</div>;
             }
