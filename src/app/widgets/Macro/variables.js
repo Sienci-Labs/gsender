@@ -52,6 +52,8 @@ module.exports = [
     '[posa]',
     { type: 'header', text: 'Set bounding box' },
     '%xmin=0,xmax=100,ymin=0,ymax=100,zmin=0,zmax=50\n',
+    { type: 'header', text: 'Request current Parameters - must do before using parameters' },
+    '$#/n%wait',
     { type: 'header', text: 'Get current Parameters' },
     '%PROBE_X = params.PRB.x',
     '%PROBE_Y = params.PRB.y',
