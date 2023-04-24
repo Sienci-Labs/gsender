@@ -85,11 +85,13 @@ onmessage = function({ data }) {
                 const { motion } = modal;
 
                 if (shouldRotate(v1.a) || shouldRotate(v2.a)) {
-                    v1.y = rotateAxis('y', v1).y;
-                    v1.z = rotateAxis('z', v1).z;
+                    const newV1 = rotateAxis('y', v1);
+                    v1.y = newV1.y;
+                    v1.z = newV1.z;
 
-                    v2.y = rotateAxis('y', v2).y;
-                    v2.z = rotateAxis('z', v2).z;
+                    const newV2 = rotateAxis('y', v2);
+                    v2.y = newV2.y;
+                    v2.z = newV2.z;
                 }
 
                 const opacity = (motion === 'G0') ? 0.5 : 1;

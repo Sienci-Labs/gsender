@@ -24,32 +24,32 @@ export const shouldRotate = (aValue) => {
     return aValue !== 0;
 };
 
-export const rotateAxis = (axis, { x, y, z, a }) => {
+export const rotateAxis = (axis, { y, z, a }) => {
     if (!axis) {
         throw new Error('Axis is required');
     }
 
-    // Convert angle from degrees to radians
     const angle = toRadians(a);
 
-    // Create a Vector3 object from the vertex coordinates
-    const point = new THREE.Vector3(z, 0, y);
+    // Calculate the sine and cosine of the angle
+    const sinA = Math.sin(angle);
+    const cosA = Math.cos(angle);
 
-    // Create a rotation matrix around the given axis
-    const rotationMatrix = new THREE.Matrix4();
+    // Rotate the vertex around the y-axis
     if (axis === 'y') {
-        rotationMatrix.makeRotationY(angle);
-    } else if (axis === 'z') {
-        rotationMatrix.makeRotationZ(angle);
-    } else {
-        throw new Error('Invalid axis');
+        const newY = y * cosA - z * sinA;
+        const newZ = y * sinA + z * cosA;
+        return { y: newY, z: newZ, a };
     }
 
-    // Apply the rotation matrix to the vertex coordinates
-    point.applyMatrix4(rotationMatrix);
+    // Rotate the vertex around the z-axis
+    if (axis === 'z') {
+        const newX = y * sinA + z * cosA;
+        const newZ = -y * cosA + z * sinA;
+        return { y: newX, z: newZ, a };
+    }
 
-    // Return the rotated vertex coordinates
-    return { y: point.x, z: point.y, a };
+    return null;
 };
 
 class GcodeToolpath {
