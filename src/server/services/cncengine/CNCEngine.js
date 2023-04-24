@@ -475,12 +475,12 @@ class CNCEngine {
                 this.unload();
             });
 
-            socket.on('networkScan', (port) => {
+            socket.on('networkScan', (port, target) => {
+                console.log(target);
                 this.networkDevices = [];
                 const options = {
-                    target: '192.168.1.1-192.168.255.255',
+                    target: target,
                     port: port,
-                    status: 'TROU', // Timeout, Refused, Open, Unreachable
                     banner: true
                 };
 
@@ -489,13 +489,12 @@ class CNCEngine {
                 scan.on('result', (device) => {
                     // fired when item is matching options
                     // only take open devices
-                    if (device.status === 'open') {
-                        if (device.banner.includes(GRBL) || device.banner.includes(GRBLHAL)) {
-                            this.networkDevices.push({
-                                ...device,
-                                controllerType: device.banner.includes(GRBL) ? GRBL : GRBLHAL,
-                            });
-                        }
+                    log.debug(device);
+                    if (device.banner.includes(GRBL) || device.banner.includes(GRBLHAL)) {
+                        this.networkDevices.push({
+                            ...device,
+                            controllerType: device.banner.includes(GRBL) ? GRBL : GRBLHAL,
+                        });
                     }
                 });
 
@@ -506,11 +505,11 @@ class CNCEngine {
                 scan.on('done', () => {
                     // finished !
                     log.info('done scan');
-                    socket.emit('networkScan', false);
+                    socket.emit('networkScan:status', false);
                 });
 
                 log.info('starting network scan');
-                socket.emit('networkScan', true);
+                socket.emit('networkScan:status', true);
                 scan.run();
             });
         });

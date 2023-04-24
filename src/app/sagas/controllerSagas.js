@@ -574,7 +574,7 @@ export function* initialize() {
         }
     });
 
-    controller.addListener('networkScan', (isScanning) => {
+    controller.addListener('networkScan:status', (isScanning) => {
         reduxStore.dispatch({
             type: connectionActions.SCAN_NETWORK,
             payload: {

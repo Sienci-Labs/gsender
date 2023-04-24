@@ -24,12 +24,14 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import cx from 'classnames';
 import controller from 'app/lib/controller';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
 import PortListing from './PortListing';
 import styles from './Index.styl';
 import StatusIndicator from './StatusIndicator';
 import FirmwareSelector from './FirmwareSelector';
+import ControlledNumberInput from '../../components/ControlledNumberInput';
 
 
 class NavbarConnection extends PureComponent {
@@ -46,7 +48,16 @@ class NavbarConnection extends PureComponent {
 
     state = {
         mobile: false,
-        isActive: false
+        isActive: false,
+        ip: [
+            192,
+            168,
+            1,
+            1,
+            255
+        ],
+        startedScan: false,
+        hasScanned: false
     }
 
     componentDidMount() {
@@ -56,6 +67,20 @@ class NavbarConnection extends PureComponent {
 
     componentWillUnmount() {
         this.removeResizeEventListener();
+    }
+
+    componentDidUpdate() {
+        const { scanning } = this.props.state;
+        const { startedScan } = this.state;
+        if (scanning) {
+            this.setState({
+                startedScan: true
+            });
+        } else if (startedScan) {
+            this.setState({
+                hasScanned: true
+            });
+        }
     }
 
     addResizeEventListener() {
@@ -95,10 +120,23 @@ class NavbarConnection extends PureComponent {
         }
     }
 
+    onIPChange(value, index) {
+        const { ip } = this.state;
+        let newIp = ip;
+        newIp[index] = value;
+        this.setState({
+            ip: newIp
+        });
+    }
+
+    convertIPToString(ip) {
+        return ip[0] + '.' + ip[1] + '.' + ip[2] + '.' + ip[3] + '-' + ip[4];
+    }
+
     render() {
         const { state, actions } = this.props;
         const { connected, ports, connecting, scanning, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized, networkPorts } = state;
-        const { isActive } = this.state;
+        const { isActive, ip, hasScanned } = this.state;
         const isMobile = window.visualViewport.width <= 599;
 
 
@@ -172,30 +210,97 @@ class NavbarConnection extends PureComponent {
                             )
                         }
                         {
-                            !connected && <h5>Network Scan</h5>
+                            !connected && <h5>Network Devices</h5>
                         }
                         {
                             !connected &&
-                                <div className={styles.firmwareSelector}>
+                                <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
+                                    <div className={styles.ipSection}>
+                                        <p className={styles.ipLabel}>Set IP Range:</p>
+                                        <div className={styles.ipContainer}>
+                                            <ControlledNumberInput
+                                                className={styles.ipInput}
+                                                externalOnChange={(e) => {
+                                                    this.onIPChange(Number(e.target.value), 0);
+                                                }}
+                                                type="number"
+                                                value={ip[0]}
+                                                min={1}
+                                                max={255}
+                                            />
+                                            <strong className={styles.dot}>.</strong>
+                                            <ControlledNumberInput
+                                                className={styles.ipInput}
+                                                externalOnChange={(e) => {
+                                                    this.onIPChange(Number(e.target.value), 1);
+                                                }}
+                                                type="number"
+                                                value={ip[1]}
+                                                min={1}
+                                                max={255}
+                                            />
+                                            <strong className={styles.dot}>.</strong>
+                                            <ControlledNumberInput
+                                                className={styles.ipInput}
+                                                externalOnChange={(e) => {
+                                                    this.onIPChange(Number(e.target.value), 2);
+                                                }}
+                                                type="number"
+                                                value={ip[2]}
+                                                min={1}
+                                                max={255}
+                                            />
+                                            <strong className={styles.dot}>.</strong>
+                                            <ControlledNumberInput
+                                                className={styles.ipInput}
+                                                externalOnChange={(e) => {
+                                                    this.onIPChange(Number(e.target.value), 3);
+                                                }}
+                                                type="number"
+                                                value={ip[3]}
+                                                min={1}
+                                                max={255}
+                                            />
+                                            <strong>—</strong>
+                                            <ControlledNumberInput
+                                                className={styles.ipInput}
+                                                externalOnChange={(e) => {
+                                                    this.onIPChange(Number(e.target.value), 4);
+                                                }}
+                                                type="number"
+                                                value={ip[4]}
+                                                min={1}
+                                                max={255}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                        }
+                        {
+                            !connected &&
+                                <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
                                     <div className={styles.selectorWrapper}>
                                         <button
                                             type="button"
-                                            onClick={() => controller.networkScan(23)}
+                                            onClick={() => controller.networkScan(23, this.convertIPToString(ip))}
                                             className={styles.scanButton}
                                         >
-                                            SCAN for Devices
+                                            Scan for Devices
                                         </button>
                                     </div>
                                 </div>
                         }
                         {
-                            !connected && <h5>Network Devices</h5>
-                        }
-                        {
                             !connected && (networkPorts.length === 0) && (
-                                <div className={styles.noDevicesWarning}>
-                                    No Devices Found
-                                </div>
+                                hasScanned ? (
+                                    <div className={styles.noDevicesWarning}>
+                                        No Network Devices Found
+                                    </div>
+                                ) : (
+                                    <div className={styles.noDevicesWarning}>
+                                        Please Scan To Display Available Devices
+                                    </div>
+                                )
                             )
                         }
                         {

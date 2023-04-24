@@ -108,7 +108,7 @@ class Controller {
         'feedhold_alt': [],
         'virtual_stop_toggle': [],
         'filetype': [],
-        'networkScan': [],
+        'networkScan:status': [],
 
         //A-Axis A.K.A Rotary-Axis events
         'rotaryAxis:updateState': []
@@ -336,8 +336,8 @@ class Controller {
         this.socket && this.socket.emit('listAllIps', callback);
     }
 
-    networkScan(port) {
-        this.socket && this.socket.emit('networkScan', port);
+    networkScan(port, target) {
+        this.socket && this.socket.emit('networkScan', port, target);
     }
 
     // Executes a command on the server.
