@@ -30,6 +30,7 @@ import store from 'app/store';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
+import cx from 'classnames';
 import reduxStore from 'app/store/redux';
 import { UPDATE_JOB_OVERRIDES } from 'app/actions/visualizerActions';
 import controller from 'app/lib/controller';
@@ -99,7 +100,7 @@ class WorkflowControl extends PureComponent {
             startFromLine: {
                 showModal: false,
                 needsRecovery: false,
-                value: 1,
+                value: 0,
                 waitForHoming: false,
                 safeHeight: store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 10 : 0.4,
                 defaultSafeHeight: store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 10 : 0.4
@@ -385,15 +386,25 @@ class WorkflowControl extends PureComponent {
             pubsub.subscribe('outline:done', () => {
                 this.workerOutline.terminate();
             }),
-            pubsub.subscribe('disconnect:recovery', (msg, received) => {
-                controller.command('homing');
-                this.setState(prev => ({
-                    startFromLine: {
-                        ...prev.startFromLine,
-                        value: received,
-                        waitForHoming: true
-                    }
-                }));
+            pubsub.subscribe('disconnect:recovery', (msg, received, homingEnabled) => {
+                if (homingEnabled) {
+                    controller.command('homing');
+                    this.setState(prev => ({
+                        startFromLine: {
+                            ...prev.startFromLine,
+                            value: received,
+                            waitForHoming: true
+                        }
+                    }));
+                } else {
+                    this.setState(prev => ({
+                        startFromLine: {
+                            ...prev.startFromLine,
+                            value: received,
+                            needsRecovery: true
+                        }
+                    }));
+                }
             }),
             pubsub.subscribe('units:change', (msg, units) => {
                 this.changeUnits(units);
@@ -528,7 +539,10 @@ class WorkflowControl extends PureComponent {
                                     !workflowPaused && (
                                         <div
                                             role="button"
-                                            className={styles['start-from-line-button']}
+                                            className={cx(
+                                                styles['start-from-line-button'],
+                                                { [styles.pulse]: needsRecovery }
+                                            )}
                                             onClick={this.startFromLinePrompt}
                                         >
                                             <i className="fas fa-list-ol" />
@@ -622,12 +636,21 @@ class WorkflowControl extends PureComponent {
                             </Modal.Header>
                             <Modal.Body style={{ backgroundColor: '#e5e7eb' }}>
                                 <div className={styles.startFromLineContainer}>
-                                    <div className={styles.startHeader}>
-                                        <p style={{ color: '#E2943B' }}>Start from line will take into account all movements prior to this line.</p>
+                                    <div className={styles.startDetails}>
+                                        <p className={styles.firstDetail}>
+                                            Recover a carve disrupted by power loss, disconnection,
+                                            mechanical malfunction, or other failures
+                                        </p>
+                                        <p style={{ marginBottom: '0px' }}>Your job was last stopped around line: <b>{value}</b></p>
+                                        <p>on a g-code file with a total of <b>{lineTotal}</b> lines</p>
+                                        {
+                                            value > 0 &&
+                                                <p>Recommended starting lines: <strong>{value - 10 >= 0 ? value - 10 : 0}</strong> - <strong>{value}</strong></p>
+                                        }
                                     </div>
                                     <div>
                                         <Input
-                                            label="Start at g-code Line:"
+                                            label="Resume job at line:"
                                             value={value}
                                             onChange={(e) => (e.target.value <= lineTotal && e.target.value >= 0) &&
                                                 this.setState(prev => ({
@@ -639,18 +662,6 @@ class WorkflowControl extends PureComponent {
                                             }
                                             additionalProps={{ type: 'number', max: lineTotal, min: 0 }}
                                         />
-                                        <div className={styles.startDetails}>
-                                            <p className={styles.firstDetail}>
-                                                Max Line Number: <strong>{lineTotal}</strong>
-                                            </p>
-                                            {
-                                                needsRecovery ? (
-                                                    value && <p>Recommended starting lines: <strong>{value - 10}</strong> - <strong>{value}</strong></p>
-                                                ) : (
-                                                    value && <p>The last job was stopped on line number: <strong>{value}</strong></p>
-                                                )
-                                            }
-                                        </div>
                                     </div>
                                     <div>
                                         <Tooltip content={`Default Value: ${defaultSafeHeight}`}>
@@ -669,11 +680,17 @@ class WorkflowControl extends PureComponent {
                                                 additionalProps={{ type: 'number' }}
                                             />
                                         </Tooltip>
-                                        <div className={styles.startDetails} style={{ float: 'left', marginLeft: '1rem' }}>
+                                        <div className={cx(styles.startDetails, styles.small)} style={{ float: 'right', marginRight: '1rem' }}>
                                             <p>
                                                 (Safe Height is the value above Z max)
                                             </p>
                                         </div>
+                                    </div>
+                                    <div className={styles.startHeader}>
+                                        <p style={{ color: '#E2943B' }}>
+                                            Accounts for all past CNC movements, units, spindle speeds,
+                                            laser power, Start/Stop gcode, and any other file modals or setup.
+                                        </p>
                                     </div>
                                     <div className={styles.buttonsContainer}>
                                         <button

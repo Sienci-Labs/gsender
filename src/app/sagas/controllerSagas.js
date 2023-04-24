@@ -249,10 +249,8 @@ export function* initialize() {
                 cancelLabel: 'Close',
                 onConfirm: () => {
                     connectToLastDevice(() => {
-                        // if limit switches active, home
-                        if (homingEnabled === '1') {
-                            pubsub.publish('disconnect:recovery', received);
-                        }
+                        // prompt recovery, either with homing or a prompt to start from line
+                        pubsub.publish('disconnect:recovery', received, homingEnabled);
                     });
                 }
             });
