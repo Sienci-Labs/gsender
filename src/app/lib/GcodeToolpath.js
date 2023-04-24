@@ -37,16 +37,17 @@ export const rotateAxis = (axis, { y, z, a }) => {
 
     // Rotate the vertex around the y-axis
     if (axis === 'y') {
-        const newY = y * cosA - z * sinA;
-        const newZ = y * sinA + z * cosA;
-        return { y: newY, z: newZ, a };
+        const rotatedZ = z * cosA - y * sinA;
+        const rotatedY = z * sinA + y * cosA;
+        return { y: rotatedY, z: rotatedZ, a };
     }
 
     // Rotate the vertex around the z-axis
+    //This logic is just for testing
     if (axis === 'z') {
-        const newX = y * sinA + z * cosA;
-        const newZ = -y * cosA + z * sinA;
-        return { y: newX, z: newZ, a };
+        const rotatedY = y * cosA - z * sinA;
+        const rotatedZ = y * sinA + z * cosA;
+        return { y: rotatedY, z: rotatedZ, a };
     }
 
     return null;
