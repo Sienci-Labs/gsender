@@ -35,19 +35,26 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
     const { isLoading } = useWizardContext();
 
     useEffect(() => {
-        const token = pubsub.subscribe('wizard:next', (msg, indexes) => {
-            const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
-            if (stepIn === stepIndex && subStepIn === substepIndex) {
-                markActionAsComplete(stepIndex, substepIndex);
-                const activeValues = completeSubStep(stepIndex, substepIndex);
-                updateSubstepOverlay(activeValues);
-                scrollToActiveStep(activeValues);
+        const tokens = [
+            pubsub.subscribe('wizard:next', (msg, indexes) => {
+                const { stepIndex: stepIn, substepIndex: subStepIn } = indexes;
+                if (stepIn === stepIndex && subStepIn === substepIndex) {
+                    markActionAsComplete(stepIndex, substepIndex);
+                    const activeValues = completeSubStep(stepIndex, substepIndex);
+                    updateSubstepOverlay(activeValues);
+                    scrollToActiveStep(activeValues);
+                    setIsLoading(false);
+                }
+            }),
+            pubsub.subscribe('error', (msg, error) => {
                 setIsLoading(false);
-            }
-        });
+            })
+        ];
 
         return () => {
-            pubsub.unsubscribe(token);
+            tokens.forEach((token) => {
+                pubsub.unsubscribe(token);
+            });
         };
     }, []);
 
