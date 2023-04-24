@@ -1,11 +1,14 @@
 import React, { useContext, useState } from 'react';
-
+import { get } from 'lodash';
+import reduxStore from 'app/store/redux';
+import { GRBLHAL } from 'app/constants';
 import ToolsNotificationModal from 'app/components/ToolsNotificationModal/Modal';
 import { Toaster, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
 import { FirmwareContext, getResetToDefaultMessage, restoreDefaultSettings, startFlash } from '../../utils';
 import defaultGRBLSettings from '../../eepromFiles/DefaultGrblSettings.json';
+import defaultGRBLHALSettings from '../../eepromFiles/DefaultGrblHalSettings.json';
 
 const Notifications = () => {
     const {
@@ -39,7 +42,8 @@ const Notifications = () => {
     const message = getResetToDefaultMessage(machineProfile);
 
     const restoreDefaults = () => {
-        const machineProfileUpdated = { ...machineProfile, eepromSettings: machineProfile.eepromSettings ?? defaultGRBLSettings };
+        const controllerType = get(reduxStore.getState(), 'controller.type');
+        const machineProfileUpdated = { ...machineProfile, eepromSettings: machineProfile.eepromSettings ?? (controllerType === GRBLHAL ? defaultGRBLHALSettings : defaultGRBLSettings) };
         restoreDefaultSettings(machineProfileUpdated);
         setSettings(prev => prev.map(item => ({ ...item, value: machineProfileUpdated.eepromSettings[item.setting] })));
         setShouldRestoreDefault(false);

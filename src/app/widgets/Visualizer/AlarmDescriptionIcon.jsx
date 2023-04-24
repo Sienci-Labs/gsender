@@ -22,12 +22,18 @@
  */
 
 import React from 'react';
+import { get } from 'lodash';
+import reduxStore from 'app/store/redux';
+import { GRBLHAL } from 'app/constants';
+import { GRBL_HAL_ALARMS } from 'server/controllers/Grblhal/constants';
 import { GRBL_ALARMS } from 'server/controllers/Grbl/constants';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import styles from './workflow-control.styl';
 
 const getCodeDescription = (code = 1) => {
-    const alarm = GRBL_ALARMS.find(alarm => alarm.code === code);
+    const controllerType = get(reduxStore.getState(), 'controller.type');
+    const ALARMS = controllerType === GRBLHAL ? GRBL_HAL_ALARMS : GRBL_ALARMS;
+    const alarm = ALARMS.find(alarm => alarm.code === code);
     if (alarm) {
         return alarm.description;
     }

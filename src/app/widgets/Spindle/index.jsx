@@ -31,6 +31,7 @@ import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import pubsub from 'pubsub-js';
 import { connect } from 'react-redux';
+import store from 'app/store';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import combokeys from 'app/lib/combokeys';
 import Widget from 'app/components/Widget';
@@ -38,7 +39,9 @@ import controller from 'app/lib/controller';
 import WidgetConfig from '../WidgetConfig';
 import {
     GRBL,
+    GRBLHAL,
     GRBL_ACTIVE_STATE_IDLE,
+    IMPERIAL_UNITS,
     LASER_MODE,
     SPINDLE_LASER_CATEGORY,
     SPINDLE_MODE,
@@ -287,6 +290,8 @@ class SpindleWidget extends PureComponent {
     }
 
     enableSpindleMode() {
+        const { units } = this.props;
+        const preferredUnits = store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
         const active = this.getSpindleActiveState();
         if (active) {
             this.isSpindleOn = false;
@@ -296,10 +301,12 @@ class SpindleWidget extends PureComponent {
         const spindleMin = this.config.get('spindleMin');
         const spindleMax = this.config.get('spindleMax');
         const commands = [
+            preferredUnits,
             ...this.getSpindleOffsetCode(),
             `$30=${spindleMax}`,
             `$31=${spindleMin}`,
-            '$32=0'
+            '$32=0',
+            units
         ];
         this.updateControllerSettings(spindleMax, spindleMin, 0);
         controller.command('gcode', commands);
@@ -401,6 +408,8 @@ class SpindleWidget extends PureComponent {
 
 
     enableLaserMode() {
+        const { units } = this.props;
+        const preferredUnits = store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
         const active = this.getSpindleActiveState();
         const laser = this.config.get('laser');
 
@@ -410,10 +419,12 @@ class SpindleWidget extends PureComponent {
             controller.command('gcode', 'M5');
         }
         const commands = [
+            preferredUnits,
             ...this.getLaserOffsetCode(),
             `$30=${maxPower}`,
             `$31=${minPower}`,
-            '$32=1'
+            '$32=1',
+            units
         ];
         this.updateControllerSettings(maxPower, minPower, 1);
         controller.command('gcode', commands);
@@ -433,7 +444,7 @@ class SpindleWidget extends PureComponent {
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL], type)) {
+        if (!includes([GRBL, GRBLHAL], type)) {
             return false;
         }
 
@@ -501,6 +512,7 @@ export default connect((store) => {
     const spindleMax = Number(get(settings, 'settings.$30', 30000));
     const wcs = get(store, 'controller.modal.wcs');
     const wpos = get(store, 'controller.wpos', {});
+    const units = get(store, 'controller.modal.units', {});
 
     return {
         workflow,
@@ -512,6 +524,7 @@ export default connect((store) => {
         spindleMin,
         spindleMax,
         wcs,
-        wpos
+        wpos,
+        units
     };
 })(SpindleWidget);

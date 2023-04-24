@@ -91,7 +91,7 @@ const main = () => {
             app.commandLine.appendSwitch('ignore-gpu-blacklist');
             // Increase V8 heap size of the main process
             if (process.arch === 'x64') {
-                const memoryLimit = 1024 * 4; // 4GB
+                const memoryLimit = 1024 * 8; // 8GB
                 app.commandLine.appendSwitch('--js-flags', `--max-old-space-size=${memoryLimit}`);
             }
 
@@ -162,7 +162,7 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `gSender ${pkg.version}`,
+                title: `gSender Hal + Rotary ${pkg.version}`,
                 kiosk
             };
             const window = windowManager.openWindow(url, options, splashScreen);
@@ -209,7 +209,7 @@ const main = () => {
                 } else {
                     (error.type === 'GRBL_ERROR') ? grblLog.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
                 }
-                
+
             });
 
             ipcMain.handle('grblLog:fetch', async (channel) => {

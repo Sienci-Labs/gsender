@@ -1,3 +1,8 @@
+import shuttleEvents from 'app/lib/shuttleEvents';
+import { MACRO_CATEGORY } from 'app/constants';
+
+const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+
 export const AVAILABILITY_TYPES = {
     DEFAULT: 'DEFAULT',
     AVAILABLE: 'AVAILABLE',
@@ -14,7 +19,15 @@ export const generateList = (shortcuts) => {
         shortcutsList.push(shortcuts[key]);
     });
     shortcutsList.sort((a, b) => {
-        return a.category.localeCompare(b.category);
+        let categoryA = MACRO_CATEGORY;
+        let categoryB = MACRO_CATEGORY;
+        if (allShuttleControlEvents[a.cmd]) {
+            categoryA = allShuttleControlEvents[a.cmd].category;
+        }
+        if (allShuttleControlEvents[b.cmd]) {
+            categoryB = allShuttleControlEvents[b.cmd].category;
+        }
+        return categoryA.localeCompare(categoryB);
     });
     return shortcutsList;
 };

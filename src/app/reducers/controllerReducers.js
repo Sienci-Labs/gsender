@@ -45,8 +45,22 @@ const initialState = {
     settings: {},
     state: {},
     modal: {},
-    mpos: {},
-    wpos: {},
+    mpos: {
+        x: 0.00,
+        y: 0.00,
+        z: 0.00,
+        a: 0.00,
+        b: 0.00,
+        c: 0.00
+    },
+    wpos: {
+        x: 0.00,
+        y: 0.00,
+        z: 0.00,
+        a: 0.00,
+        b: 0.00,
+        c: 0.00
+    },
     homingFlag: false,
     homingRun: false,
     feeder: {

@@ -21,24 +21,25 @@
  *
  */
 
+import { uniqueId } from 'lodash';
 import React from 'react';
-import cx from 'classnames';
-import styles from './Index.styl';
+import styles from './index.styl';
 
-const FirmwareSelector = ({ options = [], selectedFirmware, handleSelect }) => {
+const ButtonCollection = ({ icon, buttons = [], onClick, ...props }) => {
     return (
-        <div className={styles.firmwareSelector}>
+        <div className={styles.container}>
             <div className={styles.selectorWrapper}>
                 {
-                    options.map((option) => {
-                        const active = selectedFirmware === option;
+                    buttons.map((button) => {
                         return (
                             <button
+                                key={uniqueId()}
                                 type="button"
-                                onClick={() => handleSelect(option)}
-                                className={cx(styles.selectorButton, { [styles.selected]: active })}
+                                onClick={() => onClick(button)}
+                                className={styles.selectorButton}
+                                {...props}
                             >
-                                { option }
+                                { button }
                             </button>
                         );
                     })
@@ -48,4 +49,4 @@ const FirmwareSelector = ({ options = [], selectedFirmware, handleSelect }) => {
     );
 };
 
-export default FirmwareSelector;
+export default ButtonCollection;

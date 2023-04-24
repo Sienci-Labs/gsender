@@ -891,6 +891,8 @@ class GrblHalController {
 
         //check if controller is ready and send the status
         this.emit('grbl:iSready', this.ready);
+
+        this.command('realtime_report');
     }
 
     populateContext(context = {}) {
@@ -1433,15 +1435,24 @@ class GrblHalController {
                 this.command('gcode:resume');
             },
             'gcode:resume': async () => {
+                const [type] = args;
                 if (this.event.hasEnabledEvent(PROGRAM_RESUME)) {
                     this.feederCB = () => {
-                        this.write('~');
+                        if (type === GRBLHAL) {
+                            this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
+                        } else {
+                            this.write('~');
+                        }
                         this.workflow.resume();
                         this.feederCB = null;
                     };
                     this.event.trigger(PROGRAM_RESUME);
                 } else {
-                    this.write('~');
+                    if (type === GRBLHAL) {
+                        this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
+                    } else {
+                        this.write('~');
+                    }
                     await delay(1000);
                     this.workflow.resume();
                 }
@@ -1467,19 +1478,34 @@ class GrblHalController {
 
                 this.write('!');
             },
+            'feedhold_alt': () => {
+                this.event.trigger(FEED_HOLD);
+
+                this.write(GRBLHAL_REALTIME_COMMANDS.FEED_HOLD);
+            },
             'cyclestart': () => {
                 this.event.trigger(CYCLE_START);
 
                 this.write('~');
             },
+            'cyclestart_alt': () => {
+                this.event.trigger(CYCLE_START);
+
+                this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
+            },
             'statusreport': () => {
                 this.write('?');
             },
             'homing': () => {
+                const [axis] = args;
                 this.event.trigger(HOMING);
                 this.homingStarted = true; // Update homing cycle as having started
 
-                this.writeln('$H');
+                if (axis) {
+                    this.writeln('$H' + axis);
+                } else {
+                    this.writeln('$H');
+                }
                 this.state.status.activeState = GRBL_ACTIVE_STATE_HOME;
                 this.emit('controller:state', GRBLHAL, this.state);
             },
@@ -1812,7 +1838,19 @@ class GrblHalController {
                 this.feederCB = () => {
                     this.emit('wizard:next', stepIndex, substepIndex);
                 };
-            }
+            },
+            'realtime_report': () => {
+                this.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+            },
+            'error_clear': () => {
+                this.write('$');
+            },
+            'toolchange:acknowledge': () => {
+                this.write(GRBLHAL_REALTIME_COMMANDS.TOOL_CHANGE_ACK);
+            },
+            'virtual_stop_toggle': () => {
+                this.write(GRBLHAL_REALTIME_COMMANDS.VIRTUAL_STOP_TOGGLE);
+            },
         }[cmd];
 
         if (!handler) {

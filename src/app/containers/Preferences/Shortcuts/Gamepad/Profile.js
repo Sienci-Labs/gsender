@@ -6,6 +6,7 @@ import _ from 'lodash';
 import store from 'app/store';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import Button from 'app/components/FunctionButton/FunctionButton';
+import shuttleEvents from 'app/lib/shuttleEvents';
 import { generateList } from '../utils';
 
 import styles from '../index.styl';
@@ -25,9 +26,16 @@ const Profile = ({ data, onUpdateProfiles, setCurrentProfileID }) => {
     const [dataSet, setDataSet] = useState(shortcuts);
     const [filterCategory, setFilterCategory] = useState(ALL_CATEGORY);
 
+    const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+
     const filter = (category, shortcutsList) => {
         const allShortcuts = shortcutsList || shortcuts;
-        const filteredData = category === ALL_CATEGORY ? allShortcuts : Object.fromEntries(Object.entries(allShortcuts).filter(([key, entry]) => entry.category === category));
+        const filteredData = category === ALL_CATEGORY ? allShortcuts : Object.fromEntries(Object.entries(allShortcuts).filter(([key, entry]) => {
+            if (allShuttleControlEvents[key]) {
+                return allShuttleControlEvents[key].category === category;
+            }
+            return entry.category === category;
+        }));
         setDataSet(filteredData);
         setFilterCategory(category);
     };
@@ -132,6 +140,7 @@ const Profile = ({ data, onUpdateProfiles, setCurrentProfileID }) => {
                     />
                 </div>
                 <CategoryFilter onChange={filter} filterCategory={filterCategory} />
+                <strong>* GrblHAL ONLY</strong>
                 <div style={{ overflowY: 'auto', height: '380px', backgroundColor: 'white' }}>
                     <ShortcutsTable
                         onEdit={handleEdit}

@@ -929,9 +929,6 @@ class GrblController {
         this.writeln('$$');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
-
-        //check if controller is ready and send the status
-        //this.emit('firmware:ready', this.ready);
     }
 
     populateContext(context = {}) {
@@ -1282,10 +1279,10 @@ class GrblController {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }
 
-                gcode = gcode.replace(bracketCommentLine, '');
+                const gcodeWithoutComments = gcode.replace(bracketCommentLine, '');
 
-                const containsACommand = A_AXIS_COMMANDS.test(gcode);
-                const containsYCommand = Y_AXIS_COMMANDS.test(gcode);
+                const containsACommand = A_AXIS_COMMANDS.test(gcodeWithoutComments);
+                const containsYCommand = Y_AXIS_COMMANDS.test(gcodeWithoutComments);
 
                 if (containsACommand && containsYCommand) {
                     this.emit('filetype', FILE_TYPE.FOUR_AXIS);

@@ -924,6 +924,8 @@ class Visualizer extends Component {
         this.renderer.setSize(width, height);
         this.copyComposer.setSize(width, height);
         this.fxaaComposer.setSize(width, height);
+        this.bloomComposer.setSize(width, height);
+        this.finalComposer.setSize(width, height);
 
         // Update the scene
         this.updateScene();

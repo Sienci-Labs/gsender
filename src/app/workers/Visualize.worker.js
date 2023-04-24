@@ -263,17 +263,21 @@ onmessage = function({ data }) {
         addLine,
         addArcCurve
     });
+    const start = Date.now();
 
     toolpath
-        .loadFromString(content, (line, index) => {
+        .loadFromString(content, (err, data) => {
+            if (err) {
+                console.error(err);
+            }
+        })
+        .on('data', (data) => {
             const vertexIndex = vertices.length / 3;
-            let spindleValues = {};
-
             frames.push(vertexIndex);
 
+            let spindleValues = {};
             if (isLaser) {
-                updateSpindleStateFromLine(line);
-                //console.log(`Spindle: ${spindleOn} - ${line.line}`);
+                updateSpindleStateFromLine(data);
                 spindleValues = {
                     spindleOn,
                     spindleSpeed
@@ -281,8 +285,7 @@ onmessage = function({ data }) {
 
                 spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
             }
-        })
-        .on('data', (data) => {
+
             currentLines++;
             const newProgress = Math.floor(currentLines / totalLines * 100);
             if (newProgress !== progress) {
@@ -291,6 +294,7 @@ onmessage = function({ data }) {
             }
         })
         .on('end', () => {
+            console.log(`Duration: ${Date.now() - start} ms`);
             let tFrames = new Uint32Array(frames);
             let tVertices = new Float32Array(vertices);
 

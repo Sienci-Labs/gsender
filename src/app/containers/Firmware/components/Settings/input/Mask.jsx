@@ -19,16 +19,10 @@ const Mask = ({ value, bits, numBits, requiredBit, onChange }) => {
         initializeSettings();
     }, [value]);
 
-    useEffect(() => {
-        updateValues(bitShiftSettings);
-    }, [bitShiftSettings]);
-
     const handleSwitch = (value, index) => {
-        setBitShiftSettings(prev => {
-            const newBitShiftSettings = [...prev];
-            newBitShiftSettings[index] = value;
-            return newBitShiftSettings;
-        });
+        const newBitShiftSettings = [...bitShiftSettings];
+        newBitShiftSettings[index] = value;
+        updateValues(newBitShiftSettings);
     };
 
     const initializeSettings = () => {
@@ -37,10 +31,10 @@ const Mask = ({ value, bits, numBits, requiredBit, onChange }) => {
         }
 
         // eslint-disable-next-line no-bitwise
-        const binary = (Number(value) >>> 0).toString(2);
+        const binary = (Number(value) >>> 0).toString(2).padStart(numBits, 0);
         let settings = [];
         for (let i = 0; i < numBits; i++) {
-            settings.push(binary.indexOf(i) === '1');
+            settings[i] = binary.charAt(numBits - 1 - i) === '1';
         }
 
         setBitShiftSettings(settings);
