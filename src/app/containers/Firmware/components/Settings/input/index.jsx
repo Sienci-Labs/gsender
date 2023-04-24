@@ -44,7 +44,7 @@ const InputController = (props) => {
     }
 
     default: {
-        return null;
+        return <String {...props} />;
     }
     }
 };

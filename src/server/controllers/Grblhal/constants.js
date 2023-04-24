@@ -677,6 +677,12 @@ export const GRBL_HAL_SETTINGS = [
         inputType: SWITCH
     },
     {
+        setting: '$8',
+    },
+    {
+        setting: '$9',
+    },
+    {
         setting: '$10',
         message: 'Status report options',
         category: 'GRBL',
@@ -713,6 +719,24 @@ export const GRBL_HAL_SETTINGS = [
         units: 'boolean',
         description: 'Enables inch units when returning any position and rate value that is not a settings value.',
         inputType: SWITCH
+    },
+    {
+        setting: '$14',
+    },
+    {
+        setting: '$15',
+    },
+    {
+        setting: '$16',
+    },
+    {
+        setting: '$17',
+    },
+    {
+        setting: '$18',
+    },
+    {
+        setting: '$19',
     },
     {
         setting: '$20',
@@ -990,6 +1014,12 @@ export const GRBL_HAL_SETTINGS = [
         inputType: SWITCH,
     },
     {
+        setting: '$41',
+    },
+    {
+        setting: '$42',
+    },
+    {
         // NEW
         setting: '$43',
         message: 'Homing Locate Cycle',
@@ -1126,6 +1156,18 @@ export const GRBL_HAL_SETTINGS = [
         min: 1,
         max: 10000,
         step: 1
+    },
+    {
+        setting: '$56',
+    },
+    {
+        setting: '$57',
+    },
+    {
+        setting: '$58',
+    },
+    {
+        setting: '$59',
     },
     {
         // NEW
@@ -1553,6 +1595,24 @@ export const GRBL_HAL_SETTINGS = [
         max: 1500,
         step: 10
     },
+    {
+        setting: '$160',
+    },
+    {
+        setting: '$161',
+    },
+    {
+        setting: '$162',
+    },
+    {
+        setting: '$170',
+    },
+    {
+        setting: '$171',
+    },
+    {
+        setting: '$172',
+    },
     // spindle related settings
     {
         // NEW
@@ -1635,5 +1695,98 @@ export const GRBL_HAL_SETTINGS = [
         inputType: NUMBER,
         min: 0,
         step: 10
+    },
+    {
+        setting: '$345',
+    },
+    {
+        setting: '$347',
+    },
+    {
+        setting: '$348',
+    },
+    {
+        setting: '$349',
+    },
+    {
+        setting: '$370',
+    },
+    {
+        setting: '$372',
+    },
+    {
+        setting: '$374',
+    },
+    {
+        setting: '$375',
+    },
+    {
+        setting: '$384',
+    },
+    {
+        setting: '$392',
+    },
+    {
+        setting: '$393',
+    },
+    {
+        setting: '$395',
+    },
+    {
+        setting: '$450',
+    },
+    {
+        setting: '$451',
+    },
+    {
+        setting: '$452',
+    },
+    {
+        setting: '$453',
+    },
+    {
+        setting: '$454',
+    },
+    {
+        setting: '$455',
+    },
+    {
+        setting: '$456',
+    },
+    {
+        setting: '$460',
+    },
+    {
+        setting: '$461',
+    },
+    {
+        setting: '$462',
+    },
+    {
+        setting: '$463',
+    },
+    {
+        setting: '$464',
+    },
+    {
+        setting: '$465',
+    },
+    {
+        setting: '$466',
+    },
+    {
+        setting: '$467',
+    },
+    {
+        setting: '$468',
+    },
+    {
+        setting: '$469',
+    },
+    {
+        setting: '$470',
+    },
+    {
+        setting: '$471',
     },
 ];
