@@ -641,8 +641,8 @@ class WorkflowControl extends PureComponent {
                                             Recover a carve disrupted by power loss, disconnection,
                                             mechanical malfunction, or other failures
                                         </p>
-                                        <p style={{ marginBottom: '0px' }}>Your job was last stopped around line: <strong>{value}</strong></p>
-                                        <p>on a g-code file with a total of <strong>{lineTotal}</strong> lines</p>
+                                        <p style={{ marginBottom: '0px' }}>Your job was last stopped around line: <b>{value}</b></p>
+                                        <p>on a g-code file with a total of <b>{lineTotal}</b> lines</p>
                                         {
                                             value > 0 &&
                                                 <p>Recommended starting lines: <strong>{value - 10 >= 0 ? value - 10 : 0}</strong> - <strong>{value}</strong></p>
