@@ -35,6 +35,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import * as THREE from 'three';
+import { degToRad } from 'three/src/math/MathUtils';
 import {
     IMPERIAL_UNITS,
     METRIC_UNITS,
@@ -428,6 +429,7 @@ class Visualizer extends Component {
                 this.updateLaserPointerPosition();
                 this.updateCuttingPointerPosition();
                 this.updateLimitsPosition();
+                this.updateGcodeModalPosition(prevProps.workPosition, this.props.workPosition);
             }
         }
 
@@ -1586,6 +1588,52 @@ class Visualizer extends Component {
         this.cuttingTool.position.set(x0, y0, z0);
     }
 
+    rotateGcodeModal(degrees) {
+        const radians = degToRad(degrees);
+
+        if (this.visualizer) {
+            this.visualizer.group.rotateX(radians);
+        }
+    }
+
+    updateGcodeModalPosition(prevPos, currPos) {
+        const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
+        const { controllerType } = this.props;
+
+        const isUsingGRBL = controllerType === 'Grbl';
+        const isUsingGRBLHal = controllerType === 'grblHAL';
+
+        const isInRotaryMode = workspaceMode === WORKSPACE_MODE.ROTARY;
+        // const fileIsRotary = fileType === FILE_TYPE.ROTARY;
+        const valueHasChanged = prevValue === currValue;
+
+
+        // Use y-axis in grbl, a-axis in grblHal
+        const axis = isInRotaryMode && isUsingGRBL ? 'y' : 'a';
+
+        const prevValue = prevPos[axis];
+        const currValue = currPos[axis];
+
+        const grblCondition = isUsingGRBL && valueHasChanged && isInRotaryMode;
+        const grblHalCondition = isUsingGRBLHal && valueHasChanged;
+
+        /**
+         * GRBL Condition
+         *  - Controller is GRBL
+         *  - Y-axis value has changed since previous value
+         *  - Workspace is in rotary mode
+         *
+         * GRBLHal Condition
+         *  - Controller is GRBLHal
+         *  - A-axis value has changed since previous value
+         */
+        if (grblCondition || grblHalCondition) {
+            const axisDifference = currValue - prevValue;
+
+            this.rotateGcodeModal(axisDifference);
+        }
+    }
+
     updateRotaryStockPosition() {
         if (!this.rotaryStock) {
             return;
@@ -2080,6 +2128,7 @@ export default connect((store) => {
     const bbox = _get(store, 'file.bbox');
     const fileModal = _get(store, 'file.fileModal');
     const fileType = _get(store, 'file.fileType');
+    const controllerType = _get(store, 'controller.type');
 
     return {
         machinePosition,
@@ -2094,6 +2143,7 @@ export default connect((store) => {
         isConnected,
         bbox,
         fileModal,
-        fileType
+        fileType,
+        controllerType
     };
 }, null, null, { forwardRef: true })(Visualizer);
