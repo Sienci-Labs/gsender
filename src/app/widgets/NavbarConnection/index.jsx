@@ -127,6 +127,7 @@ class NavbarConnectionWidget extends PureComponent {
 
     setScanningState(isScanning) {
         this.setState(state => ({
+            alertMessage: '',
             scanning: isScanning
         }));
     }
@@ -152,13 +153,16 @@ class NavbarConnectionWidget extends PureComponent {
         } = this.state;
         const { isConnected, isScanning, type } = this.props;
         const wasConnected = prevProps.isConnected;
+        const wasScanning = prevProps.isScanning;
         if (!wasConnected && isConnected) {
             this.setConnectedState();
         }
         if (!isConnected && wasConnected) {
             this.setDisconnectedState();
         }
-        this.setScanningState(isScanning);
+        if (wasScanning !== isScanning) {
+            this.setScanningState(isScanning);
+        }
 
         this.config.set('minimized', minimized);
         if (controllerType !== type) {

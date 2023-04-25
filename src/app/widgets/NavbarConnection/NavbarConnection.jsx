@@ -28,6 +28,7 @@ import cx from 'classnames';
 import pubsub from 'pubsub-js';
 import controller from 'app/lib/controller';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
+import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import PortListing from './PortListing';
 import styles from './Index.styl';
 import StatusIndicator from './StatusIndicator';
@@ -233,7 +234,7 @@ class NavbarConnection extends PureComponent {
                         }
                         {
                             !connected &&
-                                <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
+                                <div className={styles.firmwareSelector}>
                                     <div className={styles.ipSection}>
                                         <p className={styles.ipLabel}>Set IP Range:</p>
                                         <div className={styles.ipContainer}>
@@ -298,15 +299,13 @@ class NavbarConnection extends PureComponent {
                         {
                             !connected &&
                                 <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
-                                    <div className={styles.selectorWrapper}>
-                                        <button
-                                            type="button"
-                                            onClick={() => controller.networkScan(23, this.convertIPToString(ip))}
-                                            className={styles.scanButton}
-                                        >
-                                            Scan for Devices
-                                        </button>
-                                    </div>
+                                    <FunctionButton
+                                        primary
+                                        onClick={() => controller.networkScan(23, this.convertIPToString(ip))}
+                                        className={styles.scanButton}
+                                    >
+                                        Scan for Devices
+                                    </FunctionButton>
                                 </div>
                         }
                         {
