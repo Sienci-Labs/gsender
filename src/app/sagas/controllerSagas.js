@@ -581,6 +581,9 @@ export function* initialize() {
                 isScanning: isScanning
             }
         });
+        if (!isScanning) {
+            pubsub.publish('networkScan:finished');
+        }
     });
 
     yield null;

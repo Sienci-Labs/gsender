@@ -25,6 +25,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import cx from 'classnames';
+import pubsub from 'pubsub-js';
 import controller from 'app/lib/controller';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
 import PortListing from './PortListing';
@@ -60,9 +61,12 @@ class NavbarConnection extends PureComponent {
         hasScanned: false
     }
 
+    tokens = [];
+
     componentDidMount() {
         this.addResizeEventListener();
         this.updateScreenSize();
+        this.subscribe();
     }
 
     componentWillUnmount() {
@@ -71,16 +75,31 @@ class NavbarConnection extends PureComponent {
 
     componentDidUpdate() {
         const { scanning } = this.props.state;
-        const { startedScan } = this.state;
+        const { startedScan, hasScanned } = this.state;
         if (scanning) {
             this.setState({
                 startedScan: true
             });
-        } else if (startedScan) {
+        } else if (startedScan && !hasScanned) {
             this.setState({
                 hasScanned: true
             });
         }
+    }
+
+    subscribe() {
+        this.tokens = [
+            pubsub.subscribe('networkScan:finished', () => {
+                this.props.actions.handleRefreshPorts();
+            })
+        ];
+    }
+
+    unsubscribe() {
+        this.tokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        this.tokens = [];
     }
 
     addResizeEventListener() {
@@ -311,7 +330,7 @@ class NavbarConnection extends PureComponent {
                                         key={port.port}
                                         baudrate={baudrate}
                                         controllerType={controllerType}
-                                        onClick={() => actions.onClickPortListing(port)}
+                                        onClick={() => actions.onClickPortListing(port, true)}
                                     />
                                 )
                             )

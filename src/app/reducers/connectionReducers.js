@@ -31,6 +31,7 @@ const initialState = {
     baudrate: '',
     ports: [],
     unrecognizedPorts: [],
+    networkPorts: [],
     err: ''
 };
 

@@ -174,6 +174,7 @@ class CNCEngine {
         });
 
         this.io.on('connection', (socket) => {
+            this.networkDevices = [];
             const address = socket.handshake.address;
             const user = socket.decoded_token || {};
             log.debug(`New connection from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`);
@@ -476,7 +477,7 @@ class CNCEngine {
             });
 
             socket.on('networkScan', (port, target) => {
-                console.log(target);
+                //console.log(target);
                 this.networkDevices = [];
                 const options = {
                     target: target,
@@ -489,7 +490,7 @@ class CNCEngine {
                 scan.on('result', (device) => {
                     // fired when item is matching options
                     // only take open devices
-                    log.debug(device);
+                    //log.debug(device);
                     if (device.banner.includes(GRBL) || device.banner.includes(GRBLHAL)) {
                         this.networkDevices.push({
                             ...device,
@@ -504,6 +505,12 @@ class CNCEngine {
 
                 scan.on('done', () => {
                     // finished !
+                    // this.networkDevices.push({
+                    //     ip: '192.168.1.1',
+                    //     port: 23,
+                    //     banner: GRBL,
+                    //     controllerType: GRBL
+                    // });
                     log.info('done scan');
                     socket.emit('networkScan:status', false);
                 });
