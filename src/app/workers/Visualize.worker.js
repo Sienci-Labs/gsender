@@ -84,7 +84,7 @@ onmessage = function({ data }) {
             addLine: (modal, v1, v2, v0) => {
                 const { motion } = modal;
 
-                if (shouldRotate(v1.a) || shouldRotate(v2.a)) {
+                if (shouldRotate(v1.a, v2.a)) {
                     const newV1 = rotateAxis('y', v1);
                     v1.y = newV1.y;
                     v1.z = newV1.z;
