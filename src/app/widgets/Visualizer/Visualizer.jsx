@@ -447,7 +447,7 @@ class Visualizer extends Component {
                 this.updateLaserPointerPosition();
                 this.updateCuttingPointerPosition();
                 this.updateLimitsPosition();
-                this.updateGcodeModalPosition(prevProps.workPosition, this.props.workPosition);
+                this.updateGcodeModal(prevProps.workPosition, this.props.workPosition);
             }
         }
 
@@ -1614,17 +1614,22 @@ class Visualizer extends Component {
         }
     }
 
-    updateGcodeModalPosition(prevPos, currPos) {
+    updateGcodeModal(prevPos, currPos) {
         const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
-        const { controllerType } = this.props;
+        const { controllerType, fileType } = this.props;
 
         const isUsingGRBL = controllerType === GRBL;
         const isUsingGRBLHal = controllerType === GRBLHAL;
+        const isRotaryFile = [FILE_TYPE.ROTARY, FILE_TYPE.FOUR_AXIS].includes(fileType);
         const isInRotaryMode = workspaceMode === WORKSPACE_MODE.ROTARY;
         const valueHasChanged = prevValue === currValue;
 
+        if (!isRotaryFile) {
+            return;
+        }
+
         // Use y-axis in grbl, a-axis in grblHal
-        const axis = isInRotaryMode && isUsingGRBL ? 'y' : 'a';
+        const axis = isInRotaryMode && isUsingGRBL && isRotaryFile ? 'y' : 'a';
 
         const prevValue = prevPos[axis];
         const currValue = currPos[axis];
