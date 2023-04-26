@@ -171,6 +171,7 @@ class PreferencesPage extends PureComponent {
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
+            ipRange: store.get('widgets.connection.ipRange', [192, 168, 1]),
         };
     }
 
@@ -236,6 +237,14 @@ class PreferencesPage extends PureComponent {
                 store.set('widgets.visualizer.showLineWarnings', shouldShow);
                 this.setState({ showLineWarnings: shouldShow });
                 pubsub.publish('gcode:showLineWarnings', shouldShow);
+            },
+            setIPRange: (value, index) => {
+                const { ipRange } = this.state;
+                let newIPRange = ipRange;
+                newIPRange[index] = value;
+                store.replace('widgets.connection.ipRange', ipRange);
+                this.setState({ ipRange: newIPRange });
+                pubsub.publish('networkScan:ipRange', newIPRange);
             },
         },
         tool: {

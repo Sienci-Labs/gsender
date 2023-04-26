@@ -6,9 +6,10 @@ import Fieldset from '../components/Fieldset';
 import Baudrates from './Baudrates';
 
 import styles from '../index.styl';
+import Input from '../components/Input';
 
 const Connection = ({ state, actions }) => {
-    const { autoReconnect, controller } = state;
+    const { autoReconnect, controller, ipRange } = state;
     let baudRateDisabled = true;
     if (controller.type === '') {
         baudRateDisabled = false;
@@ -33,6 +34,32 @@ const Connection = ({ state, actions }) => {
                     />
                 </Tooltip>
             </div>
+            <Tooltip content="Set the IP address for network scanning" location="default">
+                <h4 className={styles.settingsSubtitle}>IP Range</h4>
+                <div className={styles.ipContainer}>
+                    {
+                        ipRange.map((value, index) => {
+                            return (
+                                <>
+                                    <Input
+                                        value={value}
+                                        onChange={(e) => actions.general.setIPRange(Number(e.target.value), index)}
+                                        additionalProps={{
+                                            name: 'ip' + index,
+                                            type: 'number',
+                                            min: '1',
+                                            max: '255',
+                                        }}
+                                        className={styles.ipInput}
+                                    />
+                                    <strong className={styles.dot}>.</strong>
+                                </>
+                            );
+                        })
+                    }
+                    <h5 className={styles.ipRangeLabel}>1-255</h5>
+                </div>
+            </Tooltip>
         </Fieldset>
     );
 };

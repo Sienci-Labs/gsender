@@ -477,7 +477,7 @@ class CNCEngine {
             });
 
             socket.on('networkScan', (port, target) => {
-                //console.log(target);
+                // console.log(target);
                 this.networkDevices = [];
                 const options = {
                     target: target,

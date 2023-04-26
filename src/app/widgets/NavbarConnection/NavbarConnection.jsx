@@ -26,6 +26,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import cx from 'classnames';
 import pubsub from 'pubsub-js';
+import store from 'app/store';
 import controller from 'app/lib/controller';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
@@ -33,7 +34,6 @@ import PortListing from './PortListing';
 import styles from './Index.styl';
 import StatusIndicator from './StatusIndicator';
 import FirmwareSelector from './FirmwareSelector';
-import ControlledNumberInput from '../../components/ControlledNumberInput';
 
 
 class NavbarConnection extends PureComponent {
@@ -51,13 +51,7 @@ class NavbarConnection extends PureComponent {
     state = {
         mobile: false,
         isActive: false,
-        ip: [
-            192,
-            168,
-            1,
-            1,
-            255
-        ],
+        ip: store.get('widgets.connection.ipRange', [192, 168, 1]),
         startedScan: false,
         hasScanned: false
     }
@@ -92,6 +86,9 @@ class NavbarConnection extends PureComponent {
         this.tokens = [
             pubsub.subscribe('networkScan:finished', () => {
                 this.props.actions.handleRefreshPorts();
+            }),
+            pubsub.subscribe('networkScan:ipRange', (msg, ipRange) => {
+                this.setState({ ip: ipRange });
             })
         ];
     }
@@ -150,7 +147,7 @@ class NavbarConnection extends PureComponent {
     }
 
     convertIPToString(ip) {
-        return ip[0] + '.' + ip[1] + '.' + ip[2] + '.' + ip[3] + '-' + ip[4];
+        return ip[0] + '.' + ip[1] + '.' + ip[2] + '.1-255';
     }
 
     render() {
@@ -231,70 +228,6 @@ class NavbarConnection extends PureComponent {
                         }
                         {
                             !connected && <h5>Network Devices</h5>
-                        }
-                        {
-                            !connected &&
-                                <div className={styles.firmwareSelector}>
-                                    <div className={styles.ipSection}>
-                                        <p className={styles.ipLabel}>Set IP Range:</p>
-                                        <div className={styles.ipContainer}>
-                                            <ControlledNumberInput
-                                                className={styles.ipInput}
-                                                externalOnChange={(e) => {
-                                                    this.onIPChange(Number(e.target.value), 0);
-                                                }}
-                                                type="number"
-                                                value={ip[0]}
-                                                min={1}
-                                                max={255}
-                                            />
-                                            <strong className={styles.dot}>.</strong>
-                                            <ControlledNumberInput
-                                                className={styles.ipInput}
-                                                externalOnChange={(e) => {
-                                                    this.onIPChange(Number(e.target.value), 1);
-                                                }}
-                                                type="number"
-                                                value={ip[1]}
-                                                min={1}
-                                                max={255}
-                                            />
-                                            <strong className={styles.dot}>.</strong>
-                                            <ControlledNumberInput
-                                                className={styles.ipInput}
-                                                externalOnChange={(e) => {
-                                                    this.onIPChange(Number(e.target.value), 2);
-                                                }}
-                                                type="number"
-                                                value={ip[2]}
-                                                min={1}
-                                                max={255}
-                                            />
-                                            <strong className={styles.dot}>.</strong>
-                                            <ControlledNumberInput
-                                                className={styles.ipInput}
-                                                externalOnChange={(e) => {
-                                                    this.onIPChange(Number(e.target.value), 3);
-                                                }}
-                                                type="number"
-                                                value={ip[3]}
-                                                min={1}
-                                                max={255}
-                                            />
-                                            <strong>—</strong>
-                                            <ControlledNumberInput
-                                                className={styles.ipInput}
-                                                externalOnChange={(e) => {
-                                                    this.onIPChange(Number(e.target.value), 4);
-                                                }}
-                                                type="number"
-                                                value={ip[4]}
-                                                min={1}
-                                                max={255}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
                         }
                         {
                             !connected &&
