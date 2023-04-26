@@ -1569,19 +1569,16 @@ class Visualizer extends Component {
         const pivotPoint = this.pivotPoint.get();
         const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
 
-        if (workspaceMode === WORKSPACE_MODE.ROTARY && fileType === FILE_TYPE.ROTARY) {
-            const x0 = wpox - pivotPoint.x;
-            const z0 = wpoz - pivotPoint.z;
+        const x0 = wpox - pivotPoint.x;
+        const y0 = wpoy - pivotPoint.y;
+        const z0 = wpoz - pivotPoint.z;
 
+        if (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY) {
             this.cuttingTool.position.setX(x0);
             this.cuttingTool.position.setZ(z0);
 
             return;
         }
-
-        const x0 = wpox - pivotPoint.x;
-        const y0 = wpoy - pivotPoint.y;
-        const z0 = wpoz - pivotPoint.z;
 
         this.cuttingTool.position.set(x0, y0, z0);
     }
