@@ -62,6 +62,7 @@ import {
     AXIS_Y,
     AXIS_Z,
     AXIS_A,
+    WORKSPACE_MODE
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -434,6 +435,14 @@ class LocationWidget extends PureComponent {
             const { state } = this.props;
             const { machinePosition, safeRetractHeight, homingEnabled } = this.state;
             const activeState = get(state, 'status.activeState');
+
+            const { ROTARY } = WORKSPACE_MODE;
+            const isInRotaryMode = store.get('workspace.mode') === ROTARY;
+
+            //Disable "Go to" shortcuts for Z axis when in rotary mode
+            if (isInRotaryMode && axisList[0] === AXIS_Z) {
+                return;
+            }
 
             if (!axisList || axisList.length === 0 || activeState !== GRBL_ACTIVE_STATE_IDLE) {
                 return;
