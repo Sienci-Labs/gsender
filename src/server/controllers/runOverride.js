@@ -25,24 +25,20 @@ export const calcOverrides = (context, difference = 100, type = 'feed') => {
             minorDecrease: '\x94',
         }
     };
-    const { majorIncrease, majorDecrease, minorIncrease, minorDecrease } = commands[type];
+    const { majorIncrease, majorDecrease } = commands[type];
     // Determine quotient and remainder to determine amount of major and minor commands to send
     const absValue = Math.abs(difference);
     const quotient = Math.floor(absValue / 10);
-    const remainder = absValue % 10;
 
     if (difference > 0) {
         commandQueue.push(
             ...Array.from({ length: quotient }).fill(majorIncrease),
-            ...Array.from({ length: remainder }).fill(minorIncrease)
         );
     } else {
         commandQueue.push(
             ...Array.from({ length: quotient }).fill(majorDecrease),
-            ...Array.from({ length: remainder }).fill(minorDecrease)
         );
     }
-
     // Space out realtime commands by 50ms intervals
     commandQueue.forEach((command, index) => {
         setTimeout(() => {

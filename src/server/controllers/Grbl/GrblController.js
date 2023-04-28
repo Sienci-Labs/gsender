@@ -1563,7 +1563,7 @@ class GrblController {
             // @param {number} value The amount of percentage increase or decrease.
             'spindleOverride': () => {
                 const [value] = args;
-                const [spindleOV] = this.state.status.ov;
+                const [,, spindleOV] = this.state.status.ov;
 
                 let diff = value - spindleOV;
                 //Limits for keyboard/gamepad shortcuts
