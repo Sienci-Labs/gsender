@@ -22,6 +22,7 @@
  */
 
 import reduxStore from 'app/store/redux';
+import gsap from 'gsap';
 import { connect } from 'react-redux';
 import * as fileActions from 'app/actions/fileInfoActions';
 import _get from 'lodash/get';
@@ -1209,7 +1210,6 @@ class Visualizer extends Component {
                 this.cuttingTool.visible = false;
 
                 this.group.add(this.cuttingTool);
-
                 // Update the scene
                 this.updateScene();
             });
@@ -1489,7 +1489,13 @@ class Visualizer extends Component {
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        this.cuttingTool.position.set(x0, y0, z0);
+        gsap.to(this.cuttingTool.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
+        //this.cuttingTool.position.set(x0, y0, z0);
     }
 
     // Update cutting tool position
