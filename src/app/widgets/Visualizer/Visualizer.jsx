@@ -1495,7 +1495,6 @@ class Visualizer extends Component {
             z: z0,
             duration: 0.25
         });
-        //this.cuttingTool.position.set(x0, y0, z0);
     }
 
     // Update cutting tool position
@@ -1510,7 +1509,12 @@ class Visualizer extends Component {
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        this.laserPointer.position.set(x0, y0, z0);
+        gsap.to(this.laserPointer.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
     }
 
     // Update cutting pointer position
@@ -1525,7 +1529,12 @@ class Visualizer extends Component {
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        this.cuttingPointer.position.set(x0, y0, z0);
+        gsap.to(this.cuttingPointer.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
     }
 
     // Update limits position
