@@ -52,7 +52,7 @@ const More = () => {
                 overlay={Menu}
                 animation="slide-up"
             >
-                <button>{currentTab.label} ▼</button>
+                <button style={{ position: 'absolute', right: 0, zIndex: 1 }}>{currentTab.label} ▼</button>
             </Dropdown>
             <currentTab.component />
         </MenuWrapper>
