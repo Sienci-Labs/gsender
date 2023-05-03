@@ -29,10 +29,10 @@ import controller from 'app/lib/controller';
 import CoolantWidget from 'app/widgets/Coolant';
 import WidgetConfig from '../WidgetConfig';
 import ProbeWidget from '../Probe';
-import RotaryWidget from '../Rotary';
 import MacroWidget from '../Macro';
 import ConsoleWidget from '../Console';
-
+import MoreTabs from '../More';
+// import RotaryWidget from '../Rotary';
 // import LaserWidget from '../Laser';
 import SpindleWidget from '../Spindle';
 
@@ -181,9 +181,9 @@ class SecondaryFunctionality extends PureComponent {
                     component: CoolantWidget
                 },
                 {
-                    label: 'Rotary',
-                    widgetId: 'rotary',
-                    component: RotaryWidget
+                    label: '○○○',
+                    widgetId: 'more',
+                    component: MoreTabs
                 },
             ]
         };
@@ -203,7 +203,7 @@ class SecondaryFunctionality extends PureComponent {
                         tabs.map((tab, index) => {
                             const active = index === selectedTab;
                             return (
-                                <TabbedWidget.ChildComponent key={`${tab.widgetId}`} active={active}>
+                                <TabbedWidget.ChildComponent key={`${tab.widgetId}`} active={active} style={{ overflowX: 'auto' }}>
                                     <tab.component
                                         onFork={onFork}
                                         onRemove={onRemove}
