@@ -329,8 +329,8 @@ export default class JoggingPresets extends Component {
         }
 
         store.replace('widgets.axes.jog', defaultJogPresets);
-
         this.setState({ jogSpeeds: this.getJogSpeeds() });
+        pubsub.publish('jogSpeeds', defaultJogPresets);
 
         this.showToast();
     }
