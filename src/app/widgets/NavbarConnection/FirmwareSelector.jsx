@@ -37,6 +37,7 @@ const FirmwareSelector = ({ options = [], selectedFirmware, handleSelect }) => {
                                 type="button"
                                 onClick={() => handleSelect(option)}
                                 className={cx(styles.selectorButton, { [styles.selected]: active })}
+                                key={option}
                             >
                                 { option }
                             </button>

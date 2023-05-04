@@ -31,9 +31,9 @@ import WidgetConfig from '../WidgetConfig';
 import ProbeWidget from '../Probe';
 import MacroWidget from '../Macro';
 import ConsoleWidget from '../Console';
-import MoreTabs from '../More';
-// import RotaryWidget from '../Rotary';
-// import LaserWidget from '../Laser';
+import MoreWidgets from '../MoreWidgets';
+import RcDropdown from '../MoreWidgets/Dropdown';
+import { TabsProvider } from './TabsContext';
 import SpindleWidget from '../Spindle';
 
 import {
@@ -181,44 +181,50 @@ class SecondaryFunctionality extends PureComponent {
                     component: CoolantWidget
                 },
                 {
-                    label: '○○○',
+                    label: <RcDropdown />,
                     widgetId: 'more',
-                    component: MoreTabs
+                    component: MoreWidgets
                 },
-            ]
+            ],
+            currentDropdownTab: 'Rotary'
         };
     }
 
-
     render() {
-        const { isFullscreen, tabs, selectedTab } = this.state;
+        const { isFullscreen, tabs, selectedTab, currentDropdownTab } = this.state;
         const { onFork, onRemove, sortable } = this.props;
         const actions = { ...this.actions };
 
+        const updateDropdownTab = (newTab) => {
+            this.setState({ 'currentDropdownTab': newTab });
+        };
+
         return (
-            <TabbedWidget fullscreen={isFullscreen}>
-                <TabbedWidget.Tabs tabs={tabs} activeTabIndex={selectedTab} onClick={actions.handleTabSelect} />
-                <TabbedWidget.Content>
-                    {
-                        tabs.map((tab, index) => {
-                            const active = index === selectedTab;
-                            return (
-                                <TabbedWidget.ChildComponent key={`${tab.widgetId}`} active={active} style={{ overflowX: 'auto' }}>
-                                    <tab.component
-                                        onFork={onFork}
-                                        onRemove={onRemove}
-                                        sortable={sortable}
-                                        widgetId={tab.widgetId}
-                                        embedded
-                                        active={active}
-                                        isMainWindow={true}
-                                    />
-                                </TabbedWidget.ChildComponent>
-                            );
-                        })
-                    }
-                </TabbedWidget.Content>
-            </TabbedWidget>
+            <TabsProvider value={{ currentDropdownTab: currentDropdownTab, updateDropdownTab: updateDropdownTab }}>
+                <TabbedWidget fullscreen={isFullscreen}>
+                    <TabbedWidget.Tabs tabs={tabs} activeTabIndex={selectedTab} onClick={actions.handleTabSelect} />
+                    <TabbedWidget.Content>
+                        {
+                            tabs.map((tab, index) => {
+                                const active = index === selectedTab;
+                                return (
+                                    <TabbedWidget.ChildComponent key={`${tab.widgetId}`} active={active} style={{ overflowX: 'auto' }}>
+                                        <tab.component
+                                            onFork={onFork}
+                                            onRemove={onRemove}
+                                            sortable={sortable}
+                                            widgetId={tab.widgetId}
+                                            embedded
+                                            active={active}
+                                            isMainWindow={true}
+                                        />
+                                    </TabbedWidget.ChildComponent>
+                                );
+                            })
+                        }
+                    </TabbedWidget.Content>
+                </TabbedWidget>
+            </TabsProvider>
         );
     }
 }

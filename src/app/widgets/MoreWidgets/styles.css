@@ -1,0 +1,9 @@
+.rc-dropdown-menu > .rc-dropdown-menu-item-active{
+  color: white;
+  background: #3e85c7;
+}
+
+.rc-dropdown-menu > .rc-dropdown-menu-item-active:hover{
+  color: #78aad8;
+  background: #6596c5;
+}
