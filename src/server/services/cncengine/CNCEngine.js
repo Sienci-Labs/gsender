@@ -179,6 +179,7 @@ class CNCEngine {
 
                 const controllers = store.get('controllers', {});
                 Object.keys(controllers).forEach(port => {
+                    log.debug(port);
                     const controller = controllers[port];
                     if (!controller) {
                         return;
@@ -329,6 +330,7 @@ class CNCEngine {
                 }
 
                 if (controller.isOpen()) {
+                    log.debug('controller already open');
                     // Join the room
                     socket.join(port);
 
@@ -337,6 +339,7 @@ class CNCEngine {
                 }
 
                 controller.open((err = null) => {
+                    log.debug('controller opening');
                     if (err) {
                         callback(err);
                         return;
@@ -359,6 +362,7 @@ class CNCEngine {
 
             // Close serial port
             socket.on('close', (port, callback = noop) => {
+                const numClients = socket.adapter.rooms.get(port).size;
                 if (typeof callback !== 'function') {
                     callback = noop;
                 }
@@ -379,14 +383,20 @@ class CNCEngine {
                 // Leave the room
                 socket.leave(port);
 
-                controller.close(err => {
-                    // Remove controller from store
-                    store.unset(`controllers[${JSON.stringify(port)}]`);
+                if (numClients === 1) { // if only this one was connected
+                    controller.close(err => {
+                        // Remove controller from store
+                        store.unset(`controllers[${JSON.stringify(port)}]`);
 
-                    // Destroy controller
-                    controller.destroy();
+                        // Destroy controller
+                        controller.destroy();
 
-                    callback(null);
+                        callback(null);
+                    });
+                }
+
+                socket.emit('serialport:close', {
+                    port: port,
                 });
             });
 
