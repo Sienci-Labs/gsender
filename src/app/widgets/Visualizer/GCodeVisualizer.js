@@ -136,9 +136,11 @@ class GCodeVisualizer {
             const defaultColorArray = [...defaultColor.toArray(), 0.3];
             const colorArray = Array.from({ length: (v2 - v1) }, () => defaultColorArray).flat();
 
-            // add original color on top so you can see the parts the laser has finished
-            for (let i = 0; i < colorArray.length; i++) {
-                colorArray[i] += colorAttr.array[offsetIndex + i];
+            if (this.isLaser) {
+                // add original color on top so you can see the parts the laser has finished
+                for (let i = 0; i < colorArray.length; i++) {
+                    colorArray[i] += colorAttr.array[offsetIndex + i];
+                }
             }
 
             colorAttr.set([...colorArray], offsetIndex);
