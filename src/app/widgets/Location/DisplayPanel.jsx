@@ -160,7 +160,7 @@ class DisplayPanel extends PureComponent {
         }
     }
 
-    renderAxis = (axis, disabled = false) => {
+    renderAxis = (axis, disabled = false, disableGoTo = false) => {
         const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units, homingEnabled } = this.props;
         let mpos = !disabled ? machinePosition[axis] : '0.00';
         const wpos = !disabled ? workPosition[axis] : '0.00';
@@ -189,7 +189,7 @@ class DisplayPanel extends PureComponent {
             <tr>
                 <td className={styles.coordinate}>
                     <GoToButton
-                        disabled={!canClick || disabled}
+                        disabled={!canClick || disabled || disableGoTo}
                         onClick={() => {
                             const commands = [];
                             const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
@@ -307,7 +307,7 @@ class DisplayPanel extends PureComponent {
                                     <tbody>
                                         {hasAxisX && this.renderAxis(AXIS_X)}
                                         {!isInRotaryMode && hasAxisY ? this.renderAxis(AXIS_Y) : this.renderAxis(AXIS_Y, true)}
-                                        {hasAxisZ && this.renderAxis(AXIS_Z)}
+                                        {hasAxisZ && this.renderAxis(AXIS_Z, false, isInRotaryMode)}
                                     </tbody>
                                 )
                                 : (
@@ -378,8 +378,7 @@ class DisplayPanel extends PureComponent {
                                                 disabled={!canHome}
                                                 buttons={['X', 'Y', 'Z', 'A']}
                                                 onClick={this.actions.startSingleAxisHoming}
-                                            >
-                                            </ButtonCollection>
+                                            />
                                         </>
                                     ) : (
                                         <FunctionButton
