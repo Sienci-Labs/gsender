@@ -517,6 +517,11 @@ export function* initialize() {
         pubsub.publish('wizard:next', { stepIndex, substepIndex });
     });
 
+    controller.addListener('gcode:loaded', ({ gcode, meta }) => {
+        console.log(gcode);
+        console.log(meta);
+    });
+
     yield null;
 }
 

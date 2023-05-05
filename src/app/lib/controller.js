@@ -78,8 +78,7 @@ class Controller {
         'serialport:error': [],
         'serialport:read': [],
         'serialport:write': [],
-        'gcode:load': [], // TO BE DEPRECATED
-        'gcode:unload': [], // TO BE DEPRECATED
+        'gcode:loaded': [], // TO BE DEPRECATED
         'gcode:toolChange': [],
         'feeder:status': [],
         'workflow:pause': [],
