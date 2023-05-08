@@ -179,7 +179,6 @@ class CNCEngine {
 
                 const controllers = store.get('controllers', {});
                 Object.keys(controllers).forEach(port => {
-                    log.debug(port);
                     const controller = controllers[port];
                     if (!controller) {
                         return;
@@ -295,6 +294,7 @@ class CNCEngine {
 
             // Open serial port
             socket.on('open', (port, options, callback = noop) => {
+                const numClients = this.io.sockets.adapter.rooms.get(port)?.size || 0;
                 if (typeof callback !== 'function') {
                     callback = noop;
                 }
@@ -324,13 +324,16 @@ class CNCEngine {
                 controller.addConnection(socket);
                 // Load file to controller if it exists
                 if (this.hasFileLoaded()) {
-                    controller.loadFile(this.gcode, this.meta);
+                    if (numClients === 0) {
+                        controller.loadFile(this.gcode, this.meta);
+                    } else {
+                        log.debug('File already loaded in another socket');
+                    }
                 } else {
                     log.debug('No file in CNCEngine to load to sender');
                 }
 
                 if (controller.isOpen()) {
-                    log.debug('controller already open');
                     // Join the room
                     socket.join(port);
 
@@ -339,7 +342,6 @@ class CNCEngine {
                 }
 
                 controller.open((err = null) => {
-                    log.debug('controller opening');
                     if (err) {
                         callback(err);
                         return;
