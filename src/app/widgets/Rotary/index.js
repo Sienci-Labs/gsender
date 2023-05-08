@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import map from 'lodash/map';
 import { useSelector } from 'react-redux';
@@ -22,12 +22,14 @@ import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../JogControl/constant
 
 const Rotary = ({ active }) => {
     const [speedPreset, setSpeedPreset] = useState(SPEED_NORMAL);
+    const [isFileRunning, setIsFileRunning] = useState(false);
     const [jog, setJog] = useState({
         ...store.get('widgets.axes.jog'),
         aStep: '5.00',
     });
     const [, setIsContinuousJogging] = useState(false);
     const { state: controllerState, type: controllerType } = useSelector(state => state.controller);
+
 
     const { ROTARY } = WORKSPACE_MODE;
     const workspaceMode = store.get('workspace.mode');
@@ -102,6 +104,15 @@ const Rotary = ({ active }) => {
         },
     };
 
+    useEffect(() => {
+        if (controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run') {
+            setIsFileRunning(true);
+        } else {
+            setIsFileRunning(false);
+        }
+    }, [controllerState]);
+
+    console.log(isFileRunning);
     return (
         <Widget>
             <Widget.Content
@@ -116,10 +127,10 @@ const Rotary = ({ active }) => {
                         <p className={styles['rotary-tab-section-title']}>
                             Jog Control
                         </p>
-                        <DROarea actions={actions} canClick={enableRotaryAxis} />
+                        <DROarea actions={actions} canClick={enableRotaryAxis && !isFileRunning} />
                         <JogControlArea
                             selectedSpeed={speedPreset} actions={actions} jog={jog}
-                            disabled={!enableRotaryAxis}
+                            disabled={!enableRotaryAxis || isFileRunning}
                         />
                         <SpeedPresets selectedSpeed={speedPreset} actions={actions} />
                         <SpeedControls jog={jog} actions={actions} />

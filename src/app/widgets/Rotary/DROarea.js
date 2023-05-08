@@ -74,6 +74,8 @@ const DROarea = ({ canClick = true, actions }) => {
             return Number(num).toFixed(2);
         };
 
+        console.log('DRO :', canClick);
+
         return (
             <div style={{ display: 'flex', gap: '1rem' }}>
                 <div style={{ display: 'flex', gap: '1rem' }}>
