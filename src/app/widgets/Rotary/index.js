@@ -112,7 +112,6 @@ const Rotary = ({ active }) => {
         }
     }, [controllerState]);
 
-    console.log(isFileRunning);
     return (
         <Widget>
             <Widget.Content
