@@ -1,6 +1,6 @@
 {
-  "name": "gSender-Edge",
-  "version": "1.2.5-EDGE",
+  "name": "gSender",
+  "version": "1.2.0",
   "description": "Electron sender for GRBL based CNC machines",
   "author": {
     "name": "Sienci Labs <hi@sienci.com>",
@@ -78,11 +78,11 @@
     "coveralls": "tap test/*.js --coverage --coverage-report=text-lcov --nyc-arg=--require --nyc-arg=@babel/register --nyc-arg=--require --nyc-arg=@babel/polyfill | coveralls"
   },
   "build": {
-    "appId": "org.sienci.gsender-edge",
+    "appId": "org.sienci.gsender",
     "artifactName": "${name}-${version}-${arch}.${ext}",
     "asar": false,
     "asarUnpack": [],
-    "productName": "gSender Edge",
+    "productName": "gSender",
     "generateUpdatesFilesForAllChannels": true,
     "extraResources": [
       "./node_modules/@electron/remote/**"
