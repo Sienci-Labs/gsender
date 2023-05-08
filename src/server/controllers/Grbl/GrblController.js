@@ -1291,11 +1291,11 @@ class GrblController {
 
                 this.workflow.stop();
 
-                callback(null, this.sender.toJSON());
+                callback(null, this.sender.toJSON());this.workflow.stop();
+                this.engine.unload();
+
             },
             'gcode:unload': () => {
-                this.workflow.stop();
-                this.engine.unload();
 
                 // Sender
                 this.sender.unload();
