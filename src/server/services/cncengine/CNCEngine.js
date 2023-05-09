@@ -294,6 +294,7 @@ class CNCEngine {
 
             // Open serial port
             socket.on('open', (port, options, callback = noop) => {
+                const numClients = this.io.sockets.adapter.rooms.get(port)?.size || 0;
                 if (typeof callback !== 'function') {
                     callback = noop;
                 }
@@ -323,9 +324,13 @@ class CNCEngine {
                 controller.addConnection(socket);
                 // Load file to controller if it exists
                 if (this.hasFileLoaded()) {
-                    console.log(this.meta);
-                    controller.loadFile(this.gcode, this.meta);
-                    socket.emit('file:load', this.gcode, this.meta.name, this.meta.size);
+                    if (numClients === 0) {
+                        console.log(this.meta);
+                        controller.loadFile(this.gcode, this.meta);
+                        socket.emit('file:load', this.gcode, this.meta.name, this.meta.size);
+                    } else {
+                        log.debug('File already loaded in another socket');
+                    }
                 } else {
                     log.debug('No file in CNCEngine to load to sender');
                 }
@@ -361,6 +366,7 @@ class CNCEngine {
 
             // Close serial port
             socket.on('close', (port, callback = noop) => {
+                const numClients = socket.adapter.rooms.get(port).size;
                 if (typeof callback !== 'function') {
                     callback = noop;
                 }
@@ -381,14 +387,20 @@ class CNCEngine {
                 // Leave the room
                 socket.leave(port);
 
-                controller.close(err => {
-                    // Remove controller from store
-                    store.unset(`controllers[${JSON.stringify(port)}]`);
+                if (numClients === 1) { // if only this one was connected
+                    controller.close(err => {
+                        // Remove controller from store
+                        store.unset(`controllers[${JSON.stringify(port)}]`);
 
-                    // Destroy controller
-                    controller.destroy();
+                        // Destroy controller
+                        controller.destroy();
 
-                    callback(null);
+                        callback(null);
+                    });
+                }
+
+                socket.emit('serialport:close', {
+                    port: port,
                 });
             });
 
