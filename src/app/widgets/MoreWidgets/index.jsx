@@ -21,7 +21,7 @@
  *
  */
 import React, { useContext } from 'react';
-import Rotary from '../Rotary';
+import Coolant from '../Coolant';
 import TabsContext from '../SecondaryFunctionality/TabsContext';
 
 /**
@@ -29,12 +29,10 @@ import TabsContext from '../SecondaryFunctionality/TabsContext';
  * @props takes the current selected tab/menu
  */
 const MoreTabs = () => {
-    const { currentDropdownTab = 'Rotary' } = useContext(TabsContext);
+    const { currentDropdownTab = 'Coolant' } = useContext(TabsContext);
 
     return (
-        <div>
-            {currentDropdownTab === 'Rotary' && <Rotary /> }
-        </div>
+        currentDropdownTab === 'Coolant' ? <Coolant /> : <></>
     );
 };
 export default MoreTabs;

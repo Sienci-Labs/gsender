@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 
 const TabsContext = createContext({
-    currentDropdownTab: 'Rotary',
+    currentDropdownTab: 'Coolant',
     updateDropdownTab: () => {}
 });
 

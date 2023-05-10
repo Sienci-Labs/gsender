@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -26,12 +27,13 @@ import React, { PureComponent } from 'react';
 import store from 'app/store';
 import TabbedWidget from 'app/components/TabbedWidget';
 import controller from 'app/lib/controller';
-import CoolantWidget from 'app/widgets/Coolant';
+import RotaryWidget from 'app/widgets/Rotary';
 import WidgetConfig from '../WidgetConfig';
 import ProbeWidget from '../Probe';
 import MacroWidget from '../Macro';
 import ConsoleWidget from '../Console';
 import MoreWidgets from '../MoreWidgets';
+import CoolantWidgets from '../Coolant';
 import RcDropdown from '../MoreWidgets/Dropdown';
 import { TabsProvider } from './TabsContext';
 import SpindleWidget from '../Spindle';
@@ -98,6 +100,60 @@ class SecondaryFunctionality extends PureComponent {
         }
     };
 
+    handleResize = () => {
+        const { tabs } = this.state;
+        const screenWidth = window.innerWidth;
+        console.log(screenWidth);
+        const updatedTabs = [...tabs];
+
+        const moreWidgetObj = {
+            label: <RcDropdown />,
+            widgetId: 'more',
+            component: MoreWidgets
+        };
+
+        const coolantWidgetObj = {
+            label: 'Coolant',
+            widgetId: 'coolant',
+            component: CoolantWidgets
+        };
+
+        //Screen width less than 1231 px?
+        //move coolant under more widgets
+        if (screenWidth < 1231) {
+            const existingMoreWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'more');
+            const existingCoolantWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'coolant');
+
+            //Check if more widget is not in the list, push it
+            if (existingMoreWidgetIndex === -1) {
+                updatedTabs.push(moreWidgetObj);
+            }
+            //if coolant is in the main view, delete it
+            if (existingCoolantWidgetIndex !== -1) {
+                updatedTabs.splice(existingCoolantWidgetIndex, 1);
+            }
+        }
+
+        //Screen width more than 1230 px?
+        //move coolant out of more widgets
+        if (screenWidth > 1230) {
+            const existingMoreWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'more');
+            const existingCoolantWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'coolant');
+
+            //Check if coolant widget is not in the list, push it
+            if (existingCoolantWidgetIndex === -1) {
+                updatedTabs.push(coolantWidgetObj);
+            }
+            //if more options is in the list, delete it
+            if (existingMoreWidgetIndex !== -1) {
+                console.log('more found');
+                updatedTabs.splice(existingMoreWidgetIndex, 1);
+            }
+        }
+
+        this.setState({ tabs: updatedTabs }); // Update the state with the modified tabs array
+    };
+
     content = null;
 
     component = null;
@@ -127,10 +183,12 @@ class SecondaryFunctionality extends PureComponent {
     componentDidMount() {
         store.on('change', this.handleMachineProfileChange);
         this.handleMachineProfileChange();
+        window.addEventListener('resize', this.handleResize);
     }
 
     componentWillUnmount() {
         store.removeListener('change', this.handleMachineProfileChange);
+        window.removeEventListener('resize', this.handleResize);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -161,6 +219,16 @@ class SecondaryFunctionality extends PureComponent {
                     component: ProbeWidget,
                 },
                 {
+                    label: 'Spindle/Laser',
+                    widgetId: 'spindle',
+                    component: SpindleWidget,
+                },
+                {
+                    label: 'Rotary',
+                    widgetId: 'rotary',
+                    component: RotaryWidget
+                },
+                {
                     label: 'Macros',
                     widgetId: 'macro',
                     component: MacroWidget,
@@ -170,23 +238,8 @@ class SecondaryFunctionality extends PureComponent {
                     widgetId: 'console',
                     component: ConsoleWidget,
                 },
-                {
-                    label: 'Spindle/Laser',
-                    widgetId: 'spindle',
-                    component: SpindleWidget,
-                },
-                {
-                    label: 'Coolant',
-                    widgetId: 'coolant',
-                    component: CoolantWidget
-                },
-                {
-                    label: <RcDropdown />,
-                    widgetId: 'more',
-                    component: MoreWidgets
-                },
             ],
-            currentDropdownTab: 'Rotary'
+            currentDropdownTab: 'Coolant'
         };
     }
 

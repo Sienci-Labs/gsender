@@ -1,3 +1,3 @@
-const extraTabsList = ['Rotary'];
+const extraTabsList = ['Coolant'];
 
 export { extraTabsList };
