@@ -103,7 +103,6 @@ class SecondaryFunctionality extends PureComponent {
     handleResize = () => {
         const { tabs } = this.state;
         const screenWidth = window.innerWidth;
-        console.log(screenWidth);
         const updatedTabs = [...tabs];
 
         const moreWidgetObj = {
@@ -118,9 +117,9 @@ class SecondaryFunctionality extends PureComponent {
             component: CoolantWidgets
         };
 
-        //Screen width less than 1231 px?
+        //Screen width less than 1281 px?
         //move coolant under more widgets
-        if (screenWidth < 1231) {
+        if (screenWidth < 1281) {
             const existingMoreWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'more');
             const existingCoolantWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'coolant');
 
@@ -134,9 +133,9 @@ class SecondaryFunctionality extends PureComponent {
             }
         }
 
-        //Screen width more than 1230 px?
+        //Screen width more than 1280 px?
         //move coolant out of more widgets
-        if (screenWidth > 1230) {
+        if (screenWidth > 1280) {
             const existingMoreWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'more');
             const existingCoolantWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'coolant');
 
@@ -146,7 +145,6 @@ class SecondaryFunctionality extends PureComponent {
             }
             //if more options is in the list, delete it
             if (existingMoreWidgetIndex !== -1) {
-                console.log('more found');
                 updatedTabs.splice(existingMoreWidgetIndex, 1);
             }
         }
@@ -184,6 +182,9 @@ class SecondaryFunctionality extends PureComponent {
         store.on('change', this.handleMachineProfileChange);
         this.handleMachineProfileChange();
         window.addEventListener('resize', this.handleResize);
+
+        // Check screen size and update currentDropdownTab state accordingly
+        this.handleResize();
     }
 
     componentWillUnmount() {
