@@ -434,7 +434,7 @@ class GrblController {
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     if (toolChangeOption !== 'Ignore') {
                         if (tool) {
-                            this.emit('toolchange:tool', tool[0]);
+                            commentString = `(${tool[0]}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
                         this.emit('gcode:toolChange', {

@@ -289,8 +289,9 @@ export function* initialize() {
                 instructions: automaticToolChange
             });
         } else if (option === 'Pause') {
+            const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
             Toaster.pop({
-                msg: `Toolchange pause - ${comment}`,
+                msg: msg,
                 type: TOASTER_INFO,
                 duration: TOASTER_UNTIL_CLOSE
             });
@@ -494,15 +495,6 @@ export function* initialize() {
             }
         });
         pubsub.publish('softlimits:check');
-    });
-
-    controller.addListener('toolchange:tool', (tool) => {
-        Toaster.clear();
-        Toaster.pop({
-            type: TOASTER_INFO,
-            msg: `Tool command found - ${tool}`,
-            duration: TOASTER_UNTIL_CLOSE
-        });
     });
 
     controller.addListener('firmware:ready', (status) => {
