@@ -38,6 +38,7 @@ const Location = (props) => {
             jog={state.jog}
             actions={actions}
             safeRetractHeight={state.safeRetractHeight}
+            shouldWarnZero={state.shouldWarnZero}
         />
     );
 };
