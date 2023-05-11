@@ -1,5 +1,5 @@
 import Interpreter from 'gcode-interpreter';
-import * as THREE from 'three';
+// import * as THREE from 'three';
 
 // from in to mm
 const in2mm = (val = 0) => val * 25.4;
