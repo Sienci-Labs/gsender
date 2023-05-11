@@ -29,6 +29,7 @@ const Rotary = ({ active }) => {
     const [, setIsContinuousJogging] = useState(false);
     const { state: controllerState, type: controllerType } = useSelector(state => state.controller);
 
+
     const { ROTARY } = WORKSPACE_MODE;
     const workspaceMode = store.get('workspace.mode');
     const enableRotaryAxis = (workspaceMode === ROTARY && controllerType === 'Grbl') || controllerType === 'grblHAL';
@@ -102,6 +103,14 @@ const Rotary = ({ active }) => {
         },
     };
 
+    const isFileRunning = () => {
+        if (controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run') {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
     return (
         <Widget>
             <Widget.Content
@@ -116,10 +125,10 @@ const Rotary = ({ active }) => {
                         <p className={styles['rotary-tab-section-title']}>
                             Jog Control
                         </p>
-                        <DROarea actions={actions} canClick={enableRotaryAxis} />
+                        <DROarea actions={actions} canClick={enableRotaryAxis && !isFileRunning()} />
                         <JogControlArea
                             selectedSpeed={speedPreset} actions={actions} jog={jog}
-                            disabled={!enableRotaryAxis}
+                            disabled={!enableRotaryAxis || isFileRunning()}
                         />
                         <SpeedPresets selectedSpeed={speedPreset} actions={actions} />
                         <SpeedControls jog={jog} actions={actions} />
