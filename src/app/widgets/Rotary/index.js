@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import map from 'lodash/map';
 import { useSelector } from 'react-redux';
@@ -22,7 +22,6 @@ import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../JogControl/constant
 
 const Rotary = ({ active }) => {
     const [speedPreset, setSpeedPreset] = useState(SPEED_NORMAL);
-    const [isFileRunning, setIsFileRunning] = useState(false);
     const [jog, setJog] = useState({
         ...store.get('widgets.axes.jog'),
         aStep: '5.00',
@@ -104,13 +103,13 @@ const Rotary = ({ active }) => {
         },
     };
 
-    useEffect(() => {
+    const isFileRunning = () => {
         if (controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run') {
-            setIsFileRunning(true);
+            return true;
         } else {
-            setIsFileRunning(false);
+            return false;
         }
-    }, [controllerState]);
+    };
 
     return (
         <Widget>
@@ -126,10 +125,10 @@ const Rotary = ({ active }) => {
                         <p className={styles['rotary-tab-section-title']}>
                             Jog Control
                         </p>
-                        <DROarea actions={actions} canClick={enableRotaryAxis && !isFileRunning} />
+                        <DROarea actions={actions} canClick={enableRotaryAxis && !isFileRunning()} />
                         <JogControlArea
                             selectedSpeed={speedPreset} actions={actions} jog={jog}
-                            disabled={!enableRotaryAxis || isFileRunning}
+                            disabled={!enableRotaryAxis || isFileRunning()}
                         />
                         <SpeedPresets selectedSpeed={speedPreset} actions={actions} />
                         <SpeedControls jog={jog} actions={actions} />
