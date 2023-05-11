@@ -459,15 +459,18 @@ export function* initialize() {
 
     controller.addListener('sender:M0M1', (opts) => {
         const { data, comment = '' } = opts;
+        const msg = `A pause command (${data}) was found. Click Resume to immediately continue the job.
+            If you want to perform more operations (toolchange, jog, etc),
+            close the window, then press the standard Resume Job button when you're ready.`;
 
         const content = (comment.length > 0)
-            ? <div><p>A pause command ({data}) was found - click resume to continue.</p><p>Comment: <b>{comment}</b></p></div>
-            : `A pause command (${data}) was found - click resume to continue.`;
+            ? <div><p>{msg}</p><p>Comment: <b>{comment}</b></p></div>
+            : msg;
 
         Confirm({
             title: 'M0/M1 Pause',
             content,
-            confirmLabel: 'Resume',
+            confirmLabel: 'Resume Job',
             cancelLabel: 'Close Window',
             onConfirm: () => {
                 controller.command('gcode:resume');
