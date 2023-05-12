@@ -21,92 +21,84 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import React, { PureComponent } from 'react';
-import store from 'app/store';
 import TabbedWidget from 'app/components/TabbedWidget';
-import controller from 'app/lib/controller';
+import store from 'app/store';
 import RotaryWidget from 'app/widgets/Rotary';
-import WidgetConfig from '../WidgetConfig';
-import ProbeWidget from '../Probe';
-import MacroWidget from '../Macro';
-import ConsoleWidget from '../Console';
+import controller from 'app/lib/controller';
 import MoreWidgets from '../MoreWidgets';
 import CoolantWidgets from '../Coolant';
 import RcDropdown from '../MoreWidgets/Dropdown';
-import { TabsProvider } from './TabsContext';
-import SpindleWidget from '../Spindle';
-
+import ProbeWidget from '../Probe';
+import MacroWidget from '../Macro';
+import ConsoleWidget from '../Console';
 import {
     MODAL_NONE,
 } from './constants';
+import WidgetConfig from '../WidgetConfig';
+import { TabsProvider } from './TabsContext';
+import SpindleWidget from '../Spindle';
 
+const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
+    const config = new WidgetConfig(widgetId);
+    const [state, setState] = useState(getInitialState());
 
-class SecondaryFunctionality extends PureComponent {
-    static propTypes = {
-        widgetId: PropTypes.string.isRequired,
-        onFork: PropTypes.func.isRequired,
-        onRemove: PropTypes.func.isRequired,
-        sortable: PropTypes.object
+    const updateDropdownTab = (newTab) => {
+        setState((prev) => ({ ...prev, currentDropdownTab: newTab }));
     };
 
-    config = new WidgetConfig(this.props.widgetId);
-
-    state = this.getInitialState();
-
-    actions = {
+    const { isFullscreen, tabs, selectedTab, currentDropdownTab } = state;
+    const actions = {
         toggleDisabled: () => {
-            const { disabled } = this.state;
-            this.setState({ disabled: !disabled });
+            const { disabled } = state;
+            setState((prev) => ({ ...prev, disabled: !disabled }));
         },
         toggleFullscreen: () => {
-            const { minimized, isFullscreen } = this.state;
-            this.setState({
+            const { minimized, isFullscreen } = state;
+            setState((prev) => ({
+                ...prev,
                 minimized: isFullscreen ? minimized : false,
                 isFullscreen: !isFullscreen
-            });
+            }));
         },
         toggleMinimized: () => {
-            const { minimized } = this.state;
-            this.setState({ minimized: !minimized });
+            const { minimized } = state;
+            setState((prev) => ({ ...prev, minimized: !minimized }));
         },
         openModal: (name = MODAL_NONE, params = {}) => {
-            this.setState({
+            setState((prev) => ({
+                ...prev,
                 modal: {
                     name: name,
                     params: params
                 }
-            });
+            }));
         },
         closeModal: () => {
-            this.setState({
+            setState((prev) => ({
+                ...prev,
                 modal: {
                     name: MODAL_NONE,
                     params: {}
                 }
-            });
-        },
-        refreshContent: () => {
-            if (this.content) {
-                const forceGet = true;
-                this.content.reload(forceGet);
-            }
+            }));
         },
         handleTabSelect: (index) => {
-            const { tabs } = this.state;
+            const { tabs } = state;
             const selectedTab = ['coolant', 'rotary'].includes(tabs[index].widgetId) ? tabs[index].widgetId : '';
             const widgetId = tabs[index].widgetId;
 
-            this.setState({
+            setState((prev) => ({
+                ...prev,
                 selectedTab: index,
-            });
+            }));
             if (widgetId !== 'more') {
-                this.setState({ currentDropdownTab: selectedTab, });
+                setState((prev) => ({ ...prev, currentDropdownTab: selectedTab, }));
             }
         },
         handleResize: () => {
-            const { tabs, hiddenTabs } = this.state;
+            const { tabs, hiddenTabs } = state;
             const screenWidth = window.innerWidth;
             const updatedTabs = [...tabs];
             const moreTabs = [...hiddenTabs];
@@ -120,7 +112,7 @@ class SecondaryFunctionality extends PureComponent {
             const hiddenRotaryIndex = moreTabs.findIndex(tab => tab.widgetId === 'rotary');
 
             const moreWidgetObj = {
-                label: <RcDropdown hiddenTabs={moreTabs} handleHighlightTab={this.actions.handleHighlightTab} />,
+                label: <RcDropdown hiddenTabs={moreTabs} handleHighlightTab={actions.handleHighlightTab} />,
                 widgetId: 'more',
                 component: MoreWidgets,
             };
@@ -208,135 +200,19 @@ class SecondaryFunctionality extends PureComponent {
                     updatedTabs.push(moreWidgetObj);
                 }
             }
-
-            this.setState({ hiddenTabs: moreTabs }); // Update the more tab list
-            this.setState({ tabs: updatedTabs }); // Update the main tab list
+            setState((prev) => ({ ...prev, hiddenTabs: moreTabs })); // Update the more tab list
+            setState((prev) => ({ ...prev, tabs: updatedTabs })); // Update the main tab list
         },
-        //Logic to move tabs from hidden to the main view
         handleHighlightTab: (tab) => {
-            // const { hiddenTabs, tabs } = this.state;
-            // const moreTabs = [...hiddenTabs];
-            // const updatedTabs = [...tabs];
-            // // Widget Indexes in the main list
-            // const consoleWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'console');
-            // // Widget Indexes in the hidden list
-            // const hiddenCoolantIndex = moreTabs.findIndex(tab => tab.widgetId === 'coolant');
-            // const hiddenRotaryIndex = moreTabs.findIndex(tab => tab.widgetId === 'rotary');
-            // const hiddenConsoleIndex = moreTabs.findIndex(tab => tab.widgetId === 'console');
-
-            // const coolantWidgetObj = {
-            //     label: 'Coolant',
-            //     widgetId: 'coolant',
-            //     component: CoolantWidgets
-            // };
-
-            // const rotaryWidgetObj = {
-            //     label: 'Rotary',
-            //     widgetId: 'rotary',
-            //     component: RotaryWidget
-            // };
-
-            // const consoleWidgetObj = {
-            //     label: 'Console',
-            //     widgetId: 'console',
-            //     component: ConsoleWidget,
-            // };
-
-            // switch (tab) {
-            // case 'Rotary':
-            //     if (hiddenRotaryIndex !== -1) {
-            //         moreTabs.splice(hiddenRotaryIndex, 1);
-            //         updatedTabs.splice(updatedTabs.length - 2, 0, rotaryWidgetObj);
-            //     }
-            //     if (consoleWidgetIndex !== -1) {
-            //         updatedTabs.splice(consoleWidgetIndex, 1);
-            //     }
-            //     if (hiddenConsoleIndex === -1) {
-            //         moreTabs.push(consoleWidgetObj);
-            //     }
-            //     break;
-            // case 'Coolant':
-            //     if (hiddenCoolantIndex !== -1) {
-            //         moreTabs.splice(hiddenCoolantIndex, 1);
-            //         updatedTabs.splice(updatedTabs.length - 2, 0, coolantWidgetObj);
-            //     }
-            //     if (consoleWidgetIndex !== -1) {
-            //         updatedTabs.splice(consoleWidgetIndex, 1);
-            //     }
-            //     if (hiddenConsoleIndex === -1) {
-            //         moreTabs.push(consoleWidgetObj);
-            //     }
-            //     break;
-            // default:
-            //     break;
-            // }
-            // console.log(moreTabs);
-            // this.setState({
-            //     tabs: updatedTabs,
-            //     hiddenTabs: moreTabs
-            // });
-            console.log(tab, ' Highlighted');
-        },
+            console.log('Highlighted: ', tab);
+        }
     };
 
-    content = null;
-
-    component = null;
-
-    /**
-     * Function to listen for store changes and add or remove the spindle tab from state
-     */
-    handleMachineProfileChange = () => {
-        const machineProfile = store.get('workspace.machineProfile');
-
-        if (!machineProfile) {
-            return;
-        }
-
-        if (machineProfile.spindle) {
-            const hasSpindleWidget = this.state.tabs.find(tab => tab.widgetId === 'spindle');
-            if (!hasSpindleWidget) {
-                this.setState((prev) => ({ ...prev, tabs: [...prev.tabs, { label: 'Spindle/Laser', widgetId: 'spindle', component: SpindleWidget }] }));
-            }
-        } else {
-            const filteredTabs = this.state.tabs.filter(tab => tab.widgetId !== 'spindle');
-
-            this.setState((prev) => ({ ...prev, selectedTab: prev.selectedTab === 3 ? 0 : prev.selectedTab, tabs: filteredTabs }));
-        }
-    }
-
-    componentDidMount() {
-        store.on('change', this.handleMachineProfileChange);
-        this.handleMachineProfileChange();
-        window.addEventListener('resize', this.actions.handleResize);
-
-        // Check screen size and update currentDropdownTab state accordingly
-        this.actions.handleResize();
-    }
-
-    componentWillUnmount() {
-        store.removeListener('change', this.handleMachineProfileChange);
-        window.removeEventListener('resize', this.actions.handleResize);
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        const {
-            disabled,
-            minimized,
-            title,
-            url
-        } = this.state;
-        this.config.set('disabled', disabled);
-        this.config.set('minimized', minimized);
-        this.config.set('title', title);
-        this.config.set('url', url);
-    }
-
-    getInitialState() {
+    function getInitialState() {
         return {
-            minimized: this.config.get('minimized', false),
+            minimized: config.get('minimized', false),
             isFullscreen: false,
-            disabled: this.config.get('disabled'),
+            disabled: config.get('disabled'),
             port: controller.port,
             selectedTab: 0,
             tabs: [
@@ -371,43 +247,71 @@ class SecondaryFunctionality extends PureComponent {
         };
     }
 
-    render() {
-        const { isFullscreen, tabs, selectedTab, currentDropdownTab } = this.state;
-        const { onFork, onRemove, sortable } = this.props;
-        const actions = { ...this.actions };
+    const handleMachineProfileChange = () => {
+        const machineProfile = store.get('workspace.machineProfile');
 
-        const updateDropdownTab = (newTab) => {
-            this.setState({ 'currentDropdownTab': newTab });
+        if (!machineProfile) {
+            return;
+        }
+
+        if (machineProfile.spindle) {
+            const hasSpindleWidget = state.tabs.find((tab) => tab.widgetId === 'spindle');
+            if (!hasSpindleWidget) {
+                setState((prev) => ({ ...prev, tabs: [...prev.tabs, { label: 'Spindle/Laser', widgetId: 'spindle', component: SpindleWidget }] }));
+            }
+        } else {
+            const filteredTabs = state.tabs.filter((tab) => tab.widgetId !== 'spindle');
+            setState((prev) => ({
+                ...prev,
+                selectedTab: prev.selectedTab === 3 ? 0 : prev.selectedTab,
+                tabs: filteredTabs
+            }));
+        }
+    };
+
+    useEffect(() => {
+        store.on('change', handleMachineProfileChange);
+        handleMachineProfileChange();
+        window.addEventListener('resize', actions.handleResize);
+        actions.handleResize();
+
+        return () => {
+            store.removeListener('change', handleMachineProfileChange);
+            window.removeEventListener('resize', actions.handleResize);
         };
+    }, []);
+    return (
+        <TabsProvider value={{ currentDropdownTab, updateDropdownTab }}>
+            <TabbedWidget fullscreen={isFullscreen}>
+                <TabbedWidget.Tabs tabs={tabs} activeTabIndex={selectedTab} onClick={actions.handleTabSelect} />
+                <TabbedWidget.Content>
+                    {tabs.map((tab, index) => {
+                        const active = index === selectedTab;
+                        return (
+                            <TabbedWidget.ChildComponent key={tab.widgetId} active={active} style={{ overflowX: 'auto' }}>
+                                <tab.component
+                                    onFork={onFork}
+                                    onRemove={onRemove}
+                                    sortable={sortable}
+                                    widgetId={tab.widgetId}
+                                    embedded
+                                    active={active}
+                                    isMainWindow={true}
+                                />
+                            </TabbedWidget.ChildComponent>
+                        );
+                    })}
+                </TabbedWidget.Content>
+            </TabbedWidget>
+        </TabsProvider>
+    );
+};
 
-        return (
-            <TabsProvider value={{ currentDropdownTab: currentDropdownTab, updateDropdownTab: updateDropdownTab }}>
-                <TabbedWidget fullscreen={isFullscreen}>
-                    <TabbedWidget.Tabs tabs={tabs} activeTabIndex={selectedTab} onClick={actions.handleTabSelect} />
-                    <TabbedWidget.Content>
-                        {
-                            tabs.map((tab, index) => {
-                                const active = index === selectedTab;
-                                return (
-                                    <TabbedWidget.ChildComponent key={`${tab.widgetId}`} active={active} style={{ overflowX: 'auto' }}>
-                                        <tab.component
-                                            onFork={onFork}
-                                            onRemove={onRemove}
-                                            sortable={sortable}
-                                            widgetId={tab.widgetId}
-                                            embedded
-                                            active={active}
-                                            isMainWindow={true}
-                                        />
-                                    </TabbedWidget.ChildComponent>
-                                );
-                            })
-                        }
-                    </TabbedWidget.Content>
-                </TabbedWidget>
-            </TabsProvider>
-        );
-    }
-}
+SecondaryFunctionality.propTypes = {
+    widgetId: PropTypes.string.isRequired,
+    onFork: PropTypes.func.isRequired,
+    onRemove: PropTypes.func.isRequired,
+    sortable: PropTypes.object
+};
 
 export default SecondaryFunctionality;
