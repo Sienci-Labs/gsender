@@ -171,7 +171,7 @@ class PreferencesPage extends PureComponent {
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
-            shouldWarnZero: store.get('workspace.shouldWarnZero'),
+            shouldWarnZero: store.get('workspace.shouldWarnZero', false),
         };
     }
 
