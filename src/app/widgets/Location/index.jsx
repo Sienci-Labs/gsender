@@ -432,24 +432,10 @@ class LocationWidget extends PureComponent {
                 return;
             }
 
-            const wcs = this.actions.getWorkCoordinateSystem();
-
-            const p = {
-                'G54': 1,
-                'G55': 2,
-                'G56': 3,
-                'G57': 4,
-                'G58': 5,
-                'G59': 6
-            }[wcs] || 0;
-
-            if (axis === 'all') {
-                controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
-                return;
+            if (axis !== 'all') {
+                axis = axis.toUpperCase();
             }
-
-            axis = axis.toUpperCase();
-            controller.command('gcode', `G10 L20 P${p} ${axis}0`);
+            this.actions.setZeroOnAxis(true, axis);
         },
         GO_TO_AXIS_ZERO: (_, { axisList }) => {
             const { state } = this.props;
@@ -531,7 +517,7 @@ class LocationWidget extends PureComponent {
             keys: ['shift', 'r'].join('+'),
             cmd: 'ZERO_Z_AXIS',
             preventDefault: true,
-            payload: { axis: AXIS_A },
+            payload: { axis: AXIS_Z },
             isActive: true,
             category: LOCATION_CATEGORY,
             callback: this.shuttleControlFunctions.ZERO_AXIS
@@ -773,7 +759,7 @@ class LocationWidget extends PureComponent {
             'G59': 6
         }[wcs] || 0;
 
-        if (axis === 'All') {
+        if (axis === 'all') {
             controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
             pubsub.publish('softlimits:check', 0);
         } else {
@@ -856,7 +842,7 @@ class LocationWidget extends PureComponent {
                                         <div className={styles.runProbeBody}>
                                             <div className={styles.left}>
                                                 <div className={styles.greyText}>
-                                                    <p>{'Set Workspace Zero for ' + (showWarnZero.axis === 'All' ? 'all axes?' : `${showWarnZero.axis}?`)}</p>
+                                                    <p>{'Set Workspace Zero for ' + (showWarnZero.axis === 'all' ? 'all axes?' : `${showWarnZero.axis}?`)}</p>
                                                 </div>
                                                 <div className={styles.buttonsContainer}>
                                                     <FunctionButton

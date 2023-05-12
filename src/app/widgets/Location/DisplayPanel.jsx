@@ -402,7 +402,7 @@ class DisplayPanel extends PureComponent {
                             </table>
                             <div className={styles.controlButtons}>
                                 <FunctionButton
-                                    onClick={() => actions.setZeroOnAxis(true, 'All')}
+                                    onClick={() => actions.setZeroOnAxis(true, 'all')}
                                     disabled={!canClick}
                                 >
                                     <i className="fas fa-bullseye" />
