@@ -25,7 +25,6 @@ import Dropdown from 'rc-dropdown';
 import styled from 'styled-components';
 import Menu, { MenuItem } from 'rc-menu';
 import styles from './index.styl';
-import { extraTabsList } from './constants';
 import TabsContext from '../SecondaryFunctionality/TabsContext';
 import './styles.css';
 
@@ -34,10 +33,12 @@ import './styles.css';
  * one of the extra widgets
  * @props takes current selected tab and context of parent class component to update state
  */
-const RcDropdown = () => {
+const RcDropdown = ({ hiddenTabs = [], handleHighlightTab }) => {
     const { currentDropdownTab, updateDropdownTab } = useContext(TabsContext);
+
     const handleTabSelect = (tab) => {
         updateDropdownTab(tab);
+        handleHighlightTab(tab);
     };
 
     const DropdownWrapper = styled.div``;
@@ -48,16 +49,16 @@ const RcDropdown = () => {
 
     const Options = (
         <Menu className={styles.dropdown} activeKey={currentDropdownTab}>
-            {extraTabsList.map((tab) => (
+            {hiddenTabs.map((tab) => (
                 <MenuItem
                     className={styles.menuItems}
-                    onClick={() => handleTabSelect(tab)}
+                    onClick={() => handleTabSelect(tab.label)}
                     onKeyDown={null}
                     tabIndex={-1}
                     role="button"
-                    key={tab}
+                    key={tab.label}
                 >
-                    <span>{tab}</span>
+                    <span>{tab.label}</span>
                 </MenuItem>
             ))}
         </Menu>

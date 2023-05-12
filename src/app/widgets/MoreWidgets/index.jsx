@@ -22,6 +22,7 @@
  */
 import React, { useContext } from 'react';
 import Coolant from '../Coolant';
+import Rotary from '../Rotary';
 import TabsContext from '../SecondaryFunctionality/TabsContext';
 
 /**
@@ -31,8 +32,21 @@ import TabsContext from '../SecondaryFunctionality/TabsContext';
 const MoreTabs = () => {
     const { currentDropdownTab = 'Coolant' } = useContext(TabsContext);
 
+    let Render = Coolant;
+
+    switch (currentDropdownTab) {
+    case 'Coolant':
+        Render = Coolant;
+        break;
+    case 'Rotary':
+        Render = Rotary;
+        break;
+    default:
+        break;
+    }
+
     return (
-        currentDropdownTab === 'Coolant' ? <Coolant /> : <></>
+        <Render />
     );
 };
 export default MoreTabs;

@@ -94,62 +94,189 @@ class SecondaryFunctionality extends PureComponent {
             }
         },
         handleTabSelect: (index) => {
+            const { tabs } = this.state;
+            const selectedTab = ['coolant', 'rotary'].includes(tabs[index].widgetId) ? tabs[index].widgetId : '';
+            const widgetId = tabs[index].widgetId;
+
             this.setState({
-                selectedTab: index
+                selectedTab: index,
             });
-        }
-    };
-
-    handleResize = () => {
-        const { tabs } = this.state;
-        const screenWidth = window.innerWidth;
-        const updatedTabs = [...tabs];
-
-        const moreWidgetObj = {
-            label: <RcDropdown />,
-            widgetId: 'more',
-            component: MoreWidgets
-        };
-
-        const coolantWidgetObj = {
-            label: 'Coolant',
-            widgetId: 'coolant',
-            component: CoolantWidgets
-        };
-
-        //Screen width less than 1281 px?
-        //move coolant under more widgets
-        if (screenWidth < 1281) {
-            const existingMoreWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'more');
-            const existingCoolantWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'coolant');
-
-            //Check if more widget is not in the list, push it
-            if (existingMoreWidgetIndex === -1) {
-                updatedTabs.push(moreWidgetObj);
+            if (widgetId !== 'more') {
+                this.setState({ currentDropdownTab: selectedTab, });
             }
-            //if coolant is in the main view, delete it
-            if (existingCoolantWidgetIndex !== -1) {
-                updatedTabs.splice(existingCoolantWidgetIndex, 1);
-            }
-        }
+        },
+        handleResize: () => {
+            const { tabs, hiddenTabs } = this.state;
+            const screenWidth = window.innerWidth;
+            const updatedTabs = [...tabs];
+            const moreTabs = [...hiddenTabs];
 
-        //Screen width more than 1280 px?
-        //move coolant out of more widgets
-        if (screenWidth > 1280) {
-            const existingMoreWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'more');
-            const existingCoolantWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'coolant');
+            // Widget Indexes in the main list
+            const moreWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'more');
+            const coolantWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'coolant');
+            const rotaryWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'rotary');
+            // Widget Indexes in the hidden list
+            const hiddenCoolantIndex = moreTabs.findIndex(tab => tab.widgetId === 'coolant');
+            const hiddenRotaryIndex = moreTabs.findIndex(tab => tab.widgetId === 'rotary');
 
-            //Check if coolant widget is not in the list, push it
-            if (existingCoolantWidgetIndex === -1) {
-                updatedTabs.push(coolantWidgetObj);
-            }
-            //if more options is in the list, delete it
-            if (existingMoreWidgetIndex !== -1) {
-                updatedTabs.splice(existingMoreWidgetIndex, 1);
-            }
-        }
+            const moreWidgetObj = {
+                label: <RcDropdown hiddenTabs={moreTabs} handleHighlightTab={this.actions.handleHighlightTab} />,
+                widgetId: 'more',
+                component: MoreWidgets,
+            };
 
-        this.setState({ tabs: updatedTabs }); // Update the state with the modified tabs array
+            const coolantWidgetObj = {
+                label: 'Coolant',
+                widgetId: 'coolant',
+                component: CoolantWidgets
+            };
+
+            const rotaryWidgetObj = {
+                label: 'Rotary',
+                widgetId: 'rotary',
+                component: RotaryWidget
+            };
+
+            // Screen width between 1248px and 1280px
+            // Bring up 'more' tabs and display ONLY Coolant widget under it
+            if (screenWidth >= 1248 && screenWidth <= 1281) {
+                // if Coolant is in the main view, delete it
+                if (coolantWidgetIndex !== -1) {
+                    updatedTabs.splice(coolantWidgetIndex, 1);
+                }
+
+                // More tab should ONLY have Coolant tab
+                if (hiddenCoolantIndex === -1) {
+                    moreTabs.push(coolantWidgetObj);
+                }
+                if (hiddenRotaryIndex !== -1) {
+                    moreTabs.splice(hiddenCoolantIndex, 1);
+                }
+
+                // if Rotary is not in the main list, add it
+                if (rotaryWidgetIndex === -1) {
+                    updatedTabs.splice(moreWidgetIndex, 0, rotaryWidgetObj);
+                }
+
+                // Check if more widget is not in the list, push it
+                if (moreWidgetIndex === -1) {
+                    updatedTabs.push(moreWidgetObj);
+                }
+            }
+
+            // Screen width more than 1280 px
+            // all tabs should appear in main list
+            if (screenWidth > 1281) {
+                // Check if coolant widget is not in the main list, push it
+                if (coolantWidgetIndex === -1) {
+                    updatedTabs.push(coolantWidgetObj);
+                }
+                // Check if Rotary widget is not in the main list, push it
+                if (rotaryWidgetIndex === -1) {
+                    updatedTabs.push(rotaryWidgetObj);
+                }
+                // if more options is in the list, delete it
+                if (moreWidgetIndex !== -1) {
+                    updatedTabs.splice(moreWidgetIndex, 1);
+                }
+                // Empty hidden array list
+                moreTabs.length = 0;
+            }
+
+            // Screen width less than 1248px
+            // Move both Rotary and Coolant under 'more' tab from main tab list
+            if (screenWidth < 1248) {
+                // Move Rotary under hidden list
+                if (hiddenCoolantIndex === -1) {
+                    moreTabs.push(coolantWidgetObj);
+                }
+                // Move Coolant under hidden list
+                if (hiddenRotaryIndex === -1) {
+                    moreTabs.push(rotaryWidgetObj);
+                }
+
+                // Delete Rotary and Coolant from main list if exists
+                if (rotaryWidgetIndex !== -1) {
+                    updatedTabs.splice(rotaryWidgetIndex, 1);
+                }
+                if (coolantWidgetIndex !== -1) {
+                    updatedTabs.splice(coolantWidgetIndex, 1);
+                }
+
+                // Add more tab to the main tab list
+                if (moreWidgetIndex === -1) {
+                    updatedTabs.push(moreWidgetObj);
+                }
+            }
+
+            this.setState({ hiddenTabs: moreTabs }); // Update the more tab list
+            this.setState({ tabs: updatedTabs }); // Update the main tab list
+        },
+        //Logic to move tabs from hidden to the main view
+        handleHighlightTab: (tab) => {
+            // const { hiddenTabs, tabs } = this.state;
+            // const moreTabs = [...hiddenTabs];
+            // const updatedTabs = [...tabs];
+            // // Widget Indexes in the main list
+            // const consoleWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'console');
+            // // Widget Indexes in the hidden list
+            // const hiddenCoolantIndex = moreTabs.findIndex(tab => tab.widgetId === 'coolant');
+            // const hiddenRotaryIndex = moreTabs.findIndex(tab => tab.widgetId === 'rotary');
+            // const hiddenConsoleIndex = moreTabs.findIndex(tab => tab.widgetId === 'console');
+
+            // const coolantWidgetObj = {
+            //     label: 'Coolant',
+            //     widgetId: 'coolant',
+            //     component: CoolantWidgets
+            // };
+
+            // const rotaryWidgetObj = {
+            //     label: 'Rotary',
+            //     widgetId: 'rotary',
+            //     component: RotaryWidget
+            // };
+
+            // const consoleWidgetObj = {
+            //     label: 'Console',
+            //     widgetId: 'console',
+            //     component: ConsoleWidget,
+            // };
+
+            // switch (tab) {
+            // case 'Rotary':
+            //     if (hiddenRotaryIndex !== -1) {
+            //         moreTabs.splice(hiddenRotaryIndex, 1);
+            //         updatedTabs.splice(updatedTabs.length - 2, 0, rotaryWidgetObj);
+            //     }
+            //     if (consoleWidgetIndex !== -1) {
+            //         updatedTabs.splice(consoleWidgetIndex, 1);
+            //     }
+            //     if (hiddenConsoleIndex === -1) {
+            //         moreTabs.push(consoleWidgetObj);
+            //     }
+            //     break;
+            // case 'Coolant':
+            //     if (hiddenCoolantIndex !== -1) {
+            //         moreTabs.splice(hiddenCoolantIndex, 1);
+            //         updatedTabs.splice(updatedTabs.length - 2, 0, coolantWidgetObj);
+            //     }
+            //     if (consoleWidgetIndex !== -1) {
+            //         updatedTabs.splice(consoleWidgetIndex, 1);
+            //     }
+            //     if (hiddenConsoleIndex === -1) {
+            //         moreTabs.push(consoleWidgetObj);
+            //     }
+            //     break;
+            // default:
+            //     break;
+            // }
+            // console.log(moreTabs);
+            // this.setState({
+            //     tabs: updatedTabs,
+            //     hiddenTabs: moreTabs
+            // });
+            console.log(tab, ' Highlighted');
+        },
     };
 
     content = null;
@@ -181,15 +308,15 @@ class SecondaryFunctionality extends PureComponent {
     componentDidMount() {
         store.on('change', this.handleMachineProfileChange);
         this.handleMachineProfileChange();
-        window.addEventListener('resize', this.handleResize);
+        window.addEventListener('resize', this.actions.handleResize);
 
         // Check screen size and update currentDropdownTab state accordingly
-        this.handleResize();
+        this.actions.handleResize();
     }
 
     componentWillUnmount() {
         store.removeListener('change', this.handleMachineProfileChange);
-        window.removeEventListener('resize', this.handleResize);
+        window.removeEventListener('resize', this.actions.handleResize);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -199,7 +326,6 @@ class SecondaryFunctionality extends PureComponent {
             title,
             url
         } = this.state;
-
         this.config.set('disabled', disabled);
         this.config.set('minimized', minimized);
         this.config.set('title', title);
@@ -240,7 +366,8 @@ class SecondaryFunctionality extends PureComponent {
                     component: ConsoleWidget,
                 },
             ],
-            currentDropdownTab: 'Coolant'
+            hiddenTabs: [],
+            currentDropdownTab: ''
         };
     }
 
