@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-globals */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -178,11 +177,11 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
             // Screen width less than 1248px
             // Move both Rotary and Coolant under 'more' tab from main tab list
             if (screenWidth < 1248) {
-                // Move Rotary under hidden list
+                // Move Coolant under hidden list
                 if (hiddenCoolantIndex === -1) {
                     moreTabs.push(coolantWidgetObj);
                 }
-                // Move Coolant under hidden list
+                // Move Rotary under hidden list
                 if (hiddenRotaryIndex === -1) {
                     moreTabs.push(rotaryWidgetObj);
                 }
@@ -204,7 +203,90 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
             setState((prev) => ({ ...prev, tabs: updatedTabs })); // Update the main tab list
         },
         handleHighlightTab: (tab) => {
-            console.log('Highlighted: ', tab);
+            const { tabs, hiddenTabs } = state;
+
+            const updatedTabs = [...tabs];
+            const updatedHiddenTabs = [...hiddenTabs];
+
+            console.log('Hidden tabs in the beginning: ', updatedHiddenTabs);
+            console.log('Main tabs in the beginning: ', updatedTabs);
+
+
+            // /// Widget Indexes in the hidden list
+            // const hiddenConsoleIndex = updatedHiddenTabs.findIndex(tab => tab.widgetId === 'console');
+            // const hiddenCoolantIndex = updatedHiddenTabs.findIndex(tab => tab.widgetId === 'coolant');
+            // const hiddenRotaryIndex = updatedHiddenTabs.findIndex(tab => tab.widgetId === 'rotary');
+
+            // // Widget Indexes in the main list
+            // const consoleWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'console');
+            // const coolantWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'coolant');
+            // const rotaryWidgetIndex = updatedTabs.findIndex(tab => tab.widgetId === 'rotary');
+
+            // // Tab objects
+            // const consoleWidgetObj = {
+            //     label: 'Console',
+            //     widgetId: 'console',
+            //     component: ConsoleWidget
+            // };
+            // const coolantWidgetObj = {
+            //     label: 'Coolant',
+            //     widgetId: 'coolant',
+            //     component: CoolantWidgets
+            // };
+            // const rotaryWidgetObj = {
+            //     label: 'Rotary',
+            //     widgetId: 'rotary',
+            //     component: RotaryWidget
+            // };
+
+            // // Swap with Console every time
+            // // Move selected tab to main view for better clarity
+            // // TODO - add more cases for new tabs in future
+            // switch (tab) {
+            // case 'Rotary':
+            //     // If Rotary in hidden list, delete it
+            //     if (hiddenRotaryIndex !== -1) {
+            //         updatedHiddenTabs.splice(hiddenRotaryIndex, 1);
+            //         console.log('Rotary deleted from hidden list: ', updatedTabs);
+            //     }
+            //     // If Rotary not in main list, add it
+            //     if (rotaryWidgetIndex === -1) {
+            //         updatedTabs.push(rotaryWidgetObj);
+            //         console.log('Rotary added in main list: ', updatedTabs);
+            //     }
+            //     //If Console in main list, delete it
+            //     if (consoleWidgetIndex !== -1) {
+            //         updatedTabs.splice(consoleWidgetIndex, 1);
+            //         console.log('Console deleted from main list: ', updatedTabs);
+            //     }
+            //     // If Console not in hidden list, add it
+            //     if (hiddenConsoleIndex === -1) {
+            //         updatedHiddenTabs.push(consoleWidgetObj);
+            //         console.log('Console added to hidden list: ', updatedTabs);
+            //     }
+            //     break;
+            // case 'Coolant':
+            //     // If Coolant in hidden list, delete it
+            //     if (hiddenCoolantIndex !== -1) {
+            //         updatedHiddenTabs.splice(hiddenCoolantIndex, 1);
+            //     }
+            //     // If Coolant not in main list, add it
+            //     if (coolantWidgetIndex === -1) {
+            //         updatedTabs.push(coolantWidgetObj);
+            //     }
+            //     //If Console in main list, delete it
+            //     if (consoleWidgetIndex !== -1) {
+            //         updatedTabs.splice(coolantWidgetIndex, 1);
+            //     }
+            //     // If Console not in hidden list, add it
+            //     if (hiddenConsoleIndex === -1) {
+            //         updatedHiddenTabs.push(consoleWidgetObj);
+            //     }
+            //     break;
+            // default:
+            //     break;
+            // }
+            // setState((prev) => ({ ...prev, tabs: updatedTabs, hiddenTabs: updatedHiddenTabs }));
         }
     };
 
@@ -280,6 +362,7 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
             window.removeEventListener('resize', actions.handleResize);
         };
     }, []);
+
     return (
         <TabsProvider value={{ currentDropdownTab, updateDropdownTab }}>
             <TabbedWidget fullscreen={isFullscreen}>
