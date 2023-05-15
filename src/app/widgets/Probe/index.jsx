@@ -92,7 +92,33 @@ class ProbeWidget extends PureComponent {
 
     DWELL_TIME = 0.3;
 
+    testInterval = null;
+
     actions = {
+        startConnectivityTest: () => {
+            const { connectivityTest } = this.state;
+            const { returnProbeConnectivity } = this.actions;
+
+            if (this.testInterval) {
+                clearInterval(this.testInterval);
+                this.testInterval = null;
+            }
+            if (!connectivityTest) {
+                this.setState({
+                    connectionMade: true
+                });
+                return;
+            }
+            this.testInterval = setInterval(() => {
+                if (returnProbeConnectivity()) {
+                    this.setState({
+                        connectionMade: true,
+                    });
+                    clearInterval(this.testInterval);
+                    this.testInterval = null;
+                }
+            }, 250);
+        },
         toggleFullscreen: () => {
             const { minimized, isFullscreen } = this.state;
             this.setState({
@@ -105,6 +131,9 @@ class ProbeWidget extends PureComponent {
             this.setState({ minimized: !minimized });
         },
         openModal: (name = MODAL_NONE, params = {}) => {
+            if (name === MODAL_PREVIEW) {
+                this.actions.startConnectivityTest();
+            }
             this.setState({
                 modal: {
                     name: name,
@@ -113,11 +142,17 @@ class ProbeWidget extends PureComponent {
             });
         },
         closeModal: () => {
+            if (this.testInterval) {
+                clearInterval(this.testInterval);
+            }
+            this.testInterval = false;
+
             this.setState({
                 modal: {
                     name: MODAL_NONE,
                     params: {}
-                }
+                },
+                connectionMade: false
             });
         },
         updateModalParams: (params = {}) => {
@@ -371,6 +406,7 @@ class ProbeWidget extends PureComponent {
             selectedProbeCommand: 0,
             connectivityTest: this.config.get('connectivityTest'),
             probeType: PROBE_TYPE_AUTO,
+            connectionMade: false
         };
     }
 
@@ -1344,9 +1380,7 @@ class ProbeWidget extends PureComponent {
                     )}
                     active={active}
                 >
-                    {state.modal.name === MODAL_PREVIEW &&
-                        <RunProbe state={state} actions={actions} />
-                    }
+                    <RunProbe state={state} actions={actions} show={state.modal.name === MODAL_PREVIEW} />
                     <Probe
                         state={state}
                         actions={actions}

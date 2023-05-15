@@ -21,8 +21,8 @@
  *
  */
 
-import Toolpath from 'gcode-toolpath';
-import * as THREE from 'three';
+import GCodeVirtualizer from 'app/lib/GCodeVirtualizer';
+import { ArcCurve } from 'three';
 
 onmessage = function({ data }) {
     const { content, visualizer, isLaser = false, shouldRenderSVG = false } = data;
@@ -42,6 +42,9 @@ onmessage = function({ data }) {
     let SVGVertices = [];
     let paths = [];
     let currentMotion = '';
+    let progress = 0;
+    let currentLines = 0;
+    let totalLines = (content.match(/\n/g) || []).length;
 
     /**
      * Updates local state with any spindle changes in line
@@ -107,7 +110,7 @@ onmessage = function({ data }) {
                     endAngle += (2 * Math.PI);
                 }
 
-                const arcCurve = new THREE.ArcCurve(
+                const arcCurve = new ArcCurve(
                     v0.x, // aX
                     v0.y, // aY
                     radius, // aRadius
@@ -181,7 +184,7 @@ onmessage = function({ data }) {
                     endAngle += (2 * Math.PI);
                 }
 
-                const arcCurve = new THREE.ArcCurve(
+                const arcCurve = new ArcCurve(
                     v0.x, // aX
                     v0.y, // aY
                     radius, // aRadius
@@ -244,23 +247,17 @@ onmessage = function({ data }) {
         handlerKey = 'laser';
     }
 
-    const { addLine, addArcCurve } = handlers[handlerKey];
+    const { addLine, addArcCurve: addCurve } = handlers[handlerKey];
 
-    const toolpath = new Toolpath({
-        addLine,
-        addArcCurve
-    });
+    const vm = new GCodeVirtualizer({ addLine, addCurve, collate: true });
 
-
-    toolpath.loadFromStringSync(content, (line, index) => {
+    vm.on('data', (data) => {
         const vertexIndex = vertices.length / 3;
-        let spindleValues = {};
-
         frames.push(vertexIndex);
 
+        let spindleValues = {};
         if (isLaser) {
-            updateSpindleStateFromLine(line);
-            //console.log(`Spindle: ${spindleOn} - ${line.line}`);
+            updateSpindleStateFromLine(data);
             spindleValues = {
                 spindleOn,
                 spindleSpeed
@@ -268,16 +265,37 @@ onmessage = function({ data }) {
 
             spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
         }
+
+        currentLines++;
+        const newProgress = Math.floor(currentLines / totalLines * 100);
+        if (newProgress !== progress) {
+            progress = newProgress;
+            postMessage(progress);
+        }
     });
+
+    const lines = content
+        .split(/\r?\n/)
+        .reverse();
+
+    const start = Date.now();
+    while (lines.length) {
+        let line = lines.pop();
+        vm.virtualize(line);
+    }
+    console.log(`Parse duration: ${Date.now() - start}`);
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);
+
+    const info = vm.generateFileStats();
 
     const message = {
         vertices: tVertices,
         colors,
         frames: tFrames,
-        visualizer
+        visualizer,
+        info
     };
 
     // create path for the last motion

@@ -44,7 +44,6 @@ import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
-import EstimateWorker from './Estimate.worker';
 import WidgetConfig from '../WidgetConfig';
 import PrimaryVisualizer from './PrimaryVisualizer';
 
@@ -88,10 +87,11 @@ import {
 } from './constants';
 import SecondaryVisualizer from './SecondaryVisualizer';
 import useKeybinding from '../../lib/useKeybinding';
+import shuttleEvents from '../../lib/shuttleEvents';
 
 const displayWebGLErrorMessage = () => {
     portal(({ onClose }) => (
-        <Modal disableOverlay size="xs" onClose={onClose}>
+        <Modal disableOverlayClick size="xs" onClose={onClose}>
             <Modal.Header>
                 <Modal.Title>
                     WebGL Error Message
@@ -230,10 +230,6 @@ class VisualizerWidget extends PureComponent {
                     ready: false
                 }
             }));
-
-            // Start file parsing worker
-            this.processGCode(gcode, name, size);
-
 
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
@@ -649,30 +645,10 @@ class VisualizerWidget extends PureComponent {
             type: UPDATE_FILE_INFO,
             payload: reduxPayload
         });
-        //pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
-        //pubsub.publish('gcode:bbox', bbox);
     }
 
     processGCode = (gcode, name, size) => {
-        const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
-        //Clean up lines and remove ones that are comments and headers
-        const lines = gcode.split('\n')
-            .filter(line => (line.trim().length > 0))
-            .filter(line => !comments.some(comment => line.includes(comment)));
 
-
-        // Set "Loading" state to job info widget and start file VM processor
-        const estimateWorker = new EstimateWorker();
-        const { feedArray, accelArray } = this.props;
-
-        estimateWorker.onmessage = this.onProcessedGcode;
-        estimateWorker.postMessage({
-            lines: lines,
-            name,
-            size,
-            feedArray,
-            accelArray
-        });
     };
 
     unsubscribe() {
@@ -846,17 +822,52 @@ class VisualizerWidget extends PureComponent {
                 line: '',
             },
             layoutIsReversed: store.get('workspace.reverseWidgets'),
+
         };
     }
 
     shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
-            const feedRate = Number(amount) || 0;
-            controller.command('feedOverride', feedRate);
+            switch (Number(amount)) {
+            case 1:
+                controller.write('\x93');
+                break;
+            case -1:
+                controller.write('\x94');
+                break;
+            case 10:
+                controller.write('\x91');
+                break;
+            case -10:
+                controller.write('\x92');
+                break;
+            case 0:
+                controller.write('\x90');
+                break;
+            default:
+                return;
+            }
         },
         SPINDLE_OVERRIDE: (_, { amount }) => {
-            const spindleSpeed = Number(amount) || 0;
-            controller.command('spindleOverride', spindleSpeed);
+            switch (Number(amount)) {
+            case 1:
+                controller.write('\x9C');
+                break;
+            case -1:
+                controller.write('\x9D');
+                break;
+            case 10:
+                controller.write('\x9A');
+                break;
+            case -10:
+                controller.write('\x9B');
+                break;
+            case 0:
+                controller.write('\x99');
+                break;
+            default:
+                return;
+            }
         },
         VISUALIZER_VIEW: (_, { type }) => {
             const {
@@ -1022,6 +1033,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_P: {
             title: 'Feed +',
             keys: '',
+            gamepadKeys: '5',
+            keysName: 'R1',
             cmd: 'FEEDRATE_OVERRIDE_P',
             payload: { amount: 1 },
             preventDefault: true,
@@ -1032,6 +1045,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_PP: {
             title: 'Feed ++',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed ++',
             cmd: 'FEEDRATE_OVERRIDE_PP',
             payload: { amount: 10 },
             preventDefault: true,
@@ -1042,6 +1057,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_M: {
             title: 'Feed -',
             keys: '',
+            gamepadKeys: '7',
+            keysName: 'R2',
             cmd: 'FEEDRATE_OVERRIDE_M',
             payload: { amount: -1 },
             preventDefault: true,
@@ -1052,6 +1069,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_MM: {
             title: 'Feed --',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed --',
             cmd: 'FEEDRATE_OVERRIDE_MM',
             payload: { amount: -10 },
             preventDefault: true,
@@ -1062,6 +1081,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_RESET: {
             title: 'Feed Reset',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed Reset',
             cmd: 'FEEDRATE_OVERRIDE_RESET',
             payload: { amount: 0 },
             preventDefault: true,
@@ -1072,6 +1093,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_P: {
             title: 'Spindle/Laser +',
             keys: '',
+            gamepadKeys: '4',
+            keysName: 'L1',
             cmd: 'SPINDLE_OVERRIDE_P',
             payload: { amount: 1 },
             preventDefault: true,
@@ -1082,6 +1105,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_PP: {
             title: 'Spindle/Laser ++',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser ++',
             cmd: 'SPINDLE_OVERRIDE_PP',
             payload: { amount: 10 },
             preventDefault: true,
@@ -1092,6 +1117,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_M: {
             title: 'Spindle/Laser -',
             keys: '',
+            gamepadKeys: '6',
+            keysName: 'L2',
             cmd: 'SPINDLE_OVERRIDE_M',
             payload: { amount: -1 },
             preventDefault: true,
@@ -1102,6 +1129,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_MM: {
             title: 'Spindle/Laser --',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser --',
             cmd: 'SPINDLE_OVERRIDE_MM',
             payload: { amount: -10 },
             preventDefault: true,
@@ -1112,6 +1141,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_RESET: {
             title: 'Spindle/Laser Reset',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser Reset',
             cmd: 'SPINDLE_OVERRIDE_RESET',
             payload: { amount: 0 },
             preventDefault: true,
@@ -1241,11 +1272,12 @@ class VisualizerWidget extends PureComponent {
             category: GENERAL_CATEGORY,
             callback: () => {
                 const shortcuts = store.get('commandKeys', {});
+                const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
                 // Ignore shortcut for toggling all other shortcuts to
                 // allow them to be turned on and off
                 const allDisabled = Object.entries(shortcuts)
-                    .filter(([key, shortcut]) => shortcut.title !== 'Toggle Shortcuts')
+                    .filter(([key, shortcut]) => (allShuttleControlEvents[key] ? allShuttleControlEvents[key].title : shortcut.title) !== 'Toggle Shortcuts')
                     .every(([key, shortcut]) => !shortcut.isActive);
                 const keybindings = _.cloneDeep(shortcuts);
                 Object.entries(keybindings).forEach(([key, keybinding]) => {
@@ -1449,7 +1481,6 @@ class VisualizerWidget extends PureComponent {
 
         const showRendering = renderState === RENDER_RENDERING;
         const showLoading = renderState === RENDER_LOADING;
-        const showLoader = showLoading || showRendering;
         // Handle visualizer render
         const isVisualizerDisabled = (state.liteMode) ? state.disabledLite : state.disabled;
 
@@ -1459,7 +1490,6 @@ class VisualizerWidget extends PureComponent {
 
         const showVisualizer =
             capable.view3D &&
-            !showLoader &&
             (
                 (isSecondary && activeVisualizer === VISUALIZER_SECONDARY) ||
                 !isSecondary && activeVisualizer === VISUALIZER_PRIMARY
@@ -1519,10 +1549,16 @@ export default connect((store) => {
     const controllerType = get(store, 'controller.type');
     const activeState = get(store, 'controller.state.status.activeState');
     const alarmCode = get(store, 'controller.state.status.alarmCode');
+    const overrides = get(store, 'controller.state.status.ov', [0, 0, 0]);
+
     const { activeVisualizer } = store.visualizer;
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
     const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
+
+    const ovF = overrides[0];
+    const ovS = overrides[2];
+
     return {
         feedArray,
         accelArray,
@@ -1532,6 +1568,8 @@ export default connect((store) => {
         controllerType,
         activeState,
         activeVisualizer,
-        alarmCode
+        alarmCode,
+        ovF,
+        ovS
     };
 }, null, null, { forwardRef: true })(VisualizerWidget);

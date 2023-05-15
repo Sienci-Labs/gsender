@@ -3,6 +3,7 @@ import React, { useState, useRef } from 'react';
 import TabbedWidget from 'app/components/TabbedWidget';
 import ReactToPrint from 'react-to-print';
 import { Button } from 'react-bootstrap';
+import PrintableShortcuts from './printableShortcuts';
 
 import KeyboardShortcuts from './Keyboard';
 import Gamepad from './Gamepad';
@@ -43,6 +44,9 @@ const Shortcuts = ({ active }) => {
                     }}
                     content={() => componentRef.current}
                 />
+                <div style={{ display: 'none' }}>
+                    <PrintableShortcuts ref={componentRef} />
+                </div>
                 <TabbedWidget.Tabs
                     tabs={tabs}
                     activeTabIndex={tab}

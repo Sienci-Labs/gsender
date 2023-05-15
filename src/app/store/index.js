@@ -193,7 +193,7 @@ const migrateStore = () => {
         return;
     }
 
-    if (semver.lt(cnc.version, '1.2.3') || semver.lt(cnc.version, '1.2.3-EDGE')) {
+    if (semver.lt(cnc.version, '1.2.4') || semver.lt(cnc.version, '1.2.4-EDGE')) {
         const currentCommandKeys = store.get('commandKeys');
         let newCommandKeysList = {};
 
@@ -203,12 +203,22 @@ const migrateStore = () => {
                     element.cmd = element.id;
                 }
                 delete element.id;
-                // set flag so keybindings hook knows to change properties to the defaults
-                element.resetFlag = true;
                 newCommandKeysList[element.cmd] = element;
             });
-            store.replace('commandKeys', newCommandKeysList);
+        } else {
+            newCommandKeysList = currentCommandKeys;
         }
+
+        Object.entries(newCommandKeysList).forEach(([key, shortcut]) => {
+            delete shortcut.title;
+            delete shortcut.payload;
+            delete shortcut.preventDefault;
+            delete shortcut.category;
+            delete shortcut.callback;
+            newCommandKeysList[key] = shortcut;
+        });
+
+        store.replace('commandKeys', newCommandKeysList);
 
         const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
         const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
@@ -223,7 +233,18 @@ const migrateStore = () => {
                     delete element.id;
                     updatedProfileShortcuts[element.cmd] = element;
                 });
+            } else {
+                updatedProfileShortcuts = shortcuts;
             }
+
+            Object.entries(updatedProfileShortcuts).forEach(([key, shortcut]) => {
+                delete shortcut.title;
+                delete shortcut.payload;
+                delete shortcut.preventDefault;
+                delete shortcut.category;
+                delete shortcut.callback;
+                updatedProfileShortcuts[key] = shortcut;
+            });
 
             if (!Array.isArray(profile.id)) {
                 profile.id = [profile.id];

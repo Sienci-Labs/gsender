@@ -37,7 +37,6 @@ import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import WidgetConfig from '../WidgetConfig';
 import NavbarConnection from './NavbarConnection';
-import { Toaster, TOASTER_WARNING } from '../../lib/toaster/ToasterLib';
 
 class NavbarConnectionWidget extends PureComponent {
     static propTypes = {
@@ -344,25 +343,6 @@ class NavbarConnectionWidget extends PureComponent {
                 this.setState({
                     baudrate: value
                 });
-            }),
-            pubsub.subscribe('firmware:update', (msg, value) => {
-                this.setState({
-                    grblExists: value
-                });
-                const { isConnected } = this.props;
-                //check if GRBL does not exists, alert user with toast
-                setTimeout(() => {
-                    check();
-                }, 5000);
-
-                const check = () => {
-                    if (!this.state.grblExists && isConnected) {
-                        Toaster.pop({
-                            type: TOASTER_WARNING,
-                            msg: 'Firmware did not respond in time, please retry.',
-                        });
-                    }
-                };
             }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);

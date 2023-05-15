@@ -1,18 +1,41 @@
 import pubsub from 'pubsub-js';
 import reduxStore from 'app/store/redux';
 import * as fileActions from 'app/actions/fileInfoActions';
+import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
 import store from 'app/store';
 import { RENDER_RENDERING } from 'app/constants';
+import { isNumber } from 'lodash';
 
 export const visualizeResponse = ({ data }) => {
-    pubsub.publish('file:load', data);
-    // Visualizer Rendering
-    reduxStore.dispatch({
-        type: fileActions.UPDATE_FILE_RENDER_STATE,
-        payload: {
-            state: RENDER_RENDERING
-        }
-    });
+    if (isNumber(data)) {
+        pubsub.publish('toolpath:progress', data);
+    } else {
+        // Update estimate worker with values
+        const estimatePayload = {
+            ...data.info,
+            fileProcessing: false
+        };
+        reduxStore.dispatch({
+            type: UPDATE_FILE_INFO,
+            payload: estimatePayload
+        });
+        reduxStore.dispatch({
+            type: UPDATE_FILE_PROCESSING,
+            payload: {
+                value: false
+            }
+        });
+
+        // Handle file load
+        pubsub.publish('file:load', data);
+        // Visualizer Rendering
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_RENDER_STATE,
+            payload: {
+                state: RENDER_RENDERING
+            }
+        });
+    }
 };
 
 

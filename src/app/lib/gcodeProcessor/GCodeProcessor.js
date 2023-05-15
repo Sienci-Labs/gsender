@@ -391,17 +391,7 @@ export class GCodeProcessor {
             this._processMove(storedPos, null, vmState.feed, null, false);
             isMotion = true;
         } else if (doMotion) {
-            // throw new Error('Unsupported motion gcode ' + doMotion + ': ' + gline.toString());
-            /*console.log(doMotion);
-            console.log(gline.toString());
-            console.error('Unsupported motion gcode ' + doMotion + ': ' + gline.toString());
-            return {
-                state: vmState, // VM state after executing line
-                isMotion: isMotion, // whether the line represents motion
-                motionCode: motionCode, // If motion, the G code associated with the motion
-                changedCoordOffsets: changedCoordOffsets, // whether or not anything was changed with coordinate systems
-                time: vmState.totalTime - origTotalTime // estimated duration of instruction execution, in seconds
-            };*/
+            console.error('Invalid motion detected');
         }
 
         if (!isSimpleMotion) {

@@ -35,9 +35,7 @@ import * as fileActions from 'app/actions/fileInfoActions';
 import * as preferenceActions from 'app/actions/preferencesActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
-import EstimateWorker from 'app/workers/Estimate.worker';
 import VisualizeWorker from 'app/workers/Visualize.worker';
-import { estimateResponseHandler } from 'app/workers/Estimate.response';
 import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
@@ -251,10 +249,8 @@ export function* initialize() {
                 cancelLabel: 'Close',
                 onConfirm: () => {
                     connectToLastDevice(() => {
-                        // if limit switches active, home
-                        if (homingEnabled === '1') {
-                            pubsub.publish('disconnect:recovery', received);
-                        }
+                        // prompt recovery, either with homing or a prompt to start from line
+                        pubsub.publish('disconnect:recovery', received, homingEnabled);
                     });
                 }
             });
@@ -293,8 +289,9 @@ export function* initialize() {
                 instructions: automaticToolChange
             });
         } else if (option === 'Pause') {
+            const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
             Toaster.pop({
-                msg: `Toolchange pause - ${comment}`,
+                msg: msg,
                 type: TOASTER_INFO,
                 duration: TOASTER_UNTIL_CLOSE
             });
@@ -368,19 +365,10 @@ export function* initialize() {
                 state: RENDER_LOADING
             }
         });
-        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
-        const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
-        const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
-        const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
-
-        estimateWorker = new EstimateWorker();
-        estimateWorker.onmessage = estimateResponseHandler;
-        estimateWorker.postMessage({
-            content,
-            name,
-            size,
-            accelArray
-        });
+        /*        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
+                const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
+                const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
+                const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];*/
 
         const needsVisualization = shouldVisualize();
         const shouldRenderSVG = shouldVisualizeSVG();
@@ -472,15 +460,18 @@ export function* initialize() {
 
     controller.addListener('sender:M0M1', (opts) => {
         const { data, comment = '' } = opts;
+        const msg = `A pause command (${data}) was found. Click Resume to immediately continue the job.
+            If you want to perform more operations (toolchange, jog, etc),
+            close the window, then press the standard Resume Job button when you're ready.`;
 
         const content = (comment.length > 0)
-            ? <div><p>A pause command ({data}) was found - click resume to continue.</p><p>Comment: <b>{comment}</b></p></div>
-            : `A pause command (${data}) was found - click resume to continue.`;
+            ? <div><p>{msg}</p><p>Comment: <b>{comment}</b></p></div>
+            : msg;
 
         Confirm({
             title: 'M0/M1 Pause',
             content,
-            confirmLabel: 'Resume',
+            confirmLabel: 'Resume Job',
             cancelLabel: 'Close Window',
             onConfirm: () => {
                 controller.command('gcode:resume');
@@ -506,15 +497,6 @@ export function* initialize() {
         pubsub.publish('softlimits:check');
     });
 
-    controller.addListener('toolchange:tool', (tool) => {
-        Toaster.clear();
-        Toaster.pop({
-            type: TOASTER_INFO,
-            msg: `Tool command found - ${tool}`,
-            duration: TOASTER_UNTIL_CLOSE
-        });
-    });
-
     controller.addListener('firmware:ready', (status) => {
         pubsub.publish('firmware:update', status);
     });
@@ -523,10 +505,16 @@ export function* initialize() {
         if (isElectron() && (error.type === 'GRBL_ALARM' || error.type === 'GRBL_ERROR')) {
             window.ipcRenderer.send('logError:electron', error);
         }
+        pubsub.publish('error', error);
     });
 
     controller.addListener('wizard:next', (stepIndex, substepIndex) => {
         pubsub.publish('wizard:next', { stepIndex, substepIndex });
+    });
+
+    controller.addListener('gcode:loaded', ({ gcode, meta }) => {
+        console.log(gcode);
+        console.log(meta);
     });
 
     yield null;
