@@ -33,11 +33,13 @@ import './styles.css';
  * one of the extra widgets
  * @props takes current selected tab and context of parent class component to update state
  */
-const RcDropdown = ({ hiddenTabs = [], handleHighlightTab }) => {
-    const { currentDropdownTab, updateDropdownTab } = useContext(TabsContext);
+const RcDropdown = ({ handleHighlightTab }) => {
+    const { currentDropdownTab, updateDropdownTab, hiddenTabs } = useContext(TabsContext);
+
+    console.log('From Dropdown: ', hiddenTabs);
 
     const handleTabSelect = (tab) => {
-        updateDropdownTab(tab);
+        updateDropdownTab(tab.label);
         handleHighlightTab(tab);
     };
 
@@ -52,7 +54,7 @@ const RcDropdown = ({ hiddenTabs = [], handleHighlightTab }) => {
             {hiddenTabs.map((tab) => (
                 <MenuItem
                     className={styles.menuItems}
-                    onClick={() => handleTabSelect(tab.label)}
+                    onClick={() => handleTabSelect(tab)}
                     onKeyDown={null}
                     tabIndex={-1}
                     role="button"

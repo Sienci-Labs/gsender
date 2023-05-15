@@ -2,6 +2,7 @@ import { createContext } from 'react';
 
 const TabsContext = createContext({
     currentDropdownTab: 'Coolant',
+    hiddenTabs: [],
     updateDropdownTab: () => {}
 });
 

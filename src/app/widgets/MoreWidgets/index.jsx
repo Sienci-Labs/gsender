@@ -21,15 +21,18 @@
  *
  */
 import React, { useContext } from 'react';
+import TabsContext from '../SecondaryFunctionality/TabsContext';
 import Coolant from '../Coolant';
 import Rotary from '../Rotary';
-import TabsContext from '../SecondaryFunctionality/TabsContext';
+import Console from '../Console';
+import Macro from '../Macro';
+import Spindle from '../Spindle';
 
 /**
  * This component checks the current selected widget and renders it
  * @props takes the current selected tab/menu
  */
-const MoreTabs = () => {
+const MoreTabs = ({ onFork, onRemove, sortable, widgetId, active }) => {
     const { currentDropdownTab = 'Coolant' } = useContext(TabsContext);
 
     let Render = Coolant;
@@ -41,12 +44,29 @@ const MoreTabs = () => {
     case 'Rotary':
         Render = Rotary;
         break;
+    case 'Console':
+        Render = Console;
+        break;
+    case 'Macros':
+        Render = Macro;
+        break;
+    case 'Spindle/Laser':
+        Render = Spindle;
+        break;
     default:
         break;
     }
 
     return (
-        <Render />
+        <Render
+            onFork={onFork}
+            onRemove={onRemove}
+            sortable={sortable}
+            widgetId={widgetId}
+            embedded
+            active={active}
+            isMainWindow={true}
+        />
     );
 };
 export default MoreTabs;
