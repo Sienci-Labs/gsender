@@ -95,6 +95,8 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
             }));
             if (widgetId !== 'more') {
                 setState((prev) => ({ ...prev, currentDropdownTab: selectedTab, }));
+            } else if (!['Rotary', 'Coolant'].includes(state.currentDropdownTab)) {
+                setState((prev) => ({ ...prev, currentDropdownTab: 'Coolant', }));
             }
         },
         handleResize: () => {
