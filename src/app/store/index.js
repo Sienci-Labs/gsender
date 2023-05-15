@@ -193,7 +193,7 @@ const migrateStore = () => {
         return;
     }
 
-    if (semver.lt(cnc.version, '1.2.4') || semver.lt(cnc.version, '1.2.4-EDGE')) {
+    if (semver.lt(cnc.version, '1.2.0')) {
         const currentCommandKeys = store.get('commandKeys');
         let newCommandKeysList = {};
 
