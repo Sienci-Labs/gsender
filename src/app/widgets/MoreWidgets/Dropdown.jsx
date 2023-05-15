@@ -33,14 +33,11 @@ import './styles.css';
  * one of the extra widgets
  * @props takes current selected tab and context of parent class component to update state
  */
-const RcDropdown = ({ handleHighlightTab }) => {
+const RcDropdown = () => {
     const { currentDropdownTab, updateDropdownTab, hiddenTabs } = useContext(TabsContext);
-
-    console.log('From Dropdown: ', hiddenTabs);
 
     const handleTabSelect = (tab) => {
         updateDropdownTab(tab.label);
-        handleHighlightTab(tab);
     };
 
     const DropdownWrapper = styled.div``;

@@ -24,7 +24,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import TabbedWidget from 'app/components/TabbedWidget';
 import store from 'app/store';
-import _ from 'lodash';
+// import _ from 'lodash';
 import RotaryWidget from 'app/widgets/Rotary';
 import controller from 'app/lib/controller';
 import MoreWidgets from '../MoreWidgets';
@@ -86,7 +86,7 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
         },
         handleTabSelect: (index) => {
             const { tabs } = state;
-            const selectedTab = ['coolant', 'rotary'].includes(tabs[index].widgetId) ? tabs[index].widgetId : '';
+            const selectedTab = tabs[index].widgetId;
             const widgetId = tabs[index].widgetId;
 
             setState((prev) => ({
@@ -112,7 +112,7 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
             const hiddenRotaryIndex = moreTabs.findIndex(tab => tab.widgetId === 'rotary');
 
             const moreWidgetObj = {
-                label: <RcDropdown handleHighlightTab={actions.handleHighlightTab} />,
+                label: <RcDropdown />,
                 widgetId: 'more',
                 component: MoreWidgets,
             };
@@ -202,34 +202,36 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
             }
             setState((prev) => ({ ...prev, hiddenTabs: moreTabs, tabs: updatedTabs })); // Update the both the lists
         },
-        handleHighlightTab: (tab) => {
-            setState((prev) => {
-                const updatedTabs = [...prev.tabs];
-                const updatedHiddenTabs = [...prev.hiddenTabs];
+        // handleHighlightTab: (tab) => {
+        //     setState((prev) => {
+        //         const updatedTabs = [...prev.tabs];
+        //         const updatedHiddenTabs = [...prev.hiddenTabs];
+        //         let newSelectedTab = 0;
 
-                // Find the index of the selected hidden tab
-                const selectedHiddenTabIndex = updatedHiddenTabs.findIndex((t) => _.isEqual(t, tab));
+        //         // Find the index of the selected hidden tab
+        //         const selectedHiddenTabIndex = updatedHiddenTabs.findIndex((t) => _.isEqual(t, tab));
 
-                if (selectedHiddenTabIndex !== -1 && updatedHiddenTabs.length > 1) {
-                    // Remove the selected hidden tab from hiddenTabs
-                    updatedHiddenTabs.splice(selectedHiddenTabIndex, 1);
+        //         if (selectedHiddenTabIndex !== -1 && updatedHiddenTabs.length > 1) {
+        //             // Remove the selected hidden tab from hiddenTabs
+        //             updatedHiddenTabs.splice(selectedHiddenTabIndex, 1);
 
-                    // Add the second last tab from tabs to hiddenTabs
-                    const swap = updatedTabs[updatedTabs.length - 2];
-                    console.log('swap: ', swap);
-                    updatedTabs.splice(updatedTabs.length - 2, 1);// Remove from tab
-                    updatedHiddenTabs.push(swap);// And add to hidden tab
-                    // Add the selected hidden tab at the second last position in tabs
-                    updatedTabs.splice(updatedTabs.length - 2, 0, tab);
-                }
+        //             // Add the second last tab from tabs to hiddenTabs
+        //             const swap = updatedTabs[updatedTabs.length - 2];
+        //             updatedTabs.splice(updatedTabs.length - 2, 1);// Remove from tab
+        //             updatedHiddenTabs.push(swap);// And add to hidden tab
+        //             // Add the selected hidden tab at the second last position in tabs
+        //             updatedTabs.splice(updatedTabs.length - 2, 0, tab);
+        //             newSelectedTab = updatedTabs.length - 2;
+        //         }
 
-                return {
-                    ...prev,
-                    tabs: updatedTabs,
-                    hiddenTabs: updatedHiddenTabs,
-                };
-            });
-        }
+        //         return {
+        //             ...prev,
+        //             tabs: updatedTabs,
+        //             hiddenTabs: updatedHiddenTabs,
+        //             selectedTab: newSelectedTab
+        //         };
+        //     });
+        // }
 
     };
 
