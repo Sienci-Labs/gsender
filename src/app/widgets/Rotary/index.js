@@ -41,7 +41,7 @@ const Rotary = ({ active }) => {
             showDialogue: false,
             linesUp: DOESNT_LINE_UP,
             drillDiameter: QUARTER,
-            drillCount: SIX,
+            holeCount: SIX,
         };
     }
 

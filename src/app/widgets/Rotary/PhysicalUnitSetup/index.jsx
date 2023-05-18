@@ -17,11 +17,12 @@ const Option = styled.div`
     margin-top: 1rem;
 `;
 const MenuTitle = styled.div`
-    margin-bottom: 0.5rem;
     width: 50%;
 `;
 const RadioWrapper = styled.div`
     margin-left: 1rem;
+    display: flex;
+    align-items: center;
 `;
 const Submit = styled.div`
     position: absolute;
@@ -29,9 +30,13 @@ const Submit = styled.div`
     width: 100%;
     left: 0;
 `;
+const Description = styled.div`
+    margin-top: 3rem;
+    color: #6b7280;
+`;
 
 const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhysicalSetupState }) => {
-    const { showDialogue, linesUp, drillDiameter, drillCount } = physicalSetupState;
+    const { showDialogue, linesUp, drillDiameter, holeCount } = physicalSetupState;
 
     const actions = {
         handleSubmit: () => {
@@ -45,61 +50,61 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                 return;
             }
             // ¼” diameter endmill milling 6 holes for 30” track
-            if (drillDiameter === QUARTER && drillCount === SIX) {
+            if (drillDiameter === QUARTER && holeCount === SIX) {
                 // rotaryActions.startContinuousJog(params)
                 actions.handleModalClose();
                 Toaster.pop({
-                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
+                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
                 return;
             }
             // ⅛” diameter endmill milling 6 holes for 30” track
-            if (drillDiameter === EIGHTH && drillCount === SIX) {
+            if (drillDiameter === EIGHTH && holeCount === SIX) {
                 // rotaryActions.startContinuousJog(params)
                 actions.handleModalClose();
                 Toaster.pop({
-                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
+                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
                 return;
             }
             // ¼” diameter endmill milling 12 holes for 30” track with extension
-            if (drillDiameter === QUARTER && drillCount === TWELVE) {
+            if (drillDiameter === QUARTER && holeCount === TWELVE) {
                 // rotaryActions.startContinuousJog(params)
                 actions.handleModalClose();
                 Toaster.pop({
-                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
+                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
                 return;
             }
             // ⅛” diameter endmill milling 12 holes for 30” track with extension
-            if (drillDiameter === EIGHTH && drillCount === TWELVE) {
+            if (drillDiameter === EIGHTH && holeCount === TWELVE) {
                 // rotaryActions.startContinuousJog(params)
                 actions.handleModalClose();
                 Toaster.pop({
-                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
+                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
                 return;
             }
             // ¼” diameter endmill milling 2 holes for custom mounting solution
-            if (drillDiameter === QUARTER && drillCount === TWO) {
+            if (drillDiameter === QUARTER && holeCount === TWO) {
                 // rotaryActions.startContinuousJog(params)
                 actions.handleModalClose();
                 Toaster.pop({
-                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
+                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
                 return;
             }
             // ⅛” diameter endmill milling 2 holes for custom mounting solution
-            if (drillDiameter === EIGHTH && drillCount === TWO) {
+            if (drillDiameter === EIGHTH && holeCount === TWO) {
                 // rotaryActions.startContinuousJog(params)
                 actions.handleModalClose();
                 Toaster.pop({
-                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
+                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
                 return;
@@ -115,7 +120,7 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
             setPhysicalSetupState((prev) => ({ ...prev, drillDiameter: value }));
         },
         handleDrillCountSelection: (value, event) => {
-            setPhysicalSetupState((prev) => ({ ...prev, drillCount: value }));
+            setPhysicalSetupState((prev) => ({ ...prev, holeCount: value }));
         },
     };
 
@@ -133,7 +138,7 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                         onChange={actions.handleLinesUpSelection}
                         size="small"
                     >
-                        <RadioWrapper>
+                        <RadioWrapper style={{ marginTop: '0.6rem' }}>
                             <RadioButton className={styles.radio} label="Lines up" value={LINES_UP} />
                             <RadioButton className={styles.radio} label="Does not line up" value={DOESNT_LINE_UP} />
                         </RadioWrapper>
@@ -155,9 +160,9 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                 </Option>
                 {linesUp === LINES_UP && (
                     <Option>
-                        <MenuTitle>Number of drills</MenuTitle>
+                        <MenuTitle>Number of holes</MenuTitle>
                         <RadioGroup
-                            value={drillCount}
+                            value={holeCount}
                             depth={2}
                             onChange={actions.handleDrillCountSelection}
                             size="small"
@@ -169,6 +174,16 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                         </RadioGroup>
                     </Option>
                 )}
+                {
+                    linesUp === DOESNT_LINE_UP && (
+                        <Description>
+                            In the case where the mounting track does not lineup,
+                            you may please select the correct options above to
+                            manually drill a pair of mounting holes at safe locations
+                            on the wasteboard.
+                        </Description>
+                    )
+                }
                 <Submit>
                     <ToolModalButton
                         icon="fas fa-play"
