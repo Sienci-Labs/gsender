@@ -19,7 +19,7 @@ import SpeedControls from './SpeedControls';
 import ActionArea from './ActionArea';
 import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../JogControl/constants';
 import PhysicalUnitSetup from './PhysicalUnitSetup';
-import { DOESNT_LINE_UP, QUARTER, SIX } from './PhysicalUnitSetup/constant';
+import { LINES_UP, QUARTER, SIX } from './PhysicalUnitSetup/constant';
 
 const Rotary = ({ active }) => {
     const [speedPreset, setSpeedPreset] = useState(SPEED_NORMAL);
@@ -39,7 +39,7 @@ const Rotary = ({ active }) => {
     function initialSetupState() {
         return {
             showDialogue: false,
-            linesUp: DOESNT_LINE_UP,
+            linesUp: LINES_UP,
             drillDiameter: QUARTER,
             holeCount: SIX,
         };

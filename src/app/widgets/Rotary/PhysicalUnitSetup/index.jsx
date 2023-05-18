@@ -141,7 +141,7 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                     >
                         <RadioWrapper style={{ marginTop: '0.6rem' }}>
                             <RadioButton className={styles.radio} label="Lines up" value={LINES_UP} />
-                            <RadioButton className={styles.radio} label="Does not line up" value={DOESNT_LINE_UP} />
+                            <RadioButton className={styles.radio} label="Does not lineup" value={DOESNT_LINE_UP} />
                         </RadioWrapper>
                     </RadioGroup>
                 </Option>
