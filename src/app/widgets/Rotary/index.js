@@ -19,6 +19,7 @@ import SpeedControls from './SpeedControls';
 import ActionArea from './ActionArea';
 import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../JogControl/constants';
 import PhysicalUnitSetup from './PhysicalUnitSetup';
+import { DOESNT_LINE_UP, QUARTER, SIX } from './PhysicalUnitSetup/constant';
 
 const Rotary = ({ active }) => {
     const [speedPreset, setSpeedPreset] = useState(SPEED_NORMAL);
@@ -38,6 +39,9 @@ const Rotary = ({ active }) => {
     function initialSetupState() {
         return {
             showDialogue: false,
+            linesUp: DOESNT_LINE_UP,
+            drillDiameter: QUARTER,
+            drillCount: SIX,
         };
     }
 
@@ -145,8 +149,15 @@ const Rotary = ({ active }) => {
                         <p className={styles['rotary-tab-section-title']}>Tools</p>
                         <RotaryToggle />
                         {/* <StockDiameter /> */}
-                        <ActionArea physicalUnitState={physicalUnitState} setPhysicalUnitState={setPhysicalUnitState} />
-                        <PhysicalUnitSetup physicalUnitState={physicalUnitState} setPhysicalUnitState={setPhysicalUnitState} />
+                        <ActionArea
+                            physicalUnitState={physicalUnitState}
+                            setPhysicalUnitState={setPhysicalUnitState}
+                        />
+                        <PhysicalUnitSetup
+                            actions={actions}
+                            physicalUnitState={physicalUnitState}
+                            setPhysicalUnitState={setPhysicalUnitState}
+                        />
                     </div>
                 </div>
             </Widget.Content>
