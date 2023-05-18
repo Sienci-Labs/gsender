@@ -40,8 +40,8 @@ const Slider = ({ sliderName = 'stepper', step = 1, min = 0, max = 100, value, o
                 {...props}
             />
             <datalist id={sliderName}>
-                <option value="100"/>
-                <option value="200"/>
+                <option value="100" />
+                <option value="200" />
             </datalist>
             <span>{value}{unitString}</span>
         </div>

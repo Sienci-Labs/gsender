@@ -26,7 +26,7 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 
-import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import JogControl from 'app/widgets/JogControl';
 
 
@@ -56,7 +56,7 @@ const ToolIntroduction = ({ readyHandler, isConnected }) => {
             <div>
                 <JogControl widgetId="jogcontrol" isSecondary />
             </div>
-            <FunctionButton primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</FunctionButton>
+            <ToolModalButton icon="fas fa-play" disabled={!isConnected} onClick={readyHandler}>{ buttonText }</ToolModalButton>
         </>
     );
 };
