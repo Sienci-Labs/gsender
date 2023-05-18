@@ -89,6 +89,12 @@ const main = () => {
 
 
             app.commandLine.appendSwitch('ignore-gpu-blacklist');
+            app.commandLine.appendSwitch('enable-gpu-rasterization');
+            app.commandLine.appendSwitch('enable-accelerated-video');
+            app.commandLine.appendSwitch('enable-accelerated-video-decode');
+            app.commandLine.appendSwitch('use-gl', 'desktop');
+            app.commandLine.appendSwitch('enable-features', 'VaapiVideoDecoder');
+
             // Increase V8 heap size of the main process
             if (process.arch === 'x64') {
                 const memoryLimit = 1024 * 8; // 8GB
@@ -165,7 +171,8 @@ const main = () => {
                 title: `gSender ${pkg.version}`,
                 kiosk
             };
-            const window = windowManager.openWindow(url, options, splashScreen);
+            const window = await windowManager.openWindow(url, options, splashScreen);
+
 
             // Power saver - display sleep higher precedence over app suspension
             powerSaveBlocker.start('prevent-display-sleep');

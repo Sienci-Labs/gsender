@@ -86,7 +86,7 @@ class WindowManager {
         });
     }
 
-    openWindow(url, options, splashScreen, shouldMaximize = true, isChild = false /*, data = null*/) {
+    async openWindow(url, options, splashScreen, shouldMaximize = true, isChild = false /*, data = null*/) {
         const window = new BrowserWindow({
             ...options,
             show: false,
@@ -140,6 +140,8 @@ class WindowManager {
         ses.setProxy({ proxyRules: 'direct://' }).then(() => {
             window.loadURL(url);
         });
+
+        await ses.clearCache();
 
         if (isChild) {
             window.on('close', (e) => {
