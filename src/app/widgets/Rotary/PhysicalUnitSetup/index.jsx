@@ -5,6 +5,7 @@ import { RadioGroup, RadioButton } from 'app/components/Radio';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import styled from '@emotion/styled';
+import styles from './index.styl';
 import { DOESNT_LINE_UP, EIGHTH, LINES_UP, QUARTER, SIX, TWELVE, TWO } from './constant';
 
 const ContentWrapper = styled.div`
@@ -29,16 +30,16 @@ const Submit = styled.div`
     left: 0;
 `;
 
-const PhysicalUnitSetup = ({ actions: rotaryActions, physicalUnitState, setPhysicalUnitState }) => {
-    const { showDialogue, linesUp, drillDiameter, drillCount } = physicalUnitState;
+const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhysicalSetupState }) => {
+    const { showDialogue, linesUp, drillDiameter, drillCount } = physicalSetupState;
 
     const actions = {
         handleSubmit: () => {
             if (linesUp === DOESNT_LINE_UP) {
-                console.log('Take plan B'); // TODO - Plan B logic
+                // rotaryActions.startContinuousJog(params)
                 actions.handleModalClose();
                 Toaster.pop({
-                    msg: 'Running plan B //TODO',
+                    msg: `Drilling 2 ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
                 return;
@@ -46,8 +47,9 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalUnitState, setPhysi
             // ¼” diameter endmill milling 6 holes for 30” track
             if (drillDiameter === QUARTER && drillCount === SIX) {
                 // rotaryActions.startContinuousJog(params)
+                actions.handleModalClose();
                 Toaster.pop({
-                    msg: 'Drilling mounting holes',
+                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
                 return;
@@ -55,55 +57,65 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalUnitState, setPhysi
             // ⅛” diameter endmill milling 6 holes for 30” track
             if (drillDiameter === EIGHTH && drillCount === SIX) {
                 // rotaryActions.startContinuousJog(params)
+                actions.handleModalClose();
                 Toaster.pop({
-                    msg: 'Drilling mounting holes',
+                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
+                return;
             }
             // ¼” diameter endmill milling 12 holes for 30” track with extension
             if (drillDiameter === QUARTER && drillCount === TWELVE) {
                 // rotaryActions.startContinuousJog(params)
+                actions.handleModalClose();
                 Toaster.pop({
-                    msg: 'Drilling mounting holes',
+                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
+                return;
             }
             // ⅛” diameter endmill milling 12 holes for 30” track with extension
-            if (drillDiameter === QUARTER && drillCount === TWELVE) {
+            if (drillDiameter === EIGHTH && drillCount === TWELVE) {
                 // rotaryActions.startContinuousJog(params)
+                actions.handleModalClose();
                 Toaster.pop({
-                    msg: 'Drilling mounting holes',
+                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
+                return;
             }
             // ¼” diameter endmill milling 2 holes for custom mounting solution
             if (drillDiameter === QUARTER && drillCount === TWO) {
                 // rotaryActions.startContinuousJog(params)
+                actions.handleModalClose();
                 Toaster.pop({
-                    msg: 'Drilling mounting holes',
+                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
+                return;
             }
             // ⅛” diameter endmill milling 2 holes for custom mounting solution
             if (drillDiameter === EIGHTH && drillCount === TWO) {
                 // rotaryActions.startContinuousJog(params)
+                actions.handleModalClose();
                 Toaster.pop({
-                    msg: 'Drilling mounting holes',
+                    msg: `Drilling ${drillCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
+                return;
             }
         },
         handleModalClose: () => {
-            setPhysicalUnitState((prev) => ({ ...prev, showDialogue: false }));
+            setPhysicalSetupState((prev) => ({ ...prev, showDialogue: false }));
         },
         handleLinesUpSelection: (value, event) => {
-            setPhysicalUnitState((prev) => ({ ...prev, linesUp: value }));
+            setPhysicalSetupState((prev) => ({ ...prev, linesUp: value }));
         },
         handleDiameterSelection: (value, event) => {
-            setPhysicalUnitState((prev) => ({ ...prev, drillDiameter: value }));
+            setPhysicalSetupState((prev) => ({ ...prev, drillDiameter: value }));
         },
         handleDrillCountSelection: (value, event) => {
-            setPhysicalUnitState((prev) => ({ ...prev, drillCount: value }));
+            setPhysicalSetupState((prev) => ({ ...prev, drillCount: value }));
         },
     };
 
@@ -122,8 +134,8 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalUnitState, setPhysi
                         size="small"
                     >
                         <RadioWrapper>
-                            <RadioButton label="Lines up" value={LINES_UP} />
-                            <RadioButton label="Does not line up" value={DOESNT_LINE_UP} />
+                            <RadioButton className={styles.radio} label="Lines up" value={LINES_UP} />
+                            <RadioButton className={styles.radio} label="Does not line up" value={DOESNT_LINE_UP} />
                         </RadioWrapper>
                     </RadioGroup>
                 </Option>
@@ -136,25 +148,27 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalUnitState, setPhysi
                         size="small"
                     >
                         <RadioWrapper>
-                            <RadioButton label="1/4”" value={QUARTER} />
-                            <RadioButton label="1/8”" value={EIGHTH} />
+                            <RadioButton className={styles.radio} label="1/4”" value={QUARTER} />
+                            <RadioButton className={styles.radio} label="1/8”" value={EIGHTH} />
                         </RadioWrapper>
                     </RadioGroup>
                 </Option>
-                <Option>
-                    <MenuTitle>Number of drills</MenuTitle>
-                    <RadioGroup
-                        value={drillCount}
-                        depth={2}
-                        onChange={actions.handleDrillCountSelection}
-                        size="small"
-                    >
-                        <RadioWrapper>
-                            <RadioButton label="6" value={SIX} />
-                            <RadioButton label="12" value={TWELVE} />
-                        </RadioWrapper>
-                    </RadioGroup>
-                </Option>
+                {linesUp === LINES_UP && (
+                    <Option>
+                        <MenuTitle>Number of drills</MenuTitle>
+                        <RadioGroup
+                            value={drillCount}
+                            depth={2}
+                            onChange={actions.handleDrillCountSelection}
+                            size="small"
+                        >
+                            <RadioWrapper>
+                                <RadioButton className={styles.radio} label="6" value={SIX} />
+                                <RadioButton className={styles.radio} label="12" value={TWELVE} />
+                            </RadioWrapper>
+                        </RadioGroup>
+                    </Option>
+                )}
                 <Submit>
                     <ToolModalButton
                         icon="fas fa-play"
@@ -166,6 +180,7 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalUnitState, setPhysi
                 </Submit>
             </ContentWrapper>
         </Modal>
+
     );
 };
 

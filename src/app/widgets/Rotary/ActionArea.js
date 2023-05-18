@@ -5,7 +5,7 @@ import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import { useSelector } from 'react-redux';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 
-const ActionArea = ({ setPhysicalUnitState }) => {
+const ActionArea = ({ setPhysicalSetupState }) => {
     const controllerState = useSelector(store => get(store, 'controller.state'));
     const isFileRunning = () => {
         if (controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run') {
@@ -24,7 +24,7 @@ const ActionArea = ({ setPhysicalUnitState }) => {
             controller.command('gcode', ['G0 A0', 'G0 A360']);
         },
         showUnitSetup: () => {
-            setPhysicalUnitState((prev) => ({ ...prev, showDialogue: true }));
+            setPhysicalSetupState((prev) => ({ ...prev, showDialogue: true }));
         }
     };
 

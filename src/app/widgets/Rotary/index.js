@@ -28,7 +28,7 @@ const Rotary = ({ active }) => {
         aStep: '5.00',
     });
     const [, setIsContinuousJogging] = useState(false);
-    const [physicalUnitState, setPhysicalUnitState] = useState(initialSetupState());
+    const [physicalSetupState, setPhysicalSetupState] = useState(initialSetupState());
     const { state: controllerState, type: controllerType } = useSelector(state => state.controller);
 
 
@@ -150,13 +150,13 @@ const Rotary = ({ active }) => {
                         <RotaryToggle />
                         {/* <StockDiameter /> */}
                         <ActionArea
-                            physicalUnitState={physicalUnitState}
-                            setPhysicalUnitState={setPhysicalUnitState}
+                            physicalSetupState={physicalSetupState}
+                            setPhysicalSetupState={setPhysicalSetupState}
                         />
                         <PhysicalUnitSetup
                             actions={actions}
-                            physicalUnitState={physicalUnitState}
-                            setPhysicalUnitState={setPhysicalUnitState}
+                            physicalSetupState={physicalSetupState}
+                            setPhysicalSetupState={setPhysicalSetupState}
                         />
                     </div>
                 </div>
