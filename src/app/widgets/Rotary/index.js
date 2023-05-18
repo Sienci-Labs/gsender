@@ -17,8 +17,8 @@ import SpeedPresets from './SpeedPresets';
 import SpeedControls from './SpeedControls';
 // import StockDiameter from './StockDiameter';
 import ActionArea from './ActionArea';
-
 import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../JogControl/constants';
+import PhysicalUnitSetup from './PhysicalUnitSetup';
 
 const Rotary = ({ active }) => {
     const [speedPreset, setSpeedPreset] = useState(SPEED_NORMAL);
@@ -27,12 +27,19 @@ const Rotary = ({ active }) => {
         aStep: '5.00',
     });
     const [, setIsContinuousJogging] = useState(false);
+    const [physicalUnitState, setPhysicalUnitState] = useState(initialSetupState());
     const { state: controllerState, type: controllerType } = useSelector(state => state.controller);
 
 
     const { ROTARY } = WORKSPACE_MODE;
     const workspaceMode = store.get('workspace.mode');
     const enableRotaryAxis = (workspaceMode === ROTARY && controllerType === 'Grbl') || controllerType === 'grblHAL';
+
+    function initialSetupState() {
+        return {
+            showDialogue: false,
+        };
+    }
 
     const actions = {
         setSelectedSpeed: (speed) => {
@@ -138,7 +145,8 @@ const Rotary = ({ active }) => {
                         <p className={styles['rotary-tab-section-title']}>Tools</p>
                         <RotaryToggle />
                         {/* <StockDiameter /> */}
-                        <ActionArea />
+                        <ActionArea physicalUnitState={physicalUnitState} setPhysicalUnitState={setPhysicalUnitState} />
+                        <PhysicalUnitSetup physicalUnitState={physicalUnitState} setPhysicalUnitState={setPhysicalUnitState} />
                     </div>
                 </div>
             </Widget.Content>
