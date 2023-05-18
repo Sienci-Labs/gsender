@@ -31,9 +31,10 @@ const CustomPieChart = ({ propsData, height, width, showAnimation }) => {
                 label={renderLabelContent}
                 paddingAngle={5}
                 isAnimationActive={showAnimation}
+                style={{ outline: 'none' }}
             >
                 {propsData.map((entry, index) => (
-                    <Cell key={`slice-${uniqueId()}`} fill={entry.color} />
+                    <Cell style={{ outline: 'none' }} key={`slice-${uniqueId()}`} fill={entry.color} />
                 ))}
                 <Label width={50} position="center">
                     Jobs Run
