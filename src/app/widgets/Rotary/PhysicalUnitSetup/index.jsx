@@ -31,8 +31,9 @@ const Submit = styled.div`
     left: 0;
 `;
 const Description = styled.div`
-    margin-top: 3rem;
+    margin-top: 5rem;
     color: #6b7280;
+    font-size: 1rem;
 `;
 
 const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhysicalSetupState }) => {
