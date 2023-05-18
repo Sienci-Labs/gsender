@@ -24,11 +24,14 @@
 import React from 'react';
 import styles from './slider.styl';
 
-const Slider = ({ step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, unitString = 'unit', ...props }) => {
+const Slider = ({ sliderName = 'stepper', step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, unitString = 'unit', ...props }) => {
     return (
         <div className={styles.sliderWrapper}>
             <input
                 type="range" min={min} max={max}
+                list={sliderName}
+                id={sliderName}
+                name={sliderName}
                 className={styles.slider}
                 value={value}
                 onMouseUp={onMouseUp}
@@ -36,6 +39,10 @@ const Slider = ({ step = 1, min = 0, max = 100, value, onChange = null, onMouseU
                 step={step}
                 {...props}
             />
+            <datalist id={sliderName}>
+                <option value="100"/>
+                <option value="200"/>
+            </datalist>
             <span>{value}{unitString}</span>
         </div>
     );

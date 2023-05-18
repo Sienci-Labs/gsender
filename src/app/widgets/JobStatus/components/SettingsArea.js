@@ -97,6 +97,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                     min={VALUE_RANGES.MIN}
                     max={VALUE_RANGES.MAX}
                     value={localOvF || 100}
+                    sliderName="feedOV"
                     unitString="%"
                     step={10}
                     onChange={(e) => setLocalOvF(e.target.value)}
@@ -127,6 +128,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                             max={VALUE_RANGES.MAX}
                             value={localOvS || 100}
                             unitString="%"
+                            sliderName="spindleOV"
                             step={10}
                             onChange={(e) => setLocalOvS(e.target.value)}
                             onMouseUp={(e) => debouncedSpindleHandler(e.target.value)}
