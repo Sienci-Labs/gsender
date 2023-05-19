@@ -641,7 +641,7 @@ class WorkflowControl extends PureComponent {
                                             Recover a carve disrupted by power loss, disconnection,
                                             mechanical malfunction, or other failures
                                         </p>
-                                        <p style={{ marginBottom: '0px' }}>Your job was last stopped around line: <b>{value}</b></p>
+                                        <p style={{ marginBottom: '0px', color: '#000000' }}>Your job was last stopped around line: <b>{value}</b></p>
                                         <p>on a g-code file with a total of <b>{lineTotal}</b> lines</p>
                                         {
                                             value > 0 &&
@@ -689,7 +689,7 @@ class WorkflowControl extends PureComponent {
                                     <div className={styles.startHeader}>
                                         <p style={{ color: '#E2943B' }}>
                                             Accounts for all past CNC movements, units, spindle speeds,
-                                            laser power, Start/Stop gcode, and any other file modals or setup.
+                                            laser power, Start/Stop g-code, and any other file modals or setup.
                                         </p>
                                     </div>
                                     <div className={styles.buttonsContainer}>

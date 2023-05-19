@@ -119,7 +119,7 @@ const wizard = {
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G53 G0 Z-5',
-                                    'G38.2 Z-10 F40',
+                                    'G38.2 Z-10 F75',
                                     'G4 P0.3',
                                     '%global.toolchange.TOOL_OFFSET=posz',
                                     '(TLO set: [global.toolchange.TOOL_OFFSET])',
@@ -188,7 +188,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Resume Program',
-                    description: 'The following code will move router back to initial position, restore modals, turn on the spindle, and resume cutting.',
+                    description: 'The following code will move router back to initial position, restore modals, turn on the spindle to resume cutting.',
                     overlay: false,
                     actions: [
                         {

@@ -150,13 +150,12 @@ const wizard = {
                                 controller.command('gcode', [
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z12',
+                                    'G0 Z4',
                                     '%wait',
                                     'G38.2 Z-15 F40',
                                     'G4 P0.3',
                                     '(Set Z to Tool offset and wait)',
                                     `${modal} G10 L20 Z[global.toolchange.TOOL_OFFSET]`,
-                                    '(Set Z to Tool offset and wait)',
                                     'G21 G91 Z10',
                                 ]);
                             }
