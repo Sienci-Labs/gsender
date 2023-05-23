@@ -71,12 +71,19 @@ class GcodeToolpath {
         };
     };
 
-    offsetAddLine = (start, end, prev) => {
+    offsetAddLine = (start, end) => {
         this.fn.addLine(
             this.modal,
             this.offsetG92(start),
             this.offsetG92(end),
-            prev
+        );
+    };
+
+    offsetAddCurve = (start, end) => {
+        this.fn.addCurve(
+            this.modal,
+            this.offsetG92(start),
+            this.offsetG92(end),
         );
     };
 
