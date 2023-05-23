@@ -305,11 +305,11 @@ class Workspace extends PureComponent {
     };
 
     updateScreenSize = () => {
-        const isMobile = window.visualViewport.width <= 599;
+        const isMobile = window.visualViewport.width <= 639;
         this.setState({
             mobile: isMobile
         });
-        const isTablet = window.visualViewport.width > 599; //width smaller than height and wider than a phone
+        const isTablet = window.visualViewport.width > 639; //width smaller than height and wider than a phone
         this.setState({
             tablet: isTablet
         });
