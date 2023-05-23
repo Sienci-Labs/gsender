@@ -103,13 +103,6 @@ class GcodeToolpath {
         a: 0,
     };
 
-    prevPosition = {
-        x: 0,
-        y: 0,
-        z: 0,
-        a: 0,
-    };
-
     modal = {
         // Moton Mode
         // G0, G1, G2, G3, G38.2, G38.3, G38.4, G38.5, G80
@@ -168,13 +161,6 @@ class GcodeToolpath {
                 this.setModal({ motion: 'G0' });
             }
 
-            const v0 = {
-                x: this.prevPosition.x,
-                y: this.prevPosition.y,
-                z: this.prevPosition.z,
-                a: this.prevPosition.a,
-            };
-
             const v1 = {
                 x: this.position.x,
                 y: this.position.y,
@@ -191,7 +177,15 @@ class GcodeToolpath {
 
             const targetPosition = { x: v2.x, y: v2.y, z: v2.z, a: v2.a };
 
-            this.offsetAddLine(v1, v2, v0);
+            const isCurvedLine = shouldRotate(v1, v2);
+            const ANGLE_THRESHOLD = 30;
+            const angleDiff = Math.abs(v2.a - v1.a);
+
+            if (isCurvedLine && angleDiff > ANGLE_THRESHOLD) {
+                this.offsetAddCurve(v1, v2);
+            } else {
+                this.offsetAddLine(v1, v2);
+            }
 
             // Update position
             this.setPosition(
@@ -220,13 +214,6 @@ class GcodeToolpath {
                 this.setModal({ motion: 'G1' });
             }
 
-            const v0 = {
-                x: this.prevPosition.x,
-                y: this.prevPosition.y,
-                z: this.prevPosition.z,
-                a: this.prevPosition.a,
-            };
-
             const v1 = {
                 x: this.position.x,
                 y: this.position.y,
@@ -243,7 +230,15 @@ class GcodeToolpath {
 
             const targetPosition = { x: v2.x, y: v2.y, z: v2.z, a: v2.a };
 
-            this.offsetAddLine(v1, v2, v0);
+            const isCurvedLine = shouldRotate(v1, v2);
+            const ANGLE_THRESHOLD = 30;
+            const angleDiff = Math.abs(v2.a - v1.a);
+
+            if (isCurvedLine && angleDiff > ANGLE_THRESHOLD) {
+                this.offsetAddCurve(v1, v2);
+            } else {
+                this.offsetAddLine(v1, v2);
+            }
 
             // Update position
             this.setPosition(
@@ -731,6 +726,7 @@ class GcodeToolpath {
             modal,
             addLine = noop,
             addArcCurve = noop,
+            addCurve = noop,
         } = { ...options };
         this.g92offset.x = 0;
         this.g92offset.y = 0;
@@ -752,7 +748,7 @@ class GcodeToolpath {
         });
         this.setModal(nextModal);
 
-        this.fn = { addLine, addArcCurve };
+        this.fn = { addLine, addCurve, addArcCurve };
 
         const toolpath = new Interpreter({ handlers: this.handlers });
         toolpath.getPosition = () => ({ ...this.position });
@@ -806,11 +802,6 @@ class GcodeToolpath {
     }
 
     setPosition(...pos) {
-        this.prevPosition.x = this.position.x;
-        this.prevPosition.y = this.position.y;
-        this.prevPosition.z = this.position.z;
-        this.prevPosition.a = this.position.a;
-
         if (typeof pos[0] === 'object') {
             const { x, y, z, a } = { ...pos[0] };
 
