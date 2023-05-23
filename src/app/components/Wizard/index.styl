@@ -152,7 +152,6 @@
 .stepIndex {
   background: none;
   border: solid 1px #9ca3af;
-  display flex;
   color: #9ca3af;
   font-weight: bold;
   font-size: 1.1rem;
@@ -423,3 +422,21 @@ button-mixin($color) {
       }
     }
   }
+
+
+.minimizeActive {
+  transition: height 350ms ease-in;
+}
+
+.minimizeDone {
+  display: none;
+}
+
+.maximizeActive {
+  transition: height 350ms ease-in;
+}
+
+.maximizeDone {
+  display: flex;
+}
+
