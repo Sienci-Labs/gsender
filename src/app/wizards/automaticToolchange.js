@@ -27,6 +27,15 @@ import reduxStore from 'app/store/redux';
 import { get } from 'lodash';
 
 
+const getProbeSettings = () => {
+    const probeSettings = store.get('widgets.probe');
+    return {
+        slowSpeed: probeSettings.probeFeedrate.mm,
+        fastSpeed: probeSettings.probeFastFeedrate.mm,
+        retract: probeSettings.retractionDistance.mm
+    };
+};
+
 const getToolString = () => {
     const state = reduxStore.getState();
     const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
@@ -58,6 +67,7 @@ const wizard = {
                         {
                             label: 'Save Positions and Modals',
                             cb: () => {
+                                const settings = getProbeSettings();
                                 const probeProfile = store.get('workspace.probeProfile');
                                 const position = store.get('workspace.toolChangePosition');
                                 const { zThickness } = probeProfile;
@@ -70,7 +80,9 @@ const wizard = {
                                     '%wait',
                                     `%global.toolchange.PROBE_THICKNESS_MM=${zThickness.mm}`,
                                     '%global.toolchange.PROBE_DISTANCE=80',
-                                    '%global.toolchange.PROBE_FEEDRATE=200',
+                                    `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
+                                    `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
+                                    `%global.toolchange.RETRACT=${settings.retract}`,
                                     '%global.toolchange.XPOS=posx',
                                     '%global.toolchange.YPOS=posy',
                                     '%global.toolchange.ZPOS=posz',
@@ -118,13 +130,13 @@ const wizard = {
                                     'G53 G0 Z[global.toolchange.PROBE_POS_Z + 10]',
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G53 G0 Z-5',
-                                    'G38.2 Z-10 F75',
+                                    'G0 Z-[global.toolchange.RETRACT]',
+                                    'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
                                     'G4 P0.3',
                                     '%global.toolchange.TOOL_OFFSET=posz',
                                     '(TLO set: [global.toolchange.TOOL_OFFSET])',
                                     'G91',
-                                    'G53 G0 Z-5',
+                                    'G0 Z-[global.toolchange.RETRACT]',
                                     'G90 G21',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]'
                                 ]);
@@ -168,8 +180,8 @@ const wizard = {
                                     'G53 G0 Z[global.toolchange.PROBE_POS_Z + 10]',
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G53 G0 Z-12',
-                                    'G38.2 Z-15 F40',
+                                    'G53 G0 Z-[global.toolchange.RETRACT]',
+                                    'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
                                     'G4 P0.3',
                                     '(Set Z to Tool offset and wait)',
                                     `${modal} G10 L20 Z[global.toolchange.TOOL_OFFSET]`,
