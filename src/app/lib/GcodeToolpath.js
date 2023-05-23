@@ -19,20 +19,10 @@ export const toRadians = (degrees) => {
     return (degrees * Math.PI) / 180;
 };
 
-// If the angle is 0 or pi radians, it means that the line lies
-// in the x-y plane and should not be rotated. Otherwise, it should be rotated.
+// We just need to check the difference between the a axis values,
+// this should work fine since they are both 0 initially
 export const shouldRotate = (start, end) => {
-    const deltaY = end.y - start.y;
-    const deltaZ = end.z - start.z;
-
-    // Calculate the angle between the line and the x-y plane
-    const angle = Math.atan2(deltaZ, deltaY);
-
-    // Rotate the angle so that it is in the range [0, 2*pi]
-    const rotatedAngle = angle < 0 ? angle + 2 * Math.PI : angle;
-
-    // Determine whether or not the line should be rotated based on the angle
-    return rotatedAngle !== 0 && rotatedAngle !== Math.PI;
+    return start.a !== end.a;
 };
 
 export const rotateAxis = (axis, { y, z, a }) => {
