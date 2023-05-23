@@ -1,9 +1,10 @@
 import pubsub from 'pubsub-js';
 import reduxStore from 'app/store/redux';
+import _get from 'lodash/get';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
 import store from 'app/store';
-import { RENDER_RENDERING } from 'app/constants';
+import { RENDER_RENDERING, RENDER_RENDERED } from 'app/constants';
 import { isNumber } from 'lodash';
 
 export const visualizeResponse = ({ data }) => {
@@ -29,12 +30,17 @@ export const visualizeResponse = ({ data }) => {
         // Handle file load
         pubsub.publish('file:load', data);
         // Visualizer Rendering
-        reduxStore.dispatch({
-            type: fileActions.UPDATE_FILE_RENDER_STATE,
-            payload: {
-                state: RENDER_RENDERING
+        setTimeout(() => {
+            const renderState = _get(reduxStore.getState(), 'file.renderState');
+            if (renderState !== RENDER_RENDERED) {
+                reduxStore.dispatch({
+                    type: fileActions.UPDATE_FILE_RENDER_STATE,
+                    payload: {
+                        state: RENDER_RENDERING
+                    }
+                });
             }
-        });
+        }, 1000);
     }
 };
 
