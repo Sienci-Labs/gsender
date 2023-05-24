@@ -26,6 +26,14 @@ import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import { get } from 'lodash';
 
+const getProbeSettings = () => {
+    const probeSettings = store.get('widgets.probe');
+    return {
+        slowSpeed: probeSettings.probeFeedrate.mm,
+        fastSpeed: probeSettings.probeFastFeedrate.mm,
+        retract: probeSettings.retractionDistance.mm
+    };
+};
 
 const getToolString = () => {
     const state = reduxStore.getState();
@@ -59,13 +67,16 @@ const wizard = {
                             label: 'Save Positions and Modals',
                             cb: () => {
                                 const probeProfile = store.get('workspace.probeProfile');
+                                const settings = getProbeSettings();
                                 const { zThickness } = probeProfile;
 
                                 controller.command('gcode', [
                                     '%wait',
                                     `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
                                     '%global.toolchange.PROBE_DISTANCE=80',
-                                    '%global.toolchange.PROBE_FEEDRATE=200',
+                                    `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
+                                    `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
+                                    `%global.toolchange.RETRACT=${settings.retract}`,
                                     '%global.toolchange.XPOS=posx',
                                     '%global.toolchange.YPOS=posy',
                                     '%global.toolchange.ZPOS=posz',
@@ -105,9 +116,9 @@ const wizard = {
                                     '(This is 10 above configured location)',
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z10',
+                                    'G0 Z[global.toolchange.RETRACT]',
                                     '%wait',
-                                    'G38.2 Z-15 F40',
+                                    'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
                                     'G4 P0.3',
                                     '%global.toolchange.TOOL_OFFSET=posz',
                                     '(TLO set: [global.toolchange.TOOL_OFFSET])',
@@ -150,9 +161,8 @@ const wizard = {
                                 controller.command('gcode', [
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z4',
-                                    '%wait',
-                                    'G38.2 Z-15 F40',
+                                    'G0 Z[global.toolchange.RETRACT]',
+                                    'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
                                     'G4 P0.3',
                                     '(Set Z to Tool offset and wait)',
                                     `${modal} G10 L20 Z[global.toolchange.TOOL_OFFSET]`,

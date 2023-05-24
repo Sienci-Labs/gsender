@@ -26,6 +26,15 @@ import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import { get } from 'lodash';
 
+const getProbeSettings = () => {
+    const probeSettings = store.get('widgets.probe');
+    return {
+        slowSpeed: probeSettings.probeFeedrate.mm,
+        fastSpeed: probeSettings.probeFastFeedrate.mm,
+        retract: probeSettings.retractionDistance.mm
+    };
+};
+
 
 const getToolString = () => {
     const state = reduxStore.getState();
@@ -59,12 +68,15 @@ const wizard = {
                             label: 'Save Positions and Modals',
                             cb: () => {
                                 const probeProfile = store.get('workspace.probeProfile');
+                                const settings = getProbeSettings();
                                 const { zThickness } = probeProfile;
                                 controller.command('gcode', [
                                     '%wait',
                                     `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
                                     '%global.toolchange.PROBE_DISTANCE=80',
-                                    '%global.toolchange.PROBE_FEEDRATE=200',
+                                    `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
+                                    `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
+                                    `%global.toolchange.RETRACT=${settings.retract}`,
                                     '%global.toolchange.XPOS=posx',
                                     '%global.toolchange.YPOS=posy',
                                     '%global.toolchange.ZPOS=posz',
@@ -118,8 +130,8 @@ const wizard = {
                                     '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
                                     'G91',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z10',
-                                    'G38.2 Z-10 F40',
+                                    'G0 Z[global.toolchange.RETRACT]',
+                                    'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
                                     '%wait',
                                     'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]',
                                     'G0 G21 Z10'
