@@ -557,6 +557,9 @@ class VisualizerWidget extends PureComponent {
             },
             toRightSideView: () => {
                 this.setState({ cameraPosition: 'Right' });
+            },
+            toFreeView: () => {
+                this.setState({ cameraPosition: 'Free' });
             }
         },
         handleLiteModeToggle: () => {

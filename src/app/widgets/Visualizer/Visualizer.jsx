@@ -101,7 +101,7 @@ const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 class Visualizer extends Component {
     static propTypes = {
         show: PropTypes.bool,
-        cameraPosition: PropTypes.oneOf(['Top', '3D', 'Front', 'Left', 'Right']),
+        cameraPosition: PropTypes.oneOf(['Top', '3D', 'Front', 'Left', 'Right', 'Free']),
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
@@ -1454,6 +1454,7 @@ class Visualizer extends Component {
         });
         controls.addEventListener('end', () => {
             shouldAnimate = false;
+            this.props.actions.camera.toFreeView();
             this.updateScene();
         });
         controls.addEventListener('change', () => {
