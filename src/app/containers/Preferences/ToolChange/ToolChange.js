@@ -26,21 +26,21 @@ export const TOOLCHANGE_OPTIONS = {
     PAUSE: {
         key: 'PAUSE',
         label: 'Pause',
-        description: 'M6 commands will pause sending further commands but allow the user to jog, use macros, and probe.'
+        description: 'M6 commands will pause sending further commands but allow the user to jog, use macros, and probe.  If you move your bit, make sure it is back to the original position before resuming.'
     },
     MANUAL: {
         key: 'MANUAL',
-        label: 'Manual',
+        label: 'Standard Re-zero',
         description: 'M6 commands will initiate a guided process through which the user will manually probe a new tool to compensate for length differences.'
     },
     SEMI: {
         key: 'SEMI',
-        label: 'Semi-Automatic',
+        label: 'Flexible Re-zero',
         description: 'M6 commands will initiate a guided process through which a saved tool offset will compensate for tool length differences.'
     },
     AUTO: {
         key: 'AUTO',
-        label: 'Automatic',
+        label: 'Fixed Tool Sensor',
         description: 'M6 will commands will initiate an almost fully automated process in which preconfigured bitsetter or probe block will be used to set the new tool length.  Limit switches required.'
     }
 };

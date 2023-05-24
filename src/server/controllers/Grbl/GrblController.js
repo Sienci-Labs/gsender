@@ -82,7 +82,7 @@ import { calcOverrides } from '../runOverride';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
-const POSTHOOK_COMPLETE = '%post_complete';
+const POSTHOOK_COMPLETE = '%toolchange_complete';
 const PAUSE_START = '%pause_start';
 
 const log = logger('controller:Grbl');
@@ -266,10 +266,10 @@ class GrblController {
                         return 'G4 P0.5';
                     }
                     if (line === POSTHOOK_COMPLETE) {
-                        log.debug('Finished Post-hook, resuming program');
+                        log.debug('Finished toolchange, resuming program');
                         setTimeout(() => {
                             this.workflow.resume();
-                        }, 1500);
+                        }, 500);
                         return 'G4 P0.5';
                     }
                     if (line === PAUSE_START) {
@@ -437,11 +437,16 @@ class GrblController {
                             commentString = `(${tool[0]}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
-                        this.emit('gcode:toolChange', {
-                            line: sent + 1,
-                            block: line,
-                            option: toolChangeOption
-                        }, commentString);
+
+                        this.feederCB = () => {
+                            this.emit('gcode:toolChange', {
+                                line: sent + 1,
+                                block: line,
+                                option: toolChangeOption
+                            }, commentString);
+                        };
+
+                        this.command('gcode', ['M5']);
                     }
 
                     line = line.replace('M6', '(M6)');

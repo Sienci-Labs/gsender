@@ -213,7 +213,8 @@ const wizard = {
                                     `G90 ${unit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
                                     `G90 ${unit} G0 Z[global.toolchange.ZPOS]`,
                                     '(Restore initial modals)',
-                                    '[global.toolchange.SPINDLE] [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]'
+                                    'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
+                                    '%toolchange_complete'
                                 ]);
                             }
                         }
