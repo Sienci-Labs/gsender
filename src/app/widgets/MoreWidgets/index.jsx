@@ -25,7 +25,7 @@ import TabsContext from '../SecondaryFunctionality/TabsContext';
 import Coolant from '../Coolant';
 import Rotary from '../Rotary';
 import Console from '../Console';
-import Macro from '../Macro';
+import Macros from '../Macro';
 import Spindle from '../Spindle';
 
 /**
@@ -35,27 +35,13 @@ import Spindle from '../Spindle';
 const MoreTabs = ({ onFork, onRemove, sortable, widgetId, active }) => {
     const { currentDropdownTab = 'Coolant' } = useContext(TabsContext);
 
-    let Render = Coolant;
-
-    switch (currentDropdownTab) {
-    case 'Coolant':
-        Render = Coolant;
-        break;
-    case 'Rotary':
-        Render = Rotary;
-        break;
-    case 'Console':
-        Render = Console;
-        break;
-    case 'Macros':
-        Render = Macro;
-        break;
-    case 'Spindle/Laser':
-        Render = Spindle;
-        break;
-    default:
-        break;
-    }
+    const Render = {
+        'Coolant': Coolant,
+        'Rotary': Rotary,
+        'Console': Console,
+        'Macros': Macros,
+        'Spindle/Laser': Spindle,
+    }[currentDropdownTab] || Coolant;
 
     return (
         <Render

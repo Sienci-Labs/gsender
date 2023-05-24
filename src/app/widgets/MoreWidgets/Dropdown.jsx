@@ -22,7 +22,6 @@
  */
 import React, { useContext } from 'react';
 import Dropdown from 'rc-dropdown';
-import styled from 'styled-components';
 import Menu, { MenuItem } from 'rc-menu';
 import styles from './index.styl';
 import TabsContext from '../SecondaryFunctionality/TabsContext';
@@ -39,12 +38,6 @@ const RcDropdown = () => {
     const handleTabSelect = (tab) => {
         updateDropdownTab(tab.label);
     };
-
-    const DropdownWrapper = styled.div``;
-    const Span = styled.span``;
-    const I = styled.i`
-        font-size: 2rem !important;
-    `;
 
     const Options = (
         <Menu className={styles.dropdown} activeKey={currentDropdownTab}>
@@ -64,11 +57,11 @@ const RcDropdown = () => {
     );
 
     return (
-        <DropdownWrapper>
+        <div>
             <Dropdown trigger={['click', 'hover']} overlay={Options} animation="slide-up">
-                <Span><I className="fas fa-ellipsis-h" /></Span>
+                <span><i className={['fas fa-ellipsis-h', styles.elipseIcon].join(' ')} /></span>
             </Dropdown>
-        </DropdownWrapper>
+        </div>
     );
 };
 
