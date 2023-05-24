@@ -27,7 +27,7 @@
     grid-template-rows: minmax(0, 32fr) minmax(0, 38fr) minmax(0, 30fr);
     grid-gap: 0.5rem;
     width: 100%;
-    @media (max-width: 639px) {
+    @media (max-width: 639px), (max-device-width: 639px) {
             grid-template: none;
     }
     :global {
@@ -54,7 +54,7 @@
     min-width: 360px;
     background-color: #d1d5db;
     width: auto;
-    @media (max-width: 639px) {
+    @media (max-width: 639px), (max-device-width: 639px) {
         display: none;
     }
     @media (min-width: 1921px) {

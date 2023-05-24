@@ -97,7 +97,7 @@
     width: 100%;
     display: flex;
     justify-content: space-around;
-    @media (max-width: 639px) {
+    @media (max-width: 639px), (max-device-width: 639px) {
         display: block;
     }
 }
@@ -112,7 +112,7 @@
     grid-template-columns: repeat(3,minmax(0,1fr));
     height: max-content;
     margin: auto;
-    @media (max-width: 639px) {
+    @media (max-width: 639px), (max-device-width: 639px) {
         margin-top: 1rem;
         width: 50%;
         height: 40%
@@ -163,7 +163,7 @@
         transform: translateX(5%) rotate(45deg);
         width: 300%;
         text-align: left;
-        @media (max-width: 639px) {
+        @media (max-width: 639px), (max-device-width: 639px) {
             width: 277%;
             transform: translateX(9%) rotate(45deg);
             font-size: 1.4rem !important;
@@ -185,7 +185,7 @@
          transform: translateX(-72%) rotate(-45deg);
         width: 300%;
         text-align: right;
-        @media (max-width: 639px) {
+        @media (max-width: 639px), (max-device-width: 639px) {
             width: 271%;
             transform: translateX(-73%) rotate(-45deg);
             font-size: 1.4rem !important;
@@ -210,7 +210,7 @@
         position: relative;
         bottom: 8px;
 		display: block;
-        @media (max-width: 639px) {
+        @media (max-width: 639px), (max-device-width: 639px) {
             width: 97%;
             transform: translateX(1%) rotate(135deg);
             font-size: 1.4rem !important;
@@ -236,7 +236,7 @@
         bottom: 8px;
 		display: block;
 		text-align: right;
-        @media (max-width: 639px) {
+        @media (max-width: 639px), (max-device-width: 639px) {
             width: 99%;
             transform: translate(3%) rotate(225deg)
             font-size: 1.4rem !important;
