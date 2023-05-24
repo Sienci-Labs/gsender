@@ -77,6 +77,9 @@
 }
 
 .control-buttons {
+    @media (max-width: 639px), (max-device-width: 639px) {
+        max-width: 33%;
+    }
     padding: 0 2rem
     display: flex;
     flex-grow 1;
@@ -84,6 +87,12 @@
    padding: 0 1rem;
     button {
         margin-bottom: 10px;
+    }
+}
+
+.displaypanelTable{
+     @media (max-width: 639px), (max-device-width: 639px) {
+        width: 50%;
     }
 }
 

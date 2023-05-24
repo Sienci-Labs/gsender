@@ -99,9 +99,6 @@
         max-height: 100%;
         background-color: #d1d5db
         position: relative;
-         @media (max-width: 639px), (max-device-width: 639px) {
-            height: 100%;
-        }
     }
 
     .workspace-table-row {
@@ -152,13 +149,7 @@
     .primary-container-mobile {
         height: 100%;
         width: 100%;
-        min-width: 365px;
-        max-width: 500px;
-        overflow: hidden;
-        @media (max-width: 639px), (max-device-width: 639px) {
-            min-width: auto;
-            max-width: auto;
-        }
+        overflow-y: auto;
         &.hidden {
             display: none;
         }

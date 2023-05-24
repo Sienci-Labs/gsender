@@ -305,11 +305,11 @@ class Workspace extends PureComponent {
     };
 
     updateScreenSize = () => {
-        const isMobile = window.visualViewport.width <= 639;
+        const isMobile = window.screen.width <= 639;
         this.setState({
             mobile: isMobile
         });
-        const isTablet = window.visualViewport.width > 639; //width smaller than height and wider than a phone
+        const isTablet = window.screen.width > 639; //width smaller than height and wider than a phone
         this.setState({
             tablet: isTablet
         });
@@ -492,11 +492,11 @@ class Workspace extends PureComponent {
             this.updateScreenSize();
             this.resizeDefaultContainer();
         }, 25);
-        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+        window.addEventListener('resize', this.onResizeThrottled);
     }
 
     removeResizeEventListener() {
-        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        window.removeEventListener('resize', this.onResizeThrottled);
         this.onResizeThrottled = null;
     }
 
