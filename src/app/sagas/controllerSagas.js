@@ -38,7 +38,7 @@ import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
-import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
+import { RENDER_LOADING, RENDER_RENDERED, RENDER_NO_FILE, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import isElectron from 'is-electron';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 
@@ -312,9 +312,20 @@ export function* initialize() {
             reduxStore.dispatch({
                 type: fileActions.UPDATE_FILE_RENDER_STATE,
                 payload: {
-                    state: RENDER_LOADING
+                    state: RENDER_NO_FILE
                 }
             });
+            setTimeout(() => {
+                const renderState = _get(reduxStore.getState(), 'file.renderState');
+                if (renderState === RENDER_NO_FILE) {
+                    reduxStore.dispatch({
+                        type: fileActions.UPDATE_FILE_RENDER_STATE,
+                        payload: {
+                            state: RENDER_LOADING
+                        }
+                    });
+                }
+            }, 1000);
 
             const needsVisualization = shouldVisualize();
             const shouldRenderSVG = shouldVisualizeSVG();
@@ -358,9 +369,20 @@ export function* initialize() {
         reduxStore.dispatch({
             type: fileActions.UPDATE_FILE_RENDER_STATE,
             payload: {
-                state: RENDER_LOADING
+                state: RENDER_NO_FILE
             }
         });
+        setTimeout(() => {
+            const renderState = _get(reduxStore.getState(), 'file.renderState');
+            if (renderState === RENDER_NO_FILE) {
+                reduxStore.dispatch({
+                    type: fileActions.UPDATE_FILE_RENDER_STATE,
+                    payload: {
+                        state: RENDER_LOADING
+                    }
+                });
+            }
+        }, 1000);
         /*        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
                 const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
                 const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
