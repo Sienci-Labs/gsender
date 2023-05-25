@@ -544,19 +544,22 @@ class VisualizerWidget extends PureComponent {
                 }
             },
             toTopView: () => {
-                this.setState({ cameraPosition: 'top' });
+                this.setState({ cameraPosition: 'Top' });
             },
             to3DView: () => {
-                this.setState({ cameraPosition: '3d' });
+                this.setState({ cameraPosition: '3D' });
             },
             toFrontView: () => {
-                this.setState({ cameraPosition: 'front' });
+                this.setState({ cameraPosition: 'Front' });
             },
             toLeftSideView: () => {
-                this.setState({ cameraPosition: 'left' });
+                this.setState({ cameraPosition: 'Left' });
             },
             toRightSideView: () => {
-                this.setState({ cameraPosition: 'right' });
+                this.setState({ cameraPosition: 'Right' });
+            },
+            toFreeView: () => {
+                this.setState({ cameraPosition: 'Free' });
             }
         },
         handleLiteModeToggle: () => {
@@ -804,7 +807,7 @@ class VisualizerWidget extends PureComponent {
                 }
             },
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
-            cameraPosition: '3d', // 'top', '3d', 'front', 'left', 'right'
+            cameraPosition: '3D', // 'Top', '3D', 'Front', 'Left', 'Right'
             isAgitated: false, // Defaults to false
             currentTheme: this.getVisualizerTheme(),
             currentTab: 0,
@@ -902,12 +905,12 @@ class VisualizerWidget extends PureComponent {
             } = this.actions.camera;
 
             const cameraViews = [
-                '3d',
-                'top',
-                'front',
-                'right',
-                'left',
-                'default',
+                '3D',
+                'Top',
+                'Front',
+                'Right',
+                'Left',
+                'Default',
             ];
 
             let currIndex = cameraViews.findIndex(view => view === this.state.cameraPosition);
@@ -921,12 +924,12 @@ class VisualizerWidget extends PureComponent {
             const currView = cameraViews[currIndex];
 
             const changeCamera = {
-                '3d': to3DView,
-                'top': toTopView,
-                'front': toFrontView,
-                'right': toRightSideView,
-                'left': toLeftSideView,
-                'default': () => {
+                '3D': to3DView,
+                'Top': toTopView,
+                'Front': toFrontView,
+                'Right': toRightSideView,
+                'Left': toLeftSideView,
+                'Default': () => {
                     const { cameraPosition } = this.getInitialState();
                     this.setState({ cameraPosition });
                 }
@@ -1508,7 +1511,7 @@ class VisualizerWidget extends PureComponent {
                     }}
                     gcode={gcode}
                     surfacingData={surfacingData}
-                    cameraPosition="top"
+                    cameraPosition="Top"
                 />
             )
             : (
