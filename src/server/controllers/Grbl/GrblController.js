@@ -30,6 +30,7 @@ import map from 'lodash/map';
 import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
+import ToolChanger from '../../lib/ToolChanger';
 import Sender, { SP_TYPE_CHAR_COUNTING } from '../../lib/Sender';
 import Workflow, {
     WORKFLOW_STATE_IDLE,
@@ -79,6 +80,7 @@ import {
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
+
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -176,6 +178,9 @@ class GrblController {
 
     // Sender
     sender = null;
+
+    // Toolchange
+    toolChanger = null;
 
     // Shared context
     sharedContext = {};
@@ -445,8 +450,6 @@ class GrblController {
                                 option: toolChangeOption
                             }, commentString);
                         };
-
-                        this.command('gcode', ['M5']);
                     }
 
                     line = line.replace('M6', '(M6)');
@@ -780,6 +783,13 @@ class GrblController {
 
         this.runner.on('others', (res) => {
             this.emit('serialport:read', res.raw);
+        });
+
+        this.toolChanger = new ToolChanger({
+            isIdle: () => {
+                return this.runner.isIdle();
+            },
+            intervalTimer: 200
         });
 
         const queryStatusReport = () => {
@@ -1868,6 +1878,14 @@ class GrblController {
                 log.debug('starting post hook');
                 this.command('feeder:start');
                 this.runPostChangeHook();
+            },
+            'wizard:start': () => {
+                log.debug('Wizard kickoff code');
+                const [gcode] = args;
+
+                this.toolChanger.addInterval(() => {
+                    this.command('gcode', gcode);
+                });
             },
             'wizard:step': () => {
                 const [stepIndex, substepIndex] = args;

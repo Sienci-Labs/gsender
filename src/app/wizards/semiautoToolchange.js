@@ -54,6 +54,8 @@ const getUnitModal = () => {
 };
 
 const wizard = {
+    intro: {},
+    onStart: ['G4 P10'],
     steps: [
         {
             title: 'Initial Setup',

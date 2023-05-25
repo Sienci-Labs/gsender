@@ -270,30 +270,40 @@ export function* initialize() {
             comment
         };
         const { option } = context;
-        if (option === 'Manual') {
-            pubsub.publish('wizard:load', {
-                ...payload,
-                title: 'Manual Toolchange',
-                instructions: manualToolChange
-            });
-        } else if (option === 'Semi-Automatic') {
-            pubsub.publish('wizard:load', {
-                ...payload,
-                title: 'Semi-Automatic Toolchange',
-                instructions: semiautoToolChange
-            });
-        } else if (option === 'Automatic') {
-            pubsub.publish('wizard:load', {
-                ...payload,
-                title: 'Automatic Toolchange',
-                instructions: automaticToolChange
-            });
-        } else if (option === 'Pause') {
+        if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
             Toaster.pop({
                 msg: msg,
                 type: TOASTER_INFO,
                 duration: TOASTER_UNTIL_CLOSE
+            });
+        } else {
+            let title, instructions;
+
+            if (option === 'Standard Re-zero') {
+                title = 'Standard Re-zero';
+                instructions = manualToolChange;
+            } else if (option === 'Flexible Re-zero') {
+                title = 'Flexible Re-zero';
+                instructions = semiautoToolChange;
+            } else if (option === 'Fixed Tool Sensor') {
+                title = 'Fixed Tool Sensor';
+                instructions = automaticToolChange;
+            } else {
+                console.error('Invalid toolchange option passed');
+                return;
+            }
+
+            // Run start block on idle if exists
+            if (instructions.onStart) {
+                const onStart = instructions.onStart();
+                controller.command('wizard:start', onStart);
+            }
+
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title,
+                instructions
             });
         }
     });

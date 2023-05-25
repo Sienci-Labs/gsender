@@ -40,9 +40,9 @@ const getToolString = () => {
     const state = reduxStore.getState();
     const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
     if (tool === '0') {
-        return 'no T command parsed';
+        return 'No T command found';
     }
-    return `last T command was T${tool}`;
+    return `T${tool}`;
 };
 
 const getUnitModal = () => {
@@ -55,72 +55,50 @@ const getUnitModal = () => {
 };
 
 const wizard = {
+    onStart: () => {
+        const probeProfile = store.get('workspace.probeProfile');
+        const settings = getProbeSettings();
+        const { zThickness } = probeProfile;
+        return [
+            '%wait',
+            `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
+            '%global.toolchange.PROBE_DISTANCE=80',
+            `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
+            `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
+            `%global.toolchange.RETRACT=${settings.retract}`,
+            '%global.toolchange.XPOS=posx',
+            '%global.toolchange.YPOS=posy',
+            '%global.toolchange.ZPOS=posz',
+            '%global.toolchange.UNITS=modal.units',
+            '%global.toolchange.SPINDLE=modal.spindle',
+            '%global.toolchange.DISTANCE=modal.distance',
+            '%global.toolchange.FEEDRATE=modal.feedrate',
+            'M5',
+            '(Toolchange initiated)',
+        ];
+    },
     steps: [
         {
-            title: 'Change Bit',
+            title: 'Starting Off',
             substeps: [
                 {
                     title: 'Safety First',
-                    description: () => <div>If using a router, manually turn it off.  Click the below button to save current position and modals, and turn off spindle if active.</div>,
+                    description: () => <div>Jog your machine to a place you can reach using the jog controls and ensure that your router/spindle is turned off and has fully stopped spinning.</div>,
                     overlay: false,
-                    actions: [
-                        {
-                            label: 'Save Positions and Modals',
-                            cb: () => {
-                                const probeProfile = store.get('workspace.probeProfile');
-                                const settings = getProbeSettings();
-                                const { zThickness } = probeProfile;
-                                controller.command('gcode', [
-                                    '%wait',
-                                    `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
-                                    '%global.toolchange.PROBE_DISTANCE=80',
-                                    `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
-                                    `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
-                                    `%global.toolchange.RETRACT=${settings.retract}`,
-                                    '%global.toolchange.XPOS=posx',
-                                    '%global.toolchange.YPOS=posy',
-                                    '%global.toolchange.ZPOS=posz',
-                                    '%global.toolchange.UNITS=modal.units',
-                                    '%global.toolchange.SPINDLE=modal.spindle',
-                                    '%global.toolchange.DISTANCE=modal.distance',
-                                    '%global.toolchange.FEEDRATE=modal.feedrate',
-                                    'M5',
-                                    'G91 G21 G0Z5',
-                                    '(Toolchange variables:)',
-                                    '([JSON.stringify(global.toolchange)])',
-                                ]);
-                            }
-                        }
-                    ]
                 },
                 {
                     title: 'Change Bit',
-                    description: () => `Change tool to requested bit - ${getToolString()}`,
+                    description: () => `Change over to the next tool (${getToolString()})`,
                     overlay: false
                 }
             ]
         },
         {
-            title: 'Setup Probe',
+            title: 'Probe New Tool',
             substeps: [
                 {
-                    title: 'Touchplate Setup',
-                    description: 'Setup touchplate and attach continuity collets.',
-                    overlay: false
-                },
-                {
-                    title: 'Position Router',
-                    description: 'Jog router into position above the touch plate using the jog controls',
-                    overlay: false
-                }
-            ]
-        },
-        {
-            title: 'Probe Tool',
-            substeps: [
-                {
-                    title: 'Probe',
-                    description: 'Probe tool length - the following code will probe Z and set a new zero based on the configured touchplate thickness.',
+                    title: 'Reset the Z',
+                    description: 'Use jogging or X and Y gotos to bring your CNC back over to where you initially set the project zero. If you used a touch plate be sure to place the tool over the plate and attach the magnet.',
                     overlay: false,
                     actions: [
                         {
@@ -153,11 +131,11 @@ const wizard = {
             ]
         },
         {
-            title: 'Resume Path',
+            title: 'Resume Job',
             substeps: [
                 {
-                    title: 'Resume Program',
-                    description: 'Detach and remove your touchplate from the work area.  The following code will restore modals, and move back to initial position.  Remember to turn on your router before resuming.',
+                    title: 'Resume Job',
+                    description: 'If everything looks good, prepare for your machine to move back to the cutting area and continue as expected. Remove the touch plate magnet and turn on your router if you have them.',
                     overlay: false,
                     actions: [
                         {
