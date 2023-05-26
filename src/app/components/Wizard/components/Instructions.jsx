@@ -25,15 +25,20 @@ import React from 'react';
 import { uniqueId } from 'lodash';
 import { useWizardContext } from 'app/components/Wizard/context';
 import Substep from 'app/components/Wizard/components/Substep';
+import Introduction from 'app/components/Wizard/components/Introduction';
 import Controls from './Controls';
 import styles from '../index.styl';
 
+
 const Instructions = () => {
-    const { steps } = useWizardContext();
+    const { steps, intro, title } = useWizardContext();
 
     return (
         <div className={styles.instructionWrapper}>
             <div className={styles.stepWrapper}>
+                {
+                    intro && <Introduction description={intro} title={title}/>
+                }
                 {
                     steps.map((step, stepIndex) => {
                         return (

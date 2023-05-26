@@ -269,6 +269,7 @@ export function* initialize() {
             context,
             comment
         };
+
         const { option } = context;
         if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
@@ -281,13 +282,13 @@ export function* initialize() {
             let title, instructions;
 
             if (option === 'Standard Re-zero') {
-                title = 'Standard Re-zero';
+                title = 'Standard Re-zero Tool Change';
                 instructions = manualToolChange;
             } else if (option === 'Flexible Re-zero') {
-                title = 'Flexible Re-zero';
+                title = 'Flexible Re-zero Tool Change';
                 instructions = semiautoToolChange;
             } else if (option === 'Fixed Tool Sensor') {
-                title = 'Fixed Tool Sensor';
+                title = 'Fixed Tool Sensor Tool Change';
                 instructions = automaticToolChange;
             } else {
                 console.error('Invalid toolchange option passed');
@@ -296,6 +297,7 @@ export function* initialize() {
 
             // Run start block on idle if exists
             if (instructions.onStart) {
+                console.log('On start');
                 const onStart = instructions.onStart();
                 controller.command('wizard:start', onStart);
             }

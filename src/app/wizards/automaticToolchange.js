@@ -55,6 +55,10 @@ const getUnitModal = () => {
 };
 
 const wizard = {
+    intro: {
+        icon: 'fas fa-caution',
+        description: () => <div>Tool Change detected, stay clear of the machine! Wait until initial movements are complete!</div>
+    },
     steps: [
         {
             title: 'Initial Setup',

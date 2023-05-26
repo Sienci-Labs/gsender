@@ -443,13 +443,11 @@ class GrblController {
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
 
-                        this.feederCB = () => {
-                            this.emit('gcode:toolChange', {
-                                line: sent + 1,
-                                block: line,
-                                option: toolChangeOption
-                            }, commentString);
-                        };
+                        this.emit('gcode:toolChange', {
+                            line: sent + 1,
+                            block: line,
+                            option: toolChangeOption
+                        }, commentString);
                     }
 
                     line = line.replace('M6', '(M6)');

@@ -54,51 +54,40 @@ const getUnitModal = () => {
 };
 
 const wizard = {
-    intro: {},
-    onStart: ['G4 P10'],
+    intro: {
+        icon: 'fas fa-caution',
+        description: () => <div>Tool Change detected, stay clear of the machine! Wait until initial movements are complete!</div>
+    },
+    onStart: () => {
+        const probeProfile = store.get('workspace.probeProfile');
+        const settings = getProbeSettings();
+        const { zThickness } = probeProfile;
+
+        return [
+            '%wait',
+            `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
+            '%global.toolchange.PROBE_DISTANCE=80',
+            `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
+            `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
+            `%global.toolchange.RETRACT=${settings.retract}`,
+            '%global.toolchange.XPOS=posx',
+            '%global.toolchange.YPOS=posy',
+            '%global.toolchange.ZPOS=posz',
+            '%global.toolchange.UNITS=modal.units',
+            '%global.toolchange.SPINDLE=modal.spindle',
+            '%global.toolchange.DISTANCE=modal.distance',
+            '%global.toolchange.FEEDRATE=modal.feedrate',
+            'M5',
+            '(Toolchange Initiated)',
+        ];
+    },
     steps: [
         {
-            title: 'Initial Setup',
+            title: 'Starting Off',
             substeps: [
                 {
                     title: 'Safety First',
-                    description: () => <div>If using a router, manually turn it off.  Click the below button to save current position and modals, and turn off spindle if active.</div>,
-                    overlay: false,
-                    actions: [
-                        {
-                            label: 'Save Positions and Modals',
-                            cb: () => {
-                                const probeProfile = store.get('workspace.probeProfile');
-                                const settings = getProbeSettings();
-                                const { zThickness } = probeProfile;
-
-                                controller.command('gcode', [
-                                    '%wait',
-                                    `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
-                                    '%global.toolchange.PROBE_DISTANCE=80',
-                                    `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
-                                    `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
-                                    `%global.toolchange.RETRACT=${settings.retract}`,
-                                    '%global.toolchange.XPOS=posx',
-                                    '%global.toolchange.YPOS=posy',
-                                    '%global.toolchange.ZPOS=posz',
-                                    '%global.toolchange.UNITS=modal.units',
-                                    '%global.toolchange.SPINDLE=modal.spindle',
-                                    '%global.toolchange.DISTANCE=modal.distance',
-                                    '%global.toolchange.FEEDRATE=modal.feedrate',
-                                    'M5',
-                                    '%wait',
-                                    'G91 G21 G0Z5',
-                                    '(Toolchange variables:)',
-                                    '([JSON.stringify(global.toolchange)])',
-                                ]);
-                            }
-                        }
-                    ]
-                },
-                {
-                    title: 'Position above touchplate',
-                    description: 'Jog the router into position, about 10mm above the touchplate.',
+                    description: () => <div>Jog your machine to the probe location using the jog controls and ensure that your router/spindle is turned off and has fully stopped spinning.</div>,
                     overlay: false,
                 },
             ]
@@ -107,8 +96,8 @@ const wizard = {
             title: 'Setup Probe',
             substeps: [
                 {
-                    title: 'Probe Initial Tool Length or confirm',
-                    description: 'If you haven\'t probed your initial tool length, do so now by pressing \'Probe Tool Length\'.  Otherwise, press continue.',
+                    title: 'Check Offset',
+                    description: 'Position the current cutting tool about 10mm above the probe location, attach the magnet, and prepare to probe.',
                     overlay: false,
                     actions: [
                         {
@@ -129,15 +118,6 @@ const wizard = {
                                 ]);
                             }
                         },
-                        {
-                            label: 'Tool Length Already Set',
-                            cb: () => {
-                                controller.command('gcode', [
-                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
-                                    '(If the above is not valid, re-run Probe Initial Tool Length action)'
-                                ]);
-                            }
-                        }
                     ]
                 },
 
@@ -177,15 +157,21 @@ const wizard = {
             ]
         },
         {
-            title: 'Resume Path',
+            title: 'Resume Job',
             substeps: [
                 {
-                    title: 'Resume Program',
-                    description: 'The following code will move router back to initial position, restore modals, turn it on, and prepare you to resume cutting.',
+                    title: 'Resume Job',
+                    description: 'If everything looks good, prepare for your machine to move back to the cutting area and continue as expected. Remove the touch plate magnet and turn on your router if you have them.',
                     overlay: false,
                     actions: [
                         {
-                            label: 'Prepare for Resume',
+                            label: 'Start Spindle',
+                            cb: () => {
+                                controller.command('gcode', ['M3']);
+                            }
+                        },
+                        {
+                            label: 'Resume Cutting',
                             cb: () => {
                                 const unit = getUnitModal();
                                 controller.command('gcode', [
