@@ -29,7 +29,7 @@ export const storeUpdate = async (content, isSync) => {
         resolve(res);
     }).then((result) => {
         Promise.all([
-            events.map((event) => api.events.create(event))
+            Object.entries(events).map(([key, event]) => api.events.create(event))
         ]);
     });
 
