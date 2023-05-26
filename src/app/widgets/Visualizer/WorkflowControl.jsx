@@ -71,6 +71,7 @@ import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
 import { outlineResponse } from '../../workers/Outline.response';
 import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 import Tooltip from '../../components/TooltipCustom/ToolTip';
+import { storeUpdate } from '../../lib/storeUpdate';
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
@@ -408,6 +409,9 @@ class WorkflowControl extends PureComponent {
             }),
             pubsub.subscribe('units:change', (msg, units) => {
                 this.changeUnits(units);
+            }),
+            pubsub.subscribe('store:update', (msg, content) => {
+                storeUpdate(content, true);
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
