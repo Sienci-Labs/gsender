@@ -101,7 +101,7 @@ const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 class Visualizer extends Component {
     static propTypes = {
         show: PropTypes.bool,
-        cameraPosition: PropTypes.oneOf(['top', '3d', 'front', 'left', 'right']),
+        cameraPosition: PropTypes.oneOf(['Top', '3D', 'Front', 'Left', 'Right', 'Free']),
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
@@ -416,19 +416,19 @@ class Visualizer extends Component {
         }
 
         if (prevProps.cameraPosition !== this.props.cameraPosition) {
-            if (this.props.cameraPosition === 'top') {
+            if (this.props.cameraPosition === 'Top') {
                 this.toTopView();
             }
-            if (this.props.cameraPosition === '3d') {
+            if (this.props.cameraPosition === '3D') {
                 this.to3DView();
             }
-            if (this.props.cameraPosition === 'front') {
+            if (this.props.cameraPosition === 'Front') {
                 this.toFrontView();
             }
-            if (this.props.cameraPosition === 'left') {
+            if (this.props.cameraPosition === 'Left') {
                 this.toLeftSideView();
             }
-            if (this.props.cameraPosition === 'right') {
+            if (this.props.cameraPosition === 'Right') {
                 this.toRightSideView();
             }
         }
@@ -1454,6 +1454,7 @@ class Visualizer extends Component {
         });
         controls.addEventListener('end', () => {
             shouldAnimate = false;
+            this.props.actions.camera.toFreeView();
             this.updateScene();
         });
         controls.addEventListener('change', () => {
@@ -1617,23 +1618,23 @@ class Visualizer extends Component {
         // only set the camera if it's the first render
         if (shouldZoom) {
             switch (this.props.cameraPosition) {
-            case 'top':
+            case 'Top':
                 this.toTopView();
                 break;
 
-            case '3d':
+            case '3D':
                 this.to3DView();
                 break;
 
-            case 'front':
+            case 'Front':
                 this.toFrontView();
                 break;
 
-            case 'left':
+            case 'Left':
                 this.toLeftSideView();
                 break;
 
-            case 'right':
+            case 'Right':
                 this.toRightSideView();
                 break;
 

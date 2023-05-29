@@ -133,9 +133,9 @@ const main = () => {
             } catch (error) {
                 if (error.message.includes('EADDR')) {
                     dialog.showMessageBoxSync(null, {
-                        title: 'Error binding remote address',
-                        message: 'There was an error binding the remote address.',
-                        detail: 'Remote mode has been disabled.  Double-check the configured IP address before restarting the application.'
+                        title: 'Error Connecting to Remote Address',
+                        message: 'There was an problem connecting to the remote address in gSender.',
+                        detail: 'Remote mode has been disabled. Please verify the configured IP address before restarting the application.'
                     });
                     app.relaunch();
                     app.exit(-1);

@@ -38,7 +38,7 @@ import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app
 import VisualizeWorker from 'app/workers/Visualize.worker';
 import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
-import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
+import { RENDER_LOADING, RENDER_RENDERED, RENDER_NO_FILE, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import isElectron from 'is-electron';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 
@@ -57,30 +57,26 @@ export function* initialize() {
 
     const incrementJobCounter = () => {
         let jobsFinished = store.get('workspace.jobsFinished');
-        jobsFinished++;
-        store.set('workspace.jobsFinished', jobsFinished);
+
+        store.replace('workspace.jobsFinished', jobsFinished + 1);
     };
 
-    const addToCancelledCounter = (isAdd) => {
-        let jobsCancelled = store.get('workspace.jobsCancelled');
-        if (isAdd) {
-            jobsCancelled++;
-        } else {
-            jobsCancelled--;
-        }
-        store.set('workspace.jobsCancelled', jobsCancelled);
+    const incrementJobCancelledCounter = () => {
+        const jobsCancelled = store.get('workspace.jobsCancelled');
+
+        store.replace('workspace.jobsCancelled', jobsCancelled + 1);
     };
 
     const incrementTimeRun = (elapsedTime) => {
         // add elapsed time to total time run
         let timeSpentRunning = store.get('workspace.timeSpentRunning');
         timeSpentRunning += elapsedTime;
-        store.set('workspace.timeSpentRunning', timeSpentRunning);
+        store.replace('workspace.timeSpentRunning', timeSpentRunning);
 
         // also add it to last element in array of job times
         let jobTimes = store.get('workspace.jobTimes');
         jobTimes[jobTimes.length - 1] += elapsedTime;
-        store.set('workspace.jobTimes', jobTimes);
+        store.replace('workspace.jobTimes', jobTimes);
 
         // compare last element to the longest time
         compareLongestTime(jobTimes[jobTimes.length - 1]);
@@ -89,18 +85,15 @@ export function* initialize() {
     const compareLongestTime = (time) => {
         let longestTimeRun = store.get('workspace.longestTimeRun');
         if (time > longestTimeRun) {
-            store.set('workspace.longestTimeRun', time);
+            store.replace('workspace.longestTimeRun', time);
         }
     };
 
     const onJobStart = () => {
-        // increment cancelled jobs
-        addToCancelledCounter(true);
-
         // add another index to array of job times
         let jobTimes = store.get('workspace.jobTimes');
         jobTimes.push(0);
-        store.set('workspace.jobTimes', jobTimes);
+        store.replace('workspace.jobTimes', jobTimes);
     };
 
     const onJobStop = (elapsedTime) => {
@@ -108,7 +101,8 @@ export function* initialize() {
             onJobStart();
             areStatsInitialized = true;
         }
-        incrementTimeRun(elapsedTime);
+
+        incrementJobCancelledCounter();
     };
 
     const onJobEnd = (elapsedTime) => {
@@ -116,10 +110,9 @@ export function* initialize() {
             onJobStart();
             areStatsInitialized = true;
         }
-        // decrement cancelled jobs
-        addToCancelledCounter(false);
+
         incrementJobCounter();
-        onJobStop(elapsedTime);
+        incrementTimeRun(elapsedTime);
 
         // reset to false since it's the end of the job
         areStatsInitialized = false;
@@ -152,11 +145,14 @@ export function* initialize() {
     });
 
     controller.addListener('sender:status', (status) => {
+        console.log(status);
         // finished job
         if (status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) {
+            console.log('JOB FINISHED');
             onJobEnd(status.timeRunning);
         // cancelled job
         } else if (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD) {
+            console.log('JOB CANCELLED');
             onJobStop(status.timeRunning);
         }
 
@@ -316,9 +312,20 @@ export function* initialize() {
             reduxStore.dispatch({
                 type: fileActions.UPDATE_FILE_RENDER_STATE,
                 payload: {
-                    state: RENDER_LOADING
+                    state: RENDER_NO_FILE
                 }
             });
+            setTimeout(() => {
+                const renderState = _get(reduxStore.getState(), 'file.renderState');
+                if (renderState === RENDER_NO_FILE) {
+                    reduxStore.dispatch({
+                        type: fileActions.UPDATE_FILE_RENDER_STATE,
+                        payload: {
+                            state: RENDER_LOADING
+                        }
+                    });
+                }
+            }, 1000);
 
             const needsVisualization = shouldVisualize();
             const shouldRenderSVG = shouldVisualizeSVG();
@@ -362,9 +369,20 @@ export function* initialize() {
         reduxStore.dispatch({
             type: fileActions.UPDATE_FILE_RENDER_STATE,
             payload: {
-                state: RENDER_LOADING
+                state: RENDER_NO_FILE
             }
         });
+        setTimeout(() => {
+            const renderState = _get(reduxStore.getState(), 'file.renderState');
+            if (renderState === RENDER_NO_FILE) {
+                reduxStore.dispatch({
+                    type: fileActions.UPDATE_FILE_RENDER_STATE,
+                    payload: {
+                        state: RENDER_LOADING
+                    }
+                });
+            }
+        }, 1000);
         /*        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
                 const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
                 const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);

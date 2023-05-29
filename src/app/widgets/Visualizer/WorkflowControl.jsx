@@ -338,7 +338,7 @@ class WorkflowControl extends PureComponent {
         this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false, needsRecovery: false } }));
         const newSafeHeight = units === IMPERIAL_UNITS ? safeHeight * 25.4 : safeHeight;
         controller.command('gcode:start', value, zMax, newSafeHeight);
-
+        reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: { isChecked: true, toggleStatus: 'overrides' } });
         Toaster.pop({
             msg: 'Running Start From Specific Line Command',
             type: TOASTER_SUCCESS,
