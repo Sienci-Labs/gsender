@@ -30,6 +30,8 @@ import * as controllerActions from 'app/actions/controllerActions';
 import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
 import automaticToolChange from 'app/wizards/automaticToolchange';
+import semiautoToolchangeSecondRun from 'app/wizards/semiautoToolchangeSecondRun';
+import automaticToolchangeSecondRun from 'app/wizards/automaticToolchangeSecondRun';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import * as preferenceActions from 'app/actions/preferencesActions';
@@ -265,31 +267,43 @@ export function* initialize() {
             context,
             comment
         };
-        const { option } = context;
-        if (option === 'Manual') {
-            pubsub.publish('wizard:load', {
-                ...payload,
-                title: 'Manual Toolchange',
-                instructions: manualToolChange
-            });
-        } else if (option === 'Semi-Automatic') {
-            pubsub.publish('wizard:load', {
-                ...payload,
-                title: 'Semi-Automatic Toolchange',
-                instructions: semiautoToolChange
-            });
-        } else if (option === 'Automatic') {
-            pubsub.publish('wizard:load', {
-                ...payload,
-                title: 'Automatic Toolchange',
-                instructions: automaticToolChange
-            });
-        } else if (option === 'Pause') {
+
+        const { option, count } = context;
+        if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
             Toaster.pop({
                 msg: msg,
                 type: TOASTER_INFO,
                 duration: TOASTER_UNTIL_CLOSE
+            });
+        } else {
+            let title, instructions;
+
+            if (option === 'Standard Re-zero') {
+                title = 'Standard Re-zero Tool Change';
+                instructions = manualToolChange;
+            } else if (option === 'Flexible Re-zero') {
+                title = 'Flexible Re-zero Tool Change';
+                instructions = (count > 1) ? semiautoToolchangeSecondRun : semiautoToolChange;
+            } else if (option === 'Fixed Tool Sensor') {
+                title = 'Fixed Tool Sensor Tool Change';
+                instructions = (count > 1) ? automaticToolchangeSecondRun : automaticToolChange;
+            } else {
+                console.error('Invalid toolchange option passed');
+                return;
+            }
+
+            // Run start block on idle if exists
+            if (instructions.onStart) {
+                console.log('On start');
+                const onStart = instructions.onStart();
+                controller.command('wizard:start', onStart);
+            }
+
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title,
+                instructions
             });
         }
     });

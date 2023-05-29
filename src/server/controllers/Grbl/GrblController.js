@@ -30,6 +30,7 @@ import map from 'lodash/map';
 import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
+import ToolChanger from '../../lib/ToolChanger';
 import Sender, { SP_TYPE_CHAR_COUNTING } from '../../lib/Sender';
 import Workflow, {
     WORKFLOW_STATE_IDLE,
@@ -79,10 +80,11 @@ import {
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
+
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
-const POSTHOOK_COMPLETE = '%post_complete';
+const POSTHOOK_COMPLETE = '%toolchange_complete';
 const PAUSE_START = '%pause_start';
 
 const log = logger('controller:Grbl');
@@ -177,6 +179,9 @@ class GrblController {
     // Sender
     sender = null;
 
+    // Toolchange
+    toolChanger = null;
+
     // Shared context
     sharedContext = {};
 
@@ -266,10 +271,10 @@ class GrblController {
                         return 'G4 P0.5';
                     }
                     if (line === POSTHOOK_COMPLETE) {
-                        log.debug('Finished Post-hook, resuming program');
+                        log.debug('Finished toolchange, resuming program');
                         setTimeout(() => {
                             this.workflow.resume();
-                        }, 1500);
+                        }, 500);
                         return 'G4 P0.5';
                     }
                     if (line === PAUSE_START) {
@@ -398,10 +403,6 @@ class GrblController {
 
                 { // Program Mode: M0, M1
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
-                    let tool = line.match(toolCommand);
-                    if (tool) {
-                        commentString = '(' + tool[0] + ') ' + commentString;
-                    }
                     if (programMode === 'M0') {
                         log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         // Workaround for Carbide files - prevent M0 early from pausing program
@@ -437,8 +438,11 @@ class GrblController {
                             commentString = `(${tool[0]}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
+                        const count = this.sender.incrementToolChanges();
+
                         this.emit('gcode:toolChange', {
                             line: sent + 1,
+                            count,
                             block: line,
                             option: toolChangeOption
                         }, commentString);
@@ -775,6 +779,13 @@ class GrblController {
 
         this.runner.on('others', (res) => {
             this.emit('serialport:read', res.raw);
+        });
+
+        this.toolChanger = new ToolChanger({
+            isIdle: () => {
+                return this.runner.isIdle();
+            },
+            intervalTimer: 200
         });
 
         const queryStatusReport = () => {
@@ -1863,6 +1874,14 @@ class GrblController {
                 log.debug('starting post hook');
                 this.command('feeder:start');
                 this.runPostChangeHook();
+            },
+            'wizard:start': () => {
+                log.debug('Wizard kickoff code');
+                const [gcode] = args;
+
+                this.toolChanger.addInterval(() => {
+                    this.command('gcode', gcode);
+                });
             },
             'wizard:step': () => {
                 const [stepIndex, substepIndex] = args;

@@ -593,7 +593,7 @@ class WorkflowControl extends PureComponent {
                                 <div className={styles.runProbeBody}>
                                     <div className={styles.left}>
                                         <div className={styles.greyText}>
-                                            <p>Close this gcode File?</p>
+                                            <p>Close this g-code File?</p>
                                         </div>
                                         <div className={styles.buttonsContainer}>
                                             <FunctionButton

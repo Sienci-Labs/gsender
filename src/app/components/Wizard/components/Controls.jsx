@@ -22,12 +22,22 @@
  */
 
 import React from 'react';
+import { get } from 'lodash';
+import reduxStore from 'app/store/redux';
+import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
 import { useWizardAPI } from 'app/components/Wizard/context';
 import StepButton from 'app/components/Wizard/components/StepButton';
 import styles from '../index.styl';
 
 const Controls = () => {
     const { completeSubStep, decrementStep, scrollToActiveStep, hasIncompleteActions, updateSubstepOverlay } = useWizardAPI();
+
+    const isNotIdle = () => {
+        const state = reduxStore.getState();
+        const activeState = get(state, 'controller.state.status.activeState', '');
+        return activeState !== GRBL_ACTIVE_STATE_IDLE;
+    };
+
     return (
         <div className={styles.controls}>
             <StepButton
@@ -47,7 +57,7 @@ const Controls = () => {
                     updateSubstepOverlay(activeValues);
                     scrollToActiveStep(activeValues);
                 }}
-                disabled={hasIncompleteActions()}
+                disabled={hasIncompleteActions() || isNotIdle()}
             >
                 Complete
                 <i className="fas fa-arrow-right" />

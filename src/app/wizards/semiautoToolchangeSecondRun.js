@@ -37,7 +37,8 @@ const getProbeSettings = () => {
 
 const getToolString = () => {
     const state = reduxStore.getState();
-    const tool = get(state, 'controller.state.parserstate.modal.tool', '');
+    const tool = get(state, 'controller.state.parserstate.modal.tool');
+
     return `T${tool}`;
 };
 
@@ -87,36 +88,6 @@ const wizard = {
                     description: () => <div>Jog your machine to the probe location using the jog controls and ensure that your router/spindle is turned off and has fully stopped spinning.</div>,
                     overlay: false,
                 },
-            ]
-        },
-        {
-            title: 'Setup Probe',
-            substeps: [
-                {
-                    title: 'Check Offset',
-                    description: 'Position the current cutting tool about 10mm above the probe location, attach the magnet, and prepare to probe.',
-                    overlay: false,
-                    actions: [
-                        {
-                            label: 'Probe Initial Tool',
-                            cb: () => {
-                                controller.command('gcode', [
-                                    'G91 G21',
-                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z[global.toolchange.RETRACT]',
-                                    '%wait',
-                                    'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                    'G4 P0.3',
-                                    '%global.toolchange.TOOL_OFFSET=posz',
-                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
-                                    'G91 G21 G0 Z10',
-                                    'G90'
-                                ]);
-                            }
-                        },
-                    ]
-                },
-
             ]
         },
         {

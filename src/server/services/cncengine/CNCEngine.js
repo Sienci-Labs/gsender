@@ -387,7 +387,7 @@ class CNCEngine {
                 // Leave the room
                 socket.leave(port);
 
-                if (numClients === 1) { // if only this one was connected
+                if (numClients <= 1) { // if only this one was connected
                     controller.close(err => {
                         // Remove controller from store
                         store.unset(`controllers[${JSON.stringify(port)}]`);
