@@ -41,7 +41,7 @@ const getToolString = () => {
     if (tool === '0') {
         return 'No T command parsed';
     }
-    return `Last T command was T${tool}`;
+    return `T${tool}`;
 };
 
 const getUnitModal = () => {
@@ -56,7 +56,7 @@ const getUnitModal = () => {
 const wizard = {
     intro: {
         icon: 'fas fa-caution',
-        description: () => <div>Tool Change detected, stay clear of the machine! Wait until initial movements are complete!</div>
+        description: 'Tool Change detected, stay clear of the machine! Wait until initial movements are complete!'
     },
     onStart: () => {
         const probeProfile = store.get('workspace.probeProfile');
@@ -101,10 +101,9 @@ const wizard = {
                     overlay: false,
                     actions: [
                         {
-                            label: 'Probe Initial Tool Length',
+                            label: 'Probe Initial Tool',
                             cb: () => {
                                 controller.command('gcode', [
-                                    '(This is 10 above configured location)',
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z[global.toolchange.RETRACT]',
@@ -124,20 +123,15 @@ const wizard = {
             ]
         },
         {
-            title: 'Change and Probe New Tool',
+            title: 'Probe New Tool',
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => `Change tool to requested bit - ${getToolString()}.`,
-                    overlay: false
-                },
-                {
-                    title: 'Probe',
-                    description: 'Probe new tool length - the following code will move back about 10mm above touchplate and re-probe.',
+                    description: `Change over to the next tool (#${getToolString()}), attach the magnet, and position it to prepare to probe`,
                     overlay: false,
                     actions: [
                         {
-                            label: 'Probe New Tool Length',
+                            label: 'Probe Changed Tool',
                             cb: () => {
                                 const modal = getUnitModal();
                                 controller.command('gcode', [

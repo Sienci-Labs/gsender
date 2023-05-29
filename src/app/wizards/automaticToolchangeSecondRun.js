@@ -42,7 +42,7 @@ const getToolString = () => {
     if (tool === '0') {
         return 'No T command parsed';
     }
-    return `Last T command was T${tool}`;
+    return `T${tool}`;
 };
 
 const getUnitModal = () => {
@@ -57,123 +57,53 @@ const getUnitModal = () => {
 const wizard = {
     intro: {
         icon: 'fas fa-caution',
-        description: () => <div>Tool Change detected, stay clear of the machine! Wait until initial movements are complete!</div>
+        description: 'Tool Change detected, stay clear of the machine! Wait until initial movements are complete!'
+    },
+    onStart: () => {
+        const settings = getProbeSettings();
+        const probeProfile = store.get('workspace.probeProfile');
+        const position = store.get('workspace.toolChangePosition');
+        const { zThickness } = probeProfile;
+        // Get $13 value for adjustment of Z Safe Height
+        const state = reduxStore.getState();
+        const $13 = get(state, 'controller.settings.settings.$13', '0');
+        const zSafe = ($13 === '1') ? '-0.5' : '-10';
+
+        controller.command('gcode', [
+            '%wait',
+            `%global.toolchange.PROBE_THICKNESS_MM=${zThickness.mm}`,
+            '%global.toolchange.PROBE_DISTANCE=80',
+            `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
+            `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
+            `%global.toolchange.RETRACT=${settings.retract}`,
+            '%global.toolchange.XPOS=posx',
+            '%global.toolchange.YPOS=posy',
+            '%global.toolchange.ZPOS=posz',
+            `%global.toolchange.PROBE_POS_X=${position.x}`,
+            `%global.toolchange.PROBE_POS_Y=${position.y}`,
+            `%global.toolchange.PROBE_POS_Z=${position.z}`,
+            `%global.toolchange.Z_SAFE_HEIGHT=${zSafe}`,
+            '%global.toolchange.UNITS=modal.units',
+            '%global.toolchange.SPINDLE=modal.spindle',
+            '%global.toolchange.DISTANCE=modal.distance',
+            '%global.toolchange.FEEDRATE=modal.feedrate',
+            'M5',
+            '%wait',
+            'G91 G21',
+            '(Toolchange initiated)',
+        ]);
     },
     steps: [
-        {
-            title: 'Initial Setup',
-            substeps: [
-                {
-                    title: 'Safety First',
-                    description: () => <div>If using a router, manually turn it off.  Click the below button to save current position and modals, and turn off spindle if active.</div>,
-                    overlay: false,
-                    actions: [
-                        {
-                            label: 'Save Positions and Modals',
-                            cb: () => {
-                                const settings = getProbeSettings();
-                                const probeProfile = store.get('workspace.probeProfile');
-                                const position = store.get('workspace.toolChangePosition');
-                                const { zThickness } = probeProfile;
-                                // Get $13 value for adjustment of Z Safe Height
-                                const state = reduxStore.getState();
-                                const $13 = get(state, 'controller.settings.settings.$13', '0');
-                                const zSafe = ($13 === '1') ? '-0.5' : '-10';
-
-                                controller.command('gcode', [
-                                    '%wait',
-                                    `%global.toolchange.PROBE_THICKNESS_MM=${zThickness.mm}`,
-                                    '%global.toolchange.PROBE_DISTANCE=80',
-                                    `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
-                                    `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
-                                    `%global.toolchange.RETRACT=${settings.retract}`,
-                                    '%global.toolchange.XPOS=posx',
-                                    '%global.toolchange.YPOS=posy',
-                                    '%global.toolchange.ZPOS=posz',
-                                    `%global.toolchange.PROBE_POS_X=${position.x}`,
-                                    `%global.toolchange.PROBE_POS_Y=${position.y}`,
-                                    `%global.toolchange.PROBE_POS_Z=${position.z}`,
-                                    `%global.toolchange.Z_SAFE_HEIGHT=${zSafe}`,
-                                    '%global.toolchange.UNITS=modal.units',
-                                    '%global.toolchange.SPINDLE=modal.spindle',
-                                    '%global.toolchange.DISTANCE=modal.distance',
-                                    '%global.toolchange.FEEDRATE=modal.feedrate',
-                                    'M5',
-                                    '%wait',
-                                    'G91 G21',
-                                    'G53 G0 Z-5',
-                                    '(Toolchange variables:)',
-                                    '([JSON.stringify(global.toolchange)])',
-                                ]);
-                            }
-                        }
-                    ]
-                },
-                {
-                    title: 'Touchplate Setup',
-                    description: 'Verify your probe is setup correctly and all continuity collets are attached.',
-                    overlay: false
-                },
-            ]
-        },
-        {
-            title: 'Setup Probe',
-            substeps: [
-                {
-                    title: 'Probe Initial Tool Length or confirm',
-                    description: 'If you haven\'t probed your initial tool length, do so now by pressing \'Probe Tool Length\'.  Otherwise, press continue to skip this step.',
-                    overlay: false,
-                    actions: [
-                        {
-                            label: 'Probe Initial Tool Length',
-                            cb: () => {
-                                controller.command('gcode', [
-                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
-                                    'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
-                                    '(This is 10 above configured location)',
-                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z + 10]',
-                                    'G91 G21',
-                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z-[global.toolchange.RETRACT]',
-                                    'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                    'G4 P0.3',
-                                    '%global.toolchange.TOOL_OFFSET=posz',
-                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
-                                    'G91',
-                                    'G0 Z-[global.toolchange.RETRACT]',
-                                    'G90 G21',
-                                    'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]'
-                                ]);
-                            }
-                        },
-                        {
-                            label: 'Tool Length Already Set',
-                            cb: () => {
-                                controller.command('gcode', [
-                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
-                                    '(If the above is not valid, re-run Probe Initial Tool Length action)'
-                                ]);
-                            }
-                        }
-                    ]
-                },
-                {
-                    title: 'Change Tool',
-                    description: () => `Change the tool to the requested bit - ${getToolString()}`,
-                    overlay: false
-                },
-            ]
-        },
         {
             title: 'Probe New Tool',
             substeps: [
                 {
-                    title: 'Probe',
-                    description: 'The following code will move to the configured location, then probe then new tool length.',
+                    title: 'Change Tool',
+                    description: () => ` Ensure that your router/spindle is turned off and has fully stopped spinning, then change over to the next tool (${getToolString()}) and prepare to probe.`,
                     overlay: false,
                     actions: [
                         {
-                            label: 'Probe New Tool Length',
+                            label: 'Probe Changed Tool',
                             cb: () => {
                                 const modal = getUnitModal();
                                 controller.command('gcode', [
@@ -196,19 +126,25 @@ const wizard = {
                             }
                         }
                     ]
-                }
+                },
             ]
         },
         {
-            title: 'Resume Path',
+            title: 'Resume Job',
             substeps: [
                 {
-                    title: 'Resume Program',
-                    description: 'The following code will move router back to initial position, restore modals, turn on the spindle to resume cutting.',
+                    title: 'Resume Job',
+                    description: 'If everything looks good, prepare for your machine to move back to the cutting area and continue as expected. Turn on your router if you have one.',
                     overlay: false,
                     actions: [
                         {
-                            label: 'Prepare for Resume',
+                            label: 'Start Spindle',
+                            cb: () => {
+                                controller.command('gcode', ['M3']);
+                            }
+                        },
+                        {
+                            label: 'Resume Cutting',
                             cb: () => {
                                 const unit = getUnitModal();
                                 controller.command('gcode', [

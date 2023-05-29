@@ -56,7 +56,7 @@ const getUnitModal = () => {
 const wizard = {
     intro: {
         icon: 'fas fa-caution',
-        description: () => <div>Tool Change detected, stay clear of the machine! Wait until initial movements are complete!</div>
+        description: 'Tool Change detected, stay clear of the machine! Wait until initial movements are complete!'
     },
     onStart: () => {
         const probeProfile = store.get('workspace.probeProfile');
@@ -93,51 +93,15 @@ const wizard = {
             ]
         },
         {
-            title: 'Setup Probe',
-            substeps: [
-                {
-                    title: 'Check Offset',
-                    description: 'Position the current cutting tool about 10mm above the probe location, attach the magnet, and prepare to probe.',
-                    overlay: false,
-                    actions: [
-                        {
-                            label: 'Probe Initial Tool Length',
-                            cb: () => {
-                                controller.command('gcode', [
-                                    '(This is 10 above configured location)',
-                                    'G91 G21',
-                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z[global.toolchange.RETRACT]',
-                                    '%wait',
-                                    'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                    'G4 P0.3',
-                                    '%global.toolchange.TOOL_OFFSET=posz',
-                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
-                                    'G91 G21 G0 Z10',
-                                    'G90'
-                                ]);
-                            }
-                        },
-                    ]
-                },
-
-            ]
-        },
-        {
-            title: 'Change and Probe New Tool',
+            title: 'Probe New Tool',
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => `Change tool to requested bit - ${getToolString()}.`,
-                    overlay: false
-                },
-                {
-                    title: 'Probe',
-                    description: 'Probe new tool length - the following code will move back about 10mm above touchplate and re-probe.',
+                    description: `Change over to the next tool (#${getToolString()}), attach the magnet, and position it to prepare to probe`,
                     overlay: false,
                     actions: [
                         {
-                            label: 'Probe New Tool Length',
+                            label: 'Probe Changed Tool',
                             cb: () => {
                                 const modal = getUnitModal();
                                 controller.command('gcode', [

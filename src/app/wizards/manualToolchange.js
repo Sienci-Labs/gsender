@@ -57,7 +57,7 @@ const getUnitModal = () => {
 const wizard = {
     intro: {
         icon: 'fas fa-caution',
-        description: () => <div>Tool Change detected, stay clear of the machine! Wait until initial movements are complete!</div>
+        description: 'Tool Change detected, stay clear of the machine! Wait until initial movements are complete!'
     },
     onStart: () => {
         const probeProfile = store.get('workspace.probeProfile');
@@ -106,7 +106,7 @@ const wizard = {
                     overlay: false,
                     actions: [
                         {
-                            label: 'Probe Z',
+                            label: 'Probe Z (touch plate)',
                             cb: () => {
                                 controller.command('gcode', [
                                     '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
@@ -121,7 +121,7 @@ const wizard = {
                             }
                         },
                         {
-                            label: 'Set Z0 at Location',
+                            label: 'Set Z0 (paper method)',
                             cb: () => {
                                 controller.command('gcode', [
                                     '(Setting Z 0)',
@@ -143,7 +143,7 @@ const wizard = {
                     overlay: false,
                     actions: [
                         {
-                            label: 'Prepare for Resume',
+                            label: 'Resume Job',
                             cb: () => {
                                 const prefUnit = getUnitModal();
                                 controller.command('gcode', [
