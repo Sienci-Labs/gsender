@@ -22,6 +22,7 @@
  */
 import controller from 'app/lib/controller';
 import store from 'app/store';
+import React from 'react';
 import reduxStore from 'app/store/redux';
 import { get } from 'lodash';
 
@@ -38,9 +39,7 @@ const getProbeSettings = () => {
 const getToolString = () => {
     const state = reduxStore.getState();
     const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
-    if (tool === '0') {
-        return 'No T command parsed';
-    }
+
     return `T${tool}`;
 };
 
@@ -132,7 +131,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => `Change over to the next tool (${getToolString()}), and once secured prepare to check the length of the new cutting tool.`,
+                    description: () => <div>Change over to the next tool (${getToolString()}), and once secured prepare to check the length of the new cutting tool.</div>,
                     overlay: false,
                     actions: [
                         {

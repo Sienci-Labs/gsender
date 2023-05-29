@@ -97,7 +97,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: `Change over to the next tool (#${getToolString()}), attach the magnet, and position it to prepare to probe`,
+                    description: () => <div>Change over to the next tool (#${getToolString()}), attach the magnet, and position it to prepare to probe</div>,
                     overlay: false,
                     actions: [
                         {

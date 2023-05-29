@@ -403,10 +403,6 @@ class GrblController {
 
                 { // Program Mode: M0, M1
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
-                    let tool = line.match(toolCommand);
-                    if (tool) {
-                        commentString = '(' + tool[0] + ') ' + commentString;
-                    }
                     if (programMode === 'M0') {
                         log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         // Workaround for Carbide files - prevent M0 early from pausing program

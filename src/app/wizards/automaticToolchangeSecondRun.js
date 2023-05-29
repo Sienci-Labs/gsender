@@ -21,6 +21,7 @@
  *
  */
 import controller from 'app/lib/controller';
+import React from 'react';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import { get } from 'lodash';
@@ -38,9 +39,6 @@ const getProbeSettings = () => {
 const getToolString = () => {
     const state = reduxStore.getState();
     const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
-    if (tool === '0') {
-        return 'No T command parsed';
-    }
     return `T${tool}`;
 };
 
@@ -98,7 +96,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => ` Ensure that your router/spindle is turned off and has fully stopped spinning, then change over to the next tool (${getToolString()}) and prepare to probe.`,
+                    description: () => <div>Ensure that your router/spindle is turned off and has fully stopped spinning, then change over to the next tool (${getToolString()}) and prepare to probe.</div>,
                     overlay: false,
                     actions: [
                         {
