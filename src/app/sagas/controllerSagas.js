@@ -269,6 +269,7 @@ export function* initialize() {
             context,
             comment
         };
+        console.log(context);
 
         const { option } = context;
         if (option === 'Pause') {

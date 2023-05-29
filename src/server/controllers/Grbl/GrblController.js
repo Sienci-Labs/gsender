@@ -442,9 +442,11 @@ class GrblController {
                             commentString = `(${tool[0]}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
+                        const count = this.sender.incrementToolChanges();
 
                         this.emit('gcode:toolChange', {
                             line: sent + 1,
+                            count,
                             block: line,
                             option: toolChangeOption
                         }, commentString);
