@@ -30,6 +30,8 @@ import * as controllerActions from 'app/actions/controllerActions';
 import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
 import automaticToolChange from 'app/wizards/automaticToolchange';
+import semiautoToolchangeSecondRun from 'app/wizards/semiautoToolchangeSecondRun';
+import automaticToolchangeSecondRun from 'app/wizards/automaticToolchangeSecondRun';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import * as preferenceActions from 'app/actions/preferencesActions';
@@ -265,9 +267,8 @@ export function* initialize() {
             context,
             comment
         };
-        console.log(context);
 
-        const { option } = context;
+        const { option, count } = context;
         if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
             Toaster.pop({
@@ -283,10 +284,10 @@ export function* initialize() {
                 instructions = manualToolChange;
             } else if (option === 'Flexible Re-zero') {
                 title = 'Flexible Re-zero Tool Change';
-                instructions = semiautoToolChange;
+                instructions = (count > 1) ? semiautoToolchangeSecondRun : semiautoToolChange;
             } else if (option === 'Fixed Tool Sensor') {
                 title = 'Fixed Tool Sensor Tool Change';
-                instructions = automaticToolChange;
+                instructions = (count > 1) ? automaticToolchangeSecondRun : automaticToolChange;
             } else {
                 console.error('Invalid toolchange option passed');
                 return;
