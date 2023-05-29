@@ -185,7 +185,7 @@ class GrblRunner extends events.EventEmitter {
                 ...this.state,
                 parserstate: {
                     modal: modal,
-                    tool: tool,
+                    tool: modal.tool,
                     feedrate: feedrate,
                     spindle: spindle
                 }
