@@ -37,11 +37,9 @@ const getProbeSettings = () => {
 
 const getToolString = () => {
     const state = reduxStore.getState();
-    const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
-    if (tool === '0') {
-        return 'No T command parsed';
-    }
-    return `Last T command was T${tool}`;
+    const tool = get(state, 'controller.state.parserstate.modal.tool');
+
+    return `T${tool}`;
 };
 
 const getUnitModal = () => {
@@ -97,7 +95,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => <div>Change over to the next tool (#${getToolString()}), attach the magnet, and position it to prepare to probe</div>,
+                    description: () => <div>Change over to the next tool ({getToolString()}), attach the magnet, and position it to prepare to probe</div>,
                     overlay: false,
                     actions: [
                         {

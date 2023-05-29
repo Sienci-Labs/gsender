@@ -94,7 +94,7 @@ const ToolChange = () => {
                 <p className={styles.description}>{optionDescription}</p>
             </div>
             {
-                toolChangeOption === 'Automatic' && (
+                toolChangeOption === 'Fixed Tool Sensor' && (
                     <div>
                         <Input
                             label="Tool Length Sensor X position"

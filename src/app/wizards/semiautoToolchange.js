@@ -37,7 +37,7 @@ const getProbeSettings = () => {
 
 const getToolString = () => {
     const state = reduxStore.getState();
-    const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
+    const tool = get(state, 'controller.state.parserstate.modal.tool', '');
     return `T${tool}`;
 };
 
@@ -124,7 +124,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => <div>Change over to the next tool (#${getToolString()}), attach the magnet, and position it to prepare to probe</div>,
+                    description: () => <div>Change over to the next tool ({getToolString()}), attach the magnet, and position it to prepare to probe</div>,
                     overlay: false,
                     actions: [
                         {

@@ -23,16 +23,23 @@
 
 import React, { useEffect } from 'react';
 import pubsub from 'pubsub-js';
-import { uniqueId } from 'lodash';
+import reduxStore from 'app/store/redux';
+import { GRBL_ACTIVE_STATE_IDLE } from 'app/constants';
+import { get, uniqueId } from 'lodash';
 import controller from 'app/lib/controller';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { useWizardAPI, useWizardContext } from 'app/components/Wizard/context';
 import styles from '../index.styl';
 
-
 const Actions = ({ actions = [], stepIndex, substepIndex }) => {
     const { markActionAsComplete, completeSubStep, scrollToActiveStep, setIsLoading, updateSubstepOverlay } = useWizardAPI();
     const { isLoading } = useWizardContext();
+
+    const isNotIdle = () => {
+        const state = reduxStore.getState();
+        const activeState = get(state, 'controller.state.status.activeState', '');
+        return activeState !== GRBL_ACTIVE_STATE_IDLE;
+    };
 
     useEffect(() => {
         const tokens = [
@@ -81,7 +88,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
                                                 <span className={styles.loadingSpan}>Running</span>
                                         ) : (
                                             <>
-                                                <ToolModalButton onClick={cbWithCompletion} icon="fas fa-code" id="button-action">
+                                                <ToolModalButton disabled={isNotIdle()} onClick={cbWithCompletion} icon="fas fa-code" id="button-action">
                                                     {action.label}
                                                 </ToolModalButton>
                                                 {
