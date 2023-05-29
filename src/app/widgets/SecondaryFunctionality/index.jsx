@@ -20,7 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import TabbedWidget from 'app/components/TabbedWidget';
 import store from 'app/store';
@@ -43,12 +43,14 @@ import SpindleWidget from '../Spindle';
 const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
     const config = new WidgetConfig(widgetId);
     const [state, setState] = useState(getInitialState());
+    const [selectedTab, setSelectedTab] = useState(0);
+    const [currentDropdownTab, setCurrentDropdownTab] = useState('');
 
     const updateDropdownTab = (newTab) => {
-        setState((prev) => ({ ...prev, currentDropdownTab: newTab }));
+        setCurrentDropdownTab(newTab);
     };
 
-    const { isFullscreen, tabs, selectedTab, currentDropdownTab } = state;
+    const { isFullscreen, tabs } = state;
     const actions = {
         toggleDisabled: () => {
             const { disabled } = state;
@@ -85,21 +87,9 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
             }));
         },
         handleTabSelect: (index) => {
-            const { tabs } = state;
-            const selectedTab = tabs[index].widgetId;
-            const widgetId = tabs[index].widgetId;
-
-            setState((prev) => ({
-                ...prev,
-                selectedTab: index,
-            }));
-            if (widgetId !== 'more') {
-                setState((prev) => ({ ...prev, currentDropdownTab: selectedTab, }));
-            } else if (!['Rotary', 'Coolant'].includes(state.currentDropdownTab)) {
-                setState((prev) => ({ ...prev, currentDropdownTab: 'Coolant', }));
-            }
+            setSelectedTab(index);
         },
-        handleResize: () => {
+        handleResize: useCallback(() => {
             const { tabs, hiddenTabs } = state;
             const screenWidth = window.innerWidth;
             const updatedTabs = [...tabs];
@@ -134,6 +124,9 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
             // Screen width between 1248px and 1280px
             // Bring up 'more' tabs and display ONLY Coolant widget under it
             if (screenWidth >= 1248 && screenWidth <= 1281) {
+                if (moreTabs.length === 1) {
+                    return;
+                }
                 // if Coolant is in the main view, delete it
                 if (coolantWidgetIndex !== -1) {
                     updatedTabs.splice(coolantWidgetIndex, 1);
@@ -144,12 +137,12 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
                     moreTabs.push(coolantWidgetObj);
                 }
                 if (hiddenRotaryIndex !== -1) {
-                    moreTabs.splice(hiddenCoolantIndex, 1);
+                    moreTabs.splice(hiddenRotaryIndex, 1);
                 }
 
                 // if Rotary is not in the main list, add it
                 if (rotaryWidgetIndex === -1) {
-                    updatedTabs.splice(moreWidgetIndex, 0, rotaryWidgetObj);
+                    updatedTabs.splice(2, 0, rotaryWidgetObj);
                 }
 
                 // Check if more widget is not in the list, push it
@@ -167,7 +160,7 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
                 }
                 // Check if Rotary widget is not in the main list, push it
                 if (rotaryWidgetIndex === -1) {
-                    updatedTabs.push(rotaryWidgetObj);
+                    updatedTabs.splice(2, 0, rotaryWidgetObj);
                 }
                 // if more options is in the list, delete it
                 if (moreWidgetIndex !== -1) {
@@ -180,6 +173,9 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
             // Screen width less than 1248px
             // Move both Rotary and Coolant under 'more' tab from main tab list
             if (screenWidth < 1248) {
+                if (moreTabs.length === 2) {
+                    return;
+                }
                 // Move Coolant under hidden list
                 if (hiddenCoolantIndex === -1) {
                     moreTabs.push(coolantWidgetObj);
@@ -202,9 +198,20 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
                     updatedTabs.push(moreWidgetObj);
                 }
             }
+            const highlight = tabs[selectedTab];
+            let highlightIndex = updatedTabs.findIndex(tab => tab.widgetId === highlight.widgetId);
+
+            if (highlightIndex === -1) {
+                highlightIndex = updatedTabs.length - 1;
+            }
+
+            setSelectedTab(highlightIndex);
+            updateDropdownTab(highlight.label);
+
             setState((prev) => ({ ...prev, hiddenTabs: moreTabs, tabs: updatedTabs })); // Update the both the lists
-        },
-        // handleHighlightTab: (tab) => {
+        }, [selectedTab]),
+
+        // moveHighlightTab: (tab) => {
         //     setState((prev) => {
         //         const updatedTabs = [...prev.tabs];
         //         const updatedHiddenTabs = [...prev.hiddenTabs];
@@ -243,18 +250,16 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
             isFullscreen: false,
             disabled: config.get('disabled'),
             port: controller.port,
-            selectedTab: 0,
             tabs: [
                 {
                     label: 'Probe',
                     widgetId: 'probe',
                     component: ProbeWidget,
                 },
-                {
-                    label: 'Spindle/Laser',
-                    widgetId: 'spindle',
-                    component: SpindleWidget,
-                },
+                store.get('workspace.machineProfile').spindle
+                    ? { label: 'Spindle/Laser',
+                        widgetId: 'spindle',
+                        component: SpindleWidget } : null,
                 {
                     label: 'Rotary',
                     widgetId: 'rotary',
@@ -270,9 +275,8 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
                     widgetId: 'console',
                     component: ConsoleWidget,
                 },
-            ],
+            ].filter(Boolean),
             hiddenTabs: [],
-            currentDropdownTab: ''
         };
     }
 
@@ -286,13 +290,15 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
         if (machineProfile.spindle) {
             const hasSpindleWidget = state.tabs.find((tab) => tab.widgetId === 'spindle');
             if (!hasSpindleWidget) {
-                setState((prev) => ({ ...prev, tabs: [...prev.tabs, { label: 'Spindle/Laser', widgetId: 'spindle', component: SpindleWidget }] }));
+                const tempList = [...state.tabs];
+                tempList.splice(1, 0, { label: 'Spindle/Laser', widgetId: 'spindle', component: SpindleWidget });
+                setState((prev) => ({ ...prev, tabs: tempList }));
             }
         } else {
             const filteredTabs = state.tabs.filter((tab) => tab.widgetId !== 'spindle');
+            setSelectedTab(selectedTab === 1 ? 0 : selectedTab);
             setState((prev) => ({
                 ...prev,
-                selectedTab: prev.selectedTab === 3 ? 0 : prev.selectedTab,
                 tabs: filteredTabs
             }));
         }
@@ -300,15 +306,15 @@ const SecondaryFunctionality = ({ widgetId, onFork, onRemove, sortable }) => {
 
     useEffect(() => {
         store.on('change', handleMachineProfileChange);
-        handleMachineProfileChange();
         window.addEventListener('resize', actions.handleResize);
+        handleMachineProfileChange();
         actions.handleResize();
-
         return () => {
-            store.removeListener('change', handleMachineProfileChange);
             window.removeEventListener('resize', actions.handleResize);
+            store.removeListener('change', handleMachineProfileChange);
         };
-    }, []);
+    }, [actions.handleResize]);
+
     const { hiddenTabs } = state;
     return (
         <TabsProvider value={{ currentDropdownTab, updateDropdownTab, hiddenTabs }}>

@@ -32,16 +32,19 @@ import Spindle from '../Spindle';
  * This component checks the current selected widget and renders it
  * @props takes the current selected tab/menu
  */
-const MoreTabs = ({ onFork, onRemove, sortable, widgetId, active }) => {
+const MoreTabs = ({ onFork, onRemove, sortable, widgetId }) => {
     const { currentDropdownTab = 'Coolant' } = useContext(TabsContext);
-
+    let active = currentDropdownTab;
+    if (!['Coolant', 'Rotary'].includes(active)) {
+        active = 'Coolant';
+    }
     const Render = {
         'Coolant': Coolant,
         'Rotary': Rotary,
         'Console': Console,
         'Macros': Macros,
         'Spindle/Laser': Spindle,
-    }[currentDropdownTab] || Coolant;
+    }[active] || Coolant;
 
     return (
         <Render
