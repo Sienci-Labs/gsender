@@ -268,6 +268,8 @@ export function* initialize() {
             comment
         };
 
+        console.log(context);
+
         const { option, count } = context;
         if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
