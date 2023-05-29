@@ -96,7 +96,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => <div>Ensure that your router/spindle is turned off and has fully stopped spinning, then change over to the next tool (${getToolString()}) and prepare to probe.</div>,
+                    description: () => <div>Ensure that your router/spindle is turned off and has fully stopped spinning, then change over to the next tool ({getToolString()}) and prepare to probe.</div>,
                     overlay: false,
                     actions: [
                         {

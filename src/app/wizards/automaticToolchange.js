@@ -131,7 +131,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => <div>Change over to the next tool (${getToolString()}), and once secured prepare to check the length of the new cutting tool.</div>,
+                    description: () => <div>Change over to the next tool ({getToolString()}), and once secured prepare to check the length of the new cutting tool.</div>,
                     overlay: false,
                     actions: [
                         {
