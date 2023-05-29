@@ -22,7 +22,7 @@ import styles from './index.styl';
 const CategoryFilter = ({ onChange, filterCategory }) => {
     const getColour = (data) => {
         const categories = {
-            [ALL_CATEGORY]: chroma('white'),
+            [ALL_CATEGORY]: chroma('#edf2f4'),
             [CARVING_CATEGORY]: chroma('green').brighten(2),
             [OVERRIDES_CATEGORY]: chroma('blue').brighten(), //chroma.mix('blue', 'white'),
             [VISUALIZER_CATEGORY]: chroma('pink'),
@@ -31,7 +31,7 @@ const CategoryFilter = ({ onChange, filterCategory }) => {
             [PROBING_CATEGORY]: chroma('purple').brighten(), //chroma.mix('purple', 'white'),
             [SPINDLE_LASER_CATEGORY]: chroma('black'),
             [GENERAL_CATEGORY]: chroma('grey').brighten(),
-            [TOOLBAR_CATEGORY]: chroma('white'),
+            [TOOLBAR_CATEGORY]: chroma('#778da9'),
             [MACRO_CATEGORY]: chroma('dodgerblue'),
             [COOLANT_CATEGORY]: chroma('red').darken(2)
         };
@@ -64,6 +64,7 @@ const CategoryFilter = ({ onChange, filterCategory }) => {
                     ...styles[':hover'],
                     backgroundColor: dataColour.css(),
                     color: textValue,
+                    cursor: 'pointer',
                 },
             };
         },

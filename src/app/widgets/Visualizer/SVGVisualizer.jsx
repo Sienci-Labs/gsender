@@ -42,7 +42,6 @@ import { BACKGROUND_PART, G0_PART, G1_PART } from './constants';
 class SVGVisualizer extends Component {
     static propTypes = {
         show: PropTypes.bool,
-        cameraPosition: PropTypes.oneOf(['top', '3d', 'front', 'left', 'right']),
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
