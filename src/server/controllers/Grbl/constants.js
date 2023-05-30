@@ -343,8 +343,8 @@ export const GRBL_SETTINGS = [
         units: 'μs',
         description: 'Sets time length per step. Minimum 3usec.',
         inputType: NUMBER,
-        min: 3,
-        max: 12,
+        min: 0,
+        max: 20,
         step: 1
     },
     {
@@ -476,7 +476,7 @@ export const GRBL_SETTINGS = [
         description: 'Feed rate to slowly engage limit switch to determine its location accurately.',
         inputType: NUMBER,
         min: 1,
-        max: 30,
+        max: 50,
         step: 1
     },
     {
@@ -487,7 +487,7 @@ export const GRBL_SETTINGS = [
         description: 'Seek rate to quickly find the limit switch before the slower locating phase.',
         inputType: NUMBER,
         min: 100,
-        max: 1000,
+        max: 5000,
         step: 100
     },
     {
@@ -509,7 +509,7 @@ export const GRBL_SETTINGS = [
         description: 'Retract distance after triggering switch to disengage it. Homing will fail if switch isn\'t cleared.',
         inputType: NUMBER,
         min: 0,
-        max: 5,
+        max: 10,
         step: 0.5
     },
     {
@@ -520,7 +520,7 @@ export const GRBL_SETTINGS = [
         description: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
         inputType: NUMBER,
         min: 100,
-        max: 10000,
+        max: 50000,
         step: 100
     },
     {
@@ -531,7 +531,7 @@ export const GRBL_SETTINGS = [
         description: 'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
         inputType: NUMBER,
         min: 1,
-        max: 100,
+        max: 15000,
         step: 1
     },
     {
@@ -550,7 +550,7 @@ export const GRBL_SETTINGS = [
         description: 'X-axis travel resolution in steps per millimeter.',
         inputType: NUMBER,
         min: 10,
-        max: 500,
+        max: 1000,
         step: 10
     },
     {
@@ -561,7 +561,7 @@ export const GRBL_SETTINGS = [
         description: 'Y-axis travel resolution in steps per millimeter.',
         inputType: NUMBER,
         min: 10,
-        max: 500,
+        max: 1000,
         step: 10
     },
     {
@@ -572,7 +572,7 @@ export const GRBL_SETTINGS = [
         description: 'Z-axis travel resolution in steps per millimeter.',
         inputType: NUMBER,
         min: 10,
-        max: 500,
+        max: 1000,
         step: 10
     },
     {
@@ -583,7 +583,7 @@ export const GRBL_SETTINGS = [
         description: 'X-axis maximum rate. Used as G0 rapid rate.',
         inputType: NUMBER,
         min: 100,
-        max: 1500,
+        max: 15000,
         step: 100
     },
     {
@@ -594,7 +594,7 @@ export const GRBL_SETTINGS = [
         description: 'Y-axis maximum rate. Used as G0 rapid rate.',
         inputType: NUMBER,
         min: 100,
-        max: 1500,
+        max: 15000,
         step: 100
     },
     {
@@ -605,7 +605,7 @@ export const GRBL_SETTINGS = [
         description: 'Z-axis maximum rate. Used as G0 rapid rate.',
         inputType: NUMBER,
         min: 10,
-        max: 1000,
+        max: 15000,
         step: 10
     },
     {
@@ -616,8 +616,8 @@ export const GRBL_SETTINGS = [
         description: 'X-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
         inputType: NUMBER,
         min: 1,
-        max: 15,
-        step: 1
+        max: 10000,
+        step: 10
     },
     {
         setting: '$121',
@@ -627,8 +627,8 @@ export const GRBL_SETTINGS = [
         description: 'Y-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
         inputType: NUMBER,
         min: 1,
-        max: 15,
-        step: 1
+        max: 10000,
+        step: 10
     },
     {
         setting: '$122',
@@ -638,8 +638,8 @@ export const GRBL_SETTINGS = [
         description: 'Z-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
         inputType: NUMBER,
         min: 1,
-        max: 15,
-        step: 1
+        max: 10000,
+        step: 10
     },
     {
         setting: '$130',
