@@ -156,12 +156,6 @@ const wizard = {
                     overlay: false,
                     actions: [
                         {
-                            label: 'Start Spindle',
-                            cb: () => {
-                                controller.command('gcode', ['M3']);
-                            }
-                        },
-                        {
                             label: 'Resume Cutting',
                             cb: () => {
                                 const unit = getUnitModal();
