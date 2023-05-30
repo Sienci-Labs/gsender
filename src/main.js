@@ -238,7 +238,7 @@ const main = () => {
                         {
                             properties: ['openFile'],
                             filters: [
-                                { name: 'GCode Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
+                                { name: 'G-Code Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
                                 { name: 'All Files', extensions: ['*'] }
                             ]
                         },);

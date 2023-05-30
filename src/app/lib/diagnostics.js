@@ -635,7 +635,7 @@ function generateSupportFile() {
                     </Text>
                 </View>
                 <Text style={styles.subtitle}>
-                    GCode File
+                    G-Code File
                 </Text>
                 {
                     fileInfo.fileLoaded && grblInfo.sender.status ? (

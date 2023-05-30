@@ -189,82 +189,82 @@ export const GRBL_ERRORS = [
     },
     {
         code: 23,
-        message: 'Invalid gcode ID:23',
+        message: 'Invalid g-code ID:23',
         description: 'G-code command in block requires an integer value.'
     },
     {
         code: 24,
-        message: 'Invalid gcode ID:24',
+        message: 'Invalid g-code ID:24',
         description: 'More than one g-code command that requires axis words found in block.'
     },
     {
         code: 25,
-        message: 'Invalid gcode ID:25',
+        message: 'Invalid g-code ID:25',
         description: 'Repeated g-code word found in block.'
     },
     {
         code: 26,
-        message: 'Invalid gcode ID:26',
+        message: 'Invalid g-code ID:26',
         description: 'No axis words found in block for g-code command or current modal state which requires them.'
     },
     {
         code: 27,
-        message: 'Invalid gcode ID:27',
+        message: 'Invalid g-code ID:27',
         description: 'Line number value is invalid.'
     },
     {
         code: 28,
-        message: 'Invalid gcode ID:28',
+        message: 'Invalid g-code ID:28',
         description: 'G-code command is missing a required value word.'
     },
     {
         code: 29,
-        message: 'Invalid gcode ID:29',
+        message: 'Invalid g-code ID:29',
         description: 'G59.x work coordinate systems are not supported.'
     },
     {
         code: 30,
-        message: 'Invalid gcode ID:30',
+        message: 'Invalid g-code ID:30',
         description: 'G53 only allowed with G0 and G1 motion modes.'
     },
     {
         code: 31,
-        message: 'Invalid gcode ID:31',
+        message: 'Invalid g-code ID:31',
         description: 'Axis words found in block when no command or current modal state uses them.'
     },
     {
         code: 32,
-        message: 'Invalid gcode ID:32',
+        message: 'Invalid g-code ID:32',
         description: 'G2 and G3 arcs require at least one in-plane axis word.'
     },
     {
         code: 33,
-        message: 'Invalid gcode ID:33',
+        message: 'Invalid g-code ID:33',
         description: 'Motion command target is invalid.'
     },
     {
         code: 34,
-        message: 'Invalid gcode ID:34',
+        message: 'Invalid g-code ID:34',
         description: 'Arc radius value is invalid.'
     },
     {
         code: 35,
-        message: 'Invalid gcode ID:35',
+        message: 'Invalid g-code ID:35',
         description: 'G2 and G3 arcs require at least one in-plane offset word.'
     },
     {
         code: 36,
-        message: 'Invalid gcode ID:36',
+        message: 'Invalid g-code ID:36',
         description: 'Unused value words found in block.'
     },
     {
         code: 37,
-        message: 'Invalid gcode ID:37',
+        message: 'Invalid g-code ID:37',
         description: 'G43.1 dynamic tool length offset is not assigned to configured tool length axis.'
     },
     {
         code: 38,
-        message: 'Invalid gcode ID:38',
+        message: 'Invalid g-code ID:38',
         description: 'Tool number greater than max supported value.'
     }
 ];

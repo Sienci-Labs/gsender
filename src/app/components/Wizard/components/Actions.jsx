@@ -68,7 +68,7 @@ const Actions = ({ actions = [], stepIndex, substepIndex }) => {
     return (
         <>
             {
-                actions.length > 0 && <h2 className={styles.subHeading}>Run GCode:</h2>
+                actions.length > 0 && <h2 className={styles.subHeading}>Run G-Code:</h2>
             }
             <div className={styles.actionRow}>
 
