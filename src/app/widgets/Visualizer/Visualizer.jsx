@@ -1617,29 +1617,11 @@ class Visualizer extends Component {
 
         // only set the camera if it's the first render
         if (shouldZoom) {
-            switch (this.props.cameraPosition) {
-            case 'Top':
+            // if secondary, force top view
+            if (this.props.isSecondary) {
                 this.toTopView();
-                break;
-
-            case '3D':
-                this.to3DView();
-                break;
-
-            case 'Front':
-                this.toFrontView();
-                break;
-
-            case 'Left':
-                this.toLeftSideView();
-                break;
-
-            case 'Right':
-                this.toRightSideView();
-                break;
-
-            default:
-                this.toFrontView();
+            } else { // if primary, force 3d view
+                this.props.actions.camera.to3DView();
             }
             this.didZoom = true;
         }
