@@ -273,6 +273,7 @@ export const WizardProvider = ({ children }) => {
             setSteps([]);
             setStepCount(0);
             setMinimized(false);
+            setIsLoading(false);
 
             Toaster.clear();
         }
