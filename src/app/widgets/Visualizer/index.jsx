@@ -1468,7 +1468,10 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('gcode:surfacing', async (_, { gcode, name, size }) => {
                 const file = new File([gcode], name);
                 await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
-            })
+            }),
+            pubsub.subscribe('gcode:rotarySetup', async (_, { setupFile }) => {
+                await api.file.upload(setupFile, controller.port, VISUALIZER_PRIMARY);
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }

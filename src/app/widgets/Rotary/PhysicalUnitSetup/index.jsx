@@ -4,9 +4,24 @@ import Modal from 'app/components/ToolModal/ToolModal';
 import { RadioGroup, RadioButton } from 'app/components/Radio';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import GCodeParser from 'gcode-parser';
 import styled from '@emotion/styled';
+import quarterInchSixHoles from './SetupFiles/quarter_inch_six_holes_for_30_track.nc';
+import eightInchSixHoles from './SetupFiles/eighth_inch_six_holes_for_30_track.nc';
+import quarterInchTexHoles from './SetupFiles/quarter_inch_ten_holes_for_30_track_with_extension.nc';
+import eightInchTenHoles from './SetupFiles/eighth_inch_ten_holes_for_30_track_with_extension.nc';
+import doesNotLineupQuarter from './SetupFiles/quarter_inch_two_holes_for_custom_mounting_solution.nc';
+import doesNotLineUpEighth from './SetupFiles/eighth_inch_two_holes_for_custom_mounting_solution.nc';
 import styles from './index.styl';
-import { DOESNT_LINE_UP, EIGHTH, LINES_UP, QUARTER, SIX, TWELVE, TWO } from './constant';
+import {
+    DOESNT_LINE_UP,
+    EIGHTH,
+    LINES_UP,
+    QUARTER,
+    SIX,
+    TEN,
+    TWO,
+} from '../constant';
 
 const ContentWrapper = styled.div`
     padding: 0 2rem;
@@ -36,23 +51,34 @@ const Description = styled.div`
     font-size: 1rem;
 `;
 
-const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhysicalSetupState }) => {
-    const { showDialogue, linesUp, drillDiameter, holeCount } = physicalSetupState;
+const PhysicalUnitSetup = ({
+    actions: rotaryActions,
+    physicalSetupState,
+    setPhysicalSetupState,
+}) => {
+    const { showDialogue, linesUp, drillDiameter, holeCount } =
+        physicalSetupState;
 
     const actions = {
-        handleSubmit: () => {
-            if (linesUp === DOESNT_LINE_UP) {
-                // rotaryActions.startContinuousJog(params)
-                actions.handleModalClose();
-                Toaster.pop({
-                    msg: `Drilling 2 ${drillDiameter}” mounting holes`,
-                    type: TOASTER_INFO,
-                });
-                return;
+        readGCodeFile: async (file) => {
+            try {
+                const response = await fetch(file);
+                const gcode = await response.text();
+                return gcode;
+            } catch (error) {
+                throw error;
             }
+        },
+        parseGCodeFile: async (file) => {
+            const gcode = await actions.readGCodeFile(file);
+            const parser = new GCodeParser();
+            const gcodeData = parser.parse(gcode);
+            return gcodeData;
+        },
+        handleSubmit: () => {
             // ¼” diameter endmill milling 6 holes for 30” track
             if (drillDiameter === QUARTER && holeCount === SIX) {
-                // rotaryActions.startContinuousJog(params)
+                rotaryActions.loadGcode(actions.parseGCodeFile(quarterInchSixHoles));
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
@@ -62,7 +88,7 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
             }
             // ⅛” diameter endmill milling 6 holes for 30” track
             if (drillDiameter === EIGHTH && holeCount === SIX) {
-                // rotaryActions.startContinuousJog(params)
+                rotaryActions.loadGcode(actions.parseGCodeFile(eightInchSixHoles));
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
@@ -70,9 +96,9 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                 });
                 return;
             }
-            // ¼” diameter endmill milling 12 holes for 30” track with extension
-            if (drillDiameter === QUARTER && holeCount === TWELVE) {
-                // rotaryActions.startContinuousJog(params)
+            // ¼” diameter endmill milling 10 holes for 30” track with extension
+            if (drillDiameter === QUARTER && holeCount === TEN) {
+                rotaryActions.loadGcode(actions.parseGCodeFile(quarterInchTexHoles));
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
@@ -80,9 +106,9 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                 });
                 return;
             }
-            // ⅛” diameter endmill milling 12 holes for 30” track with extension
-            if (drillDiameter === EIGHTH && holeCount === TWELVE) {
-                // rotaryActions.startContinuousJog(params)
+            // ⅛” diameter endmill milling 10 holes for 30” track with extension
+            if (drillDiameter === EIGHTH && holeCount === TEN) {
+                rotaryActions.loadGcode(actions.parseGCodeFile(eightInchTenHoles));
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
@@ -91,8 +117,12 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                 return;
             }
             // ¼” diameter endmill milling 2 holes for custom mounting solution
-            if (drillDiameter === QUARTER && holeCount === TWO) {
-                // rotaryActions.startContinuousJog(params)
+            if (
+                linesUp === DOESNT_LINE_UP &&
+                drillDiameter === QUARTER &&
+                holeCount === TWO
+            ) {
+                rotaryActions.loadGcode(actions.parseGCodeFile(doesNotLineupQuarter));
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
@@ -101,8 +131,12 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                 return;
             }
             // ⅛” diameter endmill milling 2 holes for custom mounting solution
-            if (drillDiameter === EIGHTH && holeCount === TWO) {
-                // rotaryActions.startContinuousJog(params)
+            if (
+                linesUp === DOESNT_LINE_UP &&
+                drillDiameter === EIGHTH &&
+                holeCount === TWO
+            ) {
+                rotaryActions.loadGcode(actions.parseGCodeFile(doesNotLineUpEighth));
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
@@ -118,7 +152,10 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
             setPhysicalSetupState((prev) => ({ ...prev, linesUp: value }));
         },
         handleDiameterSelection: (value, event) => {
-            setPhysicalSetupState((prev) => ({ ...prev, drillDiameter: value }));
+            setPhysicalSetupState((prev) => ({
+                ...prev,
+                drillDiameter: value,
+            }));
         },
         handleDrillCountSelection: (value, event) => {
             setPhysicalSetupState((prev) => ({ ...prev, holeCount: value }));
@@ -127,12 +164,16 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
 
     return (
         <Modal
-            title="Physical Rotary-unit Setup" show={showDialogue} onClose={actions.handleModalClose}
+            title="Physical Rotary-unit Setup"
+            show={showDialogue}
+            onClose={actions.handleModalClose}
             size="sm"
         >
             <ContentWrapper>
                 <Option>
-                    <MenuTitle>Does the mounting track lineup without any interference?</MenuTitle>
+                    <MenuTitle>
+                        Does the mounting track lineup without any interference?
+                    </MenuTitle>
                     <RadioGroup
                         value={linesUp}
                         depth={2}
@@ -140,8 +181,16 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                         size="small"
                     >
                         <RadioWrapper style={{ marginTop: '0.6rem' }}>
-                            <RadioButton className={styles.radio} label="Lines up" value={LINES_UP} />
-                            <RadioButton className={styles.radio} label="Does not lineup" value={DOESNT_LINE_UP} />
+                            <RadioButton
+                                className={styles.radio}
+                                label="Lines up"
+                                value={LINES_UP}
+                            />
+                            <RadioButton
+                                className={styles.radio}
+                                label="Does not lineup"
+                                value={DOESNT_LINE_UP}
+                            />
                         </RadioWrapper>
                     </RadioGroup>
                 </Option>
@@ -154,8 +203,16 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                         size="small"
                     >
                         <RadioWrapper>
-                            <RadioButton className={styles.radio} label="1/4”" value={QUARTER} />
-                            <RadioButton className={styles.radio} label="1/8”" value={EIGHTH} />
+                            <RadioButton
+                                className={styles.radio}
+                                label="1/4”"
+                                value={QUARTER}
+                            />
+                            <RadioButton
+                                className={styles.radio}
+                                label="1/8”"
+                                value={EIGHTH}
+                            />
                         </RadioWrapper>
                     </RadioGroup>
                 </Option>
@@ -169,22 +226,28 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                             size="small"
                         >
                             <RadioWrapper>
-                                <RadioButton className={styles.radio} label="6" value={SIX} />
-                                <RadioButton className={styles.radio} label="12" value={TWELVE} />
+                                <RadioButton
+                                    className={styles.radio}
+                                    label="6"
+                                    value={SIX}
+                                />
+                                <RadioButton
+                                    className={styles.radio}
+                                    label="10"
+                                    value={TEN}
+                                />
                             </RadioWrapper>
                         </RadioGroup>
                     </Option>
                 )}
-                {
-                    linesUp === DOESNT_LINE_UP && (
-                        <Description>
-                            In the case where the mounting track does not lineup,
-                            you may please select the correct options above to
-                            manually drill a pair of mounting holes at safe locations
-                            on the wasteboard.
-                        </Description>
-                    )
-                }
+                {linesUp === DOESNT_LINE_UP && (
+                    <Description>
+                        In the case where the mounting track does not lineup,
+                        you may please select the correct options above to
+                        manually drill a pair of mounting holes at safe
+                        locations on the wasteboard.
+                    </Description>
+                )}
                 <Submit>
                     <ToolModalButton
                         icon="fas fa-play"
@@ -196,7 +259,6 @@ const PhysicalUnitSetup = ({ actions: rotaryActions, physicalSetupState, setPhys
                 </Submit>
             </ContentWrapper>
         </Modal>
-
     );
 };
 
