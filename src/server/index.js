@@ -296,7 +296,7 @@ const createServer = (options, callback) => {
             log.error(err.name);
             let errData = {};
             // Handle invalid IP by disabling remote mode until enabled again and signaling error
-            if (err.message.includes('address not available')) {
+            if (err.message.includes('address not available') || err.message.includes('address already in use')) {
                 config.set('remoteSettings.headlessStatus', false);
                 config.set('remoteSettings.error', true);
                 errData.bindingErr = true;
