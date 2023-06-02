@@ -6,16 +6,11 @@ import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import GCodeParser from 'gcode-parser';
 import styled from '@emotion/styled';
-import quarterInchSixHoles from './SetupFiles/quarter_inch_six_holes_for_30_track.nc';
-import eightInchSixHoles from './SetupFiles/eighth_inch_six_holes_for_30_track.nc';
-import quarterInchTexHoles from './SetupFiles/quarter_inch_ten_holes_for_30_track_with_extension.nc';
-import eightInchTenHoles from './SetupFiles/eighth_inch_ten_holes_for_30_track_with_extension.nc';
-import doesNotLineupQuarter from './SetupFiles/quarter_inch_two_holes_for_custom_mounting_solution.nc';
-import doesNotLineUpEighth from './SetupFiles/eighth_inch_two_holes_for_custom_mounting_solution.nc';
 import styles from './index.styl';
 import {
     DOESNT_LINE_UP,
     EIGHTH,
+    HOLE_TYPES,
     LINES_UP,
     QUARTER,
     SIX,
@@ -76,56 +71,15 @@ const PhysicalUnitSetup = ({
             return gcodeData;
         },
         handleSubmit: () => {
-            // ¼” diameter endmill milling 6 holes for 30” track
-            if (drillDiameter === QUARTER && holeCount === SIX) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(quarterInchSixHoles));
-                actions.handleModalClose();
-                Toaster.pop({
-                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
-                    type: TOASTER_INFO,
-                });
-                return;
-            }
-            // ⅛” diameter endmill milling 6 holes for 30” track
-            if (drillDiameter === EIGHTH && holeCount === SIX) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(eightInchSixHoles));
-                actions.handleModalClose();
-                Toaster.pop({
-                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
-                    type: TOASTER_INFO,
-                });
-                return;
-            }
-            // ¼” diameter endmill milling 10 holes for 30” track with extension
-            if (drillDiameter === QUARTER && holeCount === TEN) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(quarterInchTexHoles));
-                actions.handleModalClose();
-                Toaster.pop({
-                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
-                    type: TOASTER_INFO,
-                });
-                return;
-            }
-            // ⅛” diameter endmill milling 10 holes for 30” track with extension
-            if (drillDiameter === EIGHTH && holeCount === TEN) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(eightInchTenHoles));
-                actions.handleModalClose();
-                Toaster.pop({
-                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
-                    type: TOASTER_INFO,
-                });
-                return;
-            }
             // ¼” diameter endmill milling 2 holes for custom mounting solution
             if (
                 linesUp === DOESNT_LINE_UP &&
-                drillDiameter === QUARTER &&
-                holeCount === TWO
+                drillDiameter === QUARTER
             ) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(doesNotLineupQuarter));
+                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.DOESNT_LINE_UP_QUARTER));
                 actions.handleModalClose();
                 Toaster.pop({
-                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
+                    msg: `File added for 2 ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
                 return;
@@ -133,13 +87,52 @@ const PhysicalUnitSetup = ({
             // ⅛” diameter endmill milling 2 holes for custom mounting solution
             if (
                 linesUp === DOESNT_LINE_UP &&
-                drillDiameter === EIGHTH &&
-                holeCount === TWO
+                drillDiameter === EIGHTH
             ) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(doesNotLineUpEighth));
+                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.DOESNT_LINE_UP_EIGHTH));
                 actions.handleModalClose();
                 Toaster.pop({
-                    msg: `Drilling ${holeCount} ${drillDiameter}” mounting holes`,
+                    msg: `File added for 2 ${drillDiameter}” mounting holes`,
+                    type: TOASTER_INFO,
+                });
+                return;
+            }
+            // ¼” diameter endmill milling 6 holes for 30” track
+            if (drillDiameter === QUARTER && holeCount === SIX) {
+                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.QUARTER_INCH_SIX_HOLES));
+                actions.handleModalClose();
+                Toaster.pop({
+                    msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
+                    type: TOASTER_INFO,
+                });
+                return;
+            }
+            // ⅛” diameter endmill milling 6 holes for 30” track
+            if (drillDiameter === EIGHTH && holeCount === SIX) {
+                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.EIGHTH_INCH_SIX_HOLES));
+                actions.handleModalClose();
+                Toaster.pop({
+                    msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
+                    type: TOASTER_INFO,
+                });
+                return;
+            }
+            // ¼” diameter endmill milling 10 holes for 30” track with extension
+            if (drillDiameter === QUARTER && holeCount === TEN) {
+                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.QUARTER_INCH_TEN_HOLES));
+                actions.handleModalClose();
+                Toaster.pop({
+                    msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
+                    type: TOASTER_INFO,
+                });
+                return;
+            }
+            // ⅛” diameter endmill milling 10 holes for 30” track with extension
+            if (drillDiameter === EIGHTH && holeCount === TEN) {
+                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.EIGHTH_INCH_TEN_HOLES));
+                actions.handleModalClose();
+                Toaster.pop({
+                    msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
                     type: TOASTER_INFO,
                 });
                 return;

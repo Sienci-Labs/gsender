@@ -132,10 +132,11 @@ const Rotary = ({ active }) => {
         },
         uploadSetup: async (rotarySetupGcode) => {
             if (!rotarySetupGcode) {
-                throw new NoSetupFileError('Unable to fetch Rotary Setup files from memory');
+                throw new NoSetupFileError('No setup files found');
             }
 
-            const serializedFile = new File([rotarySetupGcode], 'rotary.gcode');
+            const blob = new Blob([rotarySetupGcode], { type: 'text/plain' });
+            const serializedFile = new File([blob], 'rotary.nc');
 
             await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
 

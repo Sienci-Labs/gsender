@@ -1470,6 +1470,7 @@ class VisualizerWidget extends PureComponent {
                 await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
             }),
             pubsub.subscribe('gcode:rotarySetup', async (_, { setupFile }) => {
+                console.log('HERE');
                 await api.file.upload(setupFile, controller.port, VISUALIZER_PRIMARY);
             }),
         ];
