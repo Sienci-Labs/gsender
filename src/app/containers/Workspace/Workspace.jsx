@@ -39,6 +39,8 @@ import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import store from 'app/store';
+import { Toaster as Toast, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+
 import * as widgetManager from './WidgetManager';
 import DefaultWidgets from './DefaultWidgets';
 import PrimaryWidgets from './PrimaryWidgets';
@@ -84,7 +86,7 @@ class Workspace extends PureComponent {
         mounted: false,
         port: '',
         modal: {
-            name: MODAL_SERVER_DISCONNECTED,
+            name: MODAL_NONE,
             params: {}
         },
         isDraggingFile: false,
@@ -160,29 +162,38 @@ class Workspace extends PureComponent {
             });
         },
         'connect': () => {
-            console.log('connect', controller);
             this.setState({ disabled: false });
             if (controller.connected) {
                 this.action.closeModal();
+                Toast.pop({
+                    msg: 'Server Reconnected Succesfully',
+                    type: TOASTER_SUCCESS,
+                });
             } else {
                 this.setState({ serverDisconnectReason: 'connect' });
                 this.action.openModal(MODAL_SERVER_DISCONNECTED);
             }
         },
         'connect_error': () => {
-            console.log('connect_error', controller);
             if (controller.connected) {
                 this.action.closeModal();
+                Toast.pop({
+                    msg: 'Server Reconnected Succesfully',
+                    type: TOASTER_SUCCESS,
+                });
             } else {
                 this.setState({ serverDisconnectReason: 'connect_error' });
                 this.action.openModal(MODAL_SERVER_DISCONNECTED);
             }
         },
         'disconnect': () => {
-            console.log('disconnect', controller);
             this.setState({ disabled: true });
             if (controller.connected) {
                 this.action.closeModal();
+                Toast.pop({
+                    msg: 'Server Reconnected Succesfully',
+                    type: TOASTER_SUCCESS,
+                });
             } else {
                 this.setState({ serverDisconnectReason: 'disconnect' });
                 this.action.openModal(MODAL_SERVER_DISCONNECTED);
