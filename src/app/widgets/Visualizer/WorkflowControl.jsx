@@ -480,7 +480,6 @@ class WorkflowControl extends PureComponent {
                                     className={`${styles['workflow-button-upload']}`}
                                     title={i18n._('Load File')}
                                     onClick={this.handleClickUpload}
-                                    style={{ writingMode: 'vertical-lr' }}
                                 >
                                     {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
@@ -505,7 +504,7 @@ class WorkflowControl extends PureComponent {
                                     title={i18n._('Outline')}
                                     onClick={this.runOutline}
                                     disabled={!canRun}
-                                    style={{ writingMode: 'vertical-lr', marginRight: '1rem' }}
+                                    style={{ marginRight: '1rem' }}
                                 >
                                     {i18n._('Outline')} <i className="fas fa-vector-square" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
@@ -515,7 +514,6 @@ class WorkflowControl extends PureComponent {
                                     title={i18n._('Test Run')}
                                     onClick={this.handleTestFile}
                                     disabled={!canRun}
-                                    style={{ writingMode: 'vertical-lr' }}
                                 >
                                     {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
