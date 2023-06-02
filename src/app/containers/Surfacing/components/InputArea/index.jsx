@@ -73,7 +73,7 @@ const InputArea = () => {
                 divider="&"
                 firstComponent={(
                     <Input
-                        additionalProps={{ type: 'number', id: 'skimDepth', min: 0.001, max: 500, style: { borderRadius: 4, ...inputStyles } }}
+                        additionalProps={{ type: 'number', id: 'skimDepth', min: 0.00001, max: 10000, style: { borderRadius: 4, ...inputStyles } }}
                         value={skimDepth}
                         onChange={onChange}
                         tooltip={{ content: `Default Value: ${defaultValues.skimDepth}` }}
@@ -82,7 +82,7 @@ const InputArea = () => {
                 secondComponent={(
                     <Input
                         units={units}
-                        additionalProps={{ type: 'number', id: 'maxDepth', min: 0.001, max: 500, style: { ...inputStyles } }}
+                        additionalProps={{ type: 'number', id: 'maxDepth', min: 0.00001, max: 10000, style: { ...inputStyles } }}
                         value={maxDepth}
                         onChange={onChange}
                         tooltip={{ content: `Default Value: ${defaultValues.maxDepth}` }}
