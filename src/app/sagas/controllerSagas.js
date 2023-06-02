@@ -148,15 +148,12 @@ export function* initialize() {
     });
 
     controller.addListener('sender:status', (status) => {
-        console.log(status);
         // finished job
         if (status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) {
-            console.log('JOB FINISHED');
             onJobEnd(status.timeRunning);
             reduxStore.dispatch({ type: visualizerActions.UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         // cancelled job
         } else if (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD) {
-            console.log('JOB CANCELLED');
             onJobStop(status.timeRunning);
             reduxStore.dispatch({ type: visualizerActions.UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         }
