@@ -49,6 +49,7 @@ import {
     TOASTER_DANGER,
     TOASTER_WARNING,
     TOASTER_UNTIL_CLOSE,
+    TOASTER_LONG,
     TOASTER_INFO
 } from '../../lib/toaster/ToasterLib';
 import {
@@ -310,7 +311,7 @@ class WorkflowControl extends PureComponent {
 
         Toaster.pop({
             TYPE: TOASTER_INFO,
-            duration: TOASTER_UNTIL_CLOSE,
+            duration: TOASTER_LONG,
             msg: 'Generating outline for current file'
         });
         this.workerOutline.onmessage = ({ data }) => {
