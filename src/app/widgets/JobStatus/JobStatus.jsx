@@ -99,8 +99,7 @@ class JobStatus extends PureComponent {
                                 <>
                                     <div className={styles['file-name']}>
                                         <TooltipCustom content={`${name} (${this.fileSizeFormat(size)}, ${total} lines)`} style={{ wordWrap: 'break-word' }}>
-                                            <span className={styles['file-text']}>{name}</span>{' '}<span>({this.fileSizeFormat(size)}, {total} lines)</span>
-                                            <span style={{ marginLeft: '2rem' }} />
+                                            <span className={styles['file-text']}>{name}</span>{' '}<span style={{ marginRight: '2rem' }}>({this.fileSizeFormat(size)}, {total} lines)</span>
                                         </TooltipCustom>
                                         {connection.isConnected
                                             ? (
