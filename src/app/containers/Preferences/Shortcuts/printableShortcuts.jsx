@@ -35,6 +35,9 @@ const PrintableShortcuts = React.forwardRef((props, ref) => {
     useEffect(() => {
         const keysToPrint = [];
         for (const [k, shortcut] of Object.entries(shortcutsList)) {
+            if (!k) {
+                return;
+            }
             if (shortcut.isActive && shortcut.keys !== '') {
                 const title = allShuttleControlEvents[k] ? allShuttleControlEvents[k].title : shortcut.title;
                 keysToPrint.push({
