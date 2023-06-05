@@ -134,31 +134,26 @@ const Rotary = ({ active }) => {
             if (!rotarySetupGcode) {
                 throw new NoSetupFileError('No setup files found');
             }
-
-            const blob = new Blob([rotarySetupGcode], { type: 'text/plain' });
-            const serializedFile = new File([blob], 'rotary.nc');
-
+            const serializedFile = new File([rotarySetupGcode], 'rotary.nc');
             await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
-
-            setSetupFIle(serializedFile);
+            setSetupFIle(rotarySetupGcode);
         },
         /**
      * Function to load generated gcode to main visualizer
      */
         loadGcode: async (rotarySetupFile = null) => {
-            await actions.uploadSetup(rotarySetupFile)
-                .then(() => {
-                    pubsub.publish('gcode:rotarySetup', { setupFile });
-                    return true;
-                })
-                .catch((error) => {
-                    log.error(error);
-                    Toaster.pop({
-                        type: TOASTER_DANGER,
-                        msg: error.message
-                    });
-                    return false;
+            try {
+                await actions.uploadSetup(rotarySetupFile);
+                pubsub.publish('gcode:rotarySetup', { setupFile, name: 'setup' });
+                return true;
+            } catch (error) {
+                log.error(error);
+                Toaster.pop({
+                    type: TOASTER_DANGER,
+                    msg: error.message
                 });
+                return false;
+            }
         },
     };
 

@@ -64,19 +64,13 @@ const PhysicalUnitSetup = ({
                 throw error;
             }
         },
-        parseGCodeFile: async (file) => {
-            const gcode = await actions.readGCodeFile(file);
-            const parser = new GCodeParser();
-            const gcodeData = parser.parse(gcode);
-            return gcodeData;
-        },
         handleSubmit: () => {
             // ¼” diameter endmill milling 2 holes for custom mounting solution
             if (
                 linesUp === DOESNT_LINE_UP &&
                 drillDiameter === QUARTER
             ) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.DOESNT_LINE_UP_QUARTER));
+                rotaryActions.loadGcode(HOLE_TYPES.DOESNT_LINE_UP_QUARTER);
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `File added for 2 ${drillDiameter}” mounting holes`,
@@ -89,7 +83,7 @@ const PhysicalUnitSetup = ({
                 linesUp === DOESNT_LINE_UP &&
                 drillDiameter === EIGHTH
             ) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.DOESNT_LINE_UP_EIGHTH));
+                rotaryActions.loadGcode(HOLE_TYPES.DOESNT_LINE_UP_EIGHTH);
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `File added for 2 ${drillDiameter}” mounting holes`,
@@ -99,7 +93,7 @@ const PhysicalUnitSetup = ({
             }
             // ¼” diameter endmill milling 6 holes for 30” track
             if (drillDiameter === QUARTER && holeCount === SIX) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.QUARTER_INCH_SIX_HOLES));
+                rotaryActions.loadGcode(HOLE_TYPES.QUARTER_INCH_SIX_HOLES);
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
@@ -109,7 +103,7 @@ const PhysicalUnitSetup = ({
             }
             // ⅛” diameter endmill milling 6 holes for 30” track
             if (drillDiameter === EIGHTH && holeCount === SIX) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.EIGHTH_INCH_SIX_HOLES));
+                rotaryActions.loadGcode(HOLE_TYPES.EIGHTH_INCH_SIX_HOLES);
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
@@ -119,7 +113,7 @@ const PhysicalUnitSetup = ({
             }
             // ¼” diameter endmill milling 10 holes for 30” track with extension
             if (drillDiameter === QUARTER && holeCount === TEN) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.QUARTER_INCH_TEN_HOLES));
+                rotaryActions.loadGcode(HOLE_TYPES.QUARTER_INCH_TEN_HOLES);
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
@@ -129,7 +123,7 @@ const PhysicalUnitSetup = ({
             }
             // ⅛” diameter endmill milling 10 holes for 30” track with extension
             if (drillDiameter === EIGHTH && holeCount === TEN) {
-                rotaryActions.loadGcode(actions.parseGCodeFile(HOLE_TYPES.EIGHTH_INCH_TEN_HOLES));
+                rotaryActions.loadGcode(HOLE_TYPES.EIGHTH_INCH_TEN_HOLES);
                 actions.handleModalClose();
                 Toaster.pop({
                     msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
