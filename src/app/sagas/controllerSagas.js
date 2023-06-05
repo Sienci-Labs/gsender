@@ -490,10 +490,8 @@ export function* initialize() {
     });
 
     controller.addListener('sender:M0M1', (opts) => {
-        const { data, comment = '' } = opts;
-        const msg = `A pause command (${data}) was found. Click Resume to immediately continue the job.
-            If you want to perform more operations (toolchange, jog, etc),
-            close the window, then press the standard Resume Job button when you're ready.`;
+        const { comment = '' } = opts;
+        const msg = 'Hit \‘Close Window\‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard \‘Resume Job\’ button to keep cutting when you\’re ready.';
 
         const content = (comment.length > 0)
             ? <div><p>{msg}</p><p>Comment: <b>{comment}</b></p></div>
