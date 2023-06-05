@@ -268,8 +268,6 @@ export function* initialize() {
             comment
         };
 
-        console.log(context);
-
         const { option, count } = context;
         if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
@@ -297,7 +295,6 @@ export function* initialize() {
 
             // Run start block on idle if exists
             if (instructions.onStart) {
-                console.log('On start');
                 const onStart = instructions.onStart();
                 controller.command('wizard:start', onStart);
             }
@@ -546,10 +543,6 @@ export function* initialize() {
         pubsub.publish('wizard:next', { stepIndex, substepIndex });
     });
 
-    controller.addListener('gcode:loaded', ({ gcode, meta }) => {
-        console.log(gcode);
-        console.log(meta);
-    });
 
     yield null;
 }
