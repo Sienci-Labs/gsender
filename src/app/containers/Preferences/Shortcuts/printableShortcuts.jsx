@@ -35,7 +35,7 @@ const PrintableShortcuts = React.forwardRef((props, ref) => {
     useEffect(() => {
         const keysToPrint = [];
         for (const [k, shortcut] of Object.entries(shortcutsList)) {
-            if (!k) {
+            if (!k || !shortcut) {
                 return;
             }
             if (shortcut.isActive && shortcut.keys !== '') {
