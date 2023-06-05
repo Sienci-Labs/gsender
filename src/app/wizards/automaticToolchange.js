@@ -110,13 +110,13 @@ const wizard = {
                                     'G53 G0 Z[global.toolchange.PROBE_POS_Z + 10]',
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z-[global.toolchange.RETRACT]',
+                                    'G0 Z[global.toolchange.RETRACT]',
                                     'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
                                     'G4 P0.3',
                                     '%global.toolchange.TOOL_OFFSET=posz',
                                     '(TLO set: [global.toolchange.TOOL_OFFSET])',
                                     'G91',
-                                    'G0 Z-[global.toolchange.RETRACT]',
+                                    'G0 Z[global.toolchange.RETRACT]',
                                     'G90 G21',
                                     'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]'
                                 ]);
