@@ -130,31 +130,38 @@ const Rotary = ({ active }) => {
             const command = `G10 P${p} L20 ${axis.toUpperCase()}${value}`;
             controller.command('gcode:safe', command, modal);
         },
-        uploadSetup: async (rotarySetupGcode) => {
+        uploadSetup: (rotarySetupGcode, callback) => {
             if (!rotarySetupGcode) {
-                throw new NoSetupFileError('No setup files found');
+                callback(new NoSetupFileError('No setup files found'));
+                return;
             }
             const serializedFile = new File([rotarySetupGcode], 'rotary.nc');
-            await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
-            setSetupFIle(rotarySetupGcode);
+            api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY, (error) => {
+                if (error) {
+                    callback(error);
+                    return;
+                }
+                setSetupFIle(rotarySetupGcode);
+                callback(null);
+            });
         },
-        /**
-     * Function to load generated gcode to main visualizer
-     */
-        loadGcode: async (rotarySetupFile = null) => {
-            try {
-                await actions.uploadSetup(rotarySetupFile);
+
+        loadGcode: (rotarySetupFile = null, callback) => {
+            actions.uploadSetup(rotarySetupFile, (error) => {
+                if (error) {
+                    log.error(error);
+                    Toaster.pop({
+                        type: TOASTER_DANGER,
+                        msg: error.message
+                    });
+                    callback(false);
+                    return;
+                }
                 pubsub.publish('gcode:rotarySetup', { setupFile, name: 'setup' });
-                return true;
-            } catch (error) {
-                log.error(error);
-                Toaster.pop({
-                    type: TOASTER_DANGER,
-                    msg: error.message
-                });
-                return false;
-            }
-        },
+                callback(true);
+            });
+        }
+
     };
 
     const isFileRunning = () => {
