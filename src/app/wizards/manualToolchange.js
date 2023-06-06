@@ -148,7 +148,7 @@ const wizard = {
                                 const prefUnit = getUnitModal();
                                 controller.command('gcode', [
                                     '(Returning to initial position)',
-                                    'G91 G21 G0 Z15',
+                                    'G21',
                                     `G90 ${prefUnit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
                                     `G90 ${prefUnit} G0 Z[global.toolchange.ZPOS]`,
                                     '(Restore initial modals)',

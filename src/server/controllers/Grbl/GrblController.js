@@ -1006,6 +1006,7 @@ class GrblController {
                 coolant: ensureArray(modal.coolant).join('\n'),
             },
 
+
             // Tool
             tool: Number(tool) || 0,
 

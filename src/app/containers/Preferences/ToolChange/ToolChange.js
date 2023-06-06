@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import map from 'lodash/map';
+import get from 'lodash/get';
 import store from 'app/store';
+import { connect } from 'react-redux';
 import controller from 'app/lib/controller';
 import Input from '../components/Input';
-
-
 import Fieldset from '../components/Fieldset';
-
 import styles from '../index.styl';
+import FunctionButton from '../../../components/FunctionButton/FunctionButton';
 
 /*const options = [
     'Ignore',
@@ -41,11 +41,11 @@ export const TOOLCHANGE_OPTIONS = {
     AUTO: {
         key: 'AUTO',
         label: 'Fixed Tool Sensor',
-        description: 'M6 will commands will initiate an almost fully automated process in which preconfigured bitsetter or probe block will be used to set the new tool length.  Limit switches required.'
+        description: 'M6 will commands will initiate an almost fully automated process in which preconfigured bitsetter or probe block will be used to set the new tool length.  Limit switches required.  Your Z position should be '
     }
 };
 
-const ToolChange = () => {
+const ToolChange = ({ mpos }) => {
     // State
     const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
     const [toolChangePosition, setToolChangePosition] = useState(store.get('workspace.toolChangePosition'));
@@ -54,6 +54,16 @@ const ToolChange = () => {
     const handleToolChange = (selection) => {
         setOptionDescription(TOOLCHANGE_OPTIONS[selection.value].description);
         return setToolChangeOption(selection.label);
+    };
+
+    const setBitsetterPosition = () => {
+        const newPosition = {
+            x: mpos.x,
+            y: mpos.y,
+            z: mpos.z
+        };
+        setToolChangePosition(newPosition);
+        store.replace('workspace.toolChangePosition', newPosition);
     };
 
     const handlePositionChange = (event, axis) => {
@@ -117,8 +127,19 @@ const ToolChange = () => {
                     </div>
                 )
             }
+            {
+                toolChangeOption === 'Fixed Tool Sensor' && (
+                    <div style={{ width: '50%' }}>
+                        <FunctionButton primary onClick={setBitsetterPosition}>Set Bitsetter Position</FunctionButton>
+                        <p className={styles.description}>Set fixed tool sensor position at current machine position.  Your Z value should be negative.</p>
+                    </div>
+                )
+            }
         </Fieldset>
     );
 };
 
-export default ToolChange;
+export default connect((store) => {
+    const mpos = get(store, 'controller.state.status.mpos', { x: 0, y: 0, z: 0 });
+    return { mpos };
+})(ToolChange);
