@@ -135,9 +135,11 @@ const createServer = (options, callback) => {
 
     let { backlog, port = 0, host } = options;
 
-    //If headless setting is ON, change to correct port and IP
+    const isInDevelopmentMode = process.env.NODE_ENV === 'development';
+
+    // If headless setting is ON, change to correct port and IP
     const remoteSettings = config.get('remoteSettings', {});
-    if (remoteSettings.headlessStatus) {
+    if (remoteSettings.headlessStatus && !isInDevelopmentMode) {
         port = remoteSettings.port;
         host = remoteSettings.ip;
     }
