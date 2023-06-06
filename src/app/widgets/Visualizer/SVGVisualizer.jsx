@@ -122,6 +122,12 @@ class SVGVisualizer extends Component {
         this.pubsubTokens = [];
     }
 
+    rerenderGCode() {
+        const { content } = this.props;
+        // reupload the file to update the colours
+        this.uploadGCodeFile(content);
+    }
+
     reloadGCode() {
         const { actions, state } = this.props;
         const { gcode } = state;

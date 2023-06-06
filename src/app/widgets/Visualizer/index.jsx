@@ -333,7 +333,9 @@ class VisualizerWidget extends PureComponent {
             };
 
             this.setState(updater, callback);
-            this.visualizer.handleSceneRender(vizualization);
+            if (this.visualizer) {
+                this.visualizer.handleSceneRender(vizualization);
+            }
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
@@ -572,6 +574,9 @@ class VisualizerWidget extends PureComponent {
                 minimizeRenders: newLiteModeValue
             });
 
+            // instead of calling loadGCode right away,
+            // use this pubsub to invoke a refresh of the visualizer wrapper.
+            // this removes visual glitches that would otherwise appear.
             pubsub.publish('litemode:change', gcode);
         },
         lineWarning: {

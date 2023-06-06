@@ -43,8 +43,15 @@ class VisualizerWrapper extends Component {
 
     componentDidUpdate() {
         if (this.state.needRefresh) {
+            console.log('refresh');
+            console.log(this.visualizer);
             this.visualizer.reloadGCode();
             this.setNeedRefresh(false);
+        } else if (this.state.needReload) {
+            console.log('reload');
+            console.log(this.visualizer);
+            this.visualizer.rerenderGCode();
+            this.setNeedReload(false);
         }
     }
 
@@ -56,13 +63,21 @@ class VisualizerWrapper extends Component {
         });
     }
 
+    setNeedReload(state) {
+        this.setState(() => {
+            return {
+                needReload: state
+            };
+        });
+    }
+
     subscribe() {
         const tokens = [
             pubsub.subscribe('litemode:change', () => {
                 this.setNeedRefresh(true);
             }),
             pubsub.subscribe('visualizer:settings', () => {
-                this.setNeedRefresh(true);
+                this.setNeedReload(true);
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
