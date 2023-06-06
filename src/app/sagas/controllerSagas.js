@@ -341,15 +341,13 @@ export function* initialize() {
             }, 1000);
 
             const needsVisualization = shouldVisualize();
-            const shouldRenderSVG = shouldVisualizeSVG();
 
             if (needsVisualization) {
                 visualizeWorker = new VisualizeWorker();
                 visualizeWorker.onmessage = visualizeResponse;
                 visualizeWorker.postMessage({
                     content,
-                    visualizer,
-                    shouldRenderSVG
+                    visualizer
                 });
             } else {
                 reduxStore.dispatch({
@@ -372,6 +370,9 @@ export function* initialize() {
                 name,
             }
         });
+        // sending gcode data to the visualizer
+        // so it can save it and give it to the normal or svg visualizer
+        pubsub.publish('file:content', content, size, name);
         // Processing started for gcodeProcessor
         reduxStore.dispatch({
             type: fileActions.UPDATE_FILE_PROCESSING,

@@ -490,19 +490,20 @@ class Visualizer extends Component {
     }
 
     rerenderGCode() {
-        const { actions, state } = this.props;
-        const { gcode } = state;
+        const content = reduxStore.getState().file.content;
 
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
             this.group.remove(group);
         }
-        if (gcode.content) {
-            actions.loadGCode('', gcode.content);
-        } else {
-            // reupload the file to update the colours
-            this.uploadGCodeFile(reduxStore.getState().file.content);
-        }
+        // reupload the file to update the colours
+        this.uploadGCodeFile(content);
+    }
+
+    reloadGCode() {
+        const { actions, state } = this.props;
+        const { gcode } = state;
+        actions.loadGCode('', gcode.visualization);
     }
 
     removeSceneGroup() {
@@ -1481,8 +1482,11 @@ class Visualizer extends Component {
     // Update cutting tool position
     updateCuttingToolPosition() {
         if (!this.cuttingTool) {
+            console.log('no cutting tool');
             return;
         }
+
+        console.log('cutting tool');
 
         const pivotPoint = this.pivotPoint.get();
         const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
@@ -1576,6 +1580,7 @@ class Visualizer extends Component {
     }
 
     handleSceneRender(vizualization, callback) {
+        console.log('vis handle scene render');
         const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
 
         if (!this.visualizer) {
@@ -1637,6 +1642,7 @@ class Visualizer extends Component {
     }
 
     load(name, vizualization, callback) {
+        console.log('vis load');
         // Remove previous G-code object
         this.unload();
         const { currentTheme, disabled, disabledLite, liteMode } = this.props.state;
