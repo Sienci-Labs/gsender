@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import ToolIntroduction from 'app/containers/Calibration/AxisTuning/ToolIntroduction';
 import ImageDiagram from 'app/containers/Calibration/AxisTuning/ImageDiagram';
+
 import Step from './Step';
 import NavigationButtons from './NavigationButtons';
-//import TriangleDiagram from '../TriangleDiagram';
 import Result from './Result';
 
 import styles from './index.styl';
 import { axisSteps } from './data';
-
 
 const AxisTuning = ({ onClose }) => {
     const steps = [axisSteps.x];
@@ -114,53 +113,57 @@ const AxisTuning = ({ onClose }) => {
     const nextDisabled = stepFinished;
     const options = getOptions();
 
-    return isFullyComplete
-        ? <Result options={options} onBack={onBack} onClose={reset} />
-        : (
-            <div className={styles.alignmentContainer}>
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                    {
-                        !introComplete &&
-                        <ToolIntroduction readyHandler={startTool} onSelectAxis={(axis) => setCurrentAxis(axis)} currentAxis={currentAxis} />
-                    }
-                    {
-                        introComplete && (
-                            <Step
-                                actions={actions}
-                                onChange={onChange}
-                                currentAction={currentAction}
-                                options={options}
-                                setRequestedDistance={setRequestedDistance}
-                                setActualDistance={setActualDistance}
-                            />
-                        )
-                    }
+    if (isFullyComplete) {
+        return <Result options={options} onBack={onBack} onClose={reset} />;
+    }
 
-                    {
-                        introComplete && (
-                            <NavigationButtons
-                                onNext={next}
-                                onPrevious={prev}
-                                prevDisabled={prevDisabled}
-                                nextDisabled={nextDisabled}
-                            />
-                        )
-                    }
-                </div>
+    return (
+        <div className={styles.alignmentContainer}>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                {
+                    !introComplete &&
+                    <ToolIntroduction readyHandler={startTool} onSelectAxis={(axis) => setCurrentAxis(axis)} currentAxis={currentAxis} />
+                }
+                {
+                    introComplete && (
+                        <Step
+                            actions={actions}
+                            onChange={onChange}
+                            currentAction={currentAction}
+                            options={options}
+                            setRequestedDistance={setRequestedDistance}
+                            setActualDistance={setActualDistance}
+                        />
+                    )
+                }
 
-                <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
-                    {
-                        <ImageDiagram actions={actions} currentAction={currentAction} />
-                    }
-                    {
-                        !introComplete && <p style={{ width: '100%', fontWeight: 'bold' }}>Whichever axis you’ll be tuning, please place it in an initial location so that it’ll have space to move to the right (for X), backwards (for Y), and downwards (for Z).</p>
-                    }
-                    {
-                        introComplete && <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
-                    }
-                </div>
+                {
+                    introComplete && (
+                        <NavigationButtons
+                            onNext={next}
+                            onPrevious={prev}
+                            prevDisabled={prevDisabled}
+                            nextDisabled={nextDisabled}
+                        />
+                    )
+                }
             </div>
-        );
-}; AxisTuning.propTypes = { step: PropTypes.object };
+
+            <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
+                {
+                    <ImageDiagram actions={actions} currentAction={currentAction} />
+                }
+                {
+                    !introComplete && <p style={{ width: '100%', fontWeight: 'bold' }}>Whichever axis you’ll be tuning, please place it in an initial location so that it’ll have space to move to the right (for X), backwards (for Y), and downwards (for Z).</p>
+                }
+                {
+                    introComplete && <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
+                }
+            </div>
+        </div>
+    );
+};
+
+AxisTuning.propTypes = { step: PropTypes.object };
 
 export default AxisTuning;
