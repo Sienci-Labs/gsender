@@ -32,7 +32,7 @@
 .action-item-container {
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    gap: 5rem;
 }
 
 .action-input {
@@ -48,18 +48,48 @@
     gap: 1rem;
     align-items: center;
     font-size: $fontSize;
-    line-height: 1.75;
     width: 100%;
-
-    &-text {
-        font-size: $fontSize;
-    }
-
-    p {
-        margin: 0;
-    }
+    height: 100%;
+    justify-content: center;
+    padding: 2rem;
+    border-radius: 10px;
 
     i {
-        font-size: 3rem;
+        font-size: 3rem !important;
     }
+}
+
+.button-wrapper {
+    display: flex;
+    gap: 1rem;
+    width: 50%;
+    align-self: center;
+    margin-top: 1rem;
+}
+
+.result-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: 3rem;
+    line-height: 1.75;
+}
+
+.result-success {
+    background-color: #ddffdd;
+    border: 4px solid green;
+    color: black;
+}
+
+.result-error {
+    background-color: #ffdddd;
+    border: 4px solid red;
+    color: black;
+}
+
+.result-warning {
+    background-color: #ffffcc;
+    border: 4px solid gold;
+    color: black;
 }
