@@ -264,6 +264,10 @@ class GrblRunner extends events.EventEmitter {
         return Number(_.get(state, 'parserstate.tool')) || 0;
     }
 
+    getCurrentFeedrate(state = this.state) {
+        return _.get(state, 'parserstate.feedrate');
+    }
+
     getParameters() {
         return _.get(this.settings, 'parameters', {});
     }

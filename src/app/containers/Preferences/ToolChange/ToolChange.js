@@ -130,7 +130,7 @@ const ToolChange = ({ mpos }) => {
             {
                 toolChangeOption === 'Fixed Tool Sensor' && (
                     <div style={{ width: '50%' }}>
-                        <FunctionButton primary onClick={setBitsetterPosition}>Set Bitsetter Position</FunctionButton>
+                        <FunctionButton primary onClick={setBitsetterPosition}>Set Fixed Sensor Position</FunctionButton>
                         <p className={styles.description}>Set fixed tool sensor position at current machine position.  Your Z value should be negative.</p>
                     </div>
                 )

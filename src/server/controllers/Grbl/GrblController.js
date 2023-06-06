@@ -258,6 +258,7 @@ class GrblController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
+
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
@@ -964,6 +965,9 @@ class GrblController {
         // G-code parameters
         const parameters = this.runner.getParameters();
 
+        // Program feedrate
+        const programFeedrate = this.runner.getCurrentFeedrate();
+
         return Object.assign(context || {}, {
             // User-defined global variables
             global: this.sharedContext,
@@ -1012,6 +1016,9 @@ class GrblController {
 
             // G-code parameters
             params: parameters,
+
+            // Program Feedrate
+            programFeedrate: programFeedrate,
 
             // Global objects
             ...globalObjects,
