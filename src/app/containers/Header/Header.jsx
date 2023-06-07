@@ -299,11 +299,11 @@ class Header extends PureComponent {
 
     addResizeEventListener() {
         this.onResizeThrottled = _.throttle(this.updateScreenSize, 25);
-        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+        window.addEventListener('resize', this.onResizeThrottled);
     }
 
     removeResizeEventListener() {
-        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        window.removeEventListener('resize', this.onResizeThrottled);
         this.onResizeThrottled = null;
     }
 
@@ -325,7 +325,7 @@ class Header extends PureComponent {
     }
 
     updateScreenSize = () => {
-        const isMobile = window.visualViewport.width <= 599;
+        const isMobile = window.screen.width <= 639;
         this.setState({
             mobile: isMobile
         });
