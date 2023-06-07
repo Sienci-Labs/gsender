@@ -98,6 +98,7 @@ class WorkflowControl extends PureComponent {
             showRecent: false,
             showLoadFile: false,
             runHasStarted: false,
+            outlineRunning: false,
             startFromLine: {
                 showModal: false,
                 needsRecovery: false,
@@ -225,6 +226,32 @@ class WorkflowControl extends PureComponent {
         controller.command('gcode:test');
     };
 
+    runOutline = () => {
+        if (this.state.outlineRunning) {
+            return;
+        }
+        this.setState({ outlineRunning: true });
+
+        this.workerOutline = new WorkerOutline();
+        const { gcode } = this.props;
+        const machineProfile = store.get('workspace.machineProfile');
+        const spindleMode = store.get('widgets.spindle.mode');
+        // outline toggled on and currently in laser mode
+        const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
+
+        Toaster.pop({
+            TYPE: TOASTER_INFO,
+            duration: TOASTER_LONG,
+            msg: 'Generating outline for current file'
+        });
+        this.workerOutline.onmessage = ({ data }) => {
+            outlineResponse({ data }, machineProfile.laserOnOutline);
+            // Enable the outline button again
+            this.setState({ outlineRunning: false });
+        };
+        this.workerOutline.postMessage({ gcode, isLaser });
+    };
+
     startRun = () => {
         const { activeState } = this.props;
 
@@ -299,25 +326,6 @@ class WorkflowControl extends PureComponent {
             type: TOASTER_UNTIL_CLOSE,
             duration: 10000
         });
-    }
-
-    runOutline = () => {
-        this.workerOutline = new WorkerOutline();
-        const { gcode } = this.props;
-        const machineProfile = store.get('workspace.machineProfile');
-        const spindleMode = store.get('widgets.spindle.mode');
-        // outline toggled on and currently in laser mode
-        const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
-
-        Toaster.pop({
-            TYPE: TOASTER_INFO,
-            duration: TOASTER_LONG,
-            msg: 'Generating outline for current file'
-        });
-        this.workerOutline.onmessage = ({ data }) => {
-            outlineResponse({ data }, machineProfile.laserOnOutline);
-        };
-        this.workerOutline.postMessage({ gcode, isLaser });
     }
 
     startFromLinePrompt = () => {

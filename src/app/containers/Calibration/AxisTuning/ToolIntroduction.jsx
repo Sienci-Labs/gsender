@@ -70,9 +70,9 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis, isConnected
             </div>
 
             <div>
-                <JogControl widgetId="jogcontrol" isSecondary />
+                <JogControl widgetId="axes" isSecondary />
             </div>
-            <ToolModalButton icon="fas fa-play" primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</ToolModalButton>
+            <ToolModalButton icon="fas fa-play" disabled={!isConnected} onClick={readyHandler}>{ buttonText }</ToolModalButton>
         </ReduxProvider>
     );
 };
