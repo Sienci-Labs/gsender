@@ -138,7 +138,7 @@ const wizard = {
                                     '(Set Z to Tool offset and wait)',
                                     'G0 Z[global.toolchange.RETRACT]',
                                     'G4 P0.3',
-                                    `${modal} G10 L20 Z[global.toolchange.TOOL_OFFSET + global.toolchange.RETRACT]`,
+                                    `${modal} G10 L20 P0 Z[global.toolchange.TOOL_OFFSET + global.toolchange.RETRACT]`,
                                 ]);
                             }
                         }
