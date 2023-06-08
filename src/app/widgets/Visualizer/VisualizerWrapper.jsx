@@ -42,9 +42,11 @@ class VisualizerWrapper extends Component {
     }
 
     componentDidUpdate() {
+        // force refresh, changing which visualizer component is being used
         if (this.state.needRefresh) {
             this.visualizer.reloadGCode();
             this.setNeedRefresh(false);
+        // a step further than refresh, reparsing the gcode as well
         } else if (this.state.needReload) {
             this.visualizer.reparseGCode();
             this.setNeedReload(false);
@@ -72,6 +74,7 @@ class VisualizerWrapper extends Component {
             pubsub.subscribe('litemode:change', () => {
                 this.setNeedRefresh(true);
             }),
+            // currently, changing the settings requires reparsing of the gcode
             pubsub.subscribe('visualizer:settings', () => {
                 this.setNeedReload(true);
             })
