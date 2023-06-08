@@ -43,6 +43,26 @@ const getToolString = () => {
     return `T${tool}`;
 };
 
+// $132 is max z travel, if soft limits ($20) enabled we need to make sure probe distance will not exceed max limits
+const calculateMaxZProbeDistance = (zProbeDistance = 30) => {
+    const state = reduxStore.getState();
+    const softLimits = Number(get(state, 'controller.settings.settings.$20', 0));
+
+    // Can safely use configured Z probe distance if soft limits not enabled
+    if (softLimits === 0) {
+        return zProbeDistance;
+    }
+    const maxZTravel = Number(get(state, 'controller.settings.settings.$132'));
+    const curZPos = Math.abs(get(state, 'controller.mpos.z'));
+
+    // If we think we'll trigger a limit switch, we need to calculate the max value we actually can probe
+    if (curZPos + zProbeDistance >= maxZTravel) {
+        zProbeDistance = maxZTravel - curZPos - 1;
+    }
+
+    return zProbeDistance;
+};
+
 const getUnitModal = () => {
     const state = reduxStore.getState();
     const $13 = get(state, 'controller.settings.settings.$13', '0');
@@ -67,10 +87,12 @@ const wizard = {
         const $13 = get(state, 'controller.settings.settings.$13', '0');
         const zSafe = ($13 === '1') ? '-0.5' : '-10';
 
+        const zProbeDistance = calculateMaxZProbeDistance(settings.zProbeDistance);
+
         controller.command('gcode', [
             '%wait',
             `%global.toolchange.PROBE_THICKNESS_MM=${zThickness.mm}`,
-            `%global.toolchange.PROBE_DISTANCE=${settings.zProbeDistance}`,
+            `%global.toolchange.PROBE_DISTANCE=${zProbeDistance}`,
             `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
             `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
             `%global.toolchange.RETRACT=${settings.retract}`,
@@ -87,6 +109,7 @@ const wizard = {
             '%global.toolchange.FEEDRATE=programFeedrate',
             'M5',
             '%wait',
+            '([JSON.stringify(global.toolchange)])',
             'G91 G21',
             '(Toolchange initiated)',
         ]);

@@ -81,12 +81,12 @@ const wizard = {
         const settings = getProbeSettings();
         const { zThickness } = probeProfile;
 
-        console.log(calculateMaxZProbeDistance);
+        const zProbeDistance = calculateMaxZProbeDistance(settings.zProbeDistance);
 
         return [
             '%wait',
             `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
-            `%global.toolchange.PROBE_DISTANCE=${settings.zProbeDistance}`,
+            `%global.toolchange.PROBE_DISTANCE=${zProbeDistance}`,
             `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
             `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
             `%global.toolchange.RETRACT=${settings.retract}`,
@@ -97,6 +97,7 @@ const wizard = {
             '%global.toolchange.SPINDLE=modal.spindle',
             '%global.toolchange.DISTANCE=modal.distance',
             '%global.toolchange.FEEDRATE=programFeedrate',
+            '([JSON.stringify(global.toolchange)])',
             'M5',
             '(Toolchange Initiated)',
         ];
