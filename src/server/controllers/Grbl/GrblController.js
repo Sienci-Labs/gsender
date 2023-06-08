@@ -442,13 +442,15 @@ class GrblController {
                         const count = this.sender.incrementToolChanges();
 
                         setTimeout(() => {
+                            // Emit the current state so latest tool info is available
+                            this.emit('controller:state', GRBL, this.state);
                             this.emit('gcode:toolChange', {
                                 line: sent + 1,
                                 count,
                                 block: line,
                                 option: toolChangeOption
                             }, commentString);
-                        }, 300);
+                        }, 500);
                     }
 
                     line = line.replace('M6', '(M6)');
