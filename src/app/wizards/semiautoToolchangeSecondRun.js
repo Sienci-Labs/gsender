@@ -53,7 +53,7 @@ const calculateMaxZProbeDistance = (zProbeDistance = 30) => {
         return zProbeDistance;
     }
     const maxZTravel = Number(get(state, 'controller.settings.settings.$132'));
-    const curZPos = Math.abs(get(state, 'controller.mpos.z'));
+    const curZPos = Math.abs(Number(get(state, 'controller.mpos.z')));
 
     // If we think we'll trigger a limit switch, we need to calculate the max value we actually can probe
     if (curZPos + zProbeDistance >= maxZTravel) {
