@@ -126,8 +126,8 @@ const ToolChange = ({ mpos }) => {
                                 onChange={(e) => handlePositionChange(e, 'z')}
                             />
                             <div>
-                                <FunctionButton primary onClick={setBitsetterPosition}>Set Fixed Sensor Position</FunctionButton>
-                                <p className={styles.description}>Set fixed tool sensor position at current machine position.  Your Z value should be negative.</p>
+                                <FunctionButton primary onClick={setBitsetterPosition}>Grab Current Position</FunctionButton>
+                                <p className={styles.description}>Set fixed tool sensor position at current machine position - this will be the start location for probing.  Your Z value should be negative.</p>
                             </div>
                         </div>
                     )
