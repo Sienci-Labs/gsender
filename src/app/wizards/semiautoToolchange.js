@@ -108,7 +108,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Safety First',
-                    description: () => <div>Jog your machine to the probe location using the jog controls and ensure that your router/spindle is turned off and has fully stopped spinning.</div>,
+                    description: () => <div>Ensure that your router/spindle is turned off and has fully stopped spinning then jog your machine to your probe location using the jog controls.</div>,
                     overlay: false,
                 },
             ]
@@ -147,7 +147,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => <div>Change over to the next tool ({getToolString()}), attach the magnet, and position it to prepare to probe</div>,
+                    description: () => <div>Jog your machine to a palce you can reach using the jog controls then change over to the next tool ({getToolString()}).  Once ready, jog to 10mm above the probe location, attach the magnet, and prepare to probe</div>,
                     overlay: false,
                     actions: [
                         {

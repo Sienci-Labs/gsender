@@ -1782,7 +1782,14 @@ class GrblController {
                     }
 
                     if (axes.Z) {
-                        axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: Math.abs(mpos.z), maxTravel: $132 });
+                        const direction = Math.sign(axes.Z);
+                        console.log(direction);
+                        if (direction === 1) {
+                            axes.Z = Math.abs((mpos.z + 1));
+                        } else {
+                            axes.Z = (-1 * ($132 - 1)) - mpos.z;
+                        }
+                        //axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: mpos.z, maxTravel: (-1 * $132) });
                     }
                 } else {
                     jogFeedrate = 1250;
