@@ -41,7 +41,7 @@ export const TOOLCHANGE_OPTIONS = {
     AUTO: {
         key: 'AUTO',
         label: 'Fixed Tool Sensor',
-        description: 'M6 will commands will initiate an almost fully automated process in which preconfigured bitsetter or probe block will be used to set the new tool length.  Limit switches required.  Your Z position should be '
+        description: 'M6 will commands will initiate an almost fully automated process in which preconfigured bitsetter or probe block will be used to set the new tool length.  Limit switches required.'
     }
 };
 
@@ -85,57 +85,55 @@ const ToolChange = ({ mpos }) => {
     }, [toolChangeOption]);
 
     return (
-        <Fieldset legend="Tool Change" className={styles.paddingBottom}>
-            <small>Strategy to handle M6 tool change commands</small>
-            <div className={styles.addMargin}>
-                <Select
-                    backspaceRemoves={false}
-                    className="sm"
-                    clearable={false}
-                    menuContainerStyle={{ zIndex: 5 }}
-                    name="toolchangeoption"
-                    onChange={handleToolChange}
-                    options={map(TOOLCHANGE_OPTIONS, (option) => ({
-                        value: option.key,
-                        label: option.label,
-                    }))}
-                    value={{ label: toolChangeOption }}
-                />
-                <p className={styles.description}>{optionDescription}</p>
-            </div>
-            {
-                toolChangeOption === 'Fixed Tool Sensor' && (
-                    <div>
-                        <Input
-                            label="Tool Length Sensor X position"
-                            units=""
-                            value={toolChangePosition.x}
-                            onChange={(e) => handlePositionChange(e, 'x')}
-                        />
-                        <Input
-                            label="Tool Length Sensor Y position"
-                            units=""
-                            value={toolChangePosition.y}
-                            onChange={(e) => handlePositionChange(e, 'y')}
-                        />
-                        <Input
-                            label="Tool Length Sensor Z position"
-                            units=""
-                            value={toolChangePosition.z}
-                            onChange={(e) => handlePositionChange(e, 'z')}
-                        />
-                    </div>
-                )
-            }
-            {
-                toolChangeOption === 'Fixed Tool Sensor' && (
-                    <div style={{ width: '50%' }}>
-                        <FunctionButton primary onClick={setBitsetterPosition}>Set Fixed Sensor Position</FunctionButton>
-                        <p className={styles.description}>Set fixed tool sensor position at current machine position.  Your Z value should be negative.</p>
-                    </div>
-                )
-            }
-        </Fieldset>
+        <div style={{ width: '70%' }}>
+            <Fieldset legend="Tool Change" className={styles.paddingBottom}>
+                <small>Strategy to handle M6 tool change commands</small>
+                <div className={styles.addMargin}>
+                    <Select
+                        backspaceRemoves={false}
+                        className="sm"
+                        clearable={false}
+                        menuContainerStyle={{ zIndex: 5 }}
+                        name="toolchangeoption"
+                        onChange={handleToolChange}
+                        options={map(TOOLCHANGE_OPTIONS, (option) => ({
+                            value: option.key,
+                            label: option.label,
+                        }))}
+                        value={{ label: toolChangeOption }}
+                    />
+                    <p className={styles.description}>{optionDescription}</p>
+                </div>
+                {
+                    toolChangeOption === 'Fixed Tool Sensor' && (
+                        <div>
+                            <Input
+                                label="Sensor X position"
+                                units=""
+                                value={toolChangePosition.x}
+                                onChange={(e) => handlePositionChange(e, 'x')}
+                            />
+                            <Input
+                                label="Sensor Y position"
+                                units=""
+                                value={toolChangePosition.y}
+                                onChange={(e) => handlePositionChange(e, 'y')}
+                            />
+                            <Input
+                                label="Sensor Z position"
+                                units=""
+                                value={toolChangePosition.z}
+                                onChange={(e) => handlePositionChange(e, 'z')}
+                            />
+                            <div>
+                                <FunctionButton primary onClick={setBitsetterPosition}>Set Fixed Sensor Position</FunctionButton>
+                                <p className={styles.description}>Set fixed tool sensor position at current machine position.  Your Z value should be negative.</p>
+                            </div>
+                        </div>
+                    )
+                }
+            </Fieldset>
+        </div>
     );
 };
 

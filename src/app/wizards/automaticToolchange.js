@@ -32,7 +32,8 @@ const getProbeSettings = () => {
     return {
         slowSpeed: probeSettings.probeFeedrate.mm,
         fastSpeed: probeSettings.probeFastFeedrate.mm,
-        retract: probeSettings.retractionDistance.mm
+        retract: probeSettings.retractionDistance.mm,
+        zProbeDistance: probeSettings.zProbeDistance.mm,
     };
 };
 
@@ -70,7 +71,7 @@ const wizard = {
         controller.command('gcode', [
             '%wait',
             `%global.toolchange.PROBE_THICKNESS_MM=${zThickness.mm}`,
-            '%global.toolchange.PROBE_DISTANCE=80',
+            `%global.toolchange.PROBE_DISTANCE=${settings.zProbeDistance}`,
             `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
             `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
             `%global.toolchange.RETRACT=${settings.retract}`,
