@@ -22,6 +22,7 @@
  */
 
 import React from 'react';
+import { uniqueId } from 'lodash';
 import styles from './slider.styl';
 
 const Slider = ({ sliderName = 'stepper', step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, unitString = 'unit', datalist, ...props }) => {
@@ -48,9 +49,9 @@ const Slider = ({ sliderName = 'stepper', step = 1, min = 0, max = 100, value, o
                                 // if the min isnt 0, need to calculate the slider number
                                 const index = i + min;
                                 if (index % step === 0 && datalist.includes(index)) {
-                                    return <p></p>;
+                                    return <p key={uniqueId()}></p>;
                                 } else {
-                                    return <div></div>;
+                                    return <div key={uniqueId()}></div>;
                                 }
                             })
                     }
