@@ -24,24 +24,46 @@
 import React from 'react';
 import styles from './slider.styl';
 
-const Slider = ({ sliderName = 'stepper', step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, unitString = 'unit', ...props }) => {
+const Slider = ({ sliderName = 'stepper', step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, unitString = 'unit', datalist, ...props }) => {
     return (
         <div className={styles.sliderWrapper}>
-            <input
-                type="range" min={min} max={max}
-                list={sliderName}
-                id={sliderName}
-                name={sliderName}
-                className={styles.slider}
-                value={value}
-                onMouseUp={onMouseUp}
-                onChange={onChange}
-                step={step}
-                {...props}
-            />
-            <datalist id={sliderName}>
-                <option value="100" />
-                <option value="200" />
+            <div className={styles.sliderContainer}>
+                <input
+                    type="range" min={min} max={max}
+                    list={sliderName + 'list'}
+                    id={sliderName}
+                    name={sliderName}
+                    className={styles.slider}
+                    value={value}
+                    onMouseUp={onMouseUp}
+                    onChange={onChange}
+                    step={step}
+                    {...props}
+                />
+                {/* these ticks are shown */}
+                <div className={styles.sliderticks}>
+                    {
+                        datalist &&
+                            [...Array(max - min)].map((e, i) => {
+                                // if the min isnt 0, need to calculate the slider number
+                                const index = i + min;
+                                if (index % step === 0 && datalist.includes(index)) {
+                                    return <p></p>;
+                                } else {
+                                    return <div></div>;
+                                }
+                            })
+                    }
+                </div>
+            </div>
+            {/* datalist ticks wont be seen (we have webkit appearance turned off),
+                but they will add the sticky functionality */}
+            <datalist id={sliderName + 'list'} >
+                {
+                    datalist.map(data => {
+                        return <option key={sliderName + 'list' + data} value={data} />;
+                    })
+                }
             </datalist>
             <span>{value}{unitString}</span>
         </div>

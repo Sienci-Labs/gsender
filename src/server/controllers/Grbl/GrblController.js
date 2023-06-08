@@ -258,6 +258,7 @@ class GrblController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
+
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
@@ -441,13 +442,15 @@ class GrblController {
                         const count = this.sender.incrementToolChanges();
 
                         setTimeout(() => {
+                            // Emit the current state so latest tool info is available
+                            this.emit('controller:state', GRBL, this.state);
                             this.emit('gcode:toolChange', {
                                 line: sent + 1,
                                 count,
                                 block: line,
                                 option: toolChangeOption
                             }, commentString);
-                        }, 300);
+                        }, 500);
                     }
 
                     line = line.replace('M6', '(M6)');
@@ -964,6 +967,9 @@ class GrblController {
         // G-code parameters
         const parameters = this.runner.getParameters();
 
+        // Program feedrate
+        const programFeedrate = this.runner.getCurrentFeedrate();
+
         return Object.assign(context || {}, {
             // User-defined global variables
             global: this.sharedContext,
@@ -1006,11 +1012,15 @@ class GrblController {
                 coolant: ensureArray(modal.coolant).join('\n'),
             },
 
+
             // Tool
             tool: Number(tool) || 0,
 
             // G-code parameters
             params: parameters,
+
+            // Program Feedrate
+            programFeedrate: programFeedrate,
 
             // Global objects
             ...globalObjects,

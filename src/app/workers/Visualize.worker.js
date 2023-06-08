@@ -278,12 +278,10 @@ onmessage = function({ data }) {
         .split(/\r?\n/)
         .reverse();
 
-    const start = Date.now();
     while (lines.length) {
         let line = lines.pop();
         vm.virtualize(line);
     }
-    console.log(`Parse duration: ${Date.now() - start}`);
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);

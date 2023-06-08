@@ -54,7 +54,7 @@ const ToolIntroduction = ({ readyHandler, isConnected }) => {
                 </ul>
             </div>
             <div>
-                <JogControl widgetId="jogcontrol" isSecondary />
+                <JogControl widgetId="axes" isSecondary />
             </div>
             <ToolModalButton icon="fas fa-play" disabled={!isConnected} onClick={readyHandler}>{ buttonText }</ToolModalButton>
         </>

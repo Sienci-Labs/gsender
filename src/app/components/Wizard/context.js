@@ -218,7 +218,6 @@ export const WizardProvider = ({ children }) => {
             setStepCount(instructions.steps.length);
             setTitle(title);
             if (instructions.intro) {
-                console.log(instructions.intro);
                 setIntro(instructions.intro.description);
             }
 
@@ -273,6 +272,7 @@ export const WizardProvider = ({ children }) => {
             setSteps([]);
             setStepCount(0);
             setMinimized(false);
+            setIsLoading(false);
 
             Toaster.clear();
         }

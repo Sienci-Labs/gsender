@@ -69,29 +69,38 @@ const Result = ({ options, onBack, onClose, xSteps, ySteps, zSteps }) => {
         const eepromSetting = getEEPROMSetting(currentAxis);
         const eepromValue = getEEPROMValue(currentAxis);
         const roundedResult = result.toFixed(3);
+
         return (
             <>
-                Optimal steps/mm for the { currentAxis } axis: <b>{ roundedResult } step/mm</b>
+                <p>Optimal steps/mm for the { currentAxis } axis: <b>{ roundedResult } step/mm</b></p>
+
                 <div>How we got this:</div>
+
                 <div>
                     You requested to move <b>{ requestedDistance }mm</b> but actually moved <b>{ actualDistance }mm</b>.
-                    Your <b>{ eepromSetting }</b> is currently set to <b>{ eepromValue }</b>
+                    Your current <b>{ eepromSetting }</b> value is currently set to <b>{ eepromValue }</b>
                 </div>
+
                 <div><b><i>{ eepromValue } × ({ requestedDistance } ÷ { actualDistance }) = { roundedResult }</i></b></div>
             </>
         );
     };
 
-    const hasError = false;
-
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'column', height: '100%', width: '100%' }}>
-            <h4 style={{ marginTop: '2rem' }}>Calibration Results</h4>
-
-            <div className={styles.result}>
-                {renderResult()}
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            height: '100%',
+            width: '80%',
+            margin: 'auto'
+        }}
+        >
+            <div className={styles.resultWrapper}>
+                <div className={styles.result}>
+                    {renderResult()}
+                </div>
             </div>
-
 
             <div style={{ display: 'flex', gap: '1rem' }}>
                 <FunctionButton
@@ -108,11 +117,7 @@ const Result = ({ options, onBack, onClose, xSteps, ySteps, zSteps }) => {
                     Set EEPROM setting {getEEPROMSetting(options.currentAxis)} to {result.toFixed(3)}
                 </FunctionButton>
 
-                {
-                    hasError
-                        ? <FunctionButton onClick={onBack}>Go Back</FunctionButton>
-                        : <FunctionButton onClick={onClose}>Restart Tool</FunctionButton>
-                }
+                <FunctionButton onClick={onClose}>Restart Tool</FunctionButton>
             </div>
         </div>
     );

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import map from 'lodash/map';
+import get from 'lodash/get';
 import store from 'app/store';
+import { connect } from 'react-redux';
 import controller from 'app/lib/controller';
 import Input from '../components/Input';
-
-
 import Fieldset from '../components/Fieldset';
-
 import styles from '../index.styl';
+import FunctionButton from '../../../components/FunctionButton/FunctionButton';
 
 /*const options = [
     'Ignore',
@@ -45,7 +45,7 @@ export const TOOLCHANGE_OPTIONS = {
     }
 };
 
-const ToolChange = () => {
+const ToolChange = ({ mpos }) => {
     // State
     const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
     const [toolChangePosition, setToolChangePosition] = useState(store.get('workspace.toolChangePosition'));
@@ -54,6 +54,16 @@ const ToolChange = () => {
     const handleToolChange = (selection) => {
         setOptionDescription(TOOLCHANGE_OPTIONS[selection.value].description);
         return setToolChangeOption(selection.label);
+    };
+
+    const setBitsetterPosition = () => {
+        const newPosition = {
+            x: mpos.x,
+            y: mpos.y,
+            z: mpos.z
+        };
+        setToolChangePosition(newPosition);
+        store.replace('workspace.toolChangePosition', newPosition);
     };
 
     const handlePositionChange = (event, axis) => {
@@ -75,50 +85,59 @@ const ToolChange = () => {
     }, [toolChangeOption]);
 
     return (
-        <Fieldset legend="Tool Change" className={styles.paddingBottom}>
-            <small>Strategy to handle M6 tool change commands</small>
-            <div className={styles.addMargin}>
-                <Select
-                    backspaceRemoves={false}
-                    className="sm"
-                    clearable={false}
-                    menuContainerStyle={{ zIndex: 5 }}
-                    name="toolchangeoption"
-                    onChange={handleToolChange}
-                    options={map(TOOLCHANGE_OPTIONS, (option) => ({
-                        value: option.key,
-                        label: option.label,
-                    }))}
-                    value={{ label: toolChangeOption }}
-                />
-                <p className={styles.description}>{optionDescription}</p>
-            </div>
-            {
-                toolChangeOption === 'Fixed Tool Sensor' && (
-                    <div>
-                        <Input
-                            label="Tool Length Sensor X position"
-                            units=""
-                            value={toolChangePosition.x}
-                            onChange={(e) => handlePositionChange(e, 'x')}
-                        />
-                        <Input
-                            label="Tool Length Sensor Y position"
-                            units=""
-                            value={toolChangePosition.y}
-                            onChange={(e) => handlePositionChange(e, 'y')}
-                        />
-                        <Input
-                            label="Tool Length Sensor Z position"
-                            units=""
-                            value={toolChangePosition.z}
-                            onChange={(e) => handlePositionChange(e, 'z')}
-                        />
-                    </div>
-                )
-            }
-        </Fieldset>
+        <div style={{ width: '70%' }}>
+            <Fieldset legend="Tool Change" className={styles.paddingBottom}>
+                <small>Strategy to handle M6 tool change commands</small>
+                <div className={styles.addMargin}>
+                    <Select
+                        backspaceRemoves={false}
+                        className="sm"
+                        clearable={false}
+                        menuContainerStyle={{ zIndex: 5 }}
+                        name="toolchangeoption"
+                        onChange={handleToolChange}
+                        options={map(TOOLCHANGE_OPTIONS, (option) => ({
+                            value: option.key,
+                            label: option.label,
+                        }))}
+                        value={{ label: toolChangeOption }}
+                    />
+                    <p className={styles.description}>{optionDescription}</p>
+                </div>
+                {
+                    toolChangeOption === 'Fixed Tool Sensor' && (
+                        <div>
+                            <Input
+                                label="Sensor X position"
+                                units=""
+                                value={toolChangePosition.x}
+                                onChange={(e) => handlePositionChange(e, 'x')}
+                            />
+                            <Input
+                                label="Sensor Y position"
+                                units=""
+                                value={toolChangePosition.y}
+                                onChange={(e) => handlePositionChange(e, 'y')}
+                            />
+                            <Input
+                                label="Sensor Z position"
+                                units=""
+                                value={toolChangePosition.z}
+                                onChange={(e) => handlePositionChange(e, 'z')}
+                            />
+                            <div>
+                                <FunctionButton primary onClick={setBitsetterPosition}>Grab Current Position</FunctionButton>
+                                <p className={styles.description}>Set fixed tool sensor position at current machine position - this will be the start location for probing.  Your Z value should be negative.</p>
+                            </div>
+                        </div>
+                    )
+                }
+            </Fieldset>
+        </div>
     );
 };
 
-export default ToolChange;
+export default connect((store) => {
+    const mpos = get(store, 'controller.state.status.mpos', { x: 0, y: 0, z: 0 });
+    return { mpos };
+})(ToolChange);

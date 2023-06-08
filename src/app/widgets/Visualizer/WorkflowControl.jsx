@@ -49,6 +49,7 @@ import {
     TOASTER_DANGER,
     TOASTER_WARNING,
     TOASTER_UNTIL_CLOSE,
+    TOASTER_LONG,
     TOASTER_INFO
 } from '../../lib/toaster/ToasterLib';
 import {
@@ -97,6 +98,7 @@ class WorkflowControl extends PureComponent {
             showRecent: false,
             showLoadFile: false,
             runHasStarted: false,
+            outlineRunning: false,
             startFromLine: {
                 showModal: false,
                 needsRecovery: false,
@@ -224,6 +226,32 @@ class WorkflowControl extends PureComponent {
         controller.command('gcode:test');
     };
 
+    runOutline = () => {
+        if (this.state.outlineRunning) {
+            return;
+        }
+        this.setState({ outlineRunning: true });
+
+        this.workerOutline = new WorkerOutline();
+        const { gcode } = this.props;
+        const machineProfile = store.get('workspace.machineProfile');
+        const spindleMode = store.get('widgets.spindle.mode');
+        // outline toggled on and currently in laser mode
+        const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
+
+        Toaster.pop({
+            TYPE: TOASTER_INFO,
+            duration: TOASTER_LONG,
+            msg: 'Generating outline for current file'
+        });
+        this.workerOutline.onmessage = ({ data }) => {
+            outlineResponse({ data }, machineProfile.laserOnOutline);
+            // Enable the outline button again
+            this.setState({ outlineRunning: false });
+        };
+        this.workerOutline.postMessage({ gcode, isLaser });
+    };
+
     startRun = () => {
         const { activeState } = this.props;
 
@@ -298,25 +326,6 @@ class WorkflowControl extends PureComponent {
             type: TOASTER_UNTIL_CLOSE,
             duration: 10000
         });
-    }
-
-    runOutline = () => {
-        this.workerOutline = new WorkerOutline();
-        const { gcode } = this.props;
-        const machineProfile = store.get('workspace.machineProfile');
-        const spindleMode = store.get('widgets.spindle.mode');
-        // outline toggled on and currently in laser mode
-        const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
-
-        Toaster.pop({
-            TYPE: TOASTER_INFO,
-            duration: TOASTER_UNTIL_CLOSE,
-            msg: 'Generating outline for current file'
-        });
-        this.workerOutline.onmessage = ({ data }) => {
-            outlineResponse({ data }, machineProfile.laserOnOutline);
-        };
-        this.workerOutline.postMessage({ gcode, isLaser });
     }
 
     startFromLinePrompt = () => {
@@ -480,7 +489,6 @@ class WorkflowControl extends PureComponent {
                                     className={`${styles['workflow-button-upload']}`}
                                     title={i18n._('Load File')}
                                     onClick={this.handleClickUpload}
-                                    style={{ writingMode: 'vertical-lr' }}
                                 >
                                     {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
@@ -505,7 +513,7 @@ class WorkflowControl extends PureComponent {
                                     title={i18n._('Outline')}
                                     onClick={this.runOutline}
                                     disabled={!canRun}
-                                    style={{ writingMode: 'vertical-lr', marginRight: '1rem' }}
+                                    style={{ marginRight: '1rem' }}
                                 >
                                     {i18n._('Outline')} <i className="fas fa-vector-square" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
@@ -515,7 +523,6 @@ class WorkflowControl extends PureComponent {
                                     title={i18n._('Test Run')}
                                     onClick={this.handleTestFile}
                                     disabled={!canRun}
-                                    style={{ writingMode: 'vertical-lr' }}
                                 >
                                     {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>

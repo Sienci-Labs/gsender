@@ -191,88 +191,92 @@ const Alignment = ({ onClose }) => {
     const prevDisabled = !!steps[currentStep - 1];
     const nextDisabled = stepFinished;
 
+
+    if (isFullyComplete) {
+        return (
+            <Result
+                triangle={{ a: 90, b: 90, c: 125 }}
+                jogValues={jogValues}
+                onBack={onBack}
+                onClose={onClose}
+            />
+        );
+    }
+
     return (
         <ReduxProvider store={reduxStore}>
-            {
-                isFullyComplete
-                    ? (
-                        <Result
-                            triangle={triangle}
-                            jogValues={jogValues}
-                            onBack={onBack}
-                            onClose={onClose}
-                        />
-                    ) : (
-                        <>
-                            <div className={styles.alignmentContainer}>
-                                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                    {
-                                        !introComplete && <ToolIntroduction readyHandler={startTool} />
-                                    }
-                                    {
-                                        introComplete && (
-                                            <Step
-                                                actions={actions}
-                                                onChange={onChange}
-                                                currentAction={currentAction}
-                                            />
-                                        )
-                                    }
+            <div className={styles.alignmentContainer}>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    {
+                        !introComplete && <ToolIntroduction readyHandler={startTool} />
+                    }
+                    {
+                        introComplete && (
+                            <>
+                                <Step
+                                    actions={actions}
+                                    onChange={onChange}
+                                    currentAction={currentAction}
+                                />
 
-                                    {
-                                        introComplete && (
-                                            <NavigationButtons
-                                                onNext={next}
-                                                onPrevious={prev}
-                                                prevDisabled={prevDisabled}
-                                                nextDisabled={nextDisabled}
-                                                onShowJogControls={() => setShowKeypad(true)}
-                                            />
-                                        )
-                                    }
-                                </div>
+                                <NavigationButtons
+                                    onNext={next}
+                                    onPrevious={prev}
+                                    prevDisabled={prevDisabled}
+                                    nextDisabled={nextDisabled}
+                                    onShowJogControls={() => setShowKeypad(true)}
+                                />
+                            </>
+                        )
+                    }
+                </div>
 
-                                <div style={{ justifyContent: 'space-between', padding: '3rem', display: 'flex', gap: '1rem', flexDirection: 'column', width: '100%', backgroundColor: 'white' }}>
+                <div style={{
+                    justifyContent: 'space-between',
+                    padding: '3rem',
+                    display: 'flex',
+                    gap: '1rem',
+                    flexDirection: 'column',
+                    width: '100%',
+                    backgroundColor: 'white'
+                }}
+                >
+                    {
+                        introComplete
+                            ? (
+                                <>
+                                    <TriangleDiagram
+                                        circlePoints={shapes.circlePoints}
+                                        arrows={shapes.arrows}
+                                        triangle={triangle}
+                                        onTriangleChange={handleTriangleChange}
+                                    />
+                                    <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
+                                </>
+                            )
+                            : (
+                                <>
+                                    <img src={introImage} alt="Introduction Diagram" style={{ width: '75%', margin: 'auto' }} />
+                                    <p style={{ width: '100%', fontWeight: 'bold' }}>
+                                        Since many CNCs run on two independent rails in the Y-axis,
+                                        misalignment between these rails can cause your cutting to become skewed.
+                                    </p>
+                                </>
+                            )
+                    }
+                </div>
+            </div>
 
-                                    {
-                                        introComplete
-                                            ? (
-                                                <>
-                                                    <TriangleDiagram
-                                                        circlePoints={shapes.circlePoints}
-                                                        arrows={shapes.arrows}
-                                                        triangle={triangle}
-                                                        onTriangleChange={handleTriangleChange}
-                                                    />
-                                                    <p style={{ width: '100%', fontWeight: 'bold' }}>{stepFinished ? 'Proceed to the Next Step' : actionData?.description}</p>
-                                                </>
-                                            )
-                                            : (
-                                                <>
-                                                    <img src={introImage} alt="Introduction Diagram" style={{ width: '75%', margin: 'auto' }} />
-                                                    <p style={{ width: '100%', fontWeight: 'bold' }}>
-                                                        Since many CNCs run on two independent rails in the Y-axis,
-                                                        misalignment between these rails can cause your cutting to become skewed.
-                                                    </p>
-                                                </>
-                                            )
-                                    }
-                                </div>
-                            </div>
-
-                            <Modal size="xs" show={showKeypad} onClose={() => setShowKeypad(false)}>
-                                <Modal.Header>
-                                    <Modal.Title>Jog Control Keypad</Modal.Title>
-                                </Modal.Header>
-                                <Modal.Body>
-                                    <ReduxProvider store={reduxStore}>
-                                        <JogControl widgetId="jogcontrol" isSecondary />
-                                    </ReduxProvider>
-                                </Modal.Body>
-                            </Modal>
-                        </>
-                    )
-            }
+            <Modal size="xs" show={showKeypad} onClose={() => setShowKeypad(false)}>
+                <Modal.Header>
+                    <Modal.Title>Jog Control Keypad</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <ReduxProvider store={reduxStore}>
+                        <JogControl widgetId="axes" isSecondary />
+                    </ReduxProvider>
+                </Modal.Body>
+            </Modal>
         </ReduxProvider>
     );
 }; Alignment.propTypes = { step: PropTypes.object };

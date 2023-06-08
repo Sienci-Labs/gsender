@@ -32,7 +32,8 @@ const getProbeSettings = () => {
     return {
         slowSpeed: probeSettings.probeFeedrate.mm,
         fastSpeed: probeSettings.probeFastFeedrate.mm,
-        retract: probeSettings.retractionDistance.mm
+        retract: probeSettings.retractionDistance.mm,
+        zProbeDistance: probeSettings.zProbeDistance.mm,
     };
 };
 
@@ -40,6 +41,26 @@ const getToolString = () => {
     const state = reduxStore.getState();
     const tool = get(state, 'controller.state.parserstate.modal.tool', '');
     return `T${tool}`;
+};
+
+// $132 is max z travel, if soft limits ($20) enabled we need to make sure probe distance will not exceed max limits
+const calculateMaxZProbeDistance = (zProbeDistance = 30) => {
+    const state = reduxStore.getState();
+    const softLimits = Number(get(state, 'controller.settings.settings.$20', 0));
+
+    // Can safely use configured Z probe distance if soft limits not enabled
+    if (softLimits === 0) {
+        return zProbeDistance;
+    }
+    const maxZTravel = Number(get(state, 'controller.settings.settings.$132'));
+    const curZPos = Math.abs(Number(get(state, 'controller.mpos.z')));
+
+    // If we think we'll trigger a limit switch, we need to calculate the max value we actually can probe
+    if (curZPos + zProbeDistance >= maxZTravel) {
+        zProbeDistance = maxZTravel - curZPos - 1;
+    }
+
+    return zProbeDistance;
 };
 
 const getUnitModal = () => {
@@ -66,10 +87,12 @@ const wizard = {
         const $13 = get(state, 'controller.settings.settings.$13', '0');
         const zSafe = ($13 === '1') ? '-0.5' : '-10';
 
+        const zProbeDistance = calculateMaxZProbeDistance(settings.zProbeDistance);
+
         controller.command('gcode', [
             '%wait',
             `%global.toolchange.PROBE_THICKNESS_MM=${zThickness.mm}`,
-            '%global.toolchange.PROBE_DISTANCE=80',
+            `%global.toolchange.PROBE_DISTANCE=${zProbeDistance}`,
             `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
             `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
             `%global.toolchange.RETRACT=${settings.retract}`,
@@ -83,9 +106,10 @@ const wizard = {
             '%global.toolchange.UNITS=modal.units',
             '%global.toolchange.SPINDLE=modal.spindle',
             '%global.toolchange.DISTANCE=modal.distance',
-            '%global.toolchange.FEEDRATE=modal.feedrate',
+            '%global.toolchange.FEEDRATE=programFeedrate',
             'M5',
             '%wait',
+            '([JSON.stringify(global.toolchange)])',
             'G91 G21',
             '(Toolchange initiated)',
         ]);
@@ -108,14 +132,14 @@ const wizard = {
                                     'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
                                     'G90 G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
                                     '(This is 10 above configured location)',
-                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z + 10]',
+                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z[global.toolchange.RETRACT]',
                                     'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                    'G4 P0.3',
+                                    'G0 Z[global.toolchange.RETRACT]',
                                     '(Set Z to Tool offset and wait)',
-                                    `${modal} G10 L20 Z[global.toolchange.TOOL_OFFSET]`,
+                                    `${modal} G10 L20 P0 Z[global.toolchange.TOOL_OFFSET + global.toolchange.RETRACT]`,
                                     '(Set Z to Tool offset and wait)',
                                     'G53 G21 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
                                     'G21 G91',

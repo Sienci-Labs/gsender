@@ -31,7 +31,8 @@ const getProbeSettings = () => {
     return {
         slowSpeed: probeSettings.probeFeedrate.mm,
         fastSpeed: probeSettings.probeFastFeedrate.mm,
-        retract: probeSettings.retractionDistance.mm
+        retract: probeSettings.retractionDistance.mm,
+        zProbeDistance: probeSettings.zProbeDistance.mm,
     };
 };
 
@@ -39,9 +40,6 @@ const getProbeSettings = () => {
 const getToolString = () => {
     const state = reduxStore.getState();
     const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
-    if (tool === '0') {
-        return 'No T command found';
-    }
     return `T${tool}`;
 };
 
@@ -63,10 +61,11 @@ const wizard = {
         const probeProfile = store.get('workspace.probeProfile');
         const settings = getProbeSettings();
         const { zThickness } = probeProfile;
+
         return [
             '%wait',
             `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
-            '%global.toolchange.PROBE_DISTANCE=80',
+            `%global.toolchange.PROBE_DISTANCE=${settings.zProbeDistance}`,
             `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
             `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
             `%global.toolchange.RETRACT=${settings.retract}`,
@@ -76,7 +75,8 @@ const wizard = {
             '%global.toolchange.UNITS=modal.units',
             '%global.toolchange.SPINDLE=modal.spindle',
             '%global.toolchange.DISTANCE=modal.distance',
-            '%global.toolchange.FEEDRATE=modal.feedrate',
+            '%global.toolchange.FEEDRATE=programFeedrate',
+            '([JSON.stringify(global.toolchange)])',
             'M5',
             '(Toolchange initiated)',
         ];
@@ -148,7 +148,7 @@ const wizard = {
                                 const prefUnit = getUnitModal();
                                 controller.command('gcode', [
                                     '(Returning to initial position)',
-                                    'G91 G21 G0 Z15',
+                                    'G21',
                                     `G90 ${prefUnit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
                                     `G90 ${prefUnit} G0 Z[global.toolchange.ZPOS]`,
                                     '(Restore initial modals)',

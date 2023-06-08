@@ -148,15 +148,12 @@ export function* initialize() {
     });
 
     controller.addListener('sender:status', (status) => {
-        console.log(status);
         // finished job
         if (status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) {
-            console.log('JOB FINISHED');
             onJobEnd(status.timeRunning);
             reduxStore.dispatch({ type: visualizerActions.UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         // cancelled job
         } else if (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD) {
-            console.log('JOB CANCELLED');
             onJobStop(status.timeRunning);
             reduxStore.dispatch({ type: visualizerActions.UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         }
@@ -271,8 +268,6 @@ export function* initialize() {
             comment
         };
 
-        console.log(context);
-
         const { option, count } = context;
         if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
@@ -300,7 +295,6 @@ export function* initialize() {
 
             // Run start block on idle if exists
             if (instructions.onStart) {
-                console.log('On start');
                 const onStart = instructions.onStart();
                 controller.command('wizard:start', onStart);
             }
@@ -496,10 +490,8 @@ export function* initialize() {
     });
 
     controller.addListener('sender:M0M1', (opts) => {
-        const { data, comment = '' } = opts;
-        const msg = `A pause command (${data}) was found. Click Resume to immediately continue the job.
-            If you want to perform more operations (toolchange, jog, etc),
-            close the window, then press the standard Resume Job button when you're ready.`;
+        const { comment = '' } = opts;
+        const msg = 'Hit \‘Close Window\‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard \‘Resume Job\’ button to keep cutting when you\’re ready.';
 
         const content = (comment.length > 0)
             ? <div><p>{msg}</p><p>Comment: <b>{comment}</b></p></div>
@@ -549,10 +541,6 @@ export function* initialize() {
         pubsub.publish('wizard:next', { stepIndex, substepIndex });
     });
 
-    controller.addListener('gcode:loaded', ({ gcode, meta }) => {
-        console.log(gcode);
-        console.log(meta);
-    });
 
     yield null;
 }

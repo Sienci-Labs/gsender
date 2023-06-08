@@ -326,7 +326,7 @@ class CNCEngine {
                 if (this.hasFileLoaded()) {
                     if (numClients === 0) {
                         controller.loadFile(this.gcode, this.meta);
-                        socket.emit('file:load', this.gcode, this.meta.name, this.meta.size);
+                        socket.emit('file:load', this.gcode, this.meta.size, this.meta.name);
                     } else {
                         log.debug('File already loaded in another socket');
                     }

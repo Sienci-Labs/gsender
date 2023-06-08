@@ -258,7 +258,6 @@ export const xAxisStep = [
             return (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <Button
-                        primary
                         disabled={!isCurrentAction}
                         style={buttonStyle}
                         onClick={handleClick}
@@ -387,7 +386,6 @@ export const zAxisStep = [
             return (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <Button
-                        primary
                         disabled={!isCurrentAction}
                         style={buttonStyle}
                         onClick={handleClick}
