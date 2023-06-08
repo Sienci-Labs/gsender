@@ -1783,7 +1783,6 @@ class GrblController {
 
                     if (axes.Z) {
                         const direction = Math.sign(axes.Z);
-                        console.log(direction);
                         if (direction === 1) {
                             axes.Z = Math.abs((mpos.z + 1));
                         } else {
