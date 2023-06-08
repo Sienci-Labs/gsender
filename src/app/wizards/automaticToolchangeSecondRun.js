@@ -46,21 +46,13 @@ const getToolString = () => {
 // $132 is max z travel, if soft limits ($20) enabled we need to make sure probe distance will not exceed max limits
 const calculateMaxZProbeDistance = (zProbeDistance = 30) => {
     const state = reduxStore.getState();
-    const softLimits = Number(get(state, 'controller.settings.settings.$20', 0));
-
-    // Can safely use configured Z probe distance if soft limits not enabled
-    if (softLimits === 0) {
-        return zProbeDistance;
-    }
     const maxZTravel = Number(get(state, 'controller.settings.settings.$132'));
-    const curZPos = Math.abs(Number(get(state, 'controller.mpos.z')));
 
-    // If we think we'll trigger a limit switch, we need to calculate the max value we actually can probe
-    if (curZPos + zProbeDistance >= maxZTravel) {
-        zProbeDistance = maxZTravel - curZPos - 1;
-    }
+    //const curZPos = Math.abs(Number(get(state, 'controller.mpos.z')));
+    const position = store.get('workspace.toolChangePosition');
+    const curZPos = Math.abs(position.z);
 
-    return zProbeDistance;
+    return maxZTravel - curZPos - 2;
 };
 
 const getUnitModal = () => {
@@ -109,8 +101,9 @@ const wizard = {
             '%global.toolchange.FEEDRATE=programFeedrate',
             'M5',
             '%wait',
-            '([JSON.stringify(global.toolchange)])',
             'G91 G21',
+            'G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
+            'G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
             '(Toolchange initiated)',
         ]);
     },
