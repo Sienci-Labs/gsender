@@ -43,14 +43,10 @@ class VisualizerWrapper extends Component {
 
     componentDidUpdate() {
         if (this.state.needRefresh) {
-            console.log('refresh');
-            console.log(this.visualizer);
             this.visualizer.reloadGCode();
             this.setNeedRefresh(false);
         } else if (this.state.needReload) {
-            console.log('reload');
-            console.log(this.visualizer);
-            this.visualizer.rerenderGCode();
+            this.visualizer.reparseGCode();
             this.setNeedReload(false);
         }
     }

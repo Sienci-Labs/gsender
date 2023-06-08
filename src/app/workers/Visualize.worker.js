@@ -205,7 +205,7 @@ onmessage = function({ data }) {
         },
     };
 
-    // Determine which handler to use - normal by default, SVG if selected, then laser if selected
+    // Determine which handler to use - normal by default, then laser if selected
     let handlerKey = 'normal';
     if (isLaser) {
         handlerKey = 'laser';

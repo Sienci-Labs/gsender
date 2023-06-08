@@ -39,7 +39,7 @@ import * as visualizerActions from 'app/actions/visualizerActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import VisualizeWorker from 'app/workers/Visualize.worker';
-import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
+import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
 import { RENDER_LOADING, RENDER_RENDERED, RENDER_NO_FILE, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import isElectron from 'is-electron';
@@ -119,6 +119,109 @@ export function* initialize() {
 
         // reset to false since it's the end of the job
         areStatsInitialized = false;
+    };
+
+    const parseGCode = (content, size, name, visualizer) => {
+        const isLaser = isLaserMode();
+        if (visualizer === VISUALIZER_SECONDARY) {
+            reduxStore.dispatch({
+                type: fileActions.UPDATE_FILE_RENDER_STATE,
+                payload: {
+                    state: RENDER_NO_FILE
+                }
+            });
+            setTimeout(() => {
+                const renderState = _get(reduxStore.getState(), 'file.renderState');
+                if (renderState === RENDER_NO_FILE) {
+                    reduxStore.dispatch({
+                        type: fileActions.UPDATE_FILE_RENDER_STATE,
+                        payload: {
+                            state: RENDER_LOADING
+                        }
+                    });
+                }
+            }, 1000);
+
+            const needsVisualization = shouldVisualize();
+
+            if (needsVisualization) {
+                visualizeWorker = new VisualizeWorker();
+                visualizeWorker.onmessage = visualizeResponse;
+                visualizeWorker.postMessage({
+                    content,
+                    visualizer
+                });
+            } else {
+                reduxStore.dispatch({
+                    type: fileActions.UPDATE_FILE_RENDER_STATE,
+                    payload: {
+                        state: RENDER_RENDERED
+                    }
+                });
+            }
+
+            return;
+        }
+
+        // Basic file content
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_CONTENT,
+            payload: {
+                content,
+                size,
+                name,
+            }
+        });
+        // sending gcode data to the visualizer
+        // so it can save it and give it to the normal or svg visualizer
+        pubsub.publish('file:content', content, size, name);
+        // Processing started for gcodeProcessor
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_PROCESSING,
+            payload: {
+                value: true
+            }
+        });
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_RENDER_STATE,
+            payload: {
+                state: RENDER_NO_FILE
+            }
+        });
+        setTimeout(() => {
+            const renderState = _get(reduxStore.getState(), 'file.renderState');
+            if (renderState === RENDER_NO_FILE) {
+                reduxStore.dispatch({
+                    type: fileActions.UPDATE_FILE_RENDER_STATE,
+                    payload: {
+                        state: RENDER_LOADING
+                    }
+                });
+            }
+        }, 1000);
+        /*        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
+                const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
+                const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
+                const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];*/
+
+        const needsVisualization = shouldVisualize();
+
+        if (needsVisualization) {
+            visualizeWorker = new VisualizeWorker();
+            visualizeWorker.onmessage = visualizeResponse;
+            visualizeWorker.postMessage({
+                content,
+                visualizer,
+                isLaser
+            });
+        } else {
+            reduxStore.dispatch({
+                type: fileActions.UPDATE_FILE_RENDER_STATE,
+                payload: {
+                    state: RENDER_RENDERED
+                }
+            });
+        }
     };
 
     controller.addListener('controller:settings', (type, settings) => {
@@ -320,108 +423,7 @@ export function* initialize() {
     });
 
     controller.addListener('file:load', (content, size, name, visualizer) => {
-        const isLaser = isLaserMode();
-        if (visualizer === VISUALIZER_SECONDARY) {
-            reduxStore.dispatch({
-                type: fileActions.UPDATE_FILE_RENDER_STATE,
-                payload: {
-                    state: RENDER_NO_FILE
-                }
-            });
-            setTimeout(() => {
-                const renderState = _get(reduxStore.getState(), 'file.renderState');
-                if (renderState === RENDER_NO_FILE) {
-                    reduxStore.dispatch({
-                        type: fileActions.UPDATE_FILE_RENDER_STATE,
-                        payload: {
-                            state: RENDER_LOADING
-                        }
-                    });
-                }
-            }, 1000);
-
-            const needsVisualization = shouldVisualize();
-
-            if (needsVisualization) {
-                visualizeWorker = new VisualizeWorker();
-                visualizeWorker.onmessage = visualizeResponse;
-                visualizeWorker.postMessage({
-                    content,
-                    visualizer
-                });
-            } else {
-                reduxStore.dispatch({
-                    type: fileActions.UPDATE_FILE_RENDER_STATE,
-                    payload: {
-                        state: RENDER_RENDERED
-                    }
-                });
-            }
-
-            return;
-        }
-
-        // Basic file content
-        reduxStore.dispatch({
-            type: fileActions.UPDATE_FILE_CONTENT,
-            payload: {
-                content,
-                size,
-                name,
-            }
-        });
-        // sending gcode data to the visualizer
-        // so it can save it and give it to the normal or svg visualizer
-        pubsub.publish('file:content', content, size, name);
-        // Processing started for gcodeProcessor
-        reduxStore.dispatch({
-            type: fileActions.UPDATE_FILE_PROCESSING,
-            payload: {
-                value: true
-            }
-        });
-        reduxStore.dispatch({
-            type: fileActions.UPDATE_FILE_RENDER_STATE,
-            payload: {
-                state: RENDER_NO_FILE
-            }
-        });
-        setTimeout(() => {
-            const renderState = _get(reduxStore.getState(), 'file.renderState');
-            if (renderState === RENDER_NO_FILE) {
-                reduxStore.dispatch({
-                    type: fileActions.UPDATE_FILE_RENDER_STATE,
-                    payload: {
-                        state: RENDER_LOADING
-                    }
-                });
-            }
-        }, 1000);
-        /*        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
-                const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
-                const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
-                const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];*/
-
-        const needsVisualization = shouldVisualize();
-        const shouldRenderSVG = shouldVisualizeSVG();
-
-        if (needsVisualization) {
-            visualizeWorker = new VisualizeWorker();
-            visualizeWorker.onmessage = visualizeResponse;
-            visualizeWorker.postMessage({
-                content,
-                visualizer,
-                isLaser,
-                shouldRenderSVG
-            });
-        } else {
-            reduxStore.dispatch({
-                type: fileActions.UPDATE_FILE_RENDER_STATE,
-                payload: {
-                    state: RENDER_RENDERED
-                }
-            });
-        }
+        parseGCode(content, size, name, visualizer);
     });
 
     controller.addListener('gcode:unload', () => {
@@ -456,6 +458,10 @@ export function* initialize() {
 
     pubsub.subscribe('estimate:done', (msg, data) => {
         estimateWorker.terminate();
+    });
+
+    pubsub.subscribe('reparseGCode', (msg, content, size, name, visualizer) => {
+        parseGCode(content, size, name, visualizer);
     });
 
     controller.addListener('toolchange:preHookComplete', (comment = '') => {

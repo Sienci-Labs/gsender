@@ -122,10 +122,11 @@ class SVGVisualizer extends Component {
         this.pubsubTokens = [];
     }
 
-    rerenderGCode() {
-        const { content } = this.props;
-        // reupload the file to update the colours
-        this.uploadGCodeFile(content);
+    reparseGCode() {
+        const { state } = this.props;
+        const { gcode } = state;
+        // reparse file
+        pubsub.publish('reparseGCode', gcode.content, gcode.size, gcode.name, this.props.isSecondary ? VISUALIZER_SECONDARY : VISUALIZER_PRIMARY);
     }
 
     reloadGCode() {
@@ -182,7 +183,6 @@ class SVGVisualizer extends Component {
     }
 
     handleSceneRender(vizualization) {
-        console.log('svg handle scene render');
         const { paths } = vizualization;
         const { currentTheme } = this.props.state;
 
@@ -222,7 +222,6 @@ class SVGVisualizer extends Component {
     // name parameter is included to match the normal visualizer load function
     // DO NOT remove it or you'll get errors
     load(name, vizualization) {
-        console.log('svg load');
         this.unload();
         this.handleSceneRender(vizualization);
     }
