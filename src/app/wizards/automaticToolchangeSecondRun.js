@@ -132,7 +132,7 @@ const wizard = {
                                     'G90 G53 G0 Z[global.toolchange.Z_SAFE_HEIGHT]',
                                     'G90 G53 G0 X[global.toolchange.PROBE_POS_X] Y[global.toolchange.PROBE_POS_Y]',
                                     '(This is 10 above configured location)',
-                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z + 10]',
+                                    'G53 G0 Z[global.toolchange.PROBE_POS_Z]',
                                     'G91 G21',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z[global.toolchange.RETRACT]',
