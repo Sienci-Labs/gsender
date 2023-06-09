@@ -104,6 +104,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                         setLocalOvF(e.target.value);
                         debouncedFeedHandler(e.target.value);
                     }}
+                    datalist={[100]}
                 />
                 <div className={styles.overridesButtonsWrapper}>
                     <FeedControlButton value="100" onClick={() => handleChangeRate(setLocalOvF, 100, '\x90')}>
@@ -136,6 +137,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                                 setLocalOvS(e.target.value);
                                 debouncedSpindleHandler(e.target.value);
                             }}
+                            datalist={[100]}
                         />
                         <div className={styles.overridesButtonsWrapper}>
                             <FeedControlButton value="100" onClick={() => handleChangeRate(setLocalOvS, 100, '\x99')}>

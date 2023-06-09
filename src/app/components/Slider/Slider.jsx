@@ -25,7 +25,7 @@ import React from 'react';
 import { uniqueId } from 'lodash';
 import styles from './slider.styl';
 
-const Slider = ({ sliderName = 'stepper', step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, unitString = 'unit', datalist, ...props }) => {
+const Slider = ({ sliderName = 'stepper', step = 1, min = 0, max = 100, value, onChange = null, onMouseUp = null, unitString = 'unit', datalist = [], ...props }) => {
     return (
         <div className={styles.sliderWrapper}>
             <div className={styles.sliderContainer}>
