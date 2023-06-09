@@ -26,6 +26,9 @@ import noop from 'lodash/noop';
 import partition from 'lodash/partition';
 import { SerialPort } from 'serialport';
 import socketIO from 'socket.io';
+import { app } from 'electron';
+import fs from 'fs';
+import path from 'path';
 //import socketioJwt from 'socketio-jwt';
 import EventTrigger from '../../lib/EventTrigger';
 import logger from '../../lib/logger';
@@ -172,8 +175,23 @@ class CNCEngine {
 
                 // User-defined baud rates and ports
                 baudrates: ensureArray(config.get('baudrates', [])),
-                ports: ensureArray(config.get('ports', []))
+                ports: ensureArray(config.get('ports', [])),
+                socketsLength: this.sockets.length
             });
+
+            socket.on('newConnection', () => {
+                // if the sockets include more than the original desktop client
+                // check if electron app is defined
+                if (this.sockets.length > 1 && app) {
+                    const userDataPath = path.join(app.getPath('userData'), 'preferences.json');
+
+                    if (fs.existsSync(userDataPath)) {
+                        const content = fs.readFileSync(userDataPath, 'utf8') || '{}';
+                        socket.emit('connection:new', content);
+                    }
+                }
+            });
+
             socket.on('disconnect', () => {
                 log.debug(`Disconnected from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`);
 

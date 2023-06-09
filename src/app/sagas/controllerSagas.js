@@ -549,6 +549,10 @@ export function* initialize() {
     });
 
 
+    controller.addListener('connection:new', (content) => {
+        pubsub.publish('store:update', content);
+    });
+
     yield null;
 }
 

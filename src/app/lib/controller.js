@@ -20,6 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import isElectron from 'is-electron';
 import io from 'socket.io-client';
 
 const ensureArray = (...args) => {
@@ -98,7 +99,8 @@ class Controller {
         'firmware:ready': [],
         'sender:M0M1': [],
         'ip:list': [],
-        'wizard:next': []
+        'wizard:next': [],
+        'connection:new': [],
     };
 
     context = {
@@ -230,6 +232,11 @@ class Controller {
 
                 // The callback can only be called once
                 next = null;
+            }
+
+            // don't want to update store if it is electron
+            if (!isElectron()) {
+                this.socket && this.socket.emit('newConnection');
             }
         });
     }
