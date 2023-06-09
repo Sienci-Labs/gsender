@@ -323,12 +323,8 @@ class CNCEngine {
 
                 controller.addConnection(socket);
 
-                // Check if a job is already loaded and running
-                if (this.hasFileLoaded() && this.isJobRunning()) {
-                    // A job is already running, don't load the file
-                    log.debug('A job is already loaded and running on the controller');
-                    socket.emit('file:load', this.gcode, this.meta.size, this.meta.name);
-                } else if (this.hasFileLoaded()) { // Load file to controller if it exists
+                // Load file to controller if it exists
+                if (this.hasFileLoaded()) {
                     if (numClients === 0) {
                         controller.loadFile(this.gcode, this.meta);
                         socket.emit('file:load', this.gcode, this.meta.size, this.meta.name);
