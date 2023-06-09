@@ -101,13 +101,13 @@ class SVGVisualizer extends Component {
 
                 if (isPrimaryVisualizer) {
                     this.isSecondaryVisualizer = false;
-                    this.load(data);
+                    this.load('', data);
                     return;
                 }
 
                 if (isSecondaryVisualizer) {
                     this.isSecondaryVisualizer = true;
-                    this.load(data);
+                    this.load('', data);
                     return;
                 }
             }),
@@ -122,16 +122,17 @@ class SVGVisualizer extends Component {
         this.pubsubTokens = [];
     }
 
-    rerenderGCode() {
-        const { state, content } = this.props;
+    reparseGCode() {
+        const { state } = this.props;
         const { gcode } = state;
+        // reparse file
+        pubsub.publish('reparseGCode', gcode.content, gcode.size, gcode.name, this.props.isSecondary ? VISUALIZER_SECONDARY : VISUALIZER_PRIMARY);
+    }
 
-        if (gcode.content) {
-            this.load(gcode.content);
-        } else {
-            // reupload the file to update the colours
-            this.uploadGCodeFile(content);
-        }
+    reloadGCode() {
+        const { actions, state } = this.props;
+        const { gcode } = state;
+        actions.loadGCode('', gcode.visualization);
     }
 
     async uploadGCodeFile (gcode) {
@@ -181,7 +182,7 @@ class SVGVisualizer extends Component {
         }
     }
 
-    handleSVGRender(vizualization) {
+    handleSceneRender(vizualization) {
         const { paths } = vizualization;
         const { currentTheme } = this.props.state;
 
@@ -218,9 +219,11 @@ class SVGVisualizer extends Component {
         }
     }
 
-    load(vizualization) {
+    // name parameter is included to match the normal visualizer load function
+    // DO NOT remove it or you'll get errors
+    load(name, vizualization) {
         this.unload();
-        this.handleSVGRender(vizualization);
+        this.handleSceneRender(vizualization);
     }
 
     unload() {

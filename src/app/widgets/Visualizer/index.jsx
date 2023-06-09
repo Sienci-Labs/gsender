@@ -333,7 +333,9 @@ class VisualizerWidget extends PureComponent {
             };
 
             this.setState(updater, callback);
-            this.visualizer.handleSceneRender(vizualization);
+            if (this.visualizer) {
+                this.visualizer.handleSceneRender(vizualization);
+            }
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
@@ -371,7 +373,8 @@ class VisualizerWidget extends PureComponent {
                             y: 0,
                             z: 0
                         }
-                    }
+                    },
+                    visualization: {}
                 }
             }));
         },
@@ -571,6 +574,9 @@ class VisualizerWidget extends PureComponent {
                 minimizeRenders: newLiteModeValue
             });
 
+            // instead of calling loadGCode right away,
+            // use this pubsub to invoke a refresh of the visualizer wrapper.
+            // this removes visual glitches that would otherwise appear.
             pubsub.publish('litemode:change', gcode);
         },
         lineWarning: {
@@ -777,6 +783,7 @@ class VisualizerWidget extends PureComponent {
                 sent: 0,
                 received: 0,
                 loadedBeforeConnection: false,
+                visualization: {}
             },
             disabled: this.config.get('disabled', false),
             disabledLite: this.config.get('disabledLite'),
@@ -1451,6 +1458,24 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('gcode:surfacing', async (_, { gcode, name, size }) => {
                 const file = new File([gcode], name);
                 await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
+            }),
+            pubsub.subscribe('file:content', (_, content, size, name) => {
+                this.setState({
+                    gcode: {
+                        ...this.state.gcode,
+                        content: content,
+                        size: size,
+                        name: name
+                    }
+                });
+            }),
+            pubsub.subscribe('file:load', (_, data) => {
+                this.setState({
+                    gcode: {
+                        ...this.state.gcode,
+                        visualization: data
+                    }
+                });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);

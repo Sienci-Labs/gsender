@@ -490,19 +490,27 @@ class Visualizer extends Component {
     }
 
     rerenderGCode() {
-        const { actions, state } = this.props;
-        const { gcode } = state;
+        const content = reduxStore.getState().file.content;
 
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
             this.group.remove(group);
         }
-        if (gcode.content) {
-            actions.loadGCode('', gcode.content);
-        } else {
-            // reupload the file to update the colours
-            this.uploadGCodeFile(reduxStore.getState().file.content);
-        }
+        // reupload the file to update the colours
+        this.uploadGCodeFile(content);
+    }
+
+    reparseGCode() {
+        const { state } = this.props;
+        const { gcode } = state;
+        // reparse file
+        pubsub.publish('reparseGCode', gcode.content, gcode.size, gcode.name, this.props.isSecondary ? VISUALIZER_SECONDARY : VISUALIZER_PRIMARY);
+    }
+
+    reloadGCode() {
+        const { actions, state } = this.props;
+        const { gcode } = state;
+        actions.loadGCode('', gcode.visualization);
     }
 
     removeSceneGroup() {
