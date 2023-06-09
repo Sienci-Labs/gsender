@@ -322,7 +322,6 @@ class CNCEngine {
                 }
 
                 controller.addConnection(socket);
-
                 // Load file to controller if it exists
                 if (this.hasFileLoaded()) {
                     if (numClients === 0) {
@@ -363,7 +362,6 @@ class CNCEngine {
                     callback(null);
                 });
             });
-
 
             // Close serial port
             socket.on('close', (port, callback = noop) => {
@@ -526,10 +524,6 @@ class CNCEngine {
 
     hasFileLoaded() {
         return this.gcode !== null;
-    }
-
-    isJobRunning() {
-        return this.server !== null;
     }
 }
 
