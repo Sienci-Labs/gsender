@@ -185,7 +185,7 @@ class GrblRunner extends events.EventEmitter {
                 ...this.state,
                 parserstate: {
                     modal: modal,
-                    tool: tool,
+                    tool: modal.tool,
                     feedrate: feedrate,
                     spindle: spindle
                 }
@@ -262,6 +262,11 @@ class GrblRunner extends events.EventEmitter {
 
     getTool(state = this.state) {
         return Number(_.get(state, 'parserstate.tool')) || 0;
+    }
+
+    getCurrentFeedrate(state = this.state) {
+        const value = _.get(state, 'parserstate.feedrate');
+        return `F${value}`;
     }
 
     getParameters() {

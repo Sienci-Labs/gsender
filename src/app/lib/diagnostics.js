@@ -29,7 +29,7 @@ import { pdf, Page, View, Text, Document, StyleSheet } from '@react-pdf/renderer
 import { saveAs } from 'file-saver';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
-import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import pkg from '../../package.json';
 import { LASER_MODE } from '../constants';
 import { getAllErrors } from '../containers/Preferences/Safety/helper';
@@ -635,7 +635,7 @@ function generateSupportFile() {
                     </Text>
                 </View>
                 <Text style={styles.subtitle}>
-                    GCode File
+                    G-Code File
                 </Text>
                 {
                     fileInfo.fileLoaded && grblInfo.sender.status ? (
@@ -748,7 +748,7 @@ function generateSupportFile() {
     };
 
     return (
-        <FunctionButton primary onClick={submitForm}>Download Now!</FunctionButton>
+        <ToolModalButton icon="fas fa-file-pdf" onClick={submitForm}>Download Now!</ToolModalButton>
     );
 }
 

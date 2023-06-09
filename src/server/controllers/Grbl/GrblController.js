@@ -30,6 +30,7 @@ import map from 'lodash/map';
 import SerialConnection from '../../lib/SerialConnection';
 import EventTrigger from '../../lib/EventTrigger';
 import Feeder from '../../lib/Feeder';
+import ToolChanger from '../../lib/ToolChanger';
 import Sender, { SP_TYPE_CHAR_COUNTING } from '../../lib/Sender';
 import Workflow, {
     WORKFLOW_STATE_IDLE,
@@ -79,10 +80,11 @@ import {
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
+
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
-const POSTHOOK_COMPLETE = '%post_complete';
+const POSTHOOK_COMPLETE = '%toolchange_complete';
 const PAUSE_START = '%pause_start';
 
 const log = logger('controller:Grbl');
@@ -177,6 +179,9 @@ class GrblController {
     // Sender
     sender = null;
 
+    // Toolchange
+    toolChanger = null;
+
     // Shared context
     sharedContext = {};
 
@@ -253,6 +258,7 @@ class GrblController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
+
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
@@ -266,10 +272,10 @@ class GrblController {
                         return 'G4 P0.5';
                     }
                     if (line === POSTHOOK_COMPLETE) {
-                        log.debug('Finished Post-hook, resuming program');
+                        log.debug('Finished toolchange, resuming program');
                         setTimeout(() => {
                             this.workflow.resume();
-                        }, 1500);
+                        }, 500);
                         return 'G4 P0.5';
                     }
                     if (line === PAUSE_START) {
@@ -398,10 +404,6 @@ class GrblController {
 
                 { // Program Mode: M0, M1
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
-                    let tool = line.match(toolCommand);
-                    if (tool) {
-                        commentString = '(' + tool[0] + ') ' + commentString;
-                    }
                     if (programMode === 'M0') {
                         log.debug(`M0 Program Pause: line=${sent + 1}, sent=${sent}, received=${received}`);
                         // Workaround for Carbide files - prevent M0 early from pausing program
@@ -437,11 +439,18 @@ class GrblController {
                             commentString = `(${tool[0]}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
-                        this.emit('gcode:toolChange', {
-                            line: sent + 1,
-                            block: line,
-                            option: toolChangeOption
-                        }, commentString);
+                        const count = this.sender.incrementToolChanges();
+
+                        setTimeout(() => {
+                            // Emit the current state so latest tool info is available
+                            this.emit('controller:state', GRBL, this.state);
+                            this.emit('gcode:toolChange', {
+                                line: sent + 1,
+                                count,
+                                block: line,
+                                option: toolChangeOption
+                            }, commentString);
+                        }, 500);
                     }
 
                     line = line.replace('M6', '(M6)');
@@ -777,6 +786,13 @@ class GrblController {
             this.emit('serialport:read', res.raw);
         });
 
+        this.toolChanger = new ToolChanger({
+            isIdle: () => {
+                return this.runner.isIdle();
+            },
+            intervalTimer: 200
+        });
+
         const queryStatusReport = () => {
             // Check the ready flag
             if (!(this.ready)) {
@@ -951,6 +967,9 @@ class GrblController {
         // G-code parameters
         const parameters = this.runner.getParameters();
 
+        // Program feedrate
+        const programFeedrate = this.runner.getCurrentFeedrate();
+
         return Object.assign(context || {}, {
             // User-defined global variables
             global: this.sharedContext,
@@ -993,11 +1012,15 @@ class GrblController {
                 coolant: ensureArray(modal.coolant).join('\n'),
             },
 
+
             // Tool
             tool: Number(tool) || 0,
 
             // G-code parameters
             params: parameters,
+
+            // Program Feedrate
+            programFeedrate: programFeedrate,
 
             // Global objects
             ...globalObjects,
@@ -1302,10 +1325,11 @@ class GrblController {
                 this.workflow.stop();
 
                 callback(null, this.sender.toJSON());
-                this.workflow.stop();
-                this.engine.unload();
             },
             'gcode:unload': () => {
+                this.workflow.stop();
+                this.engine.unload();
+
                 // Sender
                 this.sender.unload();
 
@@ -1758,7 +1782,13 @@ class GrblController {
                     }
 
                     if (axes.Z) {
-                        axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: Math.abs(mpos.z), maxTravel: $132 });
+                        const direction = Math.sign(axes.Z);
+                        if (direction === 1) {
+                            axes.Z = Math.abs((mpos.z + 1));
+                        } else {
+                            axes.Z = (-1 * ($132 - 1)) - mpos.z;
+                        }
+                        //axes.Z = calculateAxisValue({ direction: Math.sign(axes.Z), position: mpos.z, maxTravel: (-1 * $132) });
                     }
                 } else {
                     jogFeedrate = 1250;
@@ -1863,6 +1893,14 @@ class GrblController {
                 log.debug('starting post hook');
                 this.command('feeder:start');
                 this.runPostChangeHook();
+            },
+            'wizard:start': () => {
+                log.debug('Wizard kickoff code');
+                const [gcode] = args;
+
+                this.toolChanger.addInterval(() => {
+                    this.command('gcode', gcode);
+                });
             },
             'wizard:step': () => {
                 const [stepIndex, substepIndex] = args;

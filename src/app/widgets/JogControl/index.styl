@@ -111,7 +111,7 @@
     display: grid;
     grid-gap: 2rem;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    @media (max-width: 599px) {
+    @media (max-width: 639px), (max-device-width: 639px) {
         grid-gap: 5px;
     }
 }
@@ -214,7 +214,7 @@
     height: 100%;
     align-self: center;
     align-items: center;
-    @media (max-width: 599px) {
+    @media (max-width: 639px), (max-device-width: 639px) {
         display: block;
     }
 }
@@ -228,7 +228,7 @@
     @media (max-height: 820px) {
         width: 43%;
     }
-    @media (max-width: 599px) {
+    @media (max-width: 639px), (max-device-width: 639px) {
         width: 91%;
         grid-gap: 12px;
     }
@@ -256,7 +256,7 @@
     button + button {
         margin-left: 0;
     }
-    @media (max-width: 599px) {
+    @media (max-width: 639px), (max-device-width: 639px) {
         display: flex;
         width: 89%;
         margin: 1rem;

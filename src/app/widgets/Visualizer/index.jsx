@@ -333,7 +333,9 @@ class VisualizerWidget extends PureComponent {
             };
 
             this.setState(updater, callback);
-            this.visualizer.handleSceneRender(vizualization);
+            if (this.visualizer) {
+                this.visualizer.handleSceneRender(vizualization);
+            }
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
@@ -371,7 +373,8 @@ class VisualizerWidget extends PureComponent {
                             y: 0,
                             z: 0
                         }
-                    }
+                    },
+                    visualization: {}
                 }
             }));
         },
@@ -544,19 +547,22 @@ class VisualizerWidget extends PureComponent {
                 }
             },
             toTopView: () => {
-                this.setState({ cameraPosition: 'top' });
+                this.setState({ cameraPosition: 'Top' });
             },
             to3DView: () => {
-                this.setState({ cameraPosition: '3d' });
+                this.setState({ cameraPosition: '3D' });
             },
             toFrontView: () => {
-                this.setState({ cameraPosition: 'front' });
+                this.setState({ cameraPosition: 'Front' });
             },
             toLeftSideView: () => {
-                this.setState({ cameraPosition: 'left' });
+                this.setState({ cameraPosition: 'Left' });
             },
             toRightSideView: () => {
-                this.setState({ cameraPosition: 'right' });
+                this.setState({ cameraPosition: 'Right' });
+            },
+            toFreeView: () => {
+                this.setState({ cameraPosition: 'Free' });
             }
         },
         handleLiteModeToggle: () => {
@@ -568,6 +574,9 @@ class VisualizerWidget extends PureComponent {
                 minimizeRenders: newLiteModeValue
             });
 
+            // instead of calling loadGCode right away,
+            // use this pubsub to invoke a refresh of the visualizer wrapper.
+            // this removes visual glitches that would otherwise appear.
             pubsub.publish('litemode:change', gcode);
         },
         lineWarning: {
@@ -774,6 +783,7 @@ class VisualizerWidget extends PureComponent {
                 sent: 0,
                 received: 0,
                 loadedBeforeConnection: false,
+                visualization: {}
             },
             disabled: this.config.get('disabled', false),
             disabledLite: this.config.get('disabledLite'),
@@ -804,7 +814,7 @@ class VisualizerWidget extends PureComponent {
                 }
             },
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
-            cameraPosition: '3d', // 'top', '3d', 'front', 'left', 'right'
+            cameraPosition: '3D', // 'Top', '3D', 'Front', 'Left', 'Right'
             isAgitated: false, // Defaults to false
             currentTheme: this.getVisualizerTheme(),
             currentTab: 0,
@@ -902,12 +912,12 @@ class VisualizerWidget extends PureComponent {
             } = this.actions.camera;
 
             const cameraViews = [
-                '3d',
-                'top',
-                'front',
-                'right',
-                'left',
-                'default',
+                '3D',
+                'Top',
+                'Front',
+                'Right',
+                'Left',
+                'Default',
             ];
 
             let currIndex = cameraViews.findIndex(view => view === this.state.cameraPosition);
@@ -921,12 +931,12 @@ class VisualizerWidget extends PureComponent {
             const currView = cameraViews[currIndex];
 
             const changeCamera = {
-                '3d': to3DView,
-                'top': toTopView,
-                'front': toFrontView,
-                'right': toRightSideView,
-                'left': toLeftSideView,
-                'default': () => {
+                '3D': to3DView,
+                'Top': toTopView,
+                'Front': toFrontView,
+                'Right': toRightSideView,
+                'Left': toLeftSideView,
+                'Default': () => {
                     const { cameraPosition } = this.getInitialState();
                     this.setState({ cameraPosition });
                 }
@@ -1448,6 +1458,24 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('gcode:surfacing', async (_, { gcode, name, size }) => {
                 const file = new File([gcode], name);
                 await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
+            }),
+            pubsub.subscribe('file:content', (_, content, size, name) => {
+                this.setState({
+                    gcode: {
+                        ...this.state.gcode,
+                        content: content,
+                        size: size,
+                        name: name
+                    }
+                });
+            }),
+            pubsub.subscribe('file:load', (_, data) => {
+                this.setState({
+                    gcode: {
+                        ...this.state.gcode,
+                        visualization: data
+                    }
+                });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -1508,7 +1536,7 @@ class VisualizerWidget extends PureComponent {
                     }}
                     gcode={gcode}
                     surfacingData={surfacingData}
-                    cameraPosition="top"
+                    cameraPosition="Top"
                 />
             )
             : (

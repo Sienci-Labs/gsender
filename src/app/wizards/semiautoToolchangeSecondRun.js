@@ -38,7 +38,8 @@ const getProbeSettings = () => {
 
 const getToolString = () => {
     const state = reduxStore.getState();
-    const tool = get(state, 'controller.state.parserstate.modal.tool', '');
+    const tool = get(state, 'controller.state.parserstate.modal.tool');
+
     return `T${tool}`;
 };
 
@@ -52,7 +53,7 @@ const calculateMaxZProbeDistance = (zProbeDistance = 30) => {
         return zProbeDistance;
     }
     const maxZTravel = Number(get(state, 'controller.settings.settings.$132'));
-    const curZPos = Math.abs(get(state, 'controller.mpos.z'));
+    const curZPos = Math.abs(Number(get(state, 'controller.mpos.z')));
 
     // If we think we'll trigger a limit switch, we need to calculate the max value we actually can probe
     if (curZPos + zProbeDistance >= maxZTravel) {
@@ -108,38 +109,9 @@ const wizard = {
             substeps: [
                 {
                     title: 'Safety First',
-                    description: () => <div>Ensure that your router/spindle is turned off and has fully stopped spinning then jog your machine to your probe location using the jog controls.</div>,
+                    description: () => <div>Ensure that your router/spindle is turned off and has fully stopped spinning then jog to a place you can reach using the jog controls.</div>,
                     overlay: false,
                 },
-            ]
-        },
-        {
-            title: 'Setup Probe',
-            substeps: [
-                {
-                    title: 'Check Offset',
-                    description: 'Position the current cutting tool about 10mm above the probe location, attach the magnet, and prepare to probe.',
-                    overlay: false,
-                    actions: [
-                        {
-                            label: 'Probe Initial Tool',
-                            cb: () => {
-                                controller.command('gcode', [
-                                    'G91 G21',
-                                    'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z[global.toolchange.RETRACT]',
-                                    'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                    'G4 P0.3',
-                                    '%global.toolchange.TOOL_OFFSET=posz',
-                                    '(TLO set: [global.toolchange.TOOL_OFFSET])',
-                                    'G91 G21 G0 Z10',
-                                    'G90'
-                                ]);
-                            }
-                        },
-                    ]
-                },
-
             ]
         },
         {
@@ -147,7 +119,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => <div>Jog your machine to a palce you can reach using the jog controls then change over to the next tool ({getToolString()}).  Once ready, jog to 10mm above the probe location, attach the magnet, and prepare to probe</div>,
+                    description: () => <div>Change over to the next tool ({getToolString()}). Once ready, jog back to 10mm above the probe location, attach the magnet, and prepare to probe.</div>,
                     overlay: false,
                     actions: [
                         {
@@ -159,7 +131,6 @@ const wizard = {
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
                                     'G0 Z[global.toolchange.RETRACT]',
                                     'G38.2 Z-15 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
-                                    '(Set Z to Tool offset and wait)',
                                     'G0 Z[global.toolchange.RETRACT]',
                                     'G4 P0.3',
                                     `${modal} G10 L20 P0 Z[global.toolchange.TOOL_OFFSET + global.toolchange.RETRACT]`,

@@ -343,9 +343,8 @@ class CNCEngine {
                 // Load file to controller if it exists
                 if (this.hasFileLoaded()) {
                     if (numClients === 0) {
-                        console.log(this.meta);
                         controller.loadFile(this.gcode, this.meta);
-                        socket.emit('file:load', this.gcode, this.meta.name, this.meta.size);
+                        socket.emit('file:load', this.gcode, this.meta.size, this.meta.name);
                     } else {
                         log.debug('File already loaded in another socket');
                     }
@@ -405,7 +404,7 @@ class CNCEngine {
                 // Leave the room
                 socket.leave(port);
 
-                if (numClients === 1) { // if only this one was connected
+                if (numClients <= 1) { // if only this one was connected
                     controller.close(err => {
                         // Remove controller from store
                         store.unset(`controllers[${JSON.stringify(port)}]`);

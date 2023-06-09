@@ -21,7 +21,7 @@
  *
  */
 
-import ch from 'hull.js';
+import hull from 'concaveman';
 import GCodeVirtualizer from 'app/lib/GCodeVirtualizer';
 import * as THREE from 'three';
 
@@ -29,11 +29,10 @@ onmessage = ({ data }) => {
     const { gcode, isLaser = false } = data;
     // Generate an ordered pair - we don't care about Z index for outline purposes, so it's removed
     function vertex(x, y) {
-        return [x.toFixed(2), y.toFixed(2)];
+        return [x.toFixed(3), y.toFixed(3)];
     }
 
     const getOutlineGcode = (gcode, concavity = 60) => {
-        const start = Date.now();
         const vertices = [];
 
         const addLine = ({ motion }, v1, v2) => {
@@ -62,7 +61,7 @@ onmessage = ({ data }) => {
                 endAngle, // aEndAngle
                 isClockwise // isClockwise
             );
-            const divisions = 30;
+            const divisions = 10;
             const points = arcCurve.getPoints(divisions);
             vertices.push(vertex(v1.x, v1.y));
 
@@ -93,9 +92,8 @@ onmessage = ({ data }) => {
             let line = lines.pop();
             vm.virtualize(line);
         }
-        console.log(`Hull Parse: ${Date.now() - start}`);
-        console.log(vertices.length);
-        const fileHull = ch(vertices, concavity);
+
+        const fileHull = hull(vertices);
 
         const gCode = convertPointsToGCode(fileHull, isLaser);
 

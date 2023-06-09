@@ -101,7 +101,7 @@ const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 class Visualizer extends Component {
     static propTypes = {
         show: PropTypes.bool,
-        cameraPosition: PropTypes.oneOf(['top', '3d', 'front', 'left', 'right']),
+        cameraPosition: PropTypes.oneOf(['Top', '3D', 'Front', 'Left', 'Right', 'Free']),
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
@@ -416,19 +416,19 @@ class Visualizer extends Component {
         }
 
         if (prevProps.cameraPosition !== this.props.cameraPosition) {
-            if (this.props.cameraPosition === 'top') {
+            if (this.props.cameraPosition === 'Top') {
                 this.toTopView();
             }
-            if (this.props.cameraPosition === '3d') {
+            if (this.props.cameraPosition === '3D') {
                 this.to3DView();
             }
-            if (this.props.cameraPosition === 'front') {
+            if (this.props.cameraPosition === 'Front') {
                 this.toFrontView();
             }
-            if (this.props.cameraPosition === 'left') {
+            if (this.props.cameraPosition === 'Left') {
                 this.toLeftSideView();
             }
-            if (this.props.cameraPosition === 'right') {
+            if (this.props.cameraPosition === 'Right') {
                 this.toRightSideView();
             }
         }
@@ -490,19 +490,27 @@ class Visualizer extends Component {
     }
 
     rerenderGCode() {
-        const { actions, state } = this.props;
-        const { gcode } = state;
+        const content = reduxStore.getState().file.content;
 
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
             this.group.remove(group);
         }
-        if (gcode.content) {
-            actions.loadGCode('', gcode.content);
-        } else {
-            // reupload the file to update the colours
-            this.uploadGCodeFile(reduxStore.getState().file.content);
-        }
+        // reupload the file to update the colours
+        this.uploadGCodeFile(content);
+    }
+
+    reparseGCode() {
+        const { state } = this.props;
+        const { gcode } = state;
+        // reparse file
+        pubsub.publish('reparseGCode', gcode.content, gcode.size, gcode.name, this.props.isSecondary ? VISUALIZER_SECONDARY : VISUALIZER_PRIMARY);
+    }
+
+    reloadGCode() {
+        const { actions, state } = this.props;
+        const { gcode } = state;
+        actions.loadGCode('', gcode.visualization);
     }
 
     removeSceneGroup() {
@@ -1454,6 +1462,7 @@ class Visualizer extends Component {
         });
         controls.addEventListener('end', () => {
             shouldAnimate = false;
+            this.props.actions.camera.toFreeView();
             this.updateScene();
         });
         controls.addEventListener('change', () => {
@@ -1616,29 +1625,11 @@ class Visualizer extends Component {
 
         // only set the camera if it's the first render
         if (shouldZoom) {
-            switch (this.props.cameraPosition) {
-            case 'top':
+            // if secondary, force top view
+            if (this.props.isSecondary) {
                 this.toTopView();
-                break;
-
-            case '3d':
-                this.to3DView();
-                break;
-
-            case 'front':
-                this.toFrontView();
-                break;
-
-            case 'left':
-                this.toLeftSideView();
-                break;
-
-            case 'right':
-                this.toRightSideView();
-                break;
-
-            default:
-                this.toFrontView();
+            } else { // if primary, force 3d view
+                this.props.actions.camera.to3DView();
             }
             this.didZoom = true;
         }

@@ -30,15 +30,18 @@ import * as controllerActions from 'app/actions/controllerActions';
 import manualToolChange from 'app/wizards/manualToolchange';
 import semiautoToolChange from 'app/wizards/semiautoToolchange';
 import automaticToolChange from 'app/wizards/automaticToolchange';
+import semiautoToolchangeSecondRun from 'app/wizards/semiautoToolchangeSecondRun';
+import automaticToolchangeSecondRun from 'app/wizards/automaticToolchangeSecondRun';
 import * as connectionActions from 'app/actions/connectionActions';
 import * as fileActions from 'app/actions/fileInfoActions';
 import * as preferenceActions from 'app/actions/preferencesActions';
+import * as visualizerActions from 'app/actions/visualizerActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import VisualizeWorker from 'app/workers/Visualize.worker';
-import { visualizeResponse, shouldVisualize, shouldVisualizeSVG } from 'app/workers/Visualize.response';
+import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
-import { RENDER_LOADING, RENDER_RENDERED, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
+import { RENDER_LOADING, RENDER_RENDERED, RENDER_NO_FILE, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import isElectron from 'is-electron';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 
@@ -57,30 +60,26 @@ export function* initialize() {
 
     const incrementJobCounter = () => {
         let jobsFinished = store.get('workspace.jobsFinished');
-        jobsFinished++;
-        store.set('workspace.jobsFinished', jobsFinished);
+
+        store.replace('workspace.jobsFinished', jobsFinished + 1);
     };
 
-    const addToCancelledCounter = (isAdd) => {
-        let jobsCancelled = store.get('workspace.jobsCancelled');
-        if (isAdd) {
-            jobsCancelled++;
-        } else {
-            jobsCancelled--;
-        }
-        store.set('workspace.jobsCancelled', jobsCancelled);
+    const incrementJobCancelledCounter = () => {
+        const jobsCancelled = store.get('workspace.jobsCancelled');
+
+        store.replace('workspace.jobsCancelled', jobsCancelled + 1);
     };
 
     const incrementTimeRun = (elapsedTime) => {
         // add elapsed time to total time run
         let timeSpentRunning = store.get('workspace.timeSpentRunning');
         timeSpentRunning += elapsedTime;
-        store.set('workspace.timeSpentRunning', timeSpentRunning);
+        store.replace('workspace.timeSpentRunning', timeSpentRunning);
 
         // also add it to last element in array of job times
         let jobTimes = store.get('workspace.jobTimes');
         jobTimes[jobTimes.length - 1] += elapsedTime;
-        store.set('workspace.jobTimes', jobTimes);
+        store.replace('workspace.jobTimes', jobTimes);
 
         // compare last element to the longest time
         compareLongestTime(jobTimes[jobTimes.length - 1]);
@@ -89,18 +88,15 @@ export function* initialize() {
     const compareLongestTime = (time) => {
         let longestTimeRun = store.get('workspace.longestTimeRun');
         if (time > longestTimeRun) {
-            store.set('workspace.longestTimeRun', time);
+            store.replace('workspace.longestTimeRun', time);
         }
     };
 
     const onJobStart = () => {
-        // increment cancelled jobs
-        addToCancelledCounter(true);
-
         // add another index to array of job times
         let jobTimes = store.get('workspace.jobTimes');
         jobTimes.push(0);
-        store.set('workspace.jobTimes', jobTimes);
+        store.replace('workspace.jobTimes', jobTimes);
     };
 
     const onJobStop = (elapsedTime) => {
@@ -108,7 +104,8 @@ export function* initialize() {
             onJobStart();
             areStatsInitialized = true;
         }
-        incrementTimeRun(elapsedTime);
+
+        incrementJobCancelledCounter();
     };
 
     const onJobEnd = (elapsedTime) => {
@@ -116,13 +113,115 @@ export function* initialize() {
             onJobStart();
             areStatsInitialized = true;
         }
-        // decrement cancelled jobs
-        addToCancelledCounter(false);
+
         incrementJobCounter();
-        onJobStop(elapsedTime);
+        incrementTimeRun(elapsedTime);
 
         // reset to false since it's the end of the job
         areStatsInitialized = false;
+    };
+
+    const parseGCode = (content, size, name, visualizer) => {
+        const isLaser = isLaserMode();
+        if (visualizer === VISUALIZER_SECONDARY) {
+            reduxStore.dispatch({
+                type: fileActions.UPDATE_FILE_RENDER_STATE,
+                payload: {
+                    state: RENDER_NO_FILE
+                }
+            });
+            setTimeout(() => {
+                const renderState = _get(reduxStore.getState(), 'file.renderState');
+                if (renderState === RENDER_NO_FILE) {
+                    reduxStore.dispatch({
+                        type: fileActions.UPDATE_FILE_RENDER_STATE,
+                        payload: {
+                            state: RENDER_LOADING
+                        }
+                    });
+                }
+            }, 1000);
+
+            const needsVisualization = shouldVisualize();
+
+            if (needsVisualization) {
+                visualizeWorker = new VisualizeWorker();
+                visualizeWorker.onmessage = visualizeResponse;
+                visualizeWorker.postMessage({
+                    content,
+                    visualizer
+                });
+            } else {
+                reduxStore.dispatch({
+                    type: fileActions.UPDATE_FILE_RENDER_STATE,
+                    payload: {
+                        state: RENDER_RENDERED
+                    }
+                });
+            }
+
+            return;
+        }
+
+        // Basic file content
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_CONTENT,
+            payload: {
+                content,
+                size,
+                name,
+            }
+        });
+        // sending gcode data to the visualizer
+        // so it can save it and give it to the normal or svg visualizer
+        pubsub.publish('file:content', content, size, name);
+        // Processing started for gcodeProcessor
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_PROCESSING,
+            payload: {
+                value: true
+            }
+        });
+        reduxStore.dispatch({
+            type: fileActions.UPDATE_FILE_RENDER_STATE,
+            payload: {
+                state: RENDER_NO_FILE
+            }
+        });
+        setTimeout(() => {
+            const renderState = _get(reduxStore.getState(), 'file.renderState');
+            if (renderState === RENDER_NO_FILE) {
+                reduxStore.dispatch({
+                    type: fileActions.UPDATE_FILE_RENDER_STATE,
+                    payload: {
+                        state: RENDER_LOADING
+                    }
+                });
+            }
+        }, 1000);
+        /*        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
+                const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
+                const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
+                const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];*/
+
+        const needsVisualization = shouldVisualize();
+
+        if (needsVisualization) {
+            visualizeWorker = new VisualizeWorker();
+            visualizeWorker.onmessage = visualizeResponse;
+            visualizeWorker.postMessage({
+                content,
+                visualizer,
+                isLaser
+            });
+        } else {
+            reduxStore.dispatch({
+                type: fileActions.UPDATE_FILE_RENDER_STATE,
+                payload: {
+                    state: RENDER_RENDERED
+                }
+            });
+        }
     };
 
     controller.addListener('controller:settings', (type, settings) => {
@@ -155,9 +254,11 @@ export function* initialize() {
         // finished job
         if (status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) {
             onJobEnd(status.timeRunning);
+            reduxStore.dispatch({ type: visualizerActions.UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         // cancelled job
         } else if (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD) {
             onJobStop(status.timeRunning);
+            reduxStore.dispatch({ type: visualizerActions.UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         }
 
         reduxStore.dispatch({
@@ -269,31 +370,42 @@ export function* initialize() {
             context,
             comment
         };
-        const { option } = context;
-        if (option === 'Manual') {
-            pubsub.publish('wizard:load', {
-                ...payload,
-                title: 'Manual Toolchange',
-                instructions: manualToolChange
-            });
-        } else if (option === 'Semi-Automatic') {
-            pubsub.publish('wizard:load', {
-                ...payload,
-                title: 'Semi-Automatic Toolchange',
-                instructions: semiautoToolChange
-            });
-        } else if (option === 'Automatic') {
-            pubsub.publish('wizard:load', {
-                ...payload,
-                title: 'Automatic Toolchange',
-                instructions: automaticToolChange
-            });
-        } else if (option === 'Pause') {
+
+        const { option, count } = context;
+        if (option === 'Pause') {
             const msg = 'Toolchange pause' + (comment ? ` - ${comment}` : '');
             Toaster.pop({
                 msg: msg,
                 type: TOASTER_INFO,
                 duration: TOASTER_UNTIL_CLOSE
+            });
+        } else {
+            let title, instructions;
+
+            if (option === 'Standard Re-zero') {
+                title = 'Standard Re-zero Tool Change';
+                instructions = manualToolChange;
+            } else if (option === 'Flexible Re-zero') {
+                title = 'Flexible Re-zero Tool Change';
+                instructions = (count > 1) ? semiautoToolchangeSecondRun : semiautoToolChange;
+            } else if (option === 'Fixed Tool Sensor') {
+                title = 'Fixed Tool Sensor Tool Change';
+                instructions = (count > 1) ? automaticToolchangeSecondRun : automaticToolChange;
+            } else {
+                console.error('Invalid toolchange option passed');
+                return;
+            }
+
+            // Run start block on idle if exists
+            if (instructions.onStart) {
+                const onStart = instructions.onStart();
+                controller.command('wizard:start', onStart);
+            }
+
+            pubsub.publish('wizard:load', {
+                ...payload,
+                title,
+                instructions
             });
         }
     });
@@ -311,85 +423,7 @@ export function* initialize() {
     });
 
     controller.addListener('file:load', (content, size, name, visualizer) => {
-        const isLaser = isLaserMode();
-        if (visualizer === VISUALIZER_SECONDARY) {
-            reduxStore.dispatch({
-                type: fileActions.UPDATE_FILE_RENDER_STATE,
-                payload: {
-                    state: RENDER_LOADING
-                }
-            });
-
-            const needsVisualization = shouldVisualize();
-            const shouldRenderSVG = shouldVisualizeSVG();
-
-            if (needsVisualization) {
-                visualizeWorker = new VisualizeWorker();
-                visualizeWorker.onmessage = visualizeResponse;
-                visualizeWorker.postMessage({
-                    content,
-                    visualizer,
-                    shouldRenderSVG
-                });
-            } else {
-                reduxStore.dispatch({
-                    type: fileActions.UPDATE_FILE_RENDER_STATE,
-                    payload: {
-                        state: RENDER_RENDERED
-                    }
-                });
-            }
-
-            return;
-        }
-
-        // Basic file content
-        reduxStore.dispatch({
-            type: fileActions.UPDATE_FILE_CONTENT,
-            payload: {
-                content,
-                size,
-                name,
-            }
-        });
-        // Processing started for gcodeProcessor
-        reduxStore.dispatch({
-            type: fileActions.UPDATE_FILE_PROCESSING,
-            payload: {
-                value: true
-            }
-        });
-        reduxStore.dispatch({
-            type: fileActions.UPDATE_FILE_RENDER_STATE,
-            payload: {
-                state: RENDER_LOADING
-            }
-        });
-        /*        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
-                const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
-                const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
-                const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];*/
-
-        const needsVisualization = shouldVisualize();
-        const shouldRenderSVG = shouldVisualizeSVG();
-
-        if (needsVisualization) {
-            visualizeWorker = new VisualizeWorker();
-            visualizeWorker.onmessage = visualizeResponse;
-            visualizeWorker.postMessage({
-                content,
-                visualizer,
-                isLaser,
-                shouldRenderSVG
-            });
-        } else {
-            reduxStore.dispatch({
-                type: fileActions.UPDATE_FILE_RENDER_STATE,
-                payload: {
-                    state: RENDER_RENDERED
-                }
-            });
-        }
+        parseGCode(content, size, name, visualizer);
     });
 
     controller.addListener('gcode:unload', () => {
@@ -426,6 +460,10 @@ export function* initialize() {
         estimateWorker.terminate();
     });
 
+    pubsub.subscribe('reparseGCode', (msg, content, size, name, visualizer) => {
+        parseGCode(content, size, name, visualizer);
+    });
+
     controller.addListener('toolchange:preHookComplete', (comment = '') => {
         const onConfirmhandler = () => {
             controller.command('toolchange:post');
@@ -459,10 +497,8 @@ export function* initialize() {
     });
 
     controller.addListener('sender:M0M1', (opts) => {
-        const { data, comment = '' } = opts;
-        const msg = `A pause command (${data}) was found. Click Resume to immediately continue the job.
-            If you want to perform more operations (toolchange, jog, etc),
-            close the window, then press the standard Resume Job button when you're ready.`;
+        const { comment = '' } = opts;
+        const msg = 'Hit \‘Close Window\‘ if you want to do a tool change, jog, set a new zero, or perform any other operation then hit the standard \‘Resume Job\’ button to keep cutting when you\’re ready.';
 
         const content = (comment.length > 0)
             ? <div><p>{msg}</p><p>Comment: <b>{comment}</b></p></div>
@@ -512,10 +548,6 @@ export function* initialize() {
         pubsub.publish('wizard:next', { stepIndex, substepIndex });
     });
 
-    controller.addListener('gcode:loaded', ({ gcode, meta }) => {
-        console.log(gcode);
-        console.log(meta);
-    });
 
     controller.addListener('connection:new', (content) => {
         pubsub.publish('store:update', content);

@@ -26,14 +26,21 @@ import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import { get } from 'lodash';
 
+const getProbeSettings = () => {
+    const probeSettings = store.get('widgets.probe');
+    return {
+        slowSpeed: probeSettings.probeFeedrate.mm,
+        fastSpeed: probeSettings.probeFastFeedrate.mm,
+        retract: probeSettings.retractionDistance.mm,
+        zProbeDistance: probeSettings.zProbeDistance.mm,
+    };
+};
+
 
 const getToolString = () => {
     const state = reduxStore.getState();
     const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
-    if (tool === '0') {
-        return 'no T command parsed';
-    }
-    return `last T command was T${tool}`;
+    return `T${tool}`;
 };
 
 const getUnitModal = () => {
@@ -46,80 +53,67 @@ const getUnitModal = () => {
 };
 
 const wizard = {
+    intro: {
+        icon: 'fas fa-caution',
+        description: 'Tool Change detected, stay clear of the machine! Wait until initial movements are complete!'
+    },
+    onStart: () => {
+        const probeProfile = store.get('workspace.probeProfile');
+        const settings = getProbeSettings();
+        const { zThickness } = probeProfile;
+
+        return [
+            '%wait',
+            `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
+            `%global.toolchange.PROBE_DISTANCE=${settings.zProbeDistance}`,
+            `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
+            `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
+            `%global.toolchange.RETRACT=${settings.retract}`,
+            '%global.toolchange.XPOS=posx',
+            '%global.toolchange.YPOS=posy',
+            '%global.toolchange.ZPOS=posz',
+            '%global.toolchange.UNITS=modal.units',
+            '%global.toolchange.SPINDLE=modal.spindle',
+            '%global.toolchange.DISTANCE=modal.distance',
+            '%global.toolchange.FEEDRATE=programFeedrate',
+            '([JSON.stringify(global.toolchange)])',
+            'M5',
+            '(Toolchange initiated)',
+        ];
+    },
     steps: [
         {
-            title: 'Change Bit',
+            title: 'Starting Off',
             substeps: [
                 {
                     title: 'Safety First',
-                    description: () => <div>If using a router, manually turn it off.  Click the below button to save current position and modals, and turn off spindle if active.</div>,
+                    description: () => <div>Jog your machine to a place you can reach using the jog controls and ensure that your router/spindle is turned off and has fully stopped spinning.</div>,
                     overlay: false,
-                    actions: [
-                        {
-                            label: 'Save Positions and Modals',
-                            cb: () => {
-                                const probeProfile = store.get('workspace.probeProfile');
-                                const { zThickness } = probeProfile;
-                                controller.command('gcode', [
-                                    '%wait',
-                                    `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
-                                    '%global.toolchange.PROBE_DISTANCE=80',
-                                    '%global.toolchange.PROBE_FEEDRATE=200',
-                                    '%global.toolchange.XPOS=posx',
-                                    '%global.toolchange.YPOS=posy',
-                                    '%global.toolchange.ZPOS=posz',
-                                    '%global.toolchange.UNITS=modal.units',
-                                    '%global.toolchange.SPINDLE=modal.spindle',
-                                    '%global.toolchange.DISTANCE=modal.distance',
-                                    '%global.toolchange.FEEDRATE=modal.feedrate',
-                                    'M5',
-                                    'G91 G21 G0Z5',
-                                    '(Toolchange variables:)',
-                                    '([JSON.stringify(global.toolchange)])',
-                                ]);
-                            }
-                        }
-                    ]
                 },
                 {
                     title: 'Change Bit',
-                    description: () => `Change tool to requested bit - ${getToolString()}`,
+                    description: () => `Change over to the next tool (${getToolString()})`,
                     overlay: false
                 }
             ]
         },
         {
-            title: 'Setup Probe',
+            title: 'Probe New Tool',
             substeps: [
                 {
-                    title: 'Touchplate Setup',
-                    description: 'Setup touchplate and attach continuity collets.',
-                    overlay: false
-                },
-                {
-                    title: 'Position Router',
-                    description: 'Jog router into position above the touch plate using the jog controls',
-                    overlay: false
-                }
-            ]
-        },
-        {
-            title: 'Probe Tool',
-            substeps: [
-                {
-                    title: 'Probe',
-                    description: 'Probe tool length - the following code will probe Z and set a new zero based on the configured touchplate thickness.',
+                    title: 'Reset the Z',
+                    description: 'Use jogging or X and Y gotos to bring your CNC back over to where you initially set the project zero. If you used a touch plate be sure to place the tool over the plate and attach the magnet.',
                     overlay: false,
                     actions: [
                         {
-                            label: 'Probe Z',
+                            label: 'Probe Z (touch plate)',
                             cb: () => {
                                 controller.command('gcode', [
                                     '(Probing Z 0 with probe thickness of [global.toolchange.PROBE_THICKNESS]mm)',
                                     'G91',
                                     'G38.2 Z-[global.toolchange.PROBE_DISTANCE] F[global.toolchange.PROBE_FEEDRATE]',
-                                    'G0 Z10',
-                                    'G38.2 Z-10 F40',
+                                    'G0 Z[global.toolchange.RETRACT]',
+                                    'G38.2 Z-10 F[global.toolchange.PROBE_SLOW_FEEDRATE]',
                                     '%wait',
                                     'G10 L20 P0 Z[global.toolchange.PROBE_THICKNESS]',
                                     'G0 G21 Z10'
@@ -127,7 +121,7 @@ const wizard = {
                             }
                         },
                         {
-                            label: 'Set Z0 at Location',
+                            label: 'Set Z0 (paper method)',
                             cb: () => {
                                 controller.command('gcode', [
                                     '(Setting Z 0)',
@@ -141,24 +135,25 @@ const wizard = {
             ]
         },
         {
-            title: 'Resume Path',
+            title: 'Resume Job',
             substeps: [
                 {
-                    title: 'Resume Program',
-                    description: 'Detach and remove your touchplate from the work area.  The following code will restore modals, and move back to initial position.  Remember to turn on your router before resuming.',
+                    title: 'Resume Job',
+                    description: 'If everything looks good, prepare for your machine to move back to the cutting area and continue as expected. Remove the touch plate magnet and turn on your router if you have them.',
                     overlay: false,
                     actions: [
                         {
-                            label: 'Prepare for Resume',
+                            label: 'Resume Job',
                             cb: () => {
                                 const prefUnit = getUnitModal();
                                 controller.command('gcode', [
                                     '(Returning to initial position)',
-                                    'G91 G21 G0 Z15',
+                                    'G21',
                                     `G90 ${prefUnit} G0 X[global.toolchange.XPOS] Y[global.toolchange.YPOS]`,
                                     `G90 ${prefUnit} G0 Z[global.toolchange.ZPOS]`,
                                     '(Restore initial modals)',
-                                    '[global.toolchange.SPINDLE] [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]'
+                                    'M3 [global.toolchange.UNITS] [global.toolchange.DISTANCE] [global.toolchange.FEEDRATE]',
+                                    '%toolchange_complete'
                                 ]);
                             }
                         }

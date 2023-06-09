@@ -32,7 +32,7 @@ const ErrorLog = () => {
             <div className={styles.errorBody}>
                 { logs.length !== 0
                     ? (
-                        <VerticalTimeline layout="1-column-left" className={styles.verticalTimeline}>
+                        <VerticalTimeline animate={false} layout="1-column-left" className={styles.verticalTimeline}>
                             {
                                 logs.map((log, index) => {
                                     return log.toLowerCase().includes('alarm')
