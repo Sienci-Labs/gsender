@@ -1293,6 +1293,9 @@ class GrblController {
             },
             'gcode:load': () => {
                 let [name, gcode, context = {}, callback = noop] = args;
+                if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
+                    return;
+                }
                 if (typeof context === 'function') {
                     callback = context;
                     context = {};
