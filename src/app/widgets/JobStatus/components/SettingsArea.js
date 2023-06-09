@@ -40,6 +40,14 @@ const VALUE_RANGES = {
     MAX: 230
 };
 
+// debounced handlers
+const debouncedSpindleHandler = debounce((value) => {
+    controller.command('spindleOverride', Number(value));
+}, 1000);
+const debouncedFeedHandler = debounce((value) => {
+    controller.command('feedOverride', Number(value));
+}, 1000);
+
 /**
  * Settings Area component to display override controls for user
  * @prop {Object} state Default state given from parent component
@@ -64,14 +72,6 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
         setLocalFunc(newVal);
         controller.writeln(command);
     };
-
-    // debounced handlers
-    const debouncedSpindleHandler = debounce((value) => {
-        controller.command('spindleOverride', Number(value));
-    }, 100);
-    const debouncedFeedHandler = debounce((value) => {
-        controller.command('feedOverride', Number(value));
-    }, 100);
 
     const handleMachineProfileChange = () => {
         setShowSpindleOverride(store.get('workspace.machineProfile.spindle'));
@@ -100,9 +100,10 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                     sliderName="feedOV"
                     unitString="%"
                     step={10}
-                    onChange={(e) => setLocalOvF(e.target.value)}
-                    onMouseUp={(e) => debouncedFeedHandler(e.target.value)}
-                    datalist={[100]}
+                    onChange={(e) => {
+                        setLocalOvF(e.target.value);
+                        debouncedFeedHandler(e.target.value);
+                    }}
                 />
                 <div className={styles.overridesButtonsWrapper}>
                     <FeedControlButton value="100" onClick={() => handleChangeRate(setLocalOvF, 100, '\x90')}>
@@ -131,9 +132,10 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                             unitString="%"
                             sliderName="spindleOV"
                             step={10}
-                            onChange={(e) => setLocalOvS(e.target.value)}
-                            onMouseUp={(e) => debouncedSpindleHandler(e.target.value)}
-                            datalist={[100]}
+                            onChange={(e) => {
+                                setLocalOvS(e.target.value);
+                                debouncedSpindleHandler(e.target.value);
+                            }}
                         />
                         <div className={styles.overridesButtonsWrapper}>
                             <FeedControlButton value="100" onClick={() => handleChangeRate(setLocalOvS, 100, '\x99')}>
