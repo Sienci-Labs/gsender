@@ -3,11 +3,18 @@ import classNames from 'classnames';
 import map from 'lodash/map';
 import { useSelector } from 'react-redux';
 import get from 'lodash/get';
+import pubsub from 'pubsub-js';
+import api from 'app/api';
 
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import store from 'app/store';
-import { WORKSPACE_MODE, METRIC_UNITS } from 'app/constants';
+import { WORKSPACE_MODE, METRIC_UNITS, VISUALIZER_SECONDARY } from 'app/constants';
+
+import {
+    Toaster,
+    TOASTER_DANGER
+} from '../../lib/toaster/ToasterLib';
 
 import styles from './index.styl';
 import RotaryToggle from './RotaryToggle';
@@ -17,8 +24,20 @@ import SpeedPresets from './SpeedPresets';
 import SpeedControls from './SpeedControls';
 // import StockDiameter from './StockDiameter';
 import ActionArea from './ActionArea';
-
 import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../JogControl/constants';
+import PhysicalUnitSetup from './PhysicalUnitSetup';
+import { LINES_UP, QUARTER, SIX } from './constant';
+import log from '../../lib/log';
+
+/**
+ * Custom error for when Rotary setup object was not found in store
+ */
+class NoSetupFileError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'NoSetupFileError';
+    }
+}
 
 const Rotary = ({ active }) => {
     const [speedPreset, setSpeedPreset] = useState(SPEED_NORMAL);
@@ -27,12 +46,22 @@ const Rotary = ({ active }) => {
         aStep: '5.00',
     });
     const [, setIsContinuousJogging] = useState(false);
+    const [physicalSetupState, setPhysicalSetupState] = useState(initialSetupState());
     const { state: controllerState, type: controllerType } = useSelector(state => state.controller);
-
+    const [setupFile, setSetupFIle] = useState(null);
 
     const { ROTARY } = WORKSPACE_MODE;
     const workspaceMode = store.get('workspace.mode');
     const enableRotaryAxis = (workspaceMode === ROTARY && controllerType === 'Grbl') || controllerType === 'grblHAL';
+
+    function initialSetupState() {
+        return {
+            showDialogue: false,
+            linesUp: LINES_UP,
+            drillDiameter: QUARTER,
+            holeCount: SIX,
+        };
+    }
 
     const actions = {
         setSelectedSpeed: (speed) => {
@@ -101,6 +130,38 @@ const Rotary = ({ active }) => {
             const command = `G10 P${p} L20 ${axis.toUpperCase()}${value}`;
             controller.command('gcode:safe', command, modal);
         },
+        uploadSetup: (rotarySetupGcode, callback) => {
+            if (!rotarySetupGcode) {
+                callback(new NoSetupFileError('No setup files found'));
+                return;
+            }
+            const serializedFile = new File([rotarySetupGcode], 'rotary.nc');
+            api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY, (error) => {
+                if (error) {
+                    callback(error);
+                    return;
+                }
+                setSetupFIle(rotarySetupGcode);
+                callback(null);
+            });
+        },
+
+        loadGcode: (rotarySetupFile = null, callback) => {
+            actions.uploadSetup(rotarySetupFile, (error) => {
+                if (error) {
+                    log.error(error);
+                    Toaster.pop({
+                        type: TOASTER_DANGER,
+                        msg: error.message
+                    });
+                    callback(false);
+                    return;
+                }
+                pubsub.publish('gcode:rotarySetup', { setupFile, name: 'setup' });
+                callback(true);
+            });
+        }
+
     };
 
     const isFileRunning = () => {
@@ -138,7 +199,15 @@ const Rotary = ({ active }) => {
                         <p className={styles['rotary-tab-section-title']}>Tools</p>
                         <RotaryToggle />
                         {/* <StockDiameter /> */}
-                        <ActionArea />
+                        <ActionArea
+                            physicalSetupState={physicalSetupState}
+                            setPhysicalSetupState={setPhysicalSetupState}
+                        />
+                        <PhysicalUnitSetup
+                            actions={actions}
+                            physicalSetupState={physicalSetupState}
+                            setPhysicalSetupState={setPhysicalSetupState}
+                        />
                     </div>
                 </div>
             </Widget.Content>
