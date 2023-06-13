@@ -61,7 +61,20 @@ class Gamepad extends GamepadListener {
 }
 
 //  TODO:  Remove this when SSL is working correctly
-const gamepadInstance = new Gamepad();
+const getGamepadInstance = () => {
+    if (navigator.userAgent.includes('Firefox')) {
+        console.log('Mock gamepad');
+        return {
+            start: () => {},
+            on: () => {},
+        };
+    } else {
+        return new Gamepad();
+    }
+};
+
+const gamepadInstance = getGamepadInstance();
+
 gamepadInstance.start();
 
 export const shortcutComboBuilder = (list = []) => {
