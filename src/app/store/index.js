@@ -253,6 +253,12 @@ const migrateStore = () => {
 
         // Set toolchange option to ignore across the board
         store.set('workspace.toolChangeOption', 'Ignore');
+
+        // Fix Auto Zero String
+        const probeType = store.get('workspace.probeProfile.touchplateType', '');
+        if (probeType === 'Auto Zero Touchplate') {
+            store.set('workspace.probeProfile.touchplateType', 'AutoZero Touchplate');
+        }
     }
 
     if (semver.lt(cnc.version, '1.1.5')) {
