@@ -24,7 +24,8 @@ if (isElectron()) {
     const path = window.require('path'); // Require the path module within Electron
 
     userData = {
-        path: path.join(app.getPath('userData'), 'preferences.json')
+        path: path.join(app.getPath('userData'), 'gsender-0.5.6.json'),
+        newPath: path.join(app.getPath('userData'), 'preferences.json')
     };
 }
 
@@ -189,33 +190,39 @@ const migrateStore = () => {
         return;
     }
 
-    if (semver.lt(cnc.version, '1.2.4') || semver.lt(cnc.version, '1.2.4-EDGE')) {
-        const currentCommandKeys = store.get('commandKeys');
-        let newCommandKeysList = {};
+    if (semver.lt(cnc.version, '1.2.0')) {
+        // things
+        const currentCommandKeys = store.get('commandKeys', []);
+        const newCommandKeys = {};
 
-        if (Array.isArray(currentCommandKeys)) {
-            currentCommandKeys.forEach(element => {
-                if (element.category === MACRO_CATEGORY) {
-                    element.cmd = element.id;
-                }
-                delete element.id;
-                newCommandKeysList[element.cmd] = element;
-            });
-        } else {
-            newCommandKeysList = currentCommandKeys;
+        // Migrate from array to object - if already object we're good
+        if (typeof currentCommandKeys === 'object') {
+            return;
         }
 
-        Object.entries(newCommandKeysList).forEach(([key, shortcut]) => {
-            delete shortcut.title;
-            delete shortcut.payload;
-            delete shortcut.preventDefault;
-            delete shortcut.category;
-            delete shortcut.callback;
-            newCommandKeysList[key] = shortcut;
+        currentCommandKeys.forEach((c) => {
+            // All we need to store now apart from macros
+            const nc = {
+                cmd: c.cmd,
+                isActive: c.isActive,
+                keys: c.keys
+            };
+            // Make sure macros have all info so they work
+            if (c.category === 'Macros') {
+                nc.category = 'Macros';
+                nc.payload = {
+                    macroID: c.cmd
+                };
+                nc.preventDefault = false;
+                nc.title = c.title;
+            }
+
+            newCommandKeys[c.cmd] = nc;
         });
 
-        store.replace('commandKeys', newCommandKeysList);
+        store.replace('commandKeys', newCommandKeys);
 
+        // Gamepad changes
         const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
         const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
             const shortcuts = profile.shortcuts;
@@ -248,6 +255,9 @@ const migrateStore = () => {
             return { ...profile, shortcuts: isEmpty(updatedProfileShortcuts) ? shortcuts : updatedProfileShortcuts };
         });
         store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
+
+        // Set toolchange option to ignore across the board
+        store.set('workspace.toolChangeOption', 'Ignore');
     }
 
     if (semver.lt(cnc.version, '1.1.5')) {

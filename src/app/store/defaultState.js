@@ -332,6 +332,7 @@ const defaultState = {
             projection: 'orthographic', // 'perspective' or 'orthographic'
             cameraMode: 'pan', // 'pan' or 'rotate',
             theme: 'Dark',
+            SVGEnabled: false,
             gcode: {
                 displayName: true
             },
