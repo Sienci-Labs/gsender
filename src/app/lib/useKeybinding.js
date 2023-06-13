@@ -53,7 +53,7 @@ function useKeybinding(shuttleControlEvents) {
                 const shortcuts = profile.shortcuts;
                 let updatedProfileShortcuts = shortcuts;
                 if (_.isEmpty(shortcuts) || !shortcuts[defaultCommand.cmd]) {
-                    // no default keys for gamepad
+                    // no default keys for gamepadlo
                     updatedProfileShortcuts[defaultCommand.cmd] = {
                         cmd: defaultCommand.cmd,
                         keys: defaultCommand.gamepadKeys || '',
