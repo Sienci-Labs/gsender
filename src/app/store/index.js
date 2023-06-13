@@ -191,36 +191,31 @@ const migrateStore = () => {
     }
 
     if (semver.lt(cnc.version, '1.2.0')) {
-        // things
-        const currentCommandKeys = store.get('commandKeys', []);
-        const newCommandKeys = {};
+        const currentCommandKeys = store.get('commandKeys');
+        let newCommandKeysList = {};
 
-        // Migrate from array to object - if already object we're good
-        if (typeof currentCommandKeys === 'object') {
-            return;
+        if (Array.isArray(currentCommandKeys)) {
+            currentCommandKeys.forEach(element => {
+                /*if (element.category === MACRO_CATEGORY) {
+                    element.cmd = element.id;
+                }*/
+                delete element.id;
+                newCommandKeysList[element.cmd] = element;
+            });
+        } else {
+            newCommandKeysList = currentCommandKeys;
         }
 
-        currentCommandKeys.forEach((c) => {
-            // All we need to store now apart from macros
-            const nc = {
-                cmd: c.cmd,
-                isActive: c.isActive,
-                keys: c.keys
-            };
-            // Make sure macros have all info so they work
-            if (c.category === 'Macros') {
-                nc.category = 'Macros';
-                nc.payload = {
-                    macroID: c.cmd
-                };
-                nc.preventDefault = false;
-                nc.title = c.title;
-            }
-
-            newCommandKeys[c.cmd] = nc;
+        Object.entries(newCommandKeysList).forEach(([key, shortcut]) => {
+            delete shortcut.title;
+            delete shortcut.payload;
+            delete shortcut.preventDefault;
+            delete shortcut.category;
+            delete shortcut.callback;
+            newCommandKeysList[key] = shortcut;
         });
 
-        store.replace('commandKeys', newCommandKeys);
+        store.replace('commandKeys', newCommandKeysList);
 
         // Gamepad changes
         const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);

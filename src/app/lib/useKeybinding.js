@@ -37,9 +37,11 @@ function useKeybinding(shuttleControlEvents) {
             if (_.isEmpty(currentCommandKeys) || !currentCommandKeys[defaultCommand.cmd]) {
                 // add to store
                 let updatedCommandKeys = currentCommandKeys;
+                const key = defaultCommand.keys || '';
+
                 updatedCommandKeys[defaultCommand.cmd] = {
                     cmd: defaultCommand.cmd,
-                    keys: defaultCommand.keys,
+                    keys: key,
                     isActive: defaultCommand.isActive,
                 };
                 store.replace('commandKeys', updatedCommandKeys);
