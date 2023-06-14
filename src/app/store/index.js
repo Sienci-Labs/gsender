@@ -251,8 +251,12 @@ const migrateStore = () => {
         });
         store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
 
-        // Set toolchange option to ignore across the board
-        store.set('workspace.toolChangeOption', 'Pause');
+        // Set toolchange option to pause if it wasn't ignore across the board
+        const currentToolOption = store.get('workspace.ToolChangeOption');
+        if (currentToolOption !== 'Ignore') {
+            store.set('workspace.toolChangeOption', 'Pause');
+        }
+
 
         // Fix Auto Zero String
         const probeType = store.get('workspace.probeProfile.touchplateType', '');
