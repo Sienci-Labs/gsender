@@ -49,7 +49,6 @@
     "electron": "electron",
     "electron-builder": "electron-builder",
     "electron-builder:debug": "cross-env DEBUG=electron-builder electron-builder",
-    "electron-rebuild": "electron-rebuild",
     "github-release": "github-release",
     "package-sync": "node scripts/package-sync.js",
     "build:macos": "bash -c 'scripts/electron-builder.sh --macos --x64'",
@@ -156,6 +155,7 @@
   "dependencies": {
     "@babel/polyfill": "~7.4.3",
     "@babel/runtime": "~7.4.3",
+    "@electron/rebuild": "^3.2.13",
     "@electron/remote": "^2.0.8",
     "@emotion/styled": "^11.10.5",
     "@fortawesome/fontawesome-free": "^5.15.2",

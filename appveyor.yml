@@ -11,19 +11,19 @@ environment:
   matrix:
     - job_name: Windows build (x86)
       appveyor_build_worker_image: Previous Visual Studio 2019
-      nodejs_version: "14"
+      nodejs_version: "16"
       ARCH: x86
     - job_name: Windows build (x64)
       appveyor_build_worker_image: Previous Visual Studio 2019
-      nodejs_version: "14"
+      nodejs_version: "16"
       ARCH: x64
     - job_name: macOS build (x64)
       appveyor_build_worker_image: macos
-      nodejs_version: "14"
+      nodejs_version: "16"
       ARCH: x64
     - job_name: macOS build (arm64)
       appveyor_build_worker_image: macos
-      nodejs_version: "14"
+      nodejs_version: "16"
       ARCH: arm64
     #- job_name: Linux build (arm)
     #  appveyor_build_worker_image: Ubuntu2004
@@ -31,11 +31,11 @@ environment:
     #  ARCH: arm
     - job_name: Linux build (amd64)
       appveyor_build_worker_image: Ubuntu2004
-      nodejs_version: "14"
+      nodejs_version: "16"
       ARCH: amd64
     - job_name: Linux build (arm64)
       appveyor_build_worker_image: Ubuntu2004
-      nodejs_version: "14"
+      nodejs_version: "16"
       ARCH: arm64
   global:
     GH_TOKEN:
