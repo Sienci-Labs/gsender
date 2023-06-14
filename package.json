@@ -62,7 +62,7 @@
     "build:linux-arm64": "bash -c 'scripts/electron-builder.sh --linux --arm64'",
     "build:windows-ia32": "bash -c 'scripts/electron-builder.sh --windows --ia32'",
     "build:windows-x64": "bash -c 'scripts/electron-builder.sh --windows --x64'",
-    "build:windows": "bash -c 'scripts/electron-builder.sh --windows --x64'",
+    "build:windows": "bash -c 'scripts/electron-builder.sh --windows --x64 --ia32'",
     "start": "cross-env ./bin/gsender",
     "start-electron": "electron ./dist/gsender/main",
     "watch-dev": "cross-env NODE_ENV=development webpack-cli --watch --config webpack.config.server.development.js",

@@ -267,9 +267,9 @@ const migrateStore = () => {
 
         if (Array.isArray(currentCommandKeys)) {
             currentCommandKeys.forEach(element => {
-                /*if (element.category === MACRO_CATEGORY) {
+                if (element.category === MACRO_CATEGORY) {
                     element.cmd = element.id;
-                }*/
+                }
 
                 const updatedKey = oldKeysToNewKeysMap[element.title];
 
@@ -285,11 +285,10 @@ const migrateStore = () => {
         }
 
         Object.entries(newCommandKeysList).forEach(([key, shortcut]) => {
-            delete shortcut.title;
-            delete shortcut.callback;
-            delete shortcut.preventDefault;
-
             if (shortcut.category !== 'Macros') {
+                delete shortcut.title;
+                delete shortcut.callback;
+                delete shortcut.preventDefault;
                 delete shortcut.payload;
                 delete shortcut.category;
             }
