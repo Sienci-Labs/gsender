@@ -194,11 +194,89 @@ const migrateStore = () => {
         const currentCommandKeys = store.get('commandKeys');
         let newCommandKeysList = {};
 
+        const oldKeysToNewKeysMap = {
+
+            // Jog Commands
+            'Jog: X+': 'JOG_X_P',
+            'Jog: X-': 'JOG_X_M',
+            'Jog: Y+': 'JOG_Y_P',
+            'Jog: Y-': 'JOG_Y_M',
+            'Jog: Z+': 'JOG_Z_P',
+            'Jog: Z-': 'JOG_Z_M',
+            'Jog: X+ Y-': 'JOG_X_P_Y_M',
+            'Jog: X- Y+': 'JOG_X_M_Y_P',
+            'Jog: X+ Y+': 'JOG_X_Y_P',
+            'Jog: X- Y-': 'JOG_X_Y_M',
+
+            // Feedrate Commands
+            'Feed +': 'FEEDRATE_OVERRIDE_P',
+            'Feed ++': 'FEEDRATE_OVERRIDE_PP',
+            'Feed -': 'FEEDRATE_OVERRIDE_M',
+            'Feed --': 'FEEDRATE_OVERRIDE_MM',
+            'Feed Reset': 'FEEDRATE_OVERRIDE_RESET',
+
+            // Spindle Commands
+            'Spindle/Laser +': 'SPINDLE_OVERRIDE_P',
+            'Spindle/Laser ++': 'SPINDLE_OVERRIDE_PP',
+            'Spindle/Laser -': 'SPINDLE_OVERRIDE_M',
+            'Spindle/Laser --': 'SPINDLE_OVERRIDE_MM',
+            'Spindle/Laser Reset': 'SPINDLE_OVERRIDE_RESET',
+
+            // Visualizer View Commands
+            '3D / Isometric': 'VISUALIZER_VIEW_3D',
+            'Top': 'VISUALIZER_VIEW_TOP',
+            'Front': 'VISUALIZER_VIEW_FRONT',
+            'Right': 'VISUALIZER_VIEW_RIGHT',
+            'Left': 'VISUALIZER_VIEW_LEFT',
+            'Reset View': 'VISUALIZER_VIEW_RESET',
+
+            // Zeroing Commands
+            'Zero X Axis': 'ZERO_X_AXIS',
+            'Zero Y Axis': 'ZERO_Y_AXIS',
+            'Zero Z Axis': 'ZERO_Z_AXIS',
+            'Zero All': 'ZERO_ALL_AXIS',
+
+            // Go To Commands
+            'Go to X Zero': 'GO_TO_X_AXIS_ZERO',
+            'Go to Y Zero': 'GO_TO_Y_AXIS_ZERO',
+            'Go to Z Zero': 'GO_TO_Z_AXIS_ZERO',
+            'Go to XY Zero': 'GO_TO_XY_AXIS_ZERO',
+
+            // Jog Speed Commands
+            'Increase Jog Speed': 'JOG_SPEED_I',
+            'Decrease Jog Speed': 'JOG_SPEED_D',
+
+            // Jog Preset Select Commands
+            'Select Rapid Jog Preset': 'SET_R_JOG_PRESET',
+            'Select Normal Jog Preset': 'SET_N_JOG_PRESET',
+            'Select Precise Jog Preset': 'SET_P_JOG_PRESET',
+
+            // Controller Commands
+            'Unlock': 'CONTROLLER_COMMAND_UNLOCK',
+            'Soft Reset': 'CONTROLLER_COMMAND_RESET',
+
+            // Toolbar Commands
+            'Connect': 'OPEN_TOOLBAR_CONN',
+            'Surfacing': 'OPEN_TOOLBAR_SURF',
+            'Heightmap': 'OPEN_TOOLBAR_MAP',
+            'Calibrate': 'OPEN_TOOLBAR_CALI',
+            'Firmware': 'OPEN_TOOLBAR_FIRM',
+            'Help': 'OPEN_TOOLBAR_HELP',
+            'Settings': 'OPEN_TOOLBAR_SETT',
+        };
+
         if (Array.isArray(currentCommandKeys)) {
             currentCommandKeys.forEach(element => {
                 /*if (element.category === MACRO_CATEGORY) {
                     element.cmd = element.id;
                 }*/
+
+                const updatedKey = oldKeysToNewKeysMap[element.title];
+
+                if (updatedKey) {
+                    element.cmd = updatedKey;
+                }
+
                 delete element.id;
                 newCommandKeysList[element.cmd] = element;
             });
@@ -232,6 +310,13 @@ const migrateStore = () => {
                     if (element.category === MACRO_CATEGORY) {
                         element.cmd = element.id;
                     }
+
+                    const updatedKey = oldKeysToNewKeysMap[element.title];
+
+                    if (updatedKey) {
+                        element.cmd = updatedKey;
+                    }
+
                     delete element.id;
                     updatedProfileShortcuts[element.cmd] = element;
                 });
