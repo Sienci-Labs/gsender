@@ -208,10 +208,14 @@ const migrateStore = () => {
 
         Object.entries(newCommandKeysList).forEach(([key, shortcut]) => {
             delete shortcut.title;
-            delete shortcut.payload;
-            delete shortcut.preventDefault;
-            delete shortcut.category;
             delete shortcut.callback;
+            delete shortcut.preventDefault;
+
+            if (shortcut.category !== 'Macros') {
+                delete shortcut.payload;
+                delete shortcut.category;
+            }
+
             newCommandKeysList[key] = shortcut;
         });
 

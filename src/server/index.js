@@ -139,7 +139,8 @@ const createServer = (options, callback) => {
 
     // If headless setting is ON, change to correct port and IP
     const remoteSettings = config.get('remoteSettings', {});
-    if (remoteSettings.headlessStatus && !isInDevelopmentMode) {
+    // Don't do this if: disabled, default IP, dev mode
+    if (remoteSettings.headlessStatus && !isInDevelopmentMode && remoteSettings.ip !== '0.0.0.0') {
         port = remoteSettings.port;
         host = remoteSettings.ip;
     }

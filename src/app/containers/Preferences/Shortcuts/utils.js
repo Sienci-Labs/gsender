@@ -27,7 +27,6 @@ export const generateList = (shortcuts) => {
         if (allShuttleControlEvents[b.cmd]) {
             categoryB = allShuttleControlEvents[b.cmd].category || MACRO_CATEGORY;
         }
-        console.log(`a: ${categoryA}, b: ${categoryB}`);
         return categoryA.localeCompare(categoryB);
     });
     return shortcutsList;
