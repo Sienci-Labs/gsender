@@ -223,22 +223,21 @@ class WorkflowControl extends PureComponent {
         controller.command('gcode:test');
     };
 
-    startRun = (type) => {
+    startRun = () => {
         const { activeState } = this.props;
 
         Toaster.clear();
 
         if (activeState === GRBL_ACTIVE_STATE_CHECK) {
             this.setState({ testStarted: true, runHasStarted: true });
-
-            controller.command('gcode:resume', type);
+            controller.command('gcode:resume');
             return;
         }
         this.setState({ fileLoaded: true });
         this.setState({ runHasStarted: true });
         reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: { isChecked: true, toggleStatus: 'overrides' } });
         const { actions } = this.props;
-        actions.onRunClick(type);
+        actions.onRunClick();
     }
 
     componentDidMount() {
