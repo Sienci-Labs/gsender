@@ -31,7 +31,8 @@ class Feeder extends events.EventEmitter {
         pending: false,
         changed: false,
         outstanding: 0,
-        interval: null
+        interval: null,
+        waiting: false
     };
 
     dataFilter = null;
@@ -168,6 +169,18 @@ class Feeder extends events.EventEmitter {
 
     hasOutstanding() {
         return this.state.outstanding > 0;
+    }
+
+    wait() {
+        this.state.waiting = true;
+    }
+
+    continue() {
+        this.state.waiting = false;
+    }
+
+    isWaiting() {
+        return this.state.waiting;
     }
 }
 

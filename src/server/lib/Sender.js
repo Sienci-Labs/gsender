@@ -159,7 +159,8 @@ class Sender extends events.EventEmitter {
         startTime: 0,
         finishTime: 0,
         elapsedTime: 0,
-        remainingTime: 0
+        remainingTime: 0,
+        waiting: false,
     };
 
     stateChanged = false;
@@ -459,6 +460,18 @@ class Sender extends events.EventEmitter {
         const stateChanged = this.stateChanged;
         this.stateChanged = false;
         return stateChanged;
+    }
+
+    wait() {
+        this.state.waiting = true;
+    }
+
+    continue() {
+        this.state.waiting = false;
+    }
+
+    isWaiting() {
+        return this.state.waiting;
     }
 }
 
