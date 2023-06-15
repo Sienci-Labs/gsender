@@ -460,6 +460,7 @@ for:
       - ps: Install-Product node $env:nodejs_version
       - npm config set loglevel warn
       - npm config set scripts-prepend-node-path auto
+      - npm config set python C:\Python310
       - npm install -g yarn
       - yarn
 
