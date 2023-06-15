@@ -173,6 +173,8 @@ class GrblHalController {
     // Sender
     sender = null;
 
+    nextEvent = null;
+
     // Shared context
     sharedContext = {};
 
@@ -353,6 +355,20 @@ class GrblHalController {
         this.feeder.on('unhold', noop);
         this.feeder.on('complete', () => {
             this.consumeFeederCB();
+            if (this.sender.isWaiting()) {
+                this.sender.continue();
+                if (this.nextEvent === PROGRAM_RESUME) {
+                    this.write('~');
+                    this.workflow.resume();
+                } else if (this.nextEvent === PROGRAM_START) {
+                    // Feeder
+                    this.feeder.reset();
+                    this.workflow.start();
+                    // Sender
+                    this.sender.next();
+                }
+                this.nextEvent = null;
+            }
         });
 
         // Sender
@@ -459,7 +475,13 @@ class GrblHalController {
             this.connection.write(line + '\n');
             log.silly(`> ${line}`);
         });
-        this.sender.on('hold', noop);
+        this.sender.on('hold', () => {
+            if (this.feeder.isWaiting() && this.nextEvent) {
+                this.feeder.continue();
+                this.event.trigger(this.nextEvent);
+            }
+            this.nextEvent = null;
+        });
         this.sender.on('unhold', noop);
         this.sender.on('start', (startTime) => {
             this.actionTime.senderFinishTime = 0;
@@ -1371,14 +1393,8 @@ class GrblHalController {
 
                     this.command('gcode', modalGCode);
                 } else if (startEventEnabled) {
-                    this.feederCB = () => {
-                        // Feeder
-                        this.feeder.reset();
-                        this.workflow.start();
-                        // Sender
-                        this.sender.next();
-                        this.feederCB = null;
-                    };
+                    this.nextEvent = PROGRAM_START;
+                    this.sender.wait();
                     this.event.trigger(PROGRAM_START);
                 } else {
                     this.workflow.start();
@@ -1429,8 +1445,9 @@ class GrblHalController {
             },
             'gcode:pause': async () => {
                 if (this.event.hasEnabledEvent(PROGRAM_PAUSE)) {
+                    this.nextEvent = PROGRAM_PAUSE;
+                    this.feeder.wait();
                     this.workflow.pause();
-                    this.event.trigger(PROGRAM_PAUSE);
                 } else {
                     this.workflow.pause();
                     await delay(100);
@@ -1444,15 +1461,8 @@ class GrblHalController {
             'gcode:resume': async () => {
                 const [type] = args;
                 if (this.event.hasEnabledEvent(PROGRAM_RESUME)) {
-                    this.feederCB = () => {
-                        if (type === GRBLHAL) {
-                            this.write(GRBLHAL_REALTIME_COMMANDS.CYCLE_START);
-                        } else {
-                            this.write('~');
-                        }
-                        this.workflow.resume();
-                        this.feederCB = null;
-                    };
+                    this.nextEvent = PROGRAM_RESUME;
+                    this.sender.wait();
                     this.event.trigger(PROGRAM_RESUME);
                 } else {
                     if (type === GRBLHAL) {
@@ -1637,12 +1647,8 @@ class GrblHalController {
                 }
             },
             'gcode:test': () => {
-                this.feederCB = () => {
-                    this.workflow.start();
-                    this.feeder.reset();
-                    this.sender.next();
-                    this.feederCB = null;
-                };
+                this.nextEvent = PROGRAM_START;
+                this.sender.wait();
                 this.command('gcode', ['%global.state.testWCS=modal.wcs', '$C']);
             },
             'gcode:safe': () => {
