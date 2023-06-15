@@ -22,8 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
 |-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.0/gSender-1.2.0-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.0/gSender-1.2.0-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.0/gSender-1.2.0-x64.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.0/gSender-1.2.0-amd64.deb
-) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.7/gSender-1.1.7-armv7l.AppImage)
+ ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.0/gSender-1.2.0-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.0/gSender-1.2.0-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.0/gSender-1.2.0-x64.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.0/gSender-1.2.0-amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.7/gSender-1.1.7-armv7l.AppImage)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
