@@ -1,11 +1,12 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
+import styled from '@emotion/styled';
+
 import Modal from 'app/components/ToolModal/ToolModal';
 import { RadioGroup, RadioButton } from 'app/components/Radio';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-import GCodeParser from 'gcode-parser';
-import styled from '@emotion/styled';
+
 import styles from './index.styl';
 import {
     DOESNT_LINE_UP,
@@ -78,6 +79,7 @@ const PhysicalUnitSetup = ({
                 });
                 return;
             }
+
             // ⅛” diameter endmill milling 2 holes for custom mounting solution
             if (
                 linesUp === DOESNT_LINE_UP &&
@@ -91,6 +93,7 @@ const PhysicalUnitSetup = ({
                 });
                 return;
             }
+
             // ¼” diameter endmill milling 6 holes for 30” track
             if (drillDiameter === QUARTER && holeCount === SIX) {
                 rotaryActions.loadGcode(HOLE_TYPES.QUARTER_INCH_SIX_HOLES);
@@ -101,6 +104,7 @@ const PhysicalUnitSetup = ({
                 });
                 return;
             }
+
             // ⅛” diameter endmill milling 6 holes for 30” track
             if (drillDiameter === EIGHTH && holeCount === SIX) {
                 rotaryActions.loadGcode(HOLE_TYPES.EIGHTH_INCH_SIX_HOLES);
@@ -111,6 +115,7 @@ const PhysicalUnitSetup = ({
                 });
                 return;
             }
+
             // ¼” diameter endmill milling 10 holes for 30” track with extension
             if (drillDiameter === QUARTER && holeCount === TEN) {
                 rotaryActions.loadGcode(HOLE_TYPES.QUARTER_INCH_TEN_HOLES);
@@ -121,6 +126,7 @@ const PhysicalUnitSetup = ({
                 });
                 return;
             }
+
             // ⅛” diameter endmill milling 10 holes for 30” track with extension
             if (drillDiameter === EIGHTH && holeCount === TEN) {
                 rotaryActions.loadGcode(HOLE_TYPES.EIGHTH_INCH_TEN_HOLES);
