@@ -13,14 +13,12 @@ environment:
     #  nodejs_version: "14"
     #  ARCH: arm
     - job_name: Windows build (x86)
-      appveyor_build_worker_image: Visual Studio 2019
+      appveyor_build_worker_image: Visual Studio 2017
       nodejs_version: "14"
-      PYTHON: "C:\Python39"
       ARCH: x86
     - job_name: Windows build (x64)
-      appveyor_build_worker_image: Visual Studio 2019
+      appveyor_build_worker_image: Visual Studio 2017
       nodejs_version: "14"
-      PYTHON: "C:\Python39"
       ARCH: x64
     - job_name: macOS build (x64)
       appveyor_build_worker_image: macos
@@ -464,8 +462,6 @@ for:
       - npm config set scripts-prepend-node-path auto
       - npm install -g yarn
       - yarn
-      - SET PATH=%PYTHON%;%path%
-      - npm config set python %PYTHON%
 
     build_script:
       - ps: |
