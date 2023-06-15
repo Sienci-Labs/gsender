@@ -1,3 +1,4 @@
+import React from 'react';
 import get from 'lodash/get';
 
 import store from 'app/store';
@@ -44,13 +45,31 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
         if (firmwareType === 'Grbl') {
             // Convert to array to send to the controller, will look something like this: ["$101=26.667", ...]
             const rotaryFirmwareSettingsArr = Object.entries(ROTARY_MODE_FIRMWARE_SETTINGS).map(([key, value]) => `${key}=${value}`);
-            controller.command('gcode', [...rotaryFirmwareSettingsArr, '$$']);
 
             Confirm({
-                title: 'Wiring Changeover',
-                cancelLabel: null,
+                title: 'Enable Rotary Mode',
+                cancelLabel: 'Cancel',
                 confirmLabel: 'OK',
-                content: 'Rotary mode enabled. Please make sure you have switch over your wiring for the new setup.'
+                content:
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'left',
+                            alignItems: 'flex-start',
+                            marginLeft: '30px',
+                        }}
+                    >
+                        <p>Enabling Rotary Mode will do the following:</p>
+                        <p style={{ marginLeft: '10px' }}>1. Zero the Y-Axis in it&apos;s current position</p>
+                        <p style={{ marginLeft: '10px' }}>2. Turn Hard Limits off, if they are on</p>
+                        <p style={{ marginLeft: '10px' }}>3. Set the Y-Axis Travel Resolution to 19.75308642</p>
+                        <p>Please make sure you have switched over your wiring for the new setup.</p>
+                    </div>,
+                onConfirm: () => {
+                    // zero y and enable rotary
+                    controller.command('gcode', ['G10 L20 P1 Y0', ...rotaryFirmwareSettingsArr, '$$']);
+                },
             });
         }
 
