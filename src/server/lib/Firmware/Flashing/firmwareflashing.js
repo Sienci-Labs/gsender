@@ -21,7 +21,7 @@
  *
  */
 
-import AvrgirlArduino from '@sienci/avrgirl-arduino';
+import AvrgirlArduino from 'avrgirl-arduino';
 import mk1Image from '!file-loader!./mk1_20220214.hex';
 import mk2Image from '!file-loader!./mk2_20220214.hex';
 import logger from '../../logger';
