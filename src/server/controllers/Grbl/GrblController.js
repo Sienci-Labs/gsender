@@ -1307,8 +1307,9 @@ class GrblController {
                 const dwell = '%wait ; Wait for the planner to empty';
 
                 // add delay to spindle startup if enabled
-                const preferences = store.get('preferences') || { spindle: { delay: false } };
-                const delay = preferences.spindle.delay;
+                const preferences = store.get('preferences', {});
+                const delay = _.get(preferences, 'spindle.delay', false);
+
                 if (delay) {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }
