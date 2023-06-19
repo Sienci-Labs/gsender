@@ -39,11 +39,13 @@ onmessage = ({ data }) => {
             addLine: ({ motion }, v1, v2) => {
                 if (motion === 'G1' || motion === 'G0') {
                     if (shouldRotate(v1.a) || shouldRotate(v2.a)) {
-                        v1.y = rotateAxis('y', v1);
-                        v1.z = rotateAxis('z', v1);
+                        const newV1 = rotateAxis('y', v1);
+                        v1.y = newV1.y;
+                        v1.z = newV1.z;
 
-                        v2.y = rotateAxis('y', v2);
-                        v2.z = rotateAxis('z', v2);
+                        const newV2 = rotateAxis('y', v2);
+                        v2.y = newV2.y;
+                        v2.z = newV2.z;
                     }
 
                     vertices.push(vertex(v2.x, v2.y));

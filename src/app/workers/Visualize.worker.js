@@ -22,7 +22,7 @@
  */
 
 import * as THREE from 'three';
-import Toolpath, { rotateAxis, shouldRotate } from '../lib/GcodeToolpath';
+import Toolpath, { rotateAxis } from '../lib/GcodeToolpath';
 
 onmessage = function({ data }) {
     const { content, visualizer, isLaser = false, shouldRenderSVG = false } = data;
@@ -81,18 +81,16 @@ onmessage = function({ data }) {
             // @param {object} modal The modal object.
             // @param {object} v1 A 3D vector of the start point.
             // @param {object} v2 A 3D vector of the end point.
-            addLine: (modal, v1, v2, v0) => {
+            addLine: (modal, v1, v2) => {
                 const { motion } = modal;
 
-                if (shouldRotate(v1.a) || shouldRotate(v2.a)) {
-                    const newV1 = rotateAxis('y', v1);
-                    v1.y = newV1.y;
-                    v1.z = newV1.z;
+                const newV1 = rotateAxis('y', v1);
+                v1.y = newV1.y;
+                v1.z = newV1.z;
 
-                    const newV2 = rotateAxis('y', v2);
-                    v2.y = newV2.y;
-                    v2.z = newV2.z;
-                }
+                const newV2 = rotateAxis('y', v2);
+                v2.y = newV2.y;
+                v2.z = newV2.z;
 
                 const opacity = (motion === 'G0') ? 0.5 : 1;
                 const color = [motion, opacity];
@@ -101,6 +99,39 @@ onmessage = function({ data }) {
                     v1.x, v1.y, v1.z,
                     v2.x, v2.y, v2.z
                 );
+            },
+            addCurve: (modal, v1, v2) => {
+                const { motion } = modal;
+
+                const updatedV1 = rotateAxis('y', v1);
+                const updatedV2 = rotateAxis('y', v2);
+
+                const radius = v2.z;
+                let startAngle = Math.atan2(updatedV1.z, updatedV1.y);
+                let endAngle = Math.atan2(updatedV2.z, updatedV2.y);
+                const isClockwise = v2.a > v1.a;
+
+                const arcCurve = new THREE.ArcCurve(
+                    0,
+                    0,
+                    radius,
+                    startAngle,
+                    endAngle,
+                    isClockwise
+                );
+
+                const DEGREES_PER_LINE_SEGMENT = 5;
+
+                const angleDiff = Math.abs(v2.a - v1.a);
+                const divisions = Math.ceil(angleDiff / DEGREES_PER_LINE_SEGMENT);
+                const points = arcCurve.getPoints(divisions);
+                const color = [motion, 1];
+
+                for (let i = 0; i < points.length; ++i) {
+                    const point = points[i];
+                    vertices.push(v2.x, point.x, point.y);
+                    colors.push(color);
+                }
             },
             // @param {object} modal The modal object.
             // @param {object} v1 A 3D vector of the start point.
@@ -257,10 +288,11 @@ onmessage = function({ data }) {
         handlerKey = 'laser';
     }
 
-    const { addLine, addArcCurve } = handlers[handlerKey];
+    const { addLine, addCurve, addArcCurve } = handlers[handlerKey];
 
     const toolpath = new Toolpath({
         addLine,
+        addCurve,
         addArcCurve
     });
     const start = Date.now();

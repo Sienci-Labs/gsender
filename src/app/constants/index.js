@@ -209,9 +209,8 @@ export const USER_DATA_COLLECTION = {
 };
 
 export const ROTARY_MODE_FIRMWARE_SETTINGS = {
-    $101: '17.777',
-    // $111: '0.00',
-    // $121: '0.00',
+    $101: '19.75308642',
+    $21: '0'
 };
 
 export const WORKSPACE_MODE = {
