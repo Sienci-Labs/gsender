@@ -77,6 +77,7 @@ const wizard = {
             '%global.toolchange.FEEDRATE=programFeedrate',
             '([JSON.stringify(global.toolchange)])',
             'M5',
+            'G91 G21',
             '(Toolchange Initiated)',
         ];
     },
