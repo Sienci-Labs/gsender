@@ -13,7 +13,8 @@ export const getProbeSettings = () => {
         slowSpeed: probeSettings.probeFeedrate.mm,
         fastSpeed: probeSettings.probeFastFeedrate.mm,
         retract: probeSettings.retractionDistance.mm,
-        zProbeDistance: probeThickness,
+        zProbeDistance: probeSettings.zProbeDistance.mm,
+        zProbeThickness: probeThickness,
     };
 };
 

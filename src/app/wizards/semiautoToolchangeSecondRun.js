@@ -22,7 +22,6 @@
  */
 import controller from 'app/lib/controller';
 import React from 'react';
-import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import { getProbeSettings, getUnitModal, getToolString } from 'app/lib/toolChangeUtils';
 import { get } from 'lodash';
@@ -54,15 +53,13 @@ const wizard = {
         description: 'Tool Change detected, stay clear of the machine! Wait until initial movements are complete!'
     },
     onStart: () => {
-        const probeProfile = store.get('workspace.probeProfile');
         const settings = getProbeSettings();
-        const { zThickness } = probeProfile;
 
         const zProbeDistance = calculateMaxZProbeDistance(settings.zProbeDistance);
 
         return [
             '%wait',
-            `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
+            `%global.toolchange.PROBE_THICKNESS=${settings.zProbeThickness}`,
             `%global.toolchange.PROBE_DISTANCE=${zProbeDistance}`,
             `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
             `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,

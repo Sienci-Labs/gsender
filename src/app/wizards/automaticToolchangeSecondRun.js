@@ -47,9 +47,7 @@ const wizard = {
     },
     onStart: () => {
         const settings = getProbeSettings();
-        const probeProfile = store.get('workspace.probeProfile');
         const position = store.get('workspace.toolChangePosition');
-        const { zThickness } = probeProfile;
         // Get $13 value for adjustment of Z Safe Height
         const state = reduxStore.getState();
         const $13 = get(state, 'controller.settings.settings.$13', '0');
@@ -59,7 +57,7 @@ const wizard = {
 
         controller.command('gcode', [
             '%wait',
-            `%global.toolchange.PROBE_THICKNESS_MM=${zThickness.mm}`,
+            `%global.toolchange.PROBE_THICKNESS_MM=${settings.zProbeThickness}`,
             `%global.toolchange.PROBE_DISTANCE=${zProbeDistance}`,
             `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
             `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
