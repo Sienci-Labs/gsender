@@ -8,7 +8,7 @@ export const getProbeSettings = () => {
     const probeType = store.get('workspace.probeProfile.touchplateType');
 
     const probeThickness = (probeType === TOUCHPLATE_TYPE_AUTOZERO) ? '5' : probeSettings.zProbeDistance.mm;
-    console.log(probeThickness);
+
     return {
         slowSpeed: probeSettings.probeFeedrate.mm,
         fastSpeed: probeSettings.probeFastFeedrate.mm,
