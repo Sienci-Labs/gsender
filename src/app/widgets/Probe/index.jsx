@@ -44,7 +44,6 @@ import {
     // Grbl
     GRBL,
     GRBL_ACTIVE_STATE_IDLE,
-    WORKFLOW_STATE_IDLE
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -1182,13 +1181,9 @@ class ProbeWidget extends PureComponent {
     }
 
     canClick() {
-        const { workflow, isConnected, type, state } = this.props;
-        const { toolChangeActive } = this.state;
+        const { isConnected, type, state } = this.props;
 
         if (!isConnected) {
-            return false;
-        }
-        if (workflow.state !== WORKFLOW_STATE_IDLE && !toolChangeActive) {
             return false;
         }
         if (!includes([GRBL], type)) {
