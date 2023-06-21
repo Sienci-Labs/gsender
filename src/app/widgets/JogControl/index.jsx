@@ -470,12 +470,12 @@ class AxesWidget extends PureComponent {
     };
 
     shuttleControlFunctions = {
-        JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
+        JOG: (event, { axis = null }) => {
             if (event) {
                 preventDefault(event);
             }
 
-            this.handleShortcutJog({ axis, direction });
+            this.handleShortcutJog({ axis });
         },
         SET_JOG_PRESET: (event, { key }) => {
             if (!key) {
@@ -584,9 +584,7 @@ class AxesWidget extends PureComponent {
             preventDefault: false,
             isActive: true,
             category: JOGGING_CATEGORY,
-            callback: (event, { axis = null, direction = 1, factor = 1 }) => {
-                this.shuttleControlFunctions.JOG(event, { axis, direction, factor });
-            }
+            callback: this.shuttleControlFunctions.JOG
         },
         JOG_X_M: {
             title: 'Jog: X-',
@@ -829,9 +827,9 @@ class AxesWidget extends PureComponent {
         const feedrate = Number(this.actions.getFeedrate());
 
         const axisValue = {
-            X: xyStep,
-            Y: xyStep,
-            Z: zStep
+            x: xyStep,
+            y: xyStep,
+            z: zStep
         };
 
         const jogCB = (given) => this.actions.jog(given);
@@ -844,28 +842,26 @@ class AxesWidget extends PureComponent {
             this.joggingHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
         }
 
-        //Axis will either be a single string value or an object containing multiple axis' (ex. axis.X, axis.Y, axis.Z)
         const axisList = {};
 
         if (axis.x) {
-            axisList.X = axisValue.X * axis.x;
+            axisList.x = axisValue.x * axis.x;
         }
         if (axis.y) {
-            axisList.Y = axisValue.Y * axis.y;
+            axisList.y = axisValue.y * axis.y;
         }
         if (axis.z) {
-            axisList.Z = axisValue.Z * axis.z;
+            axisList.z = axisValue.z * axis.z;
         }
 
-        this.setState({ prevJog: { ...axisList, F: feedrate } });
-        this.joggingHelper.onKeyDown({ ...axisList }, feedrate);
+        this.joggingHelper.onKeyDown(axisList, feedrate);
     }
 
     handleShortcutStop = (payload) => {
-        const { prevJog } = this.state;
+        const feedrate = Number(this.actions.getFeedrate());
 
         if (!payload) {
-            this.joggingHelper && this.joggingHelper.onKeyUp(prevJog);
+            this.joggingHelper && this.joggingHelper.onKeyUp({ F: feedrate });
             return;
         }
 
@@ -890,9 +886,9 @@ class AxesWidget extends PureComponent {
             axisObj[givenAxis] = axisValue;
         }
 
-        const feedrate = Number(this.actions.getFeedrate());
-
-        this.joggingHelper && this.joggingHelper.onKeyUp({ ...axisObj, F: feedrate });
+        if (this.joggingHelper) {
+            this.joggingHelper.onKeyUp({ F: feedrate });
+        }
     }
 
     shuttleControl = null;
