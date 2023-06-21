@@ -31,7 +31,6 @@ import { TOUCHPLATE_TYPE_AUTOZERO, PROBE_TYPE_AUTO, PROBE_TYPE_TIP } from 'app/l
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 
-
 const convertAvailableTools = (tools, units) => {
     const optionLabels = [];
 
@@ -69,6 +68,8 @@ const ProbeDiameter = ({ actions, state, probeCommand }) => {
 
     const options = [];
 
+    const toolsObjects = convertAvailableTools(tools, units);
+
     const touchplateType = store.get('workspace.probeProfile.touchplateType');
 
     if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
@@ -76,9 +77,14 @@ const ProbeDiameter = ({ actions, state, probeCommand }) => {
             { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO },
             { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP },
         );
+    } else if (toolDiameter === PROBE_TYPE_AUTO || toolDiameter === PROBE_TYPE_TIP) {
+        // If auto selected and probe profile swapped, make sure we update selection to first actual tool
+        const firstTool = toolsObjects[0];
+        const value = firstTool.value || 0;
+        handleChange(value);
     }
 
-    options.push(...convertAvailableTools(tools, units));
+    options.push(...toolsObjects);
 
     return (
         <div className={cx(styles.probeDiameterWrapper, { [styles.hidden]: !probeCommand.tool })}>
