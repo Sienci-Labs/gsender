@@ -62,7 +62,7 @@ class JogHelper {
         }, this.timeout);
     }
 
-    onKeyUp(coordinates) {
+    onKeyUp(payload = {}) {
         const timer = new Date() - this.startTime;
 
         if (!this.timeoutFunction) {
@@ -73,7 +73,7 @@ class JogHelper {
         this.timeoutFunction = null;
 
         if (timer < this.timeout && this.didPress) {
-            this.jog(coordinates);
+            this.jog({ ...payload, ...this.currentCoordinates });
             this.startTime = new Date();
             this.didPress = false;
             this.currentCoordinates = null;
