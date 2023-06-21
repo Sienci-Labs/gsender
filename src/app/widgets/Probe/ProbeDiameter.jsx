@@ -77,11 +77,6 @@ const ProbeDiameter = ({ actions, state, probeCommand }) => {
             { value: PROBE_TYPE_AUTO, label: PROBE_TYPE_AUTO },
             { value: PROBE_TYPE_TIP, label: PROBE_TYPE_TIP },
         );
-    } else if (toolDiameter === PROBE_TYPE_AUTO || toolDiameter === PROBE_TYPE_TIP) {
-        // If auto selected and probe profile swapped, make sure we update selection to first actual tool
-        const firstTool = toolsObjects[0];
-        const value = firstTool.value || 0;
-        handleChange(value);
     }
 
     options.push(...toolsObjects);
