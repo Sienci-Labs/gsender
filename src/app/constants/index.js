@@ -194,3 +194,8 @@ export const USER_DATA_COLLECTION = {
     ACCEPTED: 'ACCEPTED',
     REJECTED: 'REJECTED',
 };
+
+export const OVERRIDE_VALUE_RANGES = {
+    MIN: 10,
+    MAX: 230
+};

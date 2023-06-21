@@ -24,21 +24,17 @@
 import React, { useState, useEffect } from 'react';
 import get from 'lodash/get';
 import debounce from 'lodash/debounce';
+import pubsub from 'pubsub-js';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import controller from 'app/lib/controller';
 import { mapPositionToUnits } from 'app/lib/units';
-import { METRIC_UNITS } from 'app/constants';
+import { METRIC_UNITS, OVERRIDE_VALUE_RANGES } from 'app/constants';
 import store from 'app/store';
 
 import styles from './Overrides.styl';
 import Slider from '../../../components/Slider/Slider';
 import FeedControlButton from './FeedControlButton';
-
-const VALUE_RANGES = {
-    MIN: 10,
-    MAX: 230
-};
 
 // debounced handlers
 const debouncedSpindleHandler = debounce((value) => {
@@ -48,12 +44,21 @@ const debouncedFeedHandler = debounce((value) => {
     controller.command('feedOverride', Number(value));
 }, 1000);
 
+const debounceFeedUpdate = debounce((localFunc, value) => {
+    localFunc(value);
+}, 500);
+const debounceSpindleUpdate = debounce((localFunc, value) => {
+    localFunc(value);
+}, 500);
+
 /**
  * Settings Area component to display override controls for user
  * @prop {Object} state Default state given from parent component
  *
  */
 const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
+    console.log('settings area ovf: ' + ovF);
+    console.log('settings area ovs: ' + ovS);
     const [showSpindleOverride, setShowSpindleOverride] = useState(store.get('workspace.machineProfile.spindle'));
     const [localOvF, setLocalOvF] = useState(ovF);
     const [localOvS, setLocalOvS] = useState(ovS);
@@ -66,7 +71,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
     }
 
     const handleChangeRate = (setLocalFunc, newVal, command) => {
-        if (newVal > VALUE_RANGES.MAX || newVal < VALUE_RANGES.MIN) {
+        if (newVal > OVERRIDE_VALUE_RANGES.MAX || newVal < OVERRIDE_VALUE_RANGES.MIN) {
             return;
         }
         setLocalFunc(newVal);
@@ -79,11 +84,30 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
 
     useEffect(() => {
         store.on('change', handleMachineProfileChange);
+        const tokens = [
+            pubsub.subscribe('feedrate:change', (msg, feedRate) => {
+                setLocalOvF(feedRate);
+            }),
+            pubsub.subscribe('spindlespeed:change', (msg, spindleSpeed) => {
+                setLocalOvS(spindleSpeed);
+            }),
+        ];
 
         return () => {
             store.removeListener('change', handleMachineProfileChange);
+            tokens.forEach((token) => {
+                pubsub.unsubscribe(token);
+            });
         };
     }, []);
+
+    useEffect(() => {
+        debounceFeedUpdate(setLocalOvF, ovF);
+    }, [ovF]);
+
+    useEffect(() => {
+        debounceSpindleUpdate(setLocalOvS, ovS);
+    }, [ovS]);
     const { spindleOverrideLabel } = state;
 
     return (
@@ -94,8 +118,8 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                     <span className={styles.overrideValue}>{Math.round(feedrate * 100) / 100} {unitString}</span>
                 </div>
                 <Slider
-                    min={VALUE_RANGES.MIN}
-                    max={VALUE_RANGES.MAX}
+                    min={OVERRIDE_VALUE_RANGES.MIN}
+                    max={OVERRIDE_VALUE_RANGES.MAX}
                     value={localOvF || 100}
                     sliderName="feedOV"
                     unitString="%"
@@ -127,8 +151,8 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                             <span className={styles.overrideValue}>{spindle} rpm</span>
                         </div>
                         <Slider
-                            min={VALUE_RANGES.MIN}
-                            max={VALUE_RANGES.MAX}
+                            min={OVERRIDE_VALUE_RANGES.MIN}
+                            max={OVERRIDE_VALUE_RANGES.MAX}
                             value={localOvS || 100}
                             unitString="%"
                             sliderName="spindleOV"

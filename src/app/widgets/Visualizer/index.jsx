@@ -74,6 +74,7 @@ import {
     GENERAL_CATEGORY,
     OVERRIDES_CATEGORY,
     VISUALIZER_CATEGORY,
+    OVERRIDE_VALUE_RANGES
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
@@ -838,45 +839,61 @@ class VisualizerWidget extends PureComponent {
 
     shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
-            switch (Number(amount)) {
-            case 1:
-                controller.write('\x93');
-                break;
-            case -1:
-                controller.write('\x94');
-                break;
-            case 10:
-                controller.write('\x91');
-                break;
-            case -10:
-                controller.write('\x92');
-                break;
-            case 0:
-                controller.write('\x90');
-                break;
-            default:
-                return;
+            const feedRate = this.props.ovF + (Number(amount) || 0);
+            console.log(feedRate);
+            if (feedRate <= OVERRIDE_VALUE_RANGES.MAX && feedRate >= OVERRIDE_VALUE_RANGES.MIN) {
+                console.log('made it');
+                switch (Number(amount)) {
+                case 1:
+                    controller.write('\x93');
+                    break;
+                case -1:
+                    controller.write('\x94');
+                    break;
+                case 10:
+                    controller.write('\x91');
+                    break;
+                case -10:
+                    controller.write('\x92');
+                    break;
+                case 0:
+                    controller.write('\x90');
+                    break;
+                default:
+                    break;
+                }
+                pubsub.publish('feedrate:change', feedRate);
+            } else {
+                console.log('***out of range');
+                console.log('***ovf: ' + this.props.ovF);
             }
         },
         SPINDLE_OVERRIDE: (_, { amount }) => {
-            switch (Number(amount)) {
-            case 1:
-                controller.write('\x9C');
-                break;
-            case -1:
-                controller.write('\x9D');
-                break;
-            case 10:
-                controller.write('\x9A');
-                break;
-            case -10:
-                controller.write('\x9B');
-                break;
-            case 0:
-                controller.write('\x99');
-                break;
-            default:
-                return;
+            const spindleSpeed = this.props.ovS + (Number(amount) || 0);
+            if (spindleSpeed <= OVERRIDE_VALUE_RANGES.MAX && spindleSpeed >= OVERRIDE_VALUE_RANGES.MIN) {
+                switch (Number(amount)) {
+                case 1:
+                    controller.write('\x9C');
+                    break;
+                case -1:
+                    controller.write('\x9D');
+                    break;
+                case 10:
+                    controller.write('\x9A');
+                    break;
+                case -10:
+                    controller.write('\x9B');
+                    break;
+                case 0:
+                    controller.write('\x99');
+                    break;
+                default:
+                    break;
+                }
+                pubsub.publish('spindlespeed:change', spindleSpeed);
+            } else {
+                console.log('***out of range');
+                console.log('***ovS: ' + this.props.ovS);
             }
         },
         VISUALIZER_VIEW: (_, { type }) => {
