@@ -1,11 +1,12 @@
 import pubsub from 'pubsub-js';
 import reduxStore from 'app/store/redux';
 import _get from 'lodash/get';
+import isNumber from 'lodash/isNumber';
+
 import * as fileActions from 'app/actions/fileInfoActions';
 import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
 import store from 'app/store';
-import { RENDER_RENDERING, RENDER_RENDERED } from 'app/constants';
-import { isNumber } from 'lodash';
+import { RENDER_RENDERING, RENDER_RENDERED, VISUALIZER_SECONDARY } from 'app/constants';
 
 export const visualizeResponse = ({ data }) => {
     if (isNumber(data)) {
@@ -16,10 +17,13 @@ export const visualizeResponse = ({ data }) => {
             ...data.info,
             fileProcessing: false
         };
-        reduxStore.dispatch({
-            type: UPDATE_FILE_INFO,
-            payload: estimatePayload
-        });
+
+        if (data.visualizer !== VISUALIZER_SECONDARY) {
+            reduxStore.dispatch({
+                type: UPDATE_FILE_INFO,
+                payload: estimatePayload
+            });
+        }
         reduxStore.dispatch({
             type: UPDATE_FILE_PROCESSING,
             payload: {
