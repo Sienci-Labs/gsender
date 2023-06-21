@@ -75,14 +75,6 @@ const main = () => {
 
     const store = new Store();
 
-    // Appending command line flags for WebGL support workarounds
-    app.commandLine.appendSwitch('ignore-gpu-blacklist');
-    app.commandLine.appendSwitch('enable-gpu-rasterization');
-    app.commandLine.appendSwitch('enable-accelerated-video');
-    app.commandLine.appendSwitch('enable-accelerated-video-decode');
-    app.commandLine.appendSwitch('use-gl', 'desktop');
-    app.commandLine.appendSwitch('enable-features', 'VaapiVideoDecoder');
-
     // Increase V8 heap size of the main process
     if (process.arch === 'x64') {
         const memoryLimit = 1024 * 8; // 8GB

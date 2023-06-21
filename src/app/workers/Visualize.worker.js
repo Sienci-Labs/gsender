@@ -25,7 +25,7 @@ import GCodeVirtualizer from 'app/lib/GCodeVirtualizer';
 import { ArcCurve } from 'three';
 
 onmessage = function({ data }) {
-    const { content, visualizer, isLaser = false } = data;
+    const { content, visualizer, isLaser = false, shouldIncludeSVG = false } = data;
 
     // Common state variables
     let vertices = [];
@@ -110,13 +110,15 @@ onmessage = function({ data }) {
                 );
 
                 // svg
-                svgInitialization(motion);
-                SVGVertices.push({
-                    x1: v1.x,
-                    y1: v1.y,
-                    x2: v2.x,
-                    y2: v2.y
-                });
+                if (shouldIncludeSVG) {
+                    svgInitialization(motion);
+                    SVGVertices.push({
+                        x1: v1.x,
+                        y1: v1.y,
+                        x2: v2.x,
+                        y2: v2.y
+                    });
+                }
             },
             // @param {object} modal The modal object.
             // @param {object} v1 A 3D vector of the start point.
@@ -150,7 +152,10 @@ onmessage = function({ data }) {
                 const color = [motion, 1];
 
                 // svg
-                svgInitialization(motion);
+                if (shouldIncludeSVG) {
+                    svgInitialization(motion);
+                }
+
 
                 for (let i = 0; i < points.length; ++i) {
                     const point = points[i];
@@ -160,7 +165,7 @@ onmessage = function({ data }) {
 
                     if (plane === 'G17') { // XY-plane
                         vertices.push(point.x, point.y, z);
-                        if (i > 0) {
+                        if (shouldIncludeSVG && i > 0) {
                             SVGVertices.push({
                                 x1: pointA.x,
                                 y1: pointA.y,
@@ -170,7 +175,7 @@ onmessage = function({ data }) {
                         }
                     } else if (plane === 'G18') { // ZX-plane
                         vertices.push(point.y, z, point.x);
-                        if (i > 0) {
+                        if (shouldIncludeSVG && i > 0) {
                             SVGVertices.push({
                                 x1: pointA.y,
                                 y1: z,
@@ -180,13 +185,15 @@ onmessage = function({ data }) {
                         }
                     } else if (plane === 'G19') { // YZ-plane
                         vertices.push(z, point.x, point.y);
-                        if (i > 0) {
-                            SVGVertices.push({
-                                x1: z,
-                                y1: pointA.x,
-                                x2: z,
-                                y2: pointB.x
-                            });
+                        if (shouldIncludeSVG && i > 0) {
+                            if (i > 0) {
+                                SVGVertices.push({
+                                    x1: z,
+                                    y1: pointA.x,
+                                    x2: z,
+                                    y2: pointB.x
+                                });
+                            }
                         }
                     }
                     colors.push(color);
@@ -253,7 +260,9 @@ onmessage = function({ data }) {
     const info = vm.generateFileStats();
 
     // create path for the last motion
-    createPath(currentMotion);
+    if (shouldIncludeSVG) {
+        createPath(currentMotion);
+    }
     paths = JSON.parse(JSON.stringify(paths));
 
     const message = {
