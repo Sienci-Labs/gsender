@@ -6,12 +6,13 @@ import isNumber from 'lodash/isNumber';
 import * as fileActions from 'app/actions/fileInfoActions';
 import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
 import store from 'app/store';
-import { RENDER_RENDERING, RENDER_RENDERED, VISUALIZER_SECONDARY } from 'app/constants';
+import { RENDER_RENDERED, RENDER_RENDERING, VISUALIZER_SECONDARY } from 'app/constants';
 
 export const visualizeResponse = ({ data }) => {
     if (isNumber(data)) {
         pubsub.publish('toolpath:progress', data);
     } else {
+        const { needsVisualization } = data;
         // Update estimate worker with values
         const estimatePayload = {
             ...data.info,
@@ -34,17 +35,26 @@ export const visualizeResponse = ({ data }) => {
         // Handle file load
         pubsub.publish('file:load', data);
         // Visualizer Rendering
-        setTimeout(() => {
-            const renderState = _get(reduxStore.getState(), 'file.renderState');
-            if (renderState !== RENDER_RENDERED) {
-                reduxStore.dispatch({
-                    type: fileActions.UPDATE_FILE_RENDER_STATE,
-                    payload: {
-                        state: RENDER_RENDERING
-                    }
-                });
-            }
-        }, 1000);
+        if (needsVisualization) {
+            setTimeout(() => {
+                const renderState = _get(reduxStore.getState(), 'file.renderState');
+                if (renderState !== RENDER_RENDERED) {
+                    reduxStore.dispatch({
+                        type: fileActions.UPDATE_FILE_RENDER_STATE,
+                        payload: {
+                            state: RENDER_RENDERING
+                        }
+                    });
+                }
+            }, 250);
+        } else {
+            reduxStore.dispatch({
+                type: fileActions.UPDATE_FILE_RENDER_STATE,
+                payload: {
+                    state: RENDER_RENDERED
+                }
+            });
+        }
     }
 };
 

@@ -215,23 +215,15 @@ export function* initialize() {
 
         const needsVisualization = shouldVisualize();
 
-        if (needsVisualization) {
-            visualizeWorker = new VisualizeWorker();
-            visualizeWorker.onmessage = visualizeResponse;
-            visualizeWorker.postMessage({
-                content,
-                visualizer,
-                isLaser,
-                shouldIncludeSVG
-            });
-        } else {
-            reduxStore.dispatch({
-                type: fileActions.UPDATE_FILE_RENDER_STATE,
-                payload: {
-                    state: RENDER_RENDERED
-                }
-            });
-        }
+        visualizeWorker = new VisualizeWorker();
+        visualizeWorker.onmessage = visualizeResponse;
+        visualizeWorker.postMessage({
+            content,
+            visualizer,
+            isLaser,
+            shouldIncludeSVG,
+            needsVisualization
+        });
     };
 
     controller.addListener('controller:settings', (type, settings) => {
