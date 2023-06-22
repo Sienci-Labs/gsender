@@ -24,7 +24,7 @@
 import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
 import partition from 'lodash/partition';
-import SerialPort from 'serialport';
+import { SerialPort } from 'serialport';
 import socketIO from 'socket.io';
 import { app } from 'electron';
 import fs from 'fs';
