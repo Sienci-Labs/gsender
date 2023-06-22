@@ -99,6 +99,17 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+
+# 1.2.1 (June 22, 2023)
+- Fix for files not loading for some users
+- Toolchange strategy missing units added
+- Controller functionality issues addressed
+- Calibration tools calculate correct values based on input
+- Surfacing unit conversion on RPM removed
+- Laser unit renamed to Power from RPM
+- Color theme loading no longer loads non-existant file
+
+
 # 1.2.0 (June 19th, 2023)
 - gSender runs noticeably faster and lighter!
     - There were multiple areas where we were able to make file processing on average 20% more efficient and reduce overall program memory usage by an average of 2/3rds due to an increased node sandbox memory size and improvements to multiple run times
