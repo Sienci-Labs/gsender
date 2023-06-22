@@ -118,6 +118,9 @@ class ProbeWidget extends PureComponent {
                 }
             }, 250);
         },
+        setProbeConnectivity: (connectionMade) => {
+            this.setState({ connectionMade });
+        },
         toggleFullscreen: () => {
             const { minimized, isFullscreen } = this.state;
             this.setState({
