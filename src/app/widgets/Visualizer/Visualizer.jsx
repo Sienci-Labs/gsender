@@ -1844,7 +1844,7 @@ class Visualizer extends Component {
         }
 
         this.camera.up.set(0, 0, 1);
-        this.camera.position.set(CAMERA_DISTANCE, 0, 0);
+        this.camera.position.set(-CAMERA_DISTANCE, 0, 0);
 
         if (this.viewport) {
             this.viewport.update();
@@ -1860,7 +1860,7 @@ class Visualizer extends Component {
         }
 
         this.camera.up.set(0, 0, 1);
-        this.camera.position.set(-CAMERA_DISTANCE, 0, 0);
+        this.camera.position.set(CAMERA_DISTANCE, 0, 0);
 
         if (this.viewport) {
             this.viewport.update();

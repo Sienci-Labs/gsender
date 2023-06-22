@@ -148,7 +148,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                     <div className={styles.overridesItem}>
                         <div className={styles.overridesValueWrapper}>
                             <span style={{ color: 'grey' }}>{spindleOverrideLabel}</span>
-                            <span className={styles.overrideValue}>{spindle} rpm</span>
+                            <span className={styles.overrideValue}>{spindle} {spindleOverrideLabel === 'Laser' ? 'Power' : 'RPM'}</span>
                         </div>
                         <Slider
                             min={OVERRIDE_VALUE_RANGES.MIN}

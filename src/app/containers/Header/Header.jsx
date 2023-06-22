@@ -28,14 +28,17 @@ import _ from 'lodash';
 import HeadlessIndicator from 'app/components/HeadlessIndicator';
 import Push from 'push.js';
 import isElectron from 'is-electron';
+import pubsub from 'pubsub-js';
+
 import reduxStore from 'app/store/redux';
 import api from 'app/api';
 import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import pubsub from 'pubsub-js';
+import gamepad, { runAction } from 'app/lib/gamepad';
 import NavbarConnection from 'app/widgets/NavbarConnection';
+
 import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
@@ -245,7 +248,9 @@ class Header extends PureComponent {
         this.addShuttleControlEvents();
         this.addControllerEvents();
         this.addResizeEventListener();
+
         useKeybinding(this.shuttleControlEvents);
+        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
 
         if (isElectron()) {
             this.registerIPCListeners();

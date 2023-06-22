@@ -21,27 +21,11 @@
  *
  */
 import controller from 'app/lib/controller';
+import { getProbeSettings, getUnitModal, getToolString } from 'app/lib/toolChangeUtils';
 import React from 'react';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import { get } from 'lodash';
-
-
-const getProbeSettings = () => {
-    const probeSettings = store.get('widgets.probe');
-    return {
-        slowSpeed: probeSettings.probeFeedrate.mm,
-        fastSpeed: probeSettings.probeFastFeedrate.mm,
-        retract: probeSettings.retractionDistance.mm,
-        zProbeDistance: probeSettings.zProbeDistance.mm,
-    };
-};
-
-const getToolString = () => {
-    const state = reduxStore.getState();
-    const tool = get(state, 'controller.state.parserstate.modal.tool', '');
-    return `T${tool}`;
-};
 
 // $132 is max z travel, if soft limits ($20) enabled we need to make sure probe distance will not exceed max limits
 const calculateMaxZProbeDistance = (zProbeDistance = 30) => {
@@ -55,14 +39,6 @@ const calculateMaxZProbeDistance = (zProbeDistance = 30) => {
     return maxZTravel - curZPos - 2;
 };
 
-const getUnitModal = () => {
-    const state = reduxStore.getState();
-    const $13 = get(state, 'controller.settings.settings.$13', '0');
-    if ($13 === '1') {
-        return 'G20';
-    }
-    return 'G21';
-};
 
 const wizard = {
     intro: {
@@ -71,9 +47,7 @@ const wizard = {
     },
     onStart: () => {
         const settings = getProbeSettings();
-        const probeProfile = store.get('workspace.probeProfile');
         const position = store.get('workspace.toolChangePosition');
-        const { zThickness } = probeProfile;
         // Get $13 value for adjustment of Z Safe Height
         const state = reduxStore.getState();
         const $13 = get(state, 'controller.settings.settings.$13', '0');
@@ -83,7 +57,7 @@ const wizard = {
 
         controller.command('gcode', [
             '%wait',
-            `%global.toolchange.PROBE_THICKNESS_MM=${zThickness.mm}`,
+            `%global.toolchange.PROBE_THICKNESS_MM=${settings.zProbeThickness}`,
             `%global.toolchange.PROBE_DISTANCE=${zProbeDistance}`,
             `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
             `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,

@@ -1307,8 +1307,9 @@ class GrblController {
                 const dwell = '%wait ; Wait for the planner to empty';
 
                 // add delay to spindle startup if enabled
-                const preferences = store.get('preferences') || { spindle: { delay: false } };
-                const delay = preferences.spindle.delay;
+                const preferences = store.get('preferences', {});
+                const delay = _.get(preferences, 'spindle.delay', false);
+
                 if (delay) {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }
@@ -1758,6 +1759,7 @@ class GrblController {
 
                     if (this.homingFlagSet) {
                         const [xMaxLoc, yMaxLoc] = getAxisMaximumLocation($23);
+                        console.log(`x${xMaxLoc}, y${yMaxLoc}`);
 
                         if (axes.X) {
                             axes.X = determineMaxMovement(Math.abs(mpos.x), axes.X, xMaxLoc, $130);
@@ -1766,6 +1768,7 @@ class GrblController {
                             axes.Y = determineMaxMovement(Math.abs(mpos.y), axes.Y, yMaxLoc, $131);
                         }
                     } else {
+                        console.log('calculating from no homing flag');
                         if (axes.X) {
                             axes.X = calculateAxisValue({ direction: Math.sign(axes.X), position: Math.abs(mpos.x), maxTravel: $130 });
                         }

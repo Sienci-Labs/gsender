@@ -3,8 +3,6 @@ import throttle from 'lodash/throttle';
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
-import shuttleEvents from '../shuttleEvents';
-
 const STOP_JOG_CMD = 'STOP_JOG';
 
 class Gamepad extends GamepadListener {
@@ -130,10 +128,10 @@ export const runAction = ({ event, shuttleControlEvents }) => {
         return;
     }
 
-    const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
-    const runEvent = allShuttleControlEvents[action.cmd]?.callback;
-    if (runEvent) {
-        runEvent(null, action.payload);
+    const shuttleEvent = shuttleControlEvents[action.cmd];
+
+    if (shuttleEvent?.callback) {
+        shuttleEvent.callback(null, shuttleEvent.payload);
     }
 };
 
