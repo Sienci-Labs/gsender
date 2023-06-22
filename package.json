@@ -8,8 +8,8 @@
   },
   "main": "./dist/gsender/server-cli.js",
   "bin": {
-    "gsender": "./bin/gsender",
-    "cnc": "./bin/cnc"
+    "cnc": "./bin/cnc",
+    "gsender": "./bin/gsender"
   },
   "files": [
     "bin",
