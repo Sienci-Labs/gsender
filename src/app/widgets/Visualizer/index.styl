@@ -53,6 +53,12 @@
 .svg-container {
     display: block;
     margin: auto;
+    // this is here to stop svg from changing visualizer aspect ratio
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
 }
 
 .no-margin {
