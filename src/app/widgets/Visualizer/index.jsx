@@ -566,7 +566,8 @@ class VisualizerWidget extends PureComponent {
             }
         },
         handleLiteModeToggle: () => {
-            const { liteMode, gcode } = this.state;
+            const { liteMode } = this.state;
+            const { isFileLoaded } = this.props;
             const newLiteModeValue = !liteMode;
 
             this.setState({
@@ -577,7 +578,7 @@ class VisualizerWidget extends PureComponent {
             // instead of calling loadGCode right away,
             // use this pubsub to invoke a refresh of the visualizer wrapper.
             // this removes visual glitches that would otherwise appear.
-            pubsub.publish('litemode:change', gcode);
+            pubsub.publish('litemode:change', isFileLoaded);
         },
         lineWarning: {
             onContinue: () => {
@@ -1578,6 +1579,7 @@ export default connect((store) => {
     const activeState = get(store, 'controller.state.status.activeState');
     const alarmCode = get(store, 'controller.state.status.alarmCode');
     const overrides = get(store, 'controller.state.status.ov', [0, 0, 0]);
+    const isFileLoaded = get(store, 'file.fileLoaded');
 
     const { activeVisualizer } = store.visualizer;
 
@@ -1598,6 +1600,7 @@ export default connect((store) => {
         activeVisualizer,
         alarmCode,
         ovF,
-        ovS
+        ovS,
+        isFileLoaded
     };
 }, null, null, { forwardRef: true })(VisualizerWidget);
