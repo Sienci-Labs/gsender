@@ -195,7 +195,7 @@ const Alignment = ({ onClose }) => {
     if (isFullyComplete) {
         return (
             <Result
-                triangle={{ a: 90, b: 90, c: 125 }}
+                triangle={triangle}
                 jogValues={jogValues}
                 onBack={onBack}
                 onClose={onClose}
