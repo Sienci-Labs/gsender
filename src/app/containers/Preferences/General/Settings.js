@@ -87,7 +87,6 @@ const Settings = () => {
                 <Button
                     primary
                     type="button"
-                    title="Import Macros"
                     style={{ marginBottom: '1rem' }}
                     onClick={() => {
                         inputRef.current.click();
@@ -98,7 +97,6 @@ const Settings = () => {
                 <Button
                     primary
                     type="button"
-                    title="Export Macros"
                     style={{ marginBottom: '1rem' }}
                     onClick={exportSettings}
                 >

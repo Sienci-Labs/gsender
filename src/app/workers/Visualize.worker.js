@@ -25,7 +25,7 @@ import GCodeVirtualizer from 'app/lib/GCodeVirtualizer';
 import { ArcCurve } from 'three';
 
 onmessage = function({ data }) {
-    const { content, visualizer, isLaser = false } = data;
+    const { content, visualizer, isLaser = false, shouldIncludeSVG = false, needsVisualization = true } = data;
 
     // Common state variables
     let vertices = [];
@@ -98,98 +98,109 @@ onmessage = function({ data }) {
             // @param {object} v1 A 3D vector of the start point.
             // @param {object} v2 A 3D vector of the end point.
             addLine: (modal, v1, v2) => {
-                const { motion } = modal;
+                if (needsVisualization) {
+                    const { motion } = modal;
 
-                // normal
-                const opacity = (motion === 'G0') ? 0.5 : 1;
-                const color = [motion, opacity];
-                colors.push(color, color);
-                vertices.push(
-                    v1.x, v1.y, v1.z,
-                    v2.x, v2.y, v2.z
-                );
+                    // normal
+                    const opacity = (motion === 'G0') ? 0.5 : 1;
+                    const color = [motion, opacity];
+                    colors.push(color, color);
+                    vertices.push(
+                        v1.x, v1.y, v1.z,
+                        v2.x, v2.y, v2.z
+                    );
 
-                // svg
-                svgInitialization(motion);
-                SVGVertices.push({
-                    x1: v1.x,
-                    y1: v1.y,
-                    x2: v2.x,
-                    y2: v2.y
-                });
+                    // svg
+                    if (shouldIncludeSVG) {
+                        svgInitialization(motion);
+                        SVGVertices.push({
+                            x1: v1.x,
+                            y1: v1.y,
+                            x2: v2.x,
+                            y2: v2.y
+                        });
+                    }
+                }
             },
             // @param {object} modal The modal object.
             // @param {object} v1 A 3D vector of the start point.
             // @param {object} v2 A 3D vector of the end point.
             // @param {object} v0 A 3D vector of the fixed point.
             addArcCurve: (modal, v1, v2, v0) => {
-                const { motion, plane } = modal;
-                const isClockwise = (motion === 'G2');
-                const radius = Math.sqrt(
-                    ((v1.x - v0.x) ** 2) + ((v1.y - v0.y) ** 2)
-                );
-                let startAngle = Math.atan2(v1.y - v0.y, v1.x - v0.x);
-                let endAngle = Math.atan2(v2.y - v0.y, v2.x - v0.x);
+                if (needsVisualization) {
+                    const { motion, plane } = modal;
+                    const isClockwise = (motion === 'G2');
+                    const radius = Math.sqrt(
+                        ((v1.x - v0.x) ** 2) + ((v1.y - v0.y) ** 2)
+                    );
+                    let startAngle = Math.atan2(v1.y - v0.y, v1.x - v0.x);
+                    let endAngle = Math.atan2(v2.y - v0.y, v2.x - v0.x);
 
-                // Draw full circle if startAngle and endAngle are both zero
-                if (startAngle === endAngle) {
-                    endAngle += (2 * Math.PI);
-                }
-
-                const arcCurve = new ArcCurve(
-                    v0.x, // aX
-                    v0.y, // aY
-                    radius, // aRadius
-                    startAngle, // aStartAngle
-                    endAngle, // aEndAngle
-                    isClockwise // isClockwise
-                );
-                const divisions = 30;
-                const points = arcCurve.getPoints(divisions);
-
-                const color = [motion, 1];
-
-                // svg
-                svgInitialization(motion);
-
-                for (let i = 0; i < points.length; ++i) {
-                    const point = points[i];
-                    const pointA = points[i - 1];
-                    const pointB = points[i];
-                    const z = ((v2.z - v1.z) / points.length) * i + v1.z;
-
-                    if (plane === 'G17') { // XY-plane
-                        vertices.push(point.x, point.y, z);
-                        if (i > 0) {
-                            SVGVertices.push({
-                                x1: pointA.x,
-                                y1: pointA.y,
-                                x2: pointB.x,
-                                y2: pointB.y
-                            });
-                        }
-                    } else if (plane === 'G18') { // ZX-plane
-                        vertices.push(point.y, z, point.x);
-                        if (i > 0) {
-                            SVGVertices.push({
-                                x1: pointA.y,
-                                y1: z,
-                                x2: pointB.y,
-                                y2: z
-                            });
-                        }
-                    } else if (plane === 'G19') { // YZ-plane
-                        vertices.push(z, point.x, point.y);
-                        if (i > 0) {
-                            SVGVertices.push({
-                                x1: z,
-                                y1: pointA.x,
-                                x2: z,
-                                y2: pointB.x
-                            });
-                        }
+                    // Draw full circle if startAngle and endAngle are both zero
+                    if (startAngle === endAngle) {
+                        endAngle += (2 * Math.PI);
                     }
-                    colors.push(color);
+
+                    const arcCurve = new ArcCurve(
+                        v0.x, // aX
+                        v0.y, // aY
+                        radius, // aRadius
+                        startAngle, // aStartAngle
+                        endAngle, // aEndAngle
+                        isClockwise // isClockwise
+                    );
+                    const divisions = 30;
+                    const points = arcCurve.getPoints(divisions);
+
+                    const color = [motion, 1];
+
+                    // svg
+                    if (shouldIncludeSVG) {
+                        svgInitialization(motion);
+                    }
+
+
+                    for (let i = 0; i < points.length; ++i) {
+                        const point = points[i];
+                        const pointA = points[i - 1];
+                        const pointB = points[i];
+                        const z = ((v2.z - v1.z) / points.length) * i + v1.z;
+
+                        if (plane === 'G17') { // XY-plane
+                            vertices.push(point.x, point.y, z);
+                            if (shouldIncludeSVG && i > 0) {
+                                SVGVertices.push({
+                                    x1: pointA.x,
+                                    y1: pointA.y,
+                                    x2: pointB.x,
+                                    y2: pointB.y
+                                });
+                            }
+                        } else if (plane === 'G18') { // ZX-plane
+                            vertices.push(point.y, z, point.x);
+                            if (shouldIncludeSVG && i > 0) {
+                                SVGVertices.push({
+                                    x1: pointA.y,
+                                    y1: z,
+                                    x2: pointB.y,
+                                    y2: z
+                                });
+                            }
+                        } else if (plane === 'G19') { // YZ-plane
+                            vertices.push(z, point.x, point.y);
+                            if (shouldIncludeSVG && i > 0) {
+                                if (i > 0) {
+                                    SVGVertices.push({
+                                        x1: z,
+                                        y1: pointA.x,
+                                        x2: z,
+                                        y2: pointB.x
+                                    });
+                                }
+                            }
+                        }
+                        colors.push(color);
+                    }
                 }
             }
         },
@@ -220,7 +231,7 @@ onmessage = function({ data }) {
         frames.push(vertexIndex);
 
         let spindleValues = {};
-        if (isLaser) {
+        if (isLaser && needsVisualization) {
             updateSpindleStateFromLine(data);
             spindleValues = {
                 spindleOn,
@@ -253,7 +264,9 @@ onmessage = function({ data }) {
     const info = vm.generateFileStats();
 
     // create path for the last motion
-    createPath(currentMotion);
+    if (shouldIncludeSVG) {
+        createPath(currentMotion);
+    }
     paths = JSON.parse(JSON.stringify(paths));
 
     const message = {
@@ -262,7 +275,8 @@ onmessage = function({ data }) {
         colors,
         frames: tFrames,
         visualizer,
-        info
+        info,
+        needsVisualization
     };
 
     if (isLaser) {

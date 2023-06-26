@@ -93,6 +93,7 @@ class WindowManager {
             webPreferences: {
                 nodeIntegration: true,
                 enableRemoteModule: true,
+                sandbox: false,
                 contextIsolation: false,
                 preload: path.join(__dirname, 'preload.js')
             }

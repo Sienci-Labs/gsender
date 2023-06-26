@@ -37,11 +37,19 @@ import * as fileActions from 'app/actions/fileInfoActions';
 import * as preferenceActions from 'app/actions/preferencesActions';
 import * as visualizerActions from 'app/actions/visualizerActions';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-import { Toaster, TOASTER_INFO, TOASTER_UNTIL_CLOSE, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO, TOASTER_SUCCESS, TOASTER_UNTIL_CLOSE } from 'app/lib/toaster/ToasterLib';
 import VisualizeWorker from 'app/workers/Visualize.worker';
-import { visualizeResponse, shouldVisualize } from 'app/workers/Visualize.response';
+import { shouldVisualize, visualizeResponse } from 'app/workers/Visualize.response';
 import { isLaserMode } from 'app/lib/laserMode';
-import { RENDER_LOADING, RENDER_RENDERED, RENDER_NO_FILE, VISUALIZER_SECONDARY, GRBL_ACTIVE_STATE_RUN, GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
+import {
+    GRBL_ACTIVE_STATE_HOLD,
+    GRBL_ACTIVE_STATE_IDLE,
+    GRBL_ACTIVE_STATE_RUN,
+    RENDER_LOADING,
+    RENDER_NO_FILE,
+    RENDER_RENDERED,
+    VISUALIZER_SECONDARY
+} from 'app/constants';
 import isElectron from 'is-electron';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 
@@ -121,8 +129,13 @@ export function* initialize() {
         areStatsInitialized = false;
     };
 
+    const shouldVisualizeSVG = () => {
+        return store.get('widgets.visualizer.SVGEnabled', false);
+    };
+
     const parseGCode = (content, size, name, visualizer) => {
         const isLaser = isLaserMode();
+        const shouldIncludeSVG = shouldVisualizeSVG();
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch({
                 type: fileActions.UPDATE_FILE_RENDER_STATE,
@@ -149,7 +162,7 @@ export function* initialize() {
                 visualizeWorker.onmessage = visualizeResponse;
                 visualizeWorker.postMessage({
                     content,
-                    visualizer
+                    visualizer,
                 });
             } else {
                 reduxStore.dispatch({
@@ -199,29 +212,18 @@ export function* initialize() {
                 });
             }
         }, 1000);
-        /*        const xMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$120', 500);
-                const yMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$121', 500);
-                const zMaxAccel = _get(reduxStore.getState(), 'controller.settings.settings.$122', 500);
-                const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];*/
 
         const needsVisualization = shouldVisualize();
 
-        if (needsVisualization) {
-            visualizeWorker = new VisualizeWorker();
-            visualizeWorker.onmessage = visualizeResponse;
-            visualizeWorker.postMessage({
-                content,
-                visualizer,
-                isLaser
-            });
-        } else {
-            reduxStore.dispatch({
-                type: fileActions.UPDATE_FILE_RENDER_STATE,
-                payload: {
-                    state: RENDER_RENDERED
-                }
-            });
-        }
+        visualizeWorker = new VisualizeWorker();
+        visualizeWorker.onmessage = visualizeResponse;
+        visualizeWorker.postMessage({
+            content,
+            visualizer,
+            isLaser,
+            shouldIncludeSVG,
+            needsVisualization
+        });
     };
 
     controller.addListener('controller:settings', (type, settings) => {

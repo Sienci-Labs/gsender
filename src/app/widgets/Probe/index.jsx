@@ -32,7 +32,7 @@ import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import pubsub from 'pubsub-js';
-import { TOUCHPLATE_TYPE_AUTOZERO, PROBE_TYPE_AUTO, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
+import { TOUCHPLATE_TYPE_AUTOZERO, PROBE_TYPE_AUTO, TOUCHPLATE_TYPE_ZERO, PROBE_TYPE_TIP } from 'app/lib/constants';
 import store from 'app/store';
 import { mm2in } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
@@ -44,7 +44,6 @@ import {
     // Grbl
     GRBL,
     GRBL_ACTIVE_STATE_IDLE,
-    WORKFLOW_STATE_IDLE
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -118,6 +117,9 @@ class ProbeWidget extends PureComponent {
                     this.testInterval = null;
                 }
             }, 250);
+        },
+        setProbeConnectivity: (connectionMade) => {
+            this.setState({ connectionMade });
         },
         toggleFullscreen: () => {
             const { minimized, isFullscreen } = this.state;
@@ -1093,6 +1095,8 @@ class ProbeWidget extends PureComponent {
         return code;
     }
 
+    generateAvailableTools() {}
+
     generateProbeCommands() {
         const state = { ...this.state,
             controller: {
@@ -1182,13 +1186,9 @@ class ProbeWidget extends PureComponent {
     }
 
     canClick() {
-        const { workflow, isConnected, type, state } = this.props;
-        const { toolChangeActive } = this.state;
+        const { isConnected, type, state } = this.props;
 
         if (!isConnected) {
-            return false;
-        }
-        if (workflow.state !== WORKFLOW_STATE_IDLE && !toolChangeActive) {
             return false;
         }
         if (!includes([GRBL], type)) {
@@ -1250,8 +1250,13 @@ class ProbeWidget extends PureComponent {
             }),
             pubsub.subscribe('probe:updated', (msg) => {
                 const touchplate = store.get('workspace[probeProfile]', {});
+                let { toolDiameter } = this.state;
+                if (touchplate.touchplateType !== TOUCHPLATE_TYPE_AUTOZERO && (toolDiameter === PROBE_TYPE_AUTO || toolDiameter === PROBE_TYPE_TIP)) {
+                    toolDiameter = 0;
+                }
                 this.setState({
-                    touchplate: touchplate
+                    touchplate: touchplate,
+                    toolDiameter: toolDiameter
                 }, () => {
                     this.actions.generatePossibleProbeCommands();
                 });

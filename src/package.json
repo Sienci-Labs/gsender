@@ -1,6 +1,6 @@
 {
   "name": "gSender",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "productName": "gSender",
   "description": "CNC Milling Controller",
   "author": {
@@ -14,8 +14,8 @@
   },
   "main": "main.js",
   "dependencies": {
-    "@serialport/parser-readline": "^10.0.0",
-    "avrgirl-arduino": "^5.0.1",
+    "@serialport/parser-readline": "^11.0.0",
+    "@sienci/avrgirl-arduino": "^5.0.3",
     "axios": "^1.2.4",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "~1.18.3",
@@ -61,7 +61,7 @@
     "registry-auth-token": "~3.4.0",
     "registry-url": "~5.1.0",
     "rimraf": "~2.6.3",
-    "serialport": "^9.2.8",
+    "serialport": "^10",
     "serve-favicon": "~2.5.0",
     "serve-static": "~1.13.2",
     "session-file-store": "~1.2.0",

@@ -22,35 +22,7 @@
  */
 import controller from 'app/lib/controller';
 import React from 'react';
-import store from 'app/store';
-import reduxStore from 'app/store/redux';
-import { get } from 'lodash';
-
-const getProbeSettings = () => {
-    const probeSettings = store.get('widgets.probe');
-    return {
-        slowSpeed: probeSettings.probeFeedrate.mm,
-        fastSpeed: probeSettings.probeFastFeedrate.mm,
-        retract: probeSettings.retractionDistance.mm,
-        zProbeDistance: probeSettings.zProbeDistance.mm,
-    };
-};
-
-
-const getToolString = () => {
-    const state = reduxStore.getState();
-    const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
-    return `T${tool}`;
-};
-
-const getUnitModal = () => {
-    const state = reduxStore.getState();
-    const $13 = get(state, 'controller.settings.settings.$13', '0');
-    if ($13 === '1') {
-        return 'G20';
-    }
-    return 'G21';
-};
+import { getProbeSettings, getUnitModal, getToolString } from 'app/lib/toolChangeUtils';
 
 const wizard = {
     intro: {
@@ -58,13 +30,11 @@ const wizard = {
         description: 'Tool Change detected, stay clear of the machine! Wait until initial movements are complete!'
     },
     onStart: () => {
-        const probeProfile = store.get('workspace.probeProfile');
         const settings = getProbeSettings();
-        const { zThickness } = probeProfile;
 
         return [
             '%wait',
-            `%global.toolchange.PROBE_THICKNESS=${zThickness.mm}`,
+            `%global.toolchange.PROBE_THICKNESS=${settings.zProbeThickness}`,
             `%global.toolchange.PROBE_DISTANCE=${settings.zProbeDistance}`,
             `%global.toolchange.PROBE_FEEDRATE=${settings.fastSpeed}`,
             `%global.toolchange.PROBE_SLOW_FEEDRATE=${settings.slowSpeed}`,
@@ -78,6 +48,7 @@ const wizard = {
             '%global.toolchange.FEEDRATE=programFeedrate',
             '([JSON.stringify(global.toolchange)])',
             'M5',
+            'G91 G21',
             '(Toolchange initiated)',
         ];
     },
