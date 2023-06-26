@@ -840,9 +840,7 @@ class VisualizerWidget extends PureComponent {
     shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
             const feedRate = this.props.ovF + (Number(amount) || 0);
-            console.log(feedRate);
             if (feedRate <= OVERRIDE_VALUE_RANGES.MAX && feedRate >= OVERRIDE_VALUE_RANGES.MIN) {
-                console.log('made it');
                 switch (Number(amount)) {
                 case 1:
                     controller.write('\x93');
@@ -864,8 +862,7 @@ class VisualizerWidget extends PureComponent {
                 }
                 pubsub.publish('feedrate:change', feedRate);
             } else {
-                console.log('***out of range');
-                console.log('***ovf: ' + this.props.ovF);
+                log.error('ovF out of range: ' + this.props.ovF);
             }
         },
         SPINDLE_OVERRIDE: (_, { amount }) => {
@@ -892,8 +889,7 @@ class VisualizerWidget extends PureComponent {
                 }
                 pubsub.publish('spindlespeed:change', spindleSpeed);
             } else {
-                console.log('***out of range');
-                console.log('***ovS: ' + this.props.ovS);
+                log.error('ovS out of range: ' + this.props.ovS);
             }
         },
         VISUALIZER_VIEW: (_, { type }) => {

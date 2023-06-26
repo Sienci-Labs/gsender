@@ -30,7 +30,6 @@ export const calcOverrides = (context, difference = 100, type = 'feed') => {
     const absValue = Math.abs(difference);
     const quotient = Math.floor(absValue / 10);
     const remainder = absValue % 10;
-    console.log(`${quotient} + ${remainder}`);
 
     if (difference > 0) {
         commandQueue.push(

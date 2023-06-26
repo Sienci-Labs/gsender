@@ -48,7 +48,7 @@ const Slider = ({ sliderName = 'stepper', step = 1, min = 0, max = 100, value, o
                             [...Array(max - min)].map((e, i) => {
                                 // if the min isnt 0, need to calculate the slider number
                                 const index = i + min;
-                                if (index % step === 0 && datalist.includes(index)) {
+                                if (datalist.includes(index)) {
                                     return <p key={uniqueId()}></p>;
                                 } else {
                                     return <div key={uniqueId()}></div>;

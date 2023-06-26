@@ -37,19 +37,15 @@ import Slider from '../../../components/Slider/Slider';
 import FeedControlButton from './FeedControlButton';
 
 // debounced handlers
-const debouncedSpindleHandler = debounce((value) => {
+const debouncedSpindleHandler = debounce((value, updateFunc) => {
+    updateFunc('ovS', value);
     controller.command('spindleOverride', Number(value));
 }, 1000);
-const debouncedFeedHandler = debounce((value) => {
+const debouncedFeedHandler = debounce((value, updateFunc) => {
+    updateFunc('ovF', value);
     controller.command('feedOverride', Number(value));
 }, 1000);
 
-const debounceFeedUpdate = debounce((localFunc, value) => {
-    localFunc(value);
-}, 500);
-const debounceSpindleUpdate = debounce((localFunc, value) => {
-    localFunc(value);
-}, 500);
 
 /**
  * Settings Area component to display override controls for user
@@ -57,11 +53,11 @@ const debounceSpindleUpdate = debounce((localFunc, value) => {
  *
  */
 const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
-    console.log('settings area ovf: ' + ovF);
-    console.log('settings area ovs: ' + ovS);
     const [showSpindleOverride, setShowSpindleOverride] = useState(store.get('workspace.machineProfile.spindle'));
     const [localOvF, setLocalOvF] = useState(ovF);
     const [localOvS, setLocalOvS] = useState(ovS);
+    const [dataListOvF, setDataListOvF] = useState([100]);
+    const [dataListOvS, setDataListOvS] = useState([100]);
 
     const { units } = state;
     const unitString = `${units}/min`;
@@ -74,6 +70,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
         if (newVal > OVERRIDE_VALUE_RANGES.MAX || newVal < OVERRIDE_VALUE_RANGES.MIN) {
             return;
         }
+        resetDataLists();
         setLocalFunc(newVal);
         controller.writeln(command);
     };
@@ -82,13 +79,47 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
         setShowSpindleOverride(store.get('workspace.machineProfile.spindle'));
     };
 
+    const updateDataList = (type, value) => {
+        value = Number(value) || 0;
+        if (value === 100 || value === 0) {
+            resetDataLists();
+            return;
+        }
+
+        switch (type) {
+        case 'ovS':
+            if (value > 100) {
+                setDataListOvS([100, value]);
+            } else {
+                setDataListOvS([value, 100]);
+            }
+            break;
+        case 'ovF':
+            if (value > 100) {
+                setDataListOvF([100, value]);
+            } else {
+                setDataListOvF([value, 100]);
+            }
+            break;
+        default:
+            return;
+        }
+    };
+
+    const resetDataLists = () => {
+        setDataListOvS([100]);
+        setDataListOvF([100]);
+    };
+
     useEffect(() => {
         store.on('change', handleMachineProfileChange);
         const tokens = [
             pubsub.subscribe('feedrate:change', (msg, feedRate) => {
+                resetDataLists();
                 setLocalOvF(feedRate);
             }),
             pubsub.subscribe('spindlespeed:change', (msg, spindleSpeed) => {
+                resetDataLists();
                 setLocalOvS(spindleSpeed);
             }),
         ];
@@ -102,11 +133,11 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
     }, []);
 
     useEffect(() => {
-        debounceFeedUpdate(setLocalOvF, ovF);
+        setLocalOvF(ovF);
     }, [ovF]);
 
     useEffect(() => {
-        debounceSpindleUpdate(setLocalOvS, ovS);
+        setLocalOvS(ovS);
     }, [ovS]);
     const { spindleOverrideLabel } = state;
 
@@ -126,9 +157,9 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                     step={10}
                     onChange={(e) => {
                         setLocalOvF(e.target.value);
-                        debouncedFeedHandler(e.target.value);
+                        debouncedFeedHandler(e.target.value, updateDataList);
                     }}
-                    datalist={[100]}
+                    datalist={dataListOvF}
                 />
                 <div className={styles.overridesButtonsWrapper}>
                     <FeedControlButton value="100" onClick={() => handleChangeRate(setLocalOvF, 100, '\x90')}>
@@ -159,9 +190,9 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                             step={10}
                             onChange={(e) => {
                                 setLocalOvS(e.target.value);
-                                debouncedSpindleHandler(e.target.value);
+                                debouncedSpindleHandler(e.target.value, updateDataList);
                             }}
-                            datalist={[100]}
+                            datalist={dataListOvS}
                         />
                         <div className={styles.overridesButtonsWrapper}>
                             <FeedControlButton value="100" onClick={() => handleChangeRate(setLocalOvS, 100, '\x99')}>
