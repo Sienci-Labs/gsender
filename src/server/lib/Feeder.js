@@ -118,8 +118,9 @@ class Feeder extends events.EventEmitter {
     }
 
     next() {
-        if (this.state.queue.length === 0) {
+        if (this.state.queue.length === 0 && !this.state.hold) {
             this.state.pending = false;
+            this.emit('complete'); // indicate feeder is complete
             return this.state.pending;
         }
 
@@ -141,7 +142,7 @@ class Feeder extends events.EventEmitter {
         }
 
         // Clear pending state when the feeder queue is empty
-        if (this.state.queue.length === 0) {
+        if (this.state.queue.length === 0 && !this.state.hold) {
             this.state.pending = false;
             this.emit('complete'); // indicate feeder is complete
         }
