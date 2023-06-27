@@ -1579,18 +1579,17 @@ class GrblController {
                 const [feedOV] = this.state.status.ov;
 
                 let diff = value - feedOV;
-                //Limits for keyboard/gamepad shortcuts
-                if (value < 4) {
-                    diff = 4 - feedOV;
-                } else if (value > 230) {
-                    diff = 230 - feedOV;
-                }
-
 
                 if (value === 100) {
-                    this.write('\x90');
+                    this.write(String.fromCharCode(0x90));
                 } else {
-                    calcOverrides(this, diff, 'feed');
+                    const queue = calcOverrides(diff, 'feed');
+                    queue.forEach((command, index) => {
+                        setTimeout(() => {
+                            this.connection.writeImmediate(command);
+                            this.connection.writeImmediate('?');
+                        }, 50 * (index + 1));
+                    });
                 }
             },
             // Spindle Speed Overrides
@@ -1608,9 +1607,15 @@ class GrblController {
                 }
 
                 if (value === 100) {
-                    this.write('\x99');
+                    this.write(String.fromCharCode(0x99));
                 } else {
-                    calcOverrides(this, diff, 'spindle');
+                    const queue = calcOverrides(diff, 'spindle');
+                    queue.forEach((command, index) => {
+                        setTimeout(() => {
+                            this.connection.writeImmediate(command);
+                            this.connection.writeImmediate('?');
+                        }, 50 * (index + 1));
+                    });
                 }
             },
             // Rapid Overrides
