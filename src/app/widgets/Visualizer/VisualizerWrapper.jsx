@@ -30,7 +30,10 @@ import Visualizer from './Visualizer';
 class VisualizerWrapper extends Component {
     constructor(props) {
         super(props);
-        this.state = { needRefresh: false };
+        this.state = {
+            needRefresh: false,
+            needReload: false
+        };
     }
 
     pubsubTokens = [];
@@ -71,8 +74,12 @@ class VisualizerWrapper extends Component {
 
     subscribe() {
         const tokens = [
-            pubsub.subscribe('litemode:change', () => {
-                this.setNeedRefresh(true);
+            pubsub.subscribe('litemode:change', (msg, isFileLoaded) => {
+                if (isFileLoaded) {
+                    this.setNeedRefresh(true);
+                } else {
+                    this.forceUpdate();
+                }
             }),
             // currently, changing the settings requires reparsing of the gcode
             pubsub.subscribe('visualizer:settings', () => {

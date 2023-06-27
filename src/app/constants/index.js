@@ -196,6 +196,6 @@ export const USER_DATA_COLLECTION = {
 };
 
 export const OVERRIDE_VALUE_RANGES = {
-    MIN: 10,
-    MAX: 230
+    MIN: 20,
+    MAX: 200
 };

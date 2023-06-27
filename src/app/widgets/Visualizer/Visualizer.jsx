@@ -717,14 +717,14 @@ class Visualizer extends Component {
     }
 
     createCuttingPointer() {
-        const { state } = this.props;
-        const { currentTheme } = state;
+        const { state, isConnected } = this.props;
+        const { currentTheme, liteMode } = state;
         this.cuttingPointer = new CuttingPointer({
             color: currentTheme.get(CUTTING_PART),
             diameter: 2
         });
         this.cuttingPointer.name = 'CuttingPointer';
-        this.cuttingPointer.visible = false;
+        this.cuttingPointer.visible = isConnected && (liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible);
         this.group.add(this.cuttingPointer);
     }
 
@@ -1083,10 +1083,11 @@ class Visualizer extends Component {
             return;
         }
 
-        const { state } = this.props;
-        const { units, objects, currentTheme } = state;
+        const { state, isConnected } = this.props;
+        const { units, objects, currentTheme, liteMode } = state;
         const width = this.getVisibleWidth();
         const height = this.getVisibleHeight();
+        const isLaser = isLaserMode();
 
 
         // WebGLRenderer
@@ -1215,7 +1216,7 @@ class Visualizer extends Component {
 
                 this.cuttingTool = object;
                 this.cuttingTool.name = 'CuttingTool';
-                this.cuttingTool.visible = false;
+                this.cuttingTool.visible = isConnected && !isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
 
                 this.group.add(this.cuttingTool);
                 // Update the scene
@@ -1232,7 +1233,7 @@ class Visualizer extends Component {
                 diameter: 4
             });
             this.laserPointer.name = 'LaserPointer';
-            this.laserPointer.visible = false;
+            this.laserPointer.visible = isConnected && isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
 
             this.group.add(this.laserPointer);
 
