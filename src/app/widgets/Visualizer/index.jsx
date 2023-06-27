@@ -998,6 +998,19 @@ class VisualizerWidget extends PureComponent {
                 controller.command('gcode:test');
             },
         },
+        RUN_OUTLINE: {
+            title: 'Run Outline',
+            keys: '',
+            cmd: 'RUN_OUTLINE',
+            preventDefault: false,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                if (this.workflowControl) {
+                    this.workflowControl.runOutline();
+                }
+            },
+        },
         START_JOB: {
             title: 'Start Job',
             keys: '~',
