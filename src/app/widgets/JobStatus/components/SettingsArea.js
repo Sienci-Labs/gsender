@@ -36,8 +36,8 @@ import Slider from '../../../components/Slider/Slider';
 import FeedControlButton from './FeedControlButton';
 
 const VALUE_RANGES = {
-    MIN: 10,
-    MAX: 230
+    MIN: 20,
+    MAX: 200
 };
 
 // debounced handlers
