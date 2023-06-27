@@ -1588,9 +1588,9 @@ class GrblController {
 
 
                 if (value === 100) {
-                    this.write('\x90');
+                    this.write(String.fromCharCode(0x90));
                 } else {
-                    calcOverrides(this, diff, 'feed');
+                    calcOverrides(this.connection.write, diff, 'feed');
                 }
             },
             // Spindle Speed Overrides
@@ -1608,9 +1608,9 @@ class GrblController {
                 }
 
                 if (value === 100) {
-                    this.write('\x99');
+                    this.write(String.fromCharCode(0x99));
                 } else {
-                    calcOverrides(this, diff, 'spindle');
+                    calcOverrides(this.connection.write, diff, 'spindle');
                 }
             },
             // Rapid Overrides
