@@ -4,11 +4,11 @@
 // @param {number} overridePercentage The amount of percentage increase or decrease.
 // @param {string} type The type of override - spindle or feeder
 
-export const calcOverrides = (write, difference = 100, type = 'feed') => {
+export const calcOverrides = (difference = 100, type = 'feed') => {
     const commandQueue = [];
 
     if (difference === 0) {
-        return;
+        return commandQueue;
     }
 
     const commands = {
@@ -40,10 +40,5 @@ export const calcOverrides = (write, difference = 100, type = 'feed') => {
         );
     }
     // Space out realtime commands by 50ms intervals
-    commandQueue.forEach((command, index) => {
-        setTimeout(() => {
-            write(command);
-            write('?');
-        }, 50 * (index + 1));
-    });
+    return commandQueue;
 };

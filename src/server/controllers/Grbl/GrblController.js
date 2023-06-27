@@ -1590,7 +1590,13 @@ class GrblController {
                 if (value === 100) {
                     this.write(String.fromCharCode(0x90));
                 } else {
-                    calcOverrides(this.connection.write, diff, 'feed');
+                    const queue = calcOverrides(diff, 'feed');
+                    queue.forEach((command, index) => {
+                        setTimeout(() => {
+                            this.connection.writeImmediate(command);
+                            this.connection.writeImmediate('?');
+                        }, 50 * (index + 1));
+                    });
                 }
             },
             // Spindle Speed Overrides
@@ -1610,7 +1616,13 @@ class GrblController {
                 if (value === 100) {
                     this.write(String.fromCharCode(0x99));
                 } else {
-                    calcOverrides(this.connection.write, diff, 'spindle');
+                    const queue = calcOverrides(diff, 'spindle');
+                    queue.forEach((command, index) => {
+                        setTimeout(() => {
+                            this.connection.writeImmediate(command);
+                            this.connection.writeImmediate('?');
+                        }, 50 * (index + 1));
+                    });
                 }
             },
             // Rapid Overrides
