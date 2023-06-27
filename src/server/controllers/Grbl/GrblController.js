@@ -1579,13 +1579,6 @@ class GrblController {
                 const [feedOV] = this.state.status.ov;
 
                 let diff = value - feedOV;
-                //Limits for keyboard/gamepad shortcuts
-                if (value < 4) {
-                    diff = 4 - feedOV;
-                } else if (value > 230) {
-                    diff = 230 - feedOV;
-                }
-
 
                 if (value === 100) {
                     this.write(String.fromCharCode(0x90));
