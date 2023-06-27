@@ -85,8 +85,8 @@ class Header extends PureComponent {
         CONTROLLER_COMMAND: (event, { command }) => {
             const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
             // feedhold, cyclestart, homing, unlock, reset
-            if (((command === 'unlock' || command === 'homing') && activeState === GRBL_ACTIVE_STATE_ALARM) ||
-                (command !== 'unlock' && activeState === GRBL_ACTIVE_STATE_IDLE)) {
+            if (((command === 'reset:limit' || command === 'homing') && activeState === GRBL_ACTIVE_STATE_ALARM) ||
+                (command !== 'reset:limit' && activeState === GRBL_ACTIVE_STATE_IDLE)) {
                 controller.command(command);
             }
         }
@@ -98,7 +98,7 @@ class Header extends PureComponent {
             keys: '$',
             cmd: 'CONTROLLER_COMMAND_UNLOCK',
             payload: {
-                command: 'unlock'
+                command: 'reset:limit'
             },
             preventDefault: false,
             isActive: true,
