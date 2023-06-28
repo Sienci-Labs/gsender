@@ -163,7 +163,12 @@ const Theme = ({ state, actions }) => {
                 </Fieldset>
             )}
             {
-                fileLoaded && (<p className={styles.disabledMessage}>Unload file in the visualizer to edit the theme</p>)
+                fileLoaded && (
+                    <div className={styles.disabledMessage}>
+                        Close the file in the visualizer to change the theme.
+                        <small className={styles.disabledTip}> (To close the file, go to the visualizer and press the X beside the load file button.)</small>
+                    </div>
+                )
             }
         </>
     );

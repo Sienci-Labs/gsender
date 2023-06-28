@@ -20,9 +20,9 @@ Some things that we’re looking to accomplish with this sender:
 ## 💻 Download [![Github All Releases](https://img.shields.io/github/downloads/Sienci-Labs/gsender/total.svg)]()
 
 gSender is available for the following systems and does not yet support headless Pi operation
-| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Ras Pi
-|-|-|-|-|-
- ``` Available ```[EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.7/gSender-1.1.7-windows-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.7/gSender-1.1.7-windows-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.7/gSender-1.1.7.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.7/gSender_1.1.7_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.1.7/gSender-1.1.7-armv7l.AppImage)
+| ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (ARM64) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (32) | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64) | 
+|-|-|-|-|-|-|-
+ ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender-1.2.1-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender-1.2.1-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender-1.2.1-x64.dmg) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender-1.2.1-arm64.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender-1.2.1-amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.0/gSender-1.2.0-armv7l.AppImage)| ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender_1.2.1_bullseye.deb)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -98,6 +98,58 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 
 ## 🕣 Development History
+
+
+# 1.2.1 (June 22, 2023)
+- Fix for files not loading for some users
+- Toolchange strategy missing units added
+- Controller functionality issues addressed
+- Calibration tools calculate correct values based on input
+- Surfacing unit conversion on RPM removed
+- Laser unit renamed to Power from RPM
+- Color theme loading no longer loads non-existant file
+
+
+# 1.2.0 (June 19th, 2023)
+- gSender runs noticeably faster and lighter!
+    - There were multiple areas where we were able to make file processing on average 20% more efficient and reduce overall program memory usage by an average of 2/3rds due to an increased node sandbox memory size and improvements to multiple run times
+    - On files that still take a while to load we’ve now added a loading bar window to show file loading progress
+- Added new job recovery functionality
+    - In specific instances where your machine's USB port disconnects from gSender during a job it’ll be able to recommend where you should restart from
+- Updates to gamepad controller support
+    - List of officially tested controllers if you’d like to select a gamepad that works more reliably with gSender
+    - Tested controllers come with their own pre-loaded presets
+    - Improved UI for creating controller profiles
+- Available PDF printout of shortcuts to hang up near your machine
+- Better support for Laser Diodes
+    - Optional low-power laser enable on outlining
+    - Laser-specific visualization: there’s a different style when laser mode is on and that colour can be customized
+    - Bug fix: Laser offset now allows for negative offset values
+- New Diagnostic tab inside the Calibrate Tool
+    - See at-a-glance information on whether your limit switches, touch probe, or other pins are activated
+    - General summary on your CNCs firmware settings
+    - The ability to generate a Diagnostic PDF file that includes information on your computer, CNC, recent alarms / errors, any currently loaded g-code file, and more! Very handy to share with our support team or other CNCers to help diagnose problems your CNC might be experiencing
+- Remote Mode, control your CNC remotely!
+    - Connect to your CNC from a myriad of other internet-connected devices for loading files from other computers or jogging and zeroing from your phone
+    - Easy to set up and configure
+- Tool changing is now more fully supported by our new Wizard
+    - gSender already recognized M0 and M6 commands to initialize a pause in the middle of a file
+    - New processes to support using the ‘paper method’, a touch plate, or a tool length sensor (choose based on your CNC setup) now allow more flexibility in handling tool changing and in some cases can pop up a Wizard to direct you through each step and without the need for custom macros
+- Other assorted features
+    - Slider overrides for easier feed rate and spindle / laser adjustment on the fly
+    - Ability to toggle between job overrides and file attributes before starting a job to fine-tune feed and speed overrides before starting a job
+    - Get a top-down snapshot image of your job with the new SVG Visualizer that bridges the gap between a fully disabled visualizer or the full 3D one (useful for less powerful computers)
+    - Colour coded Console on certain commands like alarms and errors that can also now pop-out
+- Assorted other settings
+    - New safety tab for tracking alarms and errors and accessing safety settings
+    - Soft limit warning on file load if machine has limit switches
+    - Customizable probe fail distance in Z
+    - More visualization theme customizations for ‘light’, ‘dark’, or your own fully custom design
+    - New Shortcuts for controlling Probing, Visualization, and Macros and the ability to filter shortcuts by category to easily find and edit them
+    - New stats tab for tracking jobs run on your CNC
+    - Custom decimal places on the DRO
+- and other bug fixes for Linux auto updates, Settings exporting, Preferred units and file unit modals, Bounding box relative movement, Shortcut printing and more!
+
 
 ### 1.1.7 (October 26th, 2022)
 - Fix for XYZ probe profile when $13 enabled

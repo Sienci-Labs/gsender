@@ -9,6 +9,7 @@ G01 Z1 F500
 G00 X0 Y0 Z5
 G00 X10 Y0 Z5
 G00 Y10 Z5
-M0
+M0 ;this is some tool comment
 G00 X10 Y0 Z5
+M0 (This is another tool comment)
 G00 Y10 Z5

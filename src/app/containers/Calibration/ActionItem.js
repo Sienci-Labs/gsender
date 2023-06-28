@@ -25,7 +25,6 @@ const ActionItem = ({ checked, onChange, id, isCurrentAction, hasBeenChanged, la
             {
                 !hideCompleteButton && (
                     <FunctionButton
-                        primary
                         style={{ margin: 0, width: '100px' }}
                         disabled={(!isCurrentAction || hasBeenChanged)}
                         onClick={() => onChange({ id, checked: true })}

@@ -20,6 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import isElectron from 'is-electron';
 import io from 'socket.io-client';
 
 const ensureArray = (...args) => {
@@ -78,8 +79,7 @@ class Controller {
         'serialport:error': [],
         'serialport:read': [],
         'serialport:write': [],
-        'gcode:load': [], // TO BE DEPRECATED
-        'gcode:unload': [], // TO BE DEPRECATED
+        'gcode:loaded': [], // TO BE DEPRECATED
         'gcode:toolChange': [],
         'feeder:status': [],
         'workflow:pause': [],
@@ -90,7 +90,6 @@ class Controller {
         'message': [],
         'toolchange:start': [],
         'toolchange:preHookComplete': [],
-        'toolchange:tool': [],
         'hPong': [],
         'outline:start': [],
         'file:load': [],
@@ -110,7 +109,8 @@ class Controller {
         'filetype': [],
 
         //A-Axis A.K.A Rotary-Axis events
-        'rotaryAxis:updateState': []
+        'rotaryAxis:updateState': [],
+        'connection:new': [],
     };
 
     context = {
@@ -242,6 +242,11 @@ class Controller {
 
                 // The callback can only be called once
                 next = null;
+            }
+
+            // don't want to update store if it is electron
+            if (!isElectron()) {
+                this.socket && this.socket.emit('newConnection');
             }
         });
     }

@@ -66,25 +66,25 @@ class RunProbe extends PureComponent {
             isActive: true,
             category: PROBING_CATEGORY,
             callback: () => {
-                if (this.state.connectionMade) {
+                const { state, actions } = this.props;
+                if (state.connectionMade) {
                     return;
                 }
+
                 Toaster.pop({
                     msg: 'Probe Confirmed Manually',
                     type: TOASTER_INFO,
                     duration: 5000,
                     icon: 'fa-satellite-dish'
                 });
-                this.setState({
-                    connectionMade: true,
-                });
+
+                actions.setProbeConnectivity(true);
             }
         }
     }
 
     getInitialState() {
         return {
-            connectionMade: false,
             testRunning: false
         };
     }
@@ -112,11 +112,11 @@ class RunProbe extends PureComponent {
     }
 
     startConnectivityTest(probeStatus, connectivityTest) {
+        const { actions } = this.props;
+
         // If we disabled test, immediately set connectionMade to true and return
         if (!connectivityTest) {
-            this.setState({
-                connectionMade: true
-            });
+            actions.setProbeConnectivity(true);
             return;
         }
 
@@ -125,9 +125,7 @@ class RunProbe extends PureComponent {
         });
         this.testInterval = setInterval(() => {
             if (probeStatus()) {
-                this.setState({
-                    connectionMade: true,
-                });
+                actions.setProbeConnectivity(true);
                 clearInterval(this.testInterval);
                 this.testInterval = null;
             }
@@ -135,9 +133,7 @@ class RunProbe extends PureComponent {
     }
 
     componentDidMount() {
-        const { actions, state } = this.props;
-        const { connectivityTest } = state;
-        this.startConnectivityTest(actions.returnProbeConnectivity, connectivityTest);
+        //this.startConnectivityTest(actions.returnProbeConnectivity, connectivityTest);
         this.addShuttleControlEvents();
         useKeybinding(this.shuttleControlEvents);
 
@@ -167,14 +163,13 @@ class RunProbe extends PureComponent {
 
     render() {
         const { actions, state, show } = this.props;
-        const { canClick, touchplate } = state;
+        const { canClick, touchplate, connectionMade } = state;
         const { touchplateType } = touchplate;
         // const probeCommands = actions.generateProbeCommands();
         // console.log(probeCommands.join('\n'));
         const probeCommand = state.availableProbeCommands[state.selectedProbeCommand];
 
         const probeActive = actions.returnProbeConnectivity();
-        const { connectionMade } = this.state;
 
         return (
             <Modal

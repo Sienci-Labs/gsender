@@ -30,6 +30,7 @@ import store from 'app/store';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import isElectron from 'is-electron';
+import cx from 'classnames';
 import reduxStore from 'app/store/redux';
 import { UPDATE_JOB_OVERRIDES } from 'app/actions/visualizerActions';
 import controller from 'app/lib/controller';
@@ -48,6 +49,7 @@ import {
     TOASTER_DANGER,
     TOASTER_WARNING,
     TOASTER_UNTIL_CLOSE,
+    TOASTER_LONG,
     TOASTER_INFO
 } from '../../lib/toaster/ToasterLib';
 import {
@@ -70,6 +72,7 @@ import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
 import { outlineResponse } from '../../workers/Outline.response';
 import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 import Tooltip from '../../components/TooltipCustom/ToolTip';
+import { storeUpdate } from '../../lib/storeUpdate';
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
@@ -96,10 +99,11 @@ class WorkflowControl extends PureComponent {
             showRecent: false,
             showLoadFile: false,
             runHasStarted: false,
+            outlineRunning: false,
             startFromLine: {
                 showModal: false,
                 needsRecovery: false,
-                value: 1,
+                value: 0,
                 waitForHoming: false,
                 safeHeight: store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 10 : 0.4,
                 defaultSafeHeight: store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 10 : 0.4
@@ -223,7 +227,33 @@ class WorkflowControl extends PureComponent {
         controller.command('gcode:test');
     };
 
-    startRun = (type) => {
+    runOutline = () => {
+        if (this.state.outlineRunning) {
+            return;
+        }
+        this.setState({ outlineRunning: true });
+
+        this.workerOutline = new WorkerOutline();
+        const { gcode } = this.props;
+        const machineProfile = store.get('workspace.machineProfile');
+        const spindleMode = store.get('widgets.spindle.mode');
+        // outline toggled on and currently in laser mode
+        const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
+
+        Toaster.pop({
+            TYPE: TOASTER_INFO,
+            duration: TOASTER_LONG,
+            msg: 'Generating outline for current file'
+        });
+        this.workerOutline.onmessage = ({ data }) => {
+            outlineResponse({ data }, machineProfile.laserOnOutline);
+            // Enable the outline button again
+            this.setState({ outlineRunning: false });
+        };
+        this.workerOutline.postMessage({ gcode, isLaser });
+    };
+
+    startRun = () => {
         const { activeState } = this.props;
 
         Toaster.clear();
@@ -231,14 +261,14 @@ class WorkflowControl extends PureComponent {
         if (activeState === GRBL_ACTIVE_STATE_CHECK) {
             this.setState({ testStarted: true, runHasStarted: true });
 
-            controller.command('gcode:resume', type);
+            controller.command('gcode:resume');
             return;
         }
         this.setState({ fileLoaded: true });
         this.setState({ runHasStarted: true });
         reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: { isChecked: true, toggleStatus: 'overrides' } });
         const { actions } = this.props;
-        actions.onRunClick(type);
+        actions.onRunClick();
     }
 
     componentDidMount() {
@@ -299,25 +329,6 @@ class WorkflowControl extends PureComponent {
         });
     }
 
-    runOutline = () => {
-        this.workerOutline = new WorkerOutline();
-        const { gcode } = this.props;
-        const machineProfile = store.get('workspace.machineProfile');
-        const spindleMode = store.get('widgets.spindle.mode');
-        // outline toggled on and currently in laser mode
-        const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
-
-        Toaster.pop({
-            TYPE: TOASTER_INFO,
-            duration: TOASTER_UNTIL_CLOSE,
-            msg: 'Generating outline for current file'
-        });
-        this.workerOutline.onmessage = ({ data }) => {
-            outlineResponse({ data }, machineProfile.laserOnOutline);
-        };
-        this.workerOutline.postMessage({ gcode, isLaser });
-    }
-
     startFromLinePrompt = () => {
         const { received } = this.props.senderStatus;
         this.setState(prev => ({
@@ -337,7 +348,7 @@ class WorkflowControl extends PureComponent {
         this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false, needsRecovery: false } }));
         const newSafeHeight = units === IMPERIAL_UNITS ? safeHeight * 25.4 : safeHeight;
         controller.command('gcode:start', value, zMax, newSafeHeight);
-
+        reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: { isChecked: true, toggleStatus: 'overrides' } });
         Toaster.pop({
             msg: 'Running Start From Specific Line Command',
             type: TOASTER_SUCCESS,
@@ -385,18 +396,31 @@ class WorkflowControl extends PureComponent {
             pubsub.subscribe('outline:done', () => {
                 this.workerOutline.terminate();
             }),
-            pubsub.subscribe('disconnect:recovery', (msg, received) => {
-                controller.command('homing');
-                this.setState(prev => ({
-                    startFromLine: {
-                        ...prev.startFromLine,
-                        value: received,
-                        waitForHoming: true
-                    }
-                }));
+            pubsub.subscribe('disconnect:recovery', (msg, received, homingEnabled) => {
+                if (homingEnabled) {
+                    controller.command('homing');
+                    this.setState(prev => ({
+                        startFromLine: {
+                            ...prev.startFromLine,
+                            value: received,
+                            waitForHoming: true
+                        }
+                    }));
+                } else {
+                    this.setState(prev => ({
+                        startFromLine: {
+                            ...prev.startFromLine,
+                            value: received,
+                            needsRecovery: true
+                        }
+                    }));
+                }
             }),
             pubsub.subscribe('units:change', (msg, units) => {
                 this.changeUnits(units);
+            }),
+            pubsub.subscribe('store:update', (msg, content) => {
+                storeUpdate(content, true);
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -469,7 +493,6 @@ class WorkflowControl extends PureComponent {
                                     className={`${styles['workflow-button-upload']}`}
                                     title={i18n._('Load File')}
                                     onClick={this.handleClickUpload}
-                                    style={{ writingMode: 'vertical-lr' }}
                                 >
                                     {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
@@ -494,7 +517,7 @@ class WorkflowControl extends PureComponent {
                                     title={i18n._('Outline')}
                                     onClick={this.runOutline}
                                     disabled={!canRun}
-                                    style={{ writingMode: 'vertical-lr', marginRight: '1rem' }}
+                                    style={{ marginRight: '1rem' }}
                                 >
                                     {i18n._('Outline')} <i className="fas fa-vector-square" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
@@ -504,7 +527,6 @@ class WorkflowControl extends PureComponent {
                                     title={i18n._('Test Run')}
                                     onClick={this.handleTestFile}
                                     disabled={!canRun}
-                                    style={{ writingMode: 'vertical-lr' }}
                                 >
                                     {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
@@ -528,7 +550,10 @@ class WorkflowControl extends PureComponent {
                                     !workflowPaused && (
                                         <div
                                             role="button"
-                                            className={styles['start-from-line-button']}
+                                            className={cx(
+                                                styles['start-from-line-button'],
+                                                { [styles.pulse]: needsRecovery }
+                                            )}
                                             onClick={this.startFromLinePrompt}
                                         >
                                             <i className="fas fa-list-ol" />
@@ -579,7 +604,7 @@ class WorkflowControl extends PureComponent {
                                 <div className={styles.runProbeBody}>
                                     <div className={styles.left}>
                                         <div className={styles.greyText}>
-                                            <p>Close this gcode File?</p>
+                                            <p>Close this g-code File?</p>
                                         </div>
                                         <div className={styles.buttonsContainer}>
                                             <FunctionButton
@@ -622,12 +647,21 @@ class WorkflowControl extends PureComponent {
                             </Modal.Header>
                             <Modal.Body style={{ backgroundColor: '#e5e7eb' }}>
                                 <div className={styles.startFromLineContainer}>
-                                    <div className={styles.startHeader}>
-                                        <p style={{ color: '#E2943B' }}>Start from line will take into account all movements prior to this line.</p>
+                                    <div className={styles.startDetails}>
+                                        <p className={styles.firstDetail}>
+                                            Recover a carve disrupted by power loss, disconnection,
+                                            mechanical malfunction, or other failures
+                                        </p>
+                                        <p style={{ marginBottom: '0px', color: '#000000' }}>Your job was last stopped around line: <b>{value}</b></p>
+                                        <p>on a g-code file with a total of <b>{lineTotal}</b> lines</p>
+                                        {
+                                            value > 0 &&
+                                                <p>Recommended starting lines: <strong>{value - 10 >= 0 ? value - 10 : 0}</strong> - <strong>{value}</strong></p>
+                                        }
                                     </div>
                                     <div>
                                         <Input
-                                            label="Start at g-code Line:"
+                                            label="Resume job at line:"
                                             value={value}
                                             onChange={(e) => (e.target.value <= lineTotal && e.target.value >= 0) &&
                                                 this.setState(prev => ({
@@ -639,18 +673,6 @@ class WorkflowControl extends PureComponent {
                                             }
                                             additionalProps={{ type: 'number', max: lineTotal, min: 0 }}
                                         />
-                                        <div className={styles.startDetails}>
-                                            <p className={styles.firstDetail}>
-                                                Max Line Number: <strong>{lineTotal}</strong>
-                                            </p>
-                                            {
-                                                needsRecovery ? (
-                                                    value && <p>Recommended starting lines: <strong>{value - 10}</strong> - <strong>{value}</strong></p>
-                                                ) : (
-                                                    value && <p>The last job was stopped on line number: <strong>{value}</strong></p>
-                                                )
-                                            }
-                                        </div>
                                     </div>
                                     <div>
                                         <Tooltip content={`Default Value: ${defaultSafeHeight}`}>
@@ -669,11 +691,17 @@ class WorkflowControl extends PureComponent {
                                                 additionalProps={{ type: 'number' }}
                                             />
                                         </Tooltip>
-                                        <div className={styles.startDetails} style={{ float: 'left', marginLeft: '1rem' }}>
+                                        <div className={cx(styles.startDetails, styles.small)} style={{ float: 'right', marginRight: '1rem' }}>
                                             <p>
                                                 (Safe Height is the value above Z max)
                                             </p>
                                         </div>
+                                    </div>
+                                    <div className={styles.startHeader}>
+                                        <p style={{ color: '#E2943B' }}>
+                                            Accounts for all past CNC movements, units, spindle speeds,
+                                            laser power, Start/Stop g-code, and any other file modals or setup.
+                                        </p>
                                     </div>
                                     <div className={styles.buttonsContainer}>
                                         <button

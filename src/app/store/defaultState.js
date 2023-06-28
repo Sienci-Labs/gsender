@@ -303,6 +303,7 @@ const defaultState = {
             speed: 1000,
             spindleMax: 30000,
             spindleMin: 10000,
+            delay: false,
             laser: {
                 power: 100,
                 duration: 1,
@@ -337,6 +338,7 @@ const defaultState = {
             projection: 'orthographic', // 'perspective' or 'orthographic'
             cameraMode: 'pan', // 'pan' or 'rotate',
             theme: 'Dark',
+            SVGEnabled: false,
             gcode: {
                 displayName: true
             },

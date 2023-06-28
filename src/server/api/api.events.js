@@ -69,7 +69,7 @@ const getSanitizedRecords = () => {
 
 export const fetch = (req, res) => {
     const records = getSanitizedRecords();
-    res.send({ jsonRecords: Object.fromEntries(records) });
+    res.send({ records: Object.fromEntries(records) });
 };
 
 export const create = (req, res) => {
@@ -176,7 +176,7 @@ export const update = (req, res) => {
 
         config.set(CONFIG_KEY, records);
 
-        res.send({ jsonRecords: Object.fromEntries(records) });
+        res.send({ records: Object.fromEntries(records) });
     } catch (err) {
         res.status(ERR_INTERNAL_SERVER_ERROR).send({
             msg: 'Failed to save ' + JSON.stringify(settings.rcfile)

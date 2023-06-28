@@ -4,19 +4,18 @@ version: "{build}-{branch}"
 branches:
   only:
     - master
-    - beta
     - /v\d+\.\d+\.\d+/
 
 environment:
   matrix:
-    - job_name: Windows build (x86)
-      appveyor_build_worker_image: Previous Visual Studio 2019
-      nodejs_version: "14"
-      ARCH: x86
-    - job_name: Windows build (x64)
-      appveyor_build_worker_image: Previous Visual Studio 2019
-      nodejs_version: "14"
-      ARCH: x64
+    #- job_name: Windows build (x86)
+    #  appveyor_build_worker_image: Visual Studio 2019
+    #  nodejs_version: "14"
+    #  ARCH: x86
+    #- job_name: Windows build (x64)
+    #  appveyor_build_worker_image: Visual Studio 2019
+    #  nodejs_version: "14"
+    #  ARCH: x64
     - job_name: macOS build (x64)
       appveyor_build_worker_image: macos
       nodejs_version: "14"
@@ -25,10 +24,6 @@ environment:
       appveyor_build_worker_image: macos
       nodejs_version: "14"
       ARCH: arm64
-    - job_name: Linux build (arm)
-      appveyor_build_worker_image: Ubuntu2004
-      nodejs_version: "14"
-      ARCH: arm
     - job_name: Linux build (amd64)
       appveyor_build_worker_image: Ubuntu2004
       nodejs_version: "14"
@@ -91,7 +86,7 @@ for:
       - sudo dpkg --add-architecture armhf
       - sudo dpkg --add-architecture i386
       - sudo dpkg --print-foreign-architectures
-      - sudo apt-get update
+      - sudo apt-get update --allow-releaseinfo-change
       - sudo apt-get install --no-install-recommends -y icnsutils graphicsmagick gcc-multilib g++-multilib rpm
       - nvm install $nodejs_version
       - npm config set loglevel warn
@@ -392,7 +387,7 @@ for:
             yarn build:macos-arm64
             ls -al output output/*
             mkdir -p releases/macos
-            cp -af "output/${PRODUCT_NAME}-${PACKAGE_VERSION}.dmg" "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.arm64.dmg"
+            cp -af "output/*.dmg" "releases/macos/${PACKAGE_NAME}-${PACKAGE_VERSION}-macos.arm64.dmg"
             ls -al releases/macos/*
             if [[ "$CI_BRANCH" == "master" && -z "$CI_TAG" ]]; then
               yarn github-release delete \
@@ -461,6 +456,7 @@ for:
       - ps: Install-Product node $env:nodejs_version
       - npm config set loglevel warn
       - npm config set scripts-prepend-node-path auto
+      - npm config set python C:\Python310
       - npm install -g yarn
       - yarn
 
@@ -481,7 +477,7 @@ for:
             $PACKAGE_VERSION = node -e "console.log(require('./src/package.json').version)"
             $PRODUCT_NAME = "gSender"
             mkdir -Force -Path releases\windows
-            yarn build:windows-all
+            yarn build:windows
             Get-ChildItem output
             Copy-Item "output\${PRODUCT_NAME} Setup ${PACKAGE_VERSION}.exe" "releases\windows\${PACKAGE_NAME}-${PACKAGE_VERSION}-windows-x64.exe"
             Get-ChildItem releases\windows
@@ -509,7 +505,7 @@ for:
             $PACKAGE_VERSION = node -e "console.log(require('./src/package.json').version)"
             $PRODUCT_NAME = "gSender"
             mkdir -Force -Path releases\windows
-            yarn build:windows-all
+            yarn build:windows
             Get-ChildItem output
             Copy-Item "output\${PRODUCT_NAME} Setup ${PACKAGE_VERSION}.exe" "releases\windows\${PACKAGE_NAME}-${PACKAGE_VERSION}-windows-x86.exe"
             Get-ChildItem releases\windows

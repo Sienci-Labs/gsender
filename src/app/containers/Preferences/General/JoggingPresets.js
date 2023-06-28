@@ -25,9 +25,14 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import _ from 'lodash';
 import pubsub from 'pubsub-js';
+
 import store from 'app/store';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import Button from 'app/components/FunctionButton/FunctionButton';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import defaultState from 'app/store/defaultState';
+
 import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
 import styles from '../index.styl';
@@ -308,6 +313,28 @@ export default class JoggingPresets extends Component {
         this.showToast();
     }
 
+    confirmResetToDefault = () => {
+        Confirm({
+            title: 'Reset Jogging Presets to Default',
+            content: 'This will reset precise, normal, and rapid preset values to default. Are you sure you want to reset?',
+            onConfirm: this.resetToDefault,
+        });
+    }
+
+    resetToDefault = () => {
+        const defaultJogPresets = _.get(defaultState, 'widgets.axes.jog', null);
+
+        if (!defaultJogPresets) {
+            return;
+        }
+
+        store.replace('widgets.axes.jog', defaultJogPresets);
+        this.setState({ jogSpeeds: this.getJogSpeeds() });
+        pubsub.publish('jogSpeeds', defaultJogPresets);
+
+        this.showToast();
+    }
+
     render() {
         const { units, jogSpeeds, selectedPreset } = this.state;
 
@@ -353,6 +380,8 @@ export default class JoggingPresets extends Component {
                         />
                     </Tooltip>
                 </div>
+
+                <Button style={{ marginBottom: '1rem' }} onClick={this.confirmResetToDefault}>Reset to Default</Button>
             </Fieldset>
         );
     }

@@ -484,7 +484,7 @@ class AxesWidget extends PureComponent {
     };
 
     shuttleControlFunctions = {
-        JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
+        JOG: (event, { axis = null }) => {
             const isInRotaryMode = store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
             const firmwareType = this.props.type;
             const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
@@ -494,7 +494,7 @@ class AxesWidget extends PureComponent {
             if (axis.a && !isInRotaryMode || axis.a && isInRotaryMode && isGrbl) {
                 return;
             }
-            this.handleShortcutJog({ axis, direction });
+            this.handleShortcutJog({ axis });
         },
         UPDATE_WORKSPACE_MODE: () => {
             const currentWorkspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
@@ -651,9 +651,7 @@ class AxesWidget extends PureComponent {
             preventDefault: false,
             isActive: true,
             category: JOGGING_CATEGORY,
-            callback: (event, { axis = null, direction = 1, factor = 1 }) => {
-                this.shuttleControlFunctions.JOG(event, { axis, direction, factor });
-            }
+            callback: this.shuttleControlFunctions.JOG
         },
         JOG_X_M: {
             title: 'Jog: X-',
@@ -897,10 +895,10 @@ class AxesWidget extends PureComponent {
         const feedrate = Number(this.actions.getFeedrate());
 
         const axisValue = {
-            X: xyStep,
-            Y: xyStep,
-            Z: zStep,
-            A: aStep
+            x: xyStep,
+            y: xyStep,
+            z: zStep,
+            a: aStep
 
         };
 
@@ -914,31 +912,29 @@ class AxesWidget extends PureComponent {
             this.joggingHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
         }
 
-        //Axis will either be a single string value or an object containing multiple axis' (ex. axis.X, axis.Y, axis.Z)
         const axisList = {};
 
         if (axis.x) {
-            axisList.X = axisValue.X * axis.x;
+            axisList.x = axisValue.x * axis.x;
         }
         if (axis.y) {
-            axisList.Y = axisValue.Y * axis.y;
+            axisList.y = axisValue.y * axis.y;
         }
         if (axis.z) {
-            axisList.Z = axisValue.Z * axis.z;
+            axisList.z = axisValue.z * axis.z;
         }
         if (axis.a) {
-            axisList.A = axisValue.A * axis.a;
+            axisList.A = axisValue.a * axis.a;
         }
 
-        this.setState({ prevJog: { ...axisList, F: feedrate } });
-        this.joggingHelper.onKeyDown({ ...axisList }, feedrate);
+        this.joggingHelper.onKeyDown(axisList, feedrate);
     }
 
     handleShortcutStop = (payload) => {
-        const { prevJog } = this.state;
+        const feedrate = Number(this.actions.getFeedrate());
 
         if (!payload) {
-            this.joggingHelper && this.joggingHelper.onKeyUp(prevJog);
+            this.joggingHelper && this.joggingHelper.onKeyUp({ F: feedrate });
             return;
         }
 
@@ -963,9 +959,9 @@ class AxesWidget extends PureComponent {
             axisObj[givenAxis] = axisValue;
         }
 
-        const feedrate = Number(this.actions.getFeedrate());
-
-        this.joggingHelper && this.joggingHelper.onKeyUp({ ...axisObj, F: feedrate });
+        if (this.joggingHelper) {
+            this.joggingHelper.onKeyUp({ F: feedrate });
+        }
     }
 
     shuttleControl = null;

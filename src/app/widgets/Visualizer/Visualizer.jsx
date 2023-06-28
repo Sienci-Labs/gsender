@@ -22,6 +22,7 @@
  */
 
 import reduxStore from 'app/store/redux';
+import gsap from 'gsap';
 import { connect } from 'react-redux';
 import * as fileActions from 'app/actions/fileInfoActions';
 import _get from 'lodash/get';
@@ -106,7 +107,7 @@ const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 class Visualizer extends Component {
     static propTypes = {
         show: PropTypes.bool,
-        cameraPosition: PropTypes.oneOf(['top', '3d', 'front', 'left', 'right']),
+        cameraPosition: PropTypes.oneOf(['Top', '3D', 'Front', 'Left', 'Right', 'Free']),
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
@@ -465,19 +466,19 @@ class Visualizer extends Component {
         }
 
         if (prevProps.cameraPosition !== this.props.cameraPosition) {
-            if (this.props.cameraPosition === 'top') {
+            if (this.props.cameraPosition === 'Top') {
                 this.toTopView();
             }
-            if (this.props.cameraPosition === '3d') {
+            if (this.props.cameraPosition === '3D') {
                 this.to3DView();
             }
-            if (this.props.cameraPosition === 'front') {
+            if (this.props.cameraPosition === 'Front') {
                 this.toFrontView();
             }
-            if (this.props.cameraPosition === 'left') {
+            if (this.props.cameraPosition === 'Left') {
                 this.toLeftSideView();
             }
-            if (this.props.cameraPosition === 'right') {
+            if (this.props.cameraPosition === 'Right') {
                 this.toRightSideView();
             }
         }
@@ -539,19 +540,27 @@ class Visualizer extends Component {
     }
 
     rerenderGCode() {
-        const { actions, state } = this.props;
-        const { gcode } = state;
+        const content = reduxStore.getState().file.content;
 
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
             this.group.remove(group);
         }
-        if (gcode.content) {
-            actions.loadGCode('', gcode.content);
-        } else {
-            // reupload the file to update the colours
-            this.uploadGCodeFile(reduxStore.getState().file.content);
-        }
+        // reupload the file to update the colours
+        this.uploadGCodeFile(content);
+    }
+
+    reparseGCode() {
+        const { state } = this.props;
+        const { gcode } = state;
+        // reparse file
+        pubsub.publish('reparseGCode', gcode.content, gcode.size, gcode.name, this.props.isSecondary ? VISUALIZER_SECONDARY : VISUALIZER_PRIMARY);
+    }
+
+    reloadGCode() {
+        const { actions, state } = this.props;
+        const { gcode } = state;
+        actions.loadGCode('', gcode.visualization);
     }
 
     removeSceneGroup() {
@@ -1259,7 +1268,6 @@ class Visualizer extends Component {
                 this.cuttingTool.visible = false;
 
                 this.group.add(this.cuttingTool);
-
                 // Update the scene
                 this.updateScene();
             });
@@ -1516,6 +1524,7 @@ class Visualizer extends Component {
         });
         controls.addEventListener('end', () => {
             shouldAnimate = false;
+            this.props.actions.camera.toFreeView();
             this.updateScene();
         });
         controls.addEventListener('change', () => {
@@ -1594,13 +1603,21 @@ class Visualizer extends Component {
         const z0 = wpoz - pivotPoint.z;
 
         if (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY) {
-            this.cuttingTool.position.setX(x0);
-            this.cuttingTool.position.setZ(z0);
+            gsap.to(this.cuttingTool.position, {
+                x: x0,
+                z: z0,
+                duration: 0.25
+            });
 
             return;
         }
 
-        this.cuttingTool.position.set(x0, y0, z0);
+        gsap.to(this.cuttingTool.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
     }
 
     rotateGcodeModal(degrees) {
@@ -1677,7 +1694,12 @@ class Visualizer extends Component {
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        this.laserPointer.position.set(x0, y0, z0);
+        gsap.to(this.laserPointer.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
     }
 
     // Update cutting pointer position
@@ -1692,7 +1714,12 @@ class Visualizer extends Component {
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        this.cuttingPointer.position.set(x0, y0, z0);
+        gsap.to(this.cuttingPointer.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
     }
 
     // Update limits position
@@ -1774,29 +1801,11 @@ class Visualizer extends Component {
 
         // only set the camera if it's the first render
         if (shouldZoom) {
-            switch (this.props.cameraPosition) {
-            case 'top':
+            // if secondary, force top view
+            if (this.props.isSecondary) {
                 this.toTopView();
-                break;
-
-            case '3d':
-                this.to3DView();
-                break;
-
-            case 'front':
-                this.toFrontView();
-                break;
-
-            case 'left':
-                this.toLeftSideView();
-                break;
-
-            case 'right':
-                this.toRightSideView();
-                break;
-
-            default:
-                this.toFrontView();
+            } else { // if primary, force 3d view
+                this.props.actions.camera.to3DView();
             }
             this.didZoom = true;
         }
@@ -2011,7 +2020,7 @@ class Visualizer extends Component {
         }
 
         this.camera.up.set(0, 0, 1);
-        this.camera.position.set(CAMERA_DISTANCE, 0, 0);
+        this.camera.position.set(-CAMERA_DISTANCE, 0, 0);
 
         if (this.viewport) {
             this.viewport.update();
@@ -2027,7 +2036,7 @@ class Visualizer extends Component {
         }
 
         this.camera.up.set(0, 0, 1);
-        this.camera.position.set(-CAMERA_DISTANCE, 0, 0);
+        this.camera.position.set(CAMERA_DISTANCE, 0, 0);
 
         if (this.viewport) {
             this.viewport.update();

@@ -189,82 +189,82 @@ export const GRBL_ERRORS = [
     },
     {
         code: 23,
-        message: 'Invalid gcode ID:23',
+        message: 'Invalid g-code ID:23',
         description: 'G-code command in block requires an integer value.'
     },
     {
         code: 24,
-        message: 'Invalid gcode ID:24',
+        message: 'Invalid g-code ID:24',
         description: 'More than one g-code command that requires axis words found in block.'
     },
     {
         code: 25,
-        message: 'Invalid gcode ID:25',
+        message: 'Invalid g-code ID:25',
         description: 'Repeated g-code word found in block.'
     },
     {
         code: 26,
-        message: 'Invalid gcode ID:26',
+        message: 'Invalid g-code ID:26',
         description: 'No axis words found in block for g-code command or current modal state which requires them.'
     },
     {
         code: 27,
-        message: 'Invalid gcode ID:27',
+        message: 'Invalid g-code ID:27',
         description: 'Line number value is invalid.'
     },
     {
         code: 28,
-        message: 'Invalid gcode ID:28',
+        message: 'Invalid g-code ID:28',
         description: 'G-code command is missing a required value word.'
     },
     {
         code: 29,
-        message: 'Invalid gcode ID:29',
+        message: 'Invalid g-code ID:29',
         description: 'G59.x work coordinate systems are not supported.'
     },
     {
         code: 30,
-        message: 'Invalid gcode ID:30',
+        message: 'Invalid g-code ID:30',
         description: 'G53 only allowed with G0 and G1 motion modes.'
     },
     {
         code: 31,
-        message: 'Invalid gcode ID:31',
+        message: 'Invalid g-code ID:31',
         description: 'Axis words found in block when no command or current modal state uses them.'
     },
     {
         code: 32,
-        message: 'Invalid gcode ID:32',
+        message: 'Invalid g-code ID:32',
         description: 'G2 and G3 arcs require at least one in-plane axis word.'
     },
     {
         code: 33,
-        message: 'Invalid gcode ID:33',
+        message: 'Invalid g-code ID:33',
         description: 'Motion command target is invalid.'
     },
     {
         code: 34,
-        message: 'Invalid gcode ID:34',
+        message: 'Invalid g-code ID:34',
         description: 'Arc radius value is invalid.'
     },
     {
         code: 35,
-        message: 'Invalid gcode ID:35',
+        message: 'Invalid g-code ID:35',
         description: 'G2 and G3 arcs require at least one in-plane offset word.'
     },
     {
         code: 36,
-        message: 'Invalid gcode ID:36',
+        message: 'Invalid g-code ID:36',
         description: 'Unused value words found in block.'
     },
     {
         code: 37,
-        message: 'Invalid gcode ID:37',
+        message: 'Invalid g-code ID:37',
         description: 'G43.1 dynamic tool length offset is not assigned to configured tool length axis.'
     },
     {
         code: 38,
-        message: 'Invalid gcode ID:38',
+        message: 'Invalid g-code ID:38',
         description: 'Tool number greater than max supported value.'
     }
 ];
@@ -343,8 +343,8 @@ export const GRBL_SETTINGS = [
         units: 'μs',
         description: 'Sets time length per step. Minimum 3usec.',
         inputType: NUMBER,
-        min: 3,
-        max: 12,
+        min: 0,
+        max: 20,
         step: 1
     },
     {
@@ -414,7 +414,6 @@ export const GRBL_SETTINGS = [
         description: 'Sets how fast Grbl travels through consecutive motions. Lower value slows it down.',
         inputType: NUMBER,
         min: 0.001,
-        max: 0.020,
         step: 0.001
     },
     {
@@ -425,7 +424,6 @@ export const GRBL_SETTINGS = [
         description: 'Sets the G2 and G3 arc tracing accuracy based on radial error. Beware: A very small value may effect performance.',
         inputType: NUMBER,
         min: 0.001,
-        max: 0.003,
         step: 0.001
     },
     {
@@ -476,7 +474,6 @@ export const GRBL_SETTINGS = [
         description: 'Feed rate to slowly engage limit switch to determine its location accurately.',
         inputType: NUMBER,
         min: 1,
-        max: 30,
         step: 1
     },
     {
@@ -487,7 +484,6 @@ export const GRBL_SETTINGS = [
         description: 'Seek rate to quickly find the limit switch before the slower locating phase.',
         inputType: NUMBER,
         min: 100,
-        max: 1000,
         step: 100
     },
     {
@@ -509,7 +505,6 @@ export const GRBL_SETTINGS = [
         description: 'Retract distance after triggering switch to disengage it. Homing will fail if switch isn\'t cleared.',
         inputType: NUMBER,
         min: 0,
-        max: 5,
         step: 0.5
     },
     {
@@ -520,7 +515,6 @@ export const GRBL_SETTINGS = [
         description: 'Maximum spindle speed. Sets PWM to 100% duty cycle.',
         inputType: NUMBER,
         min: 100,
-        max: 10000,
         step: 100
     },
     {
@@ -531,7 +525,6 @@ export const GRBL_SETTINGS = [
         description: 'Minimum spindle speed. Sets PWM to 0.4% or lowest duty cycle.',
         inputType: NUMBER,
         min: 1,
-        max: 100,
         step: 1
     },
     {
@@ -550,7 +543,6 @@ export const GRBL_SETTINGS = [
         description: 'X-axis travel resolution in steps per millimeter.',
         inputType: NUMBER,
         min: 10,
-        max: 500,
         step: 10
     },
     {
@@ -561,7 +553,6 @@ export const GRBL_SETTINGS = [
         description: 'Y-axis travel resolution in steps per millimeter.',
         inputType: NUMBER,
         min: 10,
-        max: 500,
         step: 10
     },
     {
@@ -572,7 +563,6 @@ export const GRBL_SETTINGS = [
         description: 'Z-axis travel resolution in steps per millimeter.',
         inputType: NUMBER,
         min: 10,
-        max: 500,
         step: 10
     },
     {
@@ -583,7 +573,6 @@ export const GRBL_SETTINGS = [
         description: 'X-axis maximum rate. Used as G0 rapid rate.',
         inputType: NUMBER,
         min: 100,
-        max: 1500,
         step: 100
     },
     {
@@ -594,7 +583,6 @@ export const GRBL_SETTINGS = [
         description: 'Y-axis maximum rate. Used as G0 rapid rate.',
         inputType: NUMBER,
         min: 100,
-        max: 1500,
         step: 100
     },
     {
@@ -605,7 +593,6 @@ export const GRBL_SETTINGS = [
         description: 'Z-axis maximum rate. Used as G0 rapid rate.',
         inputType: NUMBER,
         min: 10,
-        max: 1000,
         step: 10
     },
     {
@@ -616,8 +603,7 @@ export const GRBL_SETTINGS = [
         description: 'X-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
         inputType: NUMBER,
         min: 1,
-        max: 15,
-        step: 1
+        step: 10
     },
     {
         setting: '$121',
@@ -627,8 +613,7 @@ export const GRBL_SETTINGS = [
         description: 'Y-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
         inputType: NUMBER,
         min: 1,
-        max: 15,
-        step: 1
+        step: 10
     },
     {
         setting: '$122',
@@ -638,8 +623,7 @@ export const GRBL_SETTINGS = [
         description: 'Z-axis acceleration. Used for motion planning to not exceed motor torque and lose steps.',
         inputType: NUMBER,
         min: 1,
-        max: 15,
-        step: 1
+        step: 10
     },
     {
         setting: '$130',
@@ -649,7 +633,6 @@ export const GRBL_SETTINGS = [
         description: 'Maximum X-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
         inputType: NUMBER,
         min: 1,
-        max: 1500,
         step: 10
     },
     {
@@ -660,7 +643,6 @@ export const GRBL_SETTINGS = [
         description: 'Maximum Y-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
         inputType: NUMBER,
         min: 1,
-        max: 1500,
         step: 10
     },
     {
@@ -671,7 +653,6 @@ export const GRBL_SETTINGS = [
         description: 'Maximum Z-axis travel distance from homing switch. Determines valid machine space for soft-limits and homing search distances.',
         inputType: NUMBER,
         min: 1,
-        max: 1500,
         step: 10
     }
 ];
