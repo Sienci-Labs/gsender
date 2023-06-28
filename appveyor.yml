@@ -4,6 +4,7 @@ version: "{build}-{branch}"
 branches:
   only:
     - master
+    - GRBLHal
     - /v\d+\.\d+\.\d+/
     - /v\d+\.\d+\.\d+-EDGE/
 
