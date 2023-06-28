@@ -469,7 +469,7 @@ class DisplayPanel extends PureComponent {
                                     className={styles.fontMonospace}
                                     primary
                                 >
-                                    <i class="fas fa-location-arrow" />
+                                    <i className="fas fa-location-arrow" />
                                     Go To Location
                                 </FunctionButton>
                             </div>
@@ -488,8 +488,7 @@ class DisplayPanel extends PureComponent {
                                                     disabled={!canHome}
                                                     buttons={['X', 'Y', 'Z', 'A']}
                                                     onClick={this.actions.startSingleAxisHoming}
-                                                >
-                                                </ButtonCollection>
+                                                />
                                             </>
                                         ) : (
                                             <FunctionButton
