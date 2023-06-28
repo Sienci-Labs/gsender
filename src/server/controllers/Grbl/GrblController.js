@@ -1326,7 +1326,6 @@ class GrblController {
                 ApplyFirmwareProfile(nameOfMachine, typeOfMachine, port);
             },
             'firmware:grabMachineProfile': () => {
-                // let [values] = args;
                 const machineProfile = store.get('machineProfile');
                 this.emit('sender:status', machineProfile);
             },

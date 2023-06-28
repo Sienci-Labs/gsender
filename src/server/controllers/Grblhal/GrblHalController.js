@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -1234,7 +1235,6 @@ class GrblHalController {
                 ApplyFirmwareProfile(nameOfMachine, typeOfMachine, port);
             },
             'firmware:grabMachineProfile': () => {
-                // let [values] = args;
                 const machineProfile = store.get('machineProfile');
                 this.emit('sender:status', machineProfile);
             },
@@ -1252,8 +1252,9 @@ class GrblHalController {
                 const dwell = '%wait ; Wait for the planner to empty';
 
                 // add delay to spindle startup if enabled
-                const preferences = store.get('preferences') || { spindle: { delay: false } };
-                const delay = preferences.spindle.delay;
+                const preferences = store.get('preferences', {});
+                const delay = _.get(preferences, 'spindle.delay', false);
+
                 if (delay) {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }
