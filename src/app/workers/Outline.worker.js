@@ -22,10 +22,8 @@
  */
 
 import hull from 'concaveman';
-import GCodeVirtualizer from 'app/lib/GCodeVirtualizer';
+import GCodeVirtualizer, { shouldRotate, rotateAxis } from 'app/lib/GCodeVirtualizer';
 import * as THREE from 'three';
-
-import { rotateAxis, shouldRotate } from '../lib/GcodeToolpath';
 
 onmessage = ({ data }) => {
     const { gcode, isLaser = false } = data;
