@@ -1893,15 +1893,6 @@ class GrblController {
                 const [context] = args;
                 this.toolChangeContext = context;
             },
-            'toolchange:pre': () => {
-                log.debug('Starting pre hook');
-                this.runPreChangeHook();
-            },
-            'toolchange:post': () => {
-                log.debug('starting post hook');
-                this.command('feeder:start');
-                this.runPostChangeHook();
-            },
             'wizard:start': () => {
                 log.debug('Wizard kickoff code');
                 const [gcode] = args;

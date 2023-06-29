@@ -466,28 +466,6 @@ export function* initialize() {
         parseGCode(content, size, name, visualizer);
     });
 
-    controller.addListener('toolchange:preHookComplete', (comment = '') => {
-        const onConfirmhandler = () => {
-            controller.command('toolchange:post');
-        };
-
-        const content = (comment.length > 0) ? (
-            <div>
-                <p>
-                    A toolchange command (M6) was found - click confirm to verify
-                    the tool has been changed and run your post-toolchange code.
-                </p>
-                <p>Comment: <b>{comment}</b></p>
-            </div>
-        ) : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
-
-        Confirm({
-            title: 'Confirm Toolchange',
-            content,
-            confirmLabel: 'Confirm toolchange',
-            onConfirm: onConfirmhandler
-        });
-    });
 
     controller.addListener('workflow:pause', (opts) => {
         const { data } = opts;

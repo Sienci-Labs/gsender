@@ -616,7 +616,7 @@ class VisualizerWidget extends PureComponent {
             pubsub.publish('gcode:fileInfo');
             pubsub.publish('gcode:unload');
             Toaster.pop({
-                msg: 'Gcode File Closed',
+                msg: 'G-code File Closed',
                 icon: 'fa-exclamation'
             });
         }
