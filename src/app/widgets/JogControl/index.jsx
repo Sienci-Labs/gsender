@@ -1202,13 +1202,15 @@ class AxesWidget extends PureComponent {
     changeUnits(units) {
         const oldUnits = this.state.units;
         const { jog } = this.state;
-        let { zStep, xyStep } = jog;
+        let { zStep, xyStep, feedrate } = jog;
         if (oldUnits === METRIC_UNITS && units === IMPERIAL_UNITS) {
             zStep = mm2in(zStep).toFixed(3);
             xyStep = mm2in(xyStep).toFixed(3);
+            feedrate = mm2in(feedrate).toFixed(2);
         } else if (oldUnits === IMPERIAL_UNITS && units === METRIC_UNITS) {
             zStep = in2mm(zStep).toFixed(2);
             xyStep = in2mm(xyStep).toFixed(2);
+            feedrate = in2mm(feedrate).toFixed(0);
         }
 
         this.setState({
@@ -1216,7 +1218,8 @@ class AxesWidget extends PureComponent {
             jog: {
                 ...jog,
                 zStep: zStep,
-                xyStep: xyStep
+                xyStep: xyStep,
+                feedrate
             }
         });
     }
