@@ -40,6 +40,9 @@ import Overrides from './components/Overrides';
 import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
 
+
+// TODO: This component needs an overhaul
+
 /**
  * Job Status component wrapper
  * @param {Object} state Default state given from parent component (main index.js for this widget)
@@ -312,6 +315,7 @@ class JobStatus extends PureComponent {
 
     render() {
         const { state, name, size, total, fileLoaded, path, filteredPath, connection } = this.props;
+
         return (
             <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <div className={styles['file-info']}>
@@ -350,7 +354,7 @@ class JobStatus extends PureComponent {
                             )
                             : (<div className={styles['file-name']}><span className={styles['file-text']}>No File Loaded</span></div>)}
                 </div>
-                {get(reduxStore.getState(), 'visualizer.jobOverrides.isChecked') && state.senderStatus
+                {get(reduxStore.getState(), 'visualizer.jobOverrides.isChecked') && state.senderStatus && fileLoaded
                     ? <Overrides state={state} />
                     : <IdleInfo state={state} />
                 }
