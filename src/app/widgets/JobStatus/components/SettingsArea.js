@@ -62,7 +62,6 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
     const { units } = state;
     const unitString = `${units}/min`;
     if (units !== METRIC_UNITS) {
-        spindle = mapPositionToUnits(spindle, units);
         feedrate = mapPositionToUnits(feedrate, units);
     }
 
