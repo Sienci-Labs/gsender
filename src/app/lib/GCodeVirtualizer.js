@@ -804,27 +804,35 @@ class GCodeVirtualizer extends EventEmitter {
         };
         return this.modal;
     }
+
     isMetricUnits() { // mm
         return this.modal.units === 'G21';
     }
+
     isImperialUnits() { // inches
         return this.modal.units === 'G20';
     }
+
     isAbsoluteDistance() {
         return this.modal.distance === 'G90';
     }
+
     isRelativeDistance() {
         return this.modal.distance === 'G91';
     }
+
     isXYPlane() {
         return this.modal.plane === 'G17';
     }
+
     isZXPlane() {
         return this.modal.plane === 'G18';
     }
+
     isYZPlane() {
         return this.modal.plane === 'G19';
     }
+
     setPosition(...pos) {
         if (typeof pos[0] === 'object') {
             const { x, y, z } = { ...pos[0] };
@@ -838,6 +846,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.position.z = (typeof z === 'number') ? z : this.position.z;
         }
     }
+
     translateX(x, relative) {
         if (x !== undefined) {
             x = this.isImperialUnits() ? in2mm(x) : x;
@@ -847,6 +856,7 @@ class GCodeVirtualizer extends EventEmitter {
         }
         return translatePosition(this.position.x, x, !!relative);
     }
+
     translateY(y, relative) {
         if (y !== undefined) {
             y = this.isImperialUnits() ? in2mm(y) : y;
@@ -856,6 +866,7 @@ class GCodeVirtualizer extends EventEmitter {
         }
         return translatePosition(this.position.y, y, !!relative);
     }
+
     translateZ(z, relative) {
         if (z !== undefined) {
             z = this.isImperialUnits() ? in2mm(z) : z;
@@ -865,15 +876,19 @@ class GCodeVirtualizer extends EventEmitter {
         }
         return translatePosition(this.position.z, z, !!relative);
     }
+
     translateI(i) {
         return this.translateX(i, true);
     }
+
     translateJ(j) {
         return this.translateY(j, true);
     }
+
     translateK(k) {
         return this.translateZ(k, true);
     }
+
     translateR(r) {
         r = Number(r);
         if (Number.isNaN(r)) {
