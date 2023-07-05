@@ -47,22 +47,26 @@ import Axes from './Axes';
 import ShuttleControl from './ShuttleControl';
 import JogHelper from './jogHelper';
 import {
+
     // Units
     IMPERIAL_UNITS,
     IMPERIAL_STEPS,
     METRIC_UNITS,
     METRIC_STEPS,
+
     // Workflow
     GRBL_ACTIVE_STATE_JOG,
     GRBL_ACTIVE_STATE_RUN,
     GRBL_ACTIVE_STATE_IDLE,
     WORKFLOW_STATE_IDLE,
-    //GRBL_ACTIVE_STATE_HOLD,
     WORKFLOW_STATE_RUNNING,
+    WORKFLOW_STATE_PAUSED,
+
     JOGGING_CATEGORY,
+
     AXIS_X,
     AXIS_Y,
-    AXIS_Z
+    AXIS_Z,
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -1294,7 +1298,7 @@ class AxesWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId, machinePosition, workPosition, canJog, isSecondary } = this.props;
+        const { widgetId, machinePosition, workPosition, isSecondary } = this.props;
         const { minimized, isFullscreen } = this.state;
         const { units } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
@@ -1315,7 +1319,6 @@ class AxesWidget extends PureComponent {
             workPosition: mapValues(workPosition, (pos, axis) => {
                 return String(mapPositionToUnits(pos, units));
             }),
-            canJog,
             isSecondary
         };
         const actions = {
@@ -1357,7 +1360,7 @@ export default connect((store) => {
     const workPosition = get(store, 'controller.wpos');
     const machinePosition = get(store, 'controller.mpos');
     const workflow = get(store, 'controller.workflow');
-    const canJog = workflow.state === WORKFLOW_STATE_IDLE;
+    const canJog = [WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED].includes(workflow.state);
     const isConnected = get(store, 'connection.isConnected');
     const activeState = get(state, 'status.activeState');
     return {
