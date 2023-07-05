@@ -233,11 +233,14 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('controller:state', (type, state) => {
+    controller.addListener('controller:state', (type, state, tool) => {
         // if state is the same, don't update the prev and current state
         if (currentState !== state.status.activeState) {
             prevState = currentState;
             currentState = state.status.activeState;
+        }
+        if (tool) {
+            state.parserstate.modal.tool = tool;
         }
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_STATE,
