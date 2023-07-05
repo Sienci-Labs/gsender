@@ -71,7 +71,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
         }
         resetDataLists();
         setLocalFunc(newVal);
-        controller.writeln(command);
+        controller.write(command);
     };
 
     const handleMachineProfileChange = () => {
