@@ -44,7 +44,10 @@ const debouncedSpindleHandler = debounce((value, updateFunc) => {
 const debouncedFeedHandler = debounce((value, updateFunc) => {
     updateFunc('ovF', value);
     controller.command('feedOverride', Number(value));
-}, 1000);
+}, 750, {
+    leading: true,
+    trailing: false
+});
 
 
 /**
@@ -70,7 +73,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
             return;
         }
         resetDataLists();
-        setLocalFunc(newVal);
+        //setLocalFunc(newVal);
         controller.write(command);
     };
 
@@ -132,11 +135,17 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
     }, []);
 
     useEffect(() => {
-        setLocalOvF(ovF);
+        const timer = setTimeout(() => {
+            setLocalOvF(ovF);
+        }, 750);
+        return () => clearTimeout(timer);
     }, [ovF]);
 
     useEffect(() => {
-        setLocalOvS(ovS);
+        const timer = setTimeout(() => {
+            setLocalOvS(ovS);
+        }, 750);
+        return () => clearTimeout(timer);
     }, [ovS]);
     const { spindleOverrideLabel } = state;
 
@@ -155,6 +164,9 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                     unitString="%"
                     step={10}
                     onChange={(e) => {
+                        setLocalOvF(e.target.value);
+                    }}
+                    onMouseUp={(e) => {
                         setLocalOvF(e.target.value);
                         debouncedFeedHandler(e.target.value, updateDataList);
                     }}
