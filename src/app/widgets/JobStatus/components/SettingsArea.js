@@ -137,14 +137,14 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             setLocalOvF(ovF);
-        }, 750);
+        }, 500);
         return () => clearTimeout(timer);
     }, [ovF]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
             setLocalOvS(ovS);
-        }, 750);
+        }, 500);
         return () => clearTimeout(timer);
     }, [ovS]);
     const { spindleOverrideLabel } = state;
