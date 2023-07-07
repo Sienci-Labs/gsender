@@ -29,7 +29,8 @@ import {
     SPIRAL_MOVEMENT,
     START_POSITION_BACK_LEFT,
     SPINDLE_MODES,
-    WORKSPACE_MODE
+    WORKSPACE_MODE,
+    ROTARY_MODE_FIRMWARE_SETTINGS
 } from 'app/constants';
 import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 
@@ -133,6 +134,7 @@ const defaultState = {
         },
         mode: WORKSPACE_MODE.DEFAULT,
         rotaryAxis: {
+            firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS,
             prevFirmwareSettings: {},
         }
     },
