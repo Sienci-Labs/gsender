@@ -443,11 +443,13 @@ class GrblController {
 
                         setTimeout(() => {
                             // Emit the current state so latest tool info is available
-                            this.emit('controller:state', GRBL, this.state);
+                            this.runner.setTool(tool[2]); // set tool in runner state
+                            this.emit('controller:state', GRBL, this.state, tool[2]); // set tool in redux
                             this.emit('gcode:toolChange', {
                                 line: sent + 1,
                                 count,
                                 block: line,
+                                tool: tool,
                                 option: toolChangeOption
                             }, commentString);
                         }, 500);

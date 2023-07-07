@@ -99,6 +99,19 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+# 1.2.2 (July 6, 2023)
+- Fix for overrides leading to gcode errors
+- Override value correctly updates with keybind usage
+- Using override keybind should now display the override panel
+- Multiple toolchanges in a single file now display the correct tool in the Wizard
+- Controller binds should work with toolchange wizard active
+- Spindle RPM no longer incorrectly converting units
+- Spindle slider now reflects EEPROM values for min and max
+- Jog speed properly converts through preferred unit changes
+- Larger margin on shortcut printout
+- M0 in feeder macros now displays M0 pause dialog
+- Added missing outline keybind
+- Unlock keybind should work in more situations where a soft reset was required
 
 # 1.2.1 (June 22, 2023)
 - Fix for files not loading for some users

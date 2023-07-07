@@ -44,7 +44,10 @@ const debouncedSpindleHandler = debounce((value, updateFunc) => {
 const debouncedFeedHandler = debounce((value, updateFunc) => {
     updateFunc('ovF', value);
     controller.command('feedOverride', Number(value));
-}, 1000);
+}, 750, {
+    leading: true,
+    trailing: false
+});
 
 
 /**
@@ -70,8 +73,8 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
             return;
         }
         resetDataLists();
-        setLocalFunc(newVal);
-        controller.writeln(command);
+        //setLocalFunc(newVal);
+        controller.write(command);
     };
 
     const handleMachineProfileChange = () => {
@@ -85,7 +88,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
             return;
         }
 
-        switch (type) {
+        /*switch (type) {
         case 'ovS':
             if (value > 100) {
                 setDataListOvS([100, value]);
@@ -102,7 +105,7 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
             break;
         default:
             return;
-        }
+        }*/
     };
 
     const resetDataLists = () => {
@@ -132,11 +135,17 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
     }, []);
 
     useEffect(() => {
-        setLocalOvF(ovF);
+        const timer = setTimeout(() => {
+            setLocalOvF(ovF);
+        }, 500);
+        return () => clearTimeout(timer);
     }, [ovF]);
 
     useEffect(() => {
-        setLocalOvS(ovS);
+        const timer = setTimeout(() => {
+            setLocalOvS(ovS);
+        }, 500);
+        return () => clearTimeout(timer);
     }, [ovS]);
     const { spindleOverrideLabel } = state;
 
@@ -156,6 +165,9 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                     step={10}
                     onChange={(e) => {
                         setLocalOvF(e.target.value);
+                    }}
+                    onMouseUp={(e) => {
+                        setLocalOvF(e.target.value);
                         debouncedFeedHandler(e.target.value, updateDataList);
                     }}
                     datalist={dataListOvF}
@@ -164,10 +176,10 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                     <FeedControlButton value="100" onClick={() => handleChangeRate(setLocalOvF, 100, '\x90')}>
                         <i className="fas fa-redo fa-flip-horizontal" />
                     </FeedControlButton>
-                    <FeedControlButton value="-10" onClick={() => handleChangeRate(setLocalOvF, Number(localOvF) - 10, '\x92')}>
+                    <FeedControlButton value="-10" onClick={() => handleChangeRate(setLocalOvF, Number(localOvF) - 1, '\x94')}>
                         <i className="fas fa-minus" />
                     </FeedControlButton>
-                    <FeedControlButton value="10" onClick={() => handleChangeRate(setLocalOvF, Number(localOvF) + 10, '\x91')}>
+                    <FeedControlButton value="10" onClick={() => handleChangeRate(setLocalOvF, Number(localOvF) + 1, '\x93')}>
                         <i className="fas fa-plus" />
                     </FeedControlButton>
                 </div>
@@ -189,6 +201,8 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                             step={10}
                             onChange={(e) => {
                                 setLocalOvS(e.target.value);
+                            }}
+                            onMouseUp={(e) => {
                                 debouncedSpindleHandler(e.target.value, updateDataList);
                             }}
                             datalist={dataListOvS}
@@ -197,10 +211,10 @@ const SettingsArea = ({ state, ovF, ovS, spindle, feedrate }) => {
                             <FeedControlButton value="100" onClick={() => handleChangeRate(setLocalOvS, 100, '\x99')}>
                                 <i className="fas fa-redo fa-flip-horizontal" />
                             </FeedControlButton>
-                            <FeedControlButton value="-10" onClick={() => handleChangeRate(setLocalOvS, Number(localOvS) - 10, '\x9B')}>
+                            <FeedControlButton value="-10" onClick={() => handleChangeRate(setLocalOvS, Number(localOvS) - 1, '\x9D')}>
                                 <i className="fas fa-minus" />
                             </FeedControlButton>
-                            <FeedControlButton value="10" onClick={() => handleChangeRate(setLocalOvS, Number(localOvS) + 10, '\x9A')}>
+                            <FeedControlButton value="10" onClick={() => handleChangeRate(setLocalOvS, Number(localOvS) + 1, '\x9C')}>
                                 <i className="fas fa-plus" />
                             </FeedControlButton>
                         </div>
