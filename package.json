@@ -377,7 +377,7 @@
     "stylus": "~0.54.5",
     "stylus-loader": "~3.0.2",
     "tap": "~12.6.2",
-    "terser-webpack-plugin": "~1.2.3",
+    "terser-webpack-plugin": "^4",
     "text-table": "~0.2.0",
     "transform-loader": "~0.2.4",
     "url-loader": "~1.1.2",
