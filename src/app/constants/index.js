@@ -210,6 +210,7 @@ export const USER_DATA_COLLECTION = {
 
 export const ROTARY_MODE_FIRMWARE_SETTINGS = {
     $101: '19.75308642',
+    $111: '8000.00',
     $21: '0'
 };
 
