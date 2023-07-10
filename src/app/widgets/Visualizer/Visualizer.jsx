@@ -1168,7 +1168,7 @@ class Visualizer extends Component {
             const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
             imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
             imperialGridLineNumbers.visible = visible && (units === IMPERIAL_UNITS);
-            this.group.add(imperialGridLineNumbers);
+            //this.group.add(imperialGridLineNumbers);
         }
 
         { // Metric Grid Line Numbers
