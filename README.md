@@ -22,7 +22,7 @@ Some things that we’re looking to accomplish with this sender:
 gSender is available for the following systems and does not yet support headless Pi operation
 | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x32) | ![Windows](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/WIN.png)<br>Windows (x64) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (Intel) | ![Mac](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/MAC.png)<br>Mac (ARM64) | ![Linux](https://github.com/EgoistDeveloper/operating-system-logos/blob/master/src/48x48/LIN.png)<br>Linux | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (32) | ![RasPi](https://github.com/iiiypuk/rpi-icon/blob/master/48.png)<br>Pi (64) | 
 |-|-|-|-|-|-|-
- ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender-1.2.1-x86.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender-1.2.1-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender-1.2.1-x64.dmg) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender-1.2.1-arm64.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender-1.2.1-amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.0/gSender-1.2.0-armv7l.AppImage)| ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.1/gSender_1.2.1_bullseye.deb)
+ ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-x32.exe) | ``` Available ``` [EXE](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-x64.exe) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2.dmg) | ``` Available ``` [DMG](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender-1.2.2-arm64.dmg) | ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender_1.2.2_amd64.deb) | ``` Available ``` [ApIm](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.0/gSender-1.2.0-armv7l.AppImage)| ``` Available ``` [DEB](https://github.com/Sienci-Labs/gsender/releases/download/v1.2.2/gSender_1.2.2_bullseye.deb)
 
 [Check out the latest releases here.](https://github.com/Sienci-Labs/gsender/releases/)
 
@@ -99,6 +99,19 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ## 🕣 Development History
 
+# 1.2.2 (July 6, 2023)
+- Fix for overrides leading to gcode errors
+- Override value correctly updates with keybind usage
+- Using override keybind should now display the override panel
+- Multiple toolchanges in a single file now display the correct tool in the Wizard
+- Controller binds should work with toolchange wizard active
+- Spindle RPM no longer incorrectly converting units
+- Spindle slider now reflects EEPROM values for min and max
+- Jog speed properly converts through preferred unit changes
+- Larger margin on shortcut printout
+- M0 in feeder macros now displays M0 pause dialog
+- Added missing outline keybind
+- Unlock keybind should work in more situations where a soft reset was required
 
 # 1.2.1 (June 22, 2023)
 - Fix for files not loading for some users

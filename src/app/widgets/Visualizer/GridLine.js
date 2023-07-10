@@ -36,11 +36,13 @@ class GridLine {
         sizeY = (typeof sizeY === 'undefined') ? sizeX : sizeY;
         stepY = (typeof stepY === 'undefined') ? stepX : stepY;
 
+        const material = new THREE.LineBasicMaterial({
+            color: colorGrid
+        });
+
+
         for (let i = -1 * sizeX; i <= sizeX; i += stepX) {
             const points = [];
-            const material = new THREE.LineBasicMaterial({
-                color: colorGrid
-            });
 
             points.push(
                 new THREE.Vector3(-sizeX, i, 0),
@@ -53,9 +55,6 @@ class GridLine {
 
         for (let i = -1 * sizeY; i <= sizeY; i += stepY) {
             const points = [];
-            const material = new THREE.LineBasicMaterial({
-                color: colorGrid
-            });
 
             points.push(
                 new THREE.Vector3(i, -sizeY, 0),

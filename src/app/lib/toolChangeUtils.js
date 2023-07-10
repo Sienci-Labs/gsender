@@ -21,7 +21,7 @@ export const getProbeSettings = () => {
 
 export const getToolString = () => {
     const state = reduxStore.getState();
-    const tool = get(state, 'controller.state.parserstate.modal.tool', '0');
+    const tool = get(state, 'controller.state.parserstate.modal.tool', '-');
     return `T${tool}`;
 };
 

@@ -84,7 +84,9 @@ class Header extends PureComponent {
 
     shuttleControlFunctions = {
         CONTROLLER_COMMAND: (event, { command, type }) => {
-            const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+            const state = get(reduxStore.getState(), 'controller.state.status');
+            const activeState = get(state, 'activeState', 'Idle');
+            const alarmCode = get(state, 'alarmCode', 0);
             const controllerType = get(reduxStore.getState(), 'controller.type');
             // if it's a grblHAL only shortcut, don't run it
             if (type === GRBLHAL && controllerType !== GRBLHAL) {
@@ -92,8 +94,12 @@ class Header extends PureComponent {
                 return;
             }
             // feedhold, cyclestart, homing, unlock, reset
-            if (((command === 'unlock' || command === 'homing') && activeState === GRBL_ACTIVE_STATE_ALARM) ||
-                (command !== 'unlock' && activeState === GRBL_ACTIVE_STATE_IDLE)) {
+            if (((command === 'reset:limit' || command === 'homing') && activeState === GRBL_ACTIVE_STATE_ALARM) ||
+                (command !== 'reset:limit' && activeState === GRBL_ACTIVE_STATE_IDLE)) {
+                // unlock + reset on alarm 1 and 2, just unlock on others
+                if (activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode !== 1 && alarmCode !== 2) {
+                    command = 'unlock';
+                }
                 controller.command(command);
             }
         }
@@ -105,7 +111,7 @@ class Header extends PureComponent {
             keys: '$',
             cmd: 'CONTROLLER_COMMAND_UNLOCK',
             payload: {
-                command: 'unlock'
+                command: 'reset:limit'
             },
             preventDefault: false,
             isActive: true,

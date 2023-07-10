@@ -421,6 +421,12 @@ class WorkflowControl extends PureComponent {
             }),
             pubsub.subscribe('store:update', (msg, content) => {
                 storeUpdate(content, true);
+            }),
+            pubsub.subscribe('litemode:change', (msg, isFileLoaded) => {
+                // force update so the workflow controls update correctly for the visualizer used
+                if (!isFileLoaded) {
+                    this.forceUpdate();
+                }
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);

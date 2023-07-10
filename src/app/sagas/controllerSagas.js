@@ -236,11 +236,14 @@ export function* initialize() {
         });
     });
 
-    controller.addListener('controller:state', (type, state) => {
+    controller.addListener('controller:state', (type, state, tool) => {
         // if state is the same, don't update the prev and current state
         if (currentState !== state.status.activeState) {
             prevState = currentState;
             currentState = state.status.activeState;
+        }
+        if (tool) {
+            state.parserstate.modal.tool = tool;
         }
         reduxStore.dispatch({
             type: controllerActions.UPDATE_CONTROLLER_STATE,
@@ -469,28 +472,6 @@ export function* initialize() {
         parseGCode(content, size, name, visualizer);
     });
 
-    controller.addListener('toolchange:preHookComplete', (comment = '') => {
-        const onConfirmhandler = () => {
-            controller.command('toolchange:post');
-        };
-
-        const content = (comment.length > 0) ? (
-            <div>
-                <p>
-                    A toolchange command (M6) was found - click confirm to verify
-                    the tool has been changed and run your post-toolchange code.
-                </p>
-                <p>Comment: <b>{comment}</b></p>
-            </div>
-        ) : 'A toolchange command (M6) was found - click confirm to verify the tool has been changed and run your post-toolchange code.';
-
-        Confirm({
-            title: 'Confirm Toolchange',
-            content,
-            confirmLabel: 'Confirm toolchange',
-            onConfirm: onConfirmhandler
-        });
-    });
 
     controller.addListener('workflow:pause', (opts) => {
         const { data } = opts;

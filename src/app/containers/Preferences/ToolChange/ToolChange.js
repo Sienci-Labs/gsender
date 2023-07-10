@@ -45,11 +45,21 @@ export const TOOLCHANGE_OPTIONS = {
     }
 };
 
-const ToolChange = ({ mpos }) => {
+const ToolChange = ({ mpos, $13 }) => {
+    const convertToolChangePosition = () => {
+        const pos = store.get('workspace.toolChangePosition');
+        return {
+            x: Number(pos.x) / 25.4,
+            y: Number(pos.y) / 25.4,
+            z: Number(pos.z) / 25.4
+        };
+    };
+
     // State
     const [toolChangeOption, setToolChangeOption] = useState(store.get('workspace.toolChangeOption'));
-    const [toolChangePosition, setToolChangePosition] = useState(store.get('workspace.toolChangePosition'));
+    const [toolChangePosition, setToolChangePosition] = useState($13 ? convertToolChangePosition() : store.get('workspace.toolChangePosition'));
     const [optionDescription, setOptionDescription] = useState('');
+
     // Handlers
     const handleToolChange = (selection) => {
         setOptionDescription(TOOLCHANGE_OPTIONS[selection.value].description);
@@ -62,8 +72,17 @@ const ToolChange = ({ mpos }) => {
             y: mpos.y,
             z: mpos.z
         };
+        let newPositionMetric = newPosition;
+        if ($13) {
+            newPositionMetric = {
+                x: Number(mpos.x) * 25.4,
+                y: Number(mpos.y) * 25.4,
+                z: Number(mpos.z) * 25.4
+            };
+        }
+
         setToolChangePosition(newPosition);
-        store.replace('workspace.toolChangePosition', newPosition);
+        store.replace('workspace.toolChangePosition', newPositionMetric);
     };
 
     const handlePositionChange = (event, axis) => {
@@ -72,8 +91,17 @@ const ToolChange = ({ mpos }) => {
             ...toolChangePosition,
             [axis]: Number(value)
         };
+        let newPositionMetric = newPosition;
+        if ($13) {
+            const storeToolChangePosition = store.get('workspace.toolChangePosition');
+            newPositionMetric = {
+                ...storeToolChangePosition,
+                [axis]: Number(value) * 25.4
+            };
+        }
+
         setToolChangePosition(newPosition);
-        store.replace('workspace.toolChangePosition', newPosition);
+        store.replace('workspace.toolChangePosition', newPositionMetric);
     };
 
     useEffect(() => {
@@ -139,5 +167,6 @@ const ToolChange = ({ mpos }) => {
 
 export default connect((store) => {
     const mpos = get(store, 'controller.state.status.mpos', { x: 0, y: 0, z: 0 });
-    return { mpos };
+    const $13 = get(store, 'controller.settings.settings.$13', '0');
+    return { mpos, $13 };
 })(ToolChange);

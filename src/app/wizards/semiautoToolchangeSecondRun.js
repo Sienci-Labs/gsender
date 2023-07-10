@@ -26,6 +26,8 @@ import reduxStore from 'app/store/redux';
 import { getProbeSettings, getUnitModal, getToolString } from 'app/lib/toolChangeUtils';
 import { get } from 'lodash';
 
+const $13 = get(reduxStore, 'controller.settings.settings.$13', '0');
+const moveAmount = $13 ? '0.4in' : '10mm';
 
 // $132 is max z travel, if soft limits ($20) enabled we need to make sure probe distance will not exceed max limits
 const calculateMaxZProbeDistance = (zProbeDistance = 30) => {
@@ -93,7 +95,7 @@ const wizard = {
             substeps: [
                 {
                     title: 'Change Tool',
-                    description: () => <div>Change over to the next tool ({getToolString()}). Once ready, jog back to 10mm above the probe location, attach the magnet, and prepare to probe.</div>,
+                    description: () => <div>Change over to the next tool ({getToolString()}). Once ready, jog back to {moveAmount} above the probe location, attach the magnet, and prepare to probe.</div>,
                     overlay: false,
                     actions: [
                         {

@@ -4,7 +4,7 @@ import store from '../store';
 import shuttleEvents from './shuttleEvents';
 import { MACRO_CATEGORY } from '../constants';
 
-const TARGET_NUM_CALLS = 9; // this is the current number of widgets that use the useKeybinding hook
+const TARGET_NUM_CALLS = 10; // this is the current number of widgets that use the useKeybinding hook
 let numCalls = 0; // number of useKeybinding hooks that have been called
 
 /*

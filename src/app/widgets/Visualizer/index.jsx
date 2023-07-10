@@ -73,7 +73,6 @@ import {
     GRBL_ACTIVE_STATE_CHECK,
     CARVING_CATEGORY,
     GENERAL_CATEGORY,
-    OVERRIDES_CATEGORY,
     VISUALIZER_CATEGORY,
 } from '../../constants';
 import {
@@ -561,7 +560,8 @@ class VisualizerWidget extends PureComponent {
             }
         },
         handleLiteModeToggle: () => {
-            const { liteMode, gcode } = this.state;
+            const { liteMode } = this.state;
+            const { isFileLoaded } = this.props;
             const newLiteModeValue = !liteMode;
 
             this.setState({
@@ -572,7 +572,7 @@ class VisualizerWidget extends PureComponent {
             // instead of calling loadGCode right away,
             // use this pubsub to invoke a refresh of the visualizer wrapper.
             // this removes visual glitches that would otherwise appear.
-            pubsub.publish('litemode:change', gcode);
+            pubsub.publish('litemode:change', isFileLoaded);
         },
         lineWarning: {
             onContinue: () => {
@@ -611,7 +611,7 @@ class VisualizerWidget extends PureComponent {
             pubsub.publish('gcode:fileInfo');
             pubsub.publish('gcode:unload');
             Toaster.pop({
-                msg: 'Gcode File Closed',
+                msg: 'G-code File Closed',
                 icon: 'fa-exclamation'
             });
         }
@@ -1020,6 +1020,19 @@ class VisualizerWidget extends PureComponent {
                 controller.command('gcode:test');
             },
         },
+        RUN_OUTLINE: {
+            title: 'Run Outline',
+            keys: '',
+            cmd: 'RUN_OUTLINE',
+            preventDefault: false,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                if (this.workflowControl) {
+                    this.workflowControl.runOutline();
+                }
+            },
+        },
         START_JOB: {
             title: 'Start Job',
             keys: '~',
@@ -1385,7 +1398,6 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT
         },
         VISUALIZER_ZOOM_FIT: {
-            id: 73,
             title: 'Zoom In',
             keys: ['shift', 'i'].join('+'),
             cmd: 'VISUALIZER_ZOOM_FIT',
@@ -1631,7 +1643,7 @@ export default connect((store) => {
     const activeState = get(store, 'controller.state.status.activeState');
     const alarmCode = get(store, 'controller.state.status.alarmCode');
     const overrides = get(store, 'controller.state.status.ov', [0, 0, 0]);
-
+    const isFileLoaded = get(store, 'file.fileLoaded');
     const { activeVisualizer } = store.visualizer;
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
@@ -1650,7 +1662,6 @@ export default connect((store) => {
         activeState,
         activeVisualizer,
         alarmCode,
-        ovF,
-        ovS
+        isFileLoaded
     };
 }, null, null, { forwardRef: true })(VisualizerWidget);
