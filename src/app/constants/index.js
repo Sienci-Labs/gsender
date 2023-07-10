@@ -229,4 +229,3 @@ export const FILE_TYPE = {
     ROTARY: 'ROTARY',
     FOUR_AXIS: 'FOUR_AXIS'
 };
-

@@ -73,7 +73,7 @@ import {
     GRBL_ACTIVE_STATE_CHECK,
     CARVING_CATEGORY,
     GENERAL_CATEGORY,
-    VISUALIZER_CATEGORY,
+    VISUALIZER_CATEGORY, OVERRIDES_CATEGORY,
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
@@ -1662,6 +1662,8 @@ export default connect((store) => {
         activeState,
         activeVisualizer,
         alarmCode,
-        isFileLoaded
+        isFileLoaded,
+        ovF,
+        ovS
     };
 }, null, null, { forwardRef: true })(VisualizerWidget);

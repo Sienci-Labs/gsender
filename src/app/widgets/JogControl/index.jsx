@@ -69,7 +69,6 @@ import {
     AXIS_Z,
     AXIS_A,
     WORKSPACE_MODE,
-    AXIS_Z,
 } from '../../constants';
 import {
     MODAL_NONE,
