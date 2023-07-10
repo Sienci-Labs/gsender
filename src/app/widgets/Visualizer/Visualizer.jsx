@@ -1093,11 +1093,11 @@ class Visualizer extends Component {
 
         // WebGLRenderer
         this.renderer = new THREE.WebGLRenderer({
-            autoClearColor: true,
-            alpha: true
+            alpha: true,
+            // antialias: true
         });
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.shadowMap.type = THREE.BasicShadowMap;
         this.renderer.setClearColor(new THREE.Color(currentTheme.get(BACKGROUND_PART)), 1);
         this.renderer.setSize(width, height);
         this.renderer.clear();
