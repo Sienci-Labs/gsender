@@ -49,7 +49,8 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
-import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
+// import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
+import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass';
 import TrackballControls from 'app/lib/three/TrackballControls';
 import * as WebGL from 'app/lib/three/WebGL';
 import log from 'app/lib/log';
@@ -224,7 +225,7 @@ class Visualizer extends Component {
         this.camera = null;
         this.bloomComposer = null;
         this.copyComposer = null;
-        this.fxaaComposer = null;
+        // this.fxaaComposer = null;
         this.finalComposer = null;
         this.controls = null;
         this.viewport = null;
@@ -902,7 +903,7 @@ class Visualizer extends Component {
 
         this.renderer.setSize(width, height);
         this.copyComposer.setSize(width, height);
-        this.fxaaComposer.setSize(width, height);
+        // this.fxaaComposer.setSize(width, height);
         this.bloomComposer.setSize(width, height);
         this.finalComposer.setSize(width, height);
 
@@ -1267,18 +1268,20 @@ class Visualizer extends Component {
         const height = this.getVisibleHeight();
 
         // fxaa
-        const fxaaPass = new ShaderPass(FXAAShader);
+        // const fxaaPass = new ShaderPass(FXAAShader);
         const copyPass = new ShaderPass(CopyShader);
         this.copyComposer = new EffectComposer(this.renderer);
         this.copyComposer.addPass(renderScene);
         this.copyComposer.addPass(copyPass);
 
-        fxaaPass.material.uniforms.resolution.value.x = 1 / (width * pixelRatio);
-        fxaaPass.material.uniforms.resolution.value.y = 1 / (height * pixelRatio);
+        const smaaPass = new SMAAPass(width * pixelRatio, height * pixelRatio);
+        this.copyComposer.addPass(smaaPass);
+        // fxaaPass.material.uniforms.resolution.value.x = 1 / (width * pixelRatio);
+        // fxaaPass.material.uniforms.resolution.value.y = 1 / (height * pixelRatio);
 
-        this.fxaaComposer = new EffectComposer(this.renderer);
-        this.fxaaComposer.addPass(renderScene);
-        this.fxaaComposer.addPass(fxaaPass);
+        // this.fxaaComposer = new EffectComposer(this.renderer);
+        // this.fxaaComposer.addPass(renderScene);
+        // this.fxaaComposer.addPass(fxaaPass);
 
         // bloom
         const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1, 0.1, 0);
@@ -1355,7 +1358,7 @@ class Visualizer extends Component {
         if (this.renderer && needUpdateScene) {
             this.renderer.render(this.scene, this.camera);
             this.copyComposer.render();
-            this.fxaaComposer.render();
+            // this.fxaaComposer.render();
             this.renderBloom();
             this.finalComposer.render();
         }
