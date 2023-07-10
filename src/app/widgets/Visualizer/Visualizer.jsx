@@ -954,23 +954,17 @@ class Visualizer extends Component {
         const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const group = new THREE.Group();
+        const step = units === IMPERIAL_UNITS ? 25.4 : 10;
 
         const { currentTheme } = this.props.state;
 
         { // Coordinate Grid
             const gridLine = new GridLine(
                 gridCount * gridSpacing,
-                gridSpacing,
                 gridCount * gridSpacing,
-                gridSpacing,
-                currentTheme.get(GRID_PART), // center line
+                step,
                 currentTheme.get(GRID_PART) // grid
             );
-            _each(gridLine.children, (o) => {
-                o.material.opacity = 0.15;
-                o.material.transparent = true;
-                o.material.depthWrite = false;
-            });
             gridLine.name = 'GridLine';
             group.add(gridLine);
         }
@@ -1168,7 +1162,7 @@ class Visualizer extends Component {
             const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
             imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
             imperialGridLineNumbers.visible = visible && (units === IMPERIAL_UNITS);
-            //this.group.add(imperialGridLineNumbers);
+            this.group.add(imperialGridLineNumbers);
         }
 
         { // Metric Grid Line Numbers
