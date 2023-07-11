@@ -8,8 +8,6 @@ export class StockTurningGenerator {
     constructor(options) {
         const defaultOptions = defaultState.widgets.rotary.stockTurning.defaultOptions;
 
-        console.log(defaultOptions);
-
         this.options = { ...defaultOptions, ...options };
         // bitDiameter;
         // stepover;
@@ -24,8 +22,6 @@ export class StockTurningGenerator {
 
     generate = () => {
         const units = store.get('workspace.units');
-
-        console.log(this.options);
 
         const { feedrate } = this.options;
 
@@ -100,8 +96,6 @@ export class StockTurningGenerator {
         const throttledFeedrate = (feedrate * 0.2).toFixed(3);
 
         const currentZValue = Number(controller.state.status.wpos.z);
-
-        console.log(halfOfStockLength, -halfOfStockLength);
 
         const array = [
             /** 1 */ `G0 Z${safeHeight}`,

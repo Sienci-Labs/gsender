@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import get from 'lodash/get';
 import { useSelector } from 'react-redux';
 
+// eslint-disable-next-line no-unused-vars
 import { StockTurningGenerator } from './StockTurning/Generator';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import { MODALS, Y_AXIS_ALIGNMENT_PROBING_MACRO, Z_AXIS_PROBING_MACRO } from './utils/constants';
@@ -24,22 +25,23 @@ const ActionArea = ({ actions }) => {
     };
 
     const handleStockTurningClick = () => {
+        return;
         // dispatch({ type: SET_ACTIVE_DIALOG, payload: MODALS.STOCK_TURNING });
 
-        const stockTurning = new StockTurningGenerator({
-            bitDiameter: 6.35,
-            stepover: 0.15,
-            feedrate: 3000,
-            stockLength: 100,
-            startHeight: 25,
-            finalHeight: 20,
-            stepdown: 20,
-            method: 'HALF_AND_HALF_SPIRALS'
-        });
+        // const stockTurning = new StockTurningGenerator({
+        //     bitDiameter: 6.35,
+        //     stepover: 0.15,
+        //     feedrate: 3000,
+        //     stockLength: 100,
+        //     startHeight: 25,
+        //     finalHeight: 20,
+        //     stepdown: 20,
+        //     method: 'HALF_AND_HALF_SPIRALS'
+        // });
 
-        stockTurning.generate();
+        // stockTurning.generate();
 
-        console.log(stockTurning.gcode);
+        // console.log(stockTurning.gcode);
     };
 
     return (
