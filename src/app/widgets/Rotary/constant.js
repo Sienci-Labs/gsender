@@ -3,8 +3,6 @@ export const EIGHTH = '1/8';
 export const SIX = 6;
 export const TEN = 10;
 export const TWO = 2;
-export const LINES_UP = true;
-export const DOESNT_LINE_UP = false;
 
 //Rotary setup hole types
 export const HOLE_TYPES = {
