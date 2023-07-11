@@ -1591,7 +1591,7 @@ class Visualizer extends Component {
     }
 
     // Update cutting tool position
-    updateCuttingToolPosition() {
+    updateCuttingToolPosition(position, { forceUpdateAllAxes = false } = {}) {
         if (!this.cuttingTool) {
             return;
         }
@@ -1600,13 +1600,14 @@ class Visualizer extends Component {
         const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
 
         const pivotPoint = this.pivotPoint.get();
-        const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
+        const { x: wpox = 0, y: wpoy = 0, z: wpoz = 0 } = position ?? this.workPosition;
 
         const x0 = wpox - pivotPoint.x;
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        if (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY) {
+        // The force parameter will skip here and update the positioning of all axes
+        if (!forceUpdateAllAxes && (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY)) {
             gsap.to(this.cuttingTool.position, {
                 x: x0,
                 z: z0,
@@ -1627,9 +1628,11 @@ class Visualizer extends Component {
     rotateGcodeModal(degrees) {
         const radians = degToRad(degrees);
 
-        if (this.visualizer) {
-            this.visualizer.group.rotateX(radians);
+        if (!this.visualizer) {
+            return;
         }
+
+        this.visualizer.group.rotateX(radians);
     }
 
     updateGcodeModal(prevPos, currPos) {
