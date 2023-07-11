@@ -858,6 +858,9 @@ class Visualizer extends Component {
                 this.fileLoaded = false;
                 pubsub.publish('softlimits:ok');
             }),
+            pubsub.subscribe('visualizer:updateposition', (_, data) => {
+                this.updateCuttingToolPosition(data, { forceUpdateAllAxes: true });
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
