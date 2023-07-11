@@ -1,221 +1,188 @@
-/* eslint-disable no-unused-vars */
-import React from 'react';
-import styled from '@emotion/styled';
+import React, { useContext } from 'react';
 
+import store from 'app/store';
+import { FILE_TYPE, WORKSPACE_MODE } from 'app/constants';
+import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import { updateWorkspaceMode } from 'app/lib/rotary';
 import Modal from 'app/components/ToolModal/ToolModal';
 import { RadioGroup, RadioButton } from 'app/components/Radio';
 import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
-import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import Button from 'app/components/FunctionButton/FunctionButton';
+
+import standardTrackGraphic from '../assets/standard-track-top-view.png';
+import extensionTrackGraphic from '../assets/extension-track-top-view.png';
+import customTrackGraphic from '../assets/custom-boring-track-top-view.png';
 
 import styles from './index.styl';
-import {
-    DOESNT_LINE_UP,
-    EIGHTH,
-    HOLE_TYPES,
-    LINES_UP,
-    QUARTER,
-    SIX,
-    TEN,
-    TWO,
-} from '../constant';
+import { ContentWrapper, Option, MenuTitle, RadioWrapper, WarningBanner } from './styled';
+import { HOLE_TYPES, EIGHTH, QUARTER, SIX, TEN, } from '../constant';
+import { RotaryContext } from '../Context';
+import { CLOSE_ACTIVE_DIALOG, UPDATE_PHYSICAL_UNIT_SETUP } from '../Context/actions';
 
-const ContentWrapper = styled.div`
-    padding: 0 2rem;
-    height: 90%;
-`;
-const Option = styled.div`
-    display: flex;
-    margin-top: 1rem;
-`;
-const MenuTitle = styled.div`
-    width: 50%;
-`;
-const RadioWrapper = styled.div`
-    margin-left: 1rem;
-    display: flex;
-    align-items: center;
-`;
-const Submit = styled.div`
-    position: absolute;
-    bottom: 2rem;
-    width: 100%;
-    left: 0;
-`;
-const Description = styled.div`
-    margin-top: 5rem;
-    color: #6b7280;
-    font-size: 1rem;
-`;
+const PhysicalUnitSetup = ({ actions }) => {
+    const { state: { physicalUnitSetup }, dispatch } = useContext(RotaryContext);
+    const { linesUp, drillBitDiameter, holeCount } = physicalUnitSetup;
 
-const PhysicalUnitSetup = ({
-    actions: rotaryActions,
-    physicalSetupState,
-    setPhysicalSetupState,
-}) => {
-    const { showDialogue, linesUp, drillDiameter, holeCount } =
-        physicalSetupState;
+    const onSubmit = () => {
+        let gcode;
+        let localHoleCount = holeCount;
 
-    const actions = {
-        readGCodeFile: async (file) => {
-            try {
-                const response = await fetch(file);
-                const gcode = await response.text();
-                return gcode;
-            } catch (error) {
-                throw error;
-            }
-        },
-        handleSubmit: () => {
-            // ¼” diameter endmill milling 2 holes for custom mounting solution
-            if (
-                linesUp === DOESNT_LINE_UP &&
-                drillDiameter === QUARTER
-            ) {
-                rotaryActions.loadGcode(HOLE_TYPES.DOESNT_LINE_UP_QUARTER);
-                actions.handleModalClose();
-                Toaster.pop({
-                    msg: `File added for 2 ${drillDiameter}” mounting holes`,
-                    type: TOASTER_INFO,
-                });
-                return;
-            }
+        // ¼” diameter endmill milling 2 holes for custom mounting solution
+        if (!linesUp && drillBitDiameter === QUARTER) {
+            gcode = HOLE_TYPES.DOESNT_LINE_UP_QUARTER;
+            localHoleCount = 2;
+        }
 
-            // ⅛” diameter endmill milling 2 holes for custom mounting solution
-            if (
-                linesUp === DOESNT_LINE_UP &&
-                drillDiameter === EIGHTH
-            ) {
-                rotaryActions.loadGcode(HOLE_TYPES.DOESNT_LINE_UP_EIGHTH);
-                actions.handleModalClose();
-                Toaster.pop({
-                    msg: `File added for 2 ${drillDiameter}” mounting holes`,
-                    type: TOASTER_INFO,
-                });
-                return;
-            }
+        // ⅛” diameter endmill milling 2 holes for custom mounting solution
+        if (!linesUp && drillBitDiameter === EIGHTH) {
+            gcode = HOLE_TYPES.DOESNT_LINE_UP_EIGHTH;
+            localHoleCount = 2;
+        }
 
-            // ¼” diameter endmill milling 6 holes for 30” track
-            if (drillDiameter === QUARTER && holeCount === SIX) {
-                rotaryActions.loadGcode(HOLE_TYPES.QUARTER_INCH_SIX_HOLES);
-                actions.handleModalClose();
-                Toaster.pop({
-                    msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
-                    type: TOASTER_INFO,
-                });
-                return;
-            }
+        // ¼” diameter endmill milling 6 holes for 30” track
+        if (drillBitDiameter === QUARTER && holeCount === SIX) {
+            gcode = HOLE_TYPES.QUARTER_INCH_SIX_HOLES;
+        }
 
-            // ⅛” diameter endmill milling 6 holes for 30” track
-            if (drillDiameter === EIGHTH && holeCount === SIX) {
-                rotaryActions.loadGcode(HOLE_TYPES.EIGHTH_INCH_SIX_HOLES);
-                actions.handleModalClose();
-                Toaster.pop({
-                    msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
-                    type: TOASTER_INFO,
-                });
-                return;
-            }
+        // ⅛” diameter endmill milling 6 holes for 30” track
+        if (drillBitDiameter === EIGHTH && holeCount === SIX) {
+            gcode = HOLE_TYPES.EIGHTH_INCH_SIX_HOLES;
+        }
 
-            // ¼” diameter endmill milling 10 holes for 30” track with extension
-            if (drillDiameter === QUARTER && holeCount === TEN) {
-                rotaryActions.loadGcode(HOLE_TYPES.QUARTER_INCH_TEN_HOLES);
-                actions.handleModalClose();
-                Toaster.pop({
-                    msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
-                    type: TOASTER_INFO,
-                });
-                return;
-            }
+        // ¼” diameter endmill milling 10 holes for 30” track with extension
+        if (drillBitDiameter === QUARTER && holeCount === TEN) {
+            gcode = HOLE_TYPES.QUARTER_INCH_TEN_HOLES;
+        }
 
-            // ⅛” diameter endmill milling 10 holes for 30” track with extension
-            if (drillDiameter === EIGHTH && holeCount === TEN) {
-                rotaryActions.loadGcode(HOLE_TYPES.EIGHTH_INCH_TEN_HOLES);
-                actions.handleModalClose();
-                Toaster.pop({
-                    msg: `File added for ${holeCount} ${drillDiameter}” mounting holes`,
-                    type: TOASTER_INFO,
-                });
-                return;
-            }
-        },
-        handleModalClose: () => {
-            setPhysicalSetupState((prev) => ({ ...prev, showDialogue: false }));
-        },
-        handleLinesUpSelection: (value, event) => {
-            setPhysicalSetupState((prev) => ({ ...prev, linesUp: value }));
-        },
-        handleDiameterSelection: (value, event) => {
-            setPhysicalSetupState((prev) => ({
-                ...prev,
-                drillDiameter: value,
-            }));
-        },
-        handleDrillCountSelection: (value, event) => {
-            setPhysicalSetupState((prev) => ({ ...prev, holeCount: value }));
-        },
+        // ⅛” diameter endmill milling 10 holes for 30” track with extension
+        if (drillBitDiameter === EIGHTH && holeCount === TEN) {
+            gcode = HOLE_TYPES.EIGHTH_INCH_TEN_HOLES;
+        }
+
+        actions.loadGcode(gcode);
+        handleModalClose();
+        Toaster.pop({
+            msg: `File added for ${localHoleCount} ${drillBitDiameter}” mounting holes`,
+            type: TOASTER_INFO,
+        });
     };
+
+    const handleModalClose = () => {
+        dispatch({ type: CLOSE_ACTIVE_DIALOG });
+    };
+
+    const handleLinesUpSelection = (linesUp) => {
+        dispatch({ type: UPDATE_PHYSICAL_UNIT_SETUP, payload: { linesUp } });
+    };
+
+    const handleDiameterSelection = (drillBitDiameter) => {
+        dispatch({ type: UPDATE_PHYSICAL_UNIT_SETUP, payload: { drillBitDiameter } });
+    };
+
+    const handleDrillCountSelection = (holeCount) => {
+        dispatch({ type: UPDATE_PHYSICAL_UNIT_SETUP, payload: { holeCount } });
+    };
+
+    const handleDisableRotaryMode = () => {
+        updateWorkspaceMode(FILE_TYPE.DEFAULT);
+        Toaster.pop({
+            msg: 'Rotary Mode Disabled',
+            type: TOASTER_INFO,
+        });
+    };
+
+    const getIllustrationImage = () => {
+        if (!linesUp) {
+            return customTrackGraphic;
+        }
+
+        if (holeCount === SIX) {
+            return standardTrackGraphic;
+        }
+
+        if (holeCount === TEN) {
+            return extensionTrackGraphic;
+        }
+
+        return standardTrackGraphic;
+    };
+
+    const workspaceMode = store.get('workspace.mode');
 
     return (
         <Modal
             title="Physical Rotary-unit Setup"
-            show={showDialogue}
-            onClose={actions.handleModalClose}
-            size="sm"
+            onClose={handleModalClose}
+            size="lg"
         >
             <ContentWrapper>
-                <Option>
-                    <MenuTitle>
-                        Does the mounting track lineup without any interference?
-                    </MenuTitle>
-                    <RadioGroup
-                        value={linesUp}
-                        depth={2}
-                        onChange={actions.handleLinesUpSelection}
-                        size="small"
-                    >
-                        <RadioWrapper style={{ marginTop: '0.6rem' }}>
-                            <RadioButton
-                                className={styles.radio}
-                                label="Lines up"
-                                value={LINES_UP}
-                            />
-                            <RadioButton
-                                className={styles.radio}
-                                label="Does not lineup"
-                                value={DOESNT_LINE_UP}
-                            />
-                        </RadioWrapper>
-                    </RadioGroup>
-                </Option>
-                <Option>
-                    <MenuTitle>Drill bit diameter</MenuTitle>
-                    <RadioGroup
-                        value={drillDiameter}
-                        depth={2}
-                        onChange={actions.handleDiameterSelection}
-                        size="small"
-                    >
-                        <RadioWrapper>
-                            <RadioButton
-                                className={styles.radio}
-                                label="1/4”"
-                                value={QUARTER}
-                            />
-                            <RadioButton
-                                className={styles.radio}
-                                label="1/8”"
-                                value={EIGHTH}
-                            />
-                        </RadioWrapper>
-                    </RadioGroup>
-                </Option>
-                {linesUp === LINES_UP && (
+                <div>
+                    {
+                        workspaceMode === WORKSPACE_MODE.ROTARY && (
+                            <>
+                                <WarningBanner>
+                                    Rotary Mode is enabled, please disable it before proceeding.
+                                </WarningBanner>
+
+                                <Button onClick={handleDisableRotaryMode}>Disable Rotary Mode</Button>
+                            </>
+                        )
+                    }
+
                     <Option>
+                        <MenuTitle>
+                            Does the mounting track lineup without any interference?
+                        </MenuTitle>
+                        <RadioGroup
+                            value={linesUp}
+                            depth={2}
+                            onChange={handleLinesUpSelection}
+                            size="small"
+                        >
+                            <RadioWrapper>
+                                <RadioButton
+                                    className={styles.radio}
+                                    label="Lines up"
+                                    value={true}
+                                />
+                                <RadioButton
+                                    className={styles.radio}
+                                    label="Does not lineup"
+                                    value={false}
+                                />
+                            </RadioWrapper>
+                        </RadioGroup>
+                    </Option>
+
+                    <Option>
+                        <MenuTitle>End Mill Diameter</MenuTitle>
+                        <RadioGroup
+                            value={drillBitDiameter}
+                            depth={2}
+                            onChange={handleDiameterSelection}
+                            size="small"
+                        >
+                            <RadioWrapper>
+                                <RadioButton
+                                    className={styles.radio}
+                                    label="1/4”"
+                                    value={QUARTER}
+                                />
+                                <RadioButton
+                                    className={styles.radio}
+                                    label="1/8”"
+                                    value={EIGHTH}
+                                />
+                            </RadioWrapper>
+                        </RadioGroup>
+                    </Option>
+
+                    <Option disabled={!linesUp}>
                         <MenuTitle>Number of holes</MenuTitle>
                         <RadioGroup
                             value={holeCount}
                             depth={2}
-                            onChange={actions.handleDrillCountSelection}
+                            onChange={handleDrillCountSelection}
                             size="small"
                         >
                             <RadioWrapper>
@@ -232,24 +199,17 @@ const PhysicalUnitSetup = ({
                             </RadioWrapper>
                         </RadioGroup>
                     </Option>
-                )}
-                {linesUp === DOESNT_LINE_UP && (
-                    <Description>
-                        In the case where the mounting track does not lineup,
-                        you may please select the correct options above to
-                        manually drill a pair of mounting holes at safe
-                        locations on the wasteboard.
-                    </Description>
-                )}
-                <Submit>
-                    <ToolModalButton
-                        icon="fas fa-play"
-                        style={{ width: '50%', margin: 'auto' }}
-                        onClick={actions.handleSubmit}
-                    >
-                        Send to Visualizer
-                    </ToolModalButton>
-                </Submit>
+                </div>
+
+                <img className={styles.graphic} src={getIllustrationImage()} alt="" />
+
+                <ToolModalButton
+                    icon="fas fa-play"
+                    style={{ width: '50%', margin: '0 auto' }}
+                    onClick={onSubmit}
+                >
+                    Send to Visualizer
+                </ToolModalButton>
             </ContentWrapper>
         </Modal>
     );
