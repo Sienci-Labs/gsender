@@ -5,6 +5,7 @@ import ToggleSwitch from 'app/components/ToggleSwitch';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import { WORKSPACE_MODE } from 'app/constants';
 import { updateWorkspaceMode } from 'app/lib/rotary';
+import { get } from 'lodash';
 
 const { DEFAULT, ROTARY } = WORKSPACE_MODE;
 
@@ -14,13 +15,25 @@ const RotaryToggle = () => {
     const [workspaceMode, setWorkspaceMode] = useState(currentMode);
 
     useEffect(() => {
-        const newMode = store.get('workspace.mode', DEFAULT);
-        setWorkspaceMode(newMode);
-    }, [store.get('workspace.mode', DEFAULT)]);
+        const updateWorkspaceMode = (data) => {
+            const mode = get(data, 'workspace.mode', null);
+
+            if (!mode) {
+                return;
+            }
+
+            setWorkspaceMode(mode);
+        };
+
+        store.on('change', updateWorkspaceMode);
+
+        return () => {
+            store.removeListener(updateWorkspaceMode);
+        };
+    }, []);
 
     const handleToggle = (toggled) => {
         const newMode = toggled ? ROTARY : DEFAULT;
-        setWorkspaceMode(newMode);
         updateWorkspaceMode(newMode);
     };
 
