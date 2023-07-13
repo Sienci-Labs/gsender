@@ -16,6 +16,7 @@ test('GrblLineParserResultStatus: all zeroes in the mask ($10=0)', (t) => {
         t.same(status, {
             activeState: 'Idle',
             pinState: {},
+            pinState: {},
             subState: 0
         });
         t.end();
@@ -30,6 +31,7 @@ test('GrblLineParserResultStatus: default ($10=3)', (t) => {
     runner.on('status', ({ raw, ...status }) => {
         t.equal(raw, '<Idle,MPos:5.529,0.560,7.000,WPos:1.529,-5.440,-0.000>');
         t.same(status, {
+            pinState: {},
             activeState: 'Idle',
             pinState: {},
             subState: 0,
@@ -104,7 +106,7 @@ test('GrblLineParserResultStatus: set all bits to 1 ($10=31)', (t) => {
                 planner: 0,
                 rx: 0
             },
-            pinState: {}
+            pinState: {},
         });
         t.end();
     });

@@ -39,9 +39,10 @@ import SpindleLaser from './SpindleLaser';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import VisualizerSettings from './Visualizer';
 import About from './About';
+import Rotary from './Rotary';
 import store from '../../store';
 import styles from './index.styl';
-import { METRIC_UNITS, WORKFLOW_STATE_RUNNING } from '../../constants';
+import { METRIC_UNITS, ROTARY_MODE_FIRMWARE_SETTINGS, WORKFLOW_STATE_RUNNING } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 import {
     DARK_THEME_VALUES, PARTS_LIST, G1_PART
@@ -134,6 +135,11 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 9,
+                    label: 'Rotary',
+                    component: Rotary
+                },
+                {
+                    id: 10,
                     label: 'About',
                     component: About,
                 }
@@ -171,6 +177,9 @@ class PreferencesPage extends PureComponent {
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
+            rotary: {
+                firmwareSettings: store.get('workspace.rotaryAxis.firmwareSettings', ROTARY_MODE_FIRMWARE_SETTINGS)
+            }
         };
     }
 
@@ -734,6 +743,28 @@ class PreferencesPage extends PureComponent {
                     }
                 });
                 pubsub.publish('visualizer:settings');
+            }
+        },
+        rotary: {
+            updateFirmwareSetting: (setting, value) => {
+                store.replace(`workspace.rotaryAxis.firmwareSettings[${setting}]`, value);
+
+                this.setState(prev => ({
+                    rotary: {
+                        ...prev.rotary,
+                        firmwareSettings: {
+                            ...prev.rotary.firmwareSettings,
+                            [setting]: value,
+                        }
+                    }
+                }));
+            },
+            resetFirmwareToDefault: () => {
+                store.replace('workspace.rotaryAxis.firmwareSettings', ROTARY_MODE_FIRMWARE_SETTINGS);
+
+                this.setState(prev => ({
+                    rotary: { ...prev.rotary, firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS }
+                }));
             }
         }
     }

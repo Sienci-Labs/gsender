@@ -66,7 +66,7 @@ const parseMountPoint = (val, acc) => {
 const parseController = (val) => {
     val = val ? (val + '').toLowerCase() : '';
 
-    if (['grbl'].includes(val)) {
+    if (['grbl', 'grblHAL'].includes(val)) {
         return val;
     } else {
         return '';
@@ -89,7 +89,7 @@ program
     .option('--access-token-lifetime <lifetime>', 'Access token lifetime in seconds or a time span string (default: 30d)')
     .option('--allow-remote-access', 'Allow remote access to the server (default: false)', false)
     .option('--remote', 'Enable Headless mode, exposing the internal server on your local network', false)
-    .option('--controller <type>', 'Specify CNC controller: Grbl (default: \'\')', parseController, 'Grbl')
+    .option('--controller <type>', 'Specify CNC controller: Grbl, grblHAL (default: \'\')', parseController, '')
     .option('--kiosk', 'Enable Kiosk mode, only allowing this application to be run', false);
 
 // Commander assumes that the first two values in argv are 'node' and appname, and then followed by the args.

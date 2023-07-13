@@ -6,8 +6,8 @@ const NavigationButtons = ({ onNext, onPrevious, nextDisabled, prevDisabled, onS
     return (
         <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr' }}>
             <div style={{ display: 'flex', gap: '1rem' }}>
-                <FunctionButton primary onClick={onPrevious} disabled={!prevDisabled}>Previous</FunctionButton>
-                <FunctionButton primary onClick={onNext} disabled={!nextDisabled}>Next</FunctionButton>
+                <FunctionButton onClick={onPrevious} disabled={!prevDisabled}>Previous</FunctionButton>
+                <FunctionButton onClick={onNext} disabled={!nextDisabled}>Next</FunctionButton>
             </div>
             <FunctionButton onClick={onShowJogControls}>Show Jog Controls</FunctionButton>
         </div>

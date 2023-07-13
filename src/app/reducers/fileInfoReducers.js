@@ -44,6 +44,7 @@ const initialState = {
         delta: { x: 0, y: 0, z: 0 }
     },
     content: '',
+    fileType: null,
 };
 
 const normalizeBBox = (bbox) => {

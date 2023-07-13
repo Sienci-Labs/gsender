@@ -50,7 +50,7 @@ class ControlArea extends Component {
         if (alarmCode === 1 || alarmCode === 2) {
             controller.command('reset:limit');
             return;
-        } else if (alarmCode === 'Homing') {
+        } else if (alarmCode === 'Homing' || alarmCode === 11) {
             controller.command('homing');
             return;
         }

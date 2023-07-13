@@ -162,9 +162,9 @@
 }
 
 .settings-description {
-  width: 80%;
   display flex;
   flex-direction column;
+  padding: 0 10px;
 }
 
 .containerFluid {
@@ -182,7 +182,7 @@
 
 .table-row {
   display: grid;
-  grid-template-columns 1fr 8fr 5fr;
+  grid-template-columns 1fr 4fr 2fr 1fr;
   padding: 1rem 0;
 
   border-top: 1px solid lightgrey;
@@ -190,7 +190,7 @@
 
 .table-header {
   display: grid;
-  grid-template-columns 1fr 8fr 5fr;
+  grid-template-columns 1fr 4fr 2fr 1fr;
 
   grid-gap: 1px;
   background-color: lightgrey;
@@ -359,6 +359,18 @@
   &-Spindle {
     tag-mixin(#13283c, #d8e7f4)
   }
+
+  &-Network {
+    tag-mixin(#9AE8EC, #155B5F)
+  }
+
+  &-PID {
+    tag-mixin(#F58787, #8B2323)
+  }
+
+  &-NetInterface {
+    tag-mixin(#3473F1, #D0DCF3)
+  }
 }
 
 .non-default-value {
@@ -369,6 +381,10 @@
   i {
     font-size: 2rem !important;
   }
+}
+
+.hide {
+  display: none;
 }
 
 .settings-area-container {

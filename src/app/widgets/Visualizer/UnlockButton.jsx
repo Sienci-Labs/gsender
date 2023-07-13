@@ -39,7 +39,7 @@ const UnlockButton = ({ activeState, alarmCode }) => {
         setIsHovering(false);
     };
     const handleUnlock = () => {
-        if (activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode === 'Homing') {
+        if (activeState === GRBL_ACTIVE_STATE_ALARM && (alarmCode === 'Homing' || alarmCode === 11)) {
             controller.command('unlock');
         } else {
             controller.command('cyclestart');

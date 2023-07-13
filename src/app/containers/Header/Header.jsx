@@ -28,19 +28,23 @@ import _ from 'lodash';
 import HeadlessIndicator from 'app/components/HeadlessIndicator';
 import Push from 'push.js';
 import isElectron from 'is-electron';
+import pubsub from 'pubsub-js';
+
 import reduxStore from 'app/store/redux';
 import api from 'app/api';
 import settings from 'app/config/settings';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
-import pubsub from 'pubsub-js';
+import gamepad, { runAction } from 'app/lib/gamepad';
 import NavbarConnection from 'app/widgets/NavbarConnection';
+
 import styles from './index.styl';
 import NavLogo from '../../components/NavLogo';
 import NavSidebar from '../NavSidebar';
 import useKeybinding from '../../lib/useKeybinding';
-import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE, GENERAL_CATEGORY, LOCATION_CATEGORY } from '../../constants';
+import { GRBL_ACTIVE_STATE_ALARM, GRBL_ACTIVE_STATE_IDLE, GENERAL_CATEGORY, LOCATION_CATEGORY, GRBLHAL } from '../../constants';
+import { Toaster, TOASTER_WARNING } from '../../lib/toaster/ToasterLib';
 
 class Header extends PureComponent {
     static propTypes = {
@@ -79,11 +83,23 @@ class Header extends PureComponent {
     };
 
     shuttleControlFunctions = {
-        CONTROLLER_COMMAND: (event, { command }) => {
-            const activeState = get(reduxStore.getState(), 'controller.state.status.activeState');
+        CONTROLLER_COMMAND: (event, { command, type }) => {
+            const state = get(reduxStore.getState(), 'controller.state.status');
+            const activeState = get(state, 'activeState', 'Idle');
+            const alarmCode = get(state, 'alarmCode', 0);
+            const controllerType = get(reduxStore.getState(), 'controller.type');
+            // if it's a grblHAL only shortcut, don't run it
+            if (type === GRBLHAL && controllerType !== GRBLHAL) {
+                this.showToast();
+                return;
+            }
             // feedhold, cyclestart, homing, unlock, reset
-            if (((command === 'unlock' || command === 'homing') && activeState === GRBL_ACTIVE_STATE_ALARM) ||
-                (command !== 'unlock' && activeState === GRBL_ACTIVE_STATE_IDLE)) {
+            if (((command === 'reset:limit' || command === 'homing') && activeState === GRBL_ACTIVE_STATE_ALARM) ||
+                (command !== 'reset:limit' && activeState === GRBL_ACTIVE_STATE_IDLE)) {
+                // unlock + reset on alarm 1 and 2, just unlock on others
+                if (activeState === GRBL_ACTIVE_STATE_ALARM && alarmCode !== 1 && alarmCode !== 2) {
+                    command = 'unlock';
+                }
                 controller.command(command);
             }
         }
@@ -95,7 +111,7 @@ class Header extends PureComponent {
             keys: '$',
             cmd: 'CONTROLLER_COMMAND_UNLOCK',
             payload: {
-                command: 'unlock'
+                command: 'reset:limit'
             },
             preventDefault: false,
             isActive: true,
@@ -125,7 +141,59 @@ class Header extends PureComponent {
             isActive: true,
             category: LOCATION_CATEGORY,
             callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
-        }
+        },
+        CONTROLLER_COMMAND_REALTIME_REPORT: {
+            title: 'Realtime Report',
+            keys: '`',
+            cmd: 'CONTROLLER_COMMAND_REALTIME_REPORT',
+            payload: {
+                command: 'realtime_report',
+                type: GRBLHAL
+            },
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
+        },
+        CONTROLLER_COMMAND_ERROR_CLEAR: {
+            title: 'Error Clear',
+            keys: '*',
+            cmd: 'CONTROLLER_COMMAND_ERROR_CLEAR',
+            payload: {
+                command: 'error_clear',
+                type: GRBLHAL
+            },
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
+        },
+        CONTROLLER_COMMAND_TOOLCHANGE_ACKNOWLEDGEMENT: {
+            title: 'Toolchange Acknowledgement',
+            keys: ['ctrl', 'alt', 'command', 'a'].join('+'),
+            cmd: 'CONTROLLER_COMMAND_TOOLCHANGE_ACKNOWLEDGEMENT',
+            payload: {
+                command: 'toolchange:acknowledge',
+                type: GRBLHAL
+            },
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
+        },
+        CONTROLLER_COMMAND_VIRTUAL_STOP_TOGGLE: {
+            title: 'Virtual Stop Toggle',
+            keys: ['ctrl', '8'].join('+'),
+            cmd: 'CONTROLLER_COMMAND_VIRTUAL_STOP_TOGGLE',
+            payload: {
+                command: 'virtual_stop_toggle',
+                type: GRBLHAL
+            },
+            preventDefault: true,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: this.shuttleControlFunctions.CONTROLLER_COMMAND
+        },
     };
 
     controllerEvents = {
@@ -245,7 +313,9 @@ class Header extends PureComponent {
         this.addShuttleControlEvents();
         this.addControllerEvents();
         this.addResizeEventListener();
+
         useKeybinding(this.shuttleControlEvents);
+        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
 
         if (isElectron()) {
             this.registerIPCListeners();
@@ -299,11 +369,11 @@ class Header extends PureComponent {
 
     addResizeEventListener() {
         this.onResizeThrottled = _.throttle(this.updateScreenSize, 25);
-        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+        window.addEventListener('resize', this.onResizeThrottled);
     }
 
     removeResizeEventListener() {
-        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        window.removeEventListener('resize', this.onResizeThrottled);
         this.onResizeThrottled = null;
     }
 
@@ -325,11 +395,19 @@ class Header extends PureComponent {
     }
 
     updateScreenSize = () => {
-        const isMobile = window.visualViewport.width <= 599;
+        const isMobile = window.screen.width <= 639;
         this.setState({
             mobile: isMobile
         });
     };
+
+    showToast = _.throttle(() => {
+        Toaster.pop({
+            msg: 'Unable to activate GrblHAL ONLY shortcut',
+            type: TOASTER_WARNING,
+            duration: 3000
+        });
+    }, 3000, { trailing: false });
 
     render() {
         const { updateAvailable, hostInformation, mobile } = this.state;

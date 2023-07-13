@@ -46,6 +46,7 @@ import { Toaster, TOASTER_SUCCESS, TOASTER_DANGER } from '../../lib/toaster/Toas
 import {
     // Grbl
     GRBL,
+    GRBLHAL,
     GRBL_ACTIVE_STATE_IDLE,
     GRBL_ACTIVE_STATE_RUN,
     // Marlin
@@ -358,7 +359,7 @@ class MacroWidget extends PureComponent {
         if (workflow.state === WORKFLOW_STATE_RUNNING) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], type)) {
+        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG, GRBLHAL], type)) {
             return false;
         }
 

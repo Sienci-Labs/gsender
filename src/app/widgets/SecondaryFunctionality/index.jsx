@@ -29,6 +29,7 @@ import controller from 'app/lib/controller';
 import CoolantWidget from 'app/widgets/Coolant';
 import WidgetConfig from '../WidgetConfig';
 import ProbeWidget from '../Probe';
+import RotaryWidget from '../Rotary';
 import MacroWidget from '../Macro';
 import ConsoleWidget from '../Console';
 
@@ -178,7 +179,12 @@ class SecondaryFunctionality extends PureComponent {
                     label: 'Coolant',
                     widgetId: 'coolant',
                     component: CoolantWidget
-                }
+                },
+                {
+                    label: 'Rotary',
+                    widgetId: 'rotary',
+                    component: RotaryWidget
+                },
             ]
         };
     }

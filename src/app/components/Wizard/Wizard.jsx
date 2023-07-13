@@ -30,6 +30,8 @@ import { useWizardContext, useWizardAPI } from 'app/components/Wizard/context';
 import cx from 'classnames';
 import MinMaxButton from 'app/components/Wizard/components/MinMaxButton';
 import CancelButton from 'app/components/Wizard/components/CancelButton';
+import { CSSTransition } from 'react-transition-group';
+
 
 const Wizard = () => {
     const { title, visible, minimized, activeStep, overlay, steps } = useWizardContext();
@@ -66,10 +68,22 @@ const Wizard = () => {
                             <CancelButton />
                         </div>
                     </div>
-                    <div className={cx(styles.wizardContent, { [styles.hidden]: minimized })}>
-                        <Stepper />
-                        <Instructions />
-                    </div>
+                    <CSSTransition
+                        key="wizContent"
+                        timeout={350}
+                        classNames={{
+                            enterActive: styles.maximizeActive,
+                            enterDone: styles.maximizeDone,
+                            exitActive: styles.minimizeActive,
+                            exitDone: styles.minimizeDone
+                        }}
+                    >
+                        <div id="wizContent" className={cx(styles.wizardContent, { [styles.hidden]: minimized })}>
+                            <Stepper />
+                            <Instructions />
+                        </div>
+                    </CSSTransition>
+
                 </div>
             </div>
         </>

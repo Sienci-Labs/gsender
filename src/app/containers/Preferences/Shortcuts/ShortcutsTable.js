@@ -40,6 +40,7 @@ import {
     TOOLBAR_CATEGORY,
     MACRO_CATEGORY,
     COOLANT_CATEGORY,
+    GRBLHAL
 } from 'app/constants';
 
 import { formatShortcut } from './helpers';
@@ -125,24 +126,24 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                 [PROBING_CATEGORY]: 'categoryPurple',
                 [SPINDLE_LASER_CATEGORY]: 'categoryBlack',
                 [GENERAL_CATEGORY]: 'categoryGrey',
-                [TOOLBAR_CATEGORY]: 'categoryWhite',
+                [TOOLBAR_CATEGORY]: 'categoryShipCove',
                 [MACRO_CATEGORY]: 'categoryLightBlue',
                 [COOLANT_CATEGORY]: 'categoryDarkRed'
             };
 
             const rowCategory = allShuttleControlEvents[row.cmd] ? allShuttleControlEvents[row.cmd].category : row.category;
             const category = categories[rowCategory];
-
             return (
                 <div className={styles[category]}>{rowCategory}</div>
             );
         },
         renderTitleCell: (_, row) => {
             const rowTitle = allShuttleControlEvents[row.cmd] ? allShuttleControlEvents[row.cmd].title : row.title;
+            const isSpecial = allShuttleControlEvents[row.cmd]?.payload?.type === GRBLHAL;
             return (
-                <div>{rowTitle}</div>
+                <div>{rowTitle}{isSpecial ? <strong>*</strong> : ''}</div>
             );
-        }
+        },
     };
 
     const columns = [

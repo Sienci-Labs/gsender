@@ -26,6 +26,9 @@ import noop from 'lodash/noop';
 import partition from 'lodash/partition';
 import { SerialPort } from 'serialport';
 import socketIO from 'socket.io';
+import { app } from 'electron';
+import fs from 'fs';
+import path from 'path';
 //import socketioJwt from 'socketio-jwt';
 import EventTrigger from '../../lib/EventTrigger';
 import logger from '../../lib/logger';
@@ -35,9 +38,11 @@ import config from '../configstore';
 import taskRunner from '../taskrunner';
 import FlashingFirmware from '../../lib/Firmware/Flashing/firmwareflashing';
 import {
-    GrblController
+    GrblController,
+    GrblHalController
 } from '../../controllers';
 import { GRBL } from '../../controllers/Grbl/constants';
+import { GRBLHAL } from '../../controllers/Grblhal/constants';
 import {
     authorizeIPAddress,
     //validateUser
@@ -55,7 +60,12 @@ const caseInsensitiveEquals = (str1, str2) => {
     return str1 === str2;
 };
 
-const isValidController = (controller) => caseInsensitiveEquals(GRBL, controller);
+const isValidController = (controller) => (
+    // Standard GRBL
+    caseInsensitiveEquals(GRBL, controller) ||
+    // GrblHal
+    caseInsensitiveEquals(GRBLHAL, controller)
+);
 
 class CNCEngine {
     controllerClass = {};
@@ -106,6 +116,7 @@ class CNCEngine {
     // @param {string} controller Specify CNC controller.
     start(server, controller = '') {
         // Fallback to an empty string if the controller is not valid
+        log.debug(controller);
         if (!isValidController(controller)) {
             controller = '';
         }
@@ -113,6 +124,9 @@ class CNCEngine {
         // Grbl
         if (!controller || caseInsensitiveEquals(GRBL, controller)) {
             this.controllerClass[GRBL] = GrblController;
+        }
+        if (!controller || caseInsensitiveEquals(GRBLHAL, controller)) {
+            this.controllerClass[GRBLHAL] = GrblHalController;
         }
 
         if (Object.keys(this.controllerClass).length === 0) {
@@ -172,8 +186,23 @@ class CNCEngine {
 
                 // User-defined baud rates and ports
                 baudrates: ensureArray(config.get('baudrates', [])),
-                ports: ensureArray(config.get('ports', []))
+                ports: ensureArray(config.get('ports', [])),
+                socketsLength: this.sockets.length
             });
+
+            socket.on('newConnection', () => {
+                // if the sockets include more than the original desktop client
+                // check if electron app is defined
+                if (this.sockets.length > 1 && app) {
+                    const userDataPath = path.join(app.getPath('userData'), 'preferences.json');
+
+                    if (fs.existsSync(userDataPath)) {
+                        const content = fs.readFileSync(userDataPath, 'utf8') || '{}';
+                        socket.emit('connection:new', content);
+                    }
+                }
+            });
+
             socket.on('disconnect', () => {
                 log.debug(`Disconnected from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`);
 
@@ -236,14 +265,11 @@ class CNCEngine {
                             });
 
                         // Filter ports by productId to avoid non-arduino devices from appearing
-                        const validProductIDs = ['6015', '6001', '606D', '003D', '0042', '0043', '2341', '7523', 'EA60', '2303', '2145', '0AD8', '08D8'];
-                        const validVendorIDs = ['1D50', '0403', '2341', '0042', '1A86', '10C4', '067B', '03EB', '16D0'];
+                        const validProductIDs = ['6015', '6001', '606D', '003D', '0042', '0043', '2341', '7523', 'EA60', '2303', '2145', '0AD8', '08D8', '5740'];
+                        const validVendorIDs = ['1D50', '0403', '2341', '0042', '1A86', '10C4', '067B', '03EB', '16D0', '0483'];
                         let [recognizedPorts, unrecognizedPorts] = partition(ports, (port) => {
                             return validProductIDs.includes(port.productId) && validVendorIDs.includes(port.vendorId);
                         });
-
-                        /*ports = ports.filter(port => validProductIDs.includes(port.productId));
-                        ports = ports.filter(port => validVendorIDs.includes(port.vendorId));*/
 
                         const portInfoMapFn = (port) => {
                             return {
@@ -293,8 +319,8 @@ class CNCEngine {
             });
 
             // Open serial port
-            socket.on('open', (port, options, callback = noop) => {
-                const numClients = this.io.sockets.adapter.rooms.get(port)?.size || 0;
+            socket.on('open', (port, controllerType, options, callback = noop) => {
+                //const numClients = this.io.sockets.adapter.rooms.get(port)?.size || 0;
                 if (typeof callback !== 'function') {
                     callback = noop;
                 }
@@ -303,7 +329,9 @@ class CNCEngine {
 
                 let controller = store.get(`controllers["${port}"]`);
                 if (!controller) {
-                    let { controllerType = GRBL, baudrate, rtscts } = { ...options };
+                    let { baudrate, rtscts } = { ...options };
+
+                    console.log({ options });
 
                     const Controller = this.controllerClass[controllerType];
                     if (!Controller) {
@@ -324,13 +352,8 @@ class CNCEngine {
                 controller.addConnection(socket);
                 // Load file to controller if it exists
                 if (this.hasFileLoaded()) {
-                    if (numClients === 0) {
-                        console.log(this.meta);
-                        controller.loadFile(this.gcode, this.meta);
-                        socket.emit('file:load', this.gcode, this.meta.name, this.meta.size);
-                    } else {
-                        log.debug('File already loaded in another socket');
-                    }
+                    controller.loadFile(this.gcode, this.meta);
+                    socket.emit('file:load', this.gcode, this.meta.size, this.meta.name);
                 } else {
                     log.debug('No file in CNCEngine to load to sender');
                 }
@@ -387,7 +410,7 @@ class CNCEngine {
                 // Leave the room
                 socket.leave(port);
 
-                if (numClients === 1) { // if only this one was connected
+                if (numClients <= 1) { // if only this one was connected
                     controller.close(err => {
                         // Remove controller from store
                         store.unset(`controllers[${JSON.stringify(port)}]`);

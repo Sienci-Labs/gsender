@@ -29,7 +29,6 @@ import styles from './index.styl';
 
 const Axes = (props) => {
     const { state, actions } = props;
-
     if (state.isSecondary) {
         return (
             <div className={styles.jogWidget}>
@@ -44,6 +43,7 @@ const Axes = (props) => {
                     activeState={state.activeState}
                     selectedSpeed={state.selectedSpeed}
                     canJog={state.canJog}
+                    firmwareType={state.type}
                 />
             </div>
         );
@@ -62,6 +62,7 @@ const Axes = (props) => {
                 activeState={state.activeState}
                 selectedSpeed={state.selectedSpeed}
                 canJog={state.canJog}
+                firmwareType={state.type}
             />
             <SpeedControls state={state} actions={actions} />
         </div>

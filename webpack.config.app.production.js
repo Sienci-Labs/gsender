@@ -238,6 +238,9 @@ module.exports = {
         new HtmlWebpackPlugin({
             chunksSortMode: 'dependency', // Sort chunks by dependency
             title: `gSender ${pkg.version}`,
+            meta: {
+                'viewport': 'width=device-width, initial-scale=1, maximum-scale=1',
+            }
         })
     ],
     resolve: {

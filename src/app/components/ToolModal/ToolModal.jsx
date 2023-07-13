@@ -27,13 +27,16 @@ import PropTypes from 'prop-types';
 import Modal from 'app/components/Modal';
 
 import styles from './index.styl';
-import { LARGE, MEDIUM, SMALL } from './sizings';
+import { LARGE, MEDIUM, SMALL, XSMALL } from './sizings';
 
 
 const ToolModal = ({ onClose, title, style, className, size, children, disableOverlayClick = false, ...rest }) => {
     let sizingStyles;
 
     switch (size?.toLowerCase()) {
+    case 'xs':
+        sizingStyles = XSMALL;
+        break;
     case 'small':
     case 'sm':
         sizingStyles = SMALL;

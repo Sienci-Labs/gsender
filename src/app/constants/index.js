@@ -88,6 +88,7 @@ export const METRIC_STEPS = [
 
 // Controller
 export const GRBL = 'Grbl';
+export const GRBLHAL = 'grblHAL';
 export const MARLIN = 'Marlin';
 export const SMOOTHIE = 'Smoothie';
 export const TINYG = 'TinyG';
@@ -108,6 +109,18 @@ export const GRBL_ACTIVE_STATE_ALARM = 'Alarm';
 export const GRBL_ACTIVE_STATE_CHECK = 'Check';
 export const GRBL_ACTIVE_STATE_JOG = 'Jog';
 export const GRBL_ACTIVE_STATE_TESTING = 'Testing File';
+
+// grblHal Active State
+export const GRBL_HAL_ACTIVE_STATE_IDLE = 'Idle';
+export const GRBL_HAL_ACTIVE_STATE_RUN = 'Run';
+export const GRBL_HAL_ACTIVE_STATE_HOLD = 'Hold';
+export const GRBL_HAL_ACTIVE_STATE_DOOR = 'Door';
+export const GRBL_HAL_ACTIVE_STATE_HOME = 'Home';
+export const GRBL_HAL_ACTIVE_STATE_SLEEP = 'Sleep';
+export const GRBL_HAL_ACTIVE_STATE_ALARM = 'Alarm';
+export const GRBL_HAL_ACTIVE_STATE_CHECK = 'Check';
+export const GRBL_HAL_ACTIVE_STATE_JOG = 'Jog';
+export const GRBL_HAL_ACTIVE_STATE_TESTING = 'Testing File';
 
 export const LASER_MODE = 'laser';
 export const SPINDLE_MODE = 'spindle';
@@ -193,4 +206,26 @@ export const USER_DATA_COLLECTION = {
     INITIAL: 'INITIAL',
     ACCEPTED: 'ACCEPTED',
     REJECTED: 'REJECTED',
+};
+
+export const OVERRIDE_VALUE_RANGES = {
+    MIN: 20,
+    MAX: 200
+};
+
+export const ROTARY_MODE_FIRMWARE_SETTINGS = {
+    $101: '19.75308642',
+    $111: '8000.00',
+    $21: '0'
+};
+
+export const WORKSPACE_MODE = {
+    DEFAULT: 'DEFAULT',
+    ROTARY: 'ROTARY',
+};
+
+export const FILE_TYPE = {
+    DEFAULT: 'DEFAULT',
+    ROTARY: 'ROTARY',
+    FOUR_AXIS: 'FOUR_AXIS'
 };

@@ -20,6 +20,7 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
+import isElectron from 'is-electron';
 import io from 'socket.io-client';
 
 const ensureArray = (...args) => {
@@ -88,7 +89,6 @@ class Controller {
         'controller:state': [],
         'message': [],
         'toolchange:start': [],
-        'toolchange:preHookComplete': [],
         'hPong': [],
         'outline:start': [],
         'file:load': [],
@@ -98,7 +98,18 @@ class Controller {
         'firmware:ready': [],
         'sender:M0M1': [],
         'ip:list': [],
-        'wizard:next': []
+        'wizard:next': [],
+        'realtime_report': [],
+        'error_clear': [],
+        'toolchange:acknowledge': [],
+        'cyclestart_alt': [],
+        'feedhold_alt': [],
+        'virtual_stop_toggle': [],
+        'filetype': [],
+
+        //A-Axis A.K.A Rotary-Axis events
+        'rotaryAxis:updateState': [],
+        'connection:new': [],
     };
 
     context = {
@@ -231,6 +242,11 @@ class Controller {
                 // The callback can only be called once
                 next = null;
             }
+
+            // don't want to update store if it is electron
+            if (!isElectron()) {
+                this.socket && this.socket.emit('newConnection');
+            }
         });
     }
 
@@ -277,7 +293,7 @@ class Controller {
     // @param {string} [options.controllerType] One of: 'Grbl', 'Smoothe', 'TinyG'. Defaults to 'Grbl'.
     // @param {number} [options.baudrate] Defaults to 115200.
     // @param {function} [callback] Called after a connection is opened.
-    openPort(port, options, callback) {
+    openPort(port, controllerType, options, callback) {
         if (typeof options !== 'object') {
             options = {};
             callback = options;
@@ -285,7 +301,7 @@ class Controller {
         if (typeof callback !== 'function') {
             callback = noop;
         }
-        this.socket && this.socket.emit('open', port, options, callback);
+        this.socket && this.socket.emit('open', port, controllerType, options, callback);
     }
 
     // Closes an open connection.

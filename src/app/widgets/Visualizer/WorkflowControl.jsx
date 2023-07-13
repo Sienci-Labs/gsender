@@ -49,6 +49,7 @@ import {
     TOASTER_DANGER,
     TOASTER_WARNING,
     TOASTER_UNTIL_CLOSE,
+    TOASTER_LONG,
     TOASTER_INFO
 } from '../../lib/toaster/ToasterLib';
 import {
@@ -71,6 +72,7 @@ import { UPDATE_FILE_INFO } from '../../actions/fileInfoActions';
 import { outlineResponse } from '../../workers/Outline.response';
 import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 import Tooltip from '../../components/TooltipCustom/ToolTip';
+import { storeUpdate } from '../../lib/storeUpdate';
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
@@ -97,6 +99,7 @@ class WorkflowControl extends PureComponent {
             showRecent: false,
             showLoadFile: false,
             runHasStarted: false,
+            outlineRunning: false,
             startFromLine: {
                 showModal: false,
                 needsRecovery: false,
@@ -224,6 +227,32 @@ class WorkflowControl extends PureComponent {
         controller.command('gcode:test');
     };
 
+    runOutline = () => {
+        if (this.state.outlineRunning) {
+            return;
+        }
+        this.setState({ outlineRunning: true });
+
+        this.workerOutline = new WorkerOutline();
+        const { gcode } = this.props;
+        const machineProfile = store.get('workspace.machineProfile');
+        const spindleMode = store.get('widgets.spindle.mode');
+        // outline toggled on and currently in laser mode
+        const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
+
+        Toaster.pop({
+            TYPE: TOASTER_INFO,
+            duration: TOASTER_LONG,
+            msg: 'Generating outline for current file'
+        });
+        this.workerOutline.onmessage = ({ data }) => {
+            outlineResponse({ data }, machineProfile.laserOnOutline);
+            // Enable the outline button again
+            this.setState({ outlineRunning: false });
+        };
+        this.workerOutline.postMessage({ gcode, isLaser });
+    };
+
     startRun = () => {
         const { activeState } = this.props;
 
@@ -300,25 +329,6 @@ class WorkflowControl extends PureComponent {
         });
     }
 
-    runOutline = () => {
-        this.workerOutline = new WorkerOutline();
-        const { gcode } = this.props;
-        const machineProfile = store.get('workspace.machineProfile');
-        const spindleMode = store.get('widgets.spindle.mode');
-        // outline toggled on and currently in laser mode
-        const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
-
-        Toaster.pop({
-            TYPE: TOASTER_INFO,
-            duration: TOASTER_UNTIL_CLOSE,
-            msg: 'Generating outline for current file'
-        });
-        this.workerOutline.onmessage = ({ data }) => {
-            outlineResponse({ data }, machineProfile.laserOnOutline);
-        };
-        this.workerOutline.postMessage({ gcode, isLaser });
-    }
-
     startFromLinePrompt = () => {
         const { received } = this.props.senderStatus;
         this.setState(prev => ({
@@ -338,7 +348,7 @@ class WorkflowControl extends PureComponent {
         this.setState(prev => ({ startFromLine: { ...prev.startFromLine, showModal: false, needsRecovery: false } }));
         const newSafeHeight = units === IMPERIAL_UNITS ? safeHeight * 25.4 : safeHeight;
         controller.command('gcode:start', value, zMax, newSafeHeight);
-
+        reduxStore.dispatch({ type: UPDATE_JOB_OVERRIDES, payload: { isChecked: true, toggleStatus: 'overrides' } });
         Toaster.pop({
             msg: 'Running Start From Specific Line Command',
             type: TOASTER_SUCCESS,
@@ -408,6 +418,15 @@ class WorkflowControl extends PureComponent {
             }),
             pubsub.subscribe('units:change', (msg, units) => {
                 this.changeUnits(units);
+            }),
+            pubsub.subscribe('store:update', (msg, content) => {
+                storeUpdate(content, true);
+            }),
+            pubsub.subscribe('litemode:change', (msg, isFileLoaded) => {
+                // force update so the workflow controls update correctly for the visualizer used
+                if (!isFileLoaded) {
+                    this.forceUpdate();
+                }
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -480,7 +499,6 @@ class WorkflowControl extends PureComponent {
                                     className={`${styles['workflow-button-upload']}`}
                                     title={i18n._('Load File')}
                                     onClick={this.handleClickUpload}
-                                    style={{ writingMode: 'vertical-lr' }}
                                 >
                                     {i18n._('Load File')} <i className="fa fa-folder-open" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
@@ -505,7 +523,7 @@ class WorkflowControl extends PureComponent {
                                     title={i18n._('Outline')}
                                     onClick={this.runOutline}
                                     disabled={!canRun}
-                                    style={{ writingMode: 'vertical-lr', marginRight: '1rem' }}
+                                    style={{ marginRight: '1rem' }}
                                 >
                                     {i18n._('Outline')} <i className="fas fa-vector-square" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
@@ -515,7 +533,6 @@ class WorkflowControl extends PureComponent {
                                     title={i18n._('Test Run')}
                                     onClick={this.handleTestFile}
                                     disabled={!canRun}
-                                    style={{ writingMode: 'vertical-lr' }}
                                 >
                                     {i18n._('Test Run')} <i className="fa fa-tachometer-alt" style={{ writingMode: 'horizontal-tb' }} />
                                 </button>
@@ -593,7 +610,7 @@ class WorkflowControl extends PureComponent {
                                 <div className={styles.runProbeBody}>
                                     <div className={styles.left}>
                                         <div className={styles.greyText}>
-                                            <p>Close this gcode File?</p>
+                                            <p>Close this g-code File?</p>
                                         </div>
                                         <div className={styles.buttonsContainer}>
                                             <FunctionButton
@@ -641,7 +658,7 @@ class WorkflowControl extends PureComponent {
                                             Recover a carve disrupted by power loss, disconnection,
                                             mechanical malfunction, or other failures
                                         </p>
-                                        <p style={{ marginBottom: '0px' }}>Your job was last stopped around line: <b>{value}</b></p>
+                                        <p style={{ marginBottom: '0px', color: '#000000' }}>Your job was last stopped around line: <b>{value}</b></p>
                                         <p>on a g-code file with a total of <b>{lineTotal}</b> lines</p>
                                         {
                                             value > 0 &&
@@ -689,7 +706,7 @@ class WorkflowControl extends PureComponent {
                                     <div className={styles.startHeader}>
                                         <p style={{ color: '#E2943B' }}>
                                             Accounts for all past CNC movements, units, spindle speeds,
-                                            laser power, Start/Stop gcode, and any other file modals or setup.
+                                            laser power, Start/Stop g-code, and any other file modals or setup.
                                         </p>
                                     </div>
                                     <div className={styles.buttonsContainer}>
@@ -737,7 +754,7 @@ export default connect((store) => {
     const fileCompletion = get(store, 'controller.sender.status.finishTime', 0);
     const zMax = get(store, 'file.bbox.max.z', 0) || 0;
     const homingSetting = get(store, 'controller.settings.settings.$22', 0);
-    const homingEnabled = homingSetting === '1';
+    const homingEnabled = homingSetting !== '0';
     return {
         fileLoaded,
         isConnected,

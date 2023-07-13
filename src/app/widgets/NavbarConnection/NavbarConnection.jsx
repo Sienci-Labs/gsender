@@ -23,10 +23,12 @@
 
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import _, { find } from 'lodash';
+import _ from 'lodash';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
 import PortListing from './PortListing';
 import styles from './Index.styl';
+import StatusIndicator from './StatusIndicator';
+import FirmwareSelector from './FirmwareSelector';
 
 
 class NavbarConnection extends PureComponent {
@@ -57,26 +59,19 @@ class NavbarConnection extends PureComponent {
 
     addResizeEventListener() {
         this.onResizeThrottled = _.throttle(this.updateScreenSize, 25);
-        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+        window.addEventListener('resize', this.onResizeThrottled);
     }
 
     removeResizeEventListener() {
-        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        window.removeEventListener('resize', this.onResizeThrottled);
         this.onResizeThrottled = null;
     }
 
     updateScreenSize = () => {
-        const isMobile = window.visualViewport.width <= 599;
+        const isMobile = window.screen.width <= 639;
         this.setState({
             mobile: isMobile
         });
-    };
-
-    isPortInUse = (port) => {
-        const { state } = this.props;
-        port = port || state.port;
-        const o = find(state.ports, { port }) || {};
-        return !!(o.inuse);
     };
 
     getConnectionStatusText = (connected, connecting, alertMessage,) => {
@@ -90,28 +85,6 @@ class NavbarConnection extends PureComponent {
         return 'Connect to Machine ▼';
     };
 
-    renderConnectionStatusIcon = (connected, connecting, alertMessage) => {
-        if (connected) {
-            return 'fa-check';
-        } else if (alertMessage) {
-            return 'fa-times';
-        } else if (connecting) {
-            return 'fa-spinner';
-        }
-        return 'fa-plug';
-    };
-
-    getIconState(connected, connecting, alertMessage) {
-        if (connected) {
-            return 'icon-connected';
-        } else if (alertMessage) {
-            return 'icon-error';
-        } else if (connecting) {
-            return 'icon-connecting';
-        }
-        return 'icon-disconnected';
-    }
-
     displayDropdown() {
         const { mobile, isActive } = this.state;
         if (mobile) {
@@ -123,8 +96,7 @@ class NavbarConnection extends PureComponent {
         const { state, actions } = this.props;
         const { connected, ports, connecting, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
         const { isActive } = this.state;
-        const iconState = this.getIconState(connected, connecting, alertMessage);
-        const isMobile = window.visualViewport.width <= 599;
+        const isMobile = window.screen.width <= 639;
 
         return (
             <div
@@ -137,8 +109,8 @@ class NavbarConnection extends PureComponent {
                 onMouseLeave={actions.hideUnrecognizedDevices}
                 onTouchEnd={actions.handleRefreshPorts}
             >
-                <div className={`${styles.NavbarConnectionIcon} ${styles[iconState]}`}>
-                    <i className={`fa ${this.renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />
+                <div>
+                    <StatusIndicator {...{ connected, connecting, alertMessage }} />
                 </div>
                 <div>
                     <div className="dropdown-label" id="connection-selection-list">
@@ -163,6 +135,14 @@ class NavbarConnection extends PureComponent {
                     )
                 }
                 <div style={isMobile ? { display: isActive ? 'block' : 'none' } : null} className={styles.NavbarConnectionDropdownList}>
+                    {
+                        !connected && (
+                        <>
+                            <h5>Firmware</h5>
+                            <FirmwareSelector options={['Grbl', 'grblHAL']} selectedFirmware={controllerType} handleSelect={actions.onClickFirmwareButton}/>
+                        </>
+                        )
+                    }
                     {
                         !connected && <h5>Recognized Devices</h5>
                     }

@@ -41,6 +41,7 @@ import { limit } from 'app/lib/normalize-range';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
+import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import { connect } from 'react-redux';
 import store from '../../store';
 import Axes from './Axes';
@@ -57,12 +58,17 @@ import {
     GRBL_ACTIVE_STATE_RUN,
     GRBL_ACTIVE_STATE_IDLE,
     WORKFLOW_STATE_IDLE,
-    //GRBL_ACTIVE_STATE_HOLD,
     WORKFLOW_STATE_RUNNING,
+    WORKFLOW_STATE_PAUSED,
+
     JOGGING_CATEGORY,
+    GENERAL_CATEGORY,
+
     AXIS_X,
     AXIS_Y,
-    AXIS_Z
+    AXIS_Z,
+    AXIS_A,
+    WORKSPACE_MODE,
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -175,10 +181,20 @@ class AxesWidget extends PureComponent {
             const { xyStep } = jog;
             return xyStep;
         },
+        getXAJogDistance: () => {
+            const { jog } = this.state;
+            const { ayStep } = jog;
+            return ayStep;
+        },
         getZJogDistance: () => {
             const { jog } = this.state;
             const { zStep } = jog;
             return zStep;
+        },
+        getAJogDistance: () => {
+            const { jog } = this.state;
+            const { aStep } = jog;
+            return aStep;
         },
         getFeedrate: () => {
             const { jog } = this.state;
@@ -470,12 +486,29 @@ class AxesWidget extends PureComponent {
     };
 
     shuttleControlFunctions = {
-        JOG: (event, { axis = null, direction = 1, factor = 1 }) => {
+        JOG: (event, { axis = null }) => {
+            const isInRotaryMode = store.get('workspace.mode', '') === WORKSPACE_MODE.ROTARY;
+            const firmwareType = this.props.type;
+            const isGrbl = firmwareType.toLocaleLowerCase() === 'grbl';
             if (event) {
                 preventDefault(event);
             }
+            if (axis.a && !isInRotaryMode || axis.a && isInRotaryMode && isGrbl) {
+                return;
+            }
+            this.handleShortcutJog({ axis });
+        },
+        UPDATE_WORKSPACE_MODE: () => {
+            const currentWorkspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
+            const workspaceModesList = Object.values(WORKSPACE_MODE);
+            const currentWorkspaceModeIndex = workspaceModesList.findIndex(mode => mode === currentWorkspaceMode);
+            const nextWorkspaceMode = workspaceModesList[currentWorkspaceModeIndex + 1] ?? workspaceModesList[0];
 
-            this.handleShortcutJog({ axis, direction });
+            store.replace('workspace.mode', nextWorkspaceMode);
+
+            const msg = `Workspace Mode set to ${nextWorkspaceMode.charAt(0).toUpperCase() + nextWorkspaceMode.slice(1).toLowerCase()}`;
+            Toaster.clear();
+            Toaster.pop({ type: TOASTER_SUCCESS, msg });
         },
         SET_JOG_PRESET: (event, { key }) => {
             if (!key) {
@@ -572,6 +605,42 @@ class AxesWidget extends PureComponent {
     }
 
     shuttleControlEvents = {
+        JOG_A_PLUS: { // Jog A+
+            id: 100,
+            title: 'Jog: A+',
+            keys: ['ctrl', '6'].join('+'),
+            cmd: 'JOG_A_PLUS',
+            payload: {
+                axis: { [AXIS_A]: 1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG,
+        },
+        JOG_A_MINUS: { // Jog A-
+            id: 101,
+            title: 'Jog: A-',
+            keys: ['ctrl', '4'].join('+'),
+            cmd: 'JOG_A_MINUS',
+            payload: {
+                axis: { [AXIS_A]: -1 },
+            },
+            preventDefault: false,
+            isActive: true,
+            category: JOGGING_CATEGORY,
+            callback: this.shuttleControlFunctions.JOG,
+        },
+        SWITCH_WORKSPACE_MODE: {
+            id: 103,
+            title: 'Switch Between Workspace Modes',
+            keys: ['ctrl', '5'].join('+'),
+            cmd: 'SWITCH_WORKSPACE_MODE',
+            preventDefault: false,
+            isActive: true,
+            category: GENERAL_CATEGORY,
+            callback: this.shuttleControlFunctions.UPDATE_WORKSPACE_MODE
+        },
         JOG_X_P: {
             title: 'Jog: X+',
             keys: 'shift+right',
@@ -584,9 +653,7 @@ class AxesWidget extends PureComponent {
             preventDefault: false,
             isActive: true,
             category: JOGGING_CATEGORY,
-            callback: (event, { axis = null, direction = 1, factor = 1 }) => {
-                this.shuttleControlFunctions.JOG(event, { axis, direction, factor });
-            }
+            callback: this.shuttleControlFunctions.JOG
         },
         JOG_X_M: {
             title: 'Jog: X-',
@@ -816,11 +883,12 @@ class AxesWidget extends PureComponent {
 
     handleShortcutJog = ({ axis }) => {
         const { isContinuousJogging } = this.state;
-        const { getXYJogDistance, getZJogDistance } = this.actions;
+        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
         const { canJog } = this.props;
 
         const xyStep = getXYJogDistance();
         const zStep = getZJogDistance();
+        const aStep = getAJogDistance();
 
         if (!axis || isContinuousJogging || !canJog) {
             return;
@@ -829,9 +897,11 @@ class AxesWidget extends PureComponent {
         const feedrate = Number(this.actions.getFeedrate());
 
         const axisValue = {
-            X: xyStep,
-            Y: xyStep,
-            Z: zStep
+            x: xyStep,
+            y: xyStep,
+            z: zStep,
+            a: aStep
+
         };
 
         const jogCB = (given) => this.actions.jog(given);
@@ -844,28 +914,29 @@ class AxesWidget extends PureComponent {
             this.joggingHelper = new JogHelper({ jogCB, startContinuousJogCB, stopContinuousJogCB });
         }
 
-        //Axis will either be a single string value or an object containing multiple axis' (ex. axis.X, axis.Y, axis.Z)
         const axisList = {};
 
         if (axis.x) {
-            axisList.X = axisValue.X * axis.x;
+            axisList.x = axisValue.x * axis.x;
         }
         if (axis.y) {
-            axisList.Y = axisValue.Y * axis.y;
+            axisList.y = axisValue.y * axis.y;
         }
         if (axis.z) {
-            axisList.Z = axisValue.Z * axis.z;
+            axisList.z = axisValue.z * axis.z;
+        }
+        if (axis.a) {
+            axisList.A = axisValue.a * axis.a;
         }
 
-        this.setState({ prevJog: { ...axisList, F: feedrate } });
-        this.joggingHelper.onKeyDown({ ...axisList }, feedrate);
+        this.joggingHelper.onKeyDown(axisList, feedrate);
     }
 
     handleShortcutStop = (payload) => {
-        const { prevJog } = this.state;
+        const feedrate = Number(this.actions.getFeedrate());
 
         if (!payload) {
-            this.joggingHelper && this.joggingHelper.onKeyUp(prevJog);
+            this.joggingHelper && this.joggingHelper.onKeyUp({ F: feedrate });
             return;
         }
 
@@ -890,9 +961,9 @@ class AxesWidget extends PureComponent {
             axisObj[givenAxis] = axisValue;
         }
 
-        const feedrate = Number(this.actions.getFeedrate());
-
-        this.joggingHelper && this.joggingHelper.onKeyUp({ ...axisObj, F: feedrate });
+        if (this.joggingHelper) {
+            this.joggingHelper.onKeyUp({ F: feedrate });
+        }
     }
 
     shuttleControl = null;
@@ -983,6 +1054,8 @@ class AxesWidget extends PureComponent {
             // AXIS Y(1) ________ 0.75 to 0.25
 
             const [
+                APositive,
+                ANegative,
                 YPositive,
                 YNegative,
                 XPositive,
@@ -993,6 +1066,8 @@ class AxesWidget extends PureComponent {
                 BottomRight,
                 UNKNOWN_MOVE
             ] = [
+                'APositive',
+                'ANegative',
                 'YPositive',
                 'YNegative',
                 'XPositive',
@@ -1052,6 +1127,16 @@ class AxesWidget extends PureComponent {
             }
 
             switch (direction) {
+            case APositive: {
+                this.handleShortcutJog({ axis: { a: 1 } });
+                break;
+            }
+
+            case ANegative: {
+                this.handleShortcutJog({ axis: { a: -1 } });
+                break;
+            }
+
             case YPositive: {
                 this.handleShortcutJog({ axis: { y: 1 } });
                 break;
@@ -1161,7 +1246,9 @@ class AxesWidget extends PureComponent {
             },
             jog: {
                 xyStep: this.getInitialXYStep(),
+                ayStep: this.getInitialXAStep(),
                 zStep: this.getInitialZStep(),
+                aStep: this.getInitialAStep(),
                 feedrate: this.getInitialFeedRate(),
                 rapid,
                 normal,
@@ -1189,11 +1276,25 @@ class AxesWidget extends PureComponent {
         return (units === METRIC_UNITS) ? get(speeds, 'mm.xyStep') : get(speeds, 'in.xyStep');
     }
 
+    getInitialXAStep() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+        const speeds = this.config.get('jog.normal');
+
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.xaStep') : get(speeds, 'in.xaStep');
+    }
+
     getInitialZStep() {
         const units = store.get('workspace.units', METRIC_UNITS);
         const speeds = this.config.get('jog.normal');
 
         return (units === METRIC_UNITS) ? get(speeds, 'mm.zStep') : get(speeds, 'in.zStep');
+    }
+
+    getInitialAStep() {
+        const units = store.get('workspace.units', METRIC_UNITS);
+        const speeds = this.config.get('jog.normal');
+
+        return (units === METRIC_UNITS) ? get(speeds, 'mm.aStep') : get(speeds, 'in.aStep');
     }
 
     getInitialFeedRate() {
@@ -1206,13 +1307,17 @@ class AxesWidget extends PureComponent {
     changeUnits(units) {
         const oldUnits = this.state.units;
         const { jog } = this.state;
-        let { zStep, xyStep } = jog;
+        let { zStep, xyStep, aStep, feedrate } = jog;
         if (oldUnits === METRIC_UNITS && units === IMPERIAL_UNITS) {
             zStep = mm2in(zStep).toFixed(3);
             xyStep = mm2in(xyStep).toFixed(3);
+            aStep = mm2in(aStep).toFixed(3);
+            feedrate = mm2in(feedrate).toFixed(2);
         } else if (oldUnits === IMPERIAL_UNITS && units === METRIC_UNITS) {
             zStep = in2mm(zStep).toFixed(2);
             xyStep = in2mm(xyStep).toFixed(2);
+            aStep = in2mm(aStep).toFixed(2);
+            feedrate = in2mm(feedrate).toFixed(0);
         }
 
         this.setState({
@@ -1220,7 +1325,9 @@ class AxesWidget extends PureComponent {
             jog: {
                 ...jog,
                 zStep: zStep,
-                xyStep: xyStep
+                xyStep: xyStep,
+                aStep: aStep,
+                feedrate
             }
         });
     }
@@ -1295,7 +1402,7 @@ class AxesWidget extends PureComponent {
     }
 
     render() {
-        const { widgetId, machinePosition, workPosition, canJog, isSecondary } = this.props;
+        const { widgetId, machinePosition, workPosition, canJog, isSecondary, type } = this.props;
         const { minimized, isFullscreen } = this.state;
         const { units } = this.state;
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
@@ -1305,6 +1412,7 @@ class AxesWidget extends PureComponent {
             ...this.state,
             // Determine if the motion button is clickable
             canClick: this.canClick(),
+            type: type,
             canClickCancel: this.canClickCancel(),
             isJogging: this.isJogging(),
             activeState: activeState,
@@ -1358,7 +1466,7 @@ export default connect((store) => {
     const workPosition = get(store, 'controller.wpos');
     const machinePosition = get(store, 'controller.mpos');
     const workflow = get(store, 'controller.workflow');
-    const canJog = workflow.state === WORKFLOW_STATE_IDLE;
+    const canJog = [WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED].includes(workflow.state);
     const isConnected = get(store, 'connection.isConnected');
     const activeState = get(state, 'status.activeState');
     return {
@@ -1370,6 +1478,6 @@ export default connect((store) => {
         workflow,
         canJog,
         isConnected,
-        activeState
+        activeState,
     };
 })(AxesWidget);

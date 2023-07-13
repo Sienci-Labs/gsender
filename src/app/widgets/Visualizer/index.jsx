@@ -52,6 +52,7 @@ import {
     METRIC_UNITS,
     // Grbl
     GRBL,
+    GRBLHAL,
     GRBL_ACTIVE_STATE_RUN,
     // Marlin
     MARLIN,
@@ -72,8 +73,7 @@ import {
     GRBL_ACTIVE_STATE_CHECK,
     CARVING_CATEGORY,
     GENERAL_CATEGORY,
-    OVERRIDES_CATEGORY,
-    VISUALIZER_CATEGORY,
+    VISUALIZER_CATEGORY, OVERRIDES_CATEGORY,
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
@@ -333,7 +333,9 @@ class VisualizerWidget extends PureComponent {
             };
 
             this.setState(updater, callback);
-            this.visualizer.handleSceneRender(vizualization);
+            if (this.visualizer) {
+                this.visualizer.handleSceneRender(vizualization);
+            }
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
@@ -371,14 +373,15 @@ class VisualizerWidget extends PureComponent {
                             y: 0,
                             z: 0
                         }
-                    }
+                    },
+                    visualization: {}
                 }
             }));
         },
-        onRunClick: () => {
-            this.actions.handleRun();
+        onRunClick: (type) => {
+            this.actions.handleRun(type);
         },
-        handleRun: () => {
+        handleRun: (type) => {
             const { workflow, activeState } = this.props;
             console.assert(includes([WORKFLOW_STATE_IDLE, WORKFLOW_STATE_PAUSED], workflow.state) || activeState === GRBL_ACTIVE_STATE_HOLD);
             this.setState((prev) => ({ invalidGcode: { ...prev.invalidGcode, showModal: false } }));
@@ -389,19 +392,13 @@ class VisualizerWidget extends PureComponent {
             }
 
             if (workflow.state === WORKFLOW_STATE_PAUSED || activeState === GRBL_ACTIVE_STATE_HOLD) {
-                controller.command('gcode:resume');
+                controller.command('gcode:resume', type);
             }
         },
         handlePause: () => {
-            const { workflow } = this.props;
-            console.assert(includes([WORKFLOW_STATE_RUNNING], workflow.state));
-
             controller.command('gcode:pause');
         },
         handleStop: () => {
-            //const { workflow } = this.props;
-            //console.assert(includes([WORKFLOW_STATE_PAUSED], workflow.state));
-
             controller.command('gcode:stop', { force: true });
         },
         handleClose: () => {
@@ -544,23 +541,27 @@ class VisualizerWidget extends PureComponent {
                 }
             },
             toTopView: () => {
-                this.setState({ cameraPosition: 'top' });
+                this.setState({ cameraPosition: 'Top' });
             },
             to3DView: () => {
-                this.setState({ cameraPosition: '3d' });
+                this.setState({ cameraPosition: '3D' });
             },
             toFrontView: () => {
-                this.setState({ cameraPosition: 'front' });
+                this.setState({ cameraPosition: 'Front' });
             },
             toLeftSideView: () => {
-                this.setState({ cameraPosition: 'left' });
+                this.setState({ cameraPosition: 'Left' });
             },
             toRightSideView: () => {
-                this.setState({ cameraPosition: 'right' });
+                this.setState({ cameraPosition: 'Right' });
+            },
+            toFreeView: () => {
+                this.setState({ cameraPosition: 'Free' });
             }
         },
         handleLiteModeToggle: () => {
-            const { liteMode, gcode } = this.state;
+            const { liteMode } = this.state;
+            const { isFileLoaded } = this.props;
             const newLiteModeValue = !liteMode;
 
             this.setState({
@@ -568,7 +569,10 @@ class VisualizerWidget extends PureComponent {
                 minimizeRenders: newLiteModeValue
             });
 
-            pubsub.publish('litemode:change', gcode);
+            // instead of calling loadGCode right away,
+            // use this pubsub to invoke a refresh of the visualizer wrapper.
+            // this removes visual glitches that would otherwise appear.
+            pubsub.publish('litemode:change', isFileLoaded);
         },
         lineWarning: {
             onContinue: () => {
@@ -607,7 +611,7 @@ class VisualizerWidget extends PureComponent {
             pubsub.publish('gcode:fileInfo');
             pubsub.publish('gcode:unload');
             Toaster.pop({
-                msg: 'Gcode File Closed',
+                msg: 'G-code File Closed',
                 icon: 'fa-exclamation'
             });
         }
@@ -774,6 +778,7 @@ class VisualizerWidget extends PureComponent {
                 sent: 0,
                 received: 0,
                 loadedBeforeConnection: false,
+                visualization: {}
             },
             disabled: this.config.get('disabled', false),
             disabledLite: this.config.get('disabledLite'),
@@ -804,7 +809,7 @@ class VisualizerWidget extends PureComponent {
                 }
             },
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
-            cameraPosition: '3d', // 'top', '3d', 'front', 'left', 'right'
+            cameraPosition: '3D', // 'Top', '3D', 'Front', 'Left', 'Right'
             isAgitated: false, // Defaults to false
             currentTheme: this.getVisualizerTheme(),
             currentTab: 0,
@@ -822,9 +827,17 @@ class VisualizerWidget extends PureComponent {
                 line: '',
             },
             layoutIsReversed: store.get('workspace.reverseWidgets'),
-
+            workspaceMode: store.get('workspace.mode'),
         };
     }
+
+    showToast = _.throttle(() => {
+        Toaster.pop({
+            msg: 'Unable to activate GrblHAL ONLY shortcut',
+            type: TOASTER_WARNING,
+            duration: 3000
+        });
+    }, 3000, { trailing: false });
 
     shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
@@ -869,6 +882,26 @@ class VisualizerWidget extends PureComponent {
                 return;
             }
         },
+        START_JOB: (_, { type }) => {
+            const { controllerType } = this.props;
+            // if it's a grblHAL only shortcut, don't run it
+            if (type === GRBLHAL && controllerType !== GRBLHAL) {
+                this.showToast();
+                return;
+            }
+            if (this.workflowControl) {
+                this.workflowControl.startRun(type);
+            }
+        },
+        PAUSE_JOB: (_, { type }) => {
+            const { controllerType } = this.props;
+            // if it's a grblHAL only shortcut, don't run it
+            if (type === GRBLHAL && controllerType !== GRBLHAL) {
+                this.showToast();
+                return;
+            }
+            this.actions.handlePause(type);
+        },
         VISUALIZER_VIEW: (_, { type }) => {
             const {
                 to3DView,
@@ -902,12 +935,12 @@ class VisualizerWidget extends PureComponent {
             } = this.actions.camera;
 
             const cameraViews = [
-                '3d',
-                'top',
-                'front',
-                'right',
-                'left',
-                'default',
+                '3D',
+                'Top',
+                'Front',
+                'Right',
+                'Left',
+                'Default',
             ];
 
             let currIndex = cameraViews.findIndex(view => view === this.state.cameraPosition);
@@ -921,12 +954,12 @@ class VisualizerWidget extends PureComponent {
             const currView = cameraViews[currIndex];
 
             const changeCamera = {
-                '3d': to3DView,
-                'top': toTopView,
-                'front': toFrontView,
-                'right': toRightSideView,
-                'left': toLeftSideView,
-                'default': () => {
+                '3D': to3DView,
+                'Top': toTopView,
+                'Front': toFrontView,
+                'Right': toRightSideView,
+                'Left': toLeftSideView,
+                'Default': () => {
                     const { cameraPosition } = this.getInitialState();
                     this.setState({ cameraPosition });
                 }
@@ -987,20 +1020,44 @@ class VisualizerWidget extends PureComponent {
                 controller.command('gcode:test');
             },
         },
+        RUN_OUTLINE: {
+            title: 'Run Outline',
+            keys: '',
+            cmd: 'RUN_OUTLINE',
+            preventDefault: false,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                if (this.workflowControl) {
+                    this.workflowControl.runOutline();
+                }
+            },
+        },
         START_JOB: {
             title: 'Start Job',
             keys: '~',
             gamepadKeys: '9',
             keysName: 'Start',
             cmd: 'START_JOB',
+            payload: {
+                type: GRBL
+            },
             preventDefault: true,
             isActive: true,
             category: CARVING_CATEGORY,
-            callback: () => {
-                if (this.workflowControl) {
-                    this.workflowControl.startRun();
-                }
+            callback: this.shuttleControlFunctions.START_JOB
+        },
+        START_JOB_ALT: {
+            title: 'Start Job (Alt)',
+            keys: ['ctrl', '`'].join('+'),
+            cmd: 'START_JOB_ALT',
+            payload: {
+                type: GRBLHAL
             },
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: this.shuttleControlFunctions.START_JOB
         },
         PAUSE_JOB: {
             title: 'Pause Job',
@@ -1008,12 +1065,25 @@ class VisualizerWidget extends PureComponent {
             gamepadKeys: '2',
             keysName: 'X',
             cmd: 'PAUSE_JOB',
+            payload: {
+                type: GRBL
+            },
             preventDefault: true,
             isActive: true,
             category: CARVING_CATEGORY,
-            callback: () => {
-                this.actions.handlePause();
+            callback: this.shuttleControlFunctions.PAUSE_JOB
+        },
+        PAUSE_JOB_ALT: {
+            title: 'Pause Job (Alt)',
+            keys: ['ctrl', '1'].join('+'),
+            cmd: 'PAUSE_JOB_ALT',
+            payload: {
+                type: GRBLHAL
             },
+            preventDefault: true,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: this.shuttleControlFunctions.PAUSE_JOB
         },
         STOP_JOB: {
             title: 'Stop Job',
@@ -1276,7 +1346,8 @@ class VisualizerWidget extends PureComponent {
 
                 // Ignore shortcut for toggling all other shortcuts to
                 // allow them to be turned on and off
-                const allDisabled = Object.entries(shortcuts)
+                const allDisabled = Object
+                    .entries(shortcuts)
                     .filter(([key, shortcut]) => (allShuttleControlEvents[key] ? allShuttleControlEvents[key].title : shortcut.title) !== 'Toggle Shortcuts')
                     .every(([key, shortcut]) => !shortcut.isActive);
                 const keybindings = _.cloneDeep(shortcuts);
@@ -1327,7 +1398,7 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT
         },
         VISUALIZER_ZOOM_FIT: {
-            title: 'Zoom Fit',
+            title: 'Zoom In',
             keys: ['shift', 'i'].join('+'),
             cmd: 'VISUALIZER_ZOOM_FIT',
             payload: { type: 'default' },
@@ -1388,10 +1459,10 @@ class VisualizerWidget extends PureComponent {
         if (!objects.cuttingTool.visible) {
             return false;
         }
-        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG], controllerType)) {
+        if (!includes([GRBL, MARLIN, SMOOTHIE, TINYG, GRBLHAL], controllerType)) {
             return false;
         }
-        if (controllerType === GRBL) {
+        if (controllerType === GRBL || controllerType === GRBLHAL) {
             if (activeState !== GRBL_ACTIVE_STATE_RUN && activeState !== GRBL_ACTIVE_STATE_CHECK) {
                 return false;
             }
@@ -1448,7 +1519,29 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('gcode:surfacing', async (_, { gcode, name, size }) => {
                 const file = new File([gcode], name);
                 await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
-            })
+            }),
+            pubsub.subscribe('file:content', (_, content, size, name) => {
+                this.setState({
+                    gcode: {
+                        ...this.state.gcode,
+                        content: content,
+                        size: size,
+                        name: name
+                    }
+                });
+            }),
+            pubsub.subscribe('file:load', (_, data) => {
+                this.setState({
+                    gcode: {
+                        ...this.state.gcode,
+                        visualization: data
+                    }
+                });
+            }),
+            pubsub.subscribe('gcode:rotarySetup', async (_, { setupFile, name }) => {
+                const file = new File([setupFile], name);
+                await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -1508,7 +1601,7 @@ class VisualizerWidget extends PureComponent {
                     }}
                     gcode={gcode}
                     surfacingData={surfacingData}
-                    cameraPosition="top"
+                    cameraPosition="Top"
                 />
             )
             : (
@@ -1550,7 +1643,7 @@ export default connect((store) => {
     const activeState = get(store, 'controller.state.status.activeState');
     const alarmCode = get(store, 'controller.state.status.alarmCode');
     const overrides = get(store, 'controller.state.status.ov', [0, 0, 0]);
-
+    const isFileLoaded = get(store, 'file.fileLoaded');
     const { activeVisualizer } = store.visualizer;
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
@@ -1569,6 +1662,7 @@ export default connect((store) => {
         activeState,
         activeVisualizer,
         alarmCode,
+        isFileLoaded,
         ovF,
         ovS
     };

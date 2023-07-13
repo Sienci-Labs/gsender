@@ -25,7 +25,8 @@ const IdleInfo = ({ state, ...props }) => {
         spindleSet,
         toolSet,
         movementSet,
-        estimatedTime
+        estimatedTime,
+        usedAxes
     } = props;
 
     let convertedFeedMin, convertedFeedMax, feedUnits;
@@ -98,13 +99,17 @@ const IdleInfo = ({ state, ...props }) => {
 
     const formattedEstimateTime = formatEstimatedTime(estimatedTime);
 
+    const usedAxesStr = usedAxes ? [...usedAxes].toString() : '';
+
     return fileLoaded ? (
         <div className={styles['idle-info']}>
             <div className={styles.idleInfoRow}>
                 <FileStat label="Attributes">
-                    {`${formattedEstimateTime}`}
+                    Axes Used: {usedAxesStr}
                     <br />
-                    {`${feedString}`}
+                    {formattedEstimateTime}
+                    <br />
+                    {feedString}
                 </FileStat>
                 <FileStat label="Spindle">
                     {
@@ -182,6 +187,7 @@ export default connect((store) => {
         ...file,
         movementSet,
         toolSet,
-        spindleSet
+        spindleSet,
+        usedAxes: file.usedAxes
     };
 })(IdleInfo);

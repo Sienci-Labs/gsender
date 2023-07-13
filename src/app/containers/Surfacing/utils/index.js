@@ -11,7 +11,6 @@ export function convertValuesToImperial(surfacing) {
         length: convertTo(IMPERIAL_UNITS, surfacing.length),
         width: convertTo(IMPERIAL_UNITS, surfacing.width),
         bitDiameter: convertTo(IMPERIAL_UNITS, surfacing.bitDiameter),
-        spindleRPM: convertTo(IMPERIAL_UNITS, surfacing.spindleRPM),
         skimDepth: convertTo(IMPERIAL_UNITS, surfacing.skimDepth),
         maxDepth: convertTo(IMPERIAL_UNITS, surfacing.maxDepth),
         feedrate: convertTo(IMPERIAL_UNITS, surfacing.feedrate)
@@ -24,7 +23,6 @@ export function convertValuesToMetric(surfacing) {
         length: convertTo(METRIC_UNITS, surfacing.length),
         width: convertTo(METRIC_UNITS, surfacing.width),
         bitDiameter: convertTo(METRIC_UNITS, surfacing.bitDiameter),
-        spindleRPM: convertTo(METRIC_UNITS, surfacing.spindleRPM),
         skimDepth: convertTo(METRIC_UNITS, surfacing.skimDepth),
         maxDepth: convertTo(METRIC_UNITS, surfacing.maxDepth),
         feedrate: convertTo(METRIC_UNITS, surfacing.feedrate)

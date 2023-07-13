@@ -26,8 +26,9 @@ export const connectToLastDevice = (callback) => {
 
     const port = connectionConfig.get('port');
     const baudrate = connectionConfig.get('baudrate');
-    controller.openPort(port, {
-        controllerType: GRBL,
+    const controllerType = connectionConfig.get('controller.type') || GRBL;
+
+    controller.openPort(port, controllerType, {
         baudrate,
         rtscts: false
     }, (err) => {
@@ -79,7 +80,19 @@ export const restoreDefaultSettings = (machineProfile) => {
     controller.command('gcode', values);
 
     Toaster.pop({
-        msg: ('Default Settings Restored'),
+        msg: 'Default Settings Restored',
+        type: TOASTER_INFO,
+    });
+};
+
+export const restoreSingleDefaultSetting = (setting, machineProfile) => {
+    const eepromSettings = machineProfile?.eepromSettings ?? defaultGRBLSettings;
+    const defaultValue = eepromSettings[setting];
+
+    controller.command('gcode', [`${setting}=${defaultValue}`, '$$']);
+
+    Toaster.pop({
+        msg: `Restored Default Value for ${setting}`,
         type: TOASTER_INFO,
     });
 };

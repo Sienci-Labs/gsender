@@ -52,8 +52,7 @@ class NavSidebar extends PureComponent {
     state = this.getInitialState();
 
     reconnectToLastDevice(port, baudrate, controllerType) {
-        controller.openPort(port, {
-            controllerType: controllerType,
+        controller.openPort(port, controllerType, {
             baudrate: baudrate,
             rtscts: false
         }, (err) => {

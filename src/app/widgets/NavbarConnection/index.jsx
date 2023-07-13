@@ -26,7 +26,6 @@ import reverse from 'lodash/reverse';
 import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 import { connect } from 'react-redux';
-import { GRBL } from 'app/constants';
 import includes from 'lodash/includes';
 //import map from 'lodash/map';
 import PropTypes from 'prop-types';
@@ -53,61 +52,27 @@ class NavbarConnectionWidget extends PureComponent {
     state = this.getInitialState();
 
     actions = {
-        toggleFullscreen: () => {
-            const { minimized, isFullscreen } = this.state;
-            this.setState(state => ({
-                minimized: isFullscreen ? minimized : false,
-                isFullscreen: !isFullscreen
-            }));
-        },
         toggleMinimized: () => {
             const { minimized } = this.state;
             this.setState(state => ({
                 minimized: !minimized
             }));
         },
-        clearAlert: () => {
-            this.setState(state => ({
-                alertMessage: ''
-            }));
-        },
-        changeController: (controllerType) => {
-            this.setState(state => ({
-                controllerType: controllerType
-            }));
-        },
-        onChangePortOption: (option) => {
+        onClickFirmwareButton: (selectedFirmware) => {
             this.setState(state => ({
                 alertMessage: '',
-                port: option.value
+                controllerType: selectedFirmware
             }));
+            this.config.set('controller.type', selectedFirmware);
         },
         onClickPortListing: (selectedPort) => {
             this.setState(state => ({
                 alertMessage: '',
                 port: selectedPort.port
             }), () => {
-                const { port, baudrate } = this.state;
-                this.openPort(port, { baudrate: baudrate });
+                const { port, baudrate, controllerType } = this.state;
+                this.openPort(port, controllerType, { baudrate: baudrate });
             });
-        },
-        toggleAutoReconnect: (event) => {
-            const checked = event.target.checked;
-            this.setState(state => ({
-                autoReconnect: checked
-            }));
-        },
-        toggleHardwareFlowControl: (event) => {
-            const checked = event.target.checked;
-            this.setState(state => ({
-                connection: {
-                    ...state.connection,
-                    serial: {
-                        ...state.connection.serial,
-                        rtscts: checked
-                    }
-                }
-            }));
         },
         toggleShowUnrecognized: () => {
             const { showUnrecognized } = this.state;
@@ -117,10 +82,6 @@ class NavbarConnectionWidget extends PureComponent {
         },
         handleRefreshPorts: (event) => {
             this.refreshPorts();
-        },
-        handleOpenPort: (event) => {
-            const { port, baudrate } = this.state;
-            this.openPort(port, { baudrate: baudrate });
         },
         handleClosePort: (event) => {
             const { port } = this.state;
@@ -139,7 +100,7 @@ class NavbarConnectionWidget extends PureComponent {
             alertMessage: '',
             connecting: false,
             connected: true,
-            controllerType: GRBL,
+            controllerType: state.controllerType,
             port: port,
             baudrate: connectedBaudrate
         }));
@@ -187,7 +148,7 @@ class NavbarConnectionWidget extends PureComponent {
 
         this.config.set('minimized', minimized);
         if (controllerType !== type) {
-            this.config.set('controller.type', type);
+            this.config.set('controller.type', controllerType);
         }
         if (port) {
             this.config.set('port', port);
@@ -255,14 +216,14 @@ class NavbarConnectionWidget extends PureComponent {
     }
 
     attemptAutoConnect() {
-        const { autoReconnect, hasReconnected, port, baudrate } = this.state;
+        const { autoReconnect, hasReconnected, port, baudrate, controllerType } = this.state;
         const { ports } = this.props;
 
         if (autoReconnect && !hasReconnected) {
             this.setState(state => ({
                 hasReconnected: true
             }));
-            this.openPort(port, {
+            this.openPort(port, controllerType, {
                 baudrate: baudrate
             });
         } else {
@@ -291,15 +252,14 @@ class NavbarConnectionWidget extends PureComponent {
         controller.listPorts();
     }
 
-    openPort(port, options) {
+    openPort(port, controllerType, options) {
         const { baudrate } = { ...options };
 
         this.setState(state => ({
             connecting: true
         }));
 
-        controller.openPort(port, {
-            controllerType: GRBL,
+        controller.openPort(port, controllerType, {
             baudrate: baudrate,
             rtscts: this.state.connection.serial.rtscts
         }, (err) => {
@@ -360,8 +320,7 @@ class NavbarConnectionWidget extends PureComponent {
         const state = {
             ...this.state,
             ports,
-            unrecognizedPorts,
-            controllerType: GRBL,
+            unrecognizedPorts
         };
         const actions = {
             ...this.actions
