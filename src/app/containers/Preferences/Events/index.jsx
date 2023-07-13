@@ -233,7 +233,7 @@ const Events = ({ active }) => {
         async function fetchEvents() {
             try {
                 const response = await api.events.fetch();
-                const { jsonRecords } = response.body;
+                const { records: jsonRecords } = response.body;
                 const records = new Map(Object.entries(jsonRecords));
                 const startEvent = records.get(PROGRAM_START);
                 const endEvent = records.get(PROGRAM_END);

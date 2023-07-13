@@ -18,10 +18,16 @@ import { addControllerEvents, controllerSettingsLoaded, FirmwareContext, removeC
 import styles from './index.styl';
 
 const getFilteredEEPROM = (settings, eeprom = {}) => {
-    const existingSettings = Object.keys(eeprom);
-    return settings
-        .filter((item) => existingSettings.includes(item.setting))
-        .map((item) => ({ ...item, value: Object.keys(eeprom).length ? eeprom[item.setting] : 0 }));
+    return Object.keys(eeprom).map((setting) => {
+        const properties = settings.find(obj => {
+            return obj.setting === setting;
+        });
+        return {
+            ...properties || {},
+            setting: setting,
+            value: eeprom[setting]
+        };
+    });
 };
 
 const Firmware = ({ modalClose }) => {

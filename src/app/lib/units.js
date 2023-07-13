@@ -121,11 +121,13 @@ export const convertValueToMetricUnits = (pos) => {
     return setDecimalPlacesValue(defaultDecimalPlace, pos, in2mm);
 };
 
+
 export const mapPositionToPreferredUnits = (
     pos,
     currentUnits,
     preferredUnits
 ) => {
+    // Assumption: original value is always mm
     if (currentUnits !== preferredUnits) {
         if (preferredUnits === IMPERIAL_UNITS) {
             return convertValueToImperialUnits(pos);

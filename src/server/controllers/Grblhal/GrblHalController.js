@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -56,7 +57,8 @@ import {
     GRBLHAL_REALTIME_COMMANDS,
     GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
-    GRBL_HAL_SETTINGS, GRBL_ACTIVE_STATE_HOME
+    GRBL_HAL_SETTINGS,
+    GRBL_ACTIVE_STATE_HOME
 } from './constants';
 import {
     METRIC_UNITS,
@@ -715,9 +717,13 @@ class GrblHalController {
         this.runner.on('settings', (res) => {
             const setting = _.find(GRBL_HAL_SETTINGS, { setting: res.name });
 
-            if (!res.message && setting) {
+            if (!res.message) {
                 // Grbl v1.1
-                this.emit('serialport:read', `${res.name}=${res.value} (${setting.message}, ${setting.units})`);
+                if (setting?.message) {
+                    this.emit('serialport:read', `${res.name}=${res.value} (${setting.message}, ${setting.units})`);
+                } else {
+                    this.emit('serialport:read', `${res.name}=${res.value}`);
+                }
             }
         });
 
@@ -1087,11 +1093,13 @@ class GrblHalController {
                 let counter = 3;
                 const interval = setInterval(() => {
                     // check if 3 tries or controller is ready
-                    if (counter === 0 || this.ready) {
+                    if (counter <= 0 || this.ready) {
                         clearInterval(interval);
                         return;
                     }
-                    this.connection.write('$I\n');
+                    if (this.connection) {
+                        this.connection.write('$I\n');
+                    }
                     counter--;
                 }, 3000);
             }, 500);
@@ -1227,7 +1235,6 @@ class GrblHalController {
                 ApplyFirmwareProfile(nameOfMachine, typeOfMachine, port);
             },
             'firmware:grabMachineProfile': () => {
-                // let [values] = args;
                 const machineProfile = store.get('machineProfile');
                 this.emit('sender:status', machineProfile);
             },
@@ -1245,8 +1252,9 @@ class GrblHalController {
                 const dwell = '%wait ; Wait for the planner to empty';
 
                 // add delay to spindle startup if enabled
-                const preferences = store.get('preferences') || { spindle: { delay: false } };
-                const delay = preferences.spindle.delay;
+                const preferences = store.get('preferences', {});
+                const delay = _.get(preferences, 'spindle.delay', false);
+
                 if (delay) {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }

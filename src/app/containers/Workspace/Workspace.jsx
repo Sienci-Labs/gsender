@@ -39,6 +39,8 @@ import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import log from 'app/lib/log';
 import store from 'app/store';
+import { Toaster as Toast, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+
 import * as widgetManager from './WidgetManager';
 import DefaultWidgets from './DefaultWidgets';
 import PrimaryWidgets from './PrimaryWidgets';
@@ -96,7 +98,8 @@ class Workspace extends PureComponent {
         lastHealthUpdate: null,
         mobile: false,
         tablet: false,
-        shouldShowRotate: true
+        shouldShowRotate: true,
+        serverDisconnectReason: null,
     };
 
     pubsubTokens = [];
@@ -162,14 +165,24 @@ class Workspace extends PureComponent {
             this.setState({ disabled: false });
             if (controller.connected) {
                 this.action.closeModal();
+                Toast.pop({
+                    msg: 'Server Reconnected Succesfully',
+                    type: TOASTER_SUCCESS,
+                });
             } else {
+                this.setState({ serverDisconnectReason: 'connect' });
                 this.action.openModal(MODAL_SERVER_DISCONNECTED);
             }
         },
         'connect_error': () => {
             if (controller.connected) {
                 this.action.closeModal();
+                Toast.pop({
+                    msg: 'Server Reconnected Succesfully',
+                    type: TOASTER_SUCCESS,
+                });
             } else {
+                this.setState({ serverDisconnectReason: 'connect_error' });
                 this.action.openModal(MODAL_SERVER_DISCONNECTED);
             }
         },
@@ -177,7 +190,12 @@ class Workspace extends PureComponent {
             this.setState({ disabled: true });
             if (controller.connected) {
                 this.action.closeModal();
+                Toast.pop({
+                    msg: 'Server Reconnected Succesfully',
+                    type: TOASTER_SUCCESS,
+                });
             } else {
+                this.setState({ serverDisconnectReason: 'disconnect' });
                 this.action.openModal(MODAL_SERVER_DISCONNECTED);
                 this.action.reconnect();
             }
@@ -305,11 +323,11 @@ class Workspace extends PureComponent {
     };
 
     updateScreenSize = () => {
-        const isMobile = window.visualViewport.width <= 599;
+        const isMobile = window.screen.width <= 639;
         this.setState({
             mobile: isMobile
         });
-        const isTablet = window.visualViewport.width > 599; //width smaller than height and wider than a phone
+        const isTablet = window.screen.width > 639; //width smaller than height and wider than a phone
         this.setState({
             tablet: isTablet
         });
@@ -352,7 +370,6 @@ class Workspace extends PureComponent {
                 .then((res) => {
                     const { name = '', gcode = '' } = { ...res.body };
                     pubsub.publish('gcode:load', { name, gcode });
-                    log.error('Failed to upload G-code file');
                 })
                 .catch((res) => {
                     log.error('Failed to upload G-code file');
@@ -492,11 +509,11 @@ class Workspace extends PureComponent {
             this.updateScreenSize();
             this.resizeDefaultContainer();
         }, 25);
-        window.visualViewport.addEventListener('resize', this.onResizeThrottled);
+        window.addEventListener('resize', this.onResizeThrottled);
     }
 
     removeResizeEventListener() {
-        window.visualViewport.removeEventListener('resize', this.onResizeThrottled);
+        window.removeEventListener('resize', this.onResizeThrottled);
         this.onResizeThrottled = null;
     }
 
@@ -530,29 +547,24 @@ class Workspace extends PureComponent {
             showPrimaryContainer,
             reverseWidgets,
             mobile,
+            serverDisconnectReason
         } = this.state;
         const hidePrimaryContainer = !showPrimaryContainer;
         const tableStyle = mobile ? styles.workspaceTableMobile : styles.workspaceTable;
         const rowStyle = mobile ? styles.workspaceTableRowMobile : styles.workspaceTableRow;
         const primaryContainerStyle = mobile ? styles.primaryContainerMobile : styles.primaryContainer;
+
+        const modalItem = {
+            [MODAL_FEEDER_PAUSED]: <FeederPaused title={modal.params.title} onClose={this.action.closeModal} />,
+            [MODAL_FEEDER_WAIT]: <FeederWait title={modal.params.title} onClose={this.action.closeModal} />,
+            [MODAL_SERVER_DISCONNECTED]: <ServerDisconnected reason={serverDisconnectReason} onClose={this.action.closeModal} />
+        }[modal.name];
+
         return (
             <ScreenAwake>
                 <div style={style} className={classNames(className, styles.workspace)}>
-                    {modal.name === MODAL_FEEDER_PAUSED && (
-                        <FeederPaused
-                            title={modal.params.title}
-                            onClose={this.action.closeModal}
-                        />
-                    )}
-                    {modal.name === MODAL_FEEDER_WAIT && (
-                        <FeederWait
-                            title={modal.params.title}
-                            onClose={this.action.closeModal}
-                        />
-                    )}
-                    {modal.name === MODAL_SERVER_DISCONNECTED &&
-                        <ServerDisconnected />
-                    }
+                    {modalItem}
+
                     <div
                         className={classNames(
                             styles.dropzoneOverlay,

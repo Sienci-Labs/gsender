@@ -77,12 +77,22 @@
 }
 
 .control-buttons {
+    @media (max-width: 639px), (max-device-width: 639px) {
+        max-width: 33%;
+    }
+    padding: 0 2rem
     display: flex;
     flex-grow 1;
     flex-direction column;
     padding: 0 1rem;
     button {
         margin-bottom: 10px;
+    }
+}
+
+.displaypanelTable{
+     @media (max-width: 639px), (max-device-width: 639px) {
+        width: 50%;
     }
 }
 
@@ -96,7 +106,7 @@
     width: 100%;
     display: flex;
     justify-content: space-around;
-    @media (max-width: 599px) {
+    @media (max-width: 639px), (max-device-width: 639px) {
         display: block;
     }
 }
@@ -126,7 +136,9 @@
 .end-stop-active-controls {
     display: grid;
     grid-template-columns: repeat(3,minmax(0,1fr));
-    @media (max-width: 599px) {
+    height: max-content;
+    margin: auto;
+    @media (max-width: 639px), (max-device-width: 639px) {
         margin-top: 1rem;
         width: 50%;
         height: 40%
@@ -177,7 +189,7 @@
         transform: translateX(5%) rotate(45deg);
         width: 300%;
         text-align: left;
-        @media (max-width: 599px) {
+        @media (max-width: 639px), (max-device-width: 639px) {
             width: 277%;
             transform: translateX(9%) rotate(45deg);
             font-size: 1.4rem !important;
@@ -199,7 +211,7 @@
          transform: translateX(-72%) rotate(-45deg);
         width: 300%;
         text-align: right;
-        @media (max-width: 599px) {
+        @media (max-width: 639px), (max-device-width: 639px) {
             width: 271%;
             transform: translateX(-73%) rotate(-45deg);
             font-size: 1.4rem !important;
@@ -224,7 +236,7 @@
         position: relative;
         bottom: 8px;
 		display: block;
-        @media (max-width: 599px) {
+        @media (max-width: 639px), (max-device-width: 639px) {
             width: 97%;
             transform: translateX(1%) rotate(135deg);
             font-size: 1.4rem !important;
@@ -250,7 +262,7 @@
         bottom: 8px;
 		display: block;
 		text-align: right;
-        @media (max-width: 599px) {
+        @media (max-width: 639px), (max-device-width: 639px) {
             width: 99%;
             transform: translate(3%) rotate(225deg)
             font-size: 1.4rem !important;
@@ -344,4 +356,29 @@
     font-size: 0.9rem;
     width: 90px;
     text-align: center;
+}
+
+.switchWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.grey {
+    color: #8E8E8E;
+}
+
+.goButton {
+    width: 50%;
+    margin-top: 2rem;
+}
+
+.goToLocationModal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }

@@ -392,6 +392,8 @@ export class GCodeProcessor {
             storedPos = this._convertCoordSys(storedPos, null, vmState.activeCoordSys, null, vmState.offsetEnabled && vmState.offset);
             this._processMove(storedPos, null, vmState.feed, null, false);
             isMotion = true;
+        } else if (doMotion) {
+            console.error('Invalid motion detected');
         }
 
         if (!isSimpleMotion) {

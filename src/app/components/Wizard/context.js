@@ -38,6 +38,7 @@ const WizardAPI = createContext({});
 export const WizardProvider = ({ children }) => {
     const [completedStep, setCompletedStep] = useState(-1);
     const [completedSubStep, setCompletedSubStep] = useState(-1);
+    const [intro, setIntro] = useState(null);
     const [activeStep, setActiveStep] = useState(0);
     const [activeSubstep, setActiveSubstep] = useState(0);
     const [title, setTitle] = useState('Wizard');
@@ -74,6 +75,9 @@ export const WizardProvider = ({ children }) => {
                 return '';
             }
             return step.title;
+        },
+        getIntro: () => {
+            return intro;
         },
         getSubsteps: (index) => {
             const step = steps[index];
@@ -213,6 +217,10 @@ export const WizardProvider = ({ children }) => {
             setSteps([...instructions.steps]);
             setStepCount(instructions.steps.length);
             setTitle(title);
+            if (instructions.intro) {
+                setIntro(instructions.intro.description);
+            }
+
             setActiveStep(0);
             setVisible(true);
         },
@@ -264,6 +272,7 @@ export const WizardProvider = ({ children }) => {
             setSteps([]);
             setStepCount(0);
             setMinimized(false);
+            setIsLoading(false);
 
             Toaster.clear();
         }
@@ -297,7 +306,8 @@ export const WizardProvider = ({ children }) => {
                 stepCount,
                 minimized,
                 isLoading,
-                overlay
+                overlay,
+                intro
             }}
         >
             <WizardAPI.Provider value={api}>

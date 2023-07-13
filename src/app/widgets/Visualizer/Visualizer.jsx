@@ -22,6 +22,7 @@
  */
 
 import reduxStore from 'app/store/redux';
+import gsap from 'gsap';
 import { connect } from 'react-redux';
 import * as fileActions from 'app/actions/fileInfoActions';
 import _get from 'lodash/get';
@@ -106,7 +107,7 @@ const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 class Visualizer extends Component {
     static propTypes = {
         show: PropTypes.bool,
-        cameraPosition: PropTypes.oneOf(['top', '3d', 'front', 'left', 'right']),
+        cameraPosition: PropTypes.oneOf(['Top', '3D', 'Front', 'Left', 'Right', 'Free']),
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
@@ -465,19 +466,19 @@ class Visualizer extends Component {
         }
 
         if (prevProps.cameraPosition !== this.props.cameraPosition) {
-            if (this.props.cameraPosition === 'top') {
+            if (this.props.cameraPosition === 'Top') {
                 this.toTopView();
             }
-            if (this.props.cameraPosition === '3d') {
+            if (this.props.cameraPosition === '3D') {
                 this.to3DView();
             }
-            if (this.props.cameraPosition === 'front') {
+            if (this.props.cameraPosition === 'Front') {
                 this.toFrontView();
             }
-            if (this.props.cameraPosition === 'left') {
+            if (this.props.cameraPosition === 'Left') {
                 this.toLeftSideView();
             }
-            if (this.props.cameraPosition === 'right') {
+            if (this.props.cameraPosition === 'Right') {
                 this.toRightSideView();
             }
         }
@@ -539,19 +540,27 @@ class Visualizer extends Component {
     }
 
     rerenderGCode() {
-        const { actions, state } = this.props;
-        const { gcode } = state;
+        const content = reduxStore.getState().file.content;
 
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
             this.group.remove(group);
         }
-        if (gcode.content) {
-            actions.loadGCode('', gcode.content);
-        } else {
-            // reupload the file to update the colours
-            this.uploadGCodeFile(reduxStore.getState().file.content);
-        }
+        // reupload the file to update the colours
+        this.uploadGCodeFile(content);
+    }
+
+    reparseGCode() {
+        const { state } = this.props;
+        const { gcode } = state;
+        // reparse file
+        pubsub.publish('reparseGCode', gcode.content, gcode.size, gcode.name, this.props.isSecondary ? VISUALIZER_SECONDARY : VISUALIZER_PRIMARY);
+    }
+
+    reloadGCode() {
+        const { actions, state } = this.props;
+        const { gcode } = state;
+        actions.loadGCode('', gcode.visualization);
     }
 
     removeSceneGroup() {
@@ -758,14 +767,14 @@ class Visualizer extends Component {
     }
 
     createCuttingPointer() {
-        const { state } = this.props;
-        const { currentTheme } = state;
+        const { state, isConnected } = this.props;
+        const { currentTheme, liteMode } = state;
         this.cuttingPointer = new CuttingPointer({
             color: currentTheme.get(CUTTING_PART),
             diameter: 2
         });
         this.cuttingPointer.name = 'CuttingPointer';
-        this.cuttingPointer.visible = false;
+        this.cuttingPointer.visible = isConnected && (liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible);
         this.group.add(this.cuttingPointer);
     }
 
@@ -995,23 +1004,17 @@ class Visualizer extends Component {
         const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const group = new THREE.Group();
+        const step = units === IMPERIAL_UNITS ? 25.4 : 10;
 
         const { currentTheme } = this.props.state;
 
         { // Coordinate Grid
             const gridLine = new GridLine(
                 gridCount * gridSpacing,
-                gridSpacing,
                 gridCount * gridSpacing,
-                gridSpacing,
-                currentTheme.get(GRID_PART), // center line
+                step,
                 currentTheme.get(GRID_PART) // grid
             );
-            _each(gridLine.children, (o) => {
-                o.material.opacity = 0.15;
-                o.material.transparent = true;
-                o.material.depthWrite = false;
-            });
             gridLine.name = 'GridLine';
             group.add(gridLine);
         }
@@ -1124,19 +1127,20 @@ class Visualizer extends Component {
             return;
         }
 
-        const { state } = this.props;
-        const { units, objects, currentTheme } = state;
+        const { state, isConnected } = this.props;
+        const { units, objects, currentTheme, liteMode } = state;
         const width = this.getVisibleWidth();
         const height = this.getVisibleHeight();
+        const isLaser = isLaserMode();
 
 
         // WebGLRenderer
         this.renderer = new THREE.WebGLRenderer({
-            autoClearColor: true,
-            alpha: true
+            alpha: true,
+            antialias: true
         });
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.shadowMap.type = THREE.BasicShadowMap;
         this.renderer.setClearColor(new THREE.Color(currentTheme.get(BACKGROUND_PART)), 1);
         this.renderer.setSize(width, height);
         this.renderer.clear();
@@ -1204,7 +1208,7 @@ class Visualizer extends Component {
         }
 
         { // Imperial Grid Line Numbers
-            const visible = objects.gridLineNumbers.visible;
+            const visible = objects.gridLineNumbers.visyarnible;
             const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
             imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
             imperialGridLineNumbers.visible = visible && (units === IMPERIAL_UNITS);
@@ -1256,10 +1260,9 @@ class Visualizer extends Component {
 
                 this.cuttingTool = object;
                 this.cuttingTool.name = 'CuttingTool';
-                this.cuttingTool.visible = false;
+                this.cuttingTool.visible = isConnected && !isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
 
                 this.group.add(this.cuttingTool);
-
                 // Update the scene
                 this.updateScene();
             });
@@ -1274,7 +1277,7 @@ class Visualizer extends Component {
                 diameter: 4
             });
             this.laserPointer.name = 'LaserPointer';
-            this.laserPointer.visible = false;
+            this.laserPointer.visible = isConnected && isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
 
             this.group.add(this.laserPointer);
 
@@ -1407,10 +1410,10 @@ class Visualizer extends Component {
 
         if (this.renderer && needUpdateScene) {
             this.renderer.render(this.scene, this.camera);
-            this.copyComposer.render();
+            /*this.copyComposer.render();
             this.fxaaComposer.render();
             this.renderBloom();
-            this.finalComposer.render();
+            this.finalComposer.render();*/
         }
     }
 
@@ -1516,6 +1519,7 @@ class Visualizer extends Component {
         });
         controls.addEventListener('end', () => {
             shouldAnimate = false;
+            this.props.actions.camera.toFreeView();
             this.updateScene();
         });
         controls.addEventListener('change', () => {
@@ -1594,13 +1598,21 @@ class Visualizer extends Component {
         const z0 = wpoz - pivotPoint.z;
 
         if (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY) {
-            this.cuttingTool.position.setX(x0);
-            this.cuttingTool.position.setZ(z0);
+            gsap.to(this.cuttingTool.position, {
+                x: x0,
+                z: z0,
+                duration: 0.25
+            });
 
             return;
         }
 
-        this.cuttingTool.position.set(x0, y0, z0);
+        gsap.to(this.cuttingTool.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
     }
 
     rotateGcodeModal(degrees) {
@@ -1677,7 +1689,12 @@ class Visualizer extends Component {
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        this.laserPointer.position.set(x0, y0, z0);
+        gsap.to(this.laserPointer.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
     }
 
     // Update cutting pointer position
@@ -1692,7 +1709,12 @@ class Visualizer extends Component {
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        this.cuttingPointer.position.set(x0, y0, z0);
+        gsap.to(this.cuttingPointer.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
     }
 
     // Update limits position
@@ -1774,29 +1796,11 @@ class Visualizer extends Component {
 
         // only set the camera if it's the first render
         if (shouldZoom) {
-            switch (this.props.cameraPosition) {
-            case 'top':
+            // if secondary, force top view
+            if (this.props.isSecondary) {
                 this.toTopView();
-                break;
-
-            case '3d':
-                this.to3DView();
-                break;
-
-            case 'front':
-                this.toFrontView();
-                break;
-
-            case 'left':
-                this.toLeftSideView();
-                break;
-
-            case 'right':
-                this.toRightSideView();
-                break;
-
-            default:
-                this.toFrontView();
+            } else { // if primary, force 3d view
+                this.props.actions.camera.to3DView();
             }
             this.didZoom = true;
         }
@@ -2011,7 +2015,7 @@ class Visualizer extends Component {
         }
 
         this.camera.up.set(0, 0, 1);
-        this.camera.position.set(CAMERA_DISTANCE, 0, 0);
+        this.camera.position.set(-CAMERA_DISTANCE, 0, 0);
 
         if (this.viewport) {
             this.viewport.update();
@@ -2027,7 +2031,7 @@ class Visualizer extends Component {
         }
 
         this.camera.up.set(0, 0, 1);
-        this.camera.position.set(-CAMERA_DISTANCE, 0, 0);
+        this.camera.position.set(CAMERA_DISTANCE, 0, 0);
 
         if (this.viewport) {
             this.viewport.update();

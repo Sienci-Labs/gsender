@@ -3,11 +3,17 @@ import classNames from 'classnames';
 import map from 'lodash/map';
 import { useSelector } from 'react-redux';
 import get from 'lodash/get';
+import api from 'app/api';
 
 import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import store from 'app/store';
-import { WORKSPACE_MODE, METRIC_UNITS } from 'app/constants';
+import { WORKSPACE_MODE, METRIC_UNITS, VISUALIZER_PRIMARY } from 'app/constants';
+
+// import {
+//     Toaster,
+//     TOASTER_DANGER
+// } from '../../lib/toaster/ToasterLib';
 
 import styles from './index.styl';
 import RotaryToggle from './RotaryToggle';
@@ -17,8 +23,9 @@ import SpeedPresets from './SpeedPresets';
 import SpeedControls from './SpeedControls';
 // import StockDiameter from './StockDiameter';
 import ActionArea from './ActionArea';
-
 import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../JogControl/constants';
+import PhysicalUnitSetup from './PhysicalUnitSetup';
+import { LINES_UP, QUARTER, SIX } from './constant';
 
 const Rotary = ({ active }) => {
     const [speedPreset, setSpeedPreset] = useState(SPEED_NORMAL);
@@ -27,11 +34,21 @@ const Rotary = ({ active }) => {
         aStep: '5.00',
     });
     const [, setIsContinuousJogging] = useState(false);
+    const [physicalSetupState, setPhysicalSetupState] = useState(initialSetupState());
     const { state: controllerState, type: controllerType } = useSelector(state => state.controller);
 
     const { ROTARY } = WORKSPACE_MODE;
     const workspaceMode = store.get('workspace.mode');
     const enableRotaryAxis = (workspaceMode === ROTARY && controllerType === 'Grbl') || controllerType === 'grblHAL';
+
+    function initialSetupState() {
+        return {
+            showDialogue: false,
+            linesUp: LINES_UP,
+            drillDiameter: QUARTER,
+            holeCount: SIX,
+        };
+    }
 
     const actions = {
         setSelectedSpeed: (speed) => {
@@ -100,6 +117,21 @@ const Rotary = ({ active }) => {
             const command = `G10 P${p} L20 ${axis.toUpperCase()}${value}`;
             controller.command('gcode:safe', command, modal);
         },
+        loadGcode: async (rotarySetupGcode = null) => {
+            const name = 'gSender_RotaryUnitSetup';
+            const file = new File([rotarySetupGcode], name);
+
+            await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
+        }
+
+    };
+
+    const isFileRunning = () => {
+        if (controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run') {
+            return true;
+        } else {
+            return false;
+        }
     };
 
     return (
@@ -116,10 +148,10 @@ const Rotary = ({ active }) => {
                         <p className={styles['rotary-tab-section-title']}>
                             Jog Control
                         </p>
-                        <DROarea actions={actions} canClick={enableRotaryAxis} />
+                        <DROarea actions={actions} canClick={enableRotaryAxis && !isFileRunning()} />
                         <JogControlArea
                             selectedSpeed={speedPreset} actions={actions} jog={jog}
-                            disabled={!enableRotaryAxis}
+                            disabled={!enableRotaryAxis || isFileRunning()}
                         />
                         <SpeedPresets selectedSpeed={speedPreset} actions={actions} />
                         <SpeedControls jog={jog} actions={actions} />
@@ -129,7 +161,15 @@ const Rotary = ({ active }) => {
                         <p className={styles['rotary-tab-section-title']}>Tools</p>
                         <RotaryToggle />
                         {/* <StockDiameter /> */}
-                        <ActionArea />
+                        <ActionArea
+                            physicalSetupState={physicalSetupState}
+                            setPhysicalSetupState={setPhysicalSetupState}
+                        />
+                        <PhysicalUnitSetup
+                            actions={actions}
+                            physicalSetupState={physicalSetupState}
+                            setPhysicalSetupState={setPhysicalSetupState}
+                        />
                     </div>
                 </div>
             </Widget.Content>
