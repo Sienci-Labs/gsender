@@ -548,24 +548,18 @@ export function* initialize() {
                     cancelLabel: 'Close',
                     onConfirm: () => {
                         updateWorkspaceMode(WORKSPACE_MODE.ROTARY);
-                        Toaster.pop({
-                            msg: 'Rotary Mode Enabled',
-                            type: TOASTER_INFO,
-                        });
                     }
                 });
             }
         }
 
-        if (type === FILE_TYPE.FOUR_AXIS) {
-            if (controller.type === 'Grbl') {
-                Confirm({
-                    title: '4 Axis File File Loaded',
-                    content: 'G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
-                    confirmLabel: null,
-                    cancelLabel: 'Close',
-                });
-            }
+        if (type === FILE_TYPE.FOUR_AXIS && controller.type === 'Grbl') {
+            Confirm({
+                title: '4 Axis File File Loaded',
+                content: 'G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
+                confirmLabel: null,
+                cancelLabel: 'Close',
+            });
         }
     });
 

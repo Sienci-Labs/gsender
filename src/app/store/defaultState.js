@@ -299,6 +299,19 @@ const defaultState = {
             touchPlateHeight: 10,
             probeType: 'Auto',
         },
+        rotary: {
+            stockTurning: {
+                defaultOptions: {
+                    bitDiameter: 6.35,
+                    stepover: 0.15,
+                    feedrate: 3000,
+                    stockLength: 100,
+                    startHeight: 25,
+                    finalHeight: 25,
+                    stepdown: 20,
+                }
+            }
+        },
         spindle: {
             minimized: false,
             mode: SPINDLE_MODE,

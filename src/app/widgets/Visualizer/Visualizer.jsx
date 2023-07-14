@@ -46,7 +46,8 @@ import {
     FILE_TYPE,
     WORKSPACE_MODE,
     GRBL,
-    GRBLHAL
+    GRBLHAL,
+    GRBL_ACTIVE_STATE_CHECK
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/CombinedCamera';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -85,10 +86,8 @@ import {
     ZAXIS_PART
 } from './constants';
 import styles from './index.styl';
-import { GRBL_ACTIVE_STATE_CHECK } from '../../../server/controllers/Grbl/constants';
 import WidgetConfig from '../WidgetConfig';
 import { isLaserMode } from '../../lib/laserMode';
-import RotaryStock from './RotaryStock';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -243,7 +242,6 @@ class Visualizer extends Component {
         this.cuttingTool = null;
         this.laserPointer = null;
         this.cuttingPointer = null;
-        this.rotaryStock = null;
         this.limits = null;
         this.visualizer = null;
     }
@@ -271,7 +269,6 @@ class Visualizer extends Component {
         const prevState = prevProps.state;
         const state = this.props.state;
         const isConnected = this.props.isConnected;
-        const controllerType = this.props.controllerType;
 
         // Update the visualizer size whenever the machine is running,
         // to fill the empty area between it and the job status widget when necessary
@@ -377,41 +374,6 @@ class Visualizer extends Component {
                 this.laserPointer.visible = false;
                 this.cuttingPointer.visible = false;
             }
-        }
-
-        if (this.rotaryStock) {
-            const currWorkPos = this.props.workPosition;
-            const prevWorkPos = prevProps.workPosition;
-
-            // Use the y-axis for GRBL, a-axis for GRBLHal
-            const currAxisValue = {
-                [GRBL]: currWorkPos.y,
-                [GRBLHAL]: currWorkPos.a,
-            }[controllerType];
-
-            const prevAxisValue = {
-                [GRBL]: prevWorkPos.y,
-                [GRBLHAL]: prevWorkPos.a,
-            }[controllerType];
-
-            if (currAxisValue !== prevAxisValue) {
-                const difference = currAxisValue - prevAxisValue;
-                this.rotateRotaryStock(difference);
-                needUpdateScene = true;
-            }
-        }
-
-        const fileType = this.props.fileType;
-        const aAxisTypes = [FILE_TYPE.ROTARY, FILE_TYPE.FOUR_AXIS];
-
-        //Only setup rotary stock object if our file contains a-axis values, can be hidden otherwise
-        if (aAxisTypes.includes(fileType)) {
-            // Update rotary stock object
-            if (prevProps.bbox.max.x !== this.props.bbox.max.x) {
-                this.updateRotaryStock();
-            }
-        } else {
-            this.rotaryStock.visible = false;
         }
 
         { // Update position
@@ -858,6 +820,9 @@ class Visualizer extends Component {
                 this.fileLoaded = false;
                 pubsub.publish('softlimits:ok');
             }),
+            pubsub.subscribe('visualizer:updateposition', (_, data) => {
+                this.updateCuttingToolPosition(data, { forceUpdateAllAxes: true });
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -1289,19 +1254,6 @@ class Visualizer extends Component {
             this.createCuttingPointer();
         }
 
-        { // Rotary Stock
-            this.rotaryStock = new RotaryStock({
-                name: 'RotaryStockObject',
-                visible: false,
-            });
-
-            this.group.add(this.rotaryStock);
-
-            // Update the scene
-            this.updateScene();
-        }
-
-
         { // Limits
             const limits = _get(this.machineProfile, 'limits');
             const { xmin = 0, xmax = 0, ymin = 0, ymax = 0, zmin = 0, zmax = 0 } = { ...limits };
@@ -1530,42 +1482,8 @@ class Visualizer extends Component {
         return controls;
     }
 
-    updateRotaryStock = () => {
-        const { state, bbox } = this.props;
-        const rotaryStock = this.group.getObjectByName('RotaryStockObject');
-        let height = bbox.max.x;
-
-        if (state.units === METRIC_UNITS && this.props.fileModal === IMPERIAL_UNITS) {
-            height *= 25.4;
-        }
-
-        if (state.units === IMPERIAL_UNITS && this.props.fileModal === METRIC_UNITS) {
-            height /= 25.4;
-        }
-
-        this.group.remove(rotaryStock);
-        this.rotaryStock = new RotaryStock({
-            height,
-            name: 'RotaryStockObject',
-            visible: true,
-        });
-        this.updateRotaryStockPosition();
-
-        this.group.add(this.rotaryStock);
-    }
-
     getRadiansFromDegrees (val) {
         return val * Math.PI / 180;
-    }
-
-    rotateRotaryStock (amount = 0) {
-        if (!this.rotaryStock) {
-            return;
-        }
-
-        const value = this.getRadiansFromDegrees(amount);
-
-        this.rotaryStock.rotateY(value);
     }
 
     // Rotates the cutting tool around the z axis with a given rpm and an optional fps
@@ -1582,7 +1500,7 @@ class Visualizer extends Component {
     }
 
     // Update cutting tool position
-    updateCuttingToolPosition() {
+    updateCuttingToolPosition(position, { forceUpdateAllAxes = false } = {}) {
         if (!this.cuttingTool) {
             return;
         }
@@ -1591,13 +1509,14 @@ class Visualizer extends Component {
         const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
 
         const pivotPoint = this.pivotPoint.get();
-        const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
+        const { x: wpox = 0, y: wpoy = 0, z: wpoz = 0 } = position ?? this.workPosition;
 
         const x0 = wpox - pivotPoint.x;
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        if (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY) {
+        // The force parameter will skip here and update the positioning of all axes
+        if (!forceUpdateAllAxes && (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY)) {
             gsap.to(this.cuttingTool.position, {
                 x: x0,
                 z: z0,
@@ -1618,9 +1537,11 @@ class Visualizer extends Component {
     rotateGcodeModal(degrees) {
         const radians = degToRad(degrees);
 
-        if (this.visualizer) {
-            this.visualizer.group.rotateX(radians);
+        if (!this.visualizer) {
+            return;
         }
+
+        this.visualizer.group.rotateX(radians);
     }
 
     updateGcodeModal(prevPos, currPos) {
@@ -1660,21 +1581,6 @@ class Visualizer extends Component {
             const axisDifference = currValue - prevValue;
             this.rotateGcodeModal(axisDifference);
         }
-    }
-
-    updateRotaryStockPosition() {
-        if (!this.rotaryStock) {
-            return;
-        }
-
-        const pivotPoint = this.pivotPoint.get();
-        // const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
-        // Use negative offset to keep rotary stock object at the center point
-        const x0 = -pivotPoint.x;
-        const y0 = -pivotPoint.y;
-        const z0 = -pivotPoint.z;
-
-        this.rotaryStock.position.set(x0, y0, z0);
     }
 
     // Update cutting tool position
