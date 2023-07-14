@@ -1173,7 +1173,7 @@ class Visualizer extends Component {
         }
 
         { // Imperial Grid Line Numbers
-            const visible = objects.gridLineNumbers.visyarnible;
+            const visible = objects.gridLineNumbers.visible;
             const imperialGridLineNumbers = this.createGridLineNumbers(IMPERIAL_UNITS);
             imperialGridLineNumbers.name = 'ImperialGridLineNumbers';
             imperialGridLineNumbers.visible = visible && (units === IMPERIAL_UNITS);
