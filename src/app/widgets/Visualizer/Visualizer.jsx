@@ -975,8 +975,8 @@ class Visualizer extends Component {
 
         { // Coordinate Grid
             const gridLine = new GridLine(
-                gridCount * gridSpacing,
-                gridCount * gridSpacing,
+                gridCount * gridSpacing * 2,
+                gridCount * gridSpacing * 2,
                 step,
                 currentTheme.get(GRID_PART) // grid
             );
