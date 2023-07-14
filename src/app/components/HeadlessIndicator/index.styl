@@ -85,6 +85,9 @@
 .config-content-wrapper{
     height: 100%;
     margin: auto;
+
+    display: grid;
+  grid-template-columns: 1fr 1fr;
     .invalidInput{
     border: 1px solid red !important;
     border-radius: 5px !important;
@@ -119,7 +122,7 @@
         margin-top: 1rem;
       }
       .warningText{
-      color: red; 
+      color: red;
       font-size: 1rem;
       margin-left: .5rem;
       line-height: 2.5;
@@ -147,7 +150,7 @@
      padding: 1rem;
     }
     .changes{
-      padding: 1rem;  
+      padding: 1rem;
       text-align: center;
     }
     .footer{
@@ -158,7 +161,7 @@
         margin: auto;
         button{
           width: 100%;
-        }  
+        }
       }
     }
   }
@@ -177,11 +180,37 @@
         button{
           width: 50%;
           margin: 1rem;
-        }  
+        }
       }
     }
-  
+
   }
 
 
+.grid {
+  display: grid;
+  grid-template-columns 1fr 1fr;
+}
 
+
+.QRWrapper {
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction column;
+  align-items: center;
+  gap: 0.25rem;
+  justify-items: center;
+
+  h1 {
+    padding: none;
+    margin: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .subheader {
+    font-size: 0.9rem;
+    color: #4B5563;
+  }
+}
