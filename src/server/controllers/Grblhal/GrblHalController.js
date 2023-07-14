@@ -928,6 +928,8 @@ class GrblHalController {
         // Tool
         const tool = this.runner.getTool();
 
+        const parameters = this.runner.getParameters();
+
         return Object.assign(context || {}, {
             // User-defined global variables
             global: this.sharedContext,
@@ -972,6 +974,9 @@ class GrblHalController {
 
             // Tool
             tool: Number(tool) || 0,
+
+            // G-code parameters
+            params: parameters,
 
             // Global objects
             ...globalObjects,
