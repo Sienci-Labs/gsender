@@ -255,7 +255,6 @@
     "prop-types": "~15.7.2",
     "pubsub-js": "~1.9.4",
     "push.js": "~1.0.9",
-    "qrcode": "^1.5.3",
     "qs": "~6.7.0",
     "quick-local-ip": "^1.0.7",
     "range_check": "~1.4.0",
