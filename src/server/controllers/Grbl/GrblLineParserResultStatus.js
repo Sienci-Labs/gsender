@@ -169,6 +169,7 @@ class GrblLineParserResultStatus {
         payload.pinState = {};
         if (_.has(result, 'Pn')) {
             const pins = _.get(result, 'Pn[0]', '');
+            payload.pinState = {};
             pins.split('').forEach(pin => {
                 payload.pinState[pin] = true;
             });
