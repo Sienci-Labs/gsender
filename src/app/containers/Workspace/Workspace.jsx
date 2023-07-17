@@ -59,6 +59,7 @@ import UpdateAvailableAlert from './UpdateAvailableAlert/UpdateAvailableAlert';
 import Toaster from '../../lib/toaster/Toaster';
 import ConfirmationDialog from '../../components/ConfirmationDialog/ConfirmationDialog';
 import DataCollectionPopup from './DataCollectionPopup';
+import MobileWorkflow from './MobileWorkflow';
 
 
 const WAIT = '%wait';
@@ -644,6 +645,11 @@ class Workspace extends PureComponent {
                                         { [styles.disabled]: disabled }
                                     )}
                                 >
+                                    {
+                                        mobile && (
+                                            <MobileWorkflow />
+                                        )
+                                    }
                                     <PrimaryWidgets
                                         ref={node => {
                                             this.primaryWidgets = node;
