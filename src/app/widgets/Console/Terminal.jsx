@@ -209,19 +209,19 @@ class TerminalWrapper extends PureComponent {
     }
 
     clear() {
-        this.term.clear();
+        this.term && this.term.clear();
     }
 
     selectAll() {
-        this.term.selectAll();
+        this.term && this.term.selectAll();
     }
 
     clearSelection() {
-        this.term.clearSelection();
+        this.term && this.term.clearSelection();
     }
 
     write(data) {
-        this.term.write(data);
+        this.term && this.term.write(data);
     }
 
     writeln(data) {
