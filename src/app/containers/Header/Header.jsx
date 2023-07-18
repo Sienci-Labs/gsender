@@ -325,14 +325,10 @@ class Header extends PureComponent {
 
     registerIPCListeners () {
         window.ipcRenderer.on('update_available', (info) => {
-            api.getShouldInstallUpdates().then((res) => {
-                if (res.body) {
-                    this.setState({
-                        updateAvailable: true
-                    });
-                    pubsub.publish('showUpdateToast', info);
-                }
+            this.setState({
+                updateAvailable: true
             });
+            pubsub.publish('showUpdateToast', info);
         });
     }
 
