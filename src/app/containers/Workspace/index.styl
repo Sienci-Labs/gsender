@@ -90,13 +90,12 @@
     }
 
     .workspace-table-mobile {
-        overflow-y: auto;
+        //overflow-y: auto;
         display: flex;
         flex-direction: column;
         flex-grow: 1;
         width: 100%;
-        height: 100%;
-        max-height: 100%;
+        height: calc(100% + 4.5rem);
         background-color: #d1d5db
         position: relative;
     }
@@ -119,6 +118,7 @@
         box-sizing border-box;
         padding: 10px 15px;
         min-height: fit-content;
+        height: 100%;
         width: 100%;
         justify-content: center;
         align-content: center;
@@ -147,7 +147,7 @@
     }
 
     .primary-container-mobile {
-        height: 100%;
+        height: calc(100% - 10rem);
         width: 100%;
         overflow-y: auto;
         &.hidden {
