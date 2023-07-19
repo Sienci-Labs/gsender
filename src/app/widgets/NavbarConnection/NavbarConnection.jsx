@@ -100,12 +100,18 @@ class NavbarConnection extends PureComponent {
 
         return (
             <div
+                id="parent"
                 className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection}
                 role="button"
                 tabIndex={0}
                 onClick={this.displayDropdown}
                 onKeyDown={this.displayDropdown}
-                onMouseEnter={actions.handleRefreshPorts}
+                onMouseEnter={(event) => {
+                    // if mouse is entering any child, don't refresh
+                    if (event.target.id === 'parent') {
+                        actions.handleRefreshPorts();
+                    }
+                }}
                 onMouseLeave={actions.hideUnrecognizedDevices}
                 onTouchEnd={actions.handleRefreshPorts}
             >
