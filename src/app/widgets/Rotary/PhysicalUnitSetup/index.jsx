@@ -31,31 +31,26 @@ const PhysicalUnitSetup = ({ actions }) => {
         if (!linesUp && drillBitDiameter === QUARTER) {
             gcode = HOLE_TYPES.DOESNT_LINE_UP_QUARTER;
             localHoleCount = 2;
-        }
 
         // ⅛” diameter endmill milling 2 holes for custom mounting solution
-        if (!linesUp && drillBitDiameter === EIGHTH) {
+        } else if (!linesUp && drillBitDiameter === EIGHTH) {
             gcode = HOLE_TYPES.DOESNT_LINE_UP_EIGHTH;
             localHoleCount = 2;
-        }
 
         // ¼” diameter endmill milling 6 holes for 30” track
-        if (drillBitDiameter === QUARTER && holeCount === SIX) {
+        } else if (drillBitDiameter === QUARTER && holeCount === SIX) {
             gcode = HOLE_TYPES.QUARTER_INCH_SIX_HOLES;
-        }
 
         // ⅛” diameter endmill milling 6 holes for 30” track
-        if (drillBitDiameter === EIGHTH && holeCount === SIX) {
+        } else if (drillBitDiameter === EIGHTH && holeCount === SIX) {
             gcode = HOLE_TYPES.EIGHTH_INCH_SIX_HOLES;
-        }
 
         // ¼” diameter endmill milling 10 holes for 30” track with extension
-        if (drillBitDiameter === QUARTER && holeCount === TEN) {
+        } else if (drillBitDiameter === QUARTER && holeCount === TEN) {
             gcode = HOLE_TYPES.QUARTER_INCH_TEN_HOLES;
-        }
 
         // ⅛” diameter endmill milling 10 holes for 30” track with extension
-        if (drillBitDiameter === EIGHTH && holeCount === TEN) {
+        } else if (drillBitDiameter === EIGHTH && holeCount === TEN) {
             gcode = HOLE_TYPES.EIGHTH_INCH_TEN_HOLES;
         }
 
