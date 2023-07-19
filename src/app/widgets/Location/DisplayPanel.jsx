@@ -404,7 +404,7 @@ class DisplayPanel extends PureComponent {
                                         <tbody>
                                             {hasAxisX && this.renderAxis(AXIS_X)}
                                             {!isInRotaryMode && hasAxisY ? this.renderAxis(AXIS_Y) : this.renderAxis(AXIS_Y, true)}
-                                            {hasAxisZ && this.renderAxis(AXIS_Z)}
+                                            {hasAxisZ && this.renderAxis(AXIS_Z, false, isInRotaryMode)}
                                         </tbody>
                                     )
                                     : (
