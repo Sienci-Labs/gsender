@@ -459,8 +459,7 @@ class DisplayPanel extends PureComponent {
                                                     disabled={!canHome}
                                                     buttons={['X', 'Y', 'Z', 'A']}
                                                     onClick={this.actions.startSingleAxisHoming}
-                                                >
-                                                </ButtonCollection>
+                                                />
                                             </>
                                         ) : (
                                             <FunctionButton

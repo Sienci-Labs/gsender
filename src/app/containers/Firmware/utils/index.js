@@ -80,7 +80,19 @@ export const restoreDefaultSettings = (machineProfile) => {
     controller.command('gcode', values);
 
     Toaster.pop({
-        msg: ('Default Settings Restored'),
+        msg: 'Default Settings Restored',
+        type: TOASTER_INFO,
+    });
+};
+
+export const restoreSingleDefaultSetting = (setting, machineProfile) => {
+    const eepromSettings = machineProfile?.eepromSettings ?? defaultGRBLSettings;
+    const defaultValue = eepromSettings[setting];
+
+    controller.command('gcode', [`${setting}=${defaultValue}`, '$$']);
+
+    Toaster.pop({
+        msg: `Restored Default Value for ${setting}`,
         type: TOASTER_INFO,
     });
 };

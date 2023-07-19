@@ -9,6 +9,7 @@ G01 Z1 F500
 G00 X0 Y0 Z5
 G00 X10 Y0 Z5
 G00 Y10 Z5
-M0
+M0 ;This is a comment on the M0 line
 G00 X10 Y0 Z5
+M0 (This is a bracket comment)
 G00 Y10 Z5

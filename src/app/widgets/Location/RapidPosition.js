@@ -20,7 +20,8 @@
  * of Sienci Labs Inc. in Waterloo, Ontario, Canada.
  *
  */
-import store from 'app/store';
+import reduxStore from 'app/store/redux';
+import get from 'lodash/get';
 import { Toaster, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
 
 export const FRONT_RIGHT = 'FR';
@@ -46,17 +47,13 @@ export const getHomingLocation = (setting) => {
 };
 
 const getMachineMovementLimits = () => {
-    const machineProfile = store.get('workspace.machineProfile');
-    if (!machineProfile) {
-        Toaster.pop({
-            msg: 'Unable to find machine profile - make sure it\'s set in preferences',
-            type: TOASTER_DANGER
-        });
-        return [null, null];
-    }
-    const { limits } = machineProfile;
-    const xLimit = Number(limits.xmax * OFFSET_DISTANCE).toFixed(3);
-    const yLimit = Number(limits.ymax * OFFSET_DISTANCE).toFixed(3);
+    const store = reduxStore.getState();
+    const settings = get(store, 'controller.settings.settings');
+    const { $130: xMax, $131: yMax } = settings;
+
+    const xLimit = (Number(xMax) * OFFSET_DISTANCE).toFixed(3);
+    const yLimit = (Number(yMax) * OFFSET_DISTANCE).toFixed(3);
+
     return [xLimit, yLimit];
 };
 

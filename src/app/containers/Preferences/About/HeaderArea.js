@@ -7,6 +7,7 @@ import { version } from '../../../../package.json';
 import styles from './index.styl';
 
 const HeaderArea = () => {
+    const year = new Date().getFullYear();
     return (
         <div className={styles.headerArea}>
             <div className={styles.headerLeft}>
@@ -19,7 +20,7 @@ const HeaderArea = () => {
             </div>
 
             <div className={styles.headerRight}>
-                <p>Copyright &copy; 2022 Sienci Labs Inc.</p>
+                <p>Copyright &copy; {year} Sienci Labs Inc.</p>
                 <div className={styles.country}><span>Made in Canada</span> <img src={canadaFlagIcon} alt="Canada Flag" /></div>
                 <p>
                     <a

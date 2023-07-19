@@ -1,34 +1,25 @@
-/* eslint-disable no-restricted-globals */
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
+
 import mainController from 'app/lib/controller';
 import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
+import { calculateHypotenuse, calculateAlpha, calculateBeta, calculateFM, calculateMovement, FM_OFFSET_THRESHOLD } from './utils/result';
 import styles from './index.styl';
 
-const OFFSET_THRESHOLD = 2; //in mm. If the FM is less than or equal to this number, only a small warning message would be enough
+const Icon = ({ type = 'default' }) => {
+    const icon = {
+        error: <i className="fas fa-exclamation-circle" />,
+        success: <i className="fas fa-check-circle" />,
+        warning: <i className="fas fa-exclamation-triangle" />,
+        default: <i className="fas fa-exclamation-circle" />,
+    }[type];
 
-const Icon = ({ type }) => {
-    switch (type) {
-    case 'error': {
-        return <i className="fas fa-exclamation-circle" style={{ color: 'red' }} />;
-    }
-
-    case 'success': {
-        return <i className="fas fa-check-circle" style={{ color: 'green' }} />;
-    }
-
-    case 'warning': {
-        return <i className="fas fa-exclamation-triangle" style={{ color: 'orange' }} />;
-    }
-
-    default: {
-        return <i className="fas fa-exclamation-circle" />;
-    }
-    }
+    return icon;
 };
 
 const Result = ({ triangle, jogValues, onBack, onClose }) => {
@@ -38,54 +29,38 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
     const [hasError, setHasError] = useState(false);
     const [fm, setFm] = useState(false);
     const [directions, setDirections] = useState(['backwards', 'forward']);
-
     const [stepsUpdate, setStepsUpdate] = useState(null);
 
     useEffect(() => {
         try {
             const { a, b, c } = triangle;
-            const HYPOTENUSE = performPythagoreanEquation({ a, b });
+            const hypotenuse = calculateHypotenuse({ a, b });
 
-            if (HYPOTENUSE !== c) {
-                const ALPHA = calculateAlpha({ a, b, c });
-                const BETA = calculateBeta({ trueHypotenuse: HYPOTENUSE, userHypotenuse: c, alpha: ALPHA });
+            if (hypotenuse !== c) {
+                const alpha = calculateAlpha({ a, b, c });
+                const beta = calculateBeta({ trueHypotenuse: hypotenuse, userHypotenuse: c, alpha: alpha });
+                const fm = calculateFM({ b, beta: beta });
 
-                const FM = calculateFM({ b, beta: BETA });
-                if (c < HYPOTENUSE) {
+                if (c < hypotenuse) {
                     setDirections(['forward', 'backwards']);
                 }
 
-                if (isNaN(ALPHA) || isNaN(BETA) || isNaN(FM)) {
+                if (Number.isNaN(alpha) || Number.isNaN(beta) || Number.isNaN(fm)) {
                     throw new Error();
                 }
 
-                setFm(FM);
+                setFm(fm);
                 setHasError(false);
             } else {
                 setMachineIsSquared(true);
                 setHasError(false);
             }
+
             checkStepsPerMM();
         } catch (error) {
             setHasError(true);
         }
     }, []);
-
-    const calculateAlpha = ({ a, b, c }) => (Math.acos((((a ** 2) + (b ** 2) - (c ** 2)) / (2 * a * b))) * (180 / Math.PI));
-
-    const calculateBeta = ({ trueHypotenuse, userHypotenuse, alpha }) => (userHypotenuse <= trueHypotenuse ? 90 - alpha : alpha - 90);
-
-    const calculateFM = ({ b, beta }) => Number((b * Math.sin(beta * (Math.PI / 180))).toFixed(2));
-
-    const movementCalculation = ({ currentStep, movedDistance, actualDistance }) => (currentStep * (movedDistance / actualDistance));
-
-    const performPythagoreanEquation = ({ a, b }) => {
-        if (!a || !b) {
-            return null;
-        }
-
-        return Math.sqrt((a ** 2) + (b ** 2));
-    };
 
     const checkStepsPerMM = () => {
         const { settings } = controller.settings;
@@ -103,8 +78,8 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
             y: { should: false, amount: 0 },
         };
 
-        const calculatedXStep = Math.round(movementCalculation({ currentStep: Number(currentYStep), movedDistance: y, actualDistance: a }));
-        const calculatedYStep = Math.round(movementCalculation({ currentStep: Number(currentXStep), movedDistance: x, actualDistance: b }));
+        const calculatedXStep = Math.round(calculateMovement({ currentStep: Number(currentYStep), movedDistance: y, actualDistance: a }));
+        const calculatedYStep = Math.round(calculateMovement({ currentStep: Number(currentXStep), movedDistance: x, actualDistance: b }));
 
         if (calculatedXStep !== Number(currentXStep)) {
             stepsToChange.x.should = true;
@@ -138,6 +113,7 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
                 msg: 'Machine Settings Updated Succesfully',
                 type: TOASTER_SUCCESS
             });
+            onClose();
         }
     };
 
@@ -161,12 +137,12 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
         if (hasError) {
             return (
                 <>
-                    <div className={styles.result}>
+                    <div className={classnames(styles.result, styles.resultError)}>
                         <Icon type="error" />
                         <p className={styles.resultText}>There was an error in the calculation, please check the values you provided.</p>
                     </div>
 
-                    <FunctionButton primary onClick={onBack}>Go Back</FunctionButton>
+                    <FunctionButton onClick={onBack}>Go Back</FunctionButton>
                 </>
             );
         }
@@ -174,42 +150,43 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
         if (machineIsSquared || fm === 0) {
             return (
                 <>
-                    <div className={styles.result}>
+                    <div className={classnames(styles.result, styles.resultSuccess)}>
                         <Icon type="success" />
-                        <p className={styles.resultText}>Your machine is squared properly, no adjustments are needed!</p>
+                        <p className={styles.resultText}>Your machine is properly squared, no adjustments are needed!</p>
                     </div>
 
-                    <FunctionButton primary onClick={onClose}>Exit Calibration Tool</FunctionButton>
+                    <FunctionButton onClick={onClose}>Exit Calibration Tool</FunctionButton>
                 </>
             );
         }
 
-        if (fm <= OFFSET_THRESHOLD) {
+        if (fm <= FM_OFFSET_THRESHOLD) {
             return (
                 <>
-                    <div className={styles.result}>
+                    <div className={classnames(styles.result, styles.resultWarning)}>
                         <Icon type="warning" />
                         <p>
                             Your machine is pretty squared, but if you still want to have it full squared, move either the right y-axis rail backwards
-                            <strong>{fm}mm</strong> or the left y-axis rail forward by <strong>{fm}mm</strong>
+                            {' '}<strong>{fm}mm</strong> or the left y-axis rail forward by <strong>{fm}mm</strong>
                         </p>
+
+                        {stepsUpdate && (
+                            <p className={styles.resultText}>
+                                We also noticed your steps-per-mm can be updated for improved accuracy on your machine,
+                                you can click &quot;Update Machine Settings&quot; to update your EEPROM values.
+                            </p>
+                        )}
                     </div>
 
                     {
                         stepsUpdate
                             ? (
-                                <>
-                                    <p className={styles.resultText}>
-                                        We also noticed your steps-per-mm can be updated for improved accuracy on your machine,
-                                        you can click the button below to do so.
-                                    </p>
-                                    <div style={{ display: 'flex', gap: '1rem' }}>
-                                        <FunctionButton primary onClick={handleUpdateClick}>Update Machine Settings</FunctionButton>
-                                        <FunctionButton primary onClick={onClose}>Exit Calibration Tool</FunctionButton>
-                                    </div>
-                                </>
+                                <div className={styles.buttonWrapper}>
+                                    <FunctionButton primary onClick={handleUpdateClick}>Update Machine Settings</FunctionButton>
+                                    <FunctionButton onClick={onClose}>Exit Calibration Tool</FunctionButton>
+                                </div>
                             )
-                            : <FunctionButton primary onClick={onClose}>Exit Calibration Tool</FunctionButton>
+                            : <FunctionButton onClick={onClose}>Exit Calibration Tool</FunctionButton>
                     }
                 </>
             );
@@ -219,41 +196,46 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
 
         return (
             <>
-                <div className={styles.result}>
+                <div className={classnames(styles.result, styles.resultError)}>
                     <Icon type="error" />
                     <p>
                         Your machine is off by <strong>{fm}mm</strong>, to properly square it, move either the right y-axis rail { rightDirection }
-                        <strong>{fm}mm</strong> or the left y-axis rail { leftDirection } by <strong>{fm}mm</strong>
+                        {' '}<strong>{fm}mm</strong> or the left y-axis rail { leftDirection } by <strong>{fm}mm</strong>
                     </p>
+
+                    {stepsUpdate && (
+                        <p>
+                            We also noticed your steps-per-mm can be updated for improved accuracy on your machine,
+                            you can click &quot;Update Machine Settings&quot; to update your EEPROM values.
+                        </p>
+                    )}
                 </div>
 
                 {
                     stepsUpdate
                         ? (
-                            <>
-                                <p className={styles.resultText}>
-                                    We also noticed your steps-per-mm can be updated for improved accuracy on your machine,
-                                    you can click the button below to do so.
-                                </p>
-                                <div style={{ display: 'flex', gap: '1rem' }}>
-                                    <FunctionButton primary onClick={handleUpdateClick}>Update Machine Settings</FunctionButton>
-                                    <FunctionButton primary onClick={onClose}>Exit Calibration Tool</FunctionButton>
-                                </div>
-                            </>
+                            <div className={styles.buttonWrapper}>
+                                <FunctionButton primary onClick={handleUpdateClick}>Update Machine Settings</FunctionButton>
+                                <FunctionButton onClick={onClose}>Exit Calibration Tool</FunctionButton>
+                            </div>
                         )
-                        : <FunctionButton primary onClick={onClose}>Exit Calibration Tool</FunctionButton>
+                        : <FunctionButton onClick={onClose}>Exit Calibration Tool</FunctionButton>
                 }
             </>
         );
     };
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'column', height: '100%', width: '100%' }}>
-            <h4 style={{ marginTop: '2rem' }}>Calibration Results</h4>
-
+        <div className={styles.resultPageWrapper}>
             {renderResult()}
         </div>
     );
-}; Result.propTypes = { triangle: PropTypes.object, onBack: PropTypes.func, onClose: PropTypes.func, };
+};
+
+Result.propTypes = {
+    triangle: PropTypes.object,
+    onBack: PropTypes.func,
+    onClose: PropTypes.func,
+};
 
 export default Result;

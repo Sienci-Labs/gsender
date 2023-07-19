@@ -37,14 +37,18 @@ const IdleInfo = ({ state, ...props }) => {
     let spindleMin = Math.min(...spindleSet);
     let spindleMax = Math.max(...spindleSet);
 
-
+    convertedFeedMin = feedrateMin;
+    convertedFeedMax = feedrateMax;
     if (units === METRIC_UNITS) {
-        convertedFeedMin = (fileModal === METRIC_UNITS) ? feedrateMin : in2mm(feedrateMin).toFixed(2);
-        convertedFeedMax = (fileModal === METRIC_UNITS) ? feedrateMax : in2mm(feedrateMax).toFixed(2);
-    } else {
-        convertedFeedMin = (fileModal === IMPERIAL_UNITS) ? feedrateMin : mm2in(feedrateMin).toFixed(3);
-        convertedFeedMax = (fileModal === IMPERIAL_UNITS) ? feedrateMax : mm2in(feedrateMax).toFixed(3);
+        if (fileModal === IMPERIAL_UNITS) {
+            convertedFeedMin = in2mm(feedrateMin).toFixed(3);
+            convertedFeedMax = in2mm(feedrateMax).toFixed(3);
+        }
+    } else if (fileModal === METRIC_UNITS) {
+        convertedFeedMin = mm2in(feedrateMin).toFixed(2);
+        convertedFeedMax = mm2in(feedrateMax).toFixed(2);
     }
+
     /**
      * Return formatted list of tools in use
      */

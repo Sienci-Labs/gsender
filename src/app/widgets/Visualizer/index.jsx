@@ -44,7 +44,6 @@ import log from 'app/lib/log';
 import portal from 'app/lib/portal';
 import * as WebGL from 'app/lib/three/WebGL';
 import { Toaster, TOASTER_LONG, TOASTER_WARNING } from 'app/lib/toaster/ToasterLib';
-import EstimateWorker from './Estimate.worker';
 import WidgetConfig from '../WidgetConfig';
 import PrimaryVisualizer from './PrimaryVisualizer';
 
@@ -74,8 +73,7 @@ import {
     GRBL_ACTIVE_STATE_CHECK,
     CARVING_CATEGORY,
     GENERAL_CATEGORY,
-    OVERRIDES_CATEGORY,
-    VISUALIZER_CATEGORY,
+    VISUALIZER_CATEGORY, OVERRIDES_CATEGORY,
 } from '../../constants';
 import {
     CAMERA_MODE_PAN,
@@ -233,10 +231,6 @@ class VisualizerWidget extends PureComponent {
                 }
             }));
 
-            // Start file parsing worker
-            this.processGCode(gcode, name, size);
-
-
             //If we aren't connected to a device, only load the gcode
             //to the visualizer and make no calls to the controller
             if (!port) {
@@ -339,7 +333,9 @@ class VisualizerWidget extends PureComponent {
             };
 
             this.setState(updater, callback);
-            this.visualizer.handleSceneRender(vizualization);
+            if (this.visualizer) {
+                this.visualizer.handleSceneRender(vizualization);
+            }
         },
         unloadGCode: () => {
             const visualizer = this.visualizer;
@@ -377,7 +373,8 @@ class VisualizerWidget extends PureComponent {
                             y: 0,
                             z: 0
                         }
-                    }
+                    },
+                    visualization: {}
                 }
             }));
         },
@@ -544,23 +541,27 @@ class VisualizerWidget extends PureComponent {
                 }
             },
             toTopView: () => {
-                this.setState({ cameraPosition: 'top' });
+                this.setState({ cameraPosition: 'Top' });
             },
             to3DView: () => {
-                this.setState({ cameraPosition: '3d' });
+                this.setState({ cameraPosition: '3D' });
             },
             toFrontView: () => {
-                this.setState({ cameraPosition: 'front' });
+                this.setState({ cameraPosition: 'Front' });
             },
             toLeftSideView: () => {
-                this.setState({ cameraPosition: 'left' });
+                this.setState({ cameraPosition: 'Left' });
             },
             toRightSideView: () => {
-                this.setState({ cameraPosition: 'right' });
+                this.setState({ cameraPosition: 'Right' });
+            },
+            toFreeView: () => {
+                this.setState({ cameraPosition: 'Free' });
             }
         },
         handleLiteModeToggle: () => {
-            const { liteMode, gcode } = this.state;
+            const { liteMode } = this.state;
+            const { isFileLoaded } = this.props;
             const newLiteModeValue = !liteMode;
 
             this.setState({
@@ -568,7 +569,10 @@ class VisualizerWidget extends PureComponent {
                 minimizeRenders: newLiteModeValue
             });
 
-            pubsub.publish('litemode:change', gcode);
+            // instead of calling loadGCode right away,
+            // use this pubsub to invoke a refresh of the visualizer wrapper.
+            // this removes visual glitches that would otherwise appear.
+            pubsub.publish('litemode:change', isFileLoaded);
         },
         lineWarning: {
             onContinue: () => {
@@ -607,7 +611,7 @@ class VisualizerWidget extends PureComponent {
             pubsub.publish('gcode:fileInfo');
             pubsub.publish('gcode:unload');
             Toaster.pop({
-                msg: 'Gcode File Closed',
+                msg: 'G-code File Closed',
                 icon: 'fa-exclamation'
             });
         }
@@ -645,30 +649,10 @@ class VisualizerWidget extends PureComponent {
             type: UPDATE_FILE_INFO,
             payload: reduxPayload
         });
-        //pubsub.publish('gcode:fileInfo', { name, size, total, toolSet, spindleSet, movementSet, estimatedTime });
-        //pubsub.publish('gcode:bbox', bbox);
     }
 
     processGCode = (gcode, name, size) => {
-        const comments = ['#', ';', '(', '%']; // We assume an opening parenthesis indicates a header line
-        //Clean up lines and remove ones that are comments and headers
-        const lines = gcode.split('\n')
-            .filter(line => (line.trim().length > 0))
-            .filter(line => !comments.some(comment => line.includes(comment)));
 
-
-        // Set "Loading" state to job info widget and start file VM processor
-        const estimateWorker = new EstimateWorker();
-        const { feedArray, accelArray } = this.props;
-
-        estimateWorker.onmessage = this.onProcessedGcode;
-        estimateWorker.postMessage({
-            lines: lines,
-            name,
-            size,
-            feedArray,
-            accelArray
-        });
     };
 
     unsubscribe() {
@@ -794,6 +778,7 @@ class VisualizerWidget extends PureComponent {
                 sent: 0,
                 received: 0,
                 loadedBeforeConnection: false,
+                visualization: {}
             },
             disabled: this.config.get('disabled', false),
             disabledLite: this.config.get('disabledLite'),
@@ -824,7 +809,7 @@ class VisualizerWidget extends PureComponent {
                 }
             },
             cameraMode: this.config.get('cameraMode', CAMERA_MODE_PAN),
-            cameraPosition: '3d', // 'top', '3d', 'front', 'left', 'right'
+            cameraPosition: '3D', // 'Top', '3D', 'Front', 'Left', 'Right'
             isAgitated: false, // Defaults to false
             currentTheme: this.getVisualizerTheme(),
             currentTab: 0,
@@ -856,12 +841,46 @@ class VisualizerWidget extends PureComponent {
 
     shuttleControlFunctions = {
         FEEDRATE_OVERRIDE: (_, { amount }) => {
-            const feedRate = Number(amount) || 0;
-            controller.command('feedOverride', feedRate);
+            switch (Number(amount)) {
+            case 1:
+                controller.write('\x93');
+                break;
+            case -1:
+                controller.write('\x94');
+                break;
+            case 10:
+                controller.write('\x91');
+                break;
+            case -10:
+                controller.write('\x92');
+                break;
+            case 0:
+                controller.write('\x90');
+                break;
+            default:
+                return;
+            }
         },
         SPINDLE_OVERRIDE: (_, { amount }) => {
-            const spindleSpeed = Number(amount) || 0;
-            controller.command('spindleOverride', spindleSpeed);
+            switch (Number(amount)) {
+            case 1:
+                controller.write('\x9C');
+                break;
+            case -1:
+                controller.write('\x9D');
+                break;
+            case 10:
+                controller.write('\x9A');
+                break;
+            case -10:
+                controller.write('\x9B');
+                break;
+            case 0:
+                controller.write('\x99');
+                break;
+            default:
+                return;
+            }
         },
         START_JOB: (_, { type }) => {
             const { controllerType } = this.props;
@@ -916,12 +935,12 @@ class VisualizerWidget extends PureComponent {
             } = this.actions.camera;
 
             const cameraViews = [
-                '3d',
-                'top',
-                'front',
-                'right',
-                'left',
-                'default',
+                '3D',
+                'Top',
+                'Front',
+                'Right',
+                'Left',
+                'Default',
             ];
 
             let currIndex = cameraViews.findIndex(view => view === this.state.cameraPosition);
@@ -935,12 +954,12 @@ class VisualizerWidget extends PureComponent {
             const currView = cameraViews[currIndex];
 
             const changeCamera = {
-                '3d': to3DView,
-                'top': toTopView,
-                'front': toFrontView,
-                'right': toRightSideView,
-                'left': toLeftSideView,
-                'default': () => {
+                '3D': to3DView,
+                'Top': toTopView,
+                'Front': toFrontView,
+                'Right': toRightSideView,
+                'Left': toLeftSideView,
+                'Default': () => {
                     const { cameraPosition } = this.getInitialState();
                     this.setState({ cameraPosition });
                 }
@@ -999,6 +1018,19 @@ class VisualizerWidget extends PureComponent {
             category: CARVING_CATEGORY,
             callback: () => {
                 controller.command('gcode:test');
+            },
+        },
+        RUN_OUTLINE: {
+            title: 'Run Outline',
+            keys: '',
+            cmd: 'RUN_OUTLINE',
+            preventDefault: false,
+            isActive: true,
+            category: CARVING_CATEGORY,
+            callback: () => {
+                if (this.workflowControl) {
+                    this.workflowControl.runOutline();
+                }
             },
         },
         START_JOB: {
@@ -1071,6 +1103,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_P: {
             title: 'Feed +',
             keys: '',
+            gamepadKeys: '5',
+            keysName: 'R1',
             cmd: 'FEEDRATE_OVERRIDE_P',
             payload: { amount: 1 },
             preventDefault: true,
@@ -1081,6 +1115,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_PP: {
             title: 'Feed ++',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed ++',
             cmd: 'FEEDRATE_OVERRIDE_PP',
             payload: { amount: 10 },
             preventDefault: true,
@@ -1091,6 +1127,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_M: {
             title: 'Feed -',
             keys: '',
+            gamepadKeys: '7',
+            keysName: 'R2',
             cmd: 'FEEDRATE_OVERRIDE_M',
             payload: { amount: -1 },
             preventDefault: true,
@@ -1101,6 +1139,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_MM: {
             title: 'Feed --',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed --',
             cmd: 'FEEDRATE_OVERRIDE_MM',
             payload: { amount: -10 },
             preventDefault: true,
@@ -1111,6 +1151,8 @@ class VisualizerWidget extends PureComponent {
         FEEDRATE_OVERRIDE_RESET: {
             title: 'Feed Reset',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Feed Reset',
             cmd: 'FEEDRATE_OVERRIDE_RESET',
             payload: { amount: 0 },
             preventDefault: true,
@@ -1121,6 +1163,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_P: {
             title: 'Spindle/Laser +',
             keys: '',
+            gamepadKeys: '4',
+            keysName: 'L1',
             cmd: 'SPINDLE_OVERRIDE_P',
             payload: { amount: 1 },
             preventDefault: true,
@@ -1131,6 +1175,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_PP: {
             title: 'Spindle/Laser ++',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser ++',
             cmd: 'SPINDLE_OVERRIDE_PP',
             payload: { amount: 10 },
             preventDefault: true,
@@ -1141,6 +1187,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_M: {
             title: 'Spindle/Laser -',
             keys: '',
+            gamepadKeys: '6',
+            keysName: 'L2',
             cmd: 'SPINDLE_OVERRIDE_M',
             payload: { amount: -1 },
             preventDefault: true,
@@ -1151,6 +1199,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_MM: {
             title: 'Spindle/Laser --',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser --',
             cmd: 'SPINDLE_OVERRIDE_MM',
             payload: { amount: -10 },
             preventDefault: true,
@@ -1161,6 +1211,8 @@ class VisualizerWidget extends PureComponent {
         SPINDLE_OVERRIDE_RESET: {
             title: 'Spindle/Laser Reset',
             keys: '',
+            gamepadKeys: '',
+            keysName: 'Spindle/Laser Reset',
             cmd: 'SPINDLE_OVERRIDE_RESET',
             payload: { amount: 0 },
             preventDefault: true,
@@ -1346,7 +1398,6 @@ class VisualizerWidget extends PureComponent {
             callback: this.shuttleControlFunctions.VISUALIZER_ZOOM_OUT
         },
         VISUALIZER_ZOOM_FIT: {
-            id: 73,
             title: 'Zoom In',
             keys: ['shift', 'i'].join('+'),
             cmd: 'VISUALIZER_ZOOM_FIT',
@@ -1468,7 +1519,29 @@ class VisualizerWidget extends PureComponent {
             pubsub.subscribe('gcode:surfacing', async (_, { gcode, name, size }) => {
                 const file = new File([gcode], name);
                 await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
-            })
+            }),
+            pubsub.subscribe('file:content', (_, content, size, name) => {
+                this.setState({
+                    gcode: {
+                        ...this.state.gcode,
+                        content: content,
+                        size: size,
+                        name: name
+                    }
+                });
+            }),
+            pubsub.subscribe('file:load', (_, data) => {
+                this.setState({
+                    gcode: {
+                        ...this.state.gcode,
+                        visualization: data
+                    }
+                });
+            }),
+            pubsub.subscribe('gcode:rotarySetup', async (_, { setupFile, name }) => {
+                const file = new File([setupFile], name);
+                await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -1528,7 +1601,7 @@ class VisualizerWidget extends PureComponent {
                     }}
                     gcode={gcode}
                     surfacingData={surfacingData}
-                    cameraPosition="top"
+                    cameraPosition="Top"
                 />
             )
             : (
@@ -1569,10 +1642,16 @@ export default connect((store) => {
     const controllerType = get(store, 'controller.type');
     const activeState = get(store, 'controller.state.status.activeState');
     const alarmCode = get(store, 'controller.state.status.alarmCode');
+    const overrides = get(store, 'controller.state.status.ov', [0, 0, 0]);
+    const isFileLoaded = get(store, 'file.fileLoaded');
     const { activeVisualizer } = store.visualizer;
 
     const feedArray = [xMaxFeed, yMaxFeed, zMaxFeed];
     const accelArray = [xMaxAccel * 3600, yMaxAccel * 3600, zMaxAccel * 3600];
+
+    const ovF = overrides[0];
+    const ovS = overrides[2];
+
     return {
         feedArray,
         accelArray,
@@ -1582,6 +1661,9 @@ export default connect((store) => {
         controllerType,
         activeState,
         activeVisualizer,
-        alarmCode
+        alarmCode,
+        isFileLoaded,
+        ovF,
+        ovS
     };
 }, null, null, { forwardRef: true })(VisualizerWidget);

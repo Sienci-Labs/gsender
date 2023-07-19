@@ -162,9 +162,9 @@
 }
 
 .settings-description {
-  width: 80%;
   display flex;
   flex-direction column;
+  padding: 0 10px;
 }
 
 .containerFluid {
@@ -182,7 +182,7 @@
 
 .table-row {
   display: grid;
-  grid-template-columns 1fr 8fr 5fr;
+  grid-template-columns 1fr 4fr 2fr 1fr;
   padding: 1rem 0;
 
   border-top: 1px solid lightgrey;
@@ -190,7 +190,7 @@
 
 .table-header {
   display: grid;
-  grid-template-columns 1fr 8fr 5fr;
+  grid-template-columns 1fr 4fr 2fr 1fr;
 
   grid-gap: 1px;
   background-color: lightgrey;
@@ -381,6 +381,10 @@
   i {
     font-size: 2rem !important;
   }
+}
+
+.hide {
+  display: none;
 }
 
 .settings-area-container {

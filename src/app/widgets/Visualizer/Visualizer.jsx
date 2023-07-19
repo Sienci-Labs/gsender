@@ -22,6 +22,7 @@
  */
 
 import reduxStore from 'app/store/redux';
+import gsap from 'gsap';
 import { connect } from 'react-redux';
 import * as fileActions from 'app/actions/fileInfoActions';
 import _get from 'lodash/get';
@@ -45,7 +46,8 @@ import {
     FILE_TYPE,
     WORKSPACE_MODE,
     GRBL,
-    GRBLHAL
+    GRBLHAL,
+    GRBL_ACTIVE_STATE_CHECK
 } from 'app/constants';
 import CombinedCamera from 'app/lib/three/CombinedCamera';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
@@ -84,10 +86,8 @@ import {
     ZAXIS_PART
 } from './constants';
 import styles from './index.styl';
-import { GRBL_ACTIVE_STATE_CHECK } from '../../../server/controllers/Grbl/constants';
 import WidgetConfig from '../WidgetConfig';
 import { isLaserMode } from '../../lib/laserMode';
-import RotaryStock from './RotaryStock';
 
 const IMPERIAL_GRID_SPACING = 25.4; // 1 in
 const METRIC_GRID_SPACING = 10; // 10 mm
@@ -106,7 +106,7 @@ const TRACKBALL_CONTROLS_MAX_DISTANCE = 2000;
 class Visualizer extends Component {
     static propTypes = {
         show: PropTypes.bool,
-        cameraPosition: PropTypes.oneOf(['top', '3d', 'front', 'left', 'right']),
+        cameraPosition: PropTypes.oneOf(['Top', '3D', 'Front', 'Left', 'Right', 'Free']),
         state: PropTypes.object,
         isSecondary: PropTypes.bool,
     };
@@ -242,7 +242,6 @@ class Visualizer extends Component {
         this.cuttingTool = null;
         this.laserPointer = null;
         this.cuttingPointer = null;
-        this.rotaryStock = null;
         this.limits = null;
         this.visualizer = null;
     }
@@ -270,7 +269,6 @@ class Visualizer extends Component {
         const prevState = prevProps.state;
         const state = this.props.state;
         const isConnected = this.props.isConnected;
-        const controllerType = this.props.controllerType;
 
         // Update the visualizer size whenever the machine is running,
         // to fill the empty area between it and the job status widget when necessary
@@ -378,41 +376,6 @@ class Visualizer extends Component {
             }
         }
 
-        if (this.rotaryStock) {
-            const currWorkPos = this.props.workPosition;
-            const prevWorkPos = prevProps.workPosition;
-
-            // Use the y-axis for GRBL, a-axis for GRBLHal
-            const currAxisValue = {
-                [GRBL]: currWorkPos.y,
-                [GRBLHAL]: currWorkPos.a,
-            }[controllerType];
-
-            const prevAxisValue = {
-                [GRBL]: prevWorkPos.y,
-                [GRBLHAL]: prevWorkPos.a,
-            }[controllerType];
-
-            if (currAxisValue !== prevAxisValue) {
-                const difference = currAxisValue - prevAxisValue;
-                this.rotateRotaryStock(difference);
-                needUpdateScene = true;
-            }
-        }
-
-        const fileType = this.props.fileType;
-        const aAxisTypes = [FILE_TYPE.ROTARY, FILE_TYPE.FOUR_AXIS];
-
-        //Only setup rotary stock object if our file contains a-axis values, can be hidden otherwise
-        if (aAxisTypes.includes(fileType)) {
-            // Update rotary stock object
-            if (prevProps.bbox.max.x !== this.props.bbox.max.x) {
-                this.updateRotaryStock();
-            }
-        } else {
-            this.rotaryStock.visible = false;
-        }
-
         { // Update position
             const { state } = this.props;
             const { activeState } = state;
@@ -465,19 +428,19 @@ class Visualizer extends Component {
         }
 
         if (prevProps.cameraPosition !== this.props.cameraPosition) {
-            if (this.props.cameraPosition === 'top') {
+            if (this.props.cameraPosition === 'Top') {
                 this.toTopView();
             }
-            if (this.props.cameraPosition === '3d') {
+            if (this.props.cameraPosition === '3D') {
                 this.to3DView();
             }
-            if (this.props.cameraPosition === 'front') {
+            if (this.props.cameraPosition === 'Front') {
                 this.toFrontView();
             }
-            if (this.props.cameraPosition === 'left') {
+            if (this.props.cameraPosition === 'Left') {
                 this.toLeftSideView();
             }
-            if (this.props.cameraPosition === 'right') {
+            if (this.props.cameraPosition === 'Right') {
                 this.toRightSideView();
             }
         }
@@ -539,19 +502,27 @@ class Visualizer extends Component {
     }
 
     rerenderGCode() {
-        const { actions, state } = this.props;
-        const { gcode } = state;
+        const content = reduxStore.getState().file.content;
 
         const group = this.group.getObjectByName('Visualizer');
         if (group) {
             this.group.remove(group);
         }
-        if (gcode.content) {
-            actions.loadGCode('', gcode.content);
-        } else {
-            // reupload the file to update the colours
-            this.uploadGCodeFile(reduxStore.getState().file.content);
-        }
+        // reupload the file to update the colours
+        this.uploadGCodeFile(content);
+    }
+
+    reparseGCode() {
+        const { state } = this.props;
+        const { gcode } = state;
+        // reparse file
+        pubsub.publish('reparseGCode', gcode.content, gcode.size, gcode.name, this.props.isSecondary ? VISUALIZER_SECONDARY : VISUALIZER_PRIMARY);
+    }
+
+    reloadGCode() {
+        const { actions, state } = this.props;
+        const { gcode } = state;
+        actions.loadGCode('', gcode.visualization);
     }
 
     removeSceneGroup() {
@@ -758,14 +729,14 @@ class Visualizer extends Component {
     }
 
     createCuttingPointer() {
-        const { state } = this.props;
-        const { currentTheme } = state;
+        const { state, isConnected } = this.props;
+        const { currentTheme, liteMode } = state;
         this.cuttingPointer = new CuttingPointer({
             color: currentTheme.get(CUTTING_PART),
             diameter: 2
         });
         this.cuttingPointer.name = 'CuttingPointer';
-        this.cuttingPointer.visible = false;
+        this.cuttingPointer.visible = isConnected && (liteMode ? !state.objects.cuttingTool.visibleLite : !state.objects.cuttingTool.visible);
         this.group.add(this.cuttingPointer);
     }
 
@@ -849,6 +820,9 @@ class Visualizer extends Component {
                 this.fileLoaded = false;
                 pubsub.publish('softlimits:ok');
             }),
+            pubsub.subscribe('visualizer:updateposition', (_, data) => {
+                this.updateCuttingToolPosition(data, { forceUpdateAllAxes: true });
+            })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
@@ -995,23 +969,17 @@ class Visualizer extends Component {
         const gridCount = (units === IMPERIAL_UNITS) ? imperialGridCount : metricGridCount;
         const gridSpacing = (units === IMPERIAL_UNITS) ? IMPERIAL_GRID_SPACING : METRIC_GRID_SPACING;
         const group = new THREE.Group();
+        const step = units === IMPERIAL_UNITS ? 25.4 : 10;
 
         const { currentTheme } = this.props.state;
 
         { // Coordinate Grid
             const gridLine = new GridLine(
-                gridCount * gridSpacing,
-                gridSpacing,
-                gridCount * gridSpacing,
-                gridSpacing,
-                currentTheme.get(GRID_PART), // center line
+                gridCount * gridSpacing * 2,
+                gridCount * gridSpacing * 2,
+                step,
                 currentTheme.get(GRID_PART) // grid
             );
-            _each(gridLine.children, (o) => {
-                o.material.opacity = 0.15;
-                o.material.transparent = true;
-                o.material.depthWrite = false;
-            });
             gridLine.name = 'GridLine';
             group.add(gridLine);
         }
@@ -1124,19 +1092,20 @@ class Visualizer extends Component {
             return;
         }
 
-        const { state } = this.props;
-        const { units, objects, currentTheme } = state;
+        const { state, isConnected } = this.props;
+        const { units, objects, currentTheme, liteMode } = state;
         const width = this.getVisibleWidth();
         const height = this.getVisibleHeight();
+        const isLaser = isLaserMode();
 
 
         // WebGLRenderer
         this.renderer = new THREE.WebGLRenderer({
-            autoClearColor: true,
-            alpha: true
+            alpha: true,
+            antialias: true
         });
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.shadowMap.type = THREE.BasicShadowMap;
         this.renderer.setClearColor(new THREE.Color(currentTheme.get(BACKGROUND_PART)), 1);
         this.renderer.setSize(width, height);
         this.renderer.clear();
@@ -1256,10 +1225,9 @@ class Visualizer extends Component {
 
                 this.cuttingTool = object;
                 this.cuttingTool.name = 'CuttingTool';
-                this.cuttingTool.visible = false;
+                this.cuttingTool.visible = isConnected && !isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
 
                 this.group.add(this.cuttingTool);
-
                 // Update the scene
                 this.updateScene();
             });
@@ -1274,7 +1242,7 @@ class Visualizer extends Component {
                 diameter: 4
             });
             this.laserPointer.name = 'LaserPointer';
-            this.laserPointer.visible = false;
+            this.laserPointer.visible = isConnected && isLaser && (liteMode ? state.objects.cuttingTool.visibleLite : state.objects.cuttingTool.visible);
 
             this.group.add(this.laserPointer);
 
@@ -1285,19 +1253,6 @@ class Visualizer extends Component {
         { // Cutting Pointer
             this.createCuttingPointer();
         }
-
-        { // Rotary Stock
-            this.rotaryStock = new RotaryStock({
-                name: 'RotaryStockObject',
-                visible: false,
-            });
-
-            this.group.add(this.rotaryStock);
-
-            // Update the scene
-            this.updateScene();
-        }
-
 
         { // Limits
             const limits = _get(this.machineProfile, 'limits');
@@ -1407,10 +1362,10 @@ class Visualizer extends Component {
 
         if (this.renderer && needUpdateScene) {
             this.renderer.render(this.scene, this.camera);
-            this.copyComposer.render();
+            /*this.copyComposer.render();
             this.fxaaComposer.render();
             this.renderBloom();
-            this.finalComposer.render();
+            this.finalComposer.render();*/
         }
     }
 
@@ -1516,6 +1471,7 @@ class Visualizer extends Component {
         });
         controls.addEventListener('end', () => {
             shouldAnimate = false;
+            this.props.actions.camera.toFreeView();
             this.updateScene();
         });
         controls.addEventListener('change', () => {
@@ -1526,42 +1482,8 @@ class Visualizer extends Component {
         return controls;
     }
 
-    updateRotaryStock = () => {
-        const { state, bbox } = this.props;
-        const rotaryStock = this.group.getObjectByName('RotaryStockObject');
-        let height = bbox.max.x;
-
-        if (state.units === METRIC_UNITS && this.props.fileModal === IMPERIAL_UNITS) {
-            height *= 25.4;
-        }
-
-        if (state.units === IMPERIAL_UNITS && this.props.fileModal === METRIC_UNITS) {
-            height /= 25.4;
-        }
-
-        this.group.remove(rotaryStock);
-        this.rotaryStock = new RotaryStock({
-            height,
-            name: 'RotaryStockObject',
-            visible: true,
-        });
-        this.updateRotaryStockPosition();
-
-        this.group.add(this.rotaryStock);
-    }
-
     getRadiansFromDegrees (val) {
         return val * Math.PI / 180;
-    }
-
-    rotateRotaryStock (amount = 0) {
-        if (!this.rotaryStock) {
-            return;
-        }
-
-        const value = this.getRadiansFromDegrees(amount);
-
-        this.rotaryStock.rotateY(value);
     }
 
     // Rotates the cutting tool around the z axis with a given rpm and an optional fps
@@ -1578,7 +1500,7 @@ class Visualizer extends Component {
     }
 
     // Update cutting tool position
-    updateCuttingToolPosition() {
+    updateCuttingToolPosition(position, { forceUpdateAllAxes = false } = {}) {
         if (!this.cuttingTool) {
             return;
         }
@@ -1587,28 +1509,39 @@ class Visualizer extends Component {
         const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
 
         const pivotPoint = this.pivotPoint.get();
-        const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
+        const { x: wpox = 0, y: wpoy = 0, z: wpoz = 0 } = position ?? this.workPosition;
 
         const x0 = wpox - pivotPoint.x;
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        if (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY) {
-            this.cuttingTool.position.setX(x0);
-            this.cuttingTool.position.setZ(z0);
+        // The force parameter will skip here and update the positioning of all axes
+        if (!forceUpdateAllAxes && (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY)) {
+            gsap.to(this.cuttingTool.position, {
+                x: x0,
+                z: z0,
+                duration: 0.25
+            });
 
             return;
         }
 
-        this.cuttingTool.position.set(x0, y0, z0);
+        gsap.to(this.cuttingTool.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
     }
 
     rotateGcodeModal(degrees) {
         const radians = degToRad(degrees);
 
-        if (this.visualizer) {
-            this.visualizer.group.rotateX(radians);
+        if (!this.visualizer) {
+            return;
         }
+
+        this.visualizer.group.rotateX(radians);
     }
 
     updateGcodeModal(prevPos, currPos) {
@@ -1650,21 +1583,6 @@ class Visualizer extends Component {
         }
     }
 
-    updateRotaryStockPosition() {
-        if (!this.rotaryStock) {
-            return;
-        }
-
-        const pivotPoint = this.pivotPoint.get();
-        // const { x: wpox, y: wpoy, z: wpoz } = this.workPosition;
-        // Use negative offset to keep rotary stock object at the center point
-        const x0 = -pivotPoint.x;
-        const y0 = -pivotPoint.y;
-        const z0 = -pivotPoint.z;
-
-        this.rotaryStock.position.set(x0, y0, z0);
-    }
-
     // Update cutting tool position
     updateLaserPointerPosition() {
         if (!this.laserPointer) {
@@ -1677,7 +1595,12 @@ class Visualizer extends Component {
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        this.laserPointer.position.set(x0, y0, z0);
+        gsap.to(this.laserPointer.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
     }
 
     // Update cutting pointer position
@@ -1692,7 +1615,12 @@ class Visualizer extends Component {
         const y0 = wpoy - pivotPoint.y;
         const z0 = wpoz - pivotPoint.z;
 
-        this.cuttingPointer.position.set(x0, y0, z0);
+        gsap.to(this.cuttingPointer.position, {
+            x: x0,
+            y: y0,
+            z: z0,
+            duration: 0.25
+        });
     }
 
     // Update limits position
@@ -1774,29 +1702,11 @@ class Visualizer extends Component {
 
         // only set the camera if it's the first render
         if (shouldZoom) {
-            switch (this.props.cameraPosition) {
-            case 'top':
+            // if secondary, force top view
+            if (this.props.isSecondary) {
                 this.toTopView();
-                break;
-
-            case '3d':
-                this.to3DView();
-                break;
-
-            case 'front':
-                this.toFrontView();
-                break;
-
-            case 'left':
-                this.toLeftSideView();
-                break;
-
-            case 'right':
-                this.toRightSideView();
-                break;
-
-            default:
-                this.toFrontView();
+            } else { // if primary, force 3d view
+                this.props.actions.camera.to3DView();
             }
             this.didZoom = true;
         }
@@ -2011,7 +1921,7 @@ class Visualizer extends Component {
         }
 
         this.camera.up.set(0, 0, 1);
-        this.camera.position.set(CAMERA_DISTANCE, 0, 0);
+        this.camera.position.set(-CAMERA_DISTANCE, 0, 0);
 
         if (this.viewport) {
             this.viewport.update();
@@ -2027,7 +1937,7 @@ class Visualizer extends Component {
         }
 
         this.camera.up.set(0, 0, 1);
-        this.camera.position.set(-CAMERA_DISTANCE, 0, 0);
+        this.camera.position.set(CAMERA_DISTANCE, 0, 0);
 
         if (this.viewport) {
             this.viewport.update();

@@ -24,6 +24,7 @@
 import React, { useState, useEffect } from 'react';
 import reduxStore from 'app/store/redux';
 import Switch from '@mui/material/Switch';
+import QRConnection from 'Components/HeadlessIndicator/QRConnection';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import Creatable from 'react-select/creatable';
 import _ from 'lodash';
@@ -231,90 +232,98 @@ const HeadlessIndicator = ({ address, port }) => {
                 }}
             >
                 <div className={styles.configContentWrapper}>
-                    <div className={styles.toggleWrapper}>
-                        <span>Enable Remote Mode:</span>
-                        <Switch
-                            name="headlessStatus"
-                            checked={headlessSettings.headlessStatus}
-                            onChange={handleInputChanges}
-                        />
-                    </div>
-                    <div className={styles.connectionWrapper}>
-                        Please choose your remote IP and Port below: <br />
-                        <div className={styles.inputWrapper}>
-                            <div className={styles.ipInput}>
-                                <span className={styles.titleIp}>IP: &#32;</span>
-                                <Creatable
-                                    name="ip"
-                                    placeholder="select or type IP"
-                                    value={{ value: headlessSettings.ip, label: headlessSettings.ip }}
-                                    options={ipList} //{value: , label: }
-                                    onChange={handleInputChanges}
-                                    onBlur={
-                                        () => {
-                                            if (settingErrors.ipError) {
-                                                setHeadlessSettings({ ...headlessSettings, ip: oldSettings.ip });
-                                                setSettingErrors({ ...settingErrors, ipError: '', ipHint: '' });
+                    <div>
+                        <div className={styles.toggleWrapper}>
+                            <span>Enable Remote Mode:</span>
+                            <Switch
+                                name="headlessStatus"
+                                checked={headlessSettings.headlessStatus}
+                                onChange={handleInputChanges}
+                            />
+                        </div>
+                        <div className={styles.connectionWrapper}>
+                            Please choose your remote IP and Port below: <br />
+                            <div className={styles.inputWrapper}>
+                                <div className={styles.ipInput}>
+                                    <span className={styles.titleIp}>IP: &#32;</span>
+                                    <Creatable
+                                        name="ip"
+                                        placeholder="select or type IP"
+                                        value={{ value: headlessSettings.ip, label: headlessSettings.ip }}
+                                        options={ipList} //{value: , label: }
+                                        onChange={handleInputChanges}
+                                        onBlur={
+                                            () => {
+                                                if (settingErrors.ipError) {
+                                                    setHeadlessSettings({ ...headlessSettings, ip: oldSettings.ip });
+                                                    setSettingErrors({ ...settingErrors, ipError: '', ipHint: '' });
+                                                }
                                             }
                                         }
-                                    }
-                                    onKeyDown={(event) => handleEnterKey(event)}
-                                    isDisabled={!headlessSettings.headlessStatus}
-                                    className={settingErrors.ipError ? styles.invalidInput : ''}
-                                    styles={{
-                                        container: base => ({
-                                            ...base,
-                                            width: '15rem',
-                                        })
-                                    }}
-                                />
-                                {settingErrors.ipError ? <span className={styles.warningText}> <i className="fa fa-exclamation-circle" /> {settingErrors.ipError} </span> : ''}
-                            </div>
-                            {settingErrors.ipHint ? (
-                                <div className={styles.hints}>
-                                    {settingErrors.ipHint}
+                                        onKeyDown={(event) => handleEnterKey(event)}
+                                        isDisabled={!headlessSettings.headlessStatus}
+                                        className={settingErrors.ipError ? styles.invalidInput : ''}
+                                        styles={{
+                                            container: base => ({
+                                                ...base,
+                                                width: '15rem',
+                                            })
+                                        }}
+                                    />
+                                    {settingErrors.ipError ? <span className={styles.warningText}> <i className="fa fa-exclamation-circle" /> {settingErrors.ipError} </span> : ''}
                                 </div>
-                            ) : ''}
-                            <div className={styles.portInput}>
-                                <span className={styles.titlePort}>Port: &#32;</span>
-                                <input
-                                    name="port"
-                                    type="number"
-                                    value={headlessSettings.port}
-                                    min={0}
-                                    onChange={handleInputChanges}
-                                    onBlur={
-                                        () => {
-                                            if (settingErrors.portError) {
-                                                setHeadlessSettings({ ...headlessSettings, port: oldSettings.port });
-                                                setSettingErrors({ ...settingErrors, portError: '', portHint: '' });
-                                            }
-                                        }
-                                    }
-                                    placeholder="port number"
-                                    disabled={!headlessSettings.headlessStatus}
-                                    className={settingErrors.portError ? styles.invalidInput : ''}
-                                />
-                                {settingErrors.portError ? <span className={styles.warningText}> <i className="fa fa-exclamation-circle" /> {settingErrors.portError} </span> : ''}
-                                {settingErrors.portHint ? (
+                                {settingErrors.ipHint ? (
                                     <div className={styles.hints}>
-                                        {settingErrors.portHint}
+                                        {settingErrors.ipHint}
                                     </div>
                                 ) : ''}
+                                <div className={styles.portInput}>
+                                    <span className={styles.titlePort}>Port: &#32;</span>
+                                    <input
+                                        name="port"
+                                        type="number"
+                                        value={headlessSettings.port}
+                                        min={0}
+                                        onChange={handleInputChanges}
+                                        onBlur={
+                                            () => {
+                                                if (settingErrors.portError) {
+                                                    setHeadlessSettings({ ...headlessSettings, port: oldSettings.port });
+                                                    setSettingErrors({ ...settingErrors, portError: '', portHint: '' });
+                                                }
+                                            }
+                                        }
+                                        placeholder="port number"
+                                        disabled={!headlessSettings.headlessStatus}
+                                        className={settingErrors.portError ? styles.invalidInput : ''}
+                                    />
+                                    {settingErrors.portError ? <span className={styles.warningText}> <i className="fa fa-exclamation-circle" /> {settingErrors.portError} </span> : ''}
+                                    {settingErrors.portHint ? (
+                                        <div className={styles.hints}>
+                                            {settingErrors.portHint}
+                                        </div>
+                                    ) : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div className={styles.warningWrapper}>
+                                <b>Warning: </b> Any changes to remote mode settings will require a restart of the application before taking effect.  You will be prompted to restart on clicking &quot;OK&quot;
+                            </div>
+                            <div className={styles.footer}>
+                                <div className={styles.buttonWrapper}>
+                                    <Button primary onClick={updateRemotePreferences}>OK</Button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className={styles.warningWrapper}>
-                        <b>Warning: </b> Any changes to remote mode settings will require a restart of the application before taking effect.  You will be prompted to restart on clicking &quot;OK&quot;
+                    <div className={styles.QRWrapper}>
+                        {
+                            !shouldRestart && headlessSettings.headlessStatus && <QRConnection ip={headlessSettings.ip} port={headlessSettings.port} />
+                        }
                     </div>
-                    <div className={styles.changes}>
-                        <b>Remote Address: </b> {headlessSettings.headlessStatus ? `${headlessSettings.ip}:${headlessSettings.port}` : 'Headless mode disabled.'}
-                    </div>
-                    <div className={styles.footer}>
-                        <div className={styles.buttonWrapper}>
-                            <Button primary onClick={updateRemotePreferences}>OK</Button>
-                        </div>
-                    </div>
+
+
                 </div>
             </DialogBox>
             {/* Restart confirmation dialog */}

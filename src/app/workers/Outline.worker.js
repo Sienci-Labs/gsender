@@ -21,78 +21,89 @@
  *
  */
 
-import ch from 'hull.js';
+import hull from 'concaveman';
+import GCodeVirtualizer, { shouldRotate, rotateAxis } from 'app/lib/GCodeVirtualizer';
 import * as THREE from 'three';
-
-import Toolpath, { rotateAxis, shouldRotate } from '../lib/GcodeToolpath';
 
 onmessage = ({ data }) => {
     const { gcode, isLaser = false } = data;
-    // Generate an ordered pair - we don't care about Z index for outline purposes so it's removed
+    // Generate an ordered pair - we don't care about Z index for outline purposes, so it's removed
     function vertex(x, y) {
-        return [x.toFixed(2), y.toFixed(2)];
+        return [x.toFixed(3), y.toFixed(3)];
     }
 
     const getOutlineGcode = (gcode, concavity = 60) => {
         const vertices = [];
-        const toolpath = new Toolpath({
-            addLine: ({ motion }, v1, v2) => {
-                if (motion === 'G1' || motion === 'G0') {
-                    if (shouldRotate(v1.a) || shouldRotate(v2.a)) {
-                        v1.y = rotateAxis('y', v1);
-                        v1.z = rotateAxis('z', v1);
 
-                        v2.y = rotateAxis('y', v2);
-                        v2.z = rotateAxis('z', v2);
-                    }
+        const addLine = ({ motion }, v1, v2) => {
+            if (motion === 'G1' || motion === 'G0') {
+                if (shouldRotate(v1.a) || shouldRotate(v2.a)) {
+                    const newV1 = rotateAxis('y', v1);
+                    v1.y = newV1.y;
+                    v1.z = newV1.z;
 
-                    vertices.push(vertex(v2.x, v2.y));
-                }
-            },
-            addArcCurve: ({ motion, plane }, v1, v2, v0) => {
-                const isClockwise = motion === 'G2';
-                const radius = Math.sqrt(
-                    (v1.x - v0.x) ** 2 + (v1.y - v0.y) ** 2
-                );
-                let startAngle = Math.atan2(v1.y - v0.y, v1.x - v0.x);
-                let endAngle = Math.atan2(v2.y - v0.y, v2.x - v0.x);
-
-                // Draw full circle if startAngle and endAngle are both zero
-                if (startAngle === endAngle) {
-                    endAngle += 2 * Math.PI;
+                    const newV2 = rotateAxis('y', v2);
+                    v2.y = newV2.y;
+                    v2.z = newV2.z;
                 }
 
-                const arcCurve = new THREE.ArcCurve(
-                    v0.x, // aX
-                    v0.y, // aY
-                    radius, // aRadius
-                    startAngle, // aStartAngle
-                    endAngle, // aEndAngle
-                    isClockwise // isClockwise
-                );
-                const divisions = 30;
-                const points = arcCurve.getPoints(divisions);
-                vertices.push(vertex(v1.x, v1.y));
+                vertices.push(vertex(v2.x, v2.y));
+            }
+        };
+        const addCurve = ({ motion, plane }, v1, v2, v0) => {
+            const isClockwise = motion === 'G2';
+            const radius = Math.sqrt(
+                (v1.x - v0.x) ** 2 + (v1.y - v0.y) ** 2
+            );
+            let startAngle = Math.atan2(v1.y - v0.y, v1.x - v0.x);
+            let endAngle = Math.atan2(v2.y - v0.y, v2.x - v0.x);
 
-                for (let i = 0; i < points.length; ++i) {
-                    const point = points[i];
-                    const z = ((v2.z - v1.z) / points.length) * i + v1.z;
+            // Draw full circle if startAngle and endAngle are both zero
+            if (startAngle === endAngle) {
+                endAngle += 2 * Math.PI;
+            }
 
-                    if (plane === 'G17') {
-                        // XY-plane
-                        vertices.push(vertex(point.x, point.y));
-                    } else if (plane === 'G18') {
-                        // ZX-plane
-                        vertices.push(vertex(point.y, z));
-                    } else if (plane === 'G19') {
-                        // YZ-plane
-                        vertices.push(vertex(z, point.x));
-                    }
+            const arcCurve = new THREE.ArcCurve(
+                v0.x, // aX
+                v0.y, // aY
+                radius, // aRadius
+                startAngle, // aStartAngle
+                endAngle, // aEndAngle
+                isClockwise // isClockwise
+            );
+            const divisions = 10;
+            const points = arcCurve.getPoints(divisions);
+            vertices.push(vertex(v1.x, v1.y));
+
+            for (let i = 0; i < points.length; ++i) {
+                const point = points[i];
+                const z = ((v2.z - v1.z) / points.length) * i + v1.z;
+
+                if (plane === 'G17') {
+                    // XY-plane
+                    vertices.push(vertex(point.x, point.y));
+                } else if (plane === 'G18') {
+                    // ZX-plane
+                    vertices.push(vertex(point.y, z));
+                } else if (plane === 'G19') {
+                    // YZ-plane
+                    vertices.push(vertex(z, point.x));
                 }
-            },
-        });
-        toolpath.loadFromStringSync(gcode);
-        const fileHull = ch(vertices, concavity);
+            }
+        };
+
+        const vm = new GCodeVirtualizer({ addLine, addCurve, collate: true });
+
+        const lines = gcode
+            .split(/\r?\n/)
+            .reverse();
+
+        while (lines.length) {
+            let line = lines.pop();
+            vm.virtualize(line);
+        }
+
+        const fileHull = hull(vertices);
 
         const gCode = convertPointsToGCode(fileHull, isLaser);
 

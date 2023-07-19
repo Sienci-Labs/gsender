@@ -32,7 +32,7 @@ import Widget from 'app/components/Widget';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
 import pubsub from 'pubsub-js';
-import { TOUCHPLATE_TYPE_AUTOZERO, PROBE_TYPE_AUTO, TOUCHPLATE_TYPE_ZERO } from 'app/lib/constants';
+import { TOUCHPLATE_TYPE_AUTOZERO, PROBE_TYPE_AUTO, TOUCHPLATE_TYPE_ZERO, PROBE_TYPE_TIP } from 'app/lib/constants';
 import store from 'app/store';
 import { mm2in } from 'app/lib/units';
 import WidgetConfig from '../WidgetConfig';
@@ -93,7 +93,36 @@ class ProbeWidget extends PureComponent {
 
     DWELL_TIME = 0.3;
 
+    testInterval = null;
+
     actions = {
+        startConnectivityTest: () => {
+            const { connectivityTest } = this.state;
+            const { returnProbeConnectivity } = this.actions;
+
+            if (this.testInterval) {
+                clearInterval(this.testInterval);
+                this.testInterval = null;
+            }
+            if (!connectivityTest) {
+                this.setState({
+                    connectionMade: true
+                });
+                return;
+            }
+            this.testInterval = setInterval(() => {
+                if (returnProbeConnectivity()) {
+                    this.setState({
+                        connectionMade: true,
+                    });
+                    clearInterval(this.testInterval);
+                    this.testInterval = null;
+                }
+            }, 250);
+        },
+        setProbeConnectivity: (connectionMade) => {
+            this.setState({ connectionMade });
+        },
         toggleFullscreen: () => {
             const { minimized, isFullscreen } = this.state;
             this.setState({
@@ -106,6 +135,9 @@ class ProbeWidget extends PureComponent {
             this.setState({ minimized: !minimized });
         },
         openModal: (name = MODAL_NONE, params = {}) => {
+            if (name === MODAL_PREVIEW) {
+                this.actions.startConnectivityTest();
+            }
             this.setState({
                 modal: {
                     name: name,
@@ -114,11 +146,17 @@ class ProbeWidget extends PureComponent {
             });
         },
         closeModal: () => {
+            if (this.testInterval) {
+                clearInterval(this.testInterval);
+            }
+            this.testInterval = false;
+
             this.setState({
                 modal: {
                     name: MODAL_NONE,
                     params: {}
-                }
+                },
+                connectionMade: false
             });
         },
         updateModalParams: (params = {}) => {
@@ -372,6 +410,7 @@ class ProbeWidget extends PureComponent {
             selectedProbeCommand: 0,
             connectivityTest: this.config.get('connectivityTest'),
             probeType: PROBE_TYPE_AUTO,
+            connectionMade: false
         };
     }
 
@@ -1058,6 +1097,8 @@ class ProbeWidget extends PureComponent {
         return code;
     }
 
+    generateAvailableTools() {}
+
     generateProbeCommands() {
         const state = { ...this.state,
             controller: {
@@ -1215,8 +1256,13 @@ class ProbeWidget extends PureComponent {
             }),
             pubsub.subscribe('probe:updated', (msg) => {
                 const touchplate = store.get('workspace[probeProfile]', {});
+                let { toolDiameter } = this.state;
+                if (touchplate.touchplateType !== TOUCHPLATE_TYPE_AUTOZERO && (toolDiameter === PROBE_TYPE_AUTO || toolDiameter === PROBE_TYPE_TIP)) {
+                    toolDiameter = 0;
+                }
                 this.setState({
-                    touchplate: touchplate
+                    touchplate: touchplate,
+                    toolDiameter: toolDiameter
                 }, () => {
                     this.actions.generatePossibleProbeCommands();
                 });
@@ -1345,9 +1391,7 @@ class ProbeWidget extends PureComponent {
                     )}
                     active={active}
                 >
-                    {state.modal.name === MODAL_PREVIEW &&
-                        <RunProbe state={state} actions={actions} />
-                    }
+                    <RunProbe state={state} actions={actions} show={state.modal.name === MODAL_PREVIEW} />
                     <Probe
                         state={state}
                         actions={actions}

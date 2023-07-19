@@ -16,6 +16,7 @@ test('GrblLineParserResultStatus: all zeroes in the mask ($10=0)', (t) => {
         t.same(status, {
             activeState: 'Idle',
             pinState: {},
+            pinState: {},
             subState: 0
         });
         t.end();
@@ -32,6 +33,7 @@ test('GrblLineParserResultStatus: default ($10=3)', (t) => {
         t.same(status, {
             pinState: {},
             activeState: 'Idle',
+            pinState: {},
             subState: 0,
             mpos: {
                 x: '5.529',
