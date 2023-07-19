@@ -22,10 +22,10 @@ export const generateList = (shortcuts) => {
         let categoryA = MACRO_CATEGORY;
         let categoryB = MACRO_CATEGORY;
         if (allShuttleControlEvents[a.cmd]) {
-            categoryA = allShuttleControlEvents[a.cmd].category;
+            categoryA = allShuttleControlEvents[a.cmd].category || MACRO_CATEGORY;
         }
         if (allShuttleControlEvents[b.cmd]) {
-            categoryB = allShuttleControlEvents[b.cmd].category;
+            categoryB = allShuttleControlEvents[b.cmd].category || MACRO_CATEGORY;
         }
         return categoryA.localeCompare(categoryB);
     });

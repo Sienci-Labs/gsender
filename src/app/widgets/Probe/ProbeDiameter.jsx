@@ -31,7 +31,6 @@ import { TOUCHPLATE_TYPE_AUTOZERO, PROBE_TYPE_AUTO, PROBE_TYPE_TIP } from 'app/l
 import styles from './index.styl';
 import { METRIC_UNITS } from '../../constants';
 
-
 const convertAvailableTools = (tools, units) => {
     const optionLabels = [];
 
@@ -69,6 +68,8 @@ const ProbeDiameter = ({ actions, state, probeCommand }) => {
 
     const options = [];
 
+    const toolsObjects = convertAvailableTools(tools, units);
+
     const touchplateType = store.get('workspace.probeProfile.touchplateType');
 
     if (touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
@@ -78,7 +79,7 @@ const ProbeDiameter = ({ actions, state, probeCommand }) => {
         );
     }
 
-    options.push(...convertAvailableTools(tools, units));
+    options.push(...toolsObjects);
 
     return (
         <div className={cx(styles.probeDiameterWrapper, { [styles.hidden]: !probeCommand.tool })}>

@@ -135,9 +135,12 @@ const createServer = (options, callback) => {
 
     let { backlog, port = 0, host } = options;
 
-    //If headless setting is ON, change to correct port and IP
+    const isInDevelopmentMode = process.env.NODE_ENV === 'development';
+
+    // If headless setting is ON, change to correct port and IP
     const remoteSettings = config.get('remoteSettings', {});
-    if (remoteSettings.headlessStatus) {
+    // Don't do this if: disabled, default IP, dev mode
+    if (remoteSettings.headlessStatus && !isInDevelopmentMode && remoteSettings.ip !== '0.0.0.0') {
         port = remoteSettings.port;
         host = remoteSettings.ip;
     }
@@ -296,7 +299,7 @@ const createServer = (options, callback) => {
             log.error(err.name);
             let errData = {};
             // Handle invalid IP by disabling remote mode until enabled again and signaling error
-            if (err.message.includes('address not available')) {
+            if (err.message.includes('address not available') || err.message.includes('address already in use')) {
                 config.set('remoteSettings.headlessStatus', false);
                 config.set('remoteSettings.error', true);
                 errData.bindingErr = true;

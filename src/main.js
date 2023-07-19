@@ -75,6 +75,16 @@ const main = () => {
 
     const store = new Store();
 
+    // Increase V8 heap size of the main process
+    if (process.arch === 'x64') {
+        const memoryLimit = 1024 * 8; // 8GB
+        app.commandLine.appendSwitch('--js-flags', `--max-old-space-size=${memoryLimit}`);
+    }
+
+    if (process.platform === 'linux') {
+        app.commandLine.appendSwitch('--no-sandbox');
+    }
+
     // Create the user data directory if it does not exist
     const userData = app.getPath('userData');
     mkdirp.sync(userData);
@@ -86,23 +96,6 @@ const main = () => {
     app.whenReady().then(async () => {
         try {
             await session.defaultSession.clearCache();
-
-
-            app.commandLine.appendSwitch('ignore-gpu-blacklist');
-            // Increase V8 heap size of the main process
-            if (process.arch === 'x64') {
-                const memoryLimit = 1024 * 8; // 8GB
-                app.commandLine.appendSwitch('--js-flags', `--max-old-space-size=${memoryLimit}`);
-            }
-
-            if (process.platform === 'linux') {
-                // https://github.com/electron/electron/issues/18265
-                // Run this at early startup, before app.on('ready')
-                //
-                // TODO: Maybe we can only disable --disable-setuid-sandbox
-                // reference changes: https://github.com/microsoft/vscode/pull/122909/files
-                app.commandLine.appendSwitch('--no-sandbox');
-            }
 
             windowManager = new WindowManager();
             // Create and show splash before server starts
@@ -127,9 +120,9 @@ const main = () => {
             } catch (error) {
                 if (error.message.includes('EADDR')) {
                     dialog.showMessageBoxSync(null, {
-                        title: 'Error binding remote address',
-                        message: 'There was an error binding the remote address.',
-                        detail: 'Remote mode has been disabled.  Double-check the configured IP address before restarting the application.'
+                        title: 'Error Connecting to Remote Address',
+                        message: 'There was an problem connecting to the remote address in gSender.',
+                        detail: 'Remote mode has been disabled. Please verify the configured IP address before restarting the application.'
                     });
                     app.relaunch();
                     app.exit(-1);
@@ -165,7 +158,8 @@ const main = () => {
                 title: `gSender Hal + Rotary ${pkg.version}`,
                 kiosk
             };
-            const window = windowManager.openWindow(url, options, splashScreen);
+            const window = await windowManager.openWindow(url, options, splashScreen);
+
 
             // Power saver - display sleep higher precedence over app suspension
             powerSaveBlocker.start('prevent-display-sleep');
@@ -236,7 +230,7 @@ const main = () => {
                         {
                             properties: ['openFile'],
                             filters: [
-                                { name: 'GCode Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
+                                { name: 'G-Code Files', extensions: ['gcode', 'gc', 'nc', 'tap', 'cnc'] },
                                 { name: 'All Files', extensions: ['*'] }
                             ]
                         },);

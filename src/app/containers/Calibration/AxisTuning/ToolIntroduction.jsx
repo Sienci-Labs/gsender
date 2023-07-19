@@ -28,7 +28,7 @@ import Select from 'react-select';
 import get from 'lodash/get';
 
 import reduxStore from 'app/store/redux';
-import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+import ToolModalButton from 'app/components/ToolModalButton/ToolModalButton';
 import JogControl from 'app/widgets/JogControl';
 
 import styles from '../index.styl';
@@ -70,9 +70,9 @@ const ToolIntroduction = ({ readyHandler, currentAxis, onSelectAxis, isConnected
             </div>
 
             <div>
-                <JogControl widgetId="jogcontrol" isSecondary />
+                <JogControl widgetId="axes" isSecondary />
             </div>
-            <FunctionButton primary disabled={!isConnected} onClick={readyHandler}>{ buttonText }</FunctionButton>
+            <ToolModalButton icon="fas fa-play" disabled={!isConnected} onClick={readyHandler}>{ buttonText }</ToolModalButton>
         </ReduxProvider>
     );
 };

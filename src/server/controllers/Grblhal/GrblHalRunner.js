@@ -300,6 +300,14 @@ class GrblHalRunner extends events.EventEmitter {
         return Number(_.get(state, 'parserstate.tool')) || 0;
     }
 
+    setTool(tool) {
+        this.state.parserstate.modal.tool = tool;
+    }
+
+    getParameters() {
+        return _.get(this.settings, 'parameters', {});
+    }
+
     isAlarm() {
         const activeState = _.get(this.state, 'status.activeState');
         return activeState === GRBL_HAL_ACTIVE_STATE_ALARM;

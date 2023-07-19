@@ -160,7 +160,8 @@ class Sender extends events.EventEmitter {
         finishTime: 0,
         elapsedTime: 0,
         remainingTime: 0,
-        waiting: false,
+        toolChanges: 0,
+        waiting: false
     };
 
     stateChanged = false;
@@ -208,7 +209,7 @@ class Sender extends events.EventEmitter {
                         continue;
                     }
 
-                    const line = sp.line + '\n';
+                    const line = sp.line + '\r\n';
                     sp.line = '';
                     sp.dataLength += line.length;
                     sp.queue.push(line.length);
@@ -267,7 +268,8 @@ class Sender extends events.EventEmitter {
             elapsedTime: this.state.elapsedTime,
             timePaused: this.state.timePaused,
             timeRunning: this.state.timeRunning,
-            remainingTime: this.state.remainingTime
+            remainingTime: this.state.remainingTime,
+            toolChanges: this.state.toolChanges
         };
     }
 
@@ -320,6 +322,7 @@ class Sender extends events.EventEmitter {
         this.state.timePaused = 0;
         this.state.timeRunning = 0;
         this.state.remainingTime = 0;
+        this.state.toolChanges = 0;
 
         this.emit('load', name, gcode, context);
         this.emit('change');
@@ -346,6 +349,7 @@ class Sender extends events.EventEmitter {
         this.state.timePaused = 0;
         this.state.timeRunning = 0;
         this.state.remainingTime = 0;
+        this.state.toolChanges = 0;
 
         this.emit('unload');
         this.emit('change');
@@ -449,6 +453,7 @@ class Sender extends events.EventEmitter {
         this.state.holdReason = null;
         this.state.sent = 0;
         this.state.received = 0;
+        this.state.toolChanges = 0;
         this.emit('change');
 
         return true;
@@ -460,6 +465,12 @@ class Sender extends events.EventEmitter {
         const stateChanged = this.stateChanged;
         this.stateChanged = false;
         return stateChanged;
+    }
+
+    incrementToolChanges() {
+        this.state.toolChanges = this.state.toolChanges + 1;
+        this.emit('change');
+        return this.state.toolChanges;
     }
 
     wait() {
