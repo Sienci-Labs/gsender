@@ -469,7 +469,10 @@ class GrblController {
                         }, 500);
                     }
 
-                    line = line.replace('M6', '(M6)');
+                    const preferences = store.get('preferences');
+                    if (!preferences.toolChange.passthrough) {
+                        line = line.replace('M6', '(M6)');
+                    }
                 }
 
                 /**
