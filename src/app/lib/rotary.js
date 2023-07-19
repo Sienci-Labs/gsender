@@ -7,7 +7,8 @@ import controller from 'app/lib/controller';
 import reduxStore from 'app/store/redux';
 import {
     WORKSPACE_MODE,
-    ROTARY_MODE_FIRMWARE_SETTINGS
+    ROTARY_MODE_FIRMWARE_SETTINGS,
+    ROTARY_TOGGLE_MACRO
 } from 'app/constants';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
@@ -26,7 +27,7 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
 
         store.replace('workspace.rotaryAxis.prevFirmwareSettings', {});
 
-        controller.command('gcode', [...prevFirmwareSettingsArr, '$$']);
+        controller.command('gcode', [...prevFirmwareSettingsArr, '$$', ROTARY_TOGGLE_MACRO]);
         return;
     }
 
@@ -76,7 +77,7 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
                 ),
                 onConfirm: () => {
                     // zero y and enable rotary
-                    controller.command('gcode', ['G10 L20 P1 Y0', ...rotaryFirmwareSettingsArr, '$$']);
+                    controller.command('gcode', ['G10 L20 P1 Y0', ...rotaryFirmwareSettingsArr, '$$', ROTARY_TOGGLE_MACRO]);
 
                     pubsub.publish('visualizer:updateposition', { y: 0 });
 
