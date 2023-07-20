@@ -234,3 +234,8 @@ export const STOCK_TURNING_METHOD = {
     HALF_AND_HALF_SPIRALS: 'HALF_AND_HALF_SPIRALS',
     FULL_SPIRALS: 'FULL_SPIRALS',
 };
+
+export const ROTARY_TOGGLE_MACRO = `
+    G04 P0.5
+    G0 G90 Y[posy]
+`;
