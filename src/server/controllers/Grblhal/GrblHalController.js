@@ -78,6 +78,8 @@ import {
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
+import { GRBL } from 'server/controllers/Grbl/constants';
+import ToolChanger from '../../lib/ToolChanger';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -184,6 +186,9 @@ class GrblHalController {
     homingStarted = false;
 
     homingFlagSet = false;
+
+    // Toolchange
+    toolChanger = null;
 
     constructor(engine, options) {
         if (!engine) {
@@ -424,18 +429,18 @@ class GrblHalController {
 
                     let tool = line.match(toolCommand);
 
-                    // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
-                    if (toolChangeOption !== 'Ignore') {
-                        if (tool) {
-                            this.emit('toolchange:tool', tool[0]);
-                        }
-                        this.workflow.pause({ data: 'M6', comment: commentString });
+                    setTimeout(() => {
+                        // Emit the current state so latest tool info is available
+                        this.runner.setTool(tool[2]); // set tool in runner state
+                        this.emit('controller:state', GRBL, this.state, tool[2]); // set tool in redux
                         this.emit('gcode:toolChange', {
                             line: sent + 1,
+                            count,
                             block: line,
+                            tool: tool,
                             option: toolChangeOption
                         }, commentString);
-                    }
+                    }, 500);
 
                     line = line.replace('M6', '(M6)');
                 }
@@ -748,6 +753,13 @@ class GrblHalController {
                 // Initialize controller
                 this.initController();
             }
+        });
+
+        this.toolChanger = new ToolChanger({
+            isIdle: () => {
+                return this.runner.isIdle();
+            },
+            intervalTimer: 200
         });
 
         this.runner.on('others', (res) => {
@@ -1845,6 +1857,14 @@ class GrblHalController {
                 log.debug('starting post hook');
                 this.command('feeder:start');
                 this.runPostChangeHook();
+            },
+            'wizard:start': () => {
+                log.debug('Wizard kickoff code');
+                const [gcode] = args;
+
+                this.toolChanger.addInterval(() => {
+                    this.command('gcode', gcode);
+                });
             },
             'wizard:step': () => {
                 const [stepIndex, substepIndex] = args;
