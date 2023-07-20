@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 
 import store from 'app/store';
 import ToggleSwitch from 'app/components/ToggleSwitch';
-import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import { WORKSPACE_MODE } from 'app/constants';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import { get } from 'lodash';
@@ -38,20 +37,13 @@ const RotaryToggle = () => {
     };
 
     return (
-        <>
-            <Tooltip
-                content="Enabling rotary mode will update your firmware settings"
-                location="default"
-            >
-                <ToggleSwitch
-                    label="Rotary Mode"
-                    checked={workspaceMode === ROTARY}
-                    onChange={handleToggle}
-                    size="small"
-                    style={{ marginBottom: '1rem' }}
-                />
-            </Tooltip>
-        </>
+        <ToggleSwitch
+            label="Rotary Mode"
+            checked={workspaceMode === ROTARY}
+            onChange={handleToggle}
+            size="small"
+            style={{ marginBottom: '1rem' }}
+        />
     );
 };
 

@@ -49,7 +49,7 @@ const ActionArea = ({ actions }) => {
             <FunctionButton onClick={handleStockTurningClick}>Stock Turning</FunctionButton>
             <FunctionButton onClick={showUnitSetup} disabled={isFileRunning()}>Physical Rotary Unit Setup</FunctionButton>
             <FunctionButton onClick={() => actions.runProbing('Y-axis alignment', Y_AXIS_ALIGNMENT_PROBING_MACRO)}>Y-axis Alignment Setup</FunctionButton>
-            <FunctionButton onClick={() => actions.runProbing('Z-axis', Z_AXIS_PROBING_MACRO)}>Z-axis Probing Setup</FunctionButton>
+            <FunctionButton onClick={() => actions.runProbing('Z-axis', Z_AXIS_PROBING_MACRO)}>Probe Rotary Z-Axis</FunctionButton>
         </div>
     );
 };
