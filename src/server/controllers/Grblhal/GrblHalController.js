@@ -78,7 +78,6 @@ import {
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
-import { GRBL } from 'server/controllers/Grbl/constants';
 import ToolChanger from '../../lib/ToolChanger';
 // % commands
 const WAIT = '%wait';
@@ -429,19 +428,27 @@ class GrblHalController {
 
                     let tool = line.match(toolCommand);
 
-                    setTimeout(() => {
-                        // Emit the current state so latest tool info is available
-                        this.runner.setTool(tool[2]); // set tool in runner state
-                        this.emit('controller:state', GRBL, this.state, tool[2]); // set tool in redux
-                        this.emit('gcode:toolChange', {
-                            line: sent + 1,
-                            count,
-                            block: line,
-                            tool: tool,
-                            option: toolChangeOption
-                        }, commentString);
-                    }, 500);
+                    // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
+                    if (toolChangeOption !== 'Ignore') {
+                        if (tool) {
+                            commentString = `(${tool[0]}) ` + commentString;
+                        }
+                        this.workflow.pause({ data: 'M6', comment: commentString });
+                        const count = this.sender.incrementToolChanges();
 
+                        setTimeout(() => {
+                            // Emit the current state so latest tool info is available
+                            this.runner.setTool(tool[2]); // set tool in runner state
+                            this.emit('controller:state', GRBLHAL, this.state, tool[2]); // set tool in redux
+                            this.emit('gcode:toolChange', {
+                                line: sent + 1,
+                                count,
+                                block: line,
+                                tool: tool,
+                                option: toolChangeOption
+                            }, commentString);
+                        }, 500);
+                    }
                     line = line.replace('M6', '(M6)');
                 }
 
