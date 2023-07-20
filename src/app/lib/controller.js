@@ -106,6 +106,7 @@ class Controller {
         'feedhold_alt': [],
         'virtual_stop_toggle': [],
         'filetype': [],
+        'toolchange:preHookComplete': [],
 
         //A-Axis A.K.A Rotary-Axis events
         'rotaryAxis:updateState': [],

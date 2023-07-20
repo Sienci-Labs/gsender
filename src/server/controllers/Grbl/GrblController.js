@@ -453,20 +453,26 @@ class GrblController {
                             commentString = `(${tool[0]}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
-                        const count = this.sender.incrementToolChanges();
 
-                        setTimeout(() => {
-                            // Emit the current state so latest tool info is available
-                            this.runner.setTool(tool[2]); // set tool in runner state
-                            this.emit('controller:state', GRBL, this.state, tool[2]); // set tool in redux
-                            this.emit('gcode:toolChange', {
-                                line: sent + 1,
-                                count,
-                                block: line,
-                                tool: tool,
-                                option: toolChangeOption
-                            }, commentString);
-                        }, 500);
+                        if (toolChangeOption === 'Code') {
+                            this.emit('toolchange:start');
+                            this.runPreChangeHook(commentString);
+                        } else {
+                            const count = this.sender.incrementToolChanges();
+
+                            setTimeout(() => {
+                                // Emit the current state so latest tool info is available
+                                this.runner.setTool(tool[2]); // set tool in runner state
+                                this.emit('controller:state', GRBL, this.state, tool[2]); // set tool in redux
+                                this.emit('gcode:toolChange', {
+                                    line: sent + 1,
+                                    count,
+                                    block: line,
+                                    tool: tool,
+                                    option: toolChangeOption
+                                }, commentString);
+                            }, 500);
+                        }
                     }
 
                     line = line.replace('M6', '(M6)');
@@ -1942,6 +1948,15 @@ class GrblController {
             'toolchange:context': () => {
                 const [context] = args;
                 this.toolChangeContext = context;
+            },
+            'toolchange:pre': () => {
+                log.debug('Starting pre hook');
+                this.runPreChangeHook();
+            },
+            'toolchange:post': () => {
+                log.debug('starting post hook');
+                this.command('feeder:start');
+                this.runPostChangeHook();
             },
             'wizard:start': () => {
                 log.debug('Wizard kickoff code');

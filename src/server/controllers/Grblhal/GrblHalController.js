@@ -250,6 +250,7 @@ class GrblHalController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
+
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
@@ -427,14 +428,29 @@ class GrblHalController {
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     if (toolChangeOption !== 'Ignore') {
                         if (tool) {
-                            this.emit('toolchange:tool', tool[0]);
+                            commentString = `(${tool[0]}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
-                        this.emit('gcode:toolChange', {
-                            line: sent + 1,
-                            block: line,
-                            option: toolChangeOption
-                        }, commentString);
+
+                        if (toolChangeOption === 'Code') {
+                            this.emit('toolchange:start');
+                            this.runPreChangeHook(commentString);
+                        } else {
+                            const count = this.sender.incrementToolChanges();
+
+                            setTimeout(() => {
+                                // Emit the current state so latest tool info is available
+                                this.runner.setTool(tool[2]); // set tool in runner state
+                                this.emit('controller:state', GRBLHAL, this.state, tool[2]); // set tool in redux
+                                this.emit('gcode:toolChange', {
+                                    line: sent + 1,
+                                    count,
+                                    block: line,
+                                    tool: tool,
+                                    option: toolChangeOption
+                                }, commentString);
+                            }, 500);
+                        }
                     }
 
                     line = line.replace('M6', '(M6)');
