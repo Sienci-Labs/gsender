@@ -5,6 +5,8 @@ import get from 'lodash/get';
 import store from 'app/store';
 import { connect } from 'react-redux';
 import controller from 'app/lib/controller';
+import ToggleSwitch from 'app/components/ToggleSwitch';
+import TooltipCustom from 'app/components/TooltipCustom/ToolTip';
 import Input from '../components/Input';
 import Fieldset from '../components/Fieldset';
 import styles from '../index.styl';
@@ -45,7 +47,7 @@ export const TOOLCHANGE_OPTIONS = {
     }
 };
 
-const ToolChange = ({ mpos, $13 }) => {
+const ToolChange = ({ state, actions, mpos, $13 }) => {
     const convertToolChangePosition = () => {
         const pos = store.get('workspace.toolChangePosition');
         return {
@@ -115,6 +117,14 @@ const ToolChange = ({ mpos, $13 }) => {
     return (
         <div style={{ width: '70%' }}>
             <Fieldset legend="Tool Change" className={styles.paddingBottom}>
+                <TooltipCustom content="Send the toolchange line as is. This assumes that your firmware can properly handle both M6 and T commands." location="default">
+                    <ToggleSwitch
+                        label="Passthrough"
+                        checked={state.toolChange.passthrough}
+                        onChange={actions.toolChange.handlePassthroughToggle}
+                        style={{ marginBottom: '1rem' }}
+                    />
+                </TooltipCustom>
                 <small>Strategy to handle M6 tool change commands</small>
                 <div className={styles.addMargin}>
                     <Select
