@@ -143,7 +143,7 @@ const IdleInfo = ({ state, ...props }) => {
                     lastFileRan
                         ? (
                             <FileStat label="Previous Run">
-                                <span className={styles.textWrap}>{`${lastFileRan}`}</span>
+                                <span className={styles.textWrap}>{lastFileRan}</span>
                                 {`Run Length: ${elapsedTimeToDisplay}`}
                             </FileStat>
                         ) : <FileStat label="Previous Run">-</FileStat>
@@ -162,7 +162,7 @@ const IdleInfo = ({ state, ...props }) => {
                     lastFileRan
                         ? (
                             <FileStat label="Previous Run">
-                                <span className={styles.textWrap}>{`${lastFileRan}`}</span>
+                                <span className={styles.textWrap}>{lastFileRan}</span>
                                 {`Run Length: ${elapsedTimeToDisplay}`}
                             </FileStat>
                         ) : <FileStat label="Previous Run">-</FileStat>
