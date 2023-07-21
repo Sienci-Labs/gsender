@@ -46,13 +46,9 @@ class GrblLineParserResultParameters {
             }
         }
 
-        // [TLO:0.000]
-        if (name === 'TLO') {
-            payload.value = value;
-        }
-
+        // [TLO:0.000] -- in grblHal: [TLO:0.00,0.00,0.00......]
         // [PRB:0.000,0.000,1.492:1]
-        if (name === 'PRB') {
+        if (name === 'PRB' || name === 'TLO') {
             const axes = ['x', 'y', 'z', 'a', 'b', 'c'];
             const [str, result] = value.split(':');
             const list = str.split(',');
