@@ -473,6 +473,7 @@ class GrblController {
                     if (!preferences.toolChange.passthrough) {
                         line = line.replace('M6', '(M6)');
                     }
+                    line = line.replace(`${tool[0]}`, `(${tool[0]})`);
                 }
 
                 /**
