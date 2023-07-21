@@ -469,8 +469,8 @@ class GrblController {
                         }, 500);
                     }
 
-                    const preferences = store.get('preferences');
-                    if (!preferences.toolChange.passthrough) {
+                    const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                    if (!passthroughM6) {
                         line = line.replace('M6', '(M6)');
                     }
                     line = line.replace(`${tool[0]}`, `(${tool[0]})`);
