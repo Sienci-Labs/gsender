@@ -31,7 +31,7 @@ import styles from '../index.styl';
 const Input = ({ value, label, units, onChange, additionalProps, className, isNumber }) => {
     return (
         <div className={classNames(styles.input, 'form-group', className)} style={{ gridTemplateColumns: !label ? '1fr' : '' }}>
-            {label && <label htmlFor="">{`${label}`}</label>}
+            {label && <label htmlFor="">{label}</label>}
             <div className="input-group" style={{ maxHeight: '30px' }}>
                 <ControlledNumberInput
                     {...additionalProps}

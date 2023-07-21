@@ -13,9 +13,9 @@ const Text = styled.text`
 `;
 const G = styled.g`
     &:focus {
-    outline: none;
-    border: none;
-  }
+        outline: none;
+        border: none;
+    }
 `;
 
 const CustomPieChart = ({ propsData, height, width, showAnimation }) => {
@@ -23,7 +23,7 @@ const CustomPieChart = ({ propsData, height, width, showAnimation }) => {
         const { value, percent, x, y, midAngle } = props;
         return (
             <G transform={`translate(${x}, ${y})`} textAnchor={midAngle < -90 || midAngle >= 90 ? 'end' : 'start'}>
-                <Text x={0} y={0}>{`${value}`}</Text>
+                <Text x={0} y={0}>{value}</Text>
                 <Text x={0} y={20}>{`(${(percent * 100).toFixed(2)}%)`}</Text>
             </G>
         );

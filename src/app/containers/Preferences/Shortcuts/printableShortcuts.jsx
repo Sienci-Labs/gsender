@@ -39,7 +39,7 @@ const PrintableShortcuts = React.forwardRef((_, ref) => {
             const title = allShuttleControlEvents[key] ? allShuttleControlEvents[key].title : shortcut.title;
 
             return (
-                <tr key={`${shortcut.cmd}`}>
+                <tr key={shortcut.cmd}>
                     <td>{title}</td>
                     <td><i>{shortcut.keys}</i></td>
                 </tr>
