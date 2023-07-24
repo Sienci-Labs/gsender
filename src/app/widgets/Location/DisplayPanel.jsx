@@ -150,12 +150,19 @@ class DisplayPanel extends PureComponent {
 
     //Only rounds values with more than 3 decimal places which begin with 9
     customMathRound(num) {
-        let radix = num % 1.0;
-        if ((radix > 0.899 && radix < 1.0) && (Number(num.split('.')[1].slice(0, 2)) > 97)) {
-            return Math.ceil(num).toFixed(Number(num.split('.')[1].length));
-        } else {
-            return num;
+        const { $13 } = this.props;
+        const DRO = store.get('workspace.customDecimalPlaces', 0);
+        const places = $13 === '1' ? 4 : 3; // firmware gives back 3 for metric and 4 for imperial
+        const defaultPlaces = $13 === '1' ? 3 : 2; // default places when DRO = 0
+        const wholeLength = num.split('.')[0].length;
+
+        let result = num.slice(0, wholeLength + 1 + places); // cut off the javascript weirdness
+        if (DRO > places) { // add more 0s
+            result = result.padEnd(wholeLength + 1 + DRO, '0'); // +1 for ., +DRO for decimal places
+        } else { // remove decimal places (with rounding)
+            result = Number(num).toFixed(DRO === 0 ? defaultPlaces : DRO);
         }
+        return result;
     }
 
     renderAxis = (axis) => {
@@ -400,6 +407,7 @@ export default connect((store) => {
     const activeState = get(store, 'controller.state.status.activeState');
     const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
     const mpos = get(store, 'controller.mpos');
+    const $13 = get(store, 'controller.settings.settings.$13');
     return {
         homingEnabled,
         canHome,
@@ -407,6 +415,7 @@ export default connect((store) => {
         homingFlag,
         homingRun,
         pullOff,
-        mpos
+        mpos,
+        $13
     };
 })(DisplayPanel);
