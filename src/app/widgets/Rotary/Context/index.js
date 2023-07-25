@@ -1,29 +1,39 @@
 import React, { createContext, useReducer } from 'react';
 
+import store from 'app/store';
+
 import { SPEED_NORMAL } from '../../JogControl/constants';
 import { A_AXIS_JOG, HOLE_COUNT } from '../utils/constants';
-import { UPDATE_PRESET, UPDATE_JOG, SET_ACTIVE_DIALOG, CLOSE_ACTIVE_DIALOG, UPDATE_PHYSICAL_UNIT_SETUP } from './actions';
+import {
+    UPDATE_PRESET,
+    UPDATE_JOG,
+    SET_ACTIVE_DIALOG,
+    CLOSE_ACTIVE_DIALOG,
+    UPDATE_PHYSICAL_UNIT_SETUP,
+    SET_STOCK_TURNING_OUTPUT,
+    UPDATE_STOCK_TURNING_OPTION,
+    CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL
+} from './actions';
 import { QUARTER } from '../constant';
+import defaultState from '../../../store/defaultState';
+import { convertToImperial } from '../../../containers/Preferences/calculate';
 
-const initialState = {
-    speedPreset: SPEED_NORMAL,
-    jog: { a: A_AXIS_JOG },
-    activeDialog: null,
-    physicalUnitSetup: {
-        linesUp: false,
-        drillBitDiameter: QUARTER,
-        holeCount: HOLE_COUNT.SIX
-    },
-    stockTurning: {
-        bitDiameter: 6.35,
-        stepover: 0.15,
-        feedrate: 3000,
-        stockLength: 100,
-        startHeight: 25,
-        finalHeight: 20,
-        stepdown: 20,
-        gcode: null,
-    }
+const initialState = () => {
+    const stockTurningOptions = store.get('widgets.rotary.stockTurning.options', {});
+
+    const defaultStockTurningOptions = defaultState.widgets.rotary.stockTurning.options;
+
+    return {
+        speedPreset: SPEED_NORMAL,
+        jog: { a: A_AXIS_JOG },
+        activeDialog: null,
+        physicalUnitSetup: {
+            linesUp: false,
+            drillBitDiameter: QUARTER,
+            holeCount: HOLE_COUNT.SIX
+        },
+        stockTurning: { options: { ...defaultStockTurningOptions, ...stockTurningOptions }, gcode: null }
+    };
 };
 
 const reducer = (state, action) => {
@@ -54,6 +64,49 @@ const reducer = (state, action) => {
         };
     }
 
+    case SET_STOCK_TURNING_OUTPUT: {
+        return {
+            ...state,
+            stockTurning: {
+                ...state.stockTurning,
+                gcode: action.payload,
+            }
+        };
+    }
+
+    case UPDATE_STOCK_TURNING_OPTION: {
+        return {
+            ...state,
+            stockTurning: {
+                ...state.stockTurning,
+                options: {
+                    ...state.stockTurning.options,
+                    [action.payload.key]: action.payload.value
+                }
+            }
+        };
+    }
+
+    case CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL: {
+        const { stockLength, stepdown, bitDiameter, feedrate, startHeight, finalHeight } = state.stockTurning.options;
+
+        return {
+            ...state,
+            stockTurning: {
+                ...state.stockTurning,
+                options: {
+                    ...state.stockTurning.options,
+                    stockLength: convertToImperial(stockLength),
+                    stepdown: convertToImperial(stepdown),
+                    bitDiameter: convertToImperial(bitDiameter),
+                    feedrate: convertToImperial(feedrate),
+                    startHeight: convertToImperial(startHeight),
+                    finalHeight: convertToImperial(finalHeight),
+                }
+            }
+        };
+    }
+
     default: {
         return state;
     }
@@ -63,7 +116,7 @@ const reducer = (state, action) => {
 export const RotaryContext = createContext({});
 
 export const RotaryContextProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(reducer, initialState);
+    const [state, dispatch] = useReducer(reducer, initialState());
 
     return (
         <RotaryContext.Provider value={{ state, dispatch }}>
