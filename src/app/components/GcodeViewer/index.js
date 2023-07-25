@@ -19,6 +19,10 @@ const GcodeViewer = ({ gcode }) => {
         });
     }, 2000, { trailing: false });
 
+    if (!gcode) {
+        return null;
+    }
+
     return (
         <Container>
             <GcodeContainer>
