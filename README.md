@@ -1,8 +1,8 @@
-# ![gSender logo](https://github.com/Sienci-Labs/sender/blob/master/src/app/images/icon-git.png?raw=true)gSender: connect to and control [Grbl](https://github.com/grbl/grbl)-based CNCs
+# ![gSender logo](https://github.com/Sienci-Labs/sender/blob/master/src/app/images/icon-git.png?raw=true)gSender: connect to and control [grbl](https://github.com/grbl/grbl)-based CNCs
 
 gSender is a feature-packed CNC interface software designed to be clean and easy to learn while retaining a depth of capabilities for advanced users. Its development was begun out of a passion for hobby CNC machines: an interface rebuilt to suit the needs of the at-home CNC user.
-* Accepts standard, GRBL-compliant g-code and has been verified to work with many of the common CAM programs
-* Began development to bring new concepts to the existing landscape of GRBL senders in an effort to advance functionality and ease-of-use
+* Accepts standard, grbl-compliant g-code and has been verified to work with many of the common CAM programs
+* Began development to bring new concepts to the existing landscape of grbl senders in an effort to advance functionality and ease-of-use
 * Javascript-based CNC interface software which leverages [Electron](https://www.electronjs.org/) for cross platform use
 * Is a branch off of the popular [CNCjs CNC controller interface](https://github.com/cncjs/cncjs) 
 
@@ -29,7 +29,7 @@ gSender is available for the following systems and does not yet support headless
 
 ## 📦 Current Features
 
-* [GRBL](https://github.com/gnea/grbl/releases) controllers supported
+* [Grbl](https://github.com/gnea/grbl/releases) controllers supported
 * Smart machine connection
 * 3-axis digital readout (DRO) with manual value entry
 * All-directional jogging with XY diagonals, jog presets, and incremental/continuous single-button handling
@@ -50,7 +50,7 @@ gSender is available for the following systems and does not yet support headless
 * Lightweight mode reduces processing intensity on less powerful hardware or when running larger files
 * Easy workspace swapping for more advanced jigging or alignment work
 * Optional automatic handling for common error throwing g-code
-* Firmware tool for easier GRBL EEPROM changes, loading defaults, and GRBL flashing
+* Firmware tool for easier grbl EEPROM changes, loading defaults, and grbl flashing
 * Surfacing tool auto-generates surfacing g-code based on machine cutting area and other preferences, ready to execute
 * Calibration tool for axis alignment - a step by step process to make sure your CNC is square
 * Movement tuning tool for calibrating motor axis movements
@@ -103,8 +103,8 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Fix for overrides leading to gcode errors
 - Override value correctly updates with keybind usage
 - Using override keybind should now display the override panel
-- Multiple toolchanges in a single file now display the correct tool in the Wizard
-- Controller binds should work with toolchange wizard active
+- Multiple tool changes in a single file now display the correct tool in the Wizard
+- Controller binds should work with tool change wizard active
 - Spindle RPM no longer incorrectly converting units
 - Spindle slider now reflects EEPROM values for min and max
 - Jog speed properly converts through preferred unit changes
@@ -115,12 +115,12 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ### 1.2.1 (Jun 22, 2023)
 - Fix for files not loading for some users
-- Toolchange strategy missing units added
+- Tool change strategy missing units added
 - Controller functionality issues addressed
 - Calibration tools calculate correct values based on input
 - Surfacing unit conversion on RPM removed
 - Laser unit renamed to Power from RPM
-- Color theme loading no longer loads non-existant file
+- Color theme loading no longer loads non-existent file
 
 ### 1.2.0 (Jun 19, 2023)
 - gSender runs noticeably faster and lighter!
@@ -171,10 +171,10 @@ gSender is also designed in a way that it can be run locally on your computer br
 - Improved surfacing tool - pattern now ramps in to support more surfacing bit types, cut direction is reversible, able to start from center, can copy gcode to clipboard for saving.
 - Major improvements to visualizer memory usage and parsing speed
 - Start from line should account for maximum file Z height when moving into position to account for situations where Z0 is set at the spoilboard.
-- Probe code should always return to exact starting location instead of approximating it.
+- Probe code should always return to the exact starting location instead of approximating it.
 - Improvements to firmware flashing UX - can now select profile and port inside tool.
 - Fix for auto-probe code movements being too small when "$13 report as inches" EEPROM value enabled
-- Go To buttons only use safe height if below that position when limit switches enabled to avoid moving downwards.
+- Go To buttons only use safe height if below that position when limit switches are enabled to avoid moving downwards.
 - Fixed values in some machine profiles.
 - Added machine state guards to some keyboard shortcuts.
 - UI Modals now more difficult to close accidentally.
@@ -203,7 +203,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Test mode now restores WCS after the soft reset performed while exiting check mode.
 * Fixed issue with test mode that would occasionally have it start running the file after test was complete
 * Fixed issue with continuous jog when soft limits were enabled and report in inches EEPROM value was enabled
-* Firmware tool improvements - new convenient profile selection, setting search, performance improvments, highlighted changed values
+* Firmware tool improvements - new convenient profile selection, setting search, performance improvements, highlighted changed values
 * Improvements to value inputs - should no longer default to min value if there is too long a pause in typing
 * Surfacing labels changed to X/Y rather than length/width
 * Minor styling changes
@@ -258,24 +258,24 @@ gSender is also designed in a way that it can be run locally on your computer br
 
 ### 1.0.5 (Mar 4, 2022)
 * Tool commands now emitted to UI if they occur alongside M6 commands
-* Start from line should more consistently set feedrate/spindle rate
+* Start from line should more consistently set feed rate and spindle speed
 * Fixed issue where laser min and laser max were reversed on initializing laser mode.
 * Rewrite of jog UI control to gain more consistent behaviour
 * Alterations to jog keybinds to gain more consistent behaviour
-* Added logic on toolchange to prevent sender from starting before post hook is complete
+* Added logic on tool change to prevent sender from starting before post hook is complete
 * Alterations to profile default spindle min and max and laser min and max values
 
 ### 1.0.4 (Feb 15, 2022)
 * Add support for distinct Spindle max and Spindle Min while in laser or spindle mode
-* "Pause" toolchange workflow renamed to "Manual", and now allows jogging and macros to be run 
-* Default feedrate in "start from line" now reflects file unit modal
+* "Pause" tool change workflow renamed to "Manual", and now allows jogging and macros to be run 
+* Default feed rate in "start from line" now reflects file unit modal
 * Fixed issue where units weren't consistent on Go-To buttons leading to Z plunge
 * Tool diameter selection hidden on Z probe to prevent user confusion.
 * Lowered minimum resolution from 1280X960 to 1024X768 and added responsiveness to account for that.
 * Trimmed machine profile list to generic set and made it more obvious that machine dimensions are as reported from EEPROM.
 * Added MK2 machine profiles and support for default settings for new machines.
 * Updated firmware images for MK1 and MK2
-* Fixed regression where comments weren't properly stripped before sending to GBRL
+* Fixed regression where comments weren't properly stripped before sending to grbl
 * Corrections to Auto-diameter probe profiles
 * Fixed issue where T commands could cause errors when on a line with M6 commands
 * Stop job should now consistently reset board (0x18) as intended
@@ -330,7 +330,7 @@ gSender is also designed in a way that it can be run locally on your computer br
 * Fixed issue with jog/play shortcuts
 * Fixed bug where homing using the visualizer Home button did not unlock rapid position buttons
 * Fixed issue where firmware settings could be sent when machine was locked/alarmed resulting in settings not updating
-* Fixed issue where M0 commands in toolchange hooks would result in post hook not executing
+* Fixed issue where M0 commands in tool change hooks would result in post hook not executing
 
 ### Open Beta 0.7.5 (Oct 22, 2021)
 * Improvements to surfacing tool - new motions and layout
