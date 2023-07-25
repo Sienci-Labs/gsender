@@ -9,6 +9,7 @@ import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import { METRIC_UNITS, VISUALIZER_PRIMARY, VISUALIZER_SECONDARY } from 'app/constants';
 import api from 'app/api';
+import GcodeViewer from 'app/components/GcodeViewer';
 
 import Visualizer from '../Visualizer';
 import InputArea from '../InputArea';
@@ -16,7 +17,6 @@ import ActionArea from '../ActionArea';
 import styles from '../../index.styl';
 import Generator from '../../utils/Generator';
 // import { convertValuesToImperial } from '../../utils';
-import GcodeViewer from '../GcodeViewer';
 import TabArea from '../TabArea';
 import { SurfacingContext } from './Context';
 
