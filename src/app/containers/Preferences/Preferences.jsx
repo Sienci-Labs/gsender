@@ -177,6 +177,7 @@ class PreferencesPage extends PureComponent {
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
+            shouldWarnZero: store.get('workspace.shouldWarnZero', false),
             toolChange: {
                 passthrough: store.get('workspace.toolChange.passthrough', false),
             },
@@ -248,6 +249,11 @@ class PreferencesPage extends PureComponent {
                 store.set('widgets.visualizer.showLineWarnings', shouldShow);
                 this.setState({ showLineWarnings: shouldShow });
                 pubsub.publish('gcode:showLineWarnings', shouldShow);
+            },
+            setShouldWarnZero: (shouldShow) => {
+                store.set('workspace.shouldWarnZero', shouldShow);
+                this.setState({ shouldWarnZero: shouldShow });
+                pubsub.publish('gcode:shouldWarnZero', shouldShow);
             },
         },
         tool: {
