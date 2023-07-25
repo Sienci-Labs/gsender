@@ -58,7 +58,7 @@ const InputArea = () => {
 
             <div style={{ marginBottom: '1rem' }}>
                 <MultiInputBlock
-                    label="Start & End Height"
+                    label="Start & Final Height"
                     firstComponent={(
                         <Input
                             units={units}
