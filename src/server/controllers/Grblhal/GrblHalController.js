@@ -78,6 +78,7 @@ import {
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
+import ToolChanger from '../../lib/ToolChanger';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -184,6 +185,9 @@ class GrblHalController {
     homingStarted = false;
 
     homingFlagSet = false;
+
+    // Toolchange
+    toolChanger = null;
 
     constructor(engine, options) {
         if (!engine) {
@@ -453,7 +457,11 @@ class GrblHalController {
                         }
                     }
 
-                    line = line.replace('M6', '(M6)');
+                    const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                    if (!passthroughM6) {
+                        line = line.replace('M6', '(M6)');
+                    }
+                    line = line.replace(`${tool[0]}`, `(${tool[0]})`);
                 }
 
                 return line;
@@ -764,6 +772,13 @@ class GrblHalController {
                 // Initialize controller
                 this.initController();
             }
+        });
+
+        this.toolChanger = new ToolChanger({
+            isIdle: () => {
+                return this.runner.isIdle();
+            },
+            intervalTimer: 200
         });
 
         this.runner.on('others', (res) => {
@@ -1883,6 +1898,14 @@ class GrblHalController {
                 log.debug('starting post hook');
                 this.command('feeder:start');
                 this.runPostChangeHook();
+            },
+            'wizard:start': () => {
+                log.debug('Wizard kickoff code');
+                const [gcode] = args;
+
+                this.toolChanger.addInterval(() => {
+                    this.command('gcode', gcode);
+                });
             },
             'wizard:step': () => {
                 const [stepIndex, substepIndex] = args;

@@ -1554,7 +1554,7 @@ class VisualizerWidget extends PureComponent {
     }
 
     render() {
-        const { renderState, isSecondary, gcode, surfacingData, activeVisualizer, activeState, alarmCode, workflow, isConnected } = this.props;
+        const { renderState, isSecondary, gcode, activeVisualizer, activeState, alarmCode, workflow, isConnected } = this.props;
         const state = {
             ...this.state,
             controller: {
@@ -1600,7 +1600,6 @@ class VisualizerWidget extends PureComponent {
                         this.visualizer = ref?.visualizer;
                     }}
                     gcode={gcode}
-                    surfacingData={surfacingData}
                     cameraPosition="Top"
                 />
             )

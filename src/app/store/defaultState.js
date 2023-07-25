@@ -301,14 +301,17 @@ const defaultState = {
         },
         rotary: {
             stockTurning: {
-                defaultOptions: {
-                    bitDiameter: 6.35,
-                    stepover: 0.15,
-                    feedrate: 3000,
+                options: {
                     stockLength: 100,
-                    startHeight: 25,
-                    finalHeight: 25,
                     stepdown: 20,
+                    bitDiameter: 6.35,
+                    spindleRPM: 17000,
+                    feedrate: 3000,
+                    stepover: 15,
+                    startHeight: 25,
+                    finalHeight: 20,
+                    enableRehoming: false,
+                    usingBigMaterial: false,
                 }
             }
         },

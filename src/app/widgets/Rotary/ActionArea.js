@@ -25,23 +25,7 @@ const ActionArea = ({ actions }) => {
     };
 
     const handleStockTurningClick = () => {
-        return;
-        // dispatch({ type: SET_ACTIVE_DIALOG, payload: MODALS.STOCK_TURNING });
-
-        // const stockTurning = new StockTurningGenerator({
-        //     bitDiameter: 6.35,
-        //     stepover: 0.15,
-        //     feedrate: 3000,
-        //     stockLength: 100,
-        //     startHeight: 25,
-        //     finalHeight: 20,
-        //     stepdown: 20,
-        //     method: 'HALF_AND_HALF_SPIRALS'
-        // });
-
-        // stockTurning.generate();
-
-        // console.log(stockTurning.gcode);
+        dispatch({ type: SET_ACTIVE_DIALOG, payload: MODALS.STOCK_TURNING });
     };
 
     return (

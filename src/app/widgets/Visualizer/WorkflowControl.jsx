@@ -496,7 +496,7 @@ class WorkflowControl extends PureComponent {
                             <div className={styles.relativeWrapper}>
                                 <button
                                     type="button"
-                                    className={`${styles['workflow-button-upload']}`}
+                                    className={styles['workflow-button-upload']}
                                     title={i18n._('Load File')}
                                     onClick={this.handleClickUpload}
                                 >

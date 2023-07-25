@@ -36,7 +36,6 @@ import cx from 'classnames';
 import controller from 'app/lib/controller';
 //import DRO from 'app/widgets/Location/components/DRO';
 import store from 'app/store';
-import pubsub from 'pubsub-js';
 import { getHomingLocation, getMovementGCode } from 'app/widgets/Location/RapidPosition';
 import Modal from 'app/components/Modal';
 import Panel from './components/Panel';
@@ -163,12 +162,19 @@ class DisplayPanel extends PureComponent {
 
     //Only rounds values with more than 3 decimal places which begin with 9
     customMathRound(num) {
-        let radix = num % 1.0;
-        if ((radix > 0.899 && radix < 1.0) && (Number(num.split('.')[1].slice(0, 2)) > 97)) {
-            return Math.ceil(num).toFixed(Number(num.split('.')[1].length));
-        } else {
-            return num;
+        const { $13 } = this.props;
+        const DRO = store.get('workspace.customDecimalPlaces', 0);
+        const places = $13 === '1' ? 4 : 3; // firmware gives back 3 for metric and 4 for imperial
+        const defaultPlaces = $13 === '1' ? 3 : 2; // default places when DRO = 0
+        const wholeLength = num.split('.')[0].length;
+
+        let result = num.slice(0, wholeLength + 1 + places); // cut off the javascript weirdness
+        if (DRO > places) { // add more 0s
+            result = result.padEnd(wholeLength + 1 + DRO, '0'); // +1 for ., +DRO for decimal places
+        } else { // remove decimal places (with rounding)
+            result = Number(num).toFixed(DRO === 0 ? defaultPlaces : DRO);
         }
+        return result;
     }
 
     renderAxis = (axis, disabled = false, disableGoTo = false) => {
@@ -180,21 +186,6 @@ class DisplayPanel extends PureComponent {
 
         //mpos = Number(mpos).toFixed(3);
 
-        //Function to zero out given axis
-        const handleAxisButtonClick = () => {
-            const wcs = actions.getWorkCoordinateSystem();
-
-            const p = {
-                'G54': 1,
-                'G55': 2,
-                'G56': 3,
-                'G57': 4,
-                'G58': 5,
-                'G59': 6
-            }[wcs] || 0;
-
-            controller.command('gcode', `G10 L20 P${p} ${axisLabel}0`);
-        };
 
         return (
             <tr>
@@ -227,7 +218,7 @@ class DisplayPanel extends PureComponent {
                             controller.command('gcode:safe', commands, modal);
                         }}
                     />
-                    <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick || disabled} />
+                    <AxisButton axis={axisLabel} onClick={() => actions.setZeroOnAxis(true, axisLabel)} disabled={!canClick || disabled} />
                 </td>
                 <td className={styles.machinePosition}>
                     <MachinePositionInput
@@ -418,20 +409,7 @@ class DisplayPanel extends PureComponent {
                             </table>
                             <div className={styles.controlButtons}>
                                 <FunctionButton
-                                    onClick={() => {
-                                        const wcs = actions.getWorkCoordinateSystem();
-                                        const p = {
-                                            'G54': 1,
-                                            'G55': 2,
-                                            'G56': 3,
-                                            'G57': 4,
-                                            'G58': 5,
-                                            'G59': 6
-                                        }[wcs] || 0;
-
-                                        controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
-                                        pubsub.publish('softlimits:check', 0);
-                                    }}
+                                    onClick={() => actions.setZeroOnAxis(true, 'all')}
                                     disabled={!canClick}
                                 >
                                     <i className="fas fa-bullseye" />
@@ -560,6 +538,7 @@ export default connect((store) => {
     const mpos = get(store, 'controller.mpos');
     const firmware = get(store, 'controller.type');
     const modalDistance = get(store, 'controller.state.parserstate.modal.distance');
+    const $13 = get(store, 'controller.settings.settings.$13');
     return {
         homingSetting,
         homingEnabled,
@@ -570,6 +549,7 @@ export default connect((store) => {
         pullOff,
         mpos,
         firmware,
-        modalDistance
+        modalDistance,
+        $13
     };
 })(DisplayPanel);

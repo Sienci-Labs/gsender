@@ -56,7 +56,7 @@ const Workspace = ({ state, actions }) => {
                             name: 'customDecimalPlaces',
                             type: 'number',
                             min: '0',
-                            max: '5',
+                            max: '4',
                         }}
                     />
                 </Tooltip>

@@ -475,7 +475,11 @@ class GrblController {
                         }
                     }
 
-                    line = line.replace('M6', '(M6)');
+                    const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                    if (!passthroughM6) {
+                        line = line.replace('M6', '(M6)');
+                    }
+                    line = line.replace(`${tool[0]}`, `(${tool[0]})`);
                 }
 
                 /**
@@ -1808,9 +1812,9 @@ class GrblController {
                         }
 
                         if (direction === 1) {
-                            return Number(maxTravel - position - OFFSET).toFixed(FIXED);
+                            return Number(position - OFFSET).toFixed(FIXED);
                         } else {
-                            return Number(-1 * (position - OFFSET)).toFixed(FIXED);
+                            return Number(-1 * (maxTravel - position - OFFSET)).toFixed(FIXED);
                         }
                     };
 
@@ -1828,7 +1832,6 @@ class GrblController {
 
                     if (this.homingFlagSet) {
                         const [xMaxLoc, yMaxLoc] = getAxisMaximumLocation($23);
-                        console.log(`x${xMaxLoc}, y${yMaxLoc}`);
 
                         if (axes.X) {
                             axes.X = determineMaxMovement(Math.abs(mpos.x), axes.X, xMaxLoc, $130);
@@ -1837,7 +1840,6 @@ class GrblController {
                             axes.Y = determineMaxMovement(Math.abs(mpos.y), axes.Y, yMaxLoc, $131);
                         }
                     } else {
-                        console.log('calculating from no homing flag');
                         if (axes.X) {
                             axes.X = calculateAxisValue({ direction: Math.sign(axes.X), position: Math.abs(mpos.x), maxTravel: $130 });
                         }
