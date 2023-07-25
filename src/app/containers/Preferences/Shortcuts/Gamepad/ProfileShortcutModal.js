@@ -35,7 +35,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, fi
         };
     }, []);
 
-    const gamepadListener = ({ detail }) => {
+    const gamepadListener = _.throttle(({ detail }) => {
         const { gamepad: currentGamepad } = detail;
         const { id, buttons } = currentGamepad;
 
@@ -70,7 +70,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, fi
 
         setGamepadShortcut(clickedButtons);
         listenerRef.current.handleButtonPress();
-    };
+    }, 250, { trailing: false });
 
     const handleUpdateShortcut = () => {
         const newKeys = shortcutComboBuilder(gamepadShortcut.map(shortcut => shortcut.buttonIndex));
@@ -85,7 +85,7 @@ const ProfileShortcutModal = ({ profile, shortcut, onClose, onUpdateProfiles, fi
 
         const profiles = store.get('workspace.gamepad.profiles', []);
 
-        //CHecks if parent array has all the child array elements
+        //Checks if parent array has all the child array elements
         const arrayComparator = (parentArr, childArr) => childArr.every(element => parentArr.includes(element));
 
         const cleanedProfiles =
