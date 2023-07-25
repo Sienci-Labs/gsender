@@ -36,7 +36,6 @@ import cx from 'classnames';
 import controller from 'app/lib/controller';
 //import DRO from 'app/widgets/Location/components/DRO';
 import store from 'app/store';
-import pubsub from 'pubsub-js';
 import { getHomingLocation, getMovementGCode } from 'app/widgets/Location/RapidPosition';
 import Modal from 'app/components/Modal';
 import Panel from './components/Panel';
@@ -180,21 +179,6 @@ class DisplayPanel extends PureComponent {
 
         //mpos = Number(mpos).toFixed(3);
 
-        //Function to zero out given axis
-        const handleAxisButtonClick = () => {
-            const wcs = actions.getWorkCoordinateSystem();
-
-            const p = {
-                'G54': 1,
-                'G55': 2,
-                'G56': 3,
-                'G57': 4,
-                'G58': 5,
-                'G59': 6
-            }[wcs] || 0;
-
-            controller.command('gcode', `G10 L20 P${p} ${axisLabel}0`);
-        };
 
         return (
             <tr>
@@ -227,7 +211,7 @@ class DisplayPanel extends PureComponent {
                             controller.command('gcode:safe', commands, modal);
                         }}
                     />
-                    <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick || disabled} />
+                    <AxisButton axis={axisLabel} onClick={() => actions.setZeroOnAxis(true, axisLabel)} disabled={!canClick || disabled} />
                 </td>
                 <td className={styles.machinePosition}>
                     <MachinePositionInput
@@ -418,20 +402,7 @@ class DisplayPanel extends PureComponent {
                             </table>
                             <div className={styles.controlButtons}>
                                 <FunctionButton
-                                    onClick={() => {
-                                        const wcs = actions.getWorkCoordinateSystem();
-                                        const p = {
-                                            'G54': 1,
-                                            'G55': 2,
-                                            'G56': 3,
-                                            'G57': 4,
-                                            'G58': 5,
-                                            'G59': 6
-                                        }[wcs] || 0;
-
-                                        controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
-                                        pubsub.publish('softlimits:check', 0);
-                                    }}
+                                    onClick={() => actions.setZeroOnAxis(true, 'all')}
                                     disabled={!canClick}
                                 >
                                     <i className="fas fa-bullseye" />
