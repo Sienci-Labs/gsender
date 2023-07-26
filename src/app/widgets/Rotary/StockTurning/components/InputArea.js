@@ -131,11 +131,6 @@ const InputArea = () => {
                 <label style={{ fontSize: '1.1rem' }}>Enable Re-Homing</label>
                 <Checkbox id="enableRehoming" onChange={handleChange} />
             </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', marginBottom: '1rem' }}>
-                <label style={{ fontSize: '1.1rem' }}>Using Big Material</label>
-                <Checkbox id="usingBigMaterial" onChange={handleChange} />
-            </div>
         </div>
     );
 };
