@@ -62,6 +62,10 @@ const SettingsList = () => {
                                 const defaultValueLabel = grbl.inputType === 'switch' ? labelMap[defaultValue] : defaultValue;
                                 const isSienciMachine = machineProfile?.company?.includes('Sienci Labs');
                                 const highlighted = (!isSameAsDefault && isSienciMachine) ? { backgroundColor: '#f2f2c2' } : {};
+                                const {
+                                    message = 'Custom EEPROM field',
+                                    description = `Change the value of ${grbl.setting}`,
+                                } = grbl;
 
                                 return (
                                     <div key={grbl.setting} className={styles.containerFluid} style={highlighted}>
@@ -73,8 +77,8 @@ const SettingsList = () => {
 
                                             <div className={styles.settingsInformation}>
                                                 <div className={styles.settingsDescription}>
-                                                    <div className={styles.itemText}>{grbl.message}</div>
-                                                    <div className={styles.descriptionRow}>{grbl.description}</div>
+                                                    <div className={styles.itemText}>{message}</div>
+                                                    <div className={styles.descriptionRow}>{description}</div>
                                                 </div>
                                             </div>
 
