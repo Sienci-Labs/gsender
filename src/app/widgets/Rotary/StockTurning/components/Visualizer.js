@@ -13,7 +13,15 @@ const VisualizerComponent = ({ gcode }) => {
             />
         )
         : (
-            <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid black' }}>
+            <div style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                border: '1px solid black'
+            }}
+            >
                 Click Generate G-code Below
             </div>
         );
