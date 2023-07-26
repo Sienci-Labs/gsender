@@ -51,6 +51,7 @@ const Actions = () => {
                 icon="fas fa-play"
                 style={{ margin: 0 }}
                 onClick={loadGcode}
+                disabled={!state.stockTurning.gcode}
             >
                 Run on Main Visualizer
             </ToolModalButton>
