@@ -10,14 +10,14 @@ branches:
 
 environment:
   matrix:
-    - job_name: Windows build (x86)
-     appveyor_build_worker_image: Visual Studio 2019
-     nodejs_version: "14"
-     ARCH: x86
+  #  - job_name: Windows build (x86)
+  #  appveyor_build_worker_image: Visual Studio 2019
+  #  nodejs_version: "14"
+  #  ARCH: x86
     - job_name: Windows build (x64)
-     appveyor_build_worker_image: Visual Studio 2019
-     nodejs_version: "14"
-     ARCH: x64
+       appveyor_build_worker_image: Visual Studio 2019
+       nodejs_version: "14"
+       ARCH: x64
     - job_name: macOS build (x64)
       appveyor_build_worker_image: macos
       nodejs_version: "14"
