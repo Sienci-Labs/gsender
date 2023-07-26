@@ -21,17 +21,7 @@ const JogControlArea = ({ actions, jog, disabled = false }) => {
     return (
         <div className={styles['jog-control-wrapper']}>
             <JogControl
-                className={styles.btnLeft}
-                disabled={disabled}
-                jog={() => actions.jog({ A: -aStep, F: feedrate })}
-                continuousJog={() => actions.startContinuousJog({ A: -1 }, feedrate)}
-                stopContinuousJog={() => actions.stopContinuousJog()}
-            >
-                <KeypadText>A</KeypadText>
-                <KeypadDirectionText>-</KeypadDirectionText>
-            </JogControl>
-            <JogControl
-                className={styles.btnRight}
+                className={styles.btnUp}
                 disabled={disabled}
                 jog={() => actions.jog({ A: aStep, F: feedrate })}
                 continuousJog={() => actions.startContinuousJog({ A: 1 }, feedrate)}
@@ -39,6 +29,16 @@ const JogControlArea = ({ actions, jog, disabled = false }) => {
             >
                 <KeypadText>A</KeypadText>
                 <KeypadDirectionText>+</KeypadDirectionText>
+            </JogControl>
+            <JogControl
+                className={styles.btnDown}
+                disabled={disabled}
+                jog={() => actions.jog({ A: -aStep, F: feedrate })}
+                continuousJog={() => actions.startContinuousJog({ A: -1 }, feedrate)}
+                stopContinuousJog={() => actions.stopContinuousJog()}
+            >
+                <KeypadText>A</KeypadText>
+                <KeypadDirectionText>-</KeypadDirectionText>
             </JogControl>
         </div>
     );
