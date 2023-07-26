@@ -106,7 +106,7 @@ const PhysicalUnitSetup = ({ actions }) => {
 
     return (
         <Modal
-            title="Physical Rotary-unit Setup"
+            title="Rotary Mounting Setup"
             onClose={handleModalClose}
             size="lg"
         >
