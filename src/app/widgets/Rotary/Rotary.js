@@ -1,7 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import map from 'lodash/map';
 import get from 'lodash/get';
+import pubsub from 'pubsub-js';
 
 import api from 'app/api';
 import controller from 'app/lib/controller';
@@ -13,7 +14,6 @@ import styles from './index.styl';
 import RotaryToggle from './RotaryToggle';
 import DROarea from './DROarea';
 import JogControlArea from './JogControlArea';
-import SpeedPresets from './SpeedPresets';
 import SpeedControls from './SpeedControls';
 import ActionArea from './ActionArea';
 import { SPEED_NORMAL, SPEED_PRECISE, SPEED_RAPID } from '../JogControl/constants';
@@ -21,6 +21,9 @@ import PhysicalUnitSetup from './PhysicalUnitSetup';
 import { RotaryContext } from './Context';
 import { MODALS } from './utils/constants';
 import StockTurning from './StockTurning';
+
+
+let pubsubTokens = [];
 
 const Rotary = () => {
     const { state: { activeDialog } } = useContext(RotaryContext);
@@ -32,9 +35,30 @@ const Rotary = () => {
     const [, setIsContinuousJogging] = useState(false);
     const { state: controllerState, type: controllerType } = useSelector(state => state.controller);
 
-    const { ROTARY } = WORKSPACE_MODE;
-    const workspaceMode = store.get('workspace.mode');
-    const enableRotaryAxis = (workspaceMode === ROTARY && controllerType === 'Grbl') || controllerType === 'grblHAL';
+    useEffect(() => {
+        subscribe();
+
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
+    const subscribe = () => {
+        const tokens = [
+            pubsub.subscribe('jog_preset_selected', (msg, speed) => {
+                actions.setSelectedSpeed(speed);
+            }),
+        ];
+
+        pubsubTokens = pubsubTokens.concat(tokens);
+    };
+
+    const unsubscribe = () => {
+        pubsubTokens.forEach((token) => {
+            pubsub.unsubscribe(token);
+        });
+        pubsubTokens = [];
+    };
 
     const actions = {
         setSelectedSpeed: (speed) => {
@@ -125,6 +149,10 @@ const Rotary = () => {
         }
     };
 
+    const { ROTARY } = WORKSPACE_MODE;
+    const workspaceMode = store.get('workspace.mode');
+    const enableRotaryAxis = (workspaceMode === ROTARY && controllerType === 'Grbl') || controllerType === 'grblHAL';
+
     const ActiveModal = {
         [MODALS.PHYSICAL_UNIT_SETUP]: PhysicalUnitSetup,
         [MODALS.STOCK_TURNING]: StockTurning,
@@ -137,12 +165,14 @@ const Rotary = () => {
                     Jog Control
                 </p>
                 <DROarea actions={actions} canClick={enableRotaryAxis && !isFileRunning()} />
-                <JogControlArea
-                    selectedSpeed={speedPreset} actions={actions} jog={jog}
-                    disabled={!enableRotaryAxis || isFileRunning()}
-                />
-                <SpeedPresets selectedSpeed={speedPreset} actions={actions} />
-                <SpeedControls jog={jog} actions={actions} />
+
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                    <JogControlArea
+                        selectedSpeed={speedPreset} actions={actions} jog={jog}
+                        disabled={!enableRotaryAxis || isFileRunning()}
+                    />
+                    <SpeedControls jog={jog} actions={actions} />
+                </div>
             </div>
 
             <div className={styles['rotary-tools-area']}>
