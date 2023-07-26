@@ -76,7 +76,7 @@ const SettingsList = () => {
                                             </div>
 
                                             <div className={styles.settingsInformation}>
-                                                <div className={styles.settingsDescription}>
+                                                <div className={styles.setyarntingsDescription}>
                                                     <div className={styles.itemText}>{message}</div>
                                                     <div className={styles.descriptionRow}>{description}</div>
                                                 </div>
