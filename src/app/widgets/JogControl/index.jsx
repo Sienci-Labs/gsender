@@ -235,6 +235,7 @@ class AxesWidget extends PureComponent {
             return get(controllerState, 'parserstate.modal.wcs') || defaultWCS;
         },
         setSelectedSpeed: (speed) => {
+            pubsub.publish('jog_preset_selected', speed);
             this.setState({
                 selectedSpeed: speed
             });
