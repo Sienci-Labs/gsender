@@ -43,7 +43,7 @@ const ProgramInfo = ({ type, settings, connection, modals }) => {
             );
         }
         return (
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+            <b style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
                 <Tooltip content="Motion" location="default">
                     {modals.motion}
                 </Tooltip>
@@ -71,7 +71,7 @@ const ProgramInfo = ({ type, settings, connection, modals }) => {
                 <Tooltip content="Tool" location="default">
                     {modals.tool}
                 </Tooltip>
-            </div>
+            </b>
         );
     };
 
@@ -85,7 +85,7 @@ const ProgramInfo = ({ type, settings, connection, modals }) => {
             <div><i>{machineType}</i></div>
             <div><b>Preferred units: </b>{units}</div>
             <h3>Firmware Modals: </h3>
-            <b>{printModals()}</b>
+            <div>{printModals()}</div>
             <h3>Connection Info</h3>
             <div><b>Port: </b>{port}</div>
             <div><b>Baudrate: </b>{baudrate}</div>
