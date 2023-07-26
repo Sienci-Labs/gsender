@@ -12,14 +12,11 @@ export class StockTurningGenerator {
 
         let method = STOCK_TURNING_METHOD.HALF_AND_HALF_SPIRALS;
 
+        // Checking for odd and even number of passes for full spiral is done later
         if (newOptions.stepdown >= newOptions.finalHeight) {
             method = STOCK_TURNING_METHOD.HALF_AND_HALF_SPIRALS;
-        }
-
-        if (newOptions.finalHeight % newOptions.stepdown === 0 || newOptions.enableRehoming) {
-            method = STOCK_TURNING_METHOD.FULL_SPIRALS;
         } else {
-            method = STOCK_TURNING_METHOD.HALF_AND_HALF_SPIRALS;
+            method = STOCK_TURNING_METHOD.FULL_SPIRALS;
         }
 
         this.options = { ...newOptions, method };
@@ -67,13 +64,13 @@ export class StockTurningGenerator {
     generateLayers = (array, currentDepth, count) => {
         const { stepdown, finalHeight } = this.options;
 
-        const layer = this.createLayer({ depth: currentDepth > finalHeight ? currentDepth : finalHeight, count });
-
-        array.push(layer);
-
         if (currentDepth <= finalHeight) {
             return array.flat(); //Flatten out array at the end when all subset layers have been added
         }
+
+        const layer = this.createLayer({ depth: currentDepth > finalHeight ? currentDepth : finalHeight, count });
+
+        array.push(layer);
 
         return this.generateLayers(array, currentDepth - stepdown, count + 1);
     }
@@ -106,15 +103,17 @@ export class StockTurningGenerator {
     }
 
     createHalfAndHalfSpiral = (depth) => {
-        const { finalHeight, feedrate, stockLength, stepover, bitDiameter } = this.options;
+        const { finalHeight, feedrate, stockLength, stepover, stepdown, bitDiameter } = this.options;
         const safeHeight = this.getSafeZValue();
         const halfOfStockLength = (stockLength / 2).toFixed(3);
         const throttledFeedrate = (feedrate * 0.2).toFixed(3);
         const stepoverPercentage = stepover / 100;
 
-        const currentZValue = Number(controller.state.status.wpos.z) > 0
-            ? Number(controller.state.status.wpos.z)
+        const currentZValue = depth > 0
+            ? depth
             : this.getDefaultCurrentZValue();
+
+        const isFinalStepdown = currentZValue - stepdown <= finalHeight;
 
         const array = [
             /** 1 */ `G0 Z${safeHeight}`,
@@ -125,10 +124,12 @@ export class StockTurningGenerator {
 
             /** 4 */ 'G91',
 
-            /** 5 & 6 */
-            depth <= finalHeight
-                ? `G1 A-360 Z${-(currentZValue - finalHeight)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`
-                : 'G1 A-360',
+            /** 5 */
+            isFinalStepdown
+                ? (`G1 A-360 Z${-(currentZValue - finalHeight)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`)
+                : '',
+
+            /** 6 */ 'G1 A-360',
 
             /** 7 */ `G1 X${halfOfStockLength} A${(0.5 * -360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
@@ -144,7 +145,10 @@ export class StockTurningGenerator {
 
             /** 13 */ 'G91',
 
-            /** 14 */ `G1 A360 Z${-(currentZValue - finalHeight)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            /** 14 */
+            isFinalStepdown
+                ? `G1 A360 Z${-(currentZValue - finalHeight)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`
+                : '',
 
             /** 15 */ 'G1 A360',
 
@@ -163,26 +167,41 @@ export class StockTurningGenerator {
     }
 
     createFullSpiral = (depth) => {
-        const { finalHeight, feedrate, stockLength, stepover, bitDiameter, stepdown, enableRehoming } = this.options;
+        const {
+            startHeight,
+            finalHeight,
+            feedrate,
+            stockLength,
+            stepover,
+            bitDiameter,
+            stepdown,
+            enableRehoming
+        } = this.options;
         const safeHeight = this.getSafeZValue();
         const halfOfStockLength = (stockLength / 2).toFixed(3);
         const throttledFeedrate = (feedrate * 0.2).toFixed(3);
         const stepoverPercentage = stepover / 100;
 
-        const currentZValue = Number(controller.state.status.wpos.z) > 0
-            ? Number(controller.state.status.wpos.z)
+        const currentZValue = depth > 0
+            ? depth
             : this.getDefaultCurrentZValue();
 
-        const array = [
+        const isFinalStepdown = currentZValue - stepdown <= finalHeight;
+        const isEvenNumberOfStepdowns = startHeight % stepdown === 0;
+        const isFirstLayer = currentZValue === startHeight;
+
+        const firstLayerBlock = [
             /** 1 */ `G0 Z${safeHeight}`,
 
             /** 2 */ 'G0 X0 A0',
 
+            /** 3 */ `G0 Z${depth} F${throttledFeedrate}`,
+
             /** 3 */ 'G91',
 
             /** 4 */
-            depth <= finalHeight
-                ? `G1 A-360 Z${-currentZValue - finalHeight} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`
+            isFinalStepdown
+                ? `G1 A-360 Z${-(currentZValue - finalHeight)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`
                 : `G1 A-360 Z${-stepdown} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 5 */ 'G1 A-360',
@@ -190,67 +209,77 @@ export class StockTurningGenerator {
             /** 6 */ `G1 X${stockLength} A${-((360 * stockLength) / (stepover * bitDiameter)).toFixed(3)} F${((360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 7 */ 'G1 A-360',
+        ];
 
-            // SKIP STEP 8 IF THERE IS ONLY A SINGLE STEPDOWN
-            /** 8 */
-            depth <= finalHeight
-                ? `G1 A360 Z${-currentZValue - finalHeight} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`
-                : `G1 A360 Z${-stepdown} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+        const continuingLayerBlock = [
+            '; Step 8',
+
+            `G1 A360 Z${-stepdown} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             'G1 A-360',
 
             `G1 X${-stockLength} A${((360 * stockLength) / (stepover * bitDiameter)).toFixed(3)} F${((360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
-            // SKIP STEP 9 IF REHOMING IS ENABLED AND THERE ISNT AN ODD NUMBER OF STEPDOWNS
-            /** 9 */
-            !enableRehoming && [
-                'G91',
+            'G1 A-360',
 
-                depth <= finalHeight
-                    ? `G1 A-360 Z${-(currentZValue - finalHeight)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`
-                    : 'G1 A-360',
-
-                `G1 X${halfOfStockLength} A${(0.5 * -360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
-
-                'G1 A-360',
-
-                'G90',
-
-                `G0 Z${safeHeight}`,
-
-                `G0 X${stockLength} F${throttledFeedrate}`,
-
-                `G0 Z${depth} F${throttledFeedrate}`,
-
-                'G91',
-
-                `G1 A360 Z${-(currentZValue - finalHeight)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
-
-                'G1 A360',
-
-                `G1 X${-halfOfStockLength} A${(0.5 * 360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
-
-                'G1 A360',
-            ],
-
-            /** 10 */ 'G90',
-
-            /** 11 */ `G0 Z${safeHeight}`,
-
-            /** 12 */ 'G0 X0 A0'
+            '; End of Step 8',
         ];
 
-        return array.flat();
+        const finalLayerBlock = [
+            '; Step 9',
+
+            /** 4 */ 'G91',
+
+            /** 5 */
+            isFinalStepdown
+                ? (`G1 A-360 Z${-(currentZValue - finalHeight)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`)
+                : '',
+
+            /** 6 */ 'G1 A-360',
+
+            /** 7 */ `G1 X${halfOfStockLength} A${(0.5 * -360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+
+            /** 8 */ 'G1 A-360',
+
+            /** 9 */ 'G90',
+
+            /** 10 */ `G0 Z${safeHeight}`,
+
+            /** 11 */ `G0 X${stockLength} F${throttledFeedrate}`,
+
+            /** 12 */ `G0 Z${depth} F${throttledFeedrate}`,
+
+            /** 13 */ 'G91',
+
+            /** 14 */
+            isFinalStepdown
+                ? `G1 A360 Z${-(currentZValue - finalHeight)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`
+                : '',
+
+            /** 15 */ 'G1 A360',
+
+            /** 16 */ `G1 X${-halfOfStockLength} A${(0.5 * 360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+
+            /** 17 */ 'G1 A360',
+
+            '; End of Step 9',
+        ];
+
+        if (isFirstLayer) {
+            return firstLayerBlock.flat();
+        }
+
+        if (!isFirstLayer && !enableRehoming && !isEvenNumberOfStepdowns && isFinalStepdown) {
+            return finalLayerBlock.flat();
+        } else {
+            return continuingLayerBlock.flat();
+        }
     }
 
     getSafeZValue() {
-        const { startHeight, usingBigMaterial } = this.options;
+        const { startHeight } = this.options;
         const workspaceUnits = store.get('workspace.units');
         const zVal = workspaceUnits === METRIC_UNITS ? 3 : 0.12;
-
-        if (usingBigMaterial) {
-            return controller.settings.settings.$132;
-        }
 
         return zVal + startHeight;
     }
