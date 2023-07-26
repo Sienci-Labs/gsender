@@ -36,6 +36,51 @@ const ProgramInfo = ({ type, settings, connection, modals }) => {
     const units = store.get('workspace.units');
     const { port = 'Disconnected', baudrate = 'None' } = connection;
 
+    const determineMovement = () => {
+        if (modals.motion === 'G0') {
+            return 'Linear (non-extrusion)';
+        } else if (modals.motion === 'G1') {
+            return 'Linear (extrusion)';
+        } else if (modals.motion === 'G2') {
+            return 'Arc (Clockwise)';
+        } else {
+            return 'Arc (Counter-Clockwise)';
+        }
+    };
+
+    const determinePlane = () => {
+        if (modals.plane === 'G17') {
+            return 'XY';
+        } else if (modals.plane === 'G18') {
+            return 'XZ';
+        } else {
+            return 'YZ';
+        }
+    };
+
+    const determineSpindle = () => {
+        if (modals.spindle === 'M3') {
+            return 'Spinning Clockwise';
+        } else if (modals.spindle === 'M4') {
+            return 'Spinning Counter Clockwise';
+        } else {
+            return 'Stopped';
+        }
+    };
+
+    const determineCoolant = () => {
+        console.log(modals.coolant);
+        if (modals.coolant === 'M7') {
+            return 'Mist Coolant On';
+        } else if (modals.coolant === 'M8') {
+            return 'Flood Coolant On';
+        } else if (modals.coolant === 'M9') {
+            return 'Off';
+        } else {
+            return 'Mist & Flood Coolant On';
+        }
+    };
+
     const printModals = () => {
         if (isEmpty(modals)) {
             return (
@@ -44,32 +89,53 @@ const ProgramInfo = ({ type, settings, connection, modals }) => {
         }
         return (
             <b style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-                <Tooltip content="Motion" location="default">
+                <Tooltip
+                    content={'Movement: ' + determineMovement()}
+                    location="default"
+                >
                     {modals.motion}
                 </Tooltip>
-                <Tooltip content="WCS" location="default">
+                <Tooltip
+                    content="Current Workspace"
+                    location="default"
+                >
                     {modals.wcs}
                 </Tooltip>
-                <Tooltip content="Plane" location="default">
+                <Tooltip
+                    content={'Plane: ' + determinePlane()}
+                    location="default"
+                >
                     {modals.plane}
                 </Tooltip>
-                <Tooltip content="Units" location="default">
+                <Tooltip
+                    content={'Units: ' + (modals.distance === 'G21' ? 'Metric' : 'Imperial')}
+                    location="default"
+                >
                     {modals.units}
                 </Tooltip>
-                <Tooltip content="Distance" location="default">
+                <Tooltip
+                    content={'Positioning: ' + (modals.distance === 'G90' ? 'Relative' : 'Absolute')}
+                    location="default"
+                >
                     {modals.distance}
                 </Tooltip>
-                <Tooltip content="Feedrate" location="default">
+                <Tooltip
+                    content={'Feedrate: ' + (modals.distance === 'G94' ? 'units/min' : 'units/rev')}
+                    location="default"
+                >
                     {modals.feedrate}
                 </Tooltip>
-                <Tooltip content="Spindle" location="default">
+                <Tooltip
+                    content={'Spindle: ' + determineSpindle()}
+                    location="default"
+                >
                     {modals.spindle}
                 </Tooltip>
-                <Tooltip content="Coolant" location="default">
+                <Tooltip
+                    content={'Coolant: ' + determineCoolant()}
+                    location="default"
+                >
                     {modals.coolant}
-                </Tooltip>
-                <Tooltip content="Tool" location="default">
-                    {modals.tool}
                 </Tooltip>
             </b>
         );
