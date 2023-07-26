@@ -155,7 +155,7 @@ const main = () => {
             };
             const options = {
                 ...bounds,
-                title: `gSender Hal + Rotary ${pkg.version}`,
+                title: `gSender ${pkg.version}`,
                 kiosk
             };
             const window = await windowManager.openWindow(url, options, splashScreen);
