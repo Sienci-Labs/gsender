@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import Modal from 'app/components/ToolModal/ToolModal';
 import GcodeViewer from 'app/components/GcodeViewer';
@@ -9,7 +9,7 @@ import reduxStore from 'app/store/redux';
 
 import { RotaryContext } from '../Context';
 import { MODALS } from '../utils/constants';
-import { CLOSE_ACTIVE_DIALOG, SET_STOCK_TURNING_OUTPUT, CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL } from '../Context/actions';
+import { CLOSE_ACTIVE_DIALOG, SET_STOCK_TURNING_OUTPUT, CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL, SET_ACTIVE_STOCK_TURNING_TAB } from '../Context/actions';
 import InputArea from './components/InputArea';
 
 import styles from './index.styl';
@@ -18,7 +18,6 @@ import TabArea from './components/TabArea';
 import Visualizer from './components/Visualizer';
 
 const StockTurning = () => {
-    const [currentTab, setCurrentTab] = useState(0);
     const { state: { activeDialog, stockTurning }, dispatch } = useContext(RotaryContext);
 
     useEffect(() => {
@@ -44,7 +43,7 @@ const StockTurning = () => {
         dispatch({ type: SET_STOCK_TURNING_OUTPUT, payload: null });
     };
 
-    const { gcode } = stockTurning;
+    const { gcode, activeTab } = stockTurning;
 
     const tabs = [
         {
@@ -73,7 +72,11 @@ const StockTurning = () => {
                 <InputArea />
 
                 <div style={{ width: '55%' }}>
-                    <TabArea tabs={tabs} currentTab={currentTab} onTabChange={(index) => setCurrentTab(index)} />
+                    <TabArea
+                        tabs={tabs}
+                        currentTab={activeTab}
+                        onTabChange={(index) => dispatch({ type: SET_ACTIVE_STOCK_TURNING_TAB, payload: index })}
+                    />
                 </div>
             </div>
 

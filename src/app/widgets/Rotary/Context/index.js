@@ -12,7 +12,8 @@ import {
     UPDATE_PHYSICAL_UNIT_SETUP,
     SET_STOCK_TURNING_OUTPUT,
     UPDATE_STOCK_TURNING_OPTION,
-    CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL
+    CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL,
+    SET_ACTIVE_STOCK_TURNING_TAB
 } from './actions';
 import { QUARTER } from '../constant';
 import defaultState from '../../../store/defaultState';
@@ -32,7 +33,11 @@ const initialState = () => {
             drillBitDiameter: QUARTER,
             holeCount: HOLE_COUNT.SIX
         },
-        stockTurning: { options: { ...defaultStockTurningOptions, ...stockTurningOptions }, gcode: null }
+        stockTurning: {
+            options: { ...defaultStockTurningOptions, ...stockTurningOptions },
+            activeTab: 0,
+            gcode: null
+        }
     };
 };
 
@@ -103,6 +108,16 @@ const reducer = (state, action) => {
                     startHeight: convertToImperial(startHeight),
                     finalHeight: convertToImperial(finalHeight),
                 }
+            }
+        };
+    }
+
+    case SET_ACTIVE_STOCK_TURNING_TAB: {
+        return {
+            ...state,
+            stockTurning: {
+                ...state.stockTurning,
+                activeTab: action.payload,
             }
         };
     }
