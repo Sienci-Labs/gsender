@@ -46,7 +46,6 @@ const InputArea = () => {
                 Avoid running stock turning back to back without re-homing / re-connecting to the controller. Consider turning off hard and soft limits{' '}
                 so you don&apos;t encounter alarms or errors.
             </p>
-
             <Input
                 label="Stock Length"
                 units={units}
@@ -58,7 +57,7 @@ const InputArea = () => {
 
             <div style={{ marginBottom: '1rem' }}>
                 <MultiInputBlock
-                    label="Start & Final Height"
+                    label="Start & Final Diameter"
                     firstComponent={(
                         <Input
                             units={units}
