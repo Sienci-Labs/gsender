@@ -10,12 +10,14 @@ import { VISUALIZER_SECONDARY } from 'app/constants';
 import { Container } from './styled';
 import { RotaryContext } from '../../../Context';
 import { StockTurningGenerator } from '../../Generator';
-import { SET_STOCK_TURNING_OUTPUT, CLOSE_ACTIVE_DIALOG } from '../../../Context/actions';
+import { SET_STOCK_TURNING_OUTPUT, CLOSE_ACTIVE_DIALOG, SET_ACTIVE_STOCK_TURNING_TAB } from '../../../Context/actions';
 
 const Actions = () => {
     const { state, dispatch } = useContext(RotaryContext);
 
     const runGenerate = async () => {
+        dispatch({ type: SET_ACTIVE_STOCK_TURNING_TAB, payload: 0 });
+
         const stockTurning = new StockTurningGenerator(state.stockTurning.options);
 
         stockTurning.generate();
