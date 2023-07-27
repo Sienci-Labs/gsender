@@ -18,7 +18,12 @@ export class StockTurningGenerator {
             method = STOCK_TURNING_METHOD.FULL_SPIRALS;
         }
 
-        this.options = { ...newOptions, method };
+        this.options = {
+            ...newOptions,
+            method,
+            startHeight: Number((newOptions.startHeight / 2).toFixed(2)),
+            finalHeight: Number((newOptions.finalHeight / 2).toFixed(2))
+        };
     }
 
     generate = () => {
