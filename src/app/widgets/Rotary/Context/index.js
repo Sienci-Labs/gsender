@@ -1,6 +1,7 @@
 import React, { createContext, useReducer } from 'react';
 
 import store from 'app/store';
+import { METRIC_UNITS, IMPERIAL_UNITS } from 'app/constants';
 
 import { SPEED_NORMAL } from '../../JogControl/constants';
 import { A_AXIS_JOG, HOLE_COUNT } from '../utils/constants';
@@ -25,6 +26,7 @@ const initialState = () => {
     const defaultStockTurningOptions = defaultState.widgets.rotary.stockTurning.options;
 
     return {
+        units: METRIC_UNITS,
         speedPreset: SPEED_NORMAL,
         jog: { a: A_AXIS_JOG },
         activeDialog: null,
@@ -97,6 +99,7 @@ const reducer = (state, action) => {
 
         return {
             ...state,
+            units: IMPERIAL_UNITS,
             stockTurning: {
                 ...state.stockTurning,
                 options: {

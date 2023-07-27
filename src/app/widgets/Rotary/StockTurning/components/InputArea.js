@@ -21,13 +21,13 @@ const defaultStockTurningState = get(defaultState, 'widgets.rotary.stockTurning.
 const InputArea = () => {
     const { state, dispatch } = useContext(RotaryContext);
 
-    const { bitDiameter, stepover, feedrate, stockLength, startHeight, finalHeight, stepdown, spindleRPM } = state.stockTurning.options;
+    const { bitDiameter, stepover, feedrate, stockLength, startHeight, finalHeight, stepdown, spindleRPM, enableRehoming } = state.stockTurning.options;
+
+    const units = store.get('workspace.units');
 
     const defaultValues = units === METRIC_UNITS
         ? defaultStockTurningState
         : convertValuesToImperial(defaultStockTurningState);
-
-    const units = store.get('workspace.units');
 
     const handleChange = (e) => {
         const { id, value, checked } = e.target;
@@ -129,7 +129,7 @@ const InputArea = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', marginBottom: '1rem' }}>
                 <label style={{ fontSize: '1.1rem' }}>Enable Re-Homing</label>
-                <Checkbox id="enableRehoming" onChange={handleChange} />
+                <Checkbox id="enableRehoming" onChange={handleChange} checked={enableRehoming} />
             </div>
         </div>
     );
