@@ -199,10 +199,7 @@ export class StockTurningGenerator {
 
             /** 3 */ 'G91',
 
-            /** 4 */
-            isFinalStepdown
-                ? `G1 A-360 Z${-(currentZValue - finalHeight)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`
-                : `G1 A-360 Z${-stepdown} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            /** 4 */ `G1 A-360 Z${-(isFinalStepdown ? currentZValue - finalHeight : stepdown)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 5 */ 'G1 A-360',
 
@@ -214,7 +211,7 @@ export class StockTurningGenerator {
         const continuingLayerBlock = [
             '; Step 8',
 
-            `G1 A360 Z${-stepdown} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            `G1 A360 Z${-(isFinalStepdown ? currentZValue - finalHeight : stepdown)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             'G1 A-360',
 
