@@ -1,7 +1,6 @@
 import store from 'app/store';
 import controller from 'app/lib/controller';
 import { METRIC_UNITS, STOCK_TURNING_METHOD } from 'app/constants';
-import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
 import defaultState from '../../../store/defaultState';
 
@@ -24,6 +23,7 @@ export class StockTurningGenerator {
 
     generate = () => {
         const units = store.get('workspace.units');
+        const safeHeight = this.getSafeZValue();
 
         const { feedrate, method } = this.options;
 
@@ -36,8 +36,15 @@ export class StockTurningGenerator {
             wcs,
             units === METRIC_UNITS ? 'G21 ;mm' : 'G20 ;inches',
             `G1 F${feedrate}`,
+            'G90',
             '(Header End)',
             '\n'
+        ];
+
+        const zeroBlock = [
+            'G90',
+            `G0 Z${safeHeight}`,
+            'G0 X0 A0'
         ];
 
         const footerBlock = [
@@ -52,6 +59,7 @@ export class StockTurningGenerator {
         const arr = [
             ...headerBlock,
             ...bodyBlock,
+            ...zeroBlock,
             ...footerBlock
         ];
 
@@ -83,16 +91,11 @@ export class StockTurningGenerator {
             [STOCK_TURNING_METHOD.FULL_SPIRALS]: this.createFullSpiral,
         }[method];
 
-        Toaster.pop({
-            msg: `Spiral Method: ${method}`,
-            type: TOASTER_INFO
-        });
-
         if (!runSpiral) {
             throw new Error('Spiral Method Not Defined');
         }
 
-        const layer = runSpiral(depth);
+        const layer = runSpiral(depth, count);
 
         return [
             `(*** Layer ${count} ***)`,
@@ -155,18 +158,12 @@ export class StockTurningGenerator {
             /** 16 */ `G1 X${-halfOfStockLength} A${(0.5 * 360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 17 */ 'G1 A360',
-
-            /** 18 */ 'G90',
-
-            /** 19 */ `G0 Z${safeHeight}`,
-
-            /** 20 */ 'G0 X0 A0'
         ];
 
         return array;
     }
 
-    createFullSpiral = (depth) => {
+    createFullSpiral = (depth, count) => {
         const {
             startHeight,
             finalHeight,
@@ -181,6 +178,7 @@ export class StockTurningGenerator {
         const halfOfStockLength = (stockLength / 2).toFixed(3);
         const throttledFeedrate = (feedrate * 0.2).toFixed(3);
         const stepoverPercentage = stepover / 100;
+        const alternateFactor = count % 2 !== 0 ? 1 : -1;
 
         const currentZValue = depth > 0
             ? depth
@@ -199,25 +197,25 @@ export class StockTurningGenerator {
 
             /** 3 */ 'G91',
 
-            /** 4 */ `G1 A-360 Z${-(isFinalStepdown ? currentZValue - finalHeight : stepdown)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            // /** 4 */ `G1 A-360 Z${-(isFinalStepdown ? currentZValue - finalHeight : stepdown)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
-            /** 5 */ 'G1 A-360',
+            // /** 5 */ 'G1 A-360',
 
-            /** 6 */ `G1 X${stockLength} A${-((360 * stockLength) / (stepover * bitDiameter)).toFixed(3)} F${((360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            // /** 6 */ `G1 X${stockLength} A${-((360 * stockLength) / (stepoverPercentage * bitDiameter)).toFixed(3)} F${((360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
-            /** 7 */ 'G1 A-360',
+            // /** 7 */ 'G1 A-360',
         ];
 
         const continuingLayerBlock = [
             '; Step 8',
 
-            `G1 A360 Z${-(isFinalStepdown ? currentZValue - finalHeight : stepdown)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            `G1 A${alternateFactor * 360} Z${-(isFinalStepdown ? currentZValue - finalHeight : stepdown)} F${(0.2 * 360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
-            'G1 A-360',
+            `G1 A${alternateFactor * 360}`,
 
-            `G1 X${-stockLength} A${((360 * stockLength) / (stepover * bitDiameter)).toFixed(3)} F${((360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            `G1 X${alternateFactor * stockLength} A${-(alternateFactor * ((360 * stockLength) / (stepoverPercentage * bitDiameter))).toFixed(3)} F${((360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
-            'G1 A-360',
+            `G1 A${alternateFactor * 360}`,
 
             '; End of Step 8',
         ];
@@ -263,7 +261,7 @@ export class StockTurningGenerator {
         ];
 
         if (isFirstLayer) {
-            return firstLayerBlock.flat();
+            return [...firstLayerBlock, ...continuingLayerBlock].flat();
         }
 
         if (!isFirstLayer && !enableRehoming && !isEvenNumberOfStepdowns && isFinalStepdown) {
