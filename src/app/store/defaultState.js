@@ -308,8 +308,8 @@ const defaultState = {
                     spindleRPM: 17000,
                     feedrate: 3000,
                     stepover: 15,
-                    startHeight: 25,
-                    finalHeight: 20,
+                    startHeight: 50,
+                    finalHeight: 40,
                     enableRehoming: false,
                     usingBigMaterial: false,
                 }
