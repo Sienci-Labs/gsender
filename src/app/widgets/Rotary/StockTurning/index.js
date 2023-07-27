@@ -18,14 +18,14 @@ import TabArea from './components/TabArea';
 import Visualizer from './components/Visualizer';
 
 const StockTurning = () => {
-    const { state: { activeDialog, stockTurning }, dispatch } = useContext(RotaryContext);
+    const { state: { activeDialog, stockTurning, units: stockTurningUnits }, dispatch } = useContext(RotaryContext);
 
     useEffect(() => {
         reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
 
         const units = store.get('workspace.units');
 
-        if (units === 'in') {
+        if (units === 'in' && stockTurningUnits === 'mm') {
             dispatch({ type: CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL });
         }
 
@@ -35,6 +35,8 @@ const StockTurning = () => {
             }
 
             reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_PRIMARY });
+
+            dispatch({ type: SET_ACTIVE_STOCK_TURNING_TAB, payload: 0 });
         };
     }, []);
 
