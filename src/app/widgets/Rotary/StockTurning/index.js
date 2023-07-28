@@ -1,4 +1,5 @@
 import React, { useContext, useEffect } from 'react';
+import pubsub from 'pubsub-js';
 
 import Modal from 'app/components/ToolModal/ToolModal';
 import GcodeViewer from 'app/components/GcodeViewer';
@@ -6,6 +7,8 @@ import { SET_CURRENT_VISUALIZER } from 'app/actions/visualizerActions';
 import { VISUALIZER_PRIMARY, VISUALIZER_SECONDARY } from 'app/constants';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
+import api from 'app/api';
+import controller from 'app/lib/controller';
 
 import { RotaryContext } from '../Context';
 import { MODALS } from '../utils/constants';
@@ -16,6 +19,7 @@ import styles from './index.styl';
 import ActionArea from './components/ActionArea';
 import TabArea from './components/TabArea';
 import Visualizer from './components/Visualizer';
+import { StockTurningGenerator } from './Generator';
 
 const StockTurning = () => {
     const { state: { activeDialog, stockTurning, units: stockTurningUnits }, dispatch } = useContext(RotaryContext);
@@ -40,12 +44,44 @@ const StockTurning = () => {
         };
     }, []);
 
+    useEffect(() => {
+        // Need to re-visualize the gcode once the visualizer is re-mounted
+        if (stockTurning.activeTab === 0 && canLoad) {
+            runGenerate();
+        }
+    }, [stockTurning.activeTab]);
+
     const handleClose = () => {
         dispatch({ type: CLOSE_ACTIVE_DIALOG });
         dispatch({ type: SET_STOCK_TURNING_OUTPUT, payload: null });
     };
 
+    const runGenerate = async () => {
+        dispatch({ type: SET_ACTIVE_STOCK_TURNING_TAB, payload: 0 });
+
+        const stockTurningGenerator = new StockTurningGenerator(stockTurning.options);
+
+        stockTurningGenerator.generate();
+
+        dispatch({ type: SET_STOCK_TURNING_OUTPUT, payload: stockTurningGenerator.gcode });
+
+        const serializedFile = new File([stockTurningGenerator.gcode], 'stockturning.gcode');
+
+        await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
+    };
+
+    const loadGcode = () => {
+        const { gcode } = stockTurning;
+        const name = 'gSender_StockTurning';
+        const { size } = new File([gcode], name);
+
+        pubsub.publish('gcode:surfacing', { gcode, name, size });
+
+        dispatch({ type: CLOSE_ACTIVE_DIALOG });
+    };
+
     const { gcode, activeTab } = stockTurning;
+    const canLoad = !!gcode;
 
     const tabs = [
         {
@@ -82,7 +118,7 @@ const StockTurning = () => {
                 </div>
             </div>
 
-            <ActionArea />
+            <ActionArea loadGcode={loadGcode} generateGcode={runGenerate} />
         </Modal>
     );
 };
