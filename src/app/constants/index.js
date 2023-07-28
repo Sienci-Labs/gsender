@@ -239,3 +239,13 @@ export const ROTARY_TOGGLE_MACRO = `
     G04 P0.5
     G0 G90 Y[posy]
 `;
+
+export const JOB_TYPES = {
+    JOB: 'JOB',
+    MAINTENANCE: 'MAINTENANCE',
+};
+
+export const JOB_STATUS = {
+    COMPLETE: 'COMPLETE',
+    STOPPED: 'STOPPED',
+};

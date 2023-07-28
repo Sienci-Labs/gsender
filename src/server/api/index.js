@@ -36,6 +36,7 @@ import * as users from './api.users';
 import * as files from './api.file';
 import * as logs from './api.log';
 import * as metrics from './api.metrics';
+import * as jobStats from './api.jobstats';
 
 export {
     version,
@@ -52,5 +53,6 @@ export {
     users,
     files,
     logs,
-    metrics
+    metrics,
+    jobStats,
 };

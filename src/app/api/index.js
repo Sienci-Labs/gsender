@@ -450,6 +450,37 @@ remoteSetting.update = (options) => new Promise((resolve, reject) => {
 });
 
 //
+// Job Stats
+//
+const jobStats = {};
+
+jobStats.fetch = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/jobstats')
+        .query(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+jobStats.update = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .put('/api/jobstats')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+//
 // Macros
 //
 const macros = {};
@@ -882,4 +913,7 @@ export default {
 
     // Metrics
     metrics,
+
+    // Job Stats
+    jobStats,
 };

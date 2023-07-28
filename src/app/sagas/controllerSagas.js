@@ -52,84 +52,59 @@ import {
     GRBL_ACTIVE_STATE_HOLD,
     FILE_TYPE,
     WORKSPACE_MODE,
-    RENDER_NO_FILE
+    RENDER_NO_FILE,
+    JOB_TYPES,
+    JOB_STATUS
 } from 'app/constants';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 import { updateWorkspaceMode } from 'app/lib/rotary';
+import api from 'app/api';
 
 export function* initialize() {
     let visualizeWorker = null;
     let estimateWorker = null;
     let currentState = GRBL_ACTIVE_STATE_IDLE;
     let prevState = GRBL_ACTIVE_STATE_IDLE;
-    let areStatsInitialized = false;
 
     /* Health check - every 3 minutes */
     setInterval(() => {
         controller.healthCheck();
     }, 1000 * 60 * 3);
 
-    const incrementJobCounter = () => {
-        let jobsFinished = store.get('workspace.jobsFinished');
+    const updateJobStats = async(status) => {
+        const controllerType = _get(reduxStore.getState(), 'controller.type');
+        const port = _get(reduxStore.getState(), 'connection.port');
+        const path = _get(reduxStore.getState(), 'file.path');
 
-        store.replace('workspace.jobsFinished', jobsFinished + 1);
-    };
+        try {
+            let res = await api.jobStats.fetch();
+            const jobStats = res.body;
+            let newJobStats = jobStats;
 
-    const incrementJobCancelledCounter = () => {
-        const jobsCancelled = store.get('workspace.jobsCancelled');
+            if (status.endTime) {
+                newJobStats.jobsFinished += 1;
+            } else {
+                newJobStats.jobsCancelled += 1;
+            }
+            newJobStats.totalRuntime += status.timeRunning;
 
-        store.replace('workspace.jobsCancelled', jobsCancelled + 1);
-    };
-
-    const incrementTimeRun = (elapsedTime) => {
-        // add elapsed time to total time run
-        let timeSpentRunning = store.get('workspace.timeSpentRunning');
-        timeSpentRunning += elapsedTime;
-        store.replace('workspace.timeSpentRunning', timeSpentRunning);
-
-        // also add it to last element in array of job times
-        let jobTimes = store.get('workspace.jobTimes');
-        jobTimes[jobTimes.length - 1] += elapsedTime;
-        store.replace('workspace.jobTimes', jobTimes);
-
-        // compare last element to the longest time
-        compareLongestTime(jobTimes[jobTimes.length - 1]);
-    };
-
-    const compareLongestTime = (time) => {
-        let longestTimeRun = store.get('workspace.longestTimeRun');
-        if (time > longestTimeRun) {
-            store.replace('workspace.longestTimeRun', time);
+            const job = {
+                type: JOB_TYPES.JOB,
+                file: status.name,
+                path: path,
+                lines: status.lines,
+                port: port,
+                controller: controllerType,
+                startTime: status.startTime,
+                endTime: status.finishTime === 0 ? null : status.finishTime,
+                jobStatus: JOB_STATUS.COMPLETE,
+            };
+            console.log(newJobStats);
+            newJobStats.jobs.push(job);
+            api.jobStats.update(newJobStats);
+        } catch (error) {
+            console.error(error);
         }
-    };
-
-    const onJobStart = () => {
-        // add another index to array of job times
-        let jobTimes = store.get('workspace.jobTimes');
-        jobTimes.push(0);
-        store.replace('workspace.jobTimes', jobTimes);
-    };
-
-    const onJobStop = (elapsedTime) => {
-        if (!areStatsInitialized) {
-            onJobStart();
-            areStatsInitialized = true;
-        }
-
-        incrementJobCancelledCounter();
-    };
-
-    const onJobEnd = (elapsedTime) => {
-        if (!areStatsInitialized) {
-            onJobStart();
-            areStatsInitialized = true;
-        }
-
-        incrementJobCounter();
-        incrementTimeRun(elapsedTime);
-
-        // reset to false since it's the end of the job
-        areStatsInitialized = false;
     };
 
     const shouldVisualizeSVG = () => {
@@ -261,11 +236,11 @@ export function* initialize() {
     controller.addListener('sender:status', (status) => {
         // finished job
         if (status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) {
-            onJobEnd(status.timeRunning);
+            updateJobStats(status);
             reduxStore.dispatch({ type: visualizerActions.UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         // cancelled job
         } else if (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD) {
-            onJobStop(status.timeRunning);
+            updateJobStats(status);
             reduxStore.dispatch({ type: visualizerActions.UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         }
 
