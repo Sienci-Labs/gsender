@@ -91,7 +91,7 @@ const DROarea = ({ canClick = true, actions }) => {
                 <div>
                     <MachinePositionInput
                         value={customMathRound(wpos)}
-                        disabled={!canClick}
+                        disabled
                         handleManualMovement={(value) => actions.handleManualMovement(value, axis)}
                     />
                     {!showPositionInput && <PositionLabel value={customMathRound(mpos)} small />}
