@@ -183,7 +183,7 @@ export class StockTurningGenerator {
         const halfOfStockLength = (stockLength / 2).toFixed(3);
         const throttledFeedrate = (feedrate * 0.2).toFixed(3);
         const stepoverPercentage = stepover / 100;
-        const alternateFactor = count % 2 !== 0 ? 1 : -1;
+        const alternateFactor = count % 2 === 0 ? 1 : -1;
 
         const currentZValue = depth > 0
             ? depth
@@ -218,7 +218,7 @@ export class StockTurningGenerator {
 
             `G1 A${alternateFactor * 360}`,
 
-            `G1 X${alternateFactor * stockLength} A${-(alternateFactor * ((360 * stockLength) / (stepoverPercentage * bitDiameter))).toFixed(3)} F${((360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            `G1 X${-(alternateFactor * stockLength)} A${(alternateFactor * ((360 * stockLength) / (stepoverPercentage * bitDiameter))).toFixed(3)} F${((360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             `G1 A${alternateFactor * 360}`,
 
