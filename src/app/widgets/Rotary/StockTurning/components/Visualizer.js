@@ -29,7 +29,6 @@ const VisualizerComponent = ({ gcode }) => {
 
 VisualizerComponent.propTypes = {
     gcode: PropTypes.string,
-    surfacing: PropTypes.object,
 };
 
 export default VisualizerComponent;
