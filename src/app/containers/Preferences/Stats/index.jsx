@@ -27,20 +27,20 @@ import reduxStore from 'app/store/redux';
 
 import SettingWrapper from '../components/SettingWrapper';
 import GeneralArea from '../components/GeneralArea';
-import StatsList from './StatsList';
-import Charts from './Charts';
+// import StatsList from './StatsList';
+import StatsTable from './components/index';
 
 const StatsPage = ({ active, state, actions }) => {
     return (
         <SettingWrapper title="Stats" show={active}>
             <ReduxProvider store={reduxStore}>
                 <GeneralArea>
-                    <GeneralArea.Half>
+                    {/* <GeneralArea.Half>
                         <StatsList actions={actions} state={state} />
                     </GeneralArea.Half>
-                    <GeneralArea.Half>
-                        <Charts actions={actions} state={state} />
-                    </GeneralArea.Half>
+                    <GeneralArea.Half> */}
+                    <StatsTable actions={actions} state={state} />
+                    {/* </GeneralArea.Half> */}
                 </GeneralArea>
             </ReduxProvider>
         </SettingWrapper>
