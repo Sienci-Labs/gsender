@@ -98,6 +98,7 @@ export function* initialize() {
                 controller: controllerType,
                 startTime: new Date(status.startTime),
                 endTime: status.finishTime === 0 ? null : new Date(status.finishTime),
+                duration: status.timeRunning,
                 jobStatus: status.finishTime ? JOB_STATUS.COMPLETE : JOB_STATUS.STOPPED,
             };
             console.log(newJobStats);

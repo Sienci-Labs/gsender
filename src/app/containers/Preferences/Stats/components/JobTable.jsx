@@ -91,47 +91,44 @@ const JobTable = (data) => {
         //     sortingFn: fuzzySort,
         //     size: 5,
         // }),
-        // columnHelper.accessor('type', {
-        //     header: () => 'Type',
-        //     size: 10,
-        // }),
         columnHelper.accessor('file', {
             filterFn: 'fuzzy',
             sortingFn: fuzzySort,
             header: () => 'File Name',
             // size: 100,
         }),
-        // columnHelper.accessor('totalLines', {
-        //     header: () => 'No. Lines in File',
-        //     size: 10,
-        // }),
-        // columnHelper.accessor('port', {
-        //     header: () => 'Port',
-        //     size: 50,
-        // }),
-        // columnHelper.accessor('controller', {
-        //     header: () => 'Controller',
-        //     size: 10,
-        // }),
+        columnHelper.accessor('duration', {
+            header: () => 'Duration',
+            cell: (info) => {
+                const date = new Date(null);
+                date.setSeconds(Number(info.renderValue())); // specify value for SECONDS here
+                return date.toISOString().slice(11, 19);
+            },
+            size: 40,
+        }),
+        columnHelper.accessor('totalLines', {
+            header: () => '# Lines',
+            size: 40,
+        }),
         columnHelper.accessor('startTime', {
             header: () => 'Start Time',
             cell: (info) => {
-                console.log(info.renderValue());
-                return info.renderValue()?.toString();
+                const [yyyy, mm, dd, hh, mi, ss] = info.renderValue().toString().split(/[:\-T.]+/);
+                return (
+                    <>
+                        <div style={{ float: 'left' }}>{mm}/{dd}/{yyyy}</div>
+                        <div style={{ float: 'left', clear: 'both' }}>{hh}:{mi}:{ss}</div>
+                    </>
+                );
             },
-            // size: 80,
+            size: 50,
         }),
-        // columnHelper.accessor('endTime', {
-        //     header: () => 'End Time',
-        //     cell: (info) => info.renderValue()?.toString(),
-        //     size: 50,
-        // }),
         columnHelper.accessor('jobStatus', {
             header: () => 'Status',
             cell: (info) => {
                 return info.renderValue() === JOB_STATUS.COMPLETE ? <Icon path={mdiCheckBold} size={1} /> : <Icon path={mdiClose} size={1} />;
             },
-            size: 27,
+            size: 30,
         }),
     ];
 
@@ -147,7 +144,7 @@ const JobTable = (data) => {
         },
         initialState: {
             pagination: {
-                pageSize: 5,
+                pageSize: 4,
                 pageIndex: 0,
             },
         },
@@ -167,13 +164,13 @@ const JobTable = (data) => {
 
     /***** RENDERING *****/
     return (
-        <div className="container flex flex-col items-center justify-center gap-3 px-4 py-16 " style={{ maxWidth: '740px' }}>
+        <div className="container flex flex-col items-center justify-center gap-3 px-4 py-16 " style={{ maxWidth: '737px', marginBottom: '0px' }}>
             {/*** PAGINATION ***/}
             {/* buttons */}
             <div className="flex items-center gap-2">
             </div>
             {/*** GLOBAL SEARCH ***/}
-            <div>
+            <div style={{ marginBottom: '5px' }}>
                 <input
                     value={globalSearchText ?? ''}
                     onChange={(e) => {
@@ -189,8 +186,8 @@ const JobTable = (data) => {
                 />
             </div>
             {/*** TABLE ***/}
-            <div style={{ height: '250px' }}>
-                <BTable striped bordered hover responsive size="sm" style={{ tableLayout: 'fixed' }}>
+            <div style={{ height: '280px', marginBottom: '5px' }}>
+                <BTable striped bordered hover size="sm" variant="dark" style={{ tableLayout: 'fixed' }}>
                     <thead>
                         {table.getHeaderGroups().map(
                             (
@@ -203,7 +200,8 @@ const JobTable = (data) => {
                                             colSpan={header.colSpan}
                                             style={{
                                                 width: header.getSize(),
-                                                whiteSpace: 'unset'
+                                                whiteSpace: 'unset',
+                                                fontWeight: 'bold'
                                             }}
                                         >
                                             {header.isPlaceholder ? null : (
@@ -244,22 +242,6 @@ const JobTable = (data) => {
                             </tr>
                         ))}
                     </tbody>
-                    <tfoot>
-                        {table.getFooterGroups().map((footerGroup) => (
-                            <tr key={footerGroup.id}>
-                                {footerGroup.headers.map((header) => (
-                                    <th key={header.id}>
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                header.column.columnDef.footer,
-                                                header.getContext()
-                                            )}
-                                    </th>
-                                ))}
-                            </tr>
-                        ))}
-                    </tfoot>
                 </BTable>
             </div>
             <div className={styles.navContainer}>

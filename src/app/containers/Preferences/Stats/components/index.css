@@ -46,3 +46,15 @@ html {
     display: flex;
     flex-direction: column;
 }
+
+.table {
+    border: none !important;
+}
+
+.table td{
+    border: #ADADAD solid 1px !important;
+}
+
+.table th{
+    border: #ADADAD solid 1px !important;
+}
