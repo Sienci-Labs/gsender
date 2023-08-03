@@ -263,74 +263,71 @@ const JobTable = (data) => {
                 </BTable>
             </div>
             <div className={styles.navContainer}>
-                <div>
-                    <button
-                        className="rounded border p-1"
-                        onClick={() => table.setPageIndex(0)}
-                        disabled={!table.getCanPreviousPage()}
-                        display={currentPage > 1 ? 'block' : 'hidden'}
-                    >
-                        {'<<'}
-                    </button>
-                    <button
-                        className="rounded border p-1"
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                        display={currentPage > 1 ? 'block' : 'hidden'}
-                    >
-                        {'<'}
-                    </button>
-                    <button
-                        className="rounded border p-1"
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                        display={currentPage < maxPages ? 'block' : 'hidden'}
-                    >
-                        {'>'}
-                    </button>
-                    <button
-                        className="rounded border p-1"
-                        onClick={() => table.setPageIndex(maxPages - 1)}
-                        disabled={!table.getCanNextPage()}
-                        display={currentPage < maxPages ? 'block' : 'hidden'}
-                    >
-                        {'>>'}
-                    </button>
-                </div>
+                <button
+                    className="rounded border p-1"
+                    onClick={() => table.setPageIndex(0)}
+                    disabled={!table.getCanPreviousPage()}
+                    display={currentPage > 1 ? 'block' : 'hidden'}
+                >
+                    {'<<'}
+                </button>
+                <button
+                    className="rounded border p-1"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                    display={currentPage > 1 ? 'block' : 'hidden'}
+                >
+                    {'<'}
+                </button>
+                <button
+                    className="rounded border p-1"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                    display={currentPage < maxPages ? 'block' : 'hidden'}
+                >
+                    {'>'}
+                </button>
+                <button
+                    className="rounded border p-1"
+                    onClick={() => table.setPageIndex(maxPages - 1)}
+                    disabled={!table.getCanNextPage()}
+                    display={currentPage < maxPages ? 'block' : 'hidden'}
+                >
+                    {'>>'}
+                </button>
                 {/* label */}
-                <div style={{ float: 'left' }}>
-                    <span
-                        className="flex items-center gap-1"
-                    >
-                        {'Page '}
-                        <strong>
-                            {currentPage} of {maxPages}
-                        </strong>
-                    </span>
-                </div>
+                <span
+                    className="flex items-center gap-1"
+                    style={{ marginLeft: '10px' }}
+                >
+                    {'Page '}
+                    <strong>
+                        {currentPage} of {maxPages}
+                    </strong>
+                </span>
                 {/* jump to page */}
-                <div style={{ float: 'left', clear: 'both' }}>
-                    <span
-                        className="flex items-center gap-1"
-                    >
-                        {'Go to page: '}
-                        <input
-                            type="number"
-                            defaultValue={currentPage}
-                            onChange={(e) => {
-                                setPageNum(e.target.value ? Number(e.target.value) - 1 : 0);
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    table.setPageIndex(pageNum);
-                                }
-                            }}
-                            className={['w-16 rounded border p-1 ', styles.input].join(' ')}
-                            min="1"
-                            max={maxPages}
-                        />
-                    </span>
-                </div>
+                <span
+                    className="flex items-center gap-1"
+                    style={{ float: 'right' }}
+                >
+                    {'Jump to page: '}
+                    <input
+                        type="number"
+                        defaultValue={currentPage}
+                        onChange={(e) => {
+                            setPageNum(e.target.value ? Number(e.target.value) - 1 : 0);
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                table.setPageIndex(pageNum);
+                            }
+                        }}
+                        className={['w-16 rounded border p-1 ', styles.input].join(' ')}
+                        min="1"
+                        max={maxPages}
+                        style={{ minWidth: '60px' }}
+                    />
+                </span>
             </div>
         </div>
     );
