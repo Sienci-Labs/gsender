@@ -15,8 +15,18 @@
     color: black;
 }
 
+/* body and html css to overwrite changes from tanstack table package */
+body {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.2rem;
+    line-height: 2rem;
+    color: #222;
+    background-color: #fff;
+}
+
 html {
-    font-size: 12px; /*fixes issue where font size is changed to 10px due to react table package*/
+    font-size: 12px;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .tableContainer{
