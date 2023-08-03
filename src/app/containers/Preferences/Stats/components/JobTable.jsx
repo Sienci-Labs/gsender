@@ -18,13 +18,15 @@ import {
 } from '@tanstack/react-table';
 import { rankItem, compareItems } from '@tanstack/match-sorter-utils';
 
+import Icon from '@mdi/react';
+import { mdiCheckBold, mdiClose } from '@mdi/js';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Table as BTable } from 'react-bootstrap';
 import styles from './index.css';
 import { GRBL, JOB_STATUS, JOB_TYPES } from '../../../../constants';
 
 const JobTable = (data) => {
-    console.log(data);
     /***** FUNCTIONS *****/
     const fuzzyFilter = (row, columnId, value, addMeta) => {
         // Rank the item
@@ -81,53 +83,73 @@ const JobTable = (data) => {
     // columns structure
     const columnHelper = createColumnHelper();
     const columns = [
-        columnHelper.accessor((row) => `${row.id}`, {
-            id: 'id',
-            header: () => 'ID',
-            cell: (info) => <i>{info.getValue()}</i>,
+        // columnHelper.accessor((row) => `${row.id}`, {
+        //     id: 'id',
+        //     header: () => 'ID',
+        //     cell: (info) => <i>{info.getValue()}</i>,
+        //     filterFn: 'fuzzy',
+        //     sortingFn: fuzzySort,
+        //     size: 5,
+        // }),
+        // columnHelper.accessor('type', {
+        //     header: () => 'Type',
+        //     size: 10,
+        // }),
+        columnHelper.accessor('file', {
             filterFn: 'fuzzy',
             sortingFn: fuzzySort,
-        }),
-        columnHelper.accessor('type', {
-            header: () => 'Type',
-        }),
-        columnHelper.accessor('file', {
             header: () => 'File Name',
+            // size: 100,
         }),
-        columnHelper.accessor('path', {
-            header: () => 'File Path',
-        }),
-        columnHelper.accessor('lines', {
-            header: () => 'No. Lines',
-        }),
-        columnHelper.accessor('port', {
-            header: () => 'Port',
-        }),
-        columnHelper.accessor('controller', {
-            header: () => 'Controller',
-        }),
+        // columnHelper.accessor('totalLines', {
+        //     header: () => 'No. Lines in File',
+        //     size: 10,
+        // }),
+        // columnHelper.accessor('port', {
+        //     header: () => 'Port',
+        //     size: 50,
+        // }),
+        // columnHelper.accessor('controller', {
+        //     header: () => 'Controller',
+        //     size: 10,
+        // }),
         columnHelper.accessor('startTime', {
             header: () => 'Start Time',
-            cell: (info) => info.renderValue()?.toISOString(),
+            cell: (info) => {
+                console.log(info.renderValue());
+                return info.renderValue()?.toString();
+            },
+            // size: 80,
         }),
-        columnHelper.accessor('endTime', {
-            header: () => 'End Time',
-            cell: (info) => info.renderValue()?.toISOString(),
-        }),
+        // columnHelper.accessor('endTime', {
+        //     header: () => 'End Time',
+        //     cell: (info) => info.renderValue()?.toString(),
+        //     size: 50,
+        // }),
         columnHelper.accessor('jobStatus', {
             header: () => 'Status',
+            cell: (info) => {
+                return info.renderValue() === JOB_STATUS.COMPLETE ? <Icon path={mdiCheckBold} size={1} /> : <Icon path={mdiClose} size={1} />;
+            },
+            size: 27,
         }),
     ];
 
     // table variable
     const table = useReactTable({
-        data: data || defaultData,
+        data: data.props || defaultData,
         columns: columns,
         filterFns: {
             fuzzy: fuzzyFilter,
         },
         state: {
             globalFilter,
+        },
+        initialState: {
+            pagination: {
+                pageSize: 5,
+                pageIndex: 0,
+            },
         },
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
@@ -145,89 +167,10 @@ const JobTable = (data) => {
 
     /***** RENDERING *****/
     return (
-        <div className="container flex flex-col items-center justify-center gap-3 px-4 py-16 ">
+        <div className="container flex flex-col items-center justify-center gap-3 px-4 py-16 " style={{ maxWidth: '740px' }}>
             {/*** PAGINATION ***/}
             {/* buttons */}
             <div className="flex items-center gap-2">
-                {currentPage > 1 && (
-                    <button
-                        className={['rounded border p-1', styles.pagination].join(' ')}
-                        onClick={() => table.setPageIndex(0)}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        {'<<'}
-                    </button>
-                )}
-                {currentPage > 1 && (
-                    <button
-                        className={['rounded border p-1', styles.pagination].join(' ')}
-                        onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                    >
-                        {'<'}
-                    </button>
-                )}
-                {currentPage < maxPages && (
-                    <button
-                        className={['rounded border p-1', styles.pagination].join(' ')}
-                        onClick={() => table.nextPage()}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        {'>'}
-                    </button>
-                )}
-                {currentPage < maxPages && (
-                    <button
-                        className={['rounded border p-1', styles.pagination].join(' ')}
-                        onClick={() => table.setPageIndex(maxPages - 1)}
-                        disabled={!table.getCanNextPage()}
-                    >
-                        {'>>'}
-                    </button>
-                )}
-                {/* label */}
-                <span
-                    className={['flex items-center gap-1 ', styles.pagination].join(' ')}
-                >
-                    <div>Page</div>
-                    <strong>
-                        {currentPage} of {maxPages}
-                    </strong>
-                </span>
-                {/* jump to page */}
-                <span
-                    className={['flex items-center gap-1 ', styles.pagination].join(' ')}
-                >
-                    | Go to page:
-                    <input
-                        type="number"
-                        defaultValue={currentPage}
-                        onChange={(e) => {
-                            setPageNum(e.target.value ? Number(e.target.value) - 1 : 0);
-                        }}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                table.setPageIndex(pageNum);
-                            }
-                        }}
-                        className={['w-16 rounded border p-1 ', styles.input].join(' ')}
-                        min="1"
-                        max={maxPages}
-                    />
-                </span>
-                {/*** PAGE SIZE ***/}
-                <select
-                    value={table.getState().pagination.pageSize}
-                    onChange={(e) => {
-                        table.setPageSize(Number(e.target.value));
-                    }}
-                >
-                    {[10, 20, 30, 40, 50].map((pageSize) => (
-                        <option key={pageSize} value={pageSize}>
-                            Show {pageSize}
-                        </option>
-                    ))}
-                </select>
             </div>
             {/*** GLOBAL SEARCH ***/}
             <div>
@@ -246,71 +189,149 @@ const JobTable = (data) => {
                 />
             </div>
             {/*** TABLE ***/}
-            <BTable striped bordered hover responsive size="sm">
-                <thead>
-                    {table.getHeaderGroups().map(
-                        (
-                            headerGroup // we currently only have 1 group
-                        ) => (
-                            <tr key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => (
+            <div style={{ height: '250px' }}>
+                <BTable striped bordered hover responsive size="sm" style={{ tableLayout: 'fixed' }}>
+                    <thead>
+                        {table.getHeaderGroups().map(
+                            (
+                                headerGroup // we currently only have 1 group
+                            ) => (
+                                <tr key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => (
+                                        <th
+                                            key={header.id}
+                                            colSpan={header.colSpan}
+                                            style={{
+                                                width: header.getSize(),
+                                                whiteSpace: 'unset'
+                                            }}
+                                        >
+                                            {header.isPlaceholder ? null : (
+                                                <>
+                                                    <div
+                                                        {...{
+                                                            className: header.column.getCanSort()
+                                                                ? 'cursor-pointer select-none'
+                                                                : '',
+                                                            onClick: header.column.getToggleSortingHandler(),
+                                                        }}
+                                                    >
+                                                        {flexRender(
+                                                            header.column.columnDef.header,
+                                                            header.getContext()
+                                                        )}
+                                                        {{
+                                                            asc: ' 🔼',
+                                                            desc: ' 🔽',
+                                                        }[header.column.getIsSorted().toString()] ?? null}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </th>
+                                    ))}
+                                </tr>
+                            )
+                        )}
+                    </thead>
+                    <tbody>
+                        {table.getRowModel().rows.map((row) => (
+                            <tr key={row.id}>
+                                {row.getVisibleCells().map((cell) => (
+                                    <td key={cell.id} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                    <tfoot>
+                        {table.getFooterGroups().map((footerGroup) => (
+                            <tr key={footerGroup.id}>
+                                {footerGroup.headers.map((header) => (
                                     <th key={header.id}>
-                                        {header.isPlaceholder ? null : (
-                                            <>
-                                                <div
-                                                    {...{
-                                                        className: header.column.getCanSort()
-                                                            ? 'cursor-pointer select-none'
-                                                            : '',
-                                                        onClick: header.column.getToggleSortingHandler(),
-                                                    }}
-                                                >
-                                                    {flexRender(
-                                                        header.column.columnDef.header,
-                                                        header.getContext()
-                                                    )}
-                                                    {{
-                                                        asc: ' 🔼',
-                                                        desc: ' 🔽',
-                                                    }[header.column.getIsSorted().toString()] ?? null}
-                                                </div>
-                                            </>
-                                        )}
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                header.column.columnDef.footer,
+                                                header.getContext()
+                                            )}
                                     </th>
                                 ))}
                             </tr>
-                        )
-                    )}
-                </thead>
-                <tbody>
-                    {table.getRowModel().rows.map((row) => (
-                        <tr key={row.id}>
-                            {row.getVisibleCells().map((cell) => (
-                                <td key={cell.id}>
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
-                            ))}
-                        </tr>
-                    ))}
-                </tbody>
-                <tfoot>
-                    {table.getFooterGroups().map((footerGroup) => (
-                        <tr key={footerGroup.id}>
-                            {footerGroup.headers.map((header) => (
-                                <th key={header.id}>
-                                    {header.isPlaceholder
-                                        ? null
-                                        : flexRender(
-                                            header.column.columnDef.footer,
-                                            header.getContext()
-                                        )}
-                                </th>
-                            ))}
-                        </tr>
-                    ))}
-                </tfoot>
-            </BTable>
-            <div className="h-4" />
+                        ))}
+                    </tfoot>
+                </BTable>
+            </div>
+            <div className={styles.navContainer}>
+                <div>
+                    <button
+                        className="rounded border p-1"
+                        onClick={() => table.setPageIndex(0)}
+                        disabled={!table.getCanPreviousPage()}
+                        display={currentPage > 1 ? 'block' : 'hidden'}
+                    >
+                        {'<<'}
+                    </button>
+                    <button
+                        className="rounded border p-1"
+                        onClick={() => table.previousPage()}
+                        disabled={!table.getCanPreviousPage()}
+                        display={currentPage > 1 ? 'block' : 'hidden'}
+                    >
+                        {'<'}
+                    </button>
+                    <button
+                        className="rounded border p-1"
+                        onClick={() => table.nextPage()}
+                        disabled={!table.getCanNextPage()}
+                        display={currentPage < maxPages ? 'block' : 'hidden'}
+                    >
+                        {'>'}
+                    </button>
+                    <button
+                        className="rounded border p-1"
+                        onClick={() => table.setPageIndex(maxPages - 1)}
+                        disabled={!table.getCanNextPage()}
+                        display={currentPage < maxPages ? 'block' : 'hidden'}
+                    >
+                        {'>>'}
+                    </button>
+                </div>
+                {/* label */}
+                <div style={{ float: 'left' }}>
+                    <span
+                        className="flex items-center gap-1"
+                    >
+                        {'Page '}
+                        <strong>
+                            {currentPage} of {maxPages}
+                        </strong>
+                    </span>
+                </div>
+                {/* jump to page */}
+                <div style={{ float: 'left', clear: 'both' }}>
+                    <span
+                        className="flex items-center gap-1"
+                    >
+                        {'Go to page: '}
+                        <input
+                            type="number"
+                            defaultValue={currentPage}
+                            onChange={(e) => {
+                                setPageNum(e.target.value ? Number(e.target.value) - 1 : 0);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    table.setPageIndex(pageNum);
+                                }
+                            }}
+                            className={['w-16 rounded border p-1 ', styles.input].join(' ')}
+                            min="1"
+                            max={maxPages}
+                        />
+                    </span>
+                </div>
+            </div>
         </div>
     );
 };

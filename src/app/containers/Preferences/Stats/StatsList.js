@@ -57,7 +57,7 @@ const StatsList = ({ state, actions }) => {
     };
 
     return (
-        <Fieldset legend="Statistics">
+        <Fieldset legend="Statistics" className={styles.addMargin}>
             <div className={styles.addMargin}>
                 <div className={styles.statsContainer}>
                     <span className={[styles.first, styles.bold].join(' ')}>Total Runtime</span>

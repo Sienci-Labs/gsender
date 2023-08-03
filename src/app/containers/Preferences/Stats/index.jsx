@@ -26,22 +26,15 @@ import { Provider as ReduxProvider } from 'react-redux';
 import reduxStore from 'app/store/redux';
 
 import SettingWrapper from '../components/SettingWrapper';
-import GeneralArea from '../components/GeneralArea';
-// import StatsList from './StatsList';
-import StatsTable from './components/index';
+import StatsList from './StatsList';
+import JobTable from './components/index';
 
 const StatsPage = ({ active, state, actions }) => {
     return (
         <SettingWrapper title="Stats" show={active}>
             <ReduxProvider store={reduxStore}>
-                <GeneralArea>
-                    {/* <GeneralArea.Half>
-                        <StatsList actions={actions} state={state} />
-                    </GeneralArea.Half>
-                    <GeneralArea.Half> */}
-                    <StatsTable actions={actions} state={state} />
-                    {/* </GeneralArea.Half> */}
-                </GeneralArea>
+                <StatsList actions={actions} state={state} />
+                <JobTable actions={actions} state={state} />
             </ReduxProvider>
         </SettingWrapper>
     );

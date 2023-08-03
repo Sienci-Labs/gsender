@@ -81,7 +81,7 @@ export function* initialize() {
             const jobStats = res.body;
             let newJobStats = jobStats;
 
-            if (status.endTime) {
+            if (status.finishTime) {
                 newJobStats.jobsFinished += 1;
             } else {
                 newJobStats.jobsCancelled += 1;
@@ -89,15 +89,16 @@ export function* initialize() {
             newJobStats.totalRuntime += status.timeRunning;
 
             const job = {
+                id: jobStats.jobs.length > 0 ? (jobStats.jobs.length).toString() : '0',
                 type: JOB_TYPES.JOB,
                 file: status.name,
                 path: path,
-                lines: status.lines,
+                totalLines: status.total,
                 port: port,
                 controller: controllerType,
-                startTime: status.startTime,
-                endTime: status.finishTime === 0 ? null : status.finishTime,
-                jobStatus: JOB_STATUS.COMPLETE,
+                startTime: new Date(status.startTime),
+                endTime: status.finishTime === 0 ? null : new Date(status.finishTime),
+                jobStatus: status.finishTime ? JOB_STATUS.COMPLETE : JOB_STATUS.STOPPED,
             };
             console.log(newJobStats);
             newJobStats.jobs.push(job);

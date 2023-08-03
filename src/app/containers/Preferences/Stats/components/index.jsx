@@ -23,9 +23,9 @@
 
 import React, { useEffect, useState } from 'react';
 import styles from '../../index.styl';
-import Fieldset from '../../components/Fieldset';
 import JobTable from './JobTable';
 import jobActions from './jobApiActions';
+import Fieldset from '../../components/Fieldset';
 
 const StatsTable = ({ state, actions }) => {
     const [data, setData] = useState([]);
@@ -39,8 +39,8 @@ const StatsTable = ({ state, actions }) => {
 
 
     return (
-        <Fieldset legend="Charts">
-            <div className={[styles.addMargin, styles.chartsContainer].join(' ')}>
+        <Fieldset legend="Table" >
+            <div className={[styles.addMargin].join(' ')}>
                 {
                     jobsFinished === 0 && jobsCancelled === 0
                         ? <span>No jobs run</span>

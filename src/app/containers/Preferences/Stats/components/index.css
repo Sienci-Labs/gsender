@@ -10,10 +10,6 @@
     justify-content: center;
     margin-bottom: 70px;
 }
-  
-.pagination {
-    color: white;
-}
 
 .input {
     color: black;
@@ -21,4 +17,22 @@
 
 html {
     font-size: 12px; /*fixes issue where font size is changed to 10px due to react table package*/
+}
+
+.tableContainer{
+    padding: 20px;
+    background-color: rgba(25, 53, 80, 0.5);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 70px;
+}
+
+.navContainer {
+    display: flex;
+    flex-direction: column;
 }
