@@ -25,9 +25,8 @@ import React, { useEffect, useState } from 'react';
 import styles from '../../index.styl';
 import JobTable from './JobTable';
 import jobActions from './jobApiActions';
-import Fieldset from '../../components/Fieldset';
 
-const StatsTable = ({ state, actions }) => {
+const StatsTable = () => {
     const [data, setData] = useState([]);
     const [jobsFinished, setJobsFinished] = useState([]);
     const [jobsCancelled, setJobsCancelled] = useState([]);
@@ -39,17 +38,15 @@ const StatsTable = ({ state, actions }) => {
 
 
     return (
-        <Fieldset legend="Jobs Run" >
-            <div className={[styles.addMargin].join(' ')}>
-                {
-                    jobsFinished === 0 && jobsCancelled === 0
-                        ? <span>No jobs run</span>
-                        : (
-                            <JobTable props={data} />
-                        )
-                }
-            </div>
-        </Fieldset>
+        <div className={[styles.addMargin].join(' ')}>
+            {
+                jobsFinished === 0 && jobsCancelled === 0
+                    ? <span>No jobs run</span>
+                    : (
+                        <JobTable props={data} />
+                    )
+            }
+        </div>
     );
 };
 

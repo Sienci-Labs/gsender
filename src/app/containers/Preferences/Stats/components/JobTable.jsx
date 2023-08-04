@@ -104,11 +104,13 @@ const JobTable = (data) => {
                 date.setMilliseconds(Number(info.renderValue()));
                 return date.toISOString().slice(11, 19);
             },
-            size: 40,
+            minSize: 55,
+            maxSize: 55,
         }),
         columnHelper.accessor('totalLines', {
             header: () => '# Lines',
-            size: 40,
+            minSize: 50,
+            maxSize: 50,
         }),
         columnHelper.accessor('startTime', {
             header: () => 'Start Time',
@@ -116,19 +118,20 @@ const JobTable = (data) => {
                 const [yyyy, mm, dd, hh, mi, ss] = info.renderValue().toString().split(/[:\-T.]+/);
                 return (
                     <>
-                        <div style={{ float: 'left' }}>{mm}/{dd}/{yyyy}</div>
-                        <div style={{ float: 'left', clear: 'both' }}>{hh}:{mi}:{ss}</div>
+                        <div>{hh}:{mi}:{ss} - {mm}/{dd}/{yyyy}</div>
                     </>
                 );
             },
-            size: 50,
+            minSize: 90,
+            maxSize: 90,
         }),
         columnHelper.accessor('jobStatus', {
             header: () => 'Status',
             cell: (info) => {
                 return info.renderValue() === JOB_STATUS.COMPLETE ? <Icon path={mdiCheckBold} size={1} /> : <Icon path={mdiClose} size={1} />;
             },
-            size: 30,
+            minSize: 50,
+            maxSize: 50,
         }),
     ];
 
@@ -144,7 +147,7 @@ const JobTable = (data) => {
         },
         initialState: {
             pagination: {
-                pageSize: 4,
+                pageSize: 15,
                 pageIndex: 0,
             },
         },
@@ -164,11 +167,8 @@ const JobTable = (data) => {
 
     /***** RENDERING *****/
     return (
-        <div className="container flex flex-col items-center justify-center gap-3 px-4 py-16 " style={{ maxWidth: '737px', marginBottom: '0px' }}>
+        <div className="container flex flex-col items-center justify-center gap-3 px-4 py-16 " style={{ maxWidth: '760px', marginBottom: '0px', padding: 0 }}>
             {/*** PAGINATION ***/}
-            {/* buttons */}
-            <div className="flex items-center gap-2">
-            </div>
             {/*** GLOBAL SEARCH ***/}
             <div style={{ marginBottom: '5px' }}>
                 <input
@@ -186,7 +186,7 @@ const JobTable = (data) => {
                 />
             </div>
             {/*** TABLE ***/}
-            <div style={{ height: '280px', marginBottom: '5px' }}>
+            <div style={{ maxHeight: '520px', minHeight: '520px', marginBottom: '5px', overflowY: 'scroll' }}>
                 <BTable striped bordered hover size="sm" variant="dark" style={{ tableLayout: 'fixed' }}>
                     <thead>
                         {table.getHeaderGroups().map(
@@ -244,7 +244,8 @@ const JobTable = (data) => {
                     </tbody>
                 </BTable>
             </div>
-            <div className={styles.navContainer}>
+            {/* buttons */}
+            <div className={['flex items-center gap-2', styles.navContainer].join(' ')}>
                 <button
                     className="rounded border p-1"
                     onClick={() => table.setPageIndex(0)}
@@ -288,28 +289,47 @@ const JobTable = (data) => {
                     </strong>
                 </span>
                 {/* jump to page */}
-                <span
+                <div
                     className="flex items-center gap-1"
-                    style={{ float: 'right' }}
+                    style={{ display: 'flex', alignItems: 'center', float: 'right' }}
                 >
-                    {'Jump to page: '}
-                    <input
-                        type="number"
-                        defaultValue={currentPage}
-                        onChange={(e) => {
-                            setPageNum(e.target.value ? Number(e.target.value) - 1 : 0);
-                        }}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                table.setPageIndex(pageNum);
-                            }
-                        }}
-                        className={['w-16 rounded border p-1 ', styles.input].join(' ')}
-                        min="1"
-                        max={maxPages}
-                        style={{ minWidth: '60px' }}
-                    />
-                </span>
+                    <span style={{ marginRight: '5px' }}>
+                        {'Jump to page: '}
+                        <input
+                            type="number"
+                            defaultValue={currentPage}
+                            onChange={(e) => {
+                                setPageNum(e.target.value ? Number(e.target.value) - 1 : 0);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    table.setPageIndex(pageNum);
+                                }
+                            }}
+                            className={['w-16 rounded border p-1 ', styles.input].join(' ')}
+                            min="1"
+                            max={maxPages}
+                            style={{ minWidth: '60px' }}
+                        />
+                    </span>
+                    <div style={{ marginRight: '5px' }}>|</div>
+                    {/*** PAGE SIZE ***/}
+                    <div>
+                        {'Entries/Page: '}
+                        <select
+                            value={table.getState().pagination.pageSize}
+                            onChange={(e) => {
+                                table.setPageSize(Number(e.target.value));
+                            }}
+                        >
+                            {[15, 30, 50, 75, 100].map((pageSize) => (
+                                <option key={pageSize} value={pageSize}>
+                                Show {pageSize}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
     );

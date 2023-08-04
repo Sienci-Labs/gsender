@@ -26,7 +26,7 @@ import styles from '../index.styl';
 import Fieldset from '../components/Fieldset';
 import jobActions from './components/jobApiActions';
 
-const StatsList = ({ state, actions }) => {
+const StatsList = () => {
     // const [data, setData] = useState({});
     const [jobsFinished, setJobsFinished] = useState([]);
     const [jobsCancelled, setJobsCancelled] = useState([]);
