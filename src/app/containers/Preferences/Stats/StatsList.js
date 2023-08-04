@@ -21,14 +21,35 @@
  *
  */
 
-import React from 'react';
-import store from 'app/store';
+import React, { useEffect, useState } from 'react';
 import styles from '../index.styl';
 import Fieldset from '../components/Fieldset';
+import jobActions from './components/jobApiActions';
 
 const StatsList = ({ state, actions }) => {
-    const jobsFinished = store.get('workspace.jobsFinished');
-    const jobsCancelled = store.get('workspace.jobsCancelled');
+    // const [data, setData] = useState({});
+    const [jobsFinished, setJobsFinished] = useState([]);
+    const [jobsCancelled, setJobsCancelled] = useState([]);
+    const [totalRuntime, setTotalRuntime] = useState(0);
+    const [averageTime, setAverageTime] = useState(0);
+    const [longestTime, setLongestTime] = useState(0);
+
+    useEffect(() => {
+        console.log('api call');
+        jobActions.fetch(null, setJobsFinished, setJobsCancelled, setTotalRuntime).then((data) => {
+            // calc longest time run and average run time
+            let allJobTimes = 0;
+            let longestTime = 0;
+            data.jobs.forEach(job => {
+                allJobTimes += job.duration;
+                if (job.duration > longestTime) {
+                    longestTime = job.duration;
+                }
+            });
+            setAverageTime(allJobTimes / data.jobs.length);
+            setLongestTime(longestTime);
+        });
+    }, []);
 
     // solution found here: https://stackoverflow.com/a/25279340
     const convertMillisecondsToTimeStamp = (milliseconds) => {
@@ -41,39 +62,24 @@ const StatsList = ({ state, actions }) => {
         return null;
     };
 
-    const timeSpentRunning = convertMillisecondsToTimeStamp(store.get('workspace.timeSpentRunning'));
-    const longestTimeRun = convertMillisecondsToTimeStamp(store.get('workspace.longestTimeRun'));
-    const jobTimes = store.get('workspace.jobTimes');
-
-    const calculateAverageTimeRun = () => {
-        let avgTime = 0;
-        if (jobTimes.length > 0) {
-            for (let i = 0; i < jobTimes.length; i++) {
-                avgTime += jobTimes[i];
-            }
-            avgTime /= jobTimes.length;
-        }
-        return convertMillisecondsToTimeStamp(avgTime);
-    };
-
     return (
         <Fieldset legend="Statistics" className={styles.addMargin}>
             <div className={styles.addMargin}>
                 <div className={styles.statsContainer}>
                     <span className={[styles.first, styles.bold].join(' ')}>Total Runtime</span>
                     <div className={styles.dotsV2} />
-                    <span className={[styles.second, styles.bold].join(' ')}>{timeSpentRunning}</span>
+                    <span className={[styles.second, styles.bold].join(' ')}>{convertMillisecondsToTimeStamp(totalRuntime)}</span>
                 </div>
                 <div className={styles.indentContainer}>
                     <div className={styles.statsContainer}>
                         <span className={styles.first}>Longest Runtime</span>
                         <div className={styles.dotsV2} />
-                        <span className={styles.second}>{longestTimeRun}</span>
+                        <span className={styles.second}>{convertMillisecondsToTimeStamp(longestTime)}</span>
                     </div>
                     <div className={styles.statsContainer}>
                         <span className={styles.first}>Average Runtime</span>
                         <div className={styles.dotsV2} />
-                        <span className={styles.second}>{calculateAverageTimeRun()}</span>
+                        <span className={styles.second}>{convertMillisecondsToTimeStamp(averageTime)}</span>
                     </div>
                 </div>
                 <div className={styles.statsContainer}>
