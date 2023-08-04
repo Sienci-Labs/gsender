@@ -31,7 +31,7 @@ import JobTable from './components/index';
 
 const StatsPage = ({ active, state, actions }) => {
     return (
-        <SettingWrapper title="Stats" show={active}>
+        <SettingWrapper title="Job History & Stats" show={active}>
             <ReduxProvider store={reduxStore}>
                 <StatsList actions={actions} state={state} />
                 <JobTable actions={actions} state={state} />

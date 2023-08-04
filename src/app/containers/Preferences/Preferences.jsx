@@ -120,7 +120,7 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 6,
-                    label: 'Stats',
+                    label: 'Job History & Stats',
                     component: StatsPage,
                 },
                 {

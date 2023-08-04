@@ -101,7 +101,7 @@ const JobTable = (data) => {
             header: () => 'Duration',
             cell: (info) => {
                 const date = new Date(null);
-                date.setSeconds(Number(info.renderValue())); // specify value for SECONDS here
+                date.setMilliseconds(Number(info.renderValue()));
                 return date.toISOString().slice(11, 19);
             },
             size: 40,

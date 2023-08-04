@@ -39,7 +39,7 @@ const StatsTable = ({ state, actions }) => {
 
 
     return (
-        <Fieldset legend="Table" >
+        <Fieldset legend="Jobs Run" >
             <div className={[styles.addMargin].join(' ')}>
                 {
                     jobsFinished === 0 && jobsCancelled === 0
