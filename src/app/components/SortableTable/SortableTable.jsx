@@ -4,7 +4,6 @@ base filtering and pagination code is from examples in https://tanstack.com/tabl
 
 import React, { useState } from 'react';
 import {
-    createColumnHelper,
     flexRender,
     getCoreRowModel,
     useReactTable,
@@ -14,19 +13,21 @@ import {
     getFacetedRowModel,
     getFacetedUniqueValues,
     getFacetedMinMaxValues,
-    sortingFns,
 } from '@tanstack/react-table';
-import { rankItem, compareItems } from '@tanstack/match-sorter-utils';
-
-import Icon from '@mdi/react';
-import { mdiCheckBold, mdiClose } from '@mdi/js';
+import { rankItem } from '@tanstack/match-sorter-utils';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Table as BTable } from 'react-bootstrap';
 import styles from './index.css';
-import { GRBL, JOB_STATUS, JOB_TYPES } from '../../../../constants';
 
-const JobTable = (data) => {
+const SortableTable = (props) => {
+    // set defaults
+    const data = props.data || [];
+    const columns = props.columns || [];
+    const defaultData = props.defaultData || [];
+    const height = props.height || '520px';
+    const width = props.width || '760px';
+
     /***** FUNCTIONS *****/
     const fuzzyFilter = (row, columnId, value, addMeta) => {
         // Rank the item
@@ -41,22 +42,6 @@ const JobTable = (data) => {
         // Return if the item should be filtered in/out
         return itemRank.passed;
     };
-    const fuzzySort = (rowA, rowB, columnId) => {
-        let dir = 0;
-
-        // Only sort by rank if the column has ranking information
-        if (rowA.columnFiltersMeta[columnId]) {
-            dir = compareItems(
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                rowA.columnFiltersMeta[columnId]?.itemRank,
-                rowB.columnFiltersMeta[columnId]?.itemRank
-            );
-        }
-
-        // Provide an alphanumeric fallback for when the item ranks are equal
-        return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
-    };
 
     /***** CONSTANTS *****/
     const [pageNum, setPageNum] = useState(1);
@@ -64,80 +49,9 @@ const JobTable = (data) => {
     const [globalSearchText, setGlobalSearchText] = useState('');
 
     /***** TABLE DATA *****/
-    // need default data, as table does not accept null or undefined data (which the query may give back)
-    const defaultData = [
-        {
-            id: 'default',
-            type: JOB_TYPES.JOB,
-            file: '',
-            path: null,
-            lines: 0,
-            port: '',
-            controller: GRBL,
-            startTime: new Date(),
-            endTime: null,
-            jobStatus: JOB_STATUS.COMPLETE
-        },
-    ];
-
-    // columns structure
-    const columnHelper = createColumnHelper();
-    const columns = [
-        // columnHelper.accessor((row) => `${row.id}`, {
-        //     id: 'id',
-        //     header: () => 'ID',
-        //     cell: (info) => <i>{info.getValue()}</i>,
-        //     filterFn: 'fuzzy',
-        //     sortingFn: fuzzySort,
-        //     size: 5,
-        // }),
-        columnHelper.accessor('file', {
-            filterFn: 'fuzzy',
-            sortingFn: fuzzySort,
-            header: () => 'File Name',
-            // size: 100,
-        }),
-        columnHelper.accessor('duration', {
-            header: () => 'Duration',
-            cell: (info) => {
-                const date = new Date(null);
-                date.setMilliseconds(Number(info.renderValue()));
-                return date.toISOString().slice(11, 19);
-            },
-            minSize: 55,
-            maxSize: 55,
-        }),
-        columnHelper.accessor('totalLines', {
-            header: () => '# Lines',
-            minSize: 50,
-            maxSize: 50,
-        }),
-        columnHelper.accessor('startTime', {
-            header: () => 'Start Time',
-            cell: (info) => {
-                const [yyyy, mm, dd, hh, mi, ss] = info.renderValue().toString().split(/[:\-T.]+/);
-                return (
-                    <>
-                        <div>{hh}:{mi}:{ss} - {mm}/{dd}/{yyyy}</div>
-                    </>
-                );
-            },
-            minSize: 90,
-            maxSize: 90,
-        }),
-        columnHelper.accessor('jobStatus', {
-            header: () => 'Status',
-            cell: (info) => {
-                return info.renderValue() === JOB_STATUS.COMPLETE ? <Icon path={mdiCheckBold} size={1} /> : <Icon path={mdiClose} size={1} />;
-            },
-            minSize: 50,
-            maxSize: 50,
-        }),
-    ];
-
     // table variable
     const table = useReactTable({
-        data: data.props || defaultData,
+        data: data || defaultData,
         columns: columns,
         filterFns: {
             fuzzy: fuzzyFilter,
@@ -167,7 +81,7 @@ const JobTable = (data) => {
 
     /***** RENDERING *****/
     return (
-        <div className="container flex flex-col items-center justify-center gap-3 px-4 py-16 " style={{ maxWidth: '760px', marginBottom: '0px', padding: 0 }}>
+        <div className="container flex flex-col items-center justify-center gap-3 px-4 py-16 " style={{ maxWidth: width, marginBottom: '0px', padding: 0 }}>
             {/*** PAGINATION ***/}
             {/*** GLOBAL SEARCH ***/}
             <div style={{ marginBottom: '5px' }}>
@@ -186,7 +100,7 @@ const JobTable = (data) => {
                 />
             </div>
             {/*** TABLE ***/}
-            <div style={{ maxHeight: '520px', minHeight: '520px', marginBottom: '5px', overflowY: 'scroll' }}>
+            <div style={{ maxHeight: height, minHeight: height, marginBottom: '5px', overflowY: 'scroll' }}>
                 <BTable striped bordered hover size="sm" variant="dark" style={{ tableLayout: 'fixed' }}>
                     <thead>
                         {table.getHeaderGroups().map(
@@ -335,4 +249,4 @@ const JobTable = (data) => {
     );
 };
 
-export default JobTable;
+export default SortableTable;
