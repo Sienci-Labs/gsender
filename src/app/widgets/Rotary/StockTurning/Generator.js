@@ -11,18 +11,21 @@ export class StockTurningGenerator {
 
         let method = STOCK_TURNING_METHOD.HALF_AND_HALF_SPIRALS;
 
+        const newStartHeight = Number((newOptions.startHeight / 2).toFixed(2));
+        const newFinalHeight = Number((newOptions.finalHeight / 2).toFixed(2));
+
         // Checking for odd and even number of passes for full spiral is done later
-        if (newOptions.stepdown >= newOptions.finalHeight) {
+        if (newStartHeight - newOptions.stepdown <= newFinalHeight) { // check if one pass
             method = STOCK_TURNING_METHOD.HALF_AND_HALF_SPIRALS;
         } else {
-            method = STOCK_TURNING_METHOD.FULL_SPIRALS;
+            method = STOCK_TURNING_METHOD.FULL_SPIRALS; // not one pass, then use full spiral
         }
 
         this.options = {
             ...newOptions,
             method,
-            startHeight: Number((newOptions.startHeight / 2).toFixed(2)),
-            finalHeight: Number((newOptions.finalHeight / 2).toFixed(2))
+            startHeight: newStartHeight,
+            finalHeight: newFinalHeight
         };
     }
 
