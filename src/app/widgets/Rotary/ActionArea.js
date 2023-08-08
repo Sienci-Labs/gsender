@@ -28,7 +28,7 @@ const ActionArea = ({ actions }) => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <FunctionButton onClick={handleStockTurningClick} disabled={!isInRotaryMode || isFileRunning}>Stock Turning</FunctionButton>
+            <FunctionButton onClick={handleStockTurningClick} disabled={!isInRotaryMode || isFileRunning}>Rotary Surfacing</FunctionButton>
             <FunctionButton onClick={() => actions.runProbing('Z-axis', Z_AXIS_PROBING_MACRO)} disabled={!isInRotaryMode || isFileRunning}>Probe Rotary Z-Axis</FunctionButton>
             <FunctionButton onClick={() => actions.runProbing('Y-axis alignment', Y_AXIS_ALIGNMENT_PROBING_MACRO)} disabled={isInRotaryMode || isFileRunning}>Y-axis Alignment</FunctionButton>
             <FunctionButton onClick={showUnitSetup} disabled={isInRotaryMode || isFileRunning}>Rotary Mounting Setup</FunctionButton>

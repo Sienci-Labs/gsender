@@ -101,7 +101,7 @@ const StockTurning = () => {
 
     return (
         <Modal
-            title="Stock Turning Wizard"
+            title="Rotary Surfacing Tool"
             show={activeDialog === MODALS.STOCK_TURNING}
             onClose={handleClose}
             size="lg"
