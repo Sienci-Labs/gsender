@@ -47,7 +47,7 @@ const InputArea = () => {
                 so you don&apos;t encounter alarms or errors.
             </p>
             <Input
-                label="Stock Length"
+                label="Length"
                 units={units}
                 additionalProps={{ type: 'number', id: 'stockLength', min: 1, max: 1000000, style: { ...inputStyles } }}
                 value={stockLength}
@@ -92,21 +92,21 @@ const InputArea = () => {
             />
 
             <Input
-                label="Stepover"
-                units="%"
-                additionalProps={{ type: 'number', id: 'stepover', min: 1, max: 80, style: { ...inputStyles } }}
-                value={stepover}
-                onChange={handleChange}
-                tooltip={{ content: `Default Value: ${defaultValues.stepover}` }}
-            />
-
-            <Input
                 label="Bit Diameter"
                 units={units}
                 additionalProps={{ type: 'number', id: 'bitDiameter', step: 1, min: 0.01, max: 1000, style: { ...inputStyles } }}
                 value={bitDiameter}
                 onChange={handleChange}
                 tooltip={{ content: `Default Value: ${defaultValues.bitDiameter}` }}
+            />
+
+            <Input
+                label="Stepover"
+                units="%"
+                additionalProps={{ type: 'number', id: 'stepover', min: 1, max: 80, style: { ...inputStyles } }}
+                value={stepover}
+                onChange={handleChange}
+                tooltip={{ content: `Default Value: ${defaultValues.stepover}` }}
             />
 
             <Input
