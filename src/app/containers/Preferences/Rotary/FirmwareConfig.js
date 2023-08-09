@@ -4,6 +4,7 @@ import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import ToggleSwitch from 'app/components/ToggleSwitch';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import store from 'app/store';
 
 import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
@@ -21,6 +22,8 @@ const FirmwareConfig = ({ state = {}, actions }) => {
         });
     };
 
+    const units = store.get('workspace.units');
+
     return (
         <Fieldset legend="Firmware Configuration">
             <div className={styles.addMargin}>
@@ -29,9 +32,10 @@ const FirmwareConfig = ({ state = {}, actions }) => {
                     location="default"
                 >
                     <Input
-                        label="Y-axis Travel Resolution"
+                        label="A-axis Travel Resolution"
                         value={rotary.firmwareSettings.$101}
                         onChange={(e) => actions.rotary.updateFirmwareSetting('$101', e.target.value)}
+                        units={`step/${units}`}
                     />
                 </Tooltip>
             </div>
@@ -42,9 +46,10 @@ const FirmwareConfig = ({ state = {}, actions }) => {
                     location="default"
                 >
                     <Input
-                        label="Y-axis Maximum Rate"
+                        label="A-axis Maximum Rate"
                         value={rotary.firmwareSettings.$111}
                         onChange={(e) => actions.rotary.updateFirmwareSetting('$111', e.target.value)}
+                        units={`${units}/min`}
                     />
                 </Tooltip>
             </div>
@@ -57,7 +62,7 @@ const FirmwareConfig = ({ state = {}, actions }) => {
                     <ToggleSwitch
                         onChange={(value) => actions.rotary.updateFirmwareSetting('$21', (+value).toString())}
                         checked={!!Number(rotary.firmwareSettings.$21)}
-                        label="Hard Limits Enable ($21)"
+                        label="Force Hard Limits"
                         size="small"
                     />
                 </Tooltip>
