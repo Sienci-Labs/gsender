@@ -194,7 +194,7 @@ export class StockTurningGenerator {
             : this.getDefaultCurrentZValue();
 
         const isFinalStepdown = currentZValue - stepdown <= finalHeight;
-        const isEvenNumberOfStepdowns = startHeight % stepdown === 0;
+        const isEvenNumberOfStepdowns = Math.round((startHeight - finalHeight) / stepdown) % 2 === 0;
         const isFirstLayer = currentZValue === startHeight;
 
         const firstLayerBlock = [
