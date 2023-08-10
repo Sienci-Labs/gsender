@@ -572,7 +572,7 @@ export function* initialize() {
 
         if (type === FILE_TYPE.FOUR_AXIS && controller.type === 'Grbl') {
             Confirm({
-                title: '4 Axis File File Loaded',
+                title: '4 Axis File Loaded',
                 content: 'G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
                 confirmLabel: null,
                 cancelLabel: 'Close',
