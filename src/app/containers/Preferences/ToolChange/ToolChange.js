@@ -90,9 +90,9 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
         let newPositionMetric = newPosition;
         if ($13) {
             newPositionMetric = {
-                x: Number(mpos.x) * 25.4,
-                y: Number(mpos.y) * 25.4,
-                z: Number(mpos.z) * 25.4
+                x: (Number(mpos.x) * 25.4).toFixed(3),
+                y: (Number(mpos.y) * 25.4).toFixed(3),
+                z: (Number(mpos.z) * 25.4).toFixed(3)
             };
         }
 
@@ -237,6 +237,6 @@ const ToolChange = ({ state, actions, mpos, $13 }) => {
 
 export default connect((store) => {
     const mpos = get(store, 'controller.state.status.mpos', { x: 0, y: 0, z: 0 });
-    const $13 = get(store, 'controller.settings.settings.$13', '0');
+    const $13 = Number(get(store, 'controller.settings.settings.$13', 0));
     return { mpos, $13 };
 })(ToolChange);
