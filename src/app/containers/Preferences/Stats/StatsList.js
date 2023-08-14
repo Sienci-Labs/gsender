@@ -22,32 +22,95 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import styles from '../index.styl';
-import Fieldset from '../components/Fieldset';
-import jobActions from './components/jobApiActions';
+import Select from 'react-select';
+import { isEmpty, map } from 'lodash';
+import api from 'app/api';
+import { createTableColumns, SortableTable } from '../../../components/SortableTable';
+import styles from './index.styl';
+import {
+    STATS_PAGES,
+    OVERALL_STATS,
+    JOB_PER_PORT,
+    RUN_TIME_PER_PORT
+} from '../../../constants';
+
+const columnData = {
+    jobsPerPort: [
+        {
+            name: 'port',
+            header: () => 'Port',
+        },
+        {
+            name: 'numJobs',
+            header: () => '# of Jobs',
+        },
+    ],
+    runTimePerPort: [
+        {
+            name: 'port',
+            header: () => 'Port',
+        },
+        {
+            name: 'runTime',
+            header: () => 'Run Time',
+            cell: (info) => {
+                const date = new Date(null);
+                date.setMilliseconds(Number(info.renderValue()));
+                return date.toISOString().slice(11, 19);
+            },
+        },
+    ]
+};
 
 const StatsList = () => {
-    // const [data, setData] = useState({});
-    const [jobsFinished, setJobsFinished] = useState([]);
-    const [jobsCancelled, setJobsCancelled] = useState([]);
-    const [totalRuntime, setTotalRuntime] = useState(0);
-    const [averageTime, setAverageTime] = useState(0);
-    const [longestTime, setLongestTime] = useState(0);
+    const [statsPages, setStatsPages] = useState({});
+    const [page, setPage] = useState(JOB_PER_PORT);
 
     useEffect(() => {
         console.log('api call');
-        jobActions.fetch(null, setJobsFinished, setJobsCancelled, setTotalRuntime).then((data) => {
+        api.jobStats.fetch().then((res) => {
+            const data = res.body;
             // calc longest time run and average run time
             let allJobTimes = 0;
             let longestTime = 0;
+            let jobsPerPort = {};
+            let runTimePerPort = {};
             data.jobs.forEach(job => {
+                // jobs per port
+                if (!jobsPerPort[job.port]) {
+                    jobsPerPort[job.port] = 0;
+                }
+                jobsPerPort[job.port] += 1;
+                // run time per port
+                if (!runTimePerPort[job.port]) {
+                    runTimePerPort[job.port] = 0;
+                }
+                runTimePerPort[job.port] += job.duration;
+                // all job times + longest time
                 allJobTimes += job.duration;
                 if (job.duration > longestTime) {
                     longestTime = job.duration;
                 }
             });
-            setAverageTime(allJobTimes / data.jobs.length);
-            setLongestTime(longestTime);
+            const portJobData = Object.entries(jobsPerPort).map(([port, data]) => {
+                return { port: port, numJobs: data };
+            });
+            const portRunTimeData = Object.entries(runTimePerPort).map(([port, data]) => {
+                return { port: port, runTime: data };
+            });
+            const averageTime = allJobTimes / data.jobs.length;
+
+            const allStats = {
+                totalRuntime: data.totalRuntime,
+                jobsFinished: data.jobsFinished,
+                jobsCancelled: data.jobsCancelled,
+                averageTime: averageTime,
+                longestTime: longestTime,
+                jobsPerPort: portJobData,
+                runTimePerPort: portRunTimeData
+            };
+
+            setStatsPages(getStatsPages(allStats));
         });
     }, []);
 
@@ -62,45 +125,119 @@ const StatsList = () => {
         return null;
     };
 
+    const getStatsPages = (stats) => {
+        const {
+            totalRuntime,
+            jobsFinished,
+            jobsCancelled,
+            averageTime,
+            longestTime,
+            jobsPerPort,
+            runTimePerPort
+        } = stats;
+
+        return {
+            [OVERALL_STATS]: {
+                needsTable: false,
+                html:
+                <div className={styles.addMargin}>
+                    <div className={styles.statsContainer}>
+                        <span className={[styles.first, styles.bold].join(' ')}>Total Runtime</span>
+                        <div className={styles.dotsV2} />
+                        <span className={[styles.second, styles.bold].join(' ')}>{convertMillisecondsToTimeStamp(totalRuntime)}</span>
+                    </div>
+                    <div className={styles.indentContainer}>
+                        <div className={styles.statsContainer}>
+                            <span className={styles.first}>Longest Runtime</span>
+                            <div className={styles.dotsV2} />
+                            <span className={styles.second}>{convertMillisecondsToTimeStamp(longestTime)}</span>
+                        </div>
+                        <div className={styles.statsContainer}>
+                            <span className={styles.first}>Average Runtime</span>
+                            <div className={styles.dotsV2} />
+                            <span className={styles.second}>{convertMillisecondsToTimeStamp(averageTime)}</span>
+                        </div>
+                    </div>
+                    <div className={styles.statsContainer}>
+                        <span className={[styles.first, styles.bold].join(' ')}>Total Jobs Run</span>
+                        <div className={styles.dotsV2} />
+                        <span className={[styles.second, styles.bold].join(' ')}>{jobsFinished + jobsCancelled}</span>
+                    </div>
+                    <div className={styles.indentContainer}>
+                        <div className={styles.statsContainer}>
+                            <span className={styles.first}>Jobs Completed</span>
+                            <div className={styles.dotsV2} />
+                            <span className={styles.second}>{jobsFinished}</span>
+                        </div>
+                        <div className={styles.statsContainer}>
+                            <span className={styles.first}>Jobs Cancelled</span>
+                            <div className={styles.dotsV2} />
+                            <span className={styles.second}>{jobsCancelled}</span>
+                        </div>
+                    </div>
+                </div>
+            },
+            [JOB_PER_PORT]: {
+                needsTable: true,
+                columns: createTableColumns(columnData.jobsPerPort),
+                data: jobsPerPort,
+            },
+            [RUN_TIME_PER_PORT]: {
+                needsTable: true,
+                columns: createTableColumns(columnData.runTimePerPort),
+                data: runTimePerPort,
+            }
+        };
+    };
+
+    const selectRenderer = (option) => {
+        const style = {
+            color: '#333',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            textTransform: 'capitalize'
+        };
+        console.log(option);
+        return (
+            <div style={style} title={option.label}>{option.label}</div>
+        );
+    };
+
     return (
-        <Fieldset legend="Statistics" className={styles.addMargin}>
+        <div className={styles.statsWrapper}>
             <div className={styles.addMargin}>
-                <div className={styles.statsContainer}>
-                    <span className={[styles.first, styles.bold].join(' ')}>Total Runtime</span>
-                    <div className={styles.dotsV2} />
-                    <span className={[styles.second, styles.bold].join(' ')}>{convertMillisecondsToTimeStamp(totalRuntime)}</span>
-                </div>
-                <div className={styles.indentContainer}>
-                    <div className={styles.statsContainer}>
-                        <span className={styles.first}>Longest Runtime</span>
-                        <div className={styles.dotsV2} />
-                        <span className={styles.second}>{convertMillisecondsToTimeStamp(longestTime)}</span>
-                    </div>
-                    <div className={styles.statsContainer}>
-                        <span className={styles.first}>Average Runtime</span>
-                        <div className={styles.dotsV2} />
-                        <span className={styles.second}>{convertMillisecondsToTimeStamp(averageTime)}</span>
-                    </div>
-                </div>
-                <div className={styles.statsContainer}>
-                    <span className={[styles.first, styles.bold].join(' ')}>Total Jobs Run</span>
-                    <div className={styles.dotsV2} />
-                    <span className={[styles.second, styles.bold].join(' ')}>{jobsFinished + jobsCancelled}</span>
-                </div>
-                <div className={styles.indentContainer}>
-                    <div className={styles.statsContainer}>
-                        <span className={styles.first}>Jobs Completed</span>
-                        <div className={styles.dotsV2} />
-                        <span className={styles.second}>{jobsFinished}</span>
-                    </div>
-                    <div className={styles.statsContainer}>
-                        <span className={styles.first}>Jobs Cancelled</span>
-                        <div className={styles.dotsV2} />
-                        <span className={styles.second}>{jobsCancelled}</span>
-                    </div>
-                </div>
+                <Select
+                    id="statsSelect"
+                    backspaceRemoves={false}
+                    className="sm"
+                    clearable={false}
+                    menuContainerStyle={{ zIndex: 5 }}
+                    name="Job Statistics"
+                    onChange={(obj) => {
+                        console.log(obj);
+                        setPage(obj.value);
+                    }}
+                    options={map(STATS_PAGES, (value) => ({
+                        value: value,
+                        label: value
+                    }))}
+                    searchable={false}
+                    value={{ label: page }}
+                    valueRenderer={selectRenderer}
+                />
             </div>
-        </Fieldset>
+            <div className={styles.statsContent}>
+                {
+                    !isEmpty(statsPages) && (
+                        statsPages[page].needsTable ? (
+                            <SortableTable data={statsPages[page].data} columns={statsPages[page].columns} height="472px" />
+                        ) : (
+                            statsPages[page].html
+                        )
+                    )
+                }
+            </div>
+        </div>
     );
 };
 

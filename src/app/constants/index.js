@@ -249,3 +249,13 @@ export const JOB_STATUS = {
     COMPLETE: 'COMPLETE',
     STOPPED: 'STOPPED',
 };
+
+export const OVERALL_STATS = 'Overall Stats';
+export const JOB_PER_PORT = 'Jobs Per Com Port';
+export const RUN_TIME_PER_PORT = 'Run Time Per Com Port';
+
+export const STATS_PAGES = {
+    OVERALL_STATS,
+    JOB_PER_PORT,
+    RUN_TIME_PER_PORT
+};

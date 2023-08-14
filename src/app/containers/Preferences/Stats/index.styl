@@ -1,6 +1,56 @@
 .container {
   display: grid;
   grid-template-rows: 19fr 1fr;
-  margin-top: 0.5rem;
+  margin-top: 1.5rem;
   max-height: 565px;
+  max-width: 500px;
+}
+
+.stats-wrapper {
+  position: relative;
+  display: block;
+}
+
+.stats-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  min-width: 250px;
+  white-space: nowrap;
+}
+
+.indent-container {
+  margin-left: 10px;
+}
+
+.dots-v2 {
+  background-image: linear-gradient(to right, #000 30%, rgba(255, 255, 255, 0) 30%);
+  background-position: 0 14px;
+  background-size: 10px 1px;
+  background-repeat: repeat-x;
+  width: 100%;
+  height:25px;
+}
+
+.first {
+  margin-right: 0.5em;
+  white-space: nowrap;
+}
+
+.second {
+  margin-left: 0.5em;
+}
+
+.add-margin {
+  margin-bottom: .9rem;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.statsContent {
+  minheight: 472px;
+  width: 760px;
 }
