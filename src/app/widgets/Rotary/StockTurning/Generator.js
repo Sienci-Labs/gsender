@@ -11,18 +11,21 @@ export class StockTurningGenerator {
 
         let method = STOCK_TURNING_METHOD.HALF_AND_HALF_SPIRALS;
 
+        const newStartHeight = Number((newOptions.startHeight / 2).toFixed(2));
+        const newFinalHeight = Number((newOptions.finalHeight / 2).toFixed(2));
+
         // Checking for odd and even number of passes for full spiral is done later
-        if (newOptions.stepdown >= newOptions.finalHeight) {
+        if ((newStartHeight - newOptions.stepdown <= newFinalHeight) && !newOptions.enableRehoming) { // check if one pass
             method = STOCK_TURNING_METHOD.HALF_AND_HALF_SPIRALS;
         } else {
-            method = STOCK_TURNING_METHOD.FULL_SPIRALS;
+            method = STOCK_TURNING_METHOD.FULL_SPIRALS; // not one pass, then use full spiral
         }
 
         this.options = {
             ...newOptions,
             method,
-            startHeight: Number((newOptions.startHeight / 2).toFixed(2)),
-            finalHeight: Number((newOptions.finalHeight / 2).toFixed(2))
+            startHeight: newStartHeight,
+            finalHeight: newFinalHeight
         };
     }
 
@@ -121,6 +124,10 @@ export class StockTurningGenerator {
         const currentZValue = depth > 0
             ? depth
             : this.getDefaultCurrentZValue();
+        let modifiedCurrentZValue = this.getDefaultCurrentZValue();
+        if (depth > 0) {
+            modifiedCurrentZValue = depth - stepdown > finalHeight ? depth - stepdown : finalHeight;
+        }
 
         const isFinalStepdown = currentZValue - stepdown <= finalHeight;
 
@@ -140,7 +147,7 @@ export class StockTurningGenerator {
 
             /** 6 */ 'G1 A-360',
 
-            /** 7 */ `G1 X${halfOfStockLength} A${(0.5 * -360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            /** 7 */ `G1 X${halfOfStockLength} A${(0.5 * -360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 8 */ 'G1 A-360',
 
@@ -161,7 +168,7 @@ export class StockTurningGenerator {
 
             /** 15 */ 'G1 A360',
 
-            /** 16 */ `G1 X${-halfOfStockLength} A${(0.5 * 360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            /** 16 */ `G1 X${-halfOfStockLength} A${(0.5 * 360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 17 */ 'G1 A360',
         ];
@@ -189,9 +196,13 @@ export class StockTurningGenerator {
         const currentZValue = depth > 0
             ? depth
             : this.getDefaultCurrentZValue();
+        let modifiedCurrentZValue = this.getDefaultCurrentZValue();
+        if (depth > 0) {
+            modifiedCurrentZValue = depth - stepdown > finalHeight ? depth - stepdown : finalHeight;
+        }
 
         const isFinalStepdown = currentZValue - stepdown <= finalHeight;
-        const isEvenNumberOfStepdowns = startHeight % stepdown === 0;
+        const isEvenNumberOfStepdowns = Math.ceil((startHeight - finalHeight) / stepdown) % 2 === 0;
         const isFirstLayer = currentZValue === startHeight;
 
         const firstLayerBlock = [
@@ -217,7 +228,7 @@ export class StockTurningGenerator {
 
             `G1 A${alternateFactor * 360}`,
 
-            `G1 X${-(alternateFactor * stockLength)} A${(alternateFactor * ((360 * stockLength) / (stepoverPercentage * bitDiameter))).toFixed(3)} F${((360 * feedrate) / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            `G1 X${-(alternateFactor * stockLength)} A${(alternateFactor * ((360 * stockLength) / (stepoverPercentage * bitDiameter))).toFixed(3)} F${((360 * feedrate) / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             `G1 A${alternateFactor * 360}`,
         ];
@@ -232,7 +243,7 @@ export class StockTurningGenerator {
 
             /** 6 */ 'G1 A-360',
 
-            /** 7 */ `G1 X${halfOfStockLength} A${(0.5 * -360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            /** 7 */ `G1 X${halfOfStockLength} A${(0.5 * -360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 8 */ 'G1 A-360',
 
@@ -253,7 +264,7 @@ export class StockTurningGenerator {
 
             /** 15 */ 'G1 A360',
 
-            /** 16 */ `G1 X${-halfOfStockLength} A${(0.5 * 360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (currentZValue * 2 * Math.PI)).toFixed(3)}`,
+            /** 16 */ `G1 X${-halfOfStockLength} A${(0.5 * 360 * stockLength / (stepoverPercentage * bitDiameter)).toFixed(3)} F${(360 * feedrate / (modifiedCurrentZValue * 2 * Math.PI)).toFixed(3)}`,
 
             /** 17 */ 'G1 A360',
         ];
