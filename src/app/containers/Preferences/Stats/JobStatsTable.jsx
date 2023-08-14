@@ -24,10 +24,10 @@
 import React, { useEffect, useState } from 'react';
 import Icon from '@mdi/react';
 import { mdiCheckBold, mdiClose } from '@mdi/js';
-import styles from '../../index.styl';
-import jobActions from './jobApiActions';
-import { SortableTable, createTableColumns } from '../../../../components/SortableTable/index';
-import { GRBL, JOB_STATUS, JOB_TYPES } from '../../../../constants';
+import styles from '../index.styl';
+import jobActions from './lib/jobApiActions';
+import { SortableTable, createTableColumns } from '../../../components/SortableTable/index';
+import { GRBL, JOB_STATUS, JOB_TYPES } from '../../../constants';
 
 const columnData = [
     {
@@ -90,7 +90,7 @@ const defaultData = [
     },
 ];
 
-const StatsTable = () => {
+const JobStatsTable = () => {
     const [data, setData] = useState([]);
     const [jobsFinished, setJobsFinished] = useState([]);
     const [jobsCancelled, setJobsCancelled] = useState([]);
@@ -115,4 +115,4 @@ const StatsTable = () => {
     );
 };
 
-export default StatsTable;
+export default JobStatsTable;

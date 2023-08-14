@@ -28,7 +28,7 @@ import reduxStore from 'app/store/redux';
 import TabbedWidget from 'app/components/TabbedWidget';
 import SettingWrapper from '../components/SettingWrapper';
 import StatsList from './StatsList';
-import JobTable from './components/index';
+import JobTable from './JobStatsTable';
 import styles from './index.styl';
 
 const tabs = [
