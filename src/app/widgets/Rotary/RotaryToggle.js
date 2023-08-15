@@ -8,10 +8,8 @@ import { get } from 'lodash';
 
 const { DEFAULT, ROTARY } = WORKSPACE_MODE;
 
-const currentMode = store.get('workspace.mode', DEFAULT);
-
 const RotaryToggle = () => {
-    const [workspaceMode, setWorkspaceMode] = useState(currentMode);
+    const [workspaceMode, setWorkspaceMode] = useState(store.get('workspace.mode', DEFAULT));
 
     useEffect(() => {
         const updateWorkspaceMode = (data) => {
@@ -27,7 +25,7 @@ const RotaryToggle = () => {
         store.on('change', updateWorkspaceMode);
 
         return () => {
-            store.removeListener(updateWorkspaceMode);
+            store.removeListener('change', updateWorkspaceMode);
         };
     }, []);
 
