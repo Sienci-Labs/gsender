@@ -219,6 +219,12 @@ export const ROTARY_MODE_FIRMWARE_SETTINGS = {
     $21: '0'
 };
 
+export const DEFAULT_FIRMWARE_SETTINGS = {
+    $101: '200',
+    $111: '4000',
+    $21: '0'
+};
+
 export const WORKSPACE_MODE = {
     DEFAULT: 'DEFAULT',
     ROTARY: 'ROTARY',
