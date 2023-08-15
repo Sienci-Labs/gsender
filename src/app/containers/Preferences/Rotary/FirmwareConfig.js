@@ -10,6 +10,7 @@ import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
 
 import styles from '../index.styl';
+import { IMPERIAL_UNITS } from '../../../constants';
 
 const FirmwareConfig = ({ state = {}, actions }) => {
     const { rotary } = state;
@@ -22,7 +23,21 @@ const FirmwareConfig = ({ state = {}, actions }) => {
         });
     };
 
+    const processFirmwareValue = (value) => {
+        const units = store.get('workspace.units');
+
+        if (units === IMPERIAL_UNITS) {
+            return Number((value / 25.4).toFixed(3));
+        }
+
+        return value;
+    };
+
     const units = store.get('workspace.units');
+
+    const $101 = processFirmwareValue(rotary.firmwareSettings.$101);
+    const $111 = processFirmwareValue(rotary.firmwareSettings.$111);
+    const $21 = !!Number(rotary.firmwareSettings.$21);
 
     return (
         <Fieldset legend="Firmware Configuration">
@@ -33,7 +48,7 @@ const FirmwareConfig = ({ state = {}, actions }) => {
                 >
                     <Input
                         label="A-axis Travel Resolution"
-                        value={rotary.firmwareSettings.$101}
+                        value={$101}
                         onChange={(e) => actions.rotary.updateFirmwareSetting('$101', e.target.value)}
                         units={`step/${units}`}
                     />
@@ -47,7 +62,7 @@ const FirmwareConfig = ({ state = {}, actions }) => {
                 >
                     <Input
                         label="A-axis Maximum Rate"
-                        value={rotary.firmwareSettings.$111}
+                        value={$111}
                         onChange={(e) => actions.rotary.updateFirmwareSetting('$111', e.target.value)}
                         units={`${units}/min`}
                     />
@@ -61,7 +76,7 @@ const FirmwareConfig = ({ state = {}, actions }) => {
                 >
                     <ToggleSwitch
                         onChange={(value) => actions.rotary.updateFirmwareSetting('$21', (+value).toString())}
-                        checked={!!Number(rotary.firmwareSettings.$21)}
+                        checked={$21}
                         label="Force Hard Limits"
                         size="small"
                     />
