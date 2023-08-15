@@ -4,6 +4,8 @@ import get from 'lodash/get';
 import store from 'app/store';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import ToggleSwitch from 'app/components/ToggleSwitch';
+import { updateWorkspaceMode } from 'app/lib/rotary';
+import { WORKSPACE_MODE } from 'app/constants';
 
 import Fieldset from '../components/Fieldset';
 
@@ -26,8 +28,12 @@ const Toggle = () => {
         };
     }, []);
 
-    const handleToggle = (val) => {
-        store.replace('widgets.rotary.tab.show', val);
+    const handleToggle = (show) => {
+        store.replace('widgets.rotary.tab.show', show);
+
+        if (!show) {
+            updateWorkspaceMode(WORKSPACE_MODE.DEFAULT);
+        }
     };
 
     return (
