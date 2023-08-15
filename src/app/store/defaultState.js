@@ -311,8 +311,10 @@ const defaultState = {
                     startHeight: 50,
                     finalHeight: 40,
                     enableRehoming: false,
-                    usingBigMaterial: false,
                 }
+            },
+            tab: {
+                show: false,
             }
         },
         spindle: {
