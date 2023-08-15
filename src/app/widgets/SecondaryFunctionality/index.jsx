@@ -103,34 +103,35 @@ class SecondaryFunctionality extends PureComponent {
     component = null;
 
     /**
-     * Function to listen for store changes and add or remove the spindle tab from state
+     * Function to listen for store changes and display certain tabs
      */
-    handleMachineProfileChange = () => {
-        const machineProfile = store.get('workspace.machineProfile');
+    handleStoreChange = () => {
+        this.setState(prev => ({
+            ...prev,
+            tabs: prev.tabs.map(tab => {
+                if (tab.widgetId === 'spindle') {
+                    const machineProfile = store.get('workspace.machineProfile', {});
 
-        if (!machineProfile) {
-            return;
-        }
+                    return { ...tab, show: machineProfile.spindle };
+                }
 
-        if (machineProfile.spindle) {
-            const hasSpindleWidget = this.state.tabs.find(tab => tab.widgetId === 'spindle');
-            if (!hasSpindleWidget) {
-                this.setState((prev) => ({ ...prev, tabs: [...prev.tabs, { label: 'Spindle/Laser', widgetId: 'spindle', component: SpindleWidget }] }));
-            }
-        } else {
-            const filteredTabs = this.state.tabs.filter(tab => tab.widgetId !== 'spindle');
+                if (tab.widgetId === 'rotary') {
+                    const show = store.get('widgets.rotary.tab.show', false);
 
-            this.setState((prev) => ({ ...prev, selectedTab: prev.selectedTab === 3 ? 0 : prev.selectedTab, tabs: filteredTabs }));
-        }
+                    return { ...tab, show };
+                }
+                return tab;
+            })
+        }));
     }
 
     componentDidMount() {
-        store.on('change', this.handleMachineProfileChange);
-        this.handleMachineProfileChange();
+        store.on('change', this.handleStoreChange);
+        this.handleStoreChange();
     }
 
     componentWillUnmount() {
-        store.removeListener('change', this.handleMachineProfileChange);
+        store.removeListener('change', this.handleStoreChange);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -159,49 +160,58 @@ class SecondaryFunctionality extends PureComponent {
                     label: 'Probe',
                     widgetId: 'probe',
                     component: ProbeWidget,
+                    show: true,
                 },
                 {
                     label: 'Macros',
                     widgetId: 'macro',
                     component: MacroWidget,
+                    show: true,
                 },
                 {
                     label: 'Console',
                     widgetId: 'console',
                     component: ConsoleWidget,
+                    show: true,
                 },
                 {
                     label: 'Spindle/Laser',
                     widgetId: 'spindle',
                     component: SpindleWidget,
+                    show: true,
                 },
                 {
                     label: 'Coolant',
                     widgetId: 'coolant',
-                    component: CoolantWidget
+                    component: CoolantWidget,
+                    show: true,
                 },
                 {
                     label: 'Rotary',
                     widgetId: 'rotary',
-                    component: RotaryWidget
+                    component: RotaryWidget,
+                    show: true,
                 },
             ]
         };
     }
-
 
     render() {
         const { isFullscreen, tabs, selectedTab } = this.state;
         const { onFork, onRemove, sortable } = this.props;
         const actions = { ...this.actions };
 
+        const filteredTabs = tabs.filter(tab => tab.show);
+        const activeTab = filteredTabs[selectedTab] !== undefined ? selectedTab : 0;
+
         return (
             <TabbedWidget fullscreen={isFullscreen}>
-                <TabbedWidget.Tabs tabs={tabs} activeTabIndex={selectedTab} onClick={actions.handleTabSelect} />
+                <TabbedWidget.Tabs tabs={filteredTabs} activeTabIndex={activeTab} onClick={actions.handleTabSelect} />
                 <TabbedWidget.Content>
                     {
-                        tabs.map((tab, index) => {
-                            const active = index === selectedTab;
+                        filteredTabs.map((tab, index) => {
+                            const active = index === activeTab;
+
                             return (
                                 <TabbedWidget.ChildComponent key={tab.widgetId} active={active}>
                                     <tab.component
