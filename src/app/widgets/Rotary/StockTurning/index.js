@@ -12,7 +12,12 @@ import controller from 'app/lib/controller';
 
 import { RotaryContext } from '../Context';
 import { MODALS } from '../utils/constants';
-import { CLOSE_ACTIVE_DIALOG, SET_STOCK_TURNING_OUTPUT, CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL, SET_ACTIVE_STOCK_TURNING_TAB } from '../Context/actions';
+import {
+    CLOSE_ACTIVE_DIALOG,
+    SET_STOCK_TURNING_OUTPUT,
+    CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL,
+    SET_ACTIVE_STOCK_TURNING_TAB,
+} from '../Context/actions';
 import InputArea from './components/InputArea';
 
 import styles from './index.styl';
@@ -78,6 +83,7 @@ const StockTurning = () => {
         pubsub.publish('gcode:surfacing', { gcode, name, size });
 
         dispatch({ type: CLOSE_ACTIVE_DIALOG });
+        dispatch({ type: SET_STOCK_TURNING_OUTPUT, payload: null });
     };
 
     const { gcode, activeTab } = stockTurning;
