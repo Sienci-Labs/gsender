@@ -22,4 +22,4 @@
  */
 
 export { default as SortableTable } from './SortableTable';
-export { default as createTableColumns } from './CreateColumns';
+export { createTableColumns, fuzzySort } from './CreateColumns';

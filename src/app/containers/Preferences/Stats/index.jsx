@@ -30,6 +30,7 @@ import SettingWrapper from '../components/SettingWrapper';
 import StatsList from './StatsList';
 import JobTable from './JobStatsTable';
 import styles from './index.styl';
+import Maintenance from './Maintenance';
 
 const tabs = [
     {
@@ -48,7 +49,7 @@ const tabs = [
         id: 2,
         label: 'Maintenance',
         widgetId: 'maintenance',
-        component: <div></div>,
+        component: <Maintenance />,
     },
 ];
 

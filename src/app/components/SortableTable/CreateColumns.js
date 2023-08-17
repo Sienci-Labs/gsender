@@ -5,7 +5,7 @@ import {
 } from '@tanstack/react-table';
 import { compareItems } from '@tanstack/match-sorter-utils';
 
-const fuzzySort = (rowA, rowB, columnId) => {
+export const fuzzySort = (rowA, rowB, columnId) => {
     let dir = 0;
 
     // Only sort by rank if the column has ranking information
@@ -22,7 +22,7 @@ const fuzzySort = (rowA, rowB, columnId) => {
     return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
 };
 
-const createTableColumns = (columnData) => {
+export const createTableColumns = (columnData) => {
     const columnHelper = createColumnHelper();
     const columns = columnData.map((obj) => {
         const helper = columnHelper.accessor(obj.name, {
@@ -47,5 +47,3 @@ const createTableColumns = (columnData) => {
     columns[0].sortingFn = fuzzySort;
     return columns;
 };
-
-export default createTableColumns;

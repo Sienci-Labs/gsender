@@ -27,6 +27,9 @@ const SortableTable = (props) => {
     const defaultData = props.defaultData || [];
     const height = props.height || '520px';
     const width = props.width || '760px';
+    const enableSortingRemoval = props.enableSortingRemoval !== undefined ? props.enableSortingRemoval : true;
+    const sortBy = props.sortBy || [''];
+    const rowColours = props.rowColours || ['#f9f9f9', 'rgba(255, 255, 255, 0)'];
 
     /***** FUNCTIONS *****/
     const fuzzyFilter = (row, columnId, value, addMeta) => {
@@ -47,6 +50,7 @@ const SortableTable = (props) => {
     const [pageNum, setPageNum] = useState(1);
     const [globalFilter, setGlobalFilter] = useState('');
     const [globalSearchText, setGlobalSearchText] = useState('');
+    const [sorting, setSorting] = useState(sortBy);
 
     /***** TABLE DATA *****/
     // table variable
@@ -58,6 +62,7 @@ const SortableTable = (props) => {
         },
         state: {
             globalFilter,
+            sorting,
         },
         initialState: {
             pagination: {
@@ -65,6 +70,8 @@ const SortableTable = (props) => {
                 pageIndex: 0,
             },
         },
+        onSortingChange: setSorting,
+        enableSortingRemoval: enableSortingRemoval,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
@@ -146,15 +153,27 @@ const SortableTable = (props) => {
                         )}
                     </thead>
                     <tbody>
-                        {table.getRowModel().rows.map((row) => (
-                            <tr key={row.id}>
-                                {row.getVisibleCells().map((cell) => (
-                                    <td key={cell.id} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
+                        {table.getRowModel().rows.map((row, i) => {
+                            return (
+                                <React.Fragment key={row.id + 'parent'}>
+                                    <tr key={row.id} style={{ backgroundColor: rowColours[i % 2] }}>
+                                        {row.getVisibleCells().map((cell) => (
+                                            <td key={cell.id} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                    {
+                                        row.original.subRow &&
+                                        <tr key={row.id + 'subRow'} style={{ backgroundColor: rowColours[i % 2] }}>
+                                            <td colSpan={columns.length} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
+                                                {row.original.subRow}
+                                            </td>
+                                        </tr>
+                                    }
+                                </React.Fragment>
+                            );
+                        })}
                     </tbody>
                 </BTable>
             </div>
