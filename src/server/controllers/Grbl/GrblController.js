@@ -259,8 +259,11 @@ class GrblController {
             dataFilter: (line, context) => {
                 let commentMatcher = /\s*;.*/g;
                 let comment = line.match(commentMatcher);
-                const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
+                const commentString = (comment && comment[0].length > 0) ? comment[0].trim()
+                    .replace(';', '') : '';
+                line = line.replace(commentMatcher, '')
+                    .replace('/uFEFF', '')
+                    .trim();
                 context = this.populateContext(context);
 
                 if (line[0] === '%') {
@@ -284,7 +287,10 @@ class GrblController {
                     }
                     if (line === PAUSE_START) {
                         log.debug('Found M0/M1, pausing program');
-                        this.emit('sender:M0M1', { data: 'M0/M1', comment: commentString });
+                        this.emit('sender:M0M1', {
+                            data: 'M0/M1',
+                            comment: commentString
+                        });
                         return 'G4 P0.5';
                     }
                     if (line === '%_GCODE_START') {
@@ -314,10 +320,16 @@ class GrblController {
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
                     if (programMode === 'M0') {
                         log.debug('M0 Program Pause');
-                        this.feeder.hold({ data: 'M0', comment: commentString }); // Hold reason
+                        this.feeder.hold({
+                            data: 'M0',
+                            comment: commentString
+                        }); // Hold reason
                     } else if (programMode === 'M1') {
                         log.debug('M1 Program Pause');
-                        this.feeder.hold({ data: 'M1', comment: commentString }); // Hold reason
+                        this.feeder.hold({
+                            data: 'M1',
+                            comment: commentString
+                        }); // Hold reason
                     }
                 }
 
@@ -330,19 +342,28 @@ class GrblController {
                 // // M6 Tool Change
                 if (_.includes(words, 'M6')) {
                     log.debug('M6 Tool Change');
-                    this.feeder.hold({ data: 'M6', comment: commentString }); // Hold reason
+                    this.feeder.hold({
+                        data: 'M6',
+                        comment: commentString
+                    }); // Hold reason
                     line = line.replace('M6', '(M6)');
                 }
 
-                const isUsingImperialUnits = context.modal.units === 'G20';
 
-                line = translateGcode({
-                    gcode: line,
-                    from: 'A',
-                    to: 'Y',
-                    regex: A_AXIS_COMMANDS,
-                    type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
-                });
+                const containsACommand = A_AXIS_COMMANDS.test(line);
+                const containsYCommand = Y_AXIS_COMMANDS.test(line);
+
+                if (containsACommand && !containsYCommand) {
+                    const isUsingImperialUnits = context.modal.units === 'G20';
+
+                    line = translateGcode({
+                        gcode: line,
+                        from: 'A',
+                        to: 'Y',
+                        regex: A_AXIS_COMMANDS,
+                        type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                    });
+                }
 
                 return line;
             }

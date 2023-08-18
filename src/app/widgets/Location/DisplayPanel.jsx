@@ -431,7 +431,6 @@ class DisplayPanel extends PureComponent {
                                         controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
                                     }}
                                     disabled={!canClick}
-                                    className={styles.fontMonospace}
                                     primary
                                 >
                                     <i className="fas fa-chart-line" />
@@ -448,7 +447,7 @@ class DisplayPanel extends PureComponent {
                                     primary
                                 >
                                     <i className="fas fa-location-arrow" />
-                                    Go To Location
+                                    Go To
                                 </FunctionButton>
                             </div>
                         </div>
