@@ -40,7 +40,7 @@ const FirmwareConfig = ({ state = {}, actions }) => {
     const $21 = !!Number(rotary.firmwareSettings.$21);
 
     return (
-        <Fieldset legend="Firmware Configuration">
+        <Fieldset legend="Rotary Firmware Configuration">
             <div className={styles.addMargin}>
                 <Tooltip
                     content="The value used here will be used to update $101 in the firmware when toggling into rotary mode."
