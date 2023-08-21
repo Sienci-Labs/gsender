@@ -27,11 +27,10 @@ import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
 import reduxStore from 'app/store/redux';
-// import get from 'lodash/get';
+import isElectron from 'is-electron';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
-import { debounce } from 'lodash';
-
+import { debounce, get } from 'lodash';
 import store from 'app/store';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import controller from 'app/lib/controller';
@@ -44,6 +43,7 @@ import { RED, ALARM_RED } from './variables';
 
 import styles from './index.styl';
 import { UPDATE_TERMINAL_HISTORY } from '../../actions/controllerActions';
+
 
 const LINES_TO_COPY = 50;
 class TerminalWrapper extends PureComponent {
@@ -280,10 +280,19 @@ class TerminalWrapper extends PureComponent {
     }, 1000);
 
     handleCopyLines = async () => {
-        this.term.selectAll();
-        const selection = this.term.getSelection().split('\n');
-        this.term.clearSelection();
-        await navigator.clipboard.writeText(selection.slice(-LINES_TO_COPY).join('\n'));
+        const rs = reduxStore.getState();
+        const selection = get(rs, 'controller.terminalHistory');
+        const text = selection.slice(-LINES_TO_COPY).join('\n');
+        //this.term.selectAll();
+        //const selection = this.term.getSelection().split('\n');
+        //this.term.clearSelection();
+
+        if (isElectron()) {
+            window.ipcRenderer.send('clipboard', text);
+        } else {
+            await navigator.clipboard.writeText(text);
+        }
+
 
         Toaster.pop({
             msg: `Copied Last ${selection.length} Lines from the Terminal to Clipboard`,
