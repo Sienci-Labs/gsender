@@ -201,6 +201,13 @@ const main = () => {
                 (error.type === 'GRBL_ERROR') ? grblLog.error(`GRBL_ERROR:Error ${error.code} - ${error.description} Line ${error.lineNumber}: "${error.line.trim()}" Origin- ${error.origin.trim()}`) : grblLog.error(`GRBL_ALARM:Alarm ${error.code} - ${error.description}`);
             });
 
+            ipcMain.on('clipboard', (channel, text) => {
+                if (!text) {
+                    return;
+                }
+                clipboard.writeText(text);
+            });
+
             ipcMain.handle('grblLog:fetch', async (channel) => {
                 const data = await getGRBLLog(logPath);
                 return data;
@@ -311,11 +318,6 @@ const main = () => {
             ipcMain.on('remoteMode-restart', (event, headlessSettings) => {
                 app.relaunch(); // flags are handled in server/index.js
                 app.exit(0);
-            });
-
-            //Copy text to clipboard on electron
-            ipcMain.on('copy-clipboard', (event, text) => {
-                clipboard.writeText(text);
             });
         } catch (err) {
             log.error(err);

@@ -82,6 +82,7 @@
     "asar": false,
     "asarUnpack": [],
     "productName": "gSender",
+    "npmRebuild": false,
     "generateUpdatesFilesForAllChannels": true,
     "extraResources": [
       "./node_modules/@electron/remote/**"
