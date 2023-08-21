@@ -33,7 +33,6 @@ import React, { PureComponent } from 'react';
 import pubsub from 'pubsub-js';
 import gamepad, { runAction } from 'app/lib/gamepad';
 import Widget from 'app/components/Widget';
-import Modal from 'app/components/Modal';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
 import i18n from 'app/lib/i18n';
@@ -44,7 +43,6 @@ import WidgetConfig from 'app/widgets/WidgetConfig';
 import Location from './Location';
 import Settings from './Settings';
 import ShuttleControl from './ShuttleControl';
-import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import {
     // Units
     IMPERIAL_UNITS,
@@ -79,6 +77,7 @@ import {
 } from './constants';
 import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
+import { Confirm } from 'Components/ConfirmationDialog/ConfirmationDialogLib';
 
 class LocationWidget extends PureComponent {
     static propTypes = {
@@ -345,10 +344,20 @@ class LocationWidget extends PureComponent {
         },
         setZeroOnAxis: (shouldShow, axis) => {
             const { shouldWarnZero } = this.state;
+            const string = (axis === 'all') ? 'Are you sure you want to zero all axes?' : `Are you sure you want to zero the ${axis} axis?`;
             if (shouldWarnZero) {
+                Confirm({
+                    title: 'Confirm Axis Zero',
+                    content: string,
+                    confirmLabel: 'Yes',
+                    cancelLabel: 'No',
+                    onConfirm: () => {
+                        this.zeroAxis(axis);
+                    }
+                });
                 this.setState({
                     showWarnZero: {
-                        shouldShow: shouldShow,
+                        //shouldShow: shouldShow,
                         axis: axis
                     }
                 });
@@ -769,7 +778,7 @@ class LocationWidget extends PureComponent {
 
     render() {
         const { widgetId, machinePosition, workPosition, wcs } = this.props;
-        const { minimized, isFullscreen, showWarnZero } = this.state;
+        const { minimized, isFullscreen } = this.state;
         const { units } = this.state;
         const canSendCommand = this.canSendCommand();
         const isForkedWidget = widgetId.match(/\w+:[\w\-]+/);
@@ -832,52 +841,6 @@ class LocationWidget extends PureComponent {
                         {i18n._('Location')}
                     </Widget.Title>
                     <Widget.Controls className={styles.controlRow}>
-                        {
-                            showWarnZero.shouldShow &&
-                                <Modal showCloseButton={false}>
-                                    <Modal.Header className={styles.modalHeader}>
-                                        <Modal.Title>Are You Sure?</Modal.Title>
-                                    </Modal.Header>
-                                    <Modal.Body>
-                                        <div className={styles.runProbeBody}>
-                                            <div className={styles.left}>
-                                                <div className={styles.greyText}>
-                                                    <p>{'Set Workspace Zero for ' + (showWarnZero.axis === 'all' ? 'all axes?' : `${showWarnZero.axis}?`)}</p>
-                                                </div>
-                                                <div className={styles.buttonsContainer}>
-                                                    <FunctionButton
-                                                        primary
-                                                        onClick={() => {
-                                                            this.setState({
-                                                                showWarnZero: {
-                                                                    ...showWarnZero,
-                                                                    shouldShow: false,
-                                                                }
-                                                            });
-                                                            this.zeroAxis(showWarnZero.axis);
-                                                        }}
-                                                    >
-                                                        Yes
-                                                    </FunctionButton>
-                                                    <FunctionButton
-                                                        className={styles.activeButton}
-                                                        onClick={() => {
-                                                            this.setState({
-                                                                showWarnZero: {
-                                                                    ...showWarnZero,
-                                                                    shouldShow: false,
-                                                                }
-                                                            });
-                                                        }}
-                                                    >
-                                                        No
-                                                    </FunctionButton>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Modal.Body>
-                                </Modal>
-                        }
                         <label>Workspace:</label>
                         <Select
                             styles={{
