@@ -7,8 +7,9 @@ import pubsub from 'pubsub-js';
 import api from 'app/api';
 import controller from 'app/lib/controller';
 import store from 'app/store';
-import { WORKSPACE_MODE, METRIC_UNITS, VISUALIZER_PRIMARY } from 'app/constants';
+import { WORKSPACE_MODE, METRIC_UNITS, IMPERIAL_UNITS, VISUALIZER_PRIMARY } from 'app/constants';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import { in2mm, mm2in } from 'app/lib/units';
 
 import styles from './index.styl';
 import RotaryToggle from './RotaryToggle';
@@ -28,15 +29,18 @@ let pubsubTokens = [];
 const Rotary = () => {
     const { state: { activeDialog } } = useContext(RotaryContext);
     const [speedPreset, setSpeedPreset] = useState(SPEED_NORMAL);
-    const [jog, setJog] = useState({
-        ...store.get('widgets.axes.jog'),
-        aStep: '5.00',
-    });
+    const [jog, setJog] = useState({ ...store.get('widgets.axes.jog', { aStep: '5.00' }) });
     const [, setIsContinuousJogging] = useState(false);
     const { state: controllerState, type: controllerType } = useSelector(state => state.controller);
 
     useEffect(() => {
         subscribe();
+
+        const units = store.get('workspace.units', METRIC_UNITS);
+
+        if (units === IMPERIAL_UNITS) {
+            changeUnits(IMPERIAL_UNITS);
+        }
 
         return () => {
             unsubscribe();
@@ -48,6 +52,9 @@ const Rotary = () => {
             pubsub.subscribe('jog_preset_selected', (msg, speed) => {
                 actions.setSelectedSpeed(speed);
             }),
+            pubsub.subscribe('units:change', (event, units) => {
+                changeUnits(units);
+            })
         ];
 
         pubsubTokens = pubsubTokens.concat(tokens);
@@ -141,6 +148,25 @@ const Rotary = () => {
         }
     };
 
+    const changeUnits = (newUnits) => {
+        setJog(prev => {
+            const { aStep, feedrate } = prev;
+
+            let newAStep = aStep;
+            let newFeedrate = feedrate;
+
+            if (newUnits === IMPERIAL_UNITS) {
+                newAStep = mm2in(aStep).toFixed(3);
+                newFeedrate = mm2in(feedrate).toFixed(2);
+            } else if (newUnits === METRIC_UNITS) {
+                newAStep = in2mm(aStep).toFixed(2);
+                newFeedrate = in2mm(feedrate).toFixed(0);
+            }
+
+            return ({ ...prev, aStep: newAStep, feedrate: newFeedrate });
+        });
+    };
+
     const isFileRunning = () => {
         if (controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run') {
             return true;
@@ -179,9 +205,7 @@ const Rotary = () => {
                 <p className={styles['rotary-tab-section-title']}>Tools</p>
                 <RotaryToggle />
 
-                <ActionArea
-                    actions={actions}
-                />
+                <ActionArea actions={actions} />
 
                 {ActiveModal && <ActiveModal actions={actions} />}
             </div>
