@@ -31,7 +31,7 @@ import WidgetStyles from '../Widget/index.styl';
 import styles from './index.styl';
 
 
-const Tabs = ({ className, tabs, activeTabIndex, onClick, ...props }) => {
+const Tabs = ({ className, tabs, activeTabIndex, onClick, sx, ...props }) => {
     return (
         <MuiTabs
             value={activeTabIndex}
@@ -43,10 +43,8 @@ const Tabs = ({ className, tabs, activeTabIndex, onClick, ...props }) => {
                 [`& .${tabsClasses.scrollButtons}`]: {
                     '&.Mui-disabled': { opacity: 0.3 },
                 },
-                [`& .${tabsClasses.flexContainer}`]: {
-                    justifyContent: 'space-between'
-                },
                 minHeight: '32px',
+                ...sx,
             }}
             {...props}
             className={classNames(
@@ -60,7 +58,8 @@ const Tabs = ({ className, tabs, activeTabIndex, onClick, ...props }) => {
                     <Tab
                         key={`tab-${tab.widgetId}`}
                         label={tab.label}
-                        sx={{ minWidth: '75px', minHeight: '16px', padding: '8px' }}
+                        disabled={tab.disabled}
+                        sx={{ minWidth: '75px', minHeight: '16px', padding: '8px', flexGrow: '1' }}
                     />
                 ))
             }
