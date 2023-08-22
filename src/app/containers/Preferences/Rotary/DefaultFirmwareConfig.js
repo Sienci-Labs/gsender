@@ -12,14 +12,14 @@ import Input from '../components/Input';
 import styles from '../index.styl';
 import { IMPERIAL_UNITS } from '../../../constants';
 
-const FirmwareConfig = ({ state = {}, actions }) => {
+const DefaultFirmwareConfig = ({ state = {}, actions }) => {
     const { rotary } = state;
 
     const handleResetToDefault = () => {
         Confirm({
-            content: 'Are you sure you reset the firmware configuration for Rotary Mode?',
-            title: 'Reset Firmware Configuration',
-            onConfirm: actions.rotary.resetFirmwareToDefault
+            content: 'Are you sure you reset the default firmware configuration?',
+            title: 'Reset Default Firmware Configuration',
+            onConfirm: actions.rotary.resetDefaultFirmwareSettings
         });
     };
 
@@ -33,49 +33,51 @@ const FirmwareConfig = ({ state = {}, actions }) => {
         return value;
     };
 
-    const $101 = processFirmwareValue(rotary.firmwareSettings.$101);
-    const $111 = processFirmwareValue(rotary.firmwareSettings.$111);
-    const $21 = !!Number(rotary.firmwareSettings.$21);
+    const units = store.get('workspace.units');
+
+    const $101 = processFirmwareValue(rotary.defaultFirmwareSettings.$101);
+    const $111 = processFirmwareValue(rotary.defaultFirmwareSettings.$111);
+    const $21 = !!Number(rotary.defaultFirmwareSettings.$21);
 
     return (
-        <Fieldset legend="Rotary Firmware Configuration">
+        <Fieldset legend="Default Firmware Configuration">
             <div className={styles.addMargin}>
                 <Tooltip
-                    content="The value used here will be used to update $101 in the firmware when enabling rotary mode."
+                    content="The value used here will be used to update $101 in the firmware when exiting rotary mode."
                     location="default"
                 >
                     <Input
-                        label="A-axis Travel Resolution"
+                        label="Y-axis Travel Resolution"
                         value={$101}
-                        onChange={(e) => actions.rotary.updateFirmwareSetting('$101', e.target.value)}
-                        units="step/deg"
+                        onChange={(e) => actions.rotary.updateDefaultFirmwareSetting('$101', e.target.value)}
+                        units={`step/${units}`}
                     />
                 </Tooltip>
             </div>
 
             <div className={styles.addMargin}>
                 <Tooltip
-                    content="The value used here will be used to update $111 in the firmware when enabling rotary mode."
+                    content="The value used here will be used to update $111 in the firmware when exiting rotary mode."
                     location="default"
                 >
                     <Input
-                        label="A-axis Maximum Rate"
+                        label="Y-axis Maximum Rate"
                         value={$111}
-                        onChange={(e) => actions.rotary.updateFirmwareSetting('$111', e.target.value)}
-                        units="deg/min"
+                        onChange={(e) => actions.rotary.updateDefaultFirmwareSetting('$111', e.target.value)}
+                        units={`${units}/min`}
                     />
                 </Tooltip>
             </div>
 
             <div className={styles.addMargin}>
                 <Tooltip
-                    content="The value used here will be used to update $21 in the firmware when toggling into rotary mode."
+                    content="The value used here will be used to update $21 in the firmware when exiting rotary mode."
                     location="default"
                 >
                     <ToggleSwitch
-                        onChange={(value) => actions.rotary.updateFirmwareSetting('$21', (+value).toString())}
+                        onChange={(value) => actions.rotary.updateDefaultFirmwareSetting('$21', (+value).toString())}
                         checked={$21}
-                        label="Force Hard Limits"
+                        label="Hard Limits"
                         size="small"
                     />
                 </Tooltip>
@@ -86,4 +88,4 @@ const FirmwareConfig = ({ state = {}, actions }) => {
     );
 };
 
-export default FirmwareConfig;
+export default DefaultFirmwareConfig;

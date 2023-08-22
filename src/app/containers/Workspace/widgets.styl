@@ -23,10 +23,11 @@
 
 .widgets {
     height: 100%;
-    display: grid;
-    grid-template-rows: minmax(0, 32fr) minmax(0, 38fr) minmax(0, 30fr);
-    grid-gap: 0.5rem;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    
     @media (max-width: 639px), (max-device-width: 639px) {
             grid-template: none;
     }
@@ -40,6 +41,10 @@
         .sortable-ghost {
             opacity: .4;
         }
+    }
+
+    & > div {
+        height: 33%;
     }
 }
 
