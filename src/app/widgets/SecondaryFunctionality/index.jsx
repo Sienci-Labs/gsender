@@ -23,17 +23,18 @@
 
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import { tabsClasses } from '@mui/material/Tabs';
 
 import store from 'app/store';
 import TabbedWidget from 'app/components/TabbedWidget';
 import controller from 'app/lib/controller';
 import CoolantWidget from 'app/widgets/Coolant';
+
 import WidgetConfig from '../WidgetConfig';
 import ProbeWidget from '../Probe';
 import RotaryWidget from '../Rotary';
 import MacroWidget from '../Macro';
 import ConsoleWidget from '../Console';
-
 import SpindleWidget from '../Spindle';
 
 import { MODAL_NONE, } from './constants';
@@ -205,7 +206,16 @@ class SecondaryFunctionality extends PureComponent {
         return (
             <TabbedWidget fullscreen={isFullscreen}>
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <TabbedWidget.Tabs tabs={filteredTabs} activeTabIndex={activeTab} onClick={actions.handleTabSelect} />
+                    <TabbedWidget.Tabs
+                        tabs={filteredTabs}
+                        activeTabIndex={activeTab}
+                        onClick={actions.handleTabSelect}
+                        sx={{
+                            [`& .${tabsClasses.flexContainer}`]: {
+                                justifyContent: 'space-between'
+                            },
+                        }}
+                    />
                     <TabbedWidget.Content>
                         {
                             filteredTabs.map((tab, index) => {
