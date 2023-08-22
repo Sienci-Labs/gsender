@@ -109,6 +109,22 @@ export function* initialize() {
         }
     };
 
+    const updateMaintenanceTasks = async(status) => {
+        try {
+            let res = await api.maintenance.fetch();
+            const tasks = res.body;
+            let newTasks = tasks.map((task) => {
+                let newTask = task;
+                newTask.currentTime += (status.timeRunning / 1000 / 3600);
+                return newTask;
+            });
+            console.log(newTasks);
+            api.maintenance.update(newTasks);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const shouldVisualizeSVG = () => {
         return store.get('widgets.visualizer.SVGEnabled', false);
     };
@@ -236,13 +252,11 @@ export function* initialize() {
     });
 
     controller.addListener('sender:status', (status) => {
-        // finished job
-        if (status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) {
+        // finished job or cancelled job
+        if ((status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) ||
+            (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD)) {
             updateJobStats(status);
-            reduxStore.dispatch({ type: visualizerActions.UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
-        // cancelled job
-        } else if (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD) {
-            updateJobStats(status);
+            updateMaintenanceTasks(status);
             reduxStore.dispatch({ type: visualizerActions.UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
         }
 

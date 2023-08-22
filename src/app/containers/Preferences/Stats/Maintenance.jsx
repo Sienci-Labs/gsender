@@ -35,7 +35,7 @@ import maintenanceActions from './lib/maintenanceApiActions';
 const determineTime = (task) => {
     const { rangeStart, rangeEnd, currentTime } = task;
     if (currentTime < rangeStart) {
-        return rangeStart - currentTime;
+        return rangeStart - Math.floor(currentTime);
     } else if (currentTime >= rangeStart && currentTime <= rangeEnd) {
         return 'Due';
     } else {
@@ -72,7 +72,7 @@ const Maintenance = () => {
     const onClear = (id) => {
         console.log(id);
         Confirm({
-            title: 'Reset Time',
+            title: 'Reset Maintenance Timer',
             content: 'Are you sure you want to reset the maintenance timer for ' + tasks.find((obj) => obj.id === id).name + '? Only do this if you have just performed this maintenance task.',
             confirmLabel: 'Yes',
             onConfirm: () => {
