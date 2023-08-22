@@ -481,6 +481,37 @@ jobStats.update = (options) => new Promise((resolve, reject) => {
 });
 
 //
+// Maintenance
+//
+const maintenance = {};
+
+maintenance.fetch = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/maintenance')
+        .query(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+maintenance.update = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .put('/api/maintenance')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+//
 // Macros
 //
 const macros = {};
@@ -916,4 +947,7 @@ export default {
 
     // Job Stats
     jobStats,
+
+    // Maintenance
+    maintenance,
 };

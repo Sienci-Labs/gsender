@@ -327,9 +327,13 @@ const appMain = () => {
         app.put(urljoin(settings.route, '/api/remote'), api.remote.update);
         app.get(urljoin(settings.route, 'api/remote'), api.remote.fetch);
 
-        //Headless mode / Remote mode
+        // Job Stats
         app.put(urljoin(settings.route, '/api/jobstats'), api.jobStats.update);
         app.get(urljoin(settings.route, 'api/jobstats'), api.jobStats.fetch);
+
+        // Maintenance
+        app.put(urljoin(settings.route, '/api/maintenance'), api.maintenance.update);
+        app.get(urljoin(settings.route, 'api/maintenance'), api.maintenance.fetch);
 
         // Macros
         app.get(urljoin(settings.route, 'api/macros'), api.macros.fetch);

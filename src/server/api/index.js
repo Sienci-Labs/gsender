@@ -37,6 +37,7 @@ import * as files from './api.file';
 import * as logs from './api.log';
 import * as metrics from './api.metrics';
 import * as jobStats from './api.jobstats';
+import * as maintenance from './api.maintenance';
 
 export {
     version,
@@ -55,4 +56,5 @@ export {
     logs,
     metrics,
     jobStats,
+    maintenance
 };

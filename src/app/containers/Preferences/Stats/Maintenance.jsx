@@ -21,50 +21,81 @@
  *
  */
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     sortingFns,
 } from '@tanstack/react-table';
 import Icon from '@mdi/react';
-import { mdiAlert } from '@mdi/js';
+import { mdiAlert, mdiPencil, mdiCheckOutline } from '@mdi/js';
+import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import styles from '../index.styl';
 import { SortableTable } from '../../../components/SortableTable';
+import maintenanceActions from './lib/maintenanceApiActions';
+
+const determineTime = (task) => {
+    const { rangeStart, rangeEnd, currentTime } = task;
+    if (currentTime < rangeStart) {
+        return rangeStart - currentTime;
+    } else if (currentTime >= rangeStart && currentTime <= rangeEnd) {
+        return 'Due';
+    } else {
+        return <div><Icon path={mdiAlert} size={1} />{' Urgent!'}</div>;
+    }
+};
 
 const Maintenance = () => {
-    const data = [
-        {
-            id: 0,
-            part: 'Rails & Wheels',
-            time: 'Due',
-            subRow:
-                'hiiiiiiiiiiiiiii'
-        },
-        {
-            id: 1,
-            part: 'Rails & Wheels',
-            time: 3,
-            subRow:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam consequat posuere lectus vitae consectetur. Fusce et orci a justo fringilla cursus in eget mi. Aenean eget ante viverra nibh pulvinar ultrices. Nam finibus faucibus massa eu congue. Fusce posuere, felis dignissim venenatis vehicula, velit purus efficitur elit, et facilisis nulla eros quis elit. Pellentesque sit amet tortor purus. Proin et risus ex.' +
-                'Donec ut urna augue. Donec ac eros a velit placerat fermentum. Nam varius lorem turpis, ac fringilla purus ornare id. Duis consectetur velit eget facilisis egestas. Nulla non imperdiet libero, sit amet condimentum lacus. Nullam sodales metus eu felis accumsan, sit amet consequat sapien molestie. Phasellus volutpat euismod sem non faucibus. Cras eget feugiat tortor. In turpis urna, pharetra sed erat a, tincidunt tristique enim. Vivamus nec tellus consequat, auctor mi quis, dictum tortor. Mauris sodales erat a urna sagittis convallis. Vestibulum semper velit et augue rhoncus rutrum. Integer ultricies venenatis lacus, et placerat libero vestibulum non. Donec rutrum ipsum eget nibh mollis, quis dignissim velit volutpat. Aenean consequat pellentesque purus eu mattis.' +
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec a pellentesque purus. Sed non nisl vitae felis ultricies hendrerit imperdiet non ante. Vivamus consequat sagittis velit at iaculis. Nulla sed dolor elementum, elementum purus in, volutpat sapien. Suspendisse eu purus ut velit pellentesque commodo at ac dui. Ut convallis eros sit amet leo fringilla, ac viverra orci aliquet. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin congue iaculis orci. Sed vulputate lacinia leo sed efficitur. Curabitur finibus elementum sem, id tincidunt ipsum varius eu. Curabitur pretium, nulla et mattis interdum, lacus nulla tempor augue, et rutrum ex arcu et urna. Aliquam egestas faucibus sapien a sodales. Mauris condimentum augue eu metus eleifend, eu vulputate augue facilisis' +
-                'Proin metus velit, condimentum dictum laoreet id, volutpat vel lorem. Ut tristique ultricies quam in sagittis. Donec semper nunc vitae sapien convallis, nec commodo nibh condimentum. Donec imperdiet eros id est ullamcorper efficitur. Maecenas sed luctus arcu. Cras facilisis, turpis sodales dignissim vehicula, felis diam efficitur leo, ut mollis neque justo ut tortor. Donec tempus nec tortor eu consequat. Nulla aliquam lorem magna, eget porta tortor finibus et.' +
-                'Fusce lobortis ante quis pharetra suscipit. Donec porttitor ante sem, sit amet blandit ligula auctor et. Morbi blandit quis lorem sed ullamcorper. Donec aliquam nunc sed ornare lobortis. Mauris mauris erat, venenatis eget iaculis vitae, varius quis urna. Quisque vel velit eu urna iaculis varius suscipit pharetra eros. Pellentesque dignissim felis urna, eget facilisis arcu pulvinar eget. Donec arcu ante, gravida id interdum a, ultricies at felis. Sed consectetur blandit sollicitudin. Nullam tristique massa eget hendrerit tincidunt. Donec luctus felis laoreet ipsum scelerisque commodo. Nulla id efficitur odio, in facilisis urna.'
-        },
-        {
-            id: 2,
-            part: 'Linear smth',
-            time: <div><Icon path={mdiAlert} size={1} />{' Urgent!'}</div>,
-            subRow:
-                'this is a description'
-        },
-        {
-            id: 3,
-            part: 'Linear smth',
-            time: 5,
-            subRow:
-                'this is a description'
-        }
-    ];
+    const [tasks, setTasks] = useState([]);
+    const [data, setData] = useState([]);
+
+    const updateData = () => {
+        maintenanceActions.fetch(setTasks).then((tasks) => {
+            let formattedTasks = [];
+            tasks.forEach(task => {
+                const formattedTask = {
+                    id: task.id,
+                    part: task.name,
+                    time: determineTime(task),
+                    edit: '',
+                    subRow: task.description
+                };
+                formattedTasks.push(formattedTask);
+            });
+            setData(formattedTasks);
+        });
+    };
+
+    useEffect(() => {
+        console.log('api call');
+        updateData();
+    }, []);
+
+    const onClear = (id) => {
+        console.log(id);
+        Confirm({
+            title: 'Reset Time',
+            content: 'Are you sure you want to reset the maintenance timer for ' + tasks.find((obj) => obj.id === id).name + '? Only do this if you have just performed this maintenance task.',
+            confirmLabel: 'Yes',
+            onConfirm: () => {
+                const updatedTasks = tasks.map((obj) => {
+                    if (obj.id === id) {
+                        let newObj = obj;
+                        newObj.currentTime = 0;
+                        return newObj;
+                    }
+                    return obj;
+                });
+                console.log(updatedTasks);
+                maintenanceActions.update(updatedTasks).then((res) => {
+                    updateData();
+                });
+            }
+        });
+    };
+
+    const onEdit = (id) => {
+        console.log(id);
+    };
+
     const columns = useMemo(
         () => [
             {
@@ -90,6 +121,22 @@ const Maintenance = () => {
                 filterFn: 'fuzzy',
                 sortingFn: sortingFns.alphanumeric
             },
+            {
+                accessorKey: 'edit',
+                header: () => '',
+                cell: (info) => {
+                    return (
+                        <div className={styles.iconContainer}>
+                            <Icon path={mdiCheckOutline} size={1.5} color="green" onClick={() => onClear(info.cell.row.original.id)} />
+                            <Icon path={mdiPencil} size={1.5} onClick={() => onEdit(info.cell.row.original.id)} />
+                        </div>
+                    );
+                },
+                disableColSpan: true,
+                enableSorting: false,
+                minSize: 15,
+                maxSize: 15,
+            }
         ]
     );
     const sortBy = [

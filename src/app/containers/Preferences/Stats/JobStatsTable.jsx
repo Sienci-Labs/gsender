@@ -97,7 +97,6 @@ const JobStatsTable = () => {
     const columnHelpers = createTableColumns(columnData);
 
     useEffect(() => {
-        console.log('api call');
         jobActions.fetch(setData, setJobsFinished, setJobsCancelled);
     }, []);
 

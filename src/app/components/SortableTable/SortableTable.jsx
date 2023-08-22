@@ -31,6 +31,16 @@ const SortableTable = (props) => {
     const sortBy = props.sortBy || [''];
     const rowColours = props.rowColours || ['#f9f9f9', 'rgba(255, 255, 255, 0)'];
 
+    // stop col span from first col that has it disabled
+    let stopIndex = 0;
+    columns.forEach((col, i) => {
+        if (col.disableColSpan) {
+            stopIndex = i;
+        }
+    });
+
+    const colSpanLength = stopIndex;
+
     /***** FUNCTIONS *****/
     const fuzzyFilter = (row, columnId, value, addMeta) => {
         // Rank the item
@@ -158,7 +168,7 @@ const SortableTable = (props) => {
                                 <React.Fragment key={row.id + 'parent'}>
                                     <tr key={row.id} style={{ backgroundColor: rowColours[i % 2] }}>
                                         {row.getVisibleCells().map((cell) => (
-                                            <td key={cell.id} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
+                                            <td key={cell.id} rowSpan={cell.column.columnDef.accessorKey === 'edit' ? 2 : 1} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </td>
                                         ))}
@@ -166,7 +176,7 @@ const SortableTable = (props) => {
                                     {
                                         row.original.subRow &&
                                         <tr key={row.id + 'subRow'} style={{ backgroundColor: rowColours[i % 2] }}>
-                                            <td colSpan={columns.length} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
+                                            <td colSpan={colSpanLength} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
                                                 {row.original.subRow}
                                             </td>
                                         </tr>
