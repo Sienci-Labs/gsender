@@ -23,7 +23,9 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
 
     switch (mode) {
     case DEFAULT: {
-        const defaultFirmwareSettingsArr = Object.entries(DEFAULT_FIRMWARE_SETTINGS).map(([key, value]) => `${key}=${value}`);
+        const defaultFirmwareSettings = store.get('workspace.rotaryAxis.defaultFirmwareSettings', DEFAULT_FIRMWARE_SETTINGS);
+
+        const defaultFirmwareSettingsArr = Object.entries(defaultFirmwareSettings).map(([key, value]) => `${key}=${value}`);
 
         controller.command('gcode', [...defaultFirmwareSettingsArr, '$$', ROTARY_TOGGLE_MACRO]);
         return;
