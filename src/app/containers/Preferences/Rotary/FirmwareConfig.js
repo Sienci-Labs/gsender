@@ -33,8 +33,6 @@ const FirmwareConfig = ({ state = {}, actions }) => {
         return value;
     };
 
-    const units = store.get('workspace.units');
-
     const $101 = processFirmwareValue(rotary.firmwareSettings.$101);
     const $111 = processFirmwareValue(rotary.firmwareSettings.$111);
     const $21 = !!Number(rotary.firmwareSettings.$21);
@@ -43,28 +41,28 @@ const FirmwareConfig = ({ state = {}, actions }) => {
         <Fieldset legend="Rotary Firmware Configuration">
             <div className={styles.addMargin}>
                 <Tooltip
-                    content="The value used here will be used to update $101 in the firmware when toggling into rotary mode."
+                    content="The value used here will be used to update $101 in the firmware when enabling rotary mode."
                     location="default"
                 >
                     <Input
                         label="A-axis Travel Resolution"
                         value={$101}
                         onChange={(e) => actions.rotary.updateFirmwareSetting('$101', e.target.value)}
-                        units={`step/${units}`}
+                        units="step/deg"
                     />
                 </Tooltip>
             </div>
 
             <div className={styles.addMargin}>
                 <Tooltip
-                    content="The value used here will be used to update $111 in the firmware when toggling into rotary mode."
+                    content="The value used here will be used to update $111 in the firmware when enabling rotary mode."
                     location="default"
                 >
                     <Input
                         label="A-axis Maximum Rate"
                         value={$111}
                         onChange={(e) => actions.rotary.updateFirmwareSetting('$111', e.target.value)}
-                        units={`${units}/min`}
+                        units="deg/min"
                     />
                 </Tooltip>
             </div>
