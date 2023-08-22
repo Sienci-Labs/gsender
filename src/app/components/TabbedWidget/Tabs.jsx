@@ -21,35 +21,44 @@
  *
  */
 
-import classNames from 'classnames';
 import React from 'react';
+import classNames from 'classnames';
+import MuiTabs, { tabsClasses } from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+
 import WidgetStyles from '../Widget/index.styl';
-import Tab from './Tab';
+
 import styles from './index.styl';
 
 
-const Tabs = ({ className, tabs, activeTabIndex, onClick, ...props }) => (
-    <div
-        {...props}
-        className={classNames(
-            className,
-            WidgetStyles.widgetHeader,
-            styles.tabRow
-        )}
-    >
-        {
-            tabs.map((tab, index) => (
-                <Tab
-                    active={index === activeTabIndex}
-                    onClick={() => onClick(index)}
-                    key={`tab-${tab.widgetId}`}
-                    disabled={tab.disabled}
-                >
-                    {tab.label}
-                </Tab>
-            ))
-        }
-    </div>
-);
+const Tabs = ({ className, tabs, activeTabIndex, onClick, ...props }) => {
+    return (
+        <MuiTabs
+            value={activeTabIndex}
+            onChange={(_, val) => onClick(val)}
+            variant="scrollable"
+            scrollButtons="auto"
+            aria-label="scrollable auto tabs example"
+            sx={{
+                [`& .${tabsClasses.scrollButtons}`]: {
+                    '&.Mui-disabled': { opacity: 0.3 },
+                },
+                [`& .${tabsClasses.flexContainer}`]: {
+                    justifyContent: 'space-between'
+                },
+            }}
+            {...props}
+            className={classNames(
+                className,
+                WidgetStyles.widgetHeader,
+                styles.tabRow
+            )}
+        >
+            {
+                tabs.map((tab) => (<Tab key={`tab-${tab.widgetId}`} label={tab.label} />))
+            }
+        </MuiTabs>
+    );
+};
 
 export default Tabs;

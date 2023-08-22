@@ -21,13 +21,11 @@
  *
  */
 
-import PropTypes from 'prop-types';
 import React, { PureComponent } from 'react';
-import Tabs, { tabsClasses } from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
+import PropTypes from 'prop-types';
 
 import store from 'app/store';
-// import TabbedWidget from 'app/components/TabbedWidget';
+import TabbedWidget from 'app/components/TabbedWidget';
 import controller from 'app/lib/controller';
 import CoolantWidget from 'app/widgets/Coolant';
 import WidgetConfig from '../WidgetConfig';
@@ -36,12 +34,9 @@ import RotaryWidget from '../Rotary';
 import MacroWidget from '../Macro';
 import ConsoleWidget from '../Console';
 
-// import LaserWidget from '../Laser';
 import SpindleWidget from '../Spindle';
 
-import {
-    MODAL_NONE,
-} from './constants';
+import { MODAL_NONE, } from './constants';
 
 
 class SecondaryFunctionality extends PureComponent {
@@ -200,57 +195,40 @@ class SecondaryFunctionality extends PureComponent {
     }
 
     render() {
-        const { tabs, selectedTab } = this.state;
+        const { isFullscreen, tabs, selectedTab } = this.state;
         const { onFork, onRemove, sortable } = this.props;
-        // const actions = { ...this.actions };
+        const actions = { ...this.actions };
 
         const filteredTabs = tabs.filter(tab => tab.show);
         const activeTab = filteredTabs[selectedTab] !== undefined ? selectedTab : 0;
 
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <Tabs
-                    value={this.state.selectedTab}
-                    onChange={(_, val) => this.actions.handleTabSelect(val)}
-                    variant="scrollable"
-                    scrollButtons="auto"
-                    aria-label="scrollable auto tabs example"
-                    sx={{
-                        [`& .${tabsClasses.scrollButtons}`]: {
-                            '&.Mui-disabled': { opacity: 0.3 },
-                        },
-                        [`& .${tabsClasses.flexContainer}`]: {
-                            justifyContent: 'space-between'
-                        },
-                    }}
-                >
-                    { filteredTabs.map((tab) => (<Tab label={tab.label} sx={{ padding: '2px' }} />)) }
-                </Tabs>
+            <TabbedWidget fullscreen={isFullscreen}>
+                <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <TabbedWidget.Tabs tabs={filteredTabs} activeTabIndex={activeTab} onClick={actions.handleTabSelect} />
+                    <TabbedWidget.Content>
+                        {
+                            filteredTabs.map((tab, index) => {
+                                const active = index === activeTab;
 
-                {
-                    filteredTabs.map((tab, index) => {
-                        const active = index === activeTab;
-
-                        if (!active) {
-                            return null;
+                                return (
+                                    <TabbedWidget.ChildComponent key={tab.widgetId} active={active}>
+                                        <tab.component
+                                            onFork={onFork}
+                                            onRemove={onRemove}
+                                            sortable={sortable}
+                                            widgetId={tab.widgetId}
+                                            embedded
+                                            active={active}
+                                            isMainWindow={true}
+                                        />
+                                    </TabbedWidget.ChildComponent>
+                                );
+                            })
                         }
-
-                        return (
-                            <>
-                                <tab.component
-                                    onFork={onFork}
-                                    onRemove={onRemove}
-                                    sortable={sortable}
-                                    widgetId={tab.widgetId}
-                                    embedded
-                                    active={active}
-                                    isMainWindow={true}
-                                />
-                            </>
-                        );
-                    })
-                }
-            </div>
+                    </TabbedWidget.Content>
+                </div>
+            </TabbedWidget>
         );
     }
 }
