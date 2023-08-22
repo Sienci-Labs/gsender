@@ -70,7 +70,7 @@ const StockTurning = () => {
 
         dispatch({ type: SET_STOCK_TURNING_OUTPUT, payload: stockTurningGenerator.gcode });
 
-        const serializedFile = new File([stockTurningGenerator.gcode], 'stockturning.gcode');
+        const serializedFile = new File([stockTurningGenerator.gcode], 'rotary_surfacing.gcode');
 
         await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
     };
