@@ -146,6 +146,7 @@ const defaultState = {
             jog: {
                 xyStep: 5,
                 zStep: 2,
+                aStep: 5,
                 feedrate: 3000,
                 keypad: false,
                 rapid: {
