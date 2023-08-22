@@ -123,6 +123,7 @@ const PhysicalUnitSetup = ({ actions }) => {
                             </>
                         )
                     }
+                    <p style={{ fontWeight: 'bold' }}>Make sure your router is mounted as far down as possible with the bit inserted not too far into the collet to prevent bottoming out.</p>
 
                     <Option>
                         <MenuTitle>
