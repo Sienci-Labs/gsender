@@ -46,6 +46,7 @@ const Tabs = ({ className, tabs, activeTabIndex, onClick, ...props }) => {
                 [`& .${tabsClasses.flexContainer}`]: {
                     justifyContent: 'space-between'
                 },
+                minHeight: '32px',
             }}
             {...props}
             className={classNames(
@@ -55,7 +56,13 @@ const Tabs = ({ className, tabs, activeTabIndex, onClick, ...props }) => {
             )}
         >
             {
-                tabs.map((tab) => (<Tab key={`tab-${tab.widgetId}`} label={tab.label} />))
+                tabs.map((tab) => (
+                    <Tab
+                        key={`tab-${tab.widgetId}`}
+                        label={tab.label}
+                        sx={{ minWidth: '75px', minHeight: '16px', padding: '8px' }}
+                    />
+                ))
             }
         </MuiTabs>
     );
