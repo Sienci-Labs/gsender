@@ -67,7 +67,6 @@ const StatsList = () => {
     const [page, setPage] = useState(JOB_PER_PORT);
 
     useEffect(() => {
-        console.log('api call');
         api.jobStats.fetch().then((res) => {
             const data = res.body;
             // calc longest time run and average run time

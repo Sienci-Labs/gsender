@@ -28,6 +28,7 @@ import {
 import Icon from '@mdi/react';
 import { mdiAlert, mdiPencil, mdiCheckOutline } from '@mdi/js';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import EditArea from './EditArea';
 import styles from '../index.styl';
 import { SortableTable } from '../../../components/SortableTable';
 import maintenanceActions from './lib/maintenanceApiActions';
@@ -46,6 +47,8 @@ const determineTime = (task) => {
 const Maintenance = () => {
     const [tasks, setTasks] = useState([]);
     const [data, setData] = useState([]);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [currentTask, setCurrentTask] = useState(0);
 
     const updateData = () => {
         maintenanceActions.fetch(setTasks).then((tasks) => {
@@ -64,13 +67,28 @@ const Maintenance = () => {
         });
     };
 
+    const updateTasks = (updatedTasks) => {
+        maintenanceActions.update(updatedTasks).then((res) => {
+            updateData();
+        });
+    };
+
+    const replaceTask = (newTask) => {
+        const updatedTasks = tasks.map((obj) => {
+            if (obj.id === newTask.id) {
+                return newTask;
+            }
+            return obj;
+        });
+        updateTasks(updatedTasks);
+    };
+
     useEffect(() => {
         console.log('api call');
         updateData();
     }, []);
 
     const onClear = (id) => {
-        console.log(id);
         Confirm({
             title: 'Reset Maintenance Timer',
             content: 'Are you sure you want to reset the maintenance timer for ' + tasks.find((obj) => obj.id === id).name + '? Only do this if you have just performed this maintenance task.',
@@ -84,16 +102,15 @@ const Maintenance = () => {
                     }
                     return obj;
                 });
-                console.log(updatedTasks);
-                maintenanceActions.update(updatedTasks).then((res) => {
-                    updateData();
-                });
+                updateTasks(updatedTasks);
             }
         });
     };
 
     const onEdit = (id) => {
-        console.log(id);
+        const selectedTask = tasks.find((obj) => obj.id === id);
+        setCurrentTask(selectedTask);
+        setShowEditModal(true);
     };
 
     const columns = useMemo(
@@ -147,8 +164,17 @@ const Maintenance = () => {
     ];
 
     return (
-        <div className={[styles.addMargin].join(' ')}>
-            <SortableTable data={data} columns={columns} enableSortingRemoval={false} sortBy={sortBy} />
+        <div>
+            <div className={[styles.addMargin].join(' ')}>
+                <SortableTable data={data} columns={columns} enableSortingRemoval={false} sortBy={sortBy} />
+            </div>
+            { showEditModal && (
+                <EditArea
+                    task={currentTask}
+                    update={replaceTask}
+                    closeModal={() => setShowEditModal(false)}
+                />
+            ) }
         </div>
     );
 };
