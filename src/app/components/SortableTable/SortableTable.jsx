@@ -176,7 +176,7 @@ const SortableTable = (props) => {
                                     {
                                         row.original.subRow &&
                                         <tr key={row.id + 'subRow'} style={{ backgroundColor: rowColours[i % 2] }}>
-                                            <td colSpan={colSpanLength} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
+                                            <td colSpan={colSpanLength} style={{ whiteSpace: 'pre-line', overflowWrap: 'break-word' }}>
                                                 {row.original.subRow}
                                             </td>
                                         </tr>
