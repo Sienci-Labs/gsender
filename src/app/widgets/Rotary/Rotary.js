@@ -7,9 +7,8 @@ import pubsub from 'pubsub-js';
 import api from 'app/api';
 import controller from 'app/lib/controller';
 import store from 'app/store';
-import { WORKSPACE_MODE, METRIC_UNITS, IMPERIAL_UNITS, VISUALIZER_PRIMARY } from 'app/constants';
+import { WORKSPACE_MODE, METRIC_UNITS, VISUALIZER_PRIMARY } from 'app/constants';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-import { in2mm, mm2in } from 'app/lib/units';
 
 import styles from './index.styl';
 import RotaryToggle from './RotaryToggle';
@@ -23,7 +22,6 @@ import { RotaryContext } from './Context';
 import { MODALS } from './utils/constants';
 import StockTurning from './StockTurning';
 
-
 let pubsubTokens = [];
 
 const Rotary = () => {
@@ -36,12 +34,6 @@ const Rotary = () => {
     useEffect(() => {
         subscribe();
 
-        const units = store.get('workspace.units', METRIC_UNITS);
-
-        if (units === IMPERIAL_UNITS) {
-            changeUnits(IMPERIAL_UNITS);
-        }
-
         return () => {
             unsubscribe();
         };
@@ -52,9 +44,6 @@ const Rotary = () => {
             pubsub.subscribe('jog_preset_selected', (msg, speed) => {
                 actions.setSelectedSpeed(speed);
             }),
-            pubsub.subscribe('units:change', (event, units) => {
-                changeUnits(units);
-            })
         ];
 
         pubsubTokens = pubsubTokens.concat(tokens);
@@ -87,9 +76,7 @@ const Rotary = () => {
             });
         },
         jog: (params = {}) => {
-            const units = store.get('workspace.units', METRIC_UNITS);
-
-            const modal = (units === 'mm') ? 'G21' : 'G20';
+            const modal = 'G21';
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             const commands = [
                 `$J=${modal}G91 ` + s,
@@ -97,11 +84,9 @@ const Rotary = () => {
             controller.command('gcode', commands, modal);
         },
         startContinuousJog: (params = {}, feedrate = 1000) => {
-            const units = store.get('workspace.units', METRIC_UNITS);
-
             setIsContinuousJogging(true);
 
-            controller.command('jog:start', params, feedrate, units);
+            controller.command('jog:start', params, feedrate, METRIC_UNITS);
         },
         stopContinuousJog: () => {
             setIsContinuousJogging(false);
@@ -148,31 +133,8 @@ const Rotary = () => {
         }
     };
 
-    const changeUnits = (newUnits) => {
-        setJog(prev => {
-            const { aStep, feedrate } = prev;
-
-            let newAStep = aStep;
-            let newFeedrate = feedrate;
-
-            if (newUnits === IMPERIAL_UNITS) {
-                newAStep = mm2in(aStep).toFixed(3);
-                newFeedrate = mm2in(feedrate).toFixed(2);
-            } else if (newUnits === METRIC_UNITS) {
-                newAStep = in2mm(aStep).toFixed(2);
-                newFeedrate = in2mm(feedrate).toFixed(0);
-            }
-
-            return ({ ...prev, aStep: newAStep, feedrate: newFeedrate });
-        });
-    };
-
     const isFileRunning = () => {
-        if (controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run') {
-            return true;
-        } else {
-            return false;
-        }
+        return controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run';
     };
 
     const { ROTARY } = WORKSPACE_MODE;

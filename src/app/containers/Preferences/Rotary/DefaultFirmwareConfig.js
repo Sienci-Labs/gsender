@@ -10,7 +10,6 @@ import Fieldset from '../components/Fieldset';
 import Input from '../components/Input';
 
 import styles from '../index.styl';
-import { IMPERIAL_UNITS } from '../../../constants';
 
 const DefaultFirmwareConfig = ({ state = {}, actions }) => {
     const { rotary } = state;
@@ -23,20 +22,10 @@ const DefaultFirmwareConfig = ({ state = {}, actions }) => {
         });
     };
 
-    const processFirmwareValue = (value) => {
-        const units = store.get('workspace.units');
-
-        if (units === IMPERIAL_UNITS) {
-            return Number((value / 25.4).toFixed(3));
-        }
-
-        return value;
-    };
-
     const units = store.get('workspace.units');
 
-    const $101 = processFirmwareValue(rotary.defaultFirmwareSettings.$101);
-    const $111 = processFirmwareValue(rotary.defaultFirmwareSettings.$111);
+    const $101 = rotary.defaultFirmwareSettings.$101;
+    const $111 = rotary.defaultFirmwareSettings.$111;
     const $21 = !!Number(rotary.defaultFirmwareSettings.$21);
 
     return (
