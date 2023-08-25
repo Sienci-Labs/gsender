@@ -41,8 +41,10 @@ import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
-    METRIC_UNITS,
+    METRIC_UNITS, IMPERIAL_UNITS,
 } from '../../constants';
+import { RadioButton, RadioGroup } from 'Components/Radio';
+import pubsub from 'pubsub-js';
 
 class WorkflowControl extends PureComponent {
     fileInputEl = null;
@@ -77,6 +79,14 @@ class WorkflowControl extends PureComponent {
         handleStop: () => {
             controller.command('gcode:stop', { force: true });
         },
+        handleUnitSwap: (value) => {
+            console.log(value);
+
+            this.setState({
+                units: value
+            });
+            pubsub.publish('units:change', value);
+        }
     };
 
     getInitialState() {
@@ -162,7 +172,7 @@ class WorkflowControl extends PureComponent {
 
     render() {
         const { handleOnStop } = this;
-        const { runHasStarted } = this.state;
+        const { runHasStarted, units } = this.state;
         const { fileLoaded, workflowState, isConnected, senderInHold, activeState } = this.props;
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
@@ -182,6 +192,18 @@ class WorkflowControl extends PureComponent {
                         </div>
                     </div>
                     <div className={styles.widgetContentMobile}>
+                        <RadioGroup
+                            name="units"
+                            value={units}
+                            depth={2}
+                            onChange={(value) => this.actions.handleUnitSwap(value)}
+                            size="small"
+                        >
+                            <div>
+                                <RadioButton className={styles.prefferedradio} label="Inches" value={IMPERIAL_UNITS} />
+                                <RadioButton className={styles.prefferedradio} label="Millimeters" value={METRIC_UNITS} />
+                            </div>
+                        </RadioGroup>
                         <div className={styles.workflowControlMobile}>
                             <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem', flexWrap: 'wrap' }}>
                                 {
