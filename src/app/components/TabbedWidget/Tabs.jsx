@@ -22,14 +22,8 @@
  */
 
 import React from 'react';
-import classNames from 'classnames';
 import MuiTabs, { tabsClasses } from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-
-import WidgetStyles from '../Widget/index.styl';
-
-import styles from './index.styl';
-
 
 const Tabs = ({ className, tabs, activeTabIndex, onClick, sx, ...props }) => {
     return (
@@ -38,20 +32,14 @@ const Tabs = ({ className, tabs, activeTabIndex, onClick, sx, ...props }) => {
             onChange={(_, val) => onClick(val)}
             variant="scrollable"
             scrollButtons="auto"
-            aria-label="scrollable auto tabs example"
             sx={{
                 [`& .${tabsClasses.scrollButtons}`]: {
                     '&.Mui-disabled': { opacity: 0.3 },
                 },
-                minHeight: '32px',
+                minHeight: '34px',
                 ...sx,
             }}
             {...props}
-            className={classNames(
-                className,
-                WidgetStyles.widgetHeader,
-                styles.tabRow
-            )}
         >
             {
                 tabs.map((tab) => (
@@ -59,7 +47,16 @@ const Tabs = ({ className, tabs, activeTabIndex, onClick, sx, ...props }) => {
                         key={`tab-${tab.widgetId}`}
                         label={tab.label}
                         disabled={tab.disabled}
-                        sx={{ minWidth: '75px', minHeight: '16px', padding: '8px', flexGrow: '1' }}
+                        sx={{
+                            minWidth: '75px',
+                            minHeight: '16px',
+                            padding: '8px',
+                            flexGrow: '1',
+                            fontFamily: '\'Open Sans\', sans-serif',
+                            textTransform: 'none',
+                            fontSize: '1.1rem',
+                            color: '#6b7280',
+                        }}
                     />
                 ))
             }
