@@ -190,7 +190,7 @@ class Keypad extends PureComponent {
                             jog={() => actions.jog({ X: -xyDistance, Y: xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ X: -1, Y: 1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled}
+                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
                         >
                         </JogControl>
                         <JogControl
@@ -208,7 +208,7 @@ class Keypad extends PureComponent {
                             jog={() => actions.jog({ X: xyDistance, Y: xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ X: 1, Y: 1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled}
+                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
                         >
                         </JogControl>
                         <JogControl
@@ -248,7 +248,7 @@ class Keypad extends PureComponent {
                             jog={() => actions.jog({ X: -xyDistance, Y: -xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ X: -1, Y: -1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled}
+                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
                         >
                         </JogControl>
                         <JogControl
@@ -266,7 +266,7 @@ class Keypad extends PureComponent {
                             jog={() => actions.jog({ X: xyDistance, Y: -xyDistance, F: feedrate })}
                             continuousJog={() => actions.startContinuousJog({ X: 1, Y: -1 }, feedrate)}
                             stopContinuousJog={() => actions.stopContinuousJog()}
-                            disabled={xyControlsDisabled}
+                            disabled={xyControlsDisabled || rotary && firmwareType === 'Grbl'}
                         >
                         </JogControl>
                         <JogControl
