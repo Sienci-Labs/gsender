@@ -14,11 +14,12 @@ import {
     SET_STOCK_TURNING_OUTPUT,
     UPDATE_STOCK_TURNING_OPTION,
     CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL,
+    CONVERT_STOCK_TURNING_OPTIONS_TO_METRIC,
     SET_ACTIVE_STOCK_TURNING_TAB
 } from './actions';
 import { QUARTER } from '../constant';
 import defaultState from '../../../store/defaultState';
-import { convertToImperial } from '../../../containers/Preferences/calculate';
+import { convertToImperial, convertToMetric } from '../../../containers/Preferences/calculate';
 
 const initialState = () => {
     const stockTurningOptions = store.get('widgets.rotary.stockTurning.options', {});
@@ -110,6 +111,27 @@ const reducer = (state, action) => {
                     feedrate: convertToImperial(feedrate),
                     startHeight: convertToImperial(startHeight),
                     finalHeight: convertToImperial(finalHeight),
+                }
+            }
+        };
+    }
+
+    case CONVERT_STOCK_TURNING_OPTIONS_TO_METRIC: {
+        const { stockLength, stepdown, bitDiameter, feedrate, startHeight, finalHeight } = state.stockTurning.options;
+
+        return {
+            ...state,
+            units: IMPERIAL_UNITS,
+            stockTurning: {
+                ...state.stockTurning,
+                options: {
+                    ...state.stockTurning.options,
+                    stockLength: convertToMetric(stockLength),
+                    stepdown: convertToMetric(stepdown),
+                    bitDiameter: convertToMetric(bitDiameter),
+                    feedrate: convertToMetric(feedrate),
+                    startHeight: convertToMetric(startHeight),
+                    finalHeight: convertToMetric(finalHeight),
                 }
             }
         };

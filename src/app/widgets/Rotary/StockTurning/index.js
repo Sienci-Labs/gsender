@@ -16,6 +16,7 @@ import {
     CLOSE_ACTIVE_DIALOG,
     SET_STOCK_TURNING_OUTPUT,
     CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL,
+    CONVERT_STOCK_TURNING_OPTIONS_TO_METRIC,
     SET_ACTIVE_STOCK_TURNING_TAB,
 } from '../Context/actions';
 import InputArea from './components/InputArea';
@@ -27,18 +28,24 @@ import Visualizer from './components/Visualizer';
 import { StockTurningGenerator } from './Generator';
 
 const StockTurning = () => {
-    const { state: { activeDialog, stockTurning, units: stockTurningUnits }, dispatch } = useContext(RotaryContext);
+    const { state: { activeDialog, stockTurning, }, dispatch } = useContext(RotaryContext);
 
     useEffect(() => {
         reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
 
         const units = store.get('workspace.units');
 
-        if (units === 'in' && stockTurningUnits === 'mm') {
+        if (units === 'in') {
             dispatch({ type: CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL });
         }
 
         return () => {
+            const units = store.get('workspace.units');
+
+            if (units === 'in') {
+                dispatch({ type: CONVERT_STOCK_TURNING_OPTIONS_TO_METRIC });
+            }
+
             if (units === 'mm') {
                 store.replace('widgets.rotary.stockTurning.options', stockTurning.options);
             }
