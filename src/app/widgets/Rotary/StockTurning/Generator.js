@@ -33,7 +33,7 @@ export class StockTurningGenerator {
         const units = store.get('workspace.units');
         const safeHeight = this.getSafeZValue();
 
-        const { feedrate, spindleRPM } = this.options;
+        const { feedrate, spindleRPM, enableRehoming } = this.options;
 
         const wcs = controller.state?.parserstate?.modal?.wcs || 'G54';
 
@@ -49,11 +49,23 @@ export class StockTurningGenerator {
             '\n'
         ];
 
-        const zeroBlock = [
-            'G90',
-            `G0 Z${safeHeight}`,
-            'G0 X0 A0'
-        ];
+        const getZeroBlock = (axes) => {
+            let axesZeroLine = 'G0';
+
+            if (axes.x) {
+                axesZeroLine += ' X0';
+            }
+
+            if (axes.a) {
+                axesZeroLine += ' A0';
+            }
+
+            return [
+                'G90',
+                `G0 Z${safeHeight}`,
+                axesZeroLine
+            ];
+        };
 
         const footerBlock = [
             '\n',
@@ -67,7 +79,7 @@ export class StockTurningGenerator {
         const arr = [
             ...headerBlock,
             ...bodyBlock,
-            ...zeroBlock,
+            ...getZeroBlock({ x: true, a: !enableRehoming }),
             ...footerBlock
         ];
 
