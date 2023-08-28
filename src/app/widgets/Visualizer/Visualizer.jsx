@@ -1661,11 +1661,15 @@ class Visualizer extends Component {
     }
 
     handleSceneRender(vizualization, callback) {
+        const { controllerType, fileType, workPosition } = this.props;
+        const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
+
         const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
 
         if (!this.visualizer) {
             return;
         }
+
         const obj = this.visualizer.render(vizualization);
         obj.name = '';
         this.group.add(obj);
@@ -1688,6 +1692,18 @@ class Visualizer extends Component {
         this.updateLaserPointerPosition();
         this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
+
+        const isUsingGRBL = controllerType === GRBL;
+        const isRotaryFile = [FILE_TYPE.ROTARY, FILE_TYPE.FOUR_AXIS].includes(fileType);
+        const isInRotaryMode = workspaceMode === WORKSPACE_MODE.ROTARY;
+        const axis = isInRotaryMode && isUsingGRBL && isRotaryFile ? 'y' : 'a';
+
+        // Rotate g-code model if to current a-axis position
+        if (isRotaryFile) {
+            const rotationVal = workPosition[axis];
+
+            this.rotateGcodeModal(rotationVal);
+        }
 
         if (this.viewport && dX > 0 && dY > 0 && shouldZoom) {
             // The minimum viewport is 50x50mm
