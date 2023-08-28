@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import get from 'lodash/get';
 
 import controller from 'app/lib/controller';
 import {
@@ -65,13 +66,20 @@ const DROarea = ({ canClick = true, actions }) => {
         };
 
         const customMathRound = (num) => {
-            // let radix = num % 1.0;
-            // if ((radix > 0.899 && radix < 1.0) && (Number(num.split('.')[1].slice(0, 2)) > 97)) {
-            //     return Math.ceil(num).toFixed(2);
-            // } else {
-            //     return num;
-            // }
-            return Number(num).toFixed(2);
+            const $13 = get(store, 'controller.settings.settings.$13');
+
+            const DRO = store.get('workspace.customDecimalPlaces', 0);
+            const places = $13 === '1' ? 4 : 3; // firmware gives back 3 for metric and 4 for imperial
+            const defaultPlaces = $13 === '1' ? 3 : 2; // default places when DRO = 0
+            const wholeLength = num.split('.')[0].length;
+
+            let result = num.slice(0, wholeLength + 1 + places); // cut off the javascript weirdness
+            if (DRO > places) { // add more 0s
+                result = result.padEnd(wholeLength + 1 + DRO, '0'); // +1 for ., +DRO for decimal places
+            } else { // remove decimal places (with rounding)
+                result = Number(num).toFixed(DRO === 0 ? defaultPlaces : DRO);
+            }
+            return result;
         };
 
         return (
