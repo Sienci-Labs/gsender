@@ -86,9 +86,24 @@ const Maintenance = () => {
     };
 
     const addTask = (newTask) => {
-        let updatedTasks = tasks;
-        updatedTasks.push(newTask);
-        updateTasks(updatedTasks);
+        tasks.push(newTask);
+        updateTasks(tasks);
+    };
+
+    const deleteTask = () => {
+        Confirm({
+            title: 'Delete Task',
+            content: 'Are you sure you want to delete ' + currentTask.name + '?',
+            confirmLabel: 'Yes',
+            onConfirm: () => {
+                setShowEditModal(false);
+                const index = tasks.indexOf(currentTask);
+                if (index >= 0) {
+                    tasks.splice(index, 1);
+                }
+                updateTasks(tasks);
+            }
+        });
     };
 
     useEffect(() => {
@@ -185,6 +200,7 @@ const Maintenance = () => {
                     task={currentTask}
                     update={replaceTask}
                     closeModal={() => setShowEditModal(false)}
+                    deleteTask={deleteTask}
                 />
             ) }
             { showAddModal && (

@@ -22,6 +22,8 @@
  */
 
 import React, { useState } from 'react';
+import Icon from '@mdi/react';
+import { mdiDeleteOutline } from '@mdi/js';
 import { Button } from 'app/components/Buttons';
 import Modal from 'app/components/Modal';
 import { Form } from 'app/components/Forms';
@@ -31,7 +33,7 @@ import styles from './index.styl';
 
 const MAX_CHARACTERS = '1000';
 
-const EditArea = ({ task, update, closeModal }) => {
+const EditArea = ({ task, update, closeModal, deleteTask }) => {
     const [name, setName] = useState(task.name);
     const [description, setDescription] = useState(task.description);
     const [rangeStart, setRangeStart] = useState(task.rangeStart);
@@ -106,6 +108,12 @@ const EditArea = ({ task, update, closeModal }) => {
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <Button
+                    onClick={deleteTask}
+                    className={styles.deleteButton}
+                >
+                    {i18n._('Delete Task')} <Icon path={mdiDeleteOutline} size={1} />
+                </Button>
                 <Button
                     onClick={closeModal}
                 >
