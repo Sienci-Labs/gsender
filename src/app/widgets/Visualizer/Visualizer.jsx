@@ -1544,6 +1544,7 @@ class Visualizer extends Component {
         this.visualizer.group.rotateX(radians);
     }
 
+
     updateGcodeModal(prevPos, currPos) {
         const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
         const { controllerType, fileType } = this.props;
@@ -1688,7 +1689,7 @@ class Visualizer extends Component {
         this.pivotPoint.set(center.x, center.y, center.z);
 
         // Update position
-        this.updateCuttingToolPosition();
+        this.updateCuttingToolPosition(null, { forceUpdateAllAxes: true });
         this.updateLaserPointerPosition();
         this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
@@ -1714,7 +1715,7 @@ class Visualizer extends Component {
         }
 
         // Update the scene
-        this.updateScene();
+        this.updateScene({ forceUpdate: true });
 
         // only set the camera if it's the first render
         if (shouldZoom) {
