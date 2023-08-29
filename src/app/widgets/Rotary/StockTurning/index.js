@@ -39,6 +39,8 @@ const StockTurning = () => {
             dispatch({ type: CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL });
         }
 
+        pubsub.publish('file:unload:primary_visualizer');
+
         return () => {
             const units = store.get('workspace.units');
 

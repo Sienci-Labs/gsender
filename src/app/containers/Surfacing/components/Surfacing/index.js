@@ -77,6 +77,8 @@ const Surfacing = ({ onClose, showTitle }) => {
     useEffect(() => {
         reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
 
+        pubsub.publish('file:unload:primary_visualizer');
+
         if (surfacing.length === 0 && surfacing.width === 0) {
             const machineProfile = store.get('workspace.machineProfile');
 
