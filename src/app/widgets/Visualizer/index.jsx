@@ -1542,6 +1542,13 @@ class VisualizerWidget extends PureComponent {
                 const file = new File([setupFile], name);
                 await api.file.upload(file, controller.port, VISUALIZER_PRIMARY);
             }),
+            pubsub.subscribe('file:unload:primary_visualizer', () => {
+                const { isFileLoaded, activeVisualizer } = this.props;
+
+                if (isFileLoaded && activeVisualizer === VISUALIZER_PRIMARY) {
+                    this.actions.reset();
+                }
+            }),
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
     }
