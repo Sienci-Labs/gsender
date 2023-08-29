@@ -9,6 +9,7 @@ import controller from 'app/lib/controller';
 import store from 'app/store';
 import { WORKSPACE_MODE, METRIC_UNITS, VISUALIZER_PRIMARY } from 'app/constants';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import { getUnitModal } from 'app/lib/toolChangeUtils';
 
 import styles from './index.styl';
 import RotaryToggle from './RotaryToggle';
@@ -129,7 +130,10 @@ const Rotary = () => {
                 msg: `Running ${name} probing commands`,
                 type: TOASTER_INFO,
             });
-            controller.command('gcode:safe', commands, 'G21');
+
+            const unitModal = getUnitModal();
+
+            controller.command('gcode:safe', commands, unitModal);
         }
     };
 
