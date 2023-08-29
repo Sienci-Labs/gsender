@@ -29,6 +29,7 @@ import Icon from '@mdi/react';
 import { mdiAlert, mdiPencil, mdiCheckOutline } from '@mdi/js';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import EditArea from './EditArea';
+import AddArea from './AddArea';
 import styles from '../index.styl';
 import { SortableTable } from '../../../components/SortableTable';
 import maintenanceActions from './lib/maintenanceApiActions';
@@ -48,6 +49,7 @@ const Maintenance = () => {
     const [tasks, setTasks] = useState([]);
     const [data, setData] = useState([]);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
     const [currentTask, setCurrentTask] = useState(0);
 
     const updateData = () => {
@@ -83,6 +85,12 @@ const Maintenance = () => {
         updateTasks(updatedTasks);
     };
 
+    const addTask = (newTask) => {
+        let updatedTasks = tasks;
+        updatedTasks.push(newTask);
+        updateTasks(updatedTasks);
+    };
+
     useEffect(() => {
         console.log('api call');
         updateData();
@@ -111,6 +119,10 @@ const Maintenance = () => {
         const selectedTask = tasks.find((obj) => obj.id === id);
         setCurrentTask(selectedTask);
         setShowEditModal(true);
+    };
+
+    const onAdd = () => {
+        setShowAddModal(true);
     };
 
     const columns = useMemo(
@@ -166,13 +178,19 @@ const Maintenance = () => {
     return (
         <div>
             <div className={[styles.addMargin].join(' ')}>
-                <SortableTable data={data} columns={columns} enableSortingRemoval={false} sortBy={sortBy} />
+                <SortableTable data={data} columns={columns} enableSortingRemoval={false} sortBy={sortBy} onAdd={onAdd} />
             </div>
             { showEditModal && (
                 <EditArea
                     task={currentTask}
                     update={replaceTask}
                     closeModal={() => setShowEditModal(false)}
+                />
+            ) }
+            { showAddModal && (
+                <AddArea
+                    update={addTask}
+                    closeModal={() => setShowAddModal(false)}
                 />
             ) }
         </div>

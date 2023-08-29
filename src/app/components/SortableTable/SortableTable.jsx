@@ -30,6 +30,7 @@ const SortableTable = (props) => {
     const enableSortingRemoval = props.enableSortingRemoval !== undefined ? props.enableSortingRemoval : true;
     const sortBy = props.sortBy || [''];
     const rowColours = props.rowColours || ['#f9f9f9', 'rgba(255, 255, 255, 0)'];
+    const onAdd = props.onAdd || null;
 
     // stop col span from first col that has it disabled
     let stopIndex = 0;
@@ -101,7 +102,7 @@ const SortableTable = (props) => {
         <div className="container flex flex-col items-center justify-center gap-3 px-4 py-16 " style={{ maxWidth: width, marginBottom: '0px', padding: 0 }}>
             {/*** PAGINATION ***/}
             {/*** GLOBAL SEARCH ***/}
-            <div style={{ marginBottom: '5px' }}>
+            <div className={['flex items-center gap-2', styles.navContainer].join(' ')} style={{ marginBottom: '5px' }}>
                 <input
                     value={globalSearchText ?? ''}
                     onChange={(e) => {
@@ -115,6 +116,20 @@ const SortableTable = (props) => {
                     className="font-lg border-block border p-2 shadow"
                     placeholder="Search all columns..."
                 />
+                {
+                    onAdd &&
+                        <div
+                            className="flex items-center gap-1"
+                            style={{ display: 'flex', alignItems: 'center', float: 'right' }}
+                        >
+                            <button
+                                title="Add New Task"
+                                onClick={onAdd}
+                            >
+                                Add New Task <i className="fas fa-plus" />
+                            </button>
+                        </div>
+                }
             </div>
             {/*** TABLE ***/}
             <div style={{ maxHeight: height, minHeight: height, marginBottom: '5px', overflowY: 'scroll' }}>
