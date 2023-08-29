@@ -1517,10 +1517,12 @@ class Visualizer extends Component {
 
         // The force parameter will skip here and update the positioning of all axes
         if (!forceUpdateAllAxes && (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY)) {
+            const yFixed = 0 - pivotPoint.y;
             gsap.to(this.cuttingTool.position, {
                 x: x0,
                 z: z0,
-                duration: 0.25
+                y: yFixed,
+                duration: 0.24
             });
 
             return;
@@ -1530,7 +1532,7 @@ class Visualizer extends Component {
             x: x0,
             y: y0,
             z: z0,
-            duration: 0.25
+            duration: 0.24
         });
     }
 
