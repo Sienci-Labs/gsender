@@ -101,7 +101,6 @@ export function* initialize() {
                 duration: status.elapsedTime,
                 jobStatus: status.finishTime ? JOB_STATUS.COMPLETE : JOB_STATUS.STOPPED,
             };
-            console.log(newJobStats);
             newJobStats.jobs.push(job);
             api.jobStats.update(newJobStats);
         } catch (error) {
@@ -118,7 +117,6 @@ export function* initialize() {
                 newTask.currentTime += (status.timeRunning / 1000 / 3600);
                 return newTask;
             });
-            console.log(newTasks);
             api.maintenance.update(newTasks);
         } catch (error) {
             console.error(error);

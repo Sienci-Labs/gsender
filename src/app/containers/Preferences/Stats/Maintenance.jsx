@@ -107,7 +107,6 @@ const Maintenance = () => {
     };
 
     useEffect(() => {
-        console.log('api call');
         updateData();
     }, []);
 
@@ -147,7 +146,6 @@ const Maintenance = () => {
                 accessorKey: 'time',
                 header: () => null,
                 cell: (info) => {
-                    console.log(info.table.getTotalSize());
                     if (Number(info.renderValue())) {
                         return (
                             <div
@@ -209,7 +207,6 @@ const Maintenance = () => {
                 accessorKey: 'part',
                 header: () => null,
                 cell: (info) => {
-                    console.log(info);
                     return (
                         <div style={{ whiteSpace: 'pre-line', overflowWrap: 'break-word' }}>
                             <strong style={{ fontSize: '16px' }}>{info.cell.row.original.part}</strong>

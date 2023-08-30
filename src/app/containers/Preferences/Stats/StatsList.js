@@ -196,7 +196,6 @@ const StatsList = () => {
             overflow: 'hidden',
             textTransform: 'capitalize'
         };
-        console.log(option);
         return (
             <div style={style} title={option.label}>{option.label}</div>
         );
@@ -213,7 +212,6 @@ const StatsList = () => {
                     menuContainerStyle={{ zIndex: 5 }}
                     name="Job Statistics"
                     onChange={(obj) => {
-                        console.log(obj);
                         setPage(obj.value);
                     }}
                     options={map(STATS_PAGES, (value) => ({
