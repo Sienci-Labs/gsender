@@ -61,7 +61,7 @@ const Maintenance = () => {
                     part: task.name,
                     time: determineTime(task),
                     edit: '',
-                    subRow: task.description
+                    description: task.description
                 };
                 formattedTasks.push(formattedTask);
             });
@@ -140,37 +140,97 @@ const Maintenance = () => {
         setShowAddModal(true);
     };
 
+    // styling doesnt work with classname
     const columns = useMemo(
         () => [
             {
+                accessorKey: 'time',
+                header: () => null,
+                cell: (info) => {
+                    console.log(info.table.getTotalSize());
+                    if (Number(info.renderValue())) {
+                        return (
+                            <div
+                                style={{
+                                    color: 'green',
+                                    display: 'flex',
+                                    maxHeight: '100%',
+                                    alignContent: 'center',
+                                    justifyContent: 'center',
+                                    // padding: '50% 0px'
+                                }}
+                            >
+                                {info.renderValue() + ' Hours'}
+                            </div>
+                        );
+                    } else if (info.renderValue() === 'Due') {
+                        return (
+                            <div
+                                style={{
+                                    color: '#E15C00',
+                                    fontStyle: 'bold',
+                                    display: 'flex',
+                                    textAlign: 'center',
+                                    alignContent: 'center',
+                                    justifyContent: 'center',
+                                    height: '100%'
+                                }}
+                            >
+                                {info.renderValue()}
+                            </div>
+                        );
+                    } else {
+                        return (
+                            <div
+                                style={{
+                                    color: 'red',
+                                    fontStyle: 'bold',
+                                    display: 'flex',
+                                    textAlign: 'center',
+                                    alignContent: 'center',
+                                    justifyContent: 'center',
+                                    height: '100%'
+                                }}
+                            >
+                                {info.renderValue()}
+                            </div>
+                        );
+                    }
+                },
+                minSize: 30,
+                maxSize: 30,
+                invertSorting: true,
+                disableColSpan: true,
+                enableSorting: false,
+                filterFn: 'fuzzy',
+                sortingFn: sortingFns.alphanumeric,
+            },
+            {
                 accessorKey: 'part',
-                header: () => 'Part',
+                header: () => null,
+                cell: (info) => {
+                    console.log(info);
+                    return (
+                        <div style={{ whiteSpace: 'pre-line', overflowWrap: 'break-word' }}>
+                            <strong style={{ fontSize: '16px' }}>{info.cell.row.original.part}</strong>
+                            <span>{'\n'}</span>
+                            <span>{info.cell.row.original.description}</span>
+                        </div>
+                    );
+                },
                 enableSorting: false,
             },
             {
-                accessorKey: 'time',
-                header: () => 'Time Until Next Maintenance',
-                cell: (info) => {
-                    if (Number(info.renderValue())) {
-                        return <div style={{ color: 'green' }}>{info.renderValue() + ' Hours'}</div>;
-                    } else if (info.renderValue() === 'Due') {
-                        return <span style={{ color: '#E15C00', fontStyle: 'bold' }}>{info.renderValue()}</span>;
-                    } else {
-                        return <div style={{ color: 'red' }}>{info.renderValue()}</div>;
-                    }
-                },
-                minSize: 90,
-                maxSize: 90,
-                invertSorting: true,
-                filterFn: 'fuzzy',
-                sortingFn: sortingFns.alphanumeric
-            },
-            {
                 accessorKey: 'edit',
-                header: () => '',
+                header: () => null,
                 cell: (info) => {
                     return (
-                        <div className={styles.iconContainer}>
+                        <div
+                            style={{
+                                flexDirection: 'column',
+                                textAlign: 'center',
+                            }}
+                        >
                             <Icon path={mdiCheckOutline} size={1.5} color="green" onClick={() => onClear(info.cell.row.original.id)} />
                             <Icon path={mdiPencil} size={1.5} onClick={() => onEdit(info.cell.row.original.id)} />
                         </div>

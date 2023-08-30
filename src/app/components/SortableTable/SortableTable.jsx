@@ -123,10 +123,10 @@ const SortableTable = (props) => {
                             style={{ display: 'flex', alignItems: 'center', float: 'right' }}
                         >
                             <button
-                                title="Add New Task"
+                                title="Add New"
                                 onClick={onAdd}
                             >
-                                Add New Task <i className="fas fa-plus" />
+                                Add New <i className="fas fa-plus" />
                             </button>
                         </div>
                 }
@@ -183,7 +183,7 @@ const SortableTable = (props) => {
                                 <React.Fragment key={row.id + 'parent'}>
                                     <tr key={row.id} style={{ backgroundColor: rowColours[i % 2] }}>
                                         {row.getVisibleCells().map((cell) => (
-                                            <td key={cell.id} rowSpan={cell.column.columnDef.accessorKey === 'edit' ? 2 : 1} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
+                                            <td key={cell.id} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </td>
                                         ))}
