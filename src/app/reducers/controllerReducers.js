@@ -249,10 +249,11 @@ const reducer = createReducer(initialState, {
         };
     },
     [UPDATE_SETTINGS_DESCRIPTIONS]: (payload, reducerState) => {
+        const { descriptions } = payload;
         return {
             settings: {
                 ...reducerState.settings,
-                descriptions: payload
+                descriptions
             }
         };
     }

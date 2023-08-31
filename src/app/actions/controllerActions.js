@@ -60,4 +60,4 @@ export const updateHomingFlag = createAction(UPDATE_HOMING_FLAG);
 export const resetHoming = createAction(RESET_HOMING);
 export const partialSettingsUpdate = createAction(UPDATE_PARTIAL_CONTROLLER_SETTINGS);
 export const updateTerminalHistory = createAction(UPDATE_TERMINAL_HISTORY);
-export const updateSettingsDescription = createAction(UPDATE_SETTINGS_DESCRIPTIONS);
+export const updateSettingsDescriptions = createAction(UPDATE_SETTINGS_DESCRIPTIONS);

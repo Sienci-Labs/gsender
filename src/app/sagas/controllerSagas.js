@@ -587,8 +587,10 @@ export function* initialize() {
 
     controller.addListener('settings:description', (data) => {
         reduxStore.dispatch({
-            type: controllerActions.updateSettingsDescription,
-            payload: data
+            type: controllerActions.UPDATE_SETTINGS_DESCRIPTIONS,
+            payload: {
+                descriptions: data
+            }
         });
     });
 
