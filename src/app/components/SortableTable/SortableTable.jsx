@@ -87,7 +87,7 @@ const SortableTable = (props) => {
             }
         ];
     */
-    const sortBy = props.sortBy || [''];
+    const sortBy = props.sortBy || null;
     const rowColours = props.rowColours || ['#f9f9f9', 'rgba(255, 255, 255, 0)']; // every other row colours
     const onAdd = props.onAdd || null; // function for when add button is pressed
     const rowSpan = props.rowSpan || new Map(); // map: accessorKey => num rows to span
