@@ -34,6 +34,7 @@ import GrblHalLineParserResultParameters from './GrblHalLineParserResultParamete
 import GrblHalLineParserResultFeedback from './GrblHalLineParserResultFeedback';
 import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
 //import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
+import GrblHalLineParserResultSettingDescription from './GrblHalLineParserResultSettingDescription';
 import GrblHalLineParserResultVersion from './GrblHalLineParserResultVersion';
 import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 import logger from '../../lib/logger';
@@ -42,7 +43,6 @@ import {
     GRBL_HAL_ACTIVE_STATE_ALARM
 } from './constants';
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
-
 
 const log = logger('controller:grblHAL');
 
@@ -277,6 +277,9 @@ class GrblHalRunner extends events.EventEmitter {
             }
             this.emit('info', payload);
             return;
+        }
+        if (type === GrblHalLineParserResultSettingDescription) {
+            console.log('Setting^');
         }
         if (data.length > 0) {
             this.emit('others', payload);

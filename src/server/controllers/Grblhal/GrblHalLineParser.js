@@ -36,9 +36,7 @@ import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
 import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
 import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
-
-// Grbl v1.1
-// https://github.com/gnea/grbl/blob/edge/doc/markdown/interface.md
+import GrblHalLineParserResultSettingDescription from './GrblHalLineParserResultSettingDescription';
 
 class GrblHalLineParser {
     parse(line) {
@@ -81,6 +79,9 @@ class GrblHalLineParser {
             // [VER:] (v1.1)
             GrblHalLineParserResultVersion,
 
+            // [SETTING:1|27|Step idle delay|milliseconds|5|####0||65535|0|0]
+            GrblHalLineParserResultSettingDescription,
+
             // [XXXX:] (v1.1)
             GrblHalLineParserResultInfo,
 
@@ -95,7 +96,7 @@ class GrblHalLineParser {
             GrblHalLineParserResultSettings,
 
             // Grbl X.Xx ['$' for help]
-            GrblHalLineParserResultStartup
+            GrblHalLineParserResultStartup,
         ];
 
         for (let parser of parsers) {
