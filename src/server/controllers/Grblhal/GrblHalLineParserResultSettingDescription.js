@@ -16,7 +16,10 @@ function formatDataFormat(format) {
     if (format.indexOf(',') > -1) {
         return format.split(',');
     }
-    return []
+    if (format.length === 0) {
+        return null;
+    }
+    return format;
 }
 class GrblHalLineParserResultSettingDescription {
     static parse(line) {
@@ -31,11 +34,11 @@ class GrblHalLineParserResultSettingDescription {
 
 
         const payload = {
-            id: r[1],
-            group: data[0],
+            id: Number(r[1]),
+            group: Number(data[0]),
             description: data[1],
             unit: data[2],
-            dataType: data[3],
+            dataType: Number(data[3]),
             format: formatDataFormat(data[4])
         };
 

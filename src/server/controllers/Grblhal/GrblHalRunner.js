@@ -91,6 +91,9 @@ class GrblHalRunner extends events.EventEmitter {
         settings: {
         },
         info: {
+        },
+        descriptions: {
+
         }
     };
 
@@ -279,7 +282,14 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultSettingDescription) {
-            console.log('Setting^');
+            _.unset(payload, 'raw');
+            const { id, ...details } = payload;
+            this.settings.descriptions = {
+                ...this.settings.descriptions,
+                [id]: details
+            };
+            this.emit('description', payload);
+            return;
         }
         if (data.length > 0) {
             this.emit('others', payload);

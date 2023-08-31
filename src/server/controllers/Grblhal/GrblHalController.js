@@ -785,6 +785,10 @@ class GrblHalController {
             this.emit('serialport:read', res.raw);
         });
 
+        this.runner.on('description', (payload) => {
+            this.emit('settings:description', this.runner.settings.descriptions);
+        });
+
         const queryStatusReport = () => {
             // Check the ready flag
             if (!(this.ready)) {

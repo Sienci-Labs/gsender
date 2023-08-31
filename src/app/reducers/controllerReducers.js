@@ -33,7 +33,8 @@ import {
     UPDATE_HOMING_FLAG,
     RESET_HOMING,
     UPDATE_PARTIAL_CONTROLLER_SETTINGS,
-    UPDATE_TERMINAL_HISTORY
+    UPDATE_TERMINAL_HISTORY,
+    UPDATE_SETTINGS_DESCRIPTIONS
 } from '../actions/controllerActions';
 import { in2mm, mm2in } from '../lib/units';
 import { WORKFLOW_STATE_IDLE } from '../constants';
@@ -245,6 +246,14 @@ const reducer = createReducer(initialState, {
         }
         return {
             terminalHistory: newHistory
+        };
+    },
+    [UPDATE_SETTINGS_DESCRIPTIONS]: (payload, reducerState) => {
+        return {
+            settings: {
+                ...reducerState.settings,
+                descriptions: payload
+            }
         };
     }
 });
