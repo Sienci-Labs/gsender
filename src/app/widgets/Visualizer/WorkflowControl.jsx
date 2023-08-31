@@ -26,6 +26,7 @@
 import React, { PureComponent } from 'react';
 import get from 'lodash/get';
 import includes from 'lodash/includes';
+import uniqueId from 'lodash/uniqueId';
 import store from 'app/store';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -63,7 +64,8 @@ import {
     VISUALIZER_PRIMARY, LASER_MODE,
     METRIC_UNITS,
     GRBL_ACTIVE_STATE_HOME,
-    IMPERIAL_UNITS
+    IMPERIAL_UNITS,
+    JOB_STATUS
 } from '../../constants';
 import styles from './workflow-control.styl';
 import RecentFileButton from './RecentFileButton';
@@ -73,6 +75,7 @@ import { outlineResponse } from '../../workers/Outline.response';
 import { shouldVisualizeSVG } from '../../workers/Visualize.response';
 import Tooltip from '../../components/TooltipCustom/ToolTip';
 import { storeUpdate } from '../../lib/storeUpdate';
+import { convertMillisecondsToTimeStamp } from '../../lib/datetime';
 
 class WorkflowControl extends PureComponent {
     static propTypes = {
@@ -107,6 +110,12 @@ class WorkflowControl extends PureComponent {
                 waitForHoming: false,
                 safeHeight: store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 10 : 0.4,
                 defaultSafeHeight: store.get('workspace.units', METRIC_UNITS) === METRIC_UNITS ? 10 : 0.4
+            },
+            job: {
+                showStats: false,
+                time: 0,
+                status: JOB_STATUS.COMPLETE,
+                errors: []
             },
         };
     }
@@ -427,6 +436,17 @@ class WorkflowControl extends PureComponent {
                 if (!isFileLoaded) {
                     this.forceUpdate();
                 }
+            }),
+            pubsub.subscribe('job:end', (_, data) => {
+                const { status, errors } = data;
+                this.setState({
+                    job: {
+                        showStats: true,
+                        time: convertMillisecondsToTimeStamp(status.elapsedTime),
+                        status: status.finishTime ? JOB_STATUS.COMPLETE : JOB_STATUS.STOPPED,
+                        errors: errors
+                    }
+                });
             })
         ];
         this.pubsubTokens = this.pubsubTokens.concat(tokens);
@@ -473,6 +493,8 @@ class WorkflowControl extends PureComponent {
         const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
         const { showModal, needsRecovery, value, safeHeight, defaultSafeHeight } = this.state.startFromLine;
+        const { showStats, status, time, errors } = this.state.job;
+        const statusColour = status === JOB_STATUS.COMPLETE ? 'green' : 'red';
         const renderSVG = shouldVisualizeSVG();
 
         return (
@@ -725,6 +747,68 @@ class WorkflowControl extends PureComponent {
                             </Modal.Body>
                         </Modal>
                     )
+                }
+                {
+                    showStats &&
+                        <Modal onClose={() => {
+                            this.setState({
+                                job: {
+                                    showStats: false,
+                                    time: 0,
+                                    status: JOB_STATUS.COMPLETE,
+                                    errors: []
+                                }
+                            });
+                            actions.closeModal();
+                        }}
+                        >
+                            <Modal.Header className={styles.modalHeader}>
+                                <Modal.Title>Job End</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body style={{ backgroundColor: '#e5e7eb' }}>
+                                <div className={styles.jobEndContainer}>
+                                    <div className={[styles.statsWrapper, styles.left].join(' ')}>
+                                        <div>
+                                            <strong>Status:</strong>
+                                            <span style={{ color: statusColour }}>{` ${status}\n`}</span>
+                                        </div>
+                                        <div>
+                                            <strong>Time:</strong>
+                                            <span>{` ${time}\n`}</span>
+                                        </div>
+                                        <strong>{'Errors:\n'}</strong>
+                                        <span className={styles.statsWrapper} style={{ marginLeft: '10px', color: 'red' }}>
+                                            {
+                                                errors.length > 0 ?
+                                                    errors.map(error => {
+                                                        return <span key={uniqueId()}>{`- ${error}\n`}</span>;
+                                                    })
+                                                    :
+                                                    'None'
+                                            }
+                                        </span>
+                                    </div>
+                                    <div className={styles.buttonsContainer}>
+                                        <FunctionButton
+                                            className={styles.activeButton}
+                                            onClick={() => {
+                                                this.setState({
+                                                    job: {
+                                                        showStats: false,
+                                                        time: 0,
+                                                        status: JOB_STATUS.COMPLETE,
+                                                        errors: []
+                                                    }
+                                                });
+                                                actions.closeModal();
+                                            }}
+                                        >
+                                            Close
+                                        </FunctionButton>
+                                    </div>
+                                </div>
+                            </Modal.Body>
+                        </Modal>
                 }
                 {
                     !renderSVG

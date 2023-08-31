@@ -24,6 +24,7 @@
 import React, { useEffect, useState } from 'react';
 import Icon from '@mdi/react';
 import { mdiCheckBold, mdiClose } from '@mdi/js';
+import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import styles from '../index.styl';
 import jobActions from './lib/jobApiActions';
 import { SortableTable, createTableColumns } from '../../../components/SortableTable/index';
@@ -38,9 +39,8 @@ const columnData = [
         name: 'duration',
         header: () => 'Duration',
         cell: (info) => {
-            const date = new Date(null);
-            date.setMilliseconds(Number(info.renderValue()));
-            return date.toISOString().slice(11, 19);
+            const ms = Number(info.renderValue());
+            return convertMillisecondsToTimeStamp(ms);
         },
         minSize: 55,
         maxSize: 55,
