@@ -25,6 +25,7 @@ import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 import { isEmpty, map } from 'lodash';
 import api from 'app/api';
+import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
 import { createTableColumns, SortableTable } from '../../../components/SortableTable';
 import styles from './index.styl';
 import {
@@ -112,17 +113,6 @@ const StatsList = () => {
             setStatsPages(getStatsPages(allStats));
         });
     }, []);
-
-    // solution found here: https://stackoverflow.com/a/25279340
-    const convertMillisecondsToTimeStamp = (milliseconds) => {
-        if (milliseconds) {
-            let date = new Date(null);
-            date.setSeconds(milliseconds / 1000);
-            let result = date.toISOString().substring(11, 19);
-            return result;
-        }
-        return null;
-    };
 
     const getStatsPages = (stats) => {
         const {

@@ -65,6 +65,7 @@ export function* initialize() {
     let estimateWorker = null;
     let currentState = GRBL_ACTIVE_STATE_IDLE;
     let prevState = GRBL_ACTIVE_STATE_IDLE;
+    let errors = [];
 
     /* Health check - every 3 minutes */
     setInterval(() => {
@@ -87,7 +88,6 @@ export function* initialize() {
                 newJobStats.jobsCancelled += 1;
             }
             newJobStats.totalRuntime += status.timeRunning;
-
             const job = {
                 id: jobStats.jobs.length > 0 ? (jobStats.jobs.length).toString() : '0',
                 type: JOB_TYPES.JOB,
@@ -251,11 +251,14 @@ export function* initialize() {
 
     controller.addListener('sender:status', (status) => {
         // finished job or cancelled job
+        // because elapsed time and time running only update on sender.next(), they may not be entirely accurate for stopped jobs
         if ((status.finishTime > 0 && status.sent === 0 && prevState === GRBL_ACTIVE_STATE_RUN) ||
-            (status.elapsedTime > 0 && status.sent === 0 && currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD)) {
+            (status.elapsedTime > 0 && status.sent === 0 && (currentState === GRBL_ACTIVE_STATE_RUN || currentState === GRBL_ACTIVE_STATE_HOLD || (errors.length > 0 && prevState === GRBL_ACTIVE_STATE_RUN)))) {
             updateJobStats(status);
             updateMaintenanceTasks(status);
             reduxStore.dispatch({ type: visualizerActions.UPDATE_JOB_OVERRIDES, payload: { isChecked: false, toggleStatus: 'jobStatus' } });
+            pubsub.publish('job:end', { status, errors });
+            errors = [];
         }
 
         reduxStore.dispatch({
@@ -572,6 +575,10 @@ export function* initialize() {
 
     controller.addListener('connection:new', (content) => {
         pubsub.publish('store:update', content);
+    });
+
+    controller.addListener('gcode_error', (error) => {
+        errors.push(error);
     });
 
     yield null;
