@@ -28,10 +28,10 @@ import {
 import Icon from '@mdi/react';
 import { mdiAlert, mdiPencil, mdiCheckOutline } from '@mdi/js';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import SortableTable from 'app/components/SortableTable/SortableTable';
 import EditArea from './EditArea';
 import AddArea from './AddArea';
 import styles from '../index.styl';
-import { SortableTable } from '../../../components/SortableTable';
 import maintenanceActions from './lib/maintenanceApiActions';
 
 const determineTime = (task) => {
@@ -198,7 +198,6 @@ const Maintenance = () => {
                 minSize: 30,
                 maxSize: 30,
                 invertSorting: true,
-                disableColSpan: true,
                 enableSorting: false,
                 filterFn: 'fuzzy',
                 sortingFn: sortingFns.alphanumeric,
@@ -233,7 +232,6 @@ const Maintenance = () => {
                         </div>
                     );
                 },
-                disableColSpan: true,
                 enableSorting: false,
                 minSize: 15,
                 maxSize: 15,

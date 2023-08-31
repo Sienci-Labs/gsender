@@ -25,18 +25,18 @@ import React, { useEffect, useState } from 'react';
 import Icon from '@mdi/react';
 import { mdiCheckBold, mdiClose } from '@mdi/js';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
+import SortableTable from 'app/components/SortableTable/SortableTable';
 import styles from '../index.styl';
 import jobActions from './lib/jobApiActions';
-import { SortableTable, createTableColumns } from '../../../components/SortableTable/index';
 import { GRBL, JOB_STATUS, JOB_TYPES } from '../../../constants';
 
 const columnData = [
     {
-        name: 'file',
+        accessorKey: 'file',
         header: () => 'File Name',
     },
     {
-        name: 'duration',
+        accessorKey: 'duration',
         header: () => 'Duration',
         cell: (info) => {
             const ms = Number(info.renderValue());
@@ -46,13 +46,13 @@ const columnData = [
         maxSize: 55,
     },
     {
-        name: 'totalLines',
+        accessorKey: 'totalLines',
         header: () => '# Lines',
         minSize: 50,
         maxSize: 50,
     },
     {
-        name: 'startTime',
+        accessorKey: 'startTime',
         header: () => 'Start Time',
         cell: (info) => {
             const [yyyy, mm, dd, hh, mi, ss] = info.renderValue().toString().split(/[:\-T.]+/);
@@ -66,7 +66,7 @@ const columnData = [
         maxSize: 90,
     },
     {
-        name: 'jobStatus',
+        accessorKey: 'jobStatus',
         header: () => 'Status',
         cell: (info) => {
             return info.renderValue() === JOB_STATUS.COMPLETE ? <Icon path={mdiCheckBold} size={1} /> : <Icon path={mdiClose} size={1} />;
@@ -94,7 +94,6 @@ const JobStatsTable = () => {
     const [data, setData] = useState([]);
     const [jobsFinished, setJobsFinished] = useState([]);
     const [jobsCancelled, setJobsCancelled] = useState([]);
-    const columnHelpers = createTableColumns(columnData);
 
     useEffect(() => {
         jobActions.fetch(setData, setJobsFinished, setJobsCancelled);
@@ -107,7 +106,7 @@ const JobStatsTable = () => {
                 jobsFinished === 0 && jobsCancelled === 0
                     ? <span>No jobs run</span>
                     : (
-                        <SortableTable data={data} columns={columnHelpers} defaultData={defaultData} />
+                        <SortableTable data={data} columns={columnData} defaultData={defaultData} />
                     )
             }
         </div>

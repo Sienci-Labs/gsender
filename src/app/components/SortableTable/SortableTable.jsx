@@ -20,17 +20,77 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Table as BTable } from 'react-bootstrap';
 import styles from './index.css';
 
+/*
+    Columns must be in the format:
+        [
+            {
+                accessorKey: 'insert whatever key you want here',
+            },
+        ]
+    The documentation for this package is kind of confusing for the new v8, so I'll list the rest of the options I've used here:
+        header/footer
+            - params: none
+            - return value: the header/footer for the column
+        cell
+            - params: info
+            - return value: what goes in the cell
+        size/minSize/maxSize
+            - value: number
+            - determines the size of the column
+        invertSorting
+            - value: boolean
+            - default: false
+            - inverts the default sorting for the column
+        enableSorting
+            - value: boolean
+            - default: true
+            - changes whether the user is allowed to click on the header to sort the column
+        filterFn
+            - value: function or key of predetermined functions
+            - the function used to filter the entries in the table
+            - (i just use 'fuzzy' every time)
+        sortingFn
+            - value: function
+            - the function used to sort the rows in the column
+            - (you can import sortingFns from '@tanstack/react-table' to use premade ones)
+    I also have a custom property:
+        disableColSpan
+            - value: boolean
+            - if this is enabled, the column span of the previous columns will stop at this column
+                - ex. if you want the subrow to only span 2 columns, you can add disableColSpan to column 3
+                        |--------|--------|----|
+                        |Part    |Time    |Edit|
+                        |-----------------|----|
+                        |this is a subrow |    |
+                        |-----------------|----|
+                      this can set you up to do other cool things, like making column 3 span 2 rows using rowSpan!
+                        |--------|--------|----|
+                        |Part    |Time    |Edit|
+                        |-----------------|    |
+                        |this is a subrow |    |
+                        |-----------------|----|
+*/
+
 const SortableTable = (props) => {
     // set defaults
-    const data = props.data || [];
-    const columns = props.columns || [];
-    const defaultData = props.defaultData || [];
+    const data = props.data || []; // array of data objects
+    const columns = props.columns || []; // format above
+    const defaultData = props.defaultData || []; // same as data
     const height = props.height || '520px';
     const width = props.width || '760px';
     const enableSortingRemoval = props.enableSortingRemoval !== undefined ? props.enableSortingRemoval : true;
+    /*
+        const sortBy = [
+            {
+                id: 'time', // accessorKey
+                desc: true
+            }
+        ];
+    */
     const sortBy = props.sortBy || [''];
-    const rowColours = props.rowColours || ['#f9f9f9', 'rgba(255, 255, 255, 0)'];
-    const onAdd = props.onAdd || null;
+    const rowColours = props.rowColours || ['#f9f9f9', 'rgba(255, 255, 255, 0)']; // every other row colours
+    const onAdd = props.onAdd || null; // function for when add button is pressed
+    const rowSpan = props.rowSpan || new Map(); // map: accessorKey => num rows to span
 
     // stop col span from first col that has it disabled
     let stopIndex = 0;
@@ -183,7 +243,7 @@ const SortableTable = (props) => {
                                 <React.Fragment key={row.id + 'parent'}>
                                     <tr key={row.id} style={{ backgroundColor: rowColours[i % 2] }}>
                                         {row.getVisibleCells().map((cell) => (
-                                            <td key={cell.id} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
+                                            <td key={cell.id} rowSpan={rowSpan.get(cell.column.columnDef.accessorKey) || 1} style={{ whiteSpace: 'unset', overflowWrap: 'break-word' }}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </td>
                                         ))}

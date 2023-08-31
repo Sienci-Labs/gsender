@@ -26,7 +26,7 @@ import Select from 'react-select';
 import { isEmpty, map } from 'lodash';
 import api from 'app/api';
 import { convertMillisecondsToTimeStamp } from 'app/lib/datetime';
-import { createTableColumns, SortableTable } from '../../../components/SortableTable';
+import SortableTable from 'app/components/SortableTable/SortableTable';
 import styles from './index.styl';
 import {
     STATS_PAGES,
@@ -38,21 +38,21 @@ import {
 const columnData = {
     jobsPerPort: [
         {
-            name: 'port',
+            accessorKey: 'port',
             header: () => 'Port',
         },
         {
-            name: 'numJobs',
+            accessorKey: 'numJobs',
             header: () => '# of Jobs',
         },
     ],
     runTimePerPort: [
         {
-            name: 'port',
+            accessorKey: 'port',
             header: () => 'Port',
         },
         {
-            name: 'runTime',
+            accessorKey: 'runTime',
             header: () => 'Run Time',
             cell: (info) => {
                 const date = new Date(null);
@@ -168,12 +168,12 @@ const StatsList = () => {
             },
             [JOB_PER_PORT]: {
                 needsTable: true,
-                columns: createTableColumns(columnData.jobsPerPort),
+                columns: columnData.jobsPerPort,
                 data: jobsPerPort,
             },
             [RUN_TIME_PER_PORT]: {
                 needsTable: true,
-                columns: createTableColumns(columnData.runTimePerPort),
+                columns: columnData.runTimePerPort,
                 data: runTimePerPort,
             }
         };
