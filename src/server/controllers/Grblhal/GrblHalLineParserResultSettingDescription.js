@@ -21,6 +21,7 @@ function formatDataFormat(format) {
     }
     return format;
 }
+
 class GrblHalLineParserResultSettingDescription {
     static parse(line) {
         const r = line.match(/^\[SETTING:(\d+)(\|)(.+?)(?=])/);
@@ -29,9 +30,7 @@ class GrblHalLineParserResultSettingDescription {
             return null;
         }
 
-
         const data = r[3].split('|');
-
 
         const payload = {
             id: Number(r[1]),

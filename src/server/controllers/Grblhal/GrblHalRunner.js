@@ -43,6 +43,7 @@ import {
     GRBL_HAL_ACTIVE_STATE_ALARM
 } from './constants';
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
+import GrblHalLineParserResultSettingDetails from './GrblHalLineParserResultSettingDetails';
 
 const log = logger('controller:grblHAL');
 
@@ -282,6 +283,7 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultSettingDescription) {
+            // Unset raw string and emit to UI
             _.unset(payload, 'raw');
             const { id, ...details } = payload;
             this.settings.descriptions = {
@@ -289,6 +291,19 @@ class GrblHalRunner extends events.EventEmitter {
                 [id]: details
             };
             this.emit('description', payload);
+            return;
+        }
+        if (type === GrblHalLineParserResultSettingDetails) {
+            // Unset raw string and emit to UI
+            _.unset(payload, 'raw');
+            const { id, unitString, details } = payload;
+
+            this.settings.descriptions[payload.id] = {
+                ...this.settings.descriptions[id],
+                unitString,
+                details
+            };
+            this.emit('description');
             return;
         }
         if (data.length > 0) {

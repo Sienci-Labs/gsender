@@ -929,11 +929,13 @@ class GrblHalController {
         this.writeln('$$');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
-
+        this.writeln('$ES');
+        await delay(100);
+        this.writeln('$ESH');
         //check if controller is ready and send the status
-        this.emit('grbl:iSready', this.ready);
+        //this.emit('grbl:iSready', this.ready);
 
-        this.command('realtime_report');
+        //this.command('realtime_report');
     }
 
     populateContext(context = {}) {

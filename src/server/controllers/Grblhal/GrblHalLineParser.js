@@ -37,6 +37,7 @@ import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
 import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 import GrblHalLineParserResultSettingDescription from './GrblHalLineParserResultSettingDescription';
+import GrblHalLineParserResultSettingDetails from 'server/controllers/Grblhal/GrblHalLineParserResultSettingDetails';
 
 class GrblHalLineParser {
     parse(line) {
@@ -81,6 +82,9 @@ class GrblHalLineParser {
 
             // [SETTING:1|27|Step idle delay|milliseconds|5|####0||65535|0|0]
             GrblHalLineParserResultSettingDescription,
+
+            // "120","X-axis acceleration","mm/sec^2","Acceleration. Used for motion planning to not exceed motor torque and lose steps.",
+            GrblHalLineParserResultSettingDetails,
 
             // [XXXX:] (v1.1)
             GrblHalLineParserResultInfo,
