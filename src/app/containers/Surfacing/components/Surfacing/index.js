@@ -25,7 +25,7 @@ import { SurfacingContext } from './Context';
  * @description Main component for displaying Surfacing
  * @prop {Function} onClose - Function to close the current modal
  */
-const Surfacing = ({ onClose, showTitle }) => {
+const Surfacing = ({ onClose, showTitle, isDisabled }) => {
     const [surfacing, setSurfacing] = useState(store.get('widgets.surfacing'));
 
     const [gcode, setGcode] = useState('');
@@ -34,6 +34,8 @@ const Surfacing = ({ onClose, showTitle }) => {
     const [currentTab, setCurrentTab] = useState(0);
 
     const runGenerate = async () => {
+        reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
+        pubsub.publish('file:unload:primary_visualizer');
         setCurrentTab(0);
 
         const generator = new Generator({ surfacing, units, controller });
@@ -75,10 +77,6 @@ const Surfacing = ({ onClose, showTitle }) => {
      * (Having two three.js scenes makes the app choppy even or higher spec machines)
      */
     useEffect(() => {
-        reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
-
-        pubsub.publish('file:unload:primary_visualizer');
-
         if (surfacing.length === 0 && surfacing.width === 0) {
             const machineProfile = store.get('workspace.machineProfile');
 
@@ -128,6 +126,7 @@ const Surfacing = ({ onClose, showTitle }) => {
         gcode,
         units,
         canLoad,
+        isDisabled,
         setSurfacing,
         onChange: handleChange,
         onSelect: handleSelect,
