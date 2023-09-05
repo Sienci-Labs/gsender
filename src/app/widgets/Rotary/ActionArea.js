@@ -20,7 +20,7 @@ const ActionArea = ({ actions }) => {
     };
 
     const handleStockTurningClick = () => {
-        dispatch({ type: SET_ACTIVE_DIALOG, payload: MODALS.STOCK_TURNING });
+        dispatch({ type: SET_ACTIVE_DIALOG, payload: MODALS.STOCK_TURNING, isDisabled: isFileRunning });
     };
 
     const isInRotaryMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT) === WORKSPACE_MODE.ROTARY;
@@ -28,7 +28,7 @@ const ActionArea = ({ actions }) => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <FunctionButton onClick={handleStockTurningClick} disabled={!isInRotaryMode || isFileRunning}>Rotary Surfacing</FunctionButton>
+            <FunctionButton onClick={handleStockTurningClick} disabled={!isInRotaryMode}>Rotary Surfacing</FunctionButton>
             <FunctionButton onClick={() => actions.runProbing('Z-axis', runZAxisProbing())} disabled={!isInRotaryMode || isFileRunning}>Probe Rotary Z-Axis</FunctionButton>
             <FunctionButton onClick={() => actions.runProbing('Y-axis alignment', runYAxisAlignmentProbing())} disabled={isInRotaryMode || isFileRunning}>Y-axis Alignment</FunctionButton>
             <FunctionButton onClick={showUnitSetup} disabled={isInRotaryMode || isFileRunning}>Rotary Mounting Setup</FunctionButton>
