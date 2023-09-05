@@ -481,6 +481,11 @@ export function* initialize() {
         visualizeWorker.terminate();
     });
 
+    // for when you don't want to send file to backend
+    pubsub.subscribe('visualizer:load', (msg, content, size, name, visualizer) => {
+        parseGCode(content, size, name, visualizer);
+    });
+
     pubsub.subscribe('estimate:done', (msg, data) => {
         estimateWorker.terminate();
     });
