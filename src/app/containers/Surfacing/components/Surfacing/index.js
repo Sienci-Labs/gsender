@@ -8,7 +8,6 @@ import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import { METRIC_UNITS, VISUALIZER_PRIMARY, VISUALIZER_SECONDARY } from 'app/constants';
-// import api from 'app/api';
 import GcodeViewer from 'app/components/GcodeViewer';
 
 import Visualizer from '../Visualizer';
@@ -33,9 +32,8 @@ const Surfacing = ({ onClose, showTitle, isDisabled }) => {
 
     const [currentTab, setCurrentTab] = useState(0);
 
-    const runGenerate = /*async*/ () => {
+    const runGenerate = () => {
         reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
-        // pubsub.publish('file:unload:primary_visualizer');
         setCurrentTab(0);
 
         const generator = new Generator({ surfacing, units, controller });
@@ -45,8 +43,6 @@ const Surfacing = ({ onClose, showTitle, isDisabled }) => {
         const serializedFile = new File([gcode], 'surfacing.gcode');
 
         pubsub.publish('visualizer:load', gcode, serializedFile.size, serializedFile.originalname, VISUALIZER_SECONDARY);
-
-        // await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
 
         setGcode(gcode);
     };
