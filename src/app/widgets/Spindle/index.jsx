@@ -52,6 +52,7 @@ import LaserControls from './components/LaserControls';
 import ModalToggle from './components/ModalToggle';
 import ActiveIndicator from './components/ActiveIndicator';
 import useKeybinding from '../../lib/useKeybinding';
+import { convertToImperial } from '../../containers/Preferences/calculate';
 
 
 class SpindleWidget extends PureComponent {
@@ -395,12 +396,16 @@ class SpindleWidget extends PureComponent {
 
     getLaserOffsetCode() {
         const laser = this.config.get('laser');
-
+        const { units } = this.props;
 
         this.setState({
             laser
         });
-        const { xOffset, yOffset } = laser;
+        let { xOffset, yOffset } = laser;
+        if (units === IMPERIAL_UNITS) {
+            xOffset = convertToImperial(xOffset);
+            yOffset = convertToImperial(yOffset);
+        }
         const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset);
 
         let offsetQuery = [];
@@ -421,6 +426,7 @@ class SpindleWidget extends PureComponent {
     }
 
     getSpindleOffsetCode() {
+        const { units } = this.props;
         const laser = this.config.get('laser');
         this.setState({
             laser
@@ -429,6 +435,10 @@ class SpindleWidget extends PureComponent {
         let { xOffset, yOffset } = laser;
         xOffset = Number(xOffset) * -1;
         yOffset = Number(yOffset) * -1;
+        if (units === IMPERIAL_UNITS) {
+            xOffset = convertToImperial(xOffset);
+            yOffset = convertToImperial(yOffset);
+        }
         const [xoffsetAdjusted, yOffsetAdjusted] = this.calculateAdjustedOffsets(xOffset, yOffset);
         if (xOffset === 0 && yOffset !== 0) {
             offsetQuery = [
