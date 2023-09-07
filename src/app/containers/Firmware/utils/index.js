@@ -172,3 +172,17 @@ export const exportFirmwareSettings = (settings) => {
 
     download(blob, filename, 'json');
 };
+
+
+export const descriptionLookup = (key, descriptions) => {
+    let metadata = get(descriptions, key, {});
+
+    let message = metadata.description || `$${key} EEPROM Value - no detailed title found`;
+    let description = metadata.details || `Configure the value of $${key} in the firmware - no detailed description found.`;
+    console.log(description);
+    description = description.replace(/\\n/gmi, '\n');
+
+    return {
+        message, description
+    };
+};
