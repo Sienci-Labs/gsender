@@ -499,7 +499,7 @@ class PreferencesPage extends PureComponent {
             },
             setPower: (val, type) => {
                 const amount = Math.abs(Number(val));
-                const { spindle, laser } = this.state;
+                const { laser } = this.state;
 
                 if (!val || !type || amount < 0) {
                     return;
@@ -508,7 +508,9 @@ class PreferencesPage extends PureComponent {
                 const newLaserValue = { ...laser, [type]: amount };
 
                 this.spindleConfig.set(`laser.${type}`, amount);
-                this.setState({ spindle: { ...spindle, laser: newLaserValue } });
+                this.setState({
+                    laser: newLaserValue
+                });
 
                 pubsub.publish('laser:updated', newLaserValue);
             },
