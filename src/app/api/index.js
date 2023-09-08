@@ -841,6 +841,37 @@ metrics.toggleCollectDataStatus = (options) => new Promise((resolve, reject) => 
         });
 });
 
+//
+// Alarms/Errors
+//
+const alarmList = {};
+
+alarmList.fetch = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/alarmList')
+        .query(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+alarmList.update = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .put('/api/alarmList')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 export default {
     //OS
     getLatestVersion,
@@ -882,4 +913,7 @@ export default {
 
     // Metrics
     metrics,
+
+    // Alarms/Errors
+    alarmList,
 };

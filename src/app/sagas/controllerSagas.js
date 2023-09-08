@@ -52,10 +52,11 @@ import {
     GRBL_ACTIVE_STATE_HOLD,
     FILE_TYPE,
     WORKSPACE_MODE,
-    RENDER_NO_FILE
+    RENDER_NO_FILE,
 } from 'app/constants';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 import { updateWorkspaceMode } from 'app/lib/rotary';
+import api from 'app/api';
 
 export function* initialize() {
     let visualizeWorker = null;
@@ -227,6 +228,33 @@ export function* initialize() {
             shouldIncludeSVG,
             needsVisualization
         });
+    };
+
+    const updateAlarmsErrors = async (error) => {
+        const controllerType = _get(reduxStore.getState(), 'controller.type');
+        console.log(error);
+
+        try {
+            let res = await api.alarmList.fetch();
+            const alarmList = res.body;
+
+            const alarmError = {
+                id: alarmList.list.length > 0 ? (alarmList.list.length).toString() : '0',
+                type: error.type,
+                source: error.origin,
+                time: Date.now(),
+                CODE: error.code,
+                MESSAGE: error.description,
+                lineNumber: error.lineNumber,
+                line: error.line,
+                controller: controllerType,
+            };
+            alarmList.list.push(alarmError);
+            console.log(alarmError);
+            api.alarmList.update(alarmList);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     controller.addListener('controller:settings', (type, settings) => {
@@ -548,9 +576,15 @@ export function* initialize() {
     controller.addListener('error', (error) => {
         const alarmReg = new RegExp(/GRBL_[a-zA-Z_]*ALARM/);
         const errorReg = new RegExp(/GRBL_[a-zA-Z_]*ERROR/);
-        if (isElectron() && (alarmReg.test(error.type) || errorReg.test(error.type))) {
-            window.ipcRenderer.send('logError:electron', error);
+        console.log(error.type);
+        console.log(alarmReg.test(error.type));
+        if (alarmReg.test(error.type) || errorReg.test(error.type)) {
+            console.log('alarm or error');
+            updateAlarmsErrors(error);
         }
+        // if (isElectron() && (alarmReg.test(error.type) || errorReg.test(error.type))) {
+        //     window.ipcRenderer.send('logError:electron', error);
+        // }
         pubsub.publish('error', error);
     });
 

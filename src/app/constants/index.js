@@ -245,3 +245,10 @@ export const ROTARY_TOGGLE_MACRO = `
     G04 P0.5
     G0 G90 Y[posy]
 `;
+
+export const ALARM_ERROR_TYPES = {
+    GRBL_ALARM: 'GRBL_ALARM',
+    GRBL_ERROR: 'GRBL_ERROR',
+    GRBL_HAL_ALARM: 'GRBL_HAL_ALARM',
+    GRBL_HAL_ERROR: 'GRBL_HAL_ERROR',
+};
