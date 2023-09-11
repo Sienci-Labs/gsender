@@ -5,8 +5,10 @@ import 'react-vertical-timeline-component/style.min.css';
 import { VscError } from 'react-icons/vsc';
 import { BsAlarm } from 'react-icons/bs';
 import uniqueID from 'lodash/uniqueId';
-import { getAllErrors } from '../helper';
 import styles from '../../index.styl';
+import api from 'app/api';
+import { ALARM } from '../../../../constants';
+import { convertISOStringToDateAndTime } from '../../../../lib/datetime';
 
 const ErrorLog = () => {
     const [logs, setLogs] = useState([]);
@@ -18,8 +20,9 @@ const ErrorLog = () => {
 
     useEffect(() => {
         const fetchLogs = async () => {
-            const data = await getAllErrors();
-            setLogs(data);
+            const res = await api.alarmList.fetch();
+            const { list } = res.body;
+            setLogs(list || []);
         };
         fetchLogs();
     }, []);
@@ -35,46 +38,32 @@ const ErrorLog = () => {
                         <VerticalTimeline animate={false} layout="1-column-left" className={styles.verticalTimeline}>
                             {
                                 logs.map((log, index) => {
-                                    return log.toLowerCase().includes('alarm')
-                                        ? (
-                                            <VerticalTimelineElement
-                                                className={`vertical-timeline-element--work ${styles.marginUpdate}`}
-                                                contentStyle={{ height: 'auto', borderTop: `5px solid ${colorCodes.ALARM}` }}
-                                                contentArrowStyle={{ top: '42%' }}
-                                                iconStyle={{ top: '31%', background: colorCodes.ALARM, color: '#fff' }}
-                                                dateClassName={styles.inbuiltDate}
-                                                icon={<BsAlarm />}
-                                                key={uniqueID()}
-                                            >
-                                                <span className={styles.errorTag}>Alarm</span>
-                                                <span className={styles.errorDate}>
-                                                    On {log.split(/\[error\] GRBL_[a-zA-Z_]*ALARM:/)[0].slice(1, 20).replace(' ', ' at ') || ''}
-                                                </span>
-                                                <p className={styles.errorReason}>
-                                                    {log.split(/\[error\] GRBL_[a-zA-Z_]*ALARM:/)[1]}
-                                                </p>
-                                            </VerticalTimelineElement>
-                                        )
-                                        : (
-                                            <VerticalTimelineElement
-                                                className={`vertical-timeline-element--work ${styles.marginUpdate}`}
-                                                contentStyle={{ height: 'auto', borderTop: `5px solid ${colorCodes.ERROR}` }}
-                                                contentArrowStyle={{ top: '42%' }}
-                                                iconStyle={{ top: '31%', background: colorCodes.ERROR, color: '#fff' }}
-                                                dateClassName={styles.inbuiltDate}
-                                                icon={<VscError />}
-                                                key={uniqueID()}
-                                            >
-                                                <span className={styles.errorTag}>Error{log.split(/\[error\] GRBL_[a-zA-Z_]*ERROR:/)[1].split('Origin')[1]}</span>
-                                                <span className={styles.errorDate}>
-                                                    On {log.split(/\[error\] GRBL_[a-zA-Z_]*ERROR:/)[0].slice(1, 20).replace(' ', ' at ') || ''}
-                                                </span>
-                                                <p className={styles.errorReason}>
-                                                    {log.split(/\[error\] GRBL_[a-zA-Z_]*ERROR:/)[1].split('Line')[0]} <br />
-                                                    {log.includes('Feeder') ? '' : ('Line ' + log.split(/\[error\] GRBL_[a-zA-Z_]*ERROR:/)[1].split('Line')[1].split('Origin')[0])} <br />
-                                                </p>
-                                            </VerticalTimelineElement>
-                                        );
+                                    const [date, time] = convertISOStringToDateAndTime(log.time);
+                                    return (
+                                        <VerticalTimelineElement
+                                            className={`vertical-timeline-element--work ${styles.marginUpdate}`}
+                                            contentStyle={{ height: 'auto', borderTop: `5px solid ${colorCodes[log.type]}` }}
+                                            contentArrowStyle={{ top: '42%' }}
+                                            iconStyle={{ top: '31%', background: colorCodes[log.type], color: '#fff' }}
+                                            dateClassName={styles.inbuiltDate}
+                                            icon={log.type === ALARM ? <BsAlarm /> : <VscError />}
+                                            key={uniqueID()}
+                                        >
+                                            <span className={styles.errorTag}>{log.type}{log.source && ` - ${log.source}`}</span>
+                                            <span className={styles.errorDate}>
+                                                {`On ${date} at ${time}`}
+                                            </span>
+                                            <p className={styles.errorReason}>
+                                                {`${log.type} ${log.CODE} - ${log.MESSAGE}`} <br />
+                                                {
+                                                    log.line && (
+                                                        log.source !== 'Console' ? `Line ${log.lineNumber}: ` : 'Line: '
+                                                    )
+                                                }
+                                                {log.line}
+                                            </p>
+                                        </VerticalTimelineElement>
+                                    );
                                 })
                             }
                         </VerticalTimeline>
