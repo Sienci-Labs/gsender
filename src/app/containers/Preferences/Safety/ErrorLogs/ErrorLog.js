@@ -64,7 +64,7 @@ const ErrorLog = () => {
                                             </p>
                                         </VerticalTimelineElement>
                                     );
-                                })
+                                }).reverse()
                             }
                         </VerticalTimeline>
                     )
