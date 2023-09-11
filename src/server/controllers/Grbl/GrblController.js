@@ -700,6 +700,7 @@ class GrblController {
         });
 
         this.runner.on('error', (res) => {
+            console.log(res);
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
 
@@ -711,13 +712,13 @@ class GrblController {
             let errorOrigin = '';
             let line = '';
 
-            if (isFileError) {
-                errorOrigin = name;
-                line = lines[received] || '';
-            } else if (store.get('inAppConsoleInput') !== null) {
+            if (store.get('inAppConsoleInput') !== null) {
                 line = store.get('inAppConsoleInput') || '';
                 store.set('inAppConsoleInput', null);
                 errorOrigin = 'Console';
+            } else if (isFileError) {
+                errorOrigin = name;
+                line = lines[received] || '';
             } else {
                 errorOrigin = 'Feeder';
                 line = 'N/A';
@@ -777,6 +778,24 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const alarm = _.find(GRBL_ALARMS, { code: code });
 
+            const { lines, received, name } = this.sender.state;
+            const isFileError = lines.length !== 0;
+            //Check error origin
+            let errorOrigin = '';
+            let line = '';
+
+            if (store.get('inAppConsoleInput') !== null) {
+                line = store.get('inAppConsoleInput') || '';
+                store.set('inAppConsoleInput', null);
+                errorOrigin = 'Console';
+            } else if (isFileError) {
+                errorOrigin = name;
+                line = lines[received] || '';
+            } else {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
+            }
+
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
@@ -784,6 +803,9 @@ class GrblController {
                     type: ALARM,
                     code: code,
                     description: alarm.description,
+                    line: line,
+                    lineNumber: isFileError ? received + 1 : '',
+                    origin: errorOrigin,
                     controller: GRBL
                 });
                 // Force propogation of current state on alarm

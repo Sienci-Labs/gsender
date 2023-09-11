@@ -49,7 +49,7 @@ const ErrorLog = () => {
                                             icon={log.type === ALARM ? <BsAlarm /> : <VscError />}
                                             key={uniqueID()}
                                         >
-                                            <span className={styles.errorTag}>{log.type}{log.source && ` - ${log.source}`}</span>
+                                            <span className={styles.errorTag}>{log.type} - {log.source}</span>
                                             <span className={styles.errorDate}>
                                                 {`On ${date} at ${time}`}
                                             </span>
@@ -57,7 +57,7 @@ const ErrorLog = () => {
                                                 {`${log.type} ${log.CODE} - ${log.MESSAGE}`} <br />
                                                 {
                                                     log.line && (
-                                                        log.source !== 'Console' ? `Line ${log.lineNumber}: ` : 'Line: '
+                                                        log.source !== 'Console' && log.source !== 'Feeder' ? `Line ${log.lineNumber}: ` : 'Line: '
                                                     )
                                                 }
                                                 {log.line}

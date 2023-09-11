@@ -11,13 +11,11 @@ const getAlarmList = () => {
 };
 
 export const fetch = (req, res) => {
-    console.log('fetching');
     const alarmList = getAlarmList();
     res.send(alarmList);
 };
 
 export const update = (req, res) => {
-    console.log('updating');
     const alarmList = req.body;
     try {
         config.set(CONFIG_KEY, alarmList);
