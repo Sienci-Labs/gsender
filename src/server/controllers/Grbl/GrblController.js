@@ -707,15 +707,19 @@ class GrblController {
             log.error(`Error occurred at ${Date.now()}`);
 
             const { lines, received, name } = this.sender.state;
+            const { outstanding } = this.feeder.state;
             const isFileError = lines.length !== 0;
             //Check error origin
             let errorOrigin = '';
             let line = '';
 
-            if (store.get('inAppConsoleInput') !== null) {
+            if (store.get('inAppConsoleInput')) {
                 line = store.get('inAppConsoleInput') || '';
                 store.set('inAppConsoleInput', null);
                 errorOrigin = 'Console';
+            } else if (outstanding > 0) {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
             } else if (isFileError) {
                 errorOrigin = name;
                 line = lines[received] || '';
@@ -779,15 +783,22 @@ class GrblController {
             const alarm = _.find(GRBL_ALARMS, { code: code });
 
             const { lines, received, name } = this.sender.state;
+            const { outstanding } = this.feeder.state;
             const isFileError = lines.length !== 0;
             //Check error origin
             let errorOrigin = '';
             let line = '';
 
-            if (store.get('inAppConsoleInput') !== null) {
+            if (store.get('inAppConsoleInput')) {
                 line = store.get('inAppConsoleInput') || '';
                 store.set('inAppConsoleInput', null);
                 errorOrigin = 'Console';
+            } else if (this.state.status.activeState === GRBL_ACTIVE_STATE_HOME) {
+                errorOrigin = 'Console';
+                line = '$H';
+            } else if (outstanding > 0) {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
             } else if (isFileError) {
                 errorOrigin = name;
                 line = lines[received] || '';
