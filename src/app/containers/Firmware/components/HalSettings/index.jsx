@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { descriptionLookup, FirmwareContext } from 'Containers/Firmware/utils';
+import { descriptionLookup, FirmwareContext, getDatatypeInput } from 'Containers/Firmware/utils';
 import styles from 'Containers/Firmware/index.styl';
 import CategoryTag from 'Containers/Firmware/components/Settings/CategoryTag';
 
@@ -26,7 +26,8 @@ const HalSettings = ({ descriptions }) => {
             {
                 settings.map((setting) => {
                     const settingKey = setting.setting.replace('$', '');
-                    const { message, description } = descriptionLookup(settingKey, descriptions);
+                    const { message, description, dataType, ...info } = descriptionLookup(settingKey, descriptions);
+                    const InputElement = getDatatypeInput(dataType);
 
                     //const highlighted = false; // TODO: Logic for hal defaults
                     return (
@@ -43,6 +44,9 @@ const HalSettings = ({ descriptions }) => {
                                             {description}
                                         </div>
                                     </div>
+                                </div>
+                                <div className={styles.settingsControl}>
+                                    <InputElement info={info} setting={setting} />
                                 </div>
                             </div>
                         </div>
