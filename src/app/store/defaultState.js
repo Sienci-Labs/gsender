@@ -29,7 +29,9 @@ import {
     SPIRAL_MOVEMENT,
     START_POSITION_BACK_LEFT,
     SPINDLE_MODES,
-    WORKSPACE_MODE
+    WORKSPACE_MODE,
+    ROTARY_MODE_FIRMWARE_SETTINGS,
+    DEFAULT_FIRMWARE_SETTINGS
 } from 'app/constants';
 import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 
@@ -133,7 +135,8 @@ const defaultState = {
         },
         mode: WORKSPACE_MODE.DEFAULT,
         rotaryAxis: {
-            prevFirmwareSettings: {},
+            firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS,
+            defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
         }
     },
     widgets: {
@@ -143,6 +146,7 @@ const defaultState = {
             jog: {
                 xyStep: 5,
                 zStep: 2,
+                aStep: 5,
                 feedrate: 3000,
                 keypad: false,
                 rapid: {
@@ -297,12 +301,31 @@ const defaultState = {
             touchPlateHeight: 10,
             probeType: 'Auto',
         },
+        rotary: {
+            stockTurning: {
+                options: {
+                    stockLength: 100,
+                    stepdown: 20,
+                    bitDiameter: 6.35,
+                    spindleRPM: 17000,
+                    feedrate: 3000,
+                    stepover: 15,
+                    startHeight: 50,
+                    finalHeight: 40,
+                    enableRehoming: false,
+                }
+            },
+            tab: {
+                show: false,
+            }
+        },
         spindle: {
             minimized: false,
             mode: SPINDLE_MODE,
             speed: 1000,
             spindleMax: 30000,
             spindleMin: 10000,
+            delay: false,
             laser: {
                 power: 100,
                 duration: 1,
@@ -337,6 +360,7 @@ const defaultState = {
             projection: 'orthographic', // 'perspective' or 'orthographic'
             cameraMode: 'pan', // 'pan' or 'rotate',
             theme: 'Dark',
+            SVGEnabled: false,
             gcode: {
                 displayName: true
             },

@@ -4,7 +4,7 @@ import store from '../store';
 import shuttleEvents from './shuttleEvents';
 import { MACRO_CATEGORY } from '../constants';
 
-const TARGET_NUM_CALLS = 9; // this is the current number of widgets that use the useKeybinding hook
+const TARGET_NUM_CALLS = 10; // this is the current number of widgets that use the useKeybinding hook
 let numCalls = 0; // number of useKeybinding hooks that have been called
 
 /*
@@ -37,9 +37,11 @@ function useKeybinding(shuttleControlEvents) {
             if (_.isEmpty(currentCommandKeys) || !currentCommandKeys[defaultCommand.cmd]) {
                 // add to store
                 let updatedCommandKeys = currentCommandKeys;
+                const key = defaultCommand.keys || '';
+
                 updatedCommandKeys[defaultCommand.cmd] = {
                     cmd: defaultCommand.cmd,
-                    keys: defaultCommand.keys,
+                    keys: key,
                     isActive: defaultCommand.isActive,
                 };
                 store.replace('commandKeys', updatedCommandKeys);
@@ -51,7 +53,7 @@ function useKeybinding(shuttleControlEvents) {
                 const shortcuts = profile.shortcuts;
                 let updatedProfileShortcuts = shortcuts;
                 if (_.isEmpty(shortcuts) || !shortcuts[defaultCommand.cmd]) {
-                    // no default keys for gamepad
+                    // no default keys for gamepadlo
                     updatedProfileShortcuts[defaultCommand.cmd] = {
                         cmd: defaultCommand.cmd,
                         keys: defaultCommand.gamepadKeys || '',
@@ -98,7 +100,6 @@ export function removeOldKeybindings() {
     const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
     const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
         const shortcuts = profile.shortcuts;
-        console.log(shortcuts);
         let updatedProfileShortcuts = shortcuts;
         Object.entries(shortcuts).forEach(([key, keybinding]) => {
             const event = allShuttleControlEvents[key];

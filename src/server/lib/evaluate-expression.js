@@ -153,7 +153,11 @@ const evaluateExpression = (src, vars) => {
 
         if (node.type === 'Identifier') {
             if (Object.hasOwnProperty.call(vars, node.name)) {
-                return vars[node.name];
+                let value = vars[node.name];
+                if (!Number.isNaN(Number(value))) {
+                    value = Number(value);
+                }
+                return value;
             }
             return UNRESOLVED;
         }

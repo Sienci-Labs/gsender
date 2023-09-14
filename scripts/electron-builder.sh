@@ -21,12 +21,11 @@ pushd "$__dirname/../dist/gsender"
 echo "Cleaning up \"`pwd`/node_modules\""
 rm -rf node_modules
 echo "Installing packages..."
-npm install --production --ignore-engines
-npm dedupe
+yarn install --production --ignore-engines
 popd
 
 echo "Rebuild native modules using electron ${electron_version}"
-npm run electron-rebuild -- \
+yarn electron-rebuild -- \
     --version=${electron_version:1} \
     --module-dir=dist/gsender \
     --which-module=serialport

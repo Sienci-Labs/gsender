@@ -2,6 +2,8 @@ import React, { useContext } from 'react';
 import Select from 'react-select';
 import store from 'app/store';
 import controller from 'app/lib/controller';
+import get from 'lodash/get';
+import { connect } from 'react-redux';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import SettingsList from './List';
 import SearchBar from './SearchBar';
@@ -9,12 +11,15 @@ import { connectToLastDevice, FirmwareContext } from '../../utils';
 import machineProfiles from '../defaultMachineProfiles';
 import NotConnectedWarning from '../NotConnected/NotConnectedWarning';
 
+
 import styles from '../../index.styl';
+import { GRBLHAL } from 'Constants';
+import HalSettings from 'Containers/Firmware/components/HalSettings';
 
 const getMachineProfileLabel = ({ name, type }) => `${name} ${type && type}`.trim();
 
 
-const SettingsArea = () => {
+const SettingsArea = ({ firmwareType }) => {
     const { hasSettings, machineProfile, setMachineProfile } = useContext(FirmwareContext);
     const label = getMachineProfileLabel(machineProfile);
     const connectionConfig = new WidgetConfig('connection');
@@ -66,7 +71,11 @@ const SettingsArea = () => {
                 hasSettings && (
                 <>
                     <div style={{ width: '100%', height: '100%', overflow: 'auto' }}>
-                        <SettingsList />
+                        {
+                            firmwareType === GRBLHAL ?
+                                <HalSettings />
+                                : <SettingsList />
+                        }
                     </div>
                     <SearchBar />
                 </>
@@ -79,4 +88,10 @@ const SettingsArea = () => {
     );
 };
 
-export default SettingsArea;
+export default connect((store) => {
+    const firmwareType = get(store, 'controller.type');
+
+    return {
+        firmwareType
+    };
+})(SettingsArea);

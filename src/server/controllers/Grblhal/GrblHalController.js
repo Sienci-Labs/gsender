@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
  *
@@ -77,6 +78,7 @@ import {
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
 import { calcOverrides } from '../runOverride';
+import ToolChanger from '../../lib/ToolChanger';
 // % commands
 const WAIT = '%wait';
 const PREHOOK_COMPLETE = '%pre_complete';
@@ -184,6 +186,9 @@ class GrblHalController {
 
     homingFlagSet = false;
 
+    // Toolchange
+    toolChanger = null;
+
     constructor(engine, options) {
         if (!engine) {
             throw new Error('engine must be specified');
@@ -249,6 +254,7 @@ class GrblHalController {
                 const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
                 line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
                 context = this.populateContext(context);
+
                 if (line[0] === '%') {
                     // %wait
                     if (line === WAIT) {
@@ -426,17 +432,36 @@ class GrblHalController {
                     // Handle specific cases for macro and pause, ignore is default and comments line out with no other action
                     if (toolChangeOption !== 'Ignore') {
                         if (tool) {
-                            this.emit('toolchange:tool', tool[0]);
+                            commentString = `(${tool[0]}) ` + commentString;
                         }
                         this.workflow.pause({ data: 'M6', comment: commentString });
-                        this.emit('gcode:toolChange', {
-                            line: sent + 1,
-                            block: line,
-                            option: toolChangeOption
-                        }, commentString);
+
+                        if (toolChangeOption === 'Code') {
+                            this.emit('toolchange:start');
+                            this.runPreChangeHook(commentString);
+                        } else {
+                            const count = this.sender.incrementToolChanges();
+
+                            setTimeout(() => {
+                                // Emit the current state so latest tool info is available
+                                this.runner.setTool(tool[2]); // set tool in runner state
+                                this.emit('controller:state', GRBLHAL, this.state, tool[2]); // set tool in redux
+                                this.emit('gcode:toolChange', {
+                                    line: sent + 1,
+                                    count,
+                                    block: line,
+                                    tool: tool,
+                                    option: toolChangeOption
+                                }, commentString);
+                            }, 500);
+                        }
                     }
 
-                    line = line.replace('M6', '(M6)');
+                    const passthroughM6 = store.get('preferences.toolChange.passthrough', false);
+                    if (!passthroughM6) {
+                        line = line.replace('M6', '(M6)');
+                    }
+                    line = line.replace(`${tool[0]}`, `(${tool[0]})`);
                 }
 
                 return line;
@@ -749,8 +774,19 @@ class GrblHalController {
             }
         });
 
+        this.toolChanger = new ToolChanger({
+            isIdle: () => {
+                return this.runner.isIdle();
+            },
+            intervalTimer: 200
+        });
+
         this.runner.on('others', (res) => {
             this.emit('serialport:read', res.raw);
+        });
+
+        this.runner.on('description', (payload) => {
+            this.emit('settings:description', this.runner.settings.descriptions);
         });
 
         const queryStatusReport = () => {
@@ -893,11 +929,13 @@ class GrblHalController {
         this.writeln('$$');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
-
+        this.writeln('$ES');
+        await delay(100);
+        this.writeln('$ESH');
         //check if controller is ready and send the status
-        this.emit('grbl:iSready', this.ready);
+        //this.emit('grbl:iSready', this.ready);
 
-        this.command('realtime_report');
+        //this.command('realtime_report');
     }
 
     populateContext(context = {}) {
@@ -926,6 +964,8 @@ class GrblHalController {
 
         // Tool
         const tool = this.runner.getTool();
+
+        const parameters = this.runner.getParameters();
 
         return Object.assign(context || {}, {
             // User-defined global variables
@@ -971,6 +1011,9 @@ class GrblHalController {
 
             // Tool
             tool: Number(tool) || 0,
+
+            // G-code parameters
+            params: parameters,
 
             // Global objects
             ...globalObjects,
@@ -1234,7 +1277,6 @@ class GrblHalController {
                 ApplyFirmwareProfile(nameOfMachine, typeOfMachine, port);
             },
             'firmware:grabMachineProfile': () => {
-                // let [values] = args;
                 const machineProfile = store.get('machineProfile');
                 this.emit('sender:status', machineProfile);
             },
@@ -1252,8 +1294,9 @@ class GrblHalController {
                 const dwell = '%wait ; Wait for the planner to empty';
 
                 // add delay to spindle startup if enabled
-                const preferences = store.get('preferences') || { spindle: { delay: false } };
-                const delay = preferences.spindle.delay;
+                const preferences = store.get('preferences', {});
+                const delay = _.get(preferences, 'spindle.delay', false);
+
                 if (delay) {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }
@@ -1545,23 +1588,45 @@ class GrblHalController {
             'feedOverride': () => {
                 const [value] = args;
                 const [feedOV] = this.state.status.ov;
-                const diff = value - feedOV;
+
+                let diff = value - feedOV;
+
                 if (value === 100) {
-                    this.write('\x90');
+                    this.write(String.fromCharCode(0x90));
                 } else {
-                    calcOverrides(this, diff, 'feed');
+                    const queue = calcOverrides(diff, 'feed');
+                    queue.forEach((command, index) => {
+                        setTimeout(() => {
+                            this.connection.writeImmediate(command);
+                            this.connection.writeImmediate('?');
+                        }, 50 * (index + 1));
+                    });
                 }
             },
             // Spindle Speed Overrides
             // @param {number} value The amount of percentage increase or decrease.
             'spindleOverride': () => {
                 const [value] = args;
-                const [, spindleOV] = this.state.status.ov;
-                const diff = value - spindleOV;
+                const [,, spindleOV] = this.state.status.ov;
+
+                let diff = value - spindleOV;
+                //Limits for keyboard/gamepad shortcuts
+                if (value < 10) {
+                    diff = 10 - spindleOV;
+                } else if (value > 230) {
+                    diff = 230 - spindleOV;
+                }
+
                 if (value === 100) {
-                    this.write('\x99');
+                    this.write(String.fromCharCode(0x99));
                 } else {
-                    calcOverrides(this, diff, 'spindle');
+                    const queue = calcOverrides(diff, 'spindle');
+                    queue.forEach((command, index) => {
+                        setTimeout(() => {
+                            this.connection.writeImmediate(command);
+                            this.connection.writeImmediate('?');
+                        }, 50 * (index + 1));
+                    });
                 }
             },
             // Rapid Overrides
@@ -1839,6 +1904,14 @@ class GrblHalController {
                 log.debug('starting post hook');
                 this.command('feeder:start');
                 this.runPostChangeHook();
+            },
+            'wizard:start': () => {
+                log.debug('Wizard kickoff code');
+                const [gcode] = args;
+
+                this.toolChanger.addInterval(() => {
+                    this.command('gcode', gcode);
+                });
             },
             'wizard:step': () => {
                 const [stepIndex, substepIndex] = args;

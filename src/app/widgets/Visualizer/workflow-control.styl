@@ -38,6 +38,66 @@
     }
 }
 
+.workflow-control-mobile {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    :global {
+        .btn-group {
+            background-color: #fff;
+        }
+    }
+}
+
+.widget-content-mobile {
+    position: relative;
+    height: calc(100% - 1.9rem);
+    padding: 15px;
+    min-width: 330px;
+    background-color: #e5e7eb;
+    @media (max-width: 639px), (max-device-width: 639px) {
+        padding: 10px;
+    }
+    border: solid 1px #9CA3AF;
+    margin-bottom: 0.5rem;
+}
+
+.workflow-wrapper-mobile {
+    position: relative;
+    padding: 10px;
+    height: 100%;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+.widget-header-mobile {
+    background-color: #d1d5db;
+    position: relative;
+}
+
+.widget-title-mobile {
+    font-size: 1.15rem;
+    line-height: 1.9rem;
+    height: 1.9rem;
+    font-weight: bold;
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 0 10px;
+    color: #3e85c7;
+    // Truncate string with ellipsis
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+    max-width: 100%;
+}
+
 .relative-wrapper {
     position: relative;
 }
@@ -79,7 +139,7 @@
 .buttonsContainer {
     display: flex;
     width: 100%;
-    margin-top: 2rem;
+    //margin-top: 2rem;
     justify-content: center;
 }
 
@@ -299,16 +359,44 @@
 }
 
 .start-details {
-    float: right;
-    text-align: right;
+    float: left;
+    text-align: left;
     align-items: center;
     margin-right: 1rem;
     margin-bottom: 1rem;
-    font-size: 11px;
     color: grey;
+
+    b {
+        color: #222222 ;
+    }
+}
+
+.small {
+    font-size: 11px;
 }
 
 .first-detail {
-    margin-top: 2px;
-    margin-bottom: 2px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(.90);
+    box-shadow: 0 0 0 0 rgba(133, 241, 148, .7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 15px rgba(133, 241, 148, 0);
+  }
+
+  100% {
+    transform: scale(.90);
+    box-shadow: 0 0 0 0 rgba(133, 241, 148, 0);
+  }
 }

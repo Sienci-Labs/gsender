@@ -39,9 +39,10 @@ import SpindleLaser from './SpindleLaser';
 import WidgetConfig from '../../widgets/WidgetConfig';
 import VisualizerSettings from './Visualizer';
 import About from './About';
+import Rotary from './Rotary';
 import store from '../../store';
 import styles from './index.styl';
-import { METRIC_UNITS, WORKFLOW_STATE_RUNNING } from '../../constants';
+import { METRIC_UNITS, ROTARY_MODE_FIRMWARE_SETTINGS, WORKFLOW_STATE_RUNNING, DEFAULT_FIRMWARE_SETTINGS } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 import {
     DARK_THEME_VALUES, PARTS_LIST, G1_PART
@@ -134,6 +135,11 @@ class PreferencesPage extends PureComponent {
                 },
                 {
                     id: 9,
+                    label: 'Rotary',
+                    component: Rotary
+                },
+                {
+                    id: 10,
                     label: 'About',
                     component: About,
                 }
@@ -171,7 +177,15 @@ class PreferencesPage extends PureComponent {
             },
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
+            shouldWarnZero: store.get('workspace.shouldWarnZero', false),
             ipRange: store.get('widgets.connection.ipRange', [192, 168, 1]),
+            toolChange: {
+                passthrough: store.get('workspace.toolChange.passthrough', false),
+            },
+            rotary: {
+                firmwareSettings: store.get('workspace.rotaryAxis.firmwareSettings', ROTARY_MODE_FIRMWARE_SETTINGS),
+                defaultFirmwareSettings: store.get('workspace.rotaryAxis.defaultFirmwareSettings', DEFAULT_FIRMWARE_SETTINGS),
+            }
         };
     }
 
@@ -237,6 +251,11 @@ class PreferencesPage extends PureComponent {
                 store.set('widgets.visualizer.showLineWarnings', shouldShow);
                 this.setState({ showLineWarnings: shouldShow });
                 pubsub.publish('gcode:showLineWarnings', shouldShow);
+            },
+            setShouldWarnZero: (shouldShow) => {
+                store.set('workspace.shouldWarnZero', shouldShow);
+                this.setState({ shouldWarnZero: shouldShow });
+                pubsub.publish('gcode:shouldWarnZero', shouldShow);
             },
             setIPRange: (value, index) => {
                 const { ipRange } = this.state;
@@ -744,6 +763,59 @@ class PreferencesPage extends PureComponent {
                 });
                 pubsub.publish('visualizer:settings');
             }
+        },
+        toolChange: {
+            handlePassthroughToggle: () => {
+                const { toolChange } = this.state;
+                this.setState({
+                    toolChange: {
+                        ...toolChange,
+                        passthrough: !toolChange.passthrough
+                    }
+                });
+            }
+        },
+        rotary: {
+            updateFirmwareSetting: (setting, value) => {
+                store.replace(`workspace.rotaryAxis.firmwareSettings[${setting}]`, value);
+
+                this.setState(prev => ({
+                    rotary: {
+                        ...prev.rotary,
+                        firmwareSettings: {
+                            ...prev.rotary.firmwareSettings,
+                            [setting]: value,
+                        }
+                    }
+                }));
+            },
+            updateDefaultFirmwareSetting: (setting, value) => {
+                store.replace(`workspace.rotaryAxis.defaultFirmwareSettings[${setting}]`, value);
+
+                this.setState(prev => ({
+                    rotary: {
+                        ...prev.rotary,
+                        defaultFirmwareSettings: {
+                            ...prev.rotary.defaultFirmwareSettings,
+                            [setting]: value,
+                        }
+                    }
+                }));
+            },
+            resetFirmwareToDefault: () => {
+                store.replace('workspace.rotaryAxis.firmwareSettings', ROTARY_MODE_FIRMWARE_SETTINGS);
+
+                this.setState(prev => ({
+                    rotary: { ...prev.rotary, firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS }
+                }));
+            },
+            resetDefaultFirmwareSettings: () => {
+                store.replace('workspace.rotaryAxis.defaultFirmwareSettings', DEFAULT_FIRMWARE_SETTINGS);
+
+                this.setState(prev => ({
+                    rotary: { ...prev.rotary, defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS }
+                }));
+            }
         }
     }
 
@@ -797,7 +869,8 @@ class PreferencesPage extends PureComponent {
             visualizer,
             safeRetractHeight,
             customDecimalPlaces,
-            spindle
+            spindle,
+            toolChange
         } = this.state;
 
         store.set('workspace.reverseWidgets', reverseWidgets);
@@ -822,6 +895,7 @@ class PreferencesPage extends PureComponent {
         this.probeConfig.set('probeFastFeedrate', probeSettings.fastFeedrate);
         this.probeConfig.set('connectivityTest', probeSettings.connectivityTest);
         this.probeConfig.set('zProbeDistance', probeSettings.zProbeDistance);
+        store.set('workspace.toolChange.passthrough', toolChange.passthrough);
 
         controller.command('settings:updated', this.state);
 

@@ -36,11 +36,12 @@ import cx from 'classnames';
 import controller from 'app/lib/controller';
 //import DRO from 'app/widgets/Location/components/DRO';
 import store from 'app/store';
-import pubsub from 'pubsub-js';
 import { getHomingLocation, getMovementGCode } from 'app/widgets/Location/RapidPosition';
+import Modal from 'app/components/Modal';
 import Panel from './components/Panel';
 import PositionLabel from './components/PositionLabel';
 import GoToButton from './components/GoToButton';
+import Input from '../../containers/Preferences/components/Input';
 
 import {
     AXIS_E,
@@ -62,6 +63,7 @@ import AxisButton from './components/AxisButton';
 import FunctionButton from '../../components/FunctionButton/FunctionButton';
 import QuickPositionButton from './components/QuickPositionButton';
 import ButtonCollection from '../../components/ButtonCollection/ButtonCollection';
+import Switch from '../../components/ToggleSwitch';
 
 class DisplayPanel extends PureComponent {
     static propTypes = {
@@ -125,6 +127,14 @@ class DisplayPanel extends PureComponent {
             [AXIS_C]: false
         },
         machineProfile: store.get('workspace.machineProfile'),
+        modalShow: false,
+        relative: false,
+        location: {
+            x: 0,
+            y: 0,
+            z: 0,
+            a: 0
+        }
     };
 
     handleSelect = (eventKey) => {
@@ -152,44 +162,33 @@ class DisplayPanel extends PureComponent {
 
     //Only rounds values with more than 3 decimal places which begin with 9
     customMathRound(num) {
-        let radix = num % 1.0;
-        if ((radix > 0.899 && radix < 1.0) && (Number(num.split('.')[1].slice(0, 2)) > 97)) {
-            return Math.ceil(num).toFixed(Number(num.split('.')[1].length));
-        } else {
-            return num;
+        const { $13 } = this.props;
+        const DRO = store.get('workspace.customDecimalPlaces', 0);
+        const places = $13 === '1' ? 4 : 3; // firmware gives back 3 for metric and 4 for imperial
+        const defaultPlaces = $13 === '1' ? 3 : 2; // default places when DRO = 0
+        const wholeLength = num.split('.')[0].length;
+
+        let result = num.slice(0, wholeLength + 1 + places); // cut off the javascript weirdness
+        if (DRO > places) { // add more 0s
+            result = result.padEnd(wholeLength + 1 + DRO, '0'); // +1 for ., +DRO for decimal places
+        } else { // remove decimal places (with rounding)
+            result = Number(num).toFixed(DRO === 0 ? defaultPlaces : DRO);
         }
+        return result;
     }
 
-    renderAxis = (axis, disabled = false) => {
+    renderAxis = (axis, disabled = false, disableGoTo = false) => {
         const { canClick, machinePosition, workPosition, actions, safeRetractHeight, units, homingEnabled } = this.props;
         let mpos = !disabled ? machinePosition[axis] : '0.00';
         const wpos = !disabled ? workPosition[axis] : '0.00';
         const axisLabel = axis.toUpperCase();
         const showPositionInput = canClick && this.state.positionInput[axis];
 
-        //mpos = Number(mpos).toFixed(3);
-
-        //Function to zero out given axis
-        const handleAxisButtonClick = () => {
-            const wcs = actions.getWorkCoordinateSystem();
-
-            const p = {
-                'G54': 1,
-                'G55': 2,
-                'G56': 3,
-                'G57': 4,
-                'G58': 5,
-                'G59': 6
-            }[wcs] || 0;
-
-            controller.command('gcode', `G10 L20 P${p} ${axisLabel}0`);
-        };
-
         return (
             <tr>
                 <td className={styles.coordinate}>
                     <GoToButton
-                        disabled={!canClick || disabled}
+                        disabled={!canClick || disabled || disableGoTo}
                         onClick={() => {
                             const commands = [];
                             const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
@@ -216,7 +215,7 @@ class DisplayPanel extends PureComponent {
                             controller.command('gcode:safe', commands, modal);
                         }}
                     />
-                    <AxisButton axis={axisLabel} onClick={handleAxisButtonClick} disabled={!canClick || disabled} />
+                    <AxisButton axis={axisLabel} onClick={() => actions.setZeroOnAxis(true, axisLabel)} disabled={!canClick || disabled} />
                 </td>
                 <td className={styles.machinePosition}>
                     <MachinePositionInput
@@ -285,8 +284,37 @@ class DisplayPanel extends PureComponent {
         return singleAxis;
     }
 
+    handleMovementSwitch(newValue) {
+        this.setState({ relative: newValue });
+    }
+
+    setLocation(value, axis) {
+        const { location } = this.state;
+        let newLocation = location;
+        newLocation[axis] = value;
+        this.setState({ location: newLocation });
+    }
+
+    handleGoToLocation() {
+        const { location, relative } = this.state;
+        const { ROTARY } = WORKSPACE_MODE;
+        const movement = relative ? 'G91' : 'G90';
+        const currentMovement = this.props.modalDistance;
+        const isInRotaryMode = store.get('workspace.mode') === ROTARY;
+
+        controller.command('gcode', movement);
+        controller.command('gcode', 'G0 X' + location.x + ' Y' + location.y + ' Z' + location.z);
+
+        if (isInRotaryMode) {
+            controller.command('gcode', 'G0 A' + location.a);
+        }
+
+        controller.command('gcode', currentMovement);
+    }
+
     render() {
         const { axes, actions, canClick, safeRetractHeight, units, homingEnabled, canHome, homingDirection, homingRun, firmware } = this.props;
+        const { modalShow, relative, location } = this.state;
         const homingLocation = getHomingLocation(homingDirection);
         const hasAxisX = includes(axes, AXIS_X);
         const hasAxisY = includes(axes, AXIS_Y);
@@ -298,140 +326,202 @@ class DisplayPanel extends PureComponent {
         const singleAxisHoming = this.determineSingleAxisHoming();
 
         return (
-            <Panel className={styles.displayPanel}>
-                <div className={styles.locationWrapper}>
-                    <div className={styles.alwaysAvailable}>
-                        <table className={styles.displaypanelTable}>
-                            {firmware === 'Grbl'
-                                ? (
-                                    <tbody>
-                                        {hasAxisX && this.renderAxis(AXIS_X)}
-                                        {!isInRotaryMode && hasAxisY ? this.renderAxis(AXIS_Y) : this.renderAxis(AXIS_Y, true)}
-                                        {hasAxisZ && this.renderAxis(AXIS_Z)}
-                                    </tbody>
-                                )
-                                : (
-                                    <tbody>
-                                        {hasAxisX && this.renderAxis(AXIS_X)}
-                                        {hasAxisY && this.renderAxis(AXIS_Y)}
-                                        {hasAxisZ && this.renderAxis(AXIS_Z)}
-                                    </tbody>
+            <>
+                <Modal size="xs" show={modalShow} onClose={() => this.setState({ modalShow: false })}>
+                    <Modal.Header>
+                        <Modal.Title>Go To Location</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className={styles.goToLocationModal}>
+                            <Input
+                                label="X"
+                                units={units}
+                                value={location.x}
+                                onChange={(e) => this.setLocation(e.target.value, 'x')}
+                                additionalProps={{ type: 'number' }}
+                            />
+
+                            {!isInRotaryMode && (
+                                <Input
+                                    label="Y"
+                                    units={units}
+                                    value={location.y}
+                                    onChange={(e) => this.setLocation(e.target.value, 'y')}
+                                    additionalProps={{ type: 'number' }}
+                                />
+                            )}
+
+                            <Input
+                                label="Z"
+                                units={units}
+                                value={location.z}
+                                onChange={(e) => this.setLocation(e.target.value, 'z')}
+                                additionalProps={{ type: 'number' }}
+                            />
+                            {
+                                isInRotaryMode && (
+                                    <Input
+                                        label="A"
+                                        units="deg"
+                                        value={location.a}
+                                        onChange={(e) => this.setLocation(e.target.value, 'a')}
+                                        additionalProps={{ type: 'number' }}
+                                    />
                                 )
                             }
-                        </table>
-                        <div className={styles.controlButtons}>
+                            <div className={styles.switchWrapper}>
+                                <div className={ relative ? [styles.grey] : undefined }>Absolute (G90)</div>
+                                <Switch
+                                    name="movement"
+                                    checked={relative}
+                                    onChange={() => this.handleMovementSwitch(!relative)}
+                                    onColor="#888888"
+                                />
+                                <div className={ relative ? undefined : [styles.grey] }>Relative (G91)</div>
+                            </div>
                             <FunctionButton
-                                onClick={() => {
-                                    const wcs = actions.getWorkCoordinateSystem();
-                                    const p = {
-                                        'G54': 1,
-                                        'G55': 2,
-                                        'G56': 3,
-                                        'G57': 4,
-                                        'G58': 5,
-                                        'G59': 6
-                                    }[wcs] || 0;
-
-                                    controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
-                                    pubsub.publish('softlimits:check', 0);
-                                }}
-                                disabled={!canClick}
-                            >
-                                <i className="fas fa-bullseye" />
-                                Zero All
-                            </FunctionButton>
-                            <FunctionButton
-                                onClick={() => {
-                                    const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-                                    if (safeRetractHeight !== 0) {
-                                        if (homingEnabled) {
-                                            controller.command('gcode:safe', `G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`, modal);
-                                        } else {
-                                            controller.command('gcode', 'G91');
-                                            controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
-                                        }
-                                    }
-
-                                    controller.command('gcode', 'G90');
-                                    controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
-                                }}
-                                disabled={!canClick}
-                                className={styles.fontMonospace}
+                                onClick={() => this.handleGoToLocation()}
+                                className={styles.goButton}
                                 primary
                             >
-                                <i className="fas fa-chart-line" />
-                                Go XY0
+                                GO!
                             </FunctionButton>
                         </div>
-                    </div>
-
-                    {
-                        homingEnabled && (
-                            <div className={styles.endStop}>
-                                {
-                                    singleAxisHoming ? (
-                                        <>
-                                            <div className={styles.homeWrapper}>
-                                                <i className={cx('fas fa-home fa-2xl', styles.homeIcon)} /> Homing
-                                            </div>
-                                            <ButtonCollection
-                                                disabled={!canHome}
-                                                buttons={['X', 'Y', 'Z', 'A']}
-                                                onClick={this.actions.startSingleAxisHoming}
-                                            >
-                                            </ButtonCollection>
-                                        </>
-                                    ) : (
-                                        <FunctionButton
-                                            primary
-                                            disabled={!canHome}
-                                            onClick={this.actions.startHoming}
-                                            className={styles.runHomeButton}
-                                        >
-                                            <i className="fas fa-home" /> Home
-                                        </FunctionButton>
+                    </Modal.Body>
+                </Modal>
+                <Panel className={styles.displayPanel}>
+                    <div className={styles.locationWrapper}>
+                        <div className={styles.alwaysAvailable}>
+                            <table className={styles.displaypanelTable}>
+                                {firmware === 'Grbl'
+                                    ? (
+                                        <tbody>
+                                            {hasAxisX && this.renderAxis(AXIS_X)}
+                                            {!isInRotaryMode && hasAxisY ? this.renderAxis(AXIS_Y) : this.renderAxis(AXIS_Y, true)}
+                                            {hasAxisZ && this.renderAxis(AXIS_Z, false, isInRotaryMode)}
+                                        </tbody>
+                                    )
+                                    : (
+                                        <tbody>
+                                            {hasAxisX && this.renderAxis(AXIS_X)}
+                                            {hasAxisY && this.renderAxis(AXIS_Y)}
+                                            {hasAxisZ && this.renderAxis(AXIS_Z)}
+                                        </tbody>
                                     )
                                 }
-                                <div className={styles.endStopActiveControls}>
-                                    <QuickPositionButton
-                                        disabled={!canClick || !homingRun}
-                                        className={styles.QPBL}
-                                        onClick={() => {
-                                            this.actions.jogtoBLCorner();
-                                        }}
-                                        icon={(homingLocation === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                    />
-                                    <QuickPositionButton
-                                        disabled={!canClick || !homingRun}
-                                        className={styles.QPBR}
-                                        rotate={45}
-                                        onClick={() => {
-                                            this.actions.jogtoBRCorner();
-                                        }}
-                                        icon={(homingLocation === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                    />
-                                    <QuickPositionButton
-                                        disabled={!canClick || !homingRun}
-                                        className={styles.QPFL}
-                                        onClick={() => {
-                                            this.actions.jogtoFLCorner();
-                                        }}
-                                        icon={(homingLocation === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                    />
-                                    <QuickPositionButton
-                                        disabled={!canClick || !homingRun}
-                                        className={styles.QPFR}
-                                        onClick={() => {
-                                            this.actions.jogtoFRCorner();
-                                        }}
-                                        icon={(homingLocation === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
-                                    />
-                                </div>
+                            </table>
+                            <div className={styles.controlButtons}>
+                                <FunctionButton
+                                    onClick={() => actions.setZeroOnAxis(true, 'all')}
+                                    disabled={!canClick}
+                                >
+                                    <i className="fas fa-bullseye" />
+                                    Zero All
+                                </FunctionButton>
+                                <FunctionButton
+                                    onClick={() => {
+                                        const modal = (units === METRIC_UNITS) ? 'G21' : 'G20';
+                                        if (safeRetractHeight !== 0) {
+                                            if (homingEnabled) {
+                                                controller.command('gcode:safe', `G53 G0 Z${(Math.abs(safeRetractHeight) * -1)}`, modal);
+                                            } else {
+                                                controller.command('gcode', 'G91');
+                                                controller.command('gcode:safe', `G0 Z${safeRetractHeight}`, modal); // Retract Z when moving across workspace
+                                            }
+                                        }
+
+                                        controller.command('gcode', 'G90');
+                                        controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
+                                    }}
+                                    disabled={!canClick}
+                                    primary
+                                >
+                                    <i className="fas fa-chart-line" />
+                                    Go {isInRotaryMode ? 'XA0' : 'XY0'}
+                                </FunctionButton>
+                                <FunctionButton
+                                    onClick={() => {
+                                        this.setState({
+                                            modalShow: true
+                                        });
+                                    }}
+                                    disabled={!canClick}
+                                    className={styles.fontMonospace}
+                                    primary
+                                >
+                                    <i className="fas fa-location-arrow" />
+                                    Go To
+                                </FunctionButton>
                             </div>
-                        )
-                    }
-                </div>
-            </Panel>
+                        </div>
+
+                        {
+                            homingEnabled && (
+                                <div className={styles.endStop}>
+                                    {
+                                        singleAxisHoming ? (
+                                            <>
+                                                <div className={styles.homeWrapper}>
+                                                    <i className={cx('fas fa-home fa-2xl', styles.homeIcon)} /> Homing
+                                                </div>
+                                                <ButtonCollection
+                                                    disabled={!canHome}
+                                                    buttons={['X', 'Y', 'Z', 'A']}
+                                                    onClick={this.actions.startSingleAxisHoming}
+                                                />
+                                            </>
+                                        ) : (
+                                            <FunctionButton
+                                                primary
+                                                disabled={!canHome}
+                                                onClick={this.actions.startHoming}
+                                                className={styles.runHomeButton}
+                                            >
+                                                <i className="fas fa-home" /> Home
+                                            </FunctionButton>
+                                        )
+                                    }
+                                    <div className={styles.endStopActiveControls}>
+                                        <QuickPositionButton
+                                            disabled={!canClick || !homingRun}
+                                            className={styles.QPBL}
+                                            onClick={() => {
+                                                this.actions.jogtoBLCorner();
+                                            }}
+                                            icon={(homingLocation === 'BL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                        />
+                                        <QuickPositionButton
+                                            disabled={!canClick || !homingRun}
+                                            className={styles.QPBR}
+                                            rotate={45}
+                                            onClick={() => {
+                                                this.actions.jogtoBRCorner();
+                                            }}
+                                            icon={(homingLocation === 'BR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                        />
+                                        <QuickPositionButton
+                                            disabled={!canClick || !homingRun}
+                                            className={styles.QPFL}
+                                            onClick={() => {
+                                                this.actions.jogtoFLCorner();
+                                            }}
+                                            icon={(homingLocation === 'FL') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                        />
+                                        <QuickPositionButton
+                                            disabled={!canClick || !homingRun}
+                                            className={styles.QPFR}
+                                            onClick={() => {
+                                                this.actions.jogtoFRCorner();
+                                            }}
+                                            icon={(homingLocation === 'FR') ? 'fa-home' : 'fa-arrow-circle-up'}
+                                        />
+                                    </div>
+                                </div>
+                            )
+                        }
+                    </div>
+                </Panel>
+            </>
         );
     }
 }
@@ -449,6 +539,8 @@ export default connect((store) => {
     const canHome = isConnected && [GRBL_ACTIVE_STATE_IDLE, GRBL_ACTIVE_STATE_ALARM].includes(activeState) && workflowState !== WORKFLOW_STATE_RUNNING;
     const mpos = get(store, 'controller.mpos');
     const firmware = get(store, 'controller.type');
+    const modalDistance = get(store, 'controller.state.parserstate.modal.distance');
+    const $13 = get(store, 'controller.settings.settings.$13');
     return {
         homingSetting,
         homingEnabled,
@@ -458,6 +550,8 @@ export default connect((store) => {
         homingRun,
         pullOff,
         mpos,
-        firmware
+        firmware,
+        modalDistance,
+        $13
     };
 })(DisplayPanel);

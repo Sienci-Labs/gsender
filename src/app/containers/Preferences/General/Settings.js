@@ -1,11 +1,11 @@
 import React from 'react';
 
 import store from 'app/store';
-import defaultState from 'app/store/defaultState';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_DANGER } from 'app/lib/toaster/ToasterLib';
 import api from 'app/api';
+import { restoreDefault, storeUpdate } from '../../../lib/storeUpdate';
 
 import Fieldset from '../components/Fieldset';
 
@@ -21,19 +21,6 @@ const Settings = () => {
         });
     };
 
-    const restoreDefault = async () => {
-        await api.events.clearAll();
-
-        restoreSettings(defaultState);
-    };
-
-    const restoreSettings = (state) => {
-        store.restoreState(state);
-
-        setTimeout(() => {
-            window.location.reload();
-        }, 250);
-    };
 
     const importSettings = (e) => {
         const file = e.target.files[0];
@@ -51,23 +38,7 @@ const Settings = () => {
             const reader = new FileReader();
             reader.readAsText(file, 'UTF-8');
             reader.onload = async (event) => {
-                const { settings, events = [], state } = JSON.parse(event.target.result);
-
-                await new Promise((resolve, reject) => {
-                    // delete all old events
-                    const res = api.events.clearAll();
-                    resolve(res);
-                }).then((result) => {
-                    Promise.all([
-                        events.map((event) => api.events.create(event))
-                    ]);
-                });
-
-                if (settings) {
-                    restoreSettings(settings);
-                } else {
-                    restoreSettings(state);
-                }
+                await storeUpdate(event.target.result);
             };
             reader.onerror = () => {
                 Toaster.pop({
@@ -116,7 +87,6 @@ const Settings = () => {
                 <Button
                     primary
                     type="button"
-                    title="Import Macros"
                     style={{ marginBottom: '1rem' }}
                     onClick={() => {
                         inputRef.current.click();
@@ -127,7 +97,6 @@ const Settings = () => {
                 <Button
                     primary
                     type="button"
-                    title="Export Macros"
                     style={{ marginBottom: '1rem' }}
                     onClick={exportSettings}
                 >

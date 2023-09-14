@@ -145,10 +145,8 @@
     "JogControl Widget": "JogControl Widget",
     "JogControl Settings": "JogControl Settings",
     "Outline": "Outline",
-    "Server Connection Lost": "Server Connection Lost",
-    "It looks like the server connection has been lost - attempt to reconnect?": "It looks like the server connection has been lost - attempt to reconnect?",
-    "Attempt Reconnect": "Attempt Reconnect",
     "Click \"Resume\" to continue execution.": "Click \"Resume\" to continue execution.",
     "Rendering": "Rendering",
-    "Please turn your device to landscape for the best experience, or click to continue.": "Please turn your device to landscape for the best experience, or click to continue."
+    "Please turn your device to landscape for the best experience, or click to continue.": "Please turn your device to landscape for the best experience, or click to continue.",
+    "Workflow Controls": "Workflow Controls"
 }

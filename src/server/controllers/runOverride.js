@@ -4,25 +4,25 @@
 // @param {number} overridePercentage The amount of percentage increase or decrease.
 // @param {string} type The type of override - spindle or feeder
 
-export const calcOverrides = (context, difference = 100, type = 'feed') => {
+export const calcOverrides = (difference = 100, type = 'feed') => {
     const commandQueue = [];
 
     if (difference === 0) {
-        return;
+        return commandQueue;
     }
 
     const commands = {
         spindle: {
-            majorIncrease: '\x9A',
-            majorDecrease: '\x9B',
-            minorIncrease: '\x9C',
-            minorDecrease: '\x9D',
+            majorIncrease: String.fromCharCode(0x9A),
+            majorDecrease: String.fromCharCode(0x9B),
+            minorIncrease: String.fromCharCode(0x9C),
+            minorDecrease: String.fromCharCode(0x9D),
         },
         feed: {
-            majorIncrease: '\x91',
-            majorDecrease: '\x92',
-            minorIncrease: '\x93',
-            minorDecrease: '\x94',
+            majorIncrease: String.fromCharCode(0x91),
+            majorDecrease: String.fromCharCode(0x92),
+            minorIncrease: String.fromCharCode(0x93),
+            minorDecrease: String.fromCharCode(0x94),
         }
     };
     const { majorIncrease, majorDecrease, minorIncrease, minorDecrease } = commands[type];
@@ -42,11 +42,6 @@ export const calcOverrides = (context, difference = 100, type = 'feed') => {
             ...Array.from({ length: remainder }).fill(minorDecrease)
         );
     }
-
     // Space out realtime commands by 50ms intervals
-    commandQueue.forEach((command, index) => {
-        setTimeout(() => {
-            context.write(command);
-        }, 50 * (index + 1));
-    });
+    return commandQueue;
 };

@@ -62,6 +62,7 @@ import {
     AXIS_Y,
     AXIS_Z,
     AXIS_A,
+    WORKSPACE_MODE
 } from '../../constants';
 import {
     MODAL_NONE,
@@ -76,6 +77,7 @@ import {
 } from './constants';
 import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
+import { Confirm } from 'Components/ConfirmationDialog/ConfirmationDialogLib';
 
 class LocationWidget extends PureComponent {
     static propTypes = {
@@ -114,6 +116,11 @@ class LocationWidget extends PureComponent {
             pubsub.subscribe('safeHeight:update', (event, value) => {
                 this.setState({
                     safeRetractHeight: value
+                });
+            }),
+            pubsub.subscribe('gcode:shouldWarnZero', (_, shouldShow) => {
+                this.setState({
+                    shouldWarnZero: shouldShow,
                 });
             }),
         ];
@@ -334,7 +341,30 @@ class LocationWidget extends PureComponent {
                     }
                 };
             });
-        }
+        },
+        setZeroOnAxis: (shouldShow, axis) => {
+            const { shouldWarnZero } = this.state;
+            const string = (axis === 'all') ? 'Are you sure you want to zero all axes?' : `Are you sure you want to zero the ${axis} axis?`;
+            if (shouldWarnZero) {
+                Confirm({
+                    title: 'Confirm Axis Zero',
+                    content: string,
+                    confirmLabel: 'Yes',
+                    cancelLabel: 'No',
+                    onConfirm: () => {
+                        this.zeroAxis(axis);
+                    }
+                });
+                this.setState({
+                    showWarnZero: {
+                        //shouldShow: shouldShow,
+                        axis: axis
+                    }
+                });
+            } else {
+                this.zeroAxis(axis);
+            }
+        },
     };
 
     canSendCommand() {
@@ -411,29 +441,23 @@ class LocationWidget extends PureComponent {
                 return;
             }
 
-            const wcs = this.actions.getWorkCoordinateSystem();
-
-            const p = {
-                'G54': 1,
-                'G55': 2,
-                'G56': 3,
-                'G57': 4,
-                'G58': 5,
-                'G59': 6
-            }[wcs] || 0;
-
-            if (axis === 'all') {
-                controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
-                return;
+            if (axis !== 'all') {
+                axis = axis.toUpperCase();
             }
-
-            axis = axis.toUpperCase();
-            controller.command('gcode', `G10 L20 P${p} ${axis}0`);
+            this.actions.setZeroOnAxis(true, axis);
         },
         GO_TO_AXIS_ZERO: (_, { axisList }) => {
             const { state } = this.props;
             const { machinePosition, safeRetractHeight, homingEnabled } = this.state;
             const activeState = get(state, 'status.activeState');
+
+            const { ROTARY } = WORKSPACE_MODE;
+            const isInRotaryMode = store.get('workspace.mode') === ROTARY;
+
+            //Disable "Go to" shortcuts for Z axis when in rotary mode
+            if (isInRotaryMode && axisList[0] === AXIS_Z) {
+                return;
+            }
 
             if (!axisList || axisList.length === 0 || activeState !== GRBL_ACTIVE_STATE_IDLE) {
                 return;
@@ -502,7 +526,7 @@ class LocationWidget extends PureComponent {
             keys: ['shift', 'r'].join('+'),
             cmd: 'ZERO_Z_AXIS',
             preventDefault: true,
-            payload: { axis: AXIS_A },
+            payload: { axis: AXIS_Z },
             isActive: true,
             category: LOCATION_CATEGORY,
             callback: this.shuttleControlFunctions.ZERO_AXIS
@@ -628,6 +652,11 @@ class LocationWidget extends PureComponent {
                 name: MODAL_NONE,
                 params: {}
             },
+            shouldWarnZero: store.get('workspace.shouldWarnZero'),
+            showWarnZero: {
+                shouldShow: false,
+                axis: null
+            },
             axes: this.config.get('axes', DEFAULT_AXES),
             machinePosition: { // Machine position
                 x: '0.000',
@@ -726,6 +755,25 @@ class LocationWidget extends PureComponent {
             units: units,
             safeRetractHeight: store.get('workspace.safeRetractHeight')
         });
+    }
+
+    zeroAxis(axis) {
+        const wcs = this.getWorkCoordinateSystem();
+        const p = {
+            'G54': 1,
+            'G55': 2,
+            'G56': 3,
+            'G57': 4,
+            'G58': 5,
+            'G59': 6
+        }[wcs] || 0;
+
+        if (axis === 'all') {
+            controller.command('gcode', `G10 L20 P${p} X0 Y0 Z0`);
+            pubsub.publish('softlimits:check', 0);
+        } else {
+            controller.command('gcode', `G10 L20 P${p} ${axis}0`);
+        }
     }
 
     render() {

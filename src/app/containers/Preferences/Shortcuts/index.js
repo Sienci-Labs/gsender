@@ -35,6 +35,7 @@ const printButtonStyles = {
 const Shortcuts = ({ active }) => {
     const [tab, setTab] = useState(0);
     const componentRef = useRef();
+
     return (
         <SettingWrapper title="Shortcuts" show={active}>
             <TabbedWidget>

@@ -86,13 +86,14 @@ class WindowManager {
         });
     }
 
-    openWindow(url, options, splashScreen, shouldMaximize = true, isChild = false /*, data = null*/) {
+    async openWindow(url, options, splashScreen, shouldMaximize = true, isChild = false /*, data = null*/) {
         const window = new BrowserWindow({
             ...options,
             show: false,
             webPreferences: {
                 nodeIntegration: true,
                 enableRemoteModule: true,
+                sandbox: false,
                 contextIsolation: false,
                 preload: path.join(__dirname, 'preload.js')
             }
@@ -100,7 +101,7 @@ class WindowManager {
         const webContents = window.webContents;
         // Enable remote API
         remoteMain.enable(window.webContents);
-        window.removeMenu();
+        //window.removeMenu();
         window.webContents.once('did-finish-load', () => {
             window.setTitle(options.title);
         });
@@ -140,6 +141,8 @@ class WindowManager {
         ses.setProxy({ proxyRules: 'direct://' }).then(() => {
             window.loadURL(url);
         });
+
+        await ses.clearCache();
 
         if (isChild) {
             window.on('close', (e) => {

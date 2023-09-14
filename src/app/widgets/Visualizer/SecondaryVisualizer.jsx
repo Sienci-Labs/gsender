@@ -8,7 +8,7 @@ import VisualizerWrapper from './VisualizerWrapper';
 import Loading from './Loading';
 import Rendering from './Rendering';
 
-const SecondaryVisualizer = ({ state, actions, surfacingData, showVisualizer, cameraPosition, visualizerRef, showLoading, showRendering }) => {
+const SecondaryVisualizer = ({ state, actions, showVisualizer, cameraPosition, visualizerRef, showLoading, showRendering }) => {
     return (
         <div style={{ border: '1px solid black', height: '100%', width: '100%' }}>
             { showLoading && <Loading /> }
@@ -21,7 +21,6 @@ const SecondaryVisualizer = ({ state, actions, surfacingData, showVisualizer, ca
                     ref={visualizerRef}
                     state={state}
                     actions={actions}
-                    surfacingData={surfacingData}
                     containerID={SURFACING_VISUALIZER_CONTAINER_ID}
                     isSecondary={true}
                 />

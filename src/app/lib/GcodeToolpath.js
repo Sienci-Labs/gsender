@@ -12,15 +12,17 @@ const translatePosition = (position, newPosition, relative) => {
     if (Number.isNaN(newPosition)) {
         return position;
     }
-    return relative ? (position + newPosition) : newPosition;
+    return relative ? position + newPosition : newPosition;
 };
 
 export const toRadians = (degrees) => {
-    return degrees * Math.PI / 180;
+    return (degrees * Math.PI) / 180;
 };
 
-export const shouldRotate = (aValue) => {
-    return aValue !== 0;
+// We just need to check the difference between the a axis values,
+// this should work fine since they are both 0 initially
+export const shouldRotate = (start, end) => {
+    return start.a !== end.a;
 };
 
 export const rotateAxis = (axis, { y, z, a }) => {
@@ -28,15 +30,25 @@ export const rotateAxis = (axis, { y, z, a }) => {
         throw new Error('Axis is required');
     }
 
-    const sinA = Math.sin(toRadians(a));
-    const cosA = Math.cos(toRadians(a));
+    const angle = toRadians(a);
 
+    // Calculate the sine and cosine of the angle
+    const sinA = Math.sin(angle);
+    const cosA = Math.cos(angle);
+
+    // Rotate the vertex around the y-axis
     if (axis === 'y') {
-        return y * cosA - z * sinA;
+        const rotatedZ = z * cosA - y * sinA;
+        const rotatedY = z * sinA + y * cosA;
+        return { y: rotatedY, z: rotatedZ, a };
     }
 
+    // Rotate the vertex around the z-axis
+    //This logic is just for testing
     if (axis === 'z') {
-        return y * sinA + z * cosA;
+        const rotatedY = y * cosA - z * sinA;
+        const rotatedZ = y * sinA + z * cosA;
+        return { y: rotatedY, z: rotatedZ, a };
     }
 
     return null;
@@ -55,17 +67,34 @@ class GcodeToolpath {
             x: pos.x + this.g92offset.x,
             y: pos.y + this.g92offset.y,
             z: pos.z + this.g92offset.z,
-            a: pos.a + this.g92offset.a
+            a: pos.a + this.g92offset.a,
         };
-    }
+    };
 
-    offsetAddLine = (start, end, prev) => {
-        this.fn.addLine(this.modal, this.offsetG92(start), this.offsetG92(end), prev);
-    }
+    offsetAddLine = (start, end) => {
+        this.fn.addLine(
+            this.modal,
+            this.offsetG92(start),
+            this.offsetG92(end),
+        );
+    };
+
+    offsetAddCurve = (start, end) => {
+        this.fn.addCurve(
+            this.modal,
+            this.offsetG92(start),
+            this.offsetG92(end),
+        );
+    };
 
     offsetAddArcCurve = (start, end, center) => {
-        this.fn.addArcCurve(this.modal, this.offsetG92(start), this.offsetG92(end), this.offsetG92(center));
-    }
+        this.fn.addArcCurve(
+            this.modal,
+            this.offsetG92(start),
+            this.offsetG92(end),
+            this.offsetG92(center)
+        );
+    };
 
     position = {
         x: 0,
@@ -73,13 +102,6 @@ class GcodeToolpath {
         z: 0,
         a: 0,
     };
-
-    prevPosition = {
-        x: 0,
-        y: 0,
-        z: 0,
-        a: 0,
-    }
 
     modal = {
         // Moton Mode
@@ -129,7 +151,7 @@ class GcodeToolpath {
         coolant: 'M9', // 'M7', 'M8', 'M7,M8', or 'M9'
 
         // Tool Select
-        tool: 0
+        tool: 0,
     };
 
     handlers = {
@@ -138,13 +160,6 @@ class GcodeToolpath {
             if (this.modal.motion !== 'G0') {
                 this.setModal({ motion: 'G0' });
             }
-
-            const v0 = {
-                x: this.prevPosition.x,
-                y: this.prevPosition.y,
-                z: this.prevPosition.z,
-                a: this.prevPosition.a,
-            };
 
             const v1 = {
                 x: this.position.x,
@@ -157,15 +172,28 @@ class GcodeToolpath {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
                 z: this.translateZ(params.Z),
-                a: this.translateA(params.A)
+                a: this.translateA(params.A),
             };
 
             const targetPosition = { x: v2.x, y: v2.y, z: v2.z, a: v2.a };
 
-            this.offsetAddLine(v1, v2, v0);
+            const isCurvedLine = shouldRotate(v1, v2);
+            const ANGLE_THRESHOLD = 30;
+            const angleDiff = Math.abs(v2.a - v1.a);
+
+            if (isCurvedLine && angleDiff > ANGLE_THRESHOLD) {
+                this.offsetAddCurve(v1, v2);
+            } else {
+                this.offsetAddLine(v1, v2);
+            }
 
             // Update position
-            this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z, targetPosition.a);
+            this.setPosition(
+                targetPosition.x,
+                targetPosition.y,
+                targetPosition.z,
+                targetPosition.a
+            );
         },
         // G1: Linear Move
         // Usage
@@ -186,13 +214,6 @@ class GcodeToolpath {
                 this.setModal({ motion: 'G1' });
             }
 
-            const v0 = {
-                x: this.prevPosition.x,
-                y: this.prevPosition.y,
-                z: this.prevPosition.z,
-                a: this.prevPosition.a,
-            };
-
             const v1 = {
                 x: this.position.x,
                 y: this.position.y,
@@ -204,15 +225,28 @@ class GcodeToolpath {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
                 z: this.translateZ(params.Z),
-                a: this.translateA(params.A)
+                a: this.translateA(params.A),
             };
 
             const targetPosition = { x: v2.x, y: v2.y, z: v2.z, a: v2.a };
 
-            this.offsetAddLine(v1, v2, v0);
+            const isCurvedLine = shouldRotate(v1, v2);
+            const ANGLE_THRESHOLD = 30;
+            const angleDiff = Math.abs(v2.a - v1.a);
+
+            if (isCurvedLine && angleDiff > ANGLE_THRESHOLD) {
+                this.offsetAddCurve(v1, v2);
+            } else {
+                this.offsetAddLine(v1, v2);
+            }
 
             // Update position
-            this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z, targetPosition.a);
+            this.setPosition(
+                targetPosition.x,
+                targetPosition.y,
+                targetPosition.z,
+                targetPosition.a
+            );
         },
         // G2 & G3: Controlled Arc Move
         // Usage
@@ -240,30 +274,34 @@ class GcodeToolpath {
             const v1 = {
                 x: this.position.x,
                 y: this.position.y,
-                z: this.position.z
+                z: this.position.z,
             };
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
-                z: this.translateZ(params.Z)
+                z: this.translateZ(params.Z),
             };
-            const v0 = { // fixed point
+            const v0 = {
+                // fixed point
                 x: this.translateI(params.I),
                 y: this.translateJ(params.J),
-                z: this.translateK(params.K)
+                z: this.translateK(params.K),
             };
             const isClockwise = true;
             const targetPosition = { x: v2.x, y: v2.y, z: v2.z };
 
-            if (this.isXYPlane()) { // XY-plane
+            if (this.isXYPlane()) {
+                // XY-plane
                 [v1.x, v1.y, v1.z] = [v1.x, v1.y, v1.z];
                 [v2.x, v2.y, v2.z] = [v2.x, v2.y, v2.z];
                 [v0.x, v0.y, v0.z] = [v0.x, v0.y, v0.z];
-            } else if (this.isZXPlane()) { // ZX-plane
+            } else if (this.isZXPlane()) {
+                // ZX-plane
                 [v1.x, v1.y, v1.z] = [v1.z, v1.x, v1.y];
                 [v2.x, v2.y, v2.z] = [v2.z, v2.x, v2.y];
                 [v0.x, v0.y, v0.z] = [v0.z, v0.x, v0.y];
-            } else if (this.isYZPlane()) { // YZ-plane
+            } else if (this.isYZPlane()) {
+                // YZ-plane
                 [v1.x, v1.y, v1.z] = [v1.y, v1.z, v1.x];
                 [v2.x, v2.y, v2.z] = [v2.y, v2.z, v2.x];
                 [v0.x, v0.y, v0.z] = [v0.y, v0.z, v0.x];
@@ -286,8 +324,8 @@ class GcodeToolpath {
                     height = -height;
                 }
 
-                const offsetX = x / 2 - y / distance * height;
-                const offsetY = y / 2 + x / distance * height;
+                const offsetX = x / 2 - (y / distance) * height;
+                const offsetY = y / 2 + (x / distance) * height;
 
                 v0.x = v1.x + offsetX;
                 v0.y = v1.y + offsetY;
@@ -296,7 +334,11 @@ class GcodeToolpath {
             this.offsetAddArcCurve(v1, v2, v0);
 
             // Update position
-            this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
+            this.setPosition(
+                targetPosition.x,
+                targetPosition.y,
+                targetPosition.z
+            );
         },
         'G3': (params) => {
             if (this.modal.motion !== 'G3') {
@@ -306,30 +348,34 @@ class GcodeToolpath {
             const v1 = {
                 x: this.position.x,
                 y: this.position.y,
-                z: this.position.z
+                z: this.position.z,
             };
             const v2 = {
                 x: this.translateX(params.X),
                 y: this.translateY(params.Y),
-                z: this.translateZ(params.Z)
+                z: this.translateZ(params.Z),
             };
-            const v0 = { // fixed point
+            const v0 = {
+                // fixed point
                 x: this.translateI(params.I),
                 y: this.translateJ(params.J),
-                z: this.translateK(params.K)
+                z: this.translateK(params.K),
             };
             const isClockwise = false;
             const targetPosition = { x: v2.x, y: v2.y, z: v2.z };
 
-            if (this.isXYPlane()) { // XY-plane
+            if (this.isXYPlane()) {
+                // XY-plane
                 [v1.x, v1.y, v1.z] = [v1.x, v1.y, v1.z];
                 [v2.x, v2.y, v2.z] = [v2.x, v2.y, v2.z];
                 [v0.x, v0.y, v0.z] = [v0.x, v0.y, v0.z];
-            } else if (this.isZXPlane()) { // ZX-plane
+            } else if (this.isZXPlane()) {
+                // ZX-plane
                 [v1.x, v1.y, v1.z] = [v1.z, v1.x, v1.y];
                 [v2.x, v2.y, v2.z] = [v2.z, v2.x, v2.y];
                 [v0.x, v0.y, v0.z] = [v0.z, v0.x, v0.y];
-            } else if (this.isYZPlane()) { // YZ-plane
+            } else if (this.isYZPlane()) {
+                // YZ-plane
                 [v1.x, v1.y, v1.z] = [v1.y, v1.z, v1.x];
                 [v2.x, v2.y, v2.z] = [v2.y, v2.z, v2.x];
                 [v0.x, v0.y, v0.z] = [v0.y, v0.z, v0.x];
@@ -352,8 +398,8 @@ class GcodeToolpath {
                     height = -height;
                 }
 
-                const offsetX = x / 2 - y / distance * height;
-                const offsetY = y / 2 + x / distance * height;
+                const offsetX = x / 2 - (y / distance) * height;
+                const offsetY = y / 2 + (x / distance) * height;
 
                 v0.x = v1.x + offsetX;
                 v0.y = v1.y + offsetY;
@@ -362,7 +408,11 @@ class GcodeToolpath {
             this.offsetAddArcCurve(v1, v2, v0);
 
             // Update position
-            this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
+            this.setPosition(
+                targetPosition.x,
+                targetPosition.y,
+                targetPosition.z
+            );
         },
         // G4: Dwell
         // Parameters
@@ -370,11 +420,9 @@ class GcodeToolpath {
         //   Snnn Time to wait, in seconds (Only on Marlin and Smoothie)
         // Example
         //   G4 P200
-        'G4': (params) => {
-        },
+        'G4': (params) => {},
         // G10: Coordinate System Data Tool and Work Offset Tables
-        'G10': (params) => {
-        },
+        'G10': (params) => {},
         // G17..19: Plane Selection
         // G17: XY (default)
         'G17': (params) => {
@@ -511,7 +559,11 @@ class GcodeToolpath {
         // A G92 without coordinates will reset all axes to zero.
         'G92': (params) => {
             // A G92 without coordinates will reset all axes to zero.
-            if ((params.X === undefined) && (params.Y === undefined) && (params.Z === undefined)) {
+            if (
+                params.X === undefined &&
+                params.Y === undefined &&
+                params.Z === undefined
+            ) {
                 this.position.x += this.g92offset.x;
                 this.g92offset.x = 0;
                 this.position.y += this.g92offset.y;
@@ -636,7 +688,7 @@ class GcodeToolpath {
             }
 
             this.setModal({
-                coolant: coolants.indexOf('M8') >= 0 ? 'M7,M8' : 'M7'
+                coolant: coolants.indexOf('M8') >= 0 ? 'M7,M8' : 'M7',
             });
         },
         // M8: Turn flood coolant on
@@ -647,7 +699,7 @@ class GcodeToolpath {
             }
 
             this.setModal({
-                coolant: coolants.indexOf('M7') >= 0 ? 'M7,M8' : 'M8'
+                coolant: coolants.indexOf('M7') >= 0 ? 'M7,M8' : 'M8',
             });
         },
         // M9: Turn all coolant off
@@ -660,7 +712,7 @@ class GcodeToolpath {
             if (tool !== undefined) {
                 this.setModal({ tool: tool });
             }
-        }
+        },
     };
 
     // @param {object} [options]
@@ -673,7 +725,8 @@ class GcodeToolpath {
             position,
             modal,
             addLine = noop,
-            addArcCurve = noop
+            addArcCurve = noop,
+            addCurve = noop,
         } = { ...options };
         this.g92offset.x = 0;
         this.g92offset.y = 0;
@@ -687,7 +740,7 @@ class GcodeToolpath {
 
         // Modal
         const nextModal = {};
-        Object.keys({ ...modal }).forEach(key => {
+        Object.keys({ ...modal }).forEach((key) => {
             if (!Object.prototype.hasOwnProperty.call(this.modal, key)) {
                 return;
             }
@@ -695,7 +748,7 @@ class GcodeToolpath {
         });
         this.setModal(nextModal);
 
-        this.fn = { addLine, addArcCurve };
+        this.fn = { addLine, addCurve, addArcCurve };
 
         const toolpath = new Interpreter({ handlers: this.handlers });
         toolpath.getPosition = () => ({ ...this.position });
@@ -713,16 +766,18 @@ class GcodeToolpath {
     setModal(modal) {
         this.modal = {
             ...this.modal,
-            ...modal
+            ...modal,
         };
         return this.modal;
     }
 
-    isMetricUnits() { // mm
+    isMetricUnits() {
+        // mm
         return this.modal.units === 'G21';
     }
 
-    isImperialUnits() { // inches
+    isImperialUnits() {
+        // inches
         return this.modal.units === 'G20';
     }
 
@@ -747,25 +802,20 @@ class GcodeToolpath {
     }
 
     setPosition(...pos) {
-        this.prevPosition.x = this.position.x;
-        this.prevPosition.y = this.position.y;
-        this.prevPosition.z = this.position.z;
-        this.prevPosition.a = this.position.a;
-
         if (typeof pos[0] === 'object') {
             const { x, y, z, a } = { ...pos[0] };
 
-            this.position.x = (typeof x === 'number') ? x : this.position.x;
-            this.position.y = (typeof y === 'number') ? y : this.position.y;
-            this.position.z = (typeof z === 'number') ? z : this.position.z;
-            this.position.a = (typeof a === 'number') ? a : this.position.a;
+            this.position.x = typeof x === 'number' ? x : this.position.x;
+            this.position.y = typeof y === 'number' ? y : this.position.y;
+            this.position.z = typeof z === 'number' ? z : this.position.z;
+            this.position.a = typeof a === 'number' ? a : this.position.a;
         } else {
             const [x, y, z, a] = pos;
 
-            this.position.x = (typeof x === 'number') ? x : this.position.x;
-            this.position.y = (typeof y === 'number') ? y : this.position.y;
-            this.position.z = (typeof z === 'number') ? z : this.position.z;
-            this.position.a = (typeof a === 'number') ? a : this.position.a;
+            this.position.x = typeof x === 'number' ? x : this.position.x;
+            this.position.y = typeof y === 'number' ? y : this.position.y;
+            this.position.z = typeof z === 'number' ? z : this.position.z;
+            this.position.a = typeof a === 'number' ? a : this.position.a;
         }
     }
 

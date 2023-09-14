@@ -155,7 +155,7 @@ class SerialConnection extends EventEmitter {
             return;
         }
 
-        const { path, ...rest } = this.settings;
+        const { path, baudRate, ..rest } = this.settings;
 
         const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
         const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
@@ -165,24 +165,21 @@ class SerialConnection extends EventEmitter {
             this.addPortListeners();
             this.port.connect(23, path);
         } else {
-            console.log('serialport');
             this.port = new SerialPort({
                 path,
+                baudRate,
                 ...rest,
                 autoOpen: false
             });
-            this.addPortListeners();
-            this.port.open(callback);
         }
-    }
-
-    addPortListeners() {
         this.port.on('open', this.eventListener.open);
         this.port.on('close', this.eventListener.close);
         this.port.on('error', this.eventListener.error);
 
         this.parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }));
         this.parser.on('data', this.eventListener.data);
+
+        this.port.open(callback);
     }
 
     // @param {function} callback The error-first callback.
@@ -211,6 +208,10 @@ class SerialConnection extends EventEmitter {
 
         data = this.writeFilter(data, context);
         this.port.write(Buffer.from(data));
+    }
+
+    writeImmediate(data) {
+        this.port.write(data);
     }
 }
 

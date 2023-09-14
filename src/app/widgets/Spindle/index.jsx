@@ -265,15 +265,45 @@ class SpindleWidget extends PureComponent {
         const {
             minimized,
             spindleSpeed,
-            mode,
-            laser
+            laser,
+            mode
         } = this.state;
+        const {
+            spindleMax,
+            spindleMin,
+            laserAsSpindle
+        } = this.props;
 
         this.config.set('laser.duration', laser.duration);
         this.config.set('laser.power', laser.power);
         this.config.set('mode', mode);
         this.config.set('minimized', minimized);
-        this.config.set('speed', spindleSpeed);
+
+        // mode updates before redux and controller updates,
+        // so make sure that laser as spindle (from redux) is off before running this code
+        if (mode === SPINDLE_MODE && !laserAsSpindle) {
+            // set speed, taking the limits into account
+            let newSpindleSpeed = spindleSpeed;
+            if (spindleSpeed > spindleMax) {
+                newSpindleSpeed = spindleMax;
+            } else if (spindleSpeed < spindleMin) {
+                newSpindleSpeed = spindleMin;
+            }
+            this.config.set('speed', newSpindleSpeed);
+            // update the new spindle speed in state and send it to the controller
+            this.updateSpindleSpeed(newSpindleSpeed);
+        }
+    }
+
+    updateSpindleSpeed(speed) {
+        const { spindleSpeed } = this.state;
+        // only update if there is a change
+        if (spindleSpeed !== speed) {
+            this.setState({ spindleSpeed: speed });
+            if (this.isSpindleOn) {
+                this.debounceSpindleSpeed(speed);
+            }
+        }
     }
 
     getInitialState() {
@@ -290,16 +320,25 @@ class SpindleWidget extends PureComponent {
     }
 
     enableSpindleMode() {
-        const { units } = this.props;
+        const { units, spindleMax: maxPower, spindleMin: minPower } = this.props;
         const preferredUnits = store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
         const active = this.getSpindleActiveState();
+
+        // get previously saved spindle values
+        const spindleMin = this.config.get('spindleMin');
+        const spindleMax = this.config.get('spindleMax');
+
+        // save current laser values
+        let laser = this.config.get('laser');
+        laser.maxPower = maxPower;
+        laser.minPower = minPower;
+        this.config.set('laser', laser);
+
         if (active) {
             this.isSpindleOn = false;
             controller.command('gcode', 'M5');
             //this.setInactive();
         }
-        const spindleMin = this.config.get('spindleMin');
-        const spindleMax = this.config.get('spindleMax');
         const commands = [
             preferredUnits,
             ...this.getSpindleOffsetCode(),
@@ -408,12 +447,18 @@ class SpindleWidget extends PureComponent {
 
 
     enableLaserMode() {
-        const { units } = this.props;
+        const { units, spindleMax, spindleMin } = this.props;
         const preferredUnits = store.get('workspace.units') === IMPERIAL_UNITS ? 'G20' : 'G21';
         const active = this.getSpindleActiveState();
-        const laser = this.config.get('laser');
 
+        // get previously saved laser values
+        const laser = this.config.get('laser');
         const { minPower, maxPower } = laser;
+
+        // save current spindle values
+        this.config.set('spindleMin', spindleMin);
+        this.config.set('spindleMax', spindleMax);
+
         if (active) {
             this.isLaserOn = false;
             controller.command('gcode', 'M5');
@@ -457,8 +502,8 @@ class SpindleWidget extends PureComponent {
     }
 
     render() {
-        const { embedded, spindleModal } = this.props;
-        const { minimized, isFullscreen, spindleMin, spindleMax } = this.state;
+        const { embedded, spindleModal, spindleMin, spindleMax } = this.props;
+        const { minimized, isFullscreen } = this.state;
         const state = {
             ...this.state,
             spindleModal,
@@ -510,6 +555,7 @@ export default connect((store) => {
     const settings = get(store, 'controller.settings');
     const spindleMin = Number(get(settings, 'settings.$31', 1000));
     const spindleMax = Number(get(settings, 'settings.$30', 30000));
+    const laserAsSpindle = Number(get(settings, 'settings.$32', 0));
     const wcs = get(store, 'controller.modal.wcs');
     const wpos = get(store, 'controller.wpos', {});
     const units = get(store, 'controller.modal.units', {});
@@ -523,6 +569,7 @@ export default connect((store) => {
         settings,
         spindleMin,
         spindleMax,
+        laserAsSpindle,
         wcs,
         wpos,
         units
