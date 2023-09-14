@@ -197,101 +197,100 @@ class NavbarConnection extends PureComponent {
                             Disconnect
                         </button>
 
-                        )
-                    }
-                    <div style={isMobile ? { display: isActive ? 'block' : 'none' } : null} className={styles.NavbarConnectionDropdownList}>
-                        {
-                            !connected && (
+                    )
+                }
+                <div style={isMobile ? { display: isActive ? 'block' : 'none' } : null} className={styles.NavbarConnectionDropdownList}>
+                    {
+                        !connected && (
                             <>
                                 <h5>Firmware</h5>
                                 <FirmwareSelector options={['Grbl', 'grblHAL']} selectedFirmware={controllerType} handleSelect={actions.onClickFirmwareButton}/>
                             </>
+                        )
+                    }
+                    {
+                        !connected && <h5>Recognized Devices</h5>
+                    }
+                    {
+                        !connected && (ports.length === 0) && (
+                            <div className={styles.noDevicesWarning}>
+                                No Devices Found
+                            </div>
+                        )
+                    }
+                    {
+                        !connected && !connecting && ports.map(
+                            port => (
+                                <PortListing
+                                    {...port}
+                                    key={port.port}
+                                    baudrate={baudrate}
+                                    controllerType={controllerType}
+                                    onClick={() => actions.onClickPortListing(port)}
+                                />
                             )
-                        }
-                        {
-                            !connected && <h5>Recognized Devices</h5>
-                        }
-                        {
-                            !connected && (ports.length === 0) && (
+                        )
+                    }
+                    {
+                        !connected && <h5>Network Devices</h5>
+                    }
+                    {
+                        !connected &&
+                        <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
+                            <FunctionButton
+                                primary
+                                onClick={() => controller.networkScan(23, this.convertIPToString(ip))}
+                                className={styles.scanButton}
+                            >
+                                Scan for Devices
+                            </FunctionButton>
+                        </div>
+                    }
+                    {
+                        !connected && (networkPorts.length === 0) && (
+                            hasScanned ? (
                                 <div className={styles.noDevicesWarning}>
-                                    No Devices Found
+                                    No Network Devices Found
+                                </div>
+                            ) : (
+                                <div className={styles.noDevicesWarning}>
+                                    Please Scan To Display Available Devices
                                 </div>
                             )
-                        }
-                        {
-                            !connected && !connecting && ports.map(
-                                port => (
-                                    <PortListing
-                                        {...port}
-                                        key={port.port}
-                                        baudrate={baudrate}
-                                        controllerType={controllerType}
-                                        onClick={() => actions.onClickPortListing(port)}
-                                    />
-                                )
+                        )
+                    }
+                    {
+                        !connected && !connecting && networkPorts.map(
+                            port => (
+                                <PortListing
+                                    {...port}
+                                    key={port.port}
+                                    baudrate={baudrate}
+                                    controllerType={controllerType}
+                                    onClick={() => actions.onClickPortListing(port, true)}
+                                />
                             )
-                        }
-                        {
-                            !connected && <h5>Network Devices</h5>
-                        }
-                        {
-                            !connected &&
-                                <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
-                                    <FunctionButton
-                                        primary
-                                        onClick={() => controller.networkScan(23, this.convertIPToString(ip))}
-                                        className={styles.scanButton}
-                                    >
-                                        Scan for Devices
-                                    </FunctionButton>
-                                </div>
-                        }
-                        {
-                            !connected && (networkPorts.length === 0) && (
-                                hasScanned ? (
-                                    <div className={styles.noDevicesWarning}>
-                                        No Network Devices Found
-                                    </div>
-                                ) : (
-                                    <div className={styles.noDevicesWarning}>
-                                        Please Scan To Display Available Devices
-                                    </div>
-                                )
+                        )
+                    }
+                    {
+                        !connected && !connecting && (unrecognizedPorts.length > 0) &&
+                        <UnrecognizedDevices ports={unrecognizedPorts} onClick={actions.toggleShowUnrecognized} />
+                    }
+                    {
+                        !connected && !connecting && showUnrecognized && unrecognizedPorts.map(
+                            port => (
+                                <PortListing
+                                    {...port}
+                                    key={port.port}
+                                    baudrate={baudrate}
+                                    controllerType={controllerType}
+                                    onClick={() => actions.onClickPortListing(port)}
+                                />
                             )
-                        }
-                        {
-                            !connected && !connecting && networkPorts.map(
-                                port => (
-                                    <PortListing
-                                        {...port}
-                                        key={port.port}
-                                        baudrate={baudrate}
-                                        controllerType={controllerType}
-                                        onClick={() => actions.onClickPortListing(port, true)}
-                                    />
-                                )
-                            )
-                        }
-                        {
-                            !connected && !connecting && (unrecognizedPorts.length > 0) &&
-                                <UnrecognizedDevices ports={unrecognizedPorts} onClick={actions.toggleShowUnrecognized} />
-                        }
-                        {
-                            !connected && !connecting && showUnrecognized && unrecognizedPorts.map(
-                                port => (
-                                    <PortListing
-                                        {...port}
-                                        key={port.port}
-                                        baudrate={baudrate}
-                                        controllerType={controllerType}
-                                        onClick={() => actions.onClickPortListing(port)}
-                                    />
-                                )
-                            )
-                        }
-                    </div>
+                        )
+                    }
                 </div>
-            </>
+            </div>
         );
     }
 }
