@@ -1,8 +1,18 @@
 import React from 'react';
+import styles from 'Containers/Firmware/components/HalSettings/inputs/index.styl';
+import ControlledInput from 'Containers/Firmware/components/HalSettings/inputs/ControlledInput';
 
-const Ipv4Input = () => {
+const Ipv4Input = ({ info, setting }) => {
+    const { unit = null } = info;
+    let { value } = setting;
+
     return (
-        <div>IPV4</div>
+        <div className={styles.inputRow}>
+            <ControlledInput type="text" className={styles.textInput} value={value} />
+            {
+                unit && <span className={styles.unit}>{unit}</span>
+            }
+        </div>
     );
 };
 

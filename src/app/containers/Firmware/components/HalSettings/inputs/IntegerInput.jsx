@@ -10,7 +10,7 @@ const IntegerInput = ({ info, setting }) => {
     return (
         <div className={styles.inputRow}>
             <ControlledInput
-                type="number"
+                type="decimal"
                 className={styles.textInput}
                 value={value}
                 step={1}
