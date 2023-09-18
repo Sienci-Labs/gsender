@@ -8,7 +8,7 @@ import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 
-import { calculateHypotenuse, calculateAlpha, calculateBeta, calculateFM, calculateMovement, FM_OFFSET_THRESHOLD } from './utils/result';
+import { calculateHypotenuse, calculateAlpha, calculateBeta, calculateFM, calculateMovement, FM_LOWER_OFFSET_THRESHOLD, RESULT_OFFSET_THRESHOLD } from './utils/result';
 import styles from './index.styl';
 
 const Icon = ({ type = 'default' }) => {
@@ -160,7 +160,7 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
             );
         }
 
-        if (fm <= FM_OFFSET_THRESHOLD) {
+        if (fm <= FM_LOWER_OFFSET_THRESHOLD) {
             return (
                 <>
                     <div className={classnames(styles.result, styles.resultWarning)}>
@@ -209,6 +209,14 @@ const Result = ({ triangle, jogValues, onBack, onClose }) => {
                             you can click &quot;Update Machine Settings&quot; to update your EEPROM values.
                         </p>
                     )}
+
+                    {
+                        fm > RESULT_OFFSET_THRESHOLD && (
+                            <p style={{ padding: '1rem', backgroundColor: 'gold', border: '3px solid black', borderRadius: '10px' }}>
+                                Warning. Your machine is off by a large amount, updating the EEPROM values for improved accuracy may cause issues.
+                            </p>
+                        )
+                    }
                 </div>
 
                 {

@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
 import styles from './index.styl';
+import { RESULT_OFFSET_THRESHOLD } from '../Alignment/utils/result';
 
 const setEepromSetting = (setting, value) => {
     controller.command('gcode', `${setting}=${value}`);
@@ -39,7 +40,7 @@ const calculateNewStepsPerMM = (originalSteps, requestedDistance, actualDistance
     return originalSteps * (requestedDistance / actualDistance);
 };
 
-const Result = ({ options, onBack, onClose, xSteps, ySteps, zSteps }) => {
+const Result = ({ options, onClose, xSteps, ySteps, zSteps }) => {
     const [result, setResult] = useState(0);
     useEffect(() => {
         const { currentAxis, requestedDistance, actualDistance } = options;
@@ -70,6 +71,10 @@ const Result = ({ options, onBack, onClose, xSteps, ySteps, zSteps }) => {
         const eepromValue = getEEPROMValue(currentAxis);
         const roundedResult = result.toFixed(3);
 
+        if (requestedDistance === actualDistance) {
+            return <p>Your {currentAxis} is tuned, no need to update steps/mm.</p>;
+        }
+
         return (
             <>
                 <p>Optimal steps/mm for the { currentAxis } axis: <b>{ roundedResult } step/mm</b></p>
@@ -80,6 +85,14 @@ const Result = ({ options, onBack, onClose, xSteps, ySteps, zSteps }) => {
                     You requested to move <b>{ requestedDistance }mm</b> but actually moved <b>{ actualDistance }mm</b>.
                     Your current <b>{ eepromSetting }</b> value is currently set to <b>{ eepromValue }</b>
                 </div>
+
+                {
+                    result > RESULT_OFFSET_THRESHOLD && (
+                        <p style={{ padding: '1rem', backgroundColor: 'gold', border: '3px solid black', borderRadius: '10px' }}>
+                            Warning. Your machine is off by a large amount, updating the EEPROM values for improved accuracy may cause issues.
+                        </p>
+                    )
+                }
 
                 <div><b><i>{ eepromValue } × ({ requestedDistance } ÷ { actualDistance }) = { roundedResult }</i></b></div>
             </>
