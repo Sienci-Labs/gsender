@@ -32,8 +32,12 @@ export const translateGcode = ({
     regex,
     type = GCODE_TRANSLATION_TYPE.DEFAULT,
 }) => {
-    if (!from || !to || !gcode || !regex) {
-        throw new Error('Missing from, to, gcode, and/or regex values');
+    if (!gcode) {
+        return '';
+    }
+    if (!from || !to || !regex) {
+        console.error('Missing from, to, and/or regex values');
+        return gcode;
     }
 
     const updatedGcode = gcode.replace(regex, replaceHandler({ from, to, type }));

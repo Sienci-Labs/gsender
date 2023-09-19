@@ -142,14 +142,6 @@ class NavbarConnection extends PureComponent {
                 }
                 <div style={isMobile ? { display: isActive ? 'block' : 'none' } : null} className={styles.NavbarConnectionDropdownList}>
                     {
-                        !connected && (
-                        <>
-                            <h5>Firmware</h5>
-                            <FirmwareSelector options={['Grbl', 'grblHAL']} selectedFirmware={controllerType} handleSelect={actions.onClickFirmwareButton}/>
-                        </>
-                        )
-                    }
-                    {
                         !connected && <h5>Recognized Devices</h5>
                     }
                     {
@@ -187,6 +179,13 @@ class NavbarConnection extends PureComponent {
                                     onClick={() => actions.onClickPortListing(port)}
                                 />
                             )
+                        )
+                    }
+                    {
+                        !connected && (
+                            <div className={styles.addMargin}>
+                                <FirmwareSelector options={['Grbl', 'grblHAL']} selectedFirmware={controllerType} handleSelect={actions.onClickFirmwareButton}/>
+                            </div>
                         )
                     }
                 </div>

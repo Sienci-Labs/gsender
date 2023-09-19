@@ -14,4 +14,5 @@ export const calculateHypotenuse = ({ a, b }) => {
     return Math.sqrt((a ** 2) + (b ** 2));
 };
 
-export const FM_OFFSET_THRESHOLD = 2;
+export const FM_LOWER_OFFSET_THRESHOLD = 2;
+export const RESULT_OFFSET_THRESHOLD = 20;

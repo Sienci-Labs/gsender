@@ -9,6 +9,7 @@ import controller from 'app/lib/controller';
 import store from 'app/store';
 import { WORKSPACE_MODE, METRIC_UNITS, VISUALIZER_PRIMARY } from 'app/constants';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+import { getUnitModal } from 'app/lib/toolChangeUtils';
 
 import styles from './index.styl';
 import RotaryToggle from './RotaryToggle';
@@ -22,16 +23,12 @@ import { RotaryContext } from './Context';
 import { MODALS } from './utils/constants';
 import StockTurning from './StockTurning';
 
-
 let pubsubTokens = [];
 
 const Rotary = () => {
     const { state: { activeDialog } } = useContext(RotaryContext);
     const [speedPreset, setSpeedPreset] = useState(SPEED_NORMAL);
-    const [jog, setJog] = useState({
-        ...store.get('widgets.axes.jog'),
-        aStep: '5.00',
-    });
+    const [jog, setJog] = useState({ ...store.get('widgets.axes.jog', { aStep: '5.00' }) });
     const [, setIsContinuousJogging] = useState(false);
     const { state: controllerState, type: controllerType } = useSelector(state => state.controller);
 
@@ -80,9 +77,7 @@ const Rotary = () => {
             });
         },
         jog: (params = {}) => {
-            const units = store.get('workspace.units', METRIC_UNITS);
-
-            const modal = (units === 'mm') ? 'G21' : 'G20';
+            const modal = 'G21';
             const s = map(params, (value, letter) => ('' + letter.toUpperCase() + value)).join(' ');
             const commands = [
                 `$J=${modal}G91 ` + s,
@@ -90,11 +85,9 @@ const Rotary = () => {
             controller.command('gcode', commands, modal);
         },
         startContinuousJog: (params = {}, feedrate = 1000) => {
-            const units = store.get('workspace.units', METRIC_UNITS);
-
             setIsContinuousJogging(true);
 
-            controller.command('jog:start', params, feedrate, units);
+            controller.command('jog:start', params, feedrate, METRIC_UNITS);
         },
         stopContinuousJog: () => {
             setIsContinuousJogging(false);
@@ -137,16 +130,15 @@ const Rotary = () => {
                 msg: `Running ${name} probing commands`,
                 type: TOASTER_INFO,
             });
-            controller.command('gcode:safe', commands, 'G21');
+
+            const unitModal = getUnitModal();
+
+            controller.command('gcode:safe', commands, unitModal);
         }
     };
 
     const isFileRunning = () => {
-        if (controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run') {
-            return true;
-        } else {
-            return false;
-        }
+        return controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run';
     };
 
     const { ROTARY } = WORKSPACE_MODE;
@@ -179,9 +171,7 @@ const Rotary = () => {
                 <p className={styles['rotary-tab-section-title']}>Tools</p>
                 <RotaryToggle />
 
-                <ActionArea
-                    actions={actions}
-                />
+                <ActionArea actions={actions} />
 
                 {ActiveModal && <ActiveModal actions={actions} />}
             </div>

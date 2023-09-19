@@ -53,6 +53,9 @@ import {
     FILE_TYPE,
     WORKSPACE_MODE,
     RENDER_NO_FILE,
+    ALARM_ERROR_TYPES,
+    ALARM,
+    ERROR,
     JOB_TYPES,
     JOB_STATUS
 } from 'app/constants';
@@ -65,6 +68,7 @@ export function* initialize() {
     let estimateWorker = null;
     let currentState = GRBL_ACTIVE_STATE_IDLE;
     let prevState = GRBL_ACTIVE_STATE_IDLE;
+    let areStatsInitialized = false;
     let errors = [];
 
     /* Health check - every 3 minutes */
@@ -218,6 +222,29 @@ export function* initialize() {
             shouldIncludeSVG,
             needsVisualization
         });
+    };
+
+    const updateAlarmsErrors = async (error) => {
+        try {
+            let res = await api.alarmList.fetch();
+            const alarmList = res.body;
+
+            const alarmError = {
+                id: alarmList.list.length > 0 ? (alarmList.list.length).toString() : '0',
+                type: error.type.includes('ALARM') ? ALARM : ERROR,
+                source: error.origin,
+                time: new Date(),
+                CODE: error.code,
+                MESSAGE: error.description,
+                lineNumber: error.lineNumber,
+                line: error.line,
+                controller: error.controller,
+            };
+            alarmList.list.push(alarmError);
+            api.alarmList.update(alarmList);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     controller.addListener('controller:settings', (type, settings) => {
@@ -473,6 +500,11 @@ export function* initialize() {
         visualizeWorker.terminate();
     });
 
+    // for when you don't want to send file to backend
+    pubsub.subscribe('visualizer:load', (msg, content, size, name, visualizer) => {
+        parseGCode(content, size, name, visualizer);
+    });
+
     pubsub.subscribe('estimate:done', (msg, data) => {
         estimateWorker.terminate();
     });
@@ -533,11 +565,12 @@ export function* initialize() {
     });
 
     controller.addListener('error', (error) => {
-        const alarmReg = new RegExp(/GRBL_[a-zA-Z_]*ALARM/);
-        const errorReg = new RegExp(/GRBL_[a-zA-Z_]*ERROR/);
-        if (isElectron() && (alarmReg.test(error.type) || errorReg.test(error.type))) {
-            window.ipcRenderer.send('logError:electron', error);
+        if (ALARM_ERROR_TYPES.includes(error.type)) {
+            updateAlarmsErrors(error);
         }
+        // if (isElectron() && (alarmReg.test(error.type) || errorReg.test(error.type))) {
+        //     window.ipcRenderer.send('logError:electron', error);
+        // }
         pubsub.publish('error', error);
     });
 
@@ -564,7 +597,7 @@ export function* initialize() {
 
         if (type === FILE_TYPE.FOUR_AXIS && controller.type === 'Grbl') {
             Confirm({
-                title: '4 Axis File File Loaded',
+                title: '4 Axis File Loaded',
                 content: 'G-Code contains 4 simultaneous axis commands which are not supported at this time and cannot be run.',
                 confirmLabel: null,
                 cancelLabel: 'Close',
@@ -579,6 +612,15 @@ export function* initialize() {
 
     controller.addListener('gcode_error', (error) => {
         errors.push(error);
+    });
+
+    controller.addListener('settings:description', (data) => {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_SETTINGS_DESCRIPTIONS,
+            payload: {
+                descriptions: data
+            }
+        });
     });
 
     yield null;

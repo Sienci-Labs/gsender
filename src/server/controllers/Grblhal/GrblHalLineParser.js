@@ -36,9 +36,8 @@ import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
 import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
 import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
-
-// Grbl v1.1
-// https://github.com/gnea/grbl/blob/edge/doc/markdown/interface.md
+import GrblHalLineParserResultSettingDescription from './GrblHalLineParserResultSettingDescription';
+import GrblHalLineParserResultSettingDetails from 'server/controllers/Grblhal/GrblHalLineParserResultSettingDetails';
 
 class GrblHalLineParser {
     parse(line) {
@@ -81,6 +80,12 @@ class GrblHalLineParser {
             // [VER:] (v1.1)
             GrblHalLineParserResultVersion,
 
+            // [SETTING:1|27|Step idle delay|milliseconds|5|####0||65535|0|0]
+            GrblHalLineParserResultSettingDescription,
+
+            // "120","X-axis acceleration","mm/sec^2","Acceleration. Used for motion planning to not exceed motor torque and lose steps.",
+            GrblHalLineParserResultSettingDetails,
+
             // [XXXX:] (v1.1)
             GrblHalLineParserResultInfo,
 
@@ -95,7 +100,7 @@ class GrblHalLineParser {
             GrblHalLineParserResultSettings,
 
             // Grbl X.Xx ['$' for help]
-            GrblHalLineParserResultStartup
+            GrblHalLineParserResultStartup,
         ];
 
         for (let parser of parsers) {

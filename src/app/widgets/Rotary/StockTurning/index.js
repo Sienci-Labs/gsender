@@ -1,4 +1,5 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
+import pubsub from 'pubsub-js';
 
 import Modal from 'app/components/ToolModal/ToolModal';
 import GcodeViewer from 'app/components/GcodeViewer';
@@ -9,21 +10,25 @@ import reduxStore from 'app/store/redux';
 
 import { RotaryContext } from '../Context';
 import { MODALS } from '../utils/constants';
-import { CLOSE_ACTIVE_DIALOG, SET_STOCK_TURNING_OUTPUT, CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL } from '../Context/actions';
+import {
+    CLOSE_ACTIVE_DIALOG,
+    SET_STOCK_TURNING_OUTPUT,
+    CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL,
+    CONVERT_STOCK_TURNING_OPTIONS_TO_METRIC,
+    SET_ACTIVE_STOCK_TURNING_TAB,
+} from '../Context/actions';
 import InputArea from './components/InputArea';
 
 import styles from './index.styl';
 import ActionArea from './components/ActionArea';
 import TabArea from './components/TabArea';
 import Visualizer from './components/Visualizer';
+import { StockTurningGenerator } from './Generator';
 
 const StockTurning = () => {
-    const [currentTab, setCurrentTab] = useState(0);
-    const { state: { activeDialog, stockTurning }, dispatch } = useContext(RotaryContext);
+    const { state: { activeDialog, stockTurning, }, dispatch } = useContext(RotaryContext);
 
     useEffect(() => {
-        reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
-
         const units = store.get('workspace.units');
 
         if (units === 'in') {
@@ -31,20 +36,63 @@ const StockTurning = () => {
         }
 
         return () => {
+            const units = store.get('workspace.units');
+
+            if (units === 'in') {
+                dispatch({ type: CONVERT_STOCK_TURNING_OPTIONS_TO_METRIC });
+            }
+
             if (units === 'mm') {
                 store.replace('widgets.rotary.stockTurning.options', stockTurning.options);
             }
 
             reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_PRIMARY });
+
+            dispatch({ type: SET_ACTIVE_STOCK_TURNING_TAB, payload: 0 });
         };
     }, []);
+
+    useEffect(() => {
+        // Need to re-visualize the gcode once the visualizer is re-mounted
+        if (stockTurning.activeTab === 0 && canLoad) {
+            runGenerate();
+        }
+    }, [stockTurning.activeTab]);
 
     const handleClose = () => {
         dispatch({ type: CLOSE_ACTIVE_DIALOG });
         dispatch({ type: SET_STOCK_TURNING_OUTPUT, payload: null });
     };
 
-    const { gcode } = stockTurning;
+    const runGenerate = () => {
+        reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
+
+        dispatch({ type: SET_ACTIVE_STOCK_TURNING_TAB, payload: 0 });
+
+        const stockTurningGenerator = new StockTurningGenerator(stockTurning.options);
+
+        stockTurningGenerator.generate();
+
+        dispatch({ type: SET_STOCK_TURNING_OUTPUT, payload: stockTurningGenerator.gcode });
+
+        const serializedFile = new File([stockTurningGenerator.gcode], 'rotary_surfacing.gcode');
+
+        pubsub.publish('visualizer:load', stockTurningGenerator.gcode, serializedFile.size, serializedFile.originalname, VISUALIZER_SECONDARY);
+    };
+
+    const loadGcode = () => {
+        const { gcode } = stockTurning;
+        const name = 'gSender_StockTurning';
+        const { size } = new File([gcode], name);
+
+        pubsub.publish('gcode:surfacing', { gcode, name, size });
+
+        dispatch({ type: CLOSE_ACTIVE_DIALOG });
+        dispatch({ type: SET_STOCK_TURNING_OUTPUT, payload: null });
+    };
+
+    const { gcode, activeTab } = stockTurning;
+    const canLoad = !!gcode;
 
     const tabs = [
         {
@@ -64,7 +112,7 @@ const StockTurning = () => {
 
     return (
         <Modal
-            title="Stock Turning Wizard"
+            title="Rotary Surfacing Tool"
             show={activeDialog === MODALS.STOCK_TURNING}
             onClose={handleClose}
             size="lg"
@@ -73,11 +121,15 @@ const StockTurning = () => {
                 <InputArea />
 
                 <div style={{ width: '55%' }}>
-                    <TabArea tabs={tabs} currentTab={currentTab} onTabChange={(index) => setCurrentTab(index)} />
+                    <TabArea
+                        tabs={tabs}
+                        currentTab={activeTab}
+                        onTabChange={(index) => dispatch({ type: SET_ACTIVE_STOCK_TURNING_TAB, payload: index })}
+                    />
                 </div>
             </div>
 
-            <ActionArea />
+            <ActionArea loadGcode={loadGcode} generateGcode={runGenerate} />
         </Modal>
     );
 };

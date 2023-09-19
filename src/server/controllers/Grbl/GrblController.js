@@ -78,7 +78,9 @@ import {
     MACRO_RUN,
     MACRO_LOAD,
     FILE_UNLOAD,
-    FILE_TYPE
+    FILE_TYPE,
+    ALARM,
+    ERROR
 } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
@@ -259,8 +261,11 @@ class GrblController {
             dataFilter: (line, context) => {
                 let commentMatcher = /\s*;.*/g;
                 let comment = line.match(commentMatcher);
-                const commentString = (comment && comment[0].length > 0) ? comment[0].trim().replace(';', '') : '';
-                line = line.replace(commentMatcher, '').replace('/uFEFF', '').trim();
+                const commentString = (comment && comment[0].length > 0) ? comment[0].trim()
+                    .replace(';', '') : '';
+                line = line.replace(commentMatcher, '')
+                    .replace('/uFEFF', '')
+                    .trim();
                 context = this.populateContext(context);
 
                 if (line[0] === '%') {
@@ -284,7 +289,10 @@ class GrblController {
                     }
                     if (line === PAUSE_START) {
                         log.debug('Found M0/M1, pausing program');
-                        this.emit('sender:M0M1', { data: 'M0/M1', comment: commentString });
+                        this.emit('sender:M0M1', {
+                            data: 'M0/M1',
+                            comment: commentString
+                        });
                         return 'G4 P0.5';
                     }
                     if (line === '%_GCODE_START') {
@@ -314,10 +322,16 @@ class GrblController {
                     const programMode = _.intersection(words, ['M0', 'M1'])[0];
                     if (programMode === 'M0') {
                         log.debug('M0 Program Pause');
-                        this.feeder.hold({ data: 'M0', comment: commentString }); // Hold reason
+                        this.feeder.hold({
+                            data: 'M0',
+                            comment: commentString
+                        }); // Hold reason
                     } else if (programMode === 'M1') {
                         log.debug('M1 Program Pause');
-                        this.feeder.hold({ data: 'M1', comment: commentString }); // Hold reason
+                        this.feeder.hold({
+                            data: 'M1',
+                            comment: commentString
+                        }); // Hold reason
                     }
                 }
 
@@ -330,19 +344,28 @@ class GrblController {
                 // // M6 Tool Change
                 if (_.includes(words, 'M6')) {
                     log.debug('M6 Tool Change');
-                    this.feeder.hold({ data: 'M6', comment: commentString }); // Hold reason
+                    this.feeder.hold({
+                        data: 'M6',
+                        comment: commentString
+                    }); // Hold reason
                     line = line.replace('M6', '(M6)');
                 }
 
-                const isUsingImperialUnits = context.modal.units === 'G20';
 
-                line = translateGcode({
-                    gcode: line,
-                    from: 'A',
-                    to: 'Y',
-                    regex: A_AXIS_COMMANDS,
-                    type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
-                });
+                const containsACommand = A_AXIS_COMMANDS.test(line);
+                const containsYCommand = Y_AXIS_COMMANDS.test(line);
+
+                if (containsACommand && !containsYCommand) {
+                    const isUsingImperialUnits = context.modal.units === 'G20';
+
+                    line = translateGcode({
+                        gcode: line,
+                        from: 'A',
+                        to: 'Y',
+                        regex: A_AXIS_COMMANDS,
+                        type: isUsingImperialUnits ? GCODE_TRANSLATION_TYPE.TO_IMPERIAL : GCODE_TRANSLATION_TYPE.DEFAULT
+                    });
+                }
 
                 return line;
             }
@@ -386,7 +409,7 @@ class GrblController {
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
-                let bracketCommentLine = /\([^\)]*\)/gm;
+                let bracketCommentLine = /\s*\(.*\)*\)/gm;
                 let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
                 line = line.replace(bracketCommentLine, '').trim();
                 let comment = line.match(commentMatcher);
@@ -677,36 +700,42 @@ class GrblController {
         });
 
         this.runner.on('error', (res) => {
+            console.log(res);
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
 
             log.error(`Error occurred at ${Date.now()}`);
 
             const { lines, received, name } = this.sender.state;
+            const { outstanding } = this.feeder.state;
             const isFileError = lines.length !== 0;
             //Check error origin
             let errorOrigin = '';
             let line = '';
 
-            if (isFileError) {
-                errorOrigin = name;
-                line = lines[received] || '';
-            } else if (store.get('inAppConsoleInput') !== null) {
+            if (store.get('inAppConsoleInput')) {
                 line = store.get('inAppConsoleInput') || '';
                 store.set('inAppConsoleInput', null);
                 errorOrigin = 'Console';
+            } else if (outstanding > 0) {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
+            } else if (isFileError) {
+                errorOrigin = name;
+                line = lines[received] || '';
             } else {
                 errorOrigin = 'Feeder';
                 line = 'N/A';
             }
 
             this.emit('error', {
-                type: 'GRBL_ERROR',
+                type: ERROR,
                 code: `${code}`,
                 description: error.description,
                 line: line,
                 lineNumber: isFileError ? received + 1 : '',
-                origin: errorOrigin
+                origin: errorOrigin,
+                controller: GRBL,
             });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
@@ -753,13 +782,42 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const alarm = _.find(GRBL_ALARMS, { code: code });
 
+            const { lines, received, name } = this.sender.state;
+            const { outstanding } = this.feeder.state;
+            const isFileError = lines.length !== 0;
+            //Check error origin
+            let errorOrigin = '';
+            let line = '';
+
+            if (store.get('inAppConsoleInput')) {
+                line = store.get('inAppConsoleInput') || '';
+                store.set('inAppConsoleInput', null);
+                errorOrigin = 'Console';
+            } else if (this.state.status.activeState === GRBL_ACTIVE_STATE_HOME) {
+                errorOrigin = 'Console';
+                line = '$H';
+            } else if (outstanding > 0) {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
+            } else if (isFileError) {
+                errorOrigin = name;
+                line = lines[received] || '';
+            } else {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
+            }
+
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
                 this.emit('error', {
-                    type: 'GRBL_ALARM',
+                    type: ALARM,
                     code: code,
                     description: alarm.description,
+                    line: line,
+                    lineNumber: isFileError ? received + 1 : '',
+                    origin: errorOrigin,
+                    controller: GRBL
                 });
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;

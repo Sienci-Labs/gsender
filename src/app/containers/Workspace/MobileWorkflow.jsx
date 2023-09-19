@@ -41,8 +41,10 @@ import {
     WORKFLOW_STATE_IDLE,
     WORKFLOW_STATE_PAUSED,
     WORKFLOW_STATE_RUNNING,
-    METRIC_UNITS,
+    METRIC_UNITS, IMPERIAL_UNITS,
 } from '../../constants';
+import { RadioButton, RadioGroup } from 'Components/Radio';
+import pubsub from 'pubsub-js';
 
 class WorkflowControl extends PureComponent {
     fileInputEl = null;
@@ -77,6 +79,14 @@ class WorkflowControl extends PureComponent {
         handleStop: () => {
             controller.command('gcode:stop', { force: true });
         },
+        handleUnitSwap: (value) => {
+            console.log(value);
+
+            this.setState({
+                units: value
+            });
+            pubsub.publish('units:change', value);
+        }
     };
 
     getInitialState() {
@@ -162,7 +172,7 @@ class WorkflowControl extends PureComponent {
 
     render() {
         const { handleOnStop } = this;
-        const { runHasStarted } = this.state;
+        const { runHasStarted, units } = this.state;
         const { fileLoaded, workflowState, isConnected, senderInHold, activeState } = this.props;
         const canClick = !!isConnected;
         const isReady = canClick && fileLoaded;
@@ -173,64 +183,75 @@ class WorkflowControl extends PureComponent {
         const activeHold = activeState === GRBL_ACTIVE_STATE_HOLD;
         const workflowPaused = runHasStarted && (workflowState === WORKFLOW_STATE_PAUSED || senderInHold || activeHold);
 
-        return (
-            (canRun || canPause || canStop) && // if it's not in remote mode, none of these will be true
-                <div>
-                    <div className={styles.widgetHeaderMobile}>
-                        <div className={styles.widgetTitleMobile}>
-                            {i18n._('Workflow Controls')}
-                        </div>
+        return (// if it's not in remote mode, none of these will be true
+            <div>
+                <div className={styles.widgetHeaderMobile}>
+                    <div className={styles.widgetTitleMobile}>
+                        {i18n._('Workflow Controls')}
                     </div>
-                    <div className={styles.widgetContentMobile}>
-                        <div className={styles.workflowControlMobile}>
-                            <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem', flexWrap: 'wrap' }}>
-                                {
-                                    canRun && (
-                                        <div className={styles.relativeWrapper}>
-                                            <button
-                                                type="button"
-                                                className={styles['workflow-button-play']}
-                                                title={workflowPaused ? i18n._('Resume') : i18n._('Run')}
-                                                onClick={this.startRun}
-                                                disabled={!isConnected}
-                                            >
-                                                {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb', marginLeft: '5px' }} />
-                                            </button>
-                                        </div>
-                                    )
-                                }
-
-                                {
-                                    canPause && (
+                </div>
+                <div className={styles.widgetContentMobile}>
+                    <RadioGroup
+                        name="units"
+                        value={units}
+                        depth={2}
+                        onChange={(value) => this.actions.handleUnitSwap(value)}
+                        size="small"
+                    >
+                        <div>
+                            <RadioButton className={styles.prefferedradio} label="Inches" value={IMPERIAL_UNITS} />
+                            <RadioButton className={styles.prefferedradio} label="Millimeters" value={METRIC_UNITS} />
+                        </div>
+                    </RadioGroup>
+                    <div className={styles.workflowControlMobile}>
+                        <div style={{ display: 'flex', flexDirection: 'row', gap: '1rem', flexWrap: 'wrap' }}>
+                            {
+                                canRun && (
+                                    <div className={styles.relativeWrapper}>
                                         <button
                                             type="button"
-                                            className={styles['workflow-button-pause']}
-                                            title={i18n._('Pause')}
-                                            onClick={this.actions.handlePause}
-                                            disabled={!canPause}
+                                            className={styles['workflow-button-play']}
+                                            title={workflowPaused ? i18n._('Resume') : i18n._('Run')}
+                                            onClick={this.startRun}
+                                            disabled={!isConnected}
                                         >
-                                            {i18n._('Pause Job')} <i className="fa fa-pause" style={{ writingMode: 'vertical-lr' }} />
+                                            {i18n._(`${workflowPaused ? 'Resume' : 'Start'} Job`)} <i className="fa fa-play" style={{ writingMode: 'horizontal-tb', marginLeft: '5px' }} />
                                         </button>
-                                    )
-                                }
+                                    </div>
+                                )
+                            }
 
-                                {
-                                    canStop && (
-                                        <button
-                                            type="button"
-                                            className={styles['workflow-button-stop']}
-                                            title={i18n._('Stop')}
-                                            onClick={handleOnStop}
-                                            disabled={!canStop}
-                                        >
-                                            {i18n._('Stop Job')} <i className="fa fa-stop" style={{ writingMode: 'vertical-lr' }} />
-                                        </button>
-                                    )
-                                }
-                            </div>
+                            {
+                                canPause && (
+                                    <button
+                                        type="button"
+                                        className={styles['workflow-button-pause']}
+                                        title={i18n._('Pause')}
+                                        onClick={this.actions.handlePause}
+                                        disabled={!canPause}
+                                    >
+                                        {i18n._('Pause Job')} <i className="fa fa-pause" style={{ writingMode: 'vertical-lr' }} />
+                                    </button>
+                                )
+                            }
+
+                            {
+                                canStop && (
+                                    <button
+                                        type="button"
+                                        className={styles['workflow-button-stop']}
+                                        title={i18n._('Stop')}
+                                        onClick={handleOnStop}
+                                        disabled={!canStop}
+                                    >
+                                        {i18n._('Stop Job')} <i className="fa fa-stop" style={{ writingMode: 'vertical-lr' }} />
+                                    </button>
+                                )
+                            }
                         </div>
                     </div>
                 </div>
+            </div>
         );
     }
 }

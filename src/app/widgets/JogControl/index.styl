@@ -215,7 +215,7 @@
     align-self: center;
     align-items: center;
     @media (max-width: 639px), (max-device-width: 639px) {
-        display: block;
+        flex-direction column;
     }
 }
 
@@ -228,10 +228,10 @@
     @media (max-height: 820px) {
         width: 43%;
     }
-    @media (max-width: 639px), (max-device-width: 639px) {
+    /*@media (max-width: 639px), (max-device-width: 639px) {
         width: 91%;
         grid-gap: 12px;
-    }
+    }*/
 }
 
 .xy-keys > div::before, .xy-keys > button::before {

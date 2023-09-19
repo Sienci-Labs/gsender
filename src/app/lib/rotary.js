@@ -8,7 +8,8 @@ import reduxStore from 'app/store/redux';
 import {
     WORKSPACE_MODE,
     ROTARY_MODE_FIRMWARE_SETTINGS,
-    ROTARY_TOGGLE_MACRO
+    ROTARY_TOGGLE_MACRO,
+    DEFAULT_FIRMWARE_SETTINGS,
 } from 'app/constants';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
@@ -22,29 +23,15 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
 
     switch (mode) {
     case DEFAULT: {
-        const prevFirmwareSettings = store.get('workspace.rotaryAxis.prevFirmwareSettings', {});
-        const prevFirmwareSettingsArr = Object.entries(prevFirmwareSettings).map(([key, value]) => `${key}=${value}`);
+        const defaultFirmwareSettings = store.get('workspace.rotaryAxis.defaultFirmwareSettings', DEFAULT_FIRMWARE_SETTINGS);
 
-        store.replace('workspace.rotaryAxis.prevFirmwareSettings', {});
+        const defaultFirmwareSettingsArr = Object.entries(defaultFirmwareSettings).map(([key, value]) => `${key}=${value}`);
 
-        controller.command('gcode', [...prevFirmwareSettingsArr, '$$', ROTARY_TOGGLE_MACRO]);
+        controller.command('gcode', [...defaultFirmwareSettingsArr, '$$', ROTARY_TOGGLE_MACRO]);
         return;
     }
 
     case ROTARY: {
-        const currentFirmwareSettings = get(reduxStore.getState(), 'controller.settings.settings');
-
-        // Only grab the settings we want, will be based off of the settings in the constant we have
-        const retrievedSettings = Object.keys(rotaryFirmwareSettings).reduce((accumulator, currentKey) => {
-            const firmwareSettingValue = currentFirmwareSettings[currentKey];
-
-            if (firmwareSettingValue) {
-                accumulator[currentKey] = firmwareSettingValue;
-            }
-
-            return accumulator;
-        }, {});
-
         // We only need to update the firmware settings on grbl machines
         if (firmwareType === 'Grbl') {
             // Convert to array to send to the controller, will look something like this: ["$101=26.667", ...]
@@ -92,7 +79,6 @@ export const updateWorkspaceMode = (mode = WORKSPACE_MODE.DEFAULT) => {
             });
         }
 
-        store.replace('workspace.rotaryAxis.prevFirmwareSettings', retrievedSettings);
         return;
     }
 

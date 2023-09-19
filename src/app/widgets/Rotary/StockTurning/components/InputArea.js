@@ -21,13 +21,13 @@ const defaultStockTurningState = get(defaultState, 'widgets.rotary.stockTurning.
 const InputArea = () => {
     const { state, dispatch } = useContext(RotaryContext);
 
-    const { bitDiameter, stepover, feedrate, stockLength, startHeight, finalHeight, stepdown, spindleRPM } = state.stockTurning.options;
+    const { bitDiameter, stepover, feedrate, stockLength, startHeight, finalHeight, stepdown, spindleRPM, enableRehoming } = state.stockTurning.options;
+
+    const units = store.get('workspace.units');
 
     const defaultValues = units === METRIC_UNITS
         ? defaultStockTurningState
         : convertValuesToImperial(defaultStockTurningState);
-
-    const units = store.get('workspace.units');
 
     const handleChange = (e) => {
         const { id, value, checked } = e.target;
@@ -43,12 +43,11 @@ const InputArea = () => {
     return (
         <div style={{ width: '45%' }}>
             <p>
-                Avoid running stock turning back to back without re-homing / re-connecting to the controller. Consider turning off hard and soft limits{' '}
-                so you don&apos;t encounter alarms or errors.
+                Make sure that your tool clears the surface of your material without running into the limits of your Z-axis.{' '}
+                You should also use the probing feature to zero your Z-axis to the centerline before surfacing.
             </p>
-
             <Input
-                label="Stock Length"
+                label="Length"
                 units={units}
                 additionalProps={{ type: 'number', id: 'stockLength', min: 1, max: 1000000, style: { ...inputStyles } }}
                 value={stockLength}
@@ -56,40 +55,49 @@ const InputArea = () => {
                 tooltip={{ content: `Default Value: ${defaultValues.stockLength}` }}
             />
 
-            <div style={{ marginBottom: '1rem' }}>
-                <MultiInputBlock
-                    label="Start & Final Height"
-                    firstComponent={(
+            <MultiInputBlock
+                label="Start & Final Diameter"
+                firstComponent={(
+                    <Input
+                        units={units}
+                        additionalProps={{ type: 'number', id: 'startHeight', min: 1, max: 1000000, style: { ...inputStyles } }}
+                        value={startHeight}
+                        onChange={handleChange}
+                        tooltip={{ content: `Default Value: ${defaultValues.startHeight}` }}
+                    />
+                )}
+                secondComponent={(
+                    <div style={{ marginLeft: '1rem' }}>
                         <Input
                             units={units}
-                            additionalProps={{ type: 'number', id: 'startHeight', min: 1, max: 1000000, style: { ...inputStyles } }}
-                            value={startHeight}
+                            additionalProps={{ type: 'number', id: 'finalHeight', min: 1, max: 1000000, style: { ...inputStyles } }}
+                            value={finalHeight}
                             onChange={handleChange}
-                            tooltip={{ content: `Default Value: ${defaultValues.startHeight}` }}
+                            tooltip={{ content: `Default Value: ${defaultValues.finalHeight}` }}
                         />
-                    )}
-                    secondComponent={(
-                        <div style={{ marginLeft: '1rem' }}>
-                            <Input
-                                units={units}
-                                additionalProps={{ type: 'number', id: 'finalHeight', min: 1, max: 1000000, style: { ...inputStyles } }}
-                                value={finalHeight}
-                                onChange={handleChange}
-                                tooltip={{ content: `Default Value: ${defaultValues.finalHeight}` }}
-                            />
-                        </div>
-                    )}
+                    </div>
+                )}
+            />
+
+            <div style={{ marginBottom: '1rem' }}>
+                <Input
+                    label="Stepdown"
+                    units={units}
+                    additionalProps={{ type: 'number', id: 'stepdown', min: 1, max: 1000000, style: { ...inputStyles } }}
+                    value={stepdown}
+                    onChange={handleChange}
+                    tooltip={{ content: `Default Value: ${defaultValues.stepdown}` }}
                 />
-                <small>If you have limits enabled, please check that your start height does not exceed your z-axis limit</small>
+                <small>Stepdown applies to both sides of your material so your stock diameter will be reduced by twice this amount for every pass.</small>
             </div>
 
             <Input
-                label="Stepdown"
+                label="Bit Diameter"
                 units={units}
-                additionalProps={{ type: 'number', id: 'stepdown', min: 1, max: 1000000, style: { ...inputStyles } }}
-                value={stepdown}
+                additionalProps={{ type: 'number', id: 'bitDiameter', step: 1, min: 0.01, max: 1000, style: { ...inputStyles } }}
+                value={bitDiameter}
                 onChange={handleChange}
-                tooltip={{ content: `Default Value: ${defaultValues.stepdown}` }}
+                tooltip={{ content: `Default Value: ${defaultValues.bitDiameter}` }}
             />
 
             <Input
@@ -99,15 +107,6 @@ const InputArea = () => {
                 value={stepover}
                 onChange={handleChange}
                 tooltip={{ content: `Default Value: ${defaultValues.stepover}` }}
-            />
-
-            <Input
-                label="Bit Diameter"
-                units={units}
-                additionalProps={{ type: 'number', id: 'bitDiameter', step: 1, min: 0.01, max: 1000, style: { ...inputStyles } }}
-                value={bitDiameter}
-                onChange={handleChange}
-                tooltip={{ content: `Default Value: ${defaultValues.bitDiameter}` }}
             />
 
             <Input
@@ -127,9 +126,16 @@ const InputArea = () => {
                 tooltip={{ content: `Default Value: ${defaultValues.feedrate}` }}
             />
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', marginBottom: '1rem' }}>
-                <label style={{ fontSize: '1.1rem' }}>Enable Re-Homing</label>
-                <Checkbox id="enableRehoming" onChange={handleChange} />
+            <div style={{ marginBottom: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>
+                    <label style={{ fontSize: '1.1rem' }}>Enable Re-Homing</label>
+                    <Checkbox id="enableRehoming" onChange={handleChange} checked={enableRehoming} />
+                </div>
+
+                <small>
+                    This option creates a more consistent surface finish as your A axis will spin in only one direction across the entire length of your material.{' '}
+                    You will however need to rehome after surfacing to reset your A axis coordinates.
+                </small>
             </div>
         </div>
     );

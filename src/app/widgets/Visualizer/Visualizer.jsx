@@ -1517,10 +1517,12 @@ class Visualizer extends Component {
 
         // The force parameter will skip here and update the positioning of all axes
         if (!forceUpdateAllAxes && (workspaceMode === WORKSPACE_MODE.ROTARY || fileType === FILE_TYPE.ROTARY)) {
+            const yFixed = 0 - pivotPoint.y;
             gsap.to(this.cuttingTool.position, {
                 x: x0,
                 z: z0,
-                duration: 0.25
+                y: yFixed,
+                duration: 0.24
             });
 
             return;
@@ -1530,7 +1532,7 @@ class Visualizer extends Component {
             x: x0,
             y: y0,
             z: z0,
-            duration: 0.25
+            duration: 0.24
         });
     }
 
@@ -1543,6 +1545,7 @@ class Visualizer extends Component {
 
         this.visualizer.group.rotateX(radians);
     }
+
 
     updateGcodeModal(prevPos, currPos) {
         const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
@@ -1661,11 +1664,15 @@ class Visualizer extends Component {
     }
 
     handleSceneRender(vizualization, callback) {
+        const { controllerType, fileType, workPosition } = this.props;
+        const workspaceMode = store.get('workspace.mode', WORKSPACE_MODE.DEFAULT);
+
         const shouldZoom = this.props.isSecondary ? !this.didZoom : true;
 
         if (!this.visualizer) {
             return;
         }
+
         const obj = this.visualizer.render(vizualization);
         obj.name = '';
         this.group.add(obj);
@@ -1684,10 +1691,22 @@ class Visualizer extends Component {
         this.pivotPoint.set(center.x, center.y, center.z);
 
         // Update position
-        this.updateCuttingToolPosition();
+        this.updateCuttingToolPosition(null, { forceUpdateAllAxes: true });
         this.updateLaserPointerPosition();
         this.updateCuttingPointerPosition();
         this.updateLimitsPosition();
+
+        const isUsingGRBL = controllerType === GRBL;
+        const isRotaryFile = [FILE_TYPE.ROTARY, FILE_TYPE.FOUR_AXIS].includes(fileType);
+        const isInRotaryMode = workspaceMode === WORKSPACE_MODE.ROTARY;
+        const axis = isInRotaryMode && isUsingGRBL && isRotaryFile ? 'y' : 'a';
+
+        // Rotate g-code model if to current a-axis position
+        if (isRotaryFile) {
+            const rotationVal = workPosition[axis];
+
+            this.rotateGcodeModal(rotationVal);
+        }
 
         if (this.viewport && dX > 0 && dY > 0 && shouldZoom) {
             // The minimum viewport is 50x50mm
@@ -1698,7 +1717,7 @@ class Visualizer extends Component {
         }
 
         // Update the scene
-        this.updateScene();
+        this.updateScene({ forceUpdate: true });
 
         // only set the camera if it's the first render
         if (shouldZoom) {

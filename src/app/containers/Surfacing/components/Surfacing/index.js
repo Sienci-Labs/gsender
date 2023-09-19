@@ -8,7 +8,6 @@ import store from 'app/store';
 import reduxStore from 'app/store/redux';
 import controller from 'app/lib/controller';
 import { METRIC_UNITS, VISUALIZER_PRIMARY, VISUALIZER_SECONDARY } from 'app/constants';
-import api from 'app/api';
 import GcodeViewer from 'app/components/GcodeViewer';
 
 import Visualizer from '../Visualizer';
@@ -25,7 +24,7 @@ import { SurfacingContext } from './Context';
  * @description Main component for displaying Surfacing
  * @prop {Function} onClose - Function to close the current modal
  */
-const Surfacing = ({ onClose, showTitle }) => {
+const Surfacing = ({ onClose, showTitle, isDisabled }) => {
     const [surfacing, setSurfacing] = useState(store.get('widgets.surfacing'));
 
     const [gcode, setGcode] = useState('');
@@ -33,7 +32,8 @@ const Surfacing = ({ onClose, showTitle }) => {
 
     const [currentTab, setCurrentTab] = useState(0);
 
-    const runGenerate = async () => {
+    const runGenerate = () => {
+        reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
         setCurrentTab(0);
 
         const generator = new Generator({ surfacing, units, controller });
@@ -42,7 +42,7 @@ const Surfacing = ({ onClose, showTitle }) => {
 
         const serializedFile = new File([gcode], 'surfacing.gcode');
 
-        await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
+        pubsub.publish('visualizer:load', gcode, serializedFile.size, serializedFile.originalname, VISUALIZER_SECONDARY);
 
         setGcode(gcode);
     };
@@ -75,8 +75,6 @@ const Surfacing = ({ onClose, showTitle }) => {
      * (Having two three.js scenes makes the app choppy even or higher spec machines)
      */
     useEffect(() => {
-        reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
-
         if (surfacing.length === 0 && surfacing.width === 0) {
             const machineProfile = store.get('workspace.machineProfile');
 
@@ -126,6 +124,7 @@ const Surfacing = ({ onClose, showTitle }) => {
         gcode,
         units,
         canLoad,
+        isDisabled,
         setSurfacing,
         onChange: handleChange,
         onSelect: handleSelect,

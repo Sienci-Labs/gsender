@@ -219,6 +219,12 @@ export const ROTARY_MODE_FIRMWARE_SETTINGS = {
     $21: '0'
 };
 
+export const DEFAULT_FIRMWARE_SETTINGS = {
+    $101: '200',
+    $111: '4000',
+    $21: '0'
+};
+
 export const WORKSPACE_MODE = {
     DEFAULT: 'DEFAULT',
     ROTARY: 'ROTARY',
@@ -239,6 +245,14 @@ export const ROTARY_TOGGLE_MACRO = `
     G04 P0.5
     G0 G90 Y[posy]
 `;
+
+export const ALARM = 'ALARM';
+export const ERROR = 'ERROR';
+
+export const ALARM_ERROR_TYPES = [
+    ALARM,
+    ERROR
+];
 
 export const JOB_TYPES = {
     JOB: 'JOB',

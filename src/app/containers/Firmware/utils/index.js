@@ -9,6 +9,24 @@ import { Toaster, TOASTER_SUCCESS, TOASTER_INFO, TOASTER_DANGER } from 'app/lib/
 import { GRBL } from 'app/constants';
 
 import defaultGRBLSettings from '../eepromFiles/DefaultGrblSettings.json';
+import {
+    AXIS_MASK_ID,
+    BITFIELD_ID,
+    BOOLEAN_ID, DECIMAL_ID,
+    EXCLUSIVE_BITFIELD_ID,
+    INTEGER_ID, IPV4_ID, PASSWORD_ID,
+    RADIO_BUTTON_ID, STRING_ID
+} from 'Containers/Firmware/components/HalSettings/constants';
+import BooleanInput from 'Containers/Firmware/components/HalSettings/inputs/BooleanInput';
+import BitfieldInput from 'Containers/Firmware/components/HalSettings/inputs/BitfieldInput';
+import ExclusiveBitfieldInput from 'Containers/Firmware/components/HalSettings/inputs/ExclusiveBitfieldInput';
+import RadioButtonInput from 'Containers/Firmware/components/HalSettings/inputs/RadioButtonInput';
+import AxisMaskInput from 'Containers/Firmware/components/HalSettings/inputs/AxisMaskInput';
+import IntegerInput from 'Containers/Firmware/components/HalSettings/inputs/IntegerInput';
+import DecimalInput from 'Containers/Firmware/components/HalSettings/inputs/DecimalInput';
+import StringInput from 'Containers/Firmware/components/HalSettings/inputs/StringInput';
+import PasswordInput from 'Containers/Firmware/components/HalSettings/inputs/PasswordInput';
+import Ipv4Input from 'Containers/Firmware/components/HalSettings/inputs/Ipv4Input';
 
 export const FirmwareContext = createContext({ });
 
@@ -172,3 +190,39 @@ export const exportFirmwareSettings = (settings) => {
 
     download(blob, filename, 'json');
 };
+
+
+export const descriptionLookup = (key, descriptions) => {
+    let metadata = get(descriptions, key, {});
+
+    let message = metadata.description || `$${key} EEPROM Value - no detailed title found`;
+    let description = metadata.details || `Configure the value of $${key} in the firmware - no detailed description found.`;
+    // Non-newline newlines from parser need to be replaced
+    description = description.replace(/\\n/gmi, '\n');
+
+    return {
+        ...metadata, message, description
+    };
+};
+
+
+export const halDatatypeMap = {
+    [BOOLEAN_ID]: BooleanInput,
+    [BITFIELD_ID]: BitfieldInput,
+    [EXCLUSIVE_BITFIELD_ID]: ExclusiveBitfieldInput,
+    [RADIO_BUTTON_ID]: RadioButtonInput,
+    [AXIS_MASK_ID]: AxisMaskInput,
+    [INTEGER_ID]: IntegerInput,
+    [DECIMAL_ID]: DecimalInput,
+    [STRING_ID]: StringInput,
+    [PASSWORD_ID]: PasswordInput,
+    [IPV4_ID]: Ipv4Input
+};
+
+export const getDatatypeInput = (type) => {
+    type = Number(type);
+    return halDatatypeMap[type] || String;
+};
+
+
+// Convert integer to base 2 string, split and reverse it so index 0 is the lowest bit

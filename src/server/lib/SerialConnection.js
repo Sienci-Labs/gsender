@@ -154,18 +154,19 @@ class SerialConnection extends EventEmitter {
             return;
         }
 
-        const { path, baudRate } = this.settings;
+        const { path, baudRate, ...rest } = this.settings;
 
         this.port = new SerialPort({
             path,
             baudRate,
+            ...rest,
             autoOpen: false
         });
         this.port.on('open', this.eventListener.open);
         this.port.on('close', this.eventListener.close);
         this.port.on('error', this.eventListener.error);
 
-        this.parser = this.port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+        this.parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }));
         this.parser.on('data', this.eventListener.data);
 
         this.port.open(callback);

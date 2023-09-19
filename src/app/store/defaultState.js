@@ -30,7 +30,8 @@ import {
     START_POSITION_BACK_LEFT,
     SPINDLE_MODES,
     WORKSPACE_MODE,
-    ROTARY_MODE_FIRMWARE_SETTINGS
+    ROTARY_MODE_FIRMWARE_SETTINGS,
+    DEFAULT_FIRMWARE_SETTINGS
 } from 'app/constants';
 import machineProfiles from 'app/containers/Firmware/components/defaultMachineProfiles';
 
@@ -135,7 +136,7 @@ const defaultState = {
         mode: WORKSPACE_MODE.DEFAULT,
         rotaryAxis: {
             firmwareSettings: ROTARY_MODE_FIRMWARE_SETTINGS,
-            prevFirmwareSettings: {},
+            defaultFirmwareSettings: DEFAULT_FIRMWARE_SETTINGS,
         }
     },
     widgets: {
@@ -145,6 +146,7 @@ const defaultState = {
             jog: {
                 xyStep: 5,
                 zStep: 2,
+                aStep: 5,
                 feedrate: 3000,
                 keypad: false,
                 rapid: {
@@ -308,11 +310,13 @@ const defaultState = {
                     spindleRPM: 17000,
                     feedrate: 3000,
                     stepover: 15,
-                    startHeight: 25,
-                    finalHeight: 20,
+                    startHeight: 50,
+                    finalHeight: 40,
                     enableRehoming: false,
-                    usingBigMaterial: false,
                 }
+            },
+            tab: {
+                show: false,
             }
         },
         spindle: {

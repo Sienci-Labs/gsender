@@ -4,7 +4,8 @@ import classname from 'classnames';
 import Tooltip from 'app/components/TooltipCustom/ToolTip';
 import Button from 'app/components/FunctionButton/FunctionButton';
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
-
+import { connect } from 'react-redux';
+import get from 'lodash/get';
 import CategoryTag from './CategoryTag';
 import InputController from './input';
 import { FirmwareContext, restoreSingleDefaultSetting } from '../../utils';
@@ -12,7 +13,7 @@ import { FirmwareContext, restoreSingleDefaultSetting } from '../../utils';
 import styles from '../../index.styl';
 
 
-const SettingsList = () => {
+const SettingsList = ({ firmwareType }) => {
     const { hasSettings, machineProfile, settings, setFilterText, setSettings, setSettingsToApply } = useContext(FirmwareContext);
 
     const handleSettingsChange = (index) => (value) => {
@@ -76,12 +77,11 @@ const SettingsList = () => {
                                             </div>
 
                                             <div className={styles.settingsInformation}>
-                                                <div className={styles.setyarntingsDescription}>
+                                                <div className={styles.settingsDescription}>
                                                     <div className={styles.itemText}>{message}</div>
                                                     <div className={styles.descriptionRow}>{description}</div>
                                                 </div>
                                             </div>
-
                                             <div className={styles.settingsControl}>
                                                 <InputController
                                                     title={grbl.setting}
@@ -133,4 +133,10 @@ const SettingsList = () => {
     );
 };
 
-export default SettingsList;
+export default connect((store) => {
+    const firmwareType = get(store, 'controller.type');
+
+    return {
+        firmwareType
+    };
+})(SettingsList);

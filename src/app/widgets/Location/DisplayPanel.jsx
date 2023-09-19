@@ -184,9 +184,6 @@ class DisplayPanel extends PureComponent {
         const axisLabel = axis.toUpperCase();
         const showPositionInput = canClick && this.state.positionInput[axis];
 
-        //mpos = Number(mpos).toFixed(3);
-
-
         return (
             <tr>
                 <td className={styles.coordinate}>
@@ -307,9 +304,11 @@ class DisplayPanel extends PureComponent {
 
         controller.command('gcode', movement);
         controller.command('gcode', 'G0 X' + location.x + ' Y' + location.y + ' Z' + location.z);
+
         if (isInRotaryMode) {
             controller.command('gcode', 'G0 A' + location.a);
         }
+
         controller.command('gcode', currentMovement);
     }
 
@@ -341,13 +340,17 @@ class DisplayPanel extends PureComponent {
                                 onChange={(e) => this.setLocation(e.target.value, 'x')}
                                 additionalProps={{ type: 'number' }}
                             />
-                            <Input
-                                label="Y"
-                                units={units}
-                                value={location.y}
-                                onChange={(e) => this.setLocation(e.target.value, 'y')}
-                                additionalProps={{ type: 'number' }}
-                            />
+
+                            {!isInRotaryMode && (
+                                <Input
+                                    label="Y"
+                                    units={units}
+                                    value={location.y}
+                                    onChange={(e) => this.setLocation(e.target.value, 'y')}
+                                    additionalProps={{ type: 'number' }}
+                                />
+                            )}
+
                             <Input
                                 label="Z"
                                 units={units}
@@ -359,7 +362,7 @@ class DisplayPanel extends PureComponent {
                                 isInRotaryMode && (
                                     <Input
                                         label="A"
-                                        units={units}
+                                        units="deg"
                                         value={location.a}
                                         onChange={(e) => this.setLocation(e.target.value, 'a')}
                                         additionalProps={{ type: 'number' }}
@@ -431,11 +434,10 @@ class DisplayPanel extends PureComponent {
                                         controller.command('gcode', 'G0 X0 Y0'); //Move to Work Position Zero
                                     }}
                                     disabled={!canClick}
-                                    className={styles.fontMonospace}
                                     primary
                                 >
                                     <i className="fas fa-chart-line" />
-                                    Go XY0
+                                    Go {isInRotaryMode ? 'XA0' : 'XY0'}
                                 </FunctionButton>
                                 <FunctionButton
                                     onClick={() => {
@@ -448,7 +450,7 @@ class DisplayPanel extends PureComponent {
                                     primary
                                 >
                                     <i className="fas fa-location-arrow" />
-                                    Go To Location
+                                    Go To
                                 </FunctionButton>
                             </div>
                         </div>

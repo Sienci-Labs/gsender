@@ -35,6 +35,7 @@ export const {
     RESET_HOMING,
     UPDATE_PARTIAL_CONTROLLER_SETTINGS,
     UPDATE_TERMINAL_HISTORY,
+    UPDATE_SETTINGS_DESCRIPTIONS,
 } = constants('controller', [
     'UPDATE_CONTROLLER_STATE',
     'UPDATE_CONTROLLER_SETTINGS',
@@ -45,7 +46,8 @@ export const {
     'UPDATE_HOMING_FLAG',
     'RESET_HOMING',
     'UPDATE_PARTIAL_CONTROLLER_SETTINGS',
-    'UPDATE_TERMINAL_HISTORY'
+    'UPDATE_TERMINAL_HISTORY',
+    'UPDATE_SETTINGS_DESCRIPTIONS'
 ]);
 
 export const updateControllerState = createAction(UPDATE_CONTROLLER_STATE);
@@ -58,3 +60,4 @@ export const updateHomingFlag = createAction(UPDATE_HOMING_FLAG);
 export const resetHoming = createAction(RESET_HOMING);
 export const partialSettingsUpdate = createAction(UPDATE_PARTIAL_CONTROLLER_SETTINGS);
 export const updateTerminalHistory = createAction(UPDATE_TERMINAL_HISTORY);
+export const updateSettingsDescriptions = createAction(UPDATE_SETTINGS_DESCRIPTIONS);
