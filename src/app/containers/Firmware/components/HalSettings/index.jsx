@@ -6,11 +6,21 @@ import styles from 'Containers/Firmware/index.styl';
 import CategoryTag from 'Containers/Firmware/components/Settings/CategoryTag';
 
 const HalSettings = ({ descriptions }) => {
-    const { settings } = useContext(FirmwareContext);
+    const { settings, setSettings, setSettingsToApply } = useContext(FirmwareContext);
+
+    const handleSettingsChange = (index) => (value) => {
+        setSettingsToApply(true);
+        setSettings(prev => {
+            const updated = [...prev];
+            updated[index].value = value;
+            return updated;
+        });
+    };
+
 
     return (
         <div className={styles.settingsContainer}>
-            <div className={styles.tableHeader}>
+            <div className={styles.tableHeaderHal}>
                 <div className={[styles['non-default-value'], styles.tableColumnEEPROM].join(' ')}>
                     <span>$ Setting</span>
                 </div>
@@ -20,11 +30,9 @@ const HalSettings = ({ descriptions }) => {
                 <div className={styles.tableColumn}>
                     <span>Value</span>
                 </div>
-
-                <div className={styles.tableColumn} />
             </div>
             {
-                settings.map((setting) => {
+                settings.map((setting, index) => {
                     const settingKey = setting.setting.replace('$', '');
                     const { message, description, dataType, ...info } = descriptionLookup(settingKey, descriptions);
                     const InputElement = getDatatypeInput(dataType);
@@ -38,7 +46,7 @@ const HalSettings = ({ descriptions }) => {
                                     <CategoryTag category={setting.category} />
                                 </div>
                                 <div className={styles.settingsInformation}>
-                                    <div className={styles.setyarntingsDescription}>
+                                    <div className={styles.settingsDescription}>
                                         <div className={styles.itemText}>{message}</div>
                                         <div className={styles.descriptionRow}>
                                             {description}
@@ -46,7 +54,7 @@ const HalSettings = ({ descriptions }) => {
                                     </div>
                                 </div>
                                 <div className={styles.settingsControl}>
-                                    <InputElement info={info} setting={setting} />
+                                    <InputElement info={info} setting={setting} onChange={handleSettingsChange(index)} />
                                 </div>
                             </div>
                         </div>

@@ -2,7 +2,7 @@ import React from 'react';
 import styles from 'Containers/Firmware/components/HalSettings/inputs/index.styl';
 import ControlledInput from 'Containers/Firmware/components/HalSettings/inputs/ControlledInput';
 
-const IntegerInput = ({ info, setting }) => {
+const IntegerInput = ({ info, setting, onChange }) => {
     const { unit = null } = info;
     let { value } = setting;
     value = Number(value);
@@ -14,6 +14,7 @@ const IntegerInput = ({ info, setting }) => {
                 className={styles.textInput}
                 value={value}
                 step={1}
+                externalOnChange={onChange}
             />
             {
                 unit && <span className={styles.unit}>{unit}</span>

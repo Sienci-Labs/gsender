@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ensureArray from 'ensure-array';
 import styles from './index.styl';
 
-const RadioButtonInput = ({ info, setting }) => {
+const RadioButtonInput = ({ info, setting, onChange }) => {
     const [localValue, setLocalValue] = useState(0);
 
     useEffect(() => {
@@ -14,6 +14,7 @@ const RadioButtonInput = ({ info, setting }) => {
     const rbOnClick = (e) => {
         const value = e.target.value;
         setLocalValue(Number(value));
+        onChange(Number(value));
     };
 
     let { format } = info;

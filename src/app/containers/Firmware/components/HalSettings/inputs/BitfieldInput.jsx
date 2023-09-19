@@ -4,7 +4,7 @@ import ensureArray from 'ensure-array';
 import styles from './index.styl';
 import { convertBitfieldToValue, getBitfieldArr } from 'Containers/Firmware/components/HalSettings/inputs/utils';
 
-const BitfieldInput = ({ info, setting, externalFormat = null, isExclusive = false }) => {
+const BitfieldInput = ({ info, setting, onChange, externalFormat = null, isExclusive = false }) => {
     let { format } = info;
     format = ensureArray(format);
 
@@ -28,7 +28,7 @@ const BitfieldInput = ({ info, setting, externalFormat = null, isExclusive = fal
         newMap[index] = curValue;
         setBitMap(newMap);
         const intValue = convertBitfieldToValue(newMap);
-        console.log(intValue);
+        onChange(intValue);
         // Also change number value :)
     };
 

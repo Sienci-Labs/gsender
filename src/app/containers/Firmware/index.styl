@@ -156,7 +156,7 @@
   color: #6B7280;
   display flex;
   flex-direction column;
-  justify-content space-between;
+  justify-content center;
   gap: 10px;
   align-items center
 }
@@ -197,7 +197,16 @@
   border-bottom: 1px solid black;
 }
 
-.table-header > div {
+.table-header-hal {
+  display: grid;
+  grid-template-columns 1fr 4fr 2fr;
+
+  grid-gap: 1px;
+  background-color: lightgrey;
+  border-bottom: 1px solid black;
+}
+
+.table-header > div, .table-header-hal > div {
   padding: 10px;
   text-align: center;
   background-color: white;
