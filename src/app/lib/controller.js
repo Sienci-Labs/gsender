@@ -87,6 +87,7 @@ class Controller {
         'workflow:state': [],
         'controller:settings': [],
         'controller:state': [],
+        'settings:description': [],
         'message': [],
         'toolchange:start': [],
         'hPong': [],

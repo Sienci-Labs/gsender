@@ -34,6 +34,7 @@ import GrblHalLineParserResultParameters from './GrblHalLineParserResultParamete
 import GrblHalLineParserResultFeedback from './GrblHalLineParserResultFeedback';
 import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
 //import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
+import GrblHalLineParserResultSettingDescription from './GrblHalLineParserResultSettingDescription';
 import GrblHalLineParserResultVersion from './GrblHalLineParserResultVersion';
 import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 import logger from '../../lib/logger';
@@ -42,7 +43,7 @@ import {
     GRBL_HAL_ACTIVE_STATE_ALARM
 } from './constants';
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
-
+import GrblHalLineParserResultSettingDetails from './GrblHalLineParserResultSettingDetails';
 
 const log = logger('controller:grblHAL');
 
@@ -91,6 +92,9 @@ class GrblHalRunner extends events.EventEmitter {
         settings: {
         },
         info: {
+        },
+        descriptions: {
+
         }
     };
 
@@ -276,6 +280,30 @@ class GrblHalRunner extends events.EventEmitter {
                 this.settings = nextSettings; // enforce change
             }
             this.emit('info', payload);
+            return;
+        }
+        if (type === GrblHalLineParserResultSettingDescription) {
+            // Unset raw string and emit to UI
+            _.unset(payload, 'raw');
+            const { id, ...details } = payload;
+            this.settings.descriptions = {
+                ...this.settings.descriptions,
+                [id]: details
+            };
+            this.emit('description', payload);
+            return;
+        }
+        if (type === GrblHalLineParserResultSettingDetails) {
+            // Unset raw string and emit to UI
+            _.unset(payload, 'raw');
+            const { id, unitString, details } = payload;
+
+            this.settings.descriptions[payload.id] = {
+                ...this.settings.descriptions[id],
+                unitString,
+                details
+            };
+            this.emit('description');
             return;
         }
         if (data.length > 0) {

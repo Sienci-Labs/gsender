@@ -590,6 +590,15 @@ export function* initialize() {
         pubsub.publish('store:update', content);
     });
 
+    controller.addListener('settings:description', (data) => {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_SETTINGS_DESCRIPTIONS,
+            payload: {
+                descriptions: data
+            }
+        });
+    });
+
     yield null;
 }
 
