@@ -1,18 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { getBitfieldArr } from 'Containers/Firmware/components/HalSettings/inputs/utils';
+import React from 'react';
 
+import BitfieldInput from 'Containers/Firmware/components/HalSettings/inputs/BitfieldInput';
 
+// We can just wrap the working bitfield with the isExclusive tag
 const ExclusiveBitfieldInput = ({ info, setting }) => {
-    const [bitMap, setBitMap] = useState([]);
-    useEffect(() => {
-        let map = getBitfieldArr(setting.value);
-        setBitMap(map);
-        console.log(bitMap);
-    }, []);
-
     return (
-        <div>
-        </div>
+        <>
+            <BitfieldInput info={info} setting={setting} isExclusive={true} />
+        </>
     );
 };
 
