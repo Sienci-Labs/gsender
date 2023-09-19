@@ -41,7 +41,7 @@ import VisualizerSettings from './Visualizer';
 import About from './About';
 import store from '../../store';
 import styles from './index.styl';
-import { METRIC_UNITS, WORKFLOW_STATE_RUNNING } from '../../constants';
+import { IMPERIAL_UNITS, METRIC_UNITS, WORKFLOW_STATE_RUNNING } from '../../constants';
 import { convertToImperial, convertToMetric } from './calculate';
 import {
     DARK_THEME_VALUES, PARTS_LIST, G1_PART
@@ -473,8 +473,12 @@ class PreferencesPage extends PureComponent {
         },
         laser: {
             handleOffsetChange: (e, axis) => {
-                const { laser } = this.spindleConfig.get('laser');
-                const value = Number(e.target.value) || 0;
+                const { units } = this.state;
+                const laser = this.spindleConfig.get('laser');
+                let value = Number(e.target.value) || 0;
+                if (units === IMPERIAL_UNITS) {
+                    value = convertToMetric(value);
+                }
                 if (axis === 'X') {
                     this.spindleConfig.set('laser.xOffset', value);
                     this.setState({
@@ -495,7 +499,7 @@ class PreferencesPage extends PureComponent {
             },
             setPower: (val, type) => {
                 const amount = Math.abs(Number(val));
-                const { spindle, laser } = this.state;
+                const { laser } = this.state;
 
                 if (!val || !type || amount < 0) {
                     return;
@@ -504,7 +508,9 @@ class PreferencesPage extends PureComponent {
                 const newLaserValue = { ...laser, [type]: amount };
 
                 this.spindleConfig.set(`laser.${type}`, amount);
-                this.setState({ spindle: { ...spindle, laser: newLaserValue } });
+                this.setState({
+                    laser: newLaserValue
+                });
 
                 pubsub.publish('laser:updated', newLaserValue);
             },
