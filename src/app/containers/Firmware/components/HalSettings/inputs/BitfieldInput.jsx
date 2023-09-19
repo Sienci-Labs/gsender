@@ -36,11 +36,12 @@ const BitfieldInput = ({ info, setting, externalFormat = null, isExclusive = fal
         <div className={styles.column}>
             {
                 format.map((opt, index) => {
+                    let key = `${setting.setting}-${index}-key`;
                     let checked = bitMap[index] === 1;
                     let disabled = (index > 0) && isExclusive && bitMap[0] !== 1;
                     const id = `${setting.setting}-${index}-key`;
                     return (
-                        <div className={styles.row}>
+                        <div className={styles.row} key={key}>
                             <div>{opt}: </div>
                             <div>
                                 <ToggleSwitch
