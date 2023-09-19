@@ -97,7 +97,10 @@
       "oneClick": false,
       "license": "LICENSE",
       "perMachine": true,
-      "installerSidebar": "electron-build/sidebar.bmp"
+      "installerSidebar": "electron-build/sidebar.bmp",
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": false,
+      "include": "electron-build/installer.nsh"
     },
     "publish": {
       "provider": "github"
