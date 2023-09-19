@@ -77,12 +77,11 @@ const SettingsList = ({ firmwareType }) => {
                                             </div>
 
                                             <div className={styles.settingsInformation}>
-                                                <div className={styles.setyarntingsDescription}>
+                                                <div className={styles.settingsDescription}>
                                                     <div className={styles.itemText}>{message}</div>
                                                     <div className={styles.descriptionRow}>{description}</div>
                                                 </div>
                                             </div>
-                                            settingsControl
                                             <div className={styles.settingsControl}>
                                                 <InputController
                                                     title={grbl.setting}

@@ -223,3 +223,6 @@ export const getDatatypeInput = (type) => {
     type = Number(type);
     return halDatatypeMap[type] || String;
 };
+
+
+// Convert integer to base 2 string, split and reverse it so index 0 is the lowest bit
