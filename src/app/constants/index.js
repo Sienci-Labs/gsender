@@ -245,3 +245,11 @@ export const ROTARY_TOGGLE_MACRO = `
     G04 P0.5
     G0 G90 Y[posy]
 `;
+
+export const ALARM = 'ALARM';
+export const ERROR = 'ERROR';
+
+export const ALARM_ERROR_TYPES = [
+    ALARM,
+    ERROR
+];

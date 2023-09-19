@@ -360,6 +360,10 @@ const appMain = () => {
         app.post(urljoin(settings.route, 'api/metrics/collectUserData'), api.metrics.toggleCollectData);
         app.post(urljoin(settings.route, 'api/metrics/sendData'), api.metrics.sendData);
 
+        // Alarms/Errors
+        app.put(urljoin(settings.route, 'api/alarmList'), api.alarmList.update);
+        app.get(urljoin(settings.route, 'api/alarmList'), api.alarmList.fetch);
+
         // Files - with multer
         const storage = multer.memoryStorage();
         const upload = multer({
