@@ -29,6 +29,10 @@ html {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
+label {
+    font-weight: 400;
+}
+
 .tableContainer{
     padding: 20px;
     background-color: rgba(25, 53, 80, 0.5);
