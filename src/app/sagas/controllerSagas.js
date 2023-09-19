@@ -68,7 +68,6 @@ export function* initialize() {
     let estimateWorker = null;
     let currentState = GRBL_ACTIVE_STATE_IDLE;
     let prevState = GRBL_ACTIVE_STATE_IDLE;
-    let areStatsInitialized = false;
     let errors = [];
 
     /* Health check - every 3 minutes */
