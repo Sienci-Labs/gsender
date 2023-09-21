@@ -245,3 +245,31 @@ export const ROTARY_TOGGLE_MACRO = `
     G04 P0.5
     G0 G90 Y[posy]
 `;
+
+export const ALARM = 'ALARM';
+export const ERROR = 'ERROR';
+
+export const ALARM_ERROR_TYPES = [
+    ALARM,
+    ERROR
+];
+
+export const JOB_TYPES = {
+    JOB: 'JOB',
+    MAINTENANCE: 'MAINTENANCE',
+};
+
+export const JOB_STATUS = {
+    COMPLETE: 'COMPLETE',
+    STOPPED: 'STOPPED',
+};
+
+export const OVERALL_STATS = 'Overall Stats';
+export const JOB_PER_PORT = 'Jobs Per Com Port';
+export const RUN_TIME_PER_PORT = 'Run Time Per Com Port';
+
+export const STATS_PAGES = {
+    OVERALL_STATS,
+    JOB_PER_PORT,
+    RUN_TIME_PER_PORT
+};

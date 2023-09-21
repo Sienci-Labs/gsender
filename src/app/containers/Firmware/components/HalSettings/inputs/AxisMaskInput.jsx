@@ -1,9 +1,11 @@
 import React from 'react';
+import BitfieldInput from 'Containers/Firmware/components/HalSettings/inputs/BitfieldInput';
 
-const AxisMaskInput = ({ info, setting }) => {
-    console.log(info);
+const AxisMaskInput = ({ info, setting, onChange }) => {
     return (
-        <div>AM</div>
+        <>
+            <BitfieldInput info={info} setting={setting} onChange={onChange} externalFormat={['X', 'Y', 'Z', 'A']} />
+        </>
     );
 };
 

@@ -66,6 +66,7 @@ const DROarea = ({ canClick = true, actions }) => {
         };
 
         const customMathRound = (num) => {
+            num = String(num);
             const $13 = get(store, 'controller.settings.settings.$13');
 
             const DRO = store.get('workspace.customDecimalPlaces', 0);

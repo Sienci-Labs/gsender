@@ -7,8 +7,6 @@ import { SET_CURRENT_VISUALIZER } from 'app/actions/visualizerActions';
 import { VISUALIZER_PRIMARY, VISUALIZER_SECONDARY } from 'app/constants';
 import store from 'app/store';
 import reduxStore from 'app/store/redux';
-import api from 'app/api';
-import controller from 'app/lib/controller';
 
 import { RotaryContext } from '../Context';
 import { MODALS } from '../utils/constants';
@@ -31,15 +29,11 @@ const StockTurning = () => {
     const { state: { activeDialog, stockTurning, }, dispatch } = useContext(RotaryContext);
 
     useEffect(() => {
-        reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
-
         const units = store.get('workspace.units');
 
         if (units === 'in') {
             dispatch({ type: CONVERT_STOCK_TURNING_OPTIONS_TO_IMPERIAL });
         }
-
-        pubsub.publish('file:unload:primary_visualizer');
 
         return () => {
             const units = store.get('workspace.units');
@@ -70,7 +64,9 @@ const StockTurning = () => {
         dispatch({ type: SET_STOCK_TURNING_OUTPUT, payload: null });
     };
 
-    const runGenerate = async () => {
+    const runGenerate = () => {
+        reduxStore.dispatch({ type: SET_CURRENT_VISUALIZER, payload: VISUALIZER_SECONDARY });
+
         dispatch({ type: SET_ACTIVE_STOCK_TURNING_TAB, payload: 0 });
 
         const stockTurningGenerator = new StockTurningGenerator(stockTurning.options);
@@ -81,7 +77,7 @@ const StockTurning = () => {
 
         const serializedFile = new File([stockTurningGenerator.gcode], 'rotary_surfacing.gcode');
 
-        await api.file.upload(serializedFile, controller.port, VISUALIZER_SECONDARY);
+        pubsub.publish('visualizer:load', stockTurningGenerator.gcode, serializedFile.size, serializedFile.originalname, VISUALIZER_SECONDARY);
     };
 
     const loadGcode = () => {

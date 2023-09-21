@@ -78,7 +78,9 @@ import {
     MACRO_RUN,
     MACRO_LOAD,
     FILE_UNLOAD,
-    FILE_TYPE
+    FILE_TYPE,
+    ALARM,
+    ERROR
 } from '../../../app/constants';
 import ApplyFirmwareProfile from '../../lib/Firmware/Profiles/ApplyFirmwareProfile';
 import { determineMachineZeroFlagSet, determineMaxMovement, getAxisMaximumLocation } from '../../lib/homing';
@@ -407,7 +409,7 @@ class GrblController {
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
-                let bracketCommentLine = /\([^\)]*\)/gm;
+                let bracketCommentLine = /\s*\(.*\)*\)/gm;
                 let toolCommand = /(T)(-?\d*\.?\d+\.?)/;
                 line = line.replace(bracketCommentLine, '').trim();
                 let comment = line.match(commentMatcher);
@@ -698,36 +700,42 @@ class GrblController {
         });
 
         this.runner.on('error', (res) => {
+            console.log(res);
             const code = Number(res.message) || undefined;
             const error = _.find(GRBL_ERRORS, { code: code });
 
             log.error(`Error occurred at ${Date.now()}`);
 
             const { lines, received, name } = this.sender.state;
+            const { outstanding } = this.feeder.state;
             const isFileError = lines.length !== 0;
             //Check error origin
             let errorOrigin = '';
             let line = '';
 
-            if (isFileError) {
-                errorOrigin = name;
-                line = lines[received] || '';
-            } else if (store.get('inAppConsoleInput') !== null) {
+            if (store.get('inAppConsoleInput')) {
                 line = store.get('inAppConsoleInput') || '';
                 store.set('inAppConsoleInput', null);
                 errorOrigin = 'Console';
+            } else if (outstanding > 0) {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
+            } else if (isFileError) {
+                errorOrigin = name;
+                line = lines[received] || '';
             } else {
                 errorOrigin = 'Feeder';
                 line = 'N/A';
             }
 
             this.emit('error', {
-                type: 'GRBL_ERROR',
+                type: ERROR,
                 code: `${code}`,
                 description: error.description,
                 line: line,
                 lineNumber: isFileError ? received + 1 : '',
-                origin: errorOrigin
+                origin: errorOrigin,
+                controller: GRBL,
             });
 
             if (this.workflow.state === WORKFLOW_STATE_RUNNING || this.workflow.state === WORKFLOW_STATE_PAUSED) {
@@ -774,13 +782,42 @@ class GrblController {
             const code = Number(res.message) || undefined;
             const alarm = _.find(GRBL_ALARMS, { code: code });
 
+            const { lines, received, name } = this.sender.state;
+            const { outstanding } = this.feeder.state;
+            const isFileError = lines.length !== 0;
+            //Check error origin
+            let errorOrigin = '';
+            let line = '';
+
+            if (store.get('inAppConsoleInput')) {
+                line = store.get('inAppConsoleInput') || '';
+                store.set('inAppConsoleInput', null);
+                errorOrigin = 'Console';
+            } else if (this.state.status.activeState === GRBL_ACTIVE_STATE_HOME) {
+                errorOrigin = 'Console';
+                line = '$H';
+            } else if (outstanding > 0) {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
+            } else if (isFileError) {
+                errorOrigin = name;
+                line = lines[received] || '';
+            } else {
+                errorOrigin = 'Feeder';
+                line = 'N/A';
+            }
+
             if (alarm) {
                 // Grbl v1.1
                 this.emit('serialport:read', `ALARM:${code} (${alarm.message})`);
                 this.emit('error', {
-                    type: 'GRBL_ALARM',
+                    type: ALARM,
                     code: code,
                     description: alarm.description,
+                    line: line,
+                    lineNumber: isFileError ? received + 1 : '',
+                    origin: errorOrigin,
+                    controller: GRBL
                 });
                 // Force propogation of current state on alarm
                 this.state = this.runner.state;

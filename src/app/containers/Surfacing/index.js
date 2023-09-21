@@ -10,10 +10,10 @@ import Surfacing from './components/Surfacing';
  * @description Main component for displaying the Surfacing modal
  * @prop {Function} modalClose - Function to close the current modal
  */
-const SurfacingModal = ({ modalClose }) => {
+const SurfacingModal = ({ modalClose, isDisabled }) => {
     return (
         <Modal title="Surfacing Tool" onClose={modalClose} size="lg">
-            <Surfacing onClose={modalClose} />
+            <Surfacing onClose={modalClose} isDisabled={isDisabled} />
         </Modal>
     );
 };

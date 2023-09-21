@@ -226,7 +226,6 @@ class NavSidebar extends PureComponent {
                     icon="fab fa-codepen"
                     label="Surfacing"
                     onClick={() => actions.openModal(MODAL_SURFACING)}
-                    disabled={isDisabled}
                 />
                 {
                     /*<NavSidebarLink
@@ -260,7 +259,7 @@ class NavSidebar extends PureComponent {
                 />
                 { state.modal.name === MODAL_FIRMWARE && <Firmware state={state} modalClose={actions.closeModal} /> }
                 { state.modal.name === MODAL_PREFERENCES && <Preferences state={state} modalClose={actions.closeModal} /> }
-                { state.modal.name === MODAL_SURFACING && <Surfacing state={state} modalClose={actions.closeModal} /> }
+                { state.modal.name === MODAL_SURFACING && <Surfacing state={state} modalClose={actions.closeModal} isDisabled={isDisabled} /> }
                 { state.modal.name === MODAL_CALIBRATE && <Calibration state={state} modalClose={actions.closeModal} /> }
                 { state.modal.name === MODAL_HELP && <HelpModal modalClose={actions.closeModal} /> }
             </div>

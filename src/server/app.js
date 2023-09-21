@@ -327,6 +327,14 @@ const appMain = () => {
         app.put(urljoin(settings.route, '/api/remote'), api.remote.update);
         app.get(urljoin(settings.route, 'api/remote'), api.remote.fetch);
 
+        // Job Stats
+        app.put(urljoin(settings.route, '/api/jobstats'), api.jobStats.update);
+        app.get(urljoin(settings.route, 'api/jobstats'), api.jobStats.fetch);
+
+        // Maintenance
+        app.put(urljoin(settings.route, '/api/maintenance'), api.maintenance.update);
+        app.get(urljoin(settings.route, 'api/maintenance'), api.maintenance.fetch);
+
         // Macros
         app.get(urljoin(settings.route, 'api/macros'), api.macros.fetch);
         app.post(urljoin(settings.route, 'api/macros'), api.macros.create);
@@ -359,6 +367,10 @@ const appMain = () => {
         app.get(urljoin(settings.route, 'api/metrics/collectUserData'), api.metrics.getCollectDataStatus);
         app.post(urljoin(settings.route, 'api/metrics/collectUserData'), api.metrics.toggleCollectData);
         app.post(urljoin(settings.route, 'api/metrics/sendData'), api.metrics.sendData);
+
+        // Alarms/Errors
+        app.put(urljoin(settings.route, 'api/alarmList'), api.alarmList.update);
+        app.get(urljoin(settings.route, 'api/alarmList'), api.alarmList.fetch);
 
         // Files - with multer
         const storage = multer.memoryStorage();

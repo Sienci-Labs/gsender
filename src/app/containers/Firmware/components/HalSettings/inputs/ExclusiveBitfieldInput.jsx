@@ -1,8 +1,13 @@
 import React from 'react';
 
-const ExclusiveBitfieldInput = () => {
+import BitfieldInput from 'Containers/Firmware/components/HalSettings/inputs/BitfieldInput';
+
+// We can just wrap the working bitfield with the isExclusive tag
+const ExclusiveBitfieldInput = ({ info, setting, onChange }) => {
     return (
-        <div>EB</div>
+        <>
+            <BitfieldInput info={info} onChange={onChange} setting={setting} isExclusive={true} />
+        </>
     );
 };
 
