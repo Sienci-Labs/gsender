@@ -459,7 +459,8 @@ class Workspace extends PureComponent {
 
         if (collectUserDataStatus === ACCEPTED) {
             try {
-                await api.metrics.sendData();
+                const machineProfile = store.get('workspace.machineProfile', {});
+                await api.metrics.sendData(machineProfile);
             } catch (error) {
                 console.log(error);
             }
