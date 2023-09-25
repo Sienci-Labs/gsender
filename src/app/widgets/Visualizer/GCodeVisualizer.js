@@ -37,6 +37,9 @@ class GCodeVisualizer {
         this.isLaser = false;
         this.frames = []; // Example
         this.frameIndex = 0;
+        this.v2minusv1 = Array(20).fill(-1); // grey, in between, current buffer
+        this.oldV1 = Array(20).fill(-1);
+        this.countdown = 20;
 
         return this;
     }
@@ -69,6 +72,9 @@ class GCodeVisualizer {
         this.isLaser = isLaser;
         this.spindleChanges = spindleChanges;
         const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
+        this.countdown = 20;
+        this.v2minusv1 = Array(20).fill(-1);
+        this.oldV1 = Array(20).fill(-1);
 
         // Get line colors for current theme
         const motionColor = {
@@ -118,6 +124,7 @@ class GCodeVisualizer {
 
 
     setFrameIndex(frameIndex) {
+        // console.log(this.frames);
         if (this.frames.length === 0) {
             return;
         }
@@ -127,14 +134,41 @@ class GCodeVisualizer {
         frameIndex = Math.max(frameIndex, 0);
 
         const v1 = this.frames[this.frameIndex];
-        const v2 = this.frames[frameIndex];
+        const v2 = this.frames[frameIndex]; // recieved lines
 
         if (v1 < v2) {
+            // console.log('less');
+            this.countdown -= 1;
+            this.v2minusv1.shift();
+            this.v2minusv1.push(v2 - v1);
+            this.oldV1.shift();
+            this.oldV1.push(v1);
+
             const workpiece = this.group.children[0];
-            const offsetIndex = v1 * 4;
+            const offsetIndex = this.oldV1[0] * 4;
+            const bufferOffsetIndex = v1 * 4;
+            // console.log(offsetIndex);
             const colorAttr = workpiece.geometry.getAttribute('color');
+
             const defaultColorArray = [...defaultColor.toArray(), 0.3];
-            const colorArray = Array.from({ length: (v2 - v1) }, () => defaultColorArray).flat();
+            const defaultBufferColorArray = [...(new THREE.Color('#DFF204')).toArray(), 1];
+            const placeHolderColorArray = [...(new THREE.Color('#DFF204')).toArray(), 1];
+
+            let placeHolderLength = 0;
+            this.v2minusv1.forEach((num, i) => {
+                console.log(num);
+                if (i === 0) {
+                    return;
+                }
+                placeHolderLength += num;
+            });
+            console.log(placeHolderLength);
+
+            // console.log(this.v2minusv1);
+            // console.log(this.v2minusv1[0]);
+            const colorArray = Array.from({ length: (this.v2minusv1[0]) }, () => defaultColorArray).flat();
+            const bufferColorArray = Array.from({ length: (v2 - v1) }, () => defaultBufferColorArray).flat();
+            const placeHolderArray = Array.from({ length: (placeHolderLength) }, () => placeHolderColorArray).flat();
 
             if (this.isLaser) {
                 // add original color on top so you can see the parts the laser has finished
@@ -143,10 +177,17 @@ class GCodeVisualizer {
                 }
             }
 
-            colorAttr.set([...colorArray], offsetIndex);
-            // only update the range we've updated;
-            colorAttr.updateRange.count = colorArray.length;
-            colorAttr.updateRange.offset = offsetIndex;
+            // only update the range we've updated
+            if (this.countdown <= 0) {
+                console.log('*********starting');
+                colorAttr.set([...colorArray, ...placeHolderArray, ...bufferColorArray], offsetIndex);
+                colorAttr.updateRange.count = colorArray.length + placeHolderArray.length + bufferColorArray.length;
+                colorAttr.updateRange.offset = offsetIndex;
+            } else {
+                colorAttr.set([...bufferColorArray], bufferOffsetIndex);
+                colorAttr.updateRange.count = bufferColorArray.length;
+                colorAttr.updateRange.offset = bufferOffsetIndex;
+            }
             colorAttr.needsUpdate = true;
         }
 
