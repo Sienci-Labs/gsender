@@ -5,12 +5,8 @@ Function createdesktopshortcut
     CreateShortcut "$desktop\${PRODUCT_NAME}.lnk" "$instdir\${PRODUCT_NAME}.exe"
 FunctionEnd
 
-# define license data
-LicenseData "LICENSE"
-LicenseForceSelection checkbox
-
 # page order: license, directory, install, and finish page defined below
-Page License
+!insertmacro MUI_PAGE_LICENSE "${PROJECT_DIR}\LICENSE"
 Page Directory
 Page InstFiles
 # readme checkbox used as desktop shortcut
