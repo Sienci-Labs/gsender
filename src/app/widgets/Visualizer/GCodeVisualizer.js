@@ -23,7 +23,7 @@
 
 // import colornames from 'colornames';
 import * as THREE from 'three';
-import { BACKGROUND_PART, CUTTING_PART, G0_PART, G1_PART, G2_PART, G3_PART, LASER_PART } from './constants';
+import { BACKGROUND_PART, CUTTING_PART, G0_PART, G1_PART, G2_PART, G3_PART, LASER_PART, PLANNED_PART } from './constants';
 
 class GCodeVisualizer {
     constructor(theme) {
@@ -128,6 +128,7 @@ class GCodeVisualizer {
             return;
         }
         const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
+        const plannedColor = new THREE.Color(this.theme.get(PLANNED_PART));
 
         frameIndex = Math.min(frameIndex, this.frames.length - 1);
         frameIndex = Math.max(frameIndex, 0);
@@ -150,8 +151,8 @@ class GCodeVisualizer {
 
             const opacity = this.isLaser ? 1 : 0.3;
             const defaultColorArray = [...defaultColor.toArray(), opacity]; // grey
-            const defaultBufferColorArray = [...(new THREE.Color('#DFF204')).toArray(), 1]; // yellow
-            const placeHolderColorArray = [...(new THREE.Color('#DFF204')).toArray(), 1]; // yellow
+            const defaultBufferColorArray = [...plannedColor.toArray(), 1]; // yellow
+            const placeHolderColorArray = [...plannedColor.toArray(), 1]; // yellow
 
             // add the distance between the current movement and 19 moves ago
             let placeHolderLength = 0;

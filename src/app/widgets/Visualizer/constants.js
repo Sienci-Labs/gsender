@@ -73,6 +73,7 @@ export const ZAXIS_PART = 'Z Axis';
 export const LIMIT_PART = 'Limit';
 export const CUTTING_PART = 'Cutting Coordinates Lines';
 export const JOGGING_PART = 'Jogging Coordinates Lines';
+export const PLANNED_PART = 'Planned Cutting Lines';
 export const G0_PART = 'G0';
 export const G1_PART = 'G1';
 export const G2_PART = 'G2';
@@ -88,6 +89,7 @@ export const PARTS_LIST = [
     LIMIT_PART,
     CUTTING_PART,
     JOGGING_PART,
+    PLANNED_PART,
     G0_PART,
     G1_PART,
     LASER_PART
@@ -102,6 +104,7 @@ export const DARK_THEME_VALUES = new Map([
     [LIMIT_PART, '#5191cc'], //Indian Red
     [CUTTING_PART, '#fff'], //White
     [JOGGING_PART, '#0ef6ae'], // Light Green
+    [PLANNED_PART, '#dff204'], // Yellow
     [G0_PART, '#0ef6ae'], // Light Green
     [G1_PART, '#3e85c7'], // Light Blue
     [G2_PART, '#3e85c7'], // Light Blue
@@ -118,6 +121,7 @@ export const LIGHT_THEME_VALUES = new Map([
     [LIMIT_PART, '#5191cc'], //Indian Red
     [CUTTING_PART, '#000000'],
     [JOGGING_PART, '#0ef6ae'], // Light Green
+    [PLANNED_PART, '#dff204'], // Yellow
     [G0_PART, '#0ef6ae'], // Light Green
     [G1_PART, '#111827'], // Dark Blue
     [G2_PART, '#111827'], // Dark Blue
