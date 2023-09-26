@@ -153,7 +153,7 @@ class NavbarConnection extends PureComponent {
     render() {
         const { state, actions } = this.props;
         const { connected, ports, connecting, scanning, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized, networkPorts } = state;
-        const { isActive, ip, hasScanned } = this.state;
+        const { isActive, ip } = this.state;
         const isMobile = window.visualViewport.width <= 639;
 
 
@@ -234,22 +234,9 @@ class NavbarConnection extends PureComponent {
                                 onClick={() => controller.networkScan(23, this.convertIPToString(ip))}
                                 className={styles.scanButton}
                             >
-                                Scan for Devices
+                                192.168.5.1
                             </FunctionButton>
                         </div>
-                    }
-                    {
-                        !connected && (networkPorts.length === 0) && (
-                            hasScanned ? (
-                                <div className={styles.noDevicesWarning}>
-                                    No Network Devices Found
-                                </div>
-                            ) : (
-                                <div className={styles.noDevicesWarning}>
-                                    Please Scan To Display Available Devices
-                                </div>
-                            )
-                        )
                     }
                     {
                         !connected && !connecting && networkPorts.map(
