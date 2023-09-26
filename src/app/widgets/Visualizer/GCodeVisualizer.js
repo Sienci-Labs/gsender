@@ -37,7 +37,7 @@ class GCodeVisualizer {
         this.isLaser = false;
         this.frames = []; // Example
         this.frameIndex = 0;
-        this.movementDistances = Array(20).fill(-1); // stores up to 20 movement distances
+        this.frameDifferences = Array(20).fill(-1); // stores up to 20 frame distances
         this.oldV1s = Array(20).fill(-1); // stores up to 20 frames
         this.countdown = 20;
 
@@ -73,7 +73,7 @@ class GCodeVisualizer {
         this.spindleChanges = spindleChanges;
         const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
         this.countdown = 20;
-        this.movementDistances = Array(20).fill(-1);
+        this.frameDifferences = Array(20).fill(-1);
         this.oldV1s = Array(20).fill(-1);
 
         // Get line colors for current theme
@@ -138,8 +138,8 @@ class GCodeVisualizer {
         if (v1 < v2) {
             // subtract countdown and advance the queue
             this.countdown -= 1;
-            this.movementDistances.shift();
-            this.movementDistances.push(v2 - v1);
+            this.frameDifferences.shift();
+            this.frameDifferences.push(v2 - v1);
             this.oldV1s.shift();
             this.oldV1s.push(v1);
 
@@ -154,16 +154,16 @@ class GCodeVisualizer {
 
             // add the distance between the current movement and 19 moves ago
             let placeHolderLength = 0;
-            this.movementDistances.forEach((num, i) => {
+            this.frameDifferences.forEach((num, i) => {
                 // if first or last, skip
                 // these are already covered by colorArray and bufferColorArray
-                if (i === 0 || i === this.movementDistances.length - 1) {
+                if (i === 0 || i === this.frameDifferences.length - 1) {
                     return;
                 }
                 placeHolderLength += num;
             });
 
-            const colorArray = Array.from({ length: (this.movementDistances[0]) }, () => defaultColorArray).flat(); // grey, 19 movements ago
+            const colorArray = Array.from({ length: (this.frameDifferences[0]) }, () => defaultColorArray).flat(); // grey, 19 movements ago
             const bufferColorArray = Array.from({ length: (v2 - v1) }, () => defaultBufferColorArray).flat(); // current movement
             const placeHolderArray = Array.from({ length: (placeHolderLength) }, () => placeHolderColorArray).flat(); // all movements in between
 
@@ -189,6 +189,12 @@ class GCodeVisualizer {
 
         // Restore the path to its original colors
         if (v2 < v1) {
+            // reset vars
+            this.frameDifferences = Array(20).fill(-1);
+            this.oldV1s = Array(20).fill(-1);
+            this.countdown = 20;
+
+            // reset colours
             const workpiece = this.group.children[0];
             for (let i = v2; i < v1; ++i) {
                 const offsetIndex = i * 4; // Account for RGB buffer
@@ -220,6 +226,9 @@ class GCodeVisualizer {
         this.frames = null;
         this.frameIndex = 0;
         this.framesLength = 0;
+        this.frameDifferences = Array(20).fill(-1);
+        this.oldV1s = Array(20).fill(-1);
+        this.countdown = 20;
     }
 }
 
