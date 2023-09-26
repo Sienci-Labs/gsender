@@ -37,9 +37,9 @@ class GCodeVisualizer {
         this.isLaser = false;
         this.frames = []; // Example
         this.frameIndex = 0;
-        this.frameDifferences = Array(20).fill(null); // stores up to 20 frame distances
-        this.oldV1s = Array(20).fill(null); // stores up to 20 frames
-        this.countdown = 20;
+        this.frameDifferences = Array(16).fill(null); // queue, stores up to 16 frame differences (v2 - v1)
+        this.oldV1s = Array(16).fill(null); // queue, stores up to 16 frames (v1)
+        this.countdown = 16; // counter
 
         return this;
     }
@@ -72,9 +72,9 @@ class GCodeVisualizer {
         this.isLaser = isLaser;
         this.spindleChanges = spindleChanges;
         const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
-        this.countdown = 20;
-        this.frameDifferences = Array(20).fill(null);
-        this.oldV1s = Array(20).fill(null);
+        this.countdown = 16;
+        this.frameDifferences = Array(16).fill(null);
+        this.oldV1s = Array(16).fill(null);
 
         // Get line colors for current theme
         const motionColor = {
@@ -164,7 +164,7 @@ class GCodeVisualizer {
                 placeHolderLength += num;
             });
 
-            const colorArray = Array.from({ length: (this.frameDifferences[0]) }, () => defaultColorArray).flat(); // grey, 20 movements ago
+            const colorArray = Array.from({ length: (this.frameDifferences[0]) }, () => defaultColorArray).flat(); // grey, 16 movements ago
             const bufferColorArray = Array.from({ length: (v2 - v1) }, () => defaultBufferColorArray).flat(); // current movement
             const placeHolderArray = Array.from({ length: (placeHolderLength) }, () => placeHolderColorArray).flat(); // all movements in between
 
@@ -184,9 +184,9 @@ class GCodeVisualizer {
         // Restore the path to its original colors
         if (v2 < v1) {
             // reset vars
-            this.frameDifferences = Array(20).fill(-1);
-            this.oldV1s = Array(20).fill(-1);
-            this.countdown = 20;
+            this.frameDifferences = Array(16).fill(-1);
+            this.oldV1s = Array(16).fill(-1);
+            this.countdown = 16;
 
             // reset colours
             const workpiece = this.group.children[0];
@@ -220,9 +220,9 @@ class GCodeVisualizer {
         this.frames = null;
         this.frameIndex = 0;
         this.framesLength = 0;
-        this.frameDifferences = Array(20).fill(null);
-        this.oldV1s = Array(20).fill(null);
-        this.countdown = 20;
+        this.frameDifferences = Array(16).fill(null);
+        this.oldV1s = Array(16).fill(null);
+        this.countdown = 16;
     }
 }
 
