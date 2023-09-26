@@ -268,7 +268,9 @@ class Sender extends events.EventEmitter {
             timePaused: this.state.timePaused,
             timeRunning: this.state.timeRunning,
             remainingTime: this.state.remainingTime,
-            toolChanges: this.state.toolChanges
+            toolChanges: this.state.toolChanges,
+            bufferSize: this.state.bufferSize,
+            dataLength: this.state.dataLength
         };
     }
 

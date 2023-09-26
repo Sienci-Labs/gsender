@@ -366,7 +366,7 @@ class GrblHalController {
         // Sender
         this.sender = new Sender(SP_TYPE_CHAR_COUNTING, {
             // Deduct the buffer size to prevent from buffer overrun
-            bufferSize: (128 - 28), // The default buffer size is 128 bytes
+            bufferSize: (1024 - 28), // TODO: Parse this out from OPT
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
