@@ -8,12 +8,10 @@ FunctionEnd
 
 var Checkbox
 Function showNewCheckbox
-    ${NSD_CreateCheckbox} 180 213 200u 10u "Create Start Menu Shortcut"
+    ${NSD_CreateCheckbox} 180 213 100u 10u "Create Start Menu Shortcut"
     Pop $Checkbox
     # Set tranparent color for control 
-    SetCtlColors $Checkbox "0xFFFFFF" transparent
-    # Add special style 
-    ${NSD_AddExStyle} $Checkbox ${WS_EX_TRANSPARENT}|${WS_EX_TOPMOST}
+    SetCtlColors $Checkbox 0xFFFFFF 0xFFFFFF
 FunctionEnd
 
 Function checkboxLeave
