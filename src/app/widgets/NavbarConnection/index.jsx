@@ -72,9 +72,9 @@ class NavbarConnectionWidget extends PureComponent {
             }), () => {
                 const { port, baudrate, controllerType } = this.state;
                 if (isNetworkDevice) {
-                    this.openPort(port, selectedPort.controllerType, { baudrate: baudrate });
+                    this.openPort(port, controllerType, { baudrate: baudrate, network: true });
                 } else {
-                    this.openPort(port, controllerType, { baudrate: baudrate });
+                    this.openPort(port, controllerType, { baudrate: baudrate, network: false });
                 }
             });
         },

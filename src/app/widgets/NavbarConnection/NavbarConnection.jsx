@@ -27,7 +27,6 @@ import _ from 'lodash';
 import cx from 'classnames';
 import pubsub from 'pubsub-js';
 import store from 'app/store';
-import controller from 'app/lib/controller';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import PortListing from './PortListing';
@@ -153,7 +152,7 @@ class NavbarConnection extends PureComponent {
     render() {
         const { state, actions } = this.props;
         const { connected, ports, connecting, scanning, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized, networkPorts } = state;
-        const { isActive, ip } = this.state;
+        const { isActive } = this.state;
         const isMobile = window.visualViewport.width <= 639;
 
 
@@ -231,7 +230,7 @@ class NavbarConnection extends PureComponent {
                         <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
                             <FunctionButton
                                 primary
-                                onClick={() => controller.networkScan(23, this.convertIPToString(ip))}
+                                onClick={() => actions.onClickPortListing('192.168.5.1', true)}
                                 className={styles.scanButton}
                             >
                                 192.168.5.1
