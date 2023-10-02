@@ -410,7 +410,8 @@ onmessage = function({ data }) {
         frames: tFrames,
         visualizer,
         info,
-        needsVisualization
+        needsVisualization,
+        parsedData: vm.getParsedData(),
     };
 
     if (isLaser) {
