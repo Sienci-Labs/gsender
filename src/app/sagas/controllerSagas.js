@@ -133,6 +133,7 @@ export function* initialize() {
     const parseGCode = (content, size, name, visualizer) => {
         const isLaser = isLaserMode();
         const shouldIncludeSVG = shouldVisualizeSVG();
+        const parsedData = _get(reduxStore.getState(), 'file.parsedData');
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch({
                 type: fileActions.UPDATE_FILE_RENDER_STATE,
@@ -160,6 +161,7 @@ export function* initialize() {
                 visualizeWorker.postMessage({
                     content,
                     visualizer,
+                    parsedData
                 });
             } else {
                 reduxStore.dispatch({
@@ -219,7 +221,8 @@ export function* initialize() {
             visualizer,
             isLaser,
             shouldIncludeSVG,
-            needsVisualization
+            needsVisualization,
+            parsedData
         });
     };
 

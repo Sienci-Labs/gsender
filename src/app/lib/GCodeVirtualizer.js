@@ -168,7 +168,8 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     parsedData = {
-        lines: [],
+        linesData: [],
+        parsedLines: [],
     };
 
     handlers = {
@@ -207,10 +208,11 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z, targetPosition.a);
 
-            this.parsedData.lines.push({
+            this.parsedData.linesData.push({
                 modal: this.modal,
                 v1: this.offsetG92(v1),
-                v2: this.offsetG92(v2)
+                v2: this.offsetG92(v2),
+                shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
             });
         },
         // G1: Linear Move
@@ -261,10 +263,11 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z, targetPosition.a);
 
-            this.parsedData.lines.push({
+            this.parsedData.linesData.push({
                 modal: this.modal,
                 v1: this.offsetG92(v1),
-                v2: this.offsetG92(v2)
+                v2: this.offsetG92(v2),
+                shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
             });
         },
         // G2 & G3: Controlled Arc Move
@@ -354,7 +357,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
 
-            this.parsedData.lines.push({
+            this.parsedData.linesData.push({
                 modal: this.modal,
                 v1: this.offsetG92(v1),
                 v2: this.offsetG92(v2),
@@ -429,7 +432,7 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
 
-            this.parsedData.lines.push({
+            this.parsedData.linesData.push({
                 modal: this.modal,
                 v1: this.offsetG92(v1),
                 v2: this.offsetG92(v2),
@@ -885,6 +888,7 @@ class GCodeVirtualizer extends EventEmitter {
         this.totalLines += 1;
         this.fn.callback();
         this.emit('data', parsedLine);
+        this.parsedData.parsedLines.push(parsedLine);
     }
 
     generateFileStats() {

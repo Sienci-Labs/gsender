@@ -22,12 +22,12 @@
  */
 
 import { ArcCurve } from 'three';
-
+import { isEmpty } from 'lodash';
 import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
 
 
 onmessage = function({ data }) {
-    const { content, visualizer, isLaser = false, shouldIncludeSVG = false, needsVisualization = true } = data;
+    const { content, visualizer, isLaser = false, shouldIncludeSVG = false, needsVisualization = true, parsedData = null } = data;
 
     // Common state variables
     let vertices = [];
@@ -89,6 +89,29 @@ onmessage = function({ data }) {
                 SVGVertices = [];
                 currentMotion = motion;
             }
+        }
+    };
+
+    const onData = (data, total, current) => {
+        const vertexIndex = vertices.length / 3;
+        frames.push(vertexIndex);
+
+        let spindleValues = {};
+        if (isLaser && needsVisualization) {
+            updateSpindleStateFromLine(data);
+            spindleValues = {
+                spindleOn,
+                spindleSpeed
+            };
+
+            spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
+        }
+
+        currentLines++;
+        const newProgress = Math.floor(current / total * 100);
+        if (newProgress !== progress) {
+            progress = newProgress;
+            postMessage(progress);
         }
     };
 
@@ -357,45 +380,58 @@ onmessage = function({ data }) {
     }
 
     const { addLine, addArcCurve, addCurve } = handlers[handlerKey];
+    let fileInfo = null;
+    let parsedDataToSend = null;
 
-    const vm = new GCodeVirtualizer({ addLine, addArcCurve, addCurve, collate: true });
+    if (!isEmpty(parsedData)) {
+        const { linesData, parsedLines, info } = parsedData;
+        fileInfo = info;
+        const total = parsedLines.length;
+        console.log('data exists!');
+        while (linesData.length) {
+            const line = linesData.pop();
+            console.log(line);
+            const { modal, v1, v2, v0, shouldUseAddCurve } = line;
+            if (modal.motion === 'G1' || modal.motion === 'G0') {
+                if (shouldUseAddCurve) {
+                    addCurve(modal, v1, v2);
+                } else {
+                    addLine(modal, v1, v2);
+                }
+            } else {
+                addArcCurve(modal, v1, v2, v0);
+            }
+        }
+        while (parsedLines.length) {
+            const data = parsedLines.pop();
+            onData(data, total, total - parsedLines.length);
+        }
+    } else {
+        const vm = new GCodeVirtualizer({ addLine, addArcCurve, addCurve, collate: true });
 
-    vm.on('data', (data) => {
-        const vertexIndex = vertices.length / 3;
-        frames.push(vertexIndex);
+        vm.on('data', (data) => {
+            onData(data, totalLines, currentLines);
+        });
 
-        let spindleValues = {};
-        if (isLaser && needsVisualization) {
-            updateSpindleStateFromLine(data);
-            spindleValues = {
-                spindleOn,
-                spindleSpeed
-            };
+        const lines = content
+            .split(/\r?\n/)
+            .reverse();
 
-            spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
+        while (lines.length) {
+            let line = lines.pop();
+            vm.virtualize(line);
         }
 
-        currentLines++;
-        const newProgress = Math.floor(currentLines / totalLines * 100);
-        if (newProgress !== progress) {
-            progress = newProgress;
-            postMessage(progress);
-        }
-    });
-
-    const lines = content
-        .split(/\r?\n/)
-        .reverse();
-
-    while (lines.length) {
-        let line = lines.pop();
-        vm.virtualize(line);
+        const { linesData, parsedLines } = vm.getParsedData();
+        parsedDataToSend = {
+            linesData,
+            parsedLines,
+            info: vm.generateFileStats()
+        };
     }
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);
-
-    const info = vm.generateFileStats();
 
     // create path for the last motion
     if (shouldIncludeSVG) {
@@ -409,9 +445,9 @@ onmessage = function({ data }) {
         colors,
         frames: tFrames,
         visualizer,
-        info,
+        info: fileInfo,
         needsVisualization,
-        parsedData: vm.getParsedData(),
+        parsedData: parsedDataToSend,
     };
 
     if (isLaser) {

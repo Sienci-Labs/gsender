@@ -32,12 +32,15 @@ export const visualizeResponse = ({ data }) => {
             }
         });
 
-        reduxStore.dispatch({
-            type: UPDATE_FILE_PARSED_DATA,
-            payload: {
-                value: parsedData
-            }
-        });
+        if (parsedData) {
+            console.log('sending');
+            reduxStore.dispatch({
+                type: UPDATE_FILE_PARSED_DATA,
+                payload: {
+                    value: parsedData
+                }
+            });
+        }
 
         // Handle file load
         pubsub.publish('file:load', data);
