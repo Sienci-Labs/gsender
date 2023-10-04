@@ -27,7 +27,7 @@ import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
 
 
 onmessage = function({ data }) {
-    const { content, visualizer, isLaser = false, shouldIncludeSVG = false, needsVisualization = true, parsedData = null } = data;
+    const { content, visualizer, isLaser = false, shouldIncludeSVG = false, needsVisualization = true, parsedData = {}, isNewFile = false } = data;
 
     // Common state variables
     let vertices = [];
@@ -383,14 +383,13 @@ onmessage = function({ data }) {
     let fileInfo = null;
     let parsedDataToSend = null;
 
-    if (!isEmpty(parsedData)) {
+    if (!isEmpty(parsedData) && !isNewFile) {
         const { linesData, parsedLines, info } = parsedData;
         fileInfo = info;
         const total = parsedLines.length;
         console.log('data exists!');
         while (linesData.length) {
             const line = linesData.pop();
-            console.log(line);
             const { modal, v1, v2, v0, shouldUseAddCurve } = line;
             if (modal.motion === 'G1' || modal.motion === 'G0') {
                 if (shouldUseAddCurve) {

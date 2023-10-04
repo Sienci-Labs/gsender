@@ -133,7 +133,16 @@ export function* initialize() {
     const parseGCode = (content, size, name, visualizer) => {
         const isLaser = isLaserMode();
         const shouldIncludeSVG = shouldVisualizeSVG();
-        const parsedData = _get(reduxStore.getState(), 'file.parsedData');
+        const parsedData = _get(reduxStore.getState(), 'file.parsedData'); // data from GCodeVirtualizer
+
+        // compare previous file data to see if it's a new file and we need to reparse
+        let isNewFile = true;
+        const fileData = _get(reduxStore.getState(), 'file');
+        const { content: prevContent, size: prevSize, name: prevName } = fileData;
+        if (content === prevContent && size === prevSize && name === prevName) {
+            isNewFile = false;
+        }
+
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch({
                 type: fileActions.UPDATE_FILE_RENDER_STATE,
@@ -161,7 +170,8 @@ export function* initialize() {
                 visualizeWorker.postMessage({
                     content,
                     visualizer,
-                    parsedData
+                    parsedData,
+                    isNewFile
                 });
             } else {
                 reduxStore.dispatch({
@@ -222,7 +232,8 @@ export function* initialize() {
             isLaser,
             shouldIncludeSVG,
             needsVisualization,
-            parsedData
+            parsedData,
+            isNewFile
         });
     };
 

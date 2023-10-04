@@ -22,11 +22,11 @@
  */
 
 import hull from 'concaveman';
-import GCodeVirtualizer, { shouldRotate, rotateAxis } from 'app/lib/GCodeVirtualizer';
+import { shouldRotate, rotateAxis } from 'app/lib/GCodeVirtualizer';
 import * as THREE from 'three';
 
 onmessage = ({ data }) => {
-    const { gcode, isLaser = false } = data;
+    const { gcode, isLaser = false, parsedData = {} } = data;
     // Generate an ordered pair - we don't care about Z index for outline purposes, so it's removed
     function vertex(x, y) {
         return [x.toFixed(3), y.toFixed(3)];
@@ -37,7 +37,7 @@ onmessage = ({ data }) => {
 
         const addLine = ({ motion }, v1, v2) => {
             if (motion === 'G1' || motion === 'G0') {
-                if (shouldRotate(v1.a) || shouldRotate(v2.a)) {
+                if (shouldRotate(v1.a, v2.a)) {
                     const newV1 = rotateAxis('y', v1);
                     v1.y = newV1.y;
                     v1.z = newV1.z;
@@ -92,15 +92,19 @@ onmessage = ({ data }) => {
             }
         };
 
-        const vm = new GCodeVirtualizer({ addLine, addCurve, collate: true });
-
-        const lines = gcode
-            .split(/\r?\n/)
-            .reverse();
-
-        while (lines.length) {
-            let line = lines.pop();
-            vm.virtualize(line);
+        const { linesData } = parsedData;
+        while (linesData.length) {
+            const line = linesData.pop();
+            const { modal, v1, v2, v0, shouldUseAddCurve } = line;
+            if (modal.motion === 'G1' || modal.motion === 'G0') {
+                if (shouldUseAddCurve) {
+                    addCurve(modal, v1, v2);
+                } else {
+                    addLine(modal, v1, v2);
+                }
+            } else {
+                addArcCurve(modal, v1, v2, v0);
+            }
         }
 
         const fileHull = hull(vertices);

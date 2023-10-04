@@ -248,6 +248,7 @@ class WorkflowControl extends PureComponent {
         const spindleMode = store.get('widgets.spindle.mode');
         // outline toggled on and currently in laser mode
         const isLaser = machineProfile.laserOnOutline && spindleMode === LASER_MODE;
+        const parsedData = get(reduxStore.getState(), 'file.parsedData'); // data from GCodeVirtualizer
 
         Toaster.pop({
             TYPE: TOASTER_INFO,
@@ -259,7 +260,7 @@ class WorkflowControl extends PureComponent {
             // Enable the outline button again
             this.setState({ outlineRunning: false });
         };
-        this.workerOutline.postMessage({ gcode, isLaser });
+        this.workerOutline.postMessage({ gcode, isLaser, parsedData });
     };
 
     startRun = () => {

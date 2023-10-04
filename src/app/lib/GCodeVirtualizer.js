@@ -167,9 +167,10 @@ class GCodeVirtualizer extends EventEmitter {
 
     }
 
+    // data to save so we don't have to reparse
     parsedData = {
-        linesData: [],
-        parsedLines: [],
+        linesData: [], // modal changes, v1, v2, v0
+        parsedLines: [], // the parsed lines from gcode-parser
     };
 
     handlers = {
@@ -1129,7 +1130,6 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     getParsedData() {
-        console.log(this.parsedData);
         return this.parsedData;
     }
 }

@@ -32,8 +32,8 @@ export const visualizeResponse = ({ data }) => {
             }
         });
 
+        // if there's new parsed data, send to redux
         if (parsedData) {
-            console.log('sending');
             reduxStore.dispatch({
                 type: UPDATE_FILE_PARSED_DATA,
                 payload: {
