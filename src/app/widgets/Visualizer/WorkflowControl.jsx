@@ -243,7 +243,6 @@ class WorkflowControl extends PureComponent {
         this.setState({ outlineRunning: true });
 
         this.workerOutline = new WorkerOutline();
-        const { gcode } = this.props;
         const machineProfile = store.get('workspace.machineProfile');
         const spindleMode = store.get('widgets.spindle.mode');
         // outline toggled on and currently in laser mode
@@ -260,7 +259,7 @@ class WorkflowControl extends PureComponent {
             // Enable the outline button again
             this.setState({ outlineRunning: false });
         };
-        this.workerOutline.postMessage({ gcode, isLaser, parsedData });
+        this.workerOutline.postMessage({ isLaser, parsedData });
     };
 
     startRun = () => {

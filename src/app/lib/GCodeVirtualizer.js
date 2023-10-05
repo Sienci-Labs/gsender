@@ -168,10 +168,12 @@ class GCodeVirtualizer extends EventEmitter {
     }
 
     // data to save so we don't have to reparse
-    parsedData = {
-        linesData: [], // modal changes, v1, v2, v0
-        parsedLines: [], // the parsed lines from gcode-parser
-    };
+    data = [
+        {
+            parsedLine: null, // the parsed lines from gcode-parser
+            lineData: null, // modal changes, v1, v2, v0
+        }
+    ];
 
     handlers = {
         // G0: Rapid Linear Move
@@ -209,12 +211,12 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z, targetPosition.a);
 
-            this.parsedData.linesData.push({
+            this.data[this.totalLines].lineData = {
                 modal: this.modal,
                 v1: this.offsetG92(v1),
                 v2: this.offsetG92(v2),
                 shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
-            });
+            };
         },
         // G1: Linear Move
         // Usage
@@ -264,12 +266,12 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z, targetPosition.a);
 
-            this.parsedData.linesData.push({
+            this.data[this.totalLines].lineData = {
                 modal: this.modal,
                 v1: this.offsetG92(v1),
                 v2: this.offsetG92(v2),
                 shouldUseAddCurve: isCurvedLine && angleDiff > ANGLE_THRESHOLD,
-            });
+            };
         },
         // G2 & G3: Controlled Arc Move
         // Usage
@@ -358,12 +360,12 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
 
-            this.parsedData.linesData.push({
+            this.data[this.totalLines].lineData = {
                 modal: this.modal,
                 v1: this.offsetG92(v1),
                 v2: this.offsetG92(v2),
                 v0: this.offsetG92(v0)
-            });
+            };
         },
         'G3': (params) => {
             if (this.modal.motion !== 'G3') {
@@ -433,12 +435,12 @@ class GCodeVirtualizer extends EventEmitter {
             this.updateBounds(targetPosition);
             this.setPosition(targetPosition.x, targetPosition.y, targetPosition.z);
 
-            this.parsedData.linesData.push({
+            this.data[this.totalLines].lineData = {
                 modal: this.modal,
                 v1: this.offsetG92(v1),
                 v2: this.offsetG92(v2),
                 v0: this.offsetG92(v0)
-            });
+            };
         },
         // G4: Dwell
         // Parameters
@@ -886,10 +888,17 @@ class GCodeVirtualizer extends EventEmitter {
                 func(args);
             }
         }
+
+        this.data[this.totalLines].parsedLine = parsedLine;
+        // add new data structure
+        this.data.push({
+            parsedLine: null,
+            lineData: null
+        });
+
         this.totalLines += 1;
         this.fn.callback();
         this.emit('data', parsedLine);
-        this.parsedData.parsedLines.push(parsedLine);
     }
 
     generateFileStats() {
@@ -1129,8 +1138,9 @@ class GCodeVirtualizer extends EventEmitter {
         this.totalTime += moveDuration;
     }
 
-    getParsedData() {
-        return this.parsedData;
+    getData() {
+        this.data.pop(); // get rid of the last entry, as it is a temp one with null values
+        return this.data;
     }
 }
 

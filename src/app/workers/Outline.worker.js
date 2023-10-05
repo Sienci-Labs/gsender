@@ -26,13 +26,13 @@ import { shouldRotate, rotateAxis } from 'app/lib/GCodeVirtualizer';
 import * as THREE from 'three';
 
 onmessage = ({ data }) => {
-    const { gcode, isLaser = false, parsedData = {} } = data;
+    const { isLaser = false, parsedData = {} } = data;
     // Generate an ordered pair - we don't care about Z index for outline purposes, so it's removed
     function vertex(x, y) {
         return [x.toFixed(3), y.toFixed(3)];
     }
 
-    const getOutlineGcode = (gcode, concavity = 60) => {
+    const getOutlineGcode = (concavity = 60) => {
         const vertices = [];
 
         const addLine = ({ motion }, v1, v2) => {
@@ -92,18 +92,16 @@ onmessage = ({ data }) => {
             }
         };
 
-        const { linesData } = parsedData;
-        while (linesData.length) {
-            const line = linesData.pop();
-            const { modal, v1, v2, v0, shouldUseAddCurve } = line;
-            if (modal.motion === 'G1' || modal.motion === 'G0') {
+        const { data } = parsedData;
+        for (let i = 0; i < data.length; i++) {
+            const entry = data[i];
+            if (entry.lineData) {
+                const { modal, v1, v2, shouldUseAddCurve } = entry.lineData;
                 if (shouldUseAddCurve) {
                     addCurve(modal, v1, v2);
                 } else {
                     addLine(modal, v1, v2);
                 }
-            } else {
-                addArcCurve(modal, v1, v2, v0);
             }
         }
 
@@ -138,6 +136,6 @@ onmessage = ({ data }) => {
         return gCode;
     }
 
-    const outlineGcode = getOutlineGcode(gcode);
+    const outlineGcode = getOutlineGcode();
     postMessage({ outlineGcode });
 };

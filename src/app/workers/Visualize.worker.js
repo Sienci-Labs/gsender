@@ -92,7 +92,7 @@ onmessage = function({ data }) {
         }
     };
 
-    const onData = (data, total, current) => {
+    const onData = (data) => {
         const vertexIndex = vertices.length / 3;
         frames.push(vertexIndex);
 
@@ -108,7 +108,7 @@ onmessage = function({ data }) {
         }
 
         currentLines++;
-        const newProgress = Math.floor(current / total * 100);
+        const newProgress = Math.floor(currentLines / totalLines * 100);
         if (newProgress !== progress) {
             progress = newProgress;
             postMessage(progress);
@@ -384,32 +384,31 @@ onmessage = function({ data }) {
     let parsedDataToSend = null;
 
     if (!isEmpty(parsedData) && !isNewFile) {
-        const { linesData, parsedLines, info } = parsedData;
+        const { data, info } = parsedData;
         fileInfo = info;
-        const total = parsedLines.length;
-        console.log('data exists!');
-        while (linesData.length) {
-            const line = linesData.pop();
-            const { modal, v1, v2, v0, shouldUseAddCurve } = line;
-            if (modal.motion === 'G1' || modal.motion === 'G0') {
-                if (shouldUseAddCurve) {
-                    addCurve(modal, v1, v2);
+
+        for (let i = 0; i < data.length; i++) {
+            const entry = data[i];
+            if (entry.lineData) {
+                const { modal, v1, v2, v0, shouldUseAddCurve } = entry.lineData;
+                if (modal.motion === 'G1' || modal.motion === 'G0') {
+                    if (shouldUseAddCurve) {
+                        addCurve(modal, v1, v2);
+                    } else {
+                        addLine(modal, v1, v2);
+                    }
                 } else {
-                    addLine(modal, v1, v2);
+                    addArcCurve(modal, v1, v2, v0);
                 }
-            } else {
-                addArcCurve(modal, v1, v2, v0);
             }
-        }
-        while (parsedLines.length) {
-            const data = parsedLines.pop();
-            onData(data, total, total - parsedLines.length);
+
+            onData(entry.parsedLine);
         }
     } else {
         const vm = new GCodeVirtualizer({ addLine, addArcCurve, addCurve, collate: true });
 
         vm.on('data', (data) => {
-            onData(data, totalLines, currentLines);
+            onData(data);
         });
 
         const lines = content
@@ -421,10 +420,9 @@ onmessage = function({ data }) {
             vm.virtualize(line);
         }
 
-        const { linesData, parsedLines } = vm.getParsedData();
+        const data = vm.getData();
         parsedDataToSend = {
-            linesData,
-            parsedLines,
+            data,
             info: vm.generateFileStats()
         };
     }
