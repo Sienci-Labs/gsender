@@ -23,7 +23,7 @@
 
 class GrblLineParserResultOk {
     static parse(line) {
-        const r = line.match(/^ok$/);
+        const r = line.match(/^o*k*$/);
         if (!r) {
             return null;
         }
