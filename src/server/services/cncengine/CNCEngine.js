@@ -323,7 +323,7 @@ class CNCEngine {
 
                 let controller = store.get(`controllers["${port}"]`);
                 if (!controller) {
-                    let { baudrate, rtscts } = { ...options };
+                    let { baudrate, rtscts, network } = { ...options };
 
                     const Controller = this.controllerClass[controllerType];
                     if (!Controller) {
@@ -337,7 +337,8 @@ class CNCEngine {
                     controller = new Controller(engine, {
                         port: port,
                         baudrate: baudrate,
-                        rtscts: !!rtscts
+                        rtscts: !!rtscts,
+                        network
                     });
                 }
 

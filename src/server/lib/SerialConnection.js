@@ -80,6 +80,8 @@ class SerialConnection extends EventEmitter {
     constructor(options) {
         super();
 
+        console.log(options);
+
         const { writeFilter, ...rest } = { ...options };
 
         if (writeFilter) {
@@ -140,6 +142,9 @@ class SerialConnection extends EventEmitter {
     }
 
     get isOpen() {
+        if (this.settings.network) {
+            return this.port && this.port.writable;
+        }
         return this.port && this.port.isOpen;
     }
 
@@ -155,11 +160,11 @@ class SerialConnection extends EventEmitter {
             return;
         }
 
-        const { path, ...rest } = this.settings;
+        const { path, network, ...rest } = this.settings;
 
         const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
         const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
-        if (path.match(expr)) {
+        if (network || path.match(expr)) {
             console.log('telnet');
             this.port = new net.Socket();
 
