@@ -211,7 +211,11 @@ class SerialConnection extends EventEmitter {
         this.port.removeListener('error', this.eventListener.error);
         this.parser.removeListener('data', this.eventListener.data);
 
-        this.port.close(callback);
+        if (this.settings.network) {
+            this.port.destroy();
+        } else {
+            this.port.close(callback);
+        }
 
         this.port = null;
         this.parser = null;
