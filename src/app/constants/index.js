@@ -208,10 +208,21 @@ export const USER_DATA_COLLECTION = {
     REJECTED: 'REJECTED',
 };
 
+export const OVERRIDE_VALUE_RANGES = {
+    MIN: 20,
+    MAX: 200
+};
+
 export const ROTARY_MODE_FIRMWARE_SETTINGS = {
-    $101: '17.777',
-    // $111: '0.00',
-    // $121: '0.00',
+    $101: '19.75308642',
+    $111: '8000.00',
+    $21: '0'
+};
+
+export const DEFAULT_FIRMWARE_SETTINGS = {
+    $101: '200',
+    $111: '4000',
+    $21: '0'
 };
 
 export const WORKSPACE_MODE = {
@@ -223,4 +234,42 @@ export const FILE_TYPE = {
     DEFAULT: 'DEFAULT',
     ROTARY: 'ROTARY',
     FOUR_AXIS: 'FOUR_AXIS'
+};
+
+export const STOCK_TURNING_METHOD = {
+    HALF_AND_HALF_SPIRALS: 'HALF_AND_HALF_SPIRALS',
+    FULL_SPIRALS: 'FULL_SPIRALS',
+};
+
+export const ROTARY_TOGGLE_MACRO = `
+    G04 P0.5
+    G0 G90 Y[posy]
+`;
+
+export const ALARM = 'ALARM';
+export const ERROR = 'ERROR';
+
+export const ALARM_ERROR_TYPES = [
+    ALARM,
+    ERROR
+];
+
+export const JOB_TYPES = {
+    JOB: 'JOB',
+    MAINTENANCE: 'MAINTENANCE',
+};
+
+export const JOB_STATUS = {
+    COMPLETE: 'COMPLETE',
+    STOPPED: 'STOPPED',
+};
+
+export const OVERALL_STATS = 'Overall Stats';
+export const JOB_PER_PORT = 'Jobs Per Com Port';
+export const RUN_TIME_PER_PORT = 'Run Time Per Com Port';
+
+export const STATS_PAGES = {
+    OVERALL_STATS,
+    JOB_PER_PORT,
+    RUN_TIME_PER_PORT
 };

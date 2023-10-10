@@ -7,7 +7,7 @@ import { Container } from './styled';
 import { SurfacingContext } from '../Surfacing/Context';
 
 const Actions = () => {
-    const { canLoad, runGenerate, loadGcode } = useContext(SurfacingContext);
+    const { canLoad, runGenerate, loadGcode, isDisabled } = useContext(SurfacingContext);
 
     return (
         <Container>
@@ -15,13 +15,14 @@ const Actions = () => {
                 icon="fas fa-code"
                 style={{ margin: 0 }}
                 onClick={runGenerate}
+                disabled={isDisabled}
             >
                 Generate G-code
             </ToolModalButton>
 
             <ToolModalButton
                 icon="fas fa-play"
-                disabled={!canLoad}
+                disabled={!canLoad && isDisabled}
                 style={{ margin: 0 }}
                 onClick={loadGcode}
             >

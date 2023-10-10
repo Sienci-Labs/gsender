@@ -126,14 +126,13 @@ const ShortcutsTable = ({ onEdit, onDelete, onShortcutToggle, dataSet }) => {
                 [PROBING_CATEGORY]: 'categoryPurple',
                 [SPINDLE_LASER_CATEGORY]: 'categoryBlack',
                 [GENERAL_CATEGORY]: 'categoryGrey',
-                [TOOLBAR_CATEGORY]: 'categoryWhite',
+                [TOOLBAR_CATEGORY]: 'categoryShipCove',
                 [MACRO_CATEGORY]: 'categoryLightBlue',
                 [COOLANT_CATEGORY]: 'categoryDarkRed'
             };
 
             const rowCategory = allShuttleControlEvents[row.cmd] ? allShuttleControlEvents[row.cmd].category : row.category;
             const category = categories[rowCategory];
-
             return (
                 <div className={styles[category]}>{rowCategory}</div>
             );

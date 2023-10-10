@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 
 import styles from './index.styl';
+import { RESULT_OFFSET_THRESHOLD } from '../Alignment/utils/result';
 
 const setEepromSetting = (setting, value) => {
     controller.command('gcode', `${setting}=${value}`);
@@ -39,7 +40,7 @@ const calculateNewStepsPerMM = (originalSteps, requestedDistance, actualDistance
     return originalSteps * (requestedDistance / actualDistance);
 };
 
-const Result = ({ options, onBack, onClose, xSteps, ySteps, zSteps }) => {
+const Result = ({ options, onClose, xSteps, ySteps, zSteps }) => {
     const [result, setResult] = useState(0);
     useEffect(() => {
         const { currentAxis, requestedDistance, actualDistance } = options;
@@ -69,29 +70,50 @@ const Result = ({ options, onBack, onClose, xSteps, ySteps, zSteps }) => {
         const eepromSetting = getEEPROMSetting(currentAxis);
         const eepromValue = getEEPROMValue(currentAxis);
         const roundedResult = result.toFixed(3);
+
+        if (requestedDistance === actualDistance) {
+            return <p>Your {currentAxis} is tuned, no need to update steps/mm.</p>;
+        }
+
         return (
             <>
-                Optimal steps/mm for the { currentAxis } axis: <b>{ roundedResult } step/mm</b>
+                <p>Optimal steps/mm for the { currentAxis } axis: <b>{ roundedResult } step/mm</b></p>
+
                 <div>How we got this:</div>
+
                 <div>
                     You requested to move <b>{ requestedDistance }mm</b> but actually moved <b>{ actualDistance }mm</b>.
-                    Your <b>{ eepromSetting }</b> is currently set to <b>{ eepromValue }</b>
+                    Your current <b>{ eepromSetting }</b> value is currently set to <b>{ eepromValue }</b>
                 </div>
+
+                {
+                    result > RESULT_OFFSET_THRESHOLD && (
+                        <p style={{ padding: '1rem', backgroundColor: 'gold', border: '3px solid black', borderRadius: '10px' }}>
+                            Warning. Your machine is off by a large amount, updating the EEPROM values for improved accuracy may cause issues.
+                        </p>
+                    )
+                }
+
                 <div><b><i>{ eepromValue } × ({ requestedDistance } ÷ { actualDistance }) = { roundedResult }</i></b></div>
             </>
         );
     };
 
-    const hasError = false;
-
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'column', height: '100%', width: '100%' }}>
-            <h4 style={{ marginTop: '2rem' }}>Calibration Results</h4>
-
-            <div className={styles.result}>
-                {renderResult()}
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            height: '100%',
+            width: '80%',
+            margin: 'auto'
+        }}
+        >
+            <div className={styles.resultWrapper}>
+                <div className={styles.result}>
+                    {renderResult()}
+                </div>
             </div>
-
 
             <div style={{ display: 'flex', gap: '1rem' }}>
                 <FunctionButton
@@ -108,11 +130,7 @@ const Result = ({ options, onBack, onClose, xSteps, ySteps, zSteps }) => {
                     Set EEPROM setting {getEEPROMSetting(options.currentAxis)} to {result.toFixed(3)}
                 </FunctionButton>
 
-                {
-                    hasError
-                        ? <FunctionButton onClick={onBack}>Go Back</FunctionButton>
-                        : <FunctionButton onClick={onClose}>Restart Tool</FunctionButton>
-                }
+                <FunctionButton onClick={onClose}>Restart Tool</FunctionButton>
             </div>
         </div>
     );

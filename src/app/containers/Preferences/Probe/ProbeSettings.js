@@ -65,7 +65,7 @@ const ProbeSettings = ({ state, probeActions, values, type }) => {
                                 value={values.retractionDistance}
                                 onChange={probeActions.changeRetractionDistance}
                                 additionalProps={{ type: 'number', id: 'retraction' }}
-                                units={`${units}`}
+                                units={units}
                             />
                         </Tooltip>
                         <Tooltip content="Maximum distance for Z probe" location="default">
@@ -74,7 +74,7 @@ const ProbeSettings = ({ state, probeActions, values, type }) => {
                                 value={values.zProbeDistance}
                                 onChange={probeActions.changeZProbeDistance}
                                 additionalProps={{ type: 'number', id: 'zProbeDistance' }}
-                                units={`${units}`}
+                                units={units}
                             />
                         </Tooltip>
                     </>

@@ -32,7 +32,7 @@ import i18n from 'app/lib/i18n';
 const RotatePrompt = (props) => (
     <Modal
         size="xs"
-        disableOverlayClick={true}
+        disableOverlayClick
         showCloseButton={false}
     >
         <Modal.Body>

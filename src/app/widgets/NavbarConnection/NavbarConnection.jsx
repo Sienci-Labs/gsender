@@ -157,39 +157,44 @@ class NavbarConnection extends PureComponent {
 
 
         return (
-            <>
-                <div
-                    className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection}
-                    role="button"
-                    tabIndex={0}
-                    onClick={this.displayDropdown}
-                    onKeyDown={this.displayDropdown}
-                    onMouseEnter={actions.handleRefreshPorts}
-                    onMouseLeave={actions.hideUnrecognizedDevices}
-                    onTouchEnd={actions.handleRefreshPorts}
-                >
-                    <div>
-                        <StatusIndicator {...{ connected, connecting, scanning, alertMessage }} />
-                    </div>
-                    <div>
-                        <div className="dropdown-label" id="connection-selection-list">
-                            {this.getConnectionStatusText(connected, connecting, scanning, alertMessage)}
-                        </div>
-                    </div>
-                    {
-                        connected && (
-                            <div className={styles.ConnectionInfo}>
-                                <div className={styles.portLabel}>{port}</div>
-                                <div>{controllerType}</div>
-                            </div>
-                        )
+            <div
+                id="parent"
+                className={isMobile ? styles.NavbarConnectionMobile : styles.NavbarConnection}
+                role="button"
+                tabIndex={0}
+                onClick={this.displayDropdown}
+                onKeyDown={this.displayDropdown}
+                onMouseEnter={(event) => {
+                    // if mouse is entering any child, don't refresh
+                    if (event.target.id === 'parent') {
+                        actions.handleRefreshPorts();
                     }
-                    {
-                        connected && (
-                            <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
-                                <i className="fa fa-unlink" />
-                                Disconnect
-                            </button>
+                }}
+                onMouseLeave={actions.hideUnrecognizedDevices}
+                onTouchEnd={actions.handleRefreshPorts}
+            >
+                <div>
+                    <StatusIndicator {...{ connected, connecting, alertMessage }} />
+                </div>
+                <div>
+                    <div className="dropdown-label" id="connection-selection-list">
+                        {this.getConnectionStatusText(connected, connecting, scanning, alertMessage)}
+                    </div>
+                </div>
+                {
+                    connected && (
+                        <div className={styles.ConnectionInfo}>
+                            <div className={styles.portLabel}>{port}</div>
+                            <div>{controllerType}</div>
+                        </div>
+                    )
+                }
+                {
+                    connected && (
+                        <button type="button" className={styles.disconnectButton} onClick={actions.handleClosePort}>
+                            <i className="fa fa-unlink" />
+                            Disconnect
+                        </button>
 
                         )
                     }

@@ -21,27 +21,67 @@
  *
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import reduxStore from 'app/store/redux';
 
+import TabbedWidget from 'app/components/TabbedWidget';
 import SettingWrapper from '../components/SettingWrapper';
-import GeneralArea from '../components/GeneralArea';
 import StatsList from './StatsList';
-import Charts from './Charts';
+import JobTable from './JobStatsTable';
+import styles from './index.styl';
+import Maintenance from './Maintenance';
+
+const tabs = [
+    {
+        id: 0,
+        label: 'Statistics',
+        widgetId: 'job-stats',
+        component: <StatsList />,
+    },
+    {
+        id: 1,
+        label: 'Job Table',
+        widgetId: 'job-table',
+        component: <JobTable />,
+    },
+    {
+        id: 2,
+        label: 'Maintenance',
+        widgetId: 'maintenance',
+        component: <Maintenance />,
+    },
+];
 
 const StatsPage = ({ active, state, actions }) => {
+    const [tab, setTab] = useState(0);
+
     return (
-        <SettingWrapper title="Stats" show={active}>
+        <SettingWrapper title="Job History & Stats" show={active}>
             <ReduxProvider store={reduxStore}>
-                <GeneralArea>
-                    <GeneralArea.Half>
-                        <StatsList actions={actions} state={state} />
-                    </GeneralArea.Half>
-                    <GeneralArea.Half>
-                        <Charts actions={actions} state={state} />
-                    </GeneralArea.Half>
-                </GeneralArea>
+                <TabbedWidget>
+                    <TabbedWidget.Tabs
+                        tabs={tabs}
+                        activeTabIndex={tab}
+                        onClick={(index) => setTab(index)}
+                        className={styles.tabs}
+                    />
+                    <TabbedWidget.Content>
+                        <div className={styles.container}>
+                            {tabs.map((t, index) => {
+                                const active = index === tab;
+                                return (
+                                    <TabbedWidget.ChildComponent
+                                        key={t.id}
+                                        active={active}
+                                    >
+                                        {active && t.component}
+                                    </TabbedWidget.ChildComponent>
+                                );
+                            })}
+                        </div>
+                    </TabbedWidget.Content>
+                </TabbedWidget>
             </ReduxProvider>
         </SettingWrapper>
     );

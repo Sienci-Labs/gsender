@@ -9,6 +9,26 @@ import styles from './IdleInfo.styl';
 import FileStat from './FileStat';
 import { IMPERIAL_UNITS, METRIC_UNITS } from '../../../constants';
 
+const getFeedString = (movementSet, convertedFeedMin, convertedFeedMax, feedUnits) => {
+    if (movementSet.length === 0) {
+        return 'No Feedrates';
+    }
+    if (convertedFeedMin === convertedFeedMax) {
+        return `${convertedFeedMax} ${feedUnits}`;
+    }
+    return `${convertedFeedMin}-${convertedFeedMax} ${feedUnits}`;
+};
+
+const getSpindleString = (spindleSet, spindleMin, spindleMax) => {
+    if (spindleSet.length === 0) {
+        return 'No Spindle';
+    }
+    if (spindleMin === spindleMax) {
+        return `${spindleMax} RPM`;
+    }
+    return `${spindleMin}-${spindleMax} RPM`;
+};
+
 /**
  * Idle Information component displaying job information when status is set to idle
  * @param {Object} state Default state given from parent component
@@ -37,14 +57,18 @@ const IdleInfo = ({ state, ...props }) => {
     let spindleMin = Math.min(...spindleSet);
     let spindleMax = Math.max(...spindleSet);
 
-
+    convertedFeedMin = feedrateMin;
+    convertedFeedMax = feedrateMax;
     if (units === METRIC_UNITS) {
-        convertedFeedMin = (fileModal === METRIC_UNITS) ? feedrateMin : in2mm(feedrateMin).toFixed(2);
-        convertedFeedMax = (fileModal === METRIC_UNITS) ? feedrateMax : in2mm(feedrateMax).toFixed(2);
-    } else {
-        convertedFeedMin = (fileModal === IMPERIAL_UNITS) ? feedrateMin : mm2in(feedrateMin).toFixed(3);
-        convertedFeedMax = (fileModal === IMPERIAL_UNITS) ? feedrateMax : mm2in(feedrateMax).toFixed(3);
+        if (fileModal === IMPERIAL_UNITS) {
+            convertedFeedMin = in2mm(feedrateMin).toFixed(3);
+            convertedFeedMax = in2mm(feedrateMax).toFixed(3);
+        }
+    } else if (fileModal === METRIC_UNITS) {
+        convertedFeedMin = mm2in(feedrateMin).toFixed(2);
+        convertedFeedMax = mm2in(feedrateMax).toFixed(2);
     }
+
     /**
      * Return formatted list of tools in use
      */
@@ -89,7 +113,7 @@ const IdleInfo = ({ state, ...props }) => {
         return `~ ${Math.ceil(time)} seconds`;
     };
 
-    const feedString = (movementSet.length > 0) ? `${convertedFeedMin} to ${convertedFeedMax} ${feedUnits}` : 'No Feedrates';
+    const feedString = getFeedString(movementSet, convertedFeedMin, convertedFeedMax, feedUnits);
 
     let elapsedTimeToDisplay = outputFormattedTimeForLastFile(state.lastFileRunLength);
 
@@ -109,7 +133,7 @@ const IdleInfo = ({ state, ...props }) => {
                 </FileStat>
                 <FileStat label="Spindle">
                     {
-                        (spindleSet.length > 0) ? `${spindleMin} to ${spindleMax} RPM` : 'No Spindle'
+                        getSpindleString(spindleSet, spindleMin, spindleMax)
                     }
                     <br />
                     {toolSet.length > 0 ? `${toolSet.length} (${formattedToolsUsed()})` : 'No Tools'}
@@ -139,7 +163,7 @@ const IdleInfo = ({ state, ...props }) => {
                     lastFileRan
                         ? (
                             <FileStat label="Previous Run">
-                                <span className={styles.textWrap}>{`${lastFileRan}`}</span>
+                                <span className={styles.textWrap}>{lastFileRan}</span>
                                 {`Run Length: ${elapsedTimeToDisplay}`}
                             </FileStat>
                         ) : <FileStat label="Previous Run">-</FileStat>
@@ -158,7 +182,7 @@ const IdleInfo = ({ state, ...props }) => {
                     lastFileRan
                         ? (
                             <FileStat label="Previous Run">
-                                <span className={styles.textWrap}>{`${lastFileRan}`}</span>
+                                <span className={styles.textWrap}>{lastFileRan}</span>
                                 {`Run Length: ${elapsedTimeToDisplay}`}
                             </FileStat>
                         ) : <FileStat label="Previous Run">-</FileStat>

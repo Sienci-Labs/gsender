@@ -21,35 +21,33 @@
  *
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
+
 import store from 'app/store';
 import shuttleEvents from 'app/lib/shuttleEvents';
+
 import styles from './index.styl';
 
 const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
 
-const PrintableShortcuts = React.forwardRef((props, ref) => {
-    const [shortcutsList] = useState(store.get('commandKeys', {}));
-    const [keys, setKeys] = useState([]);
+const PrintableShortcuts = React.forwardRef((_, ref) => {
+    const shortcutsList = Object.entries(store.get('commandKeys', {}));
 
-    useEffect(() => {
-        const keysToPrint = [];
-        for (const [k, shortcut] of Object.entries(shortcutsList)) {
-            if (shortcut.isActive && shortcut.keys !== '') {
-                const title = allShuttleControlEvents[k] ? allShuttleControlEvents[k].title : shortcut.title;
-                keysToPrint.push({
-                    title: title,
-                    keys: shortcut.keys,
-                    id: k
-                });
-            }
-        }
-        setKeys(keysToPrint);
-    }, [shortcutsList]);
+    const keys = useMemo(() => shortcutsList
+        .filter(([, shortcut]) => (shortcut.isActive && shortcut.keys !== ''))
+        .map(([key, shortcut]) => {
+            const title = allShuttleControlEvents[key] ? allShuttleControlEvents[key].title : shortcut.title;
 
+            return (
+                <tr key={shortcut.cmd}>
+                    <td>{title}</td>
+                    <td><i>{shortcut.keys}</i></td>
+                </tr>
+            );
+        }), [shortcutsList]);
 
     return (
-        <div ref={ref}>
+        <div ref={ref} className={styles.printAreaWrapper}>
             <div className={styles.table}>
                 <table>
                     <thead>
@@ -59,14 +57,7 @@ const PrintableShortcuts = React.forwardRef((props, ref) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {
-                            keys.map(shortcut => (
-                                <tr key={`${shortcut.id}`}>
-                                    <td>{shortcut.title || '-'}</td>
-                                    <td><i>{shortcut.keys || '-'}</i></td>
-                                </tr>
-                            ))
-                        }
+                        {keys}
                     </tbody>
                 </table>
             </div>

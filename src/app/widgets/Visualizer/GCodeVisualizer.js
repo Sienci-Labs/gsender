@@ -23,7 +23,6 @@
 
 // import colornames from 'colornames';
 import * as THREE from 'three';
-import log from 'app/lib/log';
 import { BACKGROUND_PART, CUTTING_PART, G0_PART, G1_PART, G2_PART, G3_PART, LASER_PART } from './constants';
 
 class GCodeVisualizer {
@@ -94,13 +93,8 @@ class GCodeVisualizer {
                 opacity: 0.9,
             })
         );
-        this.group.add(workpiece);
 
-        log.debug({
-            workpiece: workpiece,
-            frames: this.frames,
-            frameIndex: this.frameIndex
-        });
+        this.group.add(workpiece);
 
         return this.group;
     }
@@ -141,6 +135,13 @@ class GCodeVisualizer {
             const colorAttr = workpiece.geometry.getAttribute('color');
             const defaultColorArray = [...defaultColor.toArray(), 0.3];
             const colorArray = Array.from({ length: (v2 - v1) }, () => defaultColorArray).flat();
+
+            if (this.isLaser) {
+                // add original color on top so you can see the parts the laser has finished
+                for (let i = 0; i < colorArray.length; i++) {
+                    colorArray[i] += colorAttr.array[offsetIndex + i];
+                }
+            }
 
             colorAttr.set([...colorArray], offsetIndex);
             // only update the range we've updated;

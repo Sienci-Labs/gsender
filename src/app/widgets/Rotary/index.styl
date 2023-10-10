@@ -34,21 +34,25 @@
     align-items center;
 }
 
-.btn-left {
+.btn-up {
+    clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 100%, 50% 75%, 0 100%);
+    width: 50px;
     height: 50px;
-    clip-path: polygon(100% 0, 75% 50%, 100% 100%, 25% 100%, 0 50%, 25% 0);
 }
 
-.btn-right {
+.btn-down {
+    clip-path: polygon(0 75%, 50% 100%, 100% 75%, 100% 0, 50% 25%, 0 0);
+    width: 50px;
     height: 50px;
-    clip-path: polygon(75% 0, 100% 50%, 75% 100%, 0 100%, 25% 50%, 0 0);
 }
 
 .jog-control-wrapper {
     margin-top: 1rem;
     max-width: 150px;
     display: flex;
-    gap: 1rem;
+    gap: 0.5rem;
+    width: 33%;
+    flex-direction: column;
 }
 
 .preset-controls {
@@ -78,6 +82,7 @@
     display: flex;
     gap: 1rem;
     width: 100%;
+    flex-direction: column;
 }
 
 .rotary-axis-wrapper {

@@ -341,40 +341,6 @@ export default class Generator {
         function processGcode (startPos, endPos, prevStartPos, prevEndPos, xFactor, yFactor) {
             const arr = [];
 
-            // if (startIsInCenter) {
-            //     if (cutDirectionFlipped) {
-            //         if (Math.abs(halfOfLength - endPos.y) === Math.abs(halfOfLength - (endPos.y - stepoverAmount))) {
-            //             arr.push(
-            //                 `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y))}`,
-            //                 `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x))) * -1}`,
-            //             );
-            //         } else {
-            //             arr.push(
-            //                 `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y))}`,
-            //                 `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x))) * -1}`,
-            //                 `G1 Y${toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount))) * -1}`,
-            //                 `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount)))}`,
-            //             );
-            //         }
-            //     } else if (Math.abs(halfOfLength - endPos.y) === Math.abs(halfOfLength - (endPos.y - stepoverAmount))) {
-            //         arr.push(
-            //             `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y)) * -1}`,
-            //             `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x)))}`,
-            //         );
-            //     } else {
-            //         arr.push(
-            //             `G1 Y${toFixedValue(Math.abs(halfOfLength - endPos.y)) * -1}`,
-            //             `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x)))}`,
-            //             `G1 Y${toFixedValue(Math.abs(halfOfLength - (endPos.y - stepoverAmount)))}`,
-            //             `G1 X${toFixedValue(Math.abs(halfOfWidth - (endPos.x - stepoverAmount))) * -1}`,
-            //         );
-            //     }
-
-            //     arr.push('');
-
-            //     return arr;
-            // }
-
             const xValueStart = startIsInCenter ? toFixedValue((halfOfWidth - endPos.x) * xFactor) : toFixedValue(endPos.x * xFactor);
             const yValueStart = startIsInCenter ? toFixedValue((halfOfLength - endPos.y) * yFactor) : toFixedValue(endPos.y * yFactor);
             const xValueEnd = startIsInCenter

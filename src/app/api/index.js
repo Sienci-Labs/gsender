@@ -450,6 +450,68 @@ remoteSetting.update = (options) => new Promise((resolve, reject) => {
 });
 
 //
+// Job Stats
+//
+const jobStats = {};
+
+jobStats.fetch = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/jobstats')
+        .query(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+jobStats.update = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .put('/api/jobstats')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+//
+// Maintenance
+//
+const maintenance = {};
+
+maintenance.fetch = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/maintenance')
+        .query(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+maintenance.update = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .put('/api/maintenance')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+//
 // Macros
 //
 const macros = {};
@@ -841,6 +903,37 @@ metrics.toggleCollectDataStatus = (options) => new Promise((resolve, reject) => 
         });
 });
 
+//
+// Alarms/Errors
+//
+const alarmList = {};
+
+alarmList.fetch = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .get('/api/alarmList')
+        .query(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
+alarmList.update = (options) => new Promise((resolve, reject) => {
+    authrequest
+        .put('/api/alarmList')
+        .send(options)
+        .end((err, res) => {
+            if (err) {
+                reject(res);
+            } else {
+                resolve(res);
+            }
+        });
+});
+
 export default {
     //OS
     getLatestVersion,
@@ -882,4 +975,13 @@ export default {
 
     // Metrics
     metrics,
+
+    // Job Stats
+    jobStats,
+
+    // Maintenance
+    maintenance,
+
+    // Alarms/Errors
+    alarmList,
 };

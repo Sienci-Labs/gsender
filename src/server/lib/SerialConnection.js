@@ -80,8 +80,6 @@ class SerialConnection extends EventEmitter {
     constructor(options) {
         super();
 
-        console.log(options);
-
         const { writeFilter, ...rest } = { ...options };
 
         if (writeFilter) {
@@ -160,7 +158,7 @@ class SerialConnection extends EventEmitter {
             return;
         }
 
-        const { path, network, ...rest } = this.settings;
+        const { path, baudRate, network, ...rest } = this.settings;
 
         const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
         const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
@@ -178,9 +176,9 @@ class SerialConnection extends EventEmitter {
             this.addPortListeners();
             this.port.connect(23, path);
         } else {
-            console.log('serialport');
             this.port = new SerialPort({
                 path,
+                baudRate,
                 ...rest,
                 autoOpen: false
             });
@@ -231,6 +229,10 @@ class SerialConnection extends EventEmitter {
 
         data = this.writeFilter(data, context);
         this.port.write(Buffer.from(data));
+    }
+
+    writeImmediate(data) {
+        this.port.write(data);
     }
 }
 

@@ -26,6 +26,16 @@ const Workspace = ({ state, actions }) => {
                     />
                 </Tooltip>
             </div>
+            <div style={{ marginBottom: '10px' }}>
+                <Tooltip content="gSender will warn you any time you attempt to set a workspace zero" location="default">
+                    <ToggleSwitch
+                        label="Warn when setting workspace zero"
+                        checked={state.shouldWarnZero}
+                        onChange={() => actions.general.setShouldWarnZero(!state.shouldWarnZero)}
+                        size="small"
+                    />
+                </Tooltip>
+            </div>
         </Fieldset>
     );
 };

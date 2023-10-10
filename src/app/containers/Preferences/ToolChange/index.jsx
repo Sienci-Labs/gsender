@@ -26,11 +26,11 @@ import SettingWrapper from '../components/SettingWrapper';
 import GeneralArea from '../components/GeneralArea';
 import ToolChange from './ToolChange';
 
-const EventWidget = ({ active }) => {
+const EventWidget = ({ state, actions, active }) => {
     return (
         <SettingWrapper title="Tool Change" show={active}>
             <GeneralArea>
-                <ToolChange />
+                <ToolChange state={state} actions={actions} />
             </GeneralArea>
         </SettingWrapper>
     );

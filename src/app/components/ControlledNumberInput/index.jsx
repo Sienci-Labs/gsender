@@ -41,8 +41,17 @@ const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnC
     };
 
     const onBlur = (e) => {
+        const current = inputRef.current.value;
         if (localValue && localValue !== originalValue) {
-            setLocalValue(inputRef.current.value);
+            if (current < min) {
+                inputRef.current.value = min;
+                setLocalValue(min);
+            } else if (current > max) {
+                inputRef.current.value = max;
+                setLocalValue(max);
+            } else {
+                setLocalValue(current);
+            }
             onChange(e);
         } else {
             setLocalValue(originalValue);
@@ -66,16 +75,7 @@ const ControlledNumberInput = ({ className, value, type = 'decimal', externalOnC
     };
 
     const localChange = (e) => {
-        const current = inputRef.current.value;
-        if (current < min) {
-            inputRef.current.value = min;
-            setLocalValue(min);
-        } else if (current > max) {
-            inputRef.current.value = max;
-            setLocalValue(max);
-        } else {
-            setLocalValue(current);
-        }
+        setLocalValue(inputRef.current.value);
     };
 
     return (

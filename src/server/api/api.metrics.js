@@ -26,12 +26,15 @@ import os from 'os';
 import axios from 'axios';
 import isOnline from 'is-online';
 
+import logger from '../lib/logger';
 import config from '../services/configstore';
 import pkg from '../../package.json';
 import { ERR_BAD_REQUEST, ERR_INTERNAL_SERVER_ERROR } from '../constants';
 import { USER_DATA_COLLECTION } from '../../app/constants';
 
 const CONFIG_KEY = 'metrics';
+
+const log = logger('api:metrics');
 
 const generateUniqueID = () => {
     const uniqueID = uuid.v4();
@@ -96,6 +99,7 @@ export const sendData = async (_, res) => {
 
         res.status(201).json(metricsRes.data);
     } catch (error) {
+        log.debug(`Error Sending Usage Data for ${payload.userID}. API Might Be Offline.`);
         res.status(ERR_INTERNAL_SERVER_ERROR).json({ error });
     }
 };
