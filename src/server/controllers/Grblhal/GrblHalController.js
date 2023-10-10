@@ -190,6 +190,8 @@ class GrblHalController {
         }
         this.engine = engine;
 
+        console.log(options);
+
         const { port, baudrate, rtscts } = { ...options };
         this.options = {
             ...this.options,

@@ -317,6 +317,8 @@ class CNCEngine {
                     callback = noop;
                 }
 
+                console.log(options);
+
                 log.debug(`socket.open("${port}", ${JSON.stringify(options)}): id=${socket.id}`);
 
                 let controller = store.get(`controllers["${port}"]`);

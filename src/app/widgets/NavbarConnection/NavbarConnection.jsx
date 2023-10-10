@@ -233,7 +233,7 @@ class NavbarConnection extends PureComponent {
                                 <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
                                     <FunctionButton
                                         primary
-                                        onClick={() => actions.onClickPortListing('192.168.5.1', true)}
+                                        onClick={() => actions.onClickPortListing({ port: '192.168.5.1' }, true)}
                                         className={styles.scanButton}
                                     >
                                         192.168.5.1

@@ -162,6 +162,14 @@ class SerialConnection extends EventEmitter {
         if (path.match(expr)) {
             console.log('telnet');
             this.port = new net.Socket();
+
+            this.port.on('connect', () => {
+                callback();
+            });
+            this.port.on('error', (err) => {
+                callback(err);
+            });
+
             this.addPortListeners();
             this.port.connect(23, path);
         } else {
