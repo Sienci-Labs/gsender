@@ -28,11 +28,11 @@ import cx from 'classnames';
 import pubsub from 'pubsub-js';
 import store from 'app/store';
 import UnrecognizedDevices from 'app/widgets/NavbarConnection/UnrecognizedDevices';
-import FunctionButton from 'app/components/FunctionButton/FunctionButton';
 import PortListing from './PortListing';
 import styles from './Index.styl';
 import StatusIndicator from './StatusIndicator';
 import FirmwareSelector from './FirmwareSelector';
+import { GRBLHAL } from 'Constants';
 
 
 class NavbarConnection extends PureComponent {
@@ -151,8 +151,8 @@ class NavbarConnection extends PureComponent {
 
     render() {
         const { state, actions } = this.props;
-        const { connected, ports, connecting, scanning, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized, networkPorts } = state;
-        const { isActive, hasScanned } = this.state;
+        const { connected, ports, connecting, scanning, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
+        const { isActive } = this.state;
         const isMobile = window.visualViewport.width <= 599;
 
 
@@ -230,45 +230,21 @@ class NavbarConnection extends PureComponent {
                         )
                     }
                     {
-                        !connected && <h5>Network Devices</h5>
+                        !connected && controllerType === GRBLHAL && <h5>Network Devices</h5>
                     }
                     {
-                        !connected &&
+                        !connected && controllerType === GRBLHAL &&
                         <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
-                            <FunctionButton
-                                primary
+                            <PortListing
+                                port="192.168.5.1"
+                                key="network_port"
+                                network={true}
                                 onClick={() => actions.onClickPortListing({ port: '192.168.5.1' }, true)}
                                 className={styles.scanButton}
                             >
                                 192.168.5.1
-                            </FunctionButton>
+                            </PortListing>
                         </div>
-                    }
-                    {
-                        !connected && (networkPorts.length === 0) && (
-                            hasScanned ? (
-                                <div className={styles.noDevicesWarning}>
-                                    No Network Devices Found
-                                </div>
-                            ) : (
-                                <div className={styles.noDevicesWarning}>
-                                    Please Scan To Display Available Devices
-                                </div>
-                            )
-                        )
-                    }
-                    {
-                        !connected && !connecting && networkPorts.map(
-                            port => (
-                                <PortListing
-                                    {...port}
-                                    key={port.port}
-                                    baudrate={baudrate}
-                                    controllerType={controllerType}
-                                    onClick={() => actions.onClickPortListing(port, true)}
-                                />
-                            )
-                        )
                     }
                     {
                         !connected && !connecting && (unrecognizedPorts.length > 0) &&
