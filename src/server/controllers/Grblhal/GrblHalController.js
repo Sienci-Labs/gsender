@@ -197,7 +197,6 @@ class GrblHalController {
         }
         this.engine = engine;
 
-        console.log(options);
 
         const { port, baudrate, rtscts, network } = { ...options };
         this.options = {
@@ -694,7 +693,7 @@ class GrblHalController {
             }
 
             // Clear error by sending newline for grblHAL
-            this.connection.write('\n');
+            //this.connection.write('\n');
 
             // Feeder
             this.feeder.ack();
@@ -1172,10 +1171,13 @@ class GrblHalController {
             // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
             // We set controller ready if version found
             setTimeout(() => {
+                if (this.connection) {
+                    this.connection.write('$I\n');
+                }
                 let counter = 3;
                 const interval = setInterval(() => {
                     // check if 3 tries or controller is ready
-                    if (counter <= 0 || this.ready) {
+                    if (this.ready || counter <= 0) {
                         clearInterval(interval);
                         return;
                     }
