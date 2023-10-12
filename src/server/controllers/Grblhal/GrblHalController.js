@@ -971,9 +971,9 @@ class GrblHalController {
         this.writeln('$ES');
         await delay(100);
         this.writeln('$ESH');
-        //check if controller is ready and send the status
-        //this.emit('grbl:iSready', this.ready);
-
+        await delay(50);
+        // Get full report
+        this.connection.writeImmediate(String.fromCharCode(0x87));
         //this.command('realtime_report');
     }
 

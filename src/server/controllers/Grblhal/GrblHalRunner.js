@@ -44,6 +44,7 @@ import {
 } from './constants';
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 import GrblHalLineParserResultSettingDetails from './GrblHalLineParserResultSettingDetails';
+import GrblHalLineParserResultCompleteStatus from 'server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus';
 
 const log = logger('controller:grblHAL');
 
@@ -152,6 +153,11 @@ class GrblHalRunner extends events.EventEmitter {
                 this.state = nextState; // enforce change
             }
             this.emit('status', payload);
+            return;
+        }
+        if (type === GrblHalLineParserResultCompleteStatus) {
+            console.log('full line');
+            console.log(payload);
             return;
         }
         if (type === GrblHalLineParserResultOk) {
