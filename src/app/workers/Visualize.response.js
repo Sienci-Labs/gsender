@@ -4,9 +4,10 @@ import _get from 'lodash/get';
 import isNumber from 'lodash/isNumber';
 
 import * as fileActions from 'app/actions/fileInfoActions';
-import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING, UPDATE_FILE_PARSED_DATA } from 'app/actions/fileInfoActions';
+import { UPDATE_FILE_INFO, UPDATE_FILE_PROCESSING } from 'app/actions/fileInfoActions';
 import store from 'app/store';
 import { RENDER_RENDERED, RENDER_RENDERING, VISUALIZER_SECONDARY } from 'app/constants';
+import { replaceParsedData } from '../lib/indexedDB';
 
 export const visualizeResponse = ({ data }) => {
     if (isNumber(data)) {
@@ -34,12 +35,14 @@ export const visualizeResponse = ({ data }) => {
 
         // if there's new parsed data, send to redux
         if (parsedData) {
-            reduxStore.dispatch({
-                type: UPDATE_FILE_PARSED_DATA,
-                payload: {
-                    value: parsedData
-                }
-            });
+            replaceParsedData(parsedData);
+
+            // reduxStore.dispatch({
+            //     type: UPDATE_FILE_PARSED_DATA,
+            //     payload: {
+            //         value: parsedData
+            //     }
+            // });
         }
 
         // Handle file load

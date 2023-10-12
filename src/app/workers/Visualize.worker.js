@@ -394,7 +394,16 @@ onmessage = function({ data }) {
             if (entry.lineData) {
                 const { v2, v0, shouldUseAddCurve } = entry.lineData;
                 // use previous v2 as v1 unless there is no previous entry
-                const v1 = entry.lineData.v1 ? entry.lineData.v1 : data[i - 1].lineData.v2;
+                let v1 = entry.lineData.v1;
+                if (!v1) {
+                    // sometimes the last line doesn't have movements, so we must search for the last line with a movement
+                    for (let x = i - 1; x >= 0; x--) {
+                        if (data[x].lineData && data[x].lineData.v2) {
+                            v1 = data[x].lineData.v2;
+                            break;
+                        }
+                    }
+                }
                 if (modal.motion === 'G1' || modal.motion === 'G0') {
                     if (shouldUseAddCurve) {
                         addCurve(modal, v1, v2);
@@ -408,9 +417,8 @@ onmessage = function({ data }) {
 
             let spindleValues = {};
             if (isLaser && needsVisualization) {
-                if (entry.hasS) {
-                    const spindleValue = entry.hasS.replace('S', '');
-                    console.log('spindleValue: ' + spindleValue);
+                if (entry.Scode) {
+                    const spindleValue = entry.Scode;
                     spindleSpeeds.add(spindleValue);
                     spindleSpeed = spindleValue;
                     spindleOn = spindleValue > 0;

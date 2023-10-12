@@ -170,7 +170,7 @@ class GCodeVirtualizer extends EventEmitter {
     // data to save so we don't have to reparse
     data = [
         {
-            hasS: null, // spindle value for the line
+            Scode: null, // spindle value for the line
             lineData: null, // modal changes, v1, v2, v0
         }
     ];
@@ -903,7 +903,7 @@ class GCodeVirtualizer extends EventEmitter {
             }
             if (letter === 'S') {
                 this.vmState.spindle.add(`S${code}`);
-                this.data[this.totalLines].hasS = `S${code}`;
+                this.data[this.totalLines].Scode = code;
             }
         }
 
@@ -969,7 +969,7 @@ class GCodeVirtualizer extends EventEmitter {
 
         // add new data structure
         this.data.push({
-            hasS: null,
+            Scode: null,
             lineData: null
         });
         this.modalCounter++;
