@@ -22,7 +22,7 @@
  */
 
 import hull from 'concaveman';
-import { shouldRotate, rotateAxis } from 'app/lib/GCodeVirtualizer';
+import GCodeVirtualizer, { shouldRotate, rotateAxis } from 'app/lib/GCodeVirtualizer';
 import * as THREE from 'three';
 
 onmessage = ({ data }) => {
@@ -92,17 +92,35 @@ onmessage = ({ data }) => {
             }
         };
 
-        const { data } = parsedData;
+        const vm = new GCodeVirtualizer({ addLine, addCurve, collate: true });
+        const { data, modalChanges } = parsedData;
+        let modalIndex = 0; // track changes
+        let iterationsNeeded = modalChanges[modalIndex].count; // initialize
+        let modal = vm.getCurrentModal(); // get the default modal
+        let modalCounter = 0; // tracking how long until the modal change comes
+
         for (let i = 0; i < data.length; i++) {
+            // update modal
+            if (modalCounter === iterationsNeeded) {
+                modalIndex++;
+                modal = vm.setModal(modalChanges[modalIndex].change); // change the modal
+                iterationsNeeded = modalChanges[modalIndex].count; // update the new count
+                modalCounter = 0; // reset counter
+            }
+
             const entry = data[i];
             if (entry.lineData) {
-                const { modal, v1, v2, shouldUseAddCurve } = entry.lineData;
+                const { v2, shouldUseAddCurve } = entry.lineData;
+                // use previous v2 as v1 unless there is no previous entry
+                const v1 = entry.lineData.v1 ? entry.lineData.v1 : data[i - 1].lineData.v2;
                 if (shouldUseAddCurve) {
                     addCurve(modal, v1, v2);
                 } else {
                     addLine(modal, v1, v2);
                 }
             }
+
+            modalCounter++;
         }
 
         const fileHull = hull(vertices);

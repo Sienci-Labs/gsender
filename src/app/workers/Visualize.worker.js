@@ -92,20 +92,9 @@ onmessage = function({ data }) {
         }
     };
 
-    const onData = (data) => {
+    const onData = () => {
         const vertexIndex = vertices.length / 3;
         frames.push(vertexIndex);
-
-        let spindleValues = {};
-        if (isLaser && needsVisualization) {
-            updateSpindleStateFromLine(data);
-            spindleValues = {
-                spindleOn,
-                spindleSpeed
-            };
-
-            spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
-        }
 
         currentLines++;
         const newProgress = Math.floor(currentLines / totalLines * 100);
@@ -382,15 +371,30 @@ onmessage = function({ data }) {
     const { addLine, addArcCurve, addCurve } = handlers[handlerKey];
     let fileInfo = null;
     let parsedDataToSend = null;
+    const vm = new GCodeVirtualizer({ addLine, addArcCurve, addCurve, collate: true });
 
     if (!isEmpty(parsedData) && !isNewFile) {
-        const { data, info } = parsedData;
+        const { data, info, modalChanges } = parsedData;
         fileInfo = info;
+        let modalIndex = 0; // track changes
+        let iterationsNeeded = modalChanges[modalIndex].count; // initialize
+        let modal = vm.getCurrentModal(); // get the default modal
+        let modalCounter = 0; // tracking how long until the modal change comes
 
         for (let i = 0; i < data.length; i++) {
+            // update modal
+            if (modalCounter === iterationsNeeded) {
+                modalIndex++;
+                modal = vm.setModal(modalChanges[modalIndex].change); // change the modal
+                iterationsNeeded = modalChanges[modalIndex].count; // update the new count
+                modalCounter = 0; // reset counter
+            }
+
             const entry = data[i];
             if (entry.lineData) {
-                const { modal, v1, v2, v0, shouldUseAddCurve } = entry.lineData;
+                const { v2, v0, shouldUseAddCurve } = entry.lineData;
+                // use previous v2 as v1 unless there is no previous entry
+                const v1 = entry.lineData.v1 ? entry.lineData.v1 : data[i - 1].lineData.v2;
                 if (modal.motion === 'G1' || modal.motion === 'G0') {
                     if (shouldUseAddCurve) {
                         addCurve(modal, v1, v2);
@@ -402,12 +406,39 @@ onmessage = function({ data }) {
                 }
             }
 
+            let spindleValues = {};
+            if (isLaser && needsVisualization) {
+                if (entry.hasS) {
+                    const spindleValue = entry.hasS.replace('S', '');
+                    console.log('spindleValue: ' + spindleValue);
+                    spindleSpeeds.add(spindleValue);
+                    spindleSpeed = spindleValue;
+                    spindleOn = spindleValue > 0;
+                }
+                spindleValues = {
+                    spindleOn,
+                    spindleSpeed
+                };
+
+                spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
+            }
+
             onData(entry.parsedLine);
+
+            modalCounter++;
         }
     } else {
-        const vm = new GCodeVirtualizer({ addLine, addArcCurve, addCurve, collate: true });
-
         vm.on('data', (data) => {
+            let spindleValues = {};
+            if (isLaser && needsVisualization) {
+                updateSpindleStateFromLine(data);
+                spindleValues = {
+                    spindleOn,
+                    spindleSpeed
+                };
+
+                spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
+            }
             onData(data);
         });
 
@@ -421,9 +452,11 @@ onmessage = function({ data }) {
         }
 
         const data = vm.getData();
+        const modalChanges = vm.getModalChanges();
         parsedDataToSend = {
             data,
-            info: vm.generateFileStats()
+            info: vm.generateFileStats(),
+            modalChanges
         };
     }
 
