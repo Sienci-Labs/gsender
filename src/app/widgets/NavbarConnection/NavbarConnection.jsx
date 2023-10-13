@@ -50,7 +50,7 @@ class NavbarConnection extends PureComponent {
     state = {
         mobile: false,
         isActive: false,
-        ip: store.get('widgets.connection.ipRange', [192, 168, 1]),
+        ip: store.get('widgets.connection.ip', [192, 168, 1]),
         startedScan: false,
         hasScanned: false
     }
@@ -145,8 +145,9 @@ class NavbarConnection extends PureComponent {
         });
     }
 
-    convertIPToString(ip) {
-        return ip[0] + '.' + ip[1] + '.' + ip[2] + '.1-255';
+    getIPString() {
+        const ip = store.get('widgets.connection.ip', [192, 168, 5, 1]);
+        return `${ip[0]}.${ip[1]}.${ip[2]}.${ip[3]}`;
     }
 
     render() {
@@ -154,7 +155,7 @@ class NavbarConnection extends PureComponent {
         const { connected, ports, connecting, scanning, baudrate, controllerType, alertMessage, port, unrecognizedPorts, showUnrecognized } = state;
         const { isActive } = this.state;
         const isMobile = window.visualViewport.width <= 599;
-
+        const ip = this.getIPString();
 
         return (
             <div
@@ -228,13 +229,13 @@ class NavbarConnection extends PureComponent {
                         !connected && controllerType === GRBLHAL &&
                         <div className={cx(styles.firmwareSelector, styles.bottomSpace)}>
                             <PortListing
-                                port="192.168.5.1"
+                                port={ip}
                                 key="network_port"
                                 network={true}
-                                onClick={() => actions.onClickPortListing({ port: '192.168.5.1' }, true)}
+                                onClick={() => actions.onClickPortListing({ port: ip }, true)}
                                 className={styles.scanButton}
                             >
-                                192.168.5.1
+                                {ip}
                             </PortListing>
                         </div>
                     }
