@@ -30,6 +30,8 @@ import isOnline from 'is-online';
 import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
+import * as Sentry from '@sentry/electron/main';
+
 import WindowManager from './electron-app/WindowManager';
 import launchServer from './server-cli';
 import pkg from './package.json';
@@ -37,11 +39,12 @@ import { parseAndReturnGCode } from './electron-app/RecentFiles';
 import { asyncCallWithTimeout } from './electron-app/AsyncTimeout';
 import { getGRBLLog } from './electron-app/grblLogs';
 
-
 let windowManager = null;
 let hostInformation = {};
 let grblLog = log.create('grbl');
 let logPath;
+
+Sentry.init({ dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684' });
 
 const main = () => {
     // https://github.com/electron/electron/blob/master/docs/api/app.md#apprequestsingleinstancelock
