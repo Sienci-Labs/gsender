@@ -79,7 +79,6 @@ import {
 } from './constants';
 import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
-import { JoystickJogging } from '../../lib/gamepad/JoystickJogging';
 
 class AxesWidget extends PureComponent {
     static propTypes = {
@@ -95,8 +94,6 @@ class AxesWidget extends PureComponent {
     axisDebounce = null;
 
     axisThrottle = null;
-
-    joystickJogging = null;
 
     subscribe() {
         const tokens = [
@@ -1003,8 +1000,6 @@ class AxesWidget extends PureComponent {
         useKeybinding(this.shuttleControlEvents);
         this.subscribe();
 
-        this.joystickJogging = new JoystickJogging();
-
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
@@ -1155,10 +1150,6 @@ class AxesWidget extends PureComponent {
             // };
 
             // const direction = computeDirection(stick === 0 ? leftStick : rightStick);
-
-            // const feedrate = Number(this.actions.getFeedrate());
-            // this.joystickJogging.setValue(feedrate * value);
-            // this.joystickJogging.getValue();
 
             // if (!value) {
             //     this.handleShortcutStop();

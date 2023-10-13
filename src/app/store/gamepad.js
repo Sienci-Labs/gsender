@@ -1,7 +1,6 @@
 // import { shortcuts } from './shortcuts';
 
 import { AXIS_A, AXIS_X, AXIS_Y, AXIS_Z } from '../constants';
-import { LOAD_FILE, UNLOAD_FILE } from '../lib/shortcuts/shortcutActions';
 
 /*
 ***********IMPORTANT*************
@@ -71,7 +70,7 @@ export const profiles = [
         name: 'Logitech F710 Gamepad',
         mapping: 'standard',
         buttons: [
-            { label: 'A', value: 0, primaryAction: LOAD_FILE, secondaryAction: UNLOAD_FILE, },
+            { label: 'A', value: 0, primaryAction: null, secondaryAction: null, },
             { label: 'B', value: 1, primaryAction: null, secondaryAction: null, },
             { label: 'X', value: 2, primaryAction: null, secondaryAction: null, },
             { label: 'Y', value: 3, primaryAction: null, secondaryAction: null, },
@@ -111,7 +110,7 @@ export const profiles = [
         name: 'Xbox Controller',
         mapping: 'standard',
         buttons: [
-            { label: 'A', value: 0, primaryAction: LOAD_FILE, secondaryAction: UNLOAD_FILE, },
+            { label: 'A', value: 0, primaryAction: null, secondaryAction: null, },
             { label: 'B', value: 1, primaryAction: null, secondaryAction: null, },
             { label: 'X', value: 2, primaryAction: null, secondaryAction: null, },
             { label: 'Y', value: 3, primaryAction: null, secondaryAction: null, },
