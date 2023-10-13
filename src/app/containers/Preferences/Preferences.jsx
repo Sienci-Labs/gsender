@@ -259,11 +259,10 @@ class PreferencesPage extends PureComponent {
             },
             setIPRange: (value, index) => {
                 const { ipRange } = this.state;
-                let newIPRange = ipRange;
+                const newIPRange = [...ipRange];
                 newIPRange[index] = value;
-                store.replace('widgets.connection.ipRange', ipRange);
+                store.replace('widgets.connection.ip', newIPRange);
                 this.setState({ ipRange: newIPRange });
-                pubsub.publish('networkScan:ipRange', newIPRange);
             },
         },
         tool: {

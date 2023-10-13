@@ -47,7 +47,7 @@ const Connection = ({ state, actions }) => {
                                         additionalProps={{
                                             name: 'ip' + index,
                                             type: 'number',
-                                            min: 1,
+                                            min: 0,
                                             max: 255,
                                         }}
                                         className={styles.ipInput}
