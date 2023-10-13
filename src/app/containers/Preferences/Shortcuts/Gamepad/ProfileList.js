@@ -1,34 +1,50 @@
-import React from 'react';
+import React, { useContext } from 'react';
+
 import Button from 'app/components/FunctionButton/FunctionButton';
 
-import styles from '../index.styl';
-
 import ProfileItem from './ProfileItem';
+import { GamepadContext } from './utils/context';
 
-const ProfileList = ({ profiles, onClick, onDelete, onAdd }) => {
+import styles from '../index.styl';
+import { GAMEPAD_MODAL } from './utils/constants';
+import { setCurrentModal } from './utils/actions';
+
+const ProfileList = () => {
+    const { state: { settings: { profiles } }, dispatch } = useContext(GamepadContext);
+
+    const addNewGamepadProfileButton = (
+        <Button primary onClick={() => dispatch(setCurrentModal(GAMEPAD_MODAL.ADD_NEW_PROFILE))}>
+            <i className="fas fa-plus" />
+            <span>Add New Gamepad Profile</span>
+        </Button>
+    );
+
+    if (profiles.length === 0) {
+        return (
+            <div className={styles.profileListEmpty}>
+                <p style={{ fontSize: '1.5rem' }}>No Profiles, Click the Button Below to Add One</p>
+
+                { addNewGamepadProfileButton }
+            </div>
+        );
+    }
+
     return (
         <>
-            <div className={profiles.length ? styles.profileList : styles.profileListEmpty}>
+            <div className={styles.profileList}>
                 {
-                    !profiles.length
-                        ? <p style={{ fontSize: '1.5rem' }}>No Profiles, Click the Button Below to Add One</p>
-                        : profiles.map(({ id, profileName, icon = 'fas fa-gamepad' }) => (
-                            <ProfileItem
-                                key={id}
-                                id={id}
-                                title={profileName}
-                                icon={icon}
-                                onClick={onClick}
-                                onDelete={onDelete}
-                            />
-                        ))
+                    profiles.map(({ id, profileName, icon = 'fas fa-gamepad' }) => (
+                        <ProfileItem
+                            id={id}
+                            key={id}
+                            title={profileName}
+                            icon={icon}
+                        />
+                    ))
                 }
             </div>
 
-            <Button primary onClick={onAdd}>
-                <i className="fas fa-plus" />
-                <span>Add New Gamepad Profile</span>
-            </Button>
+            { addNewGamepadProfileButton }
         </>
     );
 };

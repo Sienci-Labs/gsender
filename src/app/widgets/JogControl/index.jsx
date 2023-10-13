@@ -38,10 +38,10 @@ import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
 import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
-import gamepad, { runAction } from 'app/lib/gamepad';
+import gamepad, { runAction, checkButtonHold } from 'app/lib/gamepad';
 import WidgetConfig from 'app/widgets/WidgetConfig';
 import pubsub from 'pubsub-js';
-import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import { connect } from 'react-redux';
 import store from '../../store';
 import Axes from './Axes';
@@ -504,12 +504,18 @@ class AxesWidget extends PureComponent {
             const workspaceModesList = Object.values(WORKSPACE_MODE);
             const currentWorkspaceModeIndex = workspaceModesList.findIndex(mode => mode === currentWorkspaceMode);
             const nextWorkspaceMode = workspaceModesList[currentWorkspaceModeIndex + 1] ?? workspaceModesList[0];
+            const rotaryTabEnabled = store.get('widgets.rotary.tab.show');
+
+            if (!rotaryTabEnabled) {
+                return;
+            }
 
             store.replace('workspace.mode', nextWorkspaceMode);
 
-            const msg = `Workspace Mode set to ${nextWorkspaceMode.charAt(0).toUpperCase() + nextWorkspaceMode.slice(1).toLowerCase()}`;
-            Toaster.clear();
-            Toaster.pop({ type: TOASTER_SUCCESS, msg });
+            Toaster.pop({
+                type: TOASTER_INFO,
+                msg: `Workspace Mode set to ${nextWorkspaceMode.charAt(0).toUpperCase() + nextWorkspaceMode.slice(1).toLowerCase()}`
+            });
         },
         SET_JOG_PRESET: (event, { key }) => {
             if (!key) {
@@ -1004,189 +1010,216 @@ class AxesWidget extends PureComponent {
 
             const gamepadProfiles = store.get('workspace.gamepad.profiles', []);
 
-            const hasProfile = gamepadProfiles.find(profile => profile.id.includes(detail.gamepad.id));
+            const currentProfile = gamepadProfiles.find(profile => profile.id.includes(detail.gamepad.id));
 
-            if (!hasProfile) {
+            if (!currentProfile) {
                 return;
             }
 
-            // const [leftStickX, leftStickY, rightStickX, rightStickY] = gamepad.axes;
+            const isHoldingModifierButton = checkButtonHold('modifier', currentProfile);
+
+            const { joystickOptions: { stick1 } } = currentProfile;
 
             const { leftStick, rightStick } = degrees;
 
+            const activeStick = [leftStick, rightStick][stick];
 
-            // Y Positive Move
-            // AXIS X(0) ________ -0.25 to 0.25
-            // AXIS Y(1) ________ -1 to 0
+            const actionType = !isHoldingModifierButton ? 'primaryAction' : 'secondaryAction';
 
+            const computeAxesAndDirection = (degrees) => {
+                const { horizontal, vertical } = stick1;
 
-            // Y Negative Move
-            // AXIS X(0) ________ -0.25 to 0.25
-            // AXIS Y(1) ________ 0 to 1
+                const factor = (isReversed) => (!isReversed ? 1 : -1);
 
-
-            // X Positive Move
-            // AXIS X(0) ________ 0 to 1
-            // AXIS Y(1) ________ -0.25 to 0.25
-
-
-            // X Negative Move
-            // AXIS X(0) ________ -1 to 0
-            // AXIS Y(1) ________ -0.25 to 0.25
-
-
-            // Top Left Move
-            // AXIS X(0) ________ -0.75 to -0.25
-            // AXIS Y(1) ________ -0.75 to -0.25
-
-
-            // Top Right Move
-            // AXIS X(0) ________ 0.75 to 0.25
-            // AXIS Y(1) ________ -0.75 to -0.25
-
-
-            // Bottom Right Move
-            // AXIS X(0) ________ 0.75 to 0.25
-            // AXIS Y(1) ________ 0.75 to 0.25
-
-
-            // Bottom Left Move
-            // AXIS X(0) ________ -0.75 to -0.25
-            // AXIS Y(1) ________ 0.75 to 0.25
-
-            const [
-                APositive,
-                ANegative,
-                YPositive,
-                YNegative,
-                XPositive,
-                XNegative,
-                TopLeft,
-                TopRight,
-                BottomLeft,
-                BottomRight,
-                UNKNOWN_MOVE
-            ] = [
-                'APositive',
-                'ANegative',
-                'YPositive',
-                'YNegative',
-                'XPositive',
-                'XNegative',
-                'TopLeft',
-                'TopRight',
-                'BottomLeft',
-                'BottomRight',
-                ''
-            ];
-
-            const computeDirection = (degrees) => {
                 if (inRange(degrees, 0, 30) || inRange(degrees, 330, 360)) {
-                    return XPositive;
+                    return {
+                        [horizontal[actionType]]: factor(horizontal.isReversed)
+                    };
                 }
 
-                if (inRange(degrees, 31, 59)) {
-                    return TopRight;
-                }
+                // if (inRange(degrees, 31, 59)) {
+                //     // return TopRight;
+                // }
 
                 if (inRange(degrees, 60, 120)) {
-                    return YPositive;
+                    return {
+                        [vertical[actionType]]: factor(vertical.isReversed)
+                    };
                 }
 
-                if (inRange(degrees, 121, 149)) {
-                    return TopLeft;
-                }
+                // if (inRange(degrees, 121, 149)) {
+                //     // return TopLeft;
+                // }
 
                 if (inRange(degrees, 150, 210)) {
-                    return XNegative;
+                    return {
+                        [horizontal[actionType]]: factor(!horizontal.isReversed)
+                    };
                 }
 
-                if (inRange(degrees, 211, 239)) {
-                    return BottomLeft;
-                }
+                // if (inRange(degrees, 211, 239)) {
+                //     // return BottomLeft;
+                // }
 
                 if (inRange(degrees, 240, 300)) {
-                    return YNegative;
+                    return {
+                        [vertical[actionType]]: factor(!vertical.isReversed)
+                    };
                 }
 
-                if (inRange(degrees, 301, 329)) {
-                    return BottomRight;
-                }
+                // if (inRange(degrees, 301, 329)) {
+                //     // return BottomRight;
+                // }
 
-                return UNKNOWN_MOVE;
+                return null;
             };
 
-            const direction = computeDirection(stick === 0 ? leftStick : rightStick);
+            const data = computeAxesAndDirection(activeStick);
 
             if (!value) {
                 this.handleShortcutStop();
                 return;
             }
 
-            if (prevJog || prevDirection !== direction) {
+            if (prevJog || prevDirection !== data.direction) {
                 this.handleShortcutStop();
             }
 
-            switch (direction) {
-            case APositive: {
-                this.handleShortcutJog({ axis: { a: 1 } });
-                break;
-            }
+            this.handleShortcutJog({ axis: data });
 
-            case ANegative: {
-                this.handleShortcutJog({ axis: { a: -1 } });
-                break;
-            }
+            // const [
+            //     APositive,
+            //     ANegative,
+            //     YPositive,
+            //     YNegative,
+            //     XPositive,
+            //     XNegative,
+            //     TopLeft,
+            //     TopRight,
+            //     BottomLeft,
+            //     BottomRight,
+            //     UNKNOWN_MOVE
+            // ] = [
+            //     'APositive',
+            //     'ANegative',
+            //     'YPositive',
+            //     'YNegative',
+            //     'XPositive',
+            //     'XNegative',
+            //     'TopLeft',
+            //     'TopRight',
+            //     'BottomLeft',
+            //     'BottomRight',
+            //     ''
+            // ];
 
-            case YPositive: {
-                this.handleShortcutJog({ axis: { y: 1 } });
-                break;
-            }
+            // const computeDirection = (degrees) => {
+            //     if (inRange(degrees, 0, 30) || inRange(degrees, 330, 360)) {
+            //         return XPositive;
+            //     }
 
-            case YNegative: {
-                this.handleShortcutJog({ axis: { y: -1 } });
-                break;
-            }
+            //     if (inRange(degrees, 31, 59)) {
+            //         return TopRight;
+            //     }
 
-            case XPositive: {
-                this.handleShortcutJog({ axis: { x: 1 } });
-                break;
-            }
+            //     if (inRange(degrees, 60, 120)) {
+            //         return YPositive;
+            //     }
 
-            case XNegative: {
-                this.handleShortcutJog({ axis: { x: -1 } });
-                break;
-            }
+            //     if (inRange(degrees, 121, 149)) {
+            //         return TopLeft;
+            //     }
 
-            case TopLeft: {
-                this.handleShortcutJog({ axis: { x: -1, y: 1 } });
-                break;
-            }
+            //     if (inRange(degrees, 150, 210)) {
+            //         return XNegative;
+            //     }
 
-            case TopRight: {
-                this.handleShortcutJog({ axis: { x: 1, y: 1 } });
-                break;
-            }
+            //     if (inRange(degrees, 211, 239)) {
+            //         return BottomLeft;
+            //     }
 
-            case BottomLeft: {
-                this.handleShortcutJog({ axis: { x: -1, y: -1 } });
-                break;
-            }
+            //     if (inRange(degrees, 240, 300)) {
+            //         return YNegative;
+            //     }
 
-            case BottomRight: {
-                this.handleShortcutJog({ axis: { x: 1, y: -1 } });
-                break;
-            }
+            //     if (inRange(degrees, 301, 329)) {
+            //         return BottomRight;
+            //     }
 
-            case UNKNOWN_MOVE: {
-                break;
-            }
+            //     return UNKNOWN_MOVE;
+            // };
 
-            default: {
-                break;
-            }
-            }
-        }, 150));
+            // const direction = computeDirection(stick === 0 ? leftStick : rightStick);
+
+            // if (!value) {
+            //     this.handleShortcutStop();
+            //     return;
+            // }
+
+            // if (prevJog || prevDirection !== direction) {
+            //     this.handleShortcutStop();
+            // }
+
+            // switch (direction) {
+            // case APositive: {
+            //     this.handleShortcutJog({ axis: { a: 1 } });
+            //     break;
+            // }
+
+            // case ANegative: {
+            //     this.handleShortcutJog({ axis: { a: -1 } });
+            //     break;
+            // }
+
+            // case YPositive: {
+            //     this.handleShortcutJog({ axis: { y: 1 } });
+            //     break;
+            // }
+
+            // case YNegative: {
+            //     this.handleShortcutJog({ axis: { y: -1 } });
+            //     break;
+            // }
+
+            // case XPositive: {
+            //     this.handleShortcutJog({ axis: { x: 1 } });
+            //     break;
+            // }
+
+            // case XNegative: {
+            //     this.handleShortcutJog({ axis: { x: -1 } });
+            //     break;
+            // }
+
+            // case TopLeft: {
+            //     this.handleShortcutJog({ axis: { x: -1, y: 1 } });
+            //     break;
+            // }
+
+            // case TopRight: {
+            //     this.handleShortcutJog({ axis: { x: 1, y: 1 } });
+            //     break;
+            // }
+
+            // case BottomLeft: {
+            //     this.handleShortcutJog({ axis: { x: -1, y: -1 } });
+            //     break;
+            // }
+
+            // case BottomRight: {
+            //     this.handleShortcutJog({ axis: { x: 1, y: -1 } });
+            //     break;
+            // }
+
+            // case UNKNOWN_MOVE: {
+            //     break;
+            // }
+
+            // default: {
+            //     break;
+            // }
+            // }
+        }, 50, { leading: false, trailing: true }));
     }
 
     componentWillUnmount() {

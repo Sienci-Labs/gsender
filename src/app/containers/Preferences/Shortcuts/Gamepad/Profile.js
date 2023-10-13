@@ -1,43 +1,46 @@
-import React, { useState, useMemo } from 'react';
-import classnames from 'classnames';
+import React, { useState, useContext, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 
 import store from 'app/store';
-import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
+import gamepad from 'app/lib/gamepad';
+import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import Button from 'app/components/FunctionButton/FunctionButton';
-import shuttleEvents from 'app/lib/shuttleEvents';
-import { generateList } from '../utils';
+
+import { GamepadContext } from './utils/context';
+import { setCurrentGamepadProfile, setGamepadProfileList } from './utils/actions';
 
 import styles from '../index.styl';
-import ShortcutsTable from '../ShortcutsTable';
-import ProfileShortcutModal from './ProfileShortcutModal';
-import CategoryFilter from '../CategoryFilter';
-import { ALL_CATEGORY } from '../../../../constants';
+import Fieldset from '../../components/Fieldset';
+import ButtonActionsTable from './components/ButtonActionsTable';
+import { arrayComparator } from './utils';
+import JoystickOptions from './JoystickOptions';
 
-const Profile = ({ data, onUpdateProfiles, setCurrentProfileID }) => {
-    const { profileName, icon, shortcuts } = data;
+const Profile = ({ data }) => {
+    const { profileName } = data;
 
-    const [currentShortcutCMD, setCurrentShortcutCMD] = useState(null);
-    const [showModal, setShowModal] = useState(false);
-
+    const { dispatch } = useContext(GamepadContext);
+    const [isConnected, setIsConnected] = useState(false);
     const [name, setName] = useState(profileName);
+    useEffect(() => {
+        gamepad.on('gamepad:connected', checkGamepadConnection);
+        gamepad.on('gamepad:disconnected', checkGamepadConnection);
+        gamepad.on('gamepad:button', checkGamepadConnection);
 
-    const [dataSet, setDataSet] = useState(shortcuts);
-    const [filterCategory, setFilterCategory] = useState(ALL_CATEGORY);
+        checkGamepadConnection();
 
-    const allShuttleControlEvents = shuttleEvents.allShuttleControlEvents;
+        return () => {
+            gamepad.removeEventListener('gamepad:connected', checkGamepadConnection);
+            gamepad.removeEventListener('gamepad:disconnected', checkGamepadConnection);
+            gamepad.removeEventListener('gamepad:button', checkGamepadConnection);
+        };
+    }, []);
 
-    const filter = (category, shortcutsList) => {
-        const allShortcuts = shortcutsList || shortcuts;
-        const filteredData = category === ALL_CATEGORY ? allShortcuts : Object.fromEntries(Object.entries(allShortcuts).filter(([key, entry]) => {
-            if (allShuttleControlEvents[key]) {
-                return allShuttleControlEvents[key].category === category;
-            }
-            return entry.category === category;
-        }));
-        setDataSet(filteredData);
-        setFilterCategory(category);
+    const checkGamepadConnection = () => {
+        const gamepads = navigator.getGamepads();
+
+        const foundGamepad = gamepads?.find(gamepad => data?.id?.includes(gamepad?.id));
+
+        setIsConnected(!!foundGamepad);
     };
 
     const handleEditName = () => {
@@ -48,135 +51,54 @@ const Profile = ({ data, onUpdateProfiles, setCurrentProfileID }) => {
         const profiles = store.get('workspace.gamepad.profiles', []);
 
         const updatedProfiles =
-            profiles.map(profile => (profile.id.includes(data.id) ? ({ ...profile, profileName: name }) : profile));
+            profiles.map(profile => (arrayComparator(profile.id, data.id) ? ({ ...profile, profileName: name }) : profile));
 
-        onUpdateProfiles(updatedProfiles);
+        dispatch(setGamepadProfileList(updatedProfiles));
 
         Toaster.pop({
-            msg: 'Updated Shortcut Profile Name',
-            type: TOASTER_SUCCESS,
+            msg: 'Updated Profile Name',
+            type: TOASTER_INFO,
             duration: 2000
         });
     };
-
-    const handleDelete = (currShortcut) => {
-        const updatedShortcuts = shortcuts;
-        updatedShortcuts[currShortcut.cmd] = { ...currShortcut, keys: '', keysName: '', isActive: false };
-
-        const profiles = store.get('workspace.gamepad.profiles', []);
-
-        //CHecks if parent array has all the child array elements
-        const arrayComparator = (parentArr, childArr) => childArr.every(element => parentArr.includes(element));
-
-        const updatedProfiles =
-            profiles.map(profile => (arrayComparator(profile.id, data.id) ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
-
-        onUpdateProfiles(updatedProfiles);
-        filter(filterCategory, updatedShortcuts);
-
-        Toaster.pop({
-            msg: 'Removed Gamepad Action Shortcut',
-            type: TOASTER_SUCCESS,
-            duration: 2000
-        });
-    };
-
-    const handleShortcutToggle = (currShortcut) => {
-        const updatedShortcuts = _.cloneDeep(shortcuts);
-        updatedShortcuts[currShortcut.cmd] = currShortcut;
-
-        const profiles = store.get('workspace.gamepad.profiles', []);
-
-        //CHecks if parent array has all the child array elements
-        const arrayComparator = (parentArr, childArr) => childArr.every(element => parentArr.includes(element));
-
-        const updatedProfiles =
-            profiles.map(currentProfile => (arrayComparator(currentProfile.id, data.id) ? ({ ...data, shortcuts: updatedShortcuts }) : currentProfile));
-
-        onUpdateProfiles(updatedProfiles);
-        filter(filterCategory, updatedShortcuts);
-    };
-
-    const handleEdit = (shortcut) => {
-        setShowModal(true);
-        setCurrentShortcutCMD(shortcut.cmd);
-    };
-
-    const handleShortcutsToggle = (toggle) => {
-        let updatedShortcuts = _.cloneDeep(shortcuts);
-        let updatedArr = Object.entries(updatedShortcuts);
-        updatedArr.forEach(([key, keybinding]) => {
-            keybinding.isActive = toggle;
-        });
-        updatedShortcuts = Object.fromEntries(updatedArr);
-
-        const profiles = store.get('workspace.gamepad.profiles', []);
-
-        //CHecks if parent array has all the child array elements
-        const arrayComparator = (parentArr, childArr) => childArr.every(element => parentArr.includes(element));
-
-        const updatedProfiles =
-            profiles.map(profile => (arrayComparator(profile.id, data.id) ? ({ ...profile, shortcuts: updatedShortcuts }) : profile));
-
-        onUpdateProfiles(updatedProfiles);
-        filter(filterCategory, updatedShortcuts);
-    };
-
-    const currentShortcut = useMemo(() => shortcuts[currentShortcutCMD], [shortcuts, currentShortcutCMD]);
-    const allShortcutsEnabled = shortcuts ? Object.entries(shortcuts).every(([key, shortcut]) => shortcut.isActive) : false;
-    const allShortcutsDisabled = shortcuts ? Object.entries(shortcuts).every(([key, shortcut]) => !shortcut.isActive) : false;
 
     return (
         <>
-            <div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 13fr', alignItems: 'center', margin: '0 0 0.5rem' }}>
-                    <i className={classnames(icon, styles.profileItemIcon)} />
-                    <input
-                        type="text"
-                        value={name}
-                        className={styles.profileName}
-                        onChange={(e) => setName(e.target.value)}
-                        onBlur={handleEditName}
-                    />
-                </div>
-                <CategoryFilter onChange={filter} filterCategory={filterCategory} />
-                <strong>* GrblHAL ONLY</strong>
-                <div style={{ overflowY: 'auto', height: '380px', backgroundColor: 'white' }}>
-                    <ShortcutsTable
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                        onShortcutToggle={handleShortcutToggle}
-                        dataSet={generateList(dataSet)}
-                    />
-                </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '10fr 4fr 6fr', gap: '1.5rem', alignItems: 'center', margin: '0 0 0.5rem' }}>
+                <input
+                    type="text"
+                    value={name}
+                    className={styles.profileName}
+                    onChange={(e) => setName(e.target.value)}
+                    onBlur={handleEditName}
+                />
+                <span style={{
+                    padding: '0.5rem',
+                    borderRadius: '5px',
+                    color: 'white',
+                    backgroundColor: isConnected ? '#4bb543' : '#16b1c9',
+                    textAlign: 'center'
+                }}
+                >
+                    {isConnected ? 'Connected' : 'Not Connected'}
+                </span>
+
+                <Button onClick={() => dispatch(setCurrentGamepadProfile(null))} style={{ margin: 0 }}>
+                    <i className="fas fa-arrow-left" />
+                    <span>Back to Gamepad Profiles</span>
+                </Button>
             </div>
 
-            {showModal && (
-                <ProfileShortcutModal
-                    profile={data}
-                    shortcut={currentShortcut}
-                    onClose={() => setShowModal(false)}
-                    onUpdateProfiles={onUpdateProfiles}
-                    filterFunc={filter}
-                    filterCategory={filterCategory}
-                />
-            )}
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                <Fieldset legend="Button Actions" style={{ width: '60%', padding: '0.75rem' }}>
+                    <div style={{ overflowY: 'auto', height: '480px', backgroundColor: 'white' }}>
+                        <ButtonActionsTable />
+                    </div>
+                </Fieldset>
 
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <Button primary onClick={() => handleShortcutsToggle(true)} disabled={allShortcutsEnabled}>
-                        <i className="fas fa-toggle-on" />
-                        <span>Enable All Shortcuts</span>
-                    </Button>
-                    <Button primary onClick={() => handleShortcutsToggle(false)} disabled={allShortcutsDisabled}>
-                        <i className="fas fa-toggle-on" />
-                        <span>Disable All Shortcuts</span>
-                    </Button>
-                </div>
-                <Button primary onClick={() => setCurrentProfileID(null)}>
-                    <i className="fas fa-arrow-left" />
-                    <span>Back to Profiles List</span>
-                </Button>
+                <Fieldset legend="Joystick Options" style={{ width: '40%' }}>
+                    <JoystickOptions />
+                </Fieldset>
             </div>
         </>
     );
@@ -184,7 +106,6 @@ const Profile = ({ data, onUpdateProfiles, setCurrentProfileID }) => {
 
 Profile.propTypes = {
     data: PropTypes.object,
-    onUpdateProfiles: PropTypes.func
 };
 
 export default Profile;
