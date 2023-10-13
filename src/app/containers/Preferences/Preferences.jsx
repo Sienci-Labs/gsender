@@ -178,7 +178,7 @@ class PreferencesPage extends PureComponent {
             showWarning: store.get('widgets.visualizer.showWarning'),
             showLineWarnings: store.get('widgets.visualizer.showLineWarnings'),
             shouldWarnZero: store.get('workspace.shouldWarnZero', false),
-            ipRange: store.get('widgets.connection.ipRange', [192, 168, 1]),
+            ipRange: store.get('widgets.connection.ip', [192, 168, 5, 1]),
             toolChange: {
                 passthrough: store.get('workspace.toolChange.passthrough', false),
             },

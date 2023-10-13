@@ -47,17 +47,16 @@ const Connection = ({ state, actions }) => {
                                         additionalProps={{
                                             name: 'ip' + index,
                                             type: 'number',
-                                            min: '1',
-                                            max: '255',
+                                            min: 1,
+                                            max: 255,
                                         }}
                                         className={styles.ipInput}
                                     />
-                                    <strong className={styles.dot}>.</strong>
+                                    { index !== 3 && <strong className={styles.dot}>.</strong> }
                                 </>
                             );
                         })
                     }
-                    <h5 className={styles.ipRangeLabel}>1-255</h5>
                 </div>
             </Tooltip>
         </Fieldset>
