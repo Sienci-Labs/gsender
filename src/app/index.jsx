@@ -39,7 +39,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import XHR from 'i18next-xhr-backend';
 import { TRACE, DEBUG, INFO, WARN, ERROR } from 'universal-logger';
 import { Provider as ReduxProvider } from 'react-redux';
-import * as Sentry from '@sentry/react';
+//import * as Sentry from '@sentry/react';
 
 import { Provider as GridSystemProvider } from 'app/components/GridSystem';
 import rootSaga from 'app/sagas';
