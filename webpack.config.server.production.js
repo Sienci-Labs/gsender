@@ -30,7 +30,7 @@ const buildVersion = pkg.version;
 
 module.exports = {
     mode: 'production',
-    devtool: 'source-map',
+    devtool: 'cheap-module-source-map',
     target: 'node', // ignore built-in modules like path, fs, etc.
     context: path.resolve(__dirname, 'src/server'),
     entry: {
