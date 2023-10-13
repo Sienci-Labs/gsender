@@ -38,12 +38,12 @@ const General = ({ active, state, actions }) => {
                 <GeneralArea.Half>
                     <Connection state={state} actions={actions} />
                     <Workspace state={state} actions={actions} />
-                    <JoggingPresets />
                 </GeneralArea.Half>
 
                 <GeneralArea.Half>
                     <Settings />
                     <DataCollection />
+                    <JoggingPresets />
                 </GeneralArea.Half>
 
             </GeneralArea>
