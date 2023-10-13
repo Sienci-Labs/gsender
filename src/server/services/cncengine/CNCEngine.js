@@ -336,15 +336,12 @@ class CNCEngine {
                     callback = noop;
                 }
 
-                console.log(options);
-
                 log.debug(`socket.open("${port}", ${JSON.stringify(options)}): id=${socket.id}`);
 
                 let controller = store.get(`controllers["${port}"]`);
                 if (!controller) {
                     let { baudrate, rtscts, network } = { ...options };
 
-                    console.log({ options });
 
                     const Controller = this.controllerClass[controllerType];
                     if (!Controller) {

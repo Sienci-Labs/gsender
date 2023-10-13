@@ -11,9 +11,6 @@ class GrblHalLineParserResultCompleteStatus {
             return null;
         }
 
-        console.log(line);
-        console.log(r);
-
         const state = r[1];
         let subState = r[2] || '';
         subState = subState.replace(':', '');
@@ -28,8 +25,6 @@ class GrblHalLineParserResultCompleteStatus {
                 result[parts[0]] = parts[1].split(',') || null;
             });
         }
-
-        console.log(result);
 
         {
             // Active state (Idle, Jog, etc) and substate (mostly alarm/door)

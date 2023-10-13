@@ -189,8 +189,6 @@ class GrblHalRunner extends events.EventEmitter {
                 }
             };
 
-            console.log(nextState);
-
             if (!_.isEqual(this.state.status, nextState.status)) {
                 this.state = nextState; // enforce change
             }
