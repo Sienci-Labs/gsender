@@ -25,6 +25,7 @@ import ensureArray from 'ensure-array';
 import noop from 'lodash/noop';
 import partition from 'lodash/partition';
 import { SerialPort } from 'serialport';
+import Evilscan from 'evilscan';
 import socketIO from 'socket.io';
 import { app } from 'electron';
 import fs from 'fs';
@@ -104,6 +105,8 @@ class CNCEngine {
 
     meta = null;
 
+    networkDevices = [];
+
     // Event Trigger
     event = new EventTrigger((event, trigger, commands) => {
         log.debug(`EventTrigger: event="${event}", trigger="${trigger}", commands="${commands}"`);
@@ -174,6 +177,7 @@ class CNCEngine {
         });
 
         this.io.on('connection', (socket) => {
+            this.networkDevices = [];
             const address = socket.handshake.address;
             const user = socket.decoded_token || {};
             log.debug(`New connection from ${address}: id=${socket.id}, user.id=${user.id}, user.name=${user.name}`);
@@ -281,6 +285,13 @@ class CNCEngine {
 
                         recognizedPorts = recognizedPorts.map(portInfoMapFn);
                         unrecognizedPorts = unrecognizedPorts.map(portInfoMapFn);
+                        const networkPorts = this.networkDevices.map((port) => {
+                            return {
+                                port: port.ip,
+                                manufacturer: undefined,
+                                inuse: controllers[port],
+                            };
+                        });
                         /*unrecognizedPorts = [{
                             port: 'COM3',
                             manufacturer: 'Microsoft',
@@ -291,7 +302,7 @@ class CNCEngine {
                             inuse: false
                         }];*/
 
-                        socket.emit('serialport:list', recognizedPorts, unrecognizedPorts);
+                        socket.emit('serialport:list', recognizedPorts, unrecognizedPorts, networkPorts);
                     })
                     .catch(err => {
                         log.error(err);
@@ -329,9 +340,8 @@ class CNCEngine {
 
                 let controller = store.get(`controllers["${port}"]`);
                 if (!controller) {
-                    let { baudrate, rtscts } = { ...options };
+                    let { baudrate, rtscts, network } = { ...options };
 
-                    console.log({ options });
 
                     const Controller = this.controllerClass[controllerType];
                     if (!Controller) {
@@ -345,7 +355,8 @@ class CNCEngine {
                     controller = new Controller(engine, {
                         port: port,
                         baudrate: baudrate,
-                        rtscts: !!rtscts
+                        rtscts: !!rtscts,
+                        network
                     });
                 }
 
@@ -492,6 +503,50 @@ class CNCEngine {
             socket.on('file:unload', () => {
                 log.debug('Socket unload called');
                 this.unload();
+            });
+
+            socket.on('networkScan', (port, target) => {
+                // console.log(target);
+                this.networkDevices = [];
+                const options = {
+                    target: target,
+                    port: port,
+                    banner: true
+                };
+
+                const scan = new Evilscan(options);
+
+                scan.on('result', (device) => {
+                    // fired when item is matching options
+                    // only take open devices
+                    //log.debug(device);
+                    if (device.banner.includes(GRBL) || device.banner.includes(GRBLHAL)) {
+                        this.networkDevices.push({
+                            ...device,
+                            controllerType: device.banner.includes(GRBL) ? GRBL : GRBLHAL,
+                        });
+                    }
+                });
+
+                scan.on('error', (err) => {
+                    log.error(err);
+                });
+
+                scan.on('done', () => {
+                    // finished !
+                    // this.networkDevices.push({
+                    //     ip: '192.168.1.1',
+                    //     port: 23,
+                    //     banner: GRBL,
+                    //     controllerType: GRBL
+                    // });
+                    log.info('done scan');
+                    socket.emit('networkScan:status', false);
+                });
+
+                log.info('starting network scan');
+                socket.emit('networkScan:status', true);
+                scan.run();
             });
         });
     }

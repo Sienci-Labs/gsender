@@ -97,7 +97,10 @@
       "oneClick": false,
       "license": "LICENSE",
       "perMachine": true,
-      "installerSidebar": "electron-build/sidebar.bmp"
+      "installerSidebar": "electron-build/sidebar.bmp",
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": false,
+      "include": "electron-build/installer.nsh"
     },
     "publish": {
       "provider": "github"
@@ -166,6 +169,8 @@
     "@mui/material": "^5.9.2",
     "@octokit/core": "^3.6.0",
     "@react-pdf/renderer": "3.0.0",
+    "@sentry/electron": "^4.11.0",
+    "@sentry/react": "^7.72.0",
     "@serialport/parser-readline": "^11.0.0",
     "@sienci/avrgirl-arduino": "^5.0.3",
     "@tanstack/match-sorter-utils": "^8.8.4",
@@ -216,6 +221,7 @@
     "es5-shim": "~4.5.13",
     "escodegen": "~1.11.1",
     "esprima": "~4.0.1",
+    "evilscan": "^1.9.1",
     "expand-tilde": "~2.0.2",
     "express": "~4.16.4",
     "express-jwt": "~5.3.1",
@@ -336,6 +342,7 @@
     "@babel/preset-env": "~7.4.3",
     "@babel/preset-react": "~7.0.0",
     "@babel/register": "~7.4.0",
+    "@sentry/webpack-plugin": "^2.7.1",
     "@trendmicro/babel-config": "~1.0.0-alpha",
     "babel-core": "~7.0.0-bridge.0",
     "babel-eslint": "~10.0.1",
@@ -349,7 +356,7 @@
     "css-loader": "~2.1.1",
     "css-split-webpack-plugin": "~0.2.6",
     "dotenv": "~7.0.0",
-    "electron": "^22",
+    "electron": "^26.2.2",
     "electron-builder": "~23.6.0",
     "eslint": "~5.16.0",
     "eslint-config-trendmicro": "~1.4.1",

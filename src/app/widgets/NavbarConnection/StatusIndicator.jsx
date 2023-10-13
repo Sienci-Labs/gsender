@@ -2,18 +2,20 @@ import React from 'react';
 import cx from 'classnames';
 import styles from './Index.styl';
 
-const renderConnectionStatusIcon = (connected, connecting, alertMessage) => {
+const renderConnectionStatusIcon = (connected, connecting, scanning, alertMessage) => {
     if (connected) {
-        return 'fa-check';
+        return 'fa fa-check';
     } else if (alertMessage) {
-        return 'fa-times';
+        return 'fa fa-times';
     } else if (connecting) {
-        return 'fa-spinner';
+        return 'fa fa-spinner';
+    } else if (scanning) {
+        return styles.scanner;
     }
-    return 'fa-plug';
+    return 'fa fa-plug';
 };
 
-const getIconState = (connected, connecting, alertMessage) => {
+const getIconState = (connected, connecting, scanning, alertMessage) => {
     if (connected) {
         return 'icon-connected';
     } else if (alertMessage) {
@@ -24,12 +26,12 @@ const getIconState = (connected, connecting, alertMessage) => {
     return 'icon-disconnected';
 };
 
-const StatusIndicator = ({ connected, connecting, alertMessage }) => {
-    const iconState = getIconState(connected, connecting, alertMessage);
+const StatusIndicator = ({ connected, connecting, scanning, alertMessage }) => {
+    const iconState = getIconState(connected, connecting, scanning, alertMessage);
 
     return (
         <div className={cx(styles.statusWrapper, styles[iconState])}>
-            <i className={`fa ${renderConnectionStatusIcon(connected, connecting, alertMessage)}`} />
+            <i className={`${renderConnectionStatusIcon(connected, connecting, scanning, alertMessage)}`} />
         </div>
     );
 };

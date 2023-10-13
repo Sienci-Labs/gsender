@@ -295,6 +295,7 @@
   padding: 5px 0 0 0;
   align-items center
   justify-content center;
+  margin-bottom: 1rem;
 }
 
 .selectorWrapper {
@@ -304,15 +305,67 @@
 
 .selectorButton {
   background: #111827;
-  color: #3E85C7;
+  color: #78aad8;
   border: none;
   outline: none;
-  border-radius: 5px;
+  //border-radius: 5px;
   padding: 5px;
+}
+
+.scanButton {
+  width: 150px;
 }
 
 .selected {
   background: rgba(0, 123, 255, 0.2);
   border: 1px solid rgba(0, 123, 255, 0.3);
   color: #FFFFFF;
+}
+
+
+// https://stackoverflow.com/a/66562794
+.scanner {
+  height: 2.7rem;
+  width: 2.7rem;
+  margin:2px;
+  //outline:2px solid;
+  //outline-offset:1px;
+  position:relative;
+}
+.scanner::before {
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  width:5px;
+  background:#18c89b;
+  box-shadow:0 0 7px 2px #18c89b;
+  clip-path:inset(0);
+  animation:
+    x 0.5s ease-in-out infinite alternate,
+    y 1s   ease-in-out infinite;
+}
+
+@keyframes x {
+  to {
+    transform:translateX(-10%);
+    left:100%;
+  }
+}
+
+@keyframes y {
+   33% {
+     clip-path:inset(0 0 0 -10px);
+   }
+   50% {
+     clip-path:inset(0 0 0 0);
+   }
+   83%{
+     clip-path:inset(0 -10px 0 0);
+   }
+}
+
+.bottomSpace {
+  margin-bottom: 25px;
 }

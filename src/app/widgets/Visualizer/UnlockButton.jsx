@@ -26,7 +26,7 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import noop from 'lodash/noop';
 import controller from 'app/lib/controller';
-import { GRBL_ACTIVE_STATE_ALARM } from 'app/constants';
+import { GRBL_ACTIVE_STATE_HOLD } from 'app/constants';
 import styles from './UnlockButton.styl';
 
 
@@ -38,12 +38,20 @@ const UnlockButton = ({ activeState, alarmCode }) => {
     const onMouseOut = () => {
         setIsHovering(false);
     };
-    const handleUnlock = () => {
-        if (activeState === GRBL_ACTIVE_STATE_ALARM && (alarmCode === 'Homing' || alarmCode === 11)) {
-            controller.command('unlock');
-        } else {
-            controller.command('cyclestart');
+
+    const getButtonText = () => {
+        if (activeState === GRBL_ACTIVE_STATE_HOLD) {
+            return 'Cycle Start';
         }
+        return 'Unlock Machine';
+    };
+
+    const handleUnlock = () => {
+        if (activeState === GRBL_ACTIVE_STATE_HOLD) {
+            controller.command('cyclestart');
+            return;
+        }
+        controller.command('unlock');
     };
 
     return (
@@ -62,7 +70,7 @@ const UnlockButton = ({ activeState, alarmCode }) => {
             {
                 isHovering && (
                     <div className={styles.unlockText}>
-                        Unlock Machine
+                        {getButtonText()}
                     </div>
                 )
             }

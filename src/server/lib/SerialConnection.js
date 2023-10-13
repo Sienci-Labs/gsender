@@ -24,6 +24,7 @@
 import { EventEmitter } from 'events';
 import { SerialPort } from 'serialport';
 import { ReadlineParser } from '@serialport/parser-readline';
+import net from 'net';
 
 // Validation
 
@@ -139,6 +140,9 @@ class SerialConnection extends EventEmitter {
     }
 
     get isOpen() {
+        if (this.settings.network) {
+            return this.port && this.port.writable;
+        }
         return this.port && this.port.isOpen;
     }
 
@@ -154,22 +158,42 @@ class SerialConnection extends EventEmitter {
             return;
         }
 
-        const { path, baudRate, ...rest } = this.settings;
+        const { path, baudRate, network, ...rest } = this.settings;
 
-        this.port = new SerialPort({
-            path,
-            baudRate,
-            ...rest,
-            autoOpen: false
-        });
+        const ip = '(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)';
+        const expr = new RegExp(`^${ip}\.${ip}\.${ip}\.${ip}$`, 'g');
+        if (network || path.match(expr)) {
+            console.log('telnet');
+            this.port = new net.Socket();
+
+            this.port.on('connect', () => {
+                callback();
+            });
+            this.port.on('error', (err) => {
+                callback(err);
+            });
+
+            this.addPortListeners();
+            this.port.connect(23, path);
+        } else {
+            this.port = new SerialPort({
+                path,
+                baudRate,
+                ...rest,
+                autoOpen: false
+            });
+            this.addPortListeners();
+            this.port.open(callback);
+        }
+    }
+
+    addPortListeners() {
         this.port.on('open', this.eventListener.open);
         this.port.on('close', this.eventListener.close);
         this.port.on('error', this.eventListener.error);
 
         this.parser = this.port.pipe(new ReadlineParser({ delimiter: '\n' }));
         this.parser.on('data', this.eventListener.data);
-
-        this.port.open(callback);
     }
 
     // @param {function} callback The error-first callback.
@@ -185,7 +209,14 @@ class SerialConnection extends EventEmitter {
         this.port.removeListener('error', this.eventListener.error);
         this.parser.removeListener('data', this.eventListener.data);
 
-        this.port.close(callback);
+        if (this.settings.network) {
+            this.port.on('close', () => {
+                callback();
+            });
+            this.port.destroy();
+        } else {
+            this.port.close(callback);
+        }
 
         this.port = null;
         this.parser = null;
