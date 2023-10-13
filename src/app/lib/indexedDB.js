@@ -33,19 +33,12 @@ export const replaceParsedData = (parsedData) => {
         db = event.target.result;
 
         // delete previous data
-        const deleteReq = db
+        const replaceReq = db
             .transaction([OBJECT_STORE], 'readwrite')
             .objectStore(OBJECT_STORE)
-            .delete(DATA_ID);
-        deleteReq.onsuccess = (event) => {
-            // add
-            const addReq = db
-                .transaction([OBJECT_STORE], 'readwrite')
-                .objectStore(OBJECT_STORE)
-                .put({ id: DATA_ID, ...parsedData });
-            addReq.oncomplete = (event) => {
-                console.log('Finished replacing parsed data');
-            };
+            .put({ id: DATA_ID, ...parsedData });
+        replaceReq.oncomplete = (event) => {
+            console.log('Finished replacing parsed data');
         };
     };
 };
