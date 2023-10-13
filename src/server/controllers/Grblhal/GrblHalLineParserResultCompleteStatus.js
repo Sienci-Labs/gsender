@@ -15,7 +15,8 @@ class GrblHalLineParserResultCompleteStatus {
         console.log(r);
 
         const state = r[1];
-        const subState = r[2];
+        let subState = r[2] || '';
+        subState = subState.replace(':', '');
 
         const payload = {};
         const result = {};
