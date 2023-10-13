@@ -197,12 +197,14 @@ class GrblHalController {
         }
         this.engine = engine;
 
-        const { port, baudrate, rtscts } = { ...options };
+
+        const { port, baudrate, rtscts, network } = { ...options };
         this.options = {
             ...this.options,
             port: port,
             baudrate: baudrate,
-            rtscts: rtscts
+            rtscts: rtscts,
+            network
         };
 
         // Connection
@@ -210,6 +212,7 @@ class GrblHalController {
             path: port,
             baudRate: baudrate,
             rtscts: rtscts,
+            network,
             writeFilter: (data) => {
                 const line = data.trim();
 
@@ -690,7 +693,7 @@ class GrblHalController {
             }
 
             // Clear error by sending newline for grblHAL
-            this.connection.write('\n');
+            //this.connection.write('\n');
 
             // Feeder
             this.feeder.ack();
@@ -968,9 +971,9 @@ class GrblHalController {
         this.writeln('$ES');
         await delay(100);
         this.writeln('$ESH');
-        //check if controller is ready and send the status
-        //this.emit('grbl:iSready', this.ready);
-
+        await delay(50);
+        // Get full report
+        this.connection.writeImmediate(String.fromCharCode(0x87));
         //this.command('realtime_report');
     }
 
@@ -1168,10 +1171,13 @@ class GrblHalController {
             // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
             // We set controller ready if version found
             setTimeout(() => {
+                if (this.connection) {
+                    this.connection.write('$I\n');
+                }
                 let counter = 3;
                 const interval = setInterval(() => {
                     // check if 3 tries or controller is ready
-                    if (counter <= 0 || this.ready) {
+                    if (this.ready || counter <= 0) {
                         clearInterval(interval);
                         return;
                     }

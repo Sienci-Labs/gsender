@@ -28,12 +28,15 @@ export const {
     OPEN_CONNECTION,
     CLOSE_CONNECTION,
     LIST_PORTS,
+    SCAN_NETWORK,
 } = constants('connection', [
     'OPEN_CONNECTION',
     'CLOSE_CONNECTION',
-    'LIST_PORTS'
+    'LIST_PORTS',
+    'SCAN_NETWORK',
 ]);
 
 export const openConnection = createAction(OPEN_CONNECTION);
 export const closeConnection = createAction(CLOSE_CONNECTION);
 export const listPorts = createAction(LIST_PORTS);
+export const scanNetwork = createAction(SCAN_NETWORK);

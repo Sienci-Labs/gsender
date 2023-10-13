@@ -74,7 +74,7 @@ const PrimaryVisualizer = ({ actions, state, capable, showLoading, showRendering
                 <div className={styles.visualizerWrapper}>
                     <SoftLimitsWarningArea />
                     {
-                        showUnlockButton && <UnlockButton />
+                        (isConnected && true || showUnlockButton) && <UnlockButton />
                     }
                     <MachineStatusArea
                         state={state}

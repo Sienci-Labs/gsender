@@ -36,10 +36,8 @@ const ControlledInput = ({ className, value, type = 'decimal', externalOnChange 
     };
 
     const onChange = (e) => {
-        console.log('on Change');
         setLocalValue(inputRef.current.value);
         if (externalOnChange) {
-            console.log('external on Change');
             externalOnChange(inputRef.current.value);
         }
     };

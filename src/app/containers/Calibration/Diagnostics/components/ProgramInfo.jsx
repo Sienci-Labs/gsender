@@ -69,7 +69,6 @@ const ProgramInfo = ({ type, settings, connection, modals }) => {
     };
 
     const determineCoolant = () => {
-        console.log(modals.coolant);
         if (modals.coolant === 'M7') {
             return 'Mist Coolant On';
         } else if (modals.coolant === 'M8') {

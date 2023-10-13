@@ -384,10 +384,10 @@ export function* initialize() {
         }
     });
 
-    controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts) => {
+    controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts, networkPorts) => {
         reduxStore.dispatch({
             type: connectionActions.LIST_PORTS,
-            payload: { recognizedPorts, unrecognizedPorts }
+            payload: { recognizedPorts, unrecognizedPorts, networkPorts }
         });
     });
 
@@ -620,6 +620,18 @@ export function* initialize() {
                 descriptions: data
             }
         });
+    });
+
+    controller.addListener('networkScan:status', (isScanning) => {
+        reduxStore.dispatch({
+            type: connectionActions.SCAN_NETWORK,
+            payload: {
+                isScanning: isScanning
+            }
+        });
+        if (!isScanning) {
+            pubsub.publish('networkScan:finished');
+        }
     });
 
     yield null;

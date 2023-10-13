@@ -44,6 +44,7 @@ import {
 } from './constants';
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 import GrblHalLineParserResultSettingDetails from './GrblHalLineParserResultSettingDetails';
+import GrblHalLineParserResultCompleteStatus from 'server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus';
 
 const log = logger('controller:grblHAL');
 
@@ -62,7 +63,7 @@ class GrblHalRunner extends events.EventEmitter {
                 z: '0.000'
             },
             ov: [],
-            alarmCode: 11,
+            alarmCode: 0,
             probeActive: false,
             pinState: {}
         },
@@ -147,6 +148,46 @@ class GrblHalRunner extends events.EventEmitter {
 
             // Delete the raw key
             delete nextState.status.raw;
+
+            if (!_.isEqual(this.state.status, nextState.status)) {
+                this.state = nextState; // enforce change
+            }
+            this.emit('status', payload);
+            return;
+        }
+        if (type === GrblHalLineParserResultCompleteStatus) {
+            delete payload.raw;
+            // Grbl v1.1
+            // WCO:0.000,10.000,2.500
+            // A current work coordinate offset is now sent to easily convert
+            // between position vectors, where WPos = MPos - WCO for each axis.
+            if (_.has(payload, 'mpos') && !_.has(payload, 'wpos')) {
+                payload.wpos = payload.wpos || {};
+                _.each(payload.mpos, (mpos, axis) => {
+                    const digits = decimalPlaces(mpos);
+                    const wco = _.get((payload.wco || this.state.status.wco), axis, 0);
+                    payload.wpos[axis] = (Number(mpos) - Number(wco)).toFixed(digits);
+                });
+            } else if (_.has(payload, 'wpos') && !_.has(payload, 'mpos')) {
+                payload.mpos = payload.mpos || {};
+                _.each(payload.wpos, (wpos, axis) => {
+                    const digits = decimalPlaces(wpos);
+                    const wco = _.get((payload.wco || this.state.status.wco), axis, 0);
+                    payload.mpos[axis] = (Number(wpos) + Number(wco)).toFixed(digits);
+                });
+            }
+
+            if (payload.activeState === GRBL_HAL_ACTIVE_STATE_ALARM && payload.subState) {
+                payload.alarmCode = Number(payload.subState);
+            }
+
+            const nextState = {
+                ...this.state,
+                status: {
+                    ...this.state.status,
+                    ...payload
+                }
+            };
 
             if (!_.isEqual(this.state.status, nextState.status)) {
                 this.state = nextState; // enforce change
