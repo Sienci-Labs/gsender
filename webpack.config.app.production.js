@@ -13,6 +13,8 @@ const stylusLoader = require('stylus-loader');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
+
 const babelConfig = require('./babel.config');
 const buildConfig = require('./build.config');
 const pkg = require('./package.json');
@@ -40,7 +42,7 @@ module.exports = {
     cache: true,
     target: 'web',
     context: path.resolve(__dirname, 'src/app'),
-    devtool: 'cheap-module-source-map',
+    devtool: 'source-map',
     entry: {
         polyfill: [
             path.resolve(__dirname, 'src/app/polyfill/index.js')
@@ -241,8 +243,13 @@ module.exports = {
             meta: {
                 'viewport': 'width=device-width, initial-scale=1, maximum-scale=1',
             }
-        })
-    ],
+        }),
+        sentryWebpackPlugin({
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            urlPrefix: publicPath
+        })],
     resolve: {
         modules: [
             path.resolve(__dirname, 'src'),
