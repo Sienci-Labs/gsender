@@ -15,7 +15,7 @@ class GrblHalLineParserResultCompleteStatus {
         console.log(r);
 
         const state = r[1];
-        const substate = r[2];
+        const subState = r[2];
 
         const payload = {};
         const result = {};
@@ -33,7 +33,7 @@ class GrblHalLineParserResultCompleteStatus {
         {
             // Active state (Idle, Jog, etc) and substate (mostly alarm/door)
             payload.activeState = state;
-            payload.substate = substate || '';
+            payload.subState = subState || '';
         }
 
         // Machine Position (v0.9, v1.1)
