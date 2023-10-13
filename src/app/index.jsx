@@ -65,15 +65,15 @@ import PopUpWidget from './containers/PopUpWidget';
 import './styles/vendor.styl';
 import './styles/app.styl';
 
-if (process.env.NODE_ENV === 'production') {
-    Sentry.init({
-        dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684',
-        integrations: [
-            new Sentry.BrowserTracing(),
-            new Sentry.Replay()
-        ],
-    });
-}
+// import * as Sentry from '@sentry/react';
+
+// Sentry.init({
+//     dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684',
+//     integrations: [
+//         new Sentry.BrowserTracing(),
+//         new Sentry.Replay()
+//     ],
+// });
 
 const renderPage = () => {
     const container = document.createElement('div');

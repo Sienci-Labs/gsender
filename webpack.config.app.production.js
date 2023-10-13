@@ -13,7 +13,7 @@ const stylusLoader = require('stylus-loader');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
 const ManifestPlugin = require('webpack-manifest-plugin');
-const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
+// const { sentryWebpackPlugin } = require('@sentry/webpack-plugin');
 
 const babelConfig = require('./babel.config');
 const buildConfig = require('./build.config');
@@ -243,14 +243,14 @@ module.exports = {
             meta: {
                 'viewport': 'width=device-width, initial-scale=1, maximum-scale=1',
             }
-        }),
-        sentryWebpackPlugin({
-            org: process.env.SENTRY_ORG,
-            project: process.env.SENTRY_PROJECT,
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            urlPrefix: publicPath,
-            telemetry: false
         })],
+    // sentryWebpackPlugin({
+    //     org: process.env.SENTRY_ORG,
+    //     project: process.env.SENTRY_PROJECT,
+    //     authToken: process.env.SENTRY_AUTH_TOKEN,
+    //     urlPrefix: publicPath,
+    //     telemetry: false
+    // })],
     resolve: {
         modules: [
             path.resolve(__dirname, 'src'),
