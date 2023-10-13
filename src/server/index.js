@@ -52,10 +52,12 @@ import urljoin from './lib/urljoin';
 
 const log = logger('init');
 
-Sentry.init({
-    dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684',
-    tracesSampleRate: 0.3,
-});
+if (process.env.NODE_ENV === 'production') {
+    Sentry.init({
+        dsn: 'https://c09ff263997c4a47ba22b3c948f19734@o558751.ingest.sentry.io/5692684',
+        tracesSampleRate: 0.3,
+    });
+}
 
 const createServer = (options, callback) => {
     options = { ...options };
