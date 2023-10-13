@@ -47,24 +47,24 @@ function useKeybinding(shuttleControlEvents) {
                 store.replace('commandKeys', updatedCommandKeys);
             }
 
-            // add gamepad shortcuts
-            const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
-            const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
-                const shortcuts = profile.shortcuts;
-                let updatedProfileShortcuts = shortcuts;
-                if (_.isEmpty(shortcuts) || !shortcuts[defaultCommand.cmd]) {
-                    // no default keys for gamepadlo
-                    updatedProfileShortcuts[defaultCommand.cmd] = {
-                        cmd: defaultCommand.cmd,
-                        keys: defaultCommand.gamepadKeys || '',
-                        keysName: defaultCommand.keysName || '',
-                        isActive: defaultCommand.isActive,
-                    };
-                }
-                return { ...profile, shortcuts: updatedProfileShortcuts };
-            });
-            // replace in store
-            store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
+            // // add gamepad shortcuts
+            // const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
+            // const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
+            //     const shortcuts = profile.shortcuts;
+            //     let updatedProfileShortcuts = shortcuts;
+            //     if (_.isEmpty(shortcuts) || !shortcuts[defaultCommand.cmd]) {
+            //         // no default keys for gamepadlo
+            //         updatedProfileShortcuts[defaultCommand.cmd] = {
+            //             cmd: defaultCommand.cmd,
+            //             keys: defaultCommand.gamepadKeys || '',
+            //             keysName: defaultCommand.keysName || '',
+            //             isActive: defaultCommand.isActive,
+            //         };
+            //     }
+            //     return { ...profile, shortcuts: updatedProfileShortcuts };
+            // });
+            // // replace in store
+            // store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
         }
     });
 
@@ -96,20 +96,20 @@ export function removeOldKeybindings() {
     });
     store.replace('commandKeys', updatedCommandKeys);
 
-    // do the same for gamepad shortcuts
-    const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
-    const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
-        const shortcuts = profile.shortcuts;
-        let updatedProfileShortcuts = shortcuts;
-        Object.entries(shortcuts).forEach(([key, keybinding]) => {
-            const event = allShuttleControlEvents[key];
-            if (event === undefined && (!keybinding.category || keybinding.category !== MACRO_CATEGORY)) {
-                delete updatedProfileShortcuts[key];
-            }
-        });
-        return { ...profile, shortcuts: updatedProfileShortcuts };
-    });
-    store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
+    // // do the same for gamepad shortcuts
+    // const currentGamepadProfiles = store.get('workspace.gamepad.profiles', []);
+    // const updatedGamepadProfiles = currentGamepadProfiles.map(profile => {
+    //     const shortcuts = profile.shortcuts;
+    //     let updatedProfileShortcuts = shortcuts;
+    //     Object.entries(shortcuts).forEach(([key, keybinding]) => {
+    //         const event = allShuttleControlEvents[key];
+    //         if (event === undefined && (!keybinding.category || keybinding.category !== MACRO_CATEGORY)) {
+    //             delete updatedProfileShortcuts[key];
+    //         }
+    //     });
+    //     return { ...profile, shortcuts: updatedProfileShortcuts };
+    // });
+    // store.replace('workspace.gamepad.profiles', updatedGamepadProfiles);
 
     combokeys.reload();
 }
