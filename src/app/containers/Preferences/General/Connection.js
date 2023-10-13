@@ -40,7 +40,7 @@ const Connection = ({ state, actions }) => {
                     {
                         ipRange.map((value, index) => {
                             return (
-                                <>
+                                <React.Fragment key={value}>
                                     <Input
                                         value={value}
                                         onChange={(e) => actions.general.setIPRange(Number(e.target.value), index)}
@@ -53,7 +53,7 @@ const Connection = ({ state, actions }) => {
                                         className={styles.ipInput}
                                     />
                                     { index !== 3 && <strong className={styles.dot}>.</strong> }
-                                </>
+                                </React.Fragment>
                             );
                         })
                     }
