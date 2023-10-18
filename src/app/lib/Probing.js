@@ -106,9 +106,31 @@ export const get3AxisStandardRoutine = (options) => {
     return code;
 };
 
-export const get3AxisAutoRoutine = ({ axes, $13 }) => {
+
+const determineAutoPlateOffsetValues = (direction, diameter = null) => {
+    const xOff = 22.5;
+    const yOff = 22.5;
+
+    if (diameter && diameter !== 'TIP' && diameter !== 'AUTO') {
+        // math to compensate for tool
+    }
+
+    if (direction === BR) {
+        return [xOff * -1, yOff];
+    } else if (direction === TR) {
+        return [xOff * -1, yOff * -1];
+    } else if (direction === TL) {
+        return [xOff, yOff * -1];
+    }
+
+    return [xOff, yOff];
+};
+
+export const get3AxisAutoRoutine = ({ axes, $13, direction }) => {
     const code = [];
     const p = 'P0';
+
+    const [xOff, yOff] = determineAutoPlateOffsetValues(direction);
 
     let prependUnits = '';
     if ($13 === '1') {
@@ -118,6 +140,8 @@ export const get3AxisAutoRoutine = ({ axes, $13 }) => {
     if (axes.x && axes.y && axes.z) {
         code.push(
             '; Probe XYZ Auto Endmill',
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
@@ -130,29 +154,39 @@ export const get3AxisAutoRoutine = ({ axes, $13 }) => {
             'G21 G91 G0 X2',
             'G38.2 X-5 F75',
             'G4 P0.15',
-            'G10 L20 P0 X0',
+            '%X_LEFT=posx',
+            //'G10 L20 P0 X0',
             'G21 G91 G0 X26',
             'G38.2 X30 F150',
             'G21 G91 G0 X-2',
             'G38.2 X5 F75',
             'G4 P0.15',
-            `${prependUnits} G10 L20 P0 X[posx/2]`,
-            'G21 G90 G0 X0',
+            '%X_RIGHT=posx',
+            '%X_CHORD=X_RIGHT - XLEFT',
+            'G21 G90 G0 X[X_CHORD/2]',
+            '%X_CENTER=posx',
+            `${prependUnits} G10 L20 P0 X0`,
+            //`${prependUnits} G10 L20 P0 X[posx/2]`,
+            //'G21 G90 G0 X0',
             'G21 G91 G0 Y-13',
             'G38.2 Y-30 F250',
             'G21 G91 G0 Y2',
             'G38.2 Y-5 F75',
             'G4 P0.15',
-            'G10 L20 P0 Y0',
+            '%Y_BOTTOM = posy',
             'G21 G91 G0 Y26',
             'G38.2 Y30 F250',
             'G21 G91 G0 Y-2',
             'G38.2 Y5 F75',
             'G4 P0.15',
-            `${prependUnits} G10 L20 P0 Y[posy/2]`,
-            'G21 G90 G0 X0 Y0',
+            '%Y_TOP = posy',
+            '%Y_CHORD = Y_TOP - Y_BOTTOM',
+            'G0 Y[Y_CHORD / 2] X0',
+            //`${prependUnits} G10 L20 P0 Y[posy/2]`,
+            //'G21 G90 G0 X0 Y0',
             'G4 P0.15',
-            'G10 L20 P0 X22.5 Y22.5',
+            //`${prependUnits} G10 L20 P0 Y0`,
+            'G10 L20 P0 X[X_OFF] Y[Y_OFF]',
             'G21 G90 G0 X0 Y0',
             'G21 G90 Z1'
         );
