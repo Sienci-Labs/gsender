@@ -293,9 +293,11 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction }) => {
     return code;
 };
 
-export const get3AxisAutoTipRoutine = ({ axes, $13 }) => {
+export const get3AxisAutoTipRoutine = ({ axes, $13, direction }) => {
     const code = [];
     const p = 'P0';
+
+    const [xOff, yOff] = determineAutoPlateOffsetValues(direction);
 
     let prependUnits = '';
     if ($13 === '1') {
@@ -305,6 +307,8 @@ export const get3AxisAutoTipRoutine = ({ axes, $13 }) => {
     if (axes.x && axes.y && axes.z) {
         code.push(
             '; Probe XYZ Auto Tip',
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
@@ -317,35 +321,45 @@ export const get3AxisAutoTipRoutine = ({ axes, $13 }) => {
             'G21 G91 G0 X2',
             'G38.2 X-5 F75',
             'G4 P0.15',
-            `G10 L20 ${p} X0`,
+            '%X_LEFT=posx',
+            //`G10 L20 ${p} X0`,
             'G21 G91 G0 X14',
             'G38.2 X15 F150',
             'G21 G91 G0 X-2',
             'G38.2 X5 F75',
             'G4 P0.15',
-            `${prependUnits} G10 L20 ${p} X[posx/2]`,
-            'G21 G90 G0 X0',
+            //`${prependUnits} G10 L20 ${p} X[posx/2]`,
+            '%X_RIGHT=posx',
+            '%X_CHORD=X_RIGHT - XLEFT',
+            'G21 G90 G0 X[X_CHORD/2]',
+            '%X_CENTER=posx',
             'G21 G91 G0 Y-3',
             'G38.2 Y-15 F150',
             'G21 G91 G0 Y2',
             'G38.2 Y-5 F75',
             'G4 P0.1',
-            `G10 L20 ${p} Y0`,
+            '%Y_BOTTOM = posy',
+            //`G10 L20 ${p} Y0`,
             'G21 G91 G0 Y14',
             'G38.2 Y15 F150',
             'G21 G91 G0 Y-2',
             'G38.2 Y5 F75',
             'G4 P0.15',
-            `${prependUnits} G10 L20 ${p} Y[posy/2]`,
-            'G21 G90 G0 X0 Y0',
+            '%Y_TOP = posy',
+            '%Y_CHORD = Y_TOP - Y_BOTTOM',
+            'G0 Y[Y_CHORD / 2] X0',
+            //`${prependUnits} G10 L20 ${p} Y[posy/2]`,
+            //'G21 G90 G0 X0 Y0',
             'G4 P0.15',
-            `G10 L20 ${p} X22.5 Y22.5`,
+            `G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
             'G21 G90 G0 X0 Y0',
             'G21 G90 G0 Z1',
         );
     } else if (axes.x && axes.y) {
         code.push(
             '; Probe XY Auto Tip',
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z0.5',
@@ -376,7 +390,7 @@ export const get3AxisAutoTipRoutine = ({ axes, $13 }) => {
             `${prependUnits} G10 L20 ${p} Y[posy/2]`,
             'G21 G90 G0 X0 Y0',
             'G4 P0.15',
-            `G10 L20 ${p} X22.5 Y22.5`,
+            `G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
             'G21 G90 G0 X0 Y0',
         );
     } else if (axes.z) {
@@ -394,6 +408,7 @@ export const get3AxisAutoTipRoutine = ({ axes, $13 }) => {
     } else if (axes.x) {
         code.push(
             '; Probe X Auto Tip',
+            `%X_OFF = ${xOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z0.5',
@@ -411,11 +426,12 @@ export const get3AxisAutoTipRoutine = ({ axes, $13 }) => {
             `${prependUnits} G10 L20 ${p} X[posx/2]`,
             'G21 G90 G0 X0',
             'G4 P0.15',
-            `G10 L20 ${p} X22.5`,
+            `G10 L20 ${p} X[X_OFF]`,
         );
     } else if (axes.y) {
         code.push(
             '; Probe Y Auto Tip',
+            `%Y_OFF = ${yOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z0.5',
@@ -433,7 +449,7 @@ export const get3AxisAutoTipRoutine = ({ axes, $13 }) => {
             `${prependUnits} G10 L20 ${p} Y[posy/2]`,
             'G21 G90 G0 Y0',
             'G4 P0.15',
-            `G10 L20 ${p} Y22.5`,
+            `G10 L20 ${p} Y[Y_OFF]`,
         );
     }
 
@@ -442,9 +458,7 @@ export const get3AxisAutoTipRoutine = ({ axes, $13 }) => {
 
 export const get3AxisAutoDiameterRoutine = ({ axes, diameter }) => {
     const code = [];
-
-    const wcs = this.getWorkCoordinateSystem();
-    const p = `P${this.mapWCSToPValue(wcs)}`;
+    const p = 'P0';
 
     // const toolRadius = (diameter / 2);
     // const toolCompensatedThickness = ((-1 * toolRadius));
@@ -570,11 +584,11 @@ export const getProbeCode = (options, direction = 0) => {
     console.log(axes);
     if (plateType === TOUCHPLATE_TYPE_AUTOZERO) {
         if (options.toolDiameter === 'AUTO') {
-            return [];
+            return get3AxisAutoRoutine({ ...options, direction });
         } else if (options.toolDiameter === 'TIP') {
-            return [];
+            return get3AxisAutoTipRoutine({ ...options, direction });
         } else {
-            return [];
+            return get3AxisAutoDiameterRoutine({ ...options });
         }
     }
 
