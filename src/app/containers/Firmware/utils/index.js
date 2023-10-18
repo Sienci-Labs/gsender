@@ -152,6 +152,8 @@ export const applyNewSettings = (settings, eeprom, setSettingsToApply) => {
                 // and this is the first occurence of $20 or $21,
                 // we are going to have to switch it with $20, so save the index.
                 index2021 = i;
+            } else if (item.setting === '$450' || item.setting === '$451' || item.setting === '$452') {
+                item.value = item.value.replaceAll(' ', ''); // remove whitespace
             }
             return `${item.setting}=${item.value}`;
         });
