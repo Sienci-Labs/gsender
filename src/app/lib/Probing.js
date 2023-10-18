@@ -38,7 +38,7 @@ export const getProbeDirections = (corner) => {
 
 // Setup variables for probing and
 export const getPreamble = (options) => {
-    const { modal, axes, probeDistance, probeFast, probeSlow, retract, zThickness, xyThickness } = options;
+    const { modal, axes, probeDistance, probeFast, probeSlow, zThickness, xyThickness, xRetract, yRetract, zRetract } = options;
     let initialOffsets = 'G10 L20 P0 ';
     // Add axes to initial zeroing
     Object.keys(axes).forEach(axis => {
@@ -54,7 +54,9 @@ export const getPreamble = (options) => {
         `%PROBE_DISTANCE=${probeDistance}`,
         `%PROBE_FAST_FEED=${probeFast}`,
         `%PROBE_SLOW_FEED=${probeSlow}`,
-        `%PROBE_RETRACT=${retract}`,
+        `%X_RETRACT_DISTANCE=${xRetract}`,
+        `%Y_RETRACT_DISTANCE=${yRetract}`,
+        `%Z_RETRACT_DISTANCE=${zRetract}`,
         `%Z_THICKNESS=${zThickness}`,
         `%X_THICKNESS=${xyThickness}`,
         `%Y_THICKNESS=${xyThickness}`,
@@ -87,6 +89,7 @@ export const get3AxisStandardRoutine = (options) => {
     code.push(...getPreamble(options));
     if (axes.z) {
         code.push(...getSingleAxisStandardRoutine('Z'));
+        // Z also handles positioning for next probe on X
     }
     if (axes.x) {
         // Move into position for X
@@ -100,8 +103,6 @@ export const get3AxisStandardRoutine = (options) => {
         // Probe Y
         code.push(...get3AxisStandardRoutine('Y'));
     }
-    // Move back to origin
-
     console.log(code);
     return code;
 };
@@ -142,7 +143,7 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction }) => {
 
     if (axes.x && axes.y && axes.z) {
         code.push(
-            '; Probe XYZ Auto Endmill',
+            `; Probe XYZ Auto Endmill - direction: ${direction}`,
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
             'G21 G91',
@@ -456,9 +457,12 @@ export const get3AxisAutoTipRoutine = ({ axes, $13, direction }) => {
     return code;
 };
 
-export const get3AxisAutoDiameterRoutine = ({ axes, diameter }) => {
+export const get3AxisAutoDiameterRoutine = ({ axes, direction, toolDiameter }) => {
     const code = [];
     const p = 'P0';
+
+
+    const [xOff, yOff] = determineAutoPlateOffsetValues(direction, toolDiameter);
 
     // const toolRadius = (diameter / 2);
     // const toolCompensatedThickness = ((-1 * toolRadius));
@@ -467,6 +471,8 @@ export const get3AxisAutoDiameterRoutine = ({ axes, diameter }) => {
     if (axes.z && axes.y && axes.z) {
         code.push(
             '; Probe XYZ AutoZero Specific Diameter',
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
@@ -489,13 +495,15 @@ export const get3AxisAutoDiameterRoutine = ({ axes, diameter }) => {
             `G10 L20 ${p} Y19.325`,
             'G21 G90 G0 X0 Y0',
             'G4 P0.15',
-            `G10 L20 ${p} X22.5 Y22.5`,
+            `G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
             'G21 G90 G0 X0 Y0',
             'G21 G90 G0 Z1',
         );
     } else if (axes.x && axes.y) {
         code.push(
             '; Probe XY AutoZero Specific Diameter',
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
@@ -514,7 +522,7 @@ export const get3AxisAutoDiameterRoutine = ({ axes, diameter }) => {
             `G10 L20 ${p} Y19.325`,
             'G21 G90 G0 X0 Y0',
             'G4 P0.15',
-            `G10 L20 ${p} X22.5 Y22.5`,
+            `G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
             'G4 P0.15',
             'G21 G90 G0 X0 Y0',
         );
@@ -533,6 +541,7 @@ export const get3AxisAutoDiameterRoutine = ({ axes, diameter }) => {
     } else if (axes.y) {
         code.push(
             '; Probe Y',
+            `%Y_OFF = ${yOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
@@ -544,11 +553,12 @@ export const get3AxisAutoDiameterRoutine = ({ axes, diameter }) => {
             `G10 L20 ${p} Y19.325`,
             'G21 G90 G0 Y0',
             'G4 P0.15',
-            `G10 L20 ${p} Y22.5`,
+            `G10 L20 ${p} Y[Y_OFF]`,
         );
     } else if (axes.x) {
         code.push(
             '; Probe X',
+            `%X_OFF = ${xOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
@@ -560,7 +570,7 @@ export const get3AxisAutoDiameterRoutine = ({ axes, diameter }) => {
             `G10 L20 ${p} X19.325`,
             'G21 G90 G0 X0',
             'G4 P0.15',
-            `G10 L20 ${p} X22.5`,
+            `G10 L20 ${p} X[X_OFF]`,
         );
     }
 
@@ -580,20 +590,47 @@ const updateOptionsForDirection = (options, direction) => {
 
 // Master function - given selected routine, determine which probe code to return for a specific direction
 export const getProbeCode = (options, direction = 0) => {
-    const { plateType, axes } = options;
+    const {
+        plateType,
+        axes
+    } = options;
+    console.log(options);
+
     console.log(axes);
+    //let axesCount = Object.values(axes).reduce((a, item) => a + item, 0);
+
     if (plateType === TOUCHPLATE_TYPE_AUTOZERO) {
-        if (options.toolDiameter === 'AUTO') {
-            return get3AxisAutoRoutine({ ...options, direction });
-        } else if (options.toolDiameter === 'TIP') {
-            return get3AxisAutoTipRoutine({ ...options, direction });
+        if (options.toolDiameter === 'Auto') {
+            return get3AxisAutoRoutine({
+                ...options,
+                direction
+            });
+        } else if (options.toolDiameter === 'Tip') {
+            return get3AxisAutoTipRoutine({
+                ...options,
+                direction
+            });
         } else {
-            return get3AxisAutoDiameterRoutine({ ...options });
+            return get3AxisAutoDiameterRoutine({ ...options, direction });
         }
     }
 
     // Standard plate, we modify some values for specific directions
     options = updateOptionsForDirection(options, direction);
 
+    // Handle regular touchplate
+    if (axes.x && axes.y && axes.z) {
+        return get3AxisStandardRoutine(options);
+    } else if (axes.x && axes.y) {
+        // Do something
+    } else if (axes.z) {
+        return getSingleAxisStandardRoutine('Z');
+    } else if (axes.y) {
+        return getSingleAxisStandardRoutine('Y');
+    } else if (axes.x) {
+        return getSingleAxisStandardRoutine('X');
+    }
+
+    // Default do nothing bc we don't recognize the options
     return [];
 };
