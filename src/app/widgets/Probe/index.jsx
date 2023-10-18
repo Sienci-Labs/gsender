@@ -1115,7 +1115,7 @@ class ProbeWidget extends PureComponent {
         } = state;
         const { $13 } = this.props;
         const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
-
+        let probeDistances = (units === METRIC_UNITS) ? this.PROBE_DISTANCE_METRIC : this.PROBE_DISTANCE_IMPERIAL;
         // Grab units for correct modal
         let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
         const modal = (units === METRIC_UNITS) ? '21' : '20';
@@ -1144,7 +1144,8 @@ class ProbeWidget extends PureComponent {
             zThickness,
             xyThickness,
             plateType: touchplate.touchplateType,
-            $13
+            $13,
+            probeDistances
         };
 
         const code = getProbeCode(options, 0);

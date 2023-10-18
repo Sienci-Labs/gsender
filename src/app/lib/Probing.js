@@ -23,23 +23,15 @@ export const getProbeDirections = (corner) => {
     return [0, 0];
 };
 
-/*
-    Variables:
-    PROBE_DISTANCE: Distance to probe in a direction
-    PROBE_FAST_SPEED: Fast Speed
-    PROBE_SLOW_SPEED: Slow speed
-    PROBE_RETRACT - Distance to retract after touch
-    Z_THICKNESS - Probe plate Z thickness
-    XY_THICKNESS - Probe plate XY thickness - PRE COMPENSATE FOR TOOL THICKNESS
-    TOOL_DIAMETER - Tool diameter
-    UNITS - prior units
- */
-
 
 // Setup variables for probing and
 export const getPreamble = (options) => {
-    const { modal, axes, probeDistance, probeFast, probeSlow, zThickness, xyThickness, xRetract, yRetract, zRetract } = options;
+    if (typeof options !== 'object') {
+        return [];
+    }
+    const { modal, axes, xProbeDistance, yProbeDistance, zProbeDistance, probeFast, probeSlow, zThickness, xyThickness, xRetract, yRetract, zRetract } = options;
     let initialOffsets = 'G10 L20 P0 ';
+
     // Add axes to initial zeroing
     Object.keys(axes).forEach(axis => {
         if (axes[axis]) {
@@ -51,7 +43,9 @@ export const getPreamble = (options) => {
         '; Initial Probe setup',
         '%UNITS=modal.units',
         '%WAIT=0.3',
-        `%PROBE_DISTANCE=${probeDistance}`,
+        `%X_PROBE_DISTANCE=${xProbeDistance}`,
+        `%Y_PROBE_DISTANCE=${yProbeDistance}`,
+        `%Z_PROBE_DISTANCE=${zProbeDistance}`,
         `%PROBE_FAST_FEED=${probeFast}`,
         `%PROBE_SLOW_FEED=${probeSlow}`,
         `%X_RETRACT_DISTANCE=${xRetract}`,
@@ -63,6 +57,34 @@ export const getPreamble = (options) => {
         `${initialOffsets}`,
         `G91 G${modal}`
     ];
+};
+
+/*
+    Variables:
+    PROBE_DISTANCE: Distance to probe in a direction
+    PROBE_FAST_SPEED: Fast Speed
+    PROBE_SLOW_SPEED: Slow speed
+    PROBE_RETRACT - Distance to retract after touch
+    Z_THICKNESS - Probe plate Z thickness
+    XY_THICKNESS - Probe plate XY thickness - PRE COMPENSATE FOR TOOL THICKNESS
+    TOOL_DIAMETER - Tool diameter
+    UNITS - prior units
+ */
+const updateOptionsForDirection = (options, direction) => {
+    const [xProbeDir, yProbeDir] = getProbeDirections(direction);
+    const xRetractModifier = xProbeDir * -1;
+    const yRetractModifier = yProbeDir * -1;
+
+    // Setup probe directions and distances
+    options.xProbeDistance = options.probeDistances.X * xProbeDir;
+    options.zProbeDistance = options.probeDistances.Z * -1;
+    options.yProbeDistance = options.probeDistances.Y * yProbeDir;
+
+    // Setup retractions to be opposite of probe direction
+    options.xRetract = options.retract * xRetractModifier;
+    options.yRetract = options.retract * yRetractModifier;
+    options.zRetract = options.retract;
+    return options;
 };
 
 export const getSingleAxisStandardRoutine = (axis) => {
@@ -83,10 +105,14 @@ export const getSingleAxisStandardRoutine = (axis) => {
 };
 
 export const get3AxisStandardRoutine = (options) => {
-    const { axes } = options;
     const code = [];
 
     code.push(...getPreamble(options));
+    const { axes } = options;
+    if (typeof axes !== 'object') {
+        return [];
+    }
+
     if (axes.z) {
         code.push(...getSingleAxisStandardRoutine('Z'));
         // Z also handles positioning for next probe on X
@@ -112,7 +138,7 @@ const determineAutoPlateOffsetValues = (direction, diameter = null) => {
     let xOff = 22.5;
     let yOff = 22.5;
 
-    if (diameter && diameter !== 'TIP' && diameter !== 'AUTO') {
+    if (diameter && diameter !== 'Tip' && diameter !== 'Auto') {
         // math to compensate for tool
         const toolRadius = (diameter / 2);
         xOff -= toolRadius;
@@ -584,9 +610,6 @@ export const getNextDirection = (direction) => {
     return direction + 1;
 };
 
-const updateOptionsForDirection = (options, direction) => {
-    return options;
-};
 
 // Master function - given selected routine, determine which probe code to return for a specific direction
 export const getProbeCode = (options, direction = 0) => {
