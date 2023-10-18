@@ -108,11 +108,14 @@ export const get3AxisStandardRoutine = (options) => {
 
 
 const determineAutoPlateOffsetValues = (direction, diameter = null) => {
-    const xOff = 22.5;
-    const yOff = 22.5;
+    let xOff = 22.5;
+    let yOff = 22.5;
 
     if (diameter && diameter !== 'TIP' && diameter !== 'AUTO') {
         // math to compensate for tool
+        const toolRadius = (diameter / 2);
+        xOff -= toolRadius;
+        yOff -= toolRadius;
     }
 
     if (direction === BR) {
@@ -193,6 +196,8 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction }) => {
     } else if (axes.x && axes.y) {
         code.push(
             '; Probe XY Auto Endmill',
+            `%X_OFF = ${xOff}`,
+            `%Y_OFF = ${yOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
@@ -223,7 +228,7 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction }) => {
             `${prependUnits} G10 L20 ${p} Y[posy/2]`,
             'G21 G90 G0 X0 Y0',
             'G4 P0.15',
-            `G10 L20 ${p} X22.5 Y22.5`,
+            `G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
             'G21 G90 G0 X0 Y0',
         );
     } else if (axes.z) {
@@ -240,6 +245,7 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction }) => {
     } else if (axes.x) {
         code.push(
             '; Probe X Auto Endmill',
+            `%X_OFF = ${xOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
@@ -257,11 +263,12 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction }) => {
             `${prependUnits} G10 L20 ${p} X[posx/2]`,
             'G21 G90 G0 X0',
             'G4 P0.15',
-            `G10 L20 ${p} X22.5`,
+            `G10 L20 ${p} X[X_OFF]`,
         );
     } else if (axes.y) {
         code.push(
             '; Probe Y Auto Endmill',
+            `%Y_OFF = ${yOff}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
@@ -279,7 +286,7 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction }) => {
             `${prependUnits} G10 L20 ${p} Y[posy/2]`,
             'G21 G90 G0 Y0',
             'G4 P0.15',
-            `G10 L20 ${p} Y22.5`,
+            `G10 L20 ${p} Y[Y_OFF]`,
         );
     }
 
