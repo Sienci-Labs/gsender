@@ -1,3 +1,5 @@
+import { TOUCHPLATE_TYPE_AUTOZERO } from 'app/lib/constants';
+
 export const BL = 0;
 export const TL = 1;
 export const TR = 2;
@@ -36,7 +38,7 @@ export const getProbeDirections = (corner) => {
 
 // Setup variables for probing and
 export const getPreamble = (options) => {
-    const { modal, axes, probeDistance, probeFast, probeSlow, probeRetract, zThickness, xyThickness } = options;
+    const { modal, axes, probeDistance, probeFast, probeSlow, retract, zThickness, xyThickness } = options;
     let initialOffsets = 'G10 L20 P0 ';
     // Add axes to initial zeroing
     Object.keys(axes).forEach(axis => {
@@ -52,7 +54,7 @@ export const getPreamble = (options) => {
         `%PROBE_DISTANCE=${probeDistance}`,
         `%PROBE_FAST_FEED=${probeFast}`,
         `%PROBE_SLOW_FEED=${probeSlow}`,
-        `%PROBE_RETRACT=${probeRetract}`,
+        `%PROBE_RETRACT=${retract}`,
         `%Z_THICKNESS=${zThickness}`,
         `%X_THICKNESS=${xyThickness}`,
         `%Y_THICKNESS=${xyThickness}`,
@@ -104,12 +106,12 @@ export const get3AxisStandardRoutine = (options) => {
     return code;
 };
 
-export const get3AxisAutoRoutine = ({ axes, is13 }) => {
+export const get3AxisAutoRoutine = ({ axes, $13 }) => {
     const code = [];
     const p = 'P0';
 
     let prependUnits = '';
-    if (is13 === '1') {
+    if ($13 === '1') {
         prependUnits = 'G20';
     }
 
@@ -250,12 +252,12 @@ export const get3AxisAutoRoutine = ({ axes, is13 }) => {
     return code;
 };
 
-export const get3AxisAutoTipRoutine = ({ axes, is13 }) => {
+export const get3AxisAutoTipRoutine = ({ axes, $13 }) => {
     const code = [];
     const p = 'P0';
 
     let prependUnits = '';
-    if (is13 === '1') {
+    if ($13 === '1') {
         prependUnits = 'G20';
     }
 
@@ -508,4 +510,35 @@ export const get3AxisAutoDiameterRoutine = ({ axes, diameter }) => {
     }
 
     return code;
+};
+
+export const getNextDirection = (direction) => {
+    if (direction === 3) {
+        return 0;
+    }
+    return direction + 1;
+};
+
+const updateOptionsForDirection = (options, direction) => {
+    return options;
+};
+
+// Master function - given selected routine, determine which probe code to return for a specific direction
+export const getProbeCode = (options, direction = 0) => {
+    const { plateType, axes } = options;
+    console.log(axes);
+    if (plateType === TOUCHPLATE_TYPE_AUTOZERO) {
+        if (options.toolDiameter === 'AUTO') {
+            return [];
+        } else if (options.toolDiameter === 'TIP') {
+            return [];
+        } else {
+            return [];
+        }
+    }
+
+    // Standard plate, we modify some values for specific directions
+    options = updateOptionsForDirection(options, direction);
+
+    return [];
 };

@@ -99,6 +99,7 @@ class RunProbe extends PureComponent {
         const { actions } = this.props;
 
         const probeCommands = actions.generateProbeCommands();
+        console.log(probeCommands);
 
         actions.runProbeCommands(probeCommands);
         this.resetProbeState();

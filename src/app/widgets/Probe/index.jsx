@@ -52,6 +52,7 @@ import {
     MODAL_PREVIEW
 } from './constants';
 import styles from './index.styl';
+import { getProbeCode } from 'app/lib/Probing';
 
 
 class ProbeWidget extends PureComponent {
@@ -1105,29 +1106,15 @@ class ProbeWidget extends PureComponent {
                 state: controller.state
             }, };
         const {
-            useSafeProbeOption,
             retractionDistance,
-            probeCommand,
             probeFeedrate,
             probeFastFeedrate,
             touchplate,
             units,
             toolDiameter
         } = state;
+        const { $13 } = this.props;
         const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
-        const wcs = this.getWorkCoordinateSystem();
-        const code = [];
-
-        // Handle auto and tip selection to avoid code generation
-        if (toolDiameter === 'Auto') {
-            return this.generateAutoProbe(axes);
-        }
-        if (toolDiameter === 'Tip') {
-            return this.generateTipProbe(axes);
-        }
-        if (this.state.touchplate.touchplateType === TOUCHPLATE_TYPE_AUTOZERO) {
-            return this.generateAutoZeroAxesProbe(axes, toolDiameter);
-        }
 
         // Grab units for correct modal
         let zThickness, xyThickness, feedrate, fastFeedrate, retractDistance;
@@ -1146,36 +1133,21 @@ class ProbeWidget extends PureComponent {
             retractDistance = retractionDistance.in;
         }
 
-        const gCodeParams = {
-            wcs: wcs,
-            isSafe: useSafeProbeOption,
-            probeCommand: probeCommand,
-            retractDistance: retractDistance,
-            normalFeedrate: feedrate,
-            quickFeedrate: fastFeedrate,
-            modal: modal,
-            units
+        const options = {
+            axes,
+            modal,
+            probeFast: fastFeedrate,
+            probeSlow: feedrate,
+            units,
+            retract: retractDistance,
+            toolDiameter,
+            zThickness,
+            xyThickness,
+            plateType: touchplate.touchplateType,
+            $13
         };
 
-        const axesCount = Object.keys(axes).filter(axis => axes[axis]).length;
-        // Probe setup code
-        this.generateInitialProbeSettings(axes, wcs, modal).map(line => code.push(line));
-
-        if (axesCount === 1) {
-            if (axes.z) {
-                (this.generateSingleAxisCommands('Z', zThickness, gCodeParams)).map(line => code.push(line));
-            }
-            if (axes.y) {
-                (this.generateSingleAxisCommands('Y', xyThickness, gCodeParams)).map(line => code.push(line));
-            }
-            if (axes.x) {
-                (this.generateSingleAxisCommands('X', xyThickness, gCodeParams)).map(line => code.push(line));
-            }
-        }
-
-        if (axesCount > 1) {
-            (this.generateMultiAxisCommands(axes, xyThickness, zThickness, gCodeParams)).map(line => code.push(line));
-        }
+        const code = getProbeCode(options, 0);
 
         return code;
     }
