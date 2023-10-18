@@ -66,13 +66,13 @@ export const getSingleAxisStandardRoutine = (axis) => {
     let axisRetract = `%[${axis}_RETRACT_DISTANCE`;
     const code = [
         `; ${axis}-probe`,
-        `G38.2 ${axis}[%PROBE_DISTANCE] F[%PROBE_FAST_FEED]`,
+        `G38.2 ${axis}[PROBE_DISTANCE] F[PROBE_FAST_FEED]`,
         'G91',
         `G0 [${axisRetract}]`,
-        `G38.2 ${axis}[%PROBE_DISTANCE] F[$PROBE_SLOW_FEED]`,
+        `G38.2 ${axis}[PROBE_DISTANCE] F[PROBE_SLOW_FEED]`,
         'G4 P[%WAIT]',
-        `G10 L2 P0 ${axis}[%${axis}_THICKNESS]}`,
-        `G0 ${axis}[%${axis}_RETRACT]`
+        `G10 L2 P0 ${axis}[${axis}_THICKNESS]}`,
+        `G0 ${axis}[${axis}_RETRACT]`
     ];
 
     return code;
@@ -84,24 +84,428 @@ export const get3AxisStandardRoutine = (options) => {
 
     code.push(...getPreamble(options));
     if (axes.z) {
-        code.push(getSingleAxisStandardRoutine('Z'));
+        code.push(...getSingleAxisStandardRoutine('Z'));
     }
-    // Move into position for X
+    if (axes.x) {
+        // Move into position for X
 
-    // Probe X
+        // Probe X
+        code.push(...getSingleAxisStandardRoutine('X'));
+    }
+    if (axes.y) {
+        // Move into position for Y
 
-    // Move into position for Y
-
-    // Probe Y
+        // Probe Y
+        code.push(...get3AxisStandardRoutine('Y'));
+    }
+    // Move back to origin
 
     console.log(code);
     return code;
 };
 
 export const get3AxisAutoRoutine = ({ axes, is13 }) => {
+    const code = [];
+    const p = 'P0';
 
+    let prependUnits = '';
+    if (is13 === '1') {
+        prependUnits = 'G20';
+    }
+
+    if (axes.x && axes.y && axes.z) {
+        code.push(
+            '; Probe XYZ Auto Endmill',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P0.15',
+            'G10 L20 P0 Z5',
+            'G21 G91 G0 Z2',
+            'G21 G91 G0 X-13',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P0.15',
+            'G10 L20 P0 X0',
+            'G21 G91 G0 X26',
+            'G38.2 X30 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 P0 X[posx/2]`,
+            'G21 G90 G0 X0',
+            'G21 G91 G0 Y-13',
+            'G38.2 Y-30 F250',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P0.15',
+            'G10 L20 P0 Y0',
+            'G21 G91 G0 Y26',
+            'G38.2 Y30 F250',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 P0 Y[posy/2]`,
+            'G21 G90 G0 X0 Y0',
+            'G4 P0.15',
+            'G10 L20 P0 X22.5 Y22.5',
+            'G21 G90 G0 X0 Y0',
+            'G21 G90 Z1'
+        );
+    } else if (axes.x && axes.y) {
+        code.push(
+            '; Probe XY Auto Endmill',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G21 G91 G0 X-13',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} X0`,
+            'G21 G91 G0 X26',
+            'G38.2 X30 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 ${p} X[posx/2]`,
+            'G21 G90 G0 X0',
+            'G21 G91 G0 Y-13',
+            'G38.2 Y-30 F150',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} Y0`,
+            'G21 G91 G0 Y26',
+            'G38.2 Y30 F150',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 ${p} Y[posy/2]`,
+            'G21 G90 G0 X0 Y0',
+            'G4 P0.15',
+            `G10 L20 ${p} X22.5 Y22.5`,
+            'G21 G90 G0 X0 Y0',
+        );
+    } else if (axes.z) {
+        code.push(
+            '; Probe Z Auto Endmill',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} Z5`,
+            'G21 G91 G0 Z2',
+        );
+    } else if (axes.x) {
+        code.push(
+            '; Probe X Auto Endmill',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G21 G91 G0 X-13',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} X0`,
+            'G21 G91 G0 X26',
+            'G38.2 X30 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 ${p} X[posx/2]`,
+            'G21 G90 G0 X0',
+            'G4 P0.15',
+            `G10 L20 ${p} X22.5`,
+        );
+    } else if (axes.y) {
+        code.push(
+            '; Probe Y Auto Endmill',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G21 G91 G0 Y-13',
+            'G38.2 Y-30 F150',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} Y0`,
+            'G21 G91 G0 Y26',
+            'G38.2 Y30 F150',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 ${p} Y[posy/2]`,
+            'G21 G90 G0 Y0',
+            'G4 P0.15',
+            `G10 L20 ${p} Y22.5`,
+        );
+    }
+
+    return code;
 };
 
-export const get3AxisAutoTipRoutine = () => {};
+export const get3AxisAutoTipRoutine = ({ axes, is13 }) => {
+    const code = [];
+    const p = 'P0';
 
-export const get3AxisAutoDiameterRoutine = () => {};
+    let prependUnits = '';
+    if (is13 === '1') {
+        prependUnits = 'G20';
+    }
+
+    if (axes.x && axes.y && axes.z) {
+        code.push(
+            '; Probe XYZ Auto Tip',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} Z5`,
+            'G21 G91 G0 Z0.5',
+            'G21 G91 G0 X-3',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} X0`,
+            'G21 G91 G0 X14',
+            'G38.2 X15 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 ${p} X[posx/2]`,
+            'G21 G90 G0 X0',
+            'G21 G91 G0 Y-3',
+            'G38.2 Y-15 F150',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P0.1',
+            `G10 L20 ${p} Y0`,
+            'G21 G91 G0 Y14',
+            'G38.2 Y15 F150',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 ${p} Y[posy/2]`,
+            'G21 G90 G0 X0 Y0',
+            'G4 P0.15',
+            `G10 L20 ${p} X22.5 Y22.5`,
+            'G21 G90 G0 X0 Y0',
+            'G21 G90 G0 Z1',
+        );
+    } else if (axes.x && axes.y) {
+        code.push(
+            '; Probe XY Auto Tip',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z0.5',
+            'G21 G91 G0 X-3',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} X0`,
+            'G21 G91 G0 X14',
+            'G38.2 X15 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 ${p} X[posx/2]`,
+            'G21 G90 G0 X0',
+            'G21 G91 G0 Y-3',
+            'G38.2 Y-15 F150',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P0.1',
+            `G10 L20 ${p} Y0`,
+            'G21 G91 G0 Y14',
+            'G38.2 Y15 F150',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 ${p} Y[posy/2]`,
+            'G21 G90 G0 X0 Y0',
+            'G4 P0.15',
+            `G10 L20 ${p} X22.5 Y22.5`,
+            'G21 G90 G0 X0 Y0',
+        );
+    } else if (axes.z) {
+        code.push(
+            '; Probe Z Auto Tip',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} Z5`,
+            'G4 P0.15',
+            'G21 G91 G0 Z1',
+        );
+    } else if (axes.x) {
+        code.push(
+            '; Probe X Auto Tip',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z0.5',
+            'G21 G91 G0 X-3',
+            'G38.2 X-30 F150',
+            'G21 G91 G0 X2',
+            'G38.2 X-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} X0`,
+            'G21 G91 G0 X14',
+            'G38.2 X15 F150',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 ${p} X[posx/2]`,
+            'G21 G90 G0 X0',
+            'G4 P0.15',
+            `G10 L20 ${p} X22.5`,
+        );
+    } else if (axes.y) {
+        code.push(
+            '; Probe Y Auto Tip',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z0.5',
+            'G21 G91 G0 Y-3',
+            'G38.2 Y-15 F150',
+            'G21 G91 G0 Y2',
+            'G38.2 Y-5 F75',
+            'G4 P0.1',
+            `G10 L20 ${p} Y0`,
+            'G21 G91 G0 Y14',
+            'G38.2 Y15 F150',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.15',
+            `${prependUnits} G10 L20 ${p} Y[posy/2]`,
+            'G21 G90 G0 Y0',
+            'G4 P0.15',
+            `G10 L20 ${p} Y22.5`,
+        );
+    }
+
+    return code;
+};
+
+export const get3AxisAutoDiameterRoutine = ({ axes, diameter }) => {
+    const code = [];
+
+    const wcs = this.getWorkCoordinateSystem();
+    const p = `P${this.mapWCSToPValue(wcs)}`;
+
+    // const toolRadius = (diameter / 2);
+    // const toolCompensatedThickness = ((-1 * toolRadius));
+    // console.log(toolCompensatedThickness);
+
+    if (axes.z && axes.y && axes.z) {
+        code.push(
+            '; Probe XYZ AutoZero Specific Diameter',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} Z5`,
+            'G21 G91 G0 Z2',
+            'G21 G91 G0 X13',
+            'G38.2 X20 F250',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} X19.325`,
+            'G21 G90 G0 X0',
+            'G21 G91 G0 Y13',
+            'G38.2 Y20 F250',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} Y19.325`,
+            'G21 G90 G0 X0 Y0',
+            'G4 P0.15',
+            `G10 L20 ${p} X22.5 Y22.5`,
+            'G21 G90 G0 X0 Y0',
+            'G21 G90 G0 Z1',
+        );
+    } else if (axes.x && axes.y) {
+        code.push(
+            '; Probe XY AutoZero Specific Diameter',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G21 G91 G0 X13',
+            'G38.2 X20 F250',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} X19.325`,
+            'G21 G90 G0 X0',
+            'G21 G91 G0 Y13',
+            'G38.2 Y20 F250',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} Y19.325`,
+            'G21 G90 G0 X0 Y0',
+            'G4 P0.15',
+            `G10 L20 ${p} X22.5 Y22.5`,
+            'G4 P0.15',
+            'G21 G90 G0 X0 Y0',
+        );
+    } else if (axes.z) {
+        code.push(
+            '; Probe Z AutoZero Specific Diameter',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G38.2 Z-5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} Z5`,
+            'G4 P0.15',
+            'G21 G91 G0 Z2',
+        );
+    } else if (axes.y) {
+        code.push(
+            '; Probe Y',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G21 G91 G0 Y13',
+            'G38.2 Y20 F250',
+            'G21 G91 G0 Y-2',
+            'G38.2 Y5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} Y19.325`,
+            'G21 G90 G0 Y0',
+            'G4 P0.15',
+            `G10 L20 ${p} Y22.5`,
+        );
+    } else if (axes.x) {
+        code.push(
+            '; Probe X',
+            'G21 G91',
+            'G38.2 Z-25 F200',
+            'G21 G91 G0 Z2',
+            'G21 G91 G0 X13',
+            'G38.2 X20 F250',
+            'G21 G91 G0 X-2',
+            'G38.2 X5 F75',
+            'G4 P0.15',
+            `G10 L20 ${p} X19.325`,
+            'G21 G90 G0 X0',
+            'G4 P0.15',
+            `G10 L20 ${p} X22.5`,
+        );
+    }
+
+    return code;
+};
