@@ -1097,7 +1097,6 @@ class ProbeWidget extends PureComponent {
         return code;
     }
 
-    generateAvailableTools() {}
 
     generateProbeCommands() {
         const state = { ...this.state,
