@@ -92,10 +92,10 @@ export const getSingleAxisStandardRoutine = (axis) => {
     let axisRetract = `%[${axis}_RETRACT_DISTANCE`;
     const code = [
         `; ${axis}-probe`,
-        `G38.2 ${axis}[PROBE_DISTANCE] F[PROBE_FAST_FEED]`,
+        `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_FAST_FEED]`,
         'G91',
-        `G0 [${axisRetract}]`,
-        `G38.2 ${axis}[PROBE_DISTANCE] F[PROBE_SLOW_FEED]`,
+        `G0 ${axis}[${axisRetract}]`,
+        `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_SLOW_FEED]`,
         'G4 P[%WAIT]',
         `G10 L2 P0 ${axis}[${axis}_THICKNESS]}`,
         `G0 ${axis}[${axis}_RETRACT]`

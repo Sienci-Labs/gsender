@@ -1333,7 +1333,7 @@ class GrblHalController {
                 // respond with an ok when the dwell is complete. At that instant, there will
                 // be no queued motions, as long as no more commands were sent after the G4.
                 // This is the fastest way to do it without having to check the status reports.
-                const dwell = '%wait ; Wait for the planner to empty';
+                //const dwell = '%wait ; Wait for the planner to empty';
 
                 // add delay to spindle startup if enabled
                 const preferences = store.get('preferences', {});
@@ -1343,7 +1343,7 @@ class GrblHalController {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }
 
-                const ok = this.sender.load(name, gcode + '\n' + dwell, context);
+                const ok = this.sender.load(name, gcode + '\n', context);
                 if (!ok) {
                     callback(new Error(`Invalid G-code: name=${name}`));
                     return;
