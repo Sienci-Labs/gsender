@@ -58,7 +58,7 @@ import {
     GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
     GRBL_HAL_SETTINGS,
-    GRBL_ACTIVE_STATE_HOME, GRBL_HAL_ACTIVE_STATE_HOLD, GRBL_HAL_ACTIVE_STATE_IDLE, GRBL_HAL_ACTIVE_STATE_RUN
+    GRBL_ACTIVE_STATE_HOME, /*GRBL_HAL_ACTIVE_STATE_HOLD, GRBL_HAL_ACTIVE_STATE_IDLE, GRBL_HAL_ACTIVE_STATE_RUN*/
 } from './constants';
 import {
     METRIC_UNITS,
@@ -702,7 +702,7 @@ class GrblHalController {
         });
 
         this.runner.on('alarm', (res) => {
-            const code = Number(res.message) || undefined;
+            const code = Number(res.message) || this.state.status.subState;
             const alarm = _.find(GRBL_HAL_ALARMS, { code: code });
 
             const { lines, received, name } = this.sender.state;
@@ -736,7 +736,7 @@ class GrblHalController {
                 this.emit('error', {
                     type: ALARM,
                     code: code,
-                    description: alarm.description,
+                    description: alarm.description || '',
                     line: line,
                     lineNumber: isFileError ? received + 1 : '',
                     origin: errorOrigin,
@@ -1191,6 +1191,7 @@ class GrblHalController {
             // We set controller ready if version found
             setTimeout(() => {
                 if (this.connection) {
+                    this.connection.writeImmediate(String.fromCharCode(0x87));
                     this.connection.write('$I\n');
                 }
                 let counter = 3;

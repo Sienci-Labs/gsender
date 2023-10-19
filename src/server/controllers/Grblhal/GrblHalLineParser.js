@@ -41,6 +41,7 @@ import GrblHalLineParserResultSettingDetails from 'server/controllers/Grblhal/Gr
 import GrblHalLineParserResultCompleteStatus from 'server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus';
 import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
 import GrblHalLineParserResultGroupDetail from './GrblHalLineParserResultGroupDetail';
+import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmDetails';
 
 class GrblHalLineParser {
     parse(line) {
@@ -96,6 +97,9 @@ class GrblHalLineParser {
 
             //[SETTINGGROUP:5|0|Coolant]
             GrblHalLineParserResultGroupDetail,
+
+            //[ALARMCODE:16||Power on selftest (POS) failed.]
+            GrblHalLineParserResultAlarmDetails,
 
             // [XXXX:] (v1.1)
             GrblHalLineParserResultInfo,
