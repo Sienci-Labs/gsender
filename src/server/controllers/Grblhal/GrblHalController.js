@@ -934,7 +934,7 @@ class GrblHalController {
             // Grbl state
             if (this.state !== this.runner.state) {
                 // Unpause sending when hold state exited using macro buttons - We check if software sender paused + state changed from hold to idle/run
-                const currentActiveState = _.get(this.state, 'status.activeState', '');
+                /*const currentActiveState = _.get(this.state, 'status.activeState', '');
                 const runnerActiveState = _.get(this.runner.state, 'status.activeState', '');
                 if (this.workflow.isPaused &&
                     currentActiveState === GRBL_HAL_ACTIVE_STATE_HOLD &&
@@ -947,7 +947,7 @@ class GrblHalController {
                             this.command('gcode:resume');
                         }
                     }, 1000);
-                }
+                }*/
                 this.state = this.runner.state;
                 this.emit('controller:state', GRBLHAL, this.state);
             }
