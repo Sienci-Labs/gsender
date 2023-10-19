@@ -42,7 +42,7 @@ const HalSettings = ({ descriptions, groups }) => {
                     //const highlighted = false; // TODO: Logic for hal defaults
                     return (
                         <div key={setting.setting} className={styles.containerFluid}>
-                            <div className={styles.tableRow}>
+                            <div className={styles.tableRowHal}>
                                 <div className={styles.keyRow}>
                                     {settingKey}
                                     <CategoryTag category={groupLabel} isHAL/>
