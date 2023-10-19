@@ -45,6 +45,7 @@ import {
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 import GrblHalLineParserResultSettingDetails from './GrblHalLineParserResultSettingDetails';
 import GrblHalLineParserResultCompleteStatus from 'server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus';
+import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
 
 const log = logger('controller:grblHAL');
 
@@ -66,7 +67,7 @@ class GrblHalRunner extends events.EventEmitter {
             alarmCode: '',
             subState: '',
             probeActive: false,
-            pinState: {}
+            pinState: {},
         },
         parserstate: {
             modal: {
@@ -84,6 +85,10 @@ class GrblHalRunner extends events.EventEmitter {
             tool: '',
             feedrate: '',
             spindle: '',
+            axes: {
+                count: 3,
+                axes: ['X', 'Y', 'Z']
+            }
         }
     };
 
@@ -260,6 +265,14 @@ class GrblHalRunner extends events.EventEmitter {
                 this.settings = nextSettings; // enforce change
             }
             this.emit('parameters', payload);
+            return;
+        }
+        if (type === GrblHalLineParserResultAXS) {
+            this.state.axes = {
+                count: payload.count,
+                axes: payload.axes
+            };
+            console.log(this.state.axes);
             return;
         }
         if (type === GrblHalLineParserResultFeedback) {

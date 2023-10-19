@@ -1,4 +1,5 @@
 import { TOUCHPLATE_TYPE_AUTOZERO } from 'app/lib/constants';
+import { GRBLHAL } from '../constants';
 
 export const BL = 0;
 export const TL = 1;
@@ -29,8 +30,10 @@ export const getPreamble = (options) => {
     if (typeof options !== 'object') {
         return [];
     }
-    const { modal, axes, xProbeDistance, yProbeDistance, zProbeDistance, probeFast, probeSlow, zThickness, xyThickness, xRetract, yRetract, zRetract } = options;
+    const { modal, axes, xProbeDistance, yProbeDistance, zProbeDistance, probeFast, probeSlow, zThickness, xyThickness, xRetract, yRetract, zRetract, firmware } = options;
     let initialOffsets = 'G10 L20 P0 ';
+
+    const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
 
     // Add axes to initial zeroing
     Object.keys(axes).forEach(axis => {
@@ -54,6 +57,7 @@ export const getPreamble = (options) => {
         `%Z_THICKNESS=${zThickness}`,
         `%X_THICKNESS=${xyThickness}`,
         `%Y_THICKNESS=${xyThickness}`,
+        `%PROBE_DELAY=${probeDelay}`,
         `${initialOffsets}`,
         `G91 G${modal}`
     ];
@@ -156,9 +160,11 @@ const determineAutoPlateOffsetValues = (direction, diameter = null) => {
     return [xOff, yOff];
 };
 
-export const get3AxisAutoRoutine = ({ axes, $13, direction }) => {
+export const get3AxisAutoRoutine = ({ axes, $13, direction, firmware }) => {
     const code = [];
     const p = 'P0';
+
+    const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
 
     const [xOff, yOff] = determineAutoPlateOffsetValues(direction);
 
@@ -172,53 +178,46 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction }) => {
             `; Probe XYZ Auto Endmill - direction: ${direction}`,
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
-            'G4 P0.15',
+            'G4 P[PROBE_DELAY]',
             'G10 L20 P0 Z5',
             'G21 G91 G0 Z2',
             'G21 G91 G0 X-13',
             'G38.2 X-30 F150',
             'G21 G91 G0 X2',
             'G38.2 X-5 F75',
-            'G4 P0.15',
+            'G4 P[PROBE_DELAY]',
             '%X_LEFT=posx',
             //'G10 L20 P0 X0',
             'G21 G91 G0 X26',
             'G38.2 X30 F150',
             'G21 G91 G0 X-2',
             'G38.2 X5 F75',
-            'G4 P0.15',
+            'G4 P[PROBE_DELAY]',
             '%X_RIGHT=posx',
             '%X_CENTER=((X_RIGHT - X_LEFT)/2)*-1',
             'G21 G91 G0 X[X_CENTER]',
-            //`${prependUnits} G10 L20 P0 X0`,
-            //`${prependUnits} G10 L20 P0 X[posx/2]`,
-            //'G21 G90 G0 X0',
             'G21 G91 G0 Y-13',
             'G38.2 Y-30 F250',
             'G21 G91 G0 Y2',
             'G38.2 Y-5 F75',
-            'G4 P0.1',
-            //`G10 L20 ${p} Y0`,
+            'G4 P[PROBE_DELAY]',
             '%Y_BOTTOM = posy',
             'G21 G91 G0 Y26',
             'G38.2 Y30 F250',
             'G21 G91 G0 Y-2',
             'G38.2 Y5 F75',
-            'G4 P0.1',
+            'G4 P[PROBE_DELAY]',
             '%Y_TOP = posy',
             '%Y_CENTER = ((Y_TOP - Y_BOTTOM)/2) * -1',
             'G0 Y[Y_CENTER]',
-            //`${prependUnits} G10 L20 P0 Y[posy/2]`,
-            //'G21 G9 G0 X0 Y0',
-            'G4 P0.1',
-            //`${prependUnits} G10 L20 P0 Y0`,
             'G10 L20 P0 X[X_OFF] Y[Y_OFF]',
             'G21 G90 G0 X0 Y0',
-            'G21 G90 Z1'
+            'G21 G0 G90 Z8'
         );
     } else if (axes.x && axes.y) {
         code.push(

@@ -39,6 +39,7 @@ import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 import GrblHalLineParserResultSettingDescription from './GrblHalLineParserResultSettingDescription';
 import GrblHalLineParserResultSettingDetails from 'server/controllers/Grblhal/GrblHalLineParserResultSettingDetails';
 import GrblHalLineParserResultCompleteStatus from 'server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus';
+import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
 
 class GrblHalLineParser {
     parse(line) {
@@ -82,6 +83,9 @@ class GrblHalLineParser {
 
             // [VER:] (v1.1)
             GrblHalLineParserResultVersion,
+
+            // [AXS:]
+            GrblHalLineParserResultAXS,
 
             // [SETTING:1|27|Step idle delay|milliseconds|5|####0||65535|0|0]
             GrblHalLineParserResultSettingDescription,
