@@ -204,7 +204,6 @@ class GrblHalRunner extends events.EventEmitter {
             // https://nodejs.org/api/events.html#events_error_events
             // As a best practice, listeners should always be added for the 'error' events.
             this.emit('error', payload);
-            log.error('Error found in GrblHalLineParserResultError');
             return;
         }
         if (type === GrblHalLineParserResultAlarm) {
