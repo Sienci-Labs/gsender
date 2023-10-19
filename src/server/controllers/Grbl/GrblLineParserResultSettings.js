@@ -25,14 +25,14 @@ import _ from 'lodash';
 
 class GrblLineParserResultSettings {
     static parse(line) {
-        const r = line.match(/^(\$[^=]+)=([^ ]*)\s*(.*)/);
+        const r = line.match(/^(\$[^=]+)=([^(]*)(\(.*\))*/);
         if (!r) {
             return null;
         }
 
         const payload = {
             name: r[1],
-            value: r[2],
+            value: r[2].trim(), // need this trim as it may have a space at the end
             message: _.trim(r[3], '()')
         };
 
