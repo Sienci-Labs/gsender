@@ -12,7 +12,7 @@ const AxisMaskInput = ({ info, setting, onChange, axes }) => {
 };
 
 export default connect((store) => {
-    const axes = get(store, 'controller.state.axes.axes',k ['X', 'Y', 'Z']);
+    const axes = get(store, 'controller.state.axes.axes', ['X', 'Y', 'Z']);
     return {
         axes
     };
