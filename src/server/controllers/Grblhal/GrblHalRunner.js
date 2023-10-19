@@ -63,7 +63,8 @@ class GrblHalRunner extends events.EventEmitter {
                 z: '0.000'
             },
             ov: [],
-            alarmCode: 0,
+            alarmCode: '',
+            subState: '',
             probeActive: false,
             pinState: {}
         },
@@ -300,7 +301,8 @@ class GrblHalRunner extends events.EventEmitter {
                 status: {
                     ...this.state.status,
                     activeState: GRBL_HAL_ACTIVE_STATE_ALARM,
-                    alarmCode: Number(code)
+                    alarmCode: Number(code),
+                    subState: Number(code)
                 }
             };
             if (!_.isEqual(this.state.status, nextState.status)) {

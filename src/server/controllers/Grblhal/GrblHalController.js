@@ -831,6 +831,7 @@ class GrblHalController {
         const queryStatusReport = () => {
             // Check the ready flag
             if (!(this.ready)) {
+                console.log('not ready');
                 return;
             }
 
@@ -856,7 +857,11 @@ class GrblHalController {
             if (this.isOpen()) {
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
-                this.connection.write(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                if (this.runner.isAlarm()) {
+                    this.connection.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                } else {
+                    this.connection.write(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                }
             }
         };
 
@@ -965,16 +970,13 @@ class GrblHalController {
     async initController() {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
+        this.connection.writeImmediate(String.fromCharCode(0x87));
         this.writeln('$$');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
         this.writeln('$ES');
         await delay(100);
         this.writeln('$ESH');
-        await delay(50);
-        // Get full report
-        this.connection.writeImmediate(String.fromCharCode(0x87));
-        //this.command('realtime_report');
     }
 
     populateContext(context = {}) {

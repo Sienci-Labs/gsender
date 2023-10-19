@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 class GrblHalLineParserResultCompleteStatus {
     static parse(line) {
-        const r = line.match(/^<(Idle|Run|Hold|Jog|Alarm|Door|Check|Home|Sleep|Tool)(:\d*)?\|(.*\|FW:grblHAL)>$/);
+        const r = line.match(/^<(Idle|Run|Hold|Jog|Alarm|Door|Check|Home|Sleep|Tool)(:\d*)?\|(.*\|FW:grblHAL)(.*)?>$/);
         if (!r) {
             return null;
         }
