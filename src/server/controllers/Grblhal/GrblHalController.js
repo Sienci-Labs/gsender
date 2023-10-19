@@ -990,9 +990,10 @@ class GrblHalController {
         this.writeln('$$');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
-        this.writeln('$ES');
+        this.connection.writeImmediate('$ES\n');
         await delay(100);
-        this.writeln('$ESH');
+        this.connection.writeImmediate('$ESH\n');
+        this.connection.writeImmediate('$EG\n');
     }
 
     populateContext(context = {}) {

@@ -5,7 +5,7 @@ import { descriptionLookup, FirmwareContext, getDatatypeInput } from 'Containers
 import styles from 'Containers/Firmware/index.styl';
 import CategoryTag from 'Containers/Firmware/components/Settings/CategoryTag';
 
-const HalSettings = ({ descriptions }) => {
+const HalSettings = ({ descriptions, groups }) => {
     const { settings, setSettings, setSettingsToApply } = useContext(FirmwareContext);
 
     const handleSettingsChange = (index) => (value) => {
@@ -37,13 +37,15 @@ const HalSettings = ({ descriptions }) => {
                     const { message, description, dataType, ...info } = descriptionLookup(settingKey, descriptions);
                     const InputElement = getDatatypeInput(dataType);
 
+                    const groupLabel = groups[descriptions[settingKey].group].label;
+
                     //const highlighted = false; // TODO: Logic for hal defaults
                     return (
                         <div key={setting.setting} className={styles.containerFluid}>
                             <div className={styles.tableRow}>
                                 <div className={styles.keyRow}>
                                     {settingKey}
-                                    <CategoryTag category={setting.category} />
+                                    <CategoryTag category={groupLabel} isHAL/>
                                 </div>
                                 <div className={styles.settingsInformation}>
                                     <div className={styles.settingsDescription}>
@@ -67,8 +69,10 @@ const HalSettings = ({ descriptions }) => {
 
 export default connect((store) => {
     const descriptions = get(store, 'controller.settings.descriptions', {});
+    const groups = get(store, 'controller.settings.groups', {});
 
     return {
-        descriptions
+        descriptions,
+        groups
     };
 })(HalSettings);

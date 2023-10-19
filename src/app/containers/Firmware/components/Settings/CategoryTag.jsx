@@ -24,9 +24,10 @@
 import React from 'react';
 import styles from '../../index.styl';
 
-const CategoryTag = ({ category }) => {
+const CategoryTag = ({ category, isHAL = false }) => {
+    const styleKey = isHAL ? 'category-tag-General' : `category-tag-${category}`;
     return (
-        <div className={styles[`category-tag-${category}`]}>
+        <div className={styles[styleKey]}>
             { category }
         </div>
     );

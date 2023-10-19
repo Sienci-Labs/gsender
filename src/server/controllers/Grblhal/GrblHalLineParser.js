@@ -40,6 +40,7 @@ import GrblHalLineParserResultSettingDescription from './GrblHalLineParserResult
 import GrblHalLineParserResultSettingDetails from 'server/controllers/Grblhal/GrblHalLineParserResultSettingDetails';
 import GrblHalLineParserResultCompleteStatus from 'server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus';
 import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
+import GrblHalLineParserResultGroupDetail from './GrblHalLineParserResultGroupDetail';
 
 class GrblHalLineParser {
     parse(line) {
@@ -92,6 +93,9 @@ class GrblHalLineParser {
 
             // "120","X-axis acceleration","mm/sec^2","Acceleration. Used for motion planning to not exceed motor torque and lose steps.",
             GrblHalLineParserResultSettingDetails,
+
+            //[SETTINGGROUP:5|0|Coolant]
+            GrblHalLineParserResultGroupDetail,
 
             // [XXXX:] (v1.1)
             GrblHalLineParserResultInfo,

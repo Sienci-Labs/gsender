@@ -46,6 +46,7 @@ import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 import GrblHalLineParserResultSettingDetails from './GrblHalLineParserResultSettingDetails';
 import GrblHalLineParserResultCompleteStatus from 'server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus';
 import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
+import GrblHalLineParserResultGroupDetail from './GrblHalLineParserResultGroupDetail';
 
 const log = logger('controller:grblHAL');
 
@@ -97,6 +98,8 @@ class GrblHalRunner extends events.EventEmitter {
         parameters: {
         },
         settings: {
+        },
+        groups: {
         },
         info: {
         },
@@ -272,8 +275,12 @@ class GrblHalRunner extends events.EventEmitter {
                 count: payload.count,
                 axes: payload.axes
             };
-            console.log(this.state.axes);
             return;
+        }
+        if (type === GrblHalLineParserResultGroupDetail) {
+            delete payload.raw;
+            this.settings.groups[payload.group] = payload;
+            //console.log(payload);
         }
         if (type === GrblHalLineParserResultFeedback) {
             this.emit('feedback', payload);
