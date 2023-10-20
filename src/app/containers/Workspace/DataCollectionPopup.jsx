@@ -2,6 +2,7 @@ import isElectron from 'is-electron';
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
 
 import FunctionButton from 'app/components/FunctionButton/FunctionButton';
+import store from 'app/store';
 
 import styles from './index.styl';
 import { USER_DATA_COLLECTION } from '../../constants';
@@ -19,9 +20,8 @@ const DataCollectionPopup = (_, ref) => {
 
     const handleAccept = async () => {
         hide();
-
-        await api.metrics.sendData();
-
+        const machineProfile = store.get('workspace.machineProfile', {});
+        await api.metrics.sendData(machineProfile);
         await api.metrics.toggleCollectDataStatus({ collectUserDataStatus: USER_DATA_COLLECTION.ACCEPTED });
     };
 
