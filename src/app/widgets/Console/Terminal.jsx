@@ -325,7 +325,15 @@ class TerminalWrapper extends PureComponent {
         const { terminalInputIndex } = this.state;
 
         return (
-            <div style={{ display: 'grid', width: '100%', gridTemplateRows: '11fr 35px' }}>
+            <div
+                style={{
+                    display: 'grid',
+                    width: '100%',
+                    gridTemplateRows: '11fr 35px',
+                    height: '100%',
+                    position: 'absolute'
+                }}
+            >
                 <div
                     ref={node => {
                         this.terminalContainer = node;
