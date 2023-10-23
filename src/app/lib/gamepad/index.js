@@ -29,12 +29,17 @@ class Gamepad extends GamepadListener {
         this.shouldHold = false;
     }
 
-    onAxis = (event) => {
+    onAxis = ({ detail }) => {
         if (this.shouldHold) {
             return;
         }
 
-        const [leftStickX, leftStickY, rightStickX, rightStickY] = event.detail.gamepad.axes;
+        const profiles = store.get('workspace.gamepad.profiles', []);
+        const currentProfile = profiles.find(profile => profile.id.includes(detail.gamepad.id));
+
+        const deadZone = currentProfile?.joystickOptions?.zeroThreshold;
+
+        const [leftStickX, leftStickY, rightStickX, rightStickY] = detail.gamepad.axes;
 
         const cartesian2Polar = (x, y) => {
             const radians = Math.atan2(y, x);
@@ -46,7 +51,7 @@ class Gamepad extends GamepadListener {
         const rightStick = cartesian2Polar(rightStickX, rightStickY);
 
         const dataOutput = {
-            ...event.detail,
+            ...detail,
             degrees: {
                 leftStick,
                 rightStick,
@@ -54,6 +59,19 @@ class Gamepad extends GamepadListener {
         };
 
         const { index } = dataOutput;
+
+        if (deadZone && detail.value < deadZone && detail.value > -deadZone) {
+            const payload = {
+                ...dataOutput,
+                value: 0
+            };
+
+            this.emit('gamepad:axis', payload);
+            this.emit(`gamepad:${index}:axis`, payload);
+            this.emit(`gamepad:${index}:axis:${dataOutput.axis}`, payload.detail);
+
+            return;
+        }
 
         this.emit('gamepad:axis', dataOutput);
         this.emit(`gamepad:${index}:axis`, dataOutput);
@@ -89,7 +107,7 @@ const arrayComparator = (parentArr, childArr) => childArr.every(element => paren
 export const checkButtonHold = (buttonType, currentProfile) => {
     const gamepads = navigator.getGamepads();
 
-    const currentGamepad = gamepads.find(gamepad => currentProfile.id.includes(gamepad.id));
+    const currentGamepad = gamepads.find(gamepad => currentProfile.id.includes(gamepad?.id));
 
     const isHoldingButton = currentGamepad.buttons[currentProfile[buttonType]?.button]?.pressed;
 
@@ -182,7 +200,7 @@ gamepadInstance.on('gamepad:connected', ({ detail }) => {
     const foundGamepad = profiles.find(profile => profile.id.includes(gamepad.id));
 
     Toaster.pop({
-        msg: foundGamepad ? `${foundGamepad.profileName} Connected` : 'New gamepad connected, add it as a profile in your preferences',
+        msg: foundGamepad ? `${foundGamepad.name} Connected` : 'New gamepad connected, add it as a profile in your preferences',
         type: TOASTER_INFO,
     });
 });
