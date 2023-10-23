@@ -79,7 +79,7 @@ const JoystickOptions = () => {
                     }}
                     onChange={({ value }) => handleChange('stick1.horizontal.secondaryAction', value)}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default">
+                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox checked={stick1.horizontal.isReversed} onChange={(e) => handleChange('stick1.horizontal.isReversed', e.target.checked)} />
                 </Tooltip>
             </div>
@@ -104,7 +104,7 @@ const JoystickOptions = () => {
                     }}
                     onChange={({ value }) => handleChange('stick1.vertical.secondaryAction', value)}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default">
+                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox checked={stick1.vertical.isReversed} onChange={(e) => handleChange('stick1.vertical.isReversed', e.target.checked)} />
                 </Tooltip>
             </div>
@@ -129,7 +129,7 @@ const JoystickOptions = () => {
                     }}
                     onChange={({ value }) => handleChange('stick1.mpgMode.secondaryAction', value)}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default">
+                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox checked={stick1.mpgMode.isReversed} onChange={(e) => handleChange('stick1.mpgMode.isReversed', e.target.checked)} />
                 </Tooltip>
             </div>
@@ -154,7 +154,7 @@ const JoystickOptions = () => {
                     }}
                     onChange={({ value }) => handleChange('stick2.horizontal.secondaryAction', value)}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default">
+                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox checked={stick2.horizontal.isReversed} onChange={(e) => handleChange('stick2.horizontal.isReversed', e.target.checked)} />
                 </Tooltip>
             </div>
@@ -179,7 +179,7 @@ const JoystickOptions = () => {
                     }}
                     onChange={({ value }) => handleChange('stick2.vertical.secondaryAction', value)}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default">
+                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox checked={stick2.vertical.isReversed} onChange={(e) => handleChange('stick2.vertical.isReversed', e.target.checked)} />
                 </Tooltip>
             </div>
@@ -204,7 +204,7 @@ const JoystickOptions = () => {
                     }}
                     onChange={({ value }) => handleChange('stick2.mpgMode.secondaryAction', value)}
                 />
-                <Tooltip content="Reverse Axis Direction" location="default">
+                <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox checked={stick2.mpgMode.isReversed} onChange={(e) => handleChange('stick2.mpgMode.isReversed', e.target.checked)} />
                 </Tooltip>
             </div>
@@ -212,16 +212,11 @@ const JoystickOptions = () => {
             <div className={styles.joystickOption}>
                 <div>Zero Threshold</div>
                 <Input
-                    value={zeroThreshold.primaryAction}
-                    additionalProps={{ min: 0, max: 1.0, step: 0.1, type: 'number' }}
-                    onChange={(e) => handleChange('zeroThreshold.primaryAction', Number(e.target.value))}
+                    value={zeroThreshold}
+                    additionalProps={{ min: 0, max: 0.99, step: 0.1, type: 'number' }}
+                    onChange={(e) => handleChange('zeroThreshold', Number(e.target.value))}
+                    className={styles['joystick-option-zero-threshold']}
                 />
-                <Input
-                    value={zeroThreshold.secondaryAction}
-                    additionalProps={{ min: 0, max: 1.0, step: 0.1, type: 'number' }}
-                    onChange={(e) => handleChange('zeroThreshold.secondaryAction', Number(e.target.value))}
-                />
-                <div />
             </div>
         </div>
     );
