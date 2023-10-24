@@ -332,7 +332,6 @@ class ProbeWidget extends PureComponent {
             this.setState({
                 direction
             });
-            console.log(direction);
         }
     };
 
@@ -1124,7 +1123,8 @@ class ProbeWidget extends PureComponent {
             probeFastFeedrate,
             touchplate,
             units,
-            toolDiameter
+            toolDiameter,
+            direction
         } = state;
         const { $13 } = this.props;
         const { axes } = this.determineProbeOptions(state.availableProbeCommands[state.selectedProbeCommand]);
@@ -1161,7 +1161,7 @@ class ProbeWidget extends PureComponent {
             probeDistances
         };
 
-        const code = getProbeCode(options, 0);
+        const code = getProbeCode(options, direction);
 
         return code;
     }

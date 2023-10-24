@@ -612,9 +612,7 @@ export const getProbeCode = (options, direction = 0) => {
         plateType,
         axes
     } = options;
-    console.log(options);
 
-    console.log(axes);
     //let axesCount = Object.values(axes).reduce((a, item) => a + item, 0);
 
     if (plateType === TOUCHPLATE_TYPE_AUTOZERO) {
