@@ -32,9 +32,21 @@ const CoolantWidget = ({ widgetId, embedded }) => {
     return (
         <Widget>
             <Widget.Header embedded={embedded} />
-            <Widget.Content style={{ height: '100%' }}>
-                <CoolantActiveIndicator />
-                <CoolantControls />
+            <Widget.Content style={{ height: '100%', overflowY: 'auto' }}>
+                <div
+                    style={{
+                        position: 'absolute',
+                        display: 'grid',
+                        gridTemplateRows: '1fr 1fr',
+                        width: '100%',
+                        left: '0',
+                        top: '0',
+                        padding: '0 1rem 0 1rem'
+                    }}
+                >
+                    <CoolantActiveIndicator />
+                    <CoolantControls />
+                </div>
             </Widget.Content>
         </Widget>
     );
