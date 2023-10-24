@@ -27,7 +27,7 @@ const ActionArea = ({ actions }) => {
     const isFileRunning = controllerState.status?.activeState === 'Hold' || controllerState.status?.activeState === 'Run';
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '1rem' }}>
             <FunctionButton onClick={handleStockTurningClick} disabled={!isInRotaryMode}>Rotary Surfacing</FunctionButton>
             <FunctionButton onClick={() => actions.runProbing('Z-axis', runZAxisProbing())} disabled={!isInRotaryMode || isFileRunning}>Probe Rotary Z-Axis</FunctionButton>
             <FunctionButton onClick={() => actions.runProbing('Y-axis alignment', runYAxisAlignmentProbing())} disabled={isInRotaryMode || isFileRunning}>Y-axis Alignment</FunctionButton>
