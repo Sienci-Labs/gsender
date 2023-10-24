@@ -299,5 +299,45 @@
 
 
 .direction-button {
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    background: #e0e0e0;
+    box-shadow:  20px 20px 60px #bebebe,
+            -20px -20px 60px #ffffff;
+    z-index: 100;
+    padding: 10px;
+    img {
+        width: 35px;
+        height: 35px;
+    }
+}
 
+.direction {
+    &-d0 {
+        img {
+            transform: rotate(0deg);
+        }
+    }
+    &-d1 {
+        img {
+            transform: rotate(90deg);
+        }
+    }
+    &-d2 {
+        img {
+            transform: rotate(180deg)
+        }
+    }
+    &-d3 {
+        img {
+            transform: rotate(270deg);
+        }
+    }
+}
+
+.direction-button-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
 }

@@ -35,6 +35,7 @@ import { METRIC_UNITS, PROBING_CATEGORY } from '../../constants';
 import ProbeImage from './ProbeImage';
 import ProbeDiameter from './ProbeDiameter';
 import styles from './index.styl';
+import ProbeDirectionSelection from 'app/widgets/Probe/ProbeDirectionSelection';
 
 
 class Probe extends PureComponent {
@@ -166,7 +167,8 @@ class Probe extends PureComponent {
             canClick,
             availableProbeCommands,
             selectedProbeCommand,
-            touchplate
+            touchplate,
+            direction
         } = state;
 
         const { touchplateType } = touchplate;
@@ -176,6 +178,7 @@ class Probe extends PureComponent {
             <div className={styles.generalWrapper}>
                 <div className={styles.mainWrapper}>
                     <div className={styles.mainGrid}>
+                        <ProbeDirectionSelection direction={direction} onClick={actions.nextProbeDirection} />
                         <div className={styles.secondaryFlexbox}>
                             <div className={styles.mainGridItem}>
                                 <label style={{ margin: 0 }}>Axis</label>

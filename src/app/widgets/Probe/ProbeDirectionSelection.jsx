@@ -1,11 +1,15 @@
 import React from 'react';
+import cx from 'classnames';
+import directionIcon from './assets/direction.svg';
 import styles from './index.styl';
 
-const ProbeDirectionSelection = ({ direction }) => {
+const ProbeDirectionSelection = ({ direction, onClick }) => {
     return (
-        <button type="button" className={styles.directionButton}>
-            hi
-        </button>
+        <div className={styles.directionButtonWrapper}>
+            <button type="button" className={cx(styles.directionButton, styles[`direction-d${direction}`])} onClick={onClick}>
+                <img alt="Probe direction selection" src={directionIcon} />
+            </button>
+        </div>
     );
 };
 

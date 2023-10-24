@@ -321,6 +321,18 @@ class ProbeWidget extends PureComponent {
         },
         setProbeType: (type) => {
             this.setState({ probeType: type });
+        },
+        nextProbeDirection: () => {
+            let { direction } = this.state;
+            if (direction === 3) {
+                direction = 0;
+            } else {
+                direction += 1;
+            }
+            this.setState({
+                direction
+            });
+            console.log(direction);
         }
     };
 
@@ -411,7 +423,8 @@ class ProbeWidget extends PureComponent {
             selectedProbeCommand: 0,
             connectivityTest: this.config.get('connectivityTest'),
             probeType: PROBE_TYPE_AUTO,
-            connectionMade: false
+            connectionMade: false,
+            direction: this.config.get('direction', 0)
         };
     }
 
