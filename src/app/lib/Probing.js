@@ -31,7 +31,25 @@ export const getPreamble = (options) => {
     if (typeof options !== 'object') {
         return [];
     }
-    const { modal, axes, xProbeDistance, yProbeDistance, zProbeDistance, probeFast, probeSlow, zThickness, xyThickness, xRetract, yRetract, zRetract, firmware, xyPositionAdjust, zPositionAdjust } = options;
+    const {
+        modal,
+        xRetractModifier,
+        yRetractModifier,
+        axes,
+        xProbeDistance,
+        yProbeDistance,
+        zProbeDistance,
+        probeFast,
+        probeSlow,
+        zThickness,
+        xyThickness,
+        xRetract,
+        yRetract,
+        zRetract,
+        firmware,
+        xyPositionAdjust,
+        zPositionAdjust
+    } = options;
     let initialOffsets = 'G10 L20 P0 ';
 
     const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
@@ -49,6 +67,7 @@ export const getPreamble = (options) => {
         '%DWELL=0.3',
         `%Z_ADJUST=${zPositionAdjust}`,
         `%X_ADJUST=${xyPositionAdjust}`,
+        `%Y_ADJUST=${xyPositionAdjust}`,
         `%X_PROBE_DISTANCE=${xProbeDistance}`,
         `%Y_PROBE_DISTANCE=${yProbeDistance}`,
         `%Z_PROBE_DISTANCE=${zProbeDistance}`,
@@ -61,6 +80,8 @@ export const getPreamble = (options) => {
         `%X_THICKNESS=${xyThickness}`,
         `%Y_THICKNESS=${xyThickness}`,
         `%PROBE_DELAY=${probeDelay}`,
+        `%Y_RETRACT_DIRECTION=${yRetractModifier}`,
+        `%X_RETRACT_DIRECTION=${xRetractModifier}`,
         `${initialOffsets}`,
         `G91 G${modal}`
     ];
@@ -83,6 +104,8 @@ const updateOptionsForDirection = (options, direction) => {
     const [xProbeDir, yProbeDir] = getProbeDirections(direction);
     const xRetractModifier = xProbeDir * -1;
     const yRetractModifier = yProbeDir * -1;
+    options.xRetractModifier = xRetractModifier;
+    options.yRetractModifier = yRetractModifier;
 
     // Setup probe directions and distances
     options.xProbeDistance = options.probeDistances.X * xProbeDir;
@@ -104,14 +127,14 @@ const updateOptionsForDirection = (options, direction) => {
 
 export const getSingleAxisStandardRoutine = (axis) => {
     axis = axis.toUpperCase();
-    let axisRetract = `%[${axis}_RETRACT_DISTANCE`;
+    let axisRetract = `${axis}_RETRACT_DISTANCE`;
     const code = [
         `; ${axis}-probe`,
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_FAST_FEED]`,
         'G91',
         `G0 ${axis}[${axisRetract}]`,
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_SLOW_FEED]`,
-        'G4 P[%DWELL]',
+        'G4 P[DWELL]',
         `G10 L2 P0 ${axis}[${axis}_THICKNESS]}`,
         `G0 ${axis}[${axis}_RETRACT]`
     ];
@@ -134,7 +157,7 @@ export const get3AxisStandardRoutine = (options) => {
         code.push(...getSingleAxisStandardRoutine('Z'));
         // Z also handles positioning for next probe on X
         code.push(
-            'G91 G0 X[X_ADJUST]',
+            'G91 G0 X[X_ADJUST * X_RETRACT_DIRECTION]',
             'G0 Z-[Z_ADJUST]'
         );
     }
@@ -143,7 +166,7 @@ export const get3AxisStandardRoutine = (options) => {
         // We start at different location for
         if (!axes.z) {
             code.push(
-                'G0 X[X_RETRACT_DISTANCE] Y[Y_RETRACT_DISTANCE]',
+                'G0 X[X_RETRACT_DISTANCE * X_RETRACT_DIRECTION] Y[Y_RETRACT_DISTANCE * Y_RETRACT_DIRECTION]',
                 'G0 Y[Y_ADJUST]'
             );
         }
@@ -154,17 +177,17 @@ export const get3AxisStandardRoutine = (options) => {
     if (axes.y) {
         // Move into position for Y
         code.push(
-            'G0 X[X_RETRACT * -2]',
+            'G0 X[X_RETRACT_DISTANCE * 2 * X_RETRACT_DIRECTION]',
             'G0 Y[Y_ADJUST * -1]',
             'G0 X[X_ADJUST]'
         );
 
         // Probe Y
-        code.push(...get3AxisStandardRoutine('Y'));
+        code.push(...getSingleAxisStandardRoutine('Y'));
     }
     // Move back to original position
     code.push(
-        'G0'
+        'G0 Z[Z_ADJUST + Z_RETRACT]'
     );
     return code;
 };
