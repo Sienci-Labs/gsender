@@ -136,7 +136,7 @@ export const getSingleAxisStandardRoutine = (axis) => {
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_SLOW_FEED]`,
         'G4 P[DWELL]',
         `G10 L2 P0 ${axis}[${axis}_THICKNESS]}`,
-        `G0 ${axis}[${axis}_RETRACT]`
+        `G0 ${axis}[${axis}_RETRACT_DISTANCE]`
     ];
 
     return code;
@@ -187,7 +187,8 @@ export const get3AxisStandardRoutine = (options) => {
     }
     // Move back to original position
     code.push(
-        'G0 Z[Z_ADJUST + Z_RETRACT]'
+        'G0 Z[Z_ADJUST + Z_RETRACT_DISTANCE]',
+        'G90'
     );
     return code;
 };
