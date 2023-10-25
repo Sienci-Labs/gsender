@@ -1,5 +1,6 @@
 import { TOUCHPLATE_TYPE_AUTOZERO } from 'app/lib/constants';
-import { GRBLHAL } from '../constants';
+import { GRBLHAL, METRIC_UNITS } from '../constants';
+import { mm2in } from 'app/lib/units';
 
 export const BL = 0;
 export const TL = 1;
@@ -30,7 +31,7 @@ export const getPreamble = (options) => {
     if (typeof options !== 'object') {
         return [];
     }
-    const { modal, axes, xProbeDistance, yProbeDistance, zProbeDistance, probeFast, probeSlow, zThickness, xyThickness, xRetract, yRetract, zRetract, firmware } = options;
+    const { modal, axes, xProbeDistance, yProbeDistance, zProbeDistance, probeFast, probeSlow, zThickness, xyThickness, xRetract, yRetract, zRetract, firmware, xyPositionAdjust, zPositionAdjust } = options;
     let initialOffsets = 'G10 L20 P0 ';
 
     const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
@@ -46,6 +47,8 @@ export const getPreamble = (options) => {
         '; Initial Probe setup',
         '%UNITS=modal.units',
         '%DWELL=0.3',
+        `%Z_ADJUST=${zPositionAdjust}`,
+        `%X_ADJUST=${xyPositionAdjust}`,
         `%X_PROBE_DISTANCE=${xProbeDistance}`,
         `%Y_PROBE_DISTANCE=${yProbeDistance}`,
         `%Z_PROBE_DISTANCE=${zProbeDistance}`,
@@ -75,6 +78,8 @@ export const getPreamble = (options) => {
     UNITS - prior units
  */
 const updateOptionsForDirection = (options, direction) => {
+    const { units, toolDiameter } = options;
+    options.direction = direction;
     const [xProbeDir, yProbeDir] = getProbeDirections(direction);
     const xRetractModifier = xProbeDir * -1;
     const yRetractModifier = yProbeDir * -1;
@@ -88,6 +93,12 @@ const updateOptionsForDirection = (options, direction) => {
     options.xRetract = options.retract * xRetractModifier;
     options.yRetract = options.retract * yRetractModifier;
     options.zRetract = options.retract;
+
+    // Figure out movement distances for getting bit into position
+    let xyMovement = toolDiameter + 20;
+    options.xyPositionAdjust = (units === METRIC_UNITS) ? xyMovement : mm2in(xyMovement).toFixed(3);
+    options.zPositionAdjust = (units === METRIC_UNITS) ? 15 : mm2in(15).toFixed(3);
+
     return options;
 };
 
@@ -113,6 +124,8 @@ export const get3AxisStandardRoutine = (options) => {
 
     code.push(...getPreamble(options));
     const { axes } = options;
+
+    // invalid axes, we go next
     if (typeof axes !== 'object') {
         return [];
     }
@@ -120,19 +133,39 @@ export const get3AxisStandardRoutine = (options) => {
     if (axes.z) {
         code.push(...getSingleAxisStandardRoutine('Z'));
         // Z also handles positioning for next probe on X
+        code.push(
+            'G91 G0 X[X_ADJUST]',
+            'G0 Z-[Z_ADJUST]'
+        );
     }
     if (axes.x) {
         // Move into position for X
+        // We start at different location for
+        if (!axes.z) {
+            code.push(
+                'G0 X[X_RETRACT_DISTANCE] Y[Y_RETRACT_DISTANCE]',
+                'G0 Y[Y_ADJUST]'
+            );
+        }
 
         // Probe X
         code.push(...getSingleAxisStandardRoutine('X'));
     }
     if (axes.y) {
         // Move into position for Y
+        code.push(
+            'G0 X[X_RETRACT * -2]',
+            'G0 Y[Y_ADJUST * -1]',
+            'G0 X[X_ADJUST]'
+        );
 
         // Probe Y
         code.push(...get3AxisStandardRoutine('Y'));
     }
+    // Move back to original position
+    code.push(
+        'G0'
+    )
     return code;
 };
 
