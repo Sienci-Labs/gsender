@@ -51,21 +51,26 @@ const SetShortcut = () => {
         dispatch(setGamepadProfileList(updatedProfiles));
     };
 
-    const handleSet = (type, button, shouldSet) => {
+    const handleSetToggle = (type, button, shouldSet) => {
         let payload = {};
 
         if (type === 'lockout') {
             payload = {
                 lockout: {
                     button: shouldSet ? button : null,
-                    active: false,
                 },
+                modifier: {
+                    button: shouldSet ? null : profile.modifier?.button
+                }
             };
         } else if (type === 'modifier') {
             payload = {
                 modifier: {
                     button: shouldSet ? button : null
-                }
+                },
+                lockout: {
+                    button: shouldSet ? null : profile.lockout?.button,
+                },
             };
         }
 
@@ -149,6 +154,9 @@ const SetShortcut = () => {
     const isLockoutButton = currentButtonValue === profile.lockout?.button;
     const isSecondaryActionButton = currentButtonValue === profile.modifier?.button;
 
+    const lockoutLabel = isLockoutButton ? 'Lockout Button' : null;
+    const secondaryActionLabel = isSecondaryActionButton ? 'Activate Secondary Action Button' : null;
+
     return (
         <Modal onClose={closeModal} size="md" title="Set Gamepad Profile Shortcut">
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', padding: '1rem' }}>
@@ -171,7 +179,7 @@ const SetShortcut = () => {
                             <p>Use As Lockout Button</p>
                             <ToggleSwitch
                                 checked={isLockoutButton}
-                                onChange={(checked) => handleSet('lockout', currentButtonValue, checked)}
+                                onChange={(checked) => handleSetToggle('lockout', currentButtonValue, checked)}
                             />
                         </div>
 
@@ -179,7 +187,7 @@ const SetShortcut = () => {
                             <p>Use As Activate Second Action Button</p>
                             <ToggleSwitch
                                 checked={isSecondaryActionButton}
-                                onChange={(checked) => handleSet('modifier', currentButtonValue, checked)}
+                                onChange={(checked) => handleSetToggle('modifier', currentButtonValue, checked)}
                             />
                         </div>
                     </div>
@@ -194,7 +202,7 @@ const SetShortcut = () => {
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                         <div>Action:</div>
                         <div className={styles['action-item-active']}>
-                            {currentShortcutTitle ?? '...'}
+                            {lockoutLabel || secondaryActionLabel || currentShortcutTitle || '...'}
                         </div>
                     </div>
                 </div>

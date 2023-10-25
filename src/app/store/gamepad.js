@@ -47,8 +47,8 @@ export const defaultOptions = {
                 isReversed: false,
             },
             mpgMode: {
-                primaryAction: AXIS_Z,
-                secondaryAction: AXIS_Z,
+                primaryAction: null,
+                secondaryAction: null,
                 isReversed: false,
             },
         },
