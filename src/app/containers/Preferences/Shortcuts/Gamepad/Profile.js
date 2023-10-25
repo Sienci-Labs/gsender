@@ -16,11 +16,10 @@ import { arrayComparator } from './utils';
 import JoystickOptions from './JoystickOptions';
 
 const Profile = ({ data }) => {
-    const { profileName } = data;
-
     const { dispatch } = useContext(GamepadContext);
     const [isConnected, setIsConnected] = useState(false);
-    const [name, setName] = useState(profileName);
+    const [name, setName] = useState(data.name);
+
     useEffect(() => {
         gamepad.on('gamepad:connected', checkGamepadConnection);
         gamepad.on('gamepad:disconnected', checkGamepadConnection);
@@ -44,7 +43,7 @@ const Profile = ({ data }) => {
     };
 
     const handleEditName = () => {
-        if (name === profileName) {
+        if (name === data.name) {
             return;
         }
 

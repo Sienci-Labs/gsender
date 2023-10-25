@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import throttle from 'lodash/throttle';
-import _ from 'lodash';
 
 import store from 'app/store';
 import gamepad from 'app/lib/gamepad';
@@ -14,13 +13,19 @@ import Input from '../../components/Input';
 
 import styles from '../index.styl';
 import { AVAILABILITY_TYPES } from '../utils';
+import { GamepadContext } from './utils/context';
+import { setCurrentModal, setGamepadProfileList } from './utils/actions';
+import { defaultOptions } from '../../../../store/gamepad';
 
 const { DEFAULT, AVAILABLE, UNAVAILABLE } = AVAILABILITY_TYPES;
 
-const ProfileModal = ({ onClose, onAdd }) => {
+const ProfileModal = () => {
     const [gamepadInfo, setGamepadInfo] = useState(null);
     const [availabilityType, setAvailabilityType] = useState(DEFAULT);
     const [customProfileName, setCustomProfileName] = useState('');
+    const { dispatch } = useContext(GamepadContext);
+
+    const closeModal = () => dispatch(setCurrentModal(null));
 
     useEffect(() => {
         gamepad.start();
@@ -51,24 +56,27 @@ const ProfileModal = ({ onClose, onAdd }) => {
 
     const handleAddProfile = () => {
         const { profiles = [] } = store.get('workspace.gamepad');
-        const commandKeys = store.get('commandKeys', {});
-        const newShortcuts = _.cloneDeep(commandKeys);
-        Object.entries(newShortcuts).forEach(([key, shortcut]) => {
-            shortcut.keys = '';
-        });
 
-        const newProfiles = [
+        const updatedProfiles = [
+            ...profiles,
             {
                 id: [gamepadInfo.id],
-                active: true,
-                profileName: customProfileName || gamepadInfo.id,
-                shortcuts: newShortcuts,
-                icon: 'fas fa-gamepad'
+                name: customProfileName || gamepadInfo.id,
+                mapping: gamepadInfo.mapping,
+                buttons: gamepadInfo.buttons.map((_, index) => ({ label: index, value: index, primaryAction: null, secondaryAction: null })),
+                axes: gamepadInfo.axes,
+                joystickOptions: defaultOptions.joystickOptions,
+                lockout: {
+                    button: null,
+                    active: false,
+                },
+                modifier: {
+                    button: null
+                }
             },
-            ...profiles
         ];
 
-        store.replace('workspace.gamepad.profiles', newProfiles);
+        dispatch(setGamepadProfileList(updatedProfiles));
 
         Toaster.pop({
             msg: 'Added New Gamepad Profile',
@@ -76,8 +84,7 @@ const ProfileModal = ({ onClose, onAdd }) => {
             duration: TOASTER_SHORT
         });
 
-        onAdd(newProfiles);
-        onClose();
+        closeModal();
     };
 
     const Availability = ({ type }) => {
@@ -109,7 +116,7 @@ const ProfileModal = ({ onClose, onAdd }) => {
 
     return (
         <ToolModal
-            onClose={onClose}
+            onClose={closeModal}
             size="small"
             title="Add Gamepad Profile"
         >
@@ -118,9 +125,10 @@ const ProfileModal = ({ onClose, onAdd }) => {
 
                 <Input
                     onChange={(e) => setCustomProfileName(e.target.value)}
-                    additionalProps={{ placeholder: 'Enter a Custom Profile Name Here...', disabled: availabilityType !== AVAILABLE }}
+                    additionalProps={{ placeholder: 'Enter a custom profile name here...', disabled: availabilityType !== AVAILABLE }}
                     className={availabilityType === AVAILABLE ? styles.customProfileName : styles.customProfileNameHidden}
                     isNumber={false}
+                    value={customProfileName}
                 />
 
                 <Button

@@ -33,12 +33,12 @@ const ProfileList = () => {
         <>
             <div className={styles.profileList}>
                 {
-                    profiles.map(({ id, profileName, icon = 'fas fa-gamepad' }) => (
+                    profiles.map(({ id, name }) => (
                         <ProfileItem
-                            id={id}
                             key={id}
-                            title={profileName}
-                            icon={icon}
+                            id={id}
+                            title={name}
+                            icon="fas fa-gamepad"
                         />
                     ))
                 }

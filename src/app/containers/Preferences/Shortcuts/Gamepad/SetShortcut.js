@@ -59,19 +59,21 @@ const SetShortcut = () => {
                 lockout: {
                     button: shouldSet ? button : null,
                 },
-                modifier: {
-                    button: shouldSet ? null : profile.modifier?.button
-                }
             };
+
+            if (profile.modifier.button === button) {
+                payload.modifier = { button: null };
+            }
         } else if (type === 'modifier') {
             payload = {
                 modifier: {
                     button: shouldSet ? button : null
                 },
-                lockout: {
-                    button: shouldSet ? null : profile.lockout?.button,
-                },
             };
+
+            if (profile.lockout.button === button) {
+                payload.lockout = { button: null };
+            }
         }
 
         const updatedProfiles =

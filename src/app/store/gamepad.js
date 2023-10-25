@@ -52,10 +52,7 @@ export const defaultOptions = {
                 isReversed: false,
             },
         },
-        zeroThreshold: {
-            primaryAction: 0,
-            secondaryAction: 0
-        }
+        zeroThreshold: 0,
     },
     buttons: []
 };

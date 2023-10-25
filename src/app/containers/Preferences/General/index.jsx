@@ -29,6 +29,7 @@ import GeneralArea from '../components/GeneralArea';
 import Workspace from './Workspace';
 import Settings from './Settings';
 import DataCollection from './DataCollection';
+import TempSettings from './Temp';
 
 const General = ({ active, state, actions }) => {
     return (
@@ -38,6 +39,7 @@ const General = ({ active, state, actions }) => {
                 <GeneralArea.Half>
                     <Connection state={state} actions={actions} />
                     <Workspace state={state} actions={actions} />
+                    <TempSettings state={state} actions={actions} />
                 </GeneralArea.Half>
 
                 <GeneralArea.Half>
