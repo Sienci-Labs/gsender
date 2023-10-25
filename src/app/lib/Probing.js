@@ -165,7 +165,7 @@ export const get3AxisStandardRoutine = (options) => {
     // Move back to original position
     code.push(
         'G0'
-    )
+    );
     return code;
 };
 
