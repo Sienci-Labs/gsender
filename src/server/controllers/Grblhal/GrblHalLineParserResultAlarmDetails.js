@@ -5,7 +5,13 @@ class GrblHalLineParserResultAlarmDetails {
             return null;
         }
 
-        const payload = {};
+        console.log(r);
+        console.log(r[1]);
+
+        const payload = {
+            id: Number(r[1]),
+            description: r[2]
+        };
 
         return {
             type: GrblHalLineParserResultAlarmDetails,

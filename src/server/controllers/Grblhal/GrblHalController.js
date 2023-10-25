@@ -829,6 +829,10 @@ class GrblHalController {
             this.emit('settings:description', this.runner.settings.descriptions);
         });
 
+        this.runner.on('alarmDetail', (payload) => {
+            this.emit('settings:alarms', this.runner.settings.alarms);
+        });
+
         const queryStatusReport = () => {
             // Check the ready flag
             if (!(this.ready)) {

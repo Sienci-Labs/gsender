@@ -643,6 +643,15 @@ export function* initialize() {
         });
     });
 
+    controller.addListener('settings:alarm', (data) => {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_ALARM_DESCRIPTIONS,
+            payload: {
+                alarms: data
+            }
+        });
+    });
+
     controller.addListener('networkScan:status', (isScanning) => {
         reduxStore.dispatch({
             type: connectionActions.SCAN_NETWORK,
