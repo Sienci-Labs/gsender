@@ -2,7 +2,6 @@ import { GamepadListener } from 'gamepad.js';
 
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
-import { throttle } from 'lodash';
 
 class Gamepad extends GamepadListener {
     constructor() {
@@ -29,12 +28,19 @@ class Gamepad extends GamepadListener {
         this.shouldHold = false;
     }
 
-    onAxis = (event) => {
-        if (this.shouldHold) {
+    onAxis = ({ detail }) => {
+        const profiles = store.get('workspace.gamepad.profiles', []);
+        const currentProfile = profiles.find(profile => profile.id.includes(detail.gamepad.id));
+
+        const lockoutButton = detail.gamepad.buttons[currentProfile.lockout?.button];
+
+        if (lockoutButton && !lockoutButton?.pressed) {
             return;
         }
 
-        const [leftStickX, leftStickY, rightStickX, rightStickY] = event.detail.gamepad.axes;
+        const deadZone = currentProfile?.joystickOptions?.zeroThreshold;
+
+        const [leftStickX, leftStickY, rightStickX, rightStickY] = detail.gamepad.axes;
 
         const cartesian2Polar = (x, y) => {
             const radians = Math.atan2(y, x);
@@ -46,7 +52,7 @@ class Gamepad extends GamepadListener {
         const rightStick = cartesian2Polar(rightStickX, rightStickY);
 
         const dataOutput = {
-            ...event.detail,
+            ...detail,
             degrees: {
                 leftStick,
                 rightStick,
@@ -54,6 +60,19 @@ class Gamepad extends GamepadListener {
         };
 
         const { index } = dataOutput;
+
+        if (deadZone && detail.value < deadZone && detail.value > -deadZone) {
+            const payload = {
+                ...dataOutput,
+                value: 0
+            };
+
+            this.emit('gamepad:axis', payload);
+            this.emit(`gamepad:${index}:axis`, payload);
+            this.emit(`gamepad:${index}:axis:${dataOutput.axis}`, payload.detail);
+
+            return;
+        }
 
         this.emit('gamepad:axis', dataOutput);
         this.emit(`gamepad:${index}:axis`, dataOutput);
@@ -84,8 +103,6 @@ export const shortcutComboBuilder = (list = []) => {
     return list.join(JOIN_KEY);
 };
 
-const arrayComparator = (parentArr, childArr) => childArr.every(element => parentArr.includes(element));
-
 export const checkButtonHold = (buttonType, currentProfile) => {
     const gamepads = navigator.getGamepads();
 
@@ -95,34 +112,6 @@ export const checkButtonHold = (buttonType, currentProfile) => {
 
     return isHoldingButton;
 };
-
-const handleGamepadProfileLockout = throttle((currentProfile, isLocked) => {
-    setTimeout(() => {
-        const isHoldingLockoutButton = checkButtonHold('lockout', currentProfile);
-
-        if (!isHoldingLockoutButton) {
-            return;
-        }
-
-        const profiles = store.get('workspace.gamepad.profiles', []);
-
-        const updatedProfiles = profiles.map(profile => {
-            if (arrayComparator(profile.id, currentProfile.id)) {
-                return { ...profile, lockout: { button: profile.lockout?.button, active: !isLocked } };
-            }
-
-            return profile;
-        });
-
-        store.replace('workspace.gamepad.profiles', updatedProfiles);
-
-        Toaster.pop({
-            msg: !isLocked ? 'Gamepad Buttons Locked' : 'Gamepad Buttons Unlocked',
-            type: TOASTER_INFO,
-            duration: 3000,
-        });
-    }, 4000);
-}, 250, { trailing: false });
 
 export const onGamepadButtonPress = ({ detail }) => {
     if (gamepadInstance.shouldHold) {
@@ -139,17 +128,12 @@ export const onGamepadButtonPress = ({ detail }) => {
         return null;
     }
 
-    // the result is an array, [0] = key and [1] = shortcuts
     const foundAction = currentProfile.buttons.find(({ value }) => value === button);
 
     const modifierButton = gamepad.buttons[currentProfile.modifier?.button];
     const lockoutButton = gamepad.buttons[currentProfile.lockout?.button];
 
-    if (lockoutButton?.pressed) {
-        handleGamepadProfileLockout(currentProfile, currentProfile.lockout?.active);
-    }
-
-    if (currentProfile.lockout?.active) {
+    if (lockoutButton && !lockoutButton?.pressed) {
         return null;
     }
 
