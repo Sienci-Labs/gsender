@@ -42,7 +42,8 @@ export const getPreamble = (options) => {
         probeFast,
         probeSlow,
         zThickness,
-        xyThickness,
+        xThickness,
+        yThickness,
         xRetract,
         yRetract,
         zRetract,
@@ -77,8 +78,8 @@ export const getPreamble = (options) => {
         `%Y_RETRACT_DISTANCE=${yRetract}`,
         `%Z_RETRACT_DISTANCE=${zRetract}`,
         `%Z_THICKNESS=${zThickness}`,
-        `%X_THICKNESS=${xyThickness}`,
-        `%Y_THICKNESS=${xyThickness}`,
+        `%X_THICKNESS=${xThickness}`,
+        `%Y_THICKNESS=${yThickness}`,
         `%PROBE_DELAY=${probeDelay}`,
         `%Y_RETRACT_DIRECTION=${yRetractModifier}`,
         `%X_RETRACT_DIRECTION=${xRetractModifier}`,
@@ -117,6 +118,12 @@ const updateOptionsForDirection = (options, direction) => {
     options.yRetract = options.retract * yRetractModifier;
     options.zRetract = options.retract;
 
+    // Alter thickness for X and Y by tool diameter
+    const toolRadius = toolDiameter / 2;
+    const toolCompensatedXY = ((-1 * toolRadius) - options.xyThickness).toFixed(3);
+    options.yThickness = toolCompensatedXY * yProbeDir;
+    options.xThickness = toolCompensatedXY * xProbeDir;
+
     // Figure out movement distances for getting bit into position
     let xyMovement = toolDiameter + 20;
     options.xyPositionAdjust = (units === METRIC_UNITS) ? xyMovement : mm2in(xyMovement).toFixed(3);
@@ -131,11 +138,10 @@ export const getSingleAxisStandardRoutine = (axis) => {
     const code = [
         `; ${axis}-probe`,
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_FAST_FEED]`,
-        'G91',
-        `G0 ${axis}[${axisRetract}]`,
+        `G91 G0 ${axis}[${axisRetract}]`,
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_SLOW_FEED]`,
         'G4 P[DWELL]',
-        `G10 L2 P0 ${axis}[${axis}_THICKNESS]z`,
+        `G10 L20 P0 ${axis}[${axis}_THICKNESS]`,
         `G0 ${axis}[${axis}_RETRACT_DISTANCE]`
     ];
 
@@ -177,9 +183,9 @@ export const get3AxisStandardRoutine = (options) => {
     if (axes.y) {
         // Move into position for Y
         code.push(
-            'G0 X[X_RETRACT_DISTANCE * 2 * X_RETRACT_DIRECTION]',
-            'G0 Y[Y_ADJUST * -1]',
-            'G0 X[X_ADJUST]'
+            'G0 X[X_RETRACT_DISTANCE * 2]',
+            'G0 Y[Y_ADJUST * Y_RETRACT_DIRECTION]',
+            'G0 X[X_ADJUST * -1 * X_RETRACT_DIRECTION]'
         );
 
         // Probe Y

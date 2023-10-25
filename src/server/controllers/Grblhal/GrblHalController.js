@@ -55,10 +55,10 @@ import {
     GRBLHAL,
     GRBL_ACTIVE_STATE_RUN,
     GRBLHAL_REALTIME_COMMANDS,
-    GRBL_HAL_ALARMS,
+    //GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
     GRBL_HAL_SETTINGS,
-    GRBL_ACTIVE_STATE_HOME, /*GRBL_HAL_ACTIVE_STATE_HOLD, GRBL_HAL_ACTIVE_STATE_IDLE, GRBL_HAL_ACTIVE_STATE_RUN*/
+    GRBL_ACTIVE_STATE_HOME, GRBL_HAL_ACTIVE_STATE_HOLD, GRBL_HAL_ACTIVE_STATE_IDLE, GRBL_HAL_ACTIVE_STATE_RUN
 } from './constants';
 import {
     METRIC_UNITS,
@@ -703,7 +703,8 @@ class GrblHalController {
 
         this.runner.on('alarm', (res) => {
             const code = Number(res.message) || this.state.status.subState;
-            const alarm = _.find(GRBL_HAL_ALARMS, { code: code });
+            //const alarm = _.find(this.settings.alarms, { id: code });
+            const alarm = this.settings.alarms[code];
 
             const { lines, received, name } = this.sender.state;
             const { outstanding } = this.feeder.state;
@@ -938,20 +939,21 @@ class GrblHalController {
             // Grbl state
             if (this.state !== this.runner.state) {
                 // Unpause sending when hold state exited using macro buttons - We check if software sender paused + state changed from hold to idle/run
-                /*const currentActiveState = _.get(this.state, 'status.activeState', '');
+                const currentActiveState = _.get(this.state, 'status.activeState', '');
                 const runnerActiveState = _.get(this.runner.state, 'status.activeState', '');
                 if (this.workflow.isPaused &&
                     currentActiveState === GRBL_HAL_ACTIVE_STATE_HOLD &&
                     (runnerActiveState === GRBL_HAL_ACTIVE_STATE_IDLE || runnerActiveState === GRBL_HAL_ACTIVE_STATE_RUN)
                 ) {
-                    setTimeout(() => {
+                    console.log('Gracefully resuming');
+                    /*setTimeout(() => {
                         const as = _.get(this.state, 'status.activeState');
                         if (as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) {
                             console.log('resume timeout');
                             this.command('gcode:resume');
                         }
-                    }, 1000);
-                }*/
+                    }, 1000);*/
+                }
                 this.state = this.runner.state;
                 this.emit('controller:state', GRBLHAL, this.state);
             }

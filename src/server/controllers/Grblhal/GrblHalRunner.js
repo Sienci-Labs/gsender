@@ -279,7 +279,7 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultAlarmDetails) {
-            this.settings.alarms[payload.id] = {
+            this.settings.alarms[Number(payload.id)] = {
                 description: payload.description,
                 id: payload.id
             };
