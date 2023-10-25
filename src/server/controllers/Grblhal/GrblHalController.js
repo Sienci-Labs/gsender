@@ -998,6 +998,7 @@ class GrblHalController {
         await delay(100);
         this.connection.writeImmediate('$ESH\n');
         this.connection.writeImmediate('$EG\n');
+        this.connection.writeImmediate('$EA\n');
     }
 
     populateContext(context = {}) {

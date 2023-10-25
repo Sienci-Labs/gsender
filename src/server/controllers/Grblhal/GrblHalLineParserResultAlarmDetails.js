@@ -5,9 +5,6 @@ class GrblHalLineParserResultAlarmDetails {
             return null;
         }
 
-        console.log(r);
-        console.log(r[1]);
-
         const payload = {
             id: Number(r[1]),
             description: r[2]
