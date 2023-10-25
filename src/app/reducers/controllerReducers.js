@@ -34,7 +34,7 @@ import {
     RESET_HOMING,
     UPDATE_PARTIAL_CONTROLLER_SETTINGS,
     UPDATE_TERMINAL_HISTORY,
-    UPDATE_SETTINGS_DESCRIPTIONS
+    UPDATE_SETTINGS_DESCRIPTIONS, UPDATE_ALARM_DESCRIPTIONS
 } from '../actions/controllerActions';
 import { in2mm, mm2in } from '../lib/units';
 import { WORKFLOW_STATE_IDLE } from '../constants';
@@ -254,6 +254,15 @@ const reducer = createReducer(initialState, {
             settings: {
                 ...reducerState.settings,
                 descriptions
+            }
+        };
+    },
+    [UPDATE_ALARM_DESCRIPTIONS]: (payload, reducerState) => {
+        const { alarms } = payload;
+        return {
+            settings: {
+                ...reducerState.settings,
+                alarms
             }
         };
     }

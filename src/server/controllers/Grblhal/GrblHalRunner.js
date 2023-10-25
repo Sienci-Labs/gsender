@@ -90,7 +90,7 @@ class GrblHalRunner extends events.EventEmitter {
             axes: {
                 count: 3,
                 axes: ['X', 'Y', 'Z']
-            }
+            },
         }
     };
 
@@ -105,8 +105,8 @@ class GrblHalRunner extends events.EventEmitter {
         info: {
         },
         descriptions: {
-
-        }
+        },
+        alarms: {}
     };
 
     parser = new GrblHalLineParser();
@@ -279,13 +279,17 @@ class GrblHalRunner extends events.EventEmitter {
             return;
         }
         if (type === GrblHalLineParserResultAlarmDetails) {
-            console.log(payload);
+            this.settings.alarms[payload.id] = {
+                description: payload.description,
+                id: payload.id
+            };
+            this.emit('alarmDetail', this.settings.alarms);
             return;
         }
         if (type === GrblHalLineParserResultGroupDetail) {
             delete payload.raw;
             this.settings.groups[payload.group] = payload;
-            //console.log(payload);
+            return;
         }
         if (type === GrblHalLineParserResultFeedback) {
             this.emit('feedback', payload);
