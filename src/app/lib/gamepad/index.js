@@ -106,7 +106,7 @@ export const shortcutComboBuilder = (list = []) => {
 export const checkButtonHold = (buttonType, currentProfile) => {
     const gamepads = navigator.getGamepads();
 
-    const currentGamepad = gamepads.find(gamepad => currentProfile.id.includes(gamepad.id));
+    const currentGamepad = gamepads.find(gamepad => currentProfile.id.includes(gamepad?.id));
 
     const isHoldingButton = currentGamepad.buttons[currentProfile[buttonType]?.button]?.pressed;
 
@@ -166,7 +166,7 @@ gamepadInstance.on('gamepad:connected', ({ detail }) => {
     const foundGamepad = profiles.find(profile => profile.id.includes(gamepad.id));
 
     Toaster.pop({
-        msg: foundGamepad ? `${foundGamepad.profileName} Connected` : 'New gamepad connected, add it as a profile in your preferences',
+        msg: foundGamepad ? `${foundGamepad.name} Connected` : 'New gamepad connected, add it as a profile in your preferences',
         type: TOASTER_INFO,
     });
 });
