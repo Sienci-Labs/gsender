@@ -379,7 +379,7 @@ class Sender extends events.EventEmitter {
     // Tells the sender to send more data.
     // @return {boolean} Returns true on success, false otherwise.
     next(options = {}) {
-        const { startFromLine, timePaused } = options;
+        const { startFromLine, timePaused, forceEnd } = options;
 
         if (!this.state.gcode) {
             return false;
@@ -426,7 +426,7 @@ class Sender extends events.EventEmitter {
             this.state.remainingTime = (timePerCode * this.state.total - this.state.elapsedTime);
         }
 
-        if (this.state.received >= this.state.total) {
+        if (this.state.received >= this.state.total || forceEnd) {
             if (this.state.finishTime === 0) {
                 // avoid issue 'end' multiple times
                 this.state.finishTime = now;

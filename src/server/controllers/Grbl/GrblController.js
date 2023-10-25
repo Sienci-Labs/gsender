@@ -59,6 +59,7 @@ import {
     GRBL_ACTIVE_STATE_RUN,
     GRBL_ACTIVE_STATE_HOME,
     GRBL_ACTIVE_STATE_ALARM,
+    GRBL_ACTIVE_STATE_IDLE,
     GRBL_REALTIME_COMMANDS,
     GRBL_ALARMS,
     GRBL_ERRORS,
@@ -183,6 +184,10 @@ class GrblController {
 
     // Sender
     sender = null;
+
+    timeout = null;
+
+    forceOK = false;
 
     // Toolchange
     toolChanger = null;
@@ -591,6 +596,7 @@ class GrblController {
             this.sender.unhold();
 
             // subtract time paused
+            this.setSenderTimeout();
             this.sender.next({ timePaused: pauseTime });
         });
 
@@ -664,11 +670,17 @@ class GrblController {
                     this.emit('serialport:read', res.raw);
                 }
                 this.actionMask.queryParserState.reply = false;
+
+                if (this.forceOK) {
+                    this.forceOK = false;
+                    this.runner.forceOK();
+                }
                 return;
             }
 
             const { hold, sent, received } = this.sender.state;
             if (this.workflow.state === WORKFLOW_STATE_RUNNING) {
+                this.setSenderTimeout();
                 this.emit('serialport:read', res.raw);
                 if (hold && (received + 1 >= sent)) {
                     log.debug(`Continue sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
@@ -680,6 +692,7 @@ class GrblController {
             }
 
             if ((this.workflow.state === WORKFLOW_STATE_PAUSED) && (received < sent)) {
+                this.setSenderTimeout();
                 this.emit('serialport:read', res.raw);
                 if (!hold) {
                     log.error('The sender does not hold off during the paused state');
@@ -759,6 +772,7 @@ class GrblController {
                 } else {
                     this.emit('serialport:read', res.raw);
                 }
+                this.setSenderTimeout();
                 this.sender.ack();
                 this.sender.next();
 
@@ -1551,6 +1565,7 @@ class GrblController {
                         this.feeder.reset();
                         this.workflow.start();
                         // Sender
+                        this.setSenderTimeout();
                         this.sender.next();
                         this.feederCB = null;
                     };
@@ -1563,6 +1578,7 @@ class GrblController {
 
                     // Sender
                     this.sender.setStartLine(0);
+                    this.setSenderTimeout();
                     this.sender.next({ startFromLine: true });
                 }
             },
@@ -1813,6 +1829,7 @@ class GrblController {
                 this.feederCB = () => {
                     this.workflow.start();
                     this.feeder.reset();
+                    this.setSenderTimeout();
                     this.sender.next();
                     this.feederCB = null;
                 };
@@ -2100,6 +2117,23 @@ class GrblController {
         block.push(POSTHOOK_COMPLETE);
 
         this.command('gcode', block);
+    }
+
+    setSenderTimeout() {
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => {
+            // job idle
+            if (this.state.status.activeState === GRBL_ACTIVE_STATE_IDLE) {
+                // force one ok for query parser and another for the line
+                this.forceOK = true;
+                this.sender.ack();
+                this.runner.forceOK();
+            } else if (this.workflow.state === WORKFLOW_STATE_RUNNING) { // if job not idle but running, reset timeout
+                this.setSenderTimeout();
+            } else if (this.state.status.activeState === GRBL_ACTIVE_STATE_IDLE && this.workflow.state === WORKFLOW_STATE_IDLE) { // job done
+                this.sender.next({ forceEnd: true }); // force job end
+            }
+        }, 5000);
     }
 }
 

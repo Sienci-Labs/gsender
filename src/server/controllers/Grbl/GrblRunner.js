@@ -286,6 +286,10 @@ class GrblRunner extends events.EventEmitter {
         const activeState = _.get(this.state, 'status.activeState');
         return activeState === GRBL_ACTIVE_STATE_IDLE;
     }
+
+    forceOK() {
+        this.emit('ok', { raw: 'force ok' });
+    }
 }
 
 export default GrblRunner;
