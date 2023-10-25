@@ -45,7 +45,7 @@ export const getPreamble = (options) => {
     return [
         '; Initial Probe setup',
         '%UNITS=modal.units',
-        '%WAIT=0.3',
+        '%DWELL=0.3',
         `%X_PROBE_DISTANCE=${xProbeDistance}`,
         `%Y_PROBE_DISTANCE=${yProbeDistance}`,
         `%Z_PROBE_DISTANCE=${zProbeDistance}`,
@@ -100,7 +100,7 @@ export const getSingleAxisStandardRoutine = (axis) => {
         'G91',
         `G0 ${axis}[${axisRetract}]`,
         `G38.2 ${axis}[${axis}_PROBE_DISTANCE] F[PROBE_SLOW_FEED]`,
-        'G4 P[%WAIT]',
+        'G4 P[%DWELL]',
         `G10 L2 P0 ${axis}[${axis}_THICKNESS]}`,
         `G0 ${axis}[${axis}_RETRACT]`
     ];
@@ -133,7 +133,6 @@ export const get3AxisStandardRoutine = (options) => {
         // Probe Y
         code.push(...get3AxisStandardRoutine('Y'));
     }
-    console.log(code);
     return code;
 };
 
@@ -217,13 +216,14 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction, firmware }) => {
             'G0 Y[Y_CENTER]',
             'G10 L20 P0 X[X_OFF] Y[Y_OFF]',
             'G21 G90 G0 X0 Y0',
-            'G21 G0 G90 Z8'
+            'G21 G0 G90 Z1'
         );
     } else if (axes.x && axes.y) {
         code.push(
             '; Probe XY Auto Endmill',
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
@@ -319,9 +319,11 @@ export const get3AxisAutoRoutine = ({ axes, $13, direction, firmware }) => {
     return code;
 };
 
-export const get3AxisAutoTipRoutine = ({ axes, $13, direction }) => {
+export const get3AxisAutoTipRoutine = ({ axes, $13, direction, firmware }) => {
     const code = [];
     const p = 'P0';
+
+    const probeDelay = firmware === GRBLHAL ? 0.05 : 0.15;
 
     const [xOff, yOff] = determineAutoPlateOffsetValues(direction);
 
@@ -335,47 +337,46 @@ export const get3AxisAutoTipRoutine = ({ axes, $13, direction }) => {
             '; Probe XYZ Auto Tip',
             `%X_OFF = ${xOff}`,
             `%Y_OFF = ${yOff}`,
+            `%PROBE_DELAY=${probeDelay}`,
             'G21 G91',
             'G38.2 Z-25 F200',
             'G21 G91 G0 Z2',
             'G38.2 Z-5 F75',
-            'G4 P0.1',
+            'G4 P[PROBE_DELAY]',
             `G10 L20 ${p} Z5`,
             'G21 G91 G0 Z0.5',
             'G21 G91 G0 X-3',
             'G38.2 X-30 F150',
             'G21 G91 G0 X2',
             'G38.2 X-5 F75',
-            'G4 P0.1',
+            'G4 P[PROBE_DELAY]',
             '%X_LEFT=posx',
             'G21 G91 G0 X14',
             'G38.2 X15 F150',
             'G21 G91 G0 X-2',
             'G38.2 X5 F75',
-            'G4 P0.1',
+            'G4 P[PROBE_DELAY]',
             '%X_RIGHT=posx',
-            '%X_CHORD=X_RIGHT - XLEFT',
-            'G21 G90 G0 X[X_CHORD/2]',
-            '%X_CENTER=posx',
+            '%X_CENTER=((X_RIGHT - X_LEFT)/2)*-1',
+            'G21 G91 G0 X[X_CENTER]',
             'G21 G91 G0 Y-3',
             'G38.2 Y-15 F150',
             'G21 G91 G0 Y2',
             'G38.2 Y-5 F75',
-            'G4 P0.1',
+            'G4 P[PROBE_DELAY]',
             '%Y_BOTTOM = posy',
             //`G10 L20 ${p} Y0`,
             'G21 G91 G0 Y14',
             'G38.2 Y15 F150',
             'G21 G91 G0 Y-2',
             'G38.2 Y5 F75',
-            'G4 P0.1',
+            'G4 P[PROBE_DELAY]',
             '%Y_TOP = posy',
-            '%Y_CHORD = Y_TOP - Y_BOTTOM',
-            'G0 Y[Y_CHORD / 2] X0',
-            'G4 P0.15',
-            `G10 L20 ${p} X[X_OFF] Y[Y_OFF]`,
+            '%Y_CENTER = ((Y_TOP - Y_BOTTOM)/2) * -1',
+            'G0 Y[Y_CENTER]',
+            'G10 L20 P0 X[X_OFF] Y[Y_OFF]',
             'G21 G90 G0 X0 Y0',
-            'G21 G90 G0 Z1',
+            'G21 G0 G90 Z1'
         );
     } else if (axes.x && axes.y) {
         code.push(
