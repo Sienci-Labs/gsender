@@ -172,8 +172,9 @@ export const get3AxisStandardRoutine = (options) => {
         // We start at different location for
         if (!axes.z) {
             code.push(
-                'G0 X[X_RETRACT_DISTANCE * X_RETRACT_DIRECTION] Y[Y_RETRACT_DISTANCE * Y_RETRACT_DIRECTION]',
-                'G0 Y[Y_ADJUST]'
+                'G0 X[X_RETRACT_DISTANCE] Y[Y_RETRACT_DISTANCE]',
+                'G4 P5',
+                'G0 Y[Y_ADJUST * -1 * Y_RETRACT_DIRECTION]'
             );
         }
 
@@ -702,7 +703,7 @@ export const getProbeCode = (options, direction = 0) => {
     if (axes.x && axes.y && axes.z) {
         return get3AxisStandardRoutine(options);
     } else if (axes.x && axes.y) {
-        // Do something
+        return get3AxisStandardRoutine(options);
     } else if (axes.z) {
         return getSingleAxisStandardRoutine('Z');
     } else if (axes.y) {
