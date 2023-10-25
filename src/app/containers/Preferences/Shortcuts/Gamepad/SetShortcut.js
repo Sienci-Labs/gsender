@@ -15,7 +15,9 @@ import {
     COOLANT_CATEGORY,
 } from 'app/constants';
 import shuttleEvents from 'app/lib/shuttleEvents';
+// import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 import ToggleSwitch from 'Components/ToggleSwitch';
+// import Button from 'Components/FunctionButton/FunctionButton';
 
 import { GamepadContext } from './utils/context';
 import { setCurrentModal, setGamepadProfileList } from './utils/actions';
@@ -87,6 +89,16 @@ const SetShortcut = () => {
 
         dispatch(setGamepadProfileList(updatedProfiles));
     };
+
+    // const onSetClick = () => {
+    //     closeModal();
+
+    //     Toaster.pop({
+    //         msg: 'Set Button Shortcut',
+    //         type: TOASTER_INFO,
+    //         duration: 3000
+    //     });
+    // };
 
     const data = Object.values(shuttleEvents.allShuttleControlEvents)
         .reduce((acc, value) => {
@@ -200,6 +212,13 @@ const SetShortcut = () => {
                         <div>Shortcut:</div>
                         <kbd>{buttonLabel}</kbd>
                     </div>
+
+                    {/* <Button
+                        onClick={onSetClick}
+                        style={{ margin: 0, maxWidth: '200px' }}
+                    >
+                        Set Shortcut
+                    </Button> */}
 
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                         <div>Action:</div>
