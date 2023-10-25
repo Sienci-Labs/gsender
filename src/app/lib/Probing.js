@@ -173,7 +173,6 @@ export const get3AxisStandardRoutine = (options) => {
         if (!axes.z) {
             code.push(
                 'G0 X[X_RETRACT_DISTANCE] Y[Y_RETRACT_DISTANCE]',
-                'G4 P5',
                 'G0 Y[Y_ADJUST * -1 * Y_RETRACT_DIRECTION]'
             );
         }
