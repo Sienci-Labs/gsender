@@ -1148,20 +1148,13 @@ class AxesWidget extends PureComponent {
                 return null;
             };
 
-            const computeFeedrate = (stickValue) => {
-                const feedrate = Number(this.actions.getFeedrate());
-
-                return Math.round(Math.abs(feedrate * stickValue));
-            };
-
             const axes = computeAxesAndDirection(activeAxis);
-            const feedrate = computeFeedrate(value);
 
             if (!this.joystickLoop) {
                 this.joystickLoop = new JoystickLoop({
                     gamepadProfile: currentProfile,
                     jog: this.handleJoystickJog,
-                    axis: activeAxis,
+                    axis,
                     feedrate: this.actions.getFeedrate()
                 });
             }
@@ -1172,7 +1165,7 @@ class AxesWidget extends PureComponent {
                 return;
             }
 
-            this.joystickLoop.start({ axes, feedrate });
+            this.joystickLoop.start({ axes }, axis);
 
             // if (value === 0) {
             //     this.actions.cancelJog();

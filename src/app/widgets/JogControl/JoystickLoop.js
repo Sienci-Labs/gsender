@@ -2,11 +2,10 @@ import store from 'app/store';
 import gamepad from 'app/lib/gamepad';
 
 export class JoystickLoop {
-    constructor({ gamepadProfile, jog, axis, feedrate }) {
+    constructor({ gamepadProfile, jog, feedrate }) {
         this.isRunning = false;
         this.gamepadProfile = gamepadProfile;
         this.jog = jog;
-        this.axis = axis;
         this.feedrate = feedrate;
     }
 
@@ -19,11 +18,23 @@ export class JoystickLoop {
     _computeFeedrate = (stickValue) => {
         const feedrate = this.feedrate;
 
+        if (!stickValue) {
+            return feedrate;
+        }
+
         return Math.round(Math.abs(feedrate * stickValue));
     };
 
+    _computeIncrementalDistance = ({ feedrate }) => {
+        const feedrateInMMPerSec = Math.round(feedrate / 60);
 
-    start = ({ axes }) => {
+        const executionTimeOfSingleCommand = 0.25;
+
+        return feedrateInMMPerSec * executionTimeOfSingleCommand;
+    };
+
+
+    start = ({ axes }, activeAxis) => {
         if (this.isRunning) {
             return;
         }
@@ -42,7 +53,15 @@ export class JoystickLoop {
                 return;
             }
 
-            this.jog({ ...axes, F: this._computeFeedrate(axesValues[this.axis]) });
+            const feedrate = this._computeFeedrate(axesValues[activeAxis]);
+
+            const updatedAxis = Object.entries(axes).reduce((acc, [key, value]) => {
+                acc[key] = value * this._computeIncrementalDistance({ feedrate });
+
+                return acc;
+            }, {});
+
+            this.jog({ ...updatedAxis, F: this._computeFeedrate(axesValues[activeAxis]) });
         }, interval);
     }
 
