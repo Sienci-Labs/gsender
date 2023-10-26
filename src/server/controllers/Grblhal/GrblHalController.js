@@ -58,7 +58,8 @@ import {
     GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
     GRBL_HAL_SETTINGS,
-    GRBL_ACTIVE_STATE_HOME
+    GRBL_ACTIVE_STATE_HOME,
+    GRBL_ACTIVE_STATE_IDLE
 } from './constants';
 import {
     METRIC_UNITS,
@@ -176,6 +177,10 @@ class GrblHalController {
 
     // Sender
     sender = null;
+
+    timeout = null;
+
+    forceOK = false;
 
     // Shared context
     sharedContext = {};
@@ -530,6 +535,7 @@ class GrblHalController {
             this.sender.unhold();
 
             // subtract time paused
+            this.setSenderTimeout();
             this.sender.next({ timePaused: pauseTime });
         });
 
@@ -585,6 +591,11 @@ class GrblHalController {
                     this.emit('serialport:read', res.raw);
                 }
                 this.actionMask.queryParserState.reply = false;
+
+                if (this.forceOK) {
+                    this.forceOK = false;
+                    this.runner.forceOK();
+                }
                 return;
             }
 
@@ -595,6 +606,7 @@ class GrblHalController {
                     log.debug(`Continue sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
                     this.sender.unhold();
                 }
+                this.setSenderTimeout();
                 this.sender.ack();
                 this.sender.next();
                 return;
@@ -608,6 +620,7 @@ class GrblHalController {
                 if (received + 1 >= sent) {
                     log.debug(`Stop sending G-code: hold=${hold}, sent=${sent}, received=${received + 1}`);
                 }
+                this.setSenderTimeout();
                 this.sender.ack();
                 this.sender.next();
                 return;
@@ -679,6 +692,7 @@ class GrblHalController {
                 } else {
                     this.emit('serialport:read', res.raw);
                 }
+                this.setSenderTimeout();
                 this.sender.ack();
                 this.sender.next();
 
@@ -1455,6 +1469,7 @@ class GrblHalController {
                         this.feeder.reset();
                         this.workflow.start();
                         // Sender
+                        this.setSenderTimeout();
                         this.sender.next();
                         this.feederCB = null;
                     };
@@ -1467,6 +1482,7 @@ class GrblHalController {
 
                     // Sender
                     this.sender.setStartLine(0);
+                    this.setSenderTimeout();
                     this.sender.next({ startFromLine: true });
                 }
             },
@@ -1741,6 +1757,7 @@ class GrblHalController {
                 this.feederCB = () => {
                     this.workflow.start();
                     this.feeder.reset();
+                    this.setSenderTimeout();
                     this.sender.next();
                     this.feederCB = null;
                 };
@@ -2035,6 +2052,23 @@ class GrblHalController {
         block.push(POSTHOOK_COMPLETE);
 
         this.command('gcode', block);
+    }
+
+    setSenderTimeout() {
+        clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => {
+            // job idle
+            if (this.state.status.activeState === GRBL_ACTIVE_STATE_IDLE) {
+                // force one ok for query parser and another for the line
+                this.forceOK = true;
+                this.sender.ack();
+                this.runner.forceOK();
+            } else if (this.workflow.state === WORKFLOW_STATE_RUNNING) { // if job not idle but running, reset timeout
+                this.setSenderTimeout();
+            } else if (this.state.status.activeState === GRBL_ACTIVE_STATE_IDLE && this.workflow.state === WORKFLOW_STATE_IDLE) { // job done
+                this.sender.next({ forceEnd: true }); // force job end
+            }
+        }, 5000);
     }
 }
 
