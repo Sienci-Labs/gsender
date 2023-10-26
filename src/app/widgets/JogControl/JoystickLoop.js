@@ -1,4 +1,3 @@
-import store from 'app/store';
 import gamepad from 'app/lib/gamepad';
 
 export class JoystickLoop {
@@ -30,9 +29,13 @@ export class JoystickLoop {
 
         const executionTimeOfSingleCommand = 0.25;
 
-        return feedrateInMMPerSec * executionTimeOfSingleCommand;
+        return +((feedrateInMMPerSec * executionTimeOfSingleCommand).toFixed(2));
     };
 
+    update = ({ gamepadProfile, feedrate }) => {
+        this.gamepadProfile = gamepadProfile;
+        this.feedrate = feedrate;
+    }
 
     start = ({ axes }, activeAxis) => {
         if (this.isRunning) {
@@ -41,28 +44,32 @@ export class JoystickLoop {
 
         this.isRunning = true;
 
-        const interval = store.get('workspace.temp.gamepad.incrementalAmount', 250);
+        const INTERVAL_IN_MS = 200;
 
-        this.runLoop = setInterval(() => {
-            const axesValues = this._getCurrentGamepad()?.axes;
+        this._runJog({ axes, activeAxis });
 
-            const thumbsticksAreIdle = axesValues?.every(axis => axis === 0);
+        this.runLoop = setInterval(() => this._runJog({ axes, activeAxis }), INTERVAL_IN_MS);
+    }
 
-            if (thumbsticksAreIdle) {
-                this.stop();
-                return;
-            }
+    _runJog = ({ axes, activeAxis }) => {
+        const axesValues = this._getCurrentGamepad()?.axes;
 
-            const feedrate = this._computeFeedrate(axesValues[activeAxis]);
+        const thumbsticksAreIdle = axesValues?.every(axis => axis === 0);
 
-            const updatedAxis = Object.entries(axes).reduce((acc, [key, value]) => {
-                acc[key] = value * this._computeIncrementalDistance({ feedrate });
+        if (thumbsticksAreIdle) {
+            this.stop();
+            return;
+        }
 
-                return acc;
-            }, {});
+        const feedrate = this._computeFeedrate(axesValues[activeAxis]);
 
-            this.jog({ ...updatedAxis, F: this._computeFeedrate(axesValues[activeAxis]) });
-        }, interval);
+        const updatedAxis = Object.entries(axes).reduce((acc, [key, value]) => {
+            acc[key] = value * this._computeIncrementalDistance({ feedrate });
+
+            return acc;
+        }, {});
+
+        this.jog({ ...updatedAxis, F: this._computeFeedrate(axesValues[activeAxis]) });
     }
 
     stop = () => {
