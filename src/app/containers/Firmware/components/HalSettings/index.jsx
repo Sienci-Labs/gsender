@@ -37,7 +37,7 @@ const HalSettings = ({ descriptions, groups }) => {
                     const { message, description, dataType, ...info } = descriptionLookup(settingKey, descriptions);
                     const InputElement = getDatatypeInput(dataType);
 
-                    const categoryClass = Number(descriptions[settingKey].group) % 9;
+                    const categoryClass = (Number(descriptions[settingKey].group) % 9) + 1;
 
                     const groupLabel = groups[descriptions[settingKey].group].label;
 
