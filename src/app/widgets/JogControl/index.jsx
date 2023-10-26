@@ -78,7 +78,7 @@ import {
 } from './constants';
 import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
-// import { JoystickLoop } from './JoystickLoop';
+import { JoystickLoop } from './JoystickLoop';
 import { MPGHelper } from './MPGHelper';
 
 class AxesWidget extends PureComponent {
@@ -1098,46 +1098,33 @@ class AxesWidget extends PureComponent {
 
                 const factor = (isReversed) => (!isReversed ? 1 : -1);
 
-                // const movementDistance = store.get('workspace.temp.gamepad.joggingAmount', 3);
-                const movementDistance = 1;
+                const MOVEMENT_DISTANCE = 1;
 
                 // X-axis Positive (default behaviour)
                 if (inRange(degrees, 0, 30) || inRange(degrees, 330, 360)) {
                     return {
-                        [horizontal[actionType]]: movementDistance * factor(horizontal.isReversed)
+                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed)
                     };
                 }
-
-                // if (inRange(degrees, 31, 59)) {
-                //     // return TopRight;
-                // }
 
                 // Y-axis Positive (default behaviour)
                 if (inRange(degrees, 60, 120)) {
                     return {
-                        [vertical[actionType]]: movementDistance * factor(vertical.isReversed)
+                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(vertical.isReversed)
                     };
                 }
-
-                // if (inRange(degrees, 121, 149)) {
-                //     // return TopLeft;
-                // }
 
                 // X-axis Negative (default behaviour)
                 if (inRange(degrees, 150, 210)) {
                     return {
-                        [horizontal[actionType]]: movementDistance * factor(!horizontal.isReversed)
+                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed)
                     };
                 }
-
-                // if (inRange(degrees, 211, 239)) {
-                //     // return BottomLeft;
-                // }
 
                 // Y-axis Negative (default behaviour)
                 if (inRange(degrees, 240, 300)) {
                     return {
-                        [vertical[actionType]]: movementDistance * factor(!vertical.isReversed)
+                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(!vertical.isReversed)
                     };
                 }
 
@@ -1150,35 +1137,23 @@ class AxesWidget extends PureComponent {
 
             const data = computeAxesAndDirection(activeAxis);
 
-            const { prevJog, prevDirection } = this.state;
+            if (!this.joystickLoop) {
+                this.joystickLoop = new JoystickLoop({
+                    gamepadProfile: currentProfile,
+                    jog: this.handleJoystickJog,
+                    axis,
+                    feedrate: this.actions.getFeedrate()
+                });
+            }
 
-            if (!value) {
-                this.handleShortcutStop();
+            if (value === 0) {
+                this.joystickLoop.stop();
+                this.actions.cancelJog();
                 return;
             }
 
-            if (prevJog || prevDirection !== data) {
-                this.handleShortcutStop();
-            }
-
-            this.handleShortcutJog({ axis: data });
-
-            // if (!this.joystickLoop) {
-            //     this.joystickLoop = new JoystickLoop({
-            //         gamepadProfile: currentProfile,
-            //         jog: this.handleJoystickJog,
-            //         axis,
-            //         feedrate: this.actions.getFeedrate()
-            //     });
-            // }
-
-            // if (value === 0) {
-            //     this.joystickLoop.stop();
-            //     this.actions.cancelJog();
-            //     return;
-            // }
-
-            // this.joystickLoop.start({ axes: data }, axis);
+            this.joystickLoop.update({ gamepadProfile: currentProfile, feedrate: this.actions.getFeedrate() });
+            this.joystickLoop.start({ axes: data }, axis);
         }, 50, { leading: false, trailing: true }));
     }
 
