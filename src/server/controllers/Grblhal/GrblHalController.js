@@ -59,7 +59,7 @@ import {
     GRBL_HAL_ERRORS,
     GRBL_HAL_SETTINGS,
     GRBL_ACTIVE_STATE_HOME,
-    GRBL_ACTIVE_STATE_IDLE
+    GRBL_HAL_ACTIVE_STATE_IDLE
 } from './constants';
 import {
     METRIC_UNITS,
@@ -2058,14 +2058,14 @@ class GrblHalController {
         clearTimeout(this.timeout);
         this.timeout = setTimeout(() => {
             // job idle
-            if (this.state.status.activeState === GRBL_ACTIVE_STATE_IDLE) {
+            if (this.state.status.activeState === GRBL_HAL_ACTIVE_STATE_IDLE) {
                 // force one ok for query parser and another for the line
                 this.forceOK = true;
                 this.sender.ack();
                 this.runner.forceOK();
             } else if (this.workflow.state === WORKFLOW_STATE_RUNNING) { // if job not idle but running, reset timeout
                 this.setSenderTimeout();
-            } else if (this.state.status.activeState === GRBL_ACTIVE_STATE_IDLE && this.workflow.state === WORKFLOW_STATE_IDLE) { // job done
+            } else if (this.state.status.activeState === GRBL_HAL_ACTIVE_STATE_IDLE && this.workflow.state === WORKFLOW_STATE_IDLE) { // job done
                 this.sender.next({ forceEnd: true }); // force job end
             }
         }, 5000);
