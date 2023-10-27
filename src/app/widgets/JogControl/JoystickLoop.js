@@ -52,6 +52,10 @@ export class JoystickLoop {
     }
 
     _runJog = ({ axes, activeAxis }) => {
+        if (!axes) {
+            return;
+        }
+
         const axesValues = this._getCurrentGamepad()?.axes;
 
         const thumbsticksAreIdle = axesValues?.every(axis => axis === 0);
