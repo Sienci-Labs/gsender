@@ -39,7 +39,7 @@ const HalSettings = ({ descriptions, groups }) => {
 
                     const categoryClass = (Number(descriptions[settingKey] ? descriptions[settingKey].group : 0) % 9) + 1;
 
-                    const groupLabel = descriptions[settingKey] ? groups[descriptions[settingKey].group].label : 'null';
+                    const groupLabel = descriptions[settingKey] && groups[descriptions[settingKey].group] ? groups[descriptions[settingKey].group].label : 'null';
 
                     //const highlighted = false; // TODO: Logic for hal defaults
                     return (
