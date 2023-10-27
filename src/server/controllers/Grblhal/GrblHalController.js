@@ -55,11 +55,10 @@ import {
     GRBLHAL,
     GRBL_ACTIVE_STATE_RUN,
     GRBLHAL_REALTIME_COMMANDS,
-    GRBL_HAL_ALARMS,
+    //GRBL_HAL_ALARMS,
     GRBL_HAL_ERRORS,
     GRBL_HAL_SETTINGS,
-    GRBL_ACTIVE_STATE_HOME,
-    GRBL_HAL_ACTIVE_STATE_IDLE
+    GRBL_ACTIVE_STATE_HOME, GRBL_HAL_ACTIVE_STATE_HOLD, GRBL_HAL_ACTIVE_STATE_IDLE, GRBL_HAL_ACTIVE_STATE_RUN
 } from './constants';
 import {
     METRIC_UNITS,
@@ -202,12 +201,14 @@ class GrblHalController {
         }
         this.engine = engine;
 
-        const { port, baudrate, rtscts } = { ...options };
+
+        const { port, baudrate, rtscts, network } = { ...options };
         this.options = {
             ...this.options,
             port: port,
             baudrate: baudrate,
-            rtscts: rtscts
+            rtscts: rtscts,
+            network
         };
 
         // Connection
@@ -215,6 +216,7 @@ class GrblHalController {
             path: port,
             baudRate: baudrate,
             rtscts: rtscts,
+            network,
             writeFilter: (data) => {
                 const line = data.trim();
 
@@ -371,7 +373,7 @@ class GrblHalController {
         // Sender
         this.sender = new Sender(SP_TYPE_CHAR_COUNTING, {
             // Deduct the buffer size to prevent from buffer overrun
-            bufferSize: (128 - 28), // The default buffer size is 128 bytes
+            bufferSize: (1024 - 28), // TODO: Parse this out from OPT
             dataFilter: (line, context) => {
                 // Remove comments that start with a semicolon `;`
                 let commentMatcher = /\s*;.*/g;
@@ -545,6 +547,7 @@ class GrblHalController {
         this.runner.on('raw', noop);
 
         this.runner.on('status', (res) => {
+            //
             if (this.homingStarted) {
                 this.homingFlagSet = determineMachineZeroFlagSet(res, this.settings);
                 this.emit('homing:flag', this.homingFlagSet);
@@ -664,7 +667,7 @@ class GrblHalController {
             this.emit('error', {
                 type: ERROR,
                 code: `${code}`,
-                description: error.description,
+                description: error.description || '',
                 line: line,
                 lineNumber: isFileError ? received + 1 : '',
                 origin: errorOrigin,
@@ -704,7 +707,7 @@ class GrblHalController {
             }
 
             // Clear error by sending newline for grblHAL
-            this.connection.write('\n');
+            //this.connection.write('\n');
 
             // Feeder
             this.feeder.ack();
@@ -712,8 +715,9 @@ class GrblHalController {
         });
 
         this.runner.on('alarm', (res) => {
-            const code = Number(res.message) || undefined;
-            const alarm = _.find(GRBL_HAL_ALARMS, { code: code });
+            const code = Number(res.message) || this.state.status.subState;
+            //const alarm = _.find(this.settings.alarms, { id: code });
+            const alarm = this.settings.alarms[code];
 
             const { lines, received, name } = this.sender.state;
             const { outstanding } = this.feeder.state;
@@ -746,7 +750,7 @@ class GrblHalController {
                 this.emit('error', {
                     type: ALARM,
                     code: code,
-                    description: alarm.description,
+                    description: alarm.description || '',
                     line: line,
                     lineNumber: isFileError ? received + 1 : '',
                     origin: errorOrigin,
@@ -839,9 +843,14 @@ class GrblHalController {
             this.emit('settings:description', this.runner.settings.descriptions);
         });
 
+        this.runner.on('alarmDetail', (payload) => {
+            this.emit('settings:alarms', this.runner.settings.alarms);
+        });
+
         const queryStatusReport = () => {
             // Check the ready flag
             if (!(this.ready)) {
+                console.log('not ready');
                 return;
             }
 
@@ -867,7 +876,11 @@ class GrblHalController {
             if (this.isOpen()) {
                 this.actionMask.queryStatusReport = true;
                 this.actionTime.queryStatusReport = now;
-                this.connection.write(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                if (this.runner.isAlarm()) {
+                    this.connection.write(GRBLHAL_REALTIME_COMMANDS.COMPLETE_REALTIME_REPORT);
+                } else {
+                    this.connection.write(GRBLHAL_REALTIME_COMMANDS.STATUS_REPORT); //? or \x80
+                }
             }
         };
 
@@ -938,6 +951,22 @@ class GrblHalController {
 
             // Grbl state
             if (this.state !== this.runner.state) {
+                // Unpause sending when hold state exited using macro buttons - We check if software sender paused + state changed from hold to idle/run
+                const currentActiveState = _.get(this.state, 'status.activeState', '');
+                const runnerActiveState = _.get(this.runner.state, 'status.activeState', '');
+                if (this.workflow.isPaused &&
+                    currentActiveState === GRBL_HAL_ACTIVE_STATE_HOLD &&
+                    (runnerActiveState === GRBL_HAL_ACTIVE_STATE_IDLE || runnerActiveState === GRBL_HAL_ACTIVE_STATE_RUN)
+                ) {
+                    console.log('Gracefully resuming');
+                    /*setTimeout(() => {
+                        const as = _.get(this.state, 'status.activeState');
+                        if (as === GRBL_HAL_ACTIVE_STATE_IDLE || as === GRBL_HAL_ACTIVE_STATE_RUN) {
+                            console.log('resume timeout');
+                            this.command('gcode:resume');
+                        }
+                    }, 1000);*/
+                }
                 this.state = this.runner.state;
                 this.emit('controller:state', GRBLHAL, this.state);
             }
@@ -976,16 +1005,15 @@ class GrblHalController {
     async initController() {
         // $13=0 (report in mm)
         // $13=1 (report in inches)
+        this.connection.writeImmediate(String.fromCharCode(0x87));
         this.writeln('$$');
         await delay(50);
         this.event.trigger(CONTROLLER_READY);
-        this.writeln('$ES');
+        this.connection.writeImmediate('$ES\n');
         await delay(100);
-        this.writeln('$ESH');
-        //check if controller is ready and send the status
-        //this.emit('grbl:iSready', this.ready);
-
-        //this.command('realtime_report');
+        this.connection.writeImmediate('$ESH\n');
+        this.connection.writeImmediate('$EG\n');
+        this.connection.writeImmediate('$EA\n');
     }
 
     populateContext(context = {}) {
@@ -1182,10 +1210,14 @@ class GrblHalController {
             // We need to query version after waiting for connection, so wait 0.5 seconds and query $I
             // We set controller ready if version found
             setTimeout(() => {
+                if (this.connection) {
+                    this.connection.writeImmediate(String.fromCharCode(0x87));
+                    this.connection.write('$I\n');
+                }
                 let counter = 3;
                 const interval = setInterval(() => {
                     // check if 3 tries or controller is ready
-                    if (counter <= 0 || this.ready) {
+                    if (this.ready || counter <= 0) {
                         clearInterval(interval);
                         return;
                     }
@@ -1341,7 +1373,7 @@ class GrblHalController {
                 // respond with an ok when the dwell is complete. At that instant, there will
                 // be no queued motions, as long as no more commands were sent after the G4.
                 // This is the fastest way to do it without having to check the status reports.
-                const dwell = '%wait ; Wait for the planner to empty';
+                //const dwell = '%wait ; Wait for the planner to empty';
 
                 // add delay to spindle startup if enabled
                 const preferences = store.get('preferences', {});
@@ -1351,7 +1383,7 @@ class GrblHalController {
                     gcode = gcode.replace(/M[3-4] S[0-9]*/g, '$& G4 P1');
                 }
 
-                const ok = this.sender.load(name, gcode + '\n' + dwell, context);
+                const ok = this.sender.load(name, gcode + '\n', context);
                 if (!ok) {
                     callback(new Error(`Invalid G-code: name=${name}`));
                     return;
@@ -1537,6 +1569,7 @@ class GrblHalController {
                 this.command('gcode:resume');
             },
             'gcode:resume': async () => {
+                log.debug('gcode:resume called - program to continue sending');
                 const [type] = args;
                 if (this.event.hasEnabledEvent(PROGRAM_RESUME)) {
                     this.feederCB = () => {

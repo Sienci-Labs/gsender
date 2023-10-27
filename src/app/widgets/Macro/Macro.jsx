@@ -41,7 +41,15 @@ const Container = ({ columns, children }) => {
     const gridTemplateColumns = arr.reduce((acc) => acc + ' 1fr', '');
 
     return (
-        <div style={{ display: 'grid', gridTemplateColumns, overflowY: 'auto' }}>
+        <div
+            style={{
+                display: 'grid',
+                gridTemplateColumns,
+                overflowY: 'auto',
+                position: 'absolute',
+                height: '100%'
+            }}
+        >
             {children}
         </div>
     );

@@ -273,3 +273,7 @@ export const STATS_PAGES = {
     JOB_PER_PORT,
     RUN_TIME_PER_PORT
 };
+
+export const DB_NAME = 'ParsedDataDB';
+export const OBJECT_STORE = 'parsedData';
+export const DATA_ID = 'data';

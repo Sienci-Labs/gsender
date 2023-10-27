@@ -23,7 +23,7 @@
 
 // import colornames from 'colornames';
 import * as THREE from 'three';
-import { BACKGROUND_PART, CUTTING_PART, G0_PART, G1_PART, G2_PART, G3_PART, LASER_PART } from './constants';
+import { BACKGROUND_PART, CUTTING_PART, G0_PART, G1_PART, G2_PART, G3_PART, LASER_PART, PLANNED_PART } from './constants';
 
 class GCodeVisualizer {
     constructor(theme) {
@@ -37,6 +37,9 @@ class GCodeVisualizer {
         this.isLaser = false;
         this.frames = []; // Example
         this.frameIndex = 0;
+        this.frameDifferences = Array(16).fill(null); // queue, stores up to 16 frame differences (v2 - v1)
+        this.oldV1s = Array(16).fill(null); // queue, stores up to 16 frames (v1)
+        this.countdown = 16; // counter
 
         return this;
     }
@@ -69,6 +72,9 @@ class GCodeVisualizer {
         this.isLaser = isLaser;
         this.spindleChanges = spindleChanges;
         const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
+        this.countdown = 16;
+        this.frameDifferences = Array(16).fill(null);
+        this.oldV1s = Array(16).fill(null);
 
         // Get line colors for current theme
         const motionColor = {
@@ -122,36 +128,68 @@ class GCodeVisualizer {
             return;
         }
         const defaultColor = new THREE.Color(this.theme.get(CUTTING_PART));
+        const plannedColor = new THREE.Color(this.theme.get(PLANNED_PART));
 
         frameIndex = Math.min(frameIndex, this.frames.length - 1);
         frameIndex = Math.max(frameIndex, 0);
 
         const v1 = this.frames[this.frameIndex];
-        const v2 = this.frames[frameIndex];
+        const v2 = this.frames[frameIndex]; // recieved lines
 
         if (v1 < v2) {
+            // subtract countdown and advance the queue
+            this.countdown -= 1;
+            this.frameDifferences.shift();
+            this.frameDifferences.push(v2 - v1);
+            this.oldV1s.shift();
+            this.oldV1s.push(v1);
+
             const workpiece = this.group.children[0];
-            const offsetIndex = v1 * 4;
+            const offsetIndex = this.oldV1s[0] * 4; // use the oldest v1, as that's where we are updating from
+            const bufferOffsetIndex = v1 * 4;
             const colorAttr = workpiece.geometry.getAttribute('color');
-            const defaultColorArray = [...defaultColor.toArray(), 0.3];
-            const colorArray = Array.from({ length: (v2 - v1) }, () => defaultColorArray).flat();
 
-            if (this.isLaser) {
-                // add original color on top so you can see the parts the laser has finished
-                for (let i = 0; i < colorArray.length; i++) {
-                    colorArray[i] += colorAttr.array[offsetIndex + i];
+            const opacity = this.isLaser ? 1 : 0.3;
+            const defaultColorArray = [...defaultColor.toArray(), opacity]; // grey
+            const defaultBufferColorArray = [...plannedColor.toArray(), 1]; // yellow
+            const placeHolderColorArray = [...plannedColor.toArray(), 1]; // yellow
+
+            // add the distance between the current movement and 19 moves ago
+            let placeHolderLength = 0;
+            this.frameDifferences.forEach((num, i) => {
+                // if first or last, skip
+                // these are already covered by colorArray and bufferColorArray
+                if (i === 0 || i === this.frameDifferences.length - 1) {
+                    return;
                 }
-            }
+                placeHolderLength += num;
+            });
 
-            colorAttr.set([...colorArray], offsetIndex);
-            // only update the range we've updated;
-            colorAttr.updateRange.count = colorArray.length;
-            colorAttr.updateRange.offset = offsetIndex;
+            const colorArray = Array.from({ length: (this.frameDifferences[0]) }, () => defaultColorArray).flat(); // grey, 16 movements ago
+            const bufferColorArray = Array.from({ length: (v2 - v1) }, () => defaultBufferColorArray).flat(); // current movement
+            const placeHolderArray = Array.from({ length: (placeHolderLength) }, () => placeHolderColorArray).flat(); // all movements in between
+
+            // if finished counting down, start greying out the old movements
+            if (this.countdown <= 0) {
+                colorAttr.set([...colorArray, ...placeHolderArray, ...bufferColorArray], offsetIndex);
+                colorAttr.updateRange.count = colorArray.length + placeHolderArray.length + bufferColorArray.length;
+                colorAttr.updateRange.offset = offsetIndex;
+            } else { // if not finished, continue colouring yellow
+                colorAttr.set([...bufferColorArray], bufferOffsetIndex);
+                colorAttr.updateRange.count = bufferColorArray.length;
+                colorAttr.updateRange.offset = bufferOffsetIndex;
+            }
             colorAttr.needsUpdate = true;
         }
 
         // Restore the path to its original colors
         if (v2 < v1) {
+            // reset vars
+            this.frameDifferences = Array(16).fill(-1);
+            this.oldV1s = Array(16).fill(-1);
+            this.countdown = 16;
+
+            // reset colours
             const workpiece = this.group.children[0];
             for (let i = v2; i < v1; ++i) {
                 const offsetIndex = i * 4; // Account for RGB buffer
@@ -183,6 +221,9 @@ class GCodeVisualizer {
         this.frames = null;
         this.frameIndex = 0;
         this.framesLength = 0;
+        this.frameDifferences = Array(16).fill(null);
+        this.oldV1s = Array(16).fill(null);
+        this.countdown = 16;
     }
 }
 

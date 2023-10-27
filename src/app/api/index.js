@@ -864,10 +864,10 @@ log.printLog = (msg, file, lineNumber, level) => new Promise((resolve, reject) =
 //
 const metrics = {};
 
-metrics.sendData = (options) => new Promise((resolve, reject) => {
+metrics.sendData = (machineProfile) => new Promise((resolve, reject) => {
     authrequest
         .post('/api/metrics/sendData')
-        .send(options)
+        .send(machineProfile)
         .end((err, res) => {
             if (err) {
                 reject(res);

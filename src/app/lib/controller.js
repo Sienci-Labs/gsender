@@ -88,6 +88,7 @@ class Controller {
         'controller:settings': [],
         'controller:state': [],
         'settings:description': [],
+        'settings:alarm': [],
         'message': [],
         'toolchange:start': [],
         'hPong': [],
@@ -108,6 +109,7 @@ class Controller {
         'virtual_stop_toggle': [],
         'filetype': [],
         'toolchange:preHookComplete': [],
+        'networkScan:status': [],
 
         //A-Axis A.K.A Rotary-Axis events
         'rotaryAxis:updateState': [],
@@ -339,6 +341,10 @@ class Controller {
     // @param {function} [callback] Called once completed.
     listAllIps(callback = null) {
         this.socket && this.socket.emit('listAllIps', callback);
+    }
+
+    networkScan(port, target) {
+        this.socket && this.socket.emit('networkScan', port, target);
     }
 
     // Executes a command on the server.

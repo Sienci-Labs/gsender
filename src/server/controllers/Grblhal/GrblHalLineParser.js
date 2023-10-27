@@ -34,16 +34,22 @@ import GrblHalLineParserResultEcho from './GrblHalLineParserResultEcho';
 import GrblHalLineParserResultFeedback from './GrblHalLineParserResultFeedback';
 import GrblHalLineParserResultSettings from './GrblHalLineParserResultSettings';
 import GrblHalLineParserResultStartup from './GrblHalLineParserResultStartup';
-import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
+//import GrblHalLineParserResultCode from './GrblHalLineParserResultCode';
 import GrblHalLineParserResultInfo from './GrblHalLineParserResultInfo';
 import GrblHalLineParserResultSettingDescription from './GrblHalLineParserResultSettingDescription';
 import GrblHalLineParserResultSettingDetails from 'server/controllers/Grblhal/GrblHalLineParserResultSettingDetails';
+import GrblHalLineParserResultCompleteStatus from 'server/controllers/Grblhal/GrblHalLineParserResultCompleteStatus';
+import GrblHalLineParserResultAXS from './GrblHalLineParserResultAXS';
+import GrblHalLineParserResultGroupDetail from './GrblHalLineParserResultGroupDetail';
+import GrblHalLineParserResultAlarmDetails from './GrblHalLineParserResultAlarmDetails';
 
 class GrblHalLineParser {
     parse(line) {
         const parsers = [
+            // <Alarm:11|MPos:0.000,0.000,0.000|Bf:128,1024|FS:0,0|Pn:PXYZHS|WCO:10.000,0.000,0.000|WCS:G54|A:|Sc:|MPG:0|H:0|T:0|TLR:0|FW:grblHAL>
+            GrblHalLineParserResultCompleteStatus,
             // <Alarm:#|[...]>
-            GrblHalLineParserResultCode,
+            //GrblHalLineParserResultCode,
 
             // <>
             GrblHalLineParserResultStatus,
@@ -80,11 +86,20 @@ class GrblHalLineParser {
             // [VER:] (v1.1)
             GrblHalLineParserResultVersion,
 
+            // [AXS:]
+            GrblHalLineParserResultAXS,
+
             // [SETTING:1|27|Step idle delay|milliseconds|5|####0||65535|0|0]
             GrblHalLineParserResultSettingDescription,
 
             // "120","X-axis acceleration","mm/sec^2","Acceleration. Used for motion planning to not exceed motor torque and lose steps.",
             GrblHalLineParserResultSettingDetails,
+
+            //[SETTINGGROUP:5|0|Coolant]
+            GrblHalLineParserResultGroupDetail,
+
+            //[ALARMCODE:16||Power on selftest (POS) failed.]
+            GrblHalLineParserResultAlarmDetails,
 
             // [XXXX:] (v1.1)
             GrblHalLineParserResultInfo,

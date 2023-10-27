@@ -1,3 +1,4 @@
+/* eslint-disable no-unreachable */
 /* eslint-disable no-restricted-globals */
 /*
  * Copyright (C) 2021 Sienci Labs Inc.
@@ -22,15 +23,14 @@
  *
  */
 
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import cx from 'classnames';
 import ensureArray from 'ensure-array';
-import get from 'lodash/get';
-import map from 'lodash/map';
-import mapValues from 'lodash/mapValues';
-import includes from 'lodash/includes';
-import { throttle, inRange } from 'lodash';
-import PropTypes from 'prop-types';
-import React, { PureComponent } from 'react';
+import { throttle, includes, mapValues, map, get, inRange } from 'lodash';
+import pubsub from 'pubsub-js';
+import { connect } from 'react-redux';
+
 import Widget from 'app/components/Widget';
 import combokeys from 'app/lib/combokeys';
 import controller from 'app/lib/controller';
@@ -38,11 +38,10 @@ import { preventDefault } from 'app/lib/dom-events';
 import i18n from 'app/lib/i18n';
 import { in2mm, mm2in, mapPositionToUnits } from 'app/lib/units';
 import { limit } from 'app/lib/normalize-range';
-import gamepad, { runAction } from 'app/lib/gamepad';
+import gamepad, { runAction, checkButtonHold } from 'app/lib/gamepad';
 import WidgetConfig from 'app/widgets/WidgetConfig';
-import pubsub from 'pubsub-js';
-import { Toaster, TOASTER_SUCCESS } from 'app/lib/toaster/ToasterLib';
-import { connect } from 'react-redux';
+import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
+
 import store from '../../store';
 import Axes from './Axes';
 import ShuttleControl from './ShuttleControl';
@@ -79,6 +78,8 @@ import {
 } from './constants';
 import styles from './index.styl';
 import useKeybinding from '../../lib/useKeybinding';
+import { JoystickLoop } from './JoystickLoop';
+import { MPGHelper } from './MPGHelper';
 
 class AxesWidget extends PureComponent {
     static propTypes = {
@@ -94,6 +95,10 @@ class AxesWidget extends PureComponent {
     axisDebounce = null;
 
     axisThrottle = null;
+
+    joystickLoop = null
+
+    mpgHelper = null;
 
     subscribe() {
         const tokens = [
@@ -504,12 +509,18 @@ class AxesWidget extends PureComponent {
             const workspaceModesList = Object.values(WORKSPACE_MODE);
             const currentWorkspaceModeIndex = workspaceModesList.findIndex(mode => mode === currentWorkspaceMode);
             const nextWorkspaceMode = workspaceModesList[currentWorkspaceModeIndex + 1] ?? workspaceModesList[0];
+            const rotaryTabEnabled = store.get('widgets.rotary.tab.show');
+
+            if (!rotaryTabEnabled) {
+                return;
+            }
 
             store.replace('workspace.mode', nextWorkspaceMode);
 
-            const msg = `Workspace Mode set to ${nextWorkspaceMode.charAt(0).toUpperCase() + nextWorkspaceMode.slice(1).toLowerCase()}`;
-            Toaster.clear();
-            Toaster.pop({ type: TOASTER_SUCCESS, msg });
+            Toaster.pop({
+                type: TOASTER_INFO,
+                msg: `Workspace Mode set to ${nextWorkspaceMode.charAt(0).toUpperCase() + nextWorkspaceMode.slice(1).toLowerCase()}`
+            });
         },
         SET_JOG_PRESET: (event, { key }) => {
             if (!key) {
@@ -882,6 +893,10 @@ class AxesWidget extends PureComponent {
         }
     };
 
+    handleJoystickJog = (params) => {
+        this.actions.jog(params);
+    };
+
     handleShortcutJog = ({ axis }) => {
         const { isContinuousJogging } = this.state;
         const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
@@ -950,16 +965,17 @@ class AxesWidget extends PureComponent {
 
         const axisObj = {};
 
-        // eslint-disable-next-line guard-for-in
         for (const axis in axisList) {
-            const givenAxis = axis.toUpperCase();
-            const axisValue = {
-                X: xyStep,
-                Y: xyStep,
-                Z: zStep
-            }[givenAxis] * axisList[axis];
+            if (axis) {
+                const givenAxis = axis.toUpperCase();
+                const axisValue = {
+                    X: xyStep,
+                    Y: xyStep,
+                    Z: zStep
+                }[givenAxis] * axisList[axis];
 
-            axisObj[givenAxis] = axisValue;
+                axisObj[givenAxis] = axisValue;
+            }
         }
 
         if (this.joggingHelper) {
@@ -997,196 +1013,148 @@ class AxesWidget extends PureComponent {
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
-            const { degrees } = detail;
-            const { prevJog, prevDirection } = this.state;
-            const value = detail.value;
-            const stick = detail.stick;
+            const { degrees, axis } = detail;
 
             const gamepadProfiles = store.get('workspace.gamepad.profiles', []);
 
-            const hasProfile = gamepadProfiles.find(profile => profile.id.includes(detail.gamepad.id));
+            const currentProfile = gamepadProfiles.find(profile => profile.id.includes(detail.gamepad.id));
 
-            if (!hasProfile) {
+            if (!currentProfile) {
                 return;
             }
 
-            // const [leftStickX, leftStickY, rightStickX, rightStickY] = gamepad.axes;
-
+            const { joystickOptions } = currentProfile;
             const { leftStick, rightStick } = degrees;
 
+            const activeAxis = [leftStick, leftStick, rightStick, rightStick][axis];
+            const activeStick = ['stick1', 'stick1', 'stick2', 'stick2'][axis];
 
-            // Y Positive Move
-            // AXIS X(0) ________ -0.25 to 0.25
-            // AXIS Y(1) ________ -1 to 0
+            const isHoldingModifierButton = checkButtonHold('modifier', currentProfile);
 
+            const actionType = !isHoldingModifierButton ? 'primaryAction' : 'secondaryAction';
 
-            // Y Negative Move
-            // AXIS X(0) ________ -0.25 to 0.25
-            // AXIS Y(1) ________ 0 to 1
+            const isUsingMPGMode = !!joystickOptions[activeStick].mpgMode[actionType];
 
-
-            // X Positive Move
-            // AXIS X(0) ________ 0 to 1
-            // AXIS Y(1) ________ -0.25 to 0.25
-
-
-            // X Negative Move
-            // AXIS X(0) ________ -1 to 0
-            // AXIS Y(1) ________ -0.25 to 0.25
-
-
-            // Top Left Move
-            // AXIS X(0) ________ -0.75 to -0.25
-            // AXIS Y(1) ________ -0.75 to -0.25
-
-
-            // Top Right Move
-            // AXIS X(0) ________ 0.75 to 0.25
-            // AXIS Y(1) ________ -0.75 to -0.25
-
-
-            // Bottom Right Move
-            // AXIS X(0) ________ 0.75 to 0.25
-            // AXIS Y(1) ________ 0.75 to 0.25
-
-
-            // Bottom Left Move
-            // AXIS X(0) ________ -0.75 to -0.25
-            // AXIS Y(1) ________ 0.75 to 0.25
-
-            const [
-                APositive,
-                ANegative,
-                YPositive,
-                YNegative,
-                XPositive,
-                XNegative,
-                TopLeft,
-                TopRight,
-                BottomLeft,
-                BottomRight,
-                UNKNOWN_MOVE
-            ] = [
-                'APositive',
-                'ANegative',
-                'YPositive',
-                'YNegative',
-                'XPositive',
-                'XNegative',
-                'TopLeft',
-                'TopRight',
-                'BottomLeft',
-                'BottomRight',
-                ''
-            ];
-
-            const computeDirection = (degrees) => {
-                if (inRange(degrees, 0, 30) || inRange(degrees, 330, 360)) {
-                    return XPositive;
-                }
-
-                if (inRange(degrees, 31, 59)) {
-                    return TopRight;
-                }
-
-                if (inRange(degrees, 60, 120)) {
-                    return YPositive;
-                }
-
-                if (inRange(degrees, 121, 149)) {
-                    return TopLeft;
-                }
-
-                if (inRange(degrees, 150, 210)) {
-                    return XNegative;
-                }
-
-                if (inRange(degrees, 211, 239)) {
-                    return BottomLeft;
-                }
-
-                if (inRange(degrees, 240, 300)) {
-                    return YNegative;
-                }
-
-                if (inRange(degrees, 301, 329)) {
-                    return BottomRight;
-                }
-
-                return UNKNOWN_MOVE;
-            };
-
-            const direction = computeDirection(stick === 0 ? leftStick : rightStick);
-
-            if (!value) {
-                this.handleShortcutStop();
+            if (!isUsingMPGMode) {
                 return;
             }
 
-            if (prevJog || prevDirection !== direction) {
-                this.handleShortcutStop();
+            if (!this.mpgHelper) {
+                this.mpgHelper = new MPGHelper(activeAxis, 10);
+
+                this.mpgHelper.addListener('full:rotation', ({ fullRotationCount }) => {
+                    console.log('FULL ROTATION', fullRotationCount);
+                });
+
+                this.mpgHelper.addListener('movement:clockwise', () => {
+                    this.handleJoystickJog({ x: 1, F: 3000 });
+                });
+
+                this.mpgHelper.addListener('movement:clockwise', () => {
+                    this.handleJoystickJog({ x: -1, F: 3000 });
+                });
+
+                return;
             }
 
-            switch (direction) {
-            case APositive: {
-                this.handleShortcutJog({ axis: { a: 1 } });
-                break;
+            this.mpgHelper.updateValue(activeAxis);
+        }, 50, { leading: false, trailing: true }));
+
+        gamepad.on('gamepad:axis', throttle(({ detail }) => {
+            const { degrees, value, axis } = detail;
+
+            // detail.axis
+            // 0 - left stick x-axis
+            // 1 - left stick y-axis
+            // 2 - right stick x-axis
+            // 3 - right stick y-axis
+
+            const gamepadProfiles = store.get('workspace.gamepad.profiles', []);
+
+            const currentProfile = gamepadProfiles.find(profile => profile.id.includes(detail.gamepad.id));
+
+            if (!currentProfile) {
+                return;
             }
 
-            case ANegative: {
-                this.handleShortcutJog({ axis: { a: -1 } });
-                break;
+            const { joystickOptions } = currentProfile;
+            const { leftStick, rightStick } = degrees;
+
+            const activeAxis = [leftStick, leftStick, rightStick, rightStick][axis];
+            const activeStick = ['stick1', 'stick1', 'stick2', 'stick2'][axis];
+
+            const isHoldingModifierButton = checkButtonHold('modifier', currentProfile);
+
+            const actionType = !isHoldingModifierButton ? 'primaryAction' : 'secondaryAction';
+
+            const isUsingMPGMode = !!joystickOptions[activeStick].mpgMode[actionType];
+
+            if (isUsingMPGMode) {
+                return;
             }
 
-            case YPositive: {
-                this.handleShortcutJog({ axis: { y: 1 } });
-                break;
+            const computeAxesAndDirection = (degrees) => {
+                const { horizontal, vertical } = joystickOptions[activeStick];
+
+                const factor = (isReversed) => (!isReversed ? 1 : -1);
+
+                const MOVEMENT_DISTANCE = 1;
+
+                // X-axis Positive (default behaviour)
+                if (inRange(degrees, 0, 30) || inRange(degrees, 330, 360)) {
+                    return {
+                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed)
+                    };
+                }
+
+                // Y-axis Positive (default behaviour)
+                if (inRange(degrees, 60, 120)) {
+                    return {
+                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(vertical.isReversed)
+                    };
+                }
+
+                // X-axis Negative (default behaviour)
+                if (inRange(degrees, 150, 210)) {
+                    return {
+                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed)
+                    };
+                }
+
+                // Y-axis Negative (default behaviour)
+                if (inRange(degrees, 240, 300)) {
+                    return {
+                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(!vertical.isReversed)
+                    };
+                }
+
+                // if (inRange(degrees, 301, 329)) {
+                //     // return BottomRight;
+                // }
+
+                return null;
+            };
+
+            const data = computeAxesAndDirection(activeAxis);
+
+            if (!this.joystickLoop) {
+                this.joystickLoop = new JoystickLoop({
+                    gamepadProfile: currentProfile,
+                    jog: this.handleJoystickJog,
+                    axis,
+                    feedrate: this.actions.getFeedrate()
+                });
             }
 
-            case YNegative: {
-                this.handleShortcutJog({ axis: { y: -1 } });
-                break;
+            if (value === 0) {
+                this.joystickLoop.stop();
+                this.actions.cancelJog();
+                return;
             }
 
-            case XPositive: {
-                this.handleShortcutJog({ axis: { x: 1 } });
-                break;
-            }
-
-            case XNegative: {
-                this.handleShortcutJog({ axis: { x: -1 } });
-                break;
-            }
-
-            case TopLeft: {
-                this.handleShortcutJog({ axis: { x: -1, y: 1 } });
-                break;
-            }
-
-            case TopRight: {
-                this.handleShortcutJog({ axis: { x: 1, y: 1 } });
-                break;
-            }
-
-            case BottomLeft: {
-                this.handleShortcutJog({ axis: { x: -1, y: -1 } });
-                break;
-            }
-
-            case BottomRight: {
-                this.handleShortcutJog({ axis: { x: 1, y: -1 } });
-                break;
-            }
-
-            case UNKNOWN_MOVE: {
-                break;
-            }
-
-            default: {
-                break;
-            }
-            }
-        }, 150));
+            this.joystickLoop.update({ gamepadProfile: currentProfile, feedrate: this.actions.getFeedrate() });
+            this.joystickLoop.start({ axes: data }, axis);
+        }, 50, { leading: false, trailing: true }));
     }
 
     componentWillUnmount() {

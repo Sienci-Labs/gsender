@@ -8,6 +8,14 @@ class ShuttleEvents extends React.PureComponent {
             this.allShuttleControlEvents[eventName] = shuttleControlEvents[eventName];
         });
     }
+
+    getEvent(key) {
+        if (key === undefined) {
+            throw new Error('Key not provided');
+        }
+
+        return this.allShuttleControlEvents[key];
+    }
 }
 
 const shuttleEvents = new ShuttleEvents();

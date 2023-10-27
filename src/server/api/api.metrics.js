@@ -68,7 +68,7 @@ export const getCollectDataStatus = (_, res) => {
     res.json({ collectUserDataStatus });
 };
 
-export const sendData = async (_, res) => {
+export const sendData = async (req, res) => {
     const payload = {
         userID: getUniqueID(),
         gSenderVersion: pkg.version,
@@ -76,6 +76,7 @@ export const sendData = async (_, res) => {
         osVersion: os.version(),
         release: os.release(),
         arch: os.arch(),
+        machineProfile: JSON.stringify(req.body),
     };
 
     const ENDPOINT = global.METRICS_ENDPOINT;

@@ -210,6 +210,7 @@ class GrblController {
         }
         this.engine = engine;
 
+
         const { port, baudrate, rtscts } = { ...options };
         this.options = {
             ...this.options,

@@ -21,7 +21,7 @@
  *
  */
 import { createReducer } from 'redux-action';
-import { UNLOAD_FILE_INFO, UPDATE_FILE_INFO, UPDATE_FILE_CONTENT, UPDATE_FILE_PROCESSING, UPDATE_FILE_RENDER_STATE } from 'app/actions/fileInfoActions';
+import { UNLOAD_FILE_INFO, UPDATE_FILE_INFO, UPDATE_FILE_CONTENT, UPDATE_FILE_PROCESSING, UPDATE_FILE_RENDER_STATE, UPDATE_FILE_PARSED_DATA } from 'app/actions/fileInfoActions';
 import { METRIC_UNITS, RENDER_NO_FILE } from 'app/constants';
 
 const initialState = {
@@ -45,6 +45,7 @@ const initialState = {
     },
     content: '',
     fileType: null,
+    parsedData: {},
 };
 
 const normalizeBBox = (bbox) => {
@@ -89,6 +90,11 @@ const reducer = createReducer(initialState, {
     [UPDATE_FILE_RENDER_STATE]: ({ state }, reducerState) => {
         return {
             renderState: state
+        };
+    },
+    [UPDATE_FILE_PARSED_DATA]: ({ value }, reducerState) => {
+        return {
+            parsedData: value
         };
     },
 });

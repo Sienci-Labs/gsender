@@ -1,31 +1,50 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 import { Confirm } from 'app/components/ConfirmationDialog/ConfirmationDialogLib';
+import { Toaster, TOASTER_SUCCESS, TOASTER_SHORT } from 'app/lib/toaster/ToasterLib';
 
 import styles from '../index.styl';
+import { GamepadContext } from './utils/context';
+import { removeGamepadProfileFromList, setCurrentGamepadProfile } from './utils/actions';
 
-const ProfileItem = ({ title, icon, id, onClick, onDelete }) => {
+const ProfileItem = ({ title, icon, id }) => {
+    const { dispatch } = useContext(GamepadContext);
+
+    const deleteProfile = (profileID) => {
+        dispatch(removeGamepadProfileFromList(profileID));
+        Toaster.pop({
+            msg: 'Removed Gamepad Profile',
+            type: TOASTER_SUCCESS,
+            duration: TOASTER_SHORT
+        });
+    };
+
     const handleDelete = (e, ommitId) => {
         e.stopPropagation(); //Prevents bubbling that will fire the parent div's onclick first
 
         Confirm({
             content: 'Are you sure you want to delete this gamepad profile?',
             title: 'Delete Gamepad Profile',
-            onConfirm: () => onDelete(ommitId)
+            onConfirm: () => deleteProfile(ommitId)
         });
+    };
+
+    const setCurrentProfile = (profileID) => {
+        dispatch(setCurrentGamepadProfile(profileID));
     };
 
     return (
         <div
             tabIndex={-1}
             role="button"
-            onClick={() => onClick(id)}
+            onClick={() => setCurrentProfile(id)}
             onKeyDown={null}
             className={styles.profileItem}
         >
             <i className={classnames(icon, styles.profileItemIcon)} />
+
             <div className={styles.profileItemTitle}>{title}</div>
 
             <i
@@ -42,8 +61,6 @@ ProfileItem.propTypes = {
     title: PropTypes.string,
     icon: PropTypes.string,
     id: PropTypes.array,
-    onClick: PropTypes.func,
-    onDelete: PropTypes.func,
 };
 
 export default ProfileItem;

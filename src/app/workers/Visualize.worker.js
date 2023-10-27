@@ -22,12 +22,12 @@
  */
 
 import { ArcCurve } from 'three';
-
+import { isEmpty } from 'lodash';
 import GCodeVirtualizer, { rotateAxis } from 'app/lib/GCodeVirtualizer';
 
 
 onmessage = function({ data }) {
-    const { content, visualizer, isLaser = false, shouldIncludeSVG = false, needsVisualization = true } = data;
+    const { content, visualizer, isLaser = false, shouldIncludeSVG = false, needsVisualization = true, parsedData = {}, isNewFile = false } = data;
 
     // Common state variables
     let vertices = [];
@@ -89,6 +89,18 @@ onmessage = function({ data }) {
                 SVGVertices = [];
                 currentMotion = motion;
             }
+        }
+    };
+
+    const onData = () => {
+        const vertexIndex = vertices.length / 3;
+        frames.push(vertexIndex);
+
+        currentLines++;
+        const newProgress = Math.floor(currentLines / totalLines * 100);
+        if (newProgress !== progress) {
+            progress = newProgress;
+            postMessage(progress);
         }
     };
 
@@ -357,45 +369,108 @@ onmessage = function({ data }) {
     }
 
     const { addLine, addArcCurve, addCurve } = handlers[handlerKey];
-
+    let fileInfo = null;
+    let parsedDataToSend = null;
     const vm = new GCodeVirtualizer({ addLine, addArcCurve, addCurve, collate: true });
 
-    vm.on('data', (data) => {
-        const vertexIndex = vertices.length / 3;
-        frames.push(vertexIndex);
+    if (!isEmpty(parsedData) && !isNewFile) {
+        const { data, info, modalChanges } = parsedData;
+        fileInfo = info;
+        let modalIndex = 0; // track changes
+        let iterationsNeeded = modalChanges[modalIndex].count; // initialize
+        let modal = vm.getCurrentModal(); // get the default modal
+        let modalCounter = 0; // tracking how long until the modal change comes
 
-        let spindleValues = {};
-        if (isLaser && needsVisualization) {
-            updateSpindleStateFromLine(data);
-            spindleValues = {
-                spindleOn,
-                spindleSpeed
-            };
+        for (let i = 0; i < data.length; i++) {
+            // update modal
+            if (modalCounter === iterationsNeeded) {
+                modalIndex++;
+                modal = vm.setModal(modalChanges[modalIndex].change); // change the modal
+                iterationsNeeded = modalChanges[modalIndex].count; // update the new count
+                modalCounter = 0; // reset counter
+            }
 
-            spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
+            const entry = data[i];
+            if (entry.lineData) {
+                const { v2, v0, shouldUseAddCurve } = entry.lineData;
+                // use previous v2 as v1 unless there is no previous entry
+                let v1 = entry.lineData.v1;
+                if (!v1) {
+                    // sometimes the last line doesn't have movements, so we must search for the last line with a movement
+                    for (let x = i - 1; x >= 0; x--) {
+                        if (data[x].lineData && data[x].lineData.v2) {
+                            v1 = data[x].lineData.v2;
+                            break;
+                        }
+                    }
+                }
+                if (modal.motion === 'G1' || modal.motion === 'G0') {
+                    if (shouldUseAddCurve) {
+                        addCurve(modal, v1, v2);
+                    } else {
+                        addLine(modal, v1, v2);
+                    }
+                } else {
+                    addArcCurve(modal, v1, v2, v0);
+                }
+            }
+
+            let spindleValues = {};
+            if (isLaser && needsVisualization) {
+                if (entry.Scode) {
+                    const spindleValue = entry.Scode;
+                    spindleSpeeds.add(spindleValue);
+                    spindleSpeed = spindleValue;
+                    spindleOn = spindleValue > 0;
+                }
+                spindleValues = {
+                    spindleOn,
+                    spindleSpeed
+                };
+
+                spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
+            }
+
+            onData(entry.parsedLine);
+
+            modalCounter++;
+        }
+    } else {
+        vm.on('data', (data) => {
+            let spindleValues = {};
+            if (isLaser && needsVisualization) {
+                updateSpindleStateFromLine(data);
+                spindleValues = {
+                    spindleOn,
+                    spindleSpeed
+                };
+
+                spindleChanges.push(spindleValues); //TODO:  Make this work for laser mode
+            }
+            onData(data);
+        });
+
+        const lines = content
+            .split(/\r?\n/)
+            .reverse();
+
+        while (lines.length) {
+            let line = lines.pop();
+            vm.virtualize(line);
         }
 
-        currentLines++;
-        const newProgress = Math.floor(currentLines / totalLines * 100);
-        if (newProgress !== progress) {
-            progress = newProgress;
-            postMessage(progress);
-        }
-    });
-
-    const lines = content
-        .split(/\r?\n/)
-        .reverse();
-
-    while (lines.length) {
-        let line = lines.pop();
-        vm.virtualize(line);
+        const data = vm.getData();
+        const modalChanges = vm.getModalChanges();
+        fileInfo = vm.generateFileStats();
+        parsedDataToSend = {
+            data,
+            info: fileInfo,
+            modalChanges
+        };
     }
 
     let tFrames = new Uint32Array(frames);
     let tVertices = new Float32Array(vertices);
-
-    const info = vm.generateFileStats();
 
     // create path for the last motion
     if (shouldIncludeSVG) {
@@ -409,8 +484,9 @@ onmessage = function({ data }) {
         colors,
         frames: tFrames,
         visualizer,
-        info,
-        needsVisualization
+        info: fileInfo,
+        needsVisualization,
+        parsedData: parsedDataToSend,
     };
 
     if (isLaser) {

@@ -99,6 +99,7 @@ class RunProbe extends PureComponent {
         const { actions } = this.props;
 
         const probeCommands = actions.generateProbeCommands();
+        //console.log(probeCommands);
 
         actions.runProbeCommands(probeCommands);
         this.resetProbeState();
@@ -165,8 +166,8 @@ class RunProbe extends PureComponent {
         const { actions, state, show } = this.props;
         const { canClick, touchplate, connectionMade } = state;
         const { touchplateType } = touchplate;
-        // const probeCommands = actions.generateProbeCommands();
-        // console.log(probeCommands.join('\n'));
+        //const probeCommands = actions.generateProbeCommands();
+        //console.log(probeCommands.join('\n'));
         const probeCommand = state.availableProbeCommands[state.selectedProbeCommand];
 
         const probeActive = actions.returnProbeConnectivity();

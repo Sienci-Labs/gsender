@@ -300,6 +300,7 @@ const defaultState = {
             },
             touchPlateHeight: 10,
             probeType: 'Auto',
+            direction: 0
         },
         rotary: {
             stockTurning: {

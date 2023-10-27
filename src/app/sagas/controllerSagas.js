@@ -57,11 +57,12 @@ import {
     ALARM,
     ERROR,
     JOB_TYPES,
-    JOB_STATUS
+    JOB_STATUS,
 } from 'app/constants';
 import { connectToLastDevice } from 'app/containers/Firmware/utils/index';
 import { updateWorkspaceMode } from 'app/lib/rotary';
 import api from 'app/api';
+import { getParsedData } from '../lib/indexedDB';
 
 export function* initialize() {
     let visualizeWorker = null;
@@ -133,6 +134,16 @@ export function* initialize() {
     const parseGCode = (content, size, name, visualizer) => {
         const isLaser = isLaserMode();
         const shouldIncludeSVG = shouldVisualizeSVG();
+        // const parsedData = _get(reduxStore.getState(), 'file.parsedData'); // data from GCodeVirtualizer
+
+        // compare previous file data to see if it's a new file and we need to reparse
+        let isNewFile = true;
+        const fileData = _get(reduxStore.getState(), 'file');
+        const { content: prevContent, size: prevSize, name: prevName } = fileData;
+        if (content === prevContent && size === prevSize && name === prevName) {
+            isNewFile = false;
+        }
+
         if (visualizer === VISUALIZER_SECONDARY) {
             reduxStore.dispatch({
                 type: fileActions.UPDATE_FILE_RENDER_STATE,
@@ -157,9 +168,14 @@ export function* initialize() {
             if (needsVisualization) {
                 visualizeWorker = new VisualizeWorker();
                 visualizeWorker.onmessage = visualizeResponse;
-                visualizeWorker.postMessage({
-                    content,
-                    visualizer,
+                getParsedData().then((value) => {
+                    const parsedData = value;
+                    visualizeWorker.postMessage({
+                        content,
+                        visualizer,
+                        parsedData,
+                        isNewFile
+                    });
                 });
             } else {
                 reduxStore.dispatch({
@@ -214,12 +230,17 @@ export function* initialize() {
 
         visualizeWorker = new VisualizeWorker();
         visualizeWorker.onmessage = visualizeResponse;
-        visualizeWorker.postMessage({
-            content,
-            visualizer,
-            isLaser,
-            shouldIncludeSVG,
-            needsVisualization
+        getParsedData().then((value) => {
+            const parsedData = value;
+            visualizeWorker.postMessage({
+                content,
+                visualizer,
+                isLaser,
+                shouldIncludeSVG,
+                needsVisualization,
+                parsedData,
+                isNewFile
+            });
         });
     };
 
@@ -384,10 +405,10 @@ export function* initialize() {
         }
     });
 
-    controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts) => {
+    controller.addListener('serialport:list', (recognizedPorts, unrecognizedPorts, networkPorts) => {
         reduxStore.dispatch({
             type: connectionActions.LIST_PORTS,
-            payload: { recognizedPorts, unrecognizedPorts }
+            payload: { recognizedPorts, unrecognizedPorts, networkPorts }
         });
     });
 
@@ -620,6 +641,27 @@ export function* initialize() {
                 descriptions: data
             }
         });
+    });
+
+    controller.addListener('settings:alarm', (data) => {
+        reduxStore.dispatch({
+            type: controllerActions.UPDATE_ALARM_DESCRIPTIONS,
+            payload: {
+                alarms: data
+            }
+        });
+    });
+
+    controller.addListener('networkScan:status', (isScanning) => {
+        reduxStore.dispatch({
+            type: connectionActions.SCAN_NETWORK,
+            payload: {
+                isScanning: isScanning
+            }
+        });
+        if (!isScanning) {
+            pubsub.publish('networkScan:finished');
+        }
     });
 
     yield null;

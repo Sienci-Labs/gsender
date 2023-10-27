@@ -1,13 +1,11 @@
 import { GamepadListener } from 'gamepad.js';
-import throttle from 'lodash/throttle';
+
 import store from 'app/store';
 import { Toaster, TOASTER_INFO } from 'app/lib/toaster/ToasterLib';
 
-const STOP_JOG_CMD = 'STOP_JOG';
-
 class Gamepad extends GamepadListener {
     constructor() {
-        super({ deadZone: 0.5, precision: 2, analog: false });
+        super({ precision: 2 });
         this.shouldHold = false;
         this.start();
     }
@@ -30,8 +28,23 @@ class Gamepad extends GamepadListener {
         this.shouldHold = false;
     }
 
-    onAxis = (event) => {
-        const [leftStickX, leftStickY, rightStickX, rightStickY] = event.detail.gamepad.axes;
+    onAxis = ({ detail }) => {
+        if (this.shouldHold) {
+            return;
+        }
+
+        const profiles = store.get('workspace.gamepad.profiles', []);
+        const currentProfile = profiles.find(profile => profile.id.includes(detail.gamepad.id));
+
+        const lockoutButton = detail.gamepad.buttons[currentProfile.lockout?.button];
+
+        if (lockoutButton && !lockoutButton?.pressed) {
+            return;
+        }
+
+        const deadZone = currentProfile?.joystickOptions?.zeroThreshold;
+
+        const [leftStickX, leftStickY, rightStickX, rightStickY] = detail.gamepad.axes;
 
         const cartesian2Polar = (x, y) => {
             const radians = Math.atan2(y, x);
@@ -43,7 +56,7 @@ class Gamepad extends GamepadListener {
         const rightStick = cartesian2Polar(rightStickX, rightStickY);
 
         const dataOutput = {
-            ...event.detail,
+            ...detail,
             degrees: {
                 leftStick,
                 rightStick,
@@ -51,6 +64,19 @@ class Gamepad extends GamepadListener {
         };
 
         const { index } = dataOutput;
+
+        if (deadZone && detail.value < deadZone && detail.value > -deadZone) {
+            const payload = {
+                ...dataOutput,
+                value: 0
+            };
+
+            this.emit('gamepad:axis', payload);
+            this.emit(`gamepad:${index}:axis`, payload);
+            this.emit(`gamepad:${index}:axis:${dataOutput.axis}`, payload.detail);
+
+            return;
+        }
 
         this.emit('gamepad:axis', dataOutput);
         this.emit(`gamepad:${index}:axis`, dataOutput);
@@ -81,13 +107,22 @@ export const shortcutComboBuilder = (list = []) => {
     return list.join(JOIN_KEY);
 };
 
-export const onGamepadButtonClick = ({ detail }) => {
+export const checkButtonHold = (buttonType, currentProfile) => {
+    const gamepads = navigator.getGamepads();
+
+    const currentGamepad = gamepads.find(gamepad => currentProfile.id.includes(gamepad?.id));
+
+    const isHoldingButton = currentGamepad.buttons[currentProfile[buttonType]?.button]?.pressed;
+
+    return isHoldingButton;
+};
+
+export const onGamepadButtonPress = ({ detail }) => {
     if (gamepadInstance.shouldHold) {
         return null;
     }
 
-    const { gamepad, pressed } = detail;
-    const buttons = gamepad.buttons;
+    const { gamepad, button } = detail;
     const gamepadID = gamepad.id;
 
     const profiles = store.get('workspace.gamepad.profiles', []);
@@ -97,45 +132,37 @@ export const onGamepadButtonClick = ({ detail }) => {
         return null;
     }
 
-    const buttonCombo = shortcutComboBuilder(
-        buttons
-            .map((button, i) => ({ pressed: button.pressed, touched: button.touched, buttonIndex: i }))
-            .filter(button => button.pressed || button.touched)
-            .map(button => button.buttonIndex)
-    );
+    const foundAction = currentProfile.buttons.find(({ value }) => value === button);
 
-    // the result is an array, [0] = key and [1] = shortcuts
-    const foundAction = Object.entries(currentProfile.shortcuts).find(([key, shortcut]) => shortcut.keys === buttonCombo);
+    const modifierButton = gamepad.buttons[currentProfile.modifier?.button];
+    const lockoutButton = gamepad.buttons[currentProfile.lockout?.button];
 
-    if (!pressed) {
-        const foundStopCommand = currentProfile.shortcuts[STOP_JOG_CMD];
-        delete foundStopCommand?.payload; //We don't need to send a payload
-        return foundStopCommand;
-    }
-
-    if (!buttonCombo || (foundAction && !foundAction[1].isActive)) {
+    if (lockoutButton && !lockoutButton?.pressed) {
         return null;
     }
 
-    // null check
-    return foundAction ? foundAction[1] : foundAction;
+    if (modifierButton?.pressed) {
+        return foundAction?.secondaryAction;
+    }
+
+    return foundAction?.primaryAction;
 };
 
 export const runAction = ({ event, shuttleControlEvents }) => {
-    const action = onGamepadButtonClick(event);
+    const action = onGamepadButtonPress(event);
 
     if (!action) {
         return;
     }
 
-    const shuttleEvent = shuttleControlEvents[action.cmd];
+    const shuttleEvent = shuttleControlEvents[action];
 
     if (shuttleEvent?.callback) {
         shuttleEvent.callback(null, shuttleEvent.payload);
     }
 };
 
-gamepadInstance.on('gamepad:connected', throttle(({ detail }) => {
+gamepadInstance.on('gamepad:connected', ({ detail }) => {
     const { gamepad } = detail;
 
     const profiles = store.get('workspace.gamepad.profiles');
@@ -143,10 +170,10 @@ gamepadInstance.on('gamepad:connected', throttle(({ detail }) => {
     const foundGamepad = profiles.find(profile => profile.id.includes(gamepad.id));
 
     Toaster.pop({
-        msg: foundGamepad ? `${foundGamepad.profileName} Connected` : 'New gamepad connected, add it as a profile in your preferences',
+        msg: foundGamepad ? `${foundGamepad.name} Connected` : 'New gamepad connected, add it as a profile in your preferences',
         type: TOASTER_INFO,
     });
-}, 250, { leading: true, trailing: false }));
+});
 
 gamepadInstance.on('gamepad:disconnected', () => {
     Toaster.pop({

@@ -37,7 +37,6 @@ class GrblHalLineParserResultStatus {
         if (!r) {
             return null;
         }
-
         const payload = {};
         //const pattern = /[a-zA-Z]+(:[0-9\.\-]+(,[0-9\.\-]+){0,5})?/g;
         const pattern = /[a-zA-Z]+(:[a-zA-Z0-9\.\-]+(,[0-9\.\-[a]+){0,5})?/g;
@@ -160,6 +159,7 @@ class GrblHalLineParserResultStatus {
         //   - D H R S the door, hold, soft-reset, and cycle-start pins, respectively.
         //   - Example: Pn:PZ indicates the probe and z-limit pins are 'triggered'.
         //   - Note: A may be added in later versions for an A-axis limit pin.
+        payload.pinState = {};
         if (_.has(result, 'Pn')) {
             const pins = _.get(result, 'Pn[0]', '');
             payload.pinState = {};

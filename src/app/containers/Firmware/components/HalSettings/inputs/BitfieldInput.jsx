@@ -37,10 +37,11 @@ const BitfieldInput = ({ info, setting, onChange, externalFormat = null, isExclu
             {
                 format.map((opt, index) => {
                     let key = `${setting.setting}-${index}-key`;
+                    const notNA = opt !== 'N/A';
                     let checked = bitMap[index] === 1;
                     let disabled = (index > 0) && isExclusive && bitMap[0] !== 1;
                     const id = `${setting.setting}-${index}-key`;
-                    return (
+                    return notNA && (
                         <div className={styles.row} key={key}>
                             <div>{opt}: </div>
                             <div>

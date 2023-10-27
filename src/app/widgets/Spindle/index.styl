@@ -122,7 +122,6 @@
     display: flex;
     align-items: center;
     small {
-        margin-right: 1rem;
         font-size: 0.9rem !important;
         color: #9CA3AF
     }
@@ -133,7 +132,7 @@
     height: 2rem;
     border-radius: 9999px;
     background: #9CA3AF;
-    margin-right: 2rem;
+    margin-left: 1rem;
     border: solid 1px #6B7280;
     display: flex;
     align-items: center;
@@ -181,3 +180,12 @@
         animationTimingFunction: cubic-bezier(0, 0, 0.2, 1);
     }
    }
+
+.modal-wrapper {
+    position: absolute;
+    display: grid;
+    grid-template-rows: 1fr 4fr;
+    width: 100%;
+    left: 0;
+    padding: 0 1rem 0 1rem;
+}

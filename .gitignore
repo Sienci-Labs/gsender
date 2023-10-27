@@ -14,3 +14,6 @@ electron-builder.yml
 yarn.lock
 yarn-error.log
 gsender_server_log.txt
+
+# Sentry Auth Token
+.env.sentry-build-plugin
