@@ -50,8 +50,11 @@ const JoystickOptions = () => {
 
     const { joystickOptions: { stick1, stick2, zeroThreshold = {} } } = profile;
 
-    const stick1IsUsingMPG = stick1.mpgMode.primaryAction !== null || stick1.mpgMode.secondaryAction !== null;
-    const stick2IsUsingMPG = stick2.mpgMode.primaryAction !== null || stick2.mpgMode.secondaryAction !== null;
+    const stick1PrimaryActionIsUsingMPG = stick1.mpgMode.primaryAction !== null;
+    const stick1SecondaryActionIsUsingMPG = stick1.mpgMode.secondaryAction !== null;
+
+    const stick2PrimaryActionIsUsingMPG = stick2.mpgMode.primaryAction !== null;
+    const stick2SecondaryActionIsUsingMPG = stick2.mpgMode.secondaryAction !== null;
 
     const selectOverrideStyle = {
         valueContainer: provided => ({ ...provided, padding: 2, justifyContent: 'center' }),
@@ -79,7 +82,7 @@ const JoystickOptions = () => {
                         value: stick1.horizontal.primaryAction
                     }}
                     onChange={({ value }) => handleChange('stick1.horizontal.primaryAction', value)}
-                    isDisabled={stick1IsUsingMPG}
+                    isDisabled={stick1PrimaryActionIsUsingMPG}
                 />
                 <Select
                     styles={selectOverrideStyle}
@@ -90,13 +93,13 @@ const JoystickOptions = () => {
                         value: stick1.horizontal.secondaryAction
                     }}
                     onChange={({ value }) => handleChange('stick1.horizontal.secondaryAction', value)}
-                    isDisabled={stick1IsUsingMPG}
+                    isDisabled={stick1SecondaryActionIsUsingMPG}
                 />
                 <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
                     <Checkbox
                         checked={stick1.horizontal.isReversed}
                         onChange={(e) => handleChange('stick1.horizontal.isReversed', e.target.checked)}
-                        disabled={stick1IsUsingMPG}
+                        disabled={stick1PrimaryActionIsUsingMPG && stick1SecondaryActionIsUsingMPG}
                     />
                 </Tooltip>
             </div>
@@ -112,7 +115,7 @@ const JoystickOptions = () => {
                         value: stick1.vertical.primaryAction
                     }}
                     onChange={({ value }) => handleChange('stick1.vertical.primaryAction', value)}
-                    isDisabled={stick1IsUsingMPG}
+                    isDisabled={stick1PrimaryActionIsUsingMPG}
                 />
                 <Select
                     styles={selectOverrideStyle}
@@ -123,10 +126,14 @@ const JoystickOptions = () => {
                         value: stick1.vertical.secondaryAction
                     }}
                     onChange={({ value }) => handleChange('stick1.vertical.secondaryAction', value)}
-                    isDisabled={stick1IsUsingMPG}
+                    isDisabled={stick1SecondaryActionIsUsingMPG}
                 />
                 <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
-                    <Checkbox checked={stick1.vertical.isReversed} onChange={(e) => handleChange('stick1.vertical.isReversed', e.target.checked)} disabled={stick1IsUsingMPG} />
+                    <Checkbox
+                        checked={stick1.vertical.isReversed}
+                        onChange={(e) => handleChange('stick1.vertical.isReversed', e.target.checked)}
+                        disabled={stick1PrimaryActionIsUsingMPG && stick1SecondaryActionIsUsingMPG}
+                    />
                 </Tooltip>
             </div>
 
@@ -153,7 +160,10 @@ const JoystickOptions = () => {
                     onChange={({ value }) => handleChange('stick1.mpgMode.secondaryAction', value)}
                 />
                 <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
-                    <Checkbox checked={stick1.mpgMode.isReversed} onChange={(e) => handleChange('stick1.mpgMode.isReversed', e.target.checked)} />
+                    <Checkbox
+                        checked={stick1.mpgMode.isReversed}
+                        onChange={(e) => handleChange('stick1.mpgMode.isReversed', e.target.checked)}
+                    />
                 </Tooltip>
             </div>
 
@@ -168,7 +178,7 @@ const JoystickOptions = () => {
                         value: stick2.horizontal.primaryAction
                     }}
                     onChange={({ value }) => handleChange('stick2.horizontal.primaryAction', value)}
-                    isDisabled={stick2IsUsingMPG}
+                    isDisabled={stick2PrimaryActionIsUsingMPG}
                 />
                 <Select
                     styles={selectOverrideStyle}
@@ -179,10 +189,14 @@ const JoystickOptions = () => {
                         value: stick2.horizontal.secondaryAction
                     }}
                     onChange={({ value }) => handleChange('stick2.horizontal.secondaryAction', value)}
-                    isDisabled={stick2IsUsingMPG}
+                    isDisabled={stick2SecondaryActionIsUsingMPG}
                 />
                 <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
-                    <Checkbox checked={stick2.horizontal.isReversed} onChange={(e) => handleChange('stick2.horizontal.isReversed', e.target.checked)} disabled={stick2IsUsingMPG} />
+                    <Checkbox
+                        checked={stick2.horizontal.isReversed}
+                        onChange={(e) => handleChange('stick2.horizontal.isReversed', e.target.checked)}
+                        disabled={stick2PrimaryActionIsUsingMPG && stick2SecondaryActionIsUsingMPG}
+                    />
                 </Tooltip>
             </div>
 
@@ -197,7 +211,7 @@ const JoystickOptions = () => {
                         value: stick2.vertical.primaryAction
                     }}
                     onChange={({ value }) => handleChange('stick2.vertical.primaryAction', value)}
-                    isDisabled={stick2IsUsingMPG}
+                    isDisabled={stick2PrimaryActionIsUsingMPG}
                 />
                 <Select
                     styles={selectOverrideStyle}
@@ -208,10 +222,14 @@ const JoystickOptions = () => {
                         value: stick2.vertical.secondaryAction
                     }}
                     onChange={({ value }) => handleChange('stick2.vertical.secondaryAction', value)}
-                    isDisabled={stick2IsUsingMPG}
+                    isDisabled={stick2SecondaryActionIsUsingMPG}
                 />
                 <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
-                    <Checkbox checked={stick2.vertical.isReversed} onChange={(e) => handleChange('stick2.vertical.isReversed', e.target.checked)} disabled={stick2IsUsingMPG} />
+                    <Checkbox
+                        checked={stick2.vertical.isReversed}
+                        onChange={(e) => handleChange('stick2.vertical.isReversed', e.target.checked)}
+                        disabled={stick2PrimaryActionIsUsingMPG && stick2SecondaryActionIsUsingMPG}
+                    />
                 </Tooltip>
             </div>
 
@@ -240,7 +258,10 @@ const JoystickOptions = () => {
                     onChange={({ value }) => handleChange('stick2.mpgMode.secondaryAction', value)}
                 />
                 <Tooltip content="Reverse Axis Direction" location="default" wrapperStyle={{ display: 'inherit', justifySelf: 'center' }}>
-                    <Checkbox checked={stick2.mpgMode.isReversed} onChange={(e) => handleChange('stick2.mpgMode.isReversed', e.target.checked)} />
+                    <Checkbox
+                        checked={stick2.mpgMode.isReversed}
+                        onChange={(e) => handleChange('stick2.mpgMode.isReversed', e.target.checked)}
+                    />
                 </Tooltip>
             </div>
 

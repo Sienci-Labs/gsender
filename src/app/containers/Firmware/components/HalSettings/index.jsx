@@ -37,9 +37,9 @@ const HalSettings = ({ descriptions, groups }) => {
                     const { message, description, dataType, ...info } = descriptionLookup(settingKey, descriptions);
                     const InputElement = getDatatypeInput(dataType);
 
-                    const categoryClass = (Number(descriptions[settingKey].group) % 9) + 1;
+                    const categoryClass = (Number(descriptions[settingKey] ? descriptions[settingKey].group : 0) % 9) + 1;
 
-                    const groupLabel = groups[descriptions[settingKey].group].label;
+                    const groupLabel = descriptions[settingKey] ? groups[descriptions[settingKey].group].label : 'null';
 
                     //const highlighted = false; // TODO: Logic for hal defaults
                     return (
