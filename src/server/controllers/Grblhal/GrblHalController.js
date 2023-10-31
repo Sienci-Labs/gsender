@@ -1804,10 +1804,10 @@ class GrblHalController {
                 let [axes, feedrate = 1000, units = METRIC_UNITS] = args;
                 //const JOG_COMMAND_INTERVAL = 80;
                 let unitModal = (units === METRIC_UNITS) ? 'G21' : 'G20';
-                let { $20, $130, $131, $132, $23, $13 } = this.settings.settings;
+                let { $20, $130, $131, $132, $23, $13, $40 } = this.settings.settings;
 
                 let jogFeedrate;
-                if ($20 === '1') {
+                if ($20 === '1' && $40 === '0') { // if 40 enabled, can just use non-soft limit logic
                     $130 = Number($130);
                     $131 = Number($131);
                     $132 = Number($132);

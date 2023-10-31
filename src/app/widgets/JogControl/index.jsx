@@ -1012,8 +1012,8 @@ class AxesWidget extends PureComponent {
 
         gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
 
-        gamepad.on('gamepad:axis', throttle(({ detail }) => {
-            const { degrees, axis } = detail;
+        gamepad.on('gamepad:axis', ({ detail }) => {
+            const { degrees, axis, value } = detail;
 
             const gamepadProfiles = store.get('workspace.gamepad.profiles', []);
 
@@ -1026,39 +1026,51 @@ class AxesWidget extends PureComponent {
             const { joystickOptions } = currentProfile;
             const { leftStick, rightStick } = degrees;
 
-            const activeAxis = [leftStick, leftStick, rightStick, rightStick][axis];
+            const activeAxisAngle = [leftStick, leftStick, rightStick, rightStick][axis];
             const activeStick = ['stick1', 'stick1', 'stick2', 'stick2'][axis];
 
             const isHoldingModifierButton = checkButtonHold('modifier', currentProfile);
 
             const actionType = !isHoldingModifierButton ? 'primaryAction' : 'secondaryAction';
 
-            const isUsingMPGMode = !!joystickOptions[activeStick].mpgMode[actionType];
+            const activeAxis = joystickOptions[activeStick].mpgMode[actionType];
+
+            const isReversed = joystickOptions[activeStick].mpgMode.isReversed;
+
+            const isUsingMPGMode = !!activeAxis;
 
             if (!isUsingMPGMode) {
                 return;
             }
 
+            const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
+
+            const xyStep = getXYJogDistance();
+            const zStep = getZJogDistance();
+            const aStep = getAJogDistance();
+
+            const feedrate = Number(this.actions.getFeedrate());
+
+            const axisStep = {
+                x: xyStep,
+                y: xyStep,
+                z: zStep,
+                a: aStep
+            }[activeAxis];
+
             if (!this.mpgHelper) {
-                this.mpgHelper = new MPGHelper(activeAxis, 10);
-
-                this.mpgHelper.addListener('full:rotation', ({ fullRotationCount }) => {
-                    console.log('FULL ROTATION', fullRotationCount);
-                });
-
-                this.mpgHelper.addListener('movement:clockwise', () => {
-                    this.handleJoystickJog({ x: 1, F: 3000 });
-                });
-
-                this.mpgHelper.addListener('movement:clockwise', () => {
-                    this.handleJoystickJog({ x: -1, F: 3000 });
-                });
+                this.mpgHelper = new MPGHelper(this.handleJoystickJog);
 
                 return;
             }
 
-            this.mpgHelper.updateValue(activeAxis);
-        }, 50, { leading: false, trailing: true }));
+            if (value === 0) {
+                this.mpgHelper.clearValue();
+                return;
+            }
+
+            this.mpgHelper.update(activeAxisAngle, activeAxis, axisStep, feedrate, isReversed ? -1 : 1);
+        });
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
             const { degrees, value, axis } = detail;
@@ -1127,10 +1139,6 @@ class AxesWidget extends PureComponent {
                         [vertical[actionType]]: MOVEMENT_DISTANCE * factor(!vertical.isReversed)
                     };
                 }
-
-                // if (inRange(degrees, 301, 329)) {
-                //     // return BottomRight;
-                // }
 
                 return null;
             };
