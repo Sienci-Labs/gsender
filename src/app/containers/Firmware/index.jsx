@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import Modal from 'app/components/Modal';
@@ -17,20 +17,26 @@ import ActionArea from './components/Actions';
 import { addControllerEvents, controllerSettingsLoaded, FirmwareContext, removeControllerEvents } from './utils';
 import styles from './index.styl';
 
-const getFilteredEEPROM = (settings, eeprom = {}) => {
+const getFilteredEEPROM = (settings, eeprom = {}, halDescriptions = {}, halGroups = {}) => {
     return Object.keys(eeprom).map((setting) => {
         const properties = settings.find(obj => {
             return obj.setting === setting;
         });
+        const key = setting.replace('$', '');
+        const halData = get(halDescriptions, `${key}`, { group: -1 });
+        const halGroup = get(halGroups, `${halData.group}.label`, '');
+
         return {
             ...properties || {},
             setting: setting,
-            value: eeprom[setting]
+            value: eeprom[setting],
+            ...halData,
+            group: halGroup
         };
     });
 };
 
-const Firmware = ({ modalClose }) => {
+const Firmware = ({ modalClose, halDescriptions, halGroups }) => {
     const isConnected = useSelector(store => get(store, 'connection.isConnected'));
     const eeprom = useSelector(store => get(store, 'controller.settings.settings'));
     const activeState = useSelector(store => get(store, 'controller.state.status.activeState'));
@@ -38,7 +44,7 @@ const Firmware = ({ modalClose }) => {
     const SETTINGS = controllerType === GRBLHAL ? GRBL_HAL_SETTINGS : GRBL_SETTINGS;
     const [initiateFlashing, setInitiateFlashing] = useState(false);
     const [shouldRestoreDefault, setShouldRestoreDefault] = useState(false);
-    const [settings, setSettings] = useState(getFilteredEEPROM(SETTINGS, eeprom));
+    const [settings, setSettings] = useState(getFilteredEEPROM(SETTINGS, eeprom, halDescriptions, halGroups));
     const [filterText, setFilterText] = useState('');
     const [isFlashing, setIsFlashing] = useState(false);
     const [controller, setController] = useState(libController);
@@ -59,8 +65,8 @@ const Firmware = ({ modalClose }) => {
     }, [libController]);
 
     useEffect(() => {
-        setSettings(getFilteredEEPROM(SETTINGS, eeprom));
-    }, [eeprom]);
+        setSettings(getFilteredEEPROM(SETTINGS, eeprom, halDescriptions, halGroups));
+    }, [eeprom, halDescriptions, halGroups]);
 
     const controllerEvents = {
         'message': (message) => {
@@ -142,4 +148,13 @@ const Firmware = ({ modalClose }) => {
     );
 }; Firmware.propTypes = { modalClose: PropTypes.func };
 
-export default Firmware;
+
+export default connect((store) => {
+    const halDescriptions = get(store, 'controller.settings.descriptions', {});
+    const halGroups = get(store, 'controller.settings.groups', {});
+
+    return {
+        halDescriptions,
+        halGroups
+    };
+})(Firmware);

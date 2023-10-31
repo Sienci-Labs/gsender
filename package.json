@@ -79,7 +79,7 @@
   },
   "build": {
     "appId": "org.sienci.gsender-edge",
-    "artifactName": "${name}-${version}-${arch}.${ext}",
+    "artifactName": "${name}-${version}.${ext}",
     "asar": false,
     "asarUnpack": [],
     "productName": "gSender Edge",
