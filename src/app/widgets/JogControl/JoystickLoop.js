@@ -32,7 +32,7 @@ export class JoystickLoop {
         return +((feedrateInMMPerSec * executionTimeOfSingleCommand).toFixed(2));
     };
 
-    update = ({ gamepadProfile, feedrate }) => {
+    setOptions = ({ gamepadProfile, feedrate }) => {
         this.gamepadProfile = gamepadProfile;
         this.feedrate = feedrate;
     }
