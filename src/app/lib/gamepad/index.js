@@ -149,6 +149,10 @@ export const onGamepadButtonPress = ({ detail }) => {
 };
 
 export const runAction = ({ event, shuttleControlEvents }) => {
+    if (!event.detail.pressed) {
+        return;
+    }
+
     const action = onGamepadButtonPress(event);
 
     if (!action) {
