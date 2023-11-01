@@ -1010,7 +1010,7 @@ class AxesWidget extends PureComponent {
         useKeybinding(this.shuttleControlEvents);
         this.subscribe();
 
-        gamepad.on('gamepad:button', (event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents }));
+        gamepad.on('gamepad:button', throttle((event) => runAction({ event, shuttleControlEvents: this.shuttleControlEvents })), 50, { leading: false, trailing: true });
 
         gamepad.on('gamepad:axis', ({ detail }) => {
             const { degrees, axis, value } = detail;
@@ -1073,7 +1073,7 @@ class AxesWidget extends PureComponent {
         });
 
         gamepad.on('gamepad:axis', throttle(({ detail }) => {
-            const { degrees, value, axis } = detail;
+            const { degrees, value, axis, gamepad } = detail;
 
             // detail.axis
             // 0 - left stick x-axis
@@ -1154,13 +1154,18 @@ class AxesWidget extends PureComponent {
                 });
             }
 
-            if (value === 0) {
+            const thumbsticksAreIdle = gamepad.axes?.every(axis => axis === 0);
+
+            if (value === 0 || thumbsticksAreIdle) {
                 this.joystickLoop.stop();
                 this.actions.cancelJog();
                 return;
             }
 
-            this.joystickLoop.update({ gamepadProfile: currentProfile, feedrate: this.actions.getFeedrate() });
+            this.joystickLoop.setOptions({
+                gamepadProfile: currentProfile,
+                feedrate: this.actions.getFeedrate()
+            });
             this.joystickLoop.start({ axes: data }, axis);
         }, 50, { leading: false, trailing: true }));
     }
