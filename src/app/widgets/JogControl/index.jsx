@@ -893,7 +893,44 @@ class AxesWidget extends PureComponent {
         }
     };
 
-    handleJoystickJog = (params) => {
+    handleJoystickJog = (params, { doRegularJog } = {}) => {
+        const { getXYJogDistance, getZJogDistance, getAJogDistance } = this.actions;
+
+        const xyStep = getXYJogDistance();
+        const zStep = getZJogDistance();
+        const aStep = getAJogDistance();
+
+        const feedrate = Number(this.actions.getFeedrate());
+
+        const axisValue = {
+            x: xyStep,
+            y: xyStep,
+            z: zStep,
+            a: aStep
+
+        };
+
+        if (doRegularJog) {
+            const axisList = {};
+
+            if (params.x) {
+                axisList.x = axisValue.x * params.x;
+            }
+            if (params.y) {
+                axisList.y = axisValue.y * params.y;
+            }
+            if (params.z) {
+                axisList.z = axisValue.z * params.z;
+            }
+            if (params.a) {
+                axisList.A = axisValue.a * params.a;
+            }
+
+            this.actions.jog({ ...axisList, F: feedrate });
+
+            return;
+        }
+
         this.actions.jog(params);
     };
 
@@ -1119,10 +1156,26 @@ class AxesWidget extends PureComponent {
                     };
                 }
 
+                // Top Right (X-axis Positive, Y-axis Positive - default behaviour)
+                if (inRange(degrees, 31, 59)) {
+                    return {
+                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed),
+                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed)
+                    };
+                }
+
                 // Y-axis Positive (default behaviour)
                 if (inRange(degrees, 60, 120)) {
                     return {
                         [vertical[actionType]]: MOVEMENT_DISTANCE * factor(vertical.isReversed)
+                    };
+                }
+
+                // Top Left (X-axis Negative, Y-axis Positive - default behaviour)
+                if (inRange(degrees, 121, 149)) {
+                    return {
+                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed),
+                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed)
                     };
                 }
 
@@ -1133,10 +1186,26 @@ class AxesWidget extends PureComponent {
                     };
                 }
 
+                // Top Left (X-axis Negative, Y-axis Negative - default behaviour)
+                if (inRange(degrees, 211, 239)) {
+                    return {
+                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed),
+                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed)
+                    };
+                }
+
                 // Y-axis Negative (default behaviour)
                 if (inRange(degrees, 240, 300)) {
                     return {
                         [vertical[actionType]]: MOVEMENT_DISTANCE * factor(!vertical.isReversed)
+                    };
+                }
+
+                // Top Left (X-axis Positive, Y-axis Negative - default behaviour)
+                if (inRange(degrees, 301, 329)) {
+                    return {
+                        [horizontal[actionType]]: MOVEMENT_DISTANCE * factor(horizontal.isReversed),
+                        [vertical[actionType]]: MOVEMENT_DISTANCE * factor(!horizontal.isReversed)
                     };
                 }
 
@@ -1148,9 +1217,9 @@ class AxesWidget extends PureComponent {
             if (!this.joystickLoop) {
                 this.joystickLoop = new JoystickLoop({
                     gamepadProfile: currentProfile,
-                    jog: this.handleJoystickJog,
-                    axis,
-                    feedrate: this.actions.getFeedrate()
+                    jog: (params, doRegularJog) => this.handleJoystickJog(params, { doRegularJog }),
+                    feedrate: this.actions.getFeedrate(),
+                    cancelJog: this.actions.cancelJog
                 });
             }
 
@@ -1158,15 +1227,15 @@ class AxesWidget extends PureComponent {
 
             if (value === 0 || thumbsticksAreIdle) {
                 this.joystickLoop.stop();
-                this.actions.cancelJog();
                 return;
             }
 
             this.joystickLoop.setOptions({
                 gamepadProfile: currentProfile,
-                feedrate: this.actions.getFeedrate()
+                feedrate: this.actions.getFeedrate(),
+                axes: data,
             });
-            this.joystickLoop.start({ axes: data }, axis);
+            this.joystickLoop.start(axis);
         }, 50, { leading: false, trailing: true }));
     }
 
