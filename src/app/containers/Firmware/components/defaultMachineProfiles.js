@@ -600,4 +600,28 @@ export default [
         'laser': false,
         'laserOnOutline': false,
     },
+    {
+        'id': 53,
+        'company': 'Sienci Labs',
+        'name': 'SLB Orange',
+        'type': '30x30',
+        'version': 'MK2',
+        'mm': {
+            'width': 792,
+            'depth': 845,
+            'height': 114.3
+        },
+        'in': {
+            'width': 31.18,
+            'depth': 33.27,
+            'height': 4.5
+        },
+        'endstops': false,
+        'spindle': false,
+        'coolant': false,
+        'laser': false,
+        'laserOnOutline': false,
+        'eepromSettings': DefaultGrblHalSettings,
+        isHAL: true
+    },
 ];

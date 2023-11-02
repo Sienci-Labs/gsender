@@ -87,7 +87,7 @@ export const startFlash = (port, profile) => {
         duration: 10000
     });
     const imageType = getMachineProfileVersion(profile);
-    controller.flashFirmware(port, imageType);
+    controller.flashFirmware(port, imageType, profile.isHAL);
 };
 
 export const restoreDefaultSettings = (machineProfile) => {

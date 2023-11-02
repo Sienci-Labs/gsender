@@ -48,6 +48,7 @@ import {
     authorizeIPAddress,
     //validateUser
 } from '../../access-control';
+import DFUFlasher from '../../lib/Firmware/Flashing/DFUFlasher';
 
 const log = logger('service:cncengine');
 
@@ -449,12 +450,24 @@ class CNCEngine {
                 controller.command.apply(controller, [cmd].concat(args));
             });
 
-            socket.on('flash:start', (flashPort, imageType) => {
+            socket.on('flash:start', (flashPort, imageType, isHal = false) => {
                 log.debug('flash-start called');
                 if (!flashPort) {
                     log.error('task:error', 'No port specified - make sure you connect to you device at least once before attempting flashing');
                     return;
                 }
+
+                if (isHal) {
+                    // Do hal flash
+                    const halFlasher = new DFUFlasher({
+                        port: flashPort,
+                        image: imageType,
+                        isHal
+                    });
+                    halFlasher.flash();
+                    return;
+                }
+
                 //Close the controller for AvrgirlArduino to take over the port
                 const controller = store.get('controllers["' + flashPort + '"]');
                 if (controller) {
