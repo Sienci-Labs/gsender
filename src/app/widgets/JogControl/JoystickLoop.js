@@ -1,10 +1,19 @@
+import { throttle } from 'lodash';
+
 import gamepad from 'app/lib/gamepad';
+// import controller from 'app/lib/controller';
 
 export class JoystickLoop {
-    constructor({ gamepadProfile, jog, feedrate }) {
+    timeoutAmount = 600; // 600 ms to be consistent with jog controls
+
+    startTime = 0;
+
+    constructor({ gamepadProfile, jog, standardJog, cancelJog, feedrate }) {
         this.isRunning = false;
         this.gamepadProfile = gamepadProfile;
         this.jog = jog;
+        this.standardJog = standardJog;
+        this.cancelJog = throttle(cancelJog, 50, { leading: false, trailing: true });
         this.feedrate = feedrate;
     }
 
@@ -32,35 +41,21 @@ export class JoystickLoop {
         return +((feedrateInMMPerSec * executionTimeOfSingleCommand).toFixed(2));
     };
 
-    setOptions = ({ gamepadProfile, feedrate }) => {
-        this.gamepadProfile = gamepadProfile;
-        this.feedrate = feedrate;
-    }
-
-    start = ({ axes }, activeAxis) => {
-        if (this.isRunning) {
-            return;
-        }
-
-        this.isRunning = true;
-
-        const INTERVAL_IN_MS = 200;
-
-        this._runJog({ axes, activeAxis });
-
-        this.runLoop = setInterval(() => this._runJog({ axes, activeAxis }), INTERVAL_IN_MS);
-    }
-
     _runJog = ({ axes, activeAxis }) => {
         if (!axes) {
             return;
         }
 
-        const axesValues = this._getCurrentGamepad()?.axes;
+        const currentGamepad = this._getCurrentGamepad();
+
+        const axesValues = currentGamepad?.axes;
+
+        const lockoutButton = this.gamepadProfile.lockout.button;
+        const isHoldingLockoutButton = currentGamepad.buttons?.[lockoutButton]?.pressed;
 
         const thumbsticksAreIdle = axesValues?.every(axis => axis === 0);
 
-        if (thumbsticksAreIdle) {
+        if (thumbsticksAreIdle || lockoutButton && !isHoldingLockoutButton) {
             this.stop();
             return;
         }
@@ -76,12 +71,57 @@ export class JoystickLoop {
         this.jog({ ...updatedAxis, F: this._computeFeedrate(axesValues[activeAxis]) });
     }
 
+    setOptions = ({ gamepadProfile, feedrate, axes }) => {
+        this.gamepadProfile = gamepadProfile;
+        this.feedrate = feedrate;
+        this.axes = axes;
+    }
+
+    start = (activeAxis) => {
+        if (this.isRunning) {
+            return;
+        }
+
+        this.isRunning = true;
+        this.startTime = new Date();
+
+        const INTERVAL_IN_MS = 210;
+
+        this.timeout = setTimeout(() => {
+            this._runJog({ axes: this.axes, activeAxis });
+
+            // controller.addListener('serialport:read', (data) => {
+            //     if (data === 'ok') {
+            //         this._runJog({ axes: this.axes, activeAxis });
+            //     }
+            // });
+
+            this.runLoop = setInterval(() => {
+                this._runJog({ axes: this.axes, activeAxis });
+            }, INTERVAL_IN_MS);
+        }, this.timeoutAmount);
+    }
+
     stop = () => {
         if (!this.isRunning) {
             return;
         }
 
         clearInterval(this.runLoop);
+        clearTimeout(this.timeout);
+
+        // controller.removeListener('serialport:read');
+
+        const timer = new Date() - this.startTime;
+
+        if (timer < this.timeoutAmount) {
+            this.jog(this.axes, true);
+            this.isRunning = false;
+            return;
+        }
+
+        this.cancelJog();
+
         this.isRunning = false;
     }
 }
