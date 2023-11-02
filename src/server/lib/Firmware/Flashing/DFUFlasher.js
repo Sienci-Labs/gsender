@@ -1,5 +1,6 @@
 import fs from 'fs';
 import intelhex from 'intel-hex';
+import slb_hex from '!file-loader!./slb_orange.hex';
 
 const VALID_VENDOR_IDS = [0x0483];
 const VALID_DEVICE_ID = [0x441];
@@ -29,8 +30,8 @@ class DFUFlasher {
         this.options = options;
     }
 
-    flash(file) {
-        const data = this.parseHex(file);
+    flash() {
+        const data = this.parseHex(slb_hex);
         console.log(data);
     }
 
